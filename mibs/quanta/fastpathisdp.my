@@ -1,0 +1,549 @@
+NETGEAR-ISDP-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Switching MIB
+-- Copyright Netgear Inc (2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property. Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32,Counter32       FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TimeStamp                                       FROM SNMPv2-TC
+    lb6m                                                            FROM QUANTA-LB6M-REF-MIB   
+    DisplayString                                                       FROM RFC1213-MIB;
+
+    fastPathIsdp MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 January 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The Netgear Private MIB for FastPath ISDP"
+
+        -- Revision history.
+        REVISION
+          "201101260000Z" -- 26 January 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "201001110000Z" -- 11 January 2010 12:00:00 GMT
+        DESCRIPTION
+          "Device ID can be system's host name too."
+        REVISION
+          "200712030000Z" -- 03 December 2007 12:00:00 GMT
+        DESCRIPTION
+          "Initial version."
+
+    ::= { lb6m 39 }
+
+
+agentIsdpMIBObjects  OBJECT IDENTIFIER ::= { fastPathIsdp 1 }
+agentIsdpCache       OBJECT IDENTIFIER ::= { agentIsdpMIBObjects 2 }
+agentIsdpInterface   OBJECT IDENTIFIER ::= { agentIsdpMIBObjects 3 }
+
+-- ****************************************************************************
+--
+-- The ISDP Interface Group
+-- Manage ISDP on interface.
+--
+-- ****************************************************************************
+
+agentIsdpInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AgentIsdpInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table containing the status of ISDP on
+            the device's interfaces."
+    ::= { agentIsdpInterface 1 }
+
+agentIsdpInterfaceEntry OBJECT-TYPE
+    SYNTAX     AgentIsdpInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the agentIsdpInterfaceTable,
+            containing the status of ISDP on an interface."
+    INDEX      { agentIsdpInterfaceIfIndex }
+    ::= { agentIsdpInterfaceTable 1 }
+
+AgentIsdpInterfaceEntry ::= SEQUENCE {
+    agentIsdpInterfaceIfIndex           Integer32,
+    agentIsdpInterfaceEnable            INTEGER
+    }
+
+agentIsdpInterfaceIfIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the local interface.
+
+            For 802.3 Repeaters on which the repeater ports do not
+            have ifIndex values assigned, this value is a unique
+            value for the port, and greater than any ifIndex value
+            supported by the repeater; in this case, the specific
+            port is indicated by corresponding values of
+            agentIsdpInterfaceGroup and agentIsdpInterfacePort, where these
+            values correspond to the group number and port number
+            values of RFC 1516."
+    ::= { agentIsdpInterfaceEntry 1 }
+
+agentIsdpInterfaceEnable OBJECT-TYPE
+    SYNTAX     INTEGER {
+                enable(1),
+                disable(0)
+                }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "An indication of whether the Industry Standard Discovery Protocol
+            is currently running on this interface.  This variable
+            has no effect when ISDP is disabled (agentIsdpGlobalRun = FALSE)."
+    ::= { agentIsdpInterfaceEntry 2 }
+
+-- ****************************************************************************
+--
+-- The ISDP Cache Group
+-- Display Cache ISDP settings.
+--
+-- ****************************************************************************
+
+agentIsdpCacheTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AgentIsdpCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table containing the cached
+            information obtained via receiving ISDP messages."
+    ::= { agentIsdpCache 1 }
+
+agentIsdpCacheEntry OBJECT-TYPE
+    SYNTAX     AgentIsdpCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the agentIsdpCacheTable,
+            containing the information received via ISDP on one
+            interface from one device.  Entries appear when
+            a ISDP advertisement is received from a neighbor
+            device.  Entries disappear when ISDP is disabled
+            on the interface, or globally."
+    INDEX      { agentIsdpCacheIfIndex, agentIsdpCacheIndex }
+    ::= { agentIsdpCacheTable 1 }
+
+AgentIsdpCacheEntry ::= SEQUENCE {
+    agentIsdpCacheIfIndex              Integer32,
+    agentIsdpCacheIndex                   Integer32,
+    agentIsdpCacheLocalIntf               DisplayString,
+    agentIsdpCacheAddress                 DisplayString,
+    agentIsdpCacheVersion                 DisplayString,
+    agentIsdpCacheDeviceId                DisplayString,
+    agentIsdpCacheDevicePort              DisplayString,
+    agentIsdpCachePlatform                DisplayString,
+    agentIsdpCacheCapabilities            DisplayString,
+    agentIsdpCacheLastChange              TimeStamp,
+    agentIsdpCacheProtocolVersion         DisplayString,
+    agentIsdpCacheHoldtime                INTEGER
+}
+
+agentIsdpCacheIfIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Normally, the ifIndex value of the local interface."
+    ::= { agentIsdpCacheEntry 1 }
+
+agentIsdpCacheIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Index value is unique integer id of each neighbor entry."
+    ::= { agentIsdpCacheEntry 2 }
+
+agentIsdpCacheAddress OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The (first) network-layer address of the device's
+        SNMP-agent as reported in the Address TLV of the most recently
+        received ISDP message.  For example, if the corresponding
+        instance of cacheAddressType had the value 'ip(1)', then
+        this object would be an IP-address."
+    ::= { agentIsdpCacheEntry 3 }
+
+agentIsdpCacheLocalIntf OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The device Interface which had this neighbor."
+    ::= { agentIsdpCacheEntry 4 }
+
+agentIsdpCacheVersion OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Version string as reported in the most recent ISDP
+            message.  The zero-length string indicates that no Version
+            field (TLV) was reported in the most recent ISDP
+            message."
+    ::= { agentIsdpCacheEntry 5 }
+
+agentIsdpCacheDeviceId OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Device-ID string as reported in the most recent ISDP
+            message.  The zero-length string indicates that no Device-ID
+            field (TLV) was reported in the most recent ISDP
+            message."
+    ::= { agentIsdpCacheEntry 6 }
+
+agentIsdpCacheDevicePort OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Port-ID string as reported in the most recent ISDP
+            message.  This will typically be the value of the ifName
+            object (e.g., 'Ethernet0').  The zero-length string
+            indicates that no Port-ID field (TLV) was reported in the
+            most recent ISDP message."
+    ::= { agentIsdpCacheEntry 7 }
+
+agentIsdpCachePlatform OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Device's Hardware Platform as reported in the most
+            recent ISDP message.  The zero-length string indicates
+            that no Platform field (TLV) was reported in the most
+            recent ISDP message."
+    ::= { agentIsdpCacheEntry 8 }
+
+agentIsdpCacheCapabilities OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Device's Functional Capabilities as reported in the
+            most recent ISDP message.  For latest set of specific
+            values, see the latest version of the ISDP specification.
+            The zero-length string indicates that no Capabilities field
+            (TLV) was reported in the most recent ISDP message."
+
+    ::= { agentIsdpCacheEntry 9 }
+
+agentIsdpCacheLastChange OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the time when this cache entry was last changed.
+        This object is initialised to the current time when the entry
+        gets created and updated to the current time whenever the value
+        of any (other) object instance in the corresponding row is
+        modified."
+    ::= { agentIsdpCacheEntry 10 }
+
+agentIsdpCacheProtocolVersion OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The Device's version of ISDP protcol as reported in the
+            most recent ISDP message."
+
+    ::= { agentIsdpCacheEntry 11 }
+
+agentIsdpCacheHoldtime OBJECT-TYPE
+  SYNTAX     INTEGER (10..255)
+  UNITS      "seconds"
+  MAX-ACCESS read-only
+  STATUS     current
+  DESCRIPTION
+       "The Device's ISDP Holdtime as reported in the most
+        recent ISDP message."
+  ::= { agentIsdpCacheEntry 12 }
+
+-- ***************************************************************************
+--
+-- The ISDP Global Group
+-- Manage Global ISDP settings.
+--
+-- ***************************************************************************
+agentIsdpGlobal      OBJECT IDENTIFIER ::= { agentIsdpMIBObjects 1 }
+
+-- ****************************************************************************
+--
+-- The ISDP Clear Group
+--
+-- ****************************************************************************
+agentIsdpClear      OBJECT IDENTIFIER ::= { agentIsdpGlobal 1 }
+
+  agentIsdpClearStats OBJECT-TYPE
+    SYNTAX      INTEGER {
+                normalOperation(0),
+                clear(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Clear ISDP stats. Will always return 0 when read."
+    ::= { agentIsdpClear 1 }
+
+  agentIsdpClearEntries OBJECT-TYPE
+    SYNTAX      INTEGER {
+                normalOperation(0),
+                clear(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Clear ISDP entries table. Will always return 0 when read."
+    ::= { agentIsdpClear 2 }
+
+-- ****************************************************************************
+--
+-- The ISDP Statistics Group
+--
+-- ****************************************************************************
+agentIsdpStatistics      OBJECT IDENTIFIER ::= { agentIsdpGlobal 2 }
+
+  agentIsdpStatisticsPduReceived OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Display the number of all ISDP pdu received."
+    ::= { agentIsdpStatistics 1 }
+
+  agentIsdpStatisticsPduTransmit OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Display the number of all ISDP pdu transmitted."
+    ::= { agentIsdpStatistics 2 }
+
+  agentIsdpStatisticsV1PduReceived OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Display the number of v1 ISDP pdu received."
+    ::= { agentIsdpStatistics 3 }
+
+  agentIsdpStatisticsV1PduTransmit OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Display the number of v1 ISDP pdu transmitted."
+    ::= { agentIsdpStatistics 4 }
+
+  agentIsdpStatisticsV2PduReceived OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Display the number of v2 ISDP pdu received."
+    ::= { agentIsdpStatistics 5 }
+
+  agentIsdpStatisticsV2PduTransmit OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Display the number of v2 ISDP pdu transmitted."
+    ::= { agentIsdpStatistics 6 }
+
+  agentIsdpStatisticsBadHeaderPduReceived OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Display the number of ISDP pdu with bad header received."
+    ::= { agentIsdpStatistics 7 }
+
+  agentIsdpStatisticsChkSumErrorPduReceived OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Display the number of ISDP pdu with chksum error received."
+    ::= { agentIsdpStatistics 8 }
+
+  agentIsdpStatisticsFailurePduTransmit OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Display the number of ISDP pdu transmition failures."
+    ::= { agentIsdpStatistics 9 }
+
+  agentIsdpStatisticsInvalidFormatPduReceived OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Display the number of ISDP pdu in invalid format received."
+    ::= { agentIsdpStatistics 10 }
+
+  agentIsdpStatisticsTableFull OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "times"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Display the number of ISDP entry table was full."
+    ::= { agentIsdpStatistics 11 }
+
+  agentIsdpStatisticsIpAddressTableFull OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "times"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Display the number of ISDP entry address table was full."
+    ::= { agentIsdpStatistics 12 }
+
+agentIsdpGlobalRun OBJECT-TYPE
+  SYNTAX     INTEGER {
+                enable(1),
+                disable(0)
+                }
+  MAX-ACCESS read-write
+  STATUS     current
+  DESCRIPTION
+        "An indication of whether the Indastry Standart Discovery Protocol
+        is currently running.  Entries in agentIsdpCacheTable are
+        deleted when ISDP is disabled."
+  DEFVAL     { 1 }
+  ::= { agentIsdpGlobal 4 }
+
+agentIsdpGlobalMessageInterval OBJECT-TYPE
+  SYNTAX     INTEGER (5..254)
+  UNITS      "seconds"
+  MAX-ACCESS read-write
+  STATUS     current
+  DESCRIPTION
+      "The interval at which ISDP messages are to be generated.
+      The default value is 60 seconds. This is also known as the ISDP timer."
+  DEFVAL     { 60 }
+  ::= { agentIsdpGlobal 5 }
+
+agentIsdpGlobalHoldTime OBJECT-TYPE
+  SYNTAX     INTEGER (10..255)
+  UNITS      "seconds"
+  MAX-ACCESS read-write
+  STATUS     current
+  DESCRIPTION
+       "The time for the receiving device holds ISDP message.
+       The default value is 180 seconds."
+  DEFVAL     { 180 }
+  ::= { agentIsdpGlobal 6 }
+
+agentIsdpGlobalDeviceId OBJECT-TYPE
+  SYNTAX     DisplayString
+  MAX-ACCESS read-only
+  STATUS     current
+  DESCRIPTION
+     "The device ID advertised by this device. The format of this
+     device ID is characterized by the value of
+     agentIsdpGlobalDeviceIdFormat object."
+  ::= { agentIsdpGlobal 7 }
+
+agentIsdpGlobalAdvertiseV2 OBJECT-TYPE
+  SYNTAX     INTEGER {
+                enable(1),
+                disable(0)
+                }
+  MAX-ACCESS read-write
+  STATUS     current
+  DESCRIPTION
+     "An indication of whether the Indastry Standart Discovery Protocol V2
+     is currently enabled."
+    ::= { agentIsdpGlobal 8 }
+
+agentIsdpGlobalDeviceIdFormatCpb  OBJECT-TYPE
+    SYNTAX     BITS { 
+                 serialNumber(1), 
+                 macAddress(2),
+                 other (4),
+                 hostName(8) 
+               } 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicate the Device ID format capability of the device.
+
+         serialNumber(0) indicates that the device supports using
+         serial number as the format for its Device ID.
+
+         macAddress(1) indicates that the device supports using
+         layer 2 MAC address as the format for its Device ID.
+
+         other(2) indicates that the device supports using its
+         platform specific format as the format for its Device ID.
+
+         hostName(3) indicates that the device supports using
+         system Host Name as the format for its Device ID."
+
+    ::= { agentIsdpGlobal 9 }
+
+agentIsdpGlobalDeviceIdFormat  OBJECT-TYPE
+    SYNTAX     INTEGER { 
+                 serialNumber(1), 
+                 macAddress(2),
+                 other(3),
+                 hostName(4) 
+               } 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "An indication of the format of Device ID contained in the
+        corresponding instance of agentIsdpGlobalDeviceId. User can only
+        specify the formats which the device is capable of as
+        denoted in agentIsdpGlobalDeviceIdFormatCpb object.
+        
+        serialNumber(1) indicates that the value of agentIsdpGlobalDeviceId 
+        object is in the form of an ASCII string contain the device
+        serial number. 
+        
+        macAddress(2) indicates that the value of agentIsdpGlobalDeviceId 
+        object is in the form of Layer 2 MAC address.
+
+        other(3) indicates that the value of agentIsdpGlobalDeviceId object
+        is in the form of a platform specific ASCII string contain
+        info that identifies the device. For example: ASCII string
+        contains serialNumber appended/prepened with system name. 
+
+        hostName(4) indicates that the value of agentIsdpGlobalDeviceIdFormat
+        object is in system Host Name format."
+
+    ::= { agentIsdpGlobal 10 }
+END

@@ -9,7 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-$sysdescr_value = $poll_device['sysDescr'];
+$sysdescr_value = $device['sysDescr'];
 if (strpos($sysdescr_value, 'IBM Networking Operating System') !== false) {
     $hardware = str_replace('IBM Networking Operating System', '', $sysdescr_value);
     if (strpos($sysdescr_value, 'G8052') !== false) {

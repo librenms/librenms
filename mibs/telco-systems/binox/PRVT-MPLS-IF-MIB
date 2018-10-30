@@ -1,0 +1,283 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-MPLS-IF-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-MPLS-IF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+        FROM IF-MIB
+    mpls
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtMplsIfMIB MODULE-IDENTITY
+    LAST-UPDATED "201108050000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "This module includes configuration parameters for MPLS and RSVP interface specific parameters."
+    REVISION    "201108050000Z"
+    DESCRIPTION 
+        "Added ifaceMplsRsvpEgrLabelUsage, ifaceMplsLdpEgrLabelUsage, ifaceMplsSignalCapabilities."
+    REVISION    "201004280000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { mpls 6 }
+
+
+PrvtMplsIpAddressMask ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d/1d"
+    STATUS      current
+    DESCRIPTION 
+        "An IPv4 address and mask represented as a 5 octet string.
+         First four octets are the IP address. The fifth octet is the IP mask."
+    SYNTAX      OCTET STRING (SIZE(5))
+
+EgressLabelUsageType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Possible egress label usage values."
+    SYNTAX      INTEGER { global(0), implicitNull(1), explicitNull(2) }
+
+prvtMplsIfMIBObjects OBJECT IDENTIFIER
+    ::= { prvtMplsIfMIB 1 }
+
+prvtMplsIfaceObjs OBJECT IDENTIFIER
+    ::= { prvtMplsIfMIBObjects 1 }
+
+prvtMplsIfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtMplsIfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains object for configuring MPLS and LDP interface specific parameters."
+    ::= { prvtMplsIfaceObjs 1 }
+
+prvtMplsIfaceEntry OBJECT-TYPE
+    SYNTAX      PrvtMplsIfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtMplsIfaceTable."
+    INDEX       { ifIndex }
+    ::= { prvtMplsIfaceTable 1 }
+
+PrvtMplsIfaceEntry ::= SEQUENCE {
+    ifaceMplsRowStatus              RowStatus,
+    ifaceMplsEnable                 TruthValue,
+    ifaceMplsPHPEnable              TruthValue,
+    ifaceMplsLdpHelloHoldTimer      Integer32,
+    ifaceMplsLdpKeepaliveHoldTimer  Integer32,
+    ifaceMplsRsvpEgrLabelUsage      EgressLabelUsageType,
+    ifaceMplsLdpEgrLabelUsage       EgressLabelUsageType,
+    ifaceMplsSignalCapabilities     BITS
+}
+
+ifaceMplsRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this interface."
+    ::= { prvtMplsIfaceEntry 1 }
+
+ifaceMplsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable MPLS on this interface."
+    ::= { prvtMplsIfaceEntry 2 }
+
+ifaceMplsPHPEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable Penultimate Hop Popping on this interface."
+    ::= { prvtMplsIfaceEntry 3 }
+
+ifaceMplsLdpHelloHoldTimer OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The LDP Hello Hold Time for this interface."
+    ::= { prvtMplsIfaceEntry 4 }
+
+ifaceMplsLdpKeepaliveHoldTimer OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The LDP Keep-alive Hold Time for this interface."
+    ::= { prvtMplsIfaceEntry 5 }
+
+ifaceMplsRsvpEgrLabelUsage OBJECT-TYPE
+    SYNTAX      EgressLabelUsageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The egress label usage for RSVP."
+    ::= { prvtMplsIfaceEntry 7 }
+
+ifaceMplsLdpEgrLabelUsage OBJECT-TYPE
+    SYNTAX      EgressLabelUsageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The egress label usage for LDP."
+    ::= { prvtMplsIfaceEntry 8 }
+
+ifaceMplsSignalCapabilities OBJECT-TYPE
+    SYNTAX      BITS { sigCapsRsvp(0), sigCapsLdp(1), sigCapsData(7) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A bit map specifying the signaling capabilities that this MPLS
+         interface is to have.
+         Setting the bit sigCapsRsvp will enable RSVP signaling.
+         Setting the bit sigCapsLdp will enable LDP signaling.
+         The bit sigCapsData must always be set."
+    ::= { prvtMplsIfaceEntry 9 }
+
+prvtMplsRouteObjs OBJECT IDENTIFIER
+    ::= { prvtMplsIfMIBObjects 2 }
+
+prvtMplsRouteProtocolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtMplsRouteProtocolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains the configuration of the egress and ingress routes for LDP label
+         packets."
+    ::= { prvtMplsRouteObjs 1 }
+
+prvtMplsRouteProtocolEntry OBJECT-TYPE
+    SYNTAX      PrvtMplsRouteProtocolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in the table represents the configuration of a particular route type for ingress
+         or egress."
+    INDEX       { prvtMplsRouteProtocolDirection, 
+                  prvtMplsRouteProtocolType }
+    ::= { prvtMplsRouteProtocolTable 1 }
+
+PrvtMplsRouteProtocolEntry ::= SEQUENCE {
+    prvtMplsRouteProtocolDirection  INTEGER,
+    prvtMplsRouteProtocolType       INTEGER,
+    prvtMplsRouteProtocolRowStatus  RowStatus
+}
+
+prvtMplsRouteProtocolDirection OBJECT-TYPE
+    SYNTAX      INTEGER { ingress(1), egress(2) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The direction of the route that will be used to receive or send LDP packets."
+    ::= { prvtMplsRouteProtocolEntry 1 }
+
+prvtMplsRouteProtocolType OBJECT-TYPE
+    SYNTAX      INTEGER { bgp(1), connected(2), isisl1(3), isisl2(4), 
+                    kernel(5), ospf(6), rip(7), static(8) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The type of the route which will be used to send or receive LDP packets."
+    ::= { prvtMplsRouteProtocolEntry 2 }
+
+prvtMplsRouteProtocolRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object is used to create an entry in the table."
+    ::= { prvtMplsRouteProtocolEntry 3 }
+
+prvtMplsRouteAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtMplsRouteAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains the egress and ingress routes for LDP label
+         packets."
+    ::= { prvtMplsRouteObjs 2 }
+
+prvtMplsRouteAddressEntry OBJECT-TYPE
+    SYNTAX      PrvtMplsRouteAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtMplsRouteAddressTable."
+    INDEX       { prvtMplsRouteProtocolDirection, 
+                  prvtMplsRouteAddressIpAddrMask }
+    ::= { prvtMplsRouteAddressTable 1 }
+
+PrvtMplsRouteAddressEntry ::= SEQUENCE {
+    prvtMplsRouteAddressIpAddrMask  PrvtMplsIpAddressMask,
+    prvtMplsRouteAddressRowStatus   RowStatus
+}
+
+prvtMplsRouteAddressIpAddrMask OBJECT-TYPE
+    SYNTAX      PrvtMplsIpAddressMask
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The IP prefix of the route that will be used to send or receive LDP packets."
+    ::= { prvtMplsRouteAddressEntry 2 }
+
+prvtMplsRouteAddressRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This is object is used to create an entry in the table."
+    ::= { prvtMplsRouteAddressEntry 4 }
+
+END -- end of module PRVT-MPLS-IF-MIB.

@@ -1,0 +1,40 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.3845.31.4",
+                    "sysDescr": "Citrix Virtual WAN Appliance",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "netscaler-sdwan",
+                    "type": "appliance",
+                    "serial": null,
+                    "icon": "citrix.svg"
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.3845.31.4",
+                    "sysDescr": "Citrix Virtual WAN Appliance",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "netscaler-sdwan",
+                    "type": "appliance",
+                    "serial": null,
+                    "icon": "citrix.svg"
+                }
+            ]
+        }
+    }
+}

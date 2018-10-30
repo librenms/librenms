@@ -1,0 +1,1385 @@
+CM-SAT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, IpAddress, Unsigned32, Counter64
+             FROM SNMPv2-SMI
+    DateAndTime, DisplayString, TruthValue, RowStatus, StorageType, 
+    MacAddress, VariablePointer, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    fsp150cm
+             FROM  ADVA-MIB 
+    VlanId, VlanPriority, CmPmBinAction
+             FROM  CM-COMMON-MIB
+    neIndex, shelfIndex, slotIndex, networkElementEntry
+             FROM  CM-ENTITY-MIB
+    AdminState, OperationalState, SecondaryState,
+    MepDestinationType
+             FROM  CM-COMMON-MIB
+    EsaProbePktIntervalType, EsaProbePktIntervalType
+             FROM  CM-SA-MIB
+    PolicerColorMode
+             FROM  CM-FACILITY-MIB
+    dot1agCfmMepEntry
+             FROM IEEE8021-CFM-MIB
+    Dot1agCfmMepIdOrZero
+             FROM IEEE8021-CFM-MIB;
+
+
+cmServiceActivationMIB MODULE-IDENTITY
+    LAST-UPDATED    "201309120000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Jack Chen
+                     ADVA Optical Networking, Inc.
+                Tel: +86755 86217400-8205
+             E-mail: jchen@advaoptical.com
+             Postal: 
+             "
+    DESCRIPTION
+            "This module defines the Service Activation MIB definitions used by 
+             the F3 (FSP150CM/CC) product lines.
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201309120000Z"
+    DESCRIPTION
+        "Notes from release 201309120000Z" 
+    ::= {fsp150cm 28}    
+
+-- 
+-- OID definitions
+-- 
+cmServActivationObjects        OBJECT IDENTIFIER ::= {cmServiceActivationMIB 1}
+cmServActivationNotifications  OBJECT IDENTIFIER ::= {cmServiceActivationMIB 2}
+cmServActivationConformance    OBJECT IDENTIFIER ::= {cmServiceActivationMIB 3}
+
+ServiceActivationTestMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The test mode of Service Activation Test."
+    SYNTAX INTEGER {
+                oneWay(1),
+                twoWay(2)
+               }
+
+SatProceduresType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "All procedures type of the Service Activation Test."
+    SYNTAX INTEGER {
+                none(1),
+                configTestCir(2),
+                configTestEir(3),
+                configTestCbs(4),
+                configTestEbs(5),
+                configTestPolicing(6),
+                performanceTest(7)
+               }
+
+SatProceduresList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Bit Mask that specifies all the Service Activation Test procedure."
+    SYNTAX BITS {
+                configTestCir(1),
+                configTestEir(2),
+                configTestCbs(3),
+                configTestEbs(4),
+                configTestPolicing(5),
+                performance(6)
+               }
+
+SatStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The status of the overall Service Activation Test."
+    SYNTAX INTEGER {
+                completed(1),
+                notStarted(2),
+                inProgress(3),
+                failed(4)
+               }
+
+SatDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The direction of Service Activation Test."
+    SYNTAX INTEGER {
+                forward(1),
+                backward(2)
+               }
+
+SatFramePayloadType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This object describes the Payload type of Service Activation Test frame."
+    SYNTAX INTEGER {
+                prbs31(1),
+                custom(2)
+               }
+
+SatTestAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This object describes the operation on Service Activation Test frame Payload type."
+    SYNTAX INTEGER {
+                start(1),
+                stop(2),
+                notApplicable(3)
+               }
+
+SatResult ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This object describes the result of Service Activation Test."
+    SYNTAX INTEGER {
+                none(1),
+                pass(2),
+                fail(3)
+               }
+
+--
+--  SAT Control Table
+--
+satControlTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SatControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the control of SAT Control."
+    ::= { cmServActivationObjects 1 }
+
+satControlEntry  OBJECT-TYPE
+    SYNTAX      SatControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the satControlTable."
+    INDEX { neIndex, satControlIndex }
+    ::= { satControlTable 1 }
+
+SatControlEntry ::= SEQUENCE {
+    satControlIndex                     Integer32,
+    satControlName                      DisplayString,
+    satControlTestMode                  ServiceActivationTestMode,
+    satControlTestProcedures            SatProceduresList,
+    satControlConfigTestDuration        Integer32,
+    satControlConfigCIRTestStepNum      Integer32,
+    satControlConfigCIRTestStepDuration Integer32,
+    satControlPerfTestDuration          Integer32,
+    satControlStatus                    SatStatus,
+    satControlAction                    SatTestAction,
+    satControlStorageType               StorageType,
+    satControlRowStatus                 RowStatus,
+    satControlFailCause                 DisplayString,
+    satControlTestStartTime             DateAndTime,
+    satControlFlpduTagOverride          TruthValue
+}
+
+satControlIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The index of the Service Activation Test."
+    ::= { satControlEntry 1 }
+
+satControlName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The alias of the Service Activation Test."
+    ::= { satControlEntry 2 }
+
+satControlTestMode OBJECT-TYPE
+    SYNTAX      ServiceActivationTestMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The mode of the Service Activation Test."
+    ::= { satControlEntry 3 }
+
+satControlTestProcedures OBJECT-TYPE
+    SYNTAX      SatProceduresList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "A List of Service Activation Test procedures."
+    ::= { satControlEntry 4 }
+
+satControlConfigTestDuration OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The duration of CIR step test, expressed in seconds."
+    ::= { satControlEntry 5 }
+
+satControlConfigCIRTestStepNum OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The number of steps in CIR step test."
+    ::= { satControlEntry 6 }
+
+satControlConfigCIRTestStepDuration OBJECT-TYPE
+    SYNTAX      Integer32 (1..60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The duration of each CIR step test."
+    ::= { satControlEntry 7 }
+
+satControlPerfTestDuration OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The duration of the SAT Performance Test, expressed in minutes."
+    ::= { satControlEntry 8 }
+
+satControlStatus OBJECT-TYPE
+    SYNTAX      SatStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The overall SAT Control Test Status."
+    ::= { satControlEntry 9 }
+
+satControlAction OBJECT-TYPE
+    SYNTAX      SatTestAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The start/stop action of the SAT Control."
+    ::= { satControlEntry 10 }
+
+satControlStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { satControlEntry 11 }
+
+satControlRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of satControlRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            satControlRowStatus value as createAndGo(4).
+            Upon successful row creation, this variable has a
+            value of active(1).
+
+            The satControlRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { satControlEntry 12 }
+
+satControlFailCause OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The information about the reason of the Test failure."
+    ::= { satControlEntry 13 }
+
+satControlTestStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The start time of this SAT Control."
+    ::= { satControlEntry 14 }
+
+satControlFlpduTagOverride OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "Whether permit user to configure FLPDU explicitly.
+            Disabled: FLPDUs tag is inherited from SCM of MEP.
+            Enabled: User can configure FLPDUs tag explicitly, which will override the VLAN tags from MEP."
+    ::= { satControlEntry 15 }
+
+--
+--  SAT Stream Table
+--
+satStreamTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SatStreamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the control of SAT Streams."
+    ::= { cmServActivationObjects 2 }
+
+satStreamEntry  OBJECT-TYPE
+    SYNTAX      SatStreamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the satStreamTable."
+    INDEX { neIndex, satControlIndex, satStreamIndex }
+    ::= { satStreamTable 1 }
+
+SatStreamEntry ::= SEQUENCE {
+    satStreamIndex                     Integer32,
+    satStreamName                      DisplayString,
+    satStreamTestPort                  VariablePointer,
+    satStreamTestDirection             SatDirection,
+    satStreamDestMacAddress            MacAddress,
+    satStreamFramePayloadType          SatFramePayloadType,
+    satStreamCustomFramePayload        DisplayString,
+    satStreamFrameSizeList             DisplayString,
+    satStreamSacProfileId              VariablePointer,
+    satStreamSrcMepId                  VariablePointer,
+    satStreamDestMepType               MepDestinationType,
+    satStreamDestMepId                 Integer32,
+    satStreamDestMepMacAddr            MacAddress,
+    satStreamDmmPacketSize             Integer32,
+    satStreamDmmPacketInterval         EsaProbePktIntervalType,
+    satStreamOverallResult             SatResult,
+    satStreamAction                    SatTestAction,
+    satStreamStatus                    SatStatus,
+    satStreamCurrentTestProcedure      SatProceduresType,
+    satStreamCurrentConfigCirTestStep  Integer32,
+    satStreamInner1VlanId              VlanId,
+    satStreamInner1VlanPri             VlanPriority,
+    satStreamInner1VlanEnabled         TruthValue,
+    satStreamInner1ValnEtherType       Integer32,
+    satStreamInner2VlanId              VlanId,
+    satStreamInner2VlanPri             VlanPriority,
+    satStreamInner2VlanEnabled         TruthValue,
+    satStreamInner2VlanEtherType       Integer32,
+    satStreamOuterVlanId               VlanId,
+    satStreamOuterVlanPri              VlanPriority,
+    satStreamOuterVlanEnabled          TruthValue,
+    satStreamOuterVlanEtherType        Integer32,
+    satStreamDeiEnabled                TruthValue,
+    satStreamGreenPcp                  Integer32,
+    satStreamYellowPcp                 Integer32,
+    satStreamColorMode                 PolicerColorMode,
+    satStreamCirLo                     Unsigned32,
+    satStreamCirHi                     Unsigned32,
+    satStreamEirLo                     Unsigned32,
+    satStreamEirHi                     Unsigned32,
+    satStreamCbs                       Unsigned32,
+    satStreamEbs                       Unsigned32,
+    satStreamStorageType               StorageType,
+    satStreamRowStatus                 RowStatus,
+    satStreamDmmPktPriority            VlanPriority,
+    satStreamMFactor                   Unsigned32
+}
+
+satStreamIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The index of the Service Activation Test Stream."
+    ::= { satStreamEntry 1 }
+
+satStreamName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The alias of the Service Activation Test Stream."
+    ::= { satStreamEntry 2 }
+
+satStreamTestPort OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The related port of the Service Activation Test Stream."
+    ::= { satStreamEntry 3 }
+
+satStreamTestDirection OBJECT-TYPE
+    SYNTAX      SatDirection
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The direction of the Service Activation Test Stream."
+    ::= { satStreamEntry 4 }
+
+satStreamDestMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the destination MAC address of FLPDU."
+    ::= { satStreamEntry 5 }
+
+satStreamFramePayloadType OBJECT-TYPE
+    SYNTAX      SatFramePayloadType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The type of Payload of the Frame Loss PDU."
+    ::= { satStreamEntry 6 }
+
+satStreamCustomFramePayload OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the customized frame payload."
+    ::= { satStreamEntry 7 }
+
+satStreamFrameSizeList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes a list of Frame Sizes used in FLPDU."
+    ::= { satStreamEntry 8 }
+
+satStreamSacProfileId OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the related Service Acceptance Criteria (SAC) Profile Id."
+    ::= { satStreamEntry 9 }
+
+satStreamSrcMepId OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Local MEP related with SAT Test Stream."
+    ::= { satStreamEntry 10 }
+
+satStreamDestMepType OBJECT-TYPE
+    SYNTAX      MepDestinationType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the type of Destination MEP, which can be based on MEP id or MAC Address."
+    ::= { satStreamEntry 11 }
+
+satStreamDestMepId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the destination MEP id."
+    ::= { satStreamEntry 12 }
+
+satStreamDestMepMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Destination MEP's MAC Address."
+    ::= { satStreamEntry 13 }
+
+satStreamDmmPacketSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Delay Measurement Message (DMM) frame size."
+    ::= { satStreamEntry 14 }
+
+satStreamDmmPacketInterval OBJECT-TYPE
+    SYNTAX      EsaProbePktIntervalType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Delay Measurement Message (DMM) frame generation interval."
+    ::= { satStreamEntry 15 }
+
+satStreamOverallResult OBJECT-TYPE
+    SYNTAX      SatResult
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the test result."
+    ::= { satStreamEntry 16 }
+
+satStreamAction OBJECT-TYPE
+    SYNTAX      SatTestAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the operation on this test."
+    ::= { satStreamEntry 17 }
+
+satStreamStatus OBJECT-TYPE
+    SYNTAX      SatStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the test status of this Test Stream."
+    ::= { satStreamEntry 18 }
+
+satStreamCurrentTestProcedure OBJECT-TYPE
+    SYNTAX      SatProceduresType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the current test procedure."
+    ::= { satStreamEntry 19 }
+
+satStreamCurrentConfigCirTestStep OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the current step number of CIR Test."
+    ::= { satStreamEntry 20 }
+
+satStreamInner1VlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Inner1 VLAN Id."
+    ::= { satStreamEntry 21 }
+
+satStreamInner1VlanPri OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Inner1 VLAN Priority."
+    ::= { satStreamEntry 22 }
+
+satStreamInner1VlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes whether the Inner1 VLAN enabled."
+    ::= { satStreamEntry 23 }
+
+satStreamInner1ValnEtherType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Inner2 VLAN EtherType."
+    ::= { satStreamEntry 24 }
+
+satStreamInner2VlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Inner2 VLAN Id."
+    ::= { satStreamEntry 25 }
+
+satStreamInner2VlanPri OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Inner2 VLAN Priority."
+    ::= { satStreamEntry 26 }
+
+satStreamInner2VlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes whether the Inner2 VLAN enabled."
+    ::= { satStreamEntry 27 }
+
+satStreamInner2VlanEtherType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes whether the Inner2 VLAN ether type."
+    ::= { satStreamEntry 28 }
+
+satStreamOuterVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Outer VLAN Id."
+    ::= { satStreamEntry 29 }
+
+satStreamOuterVlanPri OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Outer VLAN Priority."
+    ::= { satStreamEntry 30 }
+
+satStreamOuterVlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes whether the Outer VLAN enabled."
+    ::= { satStreamEntry 31 }
+
+satStreamOuterVlanEtherType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes whether the Outer VLAN Ethertype."
+    ::= { satStreamEntry 32 }
+
+satStreamDeiEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes whether the DEI enabled."
+    ::= { satStreamEntry 33 }
+
+satStreamGreenPcp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the PCP value for Green Packets."
+    ::= { satStreamEntry 34 }
+
+satStreamYellowPcp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the PCP value for Yellow Packets."
+    ::= { satStreamEntry 35 }
+
+satStreamColorMode OBJECT-TYPE
+    SYNTAX      PolicerColorMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the color mode for Policing test."
+    ::= { satStreamEntry 36 }
+
+satStreamCirLo OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes CIR low 32 bits."
+    ::= { satStreamEntry 37 }
+
+satStreamCirHi OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes CIR high 32 bits."
+    ::= { satStreamEntry 38 }
+
+satStreamEirLo OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes EIR low 32 bits."
+    ::= { satStreamEntry 39 }
+
+satStreamEirHi OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes EIR high 32 bits."
+    ::= { satStreamEntry 40 }
+
+satStreamCbs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes CBS."
+    ::= { satStreamEntry 41 }
+
+satStreamEbs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes CBS."
+    ::= { satStreamEntry 42 }
+
+satStreamStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { satStreamEntry 43 }
+
+satStreamRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of satStreamRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            satStreamRowStatus value as createAndGo(4).
+            Upon successful row creation, this variable has a
+            value of active(1).
+
+            The satStreamRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { satStreamEntry 44 }
+
+satStreamDmmPktPriority OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Dmm packet priority."
+    ::= { satStreamEntry 45 }
+
+satStreamMFactor OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The M factor is used in test result validation.
+	    It is added to allow for the effect of the traffic policer's CBS and EBS settings and test time. 
+	    Roughly, it equals to EBS/Test Duration, user should configure its value based on experience test."
+    ::= { satStreamEntry 46 }
+
+
+
+--
+--  SAT Result Stats Table
+--
+satResultStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SatResultStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the control of SAT Result Statistics."
+    ::= { cmServActivationObjects 3 }
+
+satResultStatsEntry  OBJECT-TYPE
+    SYNTAX      SatResultStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the satResultStatsTable."
+    INDEX { neIndex, satControlIndex, satStreamIndex, satResultStatsTestType, satResultStatsStepNumber }
+    ::= { satResultStatsTable 1 }
+
+SatResultStatsEntry ::= SEQUENCE {
+    satResultStatsTestType              SatProceduresType,
+    satResultStatsStepNumber            Integer32,
+    satResultStatsSessionId             Unsigned32,
+    satResultStatsStartTime             DateAndTime,
+    satResultStatsEndTime               DateAndTime,
+    satResultStatsStatus                SatStatus,
+    satResultStatsResult                SatResult,
+    satResultStatsMinIRGMeasured        Counter64,
+    satResultStatsAvgIRGMeasured        Counter64,
+    satResultStatsMaxIRGMeasured        Counter64,
+    satResultStatsMinIRYMeasured        Counter64,
+    satResultStatsAvgIRYMeasured        Counter64,
+    satResultStatsMaxIRYMeasured        Counter64,
+    satResultStatsFlrGMeasured          Integer32,
+    satResultStatsFlrYMeasured          Integer32,
+    satResultStatsFlrGCounts            Counter64,
+    satResultStatsFlrYCounts            Counter64,
+    satResultStatsMinFTDGMeasured       Unsigned32,
+    satResultStatsAvgFTDGMeasured       Unsigned32,
+    satResultStatsMaxFTDGMeasured       Unsigned32,
+    satResultStatsIMinFDVGMeasured      Unsigned32,
+    satResultStatsIAvgFDVGMeasured      Unsigned32,
+    satResultStatsIMaxFDVGMeasured      Unsigned32,
+    satResultStatsISyncErrorsNum        Unsigned32,
+    satResultStatsIfNegFLG              TruthValue,
+    satResultStatsIfNegFLY              TruthValue,
+    satResultStatsAvgIRT                Counter64,
+    satResultStatsFlrTMeasured          Integer32,
+    satResultStatsFlTCounts             Counter64,
+    satResultStatsIfNegFLT              TruthValue
+}
+
+satResultStatsTestType OBJECT-TYPE
+    SYNTAX      SatProceduresType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The Test Type of the Service Activation Test."
+    ::= { satResultStatsEntry 1 }
+
+satResultStatsStepNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The Test step number of the Service Activation Test."
+    ::= { satResultStatsEntry 2 }
+
+satResultStatsSessionId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The session id of the Service Activation Test."
+    ::= { satResultStatsEntry 3 }
+
+satResultStatsStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The start time of the Service Activation Test."
+    ::= { satResultStatsEntry 4 }
+
+satResultStatsEndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The end time of the Service Activation Test."
+    ::= { satResultStatsEntry 5 }
+
+satResultStatsStatus OBJECT-TYPE
+    SYNTAX      SatStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The Status of the Service Activation Test."
+    ::= { satResultStatsEntry 6 }
+
+satResultStatsResult OBJECT-TYPE
+    SYNTAX      SatResult
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes SAT whether pass."
+    ::= { satResultStatsEntry 7 }
+
+satResultStatsMinIRGMeasured OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the minimum Information Rate (IR) for Green Packets."
+    ::= { satResultStatsEntry 8 }
+
+satResultStatsAvgIRGMeasured OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the average Information Rate (IR) for Green Packets."
+    ::= { satResultStatsEntry 9 }
+
+satResultStatsMaxIRGMeasured OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the maximum Information Rate (IR) for Green Packets."
+    ::= { satResultStatsEntry 10 }
+
+satResultStatsMinIRYMeasured OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the minimum Information Rate (IR) for Yellow Packets."
+    ::= { satResultStatsEntry 11 }
+
+satResultStatsAvgIRYMeasured OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the average Information Rate (IR) for Yellow Packets."
+    ::= { satResultStatsEntry 12 }
+
+satResultStatsMaxIRYMeasured OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the maximum Information Rate (IR) for Yellow Packets."
+    ::= { satResultStatsEntry 13 }
+
+satResultStatsFlrGMeasured OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Frame Loss Ratio (FLR) for Green Packets.
+           From the EGX8.2 and GE110 7.1, If its value is 26000001, it means 26.000001% frame lost.
+           For the earlier release, If its value is 260001, it means 26.0001% frame lost."
+    ::= { satResultStatsEntry 14 }
+
+satResultStatsFlrYMeasured OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Frame Loss Ratio (FLR) for Yellow Packets.
+           From the EGX8.2 and GE110 7.1, If its value is 26000001, it means 26.000001% frame lost.
+           For the earlier release, If its value is 260001, it means 26.0001% frame lost."
+    ::= { satResultStatsEntry 15 }
+
+satResultStatsFlrGCounts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Frame Loss (FL) count for Green Packets."
+    ::= { satResultStatsEntry 16 }
+
+satResultStatsFlrYCounts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Frame Loss (FL) count for Yellow Packets."
+    ::= { satResultStatsEntry 17 }
+
+satResultStatsMinFTDGMeasured OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the minimum Frame Transfer Delay (FTD) for Green Packets."
+    ::= { satResultStatsEntry 18 }
+
+satResultStatsAvgFTDGMeasured OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the average Frame Transfer Delay (FTD) for Green Packets."
+    ::= { satResultStatsEntry 19 }
+
+satResultStatsMaxFTDGMeasured OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the maximum Frame Transfer Delay (FTD) for Green Packets."
+    ::= { satResultStatsEntry 20 }
+
+satResultStatsIMinFDVGMeasured OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the minimum Frame Delay Variation (FDV) for Green Packets."
+    ::= { satResultStatsEntry 21 }
+
+satResultStatsIAvgFDVGMeasured OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the average Frame Delay Variation (FDV) for Green Packets."
+    ::= { satResultStatsEntry 22 }
+
+satResultStatsIMaxFDVGMeasured OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the maximum Frame Delay Variation (FDV) for Green Packets."
+    ::= { satResultStatsEntry 23 }
+
+satResultStatsISyncErrorsNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of (time) Synchronization Errors between SAT Control and SAT Responder in the current Test."
+    ::= { satResultStatsEntry 24 }
+
+satResultStatsIfNegFLG OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object means whether negative green frame loss.
+           True: negative loss of green packets occurs, which means receiving more green packets than expected.
+           False: negative loss of green packets doesn't occur, which means not receiving more green packets than expected."
+    ::= { satResultStatsEntry 25 }
+
+satResultStatsIfNegFLY OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object means whether negative yellow frame loss.
+           True: negative loss of yellow packets occurs, which means receiving more yellow packets than expected.
+           False: negative loss of yellow packets doesn't occur, which means not receiving more yellow packets than expected."
+    ::= { satResultStatsEntry 26 }
+
+satResultStatsAvgIRT OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes Average IR of total packets, non distinguishing green or yellow. Only valid for color blind test."
+    ::= { satResultStatsEntry 27 }
+
+satResultStatsFlrTMeasured OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Frame Loss Ratio (FLR) for Total Packets.
+           No distinguish color, negative value means receiving much more packets than expected.
+           Only valid for color blind test.
+           If its value is 26000001, it means 26.000001% frame lost."
+    ::= { satResultStatsEntry 28 }
+
+satResultStatsFlTCounts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Frame Loss (FL) count for Total Packets."
+    ::= { satResultStatsEntry 29 }
+
+satResultStatsIfNegFLT OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object means whether negative total frame loss.
+           True: negative loss of green packets occurs, which means receiving more green packets than expected.
+           False: negative loss of green packets doesn't occur, which means not receiving more green packets than expected."
+    ::= { satResultStatsEntry 30 }
+
+--
+--  SAT Service Acceptance Criteria Profile Table
+--
+satSacProfileTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SatSacProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the control of SAT Service Acceptance Criteria (SAC) Profile."
+    ::= { cmServActivationObjects 4 }
+
+satSacProfileEntry  OBJECT-TYPE
+    SYNTAX      SatSacProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the satSacProfileTable."
+    INDEX { satSacProfileIndex }
+    ::= { satSacProfileTable 1 }
+
+SatSacProfileEntry ::= SEQUENCE {
+    satSacProfileIndex        Integer32,
+    satSacProfileAlias        DisplayString,
+    satSacProfileFLR          Integer32,
+    satSacProfileFTD          Unsigned32,
+    satSacProfileFDV          Unsigned32,
+    satSacProfileStorageType  StorageType,
+    satSacProfileRowStatus    RowStatus     
+}
+
+satSacProfileIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The index of SAT Service Acceptance Criteria (SAC) Profile."
+    ::= { satSacProfileEntry 1 }
+
+satSacProfileAlias OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The alias of SAT Service Acceptance Criteria (SAC) Profile."
+    ::= { satSacProfileEntry 2 }
+
+satSacProfileFLR OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The Frame Loss Ratio (FLR) acceptance criteria of this SAC Profile.
+           From the EGX8.2 and GE110 7.1, If its value is 26000001, it means 26.000001% frame lost.
+           For the earlier release, If its value is 260001, it means 26.0001% frame lost."
+    ::= { satSacProfileEntry 3 }
+
+satSacProfileFTD OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The Frame Transfer Delay (FTD) acceptance criteria of this SAC Profile."
+    ::= { satSacProfileEntry 4 }
+
+satSacProfileFDV OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The frame transfer delay variation of SAT Service Acceptance Criteria (SAC) Profile."
+    ::= { satSacProfileEntry 5 }
+
+satSacProfileStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { satSacProfileEntry 6 }
+
+satSacProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of satSacProfileRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            satSacProfileRowStatus value as createAndGo(4).
+            Upon successful row creation, this variable has a
+            value of active(1).
+
+            The satSacProfileRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { satSacProfileEntry 7 }
+
+--
+--  SAT Responder Session Table
+--
+satResponderSessionTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SatResponderSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the control of SAT Responder Session."
+    ::= { cmServActivationObjects 5 }
+
+satResponderSessionEntry  OBJECT-TYPE
+    SYNTAX      SatResponderSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the satResponderSessionTable."
+    INDEX { neIndex, satResponderSessionIndex }
+    ::= { satResponderSessionTable 1 }
+
+SatResponderSessionEntry ::= SEQUENCE {
+    satResponderSessionIndex             Unsigned32,
+    satResponderSessionId                Unsigned32,
+    satResponderSessionControlMepMacAddr MacAddress,
+    satResponderSessionMepId             VariablePointer,
+    satResponderSessionStorageType       StorageType,
+    satResponderSessionRowStatus         RowStatus
+}
+
+satResponderSessionIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The index of the entry."
+    ::= { satResponderSessionEntry 1 }
+
+satResponderSessionId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The id of active test session negotiated between SAT Responder and SAT Control."
+    ::= { satResponderSessionEntry 2 }
+
+satResponderSessionControlMepMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object describes the Control MEP's MAC Address."
+    ::= { satResponderSessionEntry 3 }
+
+satResponderSessionMepId OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The local MEP Id."
+    ::= { satResponderSessionEntry 4 }
+
+satResponderSessionStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { satResponderSessionEntry 5 }
+
+satResponderSessionRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of satResponderSessionRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            satResponderSessionRowStatus value as createAndGo(4).
+            Upon successful row creation, this variable has a
+            value of active(1).
+
+            The satResponderSessionRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { satResponderSessionEntry 6 }
+
+--
+--  networkElementSatParamsTable
+--
+networkElementSatParamsTable  OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NetworkElementSatParamsEntry
+    MAX-ACCESS  not-accessible
+    STATUS          current
+    DESCRIPTION
+         "Entries may be auto discovered, or can be explicitly created by 
+          SNMP Manager.  Each remotely discovered shelf is represented as 
+          a row in this table." 
+    ::= { cmServActivationObjects 6 }
+
+networkElementSatParamsEntry  OBJECT-TYPE
+    SYNTAX          NetworkElementSatParamsEntry
+    MAX-ACCESS  not-accessible
+    STATUS          current
+    DESCRIPTION
+            "A conceptual row in the networkElementSatParamsTable."
+    AUGMENTS { networkElementEntry }
+    ::= { networkElementSatParamsTable 1 }
+
+
+NetworkElementSatParamsEntry ::= SEQUENCE {
+    neSatParamsEtherType                Unsigned32
+}
+
+neSatParamsEtherType OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describes the SAT System EtherType."
+    ::= { networkElementSatParamsEntry 1 }
+
+--
+--  satCfmMepExtTable
+--
+satCfmMepExtTable  OBJECT-TYPE
+    SYNTAX          SEQUENCE OF SatCfmMepExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS          current
+    DESCRIPTION
+         "This objects describe the SAT responder whether enabled on the MEP." 
+    ::= { cmServActivationObjects 7 }
+
+satCfmMepExtEntry  OBJECT-TYPE
+    SYNTAX          SatCfmMepExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS          current
+    DESCRIPTION
+            "A conceptual row in the satCfmMepExtTable."
+    AUGMENTS { dot1agCfmMepEntry }
+    ::= { satCfmMepExtTable 1 }
+
+
+SatCfmMepExtEntry ::= SEQUENCE {
+    satCfmMepSatResponderEnabled                 TruthValue
+}
+
+satCfmMepSatResponderEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This objects describes the SAT Responder whether enabled on the MEP." 
+    ::= { satCfmMepExtEntry 1 }
+
+--
+-- Conformance
+--
+cmServActivationCompliances OBJECT IDENTIFIER ::= {cmServActivationConformance 1}
+cmServActivationGroups      OBJECT IDENTIFIER ::= {cmServActivationConformance 2}
+
+cmServActivationCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the CM SAT
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              cmSatGroup
+        }
+    ::= { cmServActivationCompliances 1 }
+
+cmSatGroup OBJECT-GROUP
+    OBJECTS {
+        satControlIndex, satControlName, satControlTestMode, satControlTestProcedures,
+        satControlConfigTestDuration, satControlConfigCIRTestStepNum, satControlConfigCIRTestStepDuration,
+        satControlPerfTestDuration, satControlStatus, satControlAction, satControlFailCause,satControlTestStartTime,
+        satControlFlpduTagOverride, satStreamIndex, satStreamName, satStreamTestPort, satStreamTestDirection,
+        satStreamDestMacAddress, satStreamFramePayloadType, satStreamCustomFramePayload,
+        satStreamFrameSizeList, satStreamSacProfileId, satStreamSrcMepId, satStreamDestMepType,
+        satStreamDestMepId, satStreamDestMepMacAddr, satStreamDmmPacketSize, satStreamDmmPacketInterval,
+        satStreamOverallResult, satStreamAction, satStreamStatus, satStreamCurrentTestProcedure,
+        satStreamCurrentConfigCirTestStep, satStreamInner1VlanId, satStreamInner1VlanPri, satStreamInner1VlanEnabled,
+        satStreamInner1ValnEtherType, satStreamInner2VlanId, satStreamInner2VlanPri, satStreamInner2VlanEnabled,
+        satStreamInner2VlanEtherType, satStreamOuterVlanId, satStreamOuterVlanPri, satStreamOuterVlanEnabled,
+        satStreamOuterVlanEtherType, satStreamDeiEnabled, satStreamGreenPcp, satStreamYellowPcp,
+        satStreamColorMode, satStreamCirLo, satStreamCirHi, satStreamEirLo, satStreamEirHi, satStreamCbs, satStreamEbs,
+        satStreamStorageType, satStreamRowStatus, satControlStorageType, satControlRowStatus, satStreamDmmPktPriority, satStreamMFactor,
+        satResultStatsSessionId, satResultStatsTestType, satResultStatsStepNumber, satResultStatsStartTime,
+        satResultStatsEndTime, satResultStatsStatus, satResultStatsResult, satResultStatsMinIRGMeasured,
+        satResultStatsAvgIRGMeasured, satResultStatsMaxIRGMeasured, satResultStatsMinIRYMeasured,
+        satResultStatsAvgIRYMeasured, satResultStatsMaxIRYMeasured, satResultStatsFlrGMeasured,
+        satResultStatsFlrYMeasured, satResultStatsFlrGCounts, satResultStatsFlrYCounts,
+        satResultStatsMinFTDGMeasured, satResultStatsAvgFTDGMeasured, satResultStatsMaxFTDGMeasured,
+        satResultStatsIMinFDVGMeasured, satResultStatsIAvgFDVGMeasured, satResultStatsIMaxFDVGMeasured,
+        satResultStatsISyncErrorsNum, satResultStatsIfNegFLG, satResultStatsIfNegFLY,
+        satResultStatsAvgIRT,satResultStatsFlrTMeasured,satResultStatsFlTCounts,satResultStatsIfNegFLT,
+        satSacProfileIndex, satSacProfileAlias, satSacProfileFLR, satSacProfileFTD, satSacProfileFDV,
+        satSacProfileStorageType, satSacProfileRowStatus, satResponderSessionIndex, satResponderSessionId, satResponderSessionControlMepMacAddr, satResponderSessionMepId,
+        satResponderSessionStorageType, satResponderSessionRowStatus, satCfmMepSatResponderEnabled
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the CM SAT functionality."
+    ::= { cmServActivationGroups 1 }
+
+END

@@ -1,7 +1,7 @@
 #  DO NOT CHANGE THIS FILE
 #  If you need to change this file, you are doing something wrong.
 
-Options FollowSymlinks Multiviews
+Options +FollowSymlinks +Multiviews
 
 AddType image/svg+xml .svg
 <IfModule mod_filter.c>
@@ -29,6 +29,6 @@ RewriteCond %{REQUEST_URI} !=/server-status
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !\.(js|ico|txt|gif|jpg|png|css|php)
-RewriteRule ^(.*)$ index.php/$1/
+RewriteRule ^(.*)$ index.php
 
 AcceptPathInfo On

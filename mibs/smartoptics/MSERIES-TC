@@ -1,0 +1,237 @@
+	-- SmartOptics Enterprise Specific TC MIB.
+--
+-- Copyright (c) 2011, SmartOptics
+-- All rights reserved
+--
+
+MSERIES-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    mseries
+        FROM MSERIES-MIB;
+
+
+smartTcMIB     MODULE-IDENTITY
+                LAST-UPDATED    "201402121327Z"
+                ORGANIZATION    "SmartOptics"
+                CONTACT-INFO    "http://www.smartoptics.com"
+                DESCRIPTION
+                                "This is the enterprise specific TC MIB for SmartOptics M-Series"
+                REVISION        "201402121327Z"
+                DESCRIPTION
+                                "Added PortStatus and PortMode."
+
+                REVISION        "201310151341Z"
+                DESCRIPTION
+                                "Descriptions updated."
+                REVISION        "201112050000Z"
+                DESCRIPTION
+                                "Initial revision."
+
+                ::=  { mseries 5 }
+
+--
+-- definitions of the textual convetions
+--
+
+AlarmPerceivedSeverity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Alarm severity as defined in ITU-T X.733."
+    SYNTAX INTEGER {
+        cleared (1),
+        indeterminate (2),
+        critical (3),
+        major (4),
+        minor (5),
+        warning (6)
+    }
+
+AlarmNotificationType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Type of alarm as defined in ITU-T X.733."
+    SYNTAX INTEGER {
+        undefined (0),
+        other (1),
+        communicationsAlarm (2),
+        qualityOfServiceAlarm (3),
+        processingErrorAlarm (4),
+        equipmentAlarm (5),
+        environmental (6),
+        integrityViolation (7),
+        operationalViolation (8),
+        physicalViolation(9),
+        securityServiceOrMechanismViloation (10),
+        timeDomainViolation (11)
+        }
+
+AlarmProbableCause ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Alarm probable cause as defined in ITU-T X.733."
+    SYNTAX INTEGER {
+        undefined (0),
+        adapterError (1),                       -- Equipment
+        applicationSubsystemFailure (2),        -- Processing
+        bandwidthReduced (3),                   -- Quality of service
+        callEstablishmentError (4),             -- Communications
+        communicationsProtocolError (5),        -- Communications
+        communicationsSubsystemFailure (6),     -- Communications
+        configurationOrCustomizationError (7),  -- Processing
+        congestion (8),                         -- Quality of service
+        corruptData (9),                        -- Processing
+        cpuCyclesLimitExceeded (10),            -- Processing
+        dTEdCEInterfaceError (11),              -- Communications
+        datasetOrModemError (12),               -- Equipment
+        degradedSignal (13),                    -- Communications
+        enclosureDoorOpen (14),                 -- Environmental
+        equipmentMalfunction (15),              -- Equipment
+        excessiveVibration (16),                -- Environmental
+        fileError (17),                         -- Processing
+        fireDetected (18),                      -- Environmental
+        floodDetected (19),                     -- Environmental
+        framingError (20),                      -- Communications
+        heatingOrVentilationOrCoolingSystemProblem (21), -- Environmental
+        humidityUnacceptable (22),              -- Environmental
+        inputDeviceError (23),                  -- Equipment
+        inputOutputDeviceError (24),            -- Equipment
+        lANError (25),                          -- Communications
+        leakDetected (26),                      -- Environmental
+        localNodeTransmissionError (27),        -- Communications
+        lossOfFrame (28),                       -- Communications
+        lossOfSignal (29),                      -- Communications
+        materialSupplyExhausted (30),           -- Environmental
+        multiplexerProblem (31),                -- Equipment
+        outOfMemory (32),                       -- Processing
+        outputDeviceError (33),                 -- Equipment
+        performanceDegraded (34),               -- Quality of service
+        powerProblem (35),                      -- Equipment
+        pressureUnacceptable (36),              -- Environmental
+        processorProblem (37),                  -- Equipment
+        pumpFailure (38),                       -- Environmental
+        queueSizeExceeded (39),                 -- Quality of service
+        receiveFailure (40),                    -- Equipment
+        receiverFailure (41),                   -- Equipment
+        remoteNodeTransmissionError (42),       -- Communications
+        resourceAtOrNearingCapacity (43),       -- Quality of service
+        responseTimeExcessive (44),             -- Quality of service
+        retransmissionRateExcessive (45),       -- Quality of service
+        softwareProgramError (46),              -- Processing
+        softwareError (47),                     -- Processing
+        softwareProgramAbnormallyTerminated (48), -- Processing
+        storageCapacityProblem (49),            -- Processing
+        temperatureUnacceptable (50),           -- Environmental
+        thresholdCrossed (51),                  -- Quality of service
+        timingProblem (52),                     -- Equipment
+        toxicLeakDetected (53),                 -- Environmental
+        transmitFailure (54),                   -- Equipment
+        transmitterFailure (55),                -- Equipment
+        underlyingResourceUnavailable (56),     -- Processing
+        versionMismatch (57) }                  -- Processing
+
+
+UnitType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The unit type in the M-Series.
+
+         nmb - Network Management Board. The controlling
+         board of the M-Series.
+
+         psu1 - The Power Supply in slot 1 of the M-Series.
+
+         psu2 - The Power Supply in slot 2 of the M-Series.
+
+         fan  - The Fan of the M-Series.
+
+         system - The chassis.
+
+         slaveNmb - Network Management Board of the Cascading system.
+
+         slavePsu1 - The Power Supply in slot 1 of the Cascading M-Series.
+
+         slavePsu2 - The Power Supply in slot 2 of the Cascading M-Series.
+
+         slaveFan - The Fan of the Cascading M-Series."
+    SYNTAX INTEGER {
+        nmb (1),
+        psu1 (2),
+        psu2 (3),
+        fan (4),
+        system (5),
+        slaveNmb (6),
+        slavePsu1 (7),
+        slavePsu2 (8),
+        slaveFan (9)
+    }
+
+PortType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Port direction.
+
+         rx - The port direction is receiving(Rx).
+
+         tx - The port direction is transmitting(Tx).
+
+         biDi - The port direction is both transmitting and receiving."
+    SYNTAX INTEGER {
+        rx (1),
+        tx (2),
+        biDi (3)
+    }
+
+PortStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The operational state for a port.
+
+        idle - The port is not activated
+
+        down - The port traffic is lost.
+
+        up - There is traffic on the port.
+
+        high - The port got to high power.
+
+        low - The port got to low power.
+
+        eyeSafety - The Line Tx port is in Eye Safety Mode.
+        This means that either the connector on the
+        Line Tx port is not inserted or that you have
+        too strong reflection from the line fiber.
+
+        cd - Channel detected.
+
+        ncd - No channel detected."
+    SYNTAX INTEGER {
+        idle (1),
+        down (2),
+        up (3),
+        high (4),
+        low (5),
+        eyeSafety (6),
+        cd (7),
+        ncd (8) }
+
+PortMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Port Mode.
+
+         normal - The port is active. Alarms are not suppressed.
+
+         service - the port is in Service Mode. Alarms are
+         beeing suppressed. When service is ready the
+         Port Mode should be set back to normal."
+    SYNTAX INTEGER {
+        normal (1),
+        service (2)
+    }
+
+END

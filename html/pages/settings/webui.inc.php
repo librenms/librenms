@@ -7,24 +7,38 @@ $config_groups = get_config_by_group('webui');
 $search_conf = array(
     array('name'               => 'webui.global_search_result_limit',
           'descr'              => 'Set the max search result limit',
-          'type'               => 'text',
+          'type'               => 'numeric',
+          'required'           => true,
     ),
 );
 
-$graph_conf = array(
-    array('name'             => 'webui.min_graph_height',
+$graph_conf = [
+    [
+        'name'               => 'webui.min_graph_height',
         'descr'              => 'Set the minimum graph height',
-        'type'               => 'text',
-    ),
-    array('name'             => 'webui.graph_type',
+        'type'               => 'numeric',
+        'required'           => true,
+    ],
+    [
+        'name'               => 'webui.graph_type',
         'descr'              => 'Set the graph type',
         'type'               => 'select',
-        'options'            => array(
+        'options'            => [
             'png' => 'png',
             'svg' => 'svg',
-        ),
-    ),
-);
+        ],
+    ],
+    [
+        'name'  => 'webui.graph_stacked',
+        'descr' => 'Use stacked graphs',
+        'type'  => 'checkbox',
+    ],
+    [
+        'name'  => 'webui.dynamic_graphs',
+        'descr' => 'Enable dynamic graphs',
+        'type'  => 'checkbox',
+    ]
+];
 
 $availability_map_conf = array(
     array('name'               => 'webui.availability_map_compact',

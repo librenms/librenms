@@ -1,103 +1,109 @@
 <?php
+/*
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2018 LibreNMS
+ * @author     LibreNMS Contributors
+*/
+
+use LibreNMS\Authentication\LegacyAuth;
 
 $where = 1;
 $param = array();
 
 $sql = ' FROM `devices`';
 
-if (is_admin() === false && is_read() === false) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
     $where .= ' AND `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = LegacyAuth::id();
 }
 
-if (!empty($_POST['location'])) {
+if (!empty($vars['location'])) {
     $sql .= " LEFT JOIN `devices_attribs` AS `DB` ON `DB`.`device_id`=`devices`.`device_id` AND `DB`.`attrib_type`='override_sysLocation_bool' AND `DB`.`attrib_value`='1' LEFT JOIN `devices_attribs` AS `DA` ON `devices`.`device_id`=`DA`.`device_id`";
+}
+
+if (!empty($vars['group']) && is_numeric($vars['group'])) {
+    $sql .= " LEFT JOIN `device_group_device` AS `DG` ON `DG`.`device_id`=`devices`.`device_id`";
+    $where .= " AND `DG`.`device_group_id`=?";
+    $param[] = $vars['group'];
 }
 
 $sql .= " WHERE $where ";
 
-if (!empty($_POST['hostname'])) {
-    $sql .= ' AND hostname LIKE ?';
-    $param[] = '%' . $_POST['hostname'] . '%';
+if (!empty($vars['searchquery'])) {
+    $sql .= ' AND (sysName LIKE ? OR hostname LIKE ? OR hardware LIKE ? OR os LIKE ? OR location LIKE ?)';
+    $param += array_fill(count($param), 5, '%' . $vars['searchquery'] . '%');
 }
 
-if (!empty($_POST['os'])) {
+if (!empty($vars['os'])) {
     $sql .= ' AND os = ?';
-    $param[] = $_POST['os'];
+    $param[] = $vars['os'];
 }
 
-if (!empty($_POST['version'])) {
+if (!empty($vars['version'])) {
     $sql .= ' AND version = ?';
-    $param[] = $_POST['version'];
+    $param[] = $vars['version'];
 }
 
-if (!empty($_POST['hardware'])) {
+if (!empty($vars['hardware'])) {
     $sql .= ' AND hardware = ?';
-    $param[] = $_POST['hardware'];
+    $param[] = $vars['hardware'];
 }
 
-if (!empty($_POST['features'])) {
+if (!empty($vars['features'])) {
     $sql .= ' AND features = ?';
-    $param[] = $_POST['features'];
+    $param[] = $vars['features'];
 }
 
-if (!empty($_POST['type'])) {
-    if ($_POST['type'] == 'generic') {
+if (!empty($vars['type'])) {
+    if ($vars['type'] == 'generic') {
         $sql .= " AND ( type = ? OR type = '')";
-        $param[] = $_POST['type'];
+        $param[] = $vars['type'];
     } else {
         $sql .= ' AND type = ?';
-        $param[] = $_POST['type'];
+        $param[] = $vars['type'];
     }
 }
 
-if (!empty($_POST['state'])) {
+if (isset($vars['state']) && $vars['state'] !== "") {
     $sql .= ' AND status= ?';
-    if (is_numeric($_POST['state'])) {
-        $param[] = $_POST['state'];
+    if (is_numeric($vars['state'])) {
+        $param[] = $vars['state'];
     } else {
-        $param[] = str_replace(array('up', 'down'), array(1, 0), $_POST['state']);
+        $param[] = str_replace(array('up', 'down'), array(1, 0), $vars['state']);
     }
 }
 
-if (!empty($_POST['disabled'])) {
+if (!empty($vars['disabled'])) {
     $sql .= ' AND disabled= ?';
-    $param[] = $_POST['disabled'];
+    $param[] = $vars['disabled'];
 }
 
-if (!empty($_POST['ignore'])) {
+if (!empty($vars['ignore'])) {
     $sql .= ' AND `ignore`= ?';
-    $param[] = $_POST['ignore'];
+    $param[] = $vars['ignore'];
 }
 
-if (!empty($_POST['location']) && $_POST['location'] == 'Unset') {
+if (!empty($vars['location']) && $vars['location'] == 'Unset') {
     $location_filter = '';
 }
 
-if (!empty($_POST['location'])) {
+if (!empty($vars['location'])) {
     $sql .= " AND `location` = ?";
-    $param[] = $_POST['location'];
-}
-
-if (!empty($_POST['group'])) {
-    include_once '../includes/device-groups.inc.php';
-    $sql .= ' AND ( ';
-    foreach (GetDevicesFromGroup($_POST['group']) as $dev) {
-        $sql .= '`devices`.`device_id` = ? OR ';
-        $param[] = $dev;
-    }
-
-    $sql = substr($sql, 0, (strlen($sql) - 3));
-    $sql .= ' )';
+    $param[] = $vars['location'];
 }
 
 $count_sql = "SELECT COUNT(`devices`.`device_id`) $sql";
 
-$total = dbFetchCell($count_sql, $param);
-if (empty($total)) {
-    $total = 0;
-}
+$total = (int)dbFetchCell($count_sql, $param);
 
 if (!isset($sort) || empty($sort)) {
     $sort = '`hostname` DESC';
@@ -116,39 +122,34 @@ if ($rowCount != -1) {
 
 $sql = "SELECT DISTINCT(`devices`.`device_id`),`devices`.* $sql";
 
-if (!isset($_POST['format'])) {
-    $_POST['format'] = 'list_detail';
+if (!isset($vars['format'])) {
+    $vars['format'] = 'list_detail';
 }
 
-list($format, $subformat) = explode('_', $_POST['format']);
+list($format, $subformat) = explode('_', $vars['format']);
 
 foreach (dbFetchRows($sql, $param) as $device) {
-    if (isset($bg) && $bg == $list_colour_b) {
-        $bg = $list_colour_a;
+    if (isset($bg) && $bg == $config['list_colour']['odd']) {
+        $bg = $config['list_colour']['even'];
     } else {
-        $bg = $list_colour_b;
+        $bg = $config['list_colour']['odd'];
     }
 
     if ($device['status'] == '0') {
-        $extra = 'danger';
-        $msg = $device['status_reason'];
+        $extra = 'label-danger';
     } else {
-        $extra = 'success';
-        $msg = 'up';
+        $extra = 'label-success';
     }
 
     if ($device['ignore'] == '1') {
-        $extra = 'default';
-        $msg = 'ignored';
+        $extra = 'label-default';
         if ($device['status'] == '1') {
-            $extra = 'warning';
-            $msg = 'ignored';
+            $extra = 'label-warning';
         }
     }
 
     if ($device['disabled'] == '1') {
-        $extra = 'default';
-        $msg = 'disabled';
+        $extra = 'label-default';
     }
 
     $type = strtolower($device['os']);
@@ -171,7 +172,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
                 <div class="col-xs-1"><a href="' . generate_device_url($device, array('tab' => 'alerts')) . '"> <i class="fa fa-exclamation-circle fa-lg icon-theme" title="View alerts"></i></a></div>
     ';
 
-    if ($_SESSION['userlevel'] >= '7') {
+    if (LegacyAuth::user()->hasGlobalAdmin()) {
         $actions .= '<div class="col-xs-1"><a href="' . generate_device_url($device, array('tab' => 'edit')) . '"> <i class="fa fa-pencil fa-lg icon-theme" title="Edit device"></i></a></div>';
     }
 
@@ -179,13 +180,25 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $actions .= '</div><div class="row">';
     }
 
-    $actions .= '
-                <div class="col-xs-1"><a href="telnet://' . $device['hostname'] . '"><i class="fa fa-terminal fa-lg icon-theme" title="Telnet to ' . $device['hostname'] . '"></i></a></div>
-                <div class="col-xs-1"><a href="ssh://' . $device['hostname'] . '"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>
-                <div class="col-xs-1"><a href="https://' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" title="Launch browser https://' . $device['hostname'] . '"></i></a></div>
+
+        $actions .= '
+                    <div class="col-xs-1"><a href="telnet://' . $device['hostname'] . '"><i class="fa fa-terminal fa-lg icon-theme" title="Telnet to ' . $device['hostname'] . '"></i></a></div>
+                    ';
+    if (isset($config['gateone']['server'])) {
+        if ($config['gateone']['use_librenms_user'] == true) {
+                    $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . LegacyAuth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
+        } else {
+                    $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
+        }
+    } else {
+        $actions .= '<div class="col-xs-1"><a href="ssh://' . $device['hostname'] . '"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>
+        ';
+    }
+        $actions .= '<div class="col-xs-1"><a href="https://' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" title="Launch browser https://' . $device['hostname'] . '"></i></a></div>
+                </div>
             </div>
-        </div>
-    ';
+        ';
+
     $hostname = generate_device_link($device);
 
     if (extension_loaded('mbstring')) {
@@ -195,15 +208,11 @@ foreach (dbFetchRows($sql, $param) as $device) {
     }
 
     if ($subformat == 'detail') {
-        $platform = $device['hardware'] . '<br>' . $device['features'];
-        $os = $device['os_text'] . '<br>' . $device['version'];
+        $platform = $device['hardware'];
+        $os = $device['os_text'] . '<br>' . $device['version'] . (empty($device['features'])? "" : " ({$device['features']})");
         $device['ip'] = inet6_ntop($device['ip']);
         $uptime = formatUptime($device['uptime'], 'short');
-        if (format_hostname($device) !== $device['sysName']) {
-            $hostname .= '<br />' . $device['sysName'];
-        } elseif ($device['hostname'] !== $device['ip']) {
-            $hostname .= '<br />' . $device['hostname'];
-        }
+        $hostname .= '<br />' . get_device_name($device);
 
         $metrics = array();
         if ($port_count) {
@@ -239,7 +248,6 @@ foreach (dbFetchRows($sql, $param) as $device) {
 
     $response[] = array(
         'extra' => $extra,
-        'msg' => $msg,
         'list_type' => $subformat,
         'icon' => $image,
         'hostname' => $hostname,

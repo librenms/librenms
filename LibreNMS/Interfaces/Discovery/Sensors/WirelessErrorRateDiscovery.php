@@ -28,7 +28,7 @@ namespace LibreNMS\Interfaces\Discovery\Sensors;
 interface WirelessErrorRateDiscovery
 {
     /**
-     * Discover wireless bit error rate.  This is in bps. Type is error-ratio.
+     * Discover wireless bit error rate.  This is in bps. Type is error-rate.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors

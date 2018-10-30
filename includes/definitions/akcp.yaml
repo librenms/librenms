@@ -4,7 +4,6 @@ type: environment
 over:
     - { graph: device_temperature, text: temperature }
 discovery:
-    - sysDescr:
-        - SensorProbe
-        - sensorProbe4
-        - securityProbe
+    - sysDescr_regex:
+        - '/^sensorProbe/i'
+        - '/^securityProbe/i'

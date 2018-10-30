@@ -1,0 +1,839 @@
+-- Cambium MIB Release CAMBIUM_MIB_VERSION
+   CAMBIUM-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
+       enterprises, IpAddress, Integer32, Counter32, Counter64, TimeTicks, snmpModules
+           FROM SNMPv2-SMI
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+       MacAddress, DisplayString, TEXTUAL-CONVENTION
+           FROM SNMPv2-TC;
+
+   cnPilotMIB MODULE-IDENTITY 
+       LAST-UPDATED "201509091238Z"
+       ORGANIZATION "Cambium Networks Inc."
+       CONTACT-INFO
+            "Cambium Networks Support
+             http://www.cambiumnetworks.com/support/     
+            E-mail:     support@cambiumnetworks.com"
+       DESCRIPTION
+           "This module contains MIB definitions for APs"
+       REVISION        "201509091238Z"
+       DESCRIPTION
+           "The initial Version."
+       ::= { cambium 22 }
+
+   cambium                         OBJECT IDENTIFIER ::= { enterprises 17713 }
+
+   cambiumStateGroup               OBJECT IDENTIFIER ::= { cnPilotMIB 1 }
+
+
+   cambiumAccessPointTable  OBJECT-TYPE 
+       SYNTAX       SEQUENCE OF CambiumAccessPointEntry
+       MAX-ACCESS   not-accessible              
+       STATUS       current 
+       DESCRIPTION 
+                "This contains all details about AP"
+       ::= { cambiumStateGroup 1 } 
+
+   cambiumAccessPointEntry OBJECT-TYPE 
+       SYNTAX       CambiumAccessPointEntry 
+       MAX-ACCESS   not-accessible            
+       STATUS       current 
+       DESCRIPTION 
+             " "
+          INDEX { cambiumAPMACAddress }
+       ::= { cambiumAccessPointTable 1 } 
+
+   CambiumAccessPointEntry ::=
+   SEQUENCE {
+        cambiumAPMACAddress      MacAddress,
+        cambiumAPName            DisplayString,
+        cambiumAPIPAddress       DisplayString,
+        cambiumAPSerialNum       DisplayString,
+        cambiumAPModel           DisplayString,
+        cambiumAPCPUUtilization  Integer32,
+        cambiumAPMemoryFree      Integer32,
+        cambiumAPSWVersion       DisplayString,
+        cambiumAPUptime          TimeTicks,
+        cambiumAPHWType          DisplayString,
+        cambiumAPRegulatory      DisplayString,
+        cambiumAPCnmConstaus     DisplayString,
+        cambiumAPCnmAccID        DisplayString,
+        cambiumAPTotalClients    Integer32,
+        cambiumAPCheckUpgradeStatus    DisplayString
+   }
+
+   cambiumAPMACAddress OBJECT-TYPE
+       SYNTAX       MacAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Access Point MAC Address"
+      ::= { cambiumAccessPointEntry 1 }
+
+   cambiumAPName OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point hostname"
+       ::= { cambiumAccessPointEntry 2 }
+
+   cambiumAPIPAddress OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..64)) 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point IP Address"
+       ::= { cambiumAccessPointEntry 3 }
+
+   cambiumAPSerialNum OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point Serial Number"
+       ::= { cambiumAccessPointEntry 4 }
+
+   cambiumAPModel OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point Model Name"
+       ::= { cambiumAccessPointEntry 5 }
+
+   cambiumAPCPUUtilization OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point CPU Utilization"
+       ::= { cambiumAccessPointEntry 6 }
+
+   cambiumAPMemoryFree OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Amount of memory free in the access point in bytes"
+       ::= { cambiumAccessPointEntry 7 }
+
+   cambiumAPSWVersion OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point Software Version"
+       ::= { cambiumAccessPointEntry 8 }
+
+   cambiumAPUptime OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point uptime"
+       ::= { cambiumAccessPointEntry 9 }
+
+   cambiumAPHWType OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point Hardware Type"
+       ::= { cambiumAccessPointEntry 10 }
+
+   cambiumAPRegulatory OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point Regulatory detail"
+       ::= { cambiumAccessPointEntry 11 }
+
+   cambiumAPCnmConstaus OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point cnMaestro Connection Status"
+       ::= { cambiumAccessPointEntry 12 }
+
+   cambiumAPCnmAccID OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point cnMaestro Account ID"
+       ::= { cambiumAccessPointEntry 13 }
+
+   cambiumAPTotalClients OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total clients connected with this Access Point"
+       ::= { cambiumAccessPointEntry 14 }
+
+   cambiumAPCheckUpgradeStatus OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point check upgrade status"
+       ::= { cambiumAccessPointEntry 15 }
+
+
+   cambiumRadioTable  OBJECT-TYPE 
+       SYNTAX       SEQUENCE OF CambiumRadioEntry
+       MAX-ACCESS   not-accessible              
+       STATUS       current 
+       DESCRIPTION 
+                "This table contains all radios of access point"
+       ::= { cambiumStateGroup 2 } 
+
+   cambiumRadioEntry OBJECT-TYPE 
+       SYNTAX       CambiumRadioEntry 
+       MAX-ACCESS   not-accessible            
+       STATUS       current 
+       DESCRIPTION 
+             " "
+          INDEX { cambiumRadioIndex }
+       ::= { cambiumRadioTable 1 } 
+
+   CambiumRadioEntry ::=
+   SEQUENCE {
+        cambiumRadioIndex             Integer32,
+        cambiumRadioMACAddress        MacAddress,
+        cambiumRadioBandType          DisplayString,
+        cambiumRadioWlan              Integer32,
+        cambiumRadioNumClients        Integer32,
+        cambiumRadioChannel           DisplayString,
+        cambiumRadioChannelWidth      DisplayString,
+        cambiumRadioTransmitPower     Integer32,
+        cambiumRadioTotalTxPackets    Counter32,
+        cambiumRadioTotalRxPackets    Counter32,
+        cambiumRadioTxDataBytes       Counter32,
+        cambiumRadioTxDataBytes       Counter32,
+        cambiumRadioRxDataBytes       Counter32,
+        cambiumRadioState             DisplayString,
+        cambiumRadioDfsStatus         Integer32,
+        cambiumRadioDfsDetect         Integer32,
+        cambiumRadioNoiseFloor        DisplayString,
+        cambiumRadioInterference      DisplayString,
+        cambiumRadioAirtime           DisplayString
+   }
+
+   cambiumRadioIndex OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio number"
+      ::= { cambiumRadioEntry 1 }
+
+
+   cambiumRadioMACAddress OBJECT-TYPE
+       SYNTAX       MacAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio MAC Address"
+      ::= { cambiumRadioEntry 2 }
+
+   cambiumRadioBandType OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(0..32)) 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio band type"
+      ::= { cambiumRadioEntry 3 }
+
+   cambiumRadioWlan OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio WLAN number"
+      ::= { cambiumRadioEntry 4 }
+
+   cambiumRadioNumClients OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Number of clients connected with a radio"
+      ::= { cambiumRadioEntry 5 }
+
+   cambiumRadioChannel OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(0..32))
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio channel"
+      ::= { cambiumRadioEntry 6 }
+
+   cambiumRadioChannelWidth OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(0..32))
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio channel width"
+      ::= { cambiumRadioEntry 7 }
+
+   cambiumRadioTransmitPower OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio Power"
+      ::= { cambiumRadioEntry 8 }
+
+   cambiumRadioTotalTxPackets OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Total packets transmitted by a radio"
+      ::= { cambiumRadioEntry 9 }
+
+   cambiumRadioTotalRxPackets OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Total packets received by a radio"
+      ::= { cambiumRadioEntry 10 }
+
+   cambiumRadioTxDataBytes OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Transmitted data packets in bytes by a radio"
+      ::= { cambiumRadioEntry 11 }
+
+   cambiumRadioRxDataBytes OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Received data packets in bytes by a radio"
+      ::= { cambiumRadioEntry 12 }
+
+   cambiumRadioState OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(0..32))
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio state (ON/OFF)"
+      ::= { cambiumRadioEntry 13 }
+
+   cambiumRadioDfsStatus OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "DFS status"
+      ::= { cambiumRadioEntry 14 }
+
+   cambiumRadioDfsDetect OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "DFS detected by a radio"
+      ::= { cambiumRadioEntry 15 }
+
+   cambiumRadioNoiseFloor OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(0..32)) 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio noise floor"
+      ::= { cambiumRadioEntry 16 }
+
+   cambiumRadioInterference OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(0..32)) 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio channel interference"
+      ::= { cambiumRadioEntry 17 }
+
+   cambiumRadioAirtime OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(0..64)) 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio airtime (total/tx/rx/busy)"
+      ::= { cambiumRadioEntry 18 }
+
+   cambiumClientTable  OBJECT-TYPE 
+       SYNTAX       SEQUENCE OF CambiumClientEntry
+       MAX-ACCESS   not-accessible              
+       STATUS       current 
+       DESCRIPTION 
+                "This table contain information about all clients
+                connected to the access point"
+       ::= { cambiumStateGroup 3 } 
+
+   cambiumClientEntry OBJECT-TYPE 
+       SYNTAX       CambiumClientEntry 
+       MAX-ACCESS   not-accessible            
+       STATUS       current 
+       DESCRIPTION 
+             " "
+          INDEX { cambiumClientMACAddressIndex }
+       ::= { cambiumClientTable 1 } 
+
+   CambiumClientEntry ::=
+   SEQUENCE {
+        cambiumClientMACAddressIndex Integer32,
+        cambiumClientMACAddress      MacAddress,
+        cambiumClientIPAddress       DisplayString,
+        cambiumClientName            DisplayString,
+        cambiumClientSsid            DisplayString,
+        cambiumClientVendorName	     DisplayString,
+        cambiumClientHwmode          DisplayString,
+        cambiumClientRadioIndex	     Integer32,
+        cambiumClientWlan            Integer32,
+        cambiumClientVlan            Integer32,
+        cambiumClientSNR             Integer32,
+        cambiumClientTxRate          DisplayString,
+        cambiumClientTotalTxPackets  Counter32,
+        cambiumClientTxDataBytes     Counter32,
+        cambiumClientTotalRxPackets  Counter32,
+        cambiumClientRxDataBytes     Counter32
+   }
+
+   cambiumClientMACAddressIndex OBJECT-TYPE
+       SYNTAX       Integer32 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION  
+            "The auxiliary variable used to identify instances
+            of the columnar objects in the Client Table."
+       ::= { cambiumClientEntry 1 }
+
+   cambiumClientMACAddress OBJECT-TYPE
+       SYNTAX       MacAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Client MAC address"
+      ::= { cambiumClientEntry 2 }
+
+   cambiumClientIPAddress OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(0..32)) 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Client IP Address"
+      ::= { cambiumClientEntry 3 }
+
+   cambiumClientName OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32)) 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Name of user using the client"
+       ::= { cambiumClientEntry 4 }
+
+
+   cambiumClientSsid OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))  
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Client is connected with SSID"
+       ::= { cambiumClientEntry 5 }
+
+   cambiumClientVendorName OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Client operating system"
+       ::= { cambiumClientEntry 6 }
+
+   cambiumClientHwmode OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Client hardware mode"
+       ::= { cambiumClientEntry 7 }
+
+   cambiumClientRadioIndex OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Client is connected with radio"
+       ::= { cambiumClientEntry 8 }
+
+   cambiumClientWlan OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Client wlan number"
+       ::= { cambiumClientEntry 9 }
+
+   cambiumClientVlan OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Client Vlan number"
+       ::= { cambiumClientEntry 10 }
+
+   cambiumClientSNR OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Signal to noise ratio of client connection to the access point"
+       ::= { cambiumClientEntry 11 }
+
+   cambiumClientTxRate OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Transmit rate of client in mbps"
+       ::= { cambiumClientEntry 12 }
+
+   cambiumClientTotalTxPackets OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total packets transmitted by the client"
+       ::= { cambiumClientEntry 13 }
+
+   cambiumClientTxDataBytes OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total bytes transmitted by the client"
+       ::= { cambiumClientEntry 14 }
+
+   cambiumClientTotalRxPackets OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total packets received by the client"
+       ::= { cambiumClientEntry 15 }
+
+   cambiumClientRxDataBytes OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total bytes received by the client"
+       ::= { cambiumClientEntry 16 }
+
+   cambiumWlanTable  OBJECT-TYPE 
+       SYNTAX       SEQUENCE OF CambiumWlanEntry
+       MAX-ACCESS   not-accessible              
+       STATUS       current 
+       DESCRIPTION 
+                "This table contain information about all WLAN
+                configured on the access point"
+       ::= { cambiumStateGroup 4 } 
+
+   cambiumWlanEntry OBJECT-TYPE 
+       SYNTAX       CambiumWlanEntry 
+       MAX-ACCESS   not-accessible            
+       STATUS       current 
+       DESCRIPTION 
+             " "
+          INDEX { cambiumWlanIndex }
+       ::= { cambiumWlanTable 1 } 
+
+   CambiumWlanEntry ::=
+   SEQUENCE {
+        cambiumWlanIndex           Integer32,
+        cambiumWlanSsid            DisplayString,
+        cambiumWlanBand            DisplayString,
+        cambiumWlanVlan            Integer32,
+        cambiumWlanSecurity        DisplayString,
+        cambiumWlanGuestAccess     DisplayString,
+        cambiumWlanNumClients      Integer32,
+        cambiumWlanTotalTxPackets  Counter32,
+        cambiumWlanTxDataBytes     Counter32,
+        cambiumWlanTotalRxPackets  Counter32,
+        cambiumWlanRxDataBytes     Counter32
+   }
+
+   cambiumWlanIndex OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "The auxiliary variable used to identify instances
+            of the columnar objects in the Wlan Table."
+       ::= { cambiumWlanEntry 1 }
+
+   cambiumWlanSsid OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(0..32))
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Wlan SSID"
+      ::= { cambiumWlanEntry 2 }
+
+   cambiumWlanBand OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(0..32)) 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio band configuration on Wlan"
+      ::= { cambiumWlanEntry 3 }
+
+   cambiumWlanVlan OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Wlan vlan number"
+       ::= { cambiumWlanEntry 4 }
+
+   cambiumWlanSecurity OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Security configuration on Wlan"
+       ::= { cambiumWlanEntry 5 }
+
+   cambiumWlanGuestAccess OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Guest Access configuration on Wlan"
+       ::= { cambiumWlanEntry 6 }
+
+   cambiumWlanNumClients OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Number of clients connected to Wlan"
+       ::= { cambiumWlanEntry 7 }
+
+   cambiumWlanTotalTxPackets OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total packets transmitted"
+       ::= { cambiumWlanEntry 8 }
+
+   cambiumWlanTxDataBytes OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total bytes transmitted"
+       ::= { cambiumWlanEntry 9 }
+
+   cambiumWlanTotalRxPackets OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total packets received"
+       ::= { cambiumWlanEntry 10 }
+
+   cambiumWlanRxDataBytes OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total bytes received"
+       ::= { cambiumWlanEntry 11 }
+
+   cambiumMeshClientTable  OBJECT-TYPE 
+       SYNTAX       SEQUENCE OF CambiumMeshClientEntry
+       MAX-ACCESS   not-accessible              
+       STATUS       current 
+       DESCRIPTION 
+                "This table contain information about all Mesh
+                 clients connected to the access point"
+       ::= { cambiumStateGroup 5 } 
+
+   cambiumMeshClientEntry OBJECT-TYPE 
+       SYNTAX       CambiumMeshClientEntry 
+       MAX-ACCESS   not-accessible            
+       STATUS       current 
+       DESCRIPTION 
+             " "
+          INDEX { cambiumMeshClientMACAddressIndex }
+       ::= { cambiumMeshClientTable 1 } 
+
+   CambiumMeshClientEntry ::=
+   SEQUENCE {
+        cambiumMeshClientMACAddressIndex Integer32,
+        cambiumMeshClientMACAddress      MacAddress,
+        cambiumMeshClientBaseMACAddress  MacAddress,
+        cambiumMeshClientIPAddress       DisplayString,
+        cambiumMeshClientName            DisplayString,
+        cambiumMeshClientSsid            DisplayString,
+        cambiumMeshClientRadioBand       DisplayString,
+        cambiumMeshClientSNR             Integer32,
+        cambiumMeshClientRSSI            Integer32,
+        cambiumMeshClientStatus          DisplayString,
+        cambiumMeshClientDataRate        DisplayString,
+        cambiumMeshClientTotalTxPackets  Counter32,
+        cambiumMeshClientTxDataBytes     Counter32,
+        cambiumMeshClientTotalRxPackets  Counter32,
+        cambiumMeshClientRxDataBytes     Counter32
+   }
+
+   cambiumMeshClientMACAddressIndex OBJECT-TYPE
+       SYNTAX       Integer32 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION  
+            "The auxiliary variable used to identify instances
+            of the columnar objects in the mesh client Table."
+       ::= { cambiumMeshClientEntry 1 }
+
+   cambiumMeshClientMACAddress OBJECT-TYPE
+       SYNTAX       MacAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Mesh client MAC address"
+      ::= { cambiumMeshClientEntry 2 }
+
+   cambiumMeshClientBaseMACAddress OBJECT-TYPE
+       SYNTAX       MacAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Mesh client AP MAC address"
+      ::= { cambiumMeshClientEntry 3 }
+
+   cambiumMeshClientIPAddress OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(0..32)) 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Mesh client IP Address"
+      ::= { cambiumMeshClientEntry 4 }
+
+   cambiumMeshClientName OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32)) 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Hostname of the mesh client"
+       ::= { cambiumMeshClientEntry 5 }
+
+
+   cambiumMeshClientSsid OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))  
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Mesh client is connected with SSID"
+       ::= { cambiumMeshClientEntry 6 }
+
+   cambiumMeshClientRadioBand OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Mesh client is connected with Radio"
+       ::= { cambiumMeshClientEntry 7 }
+
+   cambiumMeshClientSNR OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Signal to noise ratio of mesh client connection to the access point"
+       ::= { cambiumMeshClientEntry 8 }
+
+   cambiumMeshClientRSSI OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Signal strength of mesh client connection to the access point"
+       ::= { cambiumMeshClientEntry 9 }
+
+   cambiumMeshClientStatus OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE(0..32)) 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Mesh client connection status"
+      ::= { cambiumMeshClientEntry 10 }
+
+   cambiumMeshClientDataRate OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Data rate of mesh client in mbps"
+       ::= { cambiumMeshClientEntry 11 }
+
+   cambiumMeshClientTotalTxPackets OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total packets transmitted by the mesh client"
+       ::= { cambiumMeshClientEntry 12 }
+
+   cambiumMeshClientTxDataBytes OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total bytes transmitted by the mesh client"
+       ::= { cambiumMeshClientEntry 13 }
+
+   cambiumMeshClientTotalRxPackets OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total packets received by the mesh client"
+       ::= { cambiumMeshClientEntry 14 }
+
+   cambiumMeshClientRxDataBytes OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total bytes received by the mesh client"
+       ::= { cambiumMeshClientEntry 15 }
+
+   cambiumAPSetIPAddress OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..64)) 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+            "Set Access Point IP Address"
+       ::= { cambiumStateGroup 6 }
+
+    cambiumAPReboot OBJECT-TYPE
+       SYNTAX      Integer32 (1) 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+            "OID for Device Reboot, send reboot command to device"
+       ::= { cambiumStateGroup 7 }
+ 
+END

@@ -9,10 +9,10 @@
  * @copyright  (C) 2016 Librenms
  */
 
-if (preg_match('/^Cisco IOS Software, .+? Software \([^\-]+-([^\-]+)-\w\),.+?Version ([^, ]+)/', $poll_device['sysDescr'], $regexp_result)) {
+if (preg_match('/^Cisco IOS Software, .+? Software \([^\-]+-([^\-]+)-\w\),.+?Version ([^, ]+)/', $device['sysDescr'], $regexp_result)) {
     $features = $regexp_result[1];
     $version  = $regexp_result[2];
-} elseif (preg_match('/Cisco Internetwork Operating System Software\s+IOS \(tm\) [^ ]+ Software \([^\-]+-([^\-]+)-\w\),.+?Version ([^, ]+)/', $poll_device['sysDescr'], $regexp_result)) {
+} elseif (preg_match('/Cisco Internetwork Operating System Software\s+IOS \(tm\) [^ ]+ Software \([^\-]+-([^\-]+)-\w\),.+?Version ([^, ]+)/', $device['sysDescr'], $regexp_result)) {
     $features = $regexp_result[1];
     $version  = $regexp_result[2];
 }

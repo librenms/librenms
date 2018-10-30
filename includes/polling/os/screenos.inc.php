@@ -2,13 +2,16 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$version = preg_replace('/(.+)\ version\ (.+)\ \(SN:\ (.+)\,\ (.+)\)/', '\\1||\\2||\\3||\\4', $poll_device['sysDescr']);
+$version = preg_replace('/(.+)\ version\ (.+)\ \(SN:\ (.+)\,\ (.+)\)/', '\\1||\\2||\\3||\\4', $device['sysDescr']);
 list($hardware,$version,$serial,$features) = explode('||', $version);
 
-$sess_cmd  = $config['snmpget'].' -M '.$config['mibdir'].' -O qv '.snmp_gen_auth($device).' '.$device['hostname'];
-$sess_cmd .= ' .1.3.6.1.4.1.3224.16.3.2.0 .1.3.6.1.4.1.3224.16.3.3.0 .1.3.6.1.4.1.3224.16.3.4.0';
-$sess_data = shell_exec($sess_cmd);
-list ($sessalloc, $sessmax, $sessfailed) = explode("\n", $sess_data);
+$oids = array(
+    '.1.3.6.1.4.1.3224.16.3.2.0',
+    '.1.3.6.1.4.1.3224.16.3.3.0',
+    '.1.3.6.1.4.1.3224.16.3.4.0',
+);
+$sess_data = snmp_get_multi_oid($device, $oids);
+list ($sessalloc, $sessmax, $sessfailed) = array_values($sess_data);
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('allocate', 'GAUGE', 0, 3000000)

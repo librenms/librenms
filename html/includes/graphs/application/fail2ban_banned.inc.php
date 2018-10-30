@@ -13,7 +13,7 @@ $transparency  = 15;
 
 $rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_list = array(
         array(
             'filename' => $rrd_filename,
@@ -21,12 +21,6 @@ if (is_file($rrd_filename)) {
             'ds'       => 'banned',
             'colour'   => '582A72'
         ),
-        array(
-            'filename' => $rrd_filename,
-            'descr'    => 'Firewalled',
-            'ds'       => 'firewalled',
-            'colour'   => '28774F'
-        )
     );
 } else {
     echo "file missing: $rrd_filename";

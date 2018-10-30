@@ -12,8 +12,8 @@ if (!empty($agent_data['app'][$name])) {
     $mysql = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.121.115.113.108', '-Ovq');
 }
 
-update_application($app, $mysql);
 echo ' mysql';
+$metrics = array();
 
 // General Stats
 $mapping = array(
@@ -110,6 +110,7 @@ $fields = array();
 foreach ($mapping as $k => $v) {
     $fields[$k] = (isset($map[$v]) && $map[$v] >= 0) ? $map[$v] : 'U';
 }
+$metrics = $fields;
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -218,12 +219,14 @@ $mapping_status = array(
 
 $rrd_name = array('app', $name, $app_id, 'status');
 $rrd_def = new RrdDefinition();
-unset($fields);
+
 $fields = array();
 foreach ($mapping_status as $desc => $id) {
     $fields[$desc] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : 'U';
     $rrd_def->addDataset($id, 'GAUGE', 0, 125000000000);
 }
+$metrics += $fields;
 $status = true;
 $tags = compact('name', 'app_id', 'status', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
+update_application($app, $mysql, $metrics);

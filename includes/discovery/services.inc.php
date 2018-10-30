@@ -1,6 +1,8 @@
 <?php
 
-if ($config['discover_services']) {
+use LibreNMS\Config;
+
+if (Config::get('discover_services')) {
     // FIXME: use /etc/services?
     $known_services = array(
         22  => 'ssh',

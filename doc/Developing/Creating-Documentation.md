@@ -1,4 +1,5 @@
 source: Developing/Creating-Documentation.md
+path: blob/master/doc/
 # Creating Documentation
 
 One of the goals of the LibreNMS project is to enable users to get all of the help they need from our documentation.
@@ -25,7 +26,7 @@ Our docs are based on Markdown using mkdocs which adheres to markdown specs and 
 couple of extra libraries:
 
   - pymdownx.tasklist
-  - mdx_del_ins
+  - pymdownx.tilde
 
 This means you can use:
 
@@ -35,3 +36,5 @@ This means you can use:
   - Code can be placed in `` for single line or ``` for multiline.
   - `#` Can be used for main headings which translates to a `<h1>` tag, increasing the `#`'s will increase the hX tags.
   - `###` Can be used for sub-headings which will appear in the TOC to the left.
+  
+ [Markdown CheatSheet Link](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)

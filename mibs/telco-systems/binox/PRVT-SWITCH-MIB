@@ -1,0 +1,1065 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-SWITCH-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-SWITCH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+        FROM IF-MIB
+    prvt-products
+        FROM PRVT-VENDORDEF-MIB
+    dot1qTpFdbStatus
+        FROM Q-BRIDGE-MIB
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC;
+
+prvtSwitchMIB MODULE-IDENTITY
+    LAST-UPDATED "201508030000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The switch MIB module for managing internal switch parameters"
+    REVISION    "201508030000Z"
+    DESCRIPTION 
+        "add prvtDuplicatedMACAddressAlarm,unauthorizedAccessViaCLI"
+    REVISION    "201507150000Z"
+    DESCRIPTION 
+        "add tMarc3306"
+    REVISION    "201506230000Z"
+    DESCRIPTION 
+        "add tatca510b"
+    REVISION    "201502220000Z"
+    DESCRIPTION 
+        "add tMarc3308"
+    REVISION    "201412300000Z"
+    DESCRIPTION 
+        "add tatca510"
+    REVISION    "201409180000Z"
+    DESCRIPTION 
+        "add tMarc3348s2"
+    REVISION    "201408270000Z"
+    DESCRIPTION 
+        "add cMetro-100"
+    REVISION    "201404010000Z"
+    DESCRIPTION 
+        "add m10GBASECXSMSFPPLUS (75),m10GBASECXMMSFPPLUS (76)"
+    REVISION    "201403270000Z"
+    DESCRIPTION 
+        "add m10GBaseZXSMSFPPLUS (67),m10GBaseZXMMSFPPLUS (68),
+         m10GBaseXDSMSFPPLUS (69), m10GBaseXDMMSFPPLUS (70),
+         m10GBaseLXSMSFPPLUS (71), m10GBaseLXMMSFPPLUS (72),
+         m10GBaseDWDMSMSFPPLUS (73), m10GBaseDWDMMMSFPPLUS (74)"
+    REVISION    "201403120000Z"
+    DESCRIPTION 
+        "add tMetro8064S, tMarc334SH"
+    REVISION    "201401270000Z"
+    DESCRIPTION 
+        "add tMarc3312SCH"
+    REVISION    "201401200000Z"
+    DESCRIPTION 
+        "add tMarc3312WD, tMarc3348WD"
+    REVISION    "201401070000Z"
+    DESCRIPTION 
+        "add tMarc3348WDB"
+    REVISION    "201311200000Z"
+    DESCRIPTION 
+        "add tMarc3312WDB"
+    REVISION    "201309190000Z"
+    DESCRIPTION 
+        "configL2IfaceEthertype"
+    REVISION    "201309120000Z"
+    DESCRIPTION 
+        "configL2IfaceMacAddress"
+    REVISION    "201207310000Z"
+    DESCRIPTION 
+        "configL2IfaceSelfFilterEnable"
+    REVISION    "201204190000Z"
+    DESCRIPTION 
+        "SFP transciever details."
+    REVISION    "201204100000Z"
+    DESCRIPTION 
+        "clearInterfaceFdbTable, clearInterfaceFdbTableStatus."
+    REVISION    "200911170000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { switch 100 }
+
+
+switch OBJECT IDENTIFIER
+    ::= { prvt-products 5 }
+
+prvtSwitchNotifications OBJECT IDENTIFIER
+    ::= { prvtSwitchMIB 0 }
+
+sys OBJECT IDENTIFIER
+    ::= { prvtSwitchMIB 1 }
+
+sysProductsOids OBJECT IDENTIFIER
+    ::= { sys 1 }
+
+tMetro7224 OBJECT IDENTIFIER
+    ::= { sysProductsOids 10000 }
+
+tVendorDev0001 OBJECT IDENTIFIER
+    ::= { sysProductsOids 10001 }
+
+tMetro7124S OBJECT IDENTIFIER
+    ::= { sysProductsOids 10002 }
+
+tMetro5324T OBJECT IDENTIFIER
+    ::= { sysProductsOids 10003 }
+
+tMarc3208SH OBJECT IDENTIFIER
+    ::= { sysProductsOids 10004 }
+
+tMarc3312SC OBJECT IDENTIFIER
+    ::= { sysProductsOids 10005 }
+
+tMarc3348S OBJECT IDENTIFIER
+    ::= { sysProductsOids 10006 }
+
+tMarc3312WDB OBJECT IDENTIFIER
+    ::= { sysProductsOids 10007 }
+
+tMarc3348WDB OBJECT IDENTIFIER
+    ::= { sysProductsOids 10008 }
+
+tMarc3312WD OBJECT IDENTIFIER
+    ::= { sysProductsOids 10009 }
+
+tMarc3348WD OBJECT IDENTIFIER
+    ::= { sysProductsOids 10010 }
+
+tMarc3312SCH OBJECT IDENTIFIER
+    ::= { sysProductsOids 10011 }
+
+tMarc3348SH OBJECT IDENTIFIER
+    ::= { sysProductsOids 10012 }
+
+tMarc3348S2 OBJECT IDENTIFIER
+    ::= { sysProductsOids 10013 }
+
+tMarc3308 OBJECT IDENTIFIER
+    ::= { sysProductsOids 10014 }
+
+tMarc3306 OBJECT IDENTIFIER
+    ::= { sysProductsOids 10015 }
+
+tVendorDev0002 OBJECT IDENTIFIER
+    ::= { sysProductsOids 11003 }
+
+tVendorDev0003 OBJECT IDENTIFIER
+    ::= { sysProductsOids 11004 }
+
+tVendorDev0004 OBJECT IDENTIFIER
+    ::= { sysProductsOids 11005 }
+
+thub4 OBJECT IDENTIFIER
+    ::= { sysProductsOids 20004 }
+
+tatca401 OBJECT IDENTIFIER
+    ::= { sysProductsOids 20005 }
+
+tatca510 OBJECT IDENTIFIER
+    ::= { sysProductsOids 20006 }
+
+tatca510b OBJECT IDENTIFIER
+    ::= { sysProductsOids 20007 }
+
+tm8000 OBJECT IDENTIFIER
+    ::= { sysProductsOids 40000 }
+
+tm8001 OBJECT IDENTIFIER
+    ::= { sysProductsOids 40001 }
+
+tMetro8064S OBJECT IDENTIFIER
+    ::= { sysProductsOids 40002 }
+
+cMetro100 OBJECT IDENTIFIER
+    ::= { sysProductsOids 40003 }
+
+sysManufacturingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SysManufacturingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "sysManufacturing details per module"
+    ::= { sys 2 }
+
+sysManufacturingEntry OBJECT-TYPE
+    SYNTAX      SysManufacturingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in sysManufacturingTable"
+    INDEX       { moduleId }
+    ::= { sysManufacturingTable 1 }
+
+SysManufacturingEntry ::= SEQUENCE {
+    moduleId                    INTEGER,
+    moduleSysSerialNumber       OCTET STRING,
+    moduleSysAssemblyNumber     OCTET STRING,
+    moduleSysHwRevision         OCTET STRING,
+    moduleSysHwSubRevision      OCTET STRING,
+    moduleSysPartNumber         OCTET STRING,
+    moduleSysCLEI               OCTET STRING,
+    moduleSysManufacturingDate  OCTET STRING,
+    moduleSysBaseMacAddress     OCTET STRING,
+    moduleSysFirmwareVersion    OCTET STRING
+}
+
+moduleId OBJECT-TYPE
+    SYNTAX      INTEGER { mainboard(1), slot1(2), slot2(3), slot3(4), 
+                    slot4(5), slot5(6), slot6(7), slot7(8), slot8(9), 
+                    slot9(10) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Board id"
+    ::= { sysManufacturingEntry 1 }
+
+moduleSysSerialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This is the device's serial number, which is entered during the manufacturing process."
+    ::= { sysManufacturingEntry 2 }
+
+moduleSysAssemblyNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the equipment assembly number"
+    ::= { sysManufacturingEntry 3 }
+
+moduleSysHwRevision OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the HW revision"
+    ::= { sysManufacturingEntry 4 }
+
+moduleSysHwSubRevision OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the HW sub-revision"
+    ::= { sysManufacturingEntry 5 }
+
+moduleSysPartNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the equipment part number"
+    ::= { sysManufacturingEntry 6 }
+
+moduleSysCLEI OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the common language equipment identification"
+    ::= { sysManufacturingEntry 7 }
+
+moduleSysManufacturingDate OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the manufacturing date"
+    ::= { sysManufacturingEntry 8 }
+
+moduleSysBaseMacAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Base MAC address of the module"
+    ::= { sysManufacturingEntry 9 }
+
+moduleSysFirmwareVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of the module"
+    ::= { sysManufacturingEntry 10 }
+
+sysManufacturing OBJECT IDENTIFIER
+    ::= { sys 3 }
+
+sysSerialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This is the device's serial number, which is entered during the manufacturing process."
+    ::= { sysManufacturing 1 }
+
+sysAssemblyNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the equipment assembly number"
+    ::= { sysManufacturing 3 }
+
+sysPartNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the equipment part number"
+    ::= { sysManufacturing 4 }
+
+sysCLEI OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the common language equipment identification"
+    ::= { sysManufacturing 5 }
+
+sysHwRevision OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the HW revision"
+    ::= { sysManufacturing 6 }
+
+sysManufacturingDate OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the manufacturing date"
+    ::= { sysManufacturing 7 }
+
+sysHwSubRevision OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the HW sub-revision"
+    ::= { sysManufacturing 8 }
+
+sysBaseMacAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Base MAC address of the device"
+    ::= { sysManufacturing 9 }
+
+sysFirmwareVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version"
+    ::= { sysManufacturing 10 }
+
+config OBJECT IDENTIFIER
+    ::= { prvtSwitchMIB 2 }
+
+configL2 OBJECT IDENTIFIER
+    ::= { config 2 }
+
+configL2IfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ConfigL2IfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of Interfaces and their properties"
+    ::= { configL2 1 }
+
+configL2IfaceEntry OBJECT-TYPE
+    SYNTAX      ConfigL2IfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index of interfaces."
+    INDEX       { configL2IfaceUnit, configL2IfaceSlot, 
+                  configL2IfacePort }
+    ::= { configL2IfaceTable 1 }
+
+ConfigL2IfaceEntry ::= SEQUENCE {
+    configL2IfaceUnit               Integer32,
+    configL2IfaceSlot               Integer32,
+    configL2IfacePort               Integer32,
+    configL2IfaceEnable             TruthValue,
+    configL2IfaceDefaultVID         Integer32,
+    configL2IfaceDuplexModeSet      INTEGER,
+    configL2IfaceSpeedSet           INTEGER,
+    configL2IfaceMtu                Integer32,
+    configL2IfaceFlowEnable         TruthValue,
+    configL2IfaceSelfFilterEnable   TruthValue,
+    configL2IfaceMacAddress         OCTET STRING,
+    configL2IfaceEthertype          INTEGER
+}
+
+configL2IfaceUnit OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index that uniquely identifies a unit in the
+         Interface Table."
+    ::= { configL2IfaceEntry 1 }
+
+configL2IfaceSlot OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index that uniquely identifies a slot within the unit
+         in the Interface Table."
+    ::= { configL2IfaceEntry 2 }
+
+configL2IfacePort OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index that uniquely identifies a port within the slot
+         in the Interface Table."
+    ::= { configL2IfaceEntry 3 }
+
+configL2IfaceEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The desired state of the interface."
+    ::= { configL2IfaceEntry 4 }
+
+configL2IfaceDefaultVID OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This object sets the default VLAN ID according to 802.1Q."
+    ::= { configL2IfaceEntry 5 }
+
+configL2IfaceDuplexModeSet OBJECT-TYPE
+    SYNTAX      INTEGER { auto(1), full(2), half(3), unknown(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The duplex mode for the interface. If the port type does NOT support
+         the default of autonegotiate (1), then the application will
+         initialize the port to a valid value (e.g., full (2))."
+    ::= { configL2IfaceEntry 6 }
+
+configL2IfaceSpeedSet OBJECT-TYPE
+    SYNTAX      INTEGER { auto(0), unknown(1), speed10(10), 
+                    speed100(100), speed1000(1000), speed10000(10000), 
+                    speed40000(40000) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The desired speed and duplex mode for the interface. If the selected
+         control is not available for the interface, a value of illegal (99)
+         is returned. If the port type does NOT support the
+         default of autonegotiate (1), then the application will
+         initialize the port to a valid value (e.g., 1000 (3)).
+         Note that not all controls are available for all interfaces.
+         For example, only 1000 (4) is available for Gigabit
+         Ethernet interfaces."
+    ::= { configL2IfaceEntry 7 }
+
+configL2IfaceMtu OBJECT-TYPE
+    SYNTAX      Integer32 (256..12288)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The Maximum Transmission Unit (in octets) of the interface."
+    ::= { configL2IfaceEntry 8 }
+
+configL2IfaceFlowEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The desired flow mode for the interface.
+         Note that not all controls are available for all interfaces."
+    ::= { configL2IfaceEntry 9 }
+
+configL2IfaceSelfFilterEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Deny packets received on this port to be switched back
+         the same port/trunk. Default is false."
+    ::= { configL2IfaceEntry 10 }
+
+configL2IfaceMacAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Self MAC adress per port."
+    ::= { configL2IfaceEntry 11 }
+
+configL2IfaceEthertype OBJECT-TYPE
+    SYNTAX      INTEGER { vlan(33024), dot1ad(34984), qinq(37120) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The ethertype of the interface."
+    ::= { configL2IfaceEntry 12 }
+
+reportsL2IfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ReportsL2IfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of Interfaces and their properties"
+    ::= { configL2 2 }
+
+reportsL2IfaceEntry OBJECT-TYPE
+    SYNTAX      ReportsL2IfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index of interfaces."
+    INDEX       { ifIndex }
+    ::= { reportsL2IfaceTable 1 }
+
+ReportsL2IfaceEntry ::= SEQUENCE {
+    reportsL2IfaceMediaType                     INTEGER,
+    reportsL2IfaceOperDuplex                    INTEGER,
+    reportsL2IfaceOperDual                      INTEGER,
+    reportsL2IfaceOperActive                    INTEGER,
+    reportsL2IfaceMediaTxType                   INTEGER,
+    reportsL2IfaceMediaConType                  INTEGER,
+    reportsL2IfaceMediaLengthSMF                Unsigned32,
+    reportsL2IfaceMediaLength50UM               Unsigned32,
+    reportsL2IfaceMediaLength62UM               Unsigned32,
+    reportsL2IfaceMediaLengthCu                 Unsigned32,
+    reportsL2IfaceMediaLengthOM3                Unsigned32,
+    reportsL2IfaceMediaEncoding                 INTEGER,
+    reportsL2IfaceMediaVendorID                 OCTET STRING,
+    reportsL2IfaceMediaVendorName               OCTET STRING,
+    reportsL2IfaceMediaVendorSN                 OCTET STRING,
+    reportsL2IfaceMediaVendorPN                 OCTET STRING,
+    reportsL2IfaceMediaVendorRev                OCTET STRING,
+    reportsL2IfaceMediaVendorManufacturingDate  OCTET STRING,
+    reportsL2IfaceMediaDiagnDDM                 TruthValue,
+    reportsL2IfaceMediaDiagnIntCal              TruthValue,
+    reportsL2IfaceMediaDiagnExtCal              TruthValue,
+    reportsL2IfaceMediaDiagnAPM                 TruthValue,
+    reportsL2IfaceMediaDiagnACR                 TruthValue,
+    reportsL2IfaceMediaBitrateNom               Unsigned32,
+    reportsL2IfaceMediaBitrateMin               Unsigned32,
+    reportsL2IfaceMediaBitrateMax               Unsigned32,
+    reportsL2IfaceMediaCompatSonet              INTEGER,
+    reportsL2IfaceMediaCompatEth                INTEGER,
+    reportsL2IfaceMediaCompatInfiniband         INTEGER,
+    reportsL2IfaceMediaCompatEscon              INTEGER,
+    reportsL2IfaceMediaCompat10G                INTEGER,
+    reportsL2IfaceMediaCompatFbrChLen           INTEGER,
+    reportsL2IfaceMediaCompatFbrChTech          INTEGER,
+    reportsL2IfaceMediaCompatFbrChMedia         INTEGER,
+    reportsL2IfaceMediaCompatFbrChSpeed         INTEGER
+}
+
+reportsL2IfaceMediaType OBJECT-TYPE
+    SYNTAX      INTEGER { notInstalled(1), unknown(2), 
+                    m1000BaseCXMMSFP(3), m1000BaseCXSMSFP(4), 
+                    m1000BaseTSFPCOPPERMR(5), m1000BaseTSFPCOPPERSR(6), 
+                    m1000BaseTSFPCOPPERSRWOPHY(7), 
+                    m1000BaseTSFCOPPERDISABLED(8), m1000BaseBXSMSFP(9), 
+                    m1000BaseBXMMSFP(10), m1000BasePXSMSFP(11), 
+                    m1000BasePXMMSFP(12), m1000BaseDWDMSMSFP(13), 
+                    m1000BaseDWDMMMSFP(14), m1000BaseSXMMSFP(15), 
+                    m1000BaseSXSMSFP(16), m1000BaseLXSMSFP(17), 
+                    m1000BaseLXMMSFP(18), m1000BaseXDSMSFP(19), 
+                    m1000BaseXDMMSFP(20), m1000BaseZXSMSFP(21), 
+                    m1000BaseZXMMSFP(22), m1000BaseEXSMSFP(23), 
+                    m1000BaseEXMMSFP(24), m1000BaseXWDMSMSFP(25), 
+                    m1000BaseXWDMMMSFP(26), m100BaseBXSMSFP(27), 
+                    m100BaseBXMMSFP(28), m100BasePXSMSFP(29), 
+                    m100BasePXMMSFP(30), m100BaseFXSMSFP(31), 
+                    m100BaseFXMMSFP(32), m100BaseSXSMSFP(33), 
+                    m100BaseSXMMSFP(34), m100BaseLXSMSFP(35), 
+                    m100BaseLXMMSFP(36), m100BaseXDSMSFP(37), 
+                    m100BaseXDMMSFP(38), m100BaseZXSMSFP(39), 
+                    m100BaseZXMMSFP(40), m100BaseEXSMSFP(41), 
+                    m100BaseEXMMSFP(42), m100BaseXWDMSMSFP(43), 
+                    m100BaseXWDMMMSFP(44), m10GBaseSRMMXFP(45), 
+                    m10GBaseLRMMXFP(46), m10GBaseLRMMMXFP(47), 
+                    m10GBaseLRSMXFP(48), m10GBaseSRSMXFP(49), 
+                    m10GBaseLRMSMXFP(50), m10GBaseSXMMXFP(51), 
+                    m10GBaseSXSMXFP(52), m10GBaseLXMMXFP(53), 
+                    m10GBaseLXSMXFP(54), m10GBaseXDSMXFP(55), 
+                    m10GBaseXDMMXFP(56), m10GBaseZXSMXFP(57), 
+                    m10GBaseZXMMXFP(58), m10GBaseEXSMXFP(59), 
+                    m10GBaseEXMMXFP(60), m10GBaseXWDMSMXFP(61), 
+                    m10GBaseXWDMMMXFP(62), m10GBaseSXSMSFPPLUS(63), 
+                    m10GBaseSXMMSFPPLUS(64), m40GBaseQSFPSPI(65), 
+                    rj45(66), m10GBaseZXSMSFPPLUS(67), 
+                    m10GBaseZXMMSFPPLUS(68), m10GBaseXDSMSFPPLUS(69), 
+                    m10GBaseXDMMSFPPLUS(70), m10GBaseLXSMSFPPLUS(71), 
+                    m10GBaseLXMMSFPPLUS(72), m10GBaseDWDMSMSFPPLUS(73), 
+                    m10GBaseDWDMMMSFPPLUS(74), m10GBASECXSMSFPPLUS(75), 
+                    m10GBASECXMMSFPPLUS(76) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Installed media type"
+    ::= { reportsL2IfaceEntry 1 }
+
+reportsL2IfaceOperDuplex OBJECT-TYPE
+    SYNTAX      INTEGER { auto(1), full(2), half(3), unknown(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Operational duplex on the interface"
+    ::= { reportsL2IfaceEntry 3 }
+
+reportsL2IfaceOperDual OBJECT-TYPE
+    SYNTAX      INTEGER { dualPort(1), singlePort(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicate whether interface is a dual combo port"
+    ::= { reportsL2IfaceEntry 4 }
+
+reportsL2IfaceOperActive OBJECT-TYPE
+    SYNTAX      INTEGER { copperActive(1), fiberActive(2), 
+                    notRelevent(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Information for the active copper/fiber port in case of dual port"
+    ::= { reportsL2IfaceEntry 5 }
+
+reportsL2IfaceMediaTxType OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(1), gbic(2), soldered(3), sfp(4), 
+                    xbi(5), xenpak(6), xfp(7), xff(8), xfpE(9), xpak(10), 
+                    x2(11), dwdmSFP(12), qsfp(13) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media tranceiver type"
+    ::= { reportsL2IfaceEntry 6 }
+
+reportsL2IfaceMediaConType OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(1), sc(2), fcS1Copper(3), 
+                    fcS2Copper(4), bncTNC(5), fcCoaxial(6), fiberJack(7), 
+                    lc(8), mtRJ(9), mu(10), sg(11), opticalPigtail(12), 
+                    mpoParalelOptic(13), hssdcII(14), copperPigtail(15), 
+                    rj45(16) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media connector type"
+    ::= { reportsL2IfaceEntry 7 }
+
+reportsL2IfaceMediaLengthSMF OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media length of the single mode fiber"
+    ::= { reportsL2IfaceEntry 8 }
+
+reportsL2IfaceMediaLength50UM OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media length of 50um fiber"
+    ::= { reportsL2IfaceEntry 9 }
+
+reportsL2IfaceMediaLength62UM OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media length of 62.5um fiber"
+    ::= { reportsL2IfaceEntry 10 }
+
+reportsL2IfaceMediaLengthCu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media length of copper"
+    ::= { reportsL2IfaceEntry 11 }
+
+reportsL2IfaceMediaLengthOM3 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media length of 50um OM3 fiber"
+    ::= { reportsL2IfaceEntry 12 }
+
+reportsL2IfaceMediaEncoding OBJECT-TYPE
+    SYNTAX      INTEGER { eUnknown(1), e8b10b(2), e4b5b(3), eNRZ(4), 
+                    eManchester(5), eSONETScrambled(6), e64b66b(7) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media encoding"
+    ::= { reportsL2IfaceEntry 13 }
+
+reportsL2IfaceMediaVendorID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media vendor IEEE company ID"
+    ::= { reportsL2IfaceEntry 14 }
+
+reportsL2IfaceMediaVendorName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media vendor name (ASCII)"
+    ::= { reportsL2IfaceEntry 15 }
+
+reportsL2IfaceMediaVendorSN OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media serial number provided by the vendor (ASCII)"
+    ::= { reportsL2IfaceEntry 16 }
+
+reportsL2IfaceMediaVendorPN OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media part number provided by the vendor (ASCII)"
+    ::= { reportsL2IfaceEntry 17 }
+
+reportsL2IfaceMediaVendorRev OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media revision level for part number provided by vendor (ASCII)"
+    ::= { reportsL2IfaceEntry 18 }
+
+reportsL2IfaceMediaVendorManufacturingDate OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media manufacturing date provided by the vendor (ASCII)"
+    ::= { reportsL2IfaceEntry 19 }
+
+reportsL2IfaceMediaDiagnDDM OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media Digital Diagnostic Monitoring"
+    ::= { reportsL2IfaceEntry 20 }
+
+reportsL2IfaceMediaDiagnIntCal OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media diagnostic internal calibration"
+    ::= { reportsL2IfaceEntry 21 }
+
+reportsL2IfaceMediaDiagnExtCal OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media diagnostic external calibration"
+    ::= { reportsL2IfaceEntry 22 }
+
+reportsL2IfaceMediaDiagnAPM OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media diagnostic avgerage power measurement"
+    ::= { reportsL2IfaceEntry 23 }
+
+reportsL2IfaceMediaDiagnACR OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media diagnostic address change"
+    ::= { reportsL2IfaceEntry 24 }
+
+reportsL2IfaceMediaBitrateNom OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media nominal bitrate"
+    ::= { reportsL2IfaceEntry 25 }
+
+reportsL2IfaceMediaBitrateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media minimum bitrate in percent below the nominal"
+    ::= { reportsL2IfaceEntry 26 }
+
+reportsL2IfaceMediaBitrateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media maximum bitrate in percent above the nominal"
+    ::= { reportsL2IfaceEntry 27 }
+
+reportsL2IfaceMediaCompatSonet OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(1), rsb1(2), rsb2(3), srOC192(4), 
+                    lrOC48(5), irOC48(6), srOC48(7), lrSMOC12(8), 
+                    irSMOC12(9), srOC12(10), lrSMOC3(11), irSMOC3(12), 
+                    srOC3(13) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media Sonet compatibility"
+    ::= { reportsL2IfaceEntry 28 }
+
+reportsL2IfaceMediaCompatEth OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(1), basePX(2), baseBX10(3), 
+                    m100BaseFX(4), m100BaseLXLX10(5), m1000BaseT(6), 
+                    m1000BaseCX(7), m1000BaseLX(8), m1000BaseSX(9) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media Ethernet compatibility"
+    ::= { reportsL2IfaceEntry 29 }
+
+reportsL2IfaceMediaCompatInfiniband OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(1), c1XSX(2), c1XLX(3), 
+                    c1XCopperActive(4), c1XCopperPassive(5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media InfiniBand compatibility"
+    ::= { reportsL2IfaceEntry 30 }
+
+reportsL2IfaceMediaCompatEscon OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(1), smf(2), mmf(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media ESCON compatibility"
+    ::= { reportsL2IfaceEntry 31 }
+
+reportsL2IfaceMediaCompat10G OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(1), baseLRM(2), baseLR(3), baseSR(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media 10G Ethernet compatibility"
+    ::= { reportsL2IfaceEntry 32 }
+
+reportsL2IfaceMediaCompatFbrChLen OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(1), veryLong(2), long(3), medium(4), 
+                    intermediate(5), short(6) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media Fibre Channel link length"
+    ::= { reportsL2IfaceEntry 33 }
+
+reportsL2IfaceMediaCompatFbrChTech OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(1), sa(2), lc(3), elInter(4), 
+                    elIntra(5), sn(6), sl(7), ll(8), copperActive(9), 
+                    copperPassive(10), copperFCBaseT(11) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media Fibre Channel transmitter technology"
+    ::= { reportsL2IfaceEntry 34 }
+
+reportsL2IfaceMediaCompatFbrChMedia OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(1), twistedAxialPair(2), 
+                    twistedPair(3), miniatureCoax(4), videoCoax(5), 
+                    multiMode62point5um(6), multiMode50um(7), 
+                    singleMode(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media Fibre Channel transmission media"
+    ::= { reportsL2IfaceEntry 35 }
+
+reportsL2IfaceMediaCompatFbrChSpeed OBJECT-TYPE
+    SYNTAX      INTEGER { fbrUnknwon(1), fbr100(2), fbr200(3), fbr400(4), 
+                    fbr800(5), fbr1200(6), fbr1600(7) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Media Fibre Channel speed, in MBps"
+    ::= { reportsL2IfaceEntry 36 }
+
+clearInterfaceFdbTable OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Clear fdb table for interface given as argument.
+         Both notations - SNMP and CLI are accepted - for example
+         can be set either to 1/1/1 or 1101.
+         If port notation can't be recognized ( not ifIndex or CLI notation ),
+         then whole fdb table is cleared.
+         Get requests over this object will return noSuchInstance."
+    ::= { configL2 3 }
+
+clearInterfaceFdbTableStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Return code from last operation over clearInterfaceFdbTable."
+    ::= { configL2 4 }
+
+ipSwitch OBJECT IDENTIFIER
+    ::= { prvt-products 6 }
+
+mpls OBJECT IDENTIFIER
+    ::= { ipSwitch 3 }
+
+routingProtocols OBJECT IDENTIFIER
+    ::= { ipSwitch 4 }
+
+serviceAccessSwitch OBJECT IDENTIFIER
+    ::= { prvt-products 7 }
+
+software OBJECT IDENTIFIER
+    ::= { prvt-products 111 }
+
+portSecurityViolation NOTIFICATION-TYPE
+    OBJECTS     { ifIndex }
+    STATUS      current
+    DESCRIPTION 
+        "The port security violation notification
+         indicates that a port security violation
+         has been detected, e.g more MAC adresses
+         have been learned on that port than the
+         number allowed."
+    ::= { prvtSwitchNotifications 1 }
+
+sfpPlugged NOTIFICATION-TYPE
+    OBJECTS     { ifIndex }
+    STATUS      current
+    DESCRIPTION 
+        "sfp plugged"
+    ::= { prvtSwitchNotifications 2 }
+
+sfpUnPlugged NOTIFICATION-TYPE
+    OBJECTS     { ifIndex }
+    STATUS      current
+    DESCRIPTION 
+        "sfp unplugged"
+    ::= { prvtSwitchNotifications 3 }
+
+hardwareLicenseNotInstalled NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION 
+        "Hardware license not installed. 
+         Some ports will not function normally."
+    ::= { prvtSwitchNotifications 4 }
+
+mplsMgmtTaskCrashed NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION 
+        "mpls_mgmt task crashed."
+    ::= { prvtSwitchNotifications 5 }
+
+mplsLdbHwTaskCrashed NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION 
+        "mpls_ldb_hw task crashed."
+    ::= { prvtSwitchNotifications 6 }
+
+mplsLdbFrwdTaskCrashed NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION 
+        "mpls_ldb_frwd task crashed."
+    ::= { prvtSwitchNotifications 7 }
+
+mplsStackTaskCrashed NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION 
+        "mpls_stack task crashed."
+    ::= { prvtSwitchNotifications 8 }
+
+prvtDuplicatedMACAddressAlarm NOTIFICATION-TYPE
+    OBJECTS     { dot1qTpFdbStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This notification is sent by the agent when a duplicated MAC is recived."
+    ::= { prvtSwitchNotifications 9 }
+
+unauthenticatedAccessViaCLI NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION 
+        "The unauthenticatedAccessViaCLI notification indicates that 
+         the last attempt to login to the device via CLI cannot 
+         be authenticated."
+    ::= { prvtSwitchNotifications 10 }
+
+END -- end of module PRVT-SWITCH-MIB.

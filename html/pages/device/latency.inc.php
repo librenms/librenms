@@ -50,7 +50,7 @@ if ($vars['view'] == 'incoming') {
 
         $graph_array['type']   = 'device_smokeping_in_all';
         $graph_array['device'] = $device['device_id'];
-        $graph_array['legend'] = no;
+        $graph_array['legend'] = 'no';
         echo '<tr><td>';
         echo '<h3>Aggregate</h3>';
 
@@ -94,7 +94,7 @@ if ($vars['view'] == 'incoming') {
         echo '</td></tr>';
 
         $graph_array['type']   = 'device_smokeping_out_all';
-        $graph_array['legend'] = no;
+        $graph_array['legend'] = 'no';
         echo '<tr><td>';
         echo '<h3>Aggregate</h3>';
 

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\IP;
+
 $link_array = array(
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -96,7 +98,7 @@ if ($vars['view'] == 'macaccounting_pkts') {
 print_optionbar_end();
 
 echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
-echo '<tr style="height: 30px"><th>Peer address</th><th>Type</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>';
+echo '<tr style="height: 30px"><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th>Uptime</th></tr>';
 
 $i = '1';
 
@@ -104,18 +106,18 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $has_macaccounting = dbFetchCell('SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = ? AND M.mac = I.mac_address', array($peer['bgpPeerIdentifier']));
     unset($bg_image);
     if (!is_integer($i / 2)) {
-        $bg_colour = $list_colour_a;
+        $bg_colour = $config['list_colour']['even'];
     } else {
-        $bg_colour = $list_colour_b;
+        $bg_colour = $config['list_colour']['odd'];
     }
 
     unset($alert, $bg_image);
     unset($peerhost, $peername);
 
     if (!is_integer($i / 2)) {
-        $bg_colour = $list_colour_b;
+        $bg_colour = $config['list_colour']['odd'];
     } else {
-        $bg_colour = $list_colour_a;
+        $bg_colour = $config['list_colour']['even'];
     }
 
     if ($peer['bgpPeerState'] == 'established') {
@@ -191,9 +193,8 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
 
     unset($sep);
 
-    if (filter_var($peer['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-        $peer['bgpPeerIdentifier'] = Net_IPv6::compress($peer['bgpPeerIdentifier']);
-    }
+    // make ipv6 look pretty
+    $peer['bgpPeerIdentifier'] = (string)IP::parse($peer['bgpPeerIdentifier'], true);
 
     // display overlib graphs
     $graph_array                = array();
@@ -224,6 +225,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         <td>$peer_type</td>
         <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>".(isset($peer['afi']) ? $peer['afi'] : '').'</td>
         <td><strong>AS'.$peer['bgpPeerRemoteAs'].'</strong><br />'.$peer['astext']."</td>
+        <td>".$peer['bgpPeerDescr']."</td>
         <td><strong><span style='color: $admin_col;'>".$peer['bgpPeerAdminStatus']."<span><br /><span style='color: $col;'>".$peer['bgpPeerState'].'</span></strong></td>
         <td>'.formatUptime($peer['bgpPeerFsmEstablishedTime'])."<br />
         Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> ".$peer['bgpPeerInUpdates']."

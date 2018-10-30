@@ -1,6 +1,6 @@
 <?php
 
-// NS-ROOT-MIB::vsvrName."librenms" = STRING: "librenms"
+// NS-ROOT-MIB::vsvrFullName."librenms" = STRING: "librenms"
 // NS-ROOT-MIB::vsvrIpAddress."librenms" = IpAddress: 195.78.84.141
 // NS-ROOT-MIB::vsvrPort."librenms" = INTEGER: 80
 // NS-ROOT-MIB::vsvrType."librenms" = INTEGER: http(0)
@@ -76,9 +76,9 @@ if ($device['os'] == 'netscaler') {
     d_echo($vsvrs);
 
     foreach ($vsvr_array as $index => $vsvr) {
-        if (isset($vsvr['vsvrName'])) {
-            $vsvr_exist[$vsvr['vsvrName']] = 1;
-            $rrd_name  = 'netscaler-vsvr-'.$vsvr['vsvrName'];
+        if (isset($vsvr['vsvrFullName'])) {
+            $vsvr_exist[$vsvr['vsvrFullName']] = 1;
+            $rrd_name  = 'netscaler-vsvr-'.$vsvr['vsvrFullName'];
 
             $fields = array();
             foreach ($oids as $oid) {
@@ -90,13 +90,13 @@ if ($device['os'] == 'netscaler') {
             }
 
             $tags = array(
-                'vsvrName' => $vsvr['vsvrName'],
+                'vsvrFullName' => $vsvr['vsvrFullName'],
                 'rrd_name' => $rrd_name,
                 'rrd_def' => $rrd_def
             );
             data_update($device, 'netscaler-vsvr', $tags, $fields);
 
-            echo str_pad($vsvr['vsvrName'], 25).' | '.str_pad($vsvr['vsvrType'], 5).' | '.str_pad($vsvr['vsvrState'], 6).' | '.str_pad($vsvr['vsvrIpAddress'], 16).' | '.str_pad($vsvr['vsvrPort'], 5);
+            echo str_pad($vsvr['vsvrFullName'], 25).' | '.str_pad($vsvr['vsvrType'], 5).' | '.str_pad($vsvr['vsvrState'], 6).' | '.str_pad($vsvr['vsvrIpAddress'], 16).' | '.str_pad($vsvr['vsvrPort'], 5);
             echo ' | '.str_pad($vsvr['vsvrRequestRate'], 8).' | '.str_pad($vsvr['vsvrRxBytesRate'].'B/s', 8).' | '.str_pad($vsvr['vsvrTxBytesRate'].'B/s', 8);
 
             $db_update = array(
@@ -109,12 +109,12 @@ if ($device['os'] == 'netscaler') {
                           'vsvr_bps_out'  => $vsvr['vsvrTxBytesRate'],
                          );
 
-            if (!is_array($vsvrs[$vsvr['vsvrName']])) {
-                $db_insert = array_merge(array('device_id' => $device['device_id'], 'vsvr_name' => $vsvr['vsvrName']), $db_update);
+            if (!is_array($vsvrs[$vsvr['vsvrFullName']])) {
+                $db_insert = array_merge(array('device_id' => $device['device_id'], 'vsvr_name' => $vsvr['vsvrFullName']), $db_update);
                 $vsvr_id   = dbInsert($db_insert, 'netscaler_vservers');
                 echo ' +';
             } else {
-                $updated = dbUpdate($db_update, 'netscaler_vservers', '`vsvr_id` = ?', array($vsvrs[$vsvr['vsvrName']]['vsvr_id']));
+                $updated = dbUpdate($db_update, 'netscaler_vservers', '`vsvr_id` = ?', array($vsvrs[$vsvr['vsvrFullName']]['vsvr_id']));
                 echo ' U';
             }
 

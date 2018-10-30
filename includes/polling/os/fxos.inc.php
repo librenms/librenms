@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
  
-if (preg_match('/Version ([^,]+)/', $poll_device['sysDescr'], $regexp_result)) {
+if (preg_match('/Version ([^,]+)/', $device['sysDescr'], $regexp_result)) {
     $version = $regexp_result[1];
 }
 

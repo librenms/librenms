@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-list($hardware, $version) = explode(' ', $poll_device['sysDescr'], 2);
+list($hardware, $version) = explode(' ', $device['sysDescr'], 2);
 
 $tmp = snmp_get_multi_oid($device, 'dsSerialNumber.0 dsFirmwareVersion.0', '-OQUs', 'DASAN-SWITCH-MIB:DASAN-PRODUCTS-MIB');
 

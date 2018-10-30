@@ -1,0 +1,259 @@
+STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+         Unsigned32                            FROM SNMPv2-SMI
+      DisplayString                            FROM RFC1213-MIB
+      TruthValue                               FROM SNMPv2-TC
+      stormshieldMIB                           FROM STORMSHIELD-SMI-MIB;
+
+   snsSystemMonitor MODULE-IDENTITY
+      LAST-UPDATED  "201702200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield System Monitor"
+      REVISION      "201702200000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 10 }
+
+   snsDate OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Stormshield Firewall current date (%Y-%m-%d %T)"
+      ::= { snsSystemMonitor 1 }
+
+   snsUptime OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Stormshield Firewal system running for day:hour:min:sec"
+      ::= { snsSystemMonitor 2 }
+
+   snsMem OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Stormshield Firewall memory left for in percent
+                  (host,frag,icmp,conn,dtrack,dyn)"
+      ::= { snsSystemMonitor 3 }
+
+   snsStatTime OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "Stormshield Firewall last stat time (%Y-%m-%d %T)"
+      ::= { snsSystemMonitor 4 }
+
+   snsDiskTable OBJECT-TYPE
+      SYNTAX       SEQUENCE OF SnsDiskEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION  "Disk information"
+      ::= { snsSystemMonitor 5 }
+
+   snsDiskEntry OBJECT-TYPE
+      SYNTAX         SnsDiskEntry
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION    "Disk information"
+      INDEX          { snsDiskEntryIndex }
+      ::= { snsDiskTable 1 }
+
+   SnsDiskEntry ::=
+      SEQUENCE {
+         snsDiskEntryIndex         Integer32,
+         snsDiskEntryDiskName      DisplayString,
+         snsDiskEntrySmartResult   DisplayString,
+         snsDiskEntryIsRaid        Integer32,
+         snsDiskEntryRaidStatus    DisplayString,
+         snsDiskEntryPosition      DisplayString
+      }
+
+   snsDiskEntryIndex OBJECT-TYPE
+      SYNTAX            Integer32 (0..255)
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION       "Index of each disk in table"
+      ::= { snsDiskEntry 1 }
+
+   snsDiskEntryDiskName OBJECT-TYPE
+      SYNTAX            DisplayString
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION       "Name of the disk"
+      ::= { snsDiskEntry 2 }
+
+   snsDiskEntrySmartResult OBJECT-TYPE
+      SYNTAX            DisplayString
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION       "Result of the smart infos tests"
+      ::= { snsDiskEntry 3 }
+
+   snsDiskEntryIsRaid OBJECT-TYPE
+      SYNTAX            Integer32 (0..1)
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION       "Is the disk a member of a RAID array"
+      ::= { snsDiskEntry 4 }
+
+   snsDiskEntryRaidStatus OBJECT-TYPE
+      SYNTAX            DisplayString
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION       "RAID Status"
+      ::= { snsDiskEntry 5 }
+
+   snsDiskEntryPosition OBJECT-TYPE
+      SYNTAX            DisplayString
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION       "Disk Position"
+      ::= { snsDiskEntry 6 }
+
+   snsPowerSupplyTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsPowerSupplyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Power supply status of Firewall"
+      ::= { snsSystemMonitor 6 }
+
+   snsPowerSupplyEntry OBJECT-TYPE
+      SYNTAX SnsPowerSupplyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Power supply information"
+      INDEX { snsPowerSupplyIndex }
+      ::= { snsPowerSupplyTable 1 }
+
+   SnsPowerSupplyEntry ::= SEQUENCE {
+      snsPowerSupplyIndex      Integer32,
+      snsPowerSupplyPowered    TruthValue
+   }
+
+   snsPowerSupplyIndex OBJECT-TYPE
+      SYNTAX Integer32 (0..255)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Index of each line in table"
+      ::= { snsPowerSupplyEntry 1 }
+
+   snsPowerSupplyPowered OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Is power supply powered by electricity ?"
+      ::= { snsPowerSupplyEntry 2 }
+
+   snsCpuTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsCpuEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "CPU status of Firewalls"
+      ::= { snsSystemMonitor 7 }
+
+   snsCpuEntry OBJECT-TYPE
+      SYNTAX SnsCpuEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "CPU information"
+      INDEX { snsCpuIndex }
+      ::= { snsCpuTable 1 }
+
+   SnsCpuEntry ::= SEQUENCE {
+      snsCpuIndex         Integer32,
+      snsCpuTemp          Integer32
+   }
+
+   snsCpuIndex OBJECT-TYPE
+      SYNTAX Integer32 (0..255)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Index of each CPU in table"
+      ::= { snsCpuEntry 1 }
+
+   snsCpuTemp OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Temperature in Celsius degree"
+      ::= { snsCpuEntry 2 }
+
+   snsBypassTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsBypassEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Bypass status of Firewalls"
+      ::= { snsSystemMonitor 8 }
+
+   snsBypassEntry OBJECT-TYPE
+      SYNTAX SnsBypassEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Bypass information"
+      INDEX { snsBypassIndex }
+      ::= { snsBypassTable 1 }
+
+   SnsBypassEntry ::= SEQUENCE {
+      snsBypassIndex        Integer32,
+      snsBypassI2CAddress   Unsigned32,
+      snsBypassSystemOff    TruthValue,
+      snsBypassJustOn       TruthValue,
+      snsBypassRunTime      TruthValue,
+      snsBypassWatchdog     TruthValue
+   }
+
+   snsBypassIndex OBJECT-TYPE
+      SYNTAX Integer32 (0..255)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Each line in the table"
+      ::= { snsBypassEntry 1 }
+
+   snsBypassI2CAddress OBJECT-TYPE
+      SYNTAX Unsigned32 (0..4294967295)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "I2C Address of Bypass Device"
+      ::= { snsBypassEntry 2 }
+
+   snsBypassSystemOff OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "System-off Bypass status"
+      ::= { snsBypassEntry 3 }
+
+   snsBypassJustOn OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Just-On Bypass status"
+      ::= { snsBypassEntry 4 }
+
+   snsBypassRunTime OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Run-Time Bypass status"
+      ::= { snsBypassEntry 5 }
+
+   snsBypassWatchdog OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Run-Time Watchdog Timer status"
+      ::= { snsBypassEntry 6 }
+
+END

@@ -6,7 +6,7 @@ $ds_out = 'OUTOCTETS';
 
 $i = 1;
 foreach ($devices as $device) {
-    foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ?', array($device['device_id'])) as $int) {
+    foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled` = 0', array($device['device_id'])) as $int) {
         $ignore = 0;
         if (is_array($config['device_traffic_iftype'])) {
             foreach ($config['device_traffic_iftype'] as $iftype) {

@@ -1,0 +1,560 @@
+-- **************************************************************
+-- CERENT-GENERIC-PM-MIB module
+--
+-- October 2004, Srikar B S
+-- This module contains the objects for Thresholds and performance
+-- monitoring for Electrical and Optical Cards on the 
+-- Cisco ONS devices
+
+-- Copyright (c) 2004-2005 by Cisco Systems, Inc.
+-- All rights reserved.
+--
+-- **************************************************************
+
+-- This MIB complementes the CERENT-HC-RMON-MIB and contains the threshold
+-- table and permforamance monitoring statistics tables for
+-- Optical/Electrical modules
+
+CERENT-GENERIC-PM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    Counter64
+                      FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+                      FROM SNMPv2-CONF
+    TruthValue        FROM SNMPv2-TC
+    cerentModules,
+    cerentGeneric,
+    cerentRequirements
+                      FROM CERENT-GLOBAL-REGISTRY
+    CerentAlarmThresholdMonitorType,
+    CerentMonitorType,
+    CerentLocation,
+    CerentPeriod
+                      FROM CERENT-TC;
+
+cerentGenericPmMIB MODULE-IDENTITY
+    LAST-UPDATED "200410130000Z"
+    ORGANIZATION "Cisco Systems, Inc."
+    CONTACT-INFO
+        "         support@Cisco.com
+
+         Postal:  Cisco Systems
+                  1450 N. McDowell Blvd.
+                  Petaluma, CA  94954
+                  USA
+
+            Tel:  +1-877-323-7368"
+    DESCRIPTION
+        "This module defines
+         objects for managing generic thresholds and
+         performance monitoring information"
+
+    REVISION "200410130000Z"
+    DESCRIPTION
+        "Inital version of the module"
+
+    ::= { cerentModules 130 }
+
+cerentGenericPmMIBObjects OBJECT IDENTIFIER
+      ::= { cerentGeneric 90 }
+
+--  All Cisco ONS 15454 Threshold definitions.
+
+cerentGenericPmThresholdTable       OBJECT-TYPE
+       SYNTAX SEQUENCE OF CerentGenericPmThresholdEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "This table contains one row per performance monitoring
+               threshold."
+
+       ::= { cerentGenericPmMIBObjects 10 }
+
+cerentGenericPmThresholdEntry       OBJECT-TYPE
+       SYNTAX CerentGenericPmThresholdEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "Row definition for cerentGenericPmThresholdTable"
+       INDEX {
+               cerentGenericPmThresholdIndex,
+               cerentGenericPmThresholdMonitorType,
+               cerentGenericPmThresholdLocation,
+               cerentGenericPmThresholdPeriod
+             }
+       ::= { cerentGenericPmThresholdTable 1 }
+
+CerentGenericPmThresholdEntry ::= SEQUENCE {
+      cerentGenericPmThresholdIndex           Integer32,
+      cerentGenericPmThresholdMonitorType     CerentMonitorType,
+      cerentGenericPmThresholdLocation        CerentLocation,
+      cerentGenericPmThresholdPeriod          CerentPeriod,
+      cerentGenericPmThresholdValue           Integer32,
+      cerentGenericPmThresholdOverFlowValue   Integer32,
+      cerentGenericPmThresholdHCValue         Counter64
+    }
+
+cerentGenericPmThresholdIndex  OBJECT-TYPE
+       SYNTAX  Integer32 (1..2147483647) -- Same as IfIndex from IF-MIB
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "Identifies each entry in Threshold table.
+               May not start with one and there will be some
+               missing numbers."
+       ::= { cerentGenericPmThresholdEntry 10 }
+
+cerentGenericPmThresholdMonitorType  OBJECT-TYPE
+       SYNTAX                  CerentMonitorType
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+       "This object indicates the type of metric monitored."
+       ::= { cerentGenericPmThresholdEntry 20 } 
+
+cerentGenericPmThresholdLocation     OBJECT-TYPE
+       SYNTAX                  CerentLocation
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+       "This indicates if the threshold value represented by this row
+        is for near or far end"
+       ::= { cerentGenericPmThresholdEntry 30 }
+
+cerentGenericPmThresholdPeriod       OBJECT-TYPE
+       SYNTAX                  CerentPeriod
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+       "The sampling interval period is indicated here"
+       ::= { cerentGenericPmThresholdEntry 40 }
+
+cerentGenericPmThresholdValue     OBJECT-TYPE
+       SYNTAX                  Integer32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "The lower word value of the threshold that was 
+        provisioned by the NMS"
+       ::= { cerentGenericPmThresholdEntry 50 }
+
+cerentGenericPmThresholdOverFlowValue     OBJECT-TYPE
+       SYNTAX                  Integer32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "The higher word value of the threshold that was 
+        provisioned by the NMS"
+       ::= { cerentGenericPmThresholdEntry 60 }
+
+cerentGenericPmThresholdHCValue     OBJECT-TYPE
+       SYNTAX                  Counter64
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "The value of this object will be the 64 bit threshold that was 
+        provisioned by the NMS"
+       ::= { cerentGenericPmThresholdEntry 70 }
+
+cerentGenericPmStatsCurrentTable       OBJECT-TYPE
+       SYNTAX SEQUENCE OF CerentGenericPmStatsCurrentEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "This table holds all the performance Monitoring
+               statistics for current sampling period."
+
+       ::= { cerentGenericPmMIBObjects 20 }
+
+cerentGenericPmStatsCurrentEntry       OBJECT-TYPE
+       SYNTAX CerentGenericPmStatsCurrentEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "Row definition for cerentGenericPmStatsCurrentTable"
+       INDEX {
+               cerentGenericPmStatsCurrentIndex,
+               cerentGenericPmStatsCurrentType,
+               cerentGenericPmStatsCurrentLocation,
+               cerentGenericPmStatsCurrentPeriod
+             }
+       ::= { cerentGenericPmStatsCurrentTable 1 }
+
+CerentGenericPmStatsCurrentEntry ::= SEQUENCE {
+      cerentGenericPmStatsCurrentIndex           Integer32,
+      cerentGenericPmStatsCurrentType            CerentMonitorType,
+      cerentGenericPmStatsCurrentLocation        CerentLocation,
+      cerentGenericPmStatsCurrentPeriod          CerentPeriod,
+      cerentGenericPmStatsCurrentValue           Integer32,
+      cerentGenericPmStatsCurrentOverFlowValue   Integer32,
+      cerentGenericPmStatsCurrentHCValue         Counter64,
+      cerentGenericPmStatsCurrentValidData       TruthValue,
+      cerentGenericPmStatsCurrentValidIntervals  Integer32
+    }
+
+cerentGenericPmStatsCurrentIndex  OBJECT-TYPE
+       SYNTAX  Integer32 (1..2147483647) -- Same as IfIndex from IF-MIB
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "Identifies each entry in performance monitor table.
+               May not start with one and there will be some
+               missing numbers."
+       ::= { cerentGenericPmStatsCurrentEntry 10 }
+
+cerentGenericPmStatsCurrentType  OBJECT-TYPE
+       SYNTAX                  CerentMonitorType
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+       "This object indicates the type of metric monitored."
+       ::= { cerentGenericPmStatsCurrentEntry 20 }
+
+cerentGenericPmStatsCurrentLocation     OBJECT-TYPE
+       SYNTAX                  CerentLocation
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+       "This indicates if the threshold value represented by this row
+        is for near or far end"
+       ::= { cerentGenericPmStatsCurrentEntry 30 }
+
+cerentGenericPmStatsCurrentPeriod       OBJECT-TYPE
+       SYNTAX                  CerentPeriod
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+       "The sampling interval period is indicated here"
+       ::= { cerentGenericPmStatsCurrentEntry 40 }
+
+cerentGenericPmStatsCurrentValue     OBJECT-TYPE
+       SYNTAX                  Integer32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "The counter associated with this monitor type for this
+        entity in the in the current interval of duration
+        defined by cerentGenericPmStatsPeriod"
+       ::= { cerentGenericPmStatsCurrentEntry 50 }
+
+cerentGenericPmStatsCurrentOverFlowValue     OBJECT-TYPE
+       SYNTAX                  Integer32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "The counter holds the higher ordered value associated with
+        this monitor type for this
+        entity in the in the current interval of duration
+        defined by cerentGenericPmStatsPeriod"
+       ::= { cerentGenericPmStatsCurrentEntry 60 }
+
+cerentGenericPmStatsCurrentHCValue     OBJECT-TYPE
+       SYNTAX                  Counter64
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "The 64 bit counter associated with this monitor type for this
+        entity in the in the current interval of duration
+        defined by cerentGenericPmStatsCurrentPeriod"
+       ::= { cerentGenericPmStatsCurrentEntry 70 }
+
+cerentGenericPmStatsCurrentValidData  OBJECT-TYPE
+       SYNTAX                  TruthValue
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "This value indicates if the data for the current sampling period
+        is valid"
+       ::= { cerentGenericPmStatsCurrentEntry 80 }
+
+cerentGenericPmStatsCurrentValidIntervals OBJECT-TYPE
+    SYNTAX  Integer32 (1..96)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "This objects specifies the number of contiguous intervals
+       for which the valid values are available for this performance
+       monitoring type."
+       
+    ::= { cerentGenericPmStatsCurrentEntry 90 }
+
+
+cerentGenericPmStatsIntervalTable       OBJECT-TYPE
+       SYNTAX SEQUENCE OF CerentGenericPmStatsIntervalEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "This table holds all the performance Monitoring
+               statistics for completed intervals"
+
+       ::= { cerentGenericPmMIBObjects 30 }
+
+cerentGenericPmStatsIntervalEntry       OBJECT-TYPE
+       SYNTAX CerentGenericPmStatsIntervalEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "Row definition for cerentGenericPmStatsIntervalTable"
+       INDEX {
+               cerentGenericPmStatsIntervalIndex,
+               cerentGenericPmStatsIntervalType,
+               cerentGenericPmStatsIntervalLocation,
+               cerentGenericPmStatsIntervalPeriod,
+               cerentGenericPmStatsIntervalNumber
+             }
+       ::= { cerentGenericPmStatsIntervalTable 1 }
+
+CerentGenericPmStatsIntervalEntry ::= SEQUENCE {
+      cerentGenericPmStatsIntervalIndex           Integer32,
+      cerentGenericPmStatsIntervalType            CerentMonitorType,
+      cerentGenericPmStatsIntervalLocation        CerentLocation,
+      cerentGenericPmStatsIntervalPeriod          CerentPeriod,
+      cerentGenericPmStatsIntervalNumber          Integer32,
+      cerentGenericPmStatsIntervalValue           Integer32,
+      cerentGenericPmStatsIntervalOverFlowValue   Integer32,
+      cerentGenericPmStatsIntervalHCValue         Counter64,
+      cerentGenericPmStatsIntervalValidData       TruthValue
+    }
+
+cerentGenericPmStatsIntervalIndex  OBJECT-TYPE
+       SYNTAX  Integer32 (1..2147483647) -- Same as IfIndex from IF-MIB
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "Identifies each entry in performance monitor table.
+               May not start with one and there will be some
+               missing numbers."
+       ::= { cerentGenericPmStatsIntervalEntry 10 }
+
+cerentGenericPmStatsIntervalType  OBJECT-TYPE
+       SYNTAX                  CerentMonitorType
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+       "This object indicates the type of metric monitored."
+       ::= { cerentGenericPmStatsIntervalEntry 20 }
+
+cerentGenericPmStatsIntervalLocation     OBJECT-TYPE
+       SYNTAX                  CerentLocation
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+       "This indicates if the threshold value represented by this row
+        is for near or far end"
+       ::= { cerentGenericPmStatsIntervalEntry 30 }
+
+cerentGenericPmStatsIntervalPeriod       OBJECT-TYPE
+       SYNTAX                  CerentPeriod
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+       "The sampling interval period is indicated here"
+       ::= { cerentGenericPmStatsIntervalEntry 40 }
+
+cerentGenericPmStatsIntervalNumber       OBJECT-TYPE
+       SYNTAX                  Integer32 (1..96)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+       "A number between 1 and 96, which identifies the interval
+        for which the statistics is available.
+        The interval identified by 1 is the most recently completed interval
+        and the interval identified by N is the interval immediately
+        preceding the one identified by N-1."
+       ::= { cerentGenericPmStatsIntervalEntry 50 }
+
+cerentGenericPmStatsIntervalValue     OBJECT-TYPE
+       SYNTAX                  Integer32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "The counter associated with this monitor type for this
+        entity in the in a particular interval of duration
+        defined by cerentGenericPmStatsIntervalPeriod"
+       ::= { cerentGenericPmStatsIntervalEntry 60 }
+
+cerentGenericPmStatsIntervalOverFlowValue     OBJECT-TYPE
+       SYNTAX                  Integer32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "The higher order 32 bit value of the counter associated with this
+        monitor type for this
+        entity in the in a particular interval of duration
+        defined by cerentGenericPmStatsIntervalNumber"
+       ::= { cerentGenericPmStatsIntervalEntry 70 }
+
+cerentGenericPmStatsIntervalHCValue     OBJECT-TYPE
+       SYNTAX                  Counter64
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "The 64-bit counter associated with this monitor type for this
+        entity in the in a particular interval of duration
+        defined by cerentGenericPmStatsIntervalPeriod"
+       ::= { cerentGenericPmStatsIntervalEntry 80 }
+
+cerentGenericPmStatsIntervalValidData  OBJECT-TYPE
+       SYNTAX                  TruthValue
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "This value indicates if the data for this interval is valid"
+       ::= { cerentGenericPmStatsIntervalEntry 90 }
+
+--  All Cisco ONS 15454 AlarmThreshold Definitions
+
+cerentGenericPmAlarmThresholdTable       OBJECT-TYPE
+       SYNTAX SEQUENCE OF CerentGenericPmAlarmThresholdEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "This table contains one row per performance monitoring
+               AlarmThreshold."
+
+       ::= { cerentGenericPmMIBObjects 40 }
+
+CerentGenericPmAlarmThresholdEntry ::= SEQUENCE {
+      cerentGenericPmAlarmThresholdIndex           Integer32,
+      cerentGenericPmAlarmThresholdMonitorType     CerentAlarmThresholdMonitorType,
+      cerentGenericPmAlarmThresholdValue           Integer32,
+      cerentGenericPmAlarmThresholdOverFlowValue   Integer32,
+      cerentGenericPmAlarmThresholdHCValue         Counter64
+    }
+
+cerentGenericPmAlarmThresholdEntry       OBJECT-TYPE
+       SYNTAX CerentGenericPmAlarmThresholdEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "Row definition for cerentGenericPmAlarmThresoldTable"
+       INDEX {
+               cerentGenericPmAlarmThresholdIndex,
+               cerentGenericPmAlarmThresholdMonitorType
+             }
+       ::= { cerentGenericPmAlarmThresholdTable 1 }
+
+cerentGenericPmAlarmThresholdIndex  OBJECT-TYPE
+       SYNTAX  Integer32 (1..2147483647) -- Same as IfIndex from IF-MIB
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "Identifies each entry in AlarmThreshold table.
+               May not start with one and there will be some
+               missing numbers."
+       ::= { cerentGenericPmAlarmThresholdEntry 10 }
+
+cerentGenericPmAlarmThresholdMonitorType  OBJECT-TYPE
+       SYNTAX                  CerentAlarmThresholdMonitorType
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+       "This object indicates the type of metric monitored."
+       ::= { cerentGenericPmAlarmThresholdEntry 20 }
+
+cerentGenericPmAlarmThresholdValue     OBJECT-TYPE
+       SYNTAX                  Integer32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "The lower word value of the AlarmThreshold that was
+        provisioned by the NMS"
+       ::= { cerentGenericPmAlarmThresholdEntry 30 }
+
+cerentGenericPmAlarmThresholdOverFlowValue     OBJECT-TYPE
+       SYNTAX                  Integer32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "The higher word value of the AlarmThreshold that was
+        provisioned by the NMS"
+       ::= { cerentGenericPmAlarmThresholdEntry 40 }
+
+cerentGenericPmAlarmThresholdHCValue     OBJECT-TYPE
+       SYNTAX                  Counter64
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       "The value of this object will be the 64 bit AlarmThreshold that was
+        provisioned by the NMS"
+       ::= { cerentGenericPmAlarmThresholdEntry 50 }
+
+cerentGenericPmMIBConformance OBJECT IDENTIFIER
+      ::= { cerentRequirements 80 }
+cerentGenericPmMIBCompliances OBJECT IDENTIFIER
+      ::= { cerentGenericPmMIBConformance 1}
+cerentGenericPmMIBGroups OBJECT IDENTIFIER
+      ::= { cerentGenericPmMIBConformance 2}
+
+cerentGenericPmMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "Describes the requirements for conformance to the
+        High Capacity Media Independent Group."
+    MODULE  -- this module
+    MANDATORY-GROUPS { cerentGenericPmThresholdGroup,
+                       cerentGenericPmStatsCurrentGroup,
+                       cerentGenericPmStatsIntervalGroup }
+    ::= { cerentGenericPmMIBCompliances 1 }
+       
+-- This group covers for threshold display and TCA trap
+
+cerentGenericPmThresholdGroup OBJECT-GROUP
+        OBJECTS {
+          cerentGenericPmThresholdValue,
+          cerentGenericPmThresholdOverFlowValue,
+          cerentGenericPmThresholdHCValue
+        }
+        STATUS current
+        DESCRIPTION
+          "The objects for storing all the current alarm thresholds "
+        ::= { cerentGenericPmMIBGroups 10 }
+
+-- This group covers Performance Monitoring in current interval
+
+cerentGenericPmStatsCurrentGroup OBJECT-GROUP
+        OBJECTS {
+            cerentGenericPmStatsCurrentValue,
+            cerentGenericPmStatsCurrentOverFlowValue,
+            cerentGenericPmStatsCurrentHCValue,
+            cerentGenericPmStatsCurrentValidData,
+            cerentGenericPmStatsCurrentValidIntervals
+        }
+        STATUS current
+        DESCRIPTION
+          "The objects for storing all the performance montitoring statistics"
+        ::= { cerentGenericPmMIBGroups 20 }
+
+-- This group covers Performance Monitoring in current interval
+
+cerentGenericPmStatsIntervalGroup OBJECT-GROUP
+        OBJECTS {
+            cerentGenericPmStatsIntervalValue,
+            cerentGenericPmStatsIntervalOverFlowValue,
+            cerentGenericPmStatsIntervalHCValue,
+            cerentGenericPmStatsIntervalValidData
+        }
+        STATUS current
+        DESCRIPTION
+          "The objects for storing all the performance montitoring statistics"
+        ::= { cerentGenericPmMIBGroups 30 }
+
+--This group covers for Alarm displays and traps
+
+cerentGenericPmAlarmThresholdGroup OBJECT-GROUP
+        OBJECTS {
+          cerentGenericPmAlarmThresholdValue,
+          cerentGenericPmAlarmThresholdOverFlowValue,
+          cerentGenericPmAlarmThresholdHCValue
+        }
+        STATUS current
+        DESCRIPTION
+          "The objects for storing all the current alarm thresholds "
+        ::= { cerentGenericPmMIBGroups 40 }
+
+END

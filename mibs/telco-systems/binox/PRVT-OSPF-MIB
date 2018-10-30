@@ -1,0 +1,1337 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-OSPF-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-OSPF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    routingProtocols
+        FROM PRVT-SWITCH-MIB
+    Counter32, Gauge32, Integer32, IpAddress, MODULE-IDENTITY, 
+    OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtOspfMIB MODULE-IDENTITY
+    LAST-UPDATED "201204010000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The PRVT OSPF MIB module contains additional information, needed to
+         control the OSPF protocol, that is not found in the standard RFC"
+    REVISION    "201204010000Z"
+    DESCRIPTION 
+        "Area ID is represent as octet string"
+    REVISION    "201106020000Z"
+    DESCRIPTION 
+        "Added prvtOspfTrafficEngEnable"
+    REVISION    "200911130000Z"
+    DESCRIPTION 
+        "Initial version"
+    ::= { routingProtocols 2 }
+
+
+PrvtOspfDesignatedRouterPriority ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The values defined for the priority of a system for
+         becoming the designated router."
+    SYNTAX      Integer32 (0..255)
+
+PrvtOspfIpAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d"
+    STATUS      current
+    DESCRIPTION 
+        "An IP address.
+         Currently only IPv4 network addresses are supported.
+         Format for IPv4 addresses consist of 4 octets in network-byte order."
+    SYNTAX      OCTET STRING (SIZE(4 | 16))
+
+prvtOspfObjects OBJECT IDENTIFIER
+    ::= { prvtOspfMIB 1 }
+
+prvtOspfRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "A 32-bit integer uniquely identifying the
+         router in the Autonomous System.
+         By convention, to ensure uniqueness, this
+         should default to the value of one of the
+         router's IP interface addresses."
+    REFERENCE   
+        "OSPF Version 2, C.1 Global parameters"
+    ::= { prvtOspfObjects 1 }
+
+prvtOspfAdminStat OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The administrative status of OSPF in the
+         router. The value 'enabled' denotes that the
+         OSPF Process is active on at least one interface;
+         'disabled' disables it on all interfaces."
+    ::= { prvtOspfObjects 2 }
+
+prvtOspfVersionNumber OBJECT-TYPE
+    SYNTAX      INTEGER { version2(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current version number of the OSPF
+         protocol is 2."
+    REFERENCE   
+        "OSPF Version 2, Title"
+    ::= { prvtOspfObjects 3 }
+
+prvtOspfExternLsaCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of external (LS type 5) link-state
+         advertisements in the link-state database."
+    REFERENCE   
+        "OSPF Version 2, Appendix A.4.5 AS external link
+         advertisements"
+    ::= { prvtOspfObjects 4 }
+
+prvtOspfExternLsaCksumSum OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The 32-bit unsigned sum of the LS checksums of
+         the external link-state advertisements contained
+         in the link-state database. This sum
+         can be used to determine if there has been a
+         change in a router's link state database, and
+         to compare the link-state database of two
+         routers."
+    ::= { prvtOspfObjects 5 }
+
+prvtOspfTOSSupport OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The router's support for type-of-service routing."
+    REFERENCE   
+        "OSPF Version 2, Appendix F.1.2 Optional TOS
+         support"
+    ::= { prvtOspfObjects 6 }
+
+prvtOspfOriginateNewLsas OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of new link-state advertisements
+         that have been originated. This number is
+         incremented each time the router originates a
+         new LSA."
+    ::= { prvtOspfObjects 7 }
+
+prvtOspfRxNewLsas OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of link-state advertisements re-
+         ceived determined to be new instantiations.
+         This number does not include newer instantia-
+         tions of self-originated link-state advertise-
+         ments."
+    ::= { prvtOspfObjects 8 }
+
+prvtOspfExtLsdbLimit OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The maximum number of non-default AS-
+         external-LSAs entries that can be stored in the
+         link-state database. If the value is -1, then
+         there is no limit.
+         When the number of non-default AS-external-LSAs
+         in a router's link-state database reaches
+         ospfExtLsdbLimit, the router enters Overflow-
+         State. The router never holds more than
+         ospfExtLsdbLimit non-default AS-external-LSAs
+         in its database. OspfExtLsdbLimit MUST be set
+         identically in all routers attached to the OSPF
+         backbone and/or any regular OSPF area. (i.e.,
+         OSPF stub areas and NSSAs are excluded)."
+    ::= { prvtOspfObjects 9 }
+
+prvtOspfMulticastExtensions OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A Bit Mask indicating whether the router is
+         forwarding IP multicast (Class D) datagrams
+         based on the algorithms defined in the Multi-
+         cast Extensions to OSPF.
+         Bit 0, if set, indicates that the router can
+         forward IP multicast datagrams in the router's
+         directly attached areas (called intra-area mul-
+         ticast routing).
+         Bit 1, if set, indicates that the router can
+         forward IP multicast datagrams between OSPF
+         areas (called inter-area multicast routing).
+         Bit 2, if set, indicates that the router can
+         forward IP multicast datagrams between Auto-
+         nomous Systems (called inter-AS multicast rout-
+         ing).
+         Only certain combinations of bit settings are
+         allowed, namely: 0 (no multicast forwarding is
+         enabled), 1 (intra-area multicasting only), 3
+         (intra-area and inter-area multicasting), 5
+         (intra-area and inter-AS multicasting) and 7
+         (multicasting everywhere). By default, no mul-
+         ticast forwarding is enabled."
+    ::= { prvtOspfObjects 10 }
+
+prvtOspfExitOverflowInterval OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The number of seconds that, after entering
+         OverflowState, a router will attempt to leave
+         OverflowState. This allows the router to again
+         originate non-default AS-external-LSAs. When
+         set to 0, the router will not leave Overflow-
+         State until restarted."
+    ::= { prvtOspfObjects 11 }
+
+prvtOspfDemandExtensions OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The router's support for demand routing."
+    REFERENCE   
+        "OSPF Version 2, Appendix on Demand Routing"
+    ::= { prvtOspfObjects 12 }
+
+prvtOspfAreaTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtOspfAreaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information describing the configured parameters
+         and cumulative statistics of the router's
+         attached areas."
+    REFERENCE   
+        "OSPF Version 2, Section 6 The Area Data
+         Structure"
+    ::= { prvtOspfObjects 13 }
+
+prvtOspfAreaEntry OBJECT-TYPE
+    SYNTAX      PrvtOspfAreaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information describing the configured
+         parameters and cumulative statistics
+         of one of the router's attached areas."
+    INDEX       { prvtOspfAreaId }
+    ::= { prvtOspfAreaTable 1 }
+
+PrvtOspfAreaEntry ::= SEQUENCE {
+    prvtOspfAreaId                      OCTET STRING,
+    prvtOspfAreaRowStatus               RowStatus,
+    prvtOspfAreaType                    INTEGER,
+    prvtOspfAreaSummary                 INTEGER,
+    prvtOspfAreaAuthType                INTEGER,
+    prvtOspfAreaShortcutConfiguration   TruthValue,
+    prvtOspfAreaNssaTransitRole         INTEGER,
+    prvtOspfAreaImportList              OCTET STRING,
+    prvtOspfAreaExportList              OCTET STRING,
+    prvtOspfAreaMetric                  Integer32,
+    prvtOspfAreaMetricType              INTEGER,
+    prvtOspfAreaDefaultCost             Integer32
+}
+
+prvtOspfAreaId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An octet string, uniquely identifying area.
+         Both A.B.C.D or integer notations are supported.
+         Area ID 0.0.0.0 is used for the OSPF backbone."
+    REFERENCE   
+        "OSPF Version 2, Appendix C.2 Area parameters"
+    ::= { prvtOspfAreaEntry 1 }
+
+prvtOspfAreaRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This variable displays the status of the en-
+         try. Setting it to 'invalid' has the effect of
+         rendering it inoperative. The internal effect
+         (row removal) is implementation dependent."
+    ::= { prvtOspfAreaEntry 2 }
+
+prvtOspfAreaType OBJECT-TYPE
+    SYNTAX      INTEGER { default(0), stub(1), nssa(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The area type"
+    ::= { prvtOspfAreaEntry 3 }
+
+prvtOspfAreaSummary OBJECT-TYPE
+    SYNTAX      INTEGER { noAreaSummary(1), sendAreaSummary(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The variable ospfAreaSummary controls the im-
+         port of summary LSAs into stub areas. It has
+         no effect on other areas.
+         If it is noAreaSummary, the router will neither
+         originate nor propagate summary LSAs into the
+         stub area. It will rely entirely on its de-
+         fault route.
+         If it is sendAreaSummary, the router will both
+         summarize and propagate summary LSAs."
+    ::= { prvtOspfAreaEntry 4 }
+
+prvtOspfAreaAuthType OBJECT-TYPE
+    SYNTAX      INTEGER { simple(1), md5(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The authentication type specified for an area.
+         Additional authentication types may be assigned
+         locally on a per Area basis."
+    ::= { prvtOspfAreaEntry 5 }
+
+prvtOspfAreaShortcutConfiguration OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Allows the user to set whether the area
+         allows the traffict to pass through other
+         not backbone area"
+    ::= { prvtOspfAreaEntry 6 }
+
+prvtOspfAreaNssaTransitRole OBJECT-TYPE
+    SYNTAX      INTEGER { ospfNssaRoleNever(0), ospfNssaRoleAlways(1), 
+                    ospfNssaRoleCandidate(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Transit role"
+    ::= { prvtOspfAreaEntry 7 }
+
+prvtOspfAreaImportList OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Import List"
+    ::= { prvtOspfAreaEntry 8 }
+
+prvtOspfAreaExportList OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Export List"
+    ::= { prvtOspfAreaEntry 9 }
+
+prvtOspfAreaMetric OBJECT-TYPE
+    SYNTAX      Integer32 (0..16777215)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Area metric"
+    ::= { prvtOspfAreaEntry 10 }
+
+prvtOspfAreaMetricType OBJECT-TYPE
+    SYNTAX      INTEGER { ospfMetric(1), comparableCost(2), 
+                    nonComparable(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Area metric type"
+    ::= { prvtOspfAreaEntry 11 }
+
+prvtOspfAreaDefaultCost OBJECT-TYPE
+    SYNTAX      Integer32 (0..16777215)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Default cost"
+    ::= { prvtOspfAreaEntry 12 }
+
+prvtOspfLsdbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtOspfLsdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The OSPF Process's Link State Database."
+    REFERENCE   
+        "OSPF Version 2, Section 12 Link State Adver-
+         tisements"
+    ::= { prvtOspfObjects 14 }
+
+prvtOspfLsdbEntry OBJECT-TYPE
+    SYNTAX      PrvtOspfLsdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A single Link State Advertisement."
+    INDEX       { prvtOspfLsdbAreaId, prvtOspfLsdbType, prvtOspfLsdbLsid, 
+                  prvtOspfLsdbRouterId }
+    ::= { prvtOspfLsdbTable 1 }
+
+PrvtOspfLsdbEntry ::= SEQUENCE {
+    prvtOspfLsdbAreaId          IpAddress,
+    prvtOspfLsdbType            INTEGER,
+    prvtOspfLsdbLsid            IpAddress,
+    prvtOspfLsdbRouterId        IpAddress,
+    prvtOspfLsdbSequence        Integer32,
+    prvtOspfLsdbAge             Integer32,
+    prvtOspfLsdbChecksum        Integer32,
+    prvtOspfLsdbLength          Integer32,
+    prvtOspfLsdbAdvertisement   OCTET STRING
+}
+
+prvtOspfLsdbAreaId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The 32 bit identifier of the Area from which
+         the LSA was received."
+    REFERENCE   
+        "OSPF Version 2, Appendix C.2 Area parameters"
+    ::= { prvtOspfLsdbEntry 1 }
+
+prvtOspfLsdbType OBJECT-TYPE
+    SYNTAX      INTEGER { routerLink(1), networkLink(2), summaryLink(3), 
+                    asSummaryLink(4), asExternalLink(5), 
+                    multicastLink(6), nssaExternalLink(7), 
+                    unknownLink(8), opaqueLinkLsa(9), opaqueAreaLsa(10), 
+                    opaqueAsLsa(11) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The type of the link state advertisement.
+         Each link state type has a separate
+         advertisement format."
+    REFERENCE   
+        "OSPF Version 2, Appendix A.4.1 The Link State
+         Advertisement header"
+    ::= { prvtOspfLsdbEntry 2 }
+
+prvtOspfLsdbLsid OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Link State ID is an LS Type Specific field
+         containing either a Router ID or an IP Address;
+         it identifies the piece of the routing domain
+         that is being described by the advertisement."
+    REFERENCE   
+        "OSPF Version 2, Section 12.1.4 Link State ID"
+    ::= { prvtOspfLsdbEntry 3 }
+
+prvtOspfLsdbRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The 32 bit number that uniquely identifies the
+         originating router in the Autonomous System."
+    REFERENCE   
+        "OSPF Version 2, Appendix C.1 Global parameters"
+    ::= { prvtOspfLsdbEntry 4 }
+
+prvtOspfLsdbSequence OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The sequence number field is a signed 32-bit
+         integer. It is used to detect old and duplicate
+         link state advertisements. The space of
+         sequence numbers is linearly ordered. The
+         larger the sequence number the more recent the
+         advertisement."
+    REFERENCE   
+        "OSPF Version 2, Section 12.1.6 LS sequence
+         number"
+    ::= { prvtOspfLsdbEntry 5 }
+
+prvtOspfLsdbAge OBJECT-TYPE
+    SYNTAX      Integer32 (-32768..32767)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This field is the age of the link state
+         advertisement in seconds."
+    REFERENCE   
+        "OSPF Version 2, Section 12.1.1 LS age"
+    ::= { prvtOspfLsdbEntry 6 }
+
+prvtOspfLsdbChecksum OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This field is the checksum of the complete
+         contents of the advertisement, excepting the
+         age field. The age field is excepted so that
+         an advertisement's age can be incremented
+         without updating the checksum. The checksum
+         used is the same that is used for ISO
+         connectionless datagrams; it is commonly
+         referred to as the Fletcher checksum."
+    REFERENCE   
+        "OSPF Version 2, Section 12.1.7 LS checksum"
+    ::= { prvtOspfLsdbEntry 7 }
+
+prvtOspfLsdbLength OBJECT-TYPE
+    SYNTAX      Integer32 (-32768..32767)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The length of the ospf packet"
+    ::= { prvtOspfLsdbEntry 8 }
+
+prvtOspfLsdbAdvertisement OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The entire Link State Advertisement,
+         including its header."
+    REFERENCE   
+        "OSPF Version 2, Section 12 Link State
+         Advertisements"
+    ::= { prvtOspfLsdbEntry 9 }
+
+prvtOspfExtLsdbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtOspfExtLsdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The OSPF Process's Links State Database."
+    REFERENCE   
+        "OSPF Version 2, Section 12 Link State Adver-
+         tisements"
+    ::= { prvtOspfObjects 15 }
+
+prvtOspfExtLsdbEntry OBJECT-TYPE
+    SYNTAX      PrvtOspfExtLsdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A single Link State Advertisement."
+    INDEX       { prvtOspfExtLsdbType, prvtOspfExtLsdbLsid, 
+                  prvtOspfExtLsdbRouterId }
+    ::= { prvtOspfExtLsdbTable 1 }
+
+PrvtOspfExtLsdbEntry ::= SEQUENCE {
+    prvtOspfExtLsdbType             INTEGER,
+    prvtOspfExtLsdbLsid             IpAddress,
+    prvtOspfExtLsdbRouterId         IpAddress,
+    prvtOspfExtLsdbSequence         Integer32,
+    prvtOspfExtLsdbAge              Integer32,
+    prvtOspfExtLsdbChecksum         Integer32,
+    prvtOspfExtLsdbAdvertisement    OCTET STRING
+}
+
+prvtOspfExtLsdbType OBJECT-TYPE
+    SYNTAX      INTEGER { routerLink(1), networkLink(2), summaryLink(3), 
+                    asSummaryLink(4), asExternalLink(5), 
+                    multicastLink(6), nssaExternalLink(7), 
+                    unknownLink(8), opaqueLinkLsa(9), opaqueAreaLsa(10), 
+                    opaqueAsLsa(11) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The type of the link state advertisement.
+         Each link state type has a separate advertise-
+         ment format."
+    REFERENCE   
+        "OSPF Version 2, Appendix A.4.1 The Link State
+         Advertisement header"
+    ::= { prvtOspfExtLsdbEntry 1 }
+
+prvtOspfExtLsdbLsid OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Link State ID is an LS Type Specific field
+         containing either a Router ID or an IP Address;
+         it identifies the piece of the routing domain
+         that is being described by the advertisement."
+    REFERENCE   
+        "OSPF Version 2, Section 12.1.4 Link State ID"
+    ::= { prvtOspfExtLsdbEntry 2 }
+
+prvtOspfExtLsdbRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The 32 bit number that uniquely identifies the
+         originating router in the Autonomous System."
+    REFERENCE   
+        "OSPF Version 2, Appendix C.1 Global parameters"
+    ::= { prvtOspfExtLsdbEntry 3 }
+
+prvtOspfExtLsdbSequence OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The sequence number field is a signed 32-bit
+         integer. It is used to detect old and duplicate
+         link state advertisements. The space of
+         sequence numbers is linearly ordered. The
+         larger the sequence number the more recent the
+         advertisement."
+    REFERENCE   
+        "OSPF Version 2, Section 12.1.6 LS sequence
+         number"
+    ::= { prvtOspfExtLsdbEntry 4 }
+
+prvtOspfExtLsdbAge OBJECT-TYPE
+    SYNTAX      Integer32 (-32768..32767)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This field is the age of the link state
+         advertisement in seconds."
+    REFERENCE   
+        "OSPF Version 2, Section 12.1.1 LS age"
+    ::= { prvtOspfExtLsdbEntry 5 }
+
+prvtOspfExtLsdbChecksum OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This field is the checksum of the complete
+         contents of the advertisement, excepting the
+         age field. The age field is excepted so that
+         an advertisement's age can be incremented
+         without updating the checksum. The checksum
+         used is the same that is used for ISO
+         connectionless datagrams; it is commonly referred
+         to as the Fletcher checksum."
+    REFERENCE   
+        "OSPF Version 2, Section 12.1.7 LS checksum"
+    ::= { prvtOspfExtLsdbEntry 6 }
+
+prvtOspfExtLsdbAdvertisement OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The entire Link State Advertisement, including
+         its header."
+    REFERENCE   
+        "OSPF Version 2, Section 12 Link State Adver-
+         tisements"
+    ::= { prvtOspfExtLsdbEntry 7 }
+
+prvtOspfIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtOspfIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The OSPF Interface Table describes the inter-
+         faces from the viewpoint of OSPF."
+    REFERENCE   
+        "OSPF Version 2, Appendix C.3 Router interface
+         parameters"
+    ::= { prvtOspfObjects 16 }
+
+prvtOspfIfEntry OBJECT-TYPE
+    SYNTAX      PrvtOspfIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The OSPF Interface Entry describes one inter-
+         face from the viewpoint of OSPF."
+    INDEX       { prvtOspfIfIpAddress }
+    ::= { prvtOspfIfTable 1 }
+
+PrvtOspfIfEntry ::= SEQUENCE {
+    prvtOspfIfIpAddress             IpAddress,
+    prvtOspfIfRowStatus             RowStatus,
+    prvtOspfIfAreaId                OCTET STRING,
+    prvtOspfIfWorkingMode           INTEGER,
+    prvtOspfIfTransitDelay          Integer32,
+    prvtOspfIfPriority              Integer32,
+    prvtOspfIfHelloTimer            Integer32,
+    prvtOspfIfDeadTimer             Integer32,
+    prvtOspfIfRetransmitInterval    Integer32,
+    prvtOspfIfOutputCost            Integer32,
+    prvtOspfIfAuthType              INTEGER,
+    prvtOspfIfAuthSimple            OCTET STRING,
+    prvtOspfIfType                  INTEGER
+}
+
+prvtOspfIfIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The IP address of this OSPF interface."
+    ::= { prvtOspfIfEntry 1 }
+
+prvtOspfIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This variable displays the status of the entry.
+         Setting it to 'invalid' has the effect of
+         rendering it inoperative. The internal effect
+         (row removal) is implementation dependent."
+    ::= { prvtOspfIfEntry 2 }
+
+prvtOspfIfAreaId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "An octet string, uniquely identifying area.
+         Both A.B.C.D or integer notations are supported. Area ID
+         0.0.0.0 is used for the OSPF backbone."
+    ::= { prvtOspfIfEntry 3 }
+
+prvtOspfIfWorkingMode OBJECT-TYPE
+    SYNTAX      INTEGER { active(0), passive(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Working mode"
+    ::= { prvtOspfIfEntry 4 }
+
+prvtOspfIfTransitDelay OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The estimated number of seconds it takes to
+         transmit a link state update packet over this
+         interface."
+    ::= { prvtOspfIfEntry 5 }
+
+prvtOspfIfPriority OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The priority of this interface. Used in
+         multi-access networks, this field is used in
+         the designated router election algorithm. The
+         value 0 signifies that the router is not eligible
+         to become the designated router on this
+         particular network. In the event of a tie in
+         this value, routers will use their Router ID as
+         a tie breaker."
+    ::= { prvtOspfIfEntry 6 }
+
+prvtOspfIfHelloTimer OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The length of time, in seconds, between the
+         Hello packets that the router sends on the
+         interface. This value must be the same for all
+         routers attached to a common network."
+    ::= { prvtOspfIfEntry 7 }
+
+prvtOspfIfDeadTimer OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The number of seconds that a router's Hello
+         packets have not been seen before it's neigh-
+         bors declare the router down. This should be
+         some multiple of the Hello interval. This
+         value must be the same for all routers attached
+         to a common network."
+    ::= { prvtOspfIfEntry 8 }
+
+prvtOspfIfRetransmitInterval OBJECT-TYPE
+    SYNTAX      Integer32 (3..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The number of seconds between link-state ad-
+         vertisement retransmissions, for adjacencies
+         belonging to this interface. This value is
+         also used when retransmitting database descrip-
+         tion and link-state request packets."
+    ::= { prvtOspfIfEntry 9 }
+
+prvtOspfIfOutputCost OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "No description in main model!"
+    ::= { prvtOspfIfEntry 10 }
+
+prvtOspfIfAuthType OBJECT-TYPE
+    SYNTAX      INTEGER { simple(1), md5(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set authentication type of interface.
+         If not set, will use the one from area!"
+    ::= { prvtOspfIfEntry 11 }
+
+prvtOspfIfAuthSimple OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..8))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Simple authentication password (key).Up to 8 characters"
+    ::= { prvtOspfIfEntry 12 }
+
+prvtOspfIfType OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), broadcast(1), nbma(2), 
+                    pointToPoint(3), pointToMultipoint(5), 
+                    virtualLink(6), loopback(7) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "No description in main model!"
+    ::= { prvtOspfIfEntry 13 }
+
+prvtOspfIfAuthMd5Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtOspfIfAuthMd5Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table for configuring message digest authentication password"
+    ::= { prvtOspfObjects 17 }
+
+prvtOspfIfAuthMd5Entry OBJECT-TYPE
+    SYNTAX      PrvtOspfIfAuthMd5Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table rows"
+    INDEX       { prvtOspfIfIpAddress, prvtOspfIfAuthMd5Key }
+    ::= { prvtOspfIfAuthMd5Table 1 }
+
+PrvtOspfIfAuthMd5Entry ::= SEQUENCE {
+    prvtOspfIfAuthMd5Key        Integer32,
+    prvtOspfIfAuthMd5RowStatus  RowStatus,
+    prvtOspfIfAuthMd5Word       OCTET STRING
+}
+
+prvtOspfIfAuthMd5Key OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Authentication key."
+    ::= { prvtOspfIfAuthMd5Entry 1 }
+
+prvtOspfIfAuthMd5RowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "RowStatus."
+    ::= { prvtOspfIfAuthMd5Entry 2 }
+
+prvtOspfIfAuthMd5Word OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Authentication word."
+    ::= { prvtOspfIfAuthMd5Entry 3 }
+
+prvtOspfNbrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtOspfNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table of non-virtual neighbor information."
+    REFERENCE   
+        "OSPF Version 2, Section 10 The Neighbor Data Structure"
+    ::= { prvtOspfObjects 18 }
+
+prvtOspfNbrEntry OBJECT-TYPE
+    SYNTAX      PrvtOspfNbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The information regarding a single neighbor."
+    REFERENCE   
+        "OSPF Version 2, Section 10 The Neighbor Data Structure"
+    INDEX       { prvtOspfNbrIpAddr, prvtOspfNbrAddressLessIndex }
+    ::= { prvtOspfNbrTable 1 }
+
+PrvtOspfNbrEntry ::= SEQUENCE {
+    prvtOspfNbrIpAddr               PrvtOspfIpAddress,
+    prvtOspfNbrAddressLessIndex     Integer32,
+    prvtOspfNbrRtrId                PrvtOspfIpAddress,
+    prvtOspfNbrOptions              Integer32,
+    prvtOspfNbrPriority             PrvtOspfDesignatedRouterPriority,
+    prvtOspfNbrState                INTEGER,
+    prvtOspfNbrEvents               Counter32,
+    prvtOspfNbrLsRetransQLen        Gauge32,
+    prvtOspfNbmaNbrPermanence       INTEGER,
+    prvtOspfNbrHelloSuppressed      TruthValue
+}
+
+prvtOspfNbrIpAddr OBJECT-TYPE
+    SYNTAX      PrvtOspfIpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The IP address this neighbor is using in its
+         IP Source Address. Note that, on addressless
+         links, this will not be 0.0.0.0, but the ad-
+         dress of another of the neighbor's interfaces."
+    ::= { prvtOspfNbrEntry 1 }
+
+prvtOspfNbrAddressLessIndex OBJECT-TYPE
+    SYNTAX      Integer32 (-2147483648..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "On an interface having an IP Address, zero.
+         On addressless interfaces, the corresponding
+         value of ifIndex in the Internet Standard MIB.
+         On row creation, this can be derived from the
+         instance."
+    ::= { prvtOspfNbrEntry 2 }
+
+prvtOspfNbrRtrId OBJECT-TYPE
+    SYNTAX      PrvtOspfIpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A 32-bit integer (represented as a type IpAd-
+         dress) uniquely identifying the neighboring
+         router in the Autonomous System."
+    ::= { prvtOspfNbrEntry 3 }
+
+prvtOspfNbrOptions OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A Bit Mask corresponding to the neighbor's op-
+         tions field.
+         
+         Bit 0, if set, indicates that the system will
+         operate on Type of Service metrics other than
+         TOS 0. If zero, the neighbor will ignore all
+         metrics except the TOS 0 metric.
+         
+         Bit 1, if set, indicates that the associated
+         area accepts and operates on external informa-
+         tion; if zero, it is a stub area.
+         
+         Bit 2, if set, indicates that the system is ca-
+         pable of routing IP Multicast datagrams; i.e.,
+         that it implements the Multicast Extensions to
+         OSPF.
+         
+         Bit 3, if set, indicates that the associated
+         area is an NSSA. These areas are capable of
+         carrying type 7 external advertisements, which
+         are translated into type 5 external advertise-
+         ments at NSSA borders."
+    REFERENCE   
+        "OSPF Version 2, Section 12.1.2 Options"
+    ::= { prvtOspfNbrEntry 4 }
+
+prvtOspfNbrPriority OBJECT-TYPE
+    SYNTAX      PrvtOspfDesignatedRouterPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The priority of this neighbor in the designat-
+         ed router election algorithm. The value 0 sig-
+         nifies that the neighbor is not eligible to be-
+         come the designated router on this particular
+         network."
+    ::= { prvtOspfNbrEntry 5 }
+
+prvtOspfNbrState OBJECT-TYPE
+    SYNTAX      INTEGER { down(1), attempt(2), init(3), twoWay(4), 
+                    exchangeStart(5), exchange(6), loading(7), full(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The State of the relationship with this Neigh-
+         bor."
+    REFERENCE   
+        "OSPF Version 2, Section 10.1 Neighbor States"
+    ::= { prvtOspfNbrEntry 6 }
+
+prvtOspfNbrEvents OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of times this neighbor relationship
+         has changed state, or an error has occurred."
+    ::= { prvtOspfNbrEntry 7 }
+
+prvtOspfNbrLsRetransQLen OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current length of the retransmission queue."
+    ::= { prvtOspfNbrEntry 8 }
+
+prvtOspfNbmaNbrPermanence OBJECT-TYPE
+    SYNTAX      INTEGER { dynamic(1), permanent(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This variable displays the status of the entry.
+         'dynamic' and 'permanent' refer to how
+         the neighbor became known."
+    ::= { prvtOspfNbrEntry 10 }
+
+prvtOspfNbrHelloSuppressed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether Hellos are being suppressed
+         to the neighbor"
+    ::= { prvtOspfNbrEntry 11 }
+
+prvtOspfRedistributeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtOspfRedistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The table represents the routing protocols, redistributed into the OSPF 
+         routing domain.
+         
+         Creation of conceptual row in the table starts the redistribution of the 
+         specified protocol, which would lead to the injection of routing information 
+         from that protocol into the OSPF.
+         
+         Deletion of conceptual row would stop the redistribution of that protocol 
+         into the OSPF.
+         
+         OSPF router, which redistributes routing information from other 
+         protocols, is an ASBR router"
+    ::= { prvtOspfObjects 19 }
+
+prvtOspfRedistributeEntry OBJECT-TYPE
+    SYNTAX      PrvtOspfRedistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The conceptual row represents a routing protocol, redistributed into OSPF"
+    INDEX       { prvtOspfRedistributeProtocol }
+    ::= { prvtOspfRedistributeTable 1 }
+
+PrvtOspfRedistributeEntry ::= SEQUENCE {
+    prvtOspfRedistributeProtocol    INTEGER,
+    prvtOspfRedistributeRowStatus   RowStatus,
+    prvtOspfRedistributeMetric1     Integer32,
+    prvtOspfRedistributeMetric2     Integer32,
+    prvtOspfRedistributeRouteMap    OCTET STRING
+}
+
+prvtOspfRedistributeProtocol OBJECT-TYPE
+    SYNTAX      INTEGER { kernel(2), connected(3), static(4), 
+                    default(17) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The specific routes redistributed into OSPF. For T4R model the valid values 
+         are connected, rip and static.
+         For all the other models all of the above routes can be redistributed "
+    ::= { prvtOspfRedistributeEntry 1 }
+
+prvtOspfRedistributeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the status of the row. Setting of this field to active enables the 
+         redistribution of the protocol.
+         
+         Setting this field to destroy disables the redistribution of the protocol."
+    ::= { prvtOspfRedistributeEntry 2 }
+
+prvtOspfRedistributeMetric1 OBJECT-TYPE
+    SYNTAX      Integer32 (0..16777215)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The metric 1, with which the external routes will be redistributed in the OSPF"
+    ::= { prvtOspfRedistributeEntry 3 }
+
+prvtOspfRedistributeMetric2 OBJECT-TYPE
+    SYNTAX      Integer32 (0..16777215)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The metric 2, with which the external routes will be redistributed in the OSPF"
+    ::= { prvtOspfRedistributeEntry 4 }
+
+prvtOspfRedistributeRouteMap OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The route map that would filter the redistributed routing information"
+    ::= { prvtOspfRedistributeEntry 5 }
+
+prvtOspfRouterDataTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtOspfRouterDataEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about available routers"
+    ::= { prvtOspfObjects 20 }
+
+prvtOspfRouterDataEntry OBJECT-TYPE
+    SYNTAX      PrvtOspfRouterDataEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The conceptual row represents a routing entry"
+    INDEX       { prvtOspfRouterDataPrefix, prvtOspfRouterDataType, 
+                  prvtOspfRouterDataAreaId }
+    ::= { prvtOspfRouterDataTable 1 }
+
+PrvtOspfRouterDataEntry ::= SEQUENCE {
+    prvtOspfRouterDataPrefix            OCTET STRING,
+    prvtOspfRouterDataType              INTEGER,
+    prvtOspfRouterDataAreaId            OCTET STRING,
+    prvtOspfRouterDataId                IpAddress,
+    prvtOspfRouterDataCost              Unsigned32,
+    prvtOspfRouterDataCostType          Unsigned32,
+    prvtOspfRouterDataDestType          INTEGER,
+    prvtOspfRouterDataPathType          INTEGER,
+    prvtOspfRouterDataFlags             BITS,
+    prvtOspfRouterDataExternalRouting   INTEGER,
+    prvtOspfRouterDataTag               Integer32
+}
+
+prvtOspfRouterDataPrefix OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterDataEntry 1 }
+
+prvtOspfRouterDataType OBJECT-TYPE
+    SYNTAX      INTEGER { network(1), router(2), external(3) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterDataEntry 2 }
+
+prvtOspfRouterDataAreaId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4 | 16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterDataEntry 3 }
+
+prvtOspfRouterDataId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterDataEntry 4 }
+
+prvtOspfRouterDataCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterDataEntry 5 }
+
+prvtOspfRouterDataCostType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterDataEntry 6 }
+
+prvtOspfRouterDataDestType OBJECT-TYPE
+    SYNTAX      INTEGER { router(1), network(2), disables(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterDataEntry 7 }
+
+prvtOspfRouterDataPathType OBJECT-TYPE
+    SYNTAX      INTEGER { intraArea(1), interArea(2), external1(3), 
+                    external3(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterDataEntry 8 }
+
+prvtOspfRouterDataFlags OBJECT-TYPE
+    SYNTAX      BITS { abr(0), asbr(1), virtual(2), unknown(3), nssa(4), 
+                    shortcut(5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterDataEntry 9 }
+
+prvtOspfRouterDataExternalRouting OBJECT-TYPE
+    SYNTAX      INTEGER { default(0), stub(1), nssa(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterDataEntry 10 }
+
+prvtOspfRouterDataTag OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterDataEntry 11 }
+
+prvtOspfRouterPathTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtOspfRouterPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about available router's paths"
+    ::= { prvtOspfObjects 21 }
+
+prvtOspfRouterPathEntry OBJECT-TYPE
+    SYNTAX      PrvtOspfRouterPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The conceptual row represents a routing's path entry"
+    INDEX       { prvtOspfRouterDataPrefix, prvtOspfRouterDataType, 
+                  prvtOspfRouterDataAreaId, prvtOspfRouterPathNextHop }
+    ::= { prvtOspfRouterPathTable 1 }
+
+PrvtOspfRouterPathEntry ::= SEQUENCE {
+    prvtOspfRouterPathNextHop               OCTET STRING,
+    prvtOspfRouterPathAdvertisingRouter     OCTET STRING,
+    prvtOspfRouterPathInterfaceName         OCTET STRING
+}
+
+prvtOspfRouterPathNextHop OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4 | 16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterPathEntry 1 }
+
+prvtOspfRouterPathAdvertisingRouter OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4 | 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterPathEntry 2 }
+
+prvtOspfRouterPathInterfaceName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Unknown in main data model"
+    ::= { prvtOspfRouterPathEntry 3 }
+
+prvtOspfTrafficEngEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to enable the traffic engineering extensions of OSPF.
+         Note that enabling traffic engineering requires that router interface lo1
+         (PRVT-SWITCH-IPVLAN-MIB::ipInterfaceIpAddress.lo1) be configured with a
+         valid IP address (not 0.0.0.0 or 127.0.0.1).  An attempt to enable traffic
+         engineering without such a valid address will fail (error returned)."
+    ::= { prvtOspfObjects 22 }
+
+END -- end of module PRVT-OSPF-MIB.

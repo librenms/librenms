@@ -4,12 +4,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
@@ -21,22 +21,32 @@
  * @package LibreNMS
  * @subpackage Dashboards
  */
+
+use LibreNMS\Authentication\LegacyAuth;
+
 header('Content-type: application/json');
 
 $status    = 'error';
 $message   = 'unknown error';
-if (isset($_REQUEST['dashboard_id']) && isset($_REQUEST['dashboard_name']) && isset($_REQUEST['access'])) {
-    if (dbUpdate(array('dashboard_name'=>$_REQUEST['dashboard_name'],'access'=>$_REQUEST['access']), 'dashboards', '(user_id = ? || access = 2) && dashboard_id = ?', array($_SESSION['user_id'],$_REQUEST['dashboard_id'])) >= 0) {
+
+$dashboard_id = (int)$_REQUEST['dashboard_id'];
+$dashboard_name = display($_REQUEST['dashboard_name']);
+$access = $_REQUEST['access'];
+
+if (isset($dashboard_id) && isset($dashboard_name) && isset($access)) {
+    if (dbUpdate(['dashboard_name'=> $dashboard_name,'access'=> $access], 'dashboards', '(user_id = ? || access = 2) && dashboard_id = ?', [LegacyAuth::id(), $dashboard_id]) >= 0) {
         $status  = 'ok';
-        $message = 'Updated dashboard';
+        $message = 'Dashboard ' . $dashboard_name . ' updated';
     } else {
-        $message = 'ERROR: Could not update dashboard '.$_REQUEST['dashboard_id'];
+        $message = 'ERROR: Could not update dashboard '. $dashboard_name;
     }
 } else {
     $message = 'ERROR: Not enough params';
 }
 
-die(json_encode(array(
-    'status'       => $status,
-    'message'      => $message,
-)));
+$response = array(
+    'status'        => $status,
+    'message'       => $message
+);
+
+echo _json_encode($response);

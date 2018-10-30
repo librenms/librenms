@@ -1,0 +1,952 @@
+EIP-DNSBLAST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	Integer32, Counter64, Gauge32, MODULE-IDENTITY, OBJECT-TYPE, enterprises
+			FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString
+			FROM SNMPv2-TC;
+
+eip	MODULE-IDENTITY
+LAST-UPDATED "201511300000Z"
+ORGANIZATION "EfficientIP"
+CONTACT-INFO "support@efficientip.com"
+DESCRIPTION "DNSGUARDIAN"
+REVISION "201511300000Z"
+DESCRIPTION "TBD"
+::= { enterprises 2440 }
+
+products		OBJECT IDENTIFIER ::= { eip 1 }
+
+eipDNSGUARDIAN		OBJECT IDENTIFIER ::= { products 11 }
+
+eipDNSGUARDIANStat		OBJECT IDENTIFIER ::= { eipDNSGUARDIAN 2 }
+
+--
+--
+--	DNS GUARDIAN STATISTICS
+--
+--
+
+eipDNSGUARDIANViewStatTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF EipDNSGUARDIANViewStatEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "Statistics of DNSGUARDIAN"
+	::= { eipDNSGUARDIANStat 3 }
+	
+
+eipDNSGUARDIANViewStatEntry OBJECT-TYPE
+	SYNTAX EipDNSGUARDIANViewStatEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "Statistics of DNSGUARDIAN"
+	INDEX { eipDNSGUARDIANViewStatViewID }
+	::= { eipDNSGUARDIANViewStatTable 1 }
+
+EipDNSGUARDIANViewStatEntry ::= SEQUENCE {
+	eipDNSGUARDIANViewStatViewID Integer32,
+	eipDNSGUARDIANViewStatViewName DisplayString,
+	eipDNSGUARDIANViewStatCacheHit Counter64,
+	eipDNSGUARDIANViewStatCacheMiss Counter64,
+	eipDNSGUARDIANViewStatCacheSize Gauge32,
+	eipDNSGUARDIANViewStatSendDNSPacket Counter64,
+	eipDNSGUARDIANViewStatSendDNSByte Counter64,
+	eipDNSGUARDIANViewStatRecvDNSPacket Counter64,
+	eipDNSGUARDIANViewStatRecvDNSByte Counter64,
+	eipDNSGUARDIANViewStatCacheMissExist Counter64,
+	eipDNSGUARDIANViewStatCacheMissNotExist Counter64,
+	eipDNSGUARDIANViewStatSendRescueDNSPacket Counter64,
+	eipDNSGUARDIANViewStatSendRescueDNSByte Counter64,
+	eipDNSGUARDIANViewStatRecvInvalidDNSPacket Counter64,
+	eipDNSGUARDIANViewStatRecvInvalidDNSByte Counter64,
+	eipDNSGUARDIANViewStatRecvInvalidClass Counter64,
+	eipDNSGUARDIANViewStatRecvInvalidOverflow Counter64,
+	eipDNSGUARDIANViewStatRecvInvalidEtherSource Counter64,
+	eipDNSGUARDIANViewStatRecvInvalidUDPSource Counter64,
+	eipDNSGUARDIANViewStatRecvInvalidIPSrcEqDst Counter64,
+	eipDNSGUARDIANViewStatRecvInvalidQDCount Counter64,
+	eipDNSGUARDIANViewStatRecvInvalidOPCode Counter64,
+	eipDNSGUARDIANViewStatRecvSharedPacket Counter64,
+	eipDNSGUARDIANViewStatRecvSharedByte Counter64,
+	eipDNSGUARDIANViewStatSendSharedPacket Counter64,
+	eipDNSGUARDIANViewStatSendSharedByte Counter64,
+	eipDNSGUARDIANViewStatCacheMissQuarantine Counter64,
+	eipDNSGUARDIANViewStatCacheMissExistQuarantine Counter64,
+	eipDNSGUARDIANViewStatCacheMissNotExistQuarantine Counter64,
+	eipDNSGUARDIANViewStatCacheHitQuarantine Counter64,
+	eipDNSGUARDIANViewStatQuarantineSendDNSPacket Counter64,
+	eipDNSGUARDIANViewStatQuarantineSendDNSByte Counter64,
+	eipDNSGUARDIANViewStatCacheMissRescue Counter64,
+	eipDNSGUARDIANViewStatCacheMissExistRescue Counter64,
+	eipDNSGUARDIANViewStatCacheMissNotExistRescue Counter64,
+	eipDNSGUARDIANViewStatCacheHitRescue Counter64,
+	eipDNSGUARDIANViewStatBlockedQuery Counter64,
+	eipDNSGUARDIANViewStatRatelimitedQuery Counter64,
+	eipDNSGUARDIANViewStatRTT10 Counter64,
+	eipDNSGUARDIANViewStatRTT100 Counter64,
+	eipDNSGUARDIANViewStatRTT500 Counter64,
+	eipDNSGUARDIANViewStatRTT800 Counter64,
+	eipDNSGUARDIANViewStatRTT1600 Counter64,
+	eipDNSGUARDIANViewStatRTTMax Counter64,
+	eipDNSGUARDIANViewStatCacheMissQuarantineRedirect Counter64,
+	eipDNSGUARDIANViewStatQuarantineRedirectSendDNSPacket Counter64,
+	eipDNSGUARDIANViewStatQuarantineRedirectSendDNSByte Counter64
+	}
+
+eipDNSGUARDIANViewStatViewID OBJECT-TYPE
+	SYNTAX Integer32 (0..7)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "View ID"
+	::= { eipDNSGUARDIANViewStatEntry 1 }
+
+eipDNSGUARDIANViewStatViewName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "View name"
+	::= { eipDNSGUARDIANViewStatEntry 2 }
+
+eipDNSGUARDIANViewStatCacheHit OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 3 }
+
+eipDNSGUARDIANViewStatCacheMiss OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 4 }
+
+eipDNSGUARDIANViewStatCacheSize OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 5 }
+
+eipDNSGUARDIANViewStatSendDNSPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 6 }
+
+eipDNSGUARDIANViewStatSendDNSByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 7 }
+
+eipDNSGUARDIANViewStatRecvDNSPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 8 }
+
+eipDNSGUARDIANViewStatRecvDNSByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 9 }
+
+
+eipDNSGUARDIANViewStatCacheMissExist OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 10 }
+
+eipDNSGUARDIANViewStatCacheMissNotExist OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 11 }
+
+eipDNSGUARDIANViewStatSendRescueDNSPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 12 }
+
+eipDNSGUARDIANViewStatSendRescueDNSByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 13 }
+
+eipDNSGUARDIANViewStatRecvInvalidDNSPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 14 }
+
+eipDNSGUARDIANViewStatRecvInvalidDNSByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 15 }
+
+eipDNSGUARDIANViewStatRecvInvalidClass OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 16 }
+
+eipDNSGUARDIANViewStatRecvInvalidOverflow OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 17 }
+
+eipDNSGUARDIANViewStatRecvInvalidEtherSource OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 18 }
+
+eipDNSGUARDIANViewStatRecvInvalidUDPSource OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 19 }
+
+eipDNSGUARDIANViewStatRecvInvalidIPSrcEqDst OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 20 }
+
+eipDNSGUARDIANViewStatRecvInvalidQDCount OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 21 }
+
+eipDNSGUARDIANViewStatRecvInvalidOPCode OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 22 }
+
+eipDNSGUARDIANViewStatRecvSharedPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 30 }
+
+eipDNSGUARDIANViewStatRecvSharedByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 31 }
+
+eipDNSGUARDIANViewStatSendSharedPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 32 }
+
+eipDNSGUARDIANViewStatSendSharedByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 33 }
+
+eipDNSGUARDIANViewStatCacheMissQuarantine OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 34 }
+
+eipDNSGUARDIANViewStatCacheMissExistQuarantine OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 35 }
+
+eipDNSGUARDIANViewStatCacheMissNotExistQuarantine OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 36 }
+
+eipDNSGUARDIANViewStatCacheHitQuarantine OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 37 }
+
+eipDNSGUARDIANViewStatQuarantineSendDNSPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 38 }
+
+eipDNSGUARDIANViewStatQuarantineSendDNSByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 39 }
+
+eipDNSGUARDIANViewStatCacheMissRescue OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 40 }
+
+eipDNSGUARDIANViewStatCacheMissExistRescue OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 41 }
+
+eipDNSGUARDIANViewStatCacheMissNotExistRescue OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 42 }
+
+eipDNSGUARDIANViewStatCacheHitRescue OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 43 }
+
+eipDNSGUARDIANViewStatBlockedQuery OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 44 }
+
+eipDNSGUARDIANViewStatRatelimitedQuery OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 47 }
+
+eipDNSGUARDIANViewStatRTT10 OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 48 }
+
+eipDNSGUARDIANViewStatRTT100 OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 49 }
+
+eipDNSGUARDIANViewStatRTT500 OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 50 }
+
+eipDNSGUARDIANViewStatRTT800 OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 51 }
+
+eipDNSGUARDIANViewStatRTT1600 OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 52 }
+
+eipDNSGUARDIANViewStatRTTMax OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 53 }
+
+eipDNSGUARDIANViewStatCacheMissQuarantineRedirect OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 54 }
+
+eipDNSGUARDIANViewStatQuarantineRedirectSendDNSPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 55 }
+
+eipDNSGUARDIANViewStatQuarantineRedirectSendDNSByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANViewStatEntry 56 }
+    
+--
+--
+--	DNS GUARDIAN GLOBAL STATISTICS
+--
+--
+
+eipDNSGUARDIANGlobalStat		OBJECT IDENTIFIER ::= { eipDNSGUARDIANStat 4 }
+
+eipDNSGUARDIANStatCacheHit OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 3 }
+
+eipDNSGUARDIANStatCacheMiss OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 4 }
+
+eipDNSGUARDIANStatCacheSize OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 5 }
+
+eipDNSGUARDIANStatSendDNSPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 6 }
+
+eipDNSGUARDIANStatSendDNSByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 7 }
+
+eipDNSGUARDIANStatRecvDNSPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 8 }
+
+eipDNSGUARDIANStatRecvDNSByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 9 }
+
+
+eipDNSGUARDIANStatCacheMissExist OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 10 }
+
+eipDNSGUARDIANStatCacheMissNotExist OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 11 }
+
+eipDNSGUARDIANStatSendRescueDNSPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 12 }
+
+eipDNSGUARDIANStatSendRescueDNSByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 13 }
+
+eipDNSGUARDIANStatRecvInvalidDNSPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 14 }
+
+eipDNSGUARDIANStatRecvInvalidDNSByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 15 }
+
+eipDNSGUARDIANStatRecvInvalidClass OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 16 }
+
+eipDNSGUARDIANStatRecvInvalidOverflow OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 17 }
+
+eipDNSGUARDIANStatRecvInvalidEtherSource OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 18 }
+
+eipDNSGUARDIANStatRecvInvalidUDPSource OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 19 }
+
+eipDNSGUARDIANStatRecvInvalidIPSrcEqDst OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 20 }
+
+eipDNSGUARDIANStatRecvInvalidQDCount OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 21 }
+
+eipDNSGUARDIANStatRecvInvalidOPCode OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 22 }
+
+eipDNSGUARDIANStatRecvSharedPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 30 }
+
+eipDNSGUARDIANStatRecvSharedByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 31 }
+
+eipDNSGUARDIANStatSendSharedPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 32 }
+
+eipDNSGUARDIANStatSendSharedByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 33 }
+
+eipDNSGUARDIANStatCacheMissQuarantine OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 34 }
+
+eipDNSGUARDIANStatCacheMissExistQuarantine OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 35 }
+
+eipDNSGUARDIANStatCacheMissNotExistQuarantine OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 36 }
+
+eipDNSGUARDIANStatCacheHitQuarantine OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 37 }
+
+eipDNSGUARDIANStatQuarantineSendDNSPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 38 }
+
+eipDNSGUARDIANStatQuarantineSendDNSByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 39 }
+
+eipDNSGUARDIANStatCacheMissRescue OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 40 }
+
+eipDNSGUARDIANStatCacheMissExistRescue OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 41 }
+
+eipDNSGUARDIANStatCacheMissNotExistRescue OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 42 }
+
+eipDNSGUARDIANStatCacheHitRescue OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 43 }
+
+eipDNSGUARDIANStatBlockedQuery OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 44 }
+
+eipDNSGUARDIANStatClientsSize OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 45 }
+
+eipDNSGUARDIANStatClientsUpdated OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 46 }
+
+eipDNSGUARDIANStatRatelimitedQuery OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 47 }
+
+eipDNSGUARDIANStatRTT10 OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 48 }
+
+eipDNSGUARDIANStatRTT100 OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 49 }
+
+eipDNSGUARDIANStatRTT500 OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 50 }
+
+eipDNSGUARDIANStatRTT800 OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 51 }
+
+eipDNSGUARDIANStatRTT1600 OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 52 }
+
+eipDNSGUARDIANStatRTTMax OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 53 }
+
+
+eipDNSGUARDIANStatCacheMissQuarantineRedirect OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 54 }
+
+eipDNSGUARDIANStatQuarantineRedirectSendDNSPacket OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 55 }
+
+eipDNSGUARDIANStatQuarantineRedirectSendDNSByte OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 56 }
+
+    
+
+    
+eipDNSGUARDIANStatReplyNOERROR OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 101 }
+
+eipDNSGUARDIANStatReplyFORMERR OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 102 }
+
+eipDNSGUARDIANStatReplySERVFAIL OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 103 }
+
+eipDNSGUARDIANStatReplyNXDOMAIN OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 104 }
+
+eipDNSGUARDIANStatReplyNOTIMP OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 105 }
+
+eipDNSGUARDIANStatReplyREFUSED OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 106 }
+
+eipDNSGUARDIANStatReplyYXDOMAIN OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 107 }
+
+eipDNSGUARDIANStatReplyYXRRSET OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 108 }
+
+eipDNSGUARDIANStatReplyNXRRSET OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 109 }
+    
+eipDNSGUARDIANStatReplyNOTAUTH OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 120 }
+
+eipDNSGUARDIANStatReplyNOTZONE OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "TBD"
+	::= { eipDNSGUARDIANGlobalStat 121 }
+    
+END

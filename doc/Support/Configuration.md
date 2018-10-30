@@ -1,4 +1,5 @@
 source: Support/Configuration.md
+path: blob/master/doc/
 The options shown below also contain the default values.
 
 If you would like to alter any of these then please add your config option to `config.php`.
@@ -39,6 +40,14 @@ $config['db_port']   = NULL;
 $config['db_socket'] = '/run/mysqld/mysqld.sock';
 ```
 
+### Core
+
+#### PHP Settings
+
+You can change the memory limits for php within `config.php`. The value is in Megabytes and should just be an int value:
+
+`$config['php_memory_limit'] = 128;`
+
 ### Programs
 
 A lot of these are self explanatory so no further information may be provided. Any extensions that have dedicated 
@@ -60,20 +69,28 @@ Please see [1 Minute polling](1-Minute-Polling.md) for information on configurin
 ```php
 $config['fping']            = "/usr/bin/fping";
 $config['fping6']           = "fping6";
-$config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count'] = 3;
-$config['fping_options']['millisec'] = 200;
+$config['fping_options']['interval'] = 500;
 ```
 `fping` configuration options:
 
-* `retries` (`fping` parameter `-r`): Number of times an attempt at pinging a target will be made, not including the first try.
-* `timeout` (`fping` parameter `-t`): Amount of time that fping waits for a response to its first request (in milliseconds).
+* `timeout` (`fping` parameter `-t`): Amount of time that fping waits for a response to its first request (in milliseconds). **See note below**
 * `count` (`fping` parameter `-c`): Number of request packets to send to each target.
-* `millisec` (`fping` parameter `-p`): Time in milliseconds that fping waits between successive packets to an individual target.
+* `interval` (`fping` parameter `-p`): Time in milliseconds that fping waits between successive packets to an individual target.
+
+> NOTE: Setting a higher timeout value than the interval value can lead to slowing down poller. Example:
+>
+> timeout: 3000
+>
+> count: 3
+>
+> interval: 500
+>
+> In this example, interval will be overwritten by the timeout value of 3000 which is 3 seconds. As we send three icmp packets (count: 3), each one is delayed by 3 seconds which will result in fping taking > 6 seconds to return results.
 
 You can disable the fping / icmp check that is done for a device to be determined to be up on a global or per device basis.
-**We don't advice disabling the fping / icmp check unless you know the impact, at worst if you have a large number of devices down
+**We don't advise disabling the fping / icmp check unless you know the impact, at worst if you have a large number of devices down
 then it's possible that the poller would no longer complete in 5 minutes due to waiting for snmp to timeout.**
 
 Globally disable fping / icmp check:
@@ -122,10 +139,6 @@ We can also make use of one of these environment variables which can be set in `
 http_proxy=proxy.domain.com
 https_proxy=proxy.domain.com
 ```
-
-### Memcached
-
-[Memcached](../Extensions/Memcached.md)
 
 ### RRDCached
 
@@ -210,6 +223,44 @@ $config['int_l2tp']                = 0;  # Enable L2TP Port Types
 ```
 Enable / disable certain menus from being shown in the WebUI.
 
+You are able to adjust the number and time frames of the quick select time options for graphs and the mini graphs shown per row.
+
+Quick select:
+```php
+$config['graphs']['mini']['normal'] = array(
+    'day' => '24 Hours',
+    'week' => 'One Week',
+    'month' => 'One Month',
+    'year' => 'One Year',
+);
+$config['graphs']['mini']['widescreen'] = array(
+    'sixhour' => '6 Hours',
+    'day' => '24 Hours',
+    'twoday' => '48 Hours',
+    'week' => 'One Week',
+    'twoweek' => 'Two Weeks',
+    'month' => 'One Month',
+    'twomonth' => 'Two Months',
+    'year' => 'One Year',
+    'twoyear' => 'Two Years',
+);
+```
+
+Mini graphs:
+```php
+$config['graphs']['row']['normal'] = array(
+    'sixhour' => '6 Hours',
+    'day' => '24 Hours',
+    'twoday' => '48 Hours',
+    'week' => 'One Week',
+    'twoweek' => 'Two Weeks',
+    'month' => 'One Month',
+    'twomonth' => 'Two Months',
+    'year' => 'One Year',
+    'twoyear' => 'Two Years',
+);
+```
+
 ```php
 $config['web_mouseover']      = true;
 ```
@@ -234,6 +285,10 @@ Enable or disable the sysDescr output for a device.
 $config['force_ip_to_sysname'] = false;
 ```
 When using IP addresses as a hostname you can instead represent the devices on the WebUI by its SNMP sysName resulting in an easier to read overview of your network. This would apply on networks where you don't have DNS records for most of your devices.
+```php
+$config['force_hostname_to_sysname'] = false;
+```
+When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the SNMP sysName instead as the preferred reference to the device.
 
 ```php
 $config['device_traffic_iftype'][] = '/loopback/';
@@ -255,6 +310,28 @@ You can enable the old style network map (only available for individual devices 
 $config['gui']['network-map']['style'] = 'old';
 ```
 
+```php
+$config['percentile_value'] = X;
+```
+Show the `X`th percentile in the graph instead of the default 95th percentile.
+
+```php
+$config['shorthost_target_length'] = X;
+```
+The target maximum hostname length when applying the shorthost() function.
+You can increase this if you want to try and fit more of the hostname in graph titles.
+The default value is 12
+However, this can possibly break graph generation if this is very long.
+
+You can enable dynamic graphs within the WebUI under Global Settings -> Webui Settings -> Graph Settings.
+
+Graphs will be movable/scalable without reloading the page:
+![Example dynamic graph usage](img/dynamic-graph-usage.gif)
+
+### Stacked Graphs
+You can enable stacked graphs instead of the default inverted graphs. 
+Enabling them is possible via webui Global Settings -> Webui Settings -> Graph settings -> Use stacked graphs
+
 ### Add host settings
 The following setting controls how hosts are added.  If a host is added as an ip address it is checked to ensure the ip is not already present.  If the ip is present the host is not added.
 If host is added by hostname this check is not performed.  If the setting is true hostnames are resolved and the check is also performed.  This helps prevents accidental duplicate hosts.
@@ -269,13 +346,21 @@ By default we allow hosts to be added with duplicate sysName's, you can disable 
 $config['allow_duplicate_sysName'] = false;
 ```
 
+### Global poller and discovery modules
+Generally, it is a better to set these [per OS](../Developing/os/Settings.md#poller-and-discovery-modules) or device.
+
+```php
+$config['discovery_modules]['arp-table'] = true;
+$config['poller_modules']['bgp-peers'] = false;
+```
+
 ### SNMP Settings
 
 ```php
 $config['snmp']['timeout'] = 1;            # timeout in seconds
 $config['snmp']['retries'] = 5;            # how many times to retry the query
 $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
-$config['snmp']['version'] = "v2c";         # Default version to use
+$config['snmp']['version'] = ['v2c', 'v3', 'v1'];         # Default versions to use
 $config['snmp']['port'] = 161;
 ```
 Default SNMP options including retry and timeout settings and also default version and port.
@@ -321,7 +406,7 @@ The varying options after that are to support the different transports.
 
 ### Alerting
 
-[Alerting](../Extensions/Alerting.md)
+[Alerting](../Alerting/Rules.md)
 
 ### Billing
 
@@ -356,6 +441,7 @@ Enable / disable additional port statistics.
 
 ```php
 $config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
+$config['rancid_repo_type']             = 'svn';
 $config['rancid_ignorecomments']        = 0;
 ```
 Rancid configuration, `rancid_configs` is an array containing all of the locations of your rancid files.
@@ -369,7 +455,28 @@ Setting `rancid_ignorecomments` will disable showing lines that start with #
 ```php
 $config['collectd_dir']                 = '/var/lib/collectd/rrd';
 ```
-Specify the location of the collectd rrd files.
+Specify the location of the collectd rrd files. Note that the location in config.php should be consistent with the location set in /etc/collectd.conf and etc/collectd.d/rrdtool.conf
+
+```php
+<Plugin rrdtool>
+        DataDir "/var/lib/collectd/rrd"
+        CreateFilesAsync false
+        CacheTimeout 120
+        CacheFlush   900
+        WritesPerSecond 50
+</Plugin>
+```
+/etc/collectd.conf
+
+```php
+LoadPlugin rrdtool
+<Plugin rrdtool>
+       DataDir "/var/lib/collectd/rrd"
+       CacheTimeout 120
+       CacheFlush   900
+</Plugin>
+```
+/etc/collectd.d/rrdtool.conf
 
 ```php
 $config['collectd_sock']                 = 'unix:///var/run/collectd.sock';
@@ -505,7 +612,7 @@ $config['syslog_purge']                                   = 30;
 $config['eventlog_purge']                                 = 30;
 $config['authlog_purge']                                  = 30;
 $config['perf_times_purge']                               = 30;
-$config['device_perf_purge']                              = 30;
+$config['device_perf_purge']                              = 7;
 $config['rrd_purge']                                      = 90;// Not set by default
 ```
 These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually,
@@ -552,7 +659,7 @@ You can use this array to rewrite the description of ASes that you have discover
 [Updating](../General/Updating.md)
 
 ### IPMI
-Setup the types of IPMI protocols to test a host for and it what order.
+Setup the types of IPMI protocols to test a host for and in what order. Don't forget to install ipmitool on the monitoring host.
 
 ```php
 $config['ipmi']['type'] = array();
@@ -565,3 +672,20 @@ $config['ipmi']['type'][] = "open";
 ### Distributed poller settings
 
 [Distributed Poller](../Extensions/Distributed-Poller.md)
+
+## API Settings
+
+### CORS Support
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
+
+CORS support for the API is disabled by default. Below you will find the standard options,
+all of which you can configure.
+ 
+```php
+$config['api']['cors']['enabled'] = false;
+$config['api']['cors']['origin'] = '*';
+$config['api']['cors']['maxage'] = '86400';
+$config['api']['cors']['allowmethods'] = array('POST', 'GET', 'PUT', 'DELETE', 'PATCH');
+$config['api']['cors']['allowheaders'] = array('Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Auth-Token');
+```

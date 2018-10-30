@@ -8,172 +8,291 @@
           	FROM FORCE10-SMI;
 
 	f10FamilyMIB MODULE-IDENTITY   
-    	LAST-UPDATED "200706151200Z"   -- June 15, 2007 12:00:00 GMT
-    	ORGANIZATION "Force10 Networks, Inc"
+    	LAST-UPDATED "201310221200Z"   -- October 22, 2013 12:00:00 GMT
+   	ORGANIZATION "Dell Inc"
     	CONTACT-INFO
-    	"Force10 Networks, Inc
-     	1410 McCarthy Blvd
-     	Milpitas CA USA 95035"
+    	"http://www.force10networks.com/support"
+
      	DESCRIPTION
             "This mib module defines system Object Identifier values for sysObjectID.0 for 
-	     network elements manufactured and sold by Force10 Networks, Inc
-             http://www.force10networks.com"
+	     network elements manufactured and sold by Dell Inc
+             http://www.dell.com"
 	
 	-- Revision history.
+        REVISION     "201310221200Z"   -- October 22, 2013 12:00:00 GMT
+        DESCRIPTION
+        "Added Z-Series Family of product object IDs"
+
+        REVISION     "201112151200Z"   -- December 15, 2011 12:00:00 GMT
+        DESCRIPTION
+        "Added M-Series Family of product object IDs"
+
 	REVISION     "200706151200Z"   -- June 15, 2007 12:00:00 GMT
     	DESCRIPTION
-             "- Added objects to provide grouping for Force10 product series.
+             "- Added objects to provide grouping for Dell Networking OS product series.
               - Added C Series.
               - Added S Series."
          
     	REVISION     "200201310000Z"
     	DESCRIPTION
-      	"Force10 E-Series Family of products object IDs added."
+      	"Dell Networking OS E-Series Family of products object IDs added."
 	 ::= { f10Modules 1 }  
 
 -- *****************************************************************************
--- Top-level Firce10 Product OBJECT IDENTIFIER assignments.
+-- Top-level Dell Networking OS Product OBJECT IDENTIFIER assignments.
 -- *****************************************************************************
 
 	f10ESeriesProducts  OBJECT-IDENTITY
    		STATUS         current
    		DESCRIPTION
-      		"This object identifier roots Force10 E-Series product
+      		"This object identifier roots Dell Networking OS E-Series product
       		 object identifiers."
    		::= { f10Products 1 }
    		
 	f10CSeriesProducts  OBJECT-IDENTITY
    		STATUS         current
    		DESCRIPTION
-      		"This object identifier roots Force10 C-Series product
+      		"This object identifier roots Dell Networking OS C-Series product
       		 object identifiers."
    		::= { f10Products 2 }
    		
 	f10SSeriesProducts  OBJECT-IDENTITY
    		STATUS         current
    		DESCRIPTION
-      		"This object identifier roots Force10 S-Series product
+      		"This object identifier roots Dell Networking OS S-Series product
       		 object identifiers."
    		::= { f10Products 3 }
 
+    f10MSeriesProducts  OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION
+            "This object identifier roots Dell Networking OS M-Series
+            product object identifiers."
+        ::= {f10Products 4 }
+
+	f10ZSeriesProducts  OBJECT-IDENTITY
+   		STATUS         current
+   		DESCRIPTION
+      		"This object identifier roots Dell Networking OS Z-Series product
+      		 object identifiers."
+   		::= { f10Products 5 }
+
 -- *****************************************************************************
--- Force10 E-Series Product Line
+-- Dell Networking OS E-Series Product Line
 -- *****************************************************************************   		   		
  
 	e1200  	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 E1200 16-slot switch/router."           
+            	"Dell Networking OS E1200 16-slot switch/router."           
         	::= { f10ESeriesProducts 1 }
 
 	e600   	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 E600 9-slot switch/router."           
+            	"Dell Networking OS E600 9-slot switch/router."           
         	::= { f10ESeriesProducts 2 }
 
 	e300   	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 E300 8-slot switch/router."           
+            	"Dell Networking OS E300 8-slot switch/router."           
         	::= { f10ESeriesProducts 3 }
 
 	e610   	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 E610 9-slot switch/router."           
+            	"Dell Networking OS E610 9-slot switch/router."           
         	::= { f10ESeriesProducts 4 }
 
 	e1200i 	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 E1200i 16-slot switch/router."           
+            	"Dell Networking OS E1200i 16-slot switch/router."           
         	::= { f10ESeriesProducts 5 }
 
 -- *****************************************************************************
--- Force10 C-Series Product Line
+-- Dell Networking OS C-Series Product Line
 -- *****************************************************************************   		   		
 
 	c300   	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 C300 10-slot switch/router."           
+            	"Dell Networking OS C300 10-slot switch/router."           
         	::= { f10CSeriesProducts 1 }
 
 	c150   	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 C150 6-slot switch/router."           
+            	"Dell Networking OS C150 6-slot switch/router."           
         	::= { f10CSeriesProducts 2 }
         	
 -- *****************************************************************************
--- Force10 S-Series Product Line
+-- Dell Networking OS S-Series Product Line
 -- *****************************************************************************  
 
 	s50   	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 S50 access switch."           
+            	"Dell Networking OS S50 access switch."           
         	::= { f10SSeriesProducts 1 }
         	
 	s50e   	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 S50E access switch."           
+            	"Dell Networking OS S50E access switch."           
         	::= { f10SSeriesProducts 2 }
         	
 	s50v   	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 S50V access switch."           
+            	"Dell Networking OS S50V access switch."           
         	::= { f10SSeriesProducts 3 }
         	
 	s25pac 	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 S25P-AC access switch."           
+            	"Dell Networking OS S25P-AC access switch."           
         	::= { f10SSeriesProducts 4 }
         	
 	s2410cp	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 S2410CP access switch."           
+            	"Dell Networking OS S2410CP access switch."           
         	::= { f10SSeriesProducts 5 }
         	
 	s2410p 	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 S2410P access switch."           
+            	"Dell Networking OS S2410P access switch."           
         	::= { f10SSeriesProducts 6 }
         	
 	s50nac  OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 S50N-AC access switch."           
+            	"Dell Networking OS S50N-AC access switch."           
         	::= { f10SSeriesProducts 7 }
         	
 	s50ndc  OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 S50N-DC access switch."           
+            	"Dell Networking OS S50N-DC access switch."           
         	::= { f10SSeriesProducts 8 }
         	
 	s25pdc 	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 S25P-DC access switch."           
+            	"Dell Networking OS S25P-DC access switch."           
         	::= { f10SSeriesProducts 9 }
         	
 	s25v 	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 S25V access switch."           
+            	"Dell Networking OS S25V access switch."           
         	::= { f10SSeriesProducts 10 }
         	
 	s25n 	OBJECT-IDENTITY
             	STATUS  current
             	DESCRIPTION
-            	"Force10 S25N access switch."           
+            	"Dell Networking OS S25N access switch."           
         	::= { f10SSeriesProducts 11 }
+
+	s60 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S60 access switch."           
+        	::= { f10SSeriesProducts 12 }
+
+	s55 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S55 access switch."           
+        	::= { f10SSeriesProducts 13 }
+
+	s4810 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S4810 access switch."           
+        	::= { f10SSeriesProducts 14 }
+
+	z9000 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS Z9000 switch/router."
+        	::= { f10SSeriesProducts 15 }
+
+	s4820 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+                "Dell Networking OS S4820 access switch."
+        	::= { f10SSeriesProducts 17 }
+
+	s6000 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+                "Dell Networking OS S6000 access switch."
+        	::= { f10SSeriesProducts 18 }
+
+	s5000 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S5000 access switch."
+        	::= { f10SSeriesProducts 19 }
+
+	s4810on	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+                "Dell Networking OS S4810 ON access switch."
+        	::= { f10SSeriesProducts 20 }
+
+	s6000on OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+                "Dell Networking OS S6000 ON access switch."
+        	::= { f10SSeriesProducts 21 }
+
+	s4048on	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+                "Dell Networking OS S4048 ON access switch."
+        	::= { f10SSeriesProducts 22 }
+
+	s3048on	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+                "Dell Networking OS S3048 ON access switch."
+        	::= { f10SSeriesProducts 23 }
+
+-- *****************************************************************************
+-- Dell Networking OS M-Series Product Line
+-- *****************************************************************************
+
+	m-MXL  OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                "Dell Networking OS MXL 10/40GbE switch/router."
+            ::= { f10MSeriesProducts 1 }
+
+	m-IOA  OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                " Dell PE M I/O Aggregator."
+            ::= { f10MSeriesProducts 2 }
+
+	s-IOA  OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                " Dell PE FN I/O Aggregator."
+            ::= { f10MSeriesProducts 3 }
+
+-- *****************************************************************************
+-- Dell Networking OS Z-Series Product Line
+-- *****************************************************************************
+
+	z9500  OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                "Dell Networking OS Z9500 switch/router."
+            ::= { f10ZSeriesProducts 1 }
 
 END

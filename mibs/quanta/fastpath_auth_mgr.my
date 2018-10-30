@@ -1,0 +1,624 @@
+NETGEAR-AUTHENTICATION-MANAGER-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Authentication Manager MIB
+-- Copyright Netgear Inc (2012) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property. Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+        TimeTicks, Unsigned32
+                                            FROM SNMPv2-SMI
+        MacAddress,TEXTUAL-CONVENTION,DateAndTime
+                                            FROM SNMPv2-TC
+        DisplayString                       FROM RFC1213-MIB
+        ifIndex                             FROM IF-MIB
+        InterfaceIndex                      FROM IF-MIB
+        lb6m                            FROM QUANTA-LB6M-REF-MIB;
+
+    fastPathAuthMgr MODULE-IDENTITY
+
+        LAST-UPDATED "201212280000Z" -- 28 December 2012 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "Private MIB for auth mgr"
+
+        -- Revision history.
+        REVISION
+         "201212280000Z" -- 28 December 2012 12:00:00 GMT
+        DESCRIPTION
+          "Initial version."
+
+    ::= { lb6m 61 }
+
+
+    --**************************************************************************************
+    --    agentAuthMgrGlobalConfigGroup
+    --**************************************************************************************
+    
+    agentAuthMgrGlobalConfigGroup                      OBJECT IDENTIFIER ::= { fastPathAuthMgr 1 }
+
+    agentAuthMgrAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enable or disable the authentication manager feature on the system."
+         DEFVAL { disable }
+         ::= { agentAuthMgrGlobalConfigGroup 1 }
+
+
+    --**************************************************************************************
+    --    agentAuthMgrInterfaceConfigGroup
+    --**************************************************************************************
+    
+    agentAuthMgrInterfaceConfigGroup                 OBJECT IDENTIFIER ::= { fastPathAuthMgr 2 }
+
+    agentAuthMgrInterfaceConfigMethodTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrInterfaceConfigMethodEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface configuration for authentication manager"
+         ::= { agentAuthMgrInterfaceConfigGroup 1 }
+
+    agentAuthMgrInterfaceConfigMethodEntry OBJECT-TYPE
+         SYNTAX     AgentAuthMgrInterfaceConfigMethodEntry 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The authentication manager interface config entry."
+         INDEX       { agentAuthMgrIfIndex, methodIndex}
+         ::= { agentAuthMgrInterfaceConfigMethodTable 1 }
+
+    AgentAuthMgrInterfaceConfigMethodEntry ::= SEQUENCE {
+                         agentAuthMgrIfIndex 
+                           InterfaceIndex,
+                          methodIndex 
+                           Unsigned32,
+                         agentAuthMgrMethodOrder 
+                            INTEGER, 
+                         agentAuthMgrMethodPriority 
+                            INTEGER 
+           }
+
+    agentAuthMgrIfIndex   OBJECT-TYPE
+         SYNTAX      InterfaceIndex 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface index for which the authentication manager config is required."
+         ::= { agentAuthMgrInterfaceConfigMethodEntry 1 }
+
+    methodIndex OBJECT-TYPE
+         SYNTAX     Unsigned32 
+         MAX-ACCESS not-accessible 
+         STATUS      current
+         DESCRIPTION
+                     "The index of the configuration method." 
+
+         ::= { agentAuthMgrInterfaceConfigMethodEntry 2 }
+
+    agentAuthMgrMethodOrder OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     undefined(0),
+                     dot1x(1),
+                     mab(2),
+                     captivePortal(3)
+                  }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The authentication methods allowed for order configuration." 
+         DEFVAL { undefined }
+
+         ::= { agentAuthMgrInterfaceConfigMethodEntry 3 }
+
+    agentAuthMgrMethodPriority OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     undefined(0),
+                     dot1x(1),
+                     mab(2),
+                     captivePortal(3)
+                  }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The authentication methods allowed for priority configuration." 
+         DEFVAL { undefined }
+
+         ::= { agentAuthMgrInterfaceConfigMethodEntry 4 }
+
+
+    agentAuthMgrInterfaceConfigTimerTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrInterfaceConfigTimerEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface configuration for authentication manager"
+         ::= { agentAuthMgrInterfaceConfigGroup 2 }
+
+
+    agentAuthMgrInterfaceConfigTimerEntry OBJECT-TYPE
+         SYNTAX     AgentAuthMgrInterfaceConfigTimerEntry 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The Authentication Manager Interface config entry."
+         INDEX       { agentAuthMgrTimerIfIndex}
+         ::= { agentAuthMgrInterfaceConfigTimerTable 1 }
+
+    AgentAuthMgrInterfaceConfigTimerEntry ::= SEQUENCE {
+                         agentAuthMgrTimerIfIndex 
+                           InterfaceIndex,
+                         agentAuthMgrRestart
+                           Unsigned32
+           }
+    agentAuthMgrTimerIfIndex   OBJECT-TYPE
+         SYNTAX      InterfaceIndex 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface ifIndex for which the authentication manager config is required."
+         ::= { agentAuthMgrInterfaceConfigTimerEntry 1 }
+
+    agentAuthMgrRestart  OBJECT-TYPE
+         SYNTAX      Unsigned32  (1..65535)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The authentication restart timer value."
+         DEFVAL { 300 }
+         ::= { agentAuthMgrInterfaceConfigTimerEntry 2 }
+
+
+    --**************************************************************************************
+    --    agentAuthMgrInterfaceStatusGroup
+    --**************************************************************************************
+    
+    agentAuthMgrInterfaceStatusGroup                 OBJECT IDENTIFIER ::= { fastPathAuthMgr 3 }
+
+    agentAuthMgrInterfaceStatusTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrInterfaceStatusMethodEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface configuration for authentication manager"
+         ::= { agentAuthMgrInterfaceStatusGroup 1 }
+
+    agentAuthMgrInterfaceStatusEntry OBJECT-TYPE
+         SYNTAX     AgentAuthMgrInterfaceStatusMethodEntry 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The authentication manager interface config entry."
+         INDEX       { agentAuthMgrIfIndex, methodIndex}
+         ::= { agentAuthMgrInterfaceStatusTable 1 }
+
+    AgentAuthMgrInterfaceStatusMethodEntry ::= SEQUENCE {
+                         agentAuthMgrStatusMethodOrder 
+                            INTEGER, 
+                         agentAuthMgrStatusMethodPriority 
+                            INTEGER 
+           }
+
+    agentAuthMgrStatusMethodOrder OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     undefined(0),
+                     dot1x(1),
+                     mab(2),
+                     captivePortal(3)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The authentication methods allowed for order configuration." 
+         DEFVAL { undefined }
+
+         ::= { agentAuthMgrInterfaceStatusEntry 1 }
+
+    agentAuthMgrStatusMethodPriority OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     undefined(0),
+                     dot1x(1),
+                     mab(2),
+                     captivePortal(3)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The authentication methods allowed for priority configuration." 
+         DEFVAL { undefined }
+
+         ::= { agentAuthMgrInterfaceStatusEntry 2 }
+
+
+--**************************************************************************************
+-- agentAuthMgrClientStatusGroup -> Contains MIB objects displaying Authentication Manager Client details and
+-- associated Functionality
+--
+--**************************************************************************************
+
+        agentAuthMgrClientStatusGroup OBJECT IDENTIFIER ::= { fastPathAuthMgr 4 }
+
+        agentAuthMgrClientStatusTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF AgentAuthMgrClientStatusEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION "A table for auth mgr client details and associated functionality."
+                ::= { agentAuthMgrClientStatusGroup 1 }
+
+
+        agentAuthMgrClientStatusEntry OBJECT-TYPE
+                SYNTAX      AgentAuthMgrClientStatusEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION "Represents entry for port config table."
+                INDEX       { agentAuthMgrClientMacAddress}
+                ::= {agentAuthMgrClientStatusTable 1 }
+
+        AgentAuthMgrClientStatusEntry ::= SEQUENCE {
+                agentAuthMgrClientMacAddress
+                        MacAddress,
+                agentAuthMgrLogicalPort
+                        Unsigned32,
+                agentAuthMgrInterface
+                        Unsigned32,
+                agentAuthMgrClientAuthstatus
+                        INTEGER,
+                agentAuthMgrClientAuthMethod
+                        INTEGER
+    }
+
+
+     agentAuthMgrClientMacAddress  OBJECT-TYPE
+                SYNTAX           MacAddress
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the MAC address of the client."
+                ::= { agentAuthMgrClientStatusEntry 1}
+
+      agentAuthMgrLogicalPort      OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the logical port number of the client connection."
+                ::= { agentAuthMgrClientStatusEntry 2}
+
+        agentAuthMgrInterface      OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the physical interface to which the client is attached."
+                ::= { agentAuthMgrClientStatusEntry 3}
+
+        agentAuthMgrClientAuthstatus OBJECT-TYPE
+                 SYNTAX      INTEGER {
+                                 authorized(1),
+                                 unauthorized(2)
+                             }
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The  authentication status of the client."
+                ::={ agentAuthMgrClientStatusEntry 4}
+
+
+        agentAuthMgrClientAuthMethod OBJECT-TYPE
+                SYNTAX      INTEGER {
+                               undefined(0),
+                               dot1x(1),
+                               mab(2),
+                               captivePortal(3)
+                            }
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The method using which the client is authenticated." 
+                ::={ agentAuthMgrClientStatusEntry 5}
+
+
+    agentAuthMgrAuthHistoryResultsGroup OBJECT IDENTIFIER ::= { fastPathAuthMgr 5 }
+
+    agentAuthMgrPortAuthHistoryResultTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrPortAuthHistoryResultEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A table to display history of the authentication manager."
+         ::= { agentAuthMgrAuthHistoryResultsGroup 1 }
+
+    agentAuthMgrPortAuthHistoryResultEntry OBJECT-TYPE
+         SYNTAX      AgentAuthMgrPortAuthHistoryResultEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "Represents authentication manager results in history table."
+         INDEX       { agentAuthMgrAuthHistoryResultIfaceIndex,
+                       agentAuthMgrAuthHistoryResultIndex}
+         ::= {agentAuthMgrPortAuthHistoryResultTable 1 }
+
+    AgentAuthMgrPortAuthHistoryResultEntry ::= SEQUENCE {
+         agentAuthMgrAuthHistoryResultIfaceIndex    Unsigned32,
+         agentAuthMgrAuthHistoryResultIndex             Unsigned32,
+         agentAuthMgrAuthHistoryResultTimeStamp         DateAndTime,
+         agentAuthMgrAuthHistoryResultMacAddress        MacAddress,
+         agentAuthMgrAuthHistoryResultAuthMethod        Unsigned32,
+         agentAuthMgrAuthHistoryResultAuthStatus        INTEGER
+    }
+
+    agentAuthMgrAuthHistoryResultIfaceIndex     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                   "This object represents the physical bridge port on which dot1x authentication event
+                    might be received."
+                ::= { agentAuthMgrPortAuthHistoryResultEntry 1 }
+
+    agentAuthMgrAuthHistoryResultIndex     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Reference to the authentication manager authentication history table maintained."
+                ::= { agentAuthMgrPortAuthHistoryResultEntry 2 }
+
+
+    agentAuthMgrAuthHistoryResultTimeStamp     OBJECT-TYPE
+                SYNTAX           DateAndTime
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the exact time of authentication manager authentication
+                         event information occurred maintained in the
+                         history table."
+                ::= { agentAuthMgrPortAuthHistoryResultEntry 3 }
+
+    agentAuthMgrAuthHistoryResultMacAddress     OBJECT-TYPE
+                SYNTAX           MacAddress
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the client MAC address maintained in
+                         the authentication history table."
+                ::= { agentAuthMgrPortAuthHistoryResultEntry 4 }
+
+    agentAuthMgrAuthHistoryResultAuthMethod    OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "The method using which the client is authenticated." 
+                ::= { agentAuthMgrPortAuthHistoryResultEntry 5 }
+
+
+    agentAuthMgrAuthHistoryResultAuthStatus     OBJECT-TYPE
+                SYNTAX       INTEGER {
+                              success(1),
+                              failure(2)
+                            }
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the authentication manager authentication status (Success or Failure)
+                         for the authentication manager authentication event takes place. "
+                ::= { agentAuthMgrPortAuthHistoryResultEntry 6 }
+
+
+--    agentAuthMgrAuthHistoryResultsClear OBJECT-TYPE
+--         SYNTAX      INTEGER {
+--                   enable(1),
+--                     disable(2)
+--                     }
+--         MAX-ACCESS  read-write
+--         STATUS      current
+--         DESCRIPTION
+--                     "When set to enable(1), all Authentication Manager Authentication History information will be reset."
+--         DEFVAL { disable }
+--         ::= { agentAuthMgrAuthHistoryResultsGroup 2 }
+
+    --**************************************************************************************
+    -- agentAuthMgrPortAuthHistoryResultClearTable
+    --
+    --**************************************************************************************
+
+    agentAuthMgrPortAuthHistoryResultClearTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrPortAuthHistoryResultClearEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A table to clear the authentication manager authentication history per interface."
+         ::= { agentAuthMgrAuthHistoryResultsGroup 3 }
+
+    agentAuthMgrPortAuthHistoryResultClearEntry OBJECT-TYPE
+         SYNTAX      AgentAuthMgrPortAuthHistoryResultClearEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "Represents to clear the authentication manager authentication results for an 
+                      authentication manager authentication history table."
+         INDEX       { agentAuthMgrAuthHistoryResultIfIndex }
+         ::= {agentAuthMgrPortAuthHistoryResultClearTable 1 }
+
+    AgentAuthMgrPortAuthHistoryResultClearEntry ::= SEQUENCE {
+         agentAuthMgrAuthHistoryResultIfIndex    Unsigned32,
+         agentAuthMgrPortAuthHistoryResultsClear    INTEGER
+    }
+    agentAuthMgrAuthHistoryResultIfIndex     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                   "This object represents the  physical Bridge Port on which authentication event
+                    might be received."
+                ::= { agentAuthMgrPortAuthHistoryResultClearEntry 1 }
+
+
+    agentAuthMgrPortAuthHistoryResultsClear OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "When set to enable(1), all authentication manager authentication history information for
+                      the given port will be reset. The value is write-only. Attempt to read
+                      will return disable(2)."
+         DEFVAL { disable }
+         ::= { agentAuthMgrPortAuthHistoryResultClearEntry 2 }
+
+
+--**************************************************************************************
+-- agentAuthMgrAuthStatsGroup -> Contains MIB objects displaying Authentication Manager 
+--                               statistics per interface
+--**************************************************************************************
+    agentAuthMgrAuthStatsGroup OBJECT IDENTIFIER ::= { fastPathAuthMgr 6 }
+
+    agentAuthMgrPortStatsTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrPortStatsEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A table to display the authentication manager statistics."
+         ::= { agentAuthMgrAuthStatsGroup 1 }
+
+    agentAuthMgrPortStatsEntry OBJECT-TYPE
+         SYNTAX      AgentAuthMgrPortStatsEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "Represents authentication manager statistics per port."
+         INDEX       { agentAuthMgrPortIfaceIndex, agentAuthMgrPortMethodIndex }
+         ::= {agentAuthMgrPortStatsTable 1 }
+
+    AgentAuthMgrPortStatsEntry ::= SEQUENCE {
+         agentAuthMgrPortIfaceIndex                   Unsigned32,
+         agentAuthMgrPortMethodIndex                  INTEGER,
+         agentAuthMgrPortStatsAttempts                Unsigned32,
+         agentAuthMgrPortStatsFailedAttempts          Unsigned32
+    }
+
+    agentAuthMgrPortIfaceIndex     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       not-accessible
+                STATUS           current
+                DESCRIPTION
+                   "This object represents the physical bridge port on which statistics
+                    are retrieved."
+                ::= { agentAuthMgrPortStatsEntry 1 }
+
+    agentAuthMgrPortMethodIndex   OBJECT-TYPE
+          SYNTAX     INTEGER {
+                     dot1x(1),
+                     mab(2),
+                     captivePortal(3)
+                 }
+         MAX-ACCESS     not-accessible 
+         STATUS      current
+         DESCRIPTION
+                     "The index of the authentication method for which statistics are reviewed." 
+
+         ::= { agentAuthMgrPortStatsEntry 2 }
+
+    agentAuthMgrPortStatsAttempts     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the number of successful authentications events 
+                         of specified method on specified port."
+                ::= { agentAuthMgrPortStatsEntry 3 }
+
+    agentAuthMgrPortStatsFailedAttempts     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                        "Specifies the number of unsuccessful authentications attempts
+                         of specified method on specified port."
+                ::= { agentAuthMgrPortStatsEntry 4 }
+
+
+-- Clear statistics ----
+     agentAuthMgrPortStatsClearTable  OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrPortStatsClearEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A table to clear the authentication manager statistics."
+         ::= { agentAuthMgrAuthStatsGroup 2 }
+
+    agentAuthMgrPortStatsClearEntry OBJECT-TYPE
+         SYNTAX      AgentAuthMgrPortStatsClearEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "Represents to clear the authentication manager statistics per interface."
+         INDEX       { agentAuthMgrPortIfaceIndex }
+         ::= {agentAuthMgrPortStatsClearTable 1 }
+
+    AgentAuthMgrPortStatsClearEntry ::= SEQUENCE {
+         agentAuthMgrPortIfaceIndex    Unsigned32,
+         agentAuthMgrPortStatsClear    INTEGER
+    }
+
+    agentAuthMgrPortStatsClear OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "When set to enable(1), all authentication manager statistics for
+                      the given port will be reset. The value is write-only. Attempt to read
+                      will return disable(2)."
+         DEFVAL { disable }
+         ::= { agentAuthMgrPortStatsClearEntry 2 }
+
+--**************************************************************************************
+-- Auth Mgr Traps Config
+--**************************************************************************************
+
+    agentAuthMgrTrapsConfigGroup OBJECT IDENTIFIER ::= { fastPathAuthMgr 7 }
+
+    authMgrTrapMode    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This object enables/disables the user manager trap mode."
+         DEFVAL      { disable }
+         ::= { agentAuthMgrTrapsConfigGroup 1 }
+
+--**************************************************************************************
+-- Auth Mgr Traps 
+-- 
+--**************************************************************************************
+    fastpathAuthMgrTraps OBJECT IDENTIFIER ::= { fastPathAuthMgr 0 }
+
+    agentAuthMgrClientAuthStatusTrap NOTIFICATION-TYPE
+        OBJECTS {
+                    agentAuthMgrInterface,
+                    agentAuthMgrClientMacAddress,
+                    agentAuthMgrClientAuthMethod,
+                    agentAuthMgrClientAuthstatus
+                }
+        STATUS      current
+        DESCRIPTION
+                    "Trap is sent from Auth Mgr when client is authorised/un-authorised."
+        ::= { fastpathAuthMgrTraps 1 }
+
+END

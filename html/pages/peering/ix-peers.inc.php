@@ -48,7 +48,7 @@ $status = $vars['status'];
 <script>
     var grid = $("#ixpeers").bootgrid({
         ajax: true,
-        rowCount: [25,50,100,250,-1],
+        rowCount: [50, 100, 250, -1],
         templates: {
             header: 
                 "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+

@@ -1,0 +1,452 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-LOAD-BALANCE-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-LOAD-BALANCE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Ipv6Address
+        FROM IPV6-TC
+    ipSwitch
+        FROM PRVT-SWITCH-MIB
+    IpAddress, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MacAddress, RowStatus, TEXTUAL-CONVENTION, TimeStamp
+        FROM SNMPv2-TC;
+
+prvtLoadBalMIB MODULE-IDENTITY
+    LAST-UPDATED "201012200000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The private MIB module for management of load balancing functionality."
+    REVISION    "201012200000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { ipSwitch 7 }
+
+
+PrvtLoadBalMtxIndexTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "A valid matrix group (load balancing application) index."
+    SYNTAX      Unsigned32 (1..8)
+
+prvtLoadBalObjects OBJECT IDENTIFIER
+    ::= { prvtLoadBalMIB 1 }
+
+prvtLoadBalDistributionMode OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(1), general(2), perPortUserNetwork(3), 
+                    globalNetwork(4), globalUser(5) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The global distribution mode to use."
+    ::= { prvtLoadBalObjects 1 }
+
+prvtLoadBalIpV6DistributionMode OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether IPv6 distribution mode should be enabled/disabled."
+    ::= { prvtLoadBalObjects 2 }
+
+prvtLoadBalSpiDistributionMode OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether SPI distribution mode should be enabled/disabled."
+    ::= { prvtLoadBalObjects 3 }
+
+prvtLoadBalMaxAvailSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The maximum number of elements available in the matrix according to the
+         configured global distribution mode and included protocols."
+    ::= { prvtLoadBalObjects 5 }
+
+prvtLoadBalMtxTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtLoadBalMtxEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The matrix table."
+    ::= { prvtLoadBalObjects 6 }
+
+prvtLoadBalMtxEntry OBJECT-TYPE
+    SYNTAX      PrvtLoadBalMtxEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtLoadBalMtxTable."
+    INDEX       { prvtLoadBalMtxIndex }
+    ::= { prvtLoadBalMtxTable 1 }
+
+PrvtLoadBalMtxEntry ::= SEQUENCE {
+    prvtLoadBalMtxIndex         PrvtLoadBalMtxIndexTC,
+    prvtLoadBalMtxBuckets       OCTET STRING,
+    prvtLoadBalMtxSignature     OCTET STRING
+}
+
+prvtLoadBalMtxIndex OBJECT-TYPE
+    SYNTAX      PrvtLoadBalMtxIndexTC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a matrix (load-balancing application) entry."
+    ::= { prvtLoadBalMtxEntry 1 }
+
+prvtLoadBalMtxBuckets OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..1024))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the buckets of the load-balancing matrix.
+         Each nibble specifies the CPU blade (1-12) that should handle
+         traffic belonging to the corresponding ACL rule. The high nibbles
+         corresponds to even ACL rules, the lower nibbles to odd ACL rules.
+         The number of valid nibbles is equal to prvtLoadBalMaxAvailSize."
+    ::= { prvtLoadBalMtxEntry 2 }
+
+prvtLoadBalMtxSignature OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The MD5 signature of prvtLoadBalMtxBuckets."
+    ::= { prvtLoadBalMtxEntry 3 }
+
+prvtLoadBalIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtLoadBalIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains port specific configuration."
+    ::= { prvtLoadBalObjects 7 }
+
+prvtLoadBalIfEntry OBJECT-TYPE
+    SYNTAX      PrvtLoadBalIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtLoadBalIfTable."
+    INDEX       { prvtLoadBalIfId }
+    ::= { prvtLoadBalIfTable 1 }
+
+PrvtLoadBalIfEntry ::= SEQUENCE {
+    prvtLoadBalIfId             Unsigned32,
+    prvtLoadBalIfRowStatus      RowStatus,
+    prvtLoadBalIfMode           INTEGER,
+    prvtLoadBalIfMatrixIndex    PrvtLoadBalMtxIndexTC
+}
+
+prvtLoadBalIfId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The port number to which this row applies."
+    ::= { prvtLoadBalIfEntry 1 }
+
+prvtLoadBalIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Row status of this table."
+    ::= { prvtLoadBalIfEntry 2 }
+
+prvtLoadBalIfMode OBJECT-TYPE
+    SYNTAX      INTEGER { network(1), user(2), sync(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The mode in which this interface should function."
+    ::= { prvtLoadBalIfEntry 3 }
+
+prvtLoadBalIfMatrixIndex OBJECT-TYPE
+    SYNTAX      PrvtLoadBalMtxIndexTC
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The matrix index (prvtLoadBalMtxIndex) assigned to this interface."
+    ::= { prvtLoadBalIfEntry 4 }
+
+prvtLoadBalUserNtwkSrcIpv4Mask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The user/network source IPv4 mask."
+    ::= { prvtLoadBalObjects 8 }
+
+prvtLoadBalUserNtwkDstIpv4Mask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The user/network destination IPv4 mask."
+    ::= { prvtLoadBalObjects 9 }
+
+prvtLoadBalUserNtwkSrcIpv6Mask OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The user/network source IPv6 mask."
+    ::= { prvtLoadBalObjects 10 }
+
+prvtLoadBalUserNtwkDstIpv6Mask OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The user/network destination IPv6 mask."
+    ::= { prvtLoadBalObjects 11 }
+
+prvtLoadBalSpiMask OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The SPI mask."
+    ::= { prvtLoadBalObjects 12 }
+
+prvtLoadBalGeneralSrcIpv4Mask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The general source IPv4 mask."
+    ::= { prvtLoadBalObjects 13 }
+
+prvtLoadBalGeneralDstIpv4Mask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The general destination IPv4 mask."
+    ::= { prvtLoadBalObjects 14 }
+
+prvtLoadBalGeneralSrcIpv6Mask OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The general source IPv6 mask."
+    ::= { prvtLoadBalObjects 15 }
+
+prvtLoadBalGeneralDstIpv6Mask OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The general destination IPv6 mask."
+    ::= { prvtLoadBalObjects 16 }
+
+prvtLoadBalLastUpdateTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value of sysUpTime when the configuration was last updated."
+    ::= { prvtLoadBalObjects 17 }
+
+prvtLoadBalApplyConfiguration OBJECT-TYPE
+    SYNTAX      INTEGER { noAction(0), apply(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Setting this object to the value 'apply' results in the configuration being
+         applied to the device.
+         Reads from the object always return 'noAction'."
+    ::= { prvtLoadBalObjects 18 }
+
+prvtLoadBalBladeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtLoadBalBladeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains blade specific configuration."
+    ::= { prvtLoadBalObjects 19 }
+
+prvtLoadBalBladeEntry OBJECT-TYPE
+    SYNTAX      PrvtLoadBalBladeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtLoadBalBladeTable."
+    INDEX       { prvtLoadBalBladeIndex }
+    ::= { prvtLoadBalBladeTable 1 }
+
+PrvtLoadBalBladeEntry ::= SEQUENCE {
+    prvtLoadBalBladeIndex       Unsigned32,
+    prvtLoadBalBladeMacAddr     MacAddress
+}
+
+prvtLoadBalBladeIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..12)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The index of the blade to which this row applies."
+    ::= { prvtLoadBalBladeEntry 1 }
+
+prvtLoadBalBladeMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The MAC address for this blade."
+    ::= { prvtLoadBalBladeEntry 3 }
+
+prvtLoadBalBaseIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The base IP address."
+    ::= { prvtLoadBalObjects 20 }
+
+prvtLoadBalBaseIpAddrMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The mask associated with prvtCpMatrixBaseIpAddr."
+    ::= { prvtLoadBalObjects 21 }
+
+prvtLoadBalAdminPass OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Admin user password."
+    ::= { prvtLoadBalObjects 22 }
+
+prvtLoadBalQsfpPortsMode OBJECT-TYPE
+    SYNTAX      INTEGER { mode4x10g(1), mode40g(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Gets to this object return the mode of the front panel QSFP ports.
+         Sets to this object will configure the mode of these ports.
+         Note that changing the mode requires the device to be reloaded to
+         manufacturing defaults.  Thus, sets to this object that change the
+         object's value will result in the device reloading to the default
+         configuration."
+    ::= { prvtLoadBalObjects 23 }
+
+prvtLoadBalIfVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtLoadBalIfVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains port specific configuration."
+    ::= { prvtLoadBalObjects 24 }
+
+prvtLoadBalIfVlanEntry OBJECT-TYPE
+    SYNTAX      PrvtLoadBalIfVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtLoadBalIfVlanTable."
+    INDEX       { prvtLoadBalIfId, prvtLoadBalVlanId }
+    ::= { prvtLoadBalIfVlanTable 1 }
+
+PrvtLoadBalIfVlanEntry ::= SEQUENCE {
+    prvtLoadBalVlanId               Unsigned32,
+    prvtLoadBalIfVlanRowStatus      RowStatus,
+    prvtLoadBalIfVlanMode           INTEGER,
+    prvtLoadBalIfVlanMatrixIndex    PrvtLoadBalMtxIndexTC
+}
+
+prvtLoadBalVlanId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4096)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The port number and vlan to which this row applies."
+    ::= { prvtLoadBalIfVlanEntry 1 }
+
+prvtLoadBalIfVlanRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Row status of this table."
+    ::= { prvtLoadBalIfVlanEntry 2 }
+
+prvtLoadBalIfVlanMode OBJECT-TYPE
+    SYNTAX      INTEGER { network(1), user(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The mode in which this interface and vlan should function."
+    ::= { prvtLoadBalIfVlanEntry 3 }
+
+prvtLoadBalIfVlanMatrixIndex OBJECT-TYPE
+    SYNTAX      PrvtLoadBalMtxIndexTC
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The matrix index (prvtLoadBalMtxIndex) assigned to this interface and vlan."
+    ::= { prvtLoadBalIfVlanEntry 4 }
+
+prvtLoadBalLoseLessMode OBJECT-TYPE
+    SYNTAX      INTEGER { mode1to64(0), mode1to32(1), mode1to16(2), 
+                    mode1to8(3), mode1to4(4), mode1to2(5), mode1(6), 
+                    mode2(7), mode4(8), mode8(9) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The lose-less mode to use."
+    ::= { prvtLoadBalObjects 25 }
+
+END -- end of module PRVT-LOAD-BALANCE-MIB.

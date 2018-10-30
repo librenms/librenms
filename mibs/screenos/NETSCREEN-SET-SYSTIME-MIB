@@ -1,0 +1,102 @@
+-- This module defines enterprise MIBs for time and NTP setting
+--
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SET-SYSTIME-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSetting, netscreenSettingMibModule
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    ;
+
+netscreenSetSystimeMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor 
+         NTP setting"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311120000Z" -- November 12, 2003
+    DESCRIPTION
+        "Correct wrong title"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSettingMibModule 6 }
+
+nsSetSysTime OBJECT IDENTIFIER ::= { netscreenSetting 6 }
+
+nsSetSysTimeGmtOffset OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "GMT time offset of system time"
+    ::= { nsSetSysTime 1 }
+
+nsSetSysTimeDaySaving OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "enable daylight time saving method."
+    ::= { nsSetSysTime 2 }
+
+nsSetSysTimeNTP OBJECT IDENTIFIER ::= { nsSetSysTime 3 }
+
+nsSetNtpEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Network Time Protocol"
+    ::= { nsSetSysTimeNTP 1 }
+
+nsSetNtpServer OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Network Time Server ip"
+    ::= { nsSetSysTimeNTP 2 }
+
+nsSetNtpUpdateInterval OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "If NetScreen device use NTP to get system time. This object
+         indicate the update system clock time interval."
+    ::= { nsSetSysTimeNTP 3 }
+
+END
+
+

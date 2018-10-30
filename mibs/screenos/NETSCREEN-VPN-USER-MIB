@@ -1,0 +1,466 @@
+-- This module defines enterprise MIBs for VPN User
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-VPN-USER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenVpn, netscreenVpnMibModule
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenUserMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines NetScreen private MIBs for VPN User"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311130000Z" -- November 13, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200205050000Z" -- May 05, 2002
+    DESCRIPTION
+        "Add dial-up group type"
+    REVISION      "200105140000Z" -- May 14, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenVpnMibModule 10 }
+
+NsVpnAILUsrEntry ::= SEQUENCE
+{
+    nsVpnAILUsrIndex         Integer32,
+    nsVpnAILUsrName          DisplayString,
+    nsVpnAILUsrGrp           DisplayString,
+    nsVpnAILUsrStatus        INTEGER,
+    nsVpnAILUsrIKE           INTEGER,
+    nsVpnAILUsrIKEIdType     INTEGER,
+    nsVpnAILUsrIKEId         DisplayString,
+    nsVpnAILUsrAuth          INTEGER,
+    nsVpnAILUsrL2TP          INTEGER,
+    nsVpnAILUsrL2tpRemoteIp  IpAddress,
+    nsVpnAILUsrL2tpIpPool    DisplayString,
+    nsVpnAILUsrL2tpIp        IpAddress,
+    nsVpnAILUsrL2tpPriDnsIp  IpAddress,
+    nsVpnAILUsrL2tpSecDnsIp  IpAddress,
+    nsVpnAILUsrL2tpPriWinsIp IpAddress,
+    nsVpnAILUsrL2tpSecWinsIp IpAddress,
+    nsVpnAILUsrVsys          Integer32
+}
+
+NsVpnManualKeyUsrEntry ::= SEQUENCE
+{
+    nsVpnManualKeyUsrIndex      Integer32,
+    nsVpnManualKeyUsrName       DisplayString,
+    nsVpnManualKeyUsrGrp        DisplayString,
+    nsVpnManualKeyUsrSILocal    Integer32,
+    nsVpnManualKeyUsrSIRemote   Integer32,
+    nsVpnManualKeyUsrTunnelType INTEGER,
+    nsVpnManualKeyUsrEspEncAlg  INTEGER,
+    nsVpnManualKeyUsrEspAuthAlg INTEGER,
+    nsVpnManualKeyUsrAhHash     INTEGER,
+    nsVpnManualKeyUsrVsys       Integer32
+}
+
+NsVpnUsrDialupGrpEntry ::= SEQUENCE
+{
+    nsVpnUsrDialupGrpIndex Integer32,
+    nsVpnUsrDialupGrpName  DisplayString,
+    nsVpnUsrDialupGrpType  INTEGER,
+    nsVpnUsrDialupGrpVsys  Integer32
+}
+
+nsVpnUser OBJECT IDENTIFIER ::= { netscreenVpn 10 }
+
+nsVpnUsrDialupGrpTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnUsrDialupGrpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "NetScreen supports using dialup group to organize vpn
+         user.This table collects the information of dialup group in
+         NetScreen device."
+    ::= { nsVpnUser 1 }
+
+nsVpnUsrDialupGrpEntry OBJECT-TYPE
+    SYNTAX        NsVpnUsrDialupGrpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in this table holds a set of configuration
+         information about dialup group."
+    INDEX
+        { nsVpnUsrDialupGrpIndex }
+    ::= { nsVpnUsrDialupGrpTable 1 }
+
+nsVpnUsrDialupGrpIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for schedule.  Its value ranges between 0 and
+         65535 and may not be contiguous."
+    ::= { nsVpnUsrDialupGrpEntry 1 }
+
+nsVpnUsrDialupGrpName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "dialup user group name."
+    ::= { nsVpnUsrDialupGrpEntry 2 }
+
+nsVpnUsrDialupGrpType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        undefined(0),
+        manual(1),
+        ike(2),
+        l2tp(3),
+        xauth(4),
+        auth(5),
+        external(6)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "dial up group type."
+    ::= { nsVpnUsrDialupGrpEntry 3 }
+
+nsVpnUsrDialupGrpVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vsys this group belongs to."
+    ::= { nsVpnUsrDialupGrpEntry 4 }
+
+nsVpnManualKeyUsrTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnManualKeyUsrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table specifies the configuration attributes for  manual
+         key user."
+    ::= { nsVpnUser 2 }
+
+nsVpnManualKeyUsrEntry OBJECT-TYPE
+    SYNTAX        NsVpnManualKeyUsrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsVpnManualkeyUsrTable holds a set of
+         configuration parameters associated with an instance of manual
+         key user."
+    INDEX
+        { nsVpnManualKeyUsrIndex }
+    ::= { nsVpnManualKeyUsrTable 1 }
+
+nsVpnManualKeyUsrIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for manual key user table.  Its value ranges
+         between 0 and 65535 and may not be contiguous."
+    ::= { nsVpnManualKeyUsrEntry 1 }
+
+nsVpnManualKeyUsrName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "User name."
+    ::= { nsVpnManualKeyUsrEntry 2 }
+
+nsVpnManualKeyUsrGrp OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "group this user belongs to."
+    ::= { nsVpnManualKeyUsrEntry 3 }
+
+nsVpnManualKeyUsrSILocal OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Local Security Index"
+    ::= { nsVpnManualKeyUsrEntry 4 }
+
+nsVpnManualKeyUsrSIRemote OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Remote Security Index"
+    ::= { nsVpnManualKeyUsrEntry 5 }
+
+nsVpnManualKeyUsrTunnelType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        esp(0),
+        ah(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vpn tunnel type."
+    ::= { nsVpnManualKeyUsrEntry 6 }
+
+nsVpnManualKeyUsrEspEncAlg OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        des-cbc(1),
+        triple-des-cbc(2),
+	    aes(3),
+		aes-192(4),
+		aes-256(5)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ESP Encryption Algorithm."
+    ::= { nsVpnManualKeyUsrEntry 7 }
+
+nsVpnManualKeyUsrEspAuthAlg OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        md5(1),
+        sha(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ESP Authentication Algorithm."
+    ::= { nsVpnManualKeyUsrEntry 8 }
+
+nsVpnManualKeyUsrAhHash OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        md5(1),
+        sha(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "AH Hash Algorithm."
+    ::= { nsVpnManualKeyUsrEntry 9 }
+
+nsVpnManualKeyUsrVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vsys this user belongs to."
+    ::= { nsVpnManualKeyUsrEntry 10 }
+
+nsVpnAILUsrTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnAILUsrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table specifies the configuration attributes for
+         AUTH/IKE/L2TP user."
+    ::= { nsVpnUser 3 }
+
+nsVpnAILUsrEntry OBJECT-TYPE
+    SYNTAX        NsVpnAILUsrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsVpnManualkeyUsrTable holds a set of
+         configuration parameters associated with an instance of
+         AUTH/IKE/L2TP user."
+    INDEX
+        { nsVpnAILUsrIndex }
+    ::= { nsVpnAILUsrTable 1 }
+
+nsVpnAILUsrIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for Auth/Ike/l2tp user table.  Its value ranges
+         between 1 and 65535 and may not be contiguous."
+    ::= { nsVpnAILUsrEntry 1 }
+
+nsVpnAILUsrName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "User name."
+    ::= { nsVpnAILUsrEntry 2 }
+
+nsVpnAILUsrGrp OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "group this user belongs to."
+    ::= { nsVpnAILUsrEntry 3 }
+
+nsVpnAILUsrStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "User status"
+    ::= { nsVpnAILUsrEntry 4 }
+
+nsVpnAILUsrIKE OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Since Authentication, IKE L2TP can be combined together. This
+         attribute is used to indicate if this user is an IKE user."
+    ::= { nsVpnAILUsrEntry 5 }
+
+nsVpnAILUsrIKEIdType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        not-set(0),
+        ipv4-addr(1),
+        fqdn(2),
+        usr-fqdn(3),
+        ipv4-addr-subnet(4),
+        ipv6-addr(5),
+        ipv6-addr-subnet(6),
+        ipv4-addr-addr-range(7),
+        ipv6-addr-addr-range(8),
+        der-asn1-dn(9),
+        der-asn1-gn(10)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "IKE user type 1 means auto, other values are undefined."
+    ::= { nsVpnAILUsrEntry 6 }
+
+nsVpnAILUsrIKEId OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "IKE id."
+    ::= { nsVpnAILUsrEntry 7 }
+
+nsVpnAILUsrAuth OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Since Authentication, IKE L2TP can be combined together. This
+         attribute is used to indicate if this user is an Authentication
+         user."
+    ::= { nsVpnAILUsrEntry 8 }
+
+nsVpnAILUsrL2TP OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Since Authentication, IKE L2TP can be combined together. This
+         attribute is used to indicate if this user is a L2TP user. The
+         NetScreen-1000 does not support L2TP."
+    ::= { nsVpnAILUsrEntry 9 }
+
+nsVpnAILUsrL2tpRemoteIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "L2TP remote peer ip address."
+    ::= { nsVpnAILUsrEntry 10 }
+
+nsVpnAILUsrL2tpIpPool OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ip pool entity name."
+    ::= { nsVpnAILUsrEntry 11 }
+
+nsVpnAILUsrL2tpIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "L2TP local ip address."
+    ::= { nsVpnAILUsrEntry 12 }
+
+nsVpnAILUsrL2tpPriDnsIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "primary DNS server IP address for L2TP user."
+    ::= { nsVpnAILUsrEntry 13 }
+
+nsVpnAILUsrL2tpSecDnsIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "secondary DNS server IP address for L2TP user."
+    ::= { nsVpnAILUsrEntry 14 }
+
+nsVpnAILUsrL2tpPriWinsIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "primary WINS server IP address for L2TP user."
+    ::= { nsVpnAILUsrEntry 15 }
+
+nsVpnAILUsrL2tpSecWinsIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "secondary WINS server IP address for L2TP user."
+    ::= { nsVpnAILUsrEntry 16 }
+
+nsVpnAILUsrVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vsys this user belongs to."
+    ::= { nsVpnAILUsrEntry 17 }
+
+END
+
+

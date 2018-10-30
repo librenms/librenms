@@ -1,0 +1,72 @@
+-- ============================================================================
+-- AT-QOSv2.MIB, Allied Telesis enterprise MIB:
+-- QoS MIB for the AlliedWare Plus(tm) operating system
+--
+-- Copyright (c) 2015 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-QOSv2-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            modules
+                FROM AT-SMI-MIB
+            InterfaceIndex
+                FROM IF-MIB
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI;
+
+
+        atQosv2 MODULE-IDENTITY
+            LAST-UPDATED "201508310000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "This MIB file contains definitions of managed objects for the
+                QoS module."
+            REVISION "201508310000Z"
+            DESCRIPTION
+                "Initial revision."
+            ::= { modules 503 }
+
+
+--
+-- Node definitions
+--
+
+        atQosv2Notification OBJECT IDENTIFIER ::= { atQosv2 0 }
+
+        atQosv2StormDetectionTrap NOTIFICATION-TYPE
+            OBJECTS { atQosv2IfIndex, atQosv2VlanId }
+            STATUS current
+            DESCRIPTION
+                "Generated when QoS Storm Protection feature detects a storm."
+            ::= { atQosv2Notification 1 }
+
+
+        atQosv2NotificationVariables OBJECT IDENTIFIER ::= { atQosv2 1 }
+
+        atQosv2IfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the interface where the storm is detected on."
+            ::= { atQosv2NotificationVariables 1 }
+
+        atQosv2VlanId OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The VLAN ID of the interface where the storm is detected on."
+            ::= { atQosv2NotificationVariables 2 }
+
+    END
+
+--
+-- at-qosv2.mib
+--

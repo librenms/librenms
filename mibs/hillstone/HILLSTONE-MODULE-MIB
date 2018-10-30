@@ -1,0 +1,143 @@
+-- **************************************************************************
+-- HILLSTONE-MODULE-MIB
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V6   
+-- Description:	 Hillstone Networks MODULE MIB Object Identifier Assignments
+-- **************************************************************************
+--
+
+HILLSTONE-MODULE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hillstoneModule
+		FROM HILLSTONE-SMI
+	OBJECT-TYPE
+		FROM RFC-1212	
+        RowStatus		
+		FROM SNMPv2-TC;
+
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+hillstoneModuleObjects OBJECT IDENTIFIER ::= { hillstoneModule 1 }
+
+hillstoneSlotNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The number of slots."
+    ::= { hillstoneModuleObjects 1 } 
+
+hillstoneModuleTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HillstoneModuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "This table contains all the module data."
+::= { hillstoneModuleObjects 2 }
+
+HillstoneModuleEntry OBJECT-TYPE
+	SYNTAX HillstoneModuleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Define the parameters of module."
+INDEX { hillstoneSlotIndex }
+::= { hillstoneModuleTable 1 }
+	
+HillstoneModuleEntry ::=
+SEQUENCE { 
+	hillstoneSlotIndex
+		INTEGER,
+	hillstoneSlotType
+		INTEGER,
+	hillstoneSlotDescr
+		DisplayString,
+	hillstoneSlotState
+		INTEGER,
+	hillstoneModuleType
+		DisplayString,
+	hillstoneModuleSN
+		DisplayString
+	}
+
+hillstoneSlotIndex OBJECT-TYPE
+	SYNTAX INTEGER 
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The slot index of the module."
+::= { HillstoneModuleEntry 1 }
+
+hillstoneSlotType OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		internal(0),
+		external(1)
+	} 
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The slot type of the module."
+::= { HillstoneModuleEntry 2 }
+
+hillstoneSlotDescr OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The slot description of the module."
+::= { HillstoneModuleEntry 3 }
+
+hillstoneSlotState OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		none(0),
+		empty(1),
+		present(2),
+		online_wait(3),
+		online_init_done(4),
+		online(5),
+		offline_wait(6),
+		offline(7),
+		out_of_con(8),
+		booting(9),
+		loading(10),
+		error(11),
+		unsupported(12)
+	} 
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The slot state of the module."
+::= { HillstoneModuleEntry 4 }
+
+hillstoneModuleType OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	    "The module type."
+::= { HillstoneModuleEntry 5 }
+  
+hillstoneModuleSN OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	    "The module serial number."
+::= { HillstoneModuleEntry 6 }
+
+
+END

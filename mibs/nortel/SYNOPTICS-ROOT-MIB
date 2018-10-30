@@ -1,0 +1,1159 @@
+
+SYNOPTICS-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+synoptics MODULE-IDENTITY
+       LAST-UPDATED    "201505050000Z"
+       ORGANIZATION    "Nortel Networks"
+       CONTACT-INFO    "Nortel Networks"
+       DESCRIPTION
+           "SynOptics Root MIB
+
+            Copyright 1996 - 2014 Avaya
+            All rights reserved.
+            This Avaya SNMP Management Information Base Specification
+            (Specification) embodies Avaya's confidential and
+            proprietary intellectual property. Avaya retains all
+            title and ownership in the Specification, including any
+            revisions.
+
+            This Specification is supplied 'AS IS,' and Avaya makes
+            no warranty, either express or implied, as to the use,
+            operation, condition, or performance of the Specification."
+	
+       REVISION "201505050000Z" -- 5 May 2015
+       DESCRIPTION "Version 298:  Added registrations for ERS3550T and ERS3550T-PWR+ models."
+
+       REVISION "201504220000Z" -- 22 April 2015
+       DESCRIPTION "Version 297:  Added mVSP9408 and mNetApp8032."
+	
+       REVISION "201412110000Z" -- 11 December 2014
+       DESCRIPTION "Version 296:  Added bayStackLldpExtDot3.mib."
+	
+       REVISION "201411050000Z" -- 05 Nov 2014
+       DESCRIPTION "Version 295: Added mVSP4450GSX(230) "
+	   
+       REVISION "201410150000Z" -- 15 Oct 2014
+       DESCRIPTION "Version 294: Added mVSP7254XSQ and mVSP7254XTQ"
+	   
+       REVISION "201407300000Z" -- 30 July 2014
+       DESCRIPTION "Version 293:  Added registrations for ERS 5900, ERS 4900 product families.
+                                  They replace former X710 and X610."
+
+       REVISION "201405200000Z" -- 20 May 2014
+       DESCRIPTION "Version 292:  Added mVSP4450GTXHT-PWR-PLUS and mVSP8404."
+	
+       REVISION "201405200000Z" -- 20 May 2014
+       DESCRIPTION "Version 291:  Changed name's branch to avayaWlan9100Mibs."
+	
+       REVISION "201404040000Z" -- 04 April 2014
+       DESCRIPTION "Version 290: Corrected the chassis type 216 to
+	                         mVSP4450GXS-PWR-PLUS"
+
+       REVISION "201403260000Z" -- 26 March 2014
+       DESCRIPTION "Version 289:  Added avayaWlan9100Mibs branch with old name."
+
+       REVISION "201403210000Z" -- 21 March 2014
+       DESCRIPTION "Version 288:  Added registrations for ERS X710, ERS X610 product families."
+
+       REVISION "201402140000Z" -- 14 February 2014
+       DESCRIPTION "Version 287:  Added VSP7024XT registrations."
+
+       REVISION "201401100000Z" -- 10 Jan 2014
+       DESCRIPTION "Version 286:  Changed the device type mVSP6284XQ to mVSP8284XSQ"
+
+       REVISION "201311130000Z" -- 13 Nov. 2013
+       DESCRIPTION "Version 285:  Added registrations mVSP4950GSX-PWR-PLUS"
+
+       REVISION "201310290000Z" -- 29 October 2013
+       DESCRIPTION "Version 284:  Added registrations for ERS3549GTS
+                                  and ERS3549GTS-PWR+ models."
+
+       REVISION "201310240000Z" -- 24 Oct 2013
+       DESCRIPTION "Version 283:  Added chassis type mVSP6284XQ(213)"
+
+       REVISION "201308140000Z" -- 14 Aug 2013
+       DESCRIPTION "Version 282:  Added avayaFabricAttachMib."
+
+       REVISION "201308050000Z" -- 05 Aug 2013
+       DESCRIPTION "Version 281:  Removed chassis type for VSP8000."
+	   
+       REVISION "201306250000Z" -- 25 June 2013
+       DESCRIPTION "Version 280:  Added bayStackIpv6FirstHopSecMib."
+
+       REVISION "201306190000Z" -- 19 June 2013
+       DESCRIPTION "Version 279:  Added new chassis type for VSP8000."
+
+       REVISION "201302040000Z" -- 04 February 2013
+       DESCRIPTION "Version 278:  Added bayStackIpv6MldSnoopingMib."
+
+       REVISION "201210100000Z" -- 10 Oct 2012
+       DESCRIPTION "Version 277:  Added new chassis type for VSP9010"
+
+       REVISION "201209030000Z" -- 03 September 2012
+       DESCRIPTION "Version 276:  Added bayStackLinkStateTrackingMib."
+
+       REVISION "201206050000Z" -- 5 June 2012
+       DESCRIPTION "Version 275:  Added bayStackStormControlMib."
+
+       REVISION "201206010000Z" -- 01 Jun 2012
+       DESCRIPTION "Version 274:  Added support for VSP 4K platform."
+
+       REVISION "201111250000Z" -- 25 Nov 2011
+       DESCRIPTION "Version 273:  Added support for ERS 35xx series.
+                                  Changed ERS 47xx registrations with 48xx for ERS 48xx series."            
+            
+       REVISION "201104280000Z" -- 28 Apr 2011
+       DESCRIPTION "Version 272:  Added support for VSP7024XLS."
+
+       REVISION "201012160000Z" -- 16 Dec 2010
+       DESCRIPTION "Version 271:  Added bayStackIpSecMib."
+
+       REVISION "201011030000Z" -- 03 Nov 2010
+       DESCRIPTION "Version 270:  Added bayStackIfExtMib."
+
+       REVISION "201011020000Z" -- 02 Nov 2010
+       DESCRIPTION "Version 269:  Added bayStackLldpXAvayaMib."
+
+       REVISION "201010290000Z" -- 29 Oct 2010
+       DESCRIPTION "Version 268:  Added mVSP9012(189) to SnpxChassisType." 
+
+       REVISION "201008270000Z" -- 27 Aug 2010
+       DESCRIPTION "Version 267:  Added chassis types and registrations for
+                                  new 45xx and 47xx models."
+
+       REVISION "201002220000Z" -- 22 Feb 2010
+       DESCRIPTION "Version 266:  Added additional chassis types."
+
+       REVISION "200912150000Z" -- 15 December 2009
+       DESCRIPTION "Version 265:  Added bayStackBridgeExtMib."
+
+       REVISION "200908200000Z" -- 20 August 2009
+       DESCRIPTION "Version 264:  Added bayStackEdmMib."
+
+       REVISION "200907240000Z" -- 24 July 2009
+       DESCRIPTION "Version 263:  Added bayStackIpFwdNhMib."
+
+       REVISION "200905190000Z" -- 19 May 2009
+       DESCRIPTION "Version 262:  Added bayStackNesMib."
+
+       REVISION "200905080000Z" -- 08 May 2009
+       DESCRIPTION "Version 261:  Added WC8xxx definitions."
+
+       REVISION "200903300000Z" -- 30 March 2009
+       DESCRIPTION "Version 260:  Added bayStackLldpExtMedMib"
+
+       REVISION "200902200000Z" -- 02 February 2009
+       DESCRIPTION "Version 259:  Added MESU2400"
+
+       REVISION "200812160000Z" -- 16 December 2008
+       DESCRIPTION "Version 258:  Changed ers64xx to ers66xx."
+
+       REVISION "200811190000Z" -- 19 November 2008
+       DESCRIPTION "Version 257:  Added bayStackIgmpExtMib."
+
+       REVISION "200810290000Z" -- 29 October 2008
+       DESCRIPTION "Version 256:  Added support for ERS 64xx."
+
+       REVISION "200810170000Z" -- 17 October 2008
+       DESCRIPTION "Version 255:  Added bayStackNotifyControlMib."
+
+       REVISION "200810160000Z" -- 16 October 2008
+       DESCRIPTION "Version 254:  Changed nortelWirelessMibs to nortelWlanMibs."
+
+       REVISION "200810140000Z" -- 14 October 2008
+       DESCRIPTION "Version 253:  Added support for ERS4524-GT-PWR."
+
+       REVISION "200808150000Z" -- 15 August 2008
+       DESCRIPTION "Version 252:  Added sreg-NortelMX2800."
+
+       REVISION "200804220000Z" -- 22 April 2008
+       DESCRIPTION "Version 251:  Added nortelWirelessMibs branch.
+                                  Added bayStackDdiSfpMib."
+
+       REVISION "200803260000Z" -- 26 March 2008
+       DESCRIPTION "Version 250:  Fix typo."
+
+       REVISION "200803240000Z" -- 24 March 2008
+       DESCRIPTION "Version 249:  Added mMERS8603R."
+
+       REVISION "200801210000Z" -- 21 January 2008
+       DESCRIPTION "Version 248:  Added bayStackPimExtMib and
+                                  bayStackPortMirroringMib"
+
+       REVISION "200712070000Z" -- 07 December 2007
+       DESCRIPTION "Version 247:  Added mMERS8611co."
+
+       REVISION "200711070000Z" -- 07 November 2007
+       DESCRIPTION "Version 246:  Added mMERS64000."
+
+       REVISION "200709280000Z" -- 28 September 2007
+       DESCRIPTION "Version 245:  Added branches under bayStackMibs."
+
+       REVISION "200709240000Z" -- 24 September 2007
+       DESCRIPTION "Version 244:  Changed mNVSS5000 to mVSS5000."
+
+       REVISION "200709190000Z" -- 19 September 2007
+       DESCRIPTION "Version 243:  Added ESU sysObjectID values."
+
+       REVISION "200707130000Z" -- 13 July 2007
+       DESCRIPTION "Version 242:  Updated ESU chassis IDs."
+
+       REVISION "200706290000Z" -- 29 June 2007
+       DESCRIPTION "Version 241:  Added bayUnicastStormControlMib."
+
+       REVISION "200706010000Z" -- 01 June 2007
+       DESCRIPTION "Version 240:  Fix typo."
+
+       REVISION "200705290000Z" -- 29 May 2007
+       DESCRIPTION "Version 239:  Change 4526GWX to 4526GTX."
+
+       REVISION "200705240000Z" -- 24 May 2007
+       DESCRIPTION "Version 238:  Added definitions for mNVSS5000."
+
+       REVISION "200705230000Z" -- 23 May 2007
+       DESCRIPTION "Version 237:  Added definitions for MERS and ERS56xx."
+
+       REVISION "200704030000Z" -- 03 April 2007
+       DESCRIPTION "Version 236:  Added bayStackRadiusMib."
+
+       REVISION "200703090001Z" -- 09 Mar 2007
+       DESCRIPTION "Version 235:  Added bayStackSourceGuardMib."
+
+       REVISION "200703090000Z" -- 09 Mar 2007
+       DESCRIPTION "Version 234:  Added additional BSG definitions."
+
+       REVISION "200702260000Z" -- 26 Feb 2007
+       DESCRIPTION "Version 233:  Remove some unnecessary BSG definitions."
+
+       REVISION "200702220000Z" -- 22 Feb 2007
+       DESCRIPTION "Version 232:  Added additional BotanyBay definitions."
+
+       REVISION "200702200000Z" -- 20 Feb 2007
+       DESCRIPTION "Version 231:  Added BSG definitions."
+
+       REVISION "200611140000Z" -- 11 Nov 2006
+       DESCRIPTION "Version 230:  Added bayStackErrorMessageMib."
+
+       REVISION "200609010000Z" -- 01 Sept 2006
+       DESCRIPTION "Version 229:  Added definitions for ERS2500."
+
+       REVISION "200607060000Z" -- 06 July 2006
+       DESCRIPTION "Version 228:  Fix botany bay definitions."
+
+       REVISION "200606230000Z" -- 23 June 2006
+       DESCRIPTION "Version 227:  Added bayStackDhcpSnoopingMib and bayStackArpInspectionMib."
+
+       REVISION "200605180000Z" -- 18 May 2006
+       DESCRIPTION "Version 226:  Added section to track branches under bayStackMibs."
+
+       REVISION "200604120000Z" -- 12 April 2006
+       DESCRIPTION "Version 225:  Fix typo."
+
+       REVISION "200604060000Z" -- 04 April 2006
+       DESCRIPTION "Version 224:  Added Botany Bay definitions."
+
+       REVISION "200603170000Z" -- 17 March 2006
+       DESCRIPTION "Version 223:  Added BSR definitions."
+
+       REVISION "200603100000Z" -- 10 March 2006
+       DESCRIPTION "Version 222:  Added additional BES definitions."
+
+       REVISION "200603020000Z" -- 02 March 2006
+       DESCRIPTION "Version 221:  Added BAP definitions."
+
+       REVISION "200601170000Z" -- 17 January 2006
+       DESCRIPTION "Version 220:  Added mOME6500."
+
+       REVISION "200511040000Z" -- 04 November 2005
+       DESCRIPTION "Version 219:  Added various BES definitions."
+
+       REVISION "200510110000Z" -- 11 October 2005
+       DESCRIPTION "Version 218:  Added mMetro3500."
+
+       REVISION "200506130000Z" -- 13 June 2005
+       DESCRIPTION "Version 217:  Added mNnVPNGw3070."
+
+       REVISION "200506020000Z" -- 06 June 2005
+       DESCRIPTION "Version 216:  Added mSnsa4050."
+
+       REVISION "200504210000Z" -- 21 Apr 2005
+       DESCRIPTION "Version 215:  Added ntwsTrapezeNetworks."
+
+       REVISION "200503240000Z" -- 24 Mar 2005
+       DESCRIPTION "Version 214:  more enumeration label changes to reflect
+                                  rebranding of baystack products."
+
+       REVISION "200503150000Z" -- 15 Mar 2005
+       DESCRIPTION "Version 213:  change enumeration labels to reflect rebranding
+                                  of baystack products."
+
+       REVISION "200502140000Z" -- 14 Feb 2005
+       DESCRIPTION "Version 212:  added Nortel WLAN sysObjectID values"
+
+       REVISION "200411230000Z" -- 23 Nov 2004
+       DESCRIPTION "Version 211:  added mMetroESU1850-12G-AC and
+                                  mMetroESU1850-12G-DC"
+
+       REVISION "200410130000Z" -- 13 Oct 2004
+       DESCRIPTION "Version 210:  added support for Outrigger and Dragline."
+
+       REVISION "200408300000Z" -- 30 Aug 2004
+       DESCRIPTION "Version 209:  added support for Baystack 470 24T/48T
+                                  PWR switches"
+
+       REVISION "200407200001Z" -- 20 Jul 2004
+       DESCRIPTION "Version 208:  Fix typo"
+
+       REVISION "200407200000Z" -- 20 Jul 2004
+       DESCRIPTION "Version 207:  Added version number"
+
+       REVISION "200407190000Z" -- 19 Jul 2004
+       DESCRIPTION "Added enum 127 to SnpxChassisType Textual Convention"
+
+       REVISION "200305050000Z" -- 05 May 2003
+       DESCRIPTION "v196:  Conversion to SMIv2"
+       ::= { enterprises 45 }
+
+-- Textual Conventions
+
+SnpxBackplaneType ::=  TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "This type is used to specify a concentrator backplane."
+    SYNTAX INTEGER {
+	other(1),		-- none of the following
+	eth(2),			-- ethernet
+	ethTok(3),		-- ethernet and tokenring
+	ethFddi(4),		-- ethernet and FDDI
+	ethTokFddi(5),		-- ethernet, tokenring, and FDDI
+	ethTokRed(6),		-- ethernet and tokenring with
+				--   redundant powersupply
+	ethTokFddiRed(7),	-- ethernet, tokenring, and FDDI
+				--   with redundant powersupply
+	tok(8),			-- tokenring
+        enetTrFastEnet(9),      -- ethernet, tokenring, and fast ethernet
+        enetFastEnet(10),       -- ethernet and fast ethernet
+        enetTrFastEnetRed(11),  -- ethernet, tokenring, and fast ethernet
+                                -- with redundant powersupply
+	enetFastGigEnet(12)	-- ethernet, fast, and gigabit ethernet
+	}
+
+SnpxChassisType ::=  TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "SONMP chassis identifiers"
+    SYNTAX INTEGER {
+	other(1),		-- none of the following
+	m3000(2),		-- product 3000
+	m3030(3),		-- product 3030
+	m2310(4),		-- product 2310
+	m2810(5),		-- product 2810
+	m2912(6),		-- product 2912
+	m2914(7),		-- product 2914
+	m271x(8),		-- product 271x
+	m2813(9),		-- product 2813
+	m2814(10),		-- product 2814
+	m2915(11),		-- product 2915
+	m5000(12),		-- product 5000
+	m2813SA(13),		-- product 2813SA
+	m2814SA(14),		-- product 2814SA
+	m810M(15),              -- product 810M
+	m1032x(16),             -- product EtherCell
+	m5005(17),              -- product 5005
+	mAlcatelEthConc(18),    -- product Alcatel Ethernet workgroup conc.
+	m2715SA(20),            -- product 2715SA
+	m2486(21),              -- product 2486
+	m28xxx(22),	            -- product 28000 series
+	m2300x(23),	            -- product 23000 series
+	m5DN00x(24),		-- product 5DN00x series
+	mBayStackEth(25),       -- product BayStack Ethernet
+	m2310x(26),	            -- product 23100 series
+	mBayStack100Hub(27),	-- product 100Base-T Hub
+	m3000FastEth(28),       -- product 3000 Fast Ethernet
+	mXediaSwitch(29),	      -- product Orion switch
+	notUsed(30),            -- not used 
+      m28200EthSwitch(31),    -- product DDS 
+	mCent6Slot(32),         -- product Centillion
+	mCent12Slot(33),        -- product Centillion
+	mCent1Slot(34),         -- product Centillion
+	mBayStack301(35),       -- product BayStack 301
+	mBayStackTr(36),        -- product BayStack TokenRing Hub
+	mFVC10625(37),          -- product FVC Multimedia Switch
+	mSwitchNode(38),        -- product Switch Node
+	mBayStack302(39),       -- product BayStack 302 Switch
+	mBayStack350(40),       -- product BayStack 350 Switch
+	mBayStack150(41),       -- product BayStack 150 Ethernet Hub
+        mCent50N3Slot(42),      -- product Centillion 50N switch
+        mCent50T3Slot(43),      -- product Centillion 50T switch
+        mBayStack303-304(44),   -- product BayStack 303 and 304 Switches
+	mBayStack200(45),       -- product BayStack 200 Ethernet Hub
+	mBayStack250(46),       -- product BayStack 250 10/100 Ethernet Hub
+     mBayStack450(48),       -- product BayStack 450 10/100/1000 Switches
+     mBayStack410(49),       -- product BayStack 410 10/100 Switches
+        mPassport1200(50),      -- product Passport 1200 L3 Switch
+        mPassport1250(51),      -- product Passport 1250 L3 Switch
+        mPassport1100(52),      -- product Passport 1100 L3 Switch
+        mPassport1150(53),      -- product Passport 1150 L3 Switch
+        mPassport1050(54),      -- product Passport 1050 L3 Switch
+        mPassport1051(55),      -- product Passport 1051 L3 Switch
+        mPassport8610(56),      -- product Passport 8610 L3 Switch
+        mPassport8606(57),      -- product Passport 8606 L3 Switch
+        mPassport8010(58),      -- product Passport 8010
+        mPassport8006(59),      -- product Passport 8006
+        mBayStack670(60),       -- product BayStack 670 wireless access point
+        mPassport740(61),       -- product Passport 740 
+        mPassport750(62),       -- product Passport 750 
+        mPassport790(63),       -- product Passport 790
+        mBPS2000(64),           -- product Business Policy Switch 2000 10/100 Switches
+        mPassport8110(65),      -- product Passport 8110 L2 Switch
+        mPassport8106(66),      -- product Passport 8106 L2 Switch
+        mBayStack3580(67),      -- product BayStack 3580 Gig Switch
+        mBayStack10(68),        -- product BayStack 10 Power Supply Unit
+        mBayStack420(69),       -- product BayStack 420 10/100 Switch
+        mMetro1200ESM(70),      -- product OPTera Metro 1200 Ethernet Service Module
+        mPassport8010co(71),    -- product OPTera 8010co
+        mPassport8610co(72),    -- product OPTera 8610co L3 switch
+        mPassport8110co(73),    -- product OPTera 8110co L2 switch
+        mPassport8003(74),      -- product OPTera 8003
+        mPassport8603(75),      -- product OPTera 8603 L3 switch
+        mPassport8103(76),      -- product OPTera 8103 L2 switch
+        mBayStack380(77),       -- product BayStack 380 10/100/1000 Switch
+        mES470-48T(78),             -- product Ethernet Switch 470-48T
+        mMetro1450ESM(79),      -- product OPTera Metro 1450 Ethernet Service Module
+        mMetro1400ESM(80),      -- product OPTera Metro 1400 Ethernet Service Module
+        mAlteonSwitch(81),      -- product Alteon Switch Family
+        mES460-24T-PWR(82),     -- product Ethernet Switch 460-24T-PWR
+        mMetro8010(83),         -- product OPTera Metro 8010 OPM L2 Switch
+        mMetro8010co(84),       -- product OPTera Metro 8010co OPM L2 Switch
+        mMetro8006(85),         -- product OPTera Metro 8006 OPM L2 Switch
+        mMetro8003(86),         -- product OPTera Metro 8003 OPM L2 Switch
+        mAlteon180e(87),        -- product Alteon 180e
+        mAlteonAD3(88),         -- product Alteon AD3
+        mAlteon184(89),         -- product Alteon 184
+        mAlteonAD4(90),         -- product Alteon AD4
+        mPassport1424(91),      -- product Passport 1424 L3 switch
+        mPassport1648(92),      -- product Passport 1648 L3 switch
+        mPassport1612(93),      -- product Passport 1612 L3 switch
+        mPassport1624(94),      -- product Passport 1624 L3 switch 
+        mBayStack380-24F(95),   -- product BayStack 380-24F Fiber 1000 Switch
+        mERS5510-24T(96),       -- product Ethernet Routing Switch 5510-24T
+        mERS5510-48T(97),       -- product Ethernet Routing Switch 5510-48T
+        mES470-24T(98),         -- product Ethernet Switch 470-24T
+        mWLANAccessPoint2220(99),   -- product Nortel Networks Wireless LAN Access Point 2220
+        mPassport2402(100),         -- product Passport RBS 2402 L3 switch
+        mAlteon2424(101),           -- product Alteon Application Switch 2424  
+        mAlteon2224(102),           -- product Alteon Application Switch 2224 
+        mAlteon2208(103),           -- product Alteon Application Switch 2208 
+        mAlteon2216(104),           -- product Alteon Application Switch 2216
+        mAlteon3408(105),           -- product Alteon Application Switch 3408
+        mAlteon3416(106),           -- product Alteon Application Switch 3416
+        mWLANSecuritySwitch2250(107),  -- product Nortel Networks Wireless LAN SecuritySwitch 2250
+        mES425-48T(108),            -- product Ethernet Switch 425-48T
+        mES425-24T(109),            -- product Ethernet Switch 425-24T
+        mWLANAccessPoint2221(110),    -- product Nortel Networks Wireless LAN Access Point 2221
+        mMetroESU1800-24T(111),       -- product Nortel Metro Ethernet Service Unit 24-T SPF switch
+        mMetroESU1800-24T-LX-DC(112), -- product Nortel Metro Ethernet Service Unit 24-T LX DC switch
+        mPassport8310(113),         -- product Passport 8300 10-slot chassis
+        mPassport8306(114),         -- product Passport 8300 6-slot chassis
+        mERS5520-24T-PWR(115),      -- product Ethernet Routing Switch 5520-24T-PWR
+        mERS5520-48T-PWR(116),      -- product Ethernet Routing Switch 5520-48T-PWR
+        mNnVPNGw3050(117),          -- product Nortel Networks VPN Gateway 3050
+        mAlteonSSL310(118),         -- product Alteon SSL 310 10/100
+        mAlteonSSL310Fiber(119),    -- product Alteon SSL 310 10/100 Fiber
+        mAlteonSSL310FIPS(120),     -- product Alteon SSL 310 10/100 FIPS
+        mAlteonSSL410(121),         -- product Alteon SSL 410 10/100/1000
+        mAlteonSSL410Fiber(122),    -- product Alteon SSL 410 10/100/1000 Fiber
+        mAlteonAS2424SSL(123),      -- product Alteon Application Switch 2424-SSL
+        mES325-24T(124),            -- product Ethernet Switch 325-24T
+        mES325-24G(125),            -- product Ethernet Switch 325-24G
+        mWLANAccessPoint2225(126),  -- product Nortel Networks Wireless LAN Access Point 2225
+        mWLANSecuritySwitch2270(127), -- product Nortel Networks Wireless LAN SecuritySwitch 2270
+        mES470-24T-PWR(128),        -- product 24-port Ethernet Switch 470-24T-PWR
+        mES470-48T-PWR(129),        -- product 48-port Ethernet Switch 470-48T-PWR
+        mERS5530-24TFD(130),        -- product Ethernet Routing Switch 5530-24TFD
+        mES3510-24T(131),           -- product Ethernet Switch 3510-24T
+        mMetroESU1850-12G-AC(132),  -- product Nortel Metro Ethernet Service Unit 12G AC L3 switch
+        mMetroESU1850-12G-DC(133),  -- product Nortel Metro Ethernet Service Unit 12G DC L3 switch
+        mSnas4050(134),             -- Nortel Secure Access Switch
+        mNnVPNGw3070(135),          -- Nortel Networks VPN Gateway 3070
+        mMetro3500(136),            -- OPTera Metro 3500
+        mBES1010-24T(137),          -- SMB BES 1010 24T
+        mBES1010-48T(138),          -- SMB BES 1010 48T
+        mBES1020-24T-PWR(139),      -- SMB BES 1020 24T PWR
+        mBES1020-48T-PWR(140),      -- SMB BES 1020 48T PWR
+        mBES2010-24T(141),          -- SMB BES 2010 24T
+        mBES2010-48T(142),          -- SMB BES 2010 48T
+        mBES2020-24T-PWR(143),      -- SMB BES 2020 24T PWR
+        mBES2020-48T-PWR(144),      -- SMB BES 2020 48T PWR
+        mBES110-24T(145),           -- SMB BES 110 24T
+        mBES110-48T(146),           -- SMB BES 110 48T
+        mBES120-24T-PWR(147),       -- SMB BES 120 24T PWR
+        mBES120-48T-PWR(148),       -- SMB BES 120 48T PWR
+        mBES210-24T(149),           -- SMB BES 210 24T
+        mBES210-48T(150),           -- SMB BES 210 48T
+        mBES220-24T-PWR(151),       -- SMB BES 220 24T PWR
+        mBES220-48T-PWR(152),       -- SMB BES 220 48T PWR
+        mOME6500(153),              -- OME 6500
+        mERS4548GT(154),            -- Ethernet Routing Switch 4548GT
+        mERS4548GT-PWR(155),        -- Ethernet Routing Switch 4548GT-PWR
+        mERS4550T(156),             -- Ethernet Routing Switch 4550T
+        mERS4550T-PWR(157),         -- Ethernet Routing Switch 4550T-PWR
+        mERS4526FX(158),            -- Ethernet Routing Switch 4526FX
+        mERS2500-26T(159),          -- Ethernet Routing Switch 2500-26T
+        mERS2500-26T-PWR(160),      -- Ethernet Routing Switch 2500-26T-PWR
+        mERS2500-50T(161),          -- Ethernet Routing Switch 2500-50T
+        mERS2500-50T-PWR(162),      -- Ethernet Routing Switch 2500-50T-PWR
+        mERS4526T(163),             -- Ethernet Routing Switch 4526T
+        mERS4526T-PWR(164),         -- Ethernet Routing Switch 4526T-PWR
+        mERS4524GT(165),            -- Ethernet Routing Switch 4524GT
+        mERS4526GTX(166),           -- Ethernet Routing Switch 4526GTX
+        mERS4526GTX-PWR(167),       -- Ethernet Routing Switch 4526GTX-PWR
+        mMetroNext(168),            -- MetroNext
+        mMERS4600(169),             -- MERS 4600
+        mESU1860T(170),             -- ESU 1860T
+        mESU1880S(171),             -- ESU 1880S
+        mERS5698TFD-PWR(172),       -- Ethernet Routing Switch 5698TFD-PWR
+        mERS5698TFD(173),           -- Ethernet Routing Switch 5698TFD
+        mERS5650TD-PWR(174),        -- Ethernet Routing Switch 5650TD-PWR
+        mERS5650TD(175),            -- Ethernet Routing Switch 5650TD
+        mERS5632FD(176),            -- Ethernet Routing Switch 5632FD
+        mVSS5000(177),              -- Nortel Virtual Services Switch 5000
+        mESU1860V(178),             -- ESU 1860V
+        mESU1860S(179),             -- ESU 1860S
+        mESU1860B(180),             -- ESU 1860B
+        mMERS64000(181),            -- Metro Ethernet Routing Switch 64000
+        mMERS8611c0(182),           -- Metro Ethernet Routing Switch 8611co
+        mMERS8603R(183),            -- Metro Ethernet Routing Switch 8603-R
+        mERS4524GT-PWR(184),        -- Ethernet Routing Switch 4524GT-PWR
+        mERS6628XSGT(185),          -- Ethernet Routing Switch 6628XSGT
+        mERS6632XTS(186),           -- Ethernet Routing Switch 6632XTS
+        mMESU2400(187),             -- MESU 2400
+        mWC8180(188),               -- WC 8180
+        mVSP9012(189),              -- Virtual Services Platform, 12 Slot Chassis (Cobalt Blue)
+        mERS8603r(190),             -- Ethernet Routing Switch 8003-R
+        mERS8803r(191),             -- Ethernet Routing 8803r L3 switch
+        mERS8806(192),              -- Ethernet Routing 8806 L3 switch
+        mERS8810(193),              -- Ethernet Routing 8810 L3 switch
+        mERS8810co(194),            -- Ethernet Routing 8810r L3 switch
+        mERS4526T-PWR-PLUS(195),    -- Ethernet Routing Switch 4526T-PWR+
+        mERS4550T-PWR-PLUS(196),    -- Ethernet Routing Switch 4550T-PWR+
+        mERS4826GTS-PWR-PLUS(197),  -- Ethernet Routing Switch 4826GTS-PWR+
+        mERS4850GTS-PWR-PLUS(198),  -- Ethernet Routing Switch 4850GTS-PWR+
+        mERS4826GTS(199),           -- Ethernet Routing Switch 4826GTS
+        mERS4850GTS(200),           -- Ethernet Routing Switch 4850GTS
+        mVSP7024XLS(201),           -- Virtual Services Platform 7024XLS
+        mERS3526T(202),             -- Ethernet Routing Switch 3526T
+        mERS3526T-PWR-PLUS(203),    -- Ethernet Routing Switch 3526T-PWR+
+        mERS3524GT(204),            -- Ethernet Routing Switch 3524GT
+        mERS3524GT-PWR-PLUS(205),   -- Ethernet Routing Switch 3524GT-PWR+
+        mERS3510GT(206),            -- Ethernet Routing Switch 3510GT
+        mERS3510GT-PWR-PLUS(207),   -- Ethernet Routing Switch 3510GT-PWR+
+        mVSP4826GTS(208),           -- Virtual Services Platform 4826 GTS
+        mVSP4826GTS-PWR-PLUS(209),  -- Virtual Services Platform 4826 GTS-PWR+
+        mVSP4850GTS(210),           -- Virtual Services Platform 4850 GTS
+        mVSP4850GTS-PWR-PLUS(211),  -- Virtual Services Platform 4850 GTS-PWR+
+        mVSP9010(212),              -- Virtual Services Platform, 10 Slot Chassis (Sapphire)
+        mVSP8284XSQ(213),           -- Virtual Services Platform 8284XSQ 
+        mERS3549GTS(214),           -- Ethernet Routing Switch 3549GTS
+        mERS3549GTS-PWR-PLUS(215),  -- Ethernet Routing Switch 3549GTS-PWR-PLUS
+        mVSP4450GSX-PWR-PLUS(216),  -- Virtual Services Platform 4450 GSX-PWR+
+        mVSP7024XT(217),            -- Virtual Services Platform 7024XT
+        mERS5928GTS(218),           -- Ethernet Routing Switch 5928GTS
+        mERS5928GTS-PWR-PLUS(219),  -- Ethernet Routing Switch 5928GTS-PWR+
+        mERS5952GTS(220),           -- Ethernet Routing Switch 5952GTS
+        mERS5952GTS-PWR-PLUS(221),  -- Ethernet Routing Switch 5952GTS-PWR+
+        mERS5928GTS-UPWR(222),      -- Ethernet Routing Switch 5928GTS-uPWR
+        mERS59100GTS(223),          -- Ethernet Routing Switch 59100GTS
+        mERS59100GTS-PWR-PLUS(224), -- Ethernet Routing Switch 59100GTS-PWR+
+        mERS4926GTS(225),           -- Ethernet Routing Switch 4926GTS
+        mERS4926GTS-PWR-PLUS(226),  -- Ethernet Routing Switch 4926GTS-PWR+
+        mERS4950GTS(227),           -- Ethernet Routing Switch 4950GTS
+        mERS4950GTS-PWR-PLUS(228),  -- Ethernet Routing Switch 4950GTS-PWR+
+	mVSP4450GTXHT-PWR-PLUS(229),    -- Ethernet Routing Switch 4450 HT-PWR+
+	mVSP8404(230),                  --  Virtual Services Platform 8404
+	mVSP7254XSQ(231),               -- Virtual Services Platform 7254XSQ
+        mVSP7254XTQ(232),               -- Virtual Services Platform 7254XTQ,
+	mVSP4450GSX(233),            -- Virtual Services Platform 4450 GSX
+	mVSP9408(234),               -- Virtual Services Platform 9408
+	mNetApp8032(235),            -- NetApp Platform 8032
+        mERS3550T(236),             -- Ethernet Routing Switch 3550T
+        mERS3550T-PWR-PLUS(237)     -- Ethernet Routing Switch 3550T-PWR-PLUS
+        }
+
+-- Top Branches under "synoptics"
+
+products             OBJECT IDENTIFIER ::= { synoptics 1 }
+temporary            OBJECT IDENTIFIER ::= { synoptics 2 }
+registration         OBJECT IDENTIFIER ::= { synoptics 3 }
+policy               OBJECT IDENTIFIER ::= { synoptics 4 }
+bayStackMibs         OBJECT IDENTIFIER ::= { synoptics 5 }
+ntwsTrapezeNetworks  OBJECT IDENTIFIER ::= { synoptics 6 }
+nortelWlanMibs       OBJECT IDENTIFIER ::= { synoptics 7 }
+avayaWlan9100Mibs    OBJECT IDENTIFIER ::= { synoptics 8 }
+
+
+-- Branches under "products"
+
+series1000   OBJECT IDENTIFIER ::= { products 1 }
+s3SnmpAgent  OBJECT IDENTIFIER ::= { products 2 }
+series3000   OBJECT IDENTIFIER ::= { products 3 }
+superAgent   OBJECT IDENTIFIER ::= { products 4 }
+specialTraps OBJECT IDENTIFIER ::= { products 5 }
+series5000   OBJECT IDENTIFIER ::= { products 6 }
+lanSwitch    OBJECT IDENTIFIER ::= { products 7 } 
+snpxRmonExt  OBJECT IDENTIFIER ::= { products 8 }
+wirelessLAN  OBJECT IDENTIFIER ::= { products 9 }
+powerSupply  OBJECT IDENTIFIER ::= { products 10 }
+--  powerSupply moved to 10 because of conflicts
+wlan2200     OBJECT IDENTIFIER ::= { products 11 }
+
+
+-- Branches under "temporary"
+
+-- ieee8023     OBJECT IDENTIFIER ::= { temporary 1 }
+-- proj1(del)     OBJECT IDENTIFIER ::= { temporary 2 }
+-- proj2(sa)     OBJECT IDENTIFIER ::= { temporary 3 }
+-- proj3(lc)     OBJECT IDENTIFIER ::= { temporary 4 }
+-- proj4(pen)     OBJECT IDENTIFIER ::= { temporary 5 }
+-- proj5(phe)     OBJECT IDENTIFIER ::= { temporary 6 }
+-- proj6(fddi)     OBJECT IDENTIFIER ::= { temporary 7 }
+-- proj7(xo)     OBJECT IDENTIFIER ::= { temporary 8 }
+
+-- Branches under "registration" (values for object sysObjectId)
+s3reg-other     OBJECT IDENTIFIER ::= { registration 1 }
+
+
+s3reg-3000	OBJECT IDENTIFIER ::= { registration 2 }
+  s3reg-3000-enetNMM
+		OBJECT IDENTIFIER ::= { s3reg-3000 1 }
+  s3reg-3000-trNMM
+		OBJECT IDENTIFIER ::= { s3reg-3000 2 }
+  s3reg-3000-FDDI-NMM
+		OBJECT IDENTIFIER ::= { s3reg-3000 3 }
+  s3reg-3000-FastEthNMM
+		OBJECT IDENTIFIER ::= { s3reg-3000 4 }
+  s3reg-3000-ethSwitchNMM
+		OBJECT IDENTIFIER ::= { s3reg-3000 5 }
+
+
+s3reg-3030	OBJECT IDENTIFIER ::= { registration 3 }
+  s3reg-3030-enetNMM
+		OBJECT IDENTIFIER ::= { s3reg-3030 1 }
+  s3reg-3030-trNMM
+		OBJECT IDENTIFIER ::= { s3reg-3030 2 }
+  s3reg-3030-FDDI-NMM
+		OBJECT IDENTIFIER ::= { s3reg-3030 3 }
+  s3reg-3030-ethSwitchNMM
+		OBJECT IDENTIFIER ::= { s3reg-3030 4 } 
+
+
+s3reg-2310	OBJECT IDENTIFIER ::= { registration 4 }
+  s3reg-2310-enetNMM
+		OBJECT IDENTIFIER ::= { s3reg-2310 1 }
+  s3reg-2310-trNMM
+		OBJECT IDENTIFIER ::= { s3reg-2310 2 }
+  s3reg-2310-FDDI-NMM
+		OBJECT IDENTIFIER ::= { s3reg-2310 3 }
+
+
+s3reg-332X	OBJECT IDENTIFIER ::= { registration 5 }
+s3reg-332XS	OBJECT IDENTIFIER ::= { registration 6 }
+s3reg-3356	OBJECT IDENTIFIER ::= { registration 7 }
+
+
+s3reg-2810	OBJECT IDENTIFIER ::= { registration 8 }
+  s3reg-2810-enetNMM
+		OBJECT IDENTIFIER ::= { s3reg-2810 1 }
+
+
+s3reg-2715	OBJECT IDENTIFIER ::= { registration 9 }
+  s3reg-2715-trNMM
+	OBJECT IDENTIFIER ::= { s3reg-2715 1 }
+
+
+s3reg-291X	OBJECT IDENTIFIER ::= { registration 10 }
+  s3reg-291X-FDDI-NMM
+		OBJECT IDENTIFIER ::= { s3reg-291X 1 }
+
+
+s3reg-3394	OBJECT IDENTIFIER ::= { registration 11 }
+
+s3reg-281X	OBJECT IDENTIFIER ::= { registration 12 }
+  s3reg-281X-enetNMM
+		OBJECT IDENTIFIER ::= { s3reg-281X 1 }
+
+
+s5reg-5000	OBJECT IDENTIFIER ::= { registration 13 }
+  s5reg-5000-ethNMM  -- Ethernet NMM in 5000 Chassis
+		OBJECT IDENTIFIER ::= { s5reg-5000 1 }
+  s5reg-5000-tokNMM  -- Token Ring NMM in 5000 Chassis
+		OBJECT IDENTIFIER ::= { s5reg-5000 2 }
+  s5reg-5000-fddNMM  -- FDDI NMM in 5000 Chassis
+		OBJECT IDENTIFIER ::= { s5reg-5000 3 }
+  s5reg-5000-atmNMM  -- ATM NMM in 5000 Chassis
+		OBJECT IDENTIFIER ::= { s5reg-5000 4 }
+  s5reg-5000-ethSwitchNMM  -- Ethernet Switch NMM in 5000 Chassis
+		OBJECT IDENTIFIER ::= {s5reg-5000 5}
+  s5reg-5000-ethFastEthNMM  -- 10/100 Ethernet NMM in 5000 Chassis
+		OBJECT IDENTIFIER ::= { s5reg-5000 6 }
+  s5reg-5000-eth10-100SwitchNMM  -- 10/100 Ethernet Switch NMM in 5000 Chassis
+		OBJECT IDENTIFIER ::= { s5reg-5000 7 }
+
+
+s3reg-281XSA	OBJECT IDENTIFIER ::= { registration 14 }
+  s3reg-281XSA-enetNMM
+		OBJECT IDENTIFIER ::= { s3reg-281XSA 1 }
+
+
+lsreg-28xxx	OBJECT IDENTIFIER ::= { registration 15 }
+  lsreg-28xxx-NMM
+		OBJECT IDENTIFIER ::= { lsreg-28xxx 1 }
+
+
+s3reg-8xx	OBJECT IDENTIFIER ::= { registration 16 }
+  s3reg-810M-enetNMM
+		OBJECT IDENTIFIER ::= { s3reg-8xx 1 }
+
+
+s5reg-5005	OBJECT IDENTIFIER ::= { registration 17 }
+  s5reg-5005-ethNMM  -- Ethernet NMM in 5005 Chassis
+		OBJECT IDENTIFIER ::= { s5reg-5005 1 }
+  s5reg-5005-tokNMM  -- Token Ring NMM in 5005 Chassis
+		OBJECT IDENTIFIER ::= { s5reg-5005 2 }
+  s5reg-5005-ethSwitchNMM -- Ethernet Switch NMM in 5005 Chassis
+	        OBJECT IDENTIFIER ::= { s5reg-5005 3 }
+  s5reg-5005-fddNMM  -- FDDI NMM in 5005 Chassis
+		OBJECT IDENTIFIER ::= { s5reg-5005 4 }
+  s5reg-5005-ethFastEthNMM  -- 10/100 Ethernet NMM in 5005 Chassis
+		OBJECT IDENTIFIER ::= { s5reg-5005 5 }
+  s5reg-5005-eth10-100SwitchNMM -- 10/100 Ethernet Switch NMM in 5005 Chassis
+		OBJECT IDENTIFIER ::= { s5reg-5005 7 }
+
+s3reg-AlcatelConc	OBJECT IDENTIFIER ::= { registration 18 }
+  s3reg-AlcatelEthConc-enetNMM
+		OBJECT IDENTIFIER ::= { s3reg-AlcatelConc 1 }
+
+
+s3reg-271XSA	OBJECT IDENTIFIER ::= { registration 19 }
+  s3reg-271XSA-trNMM	OBJECT IDENTIFIER ::= { s3reg-271XSA 1 }
+
+
+ecreg-1032x	OBJECT IDENTIFIER ::= { registration 20 }
+  s3reg-1032x-NMM	OBJECT IDENTIFIER ::= { ecreg-1032x 1 }
+
+
+sreg-5DN00x	OBJECT IDENTIFIER ::= { registration 21 }
+  sreg-5DN00x-EthNMM	OBJECT IDENTIFIER ::= { sreg-5DN00x 1 } 
+
+
+sreg-BayStackEth	OBJECT IDENTIFIER ::= { registration 22 }
+  sreg-BayStackEth-ethNMM   OBJECT IDENTIFIER ::= { sreg-BayStackEth 1 }
+
+
+sreg-2300x	OBJECT IDENTIFIER ::= { registration 23 }
+  sreg-2300x-NMM	OBJECT IDENTIFIER ::= { sreg-2300x 1 }
+
+
+sreg-2310x	OBJECT IDENTIFIER ::= { registration 24 }
+  sreg-2310x-NMM	OBJECT IDENTIFIER ::= { sreg-2310x 1 }
+
+sreg-Orion	OBJECT IDENTIFIER ::= { registration 25 }
+  sreg-Orion-ethNMM	OBJECT IDENTIFIER ::= { sreg-Orion 1 }
+
+sreg-BayStack100Hub     OBJECT IDENTIFIER ::= { registration 26 }
+  sreg-BayStack100Unit-12Port
+                OBJECT IDENTIFIER ::= { sreg-BayStack100Hub 1 }
+
+sreg-BayStackTr  OBJECT IDENTIFIER ::= { registration 27 }
+   sreg-BayStackTr-trNMM -- BayStackTr NMM in a virtual Chassis
+		 OBJECT IDENTIFIER ::= { sreg-BayStackTr 1 }
+
+lsreg-28200   OBJECT IDENTIFIER ::= { registration 28 }
+   lsreg-28200-ethSwitchNMM -- 28200 Ethernet Switch
+                 OBJECT IDENTIFIER ::= { lsreg-28200 1 }
+
+sreg-BayStack302   OBJECT IDENTIFIER ::= { registration 29 }
+   sreg-BayStack302-9port -- BayStack302 8+1Tx/Fx 10 Mb/s Ethernet Switch 
+                 OBJECT IDENTIFIER ::= { sreg-BayStack302 1 }
+
+sreg-BayStack350   OBJECT IDENTIFIER ::= { registration 30 }
+   sreg-BayStack350-ethSwitchNMM  -- BayStack350 Family 10/100 Adaptive Switches
+                 OBJECT IDENTIFIER ::= { sreg-BayStack350 1 }
+   sreg-BayStack350-24T-ethSwitchNMM  -- BayStack 350-24T and -12T 10/100/1000 Adaptive Switches
+		 OBJECT IDENTIFIER ::= { sreg-BayStack350 2 }
+
+sreg-BayStack150Eth        OBJECT IDENTIFIER ::= { registration 31 }
+  sreg-BayStack150Eth-ethNMM
+		OBJECT IDENTIFIER ::= { sreg-BayStack150Eth 1 }
+   
+sreg-BayStack303-304	OBJECT IDENTIFIER ::= { registration 32 }
+  sreg-BayStack303-304-Sw   -- 12-24 10mb 1 100mb with MDA Switch
+                 OBJECT IDENTIFIER ::= { sreg-BayStack303-304 1 }
+  sreg-BayStack303-24T-Sw   -- 24 10mb 1 100mb with 2 MDA Switch
+                 OBJECT IDENTIFIER ::= { sreg-BayStack303-304 2 }
+
+sreg-BayStack200Eth        OBJECT IDENTIFIER ::= { registration 33 }
+  sreg-BayStack200Eth-ethNMM  --BayStack200 Ethernet Hub
+		OBJECT IDENTIFIER ::= { sreg-BayStack200Eth 1 }
+
+sreg-BayStack250Eth        OBJECT IDENTIFIER ::= { registration 34 }
+  sreg-BayStack250Eth-ethNMM  --BayStack250 10/100 Ethernet Hub
+              OBJECT IDENTIFIER ::= { sreg-BayStack250Eth 1 }
+
+sreg-BayStack450           OBJECT IDENTIFIER ::= { registration 35 }
+  sreg-BayStack450-ethSwitchNMM  --BayStack450 10/100/1000 Ethernet Switch
+              OBJECT IDENTIFIER ::= { sreg-BayStack450 1 }
+
+sreg-BayStack410           OBJECT IDENTIFIER ::= { registration 36 }
+  sreg-BayStack410-24T-ethSwitchNMM  --BayStack 410-24T 10/100 Adaptive Switches
+	      OBJECT IDENTIFIER ::= { sreg-BayStack410 1 }
+
+sreg-BayStackICS           OBJECT IDENTIFIER ::= { registration 37 }
+  sreg-BayStackICS-NMM  --BayStack Integrated Communication Server
+	      OBJECT IDENTIFIER ::= { sreg-BayStackICS 1 }
+
+s5reg-Accelar8010          OBJECT IDENTIFIER ::= { registration 38 }
+  s5reg-Accelar8132TX    --Ethernet Switch 32 port in 8010 Chassis
+	      OBJECT IDENTIFIER ::= { s5reg-Accelar8010 1 }
+  s5reg-Accelar8148TX   --Ethernet Switch 48 port in 8010 Chassis
+ 	      OBJECT IDENTIFIER ::= { s5reg-Accelar8010 2 }
+
+sreg-BayStack670           OBJECT IDENTIFIER ::= { registration 39 }
+   sreg-BayStack670-wirelessLAN  -- BayStack 670 11Mb/s wireless access point
+		    OBJECT IDENTIFIER ::= { sreg-BayStack670 1 }
+
+sreg-BPS2000               OBJECT IDENTIFIER ::= { registration 40 }
+  sreg-BPS2000-24T-ethSwitchNMM  -- BPS 2000-24T 10/100 Switches
+	      OBJECT IDENTIFIER ::= { sreg-BPS2000 1 }
+
+sreg-BayStack3580          OBJECT IDENTIFIER ::= { registration 41 }
+  sreg-BayStack3580-16F-gigEthSwitch  --BayStack 3580-16F Gigabit Switch
+	      OBJECT IDENTIFIER ::= { sreg-BayStack3580 1 }
+
+sreg-BayStack10            OBJECT IDENTIFIER ::= { registration 42 }
+  sreg-BayStack10-powerSupplyUnit  -- BayStack 10 Power Supply Unit
+          OBJECT IDENTIFIER ::= { sreg-BayStack10 1 }
+          
+sreg-BayStack420           OBJECT IDENTIFIER ::= { registration 43 }
+  sreg-BayStack420-24T-ethSwitchNMM  -- BayStack 420-24T 10/100 Switch
+	      OBJECT IDENTIFIER ::= { sreg-BayStack420 1 }
+
+sreg-Metro1200ESM           OBJECT IDENTIFIER ::= { registration 44 }
+  sreg-Metro1200ESM-12T-ethSwitchNMM  -- OPTera Metro 1200 Ethernet Service Module
+	      OBJECT IDENTIFIER ::= { sreg-Metro1200ESM 1 }
+
+sreg-BayStack380            OBJECT IDENTIFIER ::= { registration 45 }
+  sreg-BayStack380-24T-ethSwitchNMM -- BayStack 380-24T Switch 10/100/1000 Switch
+             OBJECT IDENTIFIER ::= { sreg-BayStack380 1 }
+
+sreg-BayStack470		    OBJECT IDENTIFIER ::= { registration 46 }
+  sreg-BayStack470-48T-ethSwitchNMM -- BayStack 470-48T Switch 10/100 Switch
+		 OBJECT IDENTIFIER ::= { sreg-BayStack470 1 }
+
+sreg-Metro1450ESM           OBJECT IDENTIFIER ::= { registration 47 }
+  sreg-Metro1450ESM-12T2GBIC-ethSwitchNMM  -- OPTera Metro 1450 Ethernet Service Module
+	      OBJECT IDENTIFIER ::= { sreg-Metro1450ESM 1 }
+
+sreg-Metro1400ESM           OBJECT IDENTIFIER ::= { registration 48 }
+  sreg-Metro1400ESM-12T2GBIC-ethSwitchNMM  -- OPTera Metro 1400 Ethernet Service Module
+	      OBJECT IDENTIFIER ::= { sreg-Metro1400ESM 1 }
+
+sreg-BayStack460-24T-PWR    OBJECT IDENTIFIER ::= { registration 49 }
+  sreg-BayStack460-24T-PWR-ethSwitchNMM  -- BayStack 460-24T-PWR
+	      OBJECT IDENTIFIER ::= { sreg-BayStack460-24T-PWR 1 }
+
+sreg-Metro8000    	    OBJECT IDENTIFIER ::= { registration 50 }
+  sreg-Metro8000-8664GB-OPM  -- OPTera Metro 8000 4 Ports Open Protocol Module
+	      OBJECT IDENTIFIER ::= { sreg-Metro8000 1 }          
+	      
+sreg-BayStack380-24F        OBJECT IDENTIFIER ::= { registration 51 }
+  sreg-BayStack380-24F-ethSwitchNMM -- BayStack 380-24F Switch 1000 Fiber Switch
+             OBJECT IDENTIFIER ::= { sreg-BayStack380-24F 1 }
+
+sreg-BayStack5510-24T    OBJECT IDENTIFIER ::= { registration 52 }
+  sreg-BayStack5510-24T-ethSwitchNMM  -- BayStack 5510-24T
+	      OBJECT IDENTIFIER ::= { sreg-BayStack5510-24T 1 }
+
+sreg-BayStack5510-48T    OBJECT IDENTIFIER ::= { registration 53 }
+  sreg-BayStack5510-48T-ethSwitchNMM  -- BayStack 5510-48T
+	      OBJECT IDENTIFIER ::= { sreg-BayStack5510-48T 1 }
+
+sreg-BayStack470-24T	    OBJECT IDENTIFIER ::= { registration 54 }
+  sreg-BayStack470-24T-ethSwitchNMM -- BayStack 470-24T Switch 10/100 Switch
+		 OBJECT IDENTIFIER ::= { sreg-BayStack470-24T 1 }
+
+-- Nortel Networks Wireless LAN Access Point 2220
+sreg-WLANAccessPoint2220    OBJECT IDENTIFIER ::= { registration 55 }
+  sreg-WLANAccessPoint2220-wirelessAP
+		 OBJECT IDENTIFIER ::= { sreg-WLANAccessPoint2220 1 }
+
+-- Nortel Networks Wireless LAN Security Switch 2250
+sreg-WLANSecuritySwitch2250    OBJECT IDENTIFIER ::= { registration 56 }
+
+-- Nortel Networks BayStack 425, 48 and 24 port devices
+sreg-BayStack425 OBJECT IDENTIFIER ::= { registration 57 }
+sreg-BayStack425-48T    OBJECT IDENTIFIER ::= { sreg-BayStack425 1 }
+sreg-BayStack425-24T    OBJECT IDENTIFIER ::= { sreg-BayStack425 2 }
+
+-- Nortel Networks Wireless LAN Access Point 2221
+sreg-WLANAccessPoint2221    OBJECT IDENTIFIER ::= { registration 58 }
+  sreg-WLANAccessPoint2221-wirelessAP
+		 OBJECT IDENTIFIER ::= { sreg-WLANAccessPoint2221 1 }
+
+sreg-BayStack5520    OBJECT IDENTIFIER ::= { registration 59 }
+sreg-BayStack5520-24T-PWR    OBJECT IDENTIFIER ::= { sreg-BayStack5520 1 }
+sreg-BayStack5520-48T-PWR    OBJECT IDENTIFIER ::= { sreg-BayStack5520 2 }
+
+-- Nortel Networks WLAN Security Siwtch 2270
+sreg-WLANSecuritySwitch OBJECT IDENTIFIER ::= { registration 60 }
+sreg-WLANSecuritySwitch2270 OBJECT IDENTIFIER ::= { sreg-WLANSecuritySwitch 1 }
+
+-- Nortel Networks BayStack 325
+sreg-BayStack325    OBJECT IDENTIFIER ::= { registration 61 }
+sreg-BayStack325-24T        OBJECT IDENTIFIER ::= { sreg-BayStack325 1 }
+sreg-BayStack325-24G        OBJECT IDENTIFIER ::= { sreg-BayStack325 2 }
+
+-- Nortel Networks Wireless LAN Access Point 2225
+sreg-WLANAccessPoint2225    OBJECT IDENTIFIER ::= { registration 62 }
+  sreg-WLANAccessPoint2225-wirelessAP
+		 OBJECT IDENTIFIER ::= { sreg-WLANAccessPoint2225 1 }
+
+
+sreg-BayStack470-24T-PWR    OBJECT IDENTIFIER ::= { registration 63 }
+  sreg-BayStack470-24T-PWR-ethSwitchNMM -- BayStack 470-24T-PWR Switch 10/100 Switch
+		 OBJECT IDENTIFIER ::= { sreg-BayStack470-24T-PWR 1 }
+
+sreg-BayStack470-48T-PWR    OBJECT IDENTIFIER ::= { registration 64 }
+  sreg-BayStack470-48T-PWR-ethSwitchNMM -- BayStack 470-48T-PWR Switch 10/100 Switch
+		 OBJECT IDENTIFIER ::= { sreg-BayStack470-48T-PWR 1 }
+
+-- Ethernet Routing Switch 5530-24TFD
+sreg-EthernetRoutingSwitch5530-24TFD OBJECT IDENTIFIER ::= { registration 65 }
+
+-- Ethernet Switch 3510-24T
+sreg-EthernetSwitch3510-24T OBJECT IDENTIFIER ::= { registration 66 }
+
+-- Nortel WLAN
+sreg-NortelWLAN OBJECT IDENTIFIER ::= { registration 67 }
+sreg-NortelWLAN2350 OBJECT IDENTIFIER ::= { sreg-NortelWLAN 1 }
+sreg-NortelWLAN2360 OBJECT IDENTIFIER ::= { sreg-NortelWLAN 2 }
+sreg-NortelWLAN2361 OBJECT IDENTIFIER ::= { sreg-NortelWLAN 3 }
+sreg-NortelWLAN2370 OBJECT IDENTIFIER ::= { sreg-NortelWLAN 4 }
+sreg-NortelWLAN2380 OBJECT IDENTIFIER ::= { sreg-NortelWLAN 5 }
+sreg-NortelMX2800   OBJECT IDENTIFIER ::= { sreg-NortelWLAN 8 }
+
+-- SMB BES
+sreg-SMB-BES OBJECT IDENTIFIER ::= { registration 68 }
+sreg-SMB-BES-GIG OBJECT IDENTIFIER ::= { sreg-SMB-BES 1 }
+sreg-SMB-BES-1010-24T     OBJECT IDENTIFIER ::= { sreg-SMB-BES-GIG 1 }
+sreg-SMB-BES-1010-48T     OBJECT IDENTIFIER ::= { sreg-SMB-BES-GIG 2 }
+sreg-SMB-BES-1020-24T-PWR OBJECT IDENTIFIER ::= { sreg-SMB-BES-GIG 3 }
+sreg-SMB-BES-1020-48T-PWR OBJECT IDENTIFIER ::= { sreg-SMB-BES-GIG 4 }
+sreg-SMB-BES-2010-24T     OBJECT IDENTIFIER ::= { sreg-SMB-BES-GIG 5 }
+sreg-SMB-BES-2010-48T     OBJECT IDENTIFIER ::= { sreg-SMB-BES-GIG 6 }
+sreg-SMB-BES-2020-24T-PWR OBJECT IDENTIFIER ::= { sreg-SMB-BES-GIG 7 }
+sreg-SMB-BES-2020-48T-PWR OBJECT IDENTIFIER ::= { sreg-SMB-BES-GIG 8 }
+
+sreg-SMB-BES-FE  OBJECT IDENTIFIER ::= { sreg-SMB-BES 2 }
+sreg-SMB-BES-110-24T     OBJECT IDENTIFIER ::= { sreg-SMB-BES-FE 1 }
+sreg-SMB-BES-110-48T     OBJECT IDENTIFIER ::= { sreg-SMB-BES-FE 2 }
+sreg-SMB-BES-120-24T-PWR OBJECT IDENTIFIER ::= { sreg-SMB-BES-FE 3 }
+sreg-SMB-BES-120-48T-PWR OBJECT IDENTIFIER ::= { sreg-SMB-BES-FE 4 }
+sreg-SMB-BES-210-24T     OBJECT IDENTIFIER ::= { sreg-SMB-BES-FE 5 }
+sreg-SMB-BES-210-48T     OBJECT IDENTIFIER ::= { sreg-SMB-BES-FE 6 }
+sreg-SMB-BES-220-24T-PWR OBJECT IDENTIFIER ::= { sreg-SMB-BES-FE 7 }
+sreg-SMB-BES-220-48T-PWR OBJECT IDENTIFIER ::= { sreg-SMB-BES-FE 8 }
+
+sreg-SMB-BES-50-FE-12T-PWR OBJECT IDENTIFIER ::= { sreg-SMB-BES 3 }
+sreg-SMB-BES-50-FE-24T-PWR OBJECT IDENTIFIER ::= { sreg-SMB-BES 4 }
+sreg-SMB-BES-50-GE-12T-PWR OBJECT IDENTIFIER ::= { sreg-SMB-BES 5 }
+sreg-SMB-BES-50-GE-24T-PWR OBJECT IDENTIFIER ::= { sreg-SMB-BES 6 }
+
+-- SMB BAP
+sreg-SMB-BAP OBJECT IDENTIFIER ::= { registration 69 }
+sreg-SMB-BAP-WirelessAccessPoint OBJECT IDENTIFIER ::= { sreg-SMB-BAP 1 }
+sreg-SMB-BAP-WirelessAccessPoint-BAP110 OBJECT IDENTIFIER ::= { sreg-SMB-BAP-WirelessAccessPoint 1 }
+sreg-SMB-BAP-WirelessAccessPoint-BAP120 OBJECT IDENTIFIER ::= { sreg-SMB-BAP-WirelessAccessPoint 2 }
+
+-- SMB BSR (Business Secure Router)
+sreg-SMB-BSR OBJECT IDENTIFIER ::= { registration 70 }
+sreg-SMB-BSR222 OBJECT IDENTIFIER ::= { sreg-SMB-BSR 1 }
+sreg-SMB-BSR252 OBJECT IDENTIFIER ::= { sreg-SMB-BSR 2 }
+
+-- ERS 45xx Series
+sreg-ERS-45xx OBJECT IDENTIFIER ::= { registration 71 }
+sreg-ERS-4548GT     OBJECT IDENTIFIER ::= { sreg-ERS-45xx 1 }
+sreg-ERS-4548GT-PWR OBJECT IDENTIFIER ::= { sreg-ERS-45xx 2 }
+sreg-ERS-4550T      OBJECT IDENTIFIER ::= { sreg-ERS-45xx 3 }
+sreg-ERS-4550T-PWR  OBJECT IDENTIFIER ::= { sreg-ERS-45xx 4 }
+sreg-ERS-4526FX     OBJECT IDENTIFIER ::= { sreg-ERS-45xx 5 }
+sreg-ERS-4526GTX-PWR OBJECT IDENTIFIER ::= { sreg-ERS-45xx 6 }
+sreg-ERS-4526GTX     OBJECT IDENTIFIER ::= { sreg-ERS-45xx 7 }
+sreg-ERS-4524GT      OBJECT IDENTIFIER ::= { sreg-ERS-45xx 8 }
+sreg-ERS-4526T-PWR   OBJECT IDENTIFIER ::= { sreg-ERS-45xx 9 }
+sreg-ERS-4526T       OBJECT IDENTIFIER ::= { sreg-ERS-45xx 10 }
+sreg-ERS-4524GT-PWR  OBJECT IDENTIFIER ::= { sreg-ERS-45xx 11 }
+sreg-ERS-4526T-PWR-PLUS  OBJECT IDENTIFIER ::= { sreg-ERS-45xx 12 }
+sreg-ERS-4550T-PWR-PLUS  OBJECT IDENTIFIER ::= { sreg-ERS-45xx 13 }
+
+-- ERS 25xx Series
+sreg-ERS-25xx OBJECT IDENTIFIER ::= { registration 72 }
+sreg-ERS-2500-26T      OBJECT IDENTIFIER ::= { sreg-ERS-25xx 1 }
+sreg-ERS-2500-26T-PWR  OBJECT IDENTIFIER ::= { sreg-ERS-25xx 2 }
+sreg-ERS-2500-50T      OBJECT IDENTIFIER ::= { sreg-ERS-25xx 3 }
+sreg-ERS-2500-50T-PWR  OBJECT IDENTIFIER ::= { sreg-ERS-25xx 4 }
+
+-- SMB BSG (Business Services Gateway)
+sreg-SMB-BSG OBJECT IDENTIFIER ::= { registration 73 }
+sreg-SMB-BSGX4E OBJECT IDENTIFIER ::= { sreg-SMB-BSG 1 }
+sreg-SMB-BSG8EW OBJECT IDENTIFIER ::= { sreg-SMB-BSG 2 }
+sreg-SMB-BSG12AW OBJECT IDENTIFIER ::= { sreg-SMB-BSG 3 }
+sreg-SMB-BSG12TW OBJECT IDENTIFIER ::= { sreg-SMB-BSG 4 }
+sreg-SMB-BSG12EW OBJECT IDENTIFIER ::= { sreg-SMB-BSG 5 }
+
+-- ERS 56xx Series
+sreg-ERS-56xx OBJECT IDENTIFIER ::= { registration 74 }
+sreg-ERS-5698-TFD-PWR  OBJECT IDENTIFIER ::= { sreg-ERS-56xx 1 }
+sreg-ERS-5698-TFD      OBJECT IDENTIFIER ::= { sreg-ERS-56xx 2 }
+sreg-ERS-5650-TD-PWR   OBJECT IDENTIFIER ::= { sreg-ERS-56xx 3 }
+sreg-ERS-5650-TD       OBJECT IDENTIFIER ::= { sreg-ERS-56xx 4 }
+sreg-ERS-5632-FD       OBJECT IDENTIFIER ::= { sreg-ERS-56xx 5 }
+
+-- ESU 18xx Series
+sreg-ESU-18xx OBJECT IDENTIFIER ::= { registration 75 }
+sreg-ESU-1860-T  OBJECT IDENTIFIER ::= { sreg-ESU-18xx 1 }
+sreg-ESU-1880-S  OBJECT IDENTIFIER ::= { sreg-ESU-18xx 2 }
+sreg-ESU-1860-V  OBJECT IDENTIFIER ::= { sreg-ESU-18xx 3 }
+sreg-ESU-1860-S  OBJECT IDENTIFIER ::= { sreg-ESU-18xx 4 }
+sreg-ESU-1860-B  OBJECT IDENTIFIER ::= { sreg-ESU-18xx 5 }
+
+-- ERS 66xx Series
+sreg-ERS-66xx OBJECT IDENTIFIER ::= { registration 76 }
+sreg-ERS-6628-XSGT OBJECT IDENTIFIER ::= { sreg-ERS-66xx 1 }
+sreg-ERS-6632-XTS  OBJECT IDENTIFIER ::= { sreg-ERS-66xx 2 }
+
+-- WC 8xxx Series
+sreg-WC-8xxx OBJECT IDENTIFIER ::= { registration 77 }
+sreg-WC-8180 OBJECT IDENTIFIER ::= { sreg-WC-8xxx 1 }
+
+-- ERS 48xx Series
+sreg-ERS-48xx OBJECT IDENTIFIER ::= { registration 78 }
+sreg-ERS-4826GTS-PWR-PLUS  OBJECT IDENTIFIER ::= { sreg-ERS-48xx 1 }
+sreg-ERS-4850GTS-PWR-PLUS  OBJECT IDENTIFIER ::= { sreg-ERS-48xx 2 }
+sreg-ERS-4826GTS           OBJECT IDENTIFIER ::= { sreg-ERS-48xx 3 }
+sreg-ERS-4850GTS           OBJECT IDENTIFIER ::= { sreg-ERS-48xx 4 }
+
+-- VSP 7xxx Series
+sreg-VSP-7xxx OBJECT IDENTIFIER ::= { registration 79 }
+sreg-VSP-7024XLS  OBJECT IDENTIFIER ::= { sreg-VSP-7xxx 1 }
+sreg-VSP-7024XT   OBJECT IDENTIFIER ::= { sreg-VSP-7xxx 2 }
+
+-- ERS 35xx Series
+sreg-ERS-35xx OBJECT IDENTIFIER ::= { registration 80 }
+sreg-ERS-3526T              OBJECT IDENTIFIER ::= { sreg-ERS-35xx 1 }
+sreg-ERS-3526T-PWR-PLUS     OBJECT IDENTIFIER ::= { sreg-ERS-35xx 2 }
+sreg-ERS-3524GT             OBJECT IDENTIFIER ::= { sreg-ERS-35xx 3 }
+sreg-ERS-3524GT-PWR-PLUS    OBJECT IDENTIFIER ::= { sreg-ERS-35xx 4 }
+sreg-ERS-3510GT             OBJECT IDENTIFIER ::= { sreg-ERS-35xx 5 }
+sreg-ERS-3510GT-PWR-PLUS    OBJECT IDENTIFIER ::= { sreg-ERS-35xx 6 }
+sreg-ERS-3549GTS            OBJECT IDENTIFIER ::= { sreg-ERS-35xx 7 }
+sreg-ERS-3549GTS-PWR-PLUS   OBJECT IDENTIFIER ::= { sreg-ERS-35xx 8 }
+sreg-ERS-3550T              OBJECT IDENTIFIER ::= { sreg-ERS-35xx 9 }
+sreg-ERS-3550T-PWR-PLUS     OBJECT IDENTIFIER ::= { sreg-ERS-35xx 10 }
+
+-- ERS 5900 Series
+sreg-ERS59xx OBJECT IDENTIFIER ::= { registration 81 }
+sreg-ERS5928GTS            OBJECT IDENTIFIER ::= { sreg-ERS59xx 1 }
+sreg-ERS5928GTS-PWR-PLUS   OBJECT IDENTIFIER ::= { sreg-ERS59xx 2 }
+sreg-ERS5952GTS            OBJECT IDENTIFIER ::= { sreg-ERS59xx 3 }
+sreg-ERS5952GTS-PWR-PLUS   OBJECT IDENTIFIER ::= { sreg-ERS59xx 4 }
+sreg-ERS5928GTS-UPWR       OBJECT IDENTIFIER ::= { sreg-ERS59xx 5 }
+sreg-ERS59100GTS           OBJECT IDENTIFIER ::= { sreg-ERS59xx 6 }
+sreg-ERS59100GTS-PWR-PLUS  OBJECT IDENTIFIER ::= { sreg-ERS59xx 7 }
+
+-- ERS 4900 Series
+sreg-ERS49 OBJECT IDENTIFIER ::= { registration 82 }
+sreg-ERS4926GTS            OBJECT IDENTIFIER ::= { sreg-ERS49 1 }
+sreg-ERS4926GTS-PWR-PLUS   OBJECT IDENTIFIER ::= { sreg-ERS49 2 }
+sreg-ERS4950GTS            OBJECT IDENTIFIER ::= { sreg-ERS49 3 }
+sreg-ERS4950GTS-PWR-PLUS   OBJECT IDENTIFIER ::= { sreg-ERS49 4 }
+
+
+-- ---------------------------------------------------------
+-- Branches under 'policy'
+-- ---------------------------------------------------------
+
+-- ---------------------------------------------------------
+-- Branches under 'bayStackMibs'
+-- ---------------------------------------------------------
+-- bayStack10Mib                 OBJECT IDENTIFIER ::= { bayStackMibs 1 }
+-- bayStackNotificationsMib      OBJECT IDENTIFIER ::= { bayStackMibs 2 }
+-- bayStackEapExtMib             OBJECT IDENTIFIER ::= { bayStackMibs 3 }
+-- nnRapidSpanningTreeMib        OBJECT IDENTIFIER ::= { bayStackMibs 4 }
+-- nnMultipleSpanningTreeMib     OBJECT IDENTIFIER ::= { bayStackMibs 5 }
+-- bayStackMulticastFloodingMib  OBJECT IDENTIFIER ::= { bayStackMibs 6 }
+-- bayStackLacpExtMib            OBJECT IDENTIFIER ::= { bayStackMibs 7 }
+-- bayStackPethExtMib            OBJECT IDENTIFIER ::= { bayStackMibs 8 }
+-- bayStackAdacMib               OBJECT IDENTIFIER ::= { bayStackMibs 9 }
+-- nortelSecureNetworkAccessMib  OBJECT IDENTIFIER ::= { bayStackMibs 10 }
+-- bayStackVrrpExtMib            OBJECT IDENTIFIER ::= { bayStackMibs 11 }
+-- bayStackStatsMib              OBJECT IDENTIFIER ::= { bayStackMibs 12 }
+-- bayStackMib                   OBJECT IDENTIFIER ::= { bayStackMibs 13 }
+-- bayStackOspfExtMib            OBJECT IDENTIFIER ::= { bayStackMibs 14 }
+-- bayStackEcmpMib               OBJECT IDENTIFIER ::= { bayStackMibs 15 }
+-- bayStackPhyTestMib            OBJECT IDENTIFIER ::= { bayStackMibs 16 }
+-- bayStackDhcpSnoopingMib       OBJECT IDENTIFIER ::= { bayStackMibs 17 }
+-- bayStackArpInspectionMib      OBJECT IDENTIFIER ::= { bayStackMibs 18 }
+-- bayStackErrorMessageMib       OBJECT IDENTIFIER ::= { bayStackMibs 19 }
+-- bayStackSourceGuardMib        OBJECT IDENTIFIER ::= { bayStackMibs 20 }
+-- bayStackRadiusMib             OBJECT IDENTIFIER ::= { bayStackMibs 21 }
+-- bayUnicastStormControlMib     OBJECT IDENTIFIER ::= { bayStackMibs 22 }
+-- bayStackSourceGuardMib        OBJECT IDENTIFIER ::= { bayStackMibs 20 }
+-- bayStackRadiusMib             OBJECT IDENTIFIER ::= { bayStackMibs 21 }
+-- bayUnicastStormControlMib     OBJECT IDENTIFIER ::= { bayStackMibs 22 }
+-- bayStackRrpMib                OBJECT IDENTIFIER ::= { bayStackMibs 23 }
+-- bayStackQInQMib               OBJECT IDENTIFIER ::= { bayStackMibs 24 }
+-- bayStackRapidPingMib          OBJECT IDENTIFIER ::= { bayStackMibs 25 }
+-- bayStackRbsMib                OBJECT IDENTIFIER ::= { bayStackMibs 26 }
+-- bayStackPimExtMib             OBJECT IDENTIFIER ::= { bayStackMibs 27 }
+-- bayStackPortMirroringMib      OBJECT IDENTIFIER ::= { bayStackMibs 28 }
+-- bayStackDdiSfpMib             OBJECT IDENTIFIER ::= { bayStackMibs 29 }
+-- bayStackVdslExtMib            OBJECT IDENTIFIER ::= { bayStackMibs 30 }
+-- bayStackNotifyControlMib      OBJECT IDENTIFIER ::= { bayStackMibs 31 }
+-- bayStackIgmpExtMib            OBJECT IDENTIFIER ::= { bayStackMibs 32 }
+-- bayStackLldpExtMedMib         OBJECT IDENTIFIER ::= { bayStackMibs 33 }
+-- bayStackNesMib                OBJECT IDENTIFIER ::= { bayStackMibs 34 }
+-- bayStackIpFwdNhMib            OBJECT IDENTIFIER ::= { bayStackMibs 35 }
+-- bayStackEdmMib                OBJECT IDENTIFIER ::= { bayStackMibs 36 }
+-- bayStackBridgeExtMib          OBJECT IDENTIFIER ::= { bayStackMibs 37 }
+-- bayStackDhcpServerMib         OBJECT IDENTIFIER ::= { bayStackMibs 38 }
+-- bayStackLldpXAvayaMib         OBJECT IDENTIFIER ::= { bayStackMibs 39 }
+-- bayStackIfExtMib              OBJECT IDENTIFIER ::= { bayStackMibs 40 }
+-- bayStackIpSecMib              OBJECT IDENTIFIER ::= { bayStackMibs 41 }
+-- bayStackStormControlMib       OBJECT IDENTIFIER ::= { bayStackMibs 42 }
+-- bayStackLinkStateTrackingMib  OBJECT IDENTIFIER ::= { bayStackMibs 43 }
+-- bayStackIpv6MldSnoopingMib    OBJECT IDENTIFIER ::= { bayStackMibs 44 }
+-- bayStackIpv6FirstHopSecMib    OBJECT IDENTIFIER ::= { bayStackMibs 45 }
+-- avayaFabricAttachMib          OBJECT IDENTIFIER ::= { bayStackMibs 46 }
+-- bayStackLldpExtDot3Mib        OBJECT IDENTIFIER ::= { bayStackMibs 47 }
+
+-- ---------------------------------------------------------
+-- Branches under 'nortelWlanMibs'
+-- ---------------------------------------------------------
+-- 
+-- 
+
+
+-- ---------------------------------------------------------
+-- Branches under 'avayaWlan9100Mibs'
+-- ---------------------------------------------------------
+-- 
+-- 
+
+
+END
+

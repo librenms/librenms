@@ -1,0 +1,86 @@
+STORMSHIELD-SERVICES-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32   FROM SNMPv2-SMI
+      DisplayString                             FROM RFC1213-MIB
+      SnmpAdminString                           FROM SNMP-FRAMEWORK-MIB
+      stormshieldMIB                            FROM STORMSHIELD-SMI-MIB;
+
+   snsServices MODULE-IDENTITY
+      LAST-UPDATED  "201702200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield services"
+      REVISION      "201702200000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 7 }
+
+   snsServicesTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsServicesEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "List of running services"
+      ::= { snsServices 1 }
+
+   snsServicesEntry OBJECT-TYPE
+      SYNTAX SnsServicesEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "Each entry in the snsServicesTable holds a set of information
+         (Service name, status, and uptime)."
+      INDEX { snsServicesIndex }
+      ::= { snsServicesTable 1 }
+
+   SnsServicesEntry ::= SEQUENCE {
+      snsServicesIndex         INTEGER,
+      snsServicesName          SnmpAdminString,
+      snsServicesState         Integer32,
+      snsServicesUptime        Integer32
+   }
+
+   snsServicesIndex OBJECT-TYPE
+      SYNTAX INTEGER (1..65535)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "A unique value for the table. Its value
+         ranges between 1 and 65535 and may not be contigous.
+         the index has no other meaning but a pure index"
+      ::= { snsServicesEntry 1 }
+
+   snsServicesName OBJECT-TYPE
+      SYNTAX SnmpAdminString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Service name"
+      ::= { snsServicesEntry 2 }
+
+   snsServicesState OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "State value can be 0/1 according as the service is down/up"
+      ::= { snsServicesEntry 3 }
+
+   snsServicesUptime OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Uptime"
+   ::= { snsServicesEntry 4 }
+
+END

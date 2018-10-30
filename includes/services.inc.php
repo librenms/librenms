@@ -137,9 +137,6 @@ function poll_service($service)
     // Some debugging
     d_echo("\nNagios Service - $service_id\n");
     // the check_service function runs $check_cmd through escapeshellcmd, so
-    // echo the command as it will be run after being escaped
-    $escaped_check_cmd = escapeshellcmd($check_cmd);
-    d_echo("Request:  $escaped_check_cmd\n");
     list($new_status, $msg, $perf) = check_service($check_cmd);
     d_echo("Response: $msg\n");
 
@@ -186,6 +183,19 @@ function poll_service($service)
         $update['service_changed'] = time();
         $update['service_status'] = $new_status;
         $update['service_message'] = $msg;
+
+        // TODO: Put the 3 lines below in a function getStatus(int) ?
+        $status_text = array(0 => 'OK', 1 => 'Warning', 3 => 'Unknown');
+        $old_status_text = isset($status_text[$old_status]) ? $status_text[$old_status] : 'Critical';
+        $new_status_text = isset($status_text[$new_status]) ? $status_text[$new_status] : 'Critical';
+
+        log_event(
+            "Service '{$service['service_type']}' changed status from $old_status_text to $new_status_text - {$service['service_desc']} - $msg",
+            $service['device_id'],
+            'service',
+            4,
+            $service['service_id']
+        );
     }
 
     if ($service['service_message'] != $msg) {
@@ -208,10 +218,16 @@ function check_service($command)
     $valid_uom = array ('us', 'ms', 'KB', 'MB', 'GB', 'TB', 'c', 's', '%', 'B');
 
     // Make our command safe.
-    $command = 'LC_NUMERIC="C" '. escapeshellcmd($command);
+    $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim($command));
+    $safe_command = implode(' ', array_map(function ($part) {
+        $trimmed = preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $part);
+        return escapeshellarg($trimmed);
+    }, $parts));
+
+    d_echo("Request:  $safe_command\n");
 
     // Run the command and return its response.
-    exec($command, $response_array, $status);
+    exec('LC_NUMERIC="C" ' . $safe_command, $response_array, $status);
 
     // exec returns an array, lets implode it back to a string.
     $response_string = implode("\n", $response_array);
@@ -300,4 +316,21 @@ function check_service($command)
     }
 
     return array ($status, $response, $metrics);
+}
+
+/**
+ * List all available services from nagios plugins directory
+ *
+ * @return array
+ */
+function list_available_services()
+{
+    global $config;
+    $services = array();
+    foreach (scandir($config['nagios_plugins']) as $file) {
+        if (substr($file, 0, 6) === 'check_') {
+            $services[] = substr($file, 6);
+        }
+    }
+    return $services;
 }

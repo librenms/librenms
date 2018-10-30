@@ -1,0 +1,3286 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-ISIS-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-ISIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InterfaceIndex
+        FROM IF-MIB
+    InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
+    routingProtocols
+        FROM PRVT-SWITCH-MIB
+    Counter32, Gauge32, Integer32, IpAddress, MODULE-IDENTITY, 
+    OBJECT-TYPE, TimeTicks, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtIsisMIB MODULE-IDENTITY
+    LAST-UPDATED "201002120000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The MIB module for management of the IS-IS protocol."
+    REVISION    "201002120000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { routingProtocols 4 }
+
+
+PrvtIsisInetAddressType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "A value that represents a type of Internet address."
+    SYNTAX      INTEGER { unknown(0), ipv4(1), ipv6(2), ipv4z(3), 
+                    ipv6z(4), dns(5) }
+
+PrvtIsisInetAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION 
+        "An IPv4 IPv6 address depending upon the value of a
+         matching InetAddressType object.
+         An IPv4 address consiats of 4 octets in network-byte order.
+         An IPv6 address consiats of 16 octets in network-byte order"
+    SYNTAX      OCTET STRING (SIZE(4 | 16))
+
+PrvtIsisIPv4Address ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d"
+    STATUS      current
+    DESCRIPTION 
+        "An IPv4 address consisting of 4 octets in network-byte order.
+         A length of zero octets represents no IP address has been
+         assigned."
+    SYNTAX      OCTET STRING (SIZE(0 | 4))
+
+PrvtIsisIPv6Address ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x"
+    STATUS      current
+    DESCRIPTION 
+        "An IPv4 address consisting of 16 octets in network-byte order.
+         A length of zero octets represents no IP address has been
+         assigned."
+    SYNTAX      OCTET STRING (SIZE(0 | 16))
+
+PrvtIsisHostName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255t"
+    STATUS      current
+    DESCRIPTION 
+        "A valid host name."
+    SYNTAX      OCTET STRING
+
+PrvtIsisAuthUserDataString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION 
+        "Authentication user data."
+    SYNTAX      OCTET STRING
+
+PrvtIsisOSINSAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION 
+        "OSI Network Service Address, e.g. NSAP, SNPA, or Network
+         Entity Title"
+    SYNTAX      OCTET STRING (SIZE(1..20))
+
+PrvtIsisSystemID ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION 
+        "A ID for an Intermediate System. This should
+         be unique within a network, and is included
+         in all PDUs originated by an Intermediate System.
+         The protocol does not place any meanings upon
+         the bits, other than using ordering to break
+         ties in electing a Designated IS on a LAN."
+    SYNTAX      OCTET STRING
+
+PrvtIsisLinkStatePDUID ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION 
+        "A Link State PDU Identifier."
+    SYNTAX      OCTET STRING (SIZE(8))
+
+PrvtIsisAdminState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Type used in enabling and disabling a row."
+    SYNTAX      INTEGER { on(1), off(2) }
+
+PrvtIsisLSPBuffSize ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Integer sub range for maximum LSP size."
+    SYNTAX      Integer32 (512..16000)
+
+PrvtIsisLevelState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "States of the IS-IS protocol."
+    SYNTAX      INTEGER { off(1), on(2), waiting(3), overloaded(4) }
+
+PrvtIsisDefaultMetric ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Integer sub-range for default metric for single hop.
+         ISO 10589 provides for 4 types of metric. Only the
+         'default' metric is used in practice."
+    SYNTAX      Integer32 (0..63)
+
+PrvtIsisWideMetric ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Wide Metric for IS Neighbors. ISO 10589 provides a
+         6 bit metric. Traffic Engineering extensions provide
+         24 bit metrics."
+    SYNTAX      Unsigned32 (0..16777215)
+
+PrvtIsisFullMetric ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Full Metric for IP Routes. Traffic Engineering extensions
+         provide 32 bit metrics."
+    SYNTAX      Unsigned32
+
+PrvtIsisMetricType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Is this an Internal or External Metric?"
+    SYNTAX      INTEGER { internal(1), external(2) }
+
+PrvtIsisMetricStyle ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Do we use 1195 style Metrics or wide metrics."
+    SYNTAX      INTEGER { narrow(1), wide(2), both(3) }
+
+PrvtIsisISLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Identifies a level."
+    SYNTAX      INTEGER { none(0), area(1), domain(2) }
+
+PrvtIsisCircuitID ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION 
+        "ID for a circuit."
+    SYNTAX      OCTET STRING
+
+PrvtIsisISPriority ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Integer sub-range for IS-IS priority."
+    SYNTAX      Integer32 (0..127)
+
+PrvtIsisUnsigned16TC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "An Unsigned32 further restricted to 16 Bits. Note that
+         the ASN.1 BER encoding may still require 24 Bits for
+         some values."
+    SYNTAX      Unsigned32 (0..65535)
+
+PrvtIsisUnsigned16NoZeroTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Same as Unsigned16TC, except that 0 is not permitted."
+    SYNTAX      Unsigned32 (1..65535)
+
+PrvtIsisMaxAgeTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "TC for prvtIsisSysMaxAge."
+    SYNTAX      Unsigned32 (350..65535)
+
+PrvtIsisReceiveLSPBufferSizeTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "TC for prvtIsisSysReceiveLSPBufferSize"
+    SYNTAX      Unsigned32 (1492..16000)
+
+PrvtIsisUnsigned8TC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "An Unsigned32 further restricted to 8 Bits. Note that
+         the ASN.1 BER encoding may still require 16 Bits for
+         some values."
+    SYNTAX      Unsigned32 (0..255)
+
+PrvtIsisOperStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The current operational state of an IS-IS entity."
+    SYNTAX      INTEGER { operStatusUp(1), operStatusDown(2), 
+                    operStatusGoingUp(3), operStatusGoingDown(4), 
+                    operStatusActFailed(5) }
+
+PrvtIsisSysRestartType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The type of restart procedures to follow
+         when IS-IS activates."
+    SYNTAX      INTEGER { none(0), start(1), restart(2) }
+
+prvtIsisMIBObjects OBJECT IDENTIFIER
+    ::= { prvtIsisMIB 1 }
+
+prvtIsisSystem OBJECT IDENTIFIER
+    ::= { prvtIsisMIBObjects 1 }
+
+prvtIsisSysTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIsisSysEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The set of instances of the Integrated IS-IS
+         protocol existing on the system."
+    ::= { prvtIsisSystem 1 }
+
+prvtIsisSysEntry OBJECT-TYPE
+    SYNTAX      PrvtIsisSysEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row defines information specific to a single
+         instance of the IS-IS protocol existing on the system."
+    REFERENCE   
+        "{ISIS.poi cLNSISISBasic-P (1)}"
+    INDEX       { prvtIsisSysInstance }
+    ::= { prvtIsisSysTable 1 }
+
+PrvtIsisSysEntry ::= SEQUENCE {
+    prvtIsisSysInstance                 Integer32,
+    prvtIsisSysExistState               RowStatus,
+    prvtIsisSysVersion                  INTEGER,
+    prvtIsisSysType                     INTEGER,
+    prvtIsisSysID                       PrvtIsisSystemID,
+    prvtIsisSysMaxPathSplits            Integer32,
+    prvtIsisSysMaxLSPGenInt             Integer32,
+    prvtIsisSysPollESHelloRate          PrvtIsisUnsigned16NoZeroTC,
+    prvtIsisSysWaitTime                 PrvtIsisUnsigned16NoZeroTC,
+    prvtIsisSysShutdown                 TruthValue,
+    prvtIsisSysL2toL1Leaking            TruthValue,
+    prvtIsisSysMaxAge                   PrvtIsisMaxAgeTC,
+    prvtIsisSysReceiveLSPBufferSize     PrvtIsisReceiveLSPBufferSizeTC,
+    prvtIsisSysOperStatus               PrvtIsisOperStatus,
+    prvtIsisSysAllowAutoI3Config        TruthValue,
+    prvtIsisSysCalcMaxDelay             Unsigned32,
+    prvtIsisSysCalcThrshUpdStart        Unsigned32,
+    prvtIsisSysCalcThrshUpdRestart      Unsigned32,
+    prvtIsisSysCalcThrshRestartLimit    Unsigned32,
+    prvtIsisSysCalcPauseFreq            Unsigned32,
+    prvtIsisSysCheckChecksums           Unsigned32,
+    prvtIsisSysZeroAgeLifetime          Integer32,
+    prvtIsisSysNumUpdPending            Gauge32,
+    prvtIsisSysNumUpdMerged             Counter32,
+    prvtIsisSysNumCksumsPending         Gauge32,
+    prvtIsisSysTEMetricPcntge           Integer32,
+    prvtIsisSysMaxBwidthPcntge          Integer32,
+    prvtIsisSysMaxResBwidthPcntge       Integer32,
+    prvtIsisSysUnresBwidthPcntge        Integer32,
+    prvtIsisSysMaxLSPBwidthPcntge       Integer32,
+    prvtIsisSysMinLSPBwidthPcntge       Integer32,
+    prvtIsisSysMTUSizePcntge            Integer32,
+    prvtIsisSysTERouterID               IpAddress,
+    prvtIsisSysIPv6TERouterID           PrvtIsisIPv6Address,
+    prvtIsisSysMaxExternalRoutes        Unsigned32,
+    prvtIsisSysMaxExternalRoutesAct     INTEGER,
+    prvtIsisSysLspFullSuppress          INTEGER,
+    prvtIsisSysLspFullSetDBOL           TruthValue,
+    prvtIsisSysRestartHelpPeer          TruthValue,
+    prvtIsisSysRestartActivationType    PrvtIsisSysRestartType,
+    prvtIsisSysRestartAutoResetType     PrvtIsisSysRestartType,
+    prvtIsisSysRestartAdjacencyWait     Integer32,
+    prvtIsisSysMaxRecoveryTime          Integer32,
+    prvtIsisSysClearStats               TruthValue,
+    prvtIsisSysSetAttached              INTEGER,
+    prvtIsisSysProtSupported            BITS,
+    prvtIsisSysRstrctLanAdjsToSubnet    TruthValue,
+    prvtIsisSysHostName                 PrvtIsisHostName,
+    prvtIsisSysCalcSoonAfterCircChng    TruthValue,
+    prvtIsisSysSendNotifications        BITS,
+    prvtIsisSysLvl1OrigLSPBuffSize      PrvtIsisLSPBuffSize,
+    prvtIsisSysLvl1MinLSPGenInt         PrvtIsisUnsigned16NoZeroTC,
+    prvtIsisSysLvl1OverloadState        PrvtIsisLevelState,
+    prvtIsisSysLvl1SetOverload          TruthValue,
+    prvtIsisSysLvl1SetOverloadUntil     TimeTicks,
+    prvtIsisSysLvl1MetricStyle          PrvtIsisMetricStyle,
+    prvtIsisSysLvl1SPFConsiders         PrvtIsisMetricStyle,
+    prvtIsisSysLvl1TEEnabled            TruthValue,
+    prvtIsisSysLvl1IPv6TEEnabled        TruthValue,
+    prvtIsisSysLvl1RestartT2Duration    Integer32,
+    prvtIsisSysLvl1AuthUser             PrvtIsisAuthUserDataString,
+    prvtIsisSysLvl2OrigLSPBuffSize      PrvtIsisLSPBuffSize,
+    prvtIsisSysLvl2MinLSPGenInt         PrvtIsisUnsigned16NoZeroTC,
+    prvtIsisSysLvl2OverloadState        PrvtIsisLevelState,
+    prvtIsisSysLvl2SetOverload          TruthValue,
+    prvtIsisSysLvl2SetOverloadUntil     TimeTicks,
+    prvtIsisSysLvl2MetricStyle          PrvtIsisMetricStyle,
+    prvtIsisSysLvl2SPFConsiders         PrvtIsisMetricStyle,
+    prvtIsisSysLvl2TEEnabled            TruthValue,
+    prvtIsisSysLvl2IPv6TEEnabled        TruthValue,
+    prvtIsisSysLvl2RestartT2Duration    Integer32,
+    prvtIsisSysLvl2AuthUser             PrvtIsisAuthUserDataString
+}
+
+prvtIsisSysInstance OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The unique identifier of the Integrated IS-IS
+         instance to which this row corresponds."
+    ::= { prvtIsisSysEntry 1 }
+
+prvtIsisSysExistState OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The existence state (RowStatus) of the IS-IS router.
+         Setting this to state 'destroy' forces the router to
+         forget all the current configuration. Setting the
+         state to 'notInService' stops protocol processing, but
+         retains the configuration."
+    ::= { prvtIsisSysEntry 2 }
+
+prvtIsisSysVersion OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(0), one(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The version number of the IS-IS protocol that
+         is implemented."
+    REFERENCE   
+        "{ISIS.aoi version (1)}"
+    ::= { prvtIsisSysEntry 3 }
+
+prvtIsisSysType OBJECT-TYPE
+    SYNTAX      INTEGER { level1IS(1), level2IS(2), level1L2IS(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "At which levels is the Intermediate System
+         running? This object follows the
+         ReplaceOnlyWhileDisabled behavior."
+    REFERENCE   
+        "{ISIS.aoi iSType (2)}"
+    ::= { prvtIsisSysEntry 4 }
+
+prvtIsisSysID OBJECT-TYPE
+    SYNTAX      PrvtIsisSystemID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The ID for this instance of the Integrated IS-IS
+         protocol. This value is appended to each of the
+         area addresses to form the Network Entity Titles.
+         This value is a 6 byte MAC address.
+         
+         This object follows the ReplaceOnlyWhileDisabled
+         behavior."
+    REFERENCE   
+        "{ISIS.aoi systemId (119)}"
+    ::= { prvtIsisSysEntry 5 }
+
+prvtIsisSysMaxPathSplits OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Maximum number of paths with equal routing metric value
+         which it is permitted to split between. This object
+         follows the ReplaceOnlyWhileDisabled behavior."
+    REFERENCE   
+        "{ISIS.aoi maximumPathSplits (3)}"
+    ::= { prvtIsisSysEntry 6 }
+
+prvtIsisSysMaxLSPGenInt OBJECT-TYPE
+    SYNTAX      Integer32 (1..65235)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Maximum interval, in seconds, between generated LSPs
+         by this instance of the protocol. This object follows
+         the ResettingTimer behavior. The value must be
+         greater than any value configured for
+         prvtIsisSysLevelxMinLSPGenInt, and should be at least 300
+         seconds less than prvtIsisSysMaxAge."
+    REFERENCE   
+        "{ISIS.aoi maximumLSPGenerationInterval (6)}"
+    ::= { prvtIsisSysEntry 7 }
+
+prvtIsisSysPollESHelloRate OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned16NoZeroTC
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value, in seconds, to be used for the suggested ES
+         configuration timer in ISH PDUs when soliciting the ES
+         configuration."
+    REFERENCE   
+        "{ISIS.aoi pollESHelloRate (13)}"
+    ::= { prvtIsisSysEntry 8 }
+
+prvtIsisSysWaitTime OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned16NoZeroTC
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Number of seconds to delay in state 'waiting' before
+         entering the state 'on'. This object follows the ResettingTimer
+         behavior."
+    REFERENCE   
+        "{ISIS.aoi waitingTime (15)}"
+    ::= { prvtIsisSysEntry 9 }
+
+prvtIsisSysShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The administrative state of this instance of the
+         Integrated IS-IS protocol. Setting this object to the
+         value 'false' when its current value is 'true' enables operation
+         of this instance of the Integrated IS-IS protocol."
+    ::= { prvtIsisSysEntry 10 }
+
+prvtIsisSysL2toL1Leaking OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If true, allow the router to leak L2 routes into L1."
+    ::= { prvtIsisSysEntry 11 }
+
+prvtIsisSysMaxAge OBJECT-TYPE
+    SYNTAX      PrvtIsisMaxAgeTC
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Value to place in RemainingLifeTime field of
+         the LSPs we generate.
+         This should be at least 300 seconds greater than
+         prvtIsisSysMaxLSPGenInt."
+    ::= { prvtIsisSysEntry 12 }
+
+prvtIsisSysReceiveLSPBufferSize OBJECT-TYPE
+    SYNTAX      PrvtIsisReceiveLSPBufferSizeTC
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Size of the largest buffer we are designed or
+         configured to store. This should be at least
+         as big as the maximum prvtIsisSysLevelxOrigLSPBuffSize
+         supported by the system.
+         
+         If resources allow, we will store and flood LSPs
+         larger than prvtIsisSysReceiveLSPBufferSize, as this
+         can help avoid problems in networks with different
+         values for prvtIsisSysLevelxOrigLSPBuffSize."
+    ::= { prvtIsisSysEntry 13 }
+
+prvtIsisSysOperStatus OBJECT-TYPE
+    SYNTAX      PrvtIsisOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current operational status of this instance of the
+         Protocol Manager component of IS-IS.
+         
+         Note that IS-IS can only activate if there is at least
+         one active entry in the prvtIsisManAreaAddrTable."
+    ::= { prvtIsisSysEntry 14 }
+
+prvtIsisSysAllowAutoI3Config OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If 'true' then add IP addresses received from the I3 stub
+         to the prvtIsisCircIPAddrTable with admin state 'on'. If
+         'false' then add them with admin state 'off'. This field
+         follows the ReplaceOnlyWhileDisabled behavior."
+    ::= { prvtIsisSysEntry 15 }
+
+prvtIsisSysCalcMaxDelay OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..120000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum delay before the Routing Table is
+         recalculated following a change to the Link State
+         Database. (Recalculation is delayed to reduce the
+         frequency of recalculations of the Routing Table).
+         
+         This parameter has units of milliseconds. A value of
+         0 indicates that a routing calculation will
+         immediately follow an update to the database."
+    ::= { prvtIsisSysEntry 16 }
+
+prvtIsisSysCalcThrshUpdStart OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This parameter can be used to override the routing
+         calculation delay indicated by the prvtIsisSysCalcMaxDelay
+         parameter when the number of updates to the Link State
+         Database reaches a threshold value.
+         
+         This parameter specifies the threshold number of updates
+         that can be made to the Link State Database such that any
+         subsequent update to the database causes a full routing
+         calculation to start immediately.
+         
+         - 0 indicates that a routing calculation will immediately
+         follow an update to the database.
+         
+         - 0xFFFFFFFF indicates that this threshold is infinite, and
+         hence the timing of a routing calculation is determined
+         solely by the configured calculation delay."
+    ::= { prvtIsisSysEntry 17 }
+
+prvtIsisSysCalcThrshUpdRestart OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This parameter can be used to interrupt a full routing
+         calculation when the number of pending updates to the Link
+         State Database has reached a threshold value.
+         
+         This parameter specifies the threshold number of updates
+         that can be made to the Link State Database such that any
+         subsequent update to the database causes the current
+         routing calculation to be interrupted, and a new
+         calculation to start using an up to date Link State
+         Database.
+         
+         - 0 indicates that an update to the Link State Database
+         will cause any current routing calculation to be
+         interrupted and a new one to start.
+         
+         - 0xFFFFFFFF indicates that this threshold is infinite, and
+         hence no number of pending updates to the database will
+         cause a routing calculation to be interrupted."
+    ::= { prvtIsisSysEntry 18 }
+
+prvtIsisSysCalcThrshRestartLimit OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This parameter limits the number of consecutive times a
+         routing calculation can be interrupted by new updates.
+         This guarantees that the routing calculation will actually
+         complete.
+         
+         - 1 indicates that once a calculation has been interrupted
+         once, it will not be interrupted again.
+         
+         - 0xFFFFFFFF indicates that the calculation can always be
+         interrupted."
+    ::= { prvtIsisSysEntry 19 }
+
+prvtIsisSysCalcPauseFreq OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This value determines how regularly a Routing Calculation
+         is paused. It is measured in points.  The points scale
+         roughly maps to a time scale, so that the larger this value
+         is, the longer the Routing Calculation runs before pausing.
+         
+         - 0 indicates that the routing calculation is paused after
+         every calculation step.
+         
+         - 0xFFFFFFFF indicates that the Routing Calculation is
+         never paused."
+    ::= { prvtIsisSysEntry 20 }
+
+prvtIsisSysCheckChecksums OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This value determines how often the checksums of LSPs in
+         the Link State Database are checked. If 0, no checksums
+         in the database are checked."
+    ::= { prvtIsisSysEntry 21 }
+
+prvtIsisSysZeroAgeLifetime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This is the minimum amount of time in seconds for which the
+         header of an expired LSP shall be retained after it has
+         been flooded with zero Remaining Lifetime. All that is
+         required is that the header be retained until the zero
+         Remaining Lifetime LSP has been safely propagated to all
+         the neighbors."
+    ::= { prvtIsisSysEntry 22 }
+
+prvtIsisSysNumUpdPending OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of updates that are pending addition to the Link
+         State Database."
+    ::= { prvtIsisSysEntry 23 }
+
+prvtIsisSysNumUpdMerged OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of updates that have been merged into the Link
+         State Database since the last routing calculation."
+    ::= { prvtIsisSysEntry 24 }
+
+prvtIsisSysNumCksumsPending OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of LSPs in the Link State Database which are now
+         due to have their checksum checked."
+    ::= { prvtIsisSysEntry 25 }
+
+prvtIsisSysTEMetricPcntge OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Traffic Engineering metric is updated in real-time by
+         the I3 Stub. In order to increase performance and reduce
+         network traffic, this parameter determines the minimal
+         percentage change of the TE metric that causes a new LSP
+         to be originated."
+    ::= { prvtIsisSysEntry 26 }
+
+prvtIsisSysMaxBwidthPcntge OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum bandwidth on an interface is updated in
+         real-time by the I3 Stub. In order to increase performance
+         and reduce network traffic, this parameter determines the
+         minimal percentage change of maximum bandwidth that causes
+         a new LSP to be originated."
+    ::= { prvtIsisSysEntry 27 }
+
+prvtIsisSysMaxResBwidthPcntge OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum reservable bandwidth on an interface is updated
+         in real-time by the I3 Stub. In order to increase
+         performance and reduce network traffic, this parameter
+         determines the minimal percentage change of maximum
+         reservable bandwidth that causes a new LSP to be
+         originated."
+    ::= { prvtIsisSysEntry 28 }
+
+prvtIsisSysUnresBwidthPcntge OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The unreserved bandwidth on an interface is updated in
+         real-time by the I3 Stub. In order to increase performance
+         and reduce network traffic, this parameter determines the
+         minimal percentage change of unreserved bandwidth that
+         causes a new LSP to be originated."
+    ::= { prvtIsisSysEntry 29 }
+
+prvtIsisSysMaxLSPBwidthPcntge OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum LSP bandwidth for the various switching
+         descriptors on an interface is updated in real-time by the
+         I3 Stub. In order to increase performance and reduce
+         network traffic, this parameter determines the minimal
+         percentage change of maximum LSP bandwidth that causes a
+         new LSP to be originated."
+    ::= { prvtIsisSysEntry 30 }
+
+prvtIsisSysMinLSPBwidthPcntge OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The minimum LSP bandwidth for the various switching
+         descriptors on an interface is updated in real-time by the
+         I3 Stub. In order to increase performance and reduce
+         network traffic, this parameter determines the minimal
+         percentage change of minmimum LSP bandwidth that causes a
+         new LSP to be originated."
+    ::= { prvtIsisSysEntry 31 }
+
+prvtIsisSysMTUSizePcntge OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Maximum Transmission Unit size for the various
+         switching descriptors on an interface is updated in
+         real-time by the I3 Stub. In order to increase performance
+         and reduce network traffic, this parameter determines the
+         minimal percentage change of the Maximum Transmission Unit
+         that causes a new LSP to be originated."
+    ::= { prvtIsisSysEntry 32 }
+
+prvtIsisSysTERouterID OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Local IPv4 TE Router ID. This is a single stable IPv4
+         address that can always be referenced in a path that will
+         be reachable from multiple hops away, regardless of the
+         state of the node's interfaces.
+         
+         This field is ignored if prvtIsisSysLevelxTEEnabled is 'false'."
+    ::= { prvtIsisSysEntry 33 }
+
+prvtIsisSysIPv6TERouterID OBJECT-TYPE
+    SYNTAX      PrvtIsisIPv6Address
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Local IPv6 TE Router ID. This is a single stable IPv6
+         global address that can always be referenced in a path that
+         will be reachable from multiple hops away, regardless of
+         the state of the node's interfaces.
+         
+         This field is ignored if prvtIsisSysLevelxIPv6TEEnabled is
+         'false'."
+    ::= { prvtIsisSysEntry 34 }
+
+prvtIsisSysMaxExternalRoutes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum number of static routes and routes
+         redistributed from other protocols that will be accepted.
+         
+         The action that will be taken when the maximum is
+         exceeded is controlled by prvtIsisSysMaxExternalRoutesAct.
+         
+         0xFFFFFFFF is a special value indicating that the threshold
+         is infinite."
+    ::= { prvtIsisSysEntry 35 }
+
+prvtIsisSysMaxExternalRoutesAct OBJECT-TYPE
+    SYNTAX      INTEGER { log(1), suppressExternal(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The action that will be take whenn the number of
+         external routes exceeds prvtIsisSysMaxExternalRoutes.
+         
+         If set to 'log', IS-IS will alert the administrator by
+         logging that the limit has been exceeded.
+         
+         If set to 'suppressExternal', IS-IS will remove all
+         external routes from the local LSP (at all active levels)
+         in addition to logging the problem.
+         
+         In both cases, the administrator is responsible for
+         correcting the configuration to reduce the number of
+         redistributed external routes.
+         
+         In the 'suppressExternal' case, the system
+         is responsible for resynchronizing the set of routes with
+         IS-IS."
+    ::= { prvtIsisSysEntry 36 }
+
+prvtIsisSysLspFullSuppress OBJECT-TYPE
+    SYNTAX      INTEGER { external(1), none(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The set of routes (if any) that will be removed from the
+         local LSP when the local LSP becomes full at
+         either level.
+         
+         When set to 'external', all static routes and routes
+         redistributed from other protocols will be removed from the
+         local LSP (at all active levels) when the local LSP is
+         full.
+         
+         If set to 'none', IS-IS will be unable to accept any
+         additional configuration that may increase the size of the
+         local LSP.
+         
+         The system administrator should modify the system
+         configuration to reduce the local LSP size - for example,
+         by reducing the number of addresses redistributed from
+         other routing protocols, or by deleting circuit
+         configuration.
+         
+         Once this has been done, if prvtIsisSysLspFullSuppress is set
+         to 'external', the system is responsible
+         for resynchronizing the set of routes with ISIS."
+    ::= { prvtIsisSysEntry 37 }
+
+prvtIsisSysLspFullSetDBOL OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If set to 'true', the database overload flag will be set
+         in the local LSP (at all active levels) when the local
+         LSP becomes full (at either level).
+         
+         The administrator can clear the database overload flag for
+         a level by setting prvtIsisSysLevelxSetOverload to 'false' for
+         that level."
+    ::= { prvtIsisSysEntry 38 }
+
+prvtIsisSysRestartHelpPeer OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates if the procedures defined in the IS-IS restart
+         RFC (3847) for helping a peer to restart is implemented.
+         
+         Note that this object has no effect on the local restart
+         behavior, and so may be set independently of
+         prvtIsisSysRestartActivationType and
+         prvtIsisSysRestartAutoResetType."
+    ::= { prvtIsisSysEntry 39 }
+
+prvtIsisSysRestartActivationType OBJECT-TYPE
+    SYNTAX      PrvtIsisSysRestartType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object is only used when IS-IS is manually activated
+         or deactivated (in other words, enters or leaves the state
+         with row status 'active' and admin status 'on'), and
+         indicates which restart procedures (if any) are followed.
+         
+         During the activation period, IS-IS will use the value
+         that was configured at the start of activation. The value
+         may be changed at any time, but the new value will only
+         take effect the next time that manual activation takes
+         place.
+         
+         During deactivation, IS-IS will purge the local LSP from
+         remote nodes if this object is set to 'none' or 'start'.
+         Setting the object to 'restart' before deactivation will
+         prevent the local LSP from being purged.
+         
+         A planned restart may be initiated by setting
+         prvtIsisSysShutdown to 'true' and later to 'false'. Graceful
+         restart procedures will only function correctly if the
+         local LSP has not been purged, and so to initiate a planned
+         restart, prvtIsisSysRestartActivationType should be set to
+         'restart' before deactivation."
+    ::= { prvtIsisSysEntry 40 }
+
+prvtIsisSysRestartAutoResetType OBJECT-TYPE
+    SYNTAX      PrvtIsisSysRestartType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "There are cases where the IS-IS protocol requires the local
+         node to automatically deactivate and later reactivate.
+         This object indicates which restart procedures (if any) are
+         followed during such an automatic reset.
+         
+         During the activation period, IS-IS will use the value
+         that was configured at the start of activation. The value
+         may be changed at any time, but the new value will only
+         take effect the next time that automatic re-activation
+         takes place."
+    ::= { prvtIsisSysEntry 41 }
+
+prvtIsisSysRestartAdjacencyWait OBJECT-TYPE
+    SYNTAX      Integer32 (1..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object is only used when IS-IS activates with
+         the activation type (prvtIsisSysRestartActivationType or
+         prvtIsisSysRestartAutoResetType) set to 'start' or 'restart'.
+         
+         It defines how long IS-IS will wait to establish
+         adjacencies before completing the start/restart.
+         
+         This object follows the ResettingTimer behavior."
+    ::= { prvtIsisSysEntry 42 }
+
+prvtIsisSysMaxRecoveryTime OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object is only used when IS-IS activates with
+         the activation type (prvtIsisSysRestartActivationType or
+         prvtIsisSysRestartAutoResetType) set to 'restart'.
+         
+         It defines the maximum time that IS-IS will take before
+         completing restart procedures.
+         
+         The value specified puts an upper bound on the duration of
+         the T3 timer described in the IS-IS restart RFC (3847).
+         The actual duration of the timer is the minimum of the value
+         specified and the minimum remaining holding time received
+         on an adjacency.
+         
+         This object follows the ResettingTimer behavior."
+    ::= { prvtIsisSysEntry 43 }
+
+prvtIsisSysClearStats OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to clear all system statistics, including the
+         prvtIsisSystemCounter and prvtIsisPacketCounter tables.
+         
+         Note that prvtIsisSysStatsLSPCount is not reset by this object.
+         
+         Reading the value of this field has no meaning."
+    ::= { prvtIsisSysEntry 44 }
+
+prvtIsisSysSetAttached OBJECT-TYPE
+    SYNTAX      INTEGER { attachNoOverlapOrRedist(1), 
+                    attachNoOverlapOnly(2), attachSet(3), attachClear(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If IS-IS is operating at both level 1 and level 2, this
+         field indicates how IS-IS should decide whether to set the
+         attached bit in its level 1 LSP.
+         
+         - 'attachNoOverlapOrRedist' indicates that the attached bit
+         should be set if either of the following are true.
+         - The IS can reach at least one other area (the IS is
+         adjacent with a L2 router whose area addresses do not
+         overlap with the area addresses we know about at L1).
+         - The IS is redistributing one or more external routes
+         into the AS.
+         
+         - 'attachNoOverlapOnly' indicates that the attached bit
+         should be set only if the IS can reach at least one other
+         area.
+         
+         - 'attachSet' indicates that the attached bit should always
+         be set.
+         
+         - 'attachClear' indicates that the attached bit should
+         never be set."
+    ::= { prvtIsisSysEntry 45 }
+
+prvtIsisSysProtSupported OBJECT-TYPE
+    SYNTAX      BITS { reserved(0), ipv4(1), ipv6(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This attribute contains the set of protocols supported by
+         this Intermediate System."
+    ::= { prvtIsisSysEntry 46 }
+
+prvtIsisSysRstrctLanAdjsToSubnet OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object only affects IPv4 broadcast circuits. If this
+         is set to 'true', IS-IS will only form adjacencies with
+         intermediate systems that are on the same subnet as the
+         local circuit. This object only has effect when the I3
+         Stub is used to determine subnet addresses and is ignored
+         otherwise."
+    ::= { prvtIsisSysEntry 47 }
+
+prvtIsisSysHostName OBJECT-TYPE
+    SYNTAX      PrvtIsisHostName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The string that this instance of IS-IS will use as the
+         local hostname.
+         
+         This is advertised to other Intermediate Systems in the
+         Dynamic Hostname TLV."
+    ::= { prvtIsisSysEntry 48 }
+
+prvtIsisSysCalcSoonAfterCircChng OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set this object to 'true' to minimize the delay before
+         triggering a routing calculation that includes any
+         relevant circuit change. This means a change to the local
+         neighbors (including pseudonodes), or to the reachable
+         addresses received from the I3 stub.
+         
+         There are two aspects to minimizing the delay.
+         
+         - IS-IS overrides the setting of the
+         prvtIsisSysLevelMinLSPGenInt object when such a change
+         occurs, and usually regenerates the local LSP(s)
+         immediately. The only exception is when IS-IS is
+         performing restart procedures as defined in RFC3847.
+         This RFC specifies when IS-IS can update the local
+         LSP during a restart.
+         
+         - IS-IS overrides all of the objects that affect the
+         scheduling of routing calculations, with the exception
+         of the prvtIsisSysCalcThrshRestartLimit object. It ensures
+         that a routing calculation including the updated LSPs
+         takes place as soon as possible. It abandons an
+         existing route calculation if necessary, unless more
+         than prvtIsisSysCalcThrshRestartLimit successive
+         calculations would have been interrupted."
+    ::= { prvtIsisSysEntry 49 }
+
+prvtIsisSysSendNotifications OBJECT-TYPE
+    SYNTAX      BITS { circuitIndication(0), databaseOverload(1), 
+                    manualAreaAddressDrops(2), idLengthMismatch(3), 
+                    maxAreaAddressMismatch(4), ownLspPurge(5), 
+                    areaMismatch(6), rejectedAdjacency(7), 
+                    adjacencyChange(8), lspErrorDetected(9) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This attribute contains the set of notifications generated
+         by this Intermediate System.
+         
+         The notifications that may be enabled are the prvtIsisCircIndTable,
+         prvtIsisDatabaseOverload, prvtIsisManualAddressDrops, prvtIsisIDLenMismatch,
+         prvtIsisMaxAreaAddressesMismatch, prvtIsisOwnLSPPurge, prvtIsisAreaMismatch,
+         prvtIsisRejectedAdjacency, prvtIsisAdjacencyChange and
+         prvtIsisLSPErrorDetected notifications."
+    ::= { prvtIsisSysEntry 50 }
+
+prvtIsisSysLvl1OrigLSPBuffSize OBJECT-TYPE
+    SYNTAX      PrvtIsisLSPBuffSize
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum size of LSPs and SNPs originated by
+         this Intermediate System at level 1.
+         This object follows the ReplaceOnlyWhileDisabled
+         behavior."
+    REFERENCE   
+        "{ISIS.aoi originatingL1LSPBufferSize (9)}"
+    ::= { prvtIsisSysEntry 60 }
+
+prvtIsisSysLvl1MinLSPGenInt OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned16NoZeroTC
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Minimum interval, in seconds, between successive
+         generation of LSPs with the same LSPID at level 1
+         by this instance of the protocol. This object
+         follows the ResettingTimer behavior."
+    REFERENCE   
+        "{ISIS.aoi minimumLSPGenerationInterval (11)}"
+    ::= { prvtIsisSysEntry 61 }
+
+prvtIsisSysLvl1OverloadState OBJECT-TYPE
+    SYNTAX      PrvtIsisLevelState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The Overload state of the database at level 1.
+         The value 'overloaded' indicates a database that is
+         low on an essential resource, such as memory.
+         The administrator may indirectly force the state to
+         'waiting' when the router is initializing by setting
+         the object prvtIsisSysLvl1SetOverload.
+         If the state is waiting or overloaded, we
+         originate LSPs with the Overload bit set."
+    REFERENCE   
+        "{ISIS.aoi l1State (17)}"
+    ::= { prvtIsisSysEntry 62 }
+
+prvtIsisSysLvl1SetOverload OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Administratively set the overload bit for the level.
+         The overload bit will continue to be set if the
+         implementation runs out of memory, independent of
+         this variable."
+    ::= { prvtIsisSysEntry 63 }
+
+prvtIsisSysLvl1SetOverloadUntil OBJECT-TYPE
+    SYNTAX      TimeTicks
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If set, the overload bit should be set, and cleared
+         after sysUpTime exceeds this value."
+    ::= { prvtIsisSysEntry 64 }
+
+prvtIsisSysLvl1MetricStyle OBJECT-TYPE
+    SYNTAX      PrvtIsisMetricStyle
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Which style of Metric do we generate in our LSPs
+         at level 1 ?"
+    ::= { prvtIsisSysEntry 65 }
+
+prvtIsisSysLvl1SPFConsiders OBJECT-TYPE
+    SYNTAX      PrvtIsisMetricStyle
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Which style of Metric do we consider in our
+         SPF computation at level 1 ?"
+    ::= { prvtIsisSysEntry 66 }
+
+prvtIsisSysLvl1TEEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Do we do Traffic Engineering for IPv4 at level 1 ?
+         
+         Currently only Traffic Engineering at L1 is supported.
+         
+         If Traffic Engineering is enabled, prvtIsisSysLvl1MetricStyle
+         must be set to 'wide' or 'both', and a value must be
+         configured for prvtIsisSysTERouterID.
+         
+         When Traffic Engineering is enabled for IPv4, this IS will
+         advertise the IPv4 TE router ID in the local LSP, and will
+         advertise traffic engineering parameters (where available)
+         for links configured to support IPv4.
+         
+         This object is ignored if the 'ipv4' bit is not set in the
+         value of prvtIsisSysProtSupported."
+    ::= { prvtIsisSysEntry 67 }
+
+prvtIsisSysLvl1IPv6TEEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Do we do Traffic Engineering for IPv6 at level 1 ?
+         
+         Currently only Traffic Engineering at L1 is supported.
+         
+         If Traffic Engineering is enabled, a value must be
+         configured for prvtIsisSysIPv6TERouterID.
+         
+         When Traffic Engineering is enabled for IPv6, this IS will
+         advertise the IPv6 TE router ID in the local LSP, and will
+         advertise traffic engineering parameters (where available)
+         for links configured to support IPv6.
+         
+         This object is ignored if the 'ipv6' bit is not set in the
+         value of prvtIsisSysProtSupported."
+    ::= { prvtIsisSysEntry 68 }
+
+prvtIsisSysLvl1RestartT2Duration OBJECT-TYPE
+    SYNTAX      Integer32 (1..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object is only used when IS-IS activates with
+         the activation type (prvtIsisSysRestartActivationType or
+         prvtIsisSysRestartAutoResetType) set to 'start' or 'restart'.
+         
+         It defines how long IS-IS will wait to complete database
+         synchronization at level 1 before completing the
+         start/restart.
+         
+         This object follows the ResettingTimer behavior."
+    ::= { prvtIsisSysEntry 69 }
+
+prvtIsisSysLvl1AuthUser OBJECT-TYPE
+    SYNTAX      PrvtIsisAuthUserDataString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Authentication user data for area/domain level
+         authentication.
+         
+         This data is passed opaquely to the authentication
+         interface where it can be used to assist with
+         authentication decisions."
+    ::= { prvtIsisSysEntry 70 }
+
+prvtIsisSysLvl2OrigLSPBuffSize OBJECT-TYPE
+    SYNTAX      PrvtIsisLSPBuffSize
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum size of LSPs and SNPs originated by
+         this Intermediate System at level 2.
+         This object follows the ReplaceOnlyWhileDisabled
+         behavior."
+    REFERENCE   
+        "{ISIS.aoi originatingL1LSPBufferSize (9)}"
+    ::= { prvtIsisSysEntry 80 }
+
+prvtIsisSysLvl2MinLSPGenInt OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned16NoZeroTC
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Minimum interval, in seconds, between successive
+         generation of LSPs with the same LSPID at level 2
+         by this instance of the protocol. This object
+         follows the ResettingTimer behavior."
+    REFERENCE   
+        "{ISIS.aoi minimumLSPGenerationInterval (11)}"
+    ::= { prvtIsisSysEntry 81 }
+
+prvtIsisSysLvl2OverloadState OBJECT-TYPE
+    SYNTAX      PrvtIsisLevelState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The Overload state of the database at level 2.
+         The value 'overloaded' indicates a database that is
+         low on an essential resource, such as memory.
+         The administrator may indirectly force the state to
+         'waiting' when the router is initializing by setting
+         the object prvtIsisSysLvl2SetOverload.
+         If the state is waiting or overloaded, we
+         originate LSPs with the Overload bit set."
+    REFERENCE   
+        "{ISIS.aoi l1State (17)}"
+    ::= { prvtIsisSysEntry 82 }
+
+prvtIsisSysLvl2SetOverload OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Administratively set the overload bit for the level.
+         The overload bit will continue to be set if the
+         implementation runs out of memory, independent of
+         this variable."
+    ::= { prvtIsisSysEntry 83 }
+
+prvtIsisSysLvl2SetOverloadUntil OBJECT-TYPE
+    SYNTAX      TimeTicks
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If set, the overload bit should be set, and cleared
+         after sysUpTime exceeds this value."
+    ::= { prvtIsisSysEntry 84 }
+
+prvtIsisSysLvl2MetricStyle OBJECT-TYPE
+    SYNTAX      PrvtIsisMetricStyle
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Which style of Metric do we generate in our LSPs
+         at level 2 ?"
+    ::= { prvtIsisSysEntry 85 }
+
+prvtIsisSysLvl2SPFConsiders OBJECT-TYPE
+    SYNTAX      PrvtIsisMetricStyle
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Which style of Metric do we consider in our
+         SPF computation at level 2 ?"
+    ::= { prvtIsisSysEntry 86 }
+
+prvtIsisSysLvl2TEEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Do we do Traffic Engineering for IPv4 at level 2 ?
+         
+         Currently only Traffic Engineering at L1 is supported.
+         
+         If Traffic Engineering is enabled, prvtIsisSysLvl2MetricStyle
+         must be set to 'wide' or 'both', and a value must be
+         configured for prvtIsisSysTERouterID.
+         
+         When Traffic Engineering is enabled for IPv4, this IS will
+         advertise the IPv4 TE router ID in the local LSP, and will
+         advertise traffic engineering parameters (where available)
+         for links configured to support IPv4.
+         
+         This object is ignored if the 'ipv4' bit is not set in the
+         value of prvtIsisSysProtSupported."
+    ::= { prvtIsisSysEntry 87 }
+
+prvtIsisSysLvl2IPv6TEEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Do we do Traffic Engineering for IPv6 at level 2 ?
+         
+         Currently only Traffic Engineering at L1 is supported.
+         
+         If Traffic Engineering is enabled, a value must be
+         configured for prvtIsisSysIPv6TERouterID.
+         
+         When Traffic Engineering is enabled for IPv6, this IS will
+         advertise the IPv6 TE router ID in the local LSP, and will
+         advertise traffic engineering parameters (where available)
+         for links configured to support IPv6.
+         
+         This object is ignored if the 'ipv6' bit is not set in the
+         value of prvtIsisSysProtSupported."
+    ::= { prvtIsisSysEntry 88 }
+
+prvtIsisSysLvl2RestartT2Duration OBJECT-TYPE
+    SYNTAX      Integer32 (1..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object is only used when IS-IS activates with
+         the activation type (prvtIsisSysRestartActivationType or
+         prvtIsisSysRestartAutoResetType) set to 'start' or 'restart'.
+         
+         It defines how long IS-IS will wait to complete database
+         synchronization at level 2 before completing the
+         start/restart.
+         
+         This object follows the ResettingTimer behavior."
+    ::= { prvtIsisSysEntry 89 }
+
+prvtIsisSysLvl2AuthUser OBJECT-TYPE
+    SYNTAX      PrvtIsisAuthUserDataString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Authentication user data for area/domain level
+         authentication.
+         
+         This data is passed opaquely to the authentication
+         interface where it can be used to assist with
+         authentication decisions."
+    ::= { prvtIsisSysEntry 90 }
+
+prvtIsisManAreaAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIsisManAreaAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The set of manual area addresses configured on this
+         Intermediate System."
+    REFERENCE   
+        "{ISIS.aoi manualAreaAddresses (10)}"
+    ::= { prvtIsisSystem 2 }
+
+prvtIsisManAreaAddrEntry OBJECT-TYPE
+    SYNTAX      PrvtIsisManAreaAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry contains one area address manually configured
+         on this system"
+    INDEX       { prvtIsisSysInstance, prvtIsisManAreaAddr }
+    ::= { prvtIsisManAreaAddrTable 1 }
+
+PrvtIsisManAreaAddrEntry ::= SEQUENCE {
+    prvtIsisManAreaAddr             PrvtIsisOSINSAddress,
+    prvtIsisManAreaAddrExistState   RowStatus
+}
+
+prvtIsisManAreaAddr OBJECT-TYPE
+    SYNTAX      PrvtIsisOSINSAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A manually configured area address for this system. This
+         object follows the index behavior.
+         The area address must have a non-zero length."
+    ::= { prvtIsisManAreaAddrEntry 1 }
+
+prvtIsisManAreaAddrExistState OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The existence state (RowStatus) of the prvtIsisManAreaAddrEntry"
+    ::= { prvtIsisManAreaAddrEntry 2 }
+
+prvtIsisAreaAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIsisAreaAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The union of the sets of area addresses reported in all
+         Level 1 LSPs with segment number zero received by this
+         instance of the protocol from Intermediate Systems which
+         are reachable via Level 1 routing."
+    REFERENCE   
+        "{ISIS.aoi areaAddresses (18)}"
+    ::= { prvtIsisSystem 3 }
+
+prvtIsisAreaAddrEntry OBJECT-TYPE
+    SYNTAX      PrvtIsisAreaAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry contains one area address reported in a
+         Level 1 LSP received by this instance of the IS-IS
+         protocol.
+         
+         Received area addresses with a length of zero are
+         ignored."
+    INDEX       { prvtIsisSysInstance, prvtIsisAreaAddr }
+    ::= { prvtIsisAreaAddrTable 1 }
+
+PrvtIsisAreaAddrEntry ::= SEQUENCE {
+    prvtIsisAreaAddr        PrvtIsisOSINSAddress,
+    prvtIsisAreaAddrInLSP   TruthValue
+}
+
+prvtIsisAreaAddr OBJECT-TYPE
+    SYNTAX      PrvtIsisOSINSAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An area address reported in a Level 1 LSP received by
+         this instance of the IS-IS protocol.
+         
+         Received area addresses with a length of zero are
+         ignored."
+    ::= { prvtIsisAreaAddrEntry 1 }
+
+prvtIsisAreaAddrInLSP OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Following ISO10589 section 7.1.5, we advertise the three
+         numerically lowest level 1 area addresses in the level 2
+         LSP fragment zero.
+         
+         If 'true', then this area address is one of the three
+         numerically lowest area addresses, and if this router is
+         active at level 2, it is therefore one of those area
+         addresses advertised in the level 2 LSP fragment 0."
+    ::= { prvtIsisAreaAddrEntry 2 }
+
+prvtIsisSummAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIsisSummAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The set of IP summary addresses to use in forming
+         summary TLVs originated by this Intermediate System.
+         
+         An administrator may use a summary address to combine
+         and modify IP Reachability announcements. If the
+         Intermediate system can reach any subset of the summary
+         address, the summary address will be announced instead,
+         at the configured metric."
+    ::= { prvtIsisSystem 5 }
+
+prvtIsisSummAddrEntry OBJECT-TYPE
+    SYNTAX      PrvtIsisSummAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry contains one IP summary address."
+    INDEX       { prvtIsisSysInstance, prvtIsisSummAddress }
+    ::= { prvtIsisSummAddrTable 1 }
+
+PrvtIsisSummAddrEntry ::= SEQUENCE {
+    prvtIsisSummAddress         OCTET STRING,
+    prvtIsisSummAddrExistState  RowStatus,
+    prvtIsisSummAddrMetric      PrvtIsisDefaultMetric,
+    prvtIsisSummAddrFullMetric  PrvtIsisFullMetric
+}
+
+prvtIsisSummAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The IP address and prefix length value for this summary address."
+    ::= { prvtIsisSummAddrEntry 2 }
+
+prvtIsisSummAddrExistState OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The existence state (RowStatus) of this summary address."
+    ::= { prvtIsisSummAddrEntry 4 }
+
+prvtIsisSummAddrMetric OBJECT-TYPE
+    SYNTAX      PrvtIsisDefaultMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The metric value to announce this summary
+         address within LSPs generated by this system."
+    ::= { prvtIsisSummAddrEntry 5 }
+
+prvtIsisSummAddrFullMetric OBJECT-TYPE
+    SYNTAX      PrvtIsisFullMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The wide metric value to announce this summary
+         address within LSPs generated by this system."
+    ::= { prvtIsisSummAddrEntry 6 }
+
+prvtIsisRedistributeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIsisRedistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The table represents the routing protocols redistributed into
+         the IS-IS routing domain.
+         
+         Creation of conceptual row in the table starts the redistribution of the
+         specified protocol, which would lead to the injection of routing information
+         from that protocol into IS-IS.
+         
+         Deletion of conceptual row would stop the redistribution of that protocol
+         into the IS-IS."
+    ::= { prvtIsisSystem 10 }
+
+prvtIsisRedistributeEntry OBJECT-TYPE
+    SYNTAX      PrvtIsisRedistributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry into the prvtIsisRedistributeTable."
+    INDEX       { prvtIsisSysInstance, prvtIsisRedistributeProtocol }
+    ::= { prvtIsisRedistributeTable 1 }
+
+PrvtIsisRedistributeEntry ::= SEQUENCE {
+    prvtIsisRedistributeProtocol    INTEGER,
+    prvtIsisRedistributeRowStatus   RowStatus,
+    prvtIsisRedistributeLevel       INTEGER,
+    prvtIsisRedistributeMetric      Integer32
+}
+
+prvtIsisRedistributeProtocol OBJECT-TYPE
+    SYNTAX      INTEGER { kernel(2), connect(3), static(4), default(17) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The specific routes redistributed into IS-IS."
+    ::= { prvtIsisRedistributeEntry 1 }
+
+prvtIsisRedistributeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the status of the row.
+         
+         Setting of this field to active enables the redistribution of the protocol.
+         Setting this field to destroy disables the redistribution of the protocol."
+    ::= { prvtIsisRedistributeEntry 2 }
+
+prvtIsisRedistributeLevel OBJECT-TYPE
+    SYNTAX      INTEGER { level1(1), level2(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The IS-IS level at which this row applies to."
+    ::= { prvtIsisRedistributeEntry 3 }
+
+prvtIsisRedistributeMetric OBJECT-TYPE
+    SYNTAX      Integer32 (0..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The IS-IS protocol metric to assign to the redistributed route."
+    ::= { prvtIsisRedistributeEntry 4 }
+
+prvtIsisCirc OBJECT IDENTIFIER
+    ::= { prvtIsisMIBObjects 3 }
+
+prvtIsisCircTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIsisCircEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The table of circuits used by each instance of
+         Integrated IS-IS on this system."
+    ::= { prvtIsisCirc 2 }
+
+prvtIsisCircEntry OBJECT-TYPE
+    SYNTAX      PrvtIsisCircEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An prvtIsisCircEntry exists for each circuit used by
+         Integrated IS-IS on this system."
+    INDEX       { prvtIsisSysInstance, prvtIsisCircIfIndex }
+    ::= { prvtIsisCircTable 1 }
+
+PrvtIsisCircEntry ::= SEQUENCE {
+    prvtIsisCircIfIndex                 InterfaceIndex,
+    prvtIsisCircExistState              RowStatus,
+    prvtIsisCircIfSubIndex              Integer32,
+    prvtIsisCircShutdown                TruthValue,
+    prvtIsisCircType                    INTEGER,
+    prvtIsisCircExtDomain               TruthValue,
+    prvtIsisCircLevel                   INTEGER,
+    prvtIsisCircPassiveCircuit          TruthValue,
+    prvtIsisCircMeshGroupEnabled        INTEGER,
+    prvtIsisCircMeshGroup               Unsigned32,
+    prvtIsisCircSmallHellos             TruthValue,
+    prvtIsisCircLastUpTime              TimeTicks,
+    prvtIsisCirc3WayEnabled             TruthValue,
+    prvtIsisCircExtendedCircID          Unsigned32,
+    prvtIsisCircOperState               PrvtIsisOperStatus,
+    prvtIsisCircSdEntityIndex           Integer32,
+    prvtIsisCircDlBuffPoolSize          Unsigned32,
+    prvtIsisCircSdPDUBuffPoolSize       Unsigned32,
+    prvtIsisCircSdIndBuffPoolSize       Unsigned32,
+    prvtIsisCircDataLinkBlockSize       Unsigned32,
+    prvtIsisCircPhysicalAddress         OCTET STRING,
+    prvtIsisCircManualOrAutomatic       INTEGER,
+    prvtIsisCircT1TimerRunning          TruthValue,
+    prvtIsisCircProtSupported           BITS,
+    prvtIsisCircPtToPtOverLAN           TruthValue,
+    prvtIsisCircLvl1Metric              PrvtIsisDefaultMetric,
+    prvtIsisCircLvl1WideMetric          PrvtIsisWideMetric,
+    prvtIsisCircLvl1ISPriority          PrvtIsisISPriority,
+    prvtIsisCircLvl1IDOctet             Integer32,
+    prvtIsisCircLvl1ID                  PrvtIsisCircuitID,
+    prvtIsisCircLvl1DesIS               PrvtIsisCircuitID,
+    prvtIsisCircLvl1HelloMultiplier     Integer32,
+    prvtIsisCircLvl1HelloTimer          Integer32,
+    prvtIsisCircLvl1DRHelloTimer        Integer32,
+    prvtIsisCircLvl1LSPThrottle         PrvtIsisUnsigned16NoZeroTC,
+    prvtIsisCircLvl1MinLSPRetransInt    Integer32,
+    prvtIsisCircLvl1CSNPInterval        Integer32,
+    prvtIsisCircLvl1PartSNPInterval     Integer32,
+    prvtIsisCircLvl1StickyDIS           Integer32,
+    prvtIsisCircLvl1AuthUser            PrvtIsisAuthUserDataString,
+    prvtIsisCircLvl1IDHostname          PrvtIsisHostName,
+    prvtIsisCircLvl1DesISHostname       PrvtIsisHostName,
+    prvtIsisCircLvl2Metric              PrvtIsisDefaultMetric,
+    prvtIsisCircLvl2WideMetric          PrvtIsisWideMetric,
+    prvtIsisCircLvl2ISPriority          PrvtIsisISPriority,
+    prvtIsisCircLvl2IDOctet             Integer32,
+    prvtIsisCircLvl2ID                  PrvtIsisCircuitID,
+    prvtIsisCircLvl2DesIS               PrvtIsisCircuitID,
+    prvtIsisCircLvl2HelloMultiplier     Integer32,
+    prvtIsisCircLvl2HelloTimer          Integer32,
+    prvtIsisCircLvl2DRHelloTimer        Integer32,
+    prvtIsisCircLvl2LSPThrottle         PrvtIsisUnsigned16NoZeroTC,
+    prvtIsisCircLvl2MinLSPRetransInt    Integer32,
+    prvtIsisCircLvl2CSNPInterval        Integer32,
+    prvtIsisCircLvl2PartSNPInterval     Integer32,
+    prvtIsisCircLvl2StickyDIS           Integer32,
+    prvtIsisCircLvl2IDHostname          PrvtIsisHostName,
+    prvtIsisCircLvl2DesISHostname       PrvtIsisHostName
+}
+
+prvtIsisCircIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The value of ifIndex for the interface to which this
+         circuit corresponds. This object cannot be modified
+         after creation.
+         
+         This is also used as the 3-way circuit ID on
+         point-to-point circuits."
+    ::= { prvtIsisCircEntry 2 }
+
+prvtIsisCircExistState OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The existence state (RowStatus) of this circuit. Setting the
+         state to 'notInService' halts the generation and processing of
+         IS-IS protocol PDUs on this circuit. Setting the state
+         to destroy will also erase any configuration associated
+         with the circuit.
+         
+         Automatic circuits from the I3 stub appear as
+         passive circuits with existence state 'active'. These
+         circuits can be configured via the MIB like manual
+         circuits, except that they will survive a Destroy request,
+         with all fields reset to their automatic values.
+         
+         MIB configuration overrides automatic configuration."
+    ::= { prvtIsisCircEntry 3 }
+
+prvtIsisCircIfSubIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A specifier for the part of the interface ifIndex to which
+         this circuit corresponds, such as a DLCI or VPI/VCI.
+         This object cannot be modified after creation.
+         
+         This field is currently ignored."
+    ::= { prvtIsisCircEntry 4 }
+
+prvtIsisCircShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The administrative state of the circuit."
+    ::= { prvtIsisCircEntry 5 }
+
+prvtIsisCircType OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(0), broadcast(1), ptToPt(2), 
+                    staticIn(3), staticOut(4), dA(5) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The type of the circuit. This object follows the
+         ReplaceOnlyWhileDisabled behavior. The type specified
+         must be compatible with the type of the interface defined
+         by the value of prvtIsisCircIfIndex.
+         
+         Only 'broadcast' and 'ptToPt' circuits are currently
+         supported. An automatic circuit can have type 'unknown'
+         until the correct MIB type is defined."
+    REFERENCE   
+        "{ISIS.aoi type (33)}"
+    ::= { prvtIsisCircEntry 6 }
+
+prvtIsisCircExtDomain OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If true, suppress normal transmission of and
+         interpretation of Intra-domain IS-IS PDUs on this
+         circuit."
+    REFERENCE   
+        "{ISIS.aoi externalDomain (46)}"
+    ::= { prvtIsisCircEntry 7 }
+
+prvtIsisCircLevel OBJECT-TYPE
+    SYNTAX      INTEGER { level1(1), level2(2), level1L2(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates which type of packets will be sent and
+         accepted on this circuit. The values used will be
+         modified by the settings of prvtIsisSysType. This
+         object follows the ReplaceOnlyWhileDisabled behavior."
+    ::= { prvtIsisCircEntry 8 }
+
+prvtIsisCircPassiveCircuit OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Should we include this interface in LSPs, even if
+         it is not running the IS-IS Protocol?
+         
+         Circuits with prvtIsisCircExtDomain 'true'
+         will only be included in LSPs if this field is
+         also 'true', and the circuit is active."
+    ::= { prvtIsisCircEntry 9 }
+
+prvtIsisCircMeshGroupEnabled OBJECT-TYPE
+    SYNTAX      INTEGER { inactive(1), blocked(2), set(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Is this port a member of a mesh group, or blocked?
+         Circuits in the same mesh group act as a virtual
+         multiaccess network. LSPs seen on one circuit in
+         a mesh group will not be flooded to another circuit
+         in the same mesh group."
+    REFERENCE   
+        "{ RFC 2973 }"
+    ::= { prvtIsisCircEntry 10 }
+
+prvtIsisCircMeshGroup OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Circuits in the same mesh group act as a virtual
+         multiaccess network. LSPs seen on one circuit in
+         a mesh group will not be flooded to another circuit
+         in the same mesh group. If prvtIsisCircMeshGroupEnabled
+         is inactive or blocked, this value is ignored."
+    REFERENCE   
+        "{ RFC 2973 }"
+    ::= { prvtIsisCircEntry 11 }
+
+prvtIsisCircSmallHellos OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Can we send unpadded hellos on LAN circuits? False
+         means LAN Hellos must be padded.
+         
+         Currently only unpadded hellos are supported."
+    ::= { prvtIsisCircEntry 12 }
+
+prvtIsisCircLastUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "If the circuit is enabled, the value of sysUpTime
+         when prvtIsisCircShutdown most recently entered
+         the state on. If the circuit is not on,
+         the value of sysUpTime when the circuit last
+         entered state on, 0 if the circuit has never
+         been on."
+    ::= { prvtIsisCircEntry 13 }
+
+prvtIsisCirc3WayEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Is this circuit enabled to run 3Way handshake?
+         
+         Currently the 3-way handshake on point to
+         point circuits is always run."
+    ::= { prvtIsisCircEntry 14 }
+
+prvtIsisCircExtendedCircID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value to be used as the extended circuit ID in
+         3Way handshake. This value is only used if
+         prvtIsisCirc3WayEnabled is true, and must be unique across
+         all circuits on this IS.
+         
+         Currently the value for prvtIsisCircIfIndex is used as the extended
+         circuit ID."
+    ::= { prvtIsisCircEntry 15 }
+
+prvtIsisCircOperState OBJECT-TYPE
+    SYNTAX      PrvtIsisOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The operational state of this circuit."
+    ::= { prvtIsisCircEntry 16 }
+
+prvtIsisCircSdEntityIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Identifies the SDC entity which will handle this circuit.
+         This object must be specified before the circuit can run the
+         IS-IS protocol. It cannot be changed after it has been
+         specified."
+    ::= { prvtIsisCircEntry 17 }
+
+prvtIsisCircDlBuffPoolSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Capacity of the buffer pool used by the DL stub to send
+         data signals to the SDC. This object follows the
+         ReplaceOnlyWhileDisabled behavior."
+    ::= { prvtIsisCircEntry 18 }
+
+prvtIsisCircSdPDUBuffPoolSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Capacity of the buffer pool into which SDC transfers data
+         signals from the DL Stub. This object follows the
+         ReplaceOnlyWhileDisabled behavior."
+    ::= { prvtIsisCircEntry 19 }
+
+prvtIsisCircSdIndBuffPoolSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Capacity of the buffer pool used by SDC to send
+         indications to PM. This object follows the
+         ReplaceOnlyWhileDisabled behavior."
+    ::= { prvtIsisCircEntry 20 }
+
+prvtIsisCircDataLinkBlockSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Maximum size of PDU that can be sent or received over this
+         circuit (MTU). This object follows the
+         ReplaceOnlyWhileDisabled behavior."
+    ::= { prvtIsisCircEntry 21 }
+
+prvtIsisCircPhysicalAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The physical address of the network interface (for example
+         a MAC address on an Ethernet card). This value is only
+         relevant to a broadcast circuit and is ignored on a
+         point-to-point circuit. It needs to be specified in the
+         MIB if the information is not obtained from the I3 stub.
+         
+         This object follows the ReplaceOnlyWhileDisabled behavior."
+    ::= { prvtIsisCircEntry 22 }
+
+prvtIsisCircManualOrAutomatic OBJECT-TYPE
+    SYNTAX      INTEGER { manual(1), automatic(2), both(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Has this circuit been configured by MIB (manual), I3
+         information (automatic) or both? MIB configuration
+         overrides I3 configuration.
+         
+         Automatic circuits cannot be destroyed. Destroying a
+         manual circuit removes all configuration for that circuit.
+         Destroying a circuit in state 'both'
+         destroys any MIB configuration and returns the circuit to
+         automatic state."
+    ::= { prvtIsisCircEntry 23 }
+
+prvtIsisCircT1TimerRunning OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Is the T1 timer running on this circuit?
+         
+         This object is only valid on a circuit that is currently
+         running the IS-IS protocol (prvtIsisCircExtDomain is 'false'
+         and prvtIsisCircOperState is 'operStatusUp').
+         
+         When set to 'true', this indicates that the local node is
+         running starting or restarting node procedures."
+    ::= { prvtIsisCircEntry 24 }
+
+prvtIsisCircProtSupported OBJECT-TYPE
+    SYNTAX      BITS { reserved(0), ipv4(1), ipv6(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Which protocols are supported on this circuit?
+         
+         Note that the configured value is used in conjunction with
+         the value of prvtIsisSysProtSupported. In particular:
+         
+         - IPv4 is supported on the circuit if both
+         prvtIsisSysProtSupported and this object have the 'ipv4' bit
+         set.
+         
+         - IPv6 is supported on the circuit if both
+         prvtIsisSysProtSupported and this object have the 'ipv6' bit
+         set."
+    ::= { prvtIsisCircEntry 25 }
+
+prvtIsisCircPtToPtOverLAN OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Allows a broadcast circuit to be configured to operate
+         point-to-point over LAN procedures.
+         
+         This is used in conjunction with the prvtIsisCircType object
+         as follows.
+         
+         - If prvtIsisCircType = 'ptToPt', the circuit is a standard
+         point-point circuit, and prvtIsisCircPtToPtOverLAN is
+         ignored.
+         
+         - If prvtIsisCircType = 'broadcast' and prvtIsisCircPtToPtOverLAN
+         is 'false', the circuit is used as a normal LAN.
+         
+         - If prvtIsisCircType = 'broadcast' and prvtIsisCircPtToPtOverLAN
+         is 'true', point-point over LAN procedures are
+         followed.
+         
+         Point-to-point over LAN procedures should only be
+         configured when there are just two Intermediate Systems
+         operating on the LAN.
+         
+         This object follows the ReplaceOnlyWhileDisabled behavior."
+    ::= { prvtIsisCircEntry 26 }
+
+prvtIsisCircLvl1Metric OBJECT-TYPE
+    SYNTAX      PrvtIsisDefaultMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The metric value of this circuit for level 1."
+    REFERENCE   
+        "{ISIS.aoi l1DefaultMetric (35)}"
+    ::= { prvtIsisCircEntry 30 }
+
+prvtIsisCircLvl1WideMetric OBJECT-TYPE
+    SYNTAX      PrvtIsisWideMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The wide metric value of this circuit for level 1."
+    ::= { prvtIsisCircEntry 31 }
+
+prvtIsisCircLvl1ISPriority OBJECT-TYPE
+    SYNTAX      PrvtIsisISPriority
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The priority for becoming the LAN-Designated
+         Intermediate System at level 1."
+    REFERENCE   
+        "{ISIS.aoi l2IntermediateSystemPriority (73)}"
+    ::= { prvtIsisCircEntry 32 }
+
+prvtIsisCircLvl1IDOctet OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A one byte identifier for the circuit selected by the
+         Intermediate System.
+         
+         On point-to-point circuits, the value is used as the Local
+         Circuit ID in point-to-point IIH PDUs transmitted on this
+         circuit. In this case, values of prvtIsisCircLvl1IDOctet do
+         not need to be unique.
+         
+         For broadcast circuits, the value is used to generate the
+         LAN ID that will be used if this Intermediate System is
+         elected as the Designated IS on this circuit. The value
+         is required to differ on LANs where the Intermediate System
+         is the Designated Intermediate System."
+    ::= { prvtIsisCircEntry 33 }
+
+prvtIsisCircLvl1ID OBJECT-TYPE
+    SYNTAX      PrvtIsisCircuitID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "On a point to point circuit with a fully initialized
+         adjacency to a peer IS, the value of this object is
+         the circuit ID negotiated during adjacency initialization.
+         On a point to point circuit without such an adjacency,
+         the value is the concatenation of the local system ID
+         and the one byte prvtIsisCircLvl1IDOctet for this circuit
+         i.e. the value that would be proposed for the circuit ID.
+         
+         On other circuit types, the value returned is the zero
+         length OCTET STRING."
+    REFERENCE   
+        "{ISIS.aoi ptPtCircuitID (51)}"
+    ::= { prvtIsisCircEntry 34 }
+
+prvtIsisCircLvl1DesIS OBJECT-TYPE
+    SYNTAX      PrvtIsisCircuitID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The ID of the LAN-Designated Intermediate System
+         on this circuit at level 1. If, for any reason,
+         this system is not partaking in the relevant
+         Designated Intermediate System election process,
+         then the value returned is the zero length OCTET STRING."
+    REFERENCE   
+        "{ISIS.aoi l2DesignatedIntermediateSystem (75)}"
+    ::= { prvtIsisCircEntry 35 }
+
+prvtIsisCircLvl1HelloMultiplier OBJECT-TYPE
+    SYNTAX      Integer32 (2..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This value is multiplied by the corresponding HelloTimer
+         and the result in seconds (rounded up) is used as the
+         holding time in transmitted hellos, to be used by
+         receivers of hello packets from this IS."
+    REFERENCE   
+        "{ISIS.aoi iSISHelloTimer (45)}"
+    ::= { prvtIsisCircEntry 36 }
+
+prvtIsisCircLvl1HelloTimer OBJECT-TYPE
+    SYNTAX      Integer32 (10..600000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Maximum period, in milliseconds, between IIH PDUs
+         on multiaccess networks at level 1 for LANs.
+         The value at L1 is used as the period between
+         Hellos on L1L2 point to point circuits. Setting
+         this value at level 2 on an L1L2 point to point
+         circuit will result in an error of InconsistentValue.
+         
+         This object follows the ResettingTimer behavior."
+    REFERENCE   
+        "{ISIS.aoi iSISHelloTimer (45)}"
+    ::= { prvtIsisCircEntry 37 }
+
+prvtIsisCircLvl1DRHelloTimer OBJECT-TYPE
+    SYNTAX      Integer32 (10..120000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Period, in milliseconds, between Hello PDUs on
+         multiaccess networks when this IS is the Designated
+         Intermediate System. This object follows the
+         ResettingTimer behavior."
+    REFERENCE   
+        "{ISIS.aoi iSISHelloTimer (45)}"
+    ::= { prvtIsisCircEntry 38 }
+
+prvtIsisCircLvl1LSPThrottle OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned16NoZeroTC
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Minimal interval of time, in milliseconds, between
+         transmissions of LSPs on an interface at level 1."
+    REFERENCE   
+        "{ISIS.aoi minimumBroadcastLSPTransmissionInterval (5)}"
+    ::= { prvtIsisCircEntry 39 }
+
+prvtIsisCircLvl1MinLSPRetransInt OBJECT-TYPE
+    SYNTAX      Integer32 (1..300)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Minimum interval, in seconds, between re-transmission of
+         an LSP at level 1. This object follows the
+         ResettingTimer behavior.
+         
+         Note that prvtIsisCircLvl1LSPThrottle controls
+         how fast we send back to back LSPs. This variable
+         controls how fast we re-send the same LSP."
+    REFERENCE   
+        "{ISIS.aoi minimumLSPTransmissionInterval (5)}"
+    ::= { prvtIsisCircEntry 40 }
+
+prvtIsisCircLvl1CSNPInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Interval of time, in seconds, between periodic
+         transmission of a complete set of CSNPs on
+         multiaccess networks if this router is the
+         designated router at level 1.
+         This object follows the ResettingTimer behavior."
+    REFERENCE   
+        "{ISIS.aoi completeSNPInterval (8)}"
+    ::= { prvtIsisCircEntry 41 }
+
+prvtIsisCircLvl1PartSNPInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..120)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Minimum interval in seconds between sending Partial
+         Sequence Number PDUs at level 1. This object
+         follows the ResettingTimer behavior."
+    REFERENCE   
+        "{ISIS.aoi partialSNPInterval (14)}"
+    ::= { prvtIsisCircEntry 42 }
+
+prvtIsisCircLvl1StickyDIS OBJECT-TYPE
+    SYNTAX      Integer32 (0..127)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Boost to add to the priority of this router (up to the maximum
+         permitted value) when it becomes DIS at level 1 to make it
+         more likely to remain DIS."
+    ::= { prvtIsisCircEntry 43 }
+
+prvtIsisCircLvl1AuthUser OBJECT-TYPE
+    SYNTAX      PrvtIsisAuthUserDataString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Authentication user data for level 1's authentication.
+         This data is passed opaquely to the authentication
+         interface where it can be used to assist with
+         authentication decisions."
+    ::= { prvtIsisCircEntry 44 }
+
+prvtIsisCircLvl1IDHostname OBJECT-TYPE
+    SYNTAX      PrvtIsisHostName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The hostname corresponding to the system ID part of the
+         prvtIsisCircLvl1ID object.
+         
+         This is the null string if the prvtIsisCircLvl1ID object
+         is null, or if no hostname is known."
+    ::= { prvtIsisCircEntry 45 }
+
+prvtIsisCircLvl1DesISHostname OBJECT-TYPE
+    SYNTAX      PrvtIsisHostName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The hostname corresponding to the system ID part of the
+         prvtIsisCircLvl1DesIS object.
+         
+         This is the null string if the prvtIsisCircLvl1DesIS object
+         is null, or if no hostname is known."
+    ::= { prvtIsisCircEntry 46 }
+
+prvtIsisCircLvl2Metric OBJECT-TYPE
+    SYNTAX      PrvtIsisDefaultMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The metric value of this circuit for level 2."
+    REFERENCE   
+        "{ISIS.aoi l1DefaultMetric (35)}"
+    ::= { prvtIsisCircEntry 50 }
+
+prvtIsisCircLvl2WideMetric OBJECT-TYPE
+    SYNTAX      PrvtIsisWideMetric
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The wide metric value of this circuit for level 2."
+    ::= { prvtIsisCircEntry 51 }
+
+prvtIsisCircLvl2ISPriority OBJECT-TYPE
+    SYNTAX      PrvtIsisISPriority
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The priority for becoming the LAN-Designated
+         Intermediate System at level 2."
+    REFERENCE   
+        "{ISIS.aoi l2IntermediateSystemPriority (73)}"
+    ::= { prvtIsisCircEntry 52 }
+
+prvtIsisCircLvl2IDOctet OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A one byte identifier for the circuit selected by the
+         Intermediate System.
+         
+         On point-to-point circuits, the value is used as the Local
+         Circuit ID in point-to-point IIH PDUs transmitted on this
+         circuit. In this case, values of prvtIsisCircLvl2IDOctet do
+         not need to be unique.
+         
+         For broadcast circuits, the value is used to generate the
+         LAN ID that will be used if this Intermediate System is
+         elected as the Designated IS on this circuit. The value
+         is required to differ on LANs where the Intermediate System
+         is the Designated Intermediate System."
+    ::= { prvtIsisCircEntry 53 }
+
+prvtIsisCircLvl2ID OBJECT-TYPE
+    SYNTAX      PrvtIsisCircuitID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "On a point to point circuit with a fully initialized
+         adjacency to a peer IS, the value of this object is
+         the circuit ID negotiated during adjacency initialization.
+         On a point to point circuit without such an adjacency,
+         the value is the concatenation of the local system ID
+         and the one byte prvtIsisCircLvl2IDOctet for this circuit
+         i.e. the value that would be proposed for the circuit ID.
+         
+         On other circuit types, the value returned is the zero
+         length OCTET STRING."
+    REFERENCE   
+        "{ISIS.aoi ptPtCircuitID (51)}"
+    ::= { prvtIsisCircEntry 54 }
+
+prvtIsisCircLvl2DesIS OBJECT-TYPE
+    SYNTAX      PrvtIsisCircuitID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The ID of the LAN-Designated Intermediate System
+         on this circuit at level 2. If, for any reason,
+         this system is not partaking in the relevant
+         Designated Intermediate System election process,
+         then the value returned is the zero length OCTET STRING."
+    REFERENCE   
+        "{ISIS.aoi l2DesignatedIntermediateSystem (75)}"
+    ::= { prvtIsisCircEntry 55 }
+
+prvtIsisCircLvl2HelloMultiplier OBJECT-TYPE
+    SYNTAX      Integer32 (2..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This value is multiplied by the corresponding HelloTimer
+         and the result in seconds (rounded up) is used as the
+         holding time in transmitted hellos, to be used by
+         receivers of hello packets from this IS."
+    REFERENCE   
+        "{ISIS.aoi iSISHelloTimer (45)}"
+    ::= { prvtIsisCircEntry 56 }
+
+prvtIsisCircLvl2HelloTimer OBJECT-TYPE
+    SYNTAX      Integer32 (10..600000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Maximum period, in milliseconds, between IIH PDUs
+         on multiaccess networks at level 2 for LANs.
+         The value at L1 is used as the period between
+         Hellos on L1L2 point to point circuits. Setting
+         this value at level 2 on an L1L2 point to point
+         circuit will result in an error of InconsistentValue.
+         
+         This object follows the ResettingTimer behavior."
+    REFERENCE   
+        "{ISIS.aoi iSISHelloTimer (45)}"
+    ::= { prvtIsisCircEntry 57 }
+
+prvtIsisCircLvl2DRHelloTimer OBJECT-TYPE
+    SYNTAX      Integer32 (10..120000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Period, in milliseconds, between Hello PDUs on
+         multiaccess networks when this IS is the Designated
+         Intermediate System. This object follows the
+         ResettingTimer behavior."
+    REFERENCE   
+        "{ISIS.aoi iSISHelloTimer (45)}"
+    ::= { prvtIsisCircEntry 58 }
+
+prvtIsisCircLvl2LSPThrottle OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned16NoZeroTC
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Minimal interval of time, in milliseconds, between
+         transmissions of LSPs on an interface at level 2."
+    REFERENCE   
+        "{ISIS.aoi minimumBroadcastLSPTransmissionInterval (5)}"
+    ::= { prvtIsisCircEntry 59 }
+
+prvtIsisCircLvl2MinLSPRetransInt OBJECT-TYPE
+    SYNTAX      Integer32 (1..300)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Minimum interval, in seconds, between re-transmission of
+         an LSP at level 2. This object follows the
+         ResettingTimer behavior.
+         
+         Note that prvtIsisCircLvl2LSPThrottle controls
+         how fast we send back to back LSPs. This variable
+         controls how fast we re-send the same LSP."
+    REFERENCE   
+        "{ISIS.aoi minimumLSPTransmissionInterval (5)}"
+    ::= { prvtIsisCircEntry 60 }
+
+prvtIsisCircLvl2CSNPInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Interval of time, in seconds, between periodic
+         transmission of a complete set of CSNPs on
+         multiaccess networks if this router is the
+         designated router at level 2.
+         This object follows the ResettingTimer behavior."
+    REFERENCE   
+        "{ISIS.aoi completeSNPInterval (8)}"
+    ::= { prvtIsisCircEntry 61 }
+
+prvtIsisCircLvl2PartSNPInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..120)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Minimum interval in seconds between sending Partial
+         Sequence Number PDUs at level 2. This object
+         follows the ResettingTimer behavior."
+    REFERENCE   
+        "{ISIS.aoi partialSNPInterval (14)}"
+    ::= { prvtIsisCircEntry 62 }
+
+prvtIsisCircLvl2StickyDIS OBJECT-TYPE
+    SYNTAX      Integer32 (0..127)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Boost to add to the priority of this router (up to the maximum
+         permitted value) when it becomes DIS at level 2 to make it
+         more likely to remain DIS."
+    ::= { prvtIsisCircEntry 63 }
+
+prvtIsisCircLvl2IDHostname OBJECT-TYPE
+    SYNTAX      PrvtIsisHostName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The hostname corresponding to the system ID part of the
+         prvtIsisCircLvl2ID object.
+         
+         This is the null string if the prvtIsisCircLvl2ID object
+         is null, or if no hostname is known."
+    ::= { prvtIsisCircEntry 65 }
+
+prvtIsisCircLvl2DesISHostname OBJECT-TYPE
+    SYNTAX      PrvtIsisHostName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The hostname corresponding to the system ID part of the
+         prvtIsisCircLvl2DesIS object.
+         
+         This is the null string if the prvtIsisCircLvl2DesIS object
+         is null, or if no hostname is known."
+    ::= { prvtIsisCircEntry 66 }
+
+prvtIsisISAdj OBJECT IDENTIFIER
+    ::= { prvtIsisMIBObjects 6 }
+
+prvtIsisISAdjTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIsisISAdjEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The table of adjacencies to Intermediate Systems."
+    ::= { prvtIsisISAdj 1 }
+
+prvtIsisISAdjEntry OBJECT-TYPE
+    SYNTAX      PrvtIsisISAdjEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry corresponds to one adjacency to an
+         Intermediate System on this system."
+    INDEX       { prvtIsisSysInstance, prvtIsisCircIfIndex, 
+                  prvtIsisISAdjIndex }
+    ::= { prvtIsisISAdjTable 1 }
+
+PrvtIsisISAdjEntry ::= SEQUENCE {
+    prvtIsisISAdjIndex                  Integer32,
+    prvtIsisISAdjState                  INTEGER,
+    prvtIsisISAdj3WayState              INTEGER,
+    prvtIsisISAdjNeighSNPAAddress       PrvtIsisOSINSAddress,
+    prvtIsisISAdjNeighSysType           INTEGER,
+    prvtIsisISAdjNeighSysID             PrvtIsisSystemID,
+    prvtIsisISAdjNbrExtendedCircID      Unsigned32,
+    prvtIsisISAdjUsage                  INTEGER,
+    prvtIsisISAdjHoldTimer              PrvtIsisUnsigned16NoZeroTC,
+    prvtIsisISAdjNeighPriority          PrvtIsisISPriority,
+    prvtIsisISAdjLastUpTime             TimeTicks,
+    prvtIsisISAdjRestartCapable         TruthValue,
+    prvtIsisISAdjPeerRestartState       INTEGER,
+    prvtIsisISAdjSuppressed             TruthValue,
+    prvtIsisISAdjNeighLanID             OCTET STRING,
+    prvtIsisISAdjNeighHostname          PrvtIsisHostName,
+    prvtIsisISAdjNeighLanIDHostname     PrvtIsisHostName
+}
+
+prvtIsisISAdjIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2000000000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A unique value identifying the IS adjacency from all
+         other such adjacencies on this circuit. This value is
+         automatically assigned by the system when the adjacency
+         is created."
+    ::= { prvtIsisISAdjEntry 1 }
+
+prvtIsisISAdjState OBJECT-TYPE
+    SYNTAX      INTEGER { down(1), initializing(2), up(3), failed(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The state of the adjacency."
+    REFERENCE   
+        "{ISIS.aoi adjacencyState (78)}"
+    ::= { prvtIsisISAdjEntry 2 }
+
+prvtIsisISAdj3WayState OBJECT-TYPE
+    SYNTAX      INTEGER { up(0), initializing(1), down(2), failed(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The 3Way state of the adjacency. These are picked
+         to match the historical on-the-wire representation
+         of the 3Way state, and are not intended to match
+         prvtIsisISAdjState."
+    REFERENCE   
+        "{ RFC 3373 }"
+    ::= { prvtIsisISAdjEntry 3 }
+
+prvtIsisISAdjNeighSNPAAddress OBJECT-TYPE
+    SYNTAX      PrvtIsisOSINSAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The SNPA address of the neighboring system."
+    REFERENCE   
+        "{ISIS.aoi neighbourSNPAAddress (79)}"
+    ::= { prvtIsisISAdjEntry 4 }
+
+prvtIsisISAdjNeighSysType OBJECT-TYPE
+    SYNTAX      INTEGER { l1IntermediateSystem(1), 
+                    l2IntermediateSystem(2), l1L2IntermediateSystem(3), 
+                    unknown(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The type of the neighboring system."
+    REFERENCE   
+        "{ISIS.aoi neighbourSystemType (80)}"
+    ::= { prvtIsisISAdjEntry 5 }
+
+prvtIsisISAdjNeighSysID OBJECT-TYPE
+    SYNTAX      PrvtIsisSystemID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The system ID of the neighboring Intermediate
+         System."
+    REFERENCE   
+        "{ISIS.aoi neighbourSystemIds (83)}"
+    ::= { prvtIsisISAdjEntry 6 }
+
+prvtIsisISAdjNbrExtendedCircID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The 4-byte Extended Circuit ID learned from the
+         Neighbor during 3-way handshake, or 0."
+    ::= { prvtIsisISAdjEntry 7 }
+
+prvtIsisISAdjUsage OBJECT-TYPE
+    SYNTAX      INTEGER { level1(1), level2(2), level1and2(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "How is the adjacency used? On a point-to-point link,
+         this might be level1and2, but on a LAN, the usage will
+         be level1 on the adjacency between peers at L1,
+         and level2 for the adjacency between peers at L2."
+    REFERENCE   
+        "{ISIS.aoi adjacencyUsage (82)}"
+    ::= { prvtIsisISAdjEntry 8 }
+
+prvtIsisISAdjHoldTimer OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned16NoZeroTC
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The holding time in seconds for this adjacency.
+         This value is based on received IIH PDUs and
+         the elapsed time since receipt."
+    REFERENCE   
+        "{ISIS.aoi holdingTimer (85)}"
+    ::= { prvtIsisISAdjEntry 9 }
+
+prvtIsisISAdjNeighPriority OBJECT-TYPE
+    SYNTAX      PrvtIsisISPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Priority of the neighboring Intermediate System for
+         becoming the Designated Intermediate System."
+    REFERENCE   
+        "{ISIS.aoi lANPriority (86)}"
+    ::= { prvtIsisISAdjEntry 10 }
+
+prvtIsisISAdjLastUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "If the prvtIsisISAdjState is in state 'up', the value
+         of sysUpTime when the adjacency most recently
+         entered the state 'up', or 0 if it has never
+         been in state 'up'."
+    ::= { prvtIsisISAdjEntry 11 }
+
+prvtIsisISAdjRestartCapable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Does the neighbor support restart signalling?
+         
+         This object is set to 'true' if the peer includes the
+         restart TLV in IIH PDUs."
+    ::= { prvtIsisISAdjEntry 12 }
+
+prvtIsisISAdjPeerRestartState OBJECT-TYPE
+    SYNTAX      INTEGER { notRestarting(1), restartingNoHelp(2), 
+                    helpingRestart(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Is the peer currently restarting?
+         
+         Set to 'notRestarting' if the neighbor is not restarting
+         (is not including a restart TLV in the IIH, or is not setting the
+         RR bit).
+         
+         Set to 'restartingNoHelp' if the neighbor is restarting
+         (is including a restart TLV with the RR bit in IIH PDUs), but
+         the local node is not helping the restart.
+         
+         Set to 'helpingRestart' if the neighbor is restarting and the
+         local node is helping the restart."
+    ::= { prvtIsisISAdjEntry 13 }
+
+prvtIsisISAdjSuppressed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Has the peer requested that the adjacency be suppressed?
+         If set to 'true', the adjacency will not be added to the
+         local LSP.
+         
+         This object is set to 'true' if the peer sets the SA bit in
+         the restart TLV in IIH PDUs."
+    ::= { prvtIsisISAdjEntry 14 }
+
+prvtIsisISAdjNeighLanID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "On a broadcast circuit, the LAN ID reported by the
+         neighbor for the Designated Intermediate System on this
+         circuit at this level. For a non-broadcast circuit, or if,
+         for any reason, the neighbor is not partaking in the
+         relevant Designated Intermediate System election process,
+         then the value returned is the zero length OCTET STRING."
+    ::= { prvtIsisISAdjEntry 15 }
+
+prvtIsisISAdjNeighHostname OBJECT-TYPE
+    SYNTAX      PrvtIsisHostName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The hostname corresponding to prvtIsisISAdjNeighSysID.
+         This is the null string if prvtIsisSdEntMapHostnames is
+         'false' or if no hostname is known."
+    ::= { prvtIsisISAdjEntry 16 }
+
+prvtIsisISAdjNeighLanIDHostname OBJECT-TYPE
+    SYNTAX      PrvtIsisHostName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The hostname corresponding to the system ID part of the
+         prvtIsisISAdjNeighLanID object.
+         
+         This is the null string if the prvtIsisISAdjNeighLanID object
+         is null, if prvtIsisSdEntMapHostnames is 'false', or if no
+         hostname is known."
+    ::= { prvtIsisISAdjEntry 17 }
+
+prvtIsisISAdjAreaAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIsisISAdjAreaAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains the set of Area Addresses of
+         neighboring Intermediate Systems as reported in received
+         IIH PDUs."
+    REFERENCE   
+        "{ISIS.aoi areaAddressesOfNeighbour (84)}"
+    ::= { prvtIsisISAdj 2 }
+
+prvtIsisISAdjAreaAddrEntry OBJECT-TYPE
+    SYNTAX      PrvtIsisISAdjAreaAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry contains one Area Address reported by a
+         neighboring Intermediate System in its IIH PDUs."
+    INDEX       { prvtIsisSysInstance, prvtIsisCircIfIndex, 
+                  prvtIsisISAdjIndex, prvtIsisISAdjAreaAddrIndex }
+    ::= { prvtIsisISAdjAreaAddrTable 1 }
+
+PrvtIsisISAdjAreaAddrEntry ::= SEQUENCE {
+    prvtIsisISAdjAreaAddrIndex  Integer32,
+    prvtIsisISAdjAreaAddress    PrvtIsisOSINSAddress
+}
+
+prvtIsisISAdjAreaAddrIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2000000000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index for the areas associated with one neighbor.
+         This provides a simple way to walk the table."
+    ::= { prvtIsisISAdjAreaAddrEntry 1 }
+
+prvtIsisISAdjAreaAddress OBJECT-TYPE
+    SYNTAX      PrvtIsisOSINSAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "One Area Address as reported in IIH PDUs received from
+         the neighbor."
+    ::= { prvtIsisISAdjAreaAddrEntry 2 }
+
+prvtIsisISAdjIPAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIsisISAdjIPAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains the set of IP Addresses of
+         neighboring Intermediate Systems as reported in received
+         IIH PDUs.
+         
+         If the prvtIsisSysRstrctLanAdjsToSubnet object in prvtIsisSysTable
+         is set to 'true' then for an IPv4 broadcast circuit, only
+         IP addresses on the same subnet as the local circuit are
+         included in this table."
+    ::= { prvtIsisISAdj 3 }
+
+prvtIsisISAdjIPAddrEntry OBJECT-TYPE
+    SYNTAX      PrvtIsisISAdjIPAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry contains one IP Address reported by a
+         neighboring Intermediate System in its IIH PDUs."
+    INDEX       { prvtIsisSysInstance, prvtIsisCircIfIndex, 
+                  prvtIsisISAdjIndex, prvtIsisISAdjIPAddrIndex }
+    ::= { prvtIsisISAdjIPAddrTable 1 }
+
+PrvtIsisISAdjIPAddrEntry ::= SEQUENCE {
+    prvtIsisISAdjIPAddrIndex    Integer32,
+    prvtIsisISAdjIPAddrType     PrvtIsisInetAddressType,
+    prvtIsisISAdjIPAddrAddress  PrvtIsisInetAddress
+}
+
+prvtIsisISAdjIPAddrIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2000000000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index to this table which identifies the IP addresss
+         to which this entry belongs."
+    ::= { prvtIsisISAdjIPAddrEntry 1 }
+
+prvtIsisISAdjIPAddrType OBJECT-TYPE
+    SYNTAX      PrvtIsisInetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The type of one IP Address as reported in IIH PDUs
+         received from the neighbor."
+    ::= { prvtIsisISAdjIPAddrEntry 2 }
+
+prvtIsisISAdjIPAddrAddress OBJECT-TYPE
+    SYNTAX      PrvtIsisInetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "One IP Address as reported in IIH PDUs received from the
+         neighbor.
+         
+         The type of this address is determined by the value of
+         the prvtIsisISAdjIPAddrType object."
+    ::= { prvtIsisISAdjIPAddrEntry 3 }
+
+prvtIsisIPReachAddr OBJECT IDENTIFIER
+    ::= { prvtIsisMIBObjects 8 }
+
+prvtIsisIPRATable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIsisIPRAEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The table of IP Reachable Addresses to networks,
+         subnetworks or hosts, learned automatically.
+         
+         This table is read-only. Manual addition of entries
+         using this table is not supported."
+    ::= { prvtIsisIPReachAddr 1 }
+
+prvtIsisIPRAEntry OBJECT-TYPE
+    SYNTAX      PrvtIsisIPRAEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry defines an IP Reachable Address to a network,
+         subnetwork or host.
+         
+         Each IP Reachable Address may have multiple entries in the
+         table, one for each equal cost path to the reachable address."
+    INDEX       { prvtIsisSysInstance, prvtIsisIPRADestType, 
+                  prvtIsisIPRADest, prvtIsisIPRADestPrefixLen, 
+                  prvtIsisIPRANextHopIndex }
+    ::= { prvtIsisIPRATable 1 }
+
+PrvtIsisIPRAEntry ::= SEQUENCE {
+    prvtIsisIPRADestType        PrvtIsisInetAddressType,
+    prvtIsisIPRADest            PrvtIsisInetAddress,
+    prvtIsisIPRADestPrefixLen   InetAddressPrefixLength,
+    prvtIsisIPRANextHopIndex    Integer32,
+    prvtIsisIPRANextHopType     PrvtIsisInetAddressType,
+    prvtIsisIPRANextHop         PrvtIsisInetAddress,
+    prvtIsisIPRAType            INTEGER,
+    prvtIsisIPRAAdminState      PrvtIsisAdminState,
+    prvtIsisIPRAMetric          PrvtIsisDefaultMetric,
+    prvtIsisIPRAMetricType      PrvtIsisMetricType,
+    prvtIsisIPRAFullMetric      PrvtIsisFullMetric,
+    prvtIsisIPRASNPAAddress     PrvtIsisOSINSAddress,
+    prvtIsisIPRASourceType      INTEGER
+}
+
+prvtIsisIPRADestType OBJECT-TYPE
+    SYNTAX      PrvtIsisInetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The type of this IP Reachable Address."
+    ::= { prvtIsisIPRAEntry 1 }
+
+prvtIsisIPRADest OBJECT-TYPE
+    SYNTAX      PrvtIsisInetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The destination of this IP Reachable Address. This is
+         either a network address, subnetwork address or host
+         address.
+         
+         The type of this address is determined by the value of
+         the prvtIsisIPRADestType object."
+    ::= { prvtIsisIPRAEntry 2 }
+
+prvtIsisIPRADestPrefixLen OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The length of the IP Netmask for Reachability Address."
+    ::= { prvtIsisIPRAEntry 3 }
+
+prvtIsisIPRANextHopIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Index of next hop. Used when there are multiple Equal
+         Cost Multipath alternatives for the same destination."
+    ::= { prvtIsisIPRAEntry 4 }
+
+prvtIsisIPRANextHopType OBJECT-TYPE
+    SYNTAX      PrvtIsisInetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The type of the IP next hop address."
+    ::= { prvtIsisIPRAEntry 5 }
+
+prvtIsisIPRANextHop OBJECT-TYPE
+    SYNTAX      PrvtIsisInetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The IP next hop to this destination.
+         
+         The type of this address is determined by the value of
+         the prvtIsisIPRANextHopType object."
+    ::= { prvtIsisIPRAEntry 6 }
+
+prvtIsisIPRAType OBJECT-TYPE
+    SYNTAX      INTEGER { manual(1), automatic(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The type of this IP Reachable Address. Those of type
+         manual are created by the network manager. Those of type
+         automatic are created through propagation of routing
+         information from another routing protocol.
+         
+         Currently only automatic entries in this table are supported."
+    ::= { prvtIsisIPRAEntry 7 }
+
+prvtIsisIPRAAdminState OBJECT-TYPE
+    SYNTAX      PrvtIsisAdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The administrative state of the IP Reachable Address."
+    ::= { prvtIsisIPRAEntry 9 }
+
+prvtIsisIPRAMetric OBJECT-TYPE
+    SYNTAX      PrvtIsisDefaultMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The metric value for reaching the specified
+         destination over this circuit."
+    ::= { prvtIsisIPRAEntry 10 }
+
+prvtIsisIPRAMetricType OBJECT-TYPE
+    SYNTAX      PrvtIsisMetricType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether the metric is internal or
+         external."
+    ::= { prvtIsisIPRAEntry 11 }
+
+prvtIsisIPRAFullMetric OBJECT-TYPE
+    SYNTAX      PrvtIsisFullMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The wide metric value for reaching the specified
+         destination over this circuit."
+    ::= { prvtIsisIPRAEntry 12 }
+
+prvtIsisIPRASNPAAddress OBJECT-TYPE
+    SYNTAX      PrvtIsisOSINSAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The SNPA Address to which a PDU may be forwarded in
+         order to reach a destination which matches this IP
+         Reachable Address.
+         This field is currently not supported."
+    ::= { prvtIsisIPRAEntry 13 }
+
+prvtIsisIPRASourceType OBJECT-TYPE
+    SYNTAX      INTEGER { static(1), direct(2), ospfv2(3), ospfv3(4), 
+                    isis(5), rip(6), igrp(7), eigrp(8), bgp(9), 
+                    other(10) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The origin of this route."
+    ::= { prvtIsisIPRAEntry 14 }
+
+prvtIsisLSPDataBase OBJECT IDENTIFIER
+    ::= { prvtIsisMIBObjects 9 }
+
+prvtIsisLSPSummaryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIsisLSPSummaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The table of LSP Headers."
+    ::= { prvtIsisLSPDataBase 1 }
+
+prvtIsisLSPSummaryEntry OBJECT-TYPE
+    SYNTAX      PrvtIsisLSPSummaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry provides a summary describing an
+         LSP currently stored in the system."
+    INDEX       { prvtIsisSysInstance, prvtIsisLSPLevel, prvtIsisLSPID }
+    ::= { prvtIsisLSPSummaryTable 1 }
+
+PrvtIsisLSPSummaryEntry ::= SEQUENCE {
+    prvtIsisLSPLevel            PrvtIsisISLevel,
+    prvtIsisLSPID               PrvtIsisLinkStatePDUID,
+    prvtIsisLSPSeq              Unsigned32,
+    prvtIsisLSPZeroLife         TruthValue,
+    prvtIsisLSPChecksum         PrvtIsisUnsigned16TC,
+    prvtIsisLSPLifetimeRemain   PrvtIsisUnsigned16TC,
+    prvtIsisLSPPDULength        PrvtIsisUnsigned16TC,
+    prvtIsisLSPAttributes       PrvtIsisUnsigned8TC,
+    prvtIsisLSPIDHostname       PrvtIsisHostName
+}
+
+prvtIsisLSPLevel OBJECT-TYPE
+    SYNTAX      PrvtIsisISLevel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "At which level does this LSP appear?"
+    ::= { prvtIsisLSPSummaryEntry 1 }
+
+prvtIsisLSPID OBJECT-TYPE
+    SYNTAX      PrvtIsisLinkStatePDUID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The 8-byte LSP ID, consisting of the SystemID,
+         Circuit ID, and Fragment Number."
+    ::= { prvtIsisLSPSummaryEntry 2 }
+
+prvtIsisLSPSeq OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The sequence number for this LSP."
+    ::= { prvtIsisLSPSummaryEntry 3 }
+
+prvtIsisLSPZeroLife OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Is this LSP being purged by this System?"
+    ::= { prvtIsisLSPSummaryEntry 4 }
+
+prvtIsisLSPChecksum OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The 16 bit Fletcher Checksum for this LSP."
+    ::= { prvtIsisLSPSummaryEntry 5 }
+
+prvtIsisLSPLifetimeRemain OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned16TC
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The remaining lifetime in seconds for this LSP.
+         
+         For a current LSP (prvtIsisLSPZeroLife is 'false'), this
+         indicates the time remaining before the LSP will expire.
+         For an LSP being purged from the system (prvtIsisLSPZeroLife
+         is 'true'), the LSP remains in the database for
+         ZeroAgeLifetime, and this will indicate the time remaining
+         before final deletion of the LSP."
+    ::= { prvtIsisLSPSummaryEntry 6 }
+
+prvtIsisLSPPDULength OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The length of this LSP."
+    ::= { prvtIsisLSPSummaryEntry 7 }
+
+prvtIsisLSPAttributes OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned8TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Flags carried by the LSP."
+    ::= { prvtIsisLSPSummaryEntry 8 }
+
+prvtIsisLSPIDHostname OBJECT-TYPE
+    SYNTAX      PrvtIsisHostName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The hostname corresponding to the system ID part of the
+         prvtIsisLSPID object.
+         
+         This is the null string if no hostname is known."
+    ::= { prvtIsisLSPSummaryEntry 9 }
+
+prvtIsisLSPTLVTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIsisLSPTLVEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The table of LSPs in the database."
+    ::= { prvtIsisLSPDataBase 2 }
+
+prvtIsisLSPTLVEntry OBJECT-TYPE
+    SYNTAX      PrvtIsisLSPTLVEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry describes a TLV within
+         an LSP currently stored in the
+         system."
+    INDEX       { prvtIsisSysInstance, prvtIsisLSPLevel, prvtIsisLSPID, 
+                  prvtIsisLSPTLVIndex }
+    ::= { prvtIsisLSPTLVTable 1 }
+
+PrvtIsisLSPTLVEntry ::= SEQUENCE {
+    prvtIsisLSPTLVIndex     Unsigned32,
+    prvtIsisLSPTLVSeq       Unsigned32,
+    prvtIsisLSPTLVChecksum  PrvtIsisUnsigned16TC,
+    prvtIsisLSPTLVType      PrvtIsisUnsigned8TC,
+    prvtIsisLSPTLVLen       PrvtIsisUnsigned8TC,
+    prvtIsisLSPTLVValue     OCTET STRING,
+    prvtIsisLSPTLVHostname  PrvtIsisHostName
+}
+
+prvtIsisLSPTLVIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The index of this TLV in the LSP. The first TLV has index 1
+         and the Nth TLV has an index of N."
+    ::= { prvtIsisLSPTLVEntry 1 }
+
+prvtIsisLSPTLVSeq OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The sequence number for this LSP."
+    ::= { prvtIsisLSPTLVEntry 2 }
+
+prvtIsisLSPTLVChecksum OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The 16 bit Fletcher Checksum for this LSP."
+    ::= { prvtIsisLSPTLVEntry 3 }
+
+prvtIsisLSPTLVType OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned8TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The type of this TLV."
+    ::= { prvtIsisLSPTLVEntry 4 }
+
+prvtIsisLSPTLVLen OBJECT-TYPE
+    SYNTAX      PrvtIsisUnsigned8TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The length of this TLV."
+    ::= { prvtIsisLSPTLVEntry 5 }
+
+prvtIsisLSPTLVValue OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value of this TLV."
+    ::= { prvtIsisLSPTLVEntry 6 }
+
+prvtIsisLSPTLVHostname OBJECT-TYPE
+    SYNTAX      PrvtIsisHostName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The hostname corresponding to the system ID part of the
+         prvtIsisLSPID object.
+         
+         This is the null string if no hostname is known."
+    ::= { prvtIsisLSPTLVEntry 7 }
+
+END -- end of module PRVT-ISIS-MIB.

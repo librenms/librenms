@@ -14,7 +14,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $version = preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"));
 $hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"));
-$hostname = trim($poll_device['sysName'], '"');
+$hostname = trim($device['sysName'], '"');
 
 $users = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 

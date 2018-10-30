@@ -1,7 +1,8 @@
 source: Extensions/MIB-based-polling.md
+path: blob/master/doc/
 ## WARNING ##
 
-MIB-based polling is experimental.  It might overload your LibreNMS server,
+MIB-based polling is unmaintained and may be removed in the future.  It might overload your LibreNMS server,
 destroy your data, set your routers on fire, and kick your cat.  It has been
 tested against a very limited set of devices (namely Ruckus ZD1000 wireless
 controllers, and `net-snmp` on Linux).  It may fail badly on other hardware.
@@ -23,7 +24,7 @@ using the script `contrib/convert-mib-graphs.sh`.  Failure to do so will
 result in your data collection silently stopping.
 
 MIB-based polling is disabled by default; you must set
-    `$config['poller_modules']['mib'] = 1;`
+    `$config['poller_modules']['mib'] = true;`
 in `config.php` to enable it.
 
 ## Preparation ##
@@ -147,7 +148,7 @@ graph.
 
 ## Configuration
 ### Main Configuration
-In `/opt/librenms/config.php` add `$config['poller_modules']['mib'] = 1;` to enable MIB polling globally.
+In `/opt/librenms/config.php` add `$config['poller_modules']['mib'] = true;` to enable MIB polling globally.
 Alternatively you can enable MIB polling per device by enabling it within the modules section for the specific device.
 
 ### Discovery

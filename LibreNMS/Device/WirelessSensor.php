@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Device;
 
+use LibreNMS\Config;
 use LibreNMS\OS;
 
 class WirelessSensor extends Sensor
@@ -103,9 +104,13 @@ class WirelessSensor extends Sensor
         return $sensor;
     }
 
-    public static function discover(OS $os)
+    public static function runDiscovery(OS $os)
     {
-        foreach (self::getTypes() as $type => $descr) {
+        $types = array_keys(self::getTypes());
+        $submodules = Config::get('discovery_submodules.wireless', $types);
+        $types = array_intersect($types, $submodules);
+
+        foreach ($types as $type) {
             static::discoverType($os, $type);
         }
     }
@@ -175,6 +180,18 @@ class WirelessSensor extends Sensor
                 'unit' => 'dB',
                 'icon' => 'signal',
             ),
+            'ssr' => array(
+                'short' => 'SSR',
+                'long' => 'Signal Strength Ratio',
+                'unit' => 'dB',
+                'icon' => 'signal',
+            ),
+            'mse' => array(
+                'short' => 'MSE',
+                'long' => 'Mean Square Error',
+                'unit' => 'dB',
+                'icon' => 'signal',
+            ),
             'rssi' => array(
                 'short' => 'RSSI',
                 'long' => 'Received Signal Strength Indicator',
@@ -192,6 +209,13 @@ class WirelessSensor extends Sensor
                 'long' => 'Noise Floor',
                 'unit' => 'dBm/Hz',
                 'icon' => 'signal',
+            ),
+            'errors' => array(
+                'short' => 'Errors',
+                'long' => 'Errors',
+                'unit' => '',
+                'icon' => 'exclamation-triangle',
+                'type' => 'counter',
             ),
             'error-ratio' => array(
                 'short' => 'Error Ratio',
@@ -305,6 +329,7 @@ class WirelessSensor extends Sensor
             153 => 5765,
             157 => 5785,
             161 => 5805,
+            165 => 5825,
         );
 
         return $channels[$channel];

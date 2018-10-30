@@ -1,0 +1,137 @@
+NSCRTV-EXTENSION-GY DEFINITIONS ::= BEGIN
+
+-- *****************************************************************************
+--                             国家HFC标准MIB扩充
+-- *****************************************************************************
+
+IMPORTS
+  OBJECT-TYPE
+    FROM RFC-1212
+  TRAP-TYPE
+    FROM RFC-1215
+  IpAddress
+    FROM RFC1155-SMI
+  system, PhysAddress, DisplayString, sysName, sysLocation, sysObjectID
+    FROM RFC1213-MIB;
+
+  gyEntry   OBJECT IDENTIFIER ::= { system 1000 }
+  gyCommon  OBJECT IDENTIFIER ::= { gyEntry 1 }
+
+
+  gyTrapVersion OBJECT-TYPE
+    SYNTAX INTEGER { TRAPv1(0), TRAPv2(1) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "切换SNMP的TRAP版本。"
+    ::= { system 101 }
+
+  gyAgentStpVersion OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "下行STP协议版本号。"
+    ::= { system 102 }
+
+
+
+  gyUpdateIdentifier OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "在线升级的软件标识。"
+    ::= { gyCommon 2 }
+
+  gyTrapVariables OBJECT IDENTIFIER
+    ::= { gyCommon 99 }
+
+
+
+
+-- *****************************************************************************
+--                          通用TRAP定义（包括心跳包）
+-- *****************************************************************************
+  gyhbMacAddress OBJECT-TYPE
+    SYNTAX PhysAddress
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "设备物理地址，映射到国标的commonPhysAddress节点。"
+    ::= { gyTrapVariables 1 }
+
+  gyhbIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "设备内网IP地址，映射到国标的commonNetworkAddress节点。"
+    ::= { gyTrapVariables 2 }
+
+  gyhbLogicalID OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "设备的文本标识符，映射到国标的commonNELogicalID节点。"
+    ::= { gyTrapVariables 3 }
+
+  gyhbModelNumber OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "设备的产品型号，映射到国标的commonNEModelNumber节点。"
+    ::= { gyTrapVariables 4 }
+
+  gyhbSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "设备的产品序列号，映射到国标的commonNESerialNumber节点。"
+    ::= { gyTrapVariables 5 }
+
+  gyhbROCommunity OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "设备的只读团体名。"
+    ::= { gyTrapVariables 6 }
+
+  gyhbRWCommunity OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "设备的读写团体名。"
+    ::= { gyTrapVariables 7 }
+
+
+
+  gyHeartBeat TRAP-TYPE
+    ENTERPRISE gyEntry
+    VARIABLES {
+      gyhbMacAddress,
+      gyhbIpAddress,
+      gyhbLogicalID,
+      gyhbModelNumber,
+      gyhbSerialNumber,
+      gyhbROCommunity,
+      gyhbRWCommunity,
+      sysObjectID,
+      sysLocation,
+      sysName
+    }
+    DESCRIPTION
+        "应答器心跳包，携带多个访问应答器必需的变量。"
+    ::= 0
+
+
+-- *****************************************************************************
+--                             MIB文件尾
+-- *****************************************************************************
+
+END

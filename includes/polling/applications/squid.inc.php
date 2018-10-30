@@ -46,9 +46,6 @@ $oids=array(
     '.1.3.6.1.4.1.3495.1.3.2.2.1.10.60'
 );
 $returnedoids=snmp_get_multi_oid($device, $oids);
-if (is_array($returnedoids)) {
-    update_application($app, 'Data ok');
-}
 
 $memmaxsize = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.1.0'];
 $swapmaxsize = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.2.0'];
@@ -177,3 +174,6 @@ $fields = array(
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
+
+$response = ($returnedoids == false) ? false : 'Data ok';
+update_application($app, $response, $fields);

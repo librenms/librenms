@@ -10,7 +10,7 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 33;
-$rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-stats-'.$app['app_id'].'.rrd';
+$rrd_filename  = get_rrd_dir($device['hostname']).'/app-nfs-stats-'.$app['app_id'].'.rrd';
 $array = array(
     'net_all' => array('descr' => 'total','colour' => '000000',),
     'net_udp' => array('descr' => 'udp','colour' => 'AA3F39',),
@@ -20,7 +20,7 @@ $array = array(
 
 $i = 0;
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = $var['descr'];

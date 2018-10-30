@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$tmp_sysdescr = str_replace('Juniper Networks, Inc ', '', $poll_device['sysDescr']);
+$tmp_sysdescr = str_replace('Juniper Networks, Inc ', '', $device['sysDescr']);
 
 list($hardware, $version,) = explode(' ', $tmp_sysdescr);
 

@@ -1,0 +1,51 @@
+NETGEAR-QOS-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Inc Quality of Service Package MIB
+-- Copyright Netgear Inc (2001-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies  Netgear Inc confidential and proprietary
+-- intellectual property. Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, Gauge32        
+                                        FROM SNMPv2-SMI
+    RowStatus                           FROM SNMPv2-TC
+    lb6m                            FROM QUANTA-LB6M-REF-MIB
+    DisplayString                       FROM RFC1213-MIB;
+                
+    fastPathQOS MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The MIB definitaions for Quality of Service Flex package."
+          
+        -- Revision history.	  
+        REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+          "Netgear branding related changes."
+        REVISION
+          "200311210000Z" -- 21 Nov 2003 12:00:00 GMT
+        DESCRIPTION
+          "Revisions made for new release."
+        REVISION
+          "200201301544Z"
+        DESCRIPTION
+          "Initial revision."
+          
+    ::= { lb6m 3 }
+      
+END

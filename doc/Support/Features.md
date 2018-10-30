@@ -1,4 +1,5 @@
 source: Support/Features.md
+path: blob/master/doc/
 ### Features
 
 Here's a brief list of supported features, some might be missing.

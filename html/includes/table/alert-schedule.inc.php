@@ -12,13 +12,13 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\LegacyAuth;
+
 $where = 1;
 
-if ($_SESSION['userlevel'] >= '5') {
-    $sql = " FROM `alert_schedule` AS S WHERE $where";
-} else {
-    $sql     = " FROM `alert_schedule` AS S WHERE $where";
-    $param[] = $_SESSION['user_id'];
+$sql = " FROM `alert_schedule` AS S WHERE $where";
+if (!LegacyAuth::user()->hasGlobalRead()) {
+    $param[] = LegacyAuth::id();
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
@@ -57,7 +57,7 @@ foreach (dbFetchRows($sql, $param) as $schedule) {
         if ($end < $now) {
             $status = 1;
         }
-    
+
         if ($now >= $start && $now < $end) {
             $status = 2;
         }

@@ -1,0 +1,183 @@
+TACACS-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32 	FROM SNMPv2-SMI
+    InetAddress, InetAddressType               FROM INET-ADDRESS-MIB
+    TEXTUAL-CONVENTION, RowStatus              FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP            FROM SNMPv2-CONF
+    lb6m                                   FROM QUANTA-LB6M-REF-MIB
+    InterfaceIndexOrZero                       FROM IF-MIB;
+
+agentTacacsClientMIB MODULE-IDENTITY
+    LAST-UPDATED "201112140000Z" -- 14 Dec 2011 12:00:00 GMT
+    ORGANIZATION "Netgear Inc"
+    CONTACT-INFO ""
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         the Netgear Inc enterprise OID pertaining to
+         TACACS+ client configuration."
+
+      -- Revision history.
+    REVISION
+        "201112140000Z" -- 14 Dec 2011 12:00:00 GMT
+    DESCRIPTION
+        "TACACS Source Interface related Object added"
+    REVISION
+        "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+    DESCRIPTION
+        "Postal address updated."
+    REVISION
+        "200705230000Z" -- 23 May 2007 12:00:00 GMT
+    DESCRIPTION
+        "Netgear branding related changes."
+    REVISION 
+        "200508170044Z"  -- Wed Aug 17 00:44 GMT 2005
+    DESCRIPTION 
+        "Initial version of this MIB module."
+
+    ::= { lb6m 18 }
+
+    --***********************************************************************
+    -- MIB Objects
+    --***********************************************************************
+
+    agentTacacsClientObjects   OBJECT IDENTIFIER ::= { agentTacacsClientMIB 1 }
+
+    --***********************************************************************
+    -- agentTacacsGlobalConfigGroup -> objects in this group are GlobalConfig 
+    -- of the TACACS client. 
+    --***********************************************************************
+    agentTacacsGlobalConfigGroup          OBJECT IDENTIFIER
+                         ::= { agentTacacsClientObjects 1 }
+
+    agentTacacsGlobalTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..30)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time-out in seconds for communication 
+         with  TACACS servers ."
+    DEFVAL { 5 }
+    ::= { agentTacacsGlobalConfigGroup 1 }
+
+    agentTacacsGlobalKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Encryption and Authentication key used in 
+         communication with  TACACS servers ."
+    ::= { agentTacacsGlobalConfigGroup 2 }
+
+    agentTacacsServerTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF  AgentTacacsServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of Tacacs server entries"
+    ::= { agentTacacsClientObjects 2 }
+
+    agentTacacsServerEntry OBJECT-TYPE
+    SYNTAX     AgentTacacsServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the Tacacs Server table."
+    INDEX     {agentTacacsServerIpAddress}
+    ::= { agentTacacsServerTable 1 }
+
+    AgentTacacsServerEntry ::=
+       SEQUENCE {
+           agentTacacsServerIpAddress
+                InetAddress,
+           agentTacacsPortNumber
+                Unsigned32,
+           agentTacacsTimeOut
+                Unsigned32,
+           agentTacacsKey
+                OCTET STRING,
+           agentTacacsPriority
+                Unsigned32,
+           agentTacacsServerStatus
+                RowStatus,
+           agentTacacsServerIpAddrType
+                InetAddressType
+       }
+   
+    agentTacacsServerIpAddress OBJECT-TYPE
+       SYNTAX      InetAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "The IP address or HostName of the TACACS server."
+       ::= { agentTacacsServerEntry 1 }
+
+    agentTacacsPortNumber OBJECT-TYPE
+       SYNTAX      Unsigned32(0..65535)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The port number of the TACACS server."
+       DEFVAL { 49 }
+       ::= { agentTacacsServerEntry 2 }
+
+    agentTacacsTimeOut OBJECT-TYPE
+       SYNTAX      Unsigned32(1..30)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The time out value for the TACACS server. 
+               If not set the value of agentTacacsGlobalTimeout will be used"
+       ::= { agentTacacsServerEntry 3 }
+
+    agentTacacsKey OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE(0..128)) 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The authentication key for the TACACS server."
+       ::= { agentTacacsServerEntry 4 }
+
+    agentTacacsPriority OBJECT-TYPE
+       SYNTAX      Unsigned32(0..65535) 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The priority of the TACACS server."
+       DEFVAL { 0 }
+       ::= { agentTacacsServerEntry 5 }
+
+    agentTacacsServerStatus OBJECT-TYPE
+       SYNTAX      RowStatus 
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "The row status of this entry .
+               Supported values:
+                   active(1)      - valid entry
+                   createAndGo(4) - used to create a new entry
+                   destroy(6)     - removes the entry."
+       ::= { agentTacacsServerEntry 6 }
+
+    agentTacacsServerIpAddrType OBJECT-TYPE
+       SYNTAX      InetAddressType
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "The type of address of the TACACS server. 
+                IPv4 and DNS types are supported currently"
+       ::= { agentTacacsServerEntry 7 }
+
+    agentTacacsSourceInterface OBJECT-TYPE
+       SYNTAX      InterfaceIndexOrZero
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A source-interface selection on an Interface Index (like vlan based
+                routing interface, port based routing interface, loopback interface).
+                A non-zero value indicates ifIndex for the corresponding interface
+                entry in the ifTable is selected. A zero value indicates the
+                source-interface un-selection."
+       ::= { agentTacacsGlobalConfigGroup 3 }
+END

@@ -1,11 +1,11 @@
 <?php
 
-$poll_device['sysDescr'] = str_replace('IOS (tm)', 'IOS (tm),', $poll_device['sysDescr']);
-$poll_device['sysDescr'] = str_replace(')  RELEASE', '), RELEASE', $poll_device['sysDescr']);
+$device['sysDescr'] = str_replace('IOS (tm)', 'IOS (tm),', $device['sysDescr']);
+$device['sysDescr'] = str_replace(')  RELEASE', '), RELEASE', $device['sysDescr']);
 
-echo "\n".$poll_device['sysDescr']."\n";
+echo "\n".$device['sysDescr']."\n";
 
-list(,$features,$version) = explode(',', $poll_device['sysDescr']);
+list(,$features,$version) = explode(',', $device['sysDescr']);
 
 $version         = str_replace(' Version ', '', $version);
 list(,$features) = explode('(', $features);
@@ -40,9 +40,8 @@ if ($hardware == '') {
     $hardware = snmp_get($device, 'sysObjectID.0', '-Osqv', 'SNMPv2-MIB:CISCO-PRODUCTS-MIB:ALTEON-ROOT-MIB');
 }
 
-// if(isset($cisco_hardware_oids[$poll_device['sysObjectID']])) { $hardware = $cisco_hardware_oids[$poll_device['sysObjectID']]; }
-if (strpos($poll_device['sysDescr'], 'IOS XR')) {
-    list(,$version) = explode(',', $poll_device['sysDescr']);
+if (strpos($device['sysDescr'], 'IOS XR')) {
+    list(,$version) = explode(',', $device['sysDescr']);
     $version        = trim($version);
     list(,$version) = explode(' ', $version);
     list($version)  = explode("\n", $version);

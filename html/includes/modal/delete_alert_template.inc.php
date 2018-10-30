@@ -11,7 +11,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+use LibreNMS\Authentication\LegacyAuth;
+
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -40,10 +42,6 @@ if (is_admin() === false) {
 </div>
 
 <script>
-$('#confirm-delete-alert-template').on('show.bs.modal', function(event) {
-    template_id = $(event.relatedTarget).data('template_id');
-    $("#template_id").val(template_id);
-});
 
 $('#alert-template-removal').click('', function(event) {
     event.preventDefault();
@@ -55,16 +53,20 @@ $('#alert-template-removal').click('', function(event) {
         dataType: "html",
         success: function(msg) {
             if(msg.indexOf("ERROR:") <= -1) {
-                $("#row_"+template_id).remove();
+                $('[data-row-id="'+template_id+'"]').remove();
             }
             $("#template_id").val('');
-            $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+            toastr.success(msg);
             $("#confirm-delete-alert-template").modal('hide');
         },
         error: function() {
-            $("#message").html('<div class="alert alert-info">The alert template could not be deleted.</div>');
+            toastr.error("The alert template could not be deleted.");
             $("#confirm-delete-alert-template").modal('hide');
         }
     });
+});
+
+$('#confirm-delete-alert-template').on('hide.bs.modal', function(event) {
+    $('#template_id').val('');
 });
 </script>

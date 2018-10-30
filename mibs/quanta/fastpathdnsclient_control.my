@@ -1,0 +1,300 @@
+
+   NETGEAR-DNS-RESOLVER-CONTROL-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Counter32, Integer32, Unsigned32
+           FROM SNMPv2-SMI
+       TEXTUAL-CONVENTION, RowStatus, DisplayString, TruthValue
+           FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP
+           FROM SNMPv2-CONF
+       lb6m  
+           FROM QUANTA-LB6M-REF-MIB
+       InterfaceIndexOrZero
+           FROM IF-MIB
+       InetAddressType, InetAddress
+           FROM INET-ADDRESS-MIB;
+
+   -- DNS Control Resolver MIB
+
+   fastPathDnsResControlMIB MODULE-IDENTITY
+    LAST-UPDATED "201112140000Z" -- 14 Dec 2011 12:00:00 GMT
+    ORGANIZATION "Netgear Inc"
+    CONTACT-INFO ""
+                                                                                  
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         the Netgear Inc enterprise OID pertaining to
+         DNS Client control configuration"
+
+      -- Revision history.
+    REVISION
+          "201112140000Z" -- 14 Dec 2011 12:00:00 GMT
+    DESCRIPTION
+          "DNS Client Source Interface related changes."
+    REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+    DESCRIPTION
+          "Postal address updated."
+    REVISION
+         "200705230000Z" -- 23 May 2007 12:00:00 GMT
+    DESCRIPTION
+         "Netgear branding related changes."
+    REVISION
+         "200503281100Z"  -- Mon Mar 28 11:00 GMT 2005
+    DESCRIPTION 
+         "Initial version of this MIB module."
+    ::= { lb6m 37 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+   DnsCacheEntryType ::= TEXTUAL-CONVENTION
+       STATUS  current
+       DESCRIPTION
+               "A DNS cache entry type. This is for address or 
+                for canonical name."
+       SYNTAX  INTEGER { dnsCacheAddresstype(1), 
+                         dnsCacheCnametye(2) }
+ 
+
+   fastPathDnsResCtlMIBObjects  OBJECT IDENTIFIER ::= { fastPathDnsResControlMIB 1 }
+
+  agentResCtlglobal            OBJECT IDENTIFIER ::= { fastPathDnsResCtlMIBObjects 1 }
+  agentResCtlServConfig        OBJECT IDENTIFIER ::= { fastPathDnsResCtlMIBObjects 2 }
+  agentResCtlStaticServConfig  OBJECT IDENTIFIER ::= { fastPathDnsResCtlMIBObjects 3 }
+--  agentResCtlCacheConfig        OBJECT IDENTIFIER ::= { dnsResCtlMIBObjects 4 }
+
+
+   -- Resolver Control Configuration Group
+
+  agentResCtlAdminMode OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The  dns client administrative modes supported by the device.
+               The dns client services can be turned on or off."
+       ::= {agentResCtlglobal 1 }
+
+  agentResCtlDefDomainName OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE (0..255))
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The default domain name for unqualified hostnames."
+       ::= {agentResCtlglobal 2 }
+
+  agentResCtlCacheFlushStatus OBJECT-TYPE
+       SYNTAX  INTEGER { dnsCacheFlushEnable(1), 
+                         dnsCacheFlushDisable(2) }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The cache Flush status. If set to enable all dynamic cache 
+                entries would be removed."
+       ::= {agentResCtlglobal 3 }
+
+   agentResCtlRequestTimeout OBJECT-TYPE
+       SYNTAX  INTEGER (0..3600)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The timeout before retransmitting a request to the server. The 
+                timeout value is configured and displayed in seconds."
+       DEFVAL { 3 }
+       ::= {agentResCtlglobal 4 }
+
+   agentResCtlRequestRetransmits OBJECT-TYPE
+       SYNTAX  INTEGER (0..100)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The number of times the request is retransmitted. The request
+                is retransmitted provided the maximum timeout value allows
+                this many number of retransmits."
+       DEFVAL { 2 }
+       ::= {agentResCtlglobal 5 }
+
+  agentResCtlDomainListTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF ResCtlDomainListEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION "A table for default domain list."
+       ::= {agentResCtlglobal 6}
+
+  agentResCtlDomainListEntry OBJECT-TYPE
+       SYNTAX      ResCtlDomainListEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "An entry in the DNS domain name list.
+               Rows may be created or deleted at any time by the DNS
+              Resolver and by SNMP SET requests."
+       INDEX     {agentResCtlDomainListName }
+       ::= {agentResCtlDomainListTable 1 }
+
+   ResCtlDomainListEntry ::=
+       SEQUENCE {
+          agentResCtlDomainListName
+               DisplayString,
+          agentResCtlDomainListNameStatus
+               RowStatus
+       }
+
+  agentResCtlDomainListName OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+             "The dns domain list entry identified by
+               this row of the table."
+      ::= {agentResCtlDomainListEntry 1 }
+
+  agentResCtlDomainListNameStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "Status of the DNS domain list Entry Table
+                Supported values:
+                   active(1)      - valid entry
+                   createAndGo(4) - used to create a new entry
+                   destroy(6)     - removes the entry"
+       ::= {agentResCtlDomainListEntry 2 }
+
+   -- DNS Resolver Control Server Configuration Table
+
+  agentResCtlServConfigTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF ResCtlConfigIPEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "Table of DNS servers list"
+       ::= {agentResCtlServConfig 1 }
+
+  agentResCtlConfigIPEntry OBJECT-TYPE
+       SYNTAX      ResCtlConfigIPEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "An entry in the DNS Servers list.
+               Rows may be created or deleted at any time by the DNS
+              Resolver and by SNMP SET requests."
+       INDEX     {agentResCtlDnsNameServerIPType, 
+                  agentResCtlDnsNameServerIP }
+       ::= {agentResCtlServConfigTable 1 }
+
+   ResCtlConfigIPEntry ::=
+       SEQUENCE {
+          agentResCtlDnsNameServerIPType
+               InetAddressType,
+          agentResCtlDnsNameServerIP
+               InetAddress,
+          agentResCtlDnsNameServerStatus
+               RowStatus
+       }
+
+  agentResCtlDnsNameServerIPType OBJECT-TYPE
+       SYNTAX      InetAddressType
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The Type of IP address of the dns server identified by
+               this row of the table. Can be either ipv4(1), or ipv6(2)."
+      ::= {agentResCtlConfigIPEntry 1 }
+
+  agentResCtlDnsNameServerIP OBJECT-TYPE
+       SYNTAX      InetAddress (SIZE(0|4|16))
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+             "The IP address of the dns server identified by
+               this row of the table."
+      ::= {agentResCtlConfigIPEntry 2 }
+
+  agentResCtlDnsNameServerStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "Status of the DNS Server Address Table
+                Supported values:
+                   active(1)      - valid entry
+                   createAndGo(4) - used to create a new entry
+                   destroy(6)     - removes the entry"
+       ::= {agentResCtlConfigIPEntry 3 }
+
+   -- DNS Resolver Control Static Host Name IP Address Table
+
+  agentResCtlStaticServConfigTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF ResCtlStaticServEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "Static table of DNS hostname to IP address table"
+       ::= {agentResCtlStaticServConfig 1 }
+
+  agentResCtlStaticServEntry OBJECT-TYPE
+       SYNTAX     ResCtlStaticServEntry 
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "An entry in the static DNS hostname IP address list.
+               Rows may be created or deleted at any time by the DNS
+              Resolver and by SNMP SET requests."
+       INDEX     {agentResCtlStaticHostName,
+                  agentResCtlStaticIPAddress }
+       ::= {agentResCtlStaticServConfigTable 1 }
+
+   ResCtlStaticServEntry ::=
+       SEQUENCE {
+          agentResCtlStaticHostName
+               OCTET STRING,
+          agentResCtlStaticIPAddress
+               IpAddress,
+          agentResCtlStaticNameServerStatus
+               RowStatus
+       }
+
+  agentResCtlStaticHostName OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE (0 .. 255))
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "The static hostname to be stored in the name server table."
+       ::= {agentResCtlStaticServEntry 1 }
+
+  agentResCtlStaticIPAddress OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "The IP address of the dns server for the static hostname."
+       ::= {agentResCtlStaticServEntry 2 }
+
+  agentResCtlStaticNameServerStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "Status of the Static Host Name - IP Address Table
+                Supported values:
+                   active(1)      - valid entry
+                   createAndGo(4) - used to create a new entry
+                   destroy(6)     - removes the entry"
+       ::= {agentResCtlStaticServEntry 3 }
+
+   agentResCtlSourceInterface OBJECT-TYPE
+       SYNTAX      InterfaceIndexOrZero
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A source-interface selection on an Interface Index (like vlan based
+               routing interface, port based routing interface, loopback interface,
+               tunnel interface). A non-zero value indicates ifIndex for the
+               corresponding interface entry in the ifTable is selected.
+               A zero value indicates the source-interface un-selection."
+       ::= {agentResCtlglobal 7 }
+END

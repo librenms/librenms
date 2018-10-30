@@ -18,10 +18,17 @@
  *      DS:dispersion:GAUGE:'.$config['rrd']['heartbeat'].':0:U
  */
 
-if ($device['os_group'] == 'cisco') {
-    include 'includes/polling/ntp/cisco.inc.php';
+use LibreNMS\Config;
+
+if (file_exists(Config::get('install_dir') . "/includes/polling/ntp/{$device['os_group']}.inc.php")) {
+    include Config::get('install_dir') . "/includes/polling/ntp/{$device['os_group']}.inc.php";
+}
+
+if ($device['os'] == 'awplus') {
+    include 'includes/polling/ntp/awplus.inc.php';
 }
 
 unset(
-    $cntpPeersVarEntry
+    $cntpPeersVarEntry,
+    $atNtpAssociationEntry
 );

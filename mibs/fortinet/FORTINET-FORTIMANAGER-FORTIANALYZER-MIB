@@ -1,0 +1,1541 @@
+
+FORTINET-FORTIMANAGER-FORTIANALYZER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    fnSysSerial, fortinet, FnIndex, FnBoolState, fnGenTrapMsg
+        FROM FORTINET-CORE-MIB
+    sysName
+        FROM SNMPv2-MIB
+    InetPortNumber
+        FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+    Integer32, Gauge32, Counter32, Counter64, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+
+fnFortiManagerMib MODULE-IDENTITY
+    LAST-UPDATED "201706280000Z"
+    ORGANIZATION 
+        "Fortinet Technologies, Inc."
+    CONTACT-INFO 
+        "
+         Technical Support
+         email: support@fortinet.com
+         http://www.fortinet.com"
+    DESCRIPTION
+         "Added model names faz1000E, fmg400E,
+		  faz400E, fmg300E,
+		  faz3500F,
+		  faz3000F, fmg3000F, 
+		  faz2000E, fmg2000E,
+		  faz3700F."
+    REVISION    "201706280000Z"
+    DESCRIPTION
+         "Add fmSysVersion,fmSysUpTime,fmLogRate,fmAdom,fmDevice,fmRaid,fmPower,fmHa"
+    REVISION    "201508150000Z"
+    DESCRIPTION
+         "NPI faz200E, fmg200E."
+    REVISION    "201506120000Z"
+    DESCRIPTION
+         "Add model names faz3000E, fmg4000E, faz1000D, fmg1000D."
+    REVISION    "201404220000Z"
+    DESCRIPTION
+         "Added fmSysCpuUsageExcludedNice.
+          Added fmTrapCpuThresholdExcludeNice."
+    REVISION    "201306100000Z"
+    DESCRIPTION
+         "Add support for FortiAnalyzer."
+    REVISION    "201303270000Z"
+    DESCRIPTION 
+         "Added license gb/day and device quota trap. fmTrapLicGbDayThreshold 
+          and fmTrapLicDevQuotaThreshold"
+    REVISION    "201211260000Z"
+    DESCRIPTION 
+         "Added commas between notifications in NOTIFICATION-GROUP.
+          Added imports from SNMPv2-SMI and SNMPv2-TC.
+          imported `OBJECT-GROUP' from module SNMPv2-CONF"
+    REVISION    "201204200000Z"
+    DESCRIPTION 
+         "Added RAID trap fmTrapRAIDStatusChange."
+    REVISION    "201103250000Z"
+    DESCRIPTION 
+        "Added fmSysMemUsed,fmSysMemCapacity,fmSysCpuUsage.
+         Added new FortiManager models."
+    REVISION    "201101190000Z"
+    DESCRIPTION 
+        "MIB module for Fortinet FortiManager devices."
+    REVISION    "200807180000Z"
+    DESCRIPTION
+        "Add sysName to fmTrapHASwitch."
+    REVISION    "200806260000Z"
+    DESCRIPTION 
+        "OID correction for fnFortiManagerMib."
+    REVISION    "200806160000Z"
+    DESCRIPTION 
+        "Spelling corrections."
+    REVISION    "200806100000Z"
+    DESCRIPTION 
+        "Initial version of FORTINET-FORTIMANAGER-MIB."
+    ::= { fortinet 103 }
+
+
+--
+-- fortinet.fnFortiManagerMib.fmTraps
+--
+
+FmRAIDStatusCode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Enumerated list of RAID status codes."
+    SYNTAX      INTEGER { arrayOK(1), arrayDegraded(2), arrayFailed(3),
+		    arrayRebuilding(4), arrayRebuildingStarted(5),
+		    arrayRebuildingFinished(6), arrayInitializing(7),
+                    arrayInitializingStarted(8), arrayInitializingFinished(9),
+                    diskOk(10), diskDegraded(11), diskFailEvent(12),
+        diskUnavailable(100), diskUnused(101), diskOK(102), diskRebuilding(103), diskFailed(104), diskSpare(105),
+        raidUnavailable(200), raidOK(201), raidDegraded(202), raidFailed(203), raidBackground-Initializing(204), raidBackground-Verifying(205), raidBackground-Rebuilding(206)}
+
+FmSessProto ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "data type for session protocols"
+    SYNTAX      INTEGER { ip(0), icmp(1), igmp(2), ipip(4), tcp(6),
+                          egp(8), pup(12), udp(17), idp(22), ipv6(41),
+                          rsvp(46), gre(47), esp(50), ah(51), ospf(89),
+                          pim(103), comp(108), raw(255) }
+
+
+fmTraps OBJECT IDENTIFIER
+    ::= { fnFortiManagerMib 0 }
+
+fmTrapPrefix OBJECT IDENTIFIER
+    ::= { fmTraps 0 }
+
+fmTrapObject OBJECT IDENTIFIER
+    ::= { fmTraps 1 }
+
+fmRAIDStatus OBJECT-TYPE
+    SYNTAX      FmRAIDStatusCode
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "New RAID state associated with a RAID status change event."
+    ::= { fmTrapObject 1 }
+
+fmRAIDDevIndex OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Name/index of a RAID device relating to the event."
+    ::= { fmTrapObject 2 }
+
+fmLogRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Log receiving rate in number of logs per second."
+    ::= { fmTrapObject 3 }
+
+fmLogRateThreshold OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Threshold for log rate in number of logs per second."
+    ::= { fmTrapObject 4 }
+
+fmLogDataRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Log receiving data rate in number of KB per second."
+    ::= { fmTrapObject 5 }
+
+fmLogDataRateThreshold OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Threshold for log data rate in number of KB per second."
+    ::= { fmTrapObject 6 }
+
+fmLicGbDay OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Log data used in number of GB per day."
+    ::= { fmTrapObject 7 }
+
+fmLicGbDayThreshold OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Licensed threshold for log data in number of GB per day."
+    ::= { fmTrapObject 8 }
+
+fmLicDevQuota OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Device quota used in number of GB."
+    ::= { fmTrapObject 9 }
+
+fmLicDevQuotaThreshold OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Licensed threshold for device quota in number of GB."
+    ::= { fmTrapObject 10 }
+
+--
+-- fortinet.fnFortiManagerMib.fmModel
+--
+
+fmModel OBJECT IDENTIFIER
+    ::= { fnFortiManagerMib 1 }
+
+fmg100 OBJECT IDENTIFIER
+    ::= { fmModel 1000 }
+
+fmgvm OBJECT IDENTIFIER
+    ::= { fmModel 1001 }
+
+fmg100C OBJECT IDENTIFIER
+    ::= { fmModel 1003 }
+
+fmg200D OBJECT IDENTIFIER
+    ::= { fmModel 2004 }
+
+fmg200E OBJECT IDENTIFIER
+    ::= { fmModel 2005 }
+
+fmg300D OBJECT IDENTIFIER
+    ::= { fmModel 3004 }
+
+fmg300E OBJECT IDENTIFIER
+    ::= { fmModel 3005 }
+
+fmg400 OBJECT IDENTIFIER
+    ::= { fmModel 4000 }
+
+fmg400A OBJECT IDENTIFIER
+    ::= { fmModel 4001 }
+
+fmg400B OBJECT IDENTIFIER
+    ::= { fmModel 4002 }
+
+fmg400C OBJECT IDENTIFIER
+    ::= { fmModel 4003 }
+
+fmg400E OBJECT IDENTIFIER
+    ::= { fmModel 4005 }
+
+fmg1000C OBJECT IDENTIFIER
+    ::= { fmModel 10003 }
+
+fmg1000D OBJECT IDENTIFIER
+    ::= { fmModel 10004 }
+
+fmg2000E OBJECT IDENTIFIER
+    ::= { fmModel 20005 }
+
+fmg2000XL OBJECT IDENTIFIER
+    ::= { fmModel 20000 }
+
+fmg3000 OBJECT IDENTIFIER
+    ::= { fmModel 30000 }
+
+fmg3000B OBJECT IDENTIFIER
+    ::= { fmModel 30002 }
+
+fmg3000C OBJECT IDENTIFIER
+    ::= { fmModel 30003 }
+
+fmg3000F OBJECT IDENTIFIER
+    ::= { fmModel 30006 }
+
+fmg3900E OBJECT IDENTIFIER
+    ::= { fmModel 39005 }
+
+fmg4000D OBJECT IDENTIFIER
+    ::= { fmModel 40004 }
+
+fmg4000E OBJECT IDENTIFIER
+    ::= { fmModel 40005 }
+
+fmg5001A OBJECT IDENTIFIER
+    ::= { fmModel 50011 }
+
+--
+-- fortinet.fnFortiManagerMib.fmSystem
+--
+
+fmSystem OBJECT IDENTIFIER
+    ::= { fnFortiManagerMib 2 }
+
+--
+-- fortinet.fnFortiManagerMib.fmSystem.fmSystemInfo
+--
+
+fmSystemInfo OBJECT IDENTIFIER
+    ::= { fmSystem 1 }
+
+fmSysCpuUsage OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current CPU usage (percentage)"
+    ::= { fmSystemInfo 1 }
+
+fmSysMemUsed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current memory used (KB)"
+    ::= { fmSystemInfo 2 }
+
+fmSysMemCapacity OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total physical and swap memory installed (KB)"
+    ::= { fmSystemInfo 3 }
+
+fmSysDiskUsage OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current hard disk usage (MB)"
+    ::= { fmSystemInfo 4 }
+
+fmSysDiskCapacity OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total hard disk capacity (MB)"
+    ::= { fmSystemInfo 5 }
+
+fmSysCpuUsageExcludedNice OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current CPU usage excluded nice processes usage (percentage)"
+    ::= { fmSystemInfo 6 }
+
+fmSysVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Firmware version of the device"
+    ::= { fmSystemInfo 7 }
+
+fmSysUpTime OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "hundredths of a second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The 64bit time (in hundredths of a second) since the network management portion of the system was last re-initialized."
+    ::= { fmSystemInfo 8 }
+
+fmLogRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "logs per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Log receiving rate in number of logs per second."
+    ::= { fmSystemInfo 9 }
+
+fmTrapHASwitch NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "FortiManager HA cluster has been re-arranged. A new master has been selected and asserted."
+    ::= { fmTrapPrefix 401 }
+
+fmTrapRAIDStatusChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, 
+	              fmRAIDStatus, fmRAIDDevIndex }
+    STATUS      current
+    DESCRIPTION 
+        "Trap is sent when there is a change in the status of the RAID array, if present."
+    ::= { fmTrapPrefix 402 }
+
+fmTrapLogAlert NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fnGenTrapMsg }
+    STATUS      current
+    DESCRIPTION 
+        "Trap is sent when a log based alert has been triggered.
+         Alert description included in trap."
+    ::= { fmTrapPrefix 403 }
+
+fmTrapLogRateThreshold NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fmLogRate, fmLogRateThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the incoming log rate has exceeded the threshold"
+    ::= { fmTrapPrefix 404 }
+
+fmTrapLogDataRateThreshold NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fmLogDataRate, fmLogDataRateThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the incoming log data rate has exceeded the threshold"
+    ::= { fmTrapPrefix 405 }
+
+fmTrapLicGbDayThreshold NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fmLicGbDay, fmLicGbDayThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the used log has exceeded the licensed GB/Day"
+    ::= { fmTrapPrefix 407 }
+
+fmTrapLicDevQuotaThreshold NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fmLicDevQuota, fmLicDevQuotaThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the used device quota has exceeded the licensed device quota"
+    ::= { fmTrapPrefix 408 }
+
+fmTrapCpuThresholdExcludeNice NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the CPU usage excluding nice processes has exceeded the threshold"
+    ::= { fmTrapPrefix 409 }
+
+--
+-- fortinet.fnFortiManagerMib.faModel
+--
+
+faModel OBJECT IDENTIFIER
+    ::= { fnFortiManagerMib 3 }
+
+faz100 OBJECT IDENTIFIER
+    ::= { faModel 1000 }
+
+faz100A OBJECT IDENTIFIER
+    ::= { faModel 1001 }
+
+faz100B OBJECT IDENTIFIER
+    ::= { faModel 1002 }
+
+faz100C OBJECT IDENTIFIER
+    ::= { faModel 1003 }
+
+faz200D OBJECT IDENTIFIER
+    ::= { faModel 2004 }
+
+faz200E OBJECT IDENTIFIER
+    ::= {faModel 2005 }
+
+faz300D OBJECT IDENTIFIER
+    ::= { faModel 3004 }
+
+faz400E OBJECT IDENTIFIER
+    ::= { faModel 4005 }
+
+faz400 OBJECT IDENTIFIER
+    ::= { faModel 4000 }
+
+faz400B OBJECT IDENTIFIER
+    ::= { faModel 4002 }
+
+faz400C OBJECT IDENTIFIER
+    ::= { faModel 4003 }
+
+fazvm OBJECT IDENTIFIER
+    ::= { faModel 20 }
+
+faz800 OBJECT IDENTIFIER
+    ::= { faModel 8000 }
+
+faz800B OBJECT IDENTIFIER
+    ::= { faModel 8002 }
+
+faz1000B OBJECT IDENTIFIER
+    ::= { faModel 10002 }
+
+faz1000C OBJECT IDENTIFIER
+    ::= { faModel 10003 }
+
+faz1000D OBJECT IDENTIFIER
+    ::= { faModel 10004 }
+
+faz1000E OBJECT IDENTIFIER
+    ::= { faModel 10005 }
+
+faz2000 OBJECT IDENTIFIER
+    ::= { faModel 20000 }
+
+faz2000A OBJECT IDENTIFIER
+    ::= { faModel 20001 }
+
+faz2000B OBJECT IDENTIFIER
+    ::= { faModel 20002 }
+
+faz2000E OBJECT IDENTIFIER
+    ::= { faModel 20005 }
+
+faz3000D OBJECT IDENTIFIER
+    ::= { faModel 30004 }
+
+faz3000E OBJECT IDENTIFIER
+    ::= { faModel 30005 }
+
+faz3000F OBJECT IDENTIFIER
+    ::= { faModel 30006 }
+
+faz3500E OBJECT IDENTIFIER
+    ::= { faModel 35005 }
+
+faz3500F OBJECT IDENTIFIER
+    ::= { faModel 35006 }
+
+faz3700F OBJECT IDENTIFIER
+    ::= { faModel 37006 }
+
+faz3900E OBJECT IDENTIFIER
+    ::= { faModel 39005 }
+
+faz4000 OBJECT IDENTIFIER
+    ::= { faModel 40000 }
+
+faz4000A OBJECT IDENTIFIER
+    ::= { faModel 40001 }
+
+faz4000B OBJECT IDENTIFIER
+    ::= { faModel 40002 }
+
+--
+-- fortinet.fnFortiManagerMib.fmInetProto
+--
+
+fmInetProto OBJECT IDENTIFIER
+    ::= { fnFortiManagerMib 4 }
+
+fmInetProtoInfo OBJECT IDENTIFIER
+    ::= { fmInetProto 1 }
+
+fmInetProtoTables OBJECT IDENTIFIER
+    ::= { fmInetProto 2 }
+
+fmIpSessTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmIpSessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information on the IP sessions active on the device"
+    ::= { fmInetProtoTables 1 }
+
+fmIpSessEntry OBJECT-TYPE
+    SYNTAX      FmIpSessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information on a specific session, including source and destination"
+    INDEX       { fmIpSessIndex }
+    ::= { fmIpSessTable 1 }
+
+FmIpSessEntry ::= SEQUENCE {
+    fmIpSessIndex       FnIndex,
+    fmIpSessProto       FmSessProto,
+    fmIpSessFromAddr    IpAddress,
+    fmIpSessFromPort    InetPortNumber,
+    fmIpSessToAddr      IpAddress,
+    fmIpSessToPort      InetPortNumber,
+    fmIpSessExp         Counter32
+}
+
+fmIpSessIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index value that uniquely identifies
+         an IP session within the fmIpSessTable"
+    ::= { fmIpSessEntry 1 }
+
+fmIpSessProto OBJECT-TYPE
+    SYNTAX      FmSessProto
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The protocol the session is using (IP, TCP, UDP, etc.)"
+    ::= { fmIpSessEntry 2 }
+
+fmIpSessFromAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Source IP address (IPv4 only) of the session"
+    ::= { fmIpSessEntry 3 }
+
+fmIpSessFromPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Source port number (UDP and TCP only) of the session"
+    ::= { fmIpSessEntry 4 }
+
+fmIpSessToAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Destination IP address (IPv4 only) of the session"
+    ::= { fmIpSessEntry 5 }
+
+fmIpSessToPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Destination Port number (UDP and TCP only) of the session"
+    ::= { fmIpSessEntry 6 }
+
+fmIpSessExp OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of seconds remaining before the session expires (if idle)"
+    ::= { fmIpSessEntry 7 }
+
+--
+-- fortinet.fnFortiManagerMib.fmAdom
+--
+
+fmAdom OBJECT IDENTIFIER
+    ::= { fnFortiManagerMib 5 }
+
+fmAdomInfo OBJECT IDENTIFIER
+    ::= { fmAdom 1 }
+
+fmAdomEnabled OBJECT-TYPE
+    SYNTAX      FnBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether administrative domains are enabled on this device"
+    ::= { fmAdomInfo 1 }
+
+fmAdomNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of administrative domains in fmAdomTable"
+    ::= { fmAdomInfo 2 }
+
+fmAdomMax OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of administrative domains allowed on the device as allowed by hardware and/or licensing"
+    ::= { fmAdomInfo 3 }
+
+fmAdomTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmAdomEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of administrative domains configured on the device"
+    ::= { fmAdom 2 }
+
+fmAdomEntry OBJECT-TYPE
+    SYNTAX      FmAdomEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable
+         to a particular administrative domain"
+    INDEX       { fmAdomEntIndex }
+    ::= { fmAdomTable 1 }
+
+FmAdomEntry ::= SEQUENCE {
+    fmAdomEntIndex     FnIndex,
+    fmAdomEntName      DisplayString,
+    fmAdomEntState     FnBoolState,
+    fmAdomEntMode      FmAdomEntMode,
+    fmAdomEntFgtNumber Integer32,
+    fmAdomEntPolicyPackageNumber Integer32,
+    fmAdomEntOsVersion Integer32,
+    fmAdomEntMr        Integer32,
+    fmAdomEntVpnMode   FmAdomEntVpnMode
+}
+
+fmAdomEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies the entry"
+    ::= { fmAdomEntry 1 }
+
+fmAdomEntName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the administrative domain"
+    ::= { fmAdomEntry 2 }
+
+fmAdomEntState OBJECT-TYPE
+    SYNTAX      FnBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether adom is enabled or disabled"
+    ::= { fmAdomEntry 3 }
+
+FmAdomEntMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Whether adom is in normal or backup mode"
+    SYNTAX      INTEGER {
+        normal (1),
+        backup (2)
+    }
+
+fmAdomEntMode OBJECT-TYPE
+    SYNTAX      FmAdomEntMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether adom is in normal or backup mode"
+    ::= { fmAdomEntry 4 }
+
+fmAdomEntFgtNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of FortiGates in adom"
+    ::= { fmAdomEntry 5 }
+
+fmAdomEntPolicyPackageNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of policy packages in adom"
+    ::= { fmAdomEntry 6 }
+
+fmAdomEntOsVersion OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OS version supported by adom"
+    ::= { fmAdomEntry 7 }
+
+fmAdomEntMr OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MR version supported by adom"
+    ::= { fmAdomEntry 8 }
+
+FmAdomEntVpnMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Adom VPN mode"
+    SYNTAX      INTEGER {
+        central-console (1),
+        policy-and-device (2),
+        not-applicable (3)
+    }
+
+fmAdomEntVpnMode OBJECT-TYPE
+    SYNTAX      FmAdomEntVpnMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Adom VPN mode"
+    ::= { fmAdomEntry 9 }
+
+--
+-- fortinet.fnFortiManagerMib.fmDevice
+--
+
+fmDevice OBJECT IDENTIFIER
+    ::= { fnFortiManagerMib 6 }
+
+fmDeviceInfo OBJECT IDENTIFIER
+    ::= { fmDevice 1 }
+
+fmDeviceNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of devices in fmDeviceTable"
+    ::= { fmDeviceInfo 1 }
+
+fmDeviceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmDeviceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of devices configured on the device"
+    ::= { fmDevice 2 }
+
+fmDeviceEntry OBJECT-TYPE
+    SYNTAX      FmDeviceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable
+         to a particular device"
+    INDEX       { fmDeviceEntIndex }
+    ::= { fmDeviceTable 1 }
+
+FmDeviceEntry ::= SEQUENCE {
+    fmDeviceEntIndex     FnIndex,
+    fmDeviceEntName      DisplayString,
+    fmDeviceEntSn        DisplayString,
+    fmDeviceEntMode      FmDeviceEntMode,
+    fmDeviceEntAdom      DisplayString,
+    fmDeviceEntIp        DisplayString,
+    fmDeviceEntOsVersion Integer32,
+    fmDeviceEntMr        Integer32,
+    fmDeviceEntBuild     Integer32,
+    fmDeviceEntHaMode    FmDeviceEntHaMode,
+    fmDeviceEntHaGroup   DisplayString,
+    fmDeviceEntConnectState FmDeviceEntConnectState,
+    fmDeviceEntDbState   FmDeviceEntDbState,
+    fmDeviceEntConfigState  FmDeviceEntConfigState,
+    fmDeviceEntState     FmDeviceEntState,
+    fmDeviceEntPlatform  DisplayString,
+    fmDeviceEntVdomEnabled  FnBoolState,
+    fmDeviceEntSupportState FmDeviceEntSupportState,
+    fmDeviceEntAvExpireDate DisplayString,
+    fmDeviceEntIpsExpireDate DisplayString,
+    fmDeviceEntWfExpireDate DisplayString,
+    fmDeviceEntAsExpireDate DisplayString,
+    fmDeviceEntPolicyPackageState FmDeviceEntPolicyPackageState,
+    fmDeviceEntDesc      DisplayString
+}
+
+fmDeviceEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies the entry"
+    ::= { fmDeviceEntry 1 }
+
+fmDeviceEntName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the device"
+    ::= { fmDeviceEntry 2 }
+
+fmDeviceEntSn OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The serial number of the device"
+    ::= { fmDeviceEntry 3 }
+
+FmDeviceEntMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Device management mode"
+    SYNTAX      INTEGER {
+        unregistered (0),
+        fmg (1),
+        faz (2),
+        fmg-faz (3)
+    }
+
+fmDeviceEntMode OBJECT-TYPE
+    SYNTAX      FmDeviceEntMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device management mode"
+    ::= { fmDeviceEntry 4 }
+
+fmDeviceEntAdom OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The adom name the device belongs to"
+    ::= { fmDeviceEntry 5 }
+
+fmDeviceEntIp OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP of the device"
+    ::= { fmDeviceEntry 6 }
+
+fmDeviceEntOsVersion OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The OS version of the device"
+    ::= { fmDeviceEntry 7 }
+
+fmDeviceEntMr OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MR version of the device"
+    ::= { fmDeviceEntry 8 }
+
+fmDeviceEntBuild OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The build number of the device"
+    ::= { fmDeviceEntry 9 }
+
+FmDeviceEntHaMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Device HA mode"
+    SYNTAX      INTEGER {
+        standalone (0),
+        a-p (1),
+        a-a (2),
+        elbc (3),
+        dual (4),
+        fmg (5)
+    }
+
+fmDeviceEntHaMode OBJECT-TYPE
+    SYNTAX      FmDeviceEntHaMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device HA mode"
+    ::= { fmDeviceEntry 10 }
+
+fmDeviceEntHaGroup OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device HA group name"
+    ::= { fmDeviceEntry 11 }
+
+FmDeviceEntConnectState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Device connection status"
+    SYNTAX      INTEGER {
+        unknown (0),
+        up (1),
+        down (2)
+    }
+
+fmDeviceEntConnectState OBJECT-TYPE
+    SYNTAX      FmDeviceEntConnectState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device connection status"
+    ::= { fmDeviceEntry 12 }
+
+FmDeviceEntDbState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Device DB status"
+    SYNTAX      INTEGER {
+        unknown (0),
+        not-modified (1),
+        modified (2)
+    }
+
+fmDeviceEntDbState OBJECT-TYPE
+    SYNTAX      FmDeviceEntDbState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device DB status"
+    ::= { fmDeviceEntry 13 }
+
+FmDeviceEntConfigState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Device config status"
+    SYNTAX      INTEGER {
+        unknown (0),
+        in-sync (1),
+        out-of-sync (2)
+    }
+
+fmDeviceEntConfigState OBJECT-TYPE
+    SYNTAX      FmDeviceEntConfigState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device config status"
+    ::= { fmDeviceEntry 14 }
+
+FmDeviceEntState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Device status"
+    SYNTAX      INTEGER {
+        none (0),
+        unknown (1),
+        checked-in (2),
+        in-progress (3),
+        installed (4),
+        aborted (5),
+        sched (6),
+        retry (7),
+        canceled (8),
+        pending (9),
+        retrieved (10),
+        changed-conf (11),
+        sync-fail (12),
+        timeout (13),
+        rev-reverted (14),
+        auto-updated (15)
+    }
+
+fmDeviceEntState OBJECT-TYPE
+    SYNTAX      FmDeviceEntState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device status"
+    ::= { fmDeviceEntry 15 }
+
+fmDeviceEntPlatform OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The platform of the device"
+    ::= { fmDeviceEntry 16 }
+
+fmDeviceEntVdomEnabled OBJECT-TYPE
+    SYNTAX      FnBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether vdom enabled on the device"
+    ::= { fmDeviceEntry 17 }
+
+FmDeviceEntSupportState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The support status of the device"
+    SYNTAX      INTEGER {
+        expired  (0),
+        valid (1)
+    }
+
+fmDeviceEntSupportState OBJECT-TYPE
+    SYNTAX      FmDeviceEntSupportState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The support status of the device"
+    ::= { fmDeviceEntry 18 }
+
+fmDeviceEntAvExpireDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The AV license of the device"
+    ::= { fmDeviceEntry 19 }
+
+fmDeviceEntIpsExpireDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IPS license of the device"
+    ::= { fmDeviceEntry 20 }
+
+fmDeviceEntWfExpireDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The WCF license of the device"
+    ::= { fmDeviceEntry 21 }
+
+fmDeviceEntAsExpireDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The AS license of the device"
+    ::= { fmDeviceEntry 22 }
+
+FmDeviceEntPolicyPackageState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The policy package status of the device"
+    SYNTAX      INTEGER {
+        never-installed (-1),
+        installed  (0),
+        modified (1),
+        imported (2),
+        unknown (3),
+        out-of-sync (9),
+        conflict (10)
+    }
+
+fmDeviceEntPolicyPackageState OBJECT-TYPE
+    SYNTAX      FmDeviceEntPolicyPackageState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The policy package status of the device"
+    ::= { fmDeviceEntry 23 }
+
+fmDeviceEntDesc OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The description of the device"
+    ::= { fmDeviceEntry 24 }
+
+--
+-- fortinet.fnFortiManagerMib.fmRaid
+--
+
+fmRaid OBJECT IDENTIFIER
+    ::= { fnFortiManagerMib 7 }
+
+fmRaidInfo OBJECT IDENTIFIER
+    ::= { fmRaid 1 }
+
+FmRaidLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Raid level"
+    SYNTAX      INTEGER {
+        unavailable (0),
+        linear   (1),
+        raid-0   (2),
+        raid-1   (3),
+        raid-1s  (4),
+        raid-5   (5),
+        raid-5s  (6),
+        raid-6   (7),
+        raid-6s  (8),
+        raid-10  (9),
+        raid-10s (10),
+        raid-50  (11),
+        raid-50s (12),
+        raid-60  (13),
+        raid-60s (14)
+    }
+
+fmRaidLevel OBJECT-TYPE
+    SYNTAX      FmRaidLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Raid level"
+    ::= { fmRaidInfo 1 }
+
+FmRaidState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Raid status"
+    SYNTAX      INTEGER {
+        unavailable (0),
+        ok (1),
+        degraded (2),
+        failed (3),
+        background-initializing (4),
+        background-verifying (5),
+        background-rebuilding (6)
+    }
+
+fmRaidState OBJECT-TYPE
+    SYNTAX      FmRaidState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Raid status"
+    ::= { fmRaidInfo 2 }
+
+fmRaidSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "GB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Raid size in GB"
+    ::= { fmRaidInfo 3 }
+
+fmRaidDiskNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Disk numbers in the Raid"
+    ::= { fmRaidInfo 4 }
+
+fmRaidDiskTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmRaidDiskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of disks in the raid"
+    ::= { fmRaid 2 }
+
+fmRaidDiskEntry OBJECT-TYPE
+    SYNTAX      FmRaidDiskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable
+         to a particular raid disk"
+    INDEX       { fmRaidDiskEntIndex }
+    ::= { fmRaidDiskTable 1 }
+
+FmRaidDiskEntry ::= SEQUENCE {
+    fmRaidDiskEntIndex      FnIndex,
+    fmRaidDiskEntState      FmRaidDiskEntState,
+    fmRaidDiskEntSize       Integer32
+}
+
+fmRaidDiskEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies the entry"
+    ::= { fmRaidDiskEntry 1 }
+
+FmRaidDiskEntState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Raid disk status"
+    SYNTAX      INTEGER {
+        unavailable (0),
+        unused (1),
+        ok (2),
+        rebuilding (3),
+        failed (4),
+        spare (5)
+    }
+
+fmRaidDiskEntState OBJECT-TYPE
+    SYNTAX      FmRaidDiskEntState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Raid disk status"
+    ::= { fmRaidDiskEntry 2 }
+
+fmRaidDiskEntSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "GB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Raid disk size in GB"
+    ::= { fmRaidDiskEntry 3 }
+
+--
+-- fortinet.fnFortiManagerMib.fmPower
+--
+
+fmPower OBJECT IDENTIFIER
+    ::= { fnFortiManagerMib 8 }
+
+fmPowerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of power supply status"
+    ::= { fmPower 2 }
+
+fmPowerEntry OBJECT-TYPE
+    SYNTAX      FmPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable
+         to a particular power supply unit"
+    INDEX       { fmPowerEntIndex }
+    ::= { fmPowerTable 1 }
+
+FmPowerEntry ::= SEQUENCE {
+    fmPowerEntIndex      FnIndex,
+    fmPowerEntState      FmPowerEntState
+}
+
+fmPowerEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies the entry"
+    ::= { fmPowerEntry 1 }
+
+FmPowerEntState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Power supply unit status"
+    SYNTAX      INTEGER {
+        unknown (-1),
+        offline (0),
+        online (1)
+    }
+
+fmPowerEntState OBJECT-TYPE
+    SYNTAX      FmPowerEntState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Power supply unit status"
+    ::= { fmPowerEntry 2 }
+
+--
+-- fortinet.fnFortiManagerMib.fmHa
+--
+
+fmHa OBJECT IDENTIFIER
+    ::= { fnFortiManagerMib 9 }
+
+fmHaInfo OBJECT IDENTIFIER
+    ::= { fmHa 1 }
+
+FmHaMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Ha mode"
+    SYNTAX      INTEGER {
+        standalone (0),
+        master   (1),
+        slave   (2)
+    }
+
+fmHaMode OBJECT-TYPE
+    SYNTAX      FmHaMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Ha mode"
+    ::= { fmHaInfo 1 }
+
+fmHaClusterId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Ha cluster ID"
+    ::= { fmHaInfo 2 }
+
+fmHaPeerNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peer numbers in the Ha"
+    ::= { fmHaInfo 3 }
+
+fmHaPeerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmHaPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of peers in the Ha"
+    ::= { fmHa 2 }
+
+fmHaPeerEntry OBJECT-TYPE
+    SYNTAX      FmHaPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable
+         to a particular Ha peer"
+    INDEX       { fmHaPeerEntIndex }
+    ::= { fmHaPeerTable 1 }
+
+FmHaPeerEntry ::= SEQUENCE {
+    fmHaPeerEntIndex    FnIndex,
+    fmHaPeerEntIp       DisplayString,
+    fmHaPeerEntSn       DisplayString,
+    fmHaPeerEntEnabled  FnBoolState,
+    fmHaPeerEntHostName DisplayString,
+    fmHaPeerEntState    FmHaPeerEntState
+}
+
+fmHaPeerEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies the entry"
+    ::= { fmHaPeerEntry 1 }
+
+fmHaPeerEntIp OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peer IP"
+    ::= { fmHaPeerEntry 2 }
+
+fmHaPeerEntSn OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peer serial number"
+    ::= { fmHaPeerEntry 3 }
+
+fmHaPeerEntEnabled OBJECT-TYPE
+    SYNTAX      FnBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether peer is enabled"
+    ::= { fmHaPeerEntry 4 }
+
+fmHaPeerEntHostName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peer host name"
+    ::= { fmHaPeerEntry 5 }
+
+FmHaPeerEntState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Peer status"
+    SYNTAX      INTEGER {
+        down (0),
+        negotiating   (1),
+        synchronizing   (2),
+        up (3)
+    }
+
+fmHaPeerEntState OBJECT-TYPE
+    SYNTAX      FmHaPeerEntState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peer status"
+    ::= { fmHaPeerEntry 6 }
+
+--
+-- fortinet.fnFortiManagerMib.fmMibConformance
+--
+
+fmMIBConformance OBJECT IDENTIFIER
+    ::= { fnFortiManagerMib 10 }
+
+fmTrapsComplianceGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { fmTrapHASwitch, fmTrapRAIDStatusChange,
+                    fmTrapLogAlert, fmTrapLogRateThreshold,
+                    fmTrapLogDataRateThreshold,
+                    fmTrapLicGbDayThreshold,
+                    fmTrapLicDevQuotaThreshold,
+                    fmTrapCpuThresholdExcludeNice }
+    STATUS      current
+    DESCRIPTION 
+        "Event notifications"
+    ::= { fmMIBConformance 1 }
+
+fmSystemObjectGroup OBJECT-GROUP
+    OBJECTS     { fmSysMemUsed, fmSysMemCapacity,
+                  fmSysCpuUsage, fmSysDiskCapacity,
+                  fmSysDiskUsage, fmSysCpuUsageExcludedNice }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to the system status of the device."
+    ::= { fmMIBConformance 2 }
+
+fmNotificationObjComplianceGroup OBJECT-GROUP
+    OBJECTS     { fmRAIDStatus, fmRAIDDevIndex,
+                  fmLogRate, fmLogRateThreshold,
+                  fmLogDataRate, fmLogDataRateThreshold,
+                  fmLicGbDay, fmLicGbDayThreshold,
+                  fmLicDevQuota, fmLicDevQuotaThreshold }
+    STATUS      current
+    DESCRIPTION 
+        "Object identifiers used in notifications"
+    ::= { fmMIBConformance 3 }
+
+fmSessionComplianceGroup OBJECT-GROUP
+    OBJECTS {
+        fmIpSessProto,
+        fmIpSessFromAddr,
+        fmIpSessFromPort,
+        fmIpSessToAddr,
+        fmIpSessToPort,
+        fmIpSessExp
+        }
+    STATUS current
+    DESCRIPTION "Session related instrumentation"
+	::= { fmMIBConformance 4 }
+
+
+fmMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "The compliance statement for the FortiManager FortiAnalyzer MIB."
+
+    MODULE      -- this module
+
+        GROUP   fmTrapsComplianceGroup
+        DESCRIPTION   
+              "Traps are optional. Not all models support all traps. Consult product literature to see which traps are supported."
+
+        GROUP   fmSystemObjectGroup
+        DESCRIPTION
+              "Model and feature specific."
+
+        GROUP   fmNotificationObjComplianceGroup
+        DESCRIPTION   
+   	          "Object identifiers used in notifications. Objects are required if their containing trap is implemented."
+
+        GROUP   fmSessionComplianceGroup
+        DESCRIPTION   
+   	          "IP session related implementation."
+
+    ::= { fmMIBConformance 100 }
+
+END -- end of module FORTINET-FORTIMANAGER-FORTIANALYZER-MIB.

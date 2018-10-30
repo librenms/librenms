@@ -10,7 +10,7 @@
  */
 require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'cambium-epmp-gps');
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:numTracked='.$rrdfilename.':numTracked:AVERAGE ';
     $rrd_options .= ' DEF:numVisible='.$rrdfilename.':numVisible:AVERAGE ';

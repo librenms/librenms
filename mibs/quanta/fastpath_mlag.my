@@ -1,0 +1,1027 @@
+NETGEAR-VPC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    Integer32, Unsigned32, IpAddress     FROM SNMPv2-SMI
+    TruthValue, RowStatus, MacAddress    FROM SNMPv2-TC
+    InterfaceIndex                       FROM IF-MIB
+    lb6m, AgentPortMask              FROM QUANTA-LB6M-REF-MIB;
+
+    fastPathVpc MODULE-IDENTITY
+        LAST-UPDATED "201401200000Z" -- 20 January 2014 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The MIB definitions VPC Feature."
+
+      -- Revision history.
+    REVISION
+        "201401200000Z"  -- 20 January 2014 12:00:00 GMT
+    DESCRIPTION
+        "Initial version."
+       
+    ::= { lb6m 200 }
+
+--**************************************************************************************
+-- agentVpcConfigGroup
+--
+--**************************************************************************************
+
+agentVpcConfigGroup 			 OBJECT IDENTIFIER ::= { fastPathVpc 1 }
+
+    agentVpcMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(0)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To enable VPC globally. The VPC role election happens if both
+                      the VPC feature is enabled and if the keepalive state machine is
+                      enabled.
+                      The following options are supported:
+
+                      enable  - Enable VPC globally
+                      disable - Disable VPC globally"
+
+          ::= { agentVpcConfigGroup 1 }
+
+    agentKeepalivePriority OBJECT-TYPE
+         SYNTAX      Unsigned32(1..255)
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "To configure the priority of the VPC switch. This value is used
+                      for the VPC role election.
+                      Configurable range is 1 to 255. The default value is 100.
+                      Note: The VPC switch with lower priority becomes the Primary. If
+                            both the VPC peer switches have the same role priority, the
+                            device with lower system MAC address becomes the Primary.
+                            "
+
+          ::= { agentVpcConfigGroup 2 }
+
+    agentKeepaliveTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32(2..15)
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "To configure the peer keepalive timeout value (in seconds). If
+                      an VPC switch does not receive keepalive messages from the peer
+                      for this timeout value, it takes the decision to transition its
+                      role (if required).
+                      Configurable rang is 2 to 15 seconds. Default value is 5 seconds.
+                      Note: The keepalive state machine is not restarted if keepalive
+                      priority is modified post election."
+
+          ::= { agentVpcConfigGroup 3 }
+      agentKeepaliveMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(0)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "To start/stop the keepalive state machine on the VPC device, if
+                      VPC is globally enabled.
+                      The following options are supported:
+
+                      enable  - Enable keepalive
+                      disable - Disable keepalive"
+
+          ::= { agentVpcConfigGroup 4 }
+
+    agentPeerLink OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To configures a port channel as the VPC peer link.
+                      The configurable range is a valid port channel interface index."
+
+          ::= { agentVpcConfigGroup 5 }
+
+     agentPeerDetectionMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(0)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "To start/stop the dual control plane detection protocol (DCPDP) on the
+                      VPC switch.
+                      The following options are supported:
+
+                      enable  - Enable the DCPDP on VPC switch
+                      disable - Disable the DCPDP on VPC switch
+
+                      Note: The peer VPC switch's IP address has to be configured for
+                            the DCPDP to start on an VPC switch."
+
+          ::= { agentVpcConfigGroup 6 }
+
+     agentVpcConfigTable        OBJECT-TYPE
+         SYNTAX        SEQUENCE OF AgentVpcConfigEntry
+         MAX-ACCESS    not-accessible
+         STATUS        obsolete
+         DESCRIPTION
+                       "VPC config table."
+         ::= { agentVpcConfigGroup 7 }
+
+     agentVpcConfigEntry       OBJECT-TYPE
+         SYNTAX        AgentVpcConfigEntry
+         MAX-ACCESS    not-accessible
+         STATUS        obsolete
+         DESCRIPTION
+                       "VPC config entry."
+         INDEX         { agentVpcConfigId }
+         ::= { agentVpcConfigTable 1 }
+
+     AgentVpcConfigEntry ::= SEQUENCE {
+         agentVpcConfigId
+             Unsigned32,
+         agentVpcTrackPortMask
+             AgentPortMask
+         }
+
+     agentVpcConfigId          OBJECT-TYPE
+         SYNTAX        Unsigned32 (1..63)
+         MAX-ACCESS    read-only
+         STATUS        obsolete
+         DESCRIPTION
+                       "VPC Id. This object is obselete. Refer to agentVpcDomainIndex for configuring VPC Id."
+         ::= {agentVpcConfigEntry 1}
+
+     agentVpcTrackPortMask    OBJECT-TYPE
+         SYNTAX        AgentPortMask
+         MAX-ACCESS    read-write
+         STATUS        obsolete
+         DESCRIPTION
+                       "Tracking of non-mlag links."
+         ::= {agentVpcConfigEntry 2}
+
+     agentPeerConfigTable        OBJECT-TYPE
+         SYNTAX        SEQUENCE OF AgentPeerConfigEntry
+         MAX-ACCESS    not-accessible
+         STATUS        obsolete
+         DESCRIPTION
+                       "VPC config table."
+         ::= { agentVpcConfigGroup 8 }
+
+     agentPeerConfigEntry       OBJECT-TYPE
+         SYNTAX        AgentPeerConfigEntry
+         MAX-ACCESS    not-accessible
+         STATUS        obsolete
+         DESCRIPTION
+                       "VPC config entry."
+         INDEX         { agentPeerConfigRowIndex }
+         ::= { agentPeerConfigTable 1 }
+
+     AgentPeerConfigEntry ::= SEQUENCE {
+         agentPeerConfigRowIndex
+             Unsigned32,
+         agentPeerIpAddr
+             IpAddress,
+         agentSourceIpAddr
+             IpAddress,
+         agentDcpdpUdpPort
+             Unsigned32,
+         agentPeerRowStatus
+             RowStatus
+         }
+
+    agentPeerConfigRowIndex   OBJECT-TYPE
+         SYNTAX      Unsigned32(1..1)
+         MAX-ACCESS  not-accessible 
+         STATUS      obsolete
+         DESCRIPTION
+                     "Index." 
+         ::= { agentPeerConfigEntry 1 }
+
+     agentPeerIpAddr OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "To configure IP address of the peer VPC switch. This
+                      configuration is used by the dual control plane detection
+                      protocol (DCPDP) on the VPC switches.
+
+                      NOTE: In order to set value for the object, need to set values for agentPeerIpAddr, 
+                      agentSourceIpAddr, agentPeerRowStatus objects simultaneously.
+                      To reset the object to the default state, the agentPeerRowStatus object should be used."
+          ::= { agentPeerConfigEntry 2 }
+
+     agentSourceIpAddr OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "To configure Self IP address of the VPC switch that is used as
+                      the source IP by the dual control plane detection protocol (DCPDP)
+                      on the VPC switches.
+
+                      NOTE: In order to set value for the object, need to set values for agentPeerIpAddr, 
+                      agentSourceIpAddr, agentPeerRowStatus objects simultaneously.
+                      To reset the object to the default state, the agentPeerRowStatus object should be used."
+          ::= { agentPeerConfigEntry 3 }
+
+     agentDcpdpUdpPort OBJECT-TYPE
+         SYNTAX      Unsigned32(1..65535)
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "To configure the UDP port on which the VPC switch listens to
+                      the DCPDP messages.
+                      Configurable range is 1 to 65535. Default value is 50000.
+
+                      NOTE: In order to set value for the object, need to set values for agentPeerIpAddr, 
+                      agentSourceIpAddr, agentPeerRowStatus, agentDcpdpUdpPort objects simultaneously.
+                      To reset the object to the default state, the agentPeerRowStatus object should be used."
+          ::= { agentPeerConfigEntry 4 }
+
+     agentPeerRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      obsolete
+         DESCRIPTION
+                     "Peer config status.
+
+                     Supported values:
+                     active(1)      - valid instance.
+                     createAndGo(4) - used to configure peer configuration.
+                     destroy(6)     - reset peer configuration."
+         ::= { agentPeerConfigEntry 5 }
+--**************************************************************************************
+-- agentVpcDomainConfigTable
+--
+--**************************************************************************************
+
+     agentVpcDomainConfigTable        OBJECT-TYPE
+         SYNTAX        SEQUENCE OF AgentVpcDomainConfigEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+                       "VPC domain config table."
+          ::= { agentVpcConfigGroup 9 }
+
+     agentVpcDomainConfigEntry       OBJECT-TYPE
+         SYNTAX        AgentVpcDomainConfigEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+                       "VPC domain config entry."
+         INDEX         { agentVpcDomainIndex }
+          ::= { agentVpcDomainConfigTable 1 }
+
+     AgentVpcDomainConfigEntry ::= SEQUENCE {
+         agentVpcDomainIndex
+             Unsigned32,
+         agentVpcDomainKeepalivePriority
+             Unsigned32,
+         agentVpcDomainKeepaliveTimeout
+             Unsigned32,
+         agentVpcDomainKeepaliveMode
+             INTEGER,
+         agentVpcDomainPeerDetectionMode
+             INTEGER,
+         agentVpcDomainSystemMac
+             MacAddress,
+         agentVpcDomainSystemPriority
+             Unsigned32,
+         agentVpcDomainPeerDetectionInterval
+             Unsigned32,
+         agentVpcDomainPeerDetectionTimeout
+             Unsigned32,
+         agentVpcDomainPeerIpAddr
+             IpAddress,
+         agentVpcDomainSourceIpAddr
+             IpAddress,
+         agentVpcDomainDcpdpUdpPort
+             Unsigned32,
+         agentVpcDomainStatus
+             RowStatus
+         }
+
+    agentVpcDomainIndex   OBJECT-TYPE
+         SYNTAX      Unsigned32(1..255)
+         MAX-ACCESS  read-write 
+         STATUS      current
+         DESCRIPTION
+                     "VPC Domain ID."
+          ::= { agentVpcDomainConfigEntry 1 }
+	 		  		  
+    agentVpcDomainKeepalivePriority OBJECT-TYPE
+         SYNTAX      Unsigned32(1..255)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To configure the priority of the VPC switch. This value is used
+                      for the VPC role election.
+                      Configurable range is 1 to 255. The default value is 100.
+                      Note: The VPC switch with lower priority becomes the Primary. If
+                            both the VPC peer switches have the same role priority, the
+                            device with lower system MAC address becomes the Primary.
+                            "
+
+          ::= { agentVpcDomainConfigEntry 2 }
+
+    agentVpcDomainKeepaliveTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32(2..15)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To configure the peer keepalive timeout value (in seconds). If
+                      an VPC switch does not receive keepalive messages from the peer
+                      for this timeout value, it takes the decision to transition its
+                      role (if required).
+                      Configurable range is 2 to 15 seconds. Default value is 5 seconds.
+                      Note: The keepalive state machine is not restarted if keepalive
+                      priority is modified post election."
+
+          ::= { agentVpcDomainConfigEntry 3 }
+      agentVpcDomainKeepaliveMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(0)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To start/stop the keepalive state machine on the VPC device, if
+                      VPC is globally enabled.
+                      The following options are supported:
+
+                      enable  - Enable keepalive
+                      disable - Disable keepalive"
+
+          ::= { agentVpcDomainConfigEntry 4 }
+
+     agentVpcDomainPeerDetectionMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(0)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To start/stop the dual control plane detection protocol (DCPDP) on the
+                      VPC switch.
+                      The following options are supported:
+
+                      enable  - Enable the DCPDP on VPC switch
+                      disable - Disable the DCPDP on VPC switch
+
+                      Note: The peer VPC switch's IP address has to be configured for
+                            the DCPDP to start on an VPC switch."
+
+          ::= { agentVpcDomainConfigEntry 5 }
+
+     agentVpcDomainSystemMac OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To configure the MAC address for the VPC domain. This mac-address 
+                     is used in the LACP PDUs and STP BPDUs 
+                     that are sent out on VPC member ports. For the VPC domain to use 
+                     the manually configured VPC MAC address, it should be manually 
+                     configured on both the VPC peers and should be the same. If VPC 
+                     is configured on only one of the VPC peers or is configured 
+                     different on VPC peers, auto-generated MAC address is used. 
+                     The specified MAC address should be a unicast MAC address in 
+                     <aa:bb:cc:dd:ee:ff> format and should not be equal to the 
+                     MAC address of either primary VPC or secondary VPC device.  
+                     The manually configured VPC MAC address is used instead of 
+                     auto-generated VPC MAC address only if the VPC feature is 
+                     re-enabled after configuring the VPC MAC address.
+                     "
+
+          ::= { agentVpcDomainConfigEntry 6 }
+
+
+     agentVpcDomainSystemPriority OBJECT-TYPE
+         SYNTAX      Unsigned32(1..65535)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To configure the system priority for the VPC domain. This is used 
+                      in the LACP PDUs sent out on VPC member ports. System-priority 
+                      should be configured same on both the VPC peers. If the configured 
+                      VPC system priority is different on VPC peers, then VPC will not 
+                      come up. The default priority value is 32767.
+                      "
+          ::= { agentVpcDomainConfigEntry 7 }
+
+     agentVpcDomainPeerDetectionInterval OBJECT-TYPE
+         SYNTAX      Unsigned32(200..4000)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To configure the DCPDP transmission interval.
+                      NOTE: In order to set value for the object, need to set values for DCPDP 
+                      transmission interval and reception timeout simultaneously."
+          ::= { agentVpcDomainConfigEntry 8 }
+
+     agentVpcDomainPeerDetectionTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32(700..14000)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To configure the DCPDP reception timeout.
+                      NOTE: In order to set value for the object, need to set values for DCPDP 
+                      transmission interval and reception timeout simultaneously."
+          ::= { agentVpcDomainConfigEntry 9 }		  
+		  
+     agentVpcDomainPeerIpAddr OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To configure IP address of the peer VPC switch. This
+                      configuration is used by the dual control plane detection
+                      protocol (DCPDP) on the VPC switches.
+
+                      NOTE: In order to set value for the object, need to set values for 
+                      IP address of the peer MLAG switch and destination IP of the DCPDP 
+                      message simultaneously."
+          ::= { agentVpcDomainConfigEntry 10 }
+
+     agentVpcDomainSourceIpAddr OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To configure Self IP address of the VPC switch that is used as
+                      the source IP by the dual control plane detection protocol (DCPDP)
+                      on the VPC switches.
+
+                      NOTE: In order to set value for the object, need to set values for 
+                      IP address of the peer MLAG switch and destination IP of the DCPDP 
+                      message simultaneously."
+          ::= { agentVpcDomainConfigEntry 11 }
+
+     agentVpcDomainDcpdpUdpPort OBJECT-TYPE
+         SYNTAX      Unsigned32(1..65535)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "To configure the UDP port on which the VPC switch listens to
+                      the DCPDP messages.
+                      Configurable range is 1 to 65535. Default value is 50000.
+
+                      NOTE: In order to set value for the object, need to set values for 
+                      IP address of the peer MLAG switch, destination IP of the DCPDP 
+                      message and UDP port on which the MLAG switch listens to the 
+                      DCPDP messages simultaneously."
+          ::= { agentVpcDomainConfigEntry 12 }
+
+     agentVpcDomainStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                       "Status of VPC Domain."
+          ::= { agentVpcDomainConfigEntry 13 }
+		  
+--**************************************************************************************
+-- agentVpcPeerKeepAliveStatsGroup
+--
+--**************************************************************************************
+
+agentVpcPeerKeepAliveStatsGroup                      OBJECT IDENTIFIER ::= { fastPathVpc 2 }
+
+    agentVpcPeerKeepAliveTotalTx OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Total Packets transmitted"
+
+          ::= { agentVpcPeerKeepAliveStatsGroup 1 }
+
+    agentVpcPeerKeepAliveSuccessTx OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Successfully Transmitted Packets."
+
+          ::= { agentVpcPeerKeepAliveStatsGroup 2 }
+
+    agentVpcPeerKeepAliveTxErrors OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Transmit Failed Packets."
+
+          ::= { agentVpcPeerKeepAliveStatsGroup 3 }
+
+     agentVpcPeerKeepAliveTotalRx OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Total Packets Received."
+          ::= { agentVpcPeerKeepAliveStatsGroup 4 }
+
+     agentVpcPeerKeepAliveSuccessRx OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Successfully Received Packets."
+          ::= { agentVpcPeerKeepAliveStatsGroup 5 }
+
+      agentVpcPeerKeepAliveRxErrors OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of packets received with errors."
+          ::= { agentVpcPeerKeepAliveStatsGroup 6 }
+
+      agentVpcPeerKeepAliveTimeoutCount OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Timeout counter."
+          ::= { agentVpcPeerKeepAliveStatsGroup 7 }
+
+
+--**************************************************************************************
+-- agentVpcPeerKeepAliveStatsGroup
+--
+--**************************************************************************************
+
+agentVpcPeerLinkStatsGroup                      OBJECT IDENTIFIER ::= { fastPathVpc 3 }
+     agentVpcPeerLinkControlMsgTx    OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link control messages transmitted."
+
+          ::= { agentVpcPeerLinkStatsGroup 1 }
+     agentVpcPeerLinkTxErrors OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link control messages Tx errors."
+
+          ::= { agentVpcPeerLinkStatsGroup 2 }
+     agentVpcPeerLinkTxTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link control messages Tx timeout."
+
+          ::= { agentVpcPeerLinkStatsGroup 3 }
+     agentVpcPeerLinkControlMsgAckTx    OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link control messages ACK transmitted."
+
+          ::= { agentVpcPeerLinkStatsGroup 4 }
+     agentVpcPeerLinkControlMsgAckErrors OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link control messages ACK Tx errors."
+
+          ::= { agentVpcPeerLinkStatsGroup 5 }
+     agentVpcPeerLinkControlMsgRx  OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link control messages received."
+
+          ::= { agentVpcPeerLinkStatsGroup 6 }
+     agentVpcPeerLinkDataMsgTx    OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link data messages transmitted."
+
+          ::= { agentVpcPeerLinkStatsGroup 7 }
+     agentVpcPeerLinkDataMsgTxErrors OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link data messages Tx errors."
+
+          ::= { agentVpcPeerLinkStatsGroup 8 }
+     agentVpcPeerLinkDataMsgTxTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link data messages Tx timeout."
+
+          ::= { agentVpcPeerLinkStatsGroup 9 }
+
+     agentVpcPeerLinkDataMsgRx OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link data messages received."
+          ::= { agentVpcPeerLinkStatsGroup 10 }
+     agentVpcPeerLinkBPDUTx OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link BPDU's transmitted to peer."
+
+          ::= { agentVpcPeerLinkStatsGroup 11 }
+     agentVpcPeerLinkBPDUTxErrors OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link BPDU's Tx errors."
+          ::= { agentVpcPeerLinkStatsGroup 12 }
+     agentVpcPeerLinkBPDUrx OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link BPDU's received from peer."
+
+          ::= { agentVpcPeerLinkStatsGroup 13 }
+     agentVpcPeerLinkBPDURxErrors OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link BPDU's Rx errors."
+          ::= { agentVpcPeerLinkStatsGroup 14 }
+     agentVpcPeerLinkLACPDUTx OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link LACPDU's tranmsitted to peer."
+
+          ::= { agentVpcPeerLinkStatsGroup 15 }
+     agentVpcPeerLinkLACPDUTxErrors OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link LACPDU's Tx errors."
+          ::= { agentVpcPeerLinkStatsGroup 16 }
+     agentVpcPeerLinkLACPDUrx OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link LACPDU's received from peer."
+
+          ::= { agentVpcPeerLinkStatsGroup 17 }
+     agentVpcPeerLinkLACPDURxErrors OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link LACPDU's Rx errors."
+          ::= { agentVpcPeerLinkStatsGroup 18 }
+
+--**************************************************************************************
+-- agentVpcStatusGroup
+--
+--**************************************************************************************
+
+agentVpcStatusGroup           OBJECT IDENTIFIER ::= { fastPathVpc 4 }
+     agentVpcPeerLinkStatus    OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Peer link operational status."
+
+          ::= { agentVpcStatusGroup 1 }
+     agentVpcTotalVpcConfigured   OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of VPC's configured."
+          ::= { agentVpcStatusGroup 2 }
+     agentVpcTotalVpcOperational    OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of VPC's operational."
+          ::= { agentVpcStatusGroup 3 }
+     agentVpcSelfRole              OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       none (1),
+                       primary (2),
+                       secondary (3)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "VPC role."
+          ::= { agentVpcStatusGroup 4 }
+
+     agentVpcOperationMode    OBJECT-TYPE
+          SYNTAX        INTEGER {
+                          enable  (1),
+                          disable (2)
+                        }
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                        "VPC operational mode."
+             ::= { agentVpcStatusGroup 5 }
+
+     agentVpcPeerRole         OBJECT-TYPE
+          SYNTAX        INTEGER {
+                          none      (1),
+                          primary   (2),
+                          secondary (3)
+                        }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+                        "Vpc peer role."
+             ::= { agentVpcStatusGroup 6 }
+
+     agentVpcKeepaliveOperationalMode    OBJECT-TYPE
+          SYNTAX        INTEGER {
+                          enable  (1),
+                          disable (2)
+                        }
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                        "VPC keepalive operational mode."
+             ::= { agentVpcStatusGroup 7 }
+
+     agentVpcSystemMac        OBJECT-TYPE
+          SYNTAX        MacAddress
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                        "System MAC address."
+             ::= { agentVpcStatusGroup 8 }
+
+     agentVpcState            OBJECT-TYPE
+          SYNTAX        INTEGER {
+                          disable   (1),
+                          listen    (2),
+                          ready     (3),
+                          primary   (4),
+                          secondary (5)
+                        }
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                        "The following states of a VPC mean:
+                        DISABLE:   In this state, the VPC interfaces, if any are shut down.
+                        LISTEN:    The keepalive does not advertise any packets.
+                        READY:     The keepalive component starts sending keepalive messages periodically with the state as READY.
+                        PRIMARY:   Traffic over VPC interfaces is allowed to be forwarded. 
+                                   The keepalive protocol continues to advertise keepalive messages with the state as PRIMARY.
+                        SECONDARY: Traffic over VPC interfaces is allowed to be forwarded. 
+                                   The keepalive protocol continues to advertise keepalive messages with the state as SECONDARY."
+             ::= { agentVpcStatusGroup 9 }
+
+     agentVpcPeerPriority     OBJECT-TYPE
+          SYNTAX        Unsigned32
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                        "VPC peer priority."
+             ::= { agentVpcStatusGroup 10 }
+
+     agentVpcPeerMac    OBJECT-TYPE
+          SYNTAX        MacAddress
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                        "VPC peer MAC address."
+             ::= { agentVpcStatusGroup 11 }
+
+     agentVpcPeerDetectionStatus    OBJECT-TYPE
+          SYNTAX        TruthValue
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                        "VPC peer detection status."
+             ::= { agentVpcStatusGroup 12 }
+
+     agentVpcIsPeerDetected   OBJECT-TYPE
+          SYNTAX        TruthValue
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                        "Indicates if the VPC peer is detected."
+             ::= { agentVpcStatusGroup 13 }
+
+    agentVpcSelfMemberStatusTable      OBJECT-TYPE
+          SYNTAX        SEQUENCE OF AgentVpcSelfMemberStatusEntry 
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION
+                        "VPC self member ports status table."
+             ::= { agentVpcStatusGroup 14 }
+
+    agentVpcSelfMemberStatusEntry      OBJECT-TYPE
+          SYNTAX        AgentVpcSelfMemberStatusEntry
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION    
+                        "VPC self member port status entry."
+          INDEX         { agentVpcSelfMemberStatusVpcId, 
+                          agentVpcSelfMemberStatusIntfId }
+             ::= { agentVpcSelfMemberStatusTable 1 }
+
+    AgentVpcSelfMemberStatusEntry ::= SEQUENCE {
+          agentVpcSelfMemberStatusVpcId
+               Unsigned32,
+          agentVpcSelfMemberStatusIntfId
+               InterfaceIndex,
+          agentVpcSelfMemberStatusIntfState
+               INTEGER
+          }
+
+    agentVpcSelfMemberStatusVpcId      OBJECT-TYPE
+          SYNTAX        Unsigned32 (1..63)
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION   
+                        "VPC Id."
+             ::= { agentVpcSelfMemberStatusEntry 1 }
+
+    agentVpcSelfMemberStatusIntfId     OBJECT-TYPE
+          SYNTAX        InterfaceIndex
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION   
+                        "Interface Id."
+             ::= { agentVpcSelfMemberStatusEntry 2 }
+
+    agentVpcSelfMemberStatusIntfState  OBJECT-TYPE
+          SYNTAX        INTEGER {
+                          up   (1),
+                          down (2) 
+                        }
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION   
+                        "VPC self member interface status."
+             ::= { agentVpcSelfMemberStatusEntry 3 }
+
+    agentVpcPeerMemberStatusTable       OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentVpcPeerMemberStatusEntry 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "VPC peer member ports status table."
+             ::= { agentVpcStatusGroup 15 }
+
+    agentVpcPeerMemberStatusEntry      OBJECT-TYPE
+         SYNTAX      AgentVpcPeerMemberStatusEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION    
+                     "VPC peer member port status entry."
+         INDEX       { agentVpcPeerMemberStatusVpcId, 
+                       agentVpcPeerMemberStatusIntfId }
+             ::= { agentVpcPeerMemberStatusTable 1 }
+
+    AgentVpcPeerMemberStatusEntry ::= SEQUENCE {
+          agentVpcPeerMemberStatusVpcId
+               Unsigned32,
+          agentVpcPeerMemberStatusIntfId
+               InterfaceIndex,
+          agentVpcPeerMemberStatusIntfState
+               INTEGER
+          }
+
+    agentVpcPeerMemberStatusVpcId      OBJECT-TYPE
+          SYNTAX        Unsigned32 (1..63)
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION   
+                        "VPC Id."
+             ::= { agentVpcPeerMemberStatusEntry 1 }
+
+    agentVpcPeerMemberStatusIntfId     OBJECT-TYPE
+          SYNTAX        InterfaceIndex
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION   
+                        "Interface Id."
+             ::= { agentVpcPeerMemberStatusEntry 2 }
+
+    agentVpcPeerMemberStatusIntfState  OBJECT-TYPE
+          SYNTAX        INTEGER {
+                          up   (1),
+                          down (2) 
+                        }
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION   
+                        "VPC peer member interface status."
+             ::= { agentVpcPeerMemberStatusEntry 3 }
+
+     agentVpcStatusTable        OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentVpcStatusEntry 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "VPC status table."
+          ::= { agentVpcStatusGroup 16 }
+
+     agentVpcStatusEntry       OBJECT-TYPE
+         SYNTAX         AgentVpcStatusEntry
+         MAX-ACCESS     not-accessible
+         STATUS         current
+         DESCRIPTION    
+                      "VPC status entry."
+          INDEX    {agentVpcStatusId}
+          ::= {  agentVpcStatusTable 1 }
+
+     AgentVpcStatusEntry  ::= SEQUENCE {
+          agentVpcStatusId
+              Unsigned32,
+          agentVpcOperationalStatus
+              INTEGER,
+          agentPortChannelId
+              InterfaceIndex,
+          agentVpcInterfaceState
+              INTEGER
+          }
+
+     agentVpcStatusId      OBJECT-TYPE
+          SYNTAX        Unsigned32 (1..63)
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION   
+                        "VPC Id."
+             ::= {agentVpcStatusEntry 1}
+
+     agentVpcOperationalStatus    OBJECT-TYPE
+          SYNTAX        INTEGER {
+                          enable (1),
+                          disable (2)
+                        }
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                        "VPC operational status."
+             ::= {agentVpcStatusEntry 2}
+
+     agentPortChannelId      OBJECT-TYPE
+          SYNTAX        InterfaceIndex
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                        "Port-channel ID."
+             ::= {agentVpcStatusEntry 3}
+
+     agentVpcInterfaceState   OBJECT-TYPE
+          SYNTAX        INTEGER {
+                          disable  (1),
+                          wait     (2),
+                          error    (3),
+                          active   (4),
+                          inactive (5)
+                        }
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION
+                        "The following states of a VPC port-channel interface mean:
+                         DISABLE:  The state of a port-channel before VPC functionality is enabled on it.
+                         WAIT:     The VPC port-channel 'waits' for the VPC functionality 
+                                   to be enabled on a port-channel of the peer switch.
+                         ERROR:    After VPC is enabled on a port-channel of both peer switches, 
+                                   the DOT3AD component checks to see if all entry criteria are met 
+                                   for the port-channel to be operational. 
+                         ACTIVE:   If the entry criteria are satisfied, then the VPC interface is set 
+                                   to ACTIVE and is operationally enabled. 
+                                   Traffic is now allowed to flow through the VPC member ports.
+                         INACTIVE: If links connected to the VPC member ports are down, 
+                                   then the VPC interface is set to INACTIVE on the switch. 
+                                   The VPC will remain ACTIVE on the peer switch."
+             ::= {agentVpcStatusEntry 4}
+END

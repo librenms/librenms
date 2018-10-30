@@ -1,0 +1,9 @@
+mib: TPLINK-SYSMONITOR-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: tpSysMonitorCpu5Seconds
+                  num_oid: '.1.3.6.1.4.1.11863.6.4.1.1.1.1.2.{{ $index }}'
+                  index:  '{{ $index }}'
+                  descr: 'Proc #{{ $index }}'

@@ -1,5 +1,5 @@
 os: breeze
-text: Alvarion Breeze
+text: 'Alvarion Breeze'
 type: wireless
 icon: alvarion
 over:
@@ -7,5 +7,5 @@ over:
 mib_dir:
     - alvarion
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.12394.4.

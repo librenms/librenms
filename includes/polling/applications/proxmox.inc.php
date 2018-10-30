@@ -53,7 +53,6 @@ if (isset($config['enable_proxmox']) && $config['enable_proxmox'] && !empty($age
 }
 
 if ($proxmox) {
-    update_application($app, $proxmox);
     $pmxlines = explode("\n", $proxmox);
     $pmxcluster = array_shift($pmxlines);
     dbUpdate(
@@ -63,6 +62,7 @@ if ($proxmox) {
         array($device['device_id'], $name)
     );
 
+    $metrics = array();
     if (count($pmxlines) > 0) {
         $pmxcache = array();
 
@@ -84,6 +84,8 @@ if ($proxmox) {
                 'OUTOCTETS' => $vmpout
             );
 
+            $proxmox_metric_prefix = "pmxcluster{$pmxcluster}_vmid{$vmid}_vmport$vmport";
+            $metrics[$proxmox_metric_prefix] = $fields;
             $tags = compact('name', 'app_id', 'pmxcluster', 'vmid', 'vmport', 'rrd_proxmox_name', 'rrd_def');
             data_update($device, 'app', $tags, $fields);
 
@@ -114,6 +116,8 @@ if ($proxmox) {
             }
         }
     }
+
+    update_application($app, $proxmox, $metrics);
 }
 
 unset($pmxlines, $pmxcluster, $pmxcdir, $proxmox, $pmxcache);

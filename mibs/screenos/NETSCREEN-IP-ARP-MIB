@@ -1,0 +1,184 @@
+-- This module defines enterprise MIBs for ARP
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-IP-ARP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenIp
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString,PhysAddress
+        FROM SNMPv2-TC
+    ;
+
+nsIpArp MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines NetScreen private MIBs for ARP"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105020000Z" -- May 02, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenIp 1 }
+
+NsIpArpEntry ::= SEQUENCE
+{
+    nsIpArpIndex  Integer32,
+    nsIpArpIp     IpAddress,
+    nsIpArpMac    PhysAddress,
+    nsIpArpVsys   Integer32,
+    nsIpArpIfIdx  Integer32,
+    nsIpArpState  INTEGER,
+    nsIpArpAge    Integer32,
+    nsIpArpRetry  Integer32,
+    nsIpArpPakQue Integer32
+}
+
+nsIpArpAOD OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "ARP always on destination."
+    ::= { nsIpArp 1 }
+
+nsIpArpCachUpdate OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "ARP cache update."
+    ::= { nsIpArp 2 }
+
+nsIpArpTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsIpArpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table collects all the ARP entries existing in NetScreen
+         device."
+    ::= { nsIpArp 3 }
+
+nsIpArpEntry OBJECT-TYPE
+    SYNTAX        NsIpArpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing attributes of arp info"
+    INDEX
+        { nsIpArpIndex }
+    ::= { nsIpArpTable 1 }
+
+nsIpArpIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for arp table.  Its value ranges between 0 and
+         65535 and may not be contiguous."
+    ::= { nsIpArpEntry 1 }
+
+nsIpArpIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "IP address."
+    ::= { nsIpArpEntry 2 }
+
+nsIpArpMac OBJECT-TYPE
+    SYNTAX        PhysAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "MAC address."
+    ::= { nsIpArpEntry 3 }
+
+nsIpArpVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtual system id this entry belongs to."
+    ::= { nsIpArpEntry 4 }
+
+nsIpArpIfIdx OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Interface location."
+    ::= { nsIpArpEntry 5 }
+
+nsIpArpState OBJECT-TYPE
+    SYNTAX        INTEGER {
+        pending(1),
+        valid(2),
+        delete(3),
+        static(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ARP entry state."
+    ::= { nsIpArpEntry 6 }
+
+nsIpArpAge OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ARP entry age."
+    ::= { nsIpArpEntry 7 }
+
+nsIpArpRetry OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ARP entry retry time."
+    ::= { nsIpArpEntry 8 }
+
+nsIpArpPakQue OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ARP entry package queue."
+    ::= { nsIpArpEntry 9 }
+
+END
+
+

@@ -1,0 +1,162 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: ETH module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-ETH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE,
+    Integer32
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+ethernet MODULE-IDENTITY
+    LAST-UPDATED "201302071350Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+	DESCRIPTION
+	    "This MIB file contains definitions of managed objects for the
+	    ethernet module. "
+
+    REVISION "200606281222Z"
+	DESCRIPTION
+		"Initial Revision"
+		
+    REVISION "201302071350Z"
+	DESCRIPTION
+	"Added trap for when the new bandwidth parameter is set by the
+	command handler"
+
+::= { modules 23}
+
+-- The Ethernet module. This group consists of a table of Ethernet
+-- interfaces indexed by ifIndex which provide MIB objects not given in a
+-- convenient form by other standard MIBs.
+
+ethernetTraps 		OBJECT IDENTIFIER ::= { ethernet 0 }	
+ethernetTrap		NOTIFICATION-TYPE
+    OBJECTS   	{ ethernetTrapMessage }
+	STATUS		current
+    DESCRIPTION
+                "An ethernet trap is generated when the administrator sets the 
+                bandwidth on this interface."
+    ::= { ethernetTraps 1 }
+
+ethIntTable OBJECT-TYPE
+    SYNTAX      	SEQUENCE OF EthIntEntry
+    MAX-ACCESS  	not-accessible
+    STATUS  		current
+    DESCRIPTION
+            "The table of Ethernet interfaces."
+    ::= { ethernet 1 }
+
+ethIntEntry OBJECT-TYPE
+    SYNTAX      EthIntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry in the Ethernet interfaces table."
+    INDEX   { ethIntIndex }
+    ::= { ethIntTable 1 }
+
+EthIntEntry ::=
+    SEQUENCE {
+        ethIntIndex
+            INTEGER,
+        ethIntBoardIndex
+            INTEGER,
+        ethIntBoardPosition
+            INTEGER,
+        ethIntDuplexMode
+            INTEGER,
+        ethBandwidth
+            Integer32
+    }
+
+ethIntIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The ifIndex of the Ethernet interface."
+    ::= { ethIntEntry 1 }
+
+ethIntBoardIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index in the arBoardTable of the board on which this
+            Ethernet interface resides. If this Ethernet interface is not
+            found, the value of this object is 0."
+    ::= { ethIntEntry 2 }
+
+ethIntBoardPosition OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The position on this Ethernet interface's board of this
+            Ethernet interface. If this Ethernet interface is not found,
+            the value of this object is 0."
+    ::= { ethIntEntry 3 }
+
+ethIntDuplexMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                fullDuplex (1),
+                halfDuplex (2),
+                unknown (3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The duplex mode of this Ethernet interface. The value unknown
+            is returned when the interface cannot or has not yet made a
+            determination of its duplex mode, or when the interface cannot
+            be found."
+    ::= { ethIntEntry 4 }
+
+ethBandwidth OBJECT-TYPE
+    SYNTAX      Integer32 (0..1000000)
+    UNITS		"kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The bandwidth set on this Ethernet interface specified in kbps."
+    ::= { ethIntEntry 5 }
+
+-- The last TRAP message sent from the ethernet.
+ethernetTrapMessage OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The last message sent in an ethernet TRAP. This variable is really
+            just a placeholder for the object sent in the ethernet TRAP, but can
+            be read independently if required. Note however that a new TRAP will
+            cause this variable to be overwritten."
+    ::= { ethernet 2 }
+
+END

@@ -1,0 +1,97 @@
+ARRIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+            FROM SNMPv2-SMI
+    enterprises
+            FROM RFC1155-SMI;
+
+arris MODULE-IDENTITY
+    LAST-UPDATED    "0402020000Z" -- February 2, 2004
+    ORGANIZATION    "Arris Interactive"
+    CONTACT-INFO   
+        "Robert Coley
+         Postal: Arris Interactive
+                 3871 Lakefield Drive
+                 Suite 300
+                 Suwanee, GA 30024-1242
+                 U.S.A.
+         Phone:  +1 770 622 8500
+         E-mail: robert.coley@arrisi.com
+   
+         Initial MIB creator: Angela Lyda
+         Postal: Arris Interactive
+                  3871 Lakefield Drive
+                  Suite 300
+                  Suwanee, GA 30024-1242
+                  U.S.A.
+          Phone:  +1 770 622 8743
+          E-mail: angela.lyda@arrisi.com"
+    DESCRIPTION
+        "This is a header for the Arris enterprise MIB.  All objects appear
+         elsewhere."        
+                  
+-- Revision history 
+   REVISION     "0402020000Z"  -- February 2, 2004
+   DESCRIPTION
+       "Added Product Identifier 'cmtsCommon' for common CMTS products."
+
+   REVISION     "0206240000Z"  -- June 24, 2002
+   DESCRIPTION
+       "Added a ProductID OID for the 'tcm' product.       
+        Added the Global Access product line rooted at arrisProdIdGlobalAccess."	
+       
+   REVISION     "0110040000Z"  -- October 4, 2001
+   DESCRIPTION
+       "Added a Product Identifier OID for the CM (Cable Modem) product line.
+        Added Product Identifier OIDs for the 'ttm' and 'ttp' products."
+       
+    REVISION    "0101240000Z"  -- January 24, 2001
+    DESCRIPTION
+        "Added a Product Identifier OID for the MRC (Modular Redundant Chassis) product line.
+         Added a Product Identifier OID for the MRC Controller"
+        
+    REVISION    "0010170000Z"  -- October 17, 2000
+    DESCRIPTION
+	    "Added a Product Identifier OID for the CMTS product line.
+	     Added a Product Identifier OID for the MSAS (MultiService Access System) CMTS product."
+         
+    ::= { enterprises 4115 }
+
+arrisProducts OBJECT IDENTIFIER ::= { arris 1 }   
+
+-- Arris Product Lines
+packetport       OBJECT IDENTIFIER ::= { arrisProducts 1 }
+cm110            OBJECT IDENTIFIER ::= { arrisProducts 2 }  
+arrisProdIdCM    OBJECT IDENTIFIER ::= { arrisProducts 3 }  -- Cable Modem
+arrisProdIdCMTS  OBJECT IDENTIFIER ::= { arrisProducts 4 }  -- Cable Modem Termination System
+arrisProdIdMRC   OBJECT IDENTIFIER ::= { arrisProducts 5 }  -- Modular Redundant Chassis
+arrisProdIdGlobalAccess  OBJECT IDENTIFIER ::= { arrisProducts 6 }  -- Global Access (Fiber) products
+
+
+
+-- Product Identifiers for the CM product line
+tcm  OBJECT IDENTIFIER ::= { arrisProdIdCM 8 }      -- Touchstone Cable Modem
+ttm  OBJECT IDENTIFIER ::= { arrisProdIdCM 9 }      -- Touchstone Telephony Modem 
+ttp  OBJECT IDENTIFIER ::= { arrisProdIdCM 10 }     -- Touchstone Telephony Port
+
+-- Product Identifiers for the CMTS product line
+cmtsMSAS   OBJECT IDENTIFIER ::= { arrisProdIdCMTS 1 } -- CMTS MultiService Access System
+cmts1500   OBJECT IDENTIFIER ::= { arrisProdIdCMTS 2 } -- CMTS 1500
+cmtsC3     OBJECT IDENTIFIER ::= { arrisProdIdCMTS 3 } -- C3 CMTS
+cmtsC4     OBJECT IDENTIFIER ::= { arrisProdIdCMTS 4 } -- C4 CMTS
+cmtsCommon OBJECT IDENTIFIER ::= { arrisProdIdCMTS 5 } -- common CMTS products
+
+-- Product Identifiers for the MRC product line
+mrcController OBJECT IDENTIFIER ::= { arrisProdIdMRC 1 } -- MRC Controller
+                    
+-- Global Access products
+arrisGlobalAccessMib OBJECT IDENTIFIER ::= { arrisProdIdGlobalAccess 1 }
+       -- arrisUas FttH Universal Access Switch is arrisGlobalAccessMib.1. See ARRIS-UAS-MIB
+
+-- add Global Access sysObjectId values here.
+arrisGlobalAccessProductUas OBJECT IDENTIFIER ::= { arrisProdIdGlobalAccess 2 } -- FttH Universal Access Switch
+
+
+
+END

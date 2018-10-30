@@ -63,8 +63,9 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		DESCRIPTION		
 			"RF scan list string.
             The frequencies vary by product and region.
-            If the list is too long an SNMP error will be returned. If this occurs please refer to OID rfScanListTable,
-            which will allow user to enter the full range of available frequencies.
+            If the frequency list is too long an SNMP error will be returned. If this occurs please refer to 
+            OID rfScanListTable, which will allow user to enter the full range of available frequencies.
+            String length is limited to SNMP buffer size, so while all frequencies may be set, not all may be retrieved.
             Special settings:
             0:  none.
             all: All frequencies in the band(s) supported by the radio will be selected.
@@ -81,8 +82,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		STATUS		current
 		DESCRIPTION		
 			"SM Power Up Mode With No 802.3 Link.
-            1 -- Power up in Aim mode
-            2 -- Power up in Operational mode."
+            0 - Power up in Operational mode.
+            1 - Power up in Aim mode."
 		::={whispSmConfig 2}
 
 	lanIpSm	OBJECT-TYPE
@@ -134,9 +135,9 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					disabled(0),
 					enabled(1)}
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
-			"To enable or disable 802.3 link. For SMs only."
+			"To enable or disable 802.3 link. For SMs only.  Deprecated: Use enable8023linkBox instead."
 		::={whispSmConfig 8}
 
 	authKeyOption	OBJECT-TYPE
@@ -1479,7 +1480,10 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		SYNTAX		INTEGER {
 					bandwidth5MHz(0),
 					bandwidth10MHz(1),
-					bandwidth20MHz(2)}
+					bandwidth20MHz(2),
+					bandwidth7MHz(3),
+					bandwidth15MHz(4),
+					bandwidth30MHz(5)}
 		MAX-ACCESS	read-write
 		STATUS		current
 		DESCRIPTION		
@@ -1512,10 +1516,10 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					pmp450(2),
 					both(3)}
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
-			"Selects AP types (PMP 430 and/or PMP 450/450i) that are available for the PMP 430 SM.
-                          	When both AP types are selected, if the SM does not register to an AP after 10 minutes, it will reboot to scan the other AP type."
+			"Deprecated.  The 430 SM only supports PMP 450
+                          interoperability mode."
 		::={whispSmConfig 145}
 
 	switchRadioModeAndReboot	OBJECT-TYPE
@@ -1523,13 +1527,11 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					finishedReboot(0),
 					switchRadioModeAndReboot(1)}
 		MAX-ACCESS	read-write
-		STATUS		current
+		STATUS		obsolete
 		DESCRIPTION		
-			"Setting this to 1 will force switch the SM to the other radio mode and immediately reboot the unit.
-                            When the unit finishes rebooting, it will be in finishedReboot state.
-                            Only will be allowed to be set if both registration options are configured.
-                            PMP 430 SM only.
-                            Introduced in release 12.2."
+			"As of 14.2, the 430 SM no longer supports multiple 
+                            radio modes. It only support 450 interoperability 
+                            mode."
 		::={whispSmConfig 146}
 
 	natTslTableSize	OBJECT-TYPE
@@ -1616,6 +1618,64 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		DESCRIPTION		
 			"Units of Broadcast/ Multicast MIR value. Set units first and then bCastMIR"
 		::={whispSmConfig 155}
+
+	txPowerControl	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable/Disable Automatic control of SM TX power.
+                            Engineering use only."
+		::={whispSmConfig 157}
+
+	bridgeTableSize	OBJECT-TYPE
+		SYNTAX		INTEGER (4..4096)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Bridge Table Size : 4 -- 4096."
+		::={whispSmConfig 158}
+
+	bridgeTableRestrict	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Restrict forwarding packets from hosts for which MAC address is not in the bridge table."
+		::={whispSmConfig 159}
+
+	maxTxPowerEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable Max Tx Power configuration.
+                            This is used with OID maxTxPower to set the max transmit power.
+                            This might be required in certain regions and frequency bands.
+                            See User Guide for more information.
+                            Enabling this will not allow a radio to transmit above its EIRP limit.
+                            The AP's Transmit Power Control may still adjust the Tx power down.
+                            SM only."
+		::={whispSmConfig 160}
+
+	maxTxPower	OBJECT-TYPE
+		SYNTAX		INTEGER (-30..27)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"This OID is controled by OID maxTxPowerEnable.
+                            This might be required in certain regions and frequency bands.
+                            See user guide for more information.
+                            Setting this will not allow a radio to transmit above its EIRP limit.
+                            The AP's Transmit Power Control may still adjust the Tx power down.
+                            SM only."
+		::={whispSmConfig 161}
 
 	rfScanListTable OBJECT-TYPE
 		SYNTAX		SEQUENCE OF RfScanListEntry
@@ -2759,8 +2819,12 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 	currentBandwidth	OBJECT-TYPE
 		SYNTAX		INTEGER {
 					bandwidth5mhz(1),
+					bandwidth7MHz(2),
 					bandwidth10mhz(3),
-					bandwidth20mhz(5)}
+					bandwidth15mhz(4),
+					bandwidth20mhz(5),
+					bandwidth30mhz(6),
+					bandwidth40MHz(7)}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
@@ -2805,11 +2869,13 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					pmp430(1),
 					pmp450Interoperability(2)}
 		MAX-ACCESS	read-only
-		STATUS		current
+		STATUS		deprecated
 		DESCRIPTION		
 			"The current radio mode that SM is operating in.
                         PMP 430 SMs only.
-                        Introduced in release 12.2."
+                        As of 14.2, the 430 SM only supports PMP 450
+                        interoperability mode, so this will only return
+                        pmp450Interoperability."
 		::={whispSmStatus 127}
 
 	adaptRateLowPri	OBJECT-TYPE
@@ -3006,6 +3072,31 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 			"The percentage of beacons that the SM/BHS successfully received for the last 15 minutes. This will be updated only once in 15 minutes."
 		::={whispSmStatus 145}
 
+	smSectorID	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The current Sector ID of the Registered AP/BHM. 
+                 			A value of -1 is return when the device is not registered or AP/BHM does not support Sector ID."
+		::={whispSmStatus 146}
+
+	scanCycleCount	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The number of scan cycles.  This increments after the SM completes scanning every configured frequency and channel bandwidth."
+		::={whispSmStatus 147}
+
+	bridgeCbErrStatBridgeDropCount	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Packet drop count for hosts with MAC address not in bridge table"
+		::={whispSmStatus 148}
+
 	dhcpServerTable OBJECT-TYPE
 		SYNTAX		SEQUENCE OF DhcpServerEntry
 		MAX-ACCESS	not-accessible
@@ -3195,6 +3286,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					additionalColorCode,
 					additionalColorCodePriority,
 					deleteAdditionalColorCode,
+					bridgeTableSize,
+					bridgeTableRestrict,
 					berDeModSelect,
 					multicastVCRcvRate,
 					syslogServerApPreferred,
@@ -3203,6 +3296,9 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					syslogSMXmitControl,
 					bCastMIRUnits,
 					naptRemoteManage,
+					maxTxPowerEnable,
+					maxTxPower,
+					txPowerControl,
 					eapPeerAAAServerCommonName,
 					pmp430ApRegistrationOptions,
 					switchRadioModeAndReboot}
@@ -3294,6 +3390,8 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					zoltarFPGAFreqOffset,
 					zoltarSWFreqOffset,
 					airDelayns,
+					smSectorID,
+					scanCycleCount,
 					currentColorCode,
 					currentColorCodePri,
 					currentChanFreq,
@@ -3339,6 +3437,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 					bridgecbDownlinkCreditLimit,
 					bridgecbDownlinkMaxBurstBitRate,
 					bridgecbUplinkMaxBurstBitRate,
+					bridgeCbErrStatBridgeDropCount,
 					radioModeStatus}
 		STATUS		current
 		DESCRIPTION
@@ -3450,6 +3549,14 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
                         Warning: If currently connected, this will cause the SM/BHS to drop session"
 		::={whispSmControls 2}
 
+	apEvalControl	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting this to 0 will clear the AP Evaluation Data."
+		::={whispSmControls 3}
+
 	whispMappingTable OBJECT-TYPE
 		SYNTAX		SEQUENCE OF WhispMappingEntry
 		MAX-ACCESS	not-accessible
@@ -3543,7 +3650,7 @@ whispSmControls		OBJECT IDENTIFIER ::= {whispSm 8}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION		
-			"MAC Address of the registered enity."
+			"MAC Address of the registered entity."
 		::={whispSmTranslationTableEntry 2}
 
 	whispTranslationTableIpAddr	OBJECT-TYPE

@@ -1,0 +1,4276 @@
+CTRON-AP3000-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex                                     FROM RFC1213-MIB
+    mgmt,Counter,IpAddress, enterprises         FROM RFC1155-SMI
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Integer32, Counter32, TimeTicks
+                                          	FROM SNMPv2-SMI
+    ;
+
+    MacAddress
+        ::= OCTET STRING(SIZE (6))
+    DisplayString
+        ::= OCTET STRING
+    TruthValue  ::=
+        INTEGER { false(2), true(1) }
+            
+    --PhysAddress               ::= OCTET STRING
+    --Guage32                   ::= Counter
+    --MacAddress                ::= OCTET STRING
+    --DisplayString             ::= OCTET STRING
+    --TruthValue                ::=
+    --INTEGER { false(2), true(1) }
+    cabletron		OBJECT IDENTIFIER ::= { enterprises 52 }
+    mibs 		OBJECT IDENTIFIER ::= { cabletron 4 }
+
+
+ctronAP3000 MODULE-IDENTITY
+    LAST-UPDATED "200710301845Z"  -- Wed. October 30 18:45 GMT 2007
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+    "Postal: Enterasys Networks
+             35 Industrial Way, P.O. Box 5005
+             Rochester, NH 03867-0505
+
+     Phone:  +1 603 332 9400
+     E-mail: support@enterasys.com
+     WWW:    http://www.enterasys.com"
+
+     DESCRIPTION
+        "This mib module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks enterprise OID as an extension
+         to the Enterasys AP3000 MIB.
+
+         This Enterasys Networks Proprietary MIB was designed to be
+         used for read-write access to configuration objects in AP3000."
+
+
+
+    REVISION "200710301845Z"  -- Wed. October 30 18:45 GMT 2007
+    DESCRIPTION
+ "1. May 06,04, add the textual definition not_supported(2) in apRadioSecurityWPAMode in SYNTAX.
+  2. May 06,04, add 3's group :apEtherInterfaceMgnt,apVLANMgnt,apAuthenticationMgnt.
+  3. June 24,04,
+      -Add three elements(.1--.3) into apSecurityMgnt.apSecuritySsh
+      -Add two elements into apAuthenticationMgnt.apAuthenticationServerTable.apAuthenticationServerEntry as
+            apAuthenticationAcctPort  INTEGER
+            apAuthenticationAcctInterimUpdate   INTEGER
+      -Add four elements(.13--.16) into apRadioInterfaceMgnt.apRadioInterfaceTable.apRadioInterfaceEntry
+      -Add apRogueApMgnt.
+  4. July 05,04,
+      -Add apFilterControlMgnt.
+      -Add apWStationSessionMgnt.
+      -Add apAdminMgnt.
+      -Add apResetMgt.
+      -Add apSNTPMgnt.
+      -Add apDNSMgnt.
+      -Add apIappMgnt.
+      -Add apSyslogMgnt.
+      -Add apEventLogMgnt.
+      -Add one element-apMacFilterControl(.2) into macFilterMgnt.
+      -Rename 'snmpTrapMgnt' with 'apSnmpMgnt' with change the oid.
+      -Deprecate the trapDot11InterfaceAGFail in apSnmpMgnt.trapConfiguration.
+      -Add the trapDot11InterfaceAFail(.21) into apSnmpMgnt.trapConfiguration.
+      -Add the trapDot11InterfaceGFail(.22) into apSnmpMgnt.trapConfiguration.
+      -Add the three objects into apSnmpMgnt.
+            -the apSnmpTrapDestinationTable(.3)
+            -the apSnmpCommunityReadOnly(.4)
+            -the apSnmpCommunityReadWrite(.5)
+      -Add the dot11InterfaceAFail(.21) into apNotificationTrapObjects.
+      -Add the dot11InterfaceGFail(.22) into apNotificationTrapObjects.
+      -Add the dot11InterfaceAFail(.21) into apNotificationTrapObjects.
+      -Deprecate the apInterfaceVlanId_A in apVLANMgnt.
+      -Deprecate the apInterfaceVlanId_G in apVLANMgnt.
+      -Add the apNativeVlanTable into apVLANMgnt.
+  5.July 05,04
+      -Remove the Object deifnition-dot11InterfaceAGFail in apFilterControlMgnt.in apNotificationTrapTree.apNotificationTrapObjects.
+      -Add qosQueueingMode in qosMgnt.
+  6.July 22,04
+      -Add apWStationSessionVlanID in qosMgnt.apWStationSessionTable.apWStationSessionEntry.
+  7.August 30,04
+      -replace 'ENTERASYS-AP3000-PRIVATE-MIB' with 'CTRON-AP3000-MIB'
+      -Remove the object definition-'rogueApAuthenticate INTEGER' which is not implemented.
+      -Fix some syntax error.
+  8.September 01,04
+      -Add rogueApRADIUSAuthenticate into  apRogueApMgnt.apRougeApControl.
+  9. October 27,04
+      -Deprecated apRadioInterfaceTable from apRadioInterfaceMgnt.
+      -Add enterpriseApRadioTable and enterpriseApVapRadioTable into apRadioInterfaceMgnt.
+      -Add qosSVPStatus into qosMgnt.
+  10. November 10,04
+      -Add apVLANMgntEtherUntaggedVlanId into apVLANMgnt.
+      -Add apAuthenticationAcctState into apAuthenticationMgnt.apAuthenticationServerTable.
+  11. November 30,04
+      -Modify apRadioSecuritySharedKeyLen from Read-write to Read-Only in  apRadioInterfaceMgnt.apRadioSecurityTable.apRadioSecurityEntry.
+      -Redefine the SYNTAX of apAuthenticationServer from IpAddress to DisplayString (SIZE(1..32)) in
+       apAuthenticationMgnt.apAuthenticationServerTable.apAuthenticationServerEntry.
+      -Redefine the SYNTAX of apSyslogServerIPAddress from IpAddress to DisplayString (SIZE(1..32)) in
+       apSyslogConfigMgnt.apSyslogServerTable.ApSyslogServerEntry.
+  12. December 09,04
+      -Add vapAuthenticationTable in apAuthenticationMgnt.
+      -Add apvGlobalIBSSRelayMode in apFilterControlMgnt.
+      -Add apvFilterControlTable in apFilterControlMgnt.
+  13. December 29,04
+      -Add apvMacFilterOperateTable in macFilterMgnt.
+      -Add apvMacFilterTable in macFilterMgnt.
+      -Remark macFilterTable in macFilterMgnt.
+      -Remark apMacFilterControl in macFilterMgnt.
+  14. January 17,05
+      -Add the dot11WirelessSTPDetection Object in
+       apNotificationTrapTree.apNotificationTrapObjects
+  15. March 30,05
+      -typo error from stockhoim(25) to stockolm(25),
+      -Add apWSLSupportMgnt.
+  16. July 01,05
+      -Fix the description of the apAuthenticationServer in the apAuthenticationMgnt.apAuthenticationServerTable.
+  17. August 05,05
+      -Add enterpriseApRadioWdsTable in apRadioInterfaceMgnt.
+      -Add enterpriseApRadioWdsPeerTable in apRadioInterfaceMgnt.
+      -Add enterpriseApRadioWEPKeysTable in apRadioInterfaceMgnt.
+      -Add apvMACAuthenticationPasswd in apAuthenticationMgnt.apvAuthenticationSetupTable.
+      -Add apWSLSupportControlStatus in apWSLSupportMgnt.
+      -Add apWSLRFAreaPollControl in apWSLSupportMgnt.
+      -Add apWSLRFAreaPollControlStatus in apWSLSupportMgnt.
+  18. August 19,05
+      -obsolete apMacFilterControl in macFilterMgnt.
+      -update the description of wdsApRole.
+      -update the description of apWStationSessionTxByteCount and apWStationSessionRxByteCount.
+  20. August 26,05
+      -change enterpriseApVapRadioClosedSystem from enterpriseApVapRadioClosedSystem  in EnterpriseApVapRadioEntry.
+  21. September 09,05
+      -modify value list for apRadioSecurityWEPAuthType in apRadioSecurityEntry.
+      -obsolete apRadioSecurityWPACipher in apRadioSecurityEntry.
+      -add apRadioSecurityWPACipherSuite, apRadioApSecurityWPAPreAuthentication, apRadioApSecurityWPAPmksaLifetime in apRadioSecurityEntry.
+  22. September 23,05
+      -macFilterTable in macFilterMgnt should be remarked based on the record
+       on Dec 29,04. So make to be deprecated.
+      -apMacFilterControl in macFilterMgnt should be remarked based on the record
+       on Dec 29,04.  So make to be deprecated.
+  23. November 04,05
+      -modify from aes_ccmp(0) to aesccmp(0) in apRadioSecurityWEPAuthType in apRadioSecurityEntry.
+      -modify SYNTAX INTEGER from (1..64) to (0..255)in enterpriseApVapRadioMaxAssoc.
+      -Add wdsApAckTimeout into enterpriseApRadioWdsEntry.
+      -Add swProductName and swCountrySetting into sysEntity.
+      -Add enterpriseApRadioAvAntennaListTable apRadioInterfaceMgnt
+      -Add enterpriseApRadioAvAntennaListEntry apRadioInterfaceMgnt
+  24. November 11,05
+      -Add swWDSActivationKey into sysEntity.
+      -Modify SYNTAX INTEGER in enterpriseApRadioMulticastDataRate
+  25. November 15,05
+      -Add enterpriseApRadioAutoDataRate into EnterpriseApRadioEntry
+  26. December 06,05
+      -modify SYNTAX DisplayString (SIZE(0..20)) to (SIZE(0..64))in apAuthenticationKey.
+  27. December 09,05
+      -Add wdsPeerRSSI into EnterpriseApRadioWdsPeerEntry
+  28. January 10,06
+      -remove swWDSActivationKey from sysEntity.
+  29. January 18,06
+      -modify value list for wdsApRole in enterpriseApRadioWdsEntry.
+  30. February 15,06
+      -Add rogueApClear into apRougeApControl.
+  31. August 11,06
+      -Modify mib syntax follow SMIv2.
+      -Modify apvMacFilterActivity SYNTAX in ApvMacFilterEntry.
+      -Add apSnmpVersionFilter in apSnmpMgnt.
+      -Modify apRadioSecurityWEPAuthType SYNTAX in apRadioSecurityEntry.
+      -Modify enterpriseApRadioMulticastDataRate SYNTAX in EnterpriseApRadioEntry.
+  32. September 22,06
+      -Add apWMMMgnt.
+            -the apWMMControlTable(.1)
+            -the apWMMBssParamTable(.2)
+            -the apWMMApParamTable(.3)
+      -Modify SYNTAX DisplayString from (SIZE(1..6)) to (SIZE(1..17))in wdsPeerBssid.
+ 33. January 15,07
+      -Redefine the SYNTAX of apAuthenticationServer from IpAddress to DisplayString (SIZE(1..64)) in apAuthenticationMgnt.apAuthenticationServerTable.apAuthenticationServerEntry.
+ 34. April 10,07
+      -Add enterpriseApRadioPreamble in enterpriseApRadioEntry.
+ 35. October 30,07
+      -Add enterpriseApRadioSWRetryMode in enterpriseApRadioEntry.
+     "
+
+
+    ::= { mibs 13 }
+
+-- -------------------------------------------------------------
+-- groups in the ENTERASYS-AP3000-PRIVATE-MIB
+-- -------------------------------------------------------------
+        comPortMgnt             OBJECT IDENTIFIER ::= { ctronAP3000 1 }
+        macFilterMgnt           OBJECT IDENTIFIER ::= { ctronAP3000 2 }
+        qosMgnt                 OBJECT IDENTIFIER ::= { ctronAP3000 3 }
+        linkQualityMgnt         OBJECT IDENTIFIER ::= { ctronAP3000 4 }
+--      snmpTrapMgnt            OBJECT IDENTIFIER ::= { ctronAP3000 5 }
+        apSnmpMgnt              OBJECT IDENTIFIER ::= { ctronAP3000 5 }
+        sysEntity               OBJECT IDENTIFIER ::= { ctronAP3000 6 }
+        apSecurityMgnt          OBJECT IDENTIFIER ::= { ctronAP3000 7 }
+        apRadioInterfaceMgnt    OBJECT IDENTIFIER ::= { ctronAP3000 8 }
+        apEtherInterfaceMgnt    OBJECT IDENTIFIER ::= { ctronAP3000 9 }
+        apFilterControlMgnt     OBJECT IDENTIFIER ::= { ctronAP3000 10 }
+        apVLANMgnt              OBJECT IDENTIFIER ::= { ctronAP3000 11 }
+        apAuthenticationMgnt    OBJECT IDENTIFIER ::= { ctronAP3000 12 }
+        apWStationSessionMgnt   OBJECT IDENTIFIER ::= { ctronAP3000 13 }
+        apRogueApMgnt           OBJECT IDENTIFIER ::= { ctronAP3000 14 }
+        apAdminMgnt             OBJECT IDENTIFIER ::= { ctronAP3000 15 }
+        apResetMgt              OBJECT IDENTIFIER ::= { ctronAP3000 16 }
+        apSNTPMgnt              OBJECT IDENTIFIER ::= { ctronAP3000 17 }
+        apDNSMgnt               OBJECT IDENTIFIER ::= { ctronAP3000 18 }
+        apIappMgnt              OBJECT IDENTIFIER ::= { ctronAP3000 19 }
+        apSyslogConfigMgnt      OBJECT IDENTIFIER ::= { ctronAP3000 20 }
+        apEventLogMgnt          OBJECT IDENTIFIER ::= { ctronAP3000 21 }
+        apWSLSupportMgnt        OBJECT IDENTIFIER ::= { ctronAP3000 22 }
+        apWMMMgnt               OBJECT IDENTIFIER ::= { ctronAP3000 23 }        
+        apNotificationTrapTree  OBJECT IDENTIFIER ::= { ctronAP3000 100 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+-- tbd
+-- -------------------------------------------------------------
+-- START::The apFilterControlMgnt Group
+-- -------------------------------------------------------------
+apFilterControlBridge OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the local bridge filter setting."
+        ::= { apFilterControlMgnt 1 }
+
+enterpriseApFilterControlAPManage OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the AP management filter setting."
+        ::= { apFilterControlMgnt 2 }
+
+enterpriseApFilterControlEthernet OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the ethernet filter setting."
+        ::= { apFilterControlMgnt 3 }
+
+enterpriseApFilterProtocolTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EnterpriseApFilterProtocolEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of the filter protocol table."
+        ::= { apFilterControlMgnt 4 }
+
+enterpriseApFilterProtocolEntry OBJECT-TYPE
+        SYNTAX      EnterpriseApFilterProtocolEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the filter protocol table, containing information
+                     about configuration of one filter table entry."
+        INDEX       { enterpriseApFilterProtocolIndex }
+        ::= { enterpriseApFilterProtocolTable 1 }
+
+EnterpriseApFilterProtocolEntry ::= SEQUENCE
+{
+    enterpriseApFilterProtocolIndex          Integer32,
+    enterpriseApFilterProtocolName           DisplayString,
+    enterpriseApFilterProtocolISODesignator  DisplayString,
+    enterpriseApFilterProtocolState          INTEGER
+}
+
+enterpriseApFilterProtocolIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Index of the Protocol Filters."
+        ::= { enterpriseApFilterProtocolEntry 1 }
+
+enterpriseApFilterProtocolName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value indicates the name of the protocol filter.  One of
+                         the following:
+                         Aironet_DDP, Appletalk_ARP, ARP, Banyan, Berkeley_Trailer_Negotiation,
+                         CDP, DEC_LAT, DEC_MOP, DEC_MOP_Dump_Load, DEC_XNS, EAPOL,
+                         Enet_Config_Test, Ethertalk, IP, LAN_Test, NetBEUI, Novell_IPX(new),
+                         Novell_IPX(old), RARP, Telxon_TXP, X.25_Level3
+                        "
+    ::= { enterpriseApFilterProtocolEntry 2 }
+
+enterpriseApFilterProtocolISODesignator OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value indicates the name of the protocol filter."
+    ::= { enterpriseApFilterProtocolEntry 3 }
+
+enterpriseApFilterProtocolState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether the protocol filter is enabled."
+    ::= { enterpriseApFilterProtocolEntry 4 }
+-- -------------------------------------------------------------
+apvGlobalIBSSRelayMode OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                perVapModeEnable(1),
+                allVapModeEnable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the setting of the global IBSS Relay mode among the VAPs.
+            In Per-VAP Mode enable, the traffic between the VAPs should be blocked.
+            In Al-VAP Mode enable, the traffic between should not be blocked."
+        ::= { apFilterControlMgnt 5 }
+-- ***************************************************************
+-- * apvFilterControlEntry TABLE
+-- ***************************************************************
+apvFilterControlTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ApvFilterControlEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Table of the control and status information about
+                     configuration of the filter Control for each Vap."
+        ::= { apFilterControlMgnt 6 }
+
+apvFilterControlEntry OBJECT-TYPE
+        SYNTAX      ApvFilterControlEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of the filter for each Vap of the AP."
+        INDEX       { apvFilterControlIndex }
+        ::= { apvFilterControlTable 1 }
+
+ApvFilterControlEntry ::= SEQUENCE
+{
+    apvFilterControlIndex                      Integer32,
+    apvIBSSFilterControl                       INTEGER,
+    apvAPManageFilterControl                   INTEGER
+}
+
+apvFilterControlIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Index of the configuration."
+        ::= { apvFilterControlEntry 1 }
+
+apvIBSSFilterControl OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the local bridge filter(IBSS Relay Filter) setting."
+        ::= { apvFilterControlEntry 2 }
+
+apvAPManageFilterControl OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the AP management filter setting."
+        ::= { apvFilterControlEntry 3 }
+-- ***************************************************************
+-- * End of apvFilterControlEntry TABLE
+-- ***************************************************************
+-- -------------------------------------------------------------
+-- End::The apFilterControlMgnt Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- START::The ComPortMgnt Group
+-- -------------------------------------------------------------
+comPortControl OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The administrative enable/disable state for
+        COM Port Control in a System."
+        ::= { comPortMgnt 1 }
+-- -------------------------------------------------------------
+-- End::The ComPortMgnt Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- START::The macFilterMgnt Group
+-- -------------------------------------------------------------
+macFilterTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MacFilterEntry
+        MAX-ACCESS      not-accessible
+        STATUS      deprecated
+        DESCRIPTION "Table of status information about
+                     each configured MAC Filtering Entry."
+        ::= { macFilterMgnt 1 }
+
+macFilterEntry OBJECT-TYPE
+        SYNTAX      MacFilterEntry
+        MAX-ACCESS      not-accessible
+        STATUS      deprecated
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of MAC Filter."
+        INDEX       { macFilterIndex }
+        ::= { macFilterTable 1 }
+
+MacFilterEntry ::= SEQUENCE
+{
+    macFilterIndex                        Integer32,
+    macFilterAddress                      MacAddress,
+    macFilterAllowedToGo                  INTEGER,
+    macFilterOpeStatus                    INTEGER
+}
+
+macFilterIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS      deprecated
+        DESCRIPTION "Filter index."
+        ::= { macFilterEntry 1 }
+
+
+macFilterAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+            "This values indicates the MAC address of the
+            MAC Filter entry."
+    ::= { macFilterEntry 2 }
+
+macFilterAllowedToGo OBJECT-TYPE
+        SYNTAX INTEGER { allow(1), deny(2) }
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+            "The administrative allow/deny state for
+            that specified MAC Filter Entry."
+    ::= { macFilterEntry 3 }
+
+macFilterOpeStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                other(0),
+                valid(1),
+                invalid(2),
+                create(3)
+        }
+        MAX-ACCESS read-create
+        STATUS deprecated
+        DESCRIPTION
+        "This object indicates the status of this entry.
+            other(0) - this entry is currently in use but
+                the conditions under which it will remain
+                so differ from the following values.
+            valid(1) - this value to indicate this entry is currently
+                in used.
+            invalid(2) - write this value to the corresponding entry,
+                the whole entry will be removed. Since the order of entry
+                shall be re-order while it has been deleted. To re-freshed
+                the whole table is recommended for new index.
+            create(3) - write this value to indicate that the new MAC address
+                will be added after next writing MAC address to that new entry.
+                The adding action will be taken on the index that grater than 1.
+         "
+
+    DEFVAL      { other }
+
+    ::= { macFilterEntry 4 }
+-- -------------------------------------------------------------
+apMacFilterControl OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+            "This value indicates the control of the MAC filter setting."
+        ::= { macFilterMgnt 2 }
+-- -------------------------------------------------------------
+apvMacFilterOperateTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ApvMacFilterOperateEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "The Table used to manage the function in
+                     MAC Filter Table."
+        ::= { macFilterMgnt 3 }
+
+apvMacFilterOperateEntry OBJECT-TYPE
+        SYNTAX      ApvMacFilterOperateEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration in one VAP of the AP."
+        INDEX       { ifIndex }
+        ::= { apvMacFilterOperateTable 1 }
+
+ApvMacFilterOperateEntry ::= SEQUENCE
+{
+    apvMacFilterPermission                      INTEGER,
+    apvMacFilterAddressToAdd                    OCTET STRING
+}
+
+apvMacFilterPermission OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                allowed(1),
+                denied(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the Permission on all the active
+             filter entry for each Vap. The negative permission will
+             be applied on any inactive entry or any MAC that is not
+             in the table."
+
+    ::= { apvMacFilterOperateEntry 1 }
+
+apvMacFilterAddressToAdd OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the MAC address to be added to the
+            local MAC filter table as an active entry for each Vap."
+
+    ::= { apvMacFilterOperateEntry 2 }
+-- -------------------------------------------------------------
+apvMacFilterTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ApvMacFilterEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Table of status information about
+                     each configured MAC Address Filtering Entry."
+        ::= { macFilterMgnt 4 }
+
+apvMacFilterEntry OBJECT-TYPE
+        SYNTAX      ApvMacFilterEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration in one radio of the AP.
+                     MacFilterEntry is created and managed using
+                     localMACFilterMgnt Table."
+        INDEX       { ifIndex, apvMacFilterIndex }
+        ::= { apvMacFilterTable 1 }
+
+ApvMacFilterEntry ::= SEQUENCE
+{
+    apvMacFilterIndex                        Integer32,
+    apvMacFilterAddress                      MacAddress,
+    apvMacFilterActivity                     INTEGER
+}
+
+apvMacFilterIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "MAC Filter index in each VAP."
+        ::= { apvMacFilterEntry 1 }
+
+apvMacFilterAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This values indicates the MAC address of the
+            filter entry."
+    ::= { apvMacFilterEntry 2 }
+
+apvMacFilterActivity OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                allow(1),
+                denied(2),
+                deleteEntry(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the Activity of the MAC table
+             entry by the filter permission. If allow(1), the filter
+             permission will be applied to the MAC address.
+             If denied(2), the filter permission will not be applied
+             to the MAC address.
+             If delete_entry(3), the filter entry will be deleted."
+
+    ::= { apvMacFilterEntry 3 }
+
+-- -------------------------------------------------------------
+-- END::The macFilterMgnt Group
+-- -------------------------------------------------------------
+
+
+-- -------------------------------------------------------------
+-- START::The qosMgnt Group
+-- -------------------------------------------------------------
+qosModeControl OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                qosoff(1),
+                qossa(2),
+                qosda(3),
+                qosether(4),
+                qos8021p(5)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The administrative status and control of the QoS mode for the QoS management."
+        ::= { qosMgnt 1 }
+
+qosMACTypeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF QosMACTypeEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Table of status information about
+                     each configured MAC Type Entry for the QoS Management."
+        ::= { qosMgnt 2 }
+
+qosMACTypeEntry OBJECT-TYPE
+        SYNTAX      QosMACTypeEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration MAC Type Entry for the QoS Management."
+        INDEX       { qosMACTypeIndex }
+        ::= { qosMACTypeTable 1 }
+
+QosMACTypeEntry ::= SEQUENCE
+{
+    qosMACTypeIndex                     Integer32,
+    qosMACTypeAddress                   MacAddress,
+    qosMACTypePriority                  Integer32,
+    qosMACTypeOpeStatus                 INTEGER
+}
+
+qosMACTypeIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Qos MAC Type index."
+        ::= { qosMACTypeEntry 1 }
+
+
+qosMACTypeAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the MAC address of that specified
+            index in the entry."
+    ::= { qosMACTypeEntry 2 }
+
+qosMACTypePriority OBJECT-TYPE
+        SYNTAX Integer32 (0..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the level of priority of that specified
+            MAC Address in entry."
+
+    ::= { qosMACTypeEntry 3 }
+
+qosMACTypeOpeStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                other(0),
+                valid(1),
+                invalid(2),
+                create(3)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "This object indicates the status of this entry.
+            other(0) - this entry is currently in use but
+                the conditions under which it will remain
+                so differ from the following values.
+            valid(1) - this value to indicate this entry is currently
+                in used.
+            invalid(2) - write this value to the corresponding entry,
+                the whole entry will be removed. Since the order of entry
+                shall be re-order while it has been deleted. To re-freshed
+                the whole table is recommended for new index.
+            create(3) - write this value to indicate that the new MAC address
+                will be added after next writing MAC address to that new entry.
+                The adding action will be taken on the index that grater than 1.
+          "
+    DEFVAL      { other }
+
+    ::= { qosMACTypeEntry 4 }
+
+qosEtherTypeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF QosEtherTypeEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Table of status information about
+                     each configured Ether Type Entry for QoS Management."
+        ::= { qosMgnt 3 }
+
+qosEtherTypeEntry OBJECT-TYPE
+        SYNTAX      QosEtherTypeEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration Ether Type for QoS Management."
+        INDEX       { qosMACTypeIndex }
+        ::= { qosEtherTypeTable 1 }
+
+QosEtherTypeEntry ::= SEQUENCE
+{
+    qosEtherTypeIndex                           Integer32,
+    qosEtherTypeHexValue                        OCTET STRING,
+    qosEtherTypePriority                        Integer32,
+    qosEtherTypeOpeStatus                       INTEGER
+}
+
+qosEtherTypeIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Qos Ether Type index in the table."
+        ::= { qosEtherTypeEntry 1 }
+
+
+qosEtherTypeHexValue OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(4))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Hex Value to indicate the type of Ether of that specified
+            index in the entry."
+    ::= { qosEtherTypeEntry 2 }
+
+qosEtherTypePriority OBJECT-TYPE
+        SYNTAX Integer32 (0..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the level of priority of that specified
+            MAC Address in entry."
+
+    ::= { qosEtherTypeEntry 3 }
+
+qosEtherTypeOpeStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                other(0),
+                valid(1),
+                invalid(2),
+                create(3)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "This object indicates the status of this entry.
+            other(0) - this entry is currently in use but
+                the conditions under which it will remain
+                so differ from the following values.
+            valid(1) - this value to indicate this entry is currently
+                in used.
+            invalid(2) - write this value to the corresponding entry,
+                the whole entry will be removed. Since the order of entry
+                shall be re-order while it has been deleted. To re-freshed
+                the whole table is recommended for new index.
+            create(3) - write this value to indicate that the new Ether Value
+                will be added after next writing Ether Type Value to that new entry.
+                The adding action will be taken on the index that grater than 1.
+          "
+        DEFVAL      { other }
+        ::= { qosEtherTypeEntry 4 }
+
+qosQueueingMode OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                weighted-fair(1),
+                strict-priority(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The administrative control of the QoS Queuing mode for the QoS management."
+        ::= { qosMgnt 4 }
+
+qosSVPStatus OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The administrative enable/disable state for SVP."
+        ::= { qosMgnt 5 }
+
+-- -------------------------------------------------------------
+-- END::The qosMgnt Group
+-- -------------------------------------------------------------
+
+
+-- -------------------------------------------------------------
+-- START::The linkQualityMgnt Group
+-- -------------------------------------------------------------
+linkQualityTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF LinkQualityEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Table of status information about
+                     the radio Interface Link Quality Entry."
+        ::= { linkQualityMgnt 1 }
+
+linkQualityEntry OBJECT-TYPE
+        SYNTAX      LinkQualityEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of  the radio Interface Link Quality."
+        INDEX           { linkQualityRadioIndex,
+                          linkQualityStaIndex }
+
+        ::= { linkQualityTable 1 }
+
+LinkQualityEntry ::= SEQUENCE
+{
+    linkQualityRadioIndex               Integer32,
+    linkQualityStaIndex                 Integer32,
+    linkQualityStaMacAddress            MacAddress,
+    linkQualityStaRssi                  Integer32
+}
+linkQualityRadioIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "This is the value to define the index
+        of the radio interface."
+        ::= { linkQualityEntry 1 }
+
+linkQualityStaIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "This is value to define the index
+        of link station."
+        ::= { linkQualityEntry 2 }
+
+linkQualityStaMacAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This values indicates the MAC address of the
+            link station."
+    ::= { linkQualityEntry 3 }
+
+linkQualityStaRssi OBJECT-TYPE
+        SYNTAX Integer32(0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This values indicates the percentage RSSI of the
+            link station."
+    ::= { linkQualityEntry 4 }
+-- -------------------------------------------------------------
+-- END::The linkQualityMgnt Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- START::The snmpTrapMgnt-apSnmpMgnt Group
+-- -------------------------------------------------------------
+trapControl OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The administrative enable/disable state for
+        SNMP Trap Control in a System."
+--        ::= { snmpTrapMgnt 1 }
+        ::= { apSnmpMgnt 1 }
+-- -------------------------------------------------------------
+--trapConfiguration     OBJECT IDENTIFIER ::= { snmpTrapMgnt 2 }
+trapConfiguration     OBJECT IDENTIFIER ::= { apSnmpMgnt 2 }
+--01   trapSysSystemUp                 Enable/Disable sysSystemUp trap
+--02   trapSysSystemDown               Enable/Disable sysSystemDown trap
+--03   trapSysRadiusServerChanged      Enable/Disable sysRadiusServerChanged trap
+--04   trapDot11StationAssociation     Enable/Disable dot11StationAssociation trap
+--05   trapDot11StationReAssociation   Enable/Disable dot11StationReAssociation trap
+--06   trapDot11StationAuthentication  Enable/Disable dot11StationAuthentication trap
+--07   trapDot11StationRequestFail     Enable/Disable dot11StationRequestFail trap
+--08   trapDot11InterfaceAGFail        Enable/Disable dot11InterfaceAGFail trap
+--09   trapLocalMacAddrAuthFail        Enable/Disable localMacAddrAuthFail trap
+--10   trapLocalMacAddrAuthSuccess     Enable/Disable localMacAddrAuthSuccess trap
+--11   trapDot1xAuthNotInitiated       Enable/Disable dot1xAuthNotInitiated trap
+--12   trapDot1xAuthSuccess            Enable/Disable dot1xAuthSuccess trap
+--13   trapDot1xAuthFail               Enable/Disable dot1xAuthFail trap
+--14   trapDot1xMacAddrAuthSuccess     Enable/Disable dot1xMacAddrAuthSuccess trap
+--15   trapDot1xMacAddrAuthFail        Enable dot1xMacAddrAuthFail trap
+--16   trapPppLogonFail                Enable/Disable pppLogonFail trap
+--17   trapIappStationRoamedFrom       Enable/Disable iappStationRoamedFrom trap
+--18   trapIappStationRoamedTo         Enable/Disable iappStationRoamedTo trap
+--19   trapIappContextDataSent         Enable iappContextDataSent trap
+--20   trapSntpServerFail              Enable/Disable sntpServerFail trap
+
+
+trapSysSystemUp OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP sysSystemUp trap."
+::= { trapConfiguration 1 }
+
+trapSysSystemDown OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP sysSystemDown trap."
+::= { trapConfiguration 2 }
+
+trapSysRadiusServerChanged OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP sysRadiusServerChanged trap."
+::= { trapConfiguration 3 }
+
+ trapDot11StationAssociation OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP dot11StationAssociation trap."
+::= { trapConfiguration 4 }
+
+ trapDot11StationReAssociation OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP dot11StationReAssociation trap."
+::= { trapConfiguration 5 }
+
+trapDot11StationAuthentication OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP dot11StationAuthentication trap."
+::= { trapConfiguration 6 }
+
+trapDot11StationRequestFail OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP dot11StationRequestFail trap."
+::= { trapConfiguration 7 }
+
+-- trapDot11InterfaceAGFail OBJECT-TYPE
+--    SYNTAX INTEGER { enabled(1), disabled(2) }
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--    "The administrative enable/disable state for
+--     SNMP dot11InterfaceAGFail trap."
+--::= { trapConfiguration 8 }
+
+trapLocalMacAddrAuthFail OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP localMacAddrAuthFail trap."
+::= { trapConfiguration 9 }
+
+trapLocalMacAddrAuthSuccess OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP localMacAddrAuthSuccess trap."
+::= { trapConfiguration 10 }
+
+trapDot1xAuthNotInitiated OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP dot1xAuthNotInitiated trap."
+::= { trapConfiguration 11 }
+
+trapDot1xAuthSuccess OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP dot1xAuthSuccess trap."
+::= { trapConfiguration 12 }
+
+trapDot1xAuthFail OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP  dot1xAuthFail trap."
+::= { trapConfiguration 13 }
+
+trapDot1xMacAddrAuthSuccess OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP dot1xMacAddrAuthSuccess trap."
+::= { trapConfiguration 14 }
+
+trapDot1xMacAddrAuthFail OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP dot1xMacAddrAuthFail trap."
+::= { trapConfiguration 15 }
+
+trapPppLogonFail OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP pppLogonFail trap."
+::= { trapConfiguration 16 }
+
+trapIappStationRoamedFrom OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP iappStationRoamedFrom trap."
+::= { trapConfiguration 17 }
+
+trapIappStationRoamedTo OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP iappStationRoamedFrom trap."
+::= { trapConfiguration 18 }
+
+trapIappContextDataSent OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP iappContextDataSent trap."
+::= { trapConfiguration 19 }
+
+trapSntpServerFail OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP sntpServerFail trap."
+::= { trapConfiguration 20 }
+
+trapDot11InterfaceAFail OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP dot11InterfaceAFail trap."
+::= { trapConfiguration 21 }
+
+trapDot11InterfaceGFail OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP dot11InterfaceGFail trap."
+::= { trapConfiguration 22 }
+trapDot11WirelessSTPDetection OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The administrative enable/disable state for
+     SNMP dot11WirelessSTPDetection trap."
+::= { trapConfiguration 23 }
+-- -------------------------------------------------------------
+apSnmpTrapDestinationTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ApSnmpTrapDestinationEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of each trap receiving server."
+    ::= { apSnmpMgnt 3 }
+
+apSnmpTrapDestinationEntry OBJECT-TYPE
+        SYNTAX      ApSnmpTrapDestinationEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of one trap receiving server."
+        INDEX       { apSnmpTrapDestinationIndex }
+        ::= { apSnmpTrapDestinationTable 1 }
+
+ApSnmpTrapDestinationEntry ::= SEQUENCE
+{
+    apSnmpTrapDestinationIndex        INTEGER,
+    apSnmpTrapDestinationCommunity    DisplayString,
+    apSnmpTrapDestinationIP           IpAddress,
+    apSnmpTrapDestinationState        INTEGER
+}
+
+apSnmpTrapDestinationIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Index of the Trap Destination Table."
+        ::= { apSnmpTrapDestinationEntry 1 }
+
+apSnmpTrapDestinationCommunity OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The SNMP Trap Community"
+        ::= { apSnmpTrapDestinationEntry 2 }
+
+apSnmpTrapDestinationIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The IP address of the trap receiving server."
+        ::= { apSnmpTrapDestinationEntry 3 }
+
+apSnmpTrapDestinationState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether the trap receiving server is enabled."
+        ::= { apSnmpTrapDestinationEntry 4 }
+-- -------------------------------------------------------------
+apSnmpCommunityReadOnly OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "The SNMP Read Only Community.  The value if read,
+                     will only show ******."
+        ::= { apSnmpMgnt 4 }
+
+apSnmpCommunityReadWrite OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "The SNMP Read Write Community.  The value if read,
+                     will only show *****."
+        ::= { apSnmpMgnt 5 }
+
+apSnmpVersionFilter OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+                enableSNMPv1SNMPv2c(1),
+                disableSNMPv1SNMPv2c(2)
+        }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "To set the version-filter of SNMP."
+        DEFVAL {enableSNMPv1SNMPv2c }
+        ::= { apSnmpMgnt 6 }
+
+-- -------------------------------------------------------------
+-- END::The snmpTrapMgnt Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+--  START::sysEntity - Standard Mib elements
+-- -------------------------------------------------------------
+swHardwareVer OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Hardware version of the main board."
+        ::= { sysEntity 1 }
+
+swBootRomVer OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Boot ROM code version of the main board."
+        ::= { sysEntity 2 }
+
+swOpCodeVer OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Operation code version of the main board."
+        ::= { sysEntity 3 }
+
+swSerialNumber OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Serial Number of the Access Point."
+        ::= { sysEntity 4 }
+swProductName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The Product Name of the Access Point."
+        ::= { sysEntity 5 }
+
+swCountrySetting OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The current CountryCode Setting of the Access Point."
+        ::= { sysEntity 6 }
+
+--swWDSActivationKey OBJECT-TYPE
+--        SYNTAX OCTET STRING (SIZE(0..16))
+--        MAX-ACCESS  read-write
+--        STATUS      current
+--        DESCRIPTION
+--               "Point-to-multipoint WDS mode requires an activation
+--                key to enable. A valid multipoint activation key must
+--                be entered as a string of ACSCII characters translating
+--                to the binary HEX value of the key before the Access Point
+--                will accept the point-to-multipoint bridge mode setting.
+--
+--                Returns SNMP_BAD_VALUE if validation fails.
+--
+--                This object must be saved across a system reset and/or a
+--                power cycle."
+--        ::= { sysEntity 7 }
+
+-- resetConfigurationMgnt     OBJECT IDENTIFIER ::= { sysEntity 5 }
+-- -------------------------------------------------------------
+--  END::sysEntity - Standard Mib elements
+-- -------------------------------------------------------------
+
+
+-- -------------------------------------------------------------
+-- - apRadioSecurityMgnt TABLE
+-- -------------------------------------------------------------
+apRadioSecurityTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ApRadioSecurityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of each radio in terms of security settings."
+        ::= { apSecurityMgnt 1 }
+
+apRadioSecurityEntry OBJECT-TYPE
+        SYNTAX      ApRadioSecurityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of one radio of the AP."
+        INDEX       { apRadioSecurityIndex }
+        ::= { apRadioSecurityTable 1 }
+
+ApRadioSecurityEntry ::= SEQUENCE
+{
+    apRadioSecurityIndex          Integer32,
+    apRadioSecurityWEPAuthType    INTEGER,
+    apRadioSecuritySharedKeyLen   INTEGER,
+    apRadioSecurityWPAMode        INTEGER,
+    apRadioSecurityWPAKeyType     INTEGER,
+    apRadioSecurityWPACipher      INTEGER,
+    apRadioSecurityWPAPSKType     INTEGER,
+    apRadioSecurityWPAPSK         DisplayString,
+    apRadioSecurityWEPKeyType     INTEGER,
+    apRadioSecurityWEPEnabled     TruthValue,
+    apRadioSecurityWPACipherSuite      INTEGER,
+    apRadioApSecurityWPAPreAuthentication       INTEGER,
+    apRadioApSecurityWPAPmksaLifetime INTEGER
+}
+
+apRadioSecurityIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Radio Index for security settings."
+        ::= { apRadioSecurityEntry 1 }
+
+apRadioSecurityWEPAuthType OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                opensystem(0),
+                sharedkey(1),
+                wpa(2),
+                wpapsk(3),
+                wpawpa2mixed(4),
+                wpawpa2pskmixed(5),
+                wpa2(6),
+                wpa2psk(7)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the type of WEP authentication in use for this radio interface.
+                                                        opensystem(0)         Set authentication open
+                                                        sharedkey(1)          Set authentication shared
+                                                        wpa(2)                Set WPA Mode
+                                                        wpapsk(3)             Set WPA-PSK Mode
+                                                        wpa-wpa2-mixed(4)     Set WPA-WPA2-Mixed Mode
+                                                        wpawpa2pskmixed(5)    Set WPA-WPA2 PSK Mixed Mode
+                                                        wpa2(6)               Set WPA2 Mode
+                                                        wpa2psk(7)            Set WPA2-PSK Mode
+            "
+        ::= { apRadioSecurityEntry 2 }
+
+apRadioSecuritySharedKeyLen OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                none(0),
+                sixtyFour(1),
+                oneHundredTwentyEight(2),
+                oneHundredFiftyTwo(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value indicates the shared key length for this radio interface."
+        ::= { apRadioSecurityEntry 3 }
+
+apRadioSecurityWPAMode OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                supported(0),
+                required(1),
+                notSupported(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the state of WPA for this radio interface."
+        ::= { apRadioSecurityEntry 4 }
+
+apRadioSecurityWPAKeyType OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                dot1x(0),
+                presharedkey(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the type of WPA Key Management in use for this radio interface."
+        ::= { apRadioSecurityEntry 5 }
+
+apRadioSecurityWPACipher OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                wep(0),
+                tkip(1),
+                aes(2)
+        }
+        MAX-ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            "This value indicates the type of WPA Cipher in use for this radio interface."
+        ::= { apRadioSecurityEntry 6 }
+
+apRadioSecurityWPAPSKType OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                hex(0),
+                alphanumeric(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the type of WPA Pre Shared Key in use for this radio interface."
+        ::= { apRadioSecurityEntry 7 }
+
+apRadioSecurityWPAPSK OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..80))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates WPA Pre Shared Key in use for this radio interface."
+        ::= { apRadioSecurityEntry 8 }
+
+apRadioSecurityWEPKeyType OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                hexadecimal(0),
+                alphanumeric(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the type of WEP Key in use for this radio interface."
+        ::= { apRadioSecurityEntry 9 }
+
+apRadioSecurityWEPEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether WEP is enabled."
+        ::= { apRadioSecurityEntry 10 }
+
+apRadioSecurityWPACipherSuite OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                aesccmp(0),
+                tkip(1),
+                wep(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the type of WPA Cipher Suite in use for this radio interface."
+        ::= { apRadioSecurityEntry 11 }
+
+apRadioApSecurityWPAPreAuthentication OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS     read-write
+        STATUS current
+        DESCRIPTION
+            "Whether Pre-Authentication is enabled."
+        DEFVAL { disabled }
+        ::= { apRadioSecurityEntry 12 }
+
+apRadioApSecurityWPAPmksaLifetime OBJECT-TYPE
+        SYNTAX INTEGER (0..14400)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number (in minutes) for Pmksa-Lifetime."
+        ::= { apRadioSecurityEntry 13 }
+-- -------------------------------------------------------------
+--
+apSecuritySsh           OBJECT IDENTIFIER ::= { apSecurityMgnt 2 }
+
+apSecuritySshServerEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether SSH server is enabled."
+        ::= { apSecuritySsh 1 }
+
+apSecuritySshServerPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates SSH server's port number."
+        DEFVAL      { 22 }
+        ::= { apSecuritySsh 2 }
+
+apSecuritySshTelnetServerEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether telnet server is enabled."
+        ::= { apSecuritySsh 3 }
+
+-- -------------------------------------------------------------
+-- The enterpriseApRadio Group
+-- -------------------------------------------------------------
+
+-- **********************************************************************
+-- * EnterpriseApRadio TABLE
+-- **********************************************************************
+
+enterpriseApRadioTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EnterpriseApRadioEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of each radio."
+        ::= { apRadioInterfaceMgnt 2 }
+
+enterpriseApRadioEntry OBJECT-TYPE
+        SYNTAX      EnterpriseApRadioEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of one radio of the AP."
+        INDEX       { enterpriseApRadioIndex }
+        ::= { enterpriseApRadioTable 1 }
+
+EnterpriseApRadioEntry ::= SEQUENCE
+{
+    enterpriseApRadioIndex          Integer32,
+    enterpriseApRadioAutoChannel    INTEGER,
+    enterpriseApRadioTransmitPower  INTEGER,
+    enterpriseApRadioTurboMode      INTEGER,
+    enterpriseApRadioDataRate       INTEGER,
+    enterpriseApRadioGMode          INTEGER,
+    enterpriseApRadioAntennaMode    INTEGER,
+    rogueApState                    INTEGER,
+--  rogueApAuthenticate             INTEGER,
+    rogueApInterval                 INTEGER,
+    rogueApDuration                 INTEGER,
+    rogueApScanNow                  INTEGER,
+    enterpriseApRadioAntennaModeControl  INTEGER,
+    enterpriseApRadioFixedAntennaType  INTEGER,
+    enterpriseApRadioAntennaID      INTEGER,
+    enterpriseApRadioMulticastDataRate  INTEGER,
+    enterpriseApRadioAutoDataRate   INTEGER,
+    enterpriseApRadioPreamble       INTEGER,
+    enterpriseApRadioSWRetryMode    INTEGER    
+}
+
+enterpriseApRadioIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Radio Index for configuration."
+        ::= { enterpriseApRadioEntry 1 }
+
+enterpriseApRadioAutoChannel OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether auto channel selection is enabled or not
+                         for this radio interface"
+        ::= { enterpriseApRadioEntry 2 }
+
+enterpriseApRadioTransmitPower OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                full(1),
+                half(2),
+                quarter(3),
+                eighth(4),
+                min(5)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the transmit power for this radio interface."
+        ::= { enterpriseApRadioEntry 3 }
+
+enterpriseApRadioTurboMode OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2),
+                invalid(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether turbo mode is enabled for this radio interface."
+        ::= { enterpriseApRadioEntry 4 }
+
+enterpriseApRadioDataRate OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                oneMbps(1),
+                twoMbps(2),
+                fiveAndHalfMbps(5),
+                sixMbps(6),
+                nineMbps(9),
+                elevenMbps(11),
+                twelveMbps(12),
+                eighteenMbps(18),
+                twentyFourMbps(24),
+                thirtySixMbps(36),
+                fourtyEightMbps(48),
+                fiftyFourMbps(54),
+                auto(255)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the data rate for this radio interface.
+                        Radio interface A operates at 6, 9, 12, 18, 24, 36, 48, 54.
+            Radio interface G operates all listed data rates.   The auto
+                        setting will attempt to set the best data rate for the interface"
+        ::= { enterpriseApRadioEntry 5 }
+
+enterpriseApRadioGMode OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                bOnly(1),
+                gOnly(2),
+                bg(3),
+                invalid(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the radio mode for the 802.11g radio.
+                        This setting is only valid for the 802.11g interface."
+        ::= { enterpriseApRadioEntry 6 }
+
+enterpriseApRadioAntennaMode OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                both(1),
+                left(2),
+                right(3),
+                invalid(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the antenna mode in use for the G-radio.
+                         The values are interpreted as follows:
+                                both(1) means use both built-in antennas,
+                                left(2) means use left side.
+                                right(3) means use right side.
+                                invalid(4) means not support.
+                        This setting is only valid for the 802.11g interface."
+        ::= { enterpriseApRadioEntry 7 }
+
+rogueApState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value is used to enable/disable Rogue Ap Detection for
+                        this radio interface."
+        ::= { enterpriseApRadioEntry 8 }
+
+--rogueApAuthenticate OBJECT-TYPE
+--        SYNTAX     INTEGER
+--        {
+--                enabled(1),
+--                disabled(2)
+--        }
+--        MAX-ACCESS read-write
+--        STATUS current
+--        DESCRIPTION
+--            "Value is used to enable/disable Authentication.  If authentication is disabled, but
+--                      rogue Ap Detection is on, then the device will collect data about each AP."
+--        ::= { enterpriseApRadioEntry 14 }
+
+rogueApInterval OBJECT-TYPE
+--        SYNTAX     INTEGER (60..10080)
+        SYNTAX     INTEGER (30..10080)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "How often to scan for Rogue Aps.  The interval in minutes, with default
+                        of 720(minutes)."
+        ::= { enterpriseApRadioEntry 9 }
+
+rogueApDuration OBJECT-TYPE
+        SYNTAX     INTEGER (200..1000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "How long to scan each channel (in milliseconds).   A longer duration will yield more
+                        complete results. A shorter duration will allow clients a better chance
+                        of remaining connected.  Default value is 350(milliseconds)."
+        ::= { enterpriseApRadioEntry 10 }
+
+rogueApScanNow OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When writing the value to enable, the AP will trigger the Rouge AP scan function.
+             The value will always return disable(2)."
+        ::= { enterpriseApRadioEntry 11 }
+
+enterpriseApRadioAntennaModeControl OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                fixed(1),
+                external(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value indicates which antenna is in use for the radio Interface.
+                         The values are interpreted as follows:
+                                fixed(1) specify to use built-in antennas,
+                                external(2) specify to use one external antenna.
+                        "
+        ::= { enterpriseApRadioEntry 12 }
+
+enterpriseApRadioFixedAntennaType OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                diversity(1),
+                left(2),
+                right(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates which antenna type is in use
+             as the fixed antenna is selected.
+                        "
+        ::= { enterpriseApRadioEntry 13 }
+
+enterpriseApRadioAntennaID OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates which antenna ID will be in use for the radio Interface.
+                        "
+        ::= { enterpriseApRadioEntry 14 }
+
+enterpriseApRadioMulticastDataRate OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                oneMbps(1),
+                twoMbps(2),
+                fiveAndHalfMbps(5),
+                sixMbps(6),
+                nineMbps(9),
+                elevenMbps(11),
+                twelveMbps(12),
+                eighteenMbps(18),
+                twentyFourMbps(24),
+                thirtySixMbps(36),
+                fortyEightMbps(48),
+                fiftyFourMbps(54)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the data rate for mc/bc packets from this
+            radio interface. sixMbps(6), nineMbps(9), twelveMbps(12), eighteenMbps(18),
+            twentyFourMbps(24), thirtySixMbps(36), fortyEightMbps(48), and fiftyFourMbps(54)
+            are for 11a and g-only mode. The default for b-only and b+g mode is
+            oneMbps(1),  twoMbps(2), fiveAndHalfMbps(5) and elevenMbps(11)."
+        ::= { enterpriseApRadioEntry 15 }
+
+enterpriseApRadioAutoDataRate OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether automated data rate is enabled or not
+                         for this radio interface"
+        ::= { enterpriseApRadioEntry 16 }
+
+enterpriseApRadioPreamble OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                long(1),
+                short(2),
+                invalid(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the preamble length of 11g.
+                         The values are interpreted as follows:
+                                long(1) sets the preamble length to long.
+                                short(2) sets the preamble length to short.
+                                invalid(3) means not support.
+                        This setting is only valid for the 802.11g interface."
+        ::= { enterpriseApRadioEntry 17 }
+
+enterpriseApRadioSWRetryMode OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether SW retty mode  is enabled or not
+                         for this radio interface"
+        ::= { enterpriseApRadioEntry 18 }        
+-- **********************************************************************
+-- * EnterpriseApVapRadio TABLE
+-- **********************************************************************
+
+enterpriseApVapRadioTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EnterpriseApVapRadioEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of each Vap radio."
+        ::= { apRadioInterfaceMgnt 3 }
+
+enterpriseApVapRadioEntry OBJECT-TYPE
+        SYNTAX      EnterpriseApVapRadioEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of one Vap radio of the AP."
+        INDEX       { enterpriseApVapRadioIndex }
+        ::= { enterpriseApVapRadioTable 1 }
+
+EnterpriseApVapRadioEntry ::= SEQUENCE
+{
+    enterpriseApVapRadioIndex          Integer32,
+    enterpriseApVapRadioState          INTEGER,
+    enterpriseApVapRadioSecureAccess   INTEGER,
+    enterpriseApVapRadioMaxAssoc       INTEGER,
+    enterpriseApVapRadioTransmitKey    INTEGER,
+    enterpriseApVapRadioDescription    DisplayString,
+    enterpriseApVapRadioDefefaultPriority       Integer32
+}
+
+enterpriseApVapRadioIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Radio Index for configuration."
+        ::= { enterpriseApVapRadioEntry 1 }
+
+enterpriseApVapRadioState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the state of the radio interface."
+        ::= { enterpriseApVapRadioEntry 2 }
+
+enterpriseApVapRadioSecureAccess OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether secure access is enabled for this radio interface."
+        ::= { enterpriseApVapRadioEntry 3 }
+
+enterpriseApVapRadioMaxAssoc OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the max number of clients allowed on this radio interface."
+        ::= { enterpriseApVapRadioEntry 4 }
+
+enterpriseApVapRadioTransmitKey OBJECT-TYPE
+        SYNTAX INTEGER (1..4)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates default transmit key in use for this radio interface."
+        ::= { enterpriseApVapRadioEntry 5 }
+
+enterpriseApVapRadioDescription OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..80))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the description for this radio interface."
+        ::= { enterpriseApVapRadioEntry 6 }
+
+enterpriseApVapRadioDefefaultPriority OBJECT-TYPE
+        SYNTAX Integer32 (0..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the level of default priority of that specified
+            VAP in entry."
+
+    ::= { enterpriseApVapRadioEntry 7 }
+
+-- ****************************************************************************************
+--  enterpriseApWds Table
+-- ****************************************************************************************
+
+
+enterpriseApRadioWdsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EnterpriseApRadioWdsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of configuration information for Wds for each
+                Radio interface."
+        ::= { apRadioInterfaceMgnt 4 }
+
+enterpriseApRadioWdsEntry OBJECT-TYPE
+        SYNTAX      EnterpriseApRadioWdsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of peer Bridging
+                     for one radio of the AP.  The table is indexed by radio
+                     Index (corresponding to enterpriseApRadioTable).  The table does not contain the radio index as
+                     a member of the table."
+        INDEX       { enterpriseApRadioIndex }
+        ::= { enterpriseApRadioWdsTable 1 }
+
+EnterpriseApRadioWdsEntry ::= SEQUENCE
+{
+        wdsApRole               INTEGER,
+        wdsApAckTimeout         INTEGER
+}
+
+wdsApRole OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                roleAp(1),
+                roleBridgeMaster(2),
+                roleBridge(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the role of the Ap for this radio,
+             roleAp(1):            AP operation.
+             roleBridgeMaster(2):  Root-Bridge mode.
+             roleBridge(3):        Bridge Mode.
+            "
+        ::= { enterpriseApRadioWdsEntry 1 }
+
+wdsApAckTimeout OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the WDS Ack timeout for this radio in us,
+            and the following values can be set to the system:
+               0    Set wireless Ack Timeout as system default
+               20   0 to 1  miles: Ack timeout is 20 us
+               40   1 to 3  miles: Ack timeout is 40 us
+               75   3 to 6  miles: Ack timeout is 75 us
+               115  6 to 10 miles: Ack timeout is 115 us
+                         "
+        ::= { enterpriseApRadioWdsEntry 2 }
+
+
+-- ****************************************************************************************
+--  enterpriseApRadioWdsPeer Table
+-- ****************************************************************************************
+enterpriseApRadioWdsPeerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EnterpriseApRadioWdsPeerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of configuration information for Wds Peers for each
+                Radio interface."
+        ::= { apRadioInterfaceMgnt 5 }
+
+enterpriseApRadioWdsPeerEntry OBJECT-TYPE
+        SYNTAX      EnterpriseApRadioWdsPeerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of peer Bridging
+                                         for one radio of the AP.  The table is indexed by radio
+                                         Index (corresponding to enterpriseApRadioTable) and the peer
+                                         index (Up to 8).  The table does not contain the radio index as
+                                         a member of the table."
+        INDEX       { enterpriseApRadioIndex, wdsPeerIndex }
+        ::= { enterpriseApRadioWdsPeerTable 1 }
+
+EnterpriseApRadioWdsPeerEntry ::= SEQUENCE
+{
+    wdsPeerIndex                    Integer32,
+    wdsPeerBssid                    DisplayString,
+    wdsPeerRSSI                     Integer32
+}
+
+wdsPeerIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..8)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Peer Index for the radio interface."
+        ::= { enterpriseApRadioWdsPeerEntry 1 }
+
+wdsPeerBssid OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE(1..17))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The BSSID for this peer."
+        ::= { enterpriseApRadioWdsPeerEntry 2 }
+
+wdsPeerRSSI OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This value indicates the RSSI value of the WDS peer link."
+        ::= { enterpriseApRadioWdsPeerEntry 3 }
+
+-- ****************************************************************************************
+--  enterpriseApRadioWEPKeysTable Table
+-- ****************************************************************************************
+
+enterpriseApRadioWEPKeysTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EnterpriseApRadioWEPKeysEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Conceptual table for WEP default keys."
+        ::= {   apRadioInterfaceMgnt 6 }
+
+enterpriseApRadioWEPKeysEntry OBJECT-TYPE
+        SYNTAX EnterpriseApRadioWEPKeysEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the WEP Default Keys Table.
+             A collection of objects containing information used to
+             determine if a WEPkey as been defined and if so, the
+             value of the WEPkey."
+
+        INDEX {enterpriseApRadioIndex, enterpriseApRadioWEPKeysIndex }
+
+        ::= {  enterpriseApRadioWEPKeysTable  1 }
+
+EnterpriseApRadioWEPKeysEntry ::=
+        SEQUENCE  {
+                    enterpriseApRadioWEPKeysIndex     INTEGER,
+                    enterpriseApRadioWEPKeyType       INTEGER,
+                    enterpriseApRadioWEPKeyLength     INTEGER
+                  }
+
+enterpriseApRadioWEPKeysIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "WEP Key Index for the radio interface."
+        ::= { enterpriseApRadioWEPKeysEntry 1 }
+
+
+
+enterpriseApRadioWEPKeyType OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                hexadecimalKey(1),
+                alphanumericKey(2),
+                otherKey(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "status of the WEP Key type"
+
+        ::= {  enterpriseApRadioWEPKeysEntry 2 }
+
+enterpriseApRadioWEPKeyLength OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                keyLength64Bit(1),
+                keyLength128Bit(2),
+                keyLength152Bit(3),
+                keyLengthOther(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "status of the WEP Key Length."
+
+        ::= {  enterpriseApRadioWEPKeysEntry 3 }
+
+-- ****************************************************************************************
+--  enterpriseApRadioAvAntennaListTable Table
+-- ****************************************************************************************
+
+enterpriseApRadioAvAntennaListTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EnterpriseApRadioAvAntennaListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Conceptual table for Available Antenna List used in the Radio."
+        ::= {   apRadioInterfaceMgnt 7 }
+
+enterpriseApRadioAvAntennaListEntry OBJECT-TYPE
+        SYNTAX EnterpriseApRadioAvAntennaListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the Antenna List Table.
+             A collection of objects containing information used to
+             show if an Antenna as been defined and if so, the
+             value of the antenna Id."
+
+        INDEX {enterpriseApRadioIndex, enterpriseApRadioAvAntennaIndex }
+
+        ::= {  enterpriseApRadioAvAntennaListTable  1 }
+
+EnterpriseApRadioAvAntennaListEntry ::=
+        SEQUENCE  {
+                    enterpriseApRadioAvAntennaIndex           INTEGER,
+                    enterpriseApRadioAvAntennaId     INTEGER,
+                    enterpriseApRadioAvAntennaDesc    DisplayString
+                  }
+
+enterpriseApRadioAvAntennaIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Available Antenna List Index for the radio interface."
+        ::= { enterpriseApRadioAvAntennaListEntry 1 }
+
+
+
+enterpriseApRadioAvAntennaId OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Available antenna Id in the entry."
+        ::= {  enterpriseApRadioAvAntennaListEntry 2 }
+
+enterpriseApRadioAvAntennaDesc OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The description of the antenna ID."
+        ::= { enterpriseApRadioAvAntennaListEntry 3 }
+
+-- ****************************************************************************************
+--  enterpriseApRadioAvChannelListTable Table
+-- ****************************************************************************************
+
+enterpriseApRadioAvChannelListTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EnterpriseApRadioAvChannelListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Conceptual table for Available Channel List used in the Radio."
+        ::= {   apRadioInterfaceMgnt 8 }
+
+enterpriseApRadioAvChannelListEntry OBJECT-TYPE
+        SYNTAX EnterpriseApRadioAvChannelListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the Channel List Table.
+             A collection of objects containing information used to
+             show if a Channel No. as been defined and if so, the
+             value of the Channel No."
+
+        INDEX {enterpriseApRadioIndex, enterpriseApRadioAvChannelIndex }
+
+        ::= {  enterpriseApRadioAvChannelListTable  1 }
+
+EnterpriseApRadioAvChannelListEntry ::=
+        SEQUENCE  {
+                    enterpriseApRadioAvChannelIndex  INTEGER,
+                    enterpriseApRadioAvChannelNo     INTEGER
+                  }
+
+enterpriseApRadioAvChannelIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Channel List Index for the radio interface."
+        ::= { enterpriseApRadioAvChannelListEntry 1 }
+
+
+
+enterpriseApRadioAvChannelNo OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Available channel number in the entry"
+        ::= {  enterpriseApRadioAvChannelListEntry 2 }
+
+-- -------------------------------------------------------------
+-- START::The apEtherInterfaceMgnt Group
+-- -------------------------------------------------------------
+--  ==============================
+--  apEtherNetConfig Entry
+apEtherNetConfig
+  OBJECT IDENTIFIER ::= { apEtherInterfaceMgnt 1 }
+
+
+netConfigIPAddress  OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "The IP address of this Net interface.  The default value
+                        for this object is 0.0.0.0.  If either the netConfigIPAddress
+                        or netConfigSubnetMask are 0.0.0.0, then when the device
+                        boots, it may use DHCP to try to figure out what these
+                        values should be. If DHCP fails, before the device
+                        can talk on the network, this value must be configured
+                        (e.g., through a terminal attached to the device)."
+    ::= { apEtherNetConfig 1 }
+
+netConfigSubnetMask  OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "The subnet mask of this Net interface.  The default value
+                        for this object is 0.0.0.0.  If either the netConfigIPAddress
+                        or netConfigSubnetMask are 0.0.0.0, then when the device
+                        boots, it may use DHCP to try to figure out what these
+                        values should be. If DHCP fails, before the device
+                        can talk on the network, this value must be configured
+                        (e.g., through a terminal attached to the device)."
+    ::= { apEtherNetConfig 2 }
+
+netConfigDefaultGateway  OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "The IP Address of the default gateway.  If this value is
+                        undefined or unknown, it shall have the value 0.0.0.0."
+    ::= { apEtherNetConfig 3 }
+
+netConfigHttpState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "Whether HTTP is enabled."
+    ::= { apEtherNetConfig 4 }
+
+netConfigHttpPort OBJECT-TYPE
+        SYNTAX     INTEGER (514..65535)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "The port number for HTTP."
+    ::= { apEtherNetConfig 5 }
+
+netConfigHttpsState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "Whether Secure HTTP is enabled."
+    ::= { apEtherNetConfig 6 }
+
+netConfigHttpsPort OBJECT-TYPE
+        SYNTAX     INTEGER (514..65535)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "The port number for Secure HTTP."
+    ::= { apEtherNetConfig 7 }
+
+netConfigDHCPState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "Whether DHCP is enabled."
+    ::= { apEtherNetConfig 8 }
+-- -------------------------------------------------------------
+-- END::The apNetConfigMgnt Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- -START::apVLANMgnt - VLAN Mib elements
+-- -------------------------------------------------------------
+
+apVLANMgntNativeId OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the native VLAN Id."
+        ::= { apVLANMgnt 1 }
+
+apVLANMgntState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether VLANs are enabled or disabled."
+        ::= { apVLANMgnt 2 }
+
+apVLANMgntStateNextBoot OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the VLANs state for the next reset."
+        ::= { apVLANMgnt 3 }
+
+--apInterfaceVlanId_A OBJECT-TYPE
+--        SYNTAX Integer32
+--        MAX-ACCESS read-write
+--            "This value indicates the native VLAN Id of the 802.11 a wireless interface."
+--        STATUS current
+--        DESCRIPTION
+--        ::= { apVLANMgnt 4 }
+
+--apInterfaceVlanId_G OBJECT-TYPE
+--        SYNTAX Integer32
+--        MAX-ACCESS read-write
+--        STATUS current
+--        DESCRIPTION
+--            "This value indicates the native VLAN Id of the 802.11 g wireless interface."
+--        ::= { apVLANMgnt 5 }
+apVLANMgntEtherUntaggedVlanId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the Untagged VlanID for Ether Interface."
+        ::= {  apVLANMgnt 7 }
+-- -------------------------------------------------------------
+apNativeVlanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ApNativeVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Table used to manage the Vlans for each
+                     wireless interface."
+        ::= { apVLANMgnt 6 }
+
+apNativeVlanEntry OBJECT-TYPE
+        SYNTAX      ApNativeVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about VLAN configuration of one wireless interface."
+        INDEX       { apNativeVlanIfIndex,
+                      apNativeVlanSsidNumber }
+        ::= { apNativeVlanTable 1 }
+
+
+ApNativeVlanEntry ::= SEQUENCE
+{
+    apNativeVlanIfIndex          Integer32,
+    apNativeVlanSsidNumber       Integer32,
+    apNativeVlanVlanId           Integer32,
+    apNativeVlanState            INTEGER
+}
+
+
+apNativeVlanIfIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Interface Index of the wireless interface for which
+                             the VLAN is assigned to."
+        ::= { apNativeVlanEntry 1 }
+
+apNativeVlanSsidNumber OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Associated Number for Service Set Id (SSID) of the
+                             wireless interface for which the VLAN is assigned to.
+                                         Note: This is for future support of multiple SSIDs
+                                         per radio interface."
+        ::= { apNativeVlanEntry 2 }
+
+apNativeVlanVlanId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the native VLAN Id of the wireless interface associated
+                          with the if index and the SSID number(if it is not 0)."
+        ::= { apNativeVlanEntry 3 }
+
+apNativeVlanState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the Native VLANs state."
+        ::= { apNativeVlanEntry 4 }
+-- -------------------------------------------------------------
+-- -END::apVLANMgnt - VLAN Mib elements
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- START::The apAuthenticationMgnt Group
+-- -------------------------------------------------------------
+--  ==============================
+--  dot11AuthenticationEntry TABLE
+apAuthenticationSetupEntry
+  OBJECT IDENTIFIER ::= { apAuthenticationMgnt 1 }
+
+ap8021xState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                disabled(0),
+                supported(1),
+                required(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute indicates that the Enterprise the state
+            of the 802.1X authentication algorithm."
+
+    ::= { apAuthenticationSetupEntry 1 }
+
+ap8021xBroadcastKeyRefreshRate OBJECT-TYPE
+        SYNTAX INTEGER (0..1440)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number (in minutes) between changing the broadcast key for
+                        802.1X and WPA clients"
+
+    ::= { apAuthenticationSetupEntry 2 }
+
+ap8021xSessionKeyRefreshRate OBJECT-TYPE
+        SYNTAX INTEGER (0..1440)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number (in minutes) between changing session keys for
+                        802.1X and WPA clients"
+
+    ::= { apAuthenticationSetupEntry 3 }
+
+ap8021xReauthenticationTimeout OBJECT-TYPE
+        SYNTAX INTEGER (0..1440)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number (in minutes) between forcing 802.1X clients to
+                        reauthenticate"
+
+    ::= { apAuthenticationSetupEntry 4 }
+
+apAuthenticationMode OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                disabled(0),
+                local(1),
+                radius(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the type of MAC authentication or RADIUS authentication in use,
+             or not in use."
+            ::= { apAuthenticationSetupEntry 5 }
+
+--  ==============================
+--  apAuthenticationServerTable
+apAuthenticationServerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ApAuthenticationServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of each authentication server."
+        ::= { apAuthenticationMgnt 2 }
+
+apAuthenticationServerEntry OBJECT-TYPE
+        SYNTAX      ApAuthenticationServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of one authentication server of the AP."
+        INDEX       { apAuthenticationServerIndex }
+        ::= { apAuthenticationServerTable 1 }
+
+ApAuthenticationServerEntry ::= SEQUENCE
+{
+    apAuthenticationServerIndex        Integer32,
+--    apAuthenticationServer             IpAddress,
+    apAuthenticationServer             DisplayString,
+    apAuthenticationPort               INTEGER,
+    apAuthenticationKey                DisplayString,
+    apAuthenticationRetransmit         INTEGER,
+    apAuthenticationTimeout            INTEGER,
+    apAuthenticationAcctPort           INTEGER,
+    apAuthenticationAcctInterimUpdate  INTEGER,
+    apAuthenticationAcctState          INTEGER
+}
+
+apAuthenticationServerIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Index of the Authentication Server"
+        ::= { apAuthenticationServerEntry 1 }
+
+
+apAuthenticationServer OBJECT-TYPE
+--        SYNTAX IpAddress
+        SYNTAX     DisplayString (SIZE(1..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the IP address or host name of the authentication server."
+
+    ::= { apAuthenticationServerEntry 2 }
+
+apAuthenticationPort OBJECT-TYPE
+        SYNTAX INTEGER (1024..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the UDP Port used by the authentication server."
+
+    ::= { apAuthenticationServerEntry 3 }
+
+apAuthenticationKey OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the shared key used by the authentication server."
+
+    ::= { apAuthenticationServerEntry 4 }
+
+apAuthenticationRetransmit OBJECT-TYPE
+        SYNTAX INTEGER (1..30)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the retransmit timer length used by the
+            authentication server."
+
+    ::= { apAuthenticationServerEntry 5 }
+
+apAuthenticationTimeout OBJECT-TYPE
+        SYNTAX INTEGER (1..60)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the Timeout value(sec) used by the
+                        authentication server."
+
+    ::= { apAuthenticationServerEntry 6 }
+
+apAuthenticationAcctPort OBJECT-TYPE
+        SYNTAX      INTEGER(0..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "UDP Accounting Port.  The valid range is from
+                1024-65535. A value of 0 means accounting is disabled."
+        ::= { apAuthenticationServerEntry 7 }
+
+apAuthenticationAcctInterimUpdate OBJECT-TYPE
+        SYNTAX      INTEGER(60..86400)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The interval between sending accounting
+                updates."
+        ::= { apAuthenticationServerEntry 8 }
+
+apAuthenticationAcctState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether the Accounting Server is enabled."
+        ::= { apAuthenticationServerEntry 9 }
+--  ==============================
+--  apAuthenticationSupplicantTable TABLE
+apAuthenticationSupplicantTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ApAuthenticationSupplicantEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of supplicant"
+        ::= { apAuthenticationMgnt 3 }
+
+
+apAuthenticationSupplicantEntry OBJECT-TYPE
+        SYNTAX      ApAuthenticationSupplicantEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of one supplicant."
+        INDEX       { ap8021xSuppIndex }
+        ::= { apAuthenticationSupplicantTable 1 }
+
+
+ApAuthenticationSupplicantEntry ::= SEQUENCE
+{
+    ap8021xSuppIndex          Integer32,
+    ap8021xSuppState          INTEGER,
+    ap8021xSuppUser           DisplayString,
+    ap8021xSuppPasswd         DisplayString
+}
+
+ap8021xSuppIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Index of the interface for which this supplicant is
+                             running.  Currently only the ethernet interface."
+        ::= { apAuthenticationSupplicantEntry 1 }
+
+
+ap8021xSuppState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                disabled(0),
+                enabled(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to enable or disable the 802.1X supplicant."
+
+    ::= { apAuthenticationSupplicantEntry 2 }
+
+ap8021xSuppUser OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the username for supplicant. If value is
+                         configured, will display ****.  Else will display EMPTY."
+        ::= { apAuthenticationSupplicantEntry 3 }
+
+ap8021xSuppPasswd OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the password for supplicant. If value is
+                         configured, will display ****.  Else will display EMPTY."
+        ::= { apAuthenticationSupplicantEntry 4 }
+
+-- ***************************************************************
+-- * apvAuthenticationSetupEntry TABLE
+-- ***************************************************************
+apvAuthenticationSetupTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ApvAuthenticationSetupEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of 8021x for each Vap."
+        ::= { apAuthenticationMgnt 4 }
+
+apvAuthenticationSetupEntry OBJECT-TYPE
+        SYNTAX      ApvAuthenticationSetupEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of 8021x for each Vap of the AP."
+        INDEX       { apv8021xIndex }
+        ::= { apvAuthenticationSetupTable 1 }
+
+ApvAuthenticationSetupEntry ::= SEQUENCE
+{
+    apv8021xIndex                    Integer32,
+    apv8021xState                    INTEGER,
+    apv8021xBroadcastKeyRefreshRate  INTEGER,
+    apv8021xSessionKeyRefreshRate    INTEGER,
+    apv8021xReauthenticationTimeout  INTEGER,
+    apvMACAuthenticationMode         INTEGER,
+    apvMACAuthenticationTimeout      INTEGER,
+    apvMACAuthenticationPasswd       DisplayString
+}
+
+apv8021xIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Index for configuration."
+        ::= { apvAuthenticationSetupEntry 1 }
+
+apv8021xState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                disabled(0),
+                supported(1),
+                required(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute indicates that the Enterprise the state
+            of the 802.1X authentication algorithm."
+
+    ::= { apvAuthenticationSetupEntry 2 }
+
+apv8021xBroadcastKeyRefreshRate OBJECT-TYPE
+        SYNTAX INTEGER (0..1440)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number (in minutes) between changing the broadcast key for
+                        802.1X and WPA clients"
+
+    ::= { apvAuthenticationSetupEntry 3 }
+
+apv8021xSessionKeyRefreshRate OBJECT-TYPE
+        SYNTAX INTEGER (0..1440)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number (in minutes) between changing history keys for
+                        802.1X and WPA clients"
+
+    ::= { apvAuthenticationSetupEntry 4 }
+
+apv8021xReauthenticationTimeout OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number (in minutes) between forcing 802.1X clients to
+                        reauthenticate"
+
+    ::= { apvAuthenticationSetupEntry 5 }
+
+apvMACAuthenticationMode OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                disabled(0),
+                local(1),
+                remote(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the mode of MAC authentication in use."
+
+        ::= { apvAuthenticationSetupEntry 6 }
+
+apvMACAuthenticationTimeout OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number (in minutes) between forcing RADIUS MAC to authenticate."
+
+        ::= { apvAuthenticationSetupEntry 7 }
+
+apvMACAuthenticationPasswd OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..31))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the password for MAC RADIUS Authentication. If value is
+                         configured, will display ****.  Else will display EMPTY."
+        ::= { apvAuthenticationSetupEntry 8 }
+-- ***************************************************************
+-- * End of apAuthentication TABLE
+-- ***************************************************************
+
+
+-- -------------------------------------------------------------
+-- END::The apAuthenticationMgnt Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- START::The apWStationSessionMgnt Group
+-- -------------------------------------------------------------
+
+apWStationSessionTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF ApWStationSessionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This table list all sessions (wireless stations) status"
+        ::= { apWStationSessionMgnt 1 }
+
+apWStationSessionEntry OBJECT-TYPE
+        SYNTAX          ApWStationSessionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "An entry in the table, containing information
+                about status and statistics of the wireless station."
+    INDEX { apWStationSessionIfIndex, apWStationSessionStationAddres }
+        ::= { apWStationSessionTable 1 }
+
+ApWStationSessionEntry ::= SEQUENCE
+{
+        apWStationSessionIfIndex                Integer32,
+        apWStationSessionStationAddres          MacAddress,
+        apWStationSessionAuthenticated          TruthValue,
+        apWStationSessionAssociated             TruthValue,
+        apWStationSessionIsForwarding           TruthValue,
+        apWStationSessionKeyType                INTEGER,
+        apWStationSessionAssociationId          Integer32,
+        apWStationSessionLastAuthenticatedTime  TimeTicks,
+        apWStationSessionAssociatedTime         TimeTicks,
+        apWStationSessionLastAssociatedTime     TimeTicks,
+        apWStationSessionLastDisassociatedTime  TimeTicks,
+        apWStationSessionTxPacketCount          Counter32,
+        apWStationSessionRxPacketCount          Counter32,
+        apWStationSessionTxByteCount            Counter32,
+        apWStationSessionRxByteCount            Counter32,
+        apWStationSessionVlanID                 INTEGER
+}
+
+apWStationSessionIfIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "Interface index for the radio this session is associated
+                 with."
+    ::= { apWStationSessionEntry 1 }
+
+apWStationSessionStationAddres OBJECT-TYPE
+        SYNTAX              MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS              current
+        DESCRIPTION
+        "The unique MAC Address of the station for this session."
+    ::= { apWStationSessionEntry 2 }
+
+apWStationSessionAuthenticated OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Whether the session is authenticated or not."
+        ::= { apWStationSessionEntry 3 }
+
+apWStationSessionAssociated OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Whether the session is associated or not. It is rare case that
+                not associated stations show up in the table."
+        ::= { apWStationSessionEntry 4 }
+
+apWStationSessionIsForwarding OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Whether the AP is forwarding the client station traffic (higher level authentication)"
+        ::= { apWStationSessionEntry 5 }
+
+apWStationSessionKeyType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                none(1),
+                staticWep(2),
+                dynamicWep(3),
+                wpaWep(4),
+                wpaTkip(5),
+                wpaAes(6)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The encryption key type used by the station. Note that wpa-wep is not supported"
+        ::= { apWStationSessionEntry 6 }
+
+apWStationSessionAssociationId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The internal association identify number"
+        ::= { apWStationSessionEntry 7 }
+
+apWStationSessionLastAuthenticatedTime OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the time in hundredths of a second last time the client
+                is authenticated. Note that a session may be authenticated multiple times.
+                The value is related to the system startup"
+        ::= { apWStationSessionEntry 8 }
+
+apWStationSessionAssociatedTime OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the time in hundredths of a second since the client
+                associated. The value is related to the system startup"
+        ::= { apWStationSessionEntry 9 }
+
+apWStationSessionLastAssociatedTime OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the time in hundredths of a second when the client
+                associated in last session. The value is related to the system startup"
+        ::= { apWStationSessionEntry 10 }
+
+apWStationSessionLastDisassociatedTime OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the time in hundredths of a second when the client
+                disassociated in last session. The value is related to the system startup"
+        ::= { apWStationSessionEntry 11 }
+
+apWStationSessionTxPacketCount OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+                "This is the number of packets transmitted from the client to the AP. It includes
+         data, control and management packets."
+        ::= { apWStationSessionEntry 12 }
+
+apWStationSessionRxPacketCount OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+                "This is the number of unicast packets transmitted from the AP to the client.
+         It includes data, control and management packets."
+        ::= { apWStationSessionEntry 13 }
+
+apWStationSessionTxByteCount OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+                "This is the number of bytes transmitted from the client to the AP. It
+         includes the bytes of data, control and management packets."
+        ::= { apWStationSessionEntry 14 }
+
+apWStationSessionRxByteCount OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+                "This is the number of unicast bytes transmitted from the AP to
+         the client. It includes the bytes of data, control and management
+         packets."
+        ::= { apWStationSessionEntry 15 }
+
+apWStationSessionVlanID OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The current VLAN Id used by the station."
+        ::= { apWStationSessionEntry 16 }
+
+
+-- -------------------------------------------------------------
+-- End::The apStationSession Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- START::The apRogueApMgnt Group
+-- -------------------------------------------------------------
+
+rogueApDetectionTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RogueApDetectionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of each AP that has been detected."
+        ::= { apRogueApMgnt 1 }
+
+rogueApDetectionEntry OBJECT-TYPE
+        SYNTAX      RogueApDetectionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about any AP detected."
+        INDEX       { rogueApIndex }
+        ::= { rogueApDetectionTable 1 }
+
+RogueApDetectionEntry ::= SEQUENCE
+{
+    rogueApIndex             INTEGER,
+    rogueApBssid             DisplayString,
+    rogueApSsid              DisplayString,
+    rogueApPortNumber        Integer32,
+    rogueApChannelNumber     Integer32,
+    rogueApRSSIValue         Integer32
+}
+
+rogueApIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..128)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Monotonically increasing index."
+        ::= { rogueApDetectionEntry 1 }
+
+rogueApBssid OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE(0..6))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The AP BSSID"
+        ::= { rogueApDetectionEntry 2 }
+
+rogueApSsid OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE(0..40))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The AP SSID"
+        ::= { rogueApDetectionEntry 3 }
+
+rogueApPortNumber OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Interface index for the radio."
+    ::= { rogueApDetectionEntry 4 }
+
+rogueApChannelNumber OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Channel where Ap detected."
+    ::= { rogueApDetectionEntry 5 }
+
+rogueApRSSIValue OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "RSSI for AP detected."
+    ::= { rogueApDetectionEntry 6 }
+-- -------------------------------------------------------------
+--
+apRougeApControl                OBJECT IDENTIFIER ::= { apRogueApMgnt 2 }
+
+rogueApRADIUSAuthenticate OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Value is used to enable/disable RADIUS Authentication. "
+        ::= { apRougeApControl 1 }
+
+rogueApClear OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                clear(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is set to clear(1) to clear the Rogue AP detection table.  When read, the value
+                         will have no meaning."
+        ::= { apRougeApControl 2 }
+
+-- -------------------------------------------------------------
+-- END::The apRogueApMgnt Group
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- START::The apAdminMgnt Group
+-- -------------------------------------------------------------
+apAdminUsername OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..16))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the username for management login."
+        ::= { apAdminMgnt 1 }
+
+appAdminPassword OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..16))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the password for management login."
+        ::= { apAdminMgnt 2 }
+-- -------------------------------------------------------------
+-- End::The apAdminMgnt Group
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- START::The apResetMgt Group
+-- -------------------------------------------------------------
+apRestartOpCodeFile OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..127))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Name of op-code file for start-up."
+        ::= { apResetMgt 1 }
+
+apRestartControl  OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                running(1),
+                warmBoot(2),
+                coldBoot(3)
+        }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "Setting this object to warmBoot(2) causes the device to
+                                restart the application software with current configuration
+                                parameters saved in non-volatile memory.  Setting this
+                                object to coldBoot(3) causes the device to reinitialize
+                                configuration parameters in non-volatile memory to default
+                                values and restart the application software.  When the device
+                                is running normally, this variable has a value of running(1)."
+                ::= { apResetMgt 2 }
+-- -------------------------------------------------------------
+-- End::The apResetMgt Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- START::The apSNTPMgnt Group
+-- -------------------------------------------------------------
+apSNTPState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether SNTP is enabled or not. At least one of the
+                         SNTP servers must have a valid IP address before SNTP can be enabled."
+        ::= { apSNTPMgnt 1 }
+
+apSNTPPrimaryServer OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the IP address of the primary SNTP server."
+        ::= { apSNTPMgnt 2 }
+
+apSNTPSecondaryServer OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the IP address of the secondary SNTP server."
+        ::= { apSNTPMgnt 3 }
+
+apSNTPTimezone OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                                        enewetakKwajalein(0),
+                                        midwayIsland(1),
+                                        hawaii(2),
+                                        alaska(3),
+                                        pacific(4),
+                                        arizona(5),
+                                        mountain(6),
+                                        central(7),
+                                        mexicoCity(8),
+                                        saskatchewan(9),
+                                        bogota(10),
+                                        eastern(11),
+                                        indiana(12),
+                                        atlantic(13),
+                                        caracas(14),
+                                        santiago(15),
+                                        newfoundland(16),
+                                        brasilia(17),
+                                        buenos(18),
+                                        midAtlantic(19),
+                                        azores(20),
+                                        casablanca(21),
+                                        greenwichMeanTimeDublin(22),
+                                        greenwichMeanTimeLisbon(23),
+                                        amsterdam(24),
+                                        stockholm(25) ,
+                                        bratislava(26),
+                                        prague(27),
+                                        paris(28),
+                                        sofija(29),
+                                        athens(30),
+                                        bucharest(31),
+                                        cairo(32),
+                                        harare(33),
+                                        helsinki(34),
+                                        israel(35),
+                                        baghdad(36),
+                                        moscow(37),
+                                        tehran(38),
+                                        abuDhabi(39),
+                                        vogograd(40),
+                                        islamabad(41),
+                                        almaty(42),
+                                        bangkok(43),
+                                        beijing(44),
+                                        taipei(45),
+                                        tokyo(46),
+                                        brisbane(47),
+                                        canberra(48),
+                                        guam(49),
+                                        hobart(50),
+                                        magadan(51),
+                                        fiji(52),
+                                        wellington(53)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates which timezone to use."
+        ::= { apSNTPMgnt 4 }
+
+apSNTPDST OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether Daylight Savings Time is enabled or not."
+        ::= { apSNTPMgnt 5 }
+
+apSNTPDSTStartMonth OBJECT-TYPE
+        SYNTAX INTEGER (1..12)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the starting month for Daylight Savings Time."
+        ::= { apSNTPMgnt 6 }
+
+apSNTPDSTStartDay OBJECT-TYPE
+        SYNTAX INTEGER (1..31)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the starting day for Daylight Savings Time."
+        ::= { apSNTPMgnt 7 }
+
+apSNTPDSTEndMonth OBJECT-TYPE
+        SYNTAX INTEGER (1..12)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the ending month for Daylight Savings Time."
+        ::= { apSNTPMgnt 8 }
+
+apSNTPDSTEndDay OBJECT-TYPE
+        SYNTAX INTEGER (1..31)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the ending day for Daylight Savings Time."
+        ::= { apSNTPMgnt 9 }
+
+-- -------------------------------------------------------------
+-- End::The apSNTPMgnt Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- START::The apDNSMgnt Group
+-- -------------------------------------------------------------
+apDNSPrimaryServer OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the IP address of the primary DNS server."
+        ::= { apDNSMgnt 1 }
+
+apDNSSecondaryServer OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the IP address of the secondary DNS server."
+        ::= { apDNSMgnt 2 }
+-- -------------------------------------------------------------
+-- End::The apDNSMgnt Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- START::The apIappMgnt Group
+-- -------------------------------------------------------------
+apIappEnabled OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Whether IAPP is enabled."
+        ::= { apIappMgnt 1 }
+-- -------------------------------------------------------------
+-- End::The apIappMgnt Group
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- START::The apSyslogConfigMgnt Group
+-- --------------------------------------------------------------
+apLogConfigState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "This value indicates whether syslog is enabled."
+        ::= { apSyslogConfigMgnt 1 }
+
+apSyslogConsoleState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "This value indicates whether syslog console logging is enabled."
+        ::= { apSyslogConfigMgnt 2 }
+
+apSyslogLevel OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                emergency(0),
+                alert(1),
+                critical(2),
+                error(3),
+                warning(4),
+                notice(5),
+                info(6),
+                debug(7)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "This value indicates the syslog logging level."
+        ::= { apSyslogConfigMgnt 3 }
+-- -------------------------------------------------------------
+-- START::The apSyslogServerTable
+apSyslogServerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ApSyslogServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of each syslog server."
+        ::= { apSyslogConfigMgnt 4 }
+
+apSyslogServerEntry OBJECT-TYPE
+        SYNTAX      ApSyslogServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration of one syslog server of the AP."
+        INDEX       { apSyslogServerIndex }
+        ::= { apSyslogServerTable 1 }
+
+ApSyslogServerEntry ::= SEQUENCE
+{
+    apSyslogServerIndex        Integer32,
+    apSyslogServerState        INTEGER,
+--    apSyslogServerIPAddress    IpAddress,
+    apSyslogServerIPAddress    DisplayString,
+    apSyslogServerPort         INTEGER
+}
+
+apSyslogServerIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..4)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Index of the Syslog Server"
+        ::= { apSyslogServerEntry 1 }
+
+
+apSyslogServerState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                enabled(1),
+                disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates whether the syslog server is enabled."
+    ::= { apSyslogServerEntry 2 }
+
+apSyslogServerIPAddress OBJECT-TYPE
+--        SYNTAX IpAddress
+        SYNTAX     DisplayString (SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the IP address of the syslog server."
+    ::= { apSyslogServerEntry 3 }
+
+apSyslogServerPort OBJECT-TYPE
+        SYNTAX INTEGER (1024..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the UDP Port used by the syslog server."
+    ::= { apSyslogServerEntry 4 }
+-- END::The apSyslogServerTable
+-- -------------------------------------------------------------
+-- End::The apSyslogConfigMgnt Group
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- START::The apEventLogMgnt Group
+-- -------------------------------------------------------------
+apEventLogTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF ApEventLogEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This table is a snapshot of the current event log."
+        ::= { apEventLogMgnt 1 }
+
+apEventLogEntry OBJECT-TYPE
+        SYNTAX          ApEventLogEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "An entry in the table, containing one message
+                 from the event log."
+    INDEX { apEventLogIndex }
+        ::= { apEventLogTable 1 }
+
+ApEventLogEntry ::= SEQUENCE
+{
+        apEventLogIndex         INTEGER,
+        apEventLogMessage       DisplayString
+}
+
+apEventLogIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..128)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Index of the Event Log Message"
+        ::= { apEventLogEntry 1 }
+
+apEventLogMessage OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE(0..256))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Event Log Message"
+        ::= { apEventLogEntry 2 }
+
+apEventLogClear OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                clearLog(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is set to 1 to clear the event log.  When read, the value
+             will have no meaning."
+        ::= { apEventLogMgnt 2 }
+
+-- -------------------------------------------------------------
+-- End::The apEventLogMgnt Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- START::The apWSLSupportMgnt Group
+-- -------------------------------------------------------------
+apWSLSupportControl OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The administrative enable/disable state for
+        the control of the WSL function."
+::= { apWSLSupportMgnt 1 }
+apWSLSupportMasterAddress OBJECT-TYPE
+--        SYNTAX IpAddress
+       SYNTAX     DisplayString (SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates IP address of the main WSL."
+::= { apWSLSupportMgnt 2 }
+apWSLSupportSecondaryAddress OBJECT-TYPE
+--        SYNTAX IpAddress
+       SYNTAX     DisplayString (SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates IP address of the peer WSL."
+::= { apWSLSupportMgnt 3 }
+apWSLSupportPort OBJECT-TYPE
+        SYNTAX INTEGER (1024..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the TCP Port used by the WSL server."
+
+::= { apWSLSupportMgnt 4 }
+apWSLSupportHeartbeatInterval OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the WSL Heartbeat Interval."
+
+::= { apWSLSupportMgnt 5}
+
+apWSLSupportHeartbeatLastChange OBJECT-TYPE
+--        SYNTAX      TimeTicks
+        SYNTAX     DisplayString (SIZE(1..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The sysUpTime at which the Heartbeat was last
+             modified. The format is defined as hh:mm:ss - dd:mm:yy "
+::= { apWSLSupportMgnt 6}
+
+apWSLSupportOperationMode OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                standalone(0),
+                associated(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute indicates that the WSL Operation Mode in
+                0: AP in standalone mode, or
+                1: AP in ETS WSL managed mode (associated mode)."
+
+::= { apWSLSupportMgnt 7}
+
+apWSLSupportRxThreshold OBJECT-TYPE
+        SYNTAX INTEGER (-128..127)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the WSL CCA rejection threshold in dBm scale."
+::= { apWSLSupportMgnt 8}
+
+apWSLSupportControlStatus OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The operative enable/disable state for
+        the control of the WSL function."
+::= { apWSLSupportMgnt 9 }
+
+apWSLRFAreaPollControl OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The administrative enable/disable state for
+        the control of the WSL RF Area Poll function."
+::= { apWSLSupportMgnt 10 }
+
+apWSLRFAreaPollControlStatus OBJECT-TYPE
+        SYNTAX INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The operative enable/disable state for
+        the control of the WSL RF Area Poll function."
+::= { apWSLSupportMgnt 11 }
+-- -------------------------------------------------------------
+-- End::The apWSLSupportMgnt Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- START::The apWMMMgnt Group
+-- -------------------------------------------------------------
+-- **********************************************************************
+-- * apWMMControl TABLE
+-- **********************************************************************
+apWMMControlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ApWMMControlEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table for WMM configuration per radio."
+        ::= { apWMMMgnt 1 }
+        
+apWMMControlEntry OBJECT-TYPE
+        SYNTAX ApWMMControlEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry in the apWMMControlTable."
+        INDEX { ifIndex }
+        ::= { apWMMControlTable 1 }
+
+ApWMMControlEntry ::=SEQUENCE
+{
+        apWMMState          INTEGER
+}
+
+apWMMState OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+                disabled(0),
+                required(1),
+                supported(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the WMM state."
+        ::= { apWMMControlEntry 1 }
+-- **********************************************************************
+-- * End of apWMMAcknowledgePolicy TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- * apWMMBssParam TABLE
+-- **********************************************************************
+apWMMBssParamTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ApWMMBssParamEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Conceptual table for EDCA default parameter values at a non-AP
+            QSTA. This table shall contain the four entries of the EDCA
+            parameters corresponding to four possible ACs (access category):
+                1) AC_BE (best effort, ACI=0)
+                2) AC_BK (background, ACI=1)
+                3) AC_VI (video, ACI=2)
+                4) AC_VO (voice, ACI=3)
+            "
+        REFERENCE
+            "IEEE 802.11e -2005"
+        ::= { apWMMMgnt 2 }
+        
+apWMMBssParamEntry OBJECT-TYPE
+        SYNTAX ApWMMBssParamEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the apWMMBssParamTable.
+            ifIndex - Each IEEE 802.11 interface is represented by an ifEntry.
+            Interface tables in this MIB module are indexed by ifIndex."
+        INDEX { ifIndex, apWMMBssParamIndex }
+        ::= { apWMMBssParamTable 1 }
+
+ApWMMBssParamEntry ::=SEQUENCE
+{
+        apWMMBssParamIndex              INTEGER,
+        apWMMBssParamCWmin              INTEGER,
+        apWMMBssParamCWmax              INTEGER,
+        apWMMBssParamAIFSN              INTEGER,
+        apWMMBssParamTXOPLimit          INTEGER,
+        apWMMBssParamAdmissionControl   TruthValue
+}
+
+apWMMBssParamIndex OBJECT-TYPE
+        SYNTAX INTEGER (1..4)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index used to identify instances of the columnar
+            objects in the apWMMBssParam Table. The value of this variable is
+                1) 1 AC_BE (best effort, ACI=0)
+                2) 2 AC_BK (background, ACI=1)
+                3) 3 AC_VI (video, ACI=2)
+                4) 4 AC_VO (voice, ACI=3)          
+            "
+        ::= { apWMMBssParamEntry 1 }
+
+apWMMBssParamCWmin OBJECT-TYPE
+        SYNTAX INTEGER (1..15)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shall specify the value of the minimum size of the
+            window in the exponent form that shall be used by a QSTA for a particular AC for
+            generating a random number for the backoff."
+        ::= { apWMMBssParamEntry 2 }
+
+apWMMBssParamCWmax OBJECT-TYPE
+        SYNTAX INTEGER (1..15)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shall specify the value of the maximum size of the
+            window in the exponent form that shall be used by a QSTA for a particular AC for
+            generating a random number for the backoff."
+        ::= { apWMMBssParamEntry 3 }
+
+apWMMBssParamAIFSN OBJECT-TYPE
+        SYNTAX INTEGER (1..15)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shall specify the number of slots, after a SIFS
+            duration, that the QSTA, for a particular AC, shall sense the
+            medium idle either before transmitting or executing a backoff."
+        ::= { apWMMBssParamEntry 4 }
+
+apWMMBssParamTXOPLimit OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shall specify the maximum time of
+            an TXOP in units of 32 microseconds for a given AC at a non-AP QSTA."
+        ::= { apWMMBssParamEntry 5 }
+
+apWMMBssParamAdmissionControl OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute, when TRUE, indicates that admission control is
+            mandatory for the given AC. When False, this attribute indicates
+            that the admission control is not mandatory for the given AC. The
+            default value for this parameter shall be FALSE."
+        ::= { apWMMBssParamEntry 6 }
+-- **********************************************************************
+-- * End of apWMMBssParam TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- * apWMMApParam TABLE
+-- **********************************************************************
+apWMMApParamTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ApWMMApParamEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Conceptual table for EDCA default parameter values at the QAP.
+            This table shall contain the four entries of the EDCA
+            parameters corresponding to four possible ACs (access category):
+                1) AC_BE (best effort, ACI=0)
+                2) AC_BK (background, ACI=1)
+                3) AC_VI (video, ACI=2)
+                4) AC_VO (voice, ACI=3)
+            "
+        REFERENCE
+            "IEEE 802.11e -2005"
+        ::= { apWMMMgnt 3 }
+        
+apWMMApParamEntry OBJECT-TYPE
+        SYNTAX ApWMMApParamEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An Entry (conceptual row) in the apWMMApParamTable.
+            ifIndex - Each IEEE 802.11 interface is represented by an ifEntry.
+            Interface tables in this MIB module are indexed by ifIndex."
+        INDEX { ifIndex, apWMMApParamIndex }
+        ::= { apWMMApParamTable 1 }
+
+ApWMMApParamEntry ::=SEQUENCE
+{
+        apWMMApParamIndex              INTEGER,
+        apWMMApParamCWmin              INTEGER,
+        apWMMApParamCWmax              INTEGER,
+        apWMMApParamAIFSN              INTEGER,
+        apWMMApParamTXOPLimit          INTEGER,
+        apWMMApParamAdmissionControl   TruthValue
+}
+
+apWMMApParamIndex OBJECT-TYPE
+        SYNTAX INTEGER (1..4)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index used to identify instances of the columnar
+            objects in the apWMMApParam Table. The value of this variable is
+                1) 1 AC_BE (best effort, ACI=0)
+                2) 2 AC_BK (background, ACI=1)
+                3) 3 AC_VI (video, ACI=2)
+                4) 4 AC_VO (voice, ACI=3)          
+            "
+        ::= { apWMMApParamEntry 1 }
+
+apWMMApParamCWmin OBJECT-TYPE
+        SYNTAX INTEGER (1..15)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shall specify the value of the minimum size of the
+            window in the exponent form that shall be used by a QAP for a particular AC for
+            generating a random number for the backoff."
+        ::= { apWMMApParamEntry 2 }
+
+apWMMApParamCWmax OBJECT-TYPE
+        SYNTAX INTEGER (1..15)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shall specify the value of the maximum size of the
+            window in the exponent form that shall be used by a QAP for a particular AC for
+            generating a random number for the backoff."
+        ::= { apWMMApParamEntry 3 }
+
+apWMMApParamAIFSN OBJECT-TYPE
+        SYNTAX INTEGER (1..15)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shall specify the number of slots, after a SIFS
+            duration, that the QAP, for a particular AC, shall sense the
+            medium idle either before transmitting or executing a backoff."
+        ::= { apWMMApParamEntry 4 }
+
+apWMMApParamTXOPLimit OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute shall specify the maximum time of
+            an TXOP in units of 32 microseconds for a given AC at a QAP."
+        ::= { apWMMApParamEntry 5 }
+
+apWMMApParamAdmissionControl OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This attribute, when TRUE, indicates that admission control is
+            mandatory for the given AC. When False, this attribute indicates
+            that the admission control is not mandatory for the given AC. The
+            default value for this parameter shall be FALSE."
+        ::= { apWMMApParamEntry 6 }
+-- **********************************************************************
+-- * End of apWMMApParam TABLE
+-- **********************************************************************
+-- -------------------------------------------------------------
+-- End::The apWMMMgnt Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- -START:: apNotificationTrapTreebjects
+-- -------------------------------------------------------------
+apNotificationObjects  OBJECT IDENTIFIER ::= { apNotificationTrapTree 1 }
+
+apNotificationDot11MacAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Mac Address of the affected interface, returned with traps only."
+        ::= { apNotificationObjects 1 }
+
+apNotificationDot11Station OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This attribute holds the MAC address of the wireless station"
+        ::= { apNotificationObjects 2 }
+
+apNotificationDot11RequestType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                unknown(1),
+                association(2),
+                reAssociation(3),
+                authentication(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This attribute defines the request type sent by the station.
+                Value = 1: Unknown request type
+                Value = 2: Association Request
+                Value = 3: Re-association Request
+                Value = 4: Authentication"
+        ::= { apNotificationObjects 3 }
+
+apNotificationDot11ReasonCode OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                invalidModeOrState(1),
+                unAuthenticatedStation(2),
+                internalError(3),
+                outOfSequenceFrame(4),
+                unsupportedAlgorithm(5),
+                invalidFrameLngth(6),
+                wepRequiredOnAP(7),
+                wepNotAllowed(8),
+                challengeTextMismatch(9)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This attribute defines the reason for the failure of an operation.
+                Value = 1: Invalid mode/state
+                Value = 2: Station not authenticated.
+                                Value = 3: Internal error
+                                Value = 4: Out of sequence frame
+                                Value = 5: Un-supported algorithm
+                                Value = 6: Invalid frame length
+                                Value = 7: WEP is required on the AP
+                                Value = 8: WEP not allowed
+                                Value = 9: Challenge text mismatch"
+        ::= { apNotificationObjects 4 }
+
+apNotificationDot11IpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This value indicates the IP address of the Access Point"
+        ::= { apNotificationObjects 5 }
+
+apNotificationDot11AuthenticatorMacAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This attribute holds the MAC address of the authenticator for the AP."
+        ::= { apNotificationObjects 6 }
+
+
+
+apNotificationTrapObjects  OBJECT IDENTIFIER ::= { apNotificationTrapTree 2 }
+
+sysSystemUp NOTIFICATION-TYPE
+--        OBJECTS { }
+        STATUS current
+        DESCRIPTION
+
+                "The system up notification shall be sent when the AP
+                is fully up and running."
+
+    ::= { apNotificationTrapObjects 1 }
+
+sysSystemDown NOTIFICATION-TYPE
+--        OBJECTS { }
+        STATUS current
+        DESCRIPTION
+
+                "The system down notification shall be sent before the AP
+                is about to reboot."
+
+    ::= { apNotificationTrapObjects 2 }
+
+sysRadiusServerChanged NOTIFICATION-TYPE
+--        OBJECTS { }
+        STATUS current
+        DESCRIPTION
+
+                "The RADIUS server changed notification shall be sent when
+                 the RADIUS server has changed from Primary / Secondary to
+                 Secondary / Primary."
+
+    ::= { apNotificationTrapObjects 3 }
+
+dot11StationAssociation NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station }
+        STATUS current
+        DESCRIPTION
+
+                "The associate notification shall be sent when a station successfully
+                associates with the Access Point. The value of the notification shall
+                include the MAC address of the station that has associated."
+
+    ::= { apNotificationTrapObjects 4 }
+
+dot11StationReAssociation NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station }
+        STATUS current
+        DESCRIPTION
+
+                "The re-associate notification shall be sent when a station
+                successfully re-associates with the Access Point. The value of the
+                notification shall include the MAC address of the station
+                that has associated."
+
+    ::= { apNotificationTrapObjects 5 }
+
+dot11StationAuthentication NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station }
+        STATUS current
+        DESCRIPTION
+
+                "The authentication notification shall be sent when a station
+                successfully authenticates with the Access Point. The value of the
+                notification shall include the MAC address of the station
+                that has authenticated."
+
+    ::= { apNotificationTrapObjects 6 }
+
+-- Note that the following is different from the standard 802.11 mib dot11AuthenticateFail Notification
+-- This one also has a reason code within the trap.
+
+dot11StationRequestFail NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station, apNotificationDot11RequestType, apNotificationDot11ReasonCode }
+        STATUS current
+        DESCRIPTION
+
+                "The station request fail shall be sent out when a station
+                fails to associate / re-associate / authenticate with the
+                Access Point. The notification shall include the MAC address
+                of the station and the reason code for the failure."
+
+    ::= { apNotificationTrapObjects 7 }
+
+
+-- dot11InterfaceAGFail NOTIFICATION-TYPE
+--        OBJECTS { }
+--        STATUS current
+--        DESCRIPTION
+--
+--              "The InterfaceAGFail notification shall be sent out when
+--              802.11a/802.11g wireless interface has failed."
+--
+--    ::= { apNotificationTrapObjects 8 }
+
+dot1xMacAddrAuthSuccess NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station }
+        STATUS current
+        DESCRIPTION
+
+                "The 802.1X MAC address authentication success notification shall
+                be sent when a station successfully authenticates the MAC address
+                with the RADIUS server. The value of the notification shall
+                include the MAC address of the station that has authenticated."
+
+    ::= { apNotificationTrapObjects 9 }
+
+dot1xMacAddrAuthFail NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station }
+        STATUS current
+        DESCRIPTION
+
+                "The 802.1X MAC address authentication failure notification shall
+                be sent when a station fails to authenticate the MAC address
+                with the RADIUS server. The value of the notification shall
+                include the MAC address of the station that failed to authenticate."
+
+    ::= { apNotificationTrapObjects 10 }
+
+dot1xAuthNotInitiated NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station }
+        STATUS current
+        DESCRIPTION
+
+                "The 802.1X authentication not initiated notification shall
+                be sent when a station did not initiate 802.1X authentication
+                with the RADIUS server. The value of the notification shall
+                include the MAC address of the station that did not initiate
+                802.1X authentication."
+
+    ::= { apNotificationTrapObjects 11 }
+
+dot1xAuthSuccess NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station }
+        STATUS current
+        DESCRIPTION
+
+                "The 802.1X authentication success notification shall
+                be sent when a station successfully authenticates with the
+                RADIUS server. The value of the notification shall include
+                the MAC address of the station that has authenticated."
+
+    ::= { apNotificationTrapObjects 12 }
+
+dot1xAuthFail NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station }
+        STATUS current
+        DESCRIPTION
+
+                "The 802.1X authentication failure notification shall
+                be sent when a station fails to authenticate with the
+                RADIUS server. The value of the notification shall include
+                the MAC address of the station that failed to authenticate."
+
+    ::= { apNotificationTrapObjects 13 }
+
+localMacAddrAuthSuccess NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station }
+        STATUS current
+        DESCRIPTION
+
+                "The Local MAC address authentication success notification shall
+                be sent when a station successfully authenticates the MAC address
+                with the database stored locally within the AP. The value of the
+                notification shall include the MAC address of the station that
+                has authenticated."
+
+    ::= { apNotificationTrapObjects 14 }
+
+localMacAddrAuthFail NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station }
+        STATUS current
+        DESCRIPTION
+
+                "The Local MAC address authentication failure notification shall
+                be sent when a station fails to authenticate the MAC address
+                with the database stored locally within the AP. The value of the
+                notification shall include the MAC address of the station that
+                has authenticated."
+
+    ::= { apNotificationTrapObjects 15 }
+
+pppLogonFail NOTIFICATION-TYPE
+--        OBJECTS { }
+        STATUS current
+        DESCRIPTION
+
+                "The PPP Logon failure notification shall be sent out when
+                the AP fails to login successfully to the PPP peer using the
+                supplied username and password."
+
+    ::= { apNotificationTrapObjects 16 }
+
+iappStationRoamedFrom NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station, apNotificationDot11IpAddress}
+        STATUS current
+        DESCRIPTION
+
+                "The IAPP Station Roamed-From Notification shall be sent out
+                 whenever a station roams from another Access Point (AP) to
+                 this AP. The notification shall include the MAC address of
+                 the station and the IP address of the old AP."
+
+    ::= { apNotificationTrapObjects 17 }
+
+iappStationRoamedTo NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station, apNotificationDot11IpAddress}
+        STATUS current
+        DESCRIPTION
+
+                "The IAPP Station Roamed-To Notification shall be sent out
+                 whenever a station roams to another Access Point (AP) from
+                 this AP. The notification shall include the MAC address of
+                 the station and the IP address of the new AP."
+
+    ::= { apNotificationTrapObjects 18 }
+
+
+iappContextDataSent NOTIFICATION-TYPE
+        OBJECTS { apNotificationDot11Station, apNotificationDot11IpAddress}
+        STATUS current
+        DESCRIPTION
+
+                "The IAPP Context Data Sent notification shall be sent out
+                 whenever the context data for a station has been sent to
+                 the new AP with which the station has associated. The
+                 notification shall include the MAC address of
+                 the station and the IP address of the new AP."
+
+    ::= { apNotificationTrapObjects 19 }
+
+sntpServerFail NOTIFICATION-TYPE
+--        OBJECTS { }
+        STATUS current
+        DESCRIPTION
+
+                "The sntpServerFail notification shall be sent when the AP
+                fails to get time from the configured SNTP server."
+
+    ::= { apNotificationTrapObjects 20 }
+
+dot11InterfaceAFail NOTIFICATION-TYPE
+--        OBJECTS { }
+        STATUS current
+        DESCRIPTION
+
+                "The InterfaceAFail notification shall be sent out when
+                802.11a wireless interface has failed."
+
+    ::= { apNotificationTrapObjects 21 }
+
+dot11InterfaceGFail NOTIFICATION-TYPE
+--        OBJECTS { }
+        STATUS current
+        DESCRIPTION
+
+                "The InterfaceGFail notification shall be sent out when
+                802.11g wireless interface has failed."
+
+    ::= { apNotificationTrapObjects 22 }
+dot11WirelessSTPDetection NOTIFICATION-TYPE
+--       OBJECTS {apNotificationDot11Station}
+        STATUS current
+        DESCRIPTION
+
+                "The WirelessSTPDetection notification shall be sent out when
+                 wireless STP packet has detected."
+
+    ::= { apNotificationTrapObjects 23 }
+-- -------------------------------------------------------------
+-- -END:: apNotificationTrapTreebjects
+-- -------------------------------------------------------------
+
+END

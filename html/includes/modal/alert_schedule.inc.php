@@ -12,7 +12,9 @@
  * the source code distribution for details.
  */
 
-if (is_admin() !== false) {
+use LibreNMS\Authentication\LegacyAuth;
+
+if (LegacyAuth::user()->hasGlobalAdmin()) {
 ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -46,17 +48,13 @@ if (is_admin() !== false) {
                     </div>
                     <div class="form-group">
                         <label for="recurring" class="col-sm-4 control-label">Recurring <strong class="text-danger">*</strong>: </label>
-                        <div class="col-sm-2">
-                            <input type="radio" class="form-control" id="recurring0" name="recurring" value="0" style="width: 20px;" checked="checked"/>
-                        </div>
-                        <div class="col-sm-2">
-                            <label class="col-sm-for="recurring0">No</label>
-                        </div>
-                        <div class="col-sm-2">
-                            <input type="radio" class="form-control" id="recurring1" name="recurring" value="1" style="width: 20px;" />
-                        </div>
-                        <div class="col-sm-2">
-                            <div style="padding-top:10px;"><label for="recurring1">Yes</label></div>
+                        <div class="col-sm-8">
+                            <label class="radio-inline">
+                                <input type="radio" id="recurring0" name="recurring" value="0" checked="checked"/> No
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" id="recurring1" name="recurring" value="1"/> Yes
+                            </label>
                         </div>
                     </div>
                     <div id="norecurringgroup">
@@ -117,7 +115,7 @@ if (is_admin() !== false) {
                             <input type='text' id='map-stub' name='map-stub' class='form-control'/>
                         </div>
                         <div class="col-sm-3">
-                            <button class="btn btn-primary btn-sm" type="button" name="add-map" id="add-map" value="Add">Add</button>
+                            <button class="btn btn-primary" type="button" name="add-map" id="add-map" value="Add">Add</button>
                         </div>
                     </div>
                     <div class="form-group">
@@ -152,6 +150,7 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
     $('#recurring_day').prop('checked', false);
     $('#norecurringgroup').show();
     $('#recurringgroup').hide();
+    $('#schedulemodal-alert').remove('');
 });
 
 $('#schedule-maintenance').on('show.bs.modal', function (event) {
@@ -178,11 +177,11 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                 $('#notes').val(output['notes']);
                 if (output['recurring'] == 0){
                     $('#start').val(output['start']);
-                    $('#end').val(output['end']);                    
+                    $('#end').val(output['end']);
 
                     $('#norecurringgroup').show();
                     $('#recurringgroup').hide();
-                    
+
                     $('#start_recurring_dt').val('');
                     $('#end_recurring_dt').val('');
                     $('#start_recurring_hr').val('');
@@ -190,13 +189,13 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                     $("#recurring0").prop("checked", true);
                     $('#recurring_day').prop('checked', false);
                 }else{
-                    
+
                     $('#start_recurring_dt').val(output['start_recurring_dt']);
                     $('#end_recurring_dt').val(output['end_recurring_dt']);
                     $('#start_recurring_hr').val(output['start_recurring_hr']);
                     $('#end_recurring_hr').val(output['end_recurring_hr']);
                     $("#recurring1").prop("checked", true);
-                    
+
                     var recdayupd = output['recurring_day'];
                     if (recdayupd != ''){
                         var arrayrecdayupd = recdayupd.split(',');
@@ -204,12 +203,12 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                             $("input[name='recurring_day[]'][value="+checkedday+"]").prop('checked', true);
                         });
                     }else{
-                        $('#recurring_day').prop('checked', false);                        
+                        $('#recurring_day').prop('checked', false);
                     }
-                    
+
                     $('#norecurringgroup').hide();
                     $('#recurringgroup').show();
-                    
+
                     $('#start').val('');
                     $('#end').val('');
                 }
@@ -220,7 +219,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
 });
 
 $('#sched-form input[name=recurring]').on('change', function() {
-    var isrecurring = $('input[name=recurring]:checked', '#sched-form').val(); 
+    var isrecurring = $('input[name=recurring]:checked', '#sched-form').val();
     if (isrecurring == 1){
         $('#norecurringgroup').hide();
         $('#recurringgroup').show();
@@ -240,15 +239,17 @@ $('#sched-submit').click('', function(e) {
         dataType: "json",
         success: function(data){
             if(data.status == 'ok') {
-                $("#message").html('<div class="alert alert-info">'+data.message+'</div>');
+                $("#message").html('<div id="schedulemsg" class="alert alert-info"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
+                window.setTimeout(function() { $('#schedulemsg').fadeOut().slideUp(); } , 5000);
                 $("#schedule-maintenance").modal('hide');
+                $("#schedulemodal-alert").remove();
                 $("#alert-schedule").bootgrid('reload');
             } else {
-                $("#response").html('<div class="alert alert-info">'+data.message+'</div>');
+                $("#response").html('<div id="schedulemodal-alert" class="alert alert-danger">'+data.message+'</div>');
             }
         },
         error: function(){
-            $("#response").html('<div class="alert alert-info">An error occurred.</div>');
+            $("#response").html('<div id="schedulemodal-alert" class="alert alert-danger">An error occurred.</div>');
         }
     });
 });

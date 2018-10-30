@@ -1,0 +1,103 @@
+--
+--
+-- Copyright (C) 1992-2006 by SNMP Research, Incorporated.
+--
+-- This software is furnished under a license and may be used and copied
+-- only in accordance with the terms of such license and with the
+-- inclusion of the above copyright notice. This software or any other
+-- copies thereof may not be provided or otherwise made available to any
+-- other person. No title to and ownership of the software is hereby
+-- transferred.
+--
+-- The information in this software is subject to change without notice
+-- and should not be construed as a commitment by SNMP Research, Incorporated.
+--
+-- Restricted Rights Legend:
+--  Use, duplication, or disclosure by the Government is subject to
+--  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+--  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+--  subparagraphs (c)(4) and (d) of the Commercial Computer
+--  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+--  clauses in the NASA FAR Supplement and other corresponding
+--  governmental regulations.
+--
+-- 
+  
+-- 
+--                PROPRIETARY NOTICE 
+-- 
+-- This software is an unpublished work subject to a confidentiality agreement
+-- and is protected by copyright and trade secret law.  Unauthorized copying,
+-- redistribution or other use of this work is prohibited.
+--
+-- The above notice of copyright on this source code product does not indicate
+-- any actual or intended publication of such source code.
+--
+-- 
+
+
+SR-AGENT-INFO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	DisplayString
+		FROM SNMPv2-TC
+	MODULE-IDENTITY,
+	OBJECT-TYPE
+		FROM SNMPv2-SMI
+	snmpResearchMIBs
+		FROM SNMP-RESEARCH-MIB;
+
+srAgentInfo MODULE-IDENTITY
+	LAST-UPDATED "200308121507Z"
+	ORGANIZATION "SNMP Research"
+	CONTACT-INFO
+		"Technical Support
+
+		 Postal: SNMP Research
+		             3001 Kimberlin Heights Road
+		             Knoxville, TN 37920-9716
+
+		 Tel:     +1 865 573-1434
+	 	 Fax:     +1 865 573-9197
+
+		Email: support@snmp.com"
+	DESCRIPTION
+		"A MIB module to identify what kind of agent 
+		 is running and on what operating system 
+		 flavor."
+	::= { snmpResearchMIBs 46 }
+
+
+srAgentInfoDescr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Display String which displays information on the type
+  		 of agent built"
+	::= { srAgentInfo 1 }
+
+
+srAgentInfoOSFlavor OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Display String which displays what operating system the
+ 		 agent was built on"
+	::= { srAgentInfo 2 }
+
+srAgentInfoGroups   OBJECT IDENTIFIER ::= { srAgentInfo 10 }
+ 
+srAgentInfoInitialGroup OBJECT-GROUP
+    OBJECTS {
+        srAgentInfoDescr,
+        srAgentInfoOSFlavor
+    }
+    STATUS       current
+    DESCRIPTION
+        "All objects in the initial srAgentInfo MIB module"
+    ::= { srAgentInfoGroups 1 }
+
+
+END

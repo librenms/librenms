@@ -1,0 +1,431 @@
+--  ***************************************************************************
+--  ADVA-FSPR7-CFM-EXTENSION-MIB.txt
+--
+--             ADVA AG Optical Networking CFM Extension MIB File
+--
+--
+--  Copyright 2011 ADVA AG Optical Networking.
+--  All rights reserved.
+--  ***************************************************************************
+
+
+--  This MIB extends IEEE P802.1ag(TM) CFM MIB with following functionality:
+--    * Connectivity fault management alarms severity management
+--    * Connectivity fault management alarms retrievement
+
+ADVA-FSPR7-CFM-EXTENSION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    TEXTUAL-CONVENTION,
+    DateAndTime
+                                        FROM  SNMPv2-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+                                        FROM  SNMPv2-CONF
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Unsigned32
+                                        FROM  SNMPv2-SMI
+    SnmpAdminString
+                                        FROM  SNMP-FRAMEWORK-MIB
+    fspR7,
+    neEventLogTimeStamp,
+    neEventLogIdentityTranslation,
+    ServiceImpairment,
+    TrapAlarmSeverity
+                                        FROM  ADVA-MIB
+    flowEntityIndexEth,
+    flowEntityIndexFlow
+                                        FROM  FspR7-LAYER2-MIB
+    dot1agCfmMdIndex,
+    dot1agCfmMaIndex,
+    dot1agCfmMepIdentifier
+                                        FROM  IEEE8021-CFM-MIB;
+    
+
+cfmExtensionMIB MODULE-IDENTITY
+
+    LAST-UPDATED "201102030000Z"
+
+    ORGANIZATION "ADVA Optical Networking"
+
+    CONTACT-INFO "EMEA Support
+                  Phone : +49 89 89 0665 848
+                  Fax   : +49 89 89 0665 22848
+                  Email : support@advaoptical.com
+
+                  North American Support
+                  Phone : 886 442 ADVA (2382) (toll-free within the US, Canada and Mexico)
+                  Fax   : + 1 806 741 8529 (elsewhere)
+                  Email : support-usa@advaoptical.com
+
+                  Asia Pacific Support
+                  Phone : + 1 866 442 2382 (other toll-free numbers available in some countries)
+                  Email : support-asia@advaoptical.com"
+
+    DESCRIPTION   "This is a MIB definition for ADVA AG Optical Networking CFM extension objects."
+
+    REVISION      "201102030000Z"
+    DESCRIPTION   "FSP3000 F7 Release 10.2.2 MIB."
+    ::= { fspR7 6 }
+
+
+cfmAlarmMIB
+    OBJECT IDENTIFIER ::= { cfmExtensionMIB 1 }
+
+cfmAlarmObjects
+    OBJECT IDENTIFIER ::= { cfmAlarmMIB 1 }
+
+cfmAlarms
+    OBJECT IDENTIFIER ::= { cfmAlarmMIB 2 }
+
+cfmAlarmsPrefix
+    OBJECT IDENTIFIER ::= { cfmAlarms 0 }
+
+cfmStatusMIB
+    OBJECT IDENTIFIER ::= { cfmExtensionMIB 2 }
+
+cfmStatus
+    OBJECT IDENTIFIER ::= { cfmStatusMIB 1 }
+
+CfmAlarmType ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "The list of supported CFM alarms." 
+  SYNTAX        INTEGER
+                {
+                  undefined(0),
+                  cfmOosDisabled(13000),
+                  cfmOosManagement(13001),
+                  cfmOosMaintenance(13002),
+                  cfmOosAins(13003),
+                  cfmPriVidNotEqualExtVid(13004),
+                  cfmServerSignalFailure(13005),
+                  cfmRemoteDefectIndication(13006),
+                  cfmCcmMacStatus(13007),
+                  cfmCcmError(13008),
+                  cfmCcmLost(13009),
+                  cfmCcmXConn(13010)
+                }
+
+
+--alarm severity configuration
+
+mepAlarmSeverityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MepAlarmSeverityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains all alarms existing on Maintanance End Points."
+    ::=  { cfmAlarmObjects 10 }
+
+mepAlarmSeverityEntry OBJECT-TYPE
+    SYNTAX      MepAlarmSeverityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents particular alarm."
+    INDEX       {
+                  mepAlarmSeverityMdIndex,
+                  mepAlarmSeverityMaNetIndex,
+                  mepAlarmSeverityMepIdentifier,
+                  mepAlarmSeverityType
+                }
+    ::=  { mepAlarmSeverityTable 1 }
+
+MepAlarmSeverityEntry ::=  SEQUENCE
+  { mepAlarmSeverityMdIndex Unsigned32,
+    mepAlarmSeverityMaNetIndex Unsigned32,
+    mepAlarmSeverityMepIdentifier Unsigned32,
+    mepAlarmSeverityType CfmAlarmType,
+    mepAlarmSeverityValue TrapAlarmSeverity }
+
+mepAlarmSeverityMdIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "The index to the Maintenance Domain table."
+    ::=  { mepAlarmSeverityEntry 1 }
+
+mepAlarmSeverityMaNetIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "The index of the Maintenance Association Network table.
+        "
+    ::=  { mepAlarmSeverityEntry 2 }
+
+mepAlarmSeverityMepIdentifier OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "The index of the Maintenance Association End Point tabke.
+        "
+    ::=  { mepAlarmSeverityEntry 3 }
+
+mepAlarmSeverityType OBJECT-TYPE
+    SYNTAX      CfmAlarmType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This object identifies the type of alarm."
+    ::=  { mepAlarmSeverityEntry 4 }
+
+mepAlarmSeverityValue OBJECT-TYPE
+    SYNTAX      TrapAlarmSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION   "This object identifies the severity assigned to this alarm."
+    ::=  { mepAlarmSeverityEntry 5 }
+
+
+--standing alarms retrievement
+
+mepAlarmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MepAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table contains all raised alarms on Maintanance End Points."
+    ::=  { cfmAlarmObjects 11 }
+
+mepAlarmEntry OBJECT-TYPE
+    SYNTAX      MepAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Every row of this table represents particular alarm."
+    INDEX       {
+                  mepAlarmMdIndex,
+                  mepAlarmMaNetIndex,
+                  mepAlarmMepIdentifier,
+                  mepAlarmType
+                }
+    ::=  { mepAlarmTable 1 }
+
+MepAlarmEntry ::=  SEQUENCE
+  { mepAlarmMdIndex Unsigned32,
+    mepAlarmMaNetIndex Unsigned32,
+    mepAlarmMepIdentifier Unsigned32,
+    mepAlarmType CfmAlarmType,
+    mepAlarmSeverity TrapAlarmSeverity,
+    mepAlarmAffect ServiceImpairment,
+    mepAlarmTimeStamp DateAndTime }
+
+mepAlarmMdIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "The index to the Maintenance Domain table."
+    ::=  { mepAlarmEntry 1 }
+
+mepAlarmMaNetIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "The index of the Maintenance Association Network table.
+        "
+    ::=  { mepAlarmEntry 2 }
+
+mepAlarmMepIdentifier OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "The index of the Maintenance Association End Point tabke.
+        "
+    ::=  { mepAlarmEntry 3 }
+
+mepAlarmType OBJECT-TYPE
+    SYNTAX      CfmAlarmType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "List of all interface conditions"
+    ::=  { mepAlarmEntry 4 }
+
+mepAlarmSeverity OBJECT-TYPE
+    SYNTAX      TrapAlarmSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "This object identifies the current severity of alarm."
+    ::=  { mepAlarmEntry 5 }
+
+mepAlarmAffect OBJECT-TYPE
+    SYNTAX      ServiceImpairment
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "This object indicates the service impairment affect of the alarm."
+    ::=  { mepAlarmEntry 6 }
+
+mepAlarmTimeStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Timestamp"
+    ::=  { mepAlarmEntry 7 }
+
+--connectivity fault management notifications
+
+
+alarmCfmOosDisabled NOTIFICATION-TYPE 
+    OBJECTS     { mepAlarmSeverity,mepAlarmAffect,neEventLogTimeStamp,neEventLogIdentityTranslation } 
+    STATUS      current
+    DESCRIPTION   "Non-Specific Disablement of Management Access"
+    ::=  { cfmAlarmsPrefix 13000 }
+
+
+alarmCfmOosManagement NOTIFICATION-TYPE 
+    OBJECTS     { mepAlarmSeverity,mepAlarmAffect,neEventLogTimeStamp,neEventLogIdentityTranslation } 
+    STATUS      current
+    DESCRIPTION   "Alarms are logged but not notified, service affecting changes are permitted"
+    ::=  { cfmAlarmsPrefix 13001 }
+
+
+alarmCfmOosMaintenance NOTIFICATION-TYPE 
+    OBJECTS     { mepAlarmSeverity,mepAlarmAffect,neEventLogTimeStamp,neEventLogIdentityTranslation } 
+    STATUS      current
+    DESCRIPTION   "Alarms are logged but not notified, service affecting changes and operations are permitted"
+    ::=  { cfmAlarmsPrefix 13002 }
+
+
+alarmCfmOosAins NOTIFICATION-TYPE 
+    OBJECTS     { mepAlarmSeverity,mepAlarmAffect,neEventLogTimeStamp,neEventLogIdentityTranslation } 
+    STATUS      current
+    DESCRIPTION   "Automatic In Service"
+    ::=  { cfmAlarmsPrefix 13003 }
+
+
+alarmCfmPriVidNotEqualExtVid NOTIFICATION-TYPE 
+    OBJECTS     { mepAlarmSeverity,mepAlarmAffect,neEventLogTimeStamp,neEventLogIdentityTranslation } 
+    STATUS      current
+    DESCRIPTION   "MEP Primary VLAN ID and Flow External VLAN ID are different"
+    ::=  { cfmAlarmsPrefix 13004 }
+
+
+alarmCfmServerSignalFailure NOTIFICATION-TYPE 
+    OBJECTS     { mepAlarmSeverity,mepAlarmAffect,neEventLogTimeStamp,neEventLogIdentityTranslation } 
+    STATUS      current
+    DESCRIPTION   "All member ports signals have failed"
+    ::=  { cfmAlarmsPrefix 13005 }
+
+
+alarmCfmRemoteDefectIndication NOTIFICATION-TYPE 
+    OBJECTS     { mepAlarmSeverity,mepAlarmAffect,neEventLogTimeStamp,neEventLogIdentityTranslation } 
+    STATUS      current
+    DESCRIPTION   "RDI"
+    ::=  { cfmAlarmsPrefix 13006 }
+
+
+alarmCfmCcmMacStatus NOTIFICATION-TYPE 
+    OBJECTS     { mepAlarmSeverity,mepAlarmAffect,neEventLogTimeStamp,neEventLogIdentityTranslation } 
+    STATUS      current
+    DESCRIPTION   "MAC status of the port"
+    ::=  { cfmAlarmsPrefix 13007 }
+
+
+alarmCfmCcmError NOTIFICATION-TYPE 
+    OBJECTS     { mepAlarmSeverity,mepAlarmAffect,neEventLogTimeStamp,neEventLogIdentityTranslation } 
+    STATUS      current
+    DESCRIPTION   "Error in the CCM received"
+    ::=  { cfmAlarmsPrefix 13008 }
+
+
+alarmCfmCcmLost NOTIFICATION-TYPE 
+    OBJECTS     { mepAlarmSeverity,mepAlarmAffect,neEventLogTimeStamp,neEventLogIdentityTranslation } 
+    STATUS      current
+    DESCRIPTION   "3 or more CCMs not recieved from far end MEP"
+    ::=  { cfmAlarmsPrefix 13009 }
+
+
+alarmCfmCcmXConn NOTIFICATION-TYPE 
+    OBJECTS     { mepAlarmSeverity,mepAlarmAffect,neEventLogTimeStamp,neEventLogIdentityTranslation } 
+    STATUS      current
+    DESCRIPTION   "Cross connected CCM"
+    ::=  { cfmAlarmsPrefix 13010 }
+
+
+mepOnFlowTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MepOnFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   ""
+    ::=  { cfmStatus 1 }
+
+mepOnFlowEntry OBJECT-TYPE
+    SYNTAX      MepOnFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   ""
+    INDEX       {
+                  flowEntityIndexEth,
+                  flowEntityIndexFlow,
+                  dot1agCfmMdIndex,
+                  dot1agCfmMaIndex,
+                  dot1agCfmMepIdentifier
+                }
+    ::=  { mepOnFlowTable 1 }
+
+MepOnFlowEntry ::=  SEQUENCE
+  { mepOnFlowMepString SnmpAdminString }
+
+mepOnFlowMepString OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name" 
+    ::=  { mepOnFlowEntry 1 }
+
+
+-- conformance information
+
+cfmExtensionMIBConformance OBJECT IDENTIFIER ::= { cfmExtensionMIB 2 }
+
+cfmExtensionMIBCompliances OBJECT IDENTIFIER ::= { cfmExtensionMIBConformance 1 }
+
+cfmExtensionMIBGroups      OBJECT IDENTIFIER ::= { cfmExtensionMIBConformance 2 }
+
+
+-- compliance statements
+
+cfmExtensionMIBCompliance MODULE-COMPLIANCE
+  STATUS  current
+  DESCRIPTION
+    "The compliance statement for entities implementing the ADVA FSPR7 CFM Extension MIB."
+  MODULE  -- this module
+  MANDATORY-GROUPS { cfmExtensionObjectGroup, cfmExtensionNotificationGroup }
+  ::= { cfmExtensionMIBCompliances 1 }
+
+
+-- units of conformance
+
+cfmExtensionObjectGroup OBJECT-GROUP
+  OBJECTS {
+      mepAlarmSeverityValue,
+      mepAlarmSeverity,
+      mepAlarmAffect,
+      mepAlarmTimeStamp
+  }
+  STATUS  current
+  DESCRIPTION
+    "A list of objects."
+  ::= { cfmExtensionMIBGroups 1 }
+
+cfmExtensionNotificationGroup NOTIFICATION-GROUP
+  NOTIFICATIONS {
+      alarmCfmOosDisabled,
+      alarmCfmOosManagement,
+      alarmCfmOosMaintenance,
+      alarmCfmOosAins,
+      alarmCfmPriVidNotEqualExtVid,
+      alarmCfmServerSignalFailure,
+      alarmCfmRemoteDefectIndication,
+      alarmCfmCcmMacStatus,
+      alarmCfmCcmError,
+      alarmCfmCcmLost,
+      alarmCfmCcmXConn
+  }
+  STATUS  current
+  DESCRIPTION
+    "A list of notifications."
+  ::= { cfmExtensionMIBGroups 2 }
+
+
+END
+

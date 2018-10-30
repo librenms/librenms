@@ -10,20 +10,16 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-ini_set('allow_url_fopen', 0);
-ini_set('display_errors', 0);
+use LibreNMS\Authentication\LegacyAuth;
 
-if ($_GET[debug]) {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    ini_set('log_errors', 1);
-    ini_set('error_reporting', E_ALL);
-}
+ini_set('allow_url_fopen', 0);
 
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!$_SESSION['authenticated']) {
+set_debug($_GET['debug']);
+
+if (!LegacyAuth::check()) {
     echo 'unauthenticated';
     exit;
 }
@@ -46,7 +42,7 @@ if ($_GET['query'] && $_GET['cmd']) {
                 break;
 
             case 'nmap':
-                if ($_SESSION['userlevel'] != '10') {
+                if (!LegacyAuth::user()->isAdmin()) {
                     echo 'insufficient privileges';
                 } else {
                     $cmd = $config['nmap']." $host";

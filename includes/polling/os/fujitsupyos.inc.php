@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-$data = str_replace(array('Fujitsu ', ' Runtime Code '), '', explode(',', $poll_device['sysDescr']));
+$data = str_replace(array('Fujitsu ', ' Runtime Code '), '', explode(',', $device['sysDescr']));
 $hardware = $data[0];
 $version = $data[1];

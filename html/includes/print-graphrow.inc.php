@@ -11,14 +11,7 @@ if ($_SESSION['widescreen']) {
         $graph_array['width'] = '215';
     }
 
-    $periods = array(
-        'sixhour',
-        'day',
-        'week',
-        'month',
-        'year',
-        'twoyear',
-    );
+    $periods = $config['graphs']['mini']['widescreen'];
 } else {
     if (!$graph_array['height']) {
         $graph_array['height'] = '100';
@@ -28,12 +21,7 @@ if ($_SESSION['widescreen']) {
         $graph_array['width'] = '215';
     }
 
-    $periods = array(
-        'day',
-        'week',
-        'month',
-        'year',
-    );
+    $periods = $config['graphs']['mini']['normal'];
 }//end if
 
 if ($_SESSION['screen_width']) {
@@ -53,7 +41,7 @@ $graph_array['height'] = round($graph_array['width'] /2.15);
 $graph_array['to'] = $config['time']['now'];
 
 $graph_data = array();
-foreach ($periods as $period) {
+foreach ($periods as $period => $period_tex) {
     $graph_array['from']        = $config['time'][$period];
     $graph_array_zoom           = $graph_array;
     $graph_array_zoom['height'] = '150';

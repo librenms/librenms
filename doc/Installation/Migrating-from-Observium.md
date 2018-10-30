@@ -1,5 +1,5 @@
 source: Installation/Migrating-from-Observium.md
-## Migrating from Observium to LibreNMS
+path: blob/master/doc/
 
 A LibreNMS user, [Dan](https://twitter.com/thedanbrown), has kindly provided full details and scripts to be able to migrate from Observium to LibreNMS.
 

@@ -23,13 +23,14 @@
  * @package LibreNMS/Alerts
  */
 
-session_start();
-if (!isset($_SESSION['authenticated'])) {
+use LibreNMS\Authentication\LegacyAuth;
+
+$init_modules = array('web', 'auth');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+if (!LegacyAuth::check()) {
     die('Unauthorized.');
 }
-
-$init_modules = array('web');
-require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 set_debug($_REQUEST['debug']);
 
@@ -63,7 +64,7 @@ header('Content-type: application/json');
 $obj     = array(array('name' => 'Error: No suggestions found.'));
 $term    = array();
 $current = false;
-if (isset($_GET['term'],$_GET['device_id'])) {
+if (isset($_GET['term'], $_GET['device_id'])) {
     $chk               = array();
     $_GET['term']      = mres($_GET['term']);
     $_GET['device_id'] = mres($_GET['device_id']);
@@ -123,7 +124,7 @@ if (isset($_GET['term'],$_GET['device_id'])) {
 } elseif ($vars['type'] === 'alert_rule_collection') {
     $x=0;
     foreach (get_rules_from_json() as $rule) {
-        if (str_contains($rule['name'], $vars['term'], true)) {
+        if (str_i_contains($rule['name'], $vars['term'])) {
             $rule['id'] = $x;
             $tmp[] = $rule;
         }

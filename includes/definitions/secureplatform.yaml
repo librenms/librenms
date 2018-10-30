@@ -1,0 +1,30 @@
+os: secureplatform
+text: 'CheckPoint SecurePlatform'
+type: firewall
+icon: checkpoint
+mib_dir:
+    - checkpoint
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery_modules:
+    ports-stack: false
+    fdb-table: false
+    stp: false
+    wireless: false
+    vlans: false
+    bgp-peers: false
+    ntp: false
+    services: false
+    ip6-addresses: false
+poller_modules:
+    ntp: false
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.8072.3.2
+      snmpget:
+        oid: CHECKPOINT-MIB::osName.0
+        mib_dir: checkpoint
+        op: 'contains'
+        value: SecurePlatform

@@ -1,0 +1,7 @@
+os: microsemipdsine
+text: 'Microsemi PowerDsine Midspan PoE'
+type: network
+icon: microsemi
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.7428.1.1.1.

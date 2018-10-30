@@ -23,6 +23,7 @@ print_optionbar_start();
 $menu_options['basic']   = 'Basic';
 $menu_options['details'] = 'Details';
 $menu_options['arp']     = 'ARP Table';
+$menu_options['fdb']     = 'FDB Table';
 
 if (dbFetchCell("SELECT * FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.port_id = L.local_port_id")) {
     $menu_options['neighbours'] = 'Neighbours';
@@ -118,7 +119,7 @@ if ($vars['view'] == 'minigraphs') {
     }
 
     echo '</div>';
-} elseif ($vars['view'] == 'arp' || $vars['view'] == 'adsl' || $vars['view'] == 'neighbours') {
+} elseif ($vars['view'] == 'arp' || $vars['view'] == 'adsl' || $vars['view'] == 'neighbours' || $vars['view'] == 'fdb') {
     include 'ports/'.$vars['view'].'.inc.php';
 } else {
     if ($vars['view'] == 'details') {
@@ -141,7 +142,7 @@ if ($vars['view'] == 'minigraphs') {
 
     global $port_cache, $port_index_cache;
 
-    $ports = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' ORDER BY `ifIndex` ASC", array($device['device_id']));
+    $ports = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' AND `disabled` = 0 ORDER BY `ifIndex` ASC", array($device['device_id']));
     // As we've dragged the whole database, lets pre-populate our caches :)
     // FIXME - we should probably split the fetching of link/stack/etc into functions and cache them here too to cut down on single row queries.
 
@@ -153,10 +154,10 @@ foreach ($ports as $key => $port) {
 
 switch ($vars["sort"]) {
     case 'traffic':
-        $ports = array_sort($ports, 'ifOctets_rate', SORT_DESC);
+        $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
         break;
     default:
-        $ports = array_sort($ports, 'ifIndex', SORT_ASC);
+        $ports = array_sort_by_column($ports, 'ifIndex', SORT_ASC);
         break;
 }
 

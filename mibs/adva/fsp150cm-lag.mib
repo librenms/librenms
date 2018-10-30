@@ -1,0 +1,747 @@
+F3-LAG-MIB DEFINITIONS ::= BEGIN    
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,Counter32
+             FROM SNMPv2-SMI
+    DisplayString, TruthValue, RowStatus, StorageType, VariablePointer, 
+    DateAndTime, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC           
+    InterfaceIndex
+        FROM IF-MIB   
+    neIndex, shelfIndex, slotIndex 
+             FROM CM-ENTITY-MIB        
+    fsp150cm
+             FROM  ADVA-MIB
+    CmPmBinAction 
+             FROM CM-COMMON-MIB;
+
+f3LagMIB MODULE-IDENTITY
+    LAST-UPDATED    "201604060000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Polo Jiang
+                     ADVA Optical Networking, Inc.
+                Tel: +86 755 8621-7445
+             E-mail: pjiang@advaoptical.com
+             Postal: 518068  9/F, Xi Hai Ming Zhu, Building F, 1 Taoyuan Road,
+             	Nanshan District, Shenzhen, PRC"
+    DESCRIPTION
+            "This module defines the vendor specific 802.3ad LAG MIB definitions used 
+             by the FSP150CM 5.1 product lines, as extensions to the standard 
+             IEEE 802.3ad (802.3-2005). 
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201604060000Z"
+    DESCRIPTION
+            "Notes from release 201604060000Z,
+              (i)  Updated description of f3LagMode
+              (ii) Added new objects f3LagFrameDistAlgorithm,
+                        f3LagDiscardWrongConversation
+     
+             Notes from release 201012160000Z,
+              (i)Added new object f3LagPortMember
+
+             Notes from release 201012140000Z,
+              (i) Added new objects f3LagCcmDefectDetectionEnabled,
+                        f3LagStatsAction, f3LagPortStatsAction
+              (ii)Updated description of f3LagRowStatus, f3LagPortRowStatus
+
+             Notes from release 201011030000Z,
+               Post review changes 
+
+             Notes from release 200903160000Z
+             This release is applicable to the FSP150CM Aggregation 5.1 devices.
+
+             Notes from release 200803030000Z,
+             (1)MIB version ready for release FSP150CM Aggregation 5.1." 
+    ::= {fsp150cm 14}    
+
+-- 
+-- OID definitions
+-- 
+f3LagObjects     OBJECT IDENTIFIER ::= {f3LagMIB 1}
+f3LagConformance OBJECT IDENTIFIER ::= {f3LagMIB 2}  
+
+--
+-- Textual conventions.
+--
+
+
+
+AggMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Defines the LAG behavior. A LAG with mode
+            active-standby -  exhibits 1:1 protection behavior
+            loadsharing    -  exhibits port aggregation behavior
+         An active-standby LAG supports 0-2 member ports. One member is in Active 
+         role while the other is in Standby role. A loadsharing LAG can have multiple
+         (0-x) member ports, where x is as follows.
+             x = 2 for GE112Pro, GE114Pro, GE206V (Network ports only)
+             x = 2 for XG210 Network ports, x = 10 for XG210 Access ports
+             x = 4 for XG116Pro, XG120Pro (10G ports)
+             x = 6 for XG116Pro GE ports
+             x = 10 for XG120Pro GE ports 
+         In CM Aggregation Shelf, the loadsharing LAG can have 2-8 member ports."
+    SYNTAX       INTEGER {
+                   active-standby(1),
+                   loadsharing   (2)
+                 }
+
+AggPortState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The AggPortState provides current state of the member port.
+         Active: the member port is ready for transporting and is in working now.
+         Standby: the member port is ready for transporting, but is not working now."
+    SYNTAX       INTEGER {
+                   active (1),
+                   standby (2)
+                 }
+
+LagFrameDistributionAlgorithmType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The frame distribution algorithm used by the LAG for transmitting frames
+         on the individual LAG member ports."
+    SYNTAX       INTEGER {
+                   activeStandby (1),
+                   srcdstMacHash (2),
+                   serviceAssignment (3)
+                 }
+
+LinkAssignMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The link assignment mode used to designate a particular link for carrying
+         the service."
+    SYNTAX       INTEGER {
+                   auto (1),
+                   provisionedLinkList (2)
+                 }
+
+--
+-- Table definitions.
+--
+--
+-- LagAgg Table 
+--
+f3LagTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3LagEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the Link Aggregation Groups. 
+             Entries can be created/deleted in this table by management
+             application action."
+    ::= { f3LagObjects 1 }
+
+f3LagEntry OBJECT-TYPE
+    SYNTAX     F3LagEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             security user."
+    INDEX { neIndex, f3LagIndex }
+    ::= { f3LagTable 1 }
+
+F3LagEntry ::= SEQUENCE {
+        f3LagIndex                        Integer32,
+        f3LagIfIndex                      InterfaceIndex,
+        f3LagName                         DisplayString,
+        f3LagProtocols                    TruthValue,
+        f3LagLacpControl                  TruthValue,
+        f3LagMode                         AggMode,
+        f3LagCcmDefectsDetectionEnabled   TruthValue,
+        f3LagStatsAction                  CmPmBinAction,
+        f3LagStorageType                  StorageType,
+        f3LagRowStatus                    RowStatus,
+        f3LagIgnorePartnerColMaxDelay     TruthValue,
+        f3LagFrameDistAlgorithm           LagFrameDistributionAlgorithmType,
+        f3LagDiscardWrongConversation     TruthValue
+}
+
+f3LagIndex   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "An integer index value used to uniquely identify this Lag.
+          It should be the Lag Logical index."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.1"
+     ::= { f3LagEntry 1 }
+
+f3LagIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object has the same value as ifIndex for 
+             LAG logical Port.  An integer index value used to 
+             uniquely identify this LAG logical Port."
+    ::= { f3LagEntry 2 }
+
+f3LagName    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to name
+          the LAG aggregator."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.3"
+     ::= { f3LagEntry 3 }
+
+f3LagProtocols OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "When this object is enabled, the LACP will run as 802.3ad defines; 
+          When this object is disabled, LACP/LAMP protocols will not run and the 
+         LAG member port is fixed to an assigned LAG aggregator. "
+     ::= { f3LagEntry 4 }
+
+f3LagLacpControl OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION        
+         "Determines whether or not the Link Aggregation Control Protocol is enabled or disabled 
+          for the LAG.  When disabled, the LAG shall ignore LACP frames for the purpose of 
+          selecting the active link (port) and shall select its active link (port) solely upon 
+          the status of the LAG member links (ports).  However, when disabled, the LACP protocol 
+          shall remain active (i.e. LACP frames are transmitted when needed, etc.)."
+     ::= { f3LagEntry 5 }
+
+f3LagMode OBJECT-TYPE
+    SYNTAX     AggMode 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Defines the LAG behavior. A LAG with mode
+            active-standby -  exhibits 1:1 protection behavior
+            loadsharing    -  exhibits port aggregation behavior
+          An active-standby LAG supports 0-2 member ports. One member is in Active
+          role while the other is in Standby role. A loadsharing LAG can have multiple
+          (0-x) member ports, where x is as follows.
+             x = 2 for GE112Pro, GE114Pro, GE206V (Network ports only)
+             x = 2 for XG210 Network ports, x = 10 for XG210 Access ports
+             x = 4 for XG116Pro, XG120Pro (10G ports)
+             x = 6 for XG116Pro GE ports
+             x = 10 for XG120Pro GE ports
+          In CM Aggregation Shelf, the loadsharing LAG can have 2-8 member ports."
+     ::= { f3LagEntry 6 }
+
+f3LagCcmDefectsDetectionEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object allows for a LAG to use CCM defects DefRemoteCCM and DefRDICCM
+         as an indication of Signal Fail for the LAG member ports. 
+         When enabled, a LAG member will stop carrying service frames when a
+         DefRemoteCCM or DefRDICCM is detected on a port level CFM DOWN MEP associated
+         with the LAG member port.  Please note that port level CFM DOWN MEPs need
+         to be created on LAG member ports for this feature to work."
+     ::= { f3LagEntry 7 }
+
+f3LagStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the LAG level statistics (f3LagStatsTable)."
+    ::= { f3LagEntry 8 }
+     
+f3LagStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3LagEntry 9 }
+
+f3LagRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "The status of this row.
+          An entry MUST NOT exist in the active state unless all
+          objects in the entry have an appropriate value, as described
+          in the description clause for each writable object.
+
+          The values of f3LagRowStatus supported are
+          createAndGo(4) and destroy(6).  All mandatory attributes
+          must be specified in a single SNMP SET request with
+          f3LagRowStatus value as createAndGo(4).
+          Upon successful row creation, this object has a
+          value of active(1).
+
+          The f3LagRowStatus object may be modified if
+          the associated instance of this object is equal to active(1)."
+     ::= { f3LagEntry 10 }
+
+f3LagIgnorePartnerColMaxDelay OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+          "This object is used to configure LAG instance to ignore Collector Max Delay
+           value in the received LACP PDU. Setting this value to TRUE will result in 
+           no hold-off timer to be started, regardless of the received Collector Max
+           Delay value."
+     ::= { f3LagEntry 11 }
+
+f3LagFrameDistAlgorithm OBJECT-TYPE
+    SYNTAX     LagFrameDistributionAlgorithmType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "The frame distribution algorithm used by the LAG for transmitting frames
+           on the individual LAG member ports. For an active-standby LAG, this will 
+           be active-standby. A loadsharing LAG will follow service-assignment frame
+           distribution. The srcdst-mac-hash method is not supported on CC-NIDS."
+     ::= { f3LagEntry 12 }
+
+f3LagDiscardWrongConversation OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "This object is used to control and identify whether frames received on a 
+           LAG member port are to be discarded if the service associated with the 
+           frame (ingress membership) does not match the service-to-link mapping of
+           the LAG Service Map."
+     ::= { f3LagEntry 13 }
+           
+--
+-- f3LagStatsTable 
+--
+f3LagStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3LagStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "A list of entries corresponding to the LAG statistics. 
+          Entries cannot be created in this table by management
+          application action."
+    ::= { f3LagObjects 2 }
+
+f3LagStatsEntry OBJECT-TYPE
+    SYNTAX     F3LagStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information on the LAG logical 
+             port statistics."
+    INDEX { neIndex, f3LagIndex, f3LagStatsIndex }
+    ::= { f3LagStatsTable 1 }
+
+F3LagStatsEntry ::= SEQUENCE {
+    f3LagStatsIndex               Integer32,
+    f3LagStatsOctetsTxOK               Counter32,
+    f3LagStatsOctetsRxOK               Counter32,
+    f3LagStatsFramesTxOK               Counter32,
+    f3LagStatsFramesRxOK               Counter32,
+    f3LagStatsMulticastFramesTxOK      Counter32,
+    f3LagStatsMulticastFramesRxOK      Counter32,
+    f3LagStatsBroadcastFramesTxOK      Counter32,
+    f3LagStatsBroadcastFramesRxOK      Counter32,
+    f3LagStatsFramesWithTxErrors       Counter32,
+    f3LagStatsFramesWithRxErrors       Counter32,
+    f3LagStatsUnknownProtocolFrames    Counter32
+}
+
+f3LagStatsIndex    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier to access a unique row in the f3LagStatsTable." 
+     ::= { f3LagStatsEntry 1 }
+
+f3LagStatsOctetsTxOK OBJECT-TYPE
+    SYNTAX     Counter32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "A count of the data and padding octets transmitted by this Aggregator on all 
+          Aggregation Ports that are (or have been) members of the aggregation."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.17"
+     ::= { f3LagStatsEntry 2 }
+
+f3LagStatsOctetsRxOK OBJECT-TYPE
+    SYNTAX     Counter32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "A count of the data and padding octets received by this Aggregator, 
+          from the Aggregation Ports that are (or have been) members of the aggregation."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.18"
+     ::= { f3LagStatsEntry 3 }
+
+f3LagStatsFramesTxOK OBJECT-TYPE
+    SYNTAX     Counter32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "A count of the data frames transmitted by this Aggregator on all Aggregation 
+          Ports that are (or have been) members of the aggregation."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.19"
+     ::= { f3LagStatsEntry 4 }
+
+f3LagStatsFramesRxOK OBJECT-TYPE
+    SYNTAX     Counter32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "A count of the data frames received by this Aggregator, from the Aggregation Ports that are 
+         (or have been) members of the aggregation."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.20"
+     ::= { f3LagStatsEntry 5 }
+
+f3LagStatsMulticastFramesTxOK OBJECT-TYPE
+    SYNTAX     Counter32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "A count of the data frames transmitted by this Aggregator on all Aggregation Ports that are 
+         (or have been) members of the aggregation, to a group destination address other than the 
+         broadcast address."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.21"
+     ::= { f3LagStatsEntry 6 }
+
+f3LagStatsMulticastFramesRxOK OBJECT-TYPE
+    SYNTAX     Counter32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "A count of the data frames received by this Aggregator, from the Aggregation Ports that are 
+         (or have been) members of the aggregation, that were addressed to an active group address 
+         other than the broadcast address."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.22"
+     ::= { f3LagStatsEntry 7 }
+
+f3LagStatsBroadcastFramesTxOK OBJECT-TYPE
+    SYNTAX     Counter32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "A count of the broadcast data frames transmitted by this Aggregator on all 
+          Aggregation Ports that are (or have been) members of the aggregation."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.23"
+     ::= { f3LagStatsEntry 8 }
+
+f3LagStatsBroadcastFramesRxOK OBJECT-TYPE
+    SYNTAX     Counter32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "A count of the broadcast data frames received by this Aggregator, from the 
+          Aggregation Ports that are (or have been) members of the aggregation."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.24"
+     ::= { f3LagStatsEntry 9 }
+
+f3LagStatsFramesWithTxErrors OBJECT-TYPE
+    SYNTAX     Counter32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "A count of data frames requested to be transmitted by this Aggregator that experienced 
+          transmission errors on ports that are (or have been) members of the aggregation."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.27"
+     ::= { f3LagStatsEntry 10 }
+
+f3LagStatsFramesWithRxErrors OBJECT-TYPE
+    SYNTAX     Counter32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "A count of data frames discarded on reception by all ports that are (or have been) members of 
+         the aggregation, or that were discarded by the Collection function of the Aggregator, or that 
+         were discarded by the Aggregator due to the detection of an illegal Slow Protocols PDU."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.28"
+     ::= { f3LagStatsEntry 11 }
+
+f3LagStatsUnknownProtocolFrames OBJECT-TYPE
+    SYNTAX     Counter32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "A count of data frames discarded on reception by all ports that are (or have been) members of 
+         the aggregation, due to the detection of an unknown Slow Protocols PDU."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.29"
+     ::= { f3LagStatsEntry 12 }
+
+--
+-- f3LagPort Table 
+--
+f3LagPortTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3LagPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the LAG member ports.
+             Entries can be created/deleted in this table by management
+             application action."
+    ::= { f3LagObjects 3 }
+
+f3LagPortEntry OBJECT-TYPE
+    SYNTAX     F3LagPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             security user."
+    INDEX { neIndex, f3LagIndex, f3LagPortIndex }
+    ::= { f3LagPortTable 1 }
+
+F3LagPortEntry ::= SEQUENCE {
+        f3LagPortIndex               Integer32,
+        f3LagPortMember              VariablePointer,
+        f3LagPortLacpForceOutOfSync  TruthValue,
+        f3LagPortState               AggPortState,
+        f3LagPortStatsAction         CmPmBinAction,
+        f3LagPortStorageType         StorageType,
+        f3LagPortRowStatus           RowStatus
+}
+                                                                         
+f3LagPortIndex    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier for each Aggregation Port." 
+     ::= { f3LagPortEntry 1 }
+
+f3LagPortMember    OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "This is the OID of the LAG member port."
+     ::= { f3LagPortEntry 2 }
+
+f3LagPortLacpForceOutOfSync OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION        
+         "A boolean value which enables or disables the port from participating as an active port 
+          in the Link Aggregation Group, causing the link (port) to transmit OUT_OF_SYNC via LACP."
+     ::= { f3LagPortEntry 3 }
+
+f3LagPortState    OBJECT-TYPE
+    SYNTAX      AggPortState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object can be used to show the current status of the member port.
+        Active: the member port is ready for transporting and is in working now.
+        Standby: the member port is ready for transporting, but is not working now."
+    ::= { f3LagPortEntry 4 }
+
+f3LagPortStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the LAG Port level statistics (dot3adAggPortStatsTable)."
+    ::= { f3LagPortEntry 5 }
+
+f3LagPortStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3LagPortEntry 6 }
+    
+f3LagPortRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "The status of this row.
+          An entry MUST NOT exist in the active state unless all
+          objects in the entry have an appropriate value, as described
+          in the description clause for each writable object.
+
+          The values of f3LagPortRowStatus supported are
+          createAndGo(4) and destroy(6).  All mandatory attributes
+          must be specified in a single SNMP SET request with
+          f3LagPortRowStatus value as createAndGo(4).
+          Upon successful row creation, this object has a
+          value of active(1).
+
+          The f3LagPortRowStatus object may be modified if
+          the associated instance of this object is equal to active(1)."
+     ::= { f3LagPortEntry 7 }
+
+--
+-- f3LagServiceMap Table 
+--
+f3LagServiceMapTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3LagServiceMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the LAG service map entry.
+             Entries can be created/deleted in this table by management
+             application action."
+    ::= { f3LagObjects 4 }
+
+f3LagServiceMapEntry OBJECT-TYPE
+    SYNTAX     F3LagServiceMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             security user."
+    INDEX { neIndex, f3LagIndex, f3LagServiceMapIndex }
+    ::= { f3LagServiceMapTable 1 }
+
+F3LagServiceMapEntry ::= SEQUENCE {
+        f3LagServiceMapIndex               Integer32,
+        f3LagServiceMapServiceObj          VariablePointer,
+        f3LagServiceMapLinkAssignMode      LinkAssignMode,
+        f3LagServiceMapStorageType         StorageType,
+        f3LagServiceMapRowStatus           RowStatus,
+        f3LagServiceMapMemberLinkList      DisplayString,
+        f3LagServiceMapCurrentMemberLink   Integer32
+}
+                                                                         
+f3LagServiceMapIndex    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier for each entry/row in the Service Map." 
+     ::= { f3LagServiceMapEntry 1 }
+
+f3LagServiceMapServiceObj    OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "This is the OID of the LAG service object."
+     ::= { f3LagServiceMapEntry 2 }
+
+f3LagServiceMapLinkAssignMode    OBJECT-TYPE
+    SYNTAX      LinkAssignMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The assign mode value." 
+     ::= { f3LagServiceMapEntry 3 }
+
+f3LagServiceMapStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3LagServiceMapEntry 4 }
+    
+f3LagServiceMapRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "The status of this row.
+          An entry MUST NOT exist in the active state unless all
+          objects in the entry have an appropriate value, as described
+          in the description clause for each writable object.
+
+          The values of f3LagServiceMapRowStatus supported are
+          createAndGo(4) and destroy(6).  All mandatory attributes
+          must be specified in a single SNMP SET request with
+          f3LagServiceMapRowStatus value as createAndGo(4).
+          Upon successful row creation, this object has a
+          value of active(1).
+
+          The f3LagServiceMapRowStatus object may be modified if
+          the associated instance of this object is equal to active(1)."
+     ::= { f3LagServiceMapEntry 5 }
+
+f3LagServiceMapMemberLinkList    OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The member link list value, describe by ifindex value string split with comma." 
+     ::= { f3LagServiceMapEntry 6 }
+
+f3LagServiceMapCurrentMemberLink    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current member link ifindex value." 
+     ::= { f3LagServiceMapEntry 7 }
+
+
+--
+-- Conformance
+--
+f3LagCompliances OBJECT IDENTIFIER ::= {f3LagConformance 1}
+f3LagGroups      OBJECT IDENTIFIER ::= {f3LagConformance 2}
+
+f3LagCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the f3Lag
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3LagObjectGroup
+        }
+    ::= { f3LagCompliances 1 }
+
+--f3LagDescription, 
+f3LagObjectGroup OBJECT-GROUP
+    OBJECTS {
+    f3LagIndex, f3LagIfIndex, f3LagName, f3LagProtocols,
+    f3LagLacpControl, f3LagMode, f3LagCcmDefectsDetectionEnabled,
+    f3LagStatsAction, f3LagStorageType, f3LagRowStatus, f3LagIgnorePartnerColMaxDelay,
+    f3LagFrameDistAlgorithm, f3LagDiscardWrongConversation,
+    
+    f3LagStatsIndex, f3LagStatsOctetsTxOK, f3LagStatsOctetsRxOK, 
+    f3LagStatsFramesTxOK, f3LagStatsFramesRxOK, f3LagStatsMulticastFramesTxOK,
+    f3LagStatsMulticastFramesRxOK, f3LagStatsBroadcastFramesTxOK,
+    f3LagStatsBroadcastFramesRxOK, f3LagStatsFramesWithTxErrors,
+    f3LagStatsFramesWithRxErrors, f3LagStatsUnknownProtocolFrames,
+
+    f3LagPortIndex, f3LagPortMember, f3LagPortLacpForceOutOfSync,
+    f3LagPortState, f3LagPortStatsAction, f3LagPortStorageType,
+    f3LagPortRowStatus,
+
+    f3LagServiceMapIndex, f3LagServiceMapServiceObj,
+    f3LagServiceMapLinkAssignMode, f3LagServiceMapStorageType,      
+    f3LagServiceMapRowStatus, f3LagServiceMapMemberLinkList, 
+    f3LagServiceMapCurrentMemberLink
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the f3Lag
+             group."
+    ::= { f3LagGroups 1 }
+
+END
+

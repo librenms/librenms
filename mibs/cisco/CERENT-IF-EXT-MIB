@@ -1,0 +1,152 @@
+-- **************************************************************
+-- CERENT-IF-EXT-MIB module
+--
+-- December 2005, Srikar B S
+-- This module is an extension of the IF-MIB.
+
+-- Copyright (c) 2005-2006 by Cisco Systems, Inc.
+-- All rights reserved.
+--
+-- **************************************************************
+
+-- This MIB is an extension of the IF-MIB and contains objects
+-- to manage interfaces.
+
+CERENT-IF-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32
+                      FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP      FROM SNMPv2-CONF
+    TruthValue        FROM SNMPv2-TC
+    ifIndex           FROM IF-MIB
+    cerentModules,
+    cerentGeneric,
+    cerentRequirements
+                      FROM CERENT-GLOBAL-REGISTRY;
+
+cerentIfExtMIB MODULE-IDENTITY
+    LAST-UPDATED "200511140000Z"
+    ORGANIZATION "Cisco Systems, Inc."
+    CONTACT-INFO
+        "         support@Cisco.com
+
+         Postal:  Cisco Systems
+                  1450 N. McDowell Blvd.
+                  Petaluma, CA  94954
+                  USA
+
+            Tel:  +1-877-323-7368"
+    DESCRIPTION
+        "This module defines objects for managing interfaces."
+
+    REVISION "200511140000Z"
+    DESCRIPTION
+        "Inital version of the module"
+
+    ::= { cerentModules 140 }
+
+cerentIfExtMIBObjects OBJECT IDENTIFIER
+      ::= { cerentGeneric 100 }
+
+cerentIfExtTable       OBJECT-TYPE
+       SYNTAX SEQUENCE OF CerentIfExtEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "This table contains one row per interface."
+
+       ::= { cerentIfExtMIBObjects 10 }
+
+cerentIfExtEntry       OBJECT-TYPE
+       SYNTAX CerentIfExtEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+              "Row definition for cerentIfExtTable"
+       INDEX { ifIndex }
+       ::= { cerentIfExtTable 1 }
+
+CerentIfExtEntry ::= SEQUENCE {
+      cerentIfExtPreServiceAlarmSuppression   TruthValue,
+      cerentIfExtConfiguredSoakTime           Integer32,
+      cerentIfExtCurrentSoakTime              Integer32
+    }
+
+cerentIfExtPreServiceAlarmSuppression  OBJECT-TYPE
+       SYNTAX                  TruthValue
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+          "This object can be set through a management interface.
+           When the administrative state of this interface is 'down',
+           the value of this object does not have any impact.
+    
+           When the administrative state of this interface is 'up',
+           if this object has a value of 'false', an alarm on this 
+           interface will be reported. If the value of this object is 'true'
+           then all alarms on this interface will be suppressed.
+
+           If the interface has a good signal, the soak timer will be
+           started, if the port is faulted before the soak timer expires,
+           the soak timer will be reset to the provisioned maximum value.
+           If the soak timer expires then the value of this object is 
+           automatically set to 'false'."
+       DEFVAL { false }
+       ::= { cerentIfExtEntry 10 } 
+
+cerentIfExtConfiguredSoakTime     OBJECT-TYPE
+       SYNTAX                  Integer32
+       UNITS      "minutes"
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+          "This is the configured maximum value of the soak timer
+           for this interface."
+       DEFVAL { 480 }
+       ::= { cerentIfExtEntry 20 }
+
+cerentIfExtCurrentSoakTime     OBJECT-TYPE
+       SYNTAX                  Integer32
+       UNITS      "minutes"
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+          "This is the current value of the soak timer
+           for this interface. The difference between 
+           cerntIfExtConfiguredSoakTime and this object gives the
+           time duration for which this interface has had a good signal."
+       ::= { cerentIfExtEntry 30 }
+
+cerentIfExtMIBConformance OBJECT IDENTIFIER
+      ::= { cerentRequirements 90 }
+cerentIfExtMIBCompliances OBJECT IDENTIFIER
+      ::= { cerentIfExtMIBConformance 1}
+cerentIfExtMIBGroups OBJECT IDENTIFIER
+      ::= { cerentIfExtMIBConformance 2}
+
+cerentIfExtMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "Describes the requirements for conformance to the
+        High Capacity Media Independent Group."
+    MODULE  -- this module
+    MANDATORY-GROUPS { cerentIfExtGroup }
+    ::= { cerentIfExtMIBCompliances 1 }
+       
+
+cerentIfExtGroup OBJECT-GROUP
+        OBJECTS {
+          cerentIfExtPreServiceAlarmSuppression,
+          cerentIfExtConfiguredSoakTime,
+          cerentIfExtCurrentSoakTime
+        }
+        STATUS current
+        DESCRIPTION
+          "The objects for storing all the current alarm thresholds "
+        ::= { cerentIfExtMIBGroups 10 }
+
+END

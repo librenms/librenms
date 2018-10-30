@@ -28,7 +28,7 @@ $unix_prev_from = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastfrom')");
 $unix_prev_to   = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastto')");
 $lastmonth      = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))');
 $yesterday      = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))');
-$rightnow       = date(U);
+$rightnow       = date('U');
 
 $cur_days   = date('d', (strtotime('now') - strtotime($datefrom)));
 $total_days = date('d', (strtotime($dateto) - strtotime($datefrom)));
@@ -87,7 +87,7 @@ function showPercent($per)
 
 <div class="row">
     <div class="col-lg-5 col-lg-push-7">
-        <?php print_port_list() ?>
+        <?php print_port_list($ports) ?>
     </div>
     <div class="col-lg-7 col-lg-pull-5">
         <div class="panel panel-default">
@@ -141,8 +141,8 @@ function showPercent($per)
                     <td><?php echo $ousage['est'] ?></td>
                     <td><?php echo showPercent($ousage['per']) ?></td>
                 </tr>
-                
-        <?php } ?>        
+
+        <?php } ?>
             </tbody>
             </table>
         </div>
@@ -152,29 +152,23 @@ function showPercent($per)
 
 
 <?php
-$bi  = "<img src='bandwidth-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
+$bi  = "<img src='graph.php?type=bill_historictransfer&id=".$bill_id;
 $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
-$bi .= '&amp;type=day&imgbill=1';
-$bi .= '&amp;x=1190&amp;y=250';
-$bi .= "$type'>";
+$bi .= '&amp;imgtype=day';
+$bi .= '&amp;width=1190&amp;height=250';
+$bi .= "'>";
 
-$li  = "<img src='bandwidth-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
-$li .= '&amp;from='.$unix_prev_from.'&amp;to='.$unix_prev_to;
-$li .= '&amp;type=day';
-$li .= '&amp;x=1190&amp;y=250';
-$li .= "$type'>";
-
-$di  = "<img src='bandwidth-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
+$di  = "<img src='graph.php?type=bill_historictransfer&id=".$bill_id;
 $di .= '&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'];
-$di .= '&amp;type=hour';
-$di .= '&amp;x=1190&amp;y=250';
-$di .= "$type'>";
+$di .= '&amp;imgtype=hour';
+$di .= '&amp;width=1190&amp;height=250';
+$di .= "'>";
 
-$mi  = "<img src='bandwidth-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
+$mi  = "<img src='graph.php?type=bill_historictransfer&id=".$bill_id;
 $mi .= '&amp;from='.$lastmonth.'&amp;to='.$rightnow;
-$mi .= '&amp;&type=day';
-$mi .= '&amp;x=1190&amp;y=250';
-$mi .= "$type'>";
+$mi .= '&amp;&imgtype=day';
+$mi .= '&amp;width=1190&amp;height=250';
+$mi .= "'>";
 ?>
 
 <div class="panel panel-default">

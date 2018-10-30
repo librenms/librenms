@@ -1,0 +1,272 @@
+-- This module defines enterprise MIBs for Global, Global-Pro and NSM setting
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SET-GLB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSetting, netscreenSettingMibModule
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenSetGlbMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor 
+         Global, Global-Pro and NSM setting"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSettingMibModule 10 }
+
+nsSetGlbMng OBJECT IDENTIFIER ::= { netscreenSetting 10 }
+
+nsSetGlbMngVPNEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secure NS Global Manager/PRO traffic via VPN encryption."
+    ::= { nsSetGlbMng 1 }
+
+nsSetGlbMngEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Global Manager service on NetScreen device."
+    ::= { nsSetGlbMng 2 }
+
+nsSetGlbProEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Global Pro Management service on NetScreen device."
+    ::= { nsSetGlbMng 3 }
+
+nsSetGlbManagerSetting OBJECT IDENTIFIER ::= { nsSetGlbMng 4 }
+
+nsSetGlbMngSerName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Server Name of Global Manager service."
+    ::= { nsSetGlbManagerSetting 1 }
+
+nsSetGlbMngSerTCP OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "TCP port number of Global Manager service."
+    ::= { nsSetGlbManagerSetting 2 }
+
+nsSetGlbMngSerUDP OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "UDP port number of Global Manager service."
+    ::= { nsSetGlbManagerSetting 3 }
+
+nsSetGlbMngLocal OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Global Manager service listening port number(NS device
+         side)."
+    ::= { nsSetGlbManagerSetting 4 }
+
+nsSetGlbProManagerSetting OBJECT IDENTIFIER ::= { nsSetGlbMng 5 }
+
+nsSetGlbProPriSer OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Primary IP Address of Global PRO Server."
+    ::= { nsSetGlbProManagerSetting 1 }
+
+nsSetGlbProSecSer OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secondary IP Address of Global PRO Server"
+    ::= { nsSetGlbProManagerSetting 2 }
+
+nsSetGlbMngSetting OBJECT IDENTIFIER ::= { nsSetGlbMng 6 }
+
+nsSetGlbMngProtDist OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Protocol Distribution in global management service."
+    ::= { nsSetGlbMngSetting 1 }
+
+nsSetGlbMngEthStatis OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Ethernet Statistics in global management service."
+    ::= { nsSetGlbMngSetting 2 }
+
+nsSetGlbMngAttStatis OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Attack Statistics in global management service."
+    ::= { nsSetGlbMngSetting 3 }
+
+nsSetGlbMngPlyStatis OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Policy Statistics in global management service."
+    ::= { nsSetGlbMngSetting 4 }
+
+nsSetGlbMngFlowStatis OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Flow Statistics in global management service."
+    ::= { nsSetGlbMngSetting 5 }
+
+nsSetGlbMngTrafAlm OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Traffic Alarms in global management service."
+    ::= { nsSetGlbMngSetting 6 }
+
+nsSetGlbMngAttAlm OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Attack Alarms in global management service."
+    ::= { nsSetGlbMngSetting 7 }
+
+nsSetGlbMngEvtAlm OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Event Alarms in global management service."
+    ::= { nsSetGlbMngSetting 8 }
+
+nsSetGlbMngCfgLog OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Configuration Logs in global management service."
+    ::= { nsSetGlbMngSetting 9 }
+
+nsSetGlbMngTrafLog OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Traffic Logs in global management service."
+    ::= { nsSetGlbMngSetting 10 }
+
+nsSetGlbMngInfoLog OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Information Logs in global management service."
+    ::= { nsSetGlbMngSetting 11 }
+
+nsSetGlbMngSelfLog OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Self Logs in global management service."
+    ::= { nsSetGlbMngSetting 12 }
+
+END
+
+

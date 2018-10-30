@@ -1,0 +1,110 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-EQUIPTYPE-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+             siaeMib
+        FROM SIAE-TREE-MIB;
+
+    equipTypeMib MODULE-IDENTITY
+        LAST-UPDATED "201504230000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Types of SIAE's equipment.
+            "
+        REVISION "201504230000Z"
+        DESCRIPTION 
+            "Added equipTypeEasyCellGateway (78).
+            "
+        REVISION "201410290000Z"
+        DESCRIPTION 
+            "Added equipTypeALFOplus2 (77).
+            "
+        REVISION "201406230000Z"
+        DESCRIPTION 
+            "Fixed IMPORTS clause.
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version
+            "
+    ::= { siaeMib 501 }
+
+--------------------------------------------------------------------------------
+--  object identifier inside the module
+--------------------------------------------------------------------------------
+
+     equipTypeList OBJECT IDENTIFIER ::= { siaeMib equipment(1) 5 }
+
+--------------------------------------------------------------------------------
+--  object identifier inside the module
+--------------------------------------------------------------------------------
+
+     -- OBJECT IDENTITIES for EQUIP types
+
+     --  (see equipType of SIAE-EQUIP-MIB for usage)
+
+     -- Equipment identifiers 
+
+     equipTypeUnknown OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "Unrecognized equip type"
+       REFERENCE   "None"
+       ::= { equipTypeList 1 }
+
+     equipTypeALFO80HD OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "ALFO 80GHz HD"
+       REFERENCE   "None"
+       ::= { equipTypeList 74 }
+
+     equipTypeALFO80HDsm OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "ALFO 80GHz HD Split Mount"
+       REFERENCE   "None"
+       ::= { equipTypeList 75 }
+
+     equipTypeAGS20 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS20"
+       REFERENCE   "None"
+       ::= { equipTypeList 76 }
+
+     equipTypeALFOplus2 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS20"
+       REFERENCE   "None"
+       ::= { equipTypeList 77 }
+
+     equipTypeEasyCellGateway OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "EasyCellGateway"
+       REFERENCE   "None"
+       ::= { equipTypeList 78 }
+
+END
+
+
+
+

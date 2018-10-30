@@ -9,7 +9,7 @@ $tower_count = snmp_get($device, 'systemTowerCount.0', '-Ovq', 'Sentry3-MIB');
 $towers      = 1;
 while ($towers <= $tower_count) {
      // Check for Infeeds
-    $infeed_oids = snmp_walk($device, "infeedID.$towers.1", '-Osqn', 'Sentry3-MIB');
+    $infeed_oids = snmp_walk($device, "infeedID.$towers", '-Osqn', 'Sentry3-MIB');
     d_echo($infeed_oids."\n");
 
     $infeed_oids = trim($infeed_oids);
@@ -26,7 +26,7 @@ while ($towers <= $tower_count) {
             $infeed_index            = $split_oid[(count($split_oid) - 1)];
 
             // infeedLoadValue
-            $infeed_oid = '.1.3.6.1.4.1.1718.3.2.2.1.7.'.$towers.'.1';
+            $infeed_oid = '.1.3.6.1.4.1.1718.3.2.2.1.7.'.$towers.'.'.$infeed_index;
 
             $descr_string    = snmp_get($device, "infeedID.$towers.$infeed_index", '-Ovq', 'Sentry3-MIB');
             $descr           = "Infeed $descr_string";
@@ -37,7 +37,8 @@ while ($towers <= $tower_count) {
             $current         = (snmp_get($device, "$infeed_oid", '-Ovq', 'Sentry3-MIB') / $divisor);
 
             if ($current >= 0) {
-                discover_sensor($valid['sensor'], 'current', $device, $infeed_oid, $towers, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+                $tmp_index = "infeedID.$towers.$infeed_index";
+                discover_sensor($valid['sensor'], 'current', $device, $infeed_oid, $tmp_index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
             }
 
             // Check for per-outlet polling

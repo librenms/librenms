@@ -1,6 +1,8 @@
 <?php
 
 // This file prints a table row for each interface
+use LibreNMS\Util\IP;
+
 $port['device_id'] = $device['device_id'];
 $port['hostname']  = $device['hostname'];
 
@@ -9,9 +11,9 @@ $if_id = $port['port_id'];
 $port = cleanPort($port);
 
 if (!is_integer($i / 2)) {
-    $row_colour = $list_colour_a;
+    $row_colour = $config['list_colour']['even'];
 } else {
-    $row_colour = $list_colour_b;
+    $row_colour = $config['list_colour']['odd'];
 }
 
 if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
@@ -20,7 +22,7 @@ if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
     $error_img = '';
 }
 
-echo "<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\"
+echo "<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='{$config['list_colour']['highlight']}';\" onmouseout=\"this.style.backgroundColor='$row_colour';\"
 onclick=\"location.href='device/".$device['device_id'].'/port/'.$port['port_id']."/'\" style='cursor: pointer;'>
  <td valign=top width=350>";
 echo '        <span class=list-large>
@@ -40,7 +42,7 @@ if ($port_details) {
 
     foreach (dbFetchRows('SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?', array($port['port_id'])) as $ip6) {
         ;
-        echo "$break <a class=interface-desc href=\"javascript:popUp('netcmd.php?cmd=whois&amp;query=".$ip6['ipv6_address']."')\">".Net_IPv6::compress($ip6['ipv6_address']).'/'.$ip6['ipv6_prefixlen'].'</a>';
+        echo "$break <a class=interface-desc href=\"javascript:popUp('netcmd.php?cmd=whois&amp;query=".$ip6['ipv6_address']."')\">".IP::parse($ip6['ipv6_address'], true).'/'.$ip6['ipv6_prefixlen'].'</a>';
         $break = ',';
     }
 }

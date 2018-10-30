@@ -1,0 +1,204 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+    SIAE-QUEUE-DEPTH-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32
+        FROM SNMPv2-SMI
+             TEXTUAL-CONVENTION,
+             DisplayString
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+    queueDepth MODULE-IDENTITY
+        LAST-UPDATED "201405200000Z" 
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Queue depth management for SIAE equipments.
+            "
+        REVISION "201405200000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00.
+            "
+    ::= { siaeMib 84 }
+
+----------------------------------------------------------------------------
+--  Textual Conventions
+----------------------------------------------------------------------------
+
+DisplayString1024 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1024a"
+    STATUS       current
+    DESCRIPTION
+            "Represents textual information taken from the NVT ASCII
+            character set, as defined in pages 4, 10-11 of RFC 854.
+
+            To summarize RFC 854, the NVT ASCII repertoire specifies:
+
+              - the use of character codes 0-127 (decimal)
+
+              - the graphics characters (32-126) are interpreted as
+                US ASCII
+
+              - NUL, LF, CR, BEL, BS, HT, VT and FF have the special
+                meanings specified in RFC 854
+
+              - the other 25 codes have no standard interpretation
+
+              - the sequence 'CR LF' means newline
+
+              - the sequence 'CR NUL' means carriage-return
+
+              - an 'LF' not preceded by a 'CR' means moving to the
+                same column on the next line.
+
+              - the sequence 'CR x' for any x other than LF or NUL is
+                illegal.  (Note that this also means that a string may
+                end with either 'CR LF' or 'CR NUL', but not with CR.)
+
+            Any object defined using this syntax may not exceed 255
+            characters in length."
+    SYNTAX       OCTET STRING (SIZE (0..1024))
+
+----------------------------------------------------------------------------
+--  MIB objects
+----------------------------------------------------------------------------
+
+------ Beginning -------------------------------------------------------------
+
+    queueDepthMibVersion OBJECT-TYPE
+            SYNTAX      INTEGER
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Numerical version of this module.
+                 The string version of this MIB have the following format:
+                    XX.YY.ZZ
+                 so, for example, the value 1 should be interpreted as 00.00.01
+                 and the value 10001 should be interpreted as 01.00.01."
+    ::= {queueDepth 1}
+    
+-------  Begin of qdProfileTable
+--
+    qdProfileTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF QueueDepthProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of queue depth profile entries. This table is useful 
+             to show to the manager available profiles and its feature."
+    ::= {queueDepth 2}
+
+    qdProfileEntry OBJECT-TYPE
+        SYNTAX      QueueDepthProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing information about each queue depth settings
+             realized by a profile."
+        INDEX       {qdProfileIndex}
+    ::= {qdProfileTable 1}
+
+    QueueDepthProfileEntry  ::=
+        SEQUENCE  {
+            qdProfileIndex        Integer32,
+            qdProfileName         DisplayString,
+            qdProfileDescription  DisplayString1024
+         }
+    
+    qdProfileIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value, greater than zero, for each queue depth profile.
+             It is recommended that values are assigned contiguously 
+             starting from 1."
+    ::= {qdProfileEntry 1}
+   
+    qdProfileName OBJECT-TYPE
+        SYNTAX      DisplayString   (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A brief description of the settings realized by this profile."
+    ::= {qdProfileEntry 2}
+    
+    qdProfileDescription OBJECT-TYPE
+        SYNTAX      DisplayString1024
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A detailed description of the settings realized by this profile."
+    ::= {qdProfileEntry 3}
+        
+--
+-------  End of qdProfileTable
+
+    qdProfileSelect OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object selects a queue depth profile from qdProfileTable
+             to be applied after a cold restart."
+    DEFVAL { 1 }
+    ::= {queueDepth 3}
+
+    qdActualProfile OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object shows the actual queue profile in use.
+             The object content is set upon restart equal to qdProfileSelect
+             and is never changed, since a new profile will be applied after
+             a next cold restart. The value 0 means the actual profile is
+             unknown."
+    ::= {queueDepth 4}
+
+    qdProfileMismatchAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This alarm is raise when the actual profile is not equal to the
+             selected profile."
+    ::= {queueDepth 5}
+
+    qdProfileMismatchAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the qdProfileMismatchAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {warningTrapEnable}
+    ::= {queueDepth 6}
+
+------ End group -------------------------------------------------------------
+
+END

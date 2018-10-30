@@ -25,7 +25,7 @@ if (isset($components[$vars['id']])) {
     $hash = $components[$vars['id']]['hash'];
 
     $rrd_filename = rrd_name($device['hostname'], array('f5-ltm-vs', $label, $hash));
-    if (file_exists($rrd_filename)) {
+    if (rrdtool_check_rrd_exists($rrd_filename)) {
         require 'includes/graphs/common.inc.php';
         $ds = 'totconns';
 

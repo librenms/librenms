@@ -1,0 +1,1313 @@
+-- NETGEAR-FIPSNOOPING-MIB.my: FIP Snooping mib
+    -- April 2011, Rajesh Potula
+
+-- Netgear FIP Snooping MIB
+-- Copyright Netgear Inc (2003-2011) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property. Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+NETGEAR-FIPSNOOPING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32, Counter32                             FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP                   FROM SNMPv2-CONF
+    RowStatus, TimeStamp, TruthValue, MacAddress, 
+    MacAddress, DateAndTime, TEXTUAL-CONVENTION       FROM SNMPv2-TC
+    SnmpAdminString                                   FROM SNMP-FRAMEWORK-MIB
+    InterfaceIndex, ifIndex, InterfaceIndexOrZero     FROM IF-MIB
+    VlanIndex, dot1qVlanIndex                         FROM Q-BRIDGE-MIB
+    lb6m                                          FROM QUANTA-LB6M-REF-MIB;
+
+    fastPathFIPSnooping MODULE-IDENTITY
+        LAST-UPDATED    "201104200000Z"
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The Netgear Private MIB for FastPath FIP Snooping feature.
+
+           This MIB module is for configuring FIP snooping related objects
+		   and monitoring related FCoE sessions. 
+        
+           Terminologies used in this MIB are defined by the T11 FCoE
+           standard. Refer to www.t11.org.
+
+           This MIB also supports configuration of the following objects:
+           - Port role configuration to identify FCF facing or FCF   
+		     connected interface
+           - FC-MAP value used by the FCF operating in FPMA mode
+           "
+    REVISION        "201104200000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { lb6m 57 }
+
+--*********************************************************************
+-- FIP Snooping related objects used to configure FIP Snooping
+-- objects on Ethernet bridges connected to ENodes
+--*********************************************************************
+
+--*********************************************************************
+--   agentFIPSnoopingCfgGroup
+--*********************************************************************
+agentFIPSnoopingCfgGroup OBJECT IDENTIFIER ::= { fastPathFIPSnooping 1 }
+
+agentFIPSnoopingAdminMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+               "This enables or disables FIP Snooping on the system."
+    DEFVAL { disable }
+    ::= { agentFIPSnoopingCfgGroup 1 }
+
+agentFIPSnoopingStatsClear OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     clear(1),
+                     ignore(0)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Clear all FIP Snooping statistics in the system. 
+                     This is write-only value. It always returns '0' on request."
+		 
+         ::= { agentFIPSnoopingCfgGroup 4 }
+		 
+--*********************************************************************
+--   agentFIPSnoopingVlanCfgTable
+--   FIP Snooping VLAN Configuration table
+--   Configure FC-MAP, enable/disable
+--*********************************************************************
+    agentFIPSnoopingVlanCfgTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentFIPSnoopingVlanCfgEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the FIP Snooping Vlan configuration 
+					 entries."
+         ::= { agentFIPSnoopingCfgGroup 2 }
+
+    agentFIPSnoopingVlanCfgEntry OBJECT-TYPE
+         SYNTAX      AgentFIPSnoopingVlanCfgEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Represents entry for a FIP Snooping Vlan."
+         INDEX       { dot1qVlanIndex }
+         ::= { agentFIPSnoopingVlanCfgTable 1 }
+
+    AgentFIPSnoopingVlanCfgEntry ::= SEQUENCE {
+          agentFIPSnoopingVlanAdminMode
+              INTEGER,
+          agentFIPSnoopingVlanFCMAP
+              OCTET STRING,
+          agentFIPSnoopingVlanStatsClear
+              INTEGER
+          }
+
+    agentFIPSnoopingVlanAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     disable(0),
+                     enable(1)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables FIP Snooping on a selected Vlan interface."
+         DEFVAL { disable }
+         ::= { agentFIPSnoopingVlanCfgEntry 1 }
+
+    agentFIPSnoopingVlanFCMAP OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (8))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "This object configures the FC-MAP value associated with the 
+                        FIP snooping Vlan. Default value is 0x0EFC00."
+        DEFVAL          { "0x0EFC00" } 
+
+        ::= { agentFIPSnoopingVlanCfgEntry 2 }
+
+     agentFIPSnoopingVlanStatsClear OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     clear(1),
+                     ignore(0)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Clear FIP Snooping statistics on this Vlan.
+                     This is write-only value. It always returns '0' on request"
+
+		 
+         ::= { agentFIPSnoopingVlanCfgEntry 3 }
+
+--*********************************************************************
+--   agentFIPSnoopingIntfTable
+--   FIP Snooping Interface Configuration table
+--   Configure trusted FCF interface mode
+--*********************************************************************
+    agentFIPSnoopingIntfTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentFIPSnoopingIntfEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table providing configuration for trusted FCF 
+                     interface mode."
+
+         ::= { agentFIPSnoopingCfgGroup 3 }
+
+    agentFIPSnoopingIntfEntry OBJECT-TYPE
+         SYNTAX      AgentFIPSnoopingIntfEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "FCF trust mode configuration for an interface."
+         INDEX   { ifIndex }
+         ::= { agentFIPSnoopingIntfTable 1 }
+
+    AgentFIPSnoopingIntfEntry::=
+         SEQUENCE {
+            agentFIPSnoopingIntfPortModeFcf 
+                INTEGER,
+            agentFIPSnoopingIntfStatsClear 
+                INTEGER
+         }
+
+    agentFIPSnoopingIntfPortModeFcf OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                       }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables/disables FCF port mode on an interface."
+         DEFVAL { disable }
+
+         ::= { agentFIPSnoopingIntfEntry 2 }
+
+     agentFIPSnoopingIntfStatsClear OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     clear(1),
+                     ignore(0)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Clear FIP Snooping statistics on this interface.
+                     This is write-only value. It always returns '0' on request"
+
+		 
+	 ::= { agentFIPSnoopingIntfEntry 3 }
+
+--*********************************************************************
+-- FIP Snooping related objects used to monitor FIP Snooping
+-- sessions, ENodes and FCFs on Ethernet bridges connected to ENodes
+--*********************************************************************
+
+--*********************************************************************
+--   agentFIPSnoopingStatusGroup
+--*********************************************************************
+agentFIPSnoopingStatusGroup OBJECT IDENTIFIER ::= { fastPathFIPSnooping 2 }
+----------------------------------------------------------------------------
+--      FIP Snooping Sessions Table
+----------------------------------------------------------------------------
+        agentFIPSnoopingSessionTable OBJECT-TYPE
+            SYNTAX       SEQUENCE OF AgentFIPSnoopingSessionEntry
+            MAX-ACCESS   not-accessible
+            STATUS       current
+            DESCRIPTION "A table for FIP Snooping Session entries."
+            ::= { agentFIPSnoopingStatusGroup 1 }
+
+        agentFIPSnoopingSessionEntry OBJECT-TYPE
+            SYNTAX AgentFIPSnoopingSessionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "Represents an entry in FIP Snooping session table."
+            INDEX       { agentFIPSnoopingVlanIndex,    agentFIPSnoopingFCFMacAddr, 
+                          agentFIPSnoopingENodeMacAddr, agentFIPSnoopingSessionLoginType,
+                          agentFIPSnoopingFCoEMacAddr, agentFIPSnoopingSessionTentativeIndex,
+                          agentFIPSnoopingSessionFCID}
+            ::={ agentFIPSnoopingSessionTable 1}
+
+        AgentFIPSnoopingSessionEntry ::=
+                SEQUENCE {
+                agentFIPSnoopingVlanIndex
+                        Unsigned32,
+                agentFIPSnoopingFCFMacAddr
+                        MacAddress,
+                agentFIPSnoopingENodeMacAddr
+                        MacAddress,
+                agentFIPSnoopingSessionLoginType
+                        INTEGER,
+	        agentFIPSnoopingFCoEMacAddr
+			MacAddress,
+		agentFIPSnoopingSessionTentativeIndex
+			Unsigned32,
+		agentFIPSnoopingSessionFCID
+			OCTET STRING,
+                agentFIPSnoopingSessionENodeIntf
+                        Unsigned32,
+                agentFIPSnoopingSessionFCFIntf
+                        Unsigned32,
+                agentFIPSnoopingSessionTime
+                        DateAndTime,
+		agentFIPSnoopingSessionExpiryTime
+		        INTEGER,
+                agentFIPSnoopingSessionState
+                        OCTET STRING
+                }
+
+        agentFIPSnoopingVlanIndex OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "FCoE Vlan in which the session is established."
+                ::={agentFIPSnoopingSessionEntry 1 }
+
+        agentFIPSnoopingFCFMacAddr OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "MAC address of the FCF to which the session is established."
+            ::={ agentFIPSnoopingSessionEntry 2 }
+
+        agentFIPSnoopingENodeMacAddr OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "MAC address of the ENode from which the session originated."
+            ::={ agentFIPSnoopingSessionEntry 3 }
+
+	agentFIPSnoopingSessionLoginType OBJECT-TYPE
+              SYNTAX  INTEGER {
+                         flogi(0),
+                         fdisc(1)
+                      }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Type of login requested by ENode."
+              ::= { agentFIPSnoopingSessionEntry 4 }
+
+	agentFIPSnoopingFCoEMacAddr OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "MAC address assigned to the VN_Port on the ENode."
+            ::={ agentFIPSnoopingSessionEntry 5 }
+				
+	agentFIPSnoopingSessionTentativeIndex OBJECT-TYPE
+                SYNTAX  Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Index to the tentavtive session."
+            ::={ agentFIPSnoopingSessionEntry 6 }
+						
+        agentFIPSnoopingSessionFCID OBJECT-TYPE
+                SYNTAX  OCTET STRING (SIZE(3)) -- (00:ee:dd)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "FCID created by FCF for this virtual session."
+            ::={ agentFIPSnoopingSessionEntry 7 }
+
+        agentFIPSnoopingSessionENodeIntf OBJECT-TYPE
+                SYNTAX  Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Interface to which the ENode is connected."
+            ::={ agentFIPSnoopingSessionEntry 8 }
+
+        agentFIPSnoopingSessionFCFIntf OBJECT-TYPE
+                SYNTAX  Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Interface on which the FCF is discovered."
+            ::={ agentFIPSnoopingSessionEntry 9 }
+
+        agentFIPSnoopingSessionTime OBJECT-TYPE
+                SYNTAX  DateAndTime
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Time elapsed after this successful virtual session is
+                        established by ENode with FCF."
+            ::={ agentFIPSnoopingSessionEntry 10 }
+
+        agentFIPSnoopingSessionExpiryTime OBJECT-TYPE
+                SYNTAX  INTEGER (0..450)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This is virtual connection/session expiry interval.
+			This is used to monitor the status of the session.
+			Session entry is removed when the value reaches 0.
+			This value is reset to 450 secs	(5*90secs) every
+			time an associated VN_Port FKA is received from the
+			ENode. This is ignored (marked as NA) if the
+			D-bit is set to one in the FCF Discovery
+			Advertisements."
+						
+            ::={ agentFIPSnoopingSessionEntry 11 }
+
+        agentFIPSnoopingSessionState OBJECT-TYPE
+                SYNTAX  OCTET STRING 
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This is the state of the virtual session. The
+			state is displayed as TENTATIVE during the
+			process of ENode login to FCF (using FLOGI or
+			FDESC). It displays ACTIVE after ENode and FCF
+			establish a successful virtual connection."
+						
+            ::={ agentFIPSnoopingSessionEntry 12 }
+			
+----------------------------------------------------------------------------
+--      FIP Snooping Enode Information
+----------------------------------------------------------------------------
+        agentFIPSnoopingENodeTable OBJECT-TYPE
+            SYNTAX       SEQUENCE OF AgentFIPSnoopingENodeEntry
+            MAX-ACCESS   not-accessible
+            STATUS       current
+            DESCRIPTION "A table for FIP Snooping discovered ENode entries."
+            ::= { agentFIPSnoopingStatusGroup 2 }
+			
+        agentFIPSnoopingENodeEntry OBJECT-TYPE
+            SYNTAX AgentFIPSnoopingENodeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "Represents an entry in FIP Snooping ENodes table."
+            INDEX       { agentFIPSnoopingVlanIndex, agentFIPSnoopingENodeMacAddr }
+            ::={ agentFIPSnoopingENodeTable 1}
+
+        AgentFIPSnoopingENodeEntry ::=
+                SEQUENCE {
+                agentFIPSnoopingVlanIndex
+                        Unsigned32,
+                agentFIPSnoopingENodeMacAddr
+                        MacAddress,
+                agentFIPSnoopingENodeIntf
+                        Unsigned32,
+	        agentFIPSnoopingENodeNameID
+			OCTET STRING,
+                agentFIPSnoopingENodeMaxFCoESize
+                        Unsigned32,
+                agentFIPSnoopingENodeConnectedFCFsCount
+                        Unsigned32,
+                agentFIPSnoopingENodeActiveSessions
+                        Unsigned32,
+                agentFIPSnoopingENodeWaitingSessions
+                        Unsigned32,
+		agentFIPSnoopingENodeRejectedSessions
+			Unsigned32,
+		agentFIPSnoopingENodeTimeSinceDiscovered
+			DateAndTime
+                }
+
+        agentFIPSnoopingENodeIntf OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Interface to which the ENode is connected."
+                ::={agentFIPSnoopingENodeEntry 3 }
+				
+        agentFIPSnoopingENodeNameID OBJECT-TYPE
+                SYNTAX     OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Name ID of the ENode."
+                ::={agentFIPSnoopingENodeEntry 4 }
+				
+        agentFIPSnoopingENodeMaxFCoESize OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Maximum FCoE PDU size the ENode MAC intends to use
+			for FCoE traffic. This is equivalent to the maximum
+			Ethernet frame payload the ENode intends to send."
+                ::={agentFIPSnoopingENodeEntry 6 }
+				
+        agentFIPSnoopingENodeConnectedFCFsCount OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Number of FCFs to which this ENode has FCoE
+						virtual connections established."
+                ::={agentFIPSnoopingENodeEntry 10 }
+
+		agentFIPSnoopingENodeActiveSessions OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Number of FCoE virtual connections successfully established by the ENode with FCFs."
+                ::={agentFIPSnoopingENodeEntry 7 }
+				
+        agentFIPSnoopingENodeWaitingSessions OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Number of FCoE virtual connections initiated by ENode
+                        and waiting for FCF acceptance."
+                ::={agentFIPSnoopingENodeEntry 8 }
+				
+        agentFIPSnoopingENodeRejectedSessions OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Number of virtual connections originted from ENode 
+                        which are rejected by FCFs."
+                ::={agentFIPSnoopingENodeEntry 9 }
+				
+        agentFIPSnoopingENodeTimeSinceDiscovered OBJECT-TYPE
+                SYNTAX     DateAndTime
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Time elapsed since the ENode is discovered."
+                ::={agentFIPSnoopingENodeEntry 5 }
+				
+------------------------------------------------------------------------------
+--        FCF {Key: Vlan, FCF-MAC only}
+----------------------------------------------------------------------------
+        agentFIPSnoopingFCFTable OBJECT-TYPE
+            SYNTAX       SEQUENCE OF AgentFIPSnoopingFCFEntry
+            MAX-ACCESS   not-accessible
+            STATUS       current
+            DESCRIPTION "A table for FIP Snooping discovered FCF entries."
+            ::= { agentFIPSnoopingStatusGroup 3 }
+
+        agentFIPSnoopingFCFEntry OBJECT-TYPE
+            SYNTAX AgentFIPSnoopingFCFEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "Represents an entry in FIP Snooping FCFs table."
+            INDEX       { agentFIPSnoopingVlanIndex, agentFIPSnoopingFCFMacAddr }
+            ::={ agentFIPSnoopingFCFTable 1}
+
+        AgentFIPSnoopingFCFEntry ::=
+                SEQUENCE {
+                agentFIPSnoopingVlanIndex
+                        Unsigned32,
+                agentFIPSnoopingFCFMacAddr
+                        MacAddress,
+                agentFIPSnoopingFCFIntf
+                        Unsigned32,
+		agentFIPSnoopingFCFNameID
+			OCTET STRING,
+		agentFIPSnoopingFCFFabricName
+			OCTET STRING,
+                agentFIPSnoopingFCFAddressingMode
+                        INTEGER,
+		agentFIPSnoopingFCFPriority
+			INTEGER,
+		agentFIPSnoopingFCFConfiguredFKA
+			INTEGER,
+		agentFIPSnoopingFCFDbit
+			INTEGER,
+		agentFIPSnoopingFCFIsAvialableForLogin
+			INTEGER,
+		agentFIPSnoopingFCFTimeSinceDiscovered
+			DateAndTime,
+                agentFIPSnoopingFCFConnectedENodesCount
+                        Unsigned32,
+                agentFIPSnoopingFCFSessions
+                        Unsigned32,
+                agentFIPSnoopingFCFExpiryTime
+                        Unsigned32
+                }
+
+        agentFIPSnoopingFCFIntf OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Inteface on which FCF is discovered."
+                ::={ agentFIPSnoopingFCFEntry 3 }
+				
+        agentFIPSnoopingFCFNameID OBJECT-TYPE
+                SYNTAX     OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Name Identifer of the FCF."
+                ::={ agentFIPSnoopingFCFEntry 4 }
+				
+        agentFIPSnoopingFCFFabricName OBJECT-TYPE
+                SYNTAX     OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Fabric Name identifying the Fabric."
+                ::={ agentFIPSnoopingFCFEntry 5 }
+				
+        agentFIPSnoopingFCFAddressingMode OBJECT-TYPE
+                SYNTAX     INTEGER {
+                                     fpma(1),
+                                     spma(2),
+                                     both(3)   -- FPMA and SPMA
+                                   }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Addressing mode(s) supported by the FCF."
+                ::={agentFIPSnoopingFCFEntry 6 }
+				
+        agentFIPSnoopingFCFPriority OBJECT-TYPE
+                SYNTAX     INTEGER (0..255)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This is the priority assigned to FCF. The highest priority
+                         value is 0 and the lowest priority value is 255."
+                ::={ agentFIPSnoopingFCFEntry 7 }
+
+	agentFIPSnoopingFCFDbit OBJECT-TYPE
+                SYNTAX     INTEGER (0..1)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This reflects the value of D bit value provided by 
+                        the most recently received Discovery Advertisement 
+                        from the FCF."
+                ::={agentFIPSnoopingFCFEntry 8 }
+
+	agentFIPSnoopingFCFIsAvialableForLogin OBJECT-TYPE
+                SYNTAX     INTEGER (0..1)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This reflects the value of the A bit provided by the
+			most recently received Discovery Advertisement from
+			the FCF. This provides the information that the
+			transmitting FCF is available for FIP FLOGI/FDISC
+			from ENodes. This is informational and shall have no
+			effect on existing logins."
+                ::={agentFIPSnoopingFCFEntry 9 }
+
+	agentFIPSnoopingFCFConfiguredFKA OBJECT-TYPE
+                SYNTAX     INTEGER (1..450)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "FIP keepalive interval (FKA_ADV_PERIOD) in seconds
+			configured on the FCF multiplied by five. For
+			example, if the FKA_ADV period configured on the FCF
+			is 80 seconds, the value of this field is 400 seconds."
+                ::={ agentFIPSnoopingFCFEntry 10 }			
+				
+	agentFIPSnoopingFCFTimeSinceDiscovered OBJECT-TYPE
+                SYNTAX     DateAndTime
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Time elapsed since the FCF is discovered."
+                ::={ agentFIPSnoopingFCFEntry 11 }
+
+	agentFIPSnoopingFCFConnectedENodesCount OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Number of ENodes to which FCF has FCoE
+			virtual connections established."
+                ::={ agentFIPSnoopingFCFEntry 12 }			
+
+	agentFIPSnoopingFCFSessions OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Total number of FCoE virtual connections successfully
+                        established by the ENodes with this FCF."
+                ::={ agentFIPSnoopingFCFEntry 13 }
+				
+	agentFIPSnoopingFCFExpiryTime OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This indicates the timer value in seconds to monitor
+                        the status of the FCF. FCF entry and all its associated
+                        virtual sessions will be removed when the value reaches
+                        0.  This value is reset to 'Configured FKA-ADV' every
+                        time a Discovery Advertisement is received from the 
+                        FCF-MAC."
+                ::={ agentFIPSnoopingFCFEntry 14 }
+		
+--*********************************************************************
+-- FIP Snooping related objects used to monitor FIP Snooping
+-- statistics on Ethernet bridges connected to ENodes
+--*********************************************************************
+
+--*********************************************************************
+-- agentFIPSnoopingStatisticsGroup
+--*********************************************************************
+agentFIPSnoopingStatisticsGroup OBJECT IDENTIFIER ::= { fastPathFIPSnooping 3 }
+
+-- -------------------------------------------------------------
+-- Per FCoE VLAN Statistics Table
+-- -------------------------------------------------------------
+agentFIPSnoopingVlanStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AgentFIPSnoopingVlanStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per-port, per-VLAN statistics for
+        traffic received. Separate objects are provided for both the
+        most-significant and least-significant bits of statistics
+        counters for ports that are associated with this transparent
+        bridge. The most-significant bit objects are only required on
+        high capacity interfaces, as defined in the conformance clauses
+        for these objects. This mechanism is provided as a way to read
+        64-bit counters for agents which support only SNMPv1.
+
+        Note that the reporting of most-significant and least-
+        significant counter bits separately runs the risk of missing
+        an overflow of the lower bits in the interval between sampling.
+        The manager must be aware of this possibility, even within the
+        same varbindlist, when interpreting the results of a request or
+        asynchronous notification."
+    ::= { agentFIPSnoopingStatisticsGroup 1 }
+
+agentFIPSnoopingVlanStatsEntry OBJECT-TYPE
+    SYNTAX      AgentFIPSnoopingVlanStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "FIP Snooping control traffic statistics of a VLAN."
+    INDEX   { agentFIPSnoopingVlanIndex }
+    ::= { agentFIPSnoopingVlanStatisticsTable 1 }
+
+AgentFIPSnoopingVlanStatsEntry ::=
+    SEQUENCE {
+    agentFIPSnoopingVlanVlanRequests
+            Counter32,
+    agentFIPSnoopingVlanVlanNotifications
+            Counter32,
+    agentFIPSnoopingVlanMulticastDiscSolicits 
+            Counter32,
+    agentFIPSnoopingVlanUnicastDiscSolicits 
+            Counter32,
+    agentFIPSnoopingVlanFLogis 
+            Counter32,
+    agentFIPSnoopingVlanFDiscs 
+            Counter32,
+    agentFIPSnoopingVlanFLogouts 
+            Counter32,
+    agentFIPSnoopingVlanVnPortKeepAlives 
+            Counter32,
+    agentFIPSnoopingVlanMulticastDiscAdverts 
+            Counter32,
+    agentFIPSnoopingVlanUnicastDiscAdverts 
+            Counter32,
+    agentFIPSnoopingVlanFLogiAccepts 
+            Counter32,
+    agentFIPSnoopingVlanFLogiRejects 
+            Counter32,
+    agentFIPSnoopingVlanFDiscAccepts 
+            Counter32,
+    agentFIPSnoopingVlanFDiscRejects 
+            Counter32,
+    agentFIPSnoopingVlanFLogoutAccepts 
+            Counter32,
+    agentFIPSnoopingVlanFLogoutRejects 
+            Counter32,
+    agentFIPSnoopingVlanClearVirtLinks 
+            Counter32,
+    agentFIPSnoopingVlanVnPortSessionTimeouts 
+            Counter32,
+    agentFIPSnoopingVlanFcfDiscAdvTimeouts 
+            Counter32,
+    agentFIPSnoopingVlanSessionFailuresDueToHwConfig
+            Counter32,
+    agentFIPSnoopingVlanSessionsDeniedFcfLimitReached
+            Counter32,
+    agentFIPSnoopingVlanSessionsDeniedENodeLimitReached 
+            Counter32,
+    agentFIPSnoopingVlanSessionsDeniedSystemLimitReached 
+            Counter32
+    }
+
+    agentFIPSnoopingVlanVlanRequests OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION    
+                        "Number of VLAN Request messages received on the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 1 }
+ 
+    agentFIPSnoopingVlanVlanNotifications OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+                        "Number of VLAN Notification messages received on the VLAN."
+       
+         ::={ agentFIPSnoopingVlanStatsEntry 2 }
+
+    agentFIPSnoopingVlanMulticastDiscSolicits OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Multicast Discovery Solicitation messages snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 3 }
+
+    agentFIPSnoopingVlanUnicastDiscSolicits OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Unicast Discovery Solicitation messages snooped in the VLAN." 
+
+        ::={ agentFIPSnoopingVlanStatsEntry 4 }
+
+    agentFIPSnoopingVlanFLogis OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Login messages snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 5 }
+
+    agentFIPSnoopingVlanFDiscs OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Discovery Login messages snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 6 }
+
+    agentFIPSnoopingVlanFLogouts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logout messages snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 7 }
+
+    agentFIPSnoopingVlanVnPortKeepAlives OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of VN_Port keep alive messages snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 8 }
+
+    agentFIPSnoopingVlanMulticastDiscAdverts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Multicast Discovery Advertisement messages snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 9 }
+
+    agentFIPSnoopingVlanUnicastDiscAdverts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Unicast Discovery Advertisement packets snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 10 }
+
+    agentFIPSnoopingVlanFLogiAccepts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Login accept packets snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 11 }
+
+    agentFIPSnoopingVlanFLogiRejects OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Login reject packets snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 12 }
+
+    agentFIPSnoopingVlanFDiscAccepts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Discovery accept packets snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 13 }
+
+    agentFIPSnoopingVlanFDiscRejects OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Discovery reject packets snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 14 }
+
+    agentFIPSnoopingVlanFLogoutAccepts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logouts accept packets snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 15 }
+
+    agentFIPSnoopingVlanFLogoutRejects OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logouts reject packets snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 16 }
+
+    agentFIPSnoopingVlanClearVirtLinks OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Clear Virtual Link request packets snooped in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 17 }
+
+    agentFIPSnoopingVlanVnPortSessionTimeouts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of virtual sessions removed due to session timer expiry in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 18 }
+
+    agentFIPSnoopingVlanFcfDiscAdvTimeouts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of ACTIVE sessions timed out due to Discovery Advertisements timer expiry from FCFs in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 19 }
+
+    agentFIPSnoopingVlanSessionFailuresDueToHwConfig OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions in the VLAN that failed while configuring the hardware."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 20 }
+
+    agentFIPSnoopingVlanSessionsDeniedFcfLimitReached OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions that are denied to be created for the new FCF as the number of FCFs reached the maximum allowed limit supported in the VLAN."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 21 }
+
+    agentFIPSnoopingVlanSessionsDeniedENodeLimitReached OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions that are denied to be created for the new ENode as the number of ENodes reached the maximum allowed limit supported by the system."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 22 }
+
+    agentFIPSnoopingVlanSessionsDeniedSystemLimitReached OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of session create requests denied as the number of sessions reached the maximum allowed limit supported by the system."
+
+        ::={ agentFIPSnoopingVlanStatsEntry 23 }
+
+	
+-- -------------------------------------------------------------
+-- Per Interface Statistics Table
+-- -------------------------------------------------------------
+agentFIPSnoopingIntfStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AgentFIPSnoopingIntfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per-port, per-VLAN statistics for
+        traffic received. Separate objects are provided for both the
+        most-significant and least-significant bits of statistics
+        counters for ports that are associated with this transparent
+        bridge. The most-significant bit objects are only required on
+        high capacity interfaces, as defined in the conformance clauses
+        for these objects. This mechanism is provided as a way to read
+        64-bit counters for agents which support only SNMPv1.
+
+        Note that the reporting of most-significant and least-
+        significant counter bits separately runs the risk of missing
+        an overflow of the lower bits in the interval between sampling.
+        The manager must be aware of this possibility, even within the
+        same varbindlist, when interpreting the results of a request or
+        asynchronous notification."
+    ::= { agentFIPSnoopingStatisticsGroup 2 }
+
+agentFIPSnoopingIntfStatsEntry OBJECT-TYPE
+    SYNTAX      AgentFIPSnoopingIntfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "FIP Snooping control traffic statistics on this interface."
+    INDEX   { ifIndex }
+    ::= { agentFIPSnoopingIntfStatisticsTable 1 }
+
+AgentFIPSnoopingIntfStatsEntry ::=
+    SEQUENCE {
+        agentFIPSnoopingIntfVlanRequests
+            Counter32,
+        agentFIPSnoopingIntfVlanNotifications
+            Counter32,
+        agentFIPSnoopingIntfMulticastDiscSolicits
+            Counter32,
+        agentFIPSnoopingIntfUnicastDiscSolicits
+            Counter32,
+        agentFIPSnoopingIntfFLogis
+            Counter32,
+        agentFIPSnoopingIntfFDiscs
+            Counter32,
+        agentFIPSnoopingIntfFLogouts
+            Counter32,
+        agentFIPSnoopingIntfVnPortKeepAlives
+            Counter32,
+        agentFIPSnoopingIntfMulticastDiscAdverts
+            Counter32,
+        agentFIPSnoopingIntfUnicastDiscAdverts
+            Counter32,
+        agentFIPSnoopingIntfFLogiAccepts
+            Counter32,
+        agentFIPSnoopingIntfFLogiRejects
+            Counter32,
+        agentFIPSnoopingIntfFDiscAccepts
+            Counter32,
+        agentFIPSnoopingIntfFDiscRejects
+            Counter32,
+        agentFIPSnoopingIntfFLogoutAccepts
+            Counter32,
+        agentFIPSnoopingIntfFLogoutRejects
+            Counter32,
+        agentFIPSnoopingIntfClearVirtLinks
+            Counter32,
+        agentFIPSnoopingIntfVnPortSessionTimeouts
+            Counter32,
+        agentFIPSnoopingIntfFcfDiscAdvTimeouts
+            Counter32,
+        agentFIPSnoopingIntfSessionFailuresDueToHwConfig
+            Counter32,
+        agentFIPSnoopingIntfSessionsDeniedFcfLimitReached
+            Counter32,
+        agentFIPSnoopingIntfSessionsDeniedENodeLimitReached
+            Counter32,
+        agentFIPSnoopingIntfSessionsDeniedSystemLimitReached
+            Counter32
+    }
+
+    agentFIPSnoopingIntfVlanRequests OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+                        "Number of VLAN Request messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 1 }
+
+    agentFIPSnoopingIntfVlanNotifications OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+                        "Number of VLAN Notification messages received on the interface."
+
+         ::={ agentFIPSnoopingIntfStatsEntry 2 }
+
+    agentFIPSnoopingIntfMulticastDiscSolicits OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Multicast Discovery Solicitation messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 3 }
+
+    agentFIPSnoopingIntfUnicastDiscSolicits OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Unicast Discovery Solicitation messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 4 }
+
+    agentFIPSnoopingIntfFLogis OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logins received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 5 }
+
+    agentFIPSnoopingIntfFDiscs OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Discovery logins received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 6 }
+
+    agentFIPSnoopingIntfFLogouts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logouts received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 7 }
+
+    agentFIPSnoopingIntfVnPortKeepAlives OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of VN_Port keepalive messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 8 }
+
+    agentFIPSnoopingIntfMulticastDiscAdverts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Multicast Discovery Advertisement messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 9 }
+
+    agentFIPSnoopingIntfUnicastDiscAdverts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Unicast Discovery Advertisement messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 10 }
+
+    agentFIPSnoopingIntfFLogiAccepts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Login accept messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 11 }
+
+    agentFIPSnoopingIntfFLogiRejects OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Login reject messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 12 }
+
+    agentFIPSnoopingIntfFDiscAccepts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Discovery accept messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 13 }
+
+    agentFIPSnoopingIntfFDiscRejects OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Discovery reject messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 14 }
+
+    agentFIPSnoopingIntfFLogoutAccepts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logout accept messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 15 }
+
+    agentFIPSnoopingIntfFLogoutRejects OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logout reject messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 16 }
+
+    agentFIPSnoopingIntfClearVirtLinks OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Clear Virtual Links messages received on the interface."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 17 }
+
+    agentFIPSnoopingIntfVnPortSessionTimeouts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Virtual sessions removed due to session timer expiry."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 18 }
+
+    agentFIPSnoopingIntfFcfDiscAdvTimeouts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of ACTIVE sessions timed out due to Discovery Advertisements timer expiry from FCFs on this interface."
+
+
+        ::={ agentFIPSnoopingIntfStatsEntry 19 }
+
+    agentFIPSnoopingIntfSessionFailuresDueToHwConfig OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions on this interface that failed while configuring the hardware."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 20 }
+
+    agentFIPSnoopingIntfSessionsDeniedFcfLimitReached OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions that are denied to be created on this interface form a new FCF as the number of FCFs count reached the maximum allowed limit in the system."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 21 }
+
+    agentFIPSnoopingIntfSessionsDeniedENodeLimitReached OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions that are denied to be created on this interface form a new ENode/host as the number of ENodes/hosts count reached the maximum allowed limit in the system."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 22 }
+
+    agentFIPSnoopingIntfSessionsDeniedSystemLimitReached OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions that are denied to be created as the number of sessions count reached the maximum allowed limit supported in the system. This is a global counter."
+
+        ::={ agentFIPSnoopingIntfStatsEntry 23 }
+
+--*************************************************************************************
+--   Traps
+--**************************************************************************************
+
+agentFIPSnoopingTraps OBJECT IDENTIFIER ::= { fastPathFIPSnooping 4 }
+
+
+    maxAllowedFcfsInVlanLimitReachedTrap NOTIFICATION-TYPE
+        OBJECTS         {agentFIPSnoopingVlanIndex} 
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when number of FCFs reached maximum allowed limit in VLAN."
+        ::= { agentFIPSnoopingTraps 1 }
+
+    maxAllowedENodesLimitReachedTrap NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when number of ENodes reached maximum allowed limit in the system."
+        ::= { agentFIPSnoopingTraps 2 }
+
+    maxAllowedSessionsLimitReachedTrap NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when number of sessions reached maximum allowed limit in the system."
+        ::= { agentFIPSnoopingTraps 3 }
+
+    fcfDroppedTrap NOTIFICATION-TYPE
+        OBJECTS         {agentFIPSnoopingVlanIndex, agentFIPSnoopingFCFIntf,
+                         agentFIPSnoopingFCFMacAddr}
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when a new FCF discovered (Discovery Advertisement is received from FCF) is dropped, 
+                         as the maximum allowed FCFs limit in a VLAN is already reached."
+        ::= { agentFIPSnoopingTraps 4 }
+
+    eNodeDroppedTrap NOTIFICATION-TYPE
+        OBJECTS         {agentFIPSnoopingVlanIndex, agentFIPSnoopingENodeIntf,
+                         agentFIPSnoopingENodeMacAddr}
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when a new ENode discovered is dropped, 
+                         as the maximum allowed ENodes limit in the system is already reached."
+        ::= { agentFIPSnoopingTraps 5 }
+
+    sessionRequestDroppedTrap NOTIFICATION-TYPE
+        OBJECTS         {agentFIPSnoopingVlanIndex, agentFIPSnoopingENodeIntf,
+                         agentFIPSnoopingENodeMacAddr}
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when a new session request received is dropped,
+                         as the maximum allowed session limit in system is already reached."
+        ::= { agentFIPSnoopingTraps 6 }
+    
+END

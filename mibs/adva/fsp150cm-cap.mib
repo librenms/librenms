@@ -1,0 +1,3480 @@
+F3-CAPABILITIES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    AGENT-CAPABILITIES 
+             FROM SNMPv2-CONF
+    SnmpAdminString
+             FROM SNMP-FRAMEWORK-MIB
+    VlanIdOrAnyOrNone
+             FROM Q-BRIDGE-MIB 
+    Integer32, MODULE-IDENTITY
+             FROM SNMPv2-SMI
+    f3Capabilities
+             FROM  CM-COMMON-MIB;
+
+f3CapabilityMIB  MODULE-IDENTITY
+    LAST-UPDATED    "201107080000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the Capabilities MIB definitions used by 
+             the F3 (FSP150CC) product lines.
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201107080000Z"
+    DESCRIPTION
+        "
+         Notes from release 201107080000Z
+               -Added capabilities for 
+                    ethernetNTEGE206CardFineGrainedPmInterval,
+                    ethernetNTEGE201SyncECardFineGrainedPmInterval,
+                    ethernetNTEGE201CardFineGrainedPmInterval,
+                    ethernetNTEGE206FCardFineGrainedPmInterval
+
+         Notes from release 201106010000Z
+               -First release of the agent capabilities with R5.2.1CC." 
+    ::= {f3Capabilities 1}
+
+-- 
+-- OID definitions
+-- 
+f3CapabilityDefinitions      OBJECT IDENTIFIER ::= {f3CapabilityMIB 1}
+
+f3BaseStandardsCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP Standard/Framework Capabilities for the F3 product family"
+      -- Following MIB modules are supported, but do not have compliance groups
+      -- RFC1155-SMI, RFC-1212, RFC1215,
+
+      -- RFC1213-MIB has compliance groups for mib-2 in other MIBs: IP-MIB, IF-MIB etc.
+            -- Support system, interfaces, ip, snmp 
+            -- Do not support at, icmp, tcp, udp, egp
+            -- Questionable support of transmission
+
+      SUPPORTS  IP-MIB
+      -- only ipAddrTable is supported
+      INCLUDES  { ipGroup }
+
+          VARIATION  ipDefaultTTL
+          ACCESS     not-implemented
+          DESCRIPTION "ipDefaultTTL is not implemented"
+
+          VARIATION  ipInReceives
+          ACCESS     not-implemented
+          DESCRIPTION "ipInReceives is not implemented"
+
+          VARIATION  ipInHdrErrors
+          ACCESS     not-implemented
+          DESCRIPTION "ipInHdrErrors is not implemented"
+
+          VARIATION  ipInAddrErrors
+          ACCESS     not-implemented
+          DESCRIPTION "ipInAddrErrors is not implemented"
+
+          VARIATION  ipForwDatagrams
+          ACCESS     not-implemented
+          DESCRIPTION "ipForwDatagrams is not implemented"
+
+          VARIATION  ipInUnknownProtos
+          ACCESS     not-implemented
+          DESCRIPTION "ipInUnknownProtos is not implemented"
+
+          VARIATION  ipInDiscards
+          ACCESS     not-implemented
+          DESCRIPTION "ipInDiscards is not implemented"
+
+          VARIATION  ipInDelivers
+          ACCESS     not-implemented
+          DESCRIPTION "ipInDelivers is not implemented"
+
+          VARIATION  ipOutRequests
+          ACCESS     not-implemented
+          DESCRIPTION "ipOutRequests is not implemented"
+
+          VARIATION  ipOutDiscards
+          ACCESS     not-implemented
+          DESCRIPTION "ipOutDiscards is not implemented"
+
+          VARIATION  ipOutNoRoutes
+          ACCESS     not-implemented
+          DESCRIPTION "ipOutNoRoutes is not implemented"
+
+          VARIATION  ipReasmTimeout
+          ACCESS     not-implemented
+          DESCRIPTION "ipReasmTimeout is not implemented"
+
+          VARIATION  ipReasmReqds
+          ACCESS     not-implemented
+          DESCRIPTION "ipReasmReqds is not implemented"
+
+          VARIATION  ipReasmOKs
+          ACCESS     not-implemented
+          DESCRIPTION "ipReasmOKs is not implemented"
+
+          VARIATION  ipReasmFails
+          ACCESS     not-implemented
+          DESCRIPTION "ipReasmFails is not implemented"
+
+          VARIATION  ipFragOKs
+          ACCESS     not-implemented
+          DESCRIPTION "ipFragOKs is not implemented"
+
+          VARIATION  ipFragFails
+          ACCESS     not-implemented
+          DESCRIPTION "ipFragFails is not implemented"
+
+          VARIATION  ipFragCreates
+          ACCESS     not-implemented
+          DESCRIPTION "ipFragCreates is not implemented"
+
+          VARIATION  ipNetToMediaIfIndex
+          ACCESS     not-implemented
+          DESCRIPTION "ipNetToMediaIfIndex is not implemented"
+
+          VARIATION  ipNetToMediaPhysAddress
+          ACCESS     not-implemented
+          DESCRIPTION "ipNetToMediaPhysAddress is not implemented"
+
+          VARIATION  ipNetToMediaNetAddress
+          ACCESS     not-implemented
+          DESCRIPTION "ipNetToMediaNetAddress is not implemented"
+
+          VARIATION  ipNetToMediaType
+          ACCESS     not-implemented
+          DESCRIPTION "ipNetToMediaType is not implemented"
+
+          VARIATION  ipRoutingDiscards
+          ACCESS     not-implemented
+          DESCRIPTION "ipRoutingDiscards is not implemented"
+
+      SUPPORTS  SNMP-FRAMEWORK-MIB
+      INCLUDES  { snmpEngineGroup }
+
+      SUPPORTS  SNMP-MPD-MIB
+      INCLUDES  { snmpMPDGroup }
+
+      SUPPORTS  SNMPv2-MIB 
+      INCLUDES  { snmpGroup, snmpCommunityGroup, snmpSetGroup, systemGroup, 
+                  snmpBasicNotificationsGroup, snmpWarmStartNotificationGroup,
+                  snmpNotificationGroup, snmpObsoleteGroup }
+
+      SUPPORTS IP-FORWARD-MIB 
+          --ipForwardMultiPathGroup not supported
+      INCLUDES { ipForwardCidrRouteGroup }
+          VARIATION  ipCidrRouteIfIndex
+          ACCESS     read-only 
+          DESCRIPTION "ipCidrRouteIfIndex is restricted to read-only" 
+
+          VARIATION  ipCidrRouteType
+          ACCESS     read-only 
+          DESCRIPTION "ipCidrRouteType is restricted to read-only" 
+
+          VARIATION  ipCidrRouteInfo
+          ACCESS     read-only 
+          DESCRIPTION "ipCidrRouteInfo is restricted to read-only" 
+
+          VARIATION  ipCidrRouteNextHopAS
+          ACCESS     read-only 
+          DESCRIPTION "ipCidrRouteNextHopAS is restricted to read-only" 
+
+          VARIATION  ipCidrRouteMetric1
+          ACCESS     read-only 
+          DESCRIPTION "ipCidrRouteMetric1 is restricted to read-only" 
+
+          VARIATION  ipCidrRouteMetric2
+          ACCESS     read-only 
+          DESCRIPTION "ipCidrRouteMetric2 is restricted to read-only" 
+
+          VARIATION  ipCidrRouteMetric3
+          ACCESS     read-only 
+          DESCRIPTION "ipCidrRouteMetric3 is restricted to read-only" 
+
+          VARIATION  ipCidrRouteMetric4
+          ACCESS     read-only 
+          DESCRIPTION "ipCidrRouteMetric4 is restricted to read-only" 
+
+          VARIATION  ipCidrRouteMetric5
+          ACCESS     read-only 
+          DESCRIPTION "ipCidrRouteMetric5 is restricted to read-only" 
+
+          VARIATION  ipCidrRouteStatus
+          ACCESS     read-only
+          DESCRIPTION "ipCidrRouteStatus is restricted to read-only" 
+
+          VARIATION  ipCidrRouteStatus
+          SYNTAX     INTEGER {active(1)}
+          ACCESS     read-only
+          DESCRIPTION "notInService(2), notReady(3), createAndGo(4), 
+                       createAndWait(5) and destroy(6) are not supported."
+    
+      ::= {f3CapabilityDefinitions 1}
+
+f3StandardIfEntityCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP Standard IF and ENTITY Capabilities for the F3 product family"
+
+      SUPPORTS IF-MIB 
+          --ifTestGroup, ifStackGroup, ifOldObjectsGroup 
+          --ifFixedLengthGroup, ifHCFixedLengthGroup, ifPacketGroup, ifHCPacketGroup,
+          --ifRcvAddressGroup, ifStackGroup2, ifCounterDiscontinuityGroup not supported
+      INCLUDES  { ifGeneralInformationGroup, ifVHCPacketGroup, 
+                  linkUpDownNotificationsGroup } 
+          VARIATION  ifOperStatus 
+          SYNTAX     INTEGER {up(1), down(2)}
+          DESCRIPTION "testing(3), unknown(4), dormant(5), notPresent(6), lowerLayerDown(7)
+                        are not supported."
+
+      SUPPORTS ENTITY-MIB 
+        --entityLogicalGroup, entityMappingGroup and entityLogical2Group are not supported
+      INCLUDES { entityPhysicalGroup, entityGeneralGroup, entityNotificationsGroup,
+                 entityPhysical2Group }
+
+          VARIATION  entPhysicalSerialNum 
+          ACCESS     read-only 
+          DESCRIPTION "entPhysicalSerialNum is restricted to read-only" 
+          
+      ::= {f3CapabilityDefinitions 2}
+
+f3StandardTargetNotifCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - Standard Interface and Entity capabilities "
+    STATUS           current
+    DESCRIPTION      "SNMP Target/Notification Capabilities for the F3 product family"
+
+      SUPPORTS  SNMP-NOTIFICATION-MIB
+      INCLUDES  { snmpNotifyGroup }
+          VARIATION  snmpNotifyTag 
+          ACCESS     read-only 
+          DESCRIPTION "snmpNotifyTag is restricted to read-only" 
+
+          VARIATION  snmpNotifyType 
+          ACCESS     read-only 
+          DESCRIPTION "snmpNotifyType is restricted to read-only" 
+
+          VARIATION  snmpNotifyStorageType 
+          ACCESS     read-only 
+          DESCRIPTION "snmpNotifyStorageType is restricted to read-only" 
+
+          VARIATION  snmpNotifyRowStatus 
+          ACCESS     read-only 
+          DESCRIPTION "snmpNotifyRowStatus is restricted to read-only" 
+
+      SUPPORTS  SNMP-TARGET-MIB
+      INCLUDES  { snmpTargetBasicGroup, snmpTargetResponseGroup, 
+                  snmpTargetCommandResponderGroup }
+
+          VARIATION  snmpTargetAddrRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2), notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  snmpTargetAddrStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+          VARIATION  snmpTargetParamsRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2), notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  snmpTargetParamsStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+       
+      ::= {f3CapabilityDefinitions 3}
+
+f3StandardSecurityCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP Security Capabilities for the F3 product family"
+      -- Following MIB modules are not supported 
+      --         SNMP-COMMUNITY-MIB,
+      SUPPORTS  SNMP-USER-BASED-SM-MIB 
+      INCLUDES  { usmMIBBasicGroup }
+          VARIATION  usmUserStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2), notReady(3) and createAndWait(5) are not supported."
+          VARIATION  usmUserStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+      ::= {f3CapabilityDefinitions 4}
+
+f3StandardRMONCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP RMON Capabilities for the F3  product family"
+      SUPPORTS RMON-MIB
+          --rmonHostGroup, rmonHostTopNGroup, rmonMatrixGroup, rmonFilterGroup,
+          --rmonPacketCaptureGroup, rmonEventGroup are not supported 
+      INCLUDES { rmonEtherStatsGroup, rmonHistoryControlGroup, rmonHistoryControlGroup,
+                 rmonEthernetHistoryGroup, rmonAlarmGroup,
+                 rmonNotificationGroup }
+           VARIATION fallingAlarm
+           ACCESS     not-implemented
+           DESCRIPTION "fallingAlarm is not implemented"
+
+           VARIATION  etherStatsDataSource 
+           ACCESS     read-only 
+           DESCRIPTION "etherStatsDataSource is restricted to read-only" 
+
+           VARIATION  etherStatsOwner 
+           ACCESS     read-only 
+           DESCRIPTION "etherStatsOwner is restricted to read-only" 
+
+           VARIATION  etherStatsStatus 
+           SYNTAX     INTEGER {valid(1)}
+           ACCESS     read-only 
+           DESCRIPTION "etherStatsStatus is restricted to valid(1) and read-only" 
+
+           VARIATION  historyControlDataSource 
+           ACCESS     read-only 
+           DESCRIPTION "historyControlDataSource is restricted to read-only" 
+
+           VARIATION  historyControlBucketsRequested 
+           ACCESS     read-only 
+           DESCRIPTION "historyControlBucketsRequested is restricted to read-only" 
+
+           VARIATION  historyControlInterval 
+           ACCESS     read-only 
+           DESCRIPTION "historyControlInterval is restricted to read-only" 
+
+           VARIATION  historyControlOwner 
+           ACCESS     read-only 
+           DESCRIPTION "historyControlOwner is restricted to read-only" 
+
+           VARIATION  historyControlStatus 
+           SYNTAX     INTEGER {valid(1)}
+           ACCESS     read-only 
+           DESCRIPTION "historyControlStatus is restricted to valid(1) and read-only" 
+
+           VARIATION  alarmInterval 
+           ACCESS     read-only 
+           DESCRIPTION "alarmInterval is restricted to read-only" 
+
+           VARIATION  alarmVariable 
+           ACCESS     read-only 
+           DESCRIPTION "alarmVariable is restricted to read-only" 
+
+           VARIATION  alarmSampleType 
+           ACCESS     read-only 
+           DESCRIPTION "alarmSampleType is restricted to read-only" 
+
+           VARIATION  alarmStartupAlarm 
+           ACCESS     read-only 
+           DESCRIPTION "alarmStartupAlarm is restricted to read-only" 
+
+           VARIATION  alarmRisingThreshold 
+           ACCESS     read-only 
+           DESCRIPTION "alarmRisingThreshold is restricted to read-only" 
+
+           VARIATION  alarmRisingEventIndex 
+           ACCESS     read-only 
+           DESCRIPTION "alarmRisingEventIndex is restricted to read-only" 
+
+           VARIATION  alarmOwner 
+           ACCESS     read-only 
+           DESCRIPTION "alarmOwner is restricted to read-only" 
+
+           VARIATION  alarmStatus 
+           SYNTAX     INTEGER {valid(1)}
+           ACCESS     read-only 
+           DESCRIPTION "alarmStatus is restricted to valid(1) and read-only" 
+
+
+      SUPPORTS RMON2-MIB
+          --protocolDirectoryGroup, protocolDistributionGroup, addressMapGroup,
+          --nlHostGroup, nlMatrixGroup, alHostGroup, alMatrixGroup, usrHistoryGroup,
+          --rmon1EnhancementGroup, rmon1EthernetEnhancementGroup, 
+          --rmon1TokenRingEnhancementGroup are not supported 
+      INCLUDES { probeInformationGroup, probeConfigurationGroup }
+          VARIATION  probeDownloadFile
+          ACCESS     not-implemented
+          DESCRIPTION "probeDownloadFile is not implemented"
+
+          VARIATION  probeDownloadTFTPServer
+          ACCESS     not-implemented
+          DESCRIPTION "probeDownloadFile is not implemented"
+
+          VARIATION  probeDownloadAction
+          ACCESS     not-implemented
+          DESCRIPTION "probeDownloadAction is not implemented"
+
+          VARIATION  probeDownloadStatus
+          ACCESS     not-implemented
+          DESCRIPTION "probeDownloadStatus is not implemented"
+
+          VARIATION  serialMode
+          ACCESS     not-implemented
+          DESCRIPTION "serialMode is not implemented"
+
+          VARIATION  serialProtocol
+          ACCESS     not-implemented
+          DESCRIPTION "serialProtocol is not implemented"
+
+          VARIATION  serialTimeout
+          ACCESS     not-implemented
+          DESCRIPTION "serialTimeout is not implemented"
+
+          VARIATION  serialModemInitString
+          ACCESS     not-implemented
+          DESCRIPTION "serialModemInitString is not implemented"
+
+          VARIATION  serialModemHangUpString
+          ACCESS     not-implemented
+          DESCRIPTION "serialModemHangUpString is not implemented"
+
+          VARIATION  serialModemConnectResp
+          ACCESS     not-implemented
+          DESCRIPTION "serialModemConnectResp is not implemented"
+
+          VARIATION  serialModemNoConnectResp
+          ACCESS     not-implemented
+          DESCRIPTION "serialModemNoConnectResp is not implemented"
+
+          VARIATION  serialDialoutTimeout
+          ACCESS     not-implemented
+          DESCRIPTION "serialDialoutTimeout is not implemented"
+
+          VARIATION  serialStatus
+          ACCESS     not-implemented
+          DESCRIPTION "serialStatus is not implemented"
+
+          VARIATION  netConfigIPAddress
+          ACCESS     not-implemented
+          DESCRIPTION "netConfigIPAddress is not implemented"
+
+          VARIATION  netConfigSubnetMask
+          ACCESS     not-implemented
+          DESCRIPTION "netConfigSubnetMask is not implemented"
+
+          VARIATION  netConfigStatus
+          ACCESS     not-implemented
+          DESCRIPTION "netConfigStatus is not implemented"
+
+          VARIATION  netDefaultGateway
+          ACCESS     not-implemented
+          DESCRIPTION "netDefaultGateway is not implemented"
+
+          VARIATION  trapDestCommunity
+          ACCESS     not-implemented
+          DESCRIPTION "trapDestCommunity is not implemented"
+
+          VARIATION  trapDestProtocol
+          ACCESS     not-implemented
+          DESCRIPTION "trapDestProtocol is not implemented"
+
+          VARIATION  trapDestAddress
+          ACCESS     not-implemented
+          DESCRIPTION "trapDestAddress is not implemented"
+
+          VARIATION  trapDestOwner
+          ACCESS     not-implemented
+          DESCRIPTION "trapDestOwner is not implemented"
+
+          VARIATION  trapDestStatus
+          ACCESS     not-implemented
+          DESCRIPTION "trapDestStatus is not implemented"
+
+          VARIATION  serialConnectDestIpAddress
+          ACCESS     not-implemented
+          DESCRIPTION "serialConnectDestIpAddress is not implemented"
+
+          VARIATION  serialConnectType
+          ACCESS     not-implemented
+          DESCRIPTION "serialConnectType is not implemented"
+
+          VARIATION  serialConnectDialString
+          ACCESS     not-implemented
+          DESCRIPTION "serialConnectDialString is not implemented"
+
+          VARIATION  serialConnectSwitchConnectSeq
+          ACCESS     not-implemented
+          DESCRIPTION "serialConnectSwitchConnectSeq is not implemented"
+
+          VARIATION  serialConnectSwitchDisconnectSeq
+          ACCESS     not-implemented
+          DESCRIPTION "serialConnectSwitchDisconnectSeq is not implemented"
+
+          VARIATION  serialConnectSwitchResetSeq
+          ACCESS     not-implemented
+          DESCRIPTION "serialConnectSwitchResetSeq is not implemented"
+
+          VARIATION  serialConnectOwner
+          ACCESS     not-implemented
+          DESCRIPTION "serialConnectOwner is not implemented"
+
+          VARIATION  serialConnectStatus
+          ACCESS     not-implemented
+          DESCRIPTION "serialConnectStatus is not implemented"
+
+      SUPPORTS HC-ALARM-MIB
+          --hcAlarmCapabilitiesGroup not supported
+      INCLUDES { hcAlarmControlGroup, hcAlarmNotificationsGroup }
+           VARIATION  hcFallingAlarm
+           ACCESS     not-implemented
+           DESCRIPTION "hcFallingAlarm is not implemented"
+
+           VARIATION  hcAlarmInterval 
+           ACCESS     read-only 
+           DESCRIPTION "hcAlarmInterval is restricted to read-only" 
+
+           VARIATION  hcAlarmVariable 
+           ACCESS     read-only 
+           DESCRIPTION "hcAlarmVariable is restricted to read-only" 
+
+           VARIATION  hcAlarmSampleType 
+           ACCESS     read-only 
+           DESCRIPTION " hcAlarmSampleType is restricted to read-only" 
+
+           VARIATION  hcAlarmStartupAlarm 
+           ACCESS     read-only 
+           DESCRIPTION "hcAlarmStartupAlarm is restricted to read-only" 
+
+           VARIATION  hcAlarmRisingThreshAbsValueLo 
+           ACCESS     read-only 
+           DESCRIPTION "hcAlarmRisingThreshAbsValueLo is restricted to read-only" 
+
+           VARIATION  hcAlarmRisingThreshAbsValueHi 
+           ACCESS     read-only 
+           DESCRIPTION "hcAlarmRisingThreshAbsValueHi is restricted to read-only" 
+
+           VARIATION  hcAlarmRisingThresholdValStatus 
+           ACCESS     read-only 
+           DESCRIPTION "hcAlarmRisingThresholdValStatus is restricted to read-only" 
+
+           VARIATION  hcAlarmRisingEventIndex 
+           ACCESS     read-only 
+           DESCRIPTION "hcAlarmRisingEventIndex is restricted to read-only" 
+
+           VARIATION  hcAlarmOwner 
+           ACCESS     read-only 
+           DESCRIPTION "hcAlarmOwner is restricted to read-only" 
+
+           VARIATION  hcAlarmStorageType 
+           ACCESS     read-only 
+           DESCRIPTION " hcAlarmStorageType is restricted to read-only" 
+
+           VARIATION  hcAlarmStatus 
+           ACCESS     read-only 
+           DESCRIPTION " hcAlarmStatus is restricted to read-only" 
+
+      SUPPORTS HC-RMON-MIB
+          --mediaIndependentGroup, hostHighCapacityGroup, hostTopNHighCapacityGroup,
+          --matrixHighCapacityGroup, captureBufferHighCapacityGroup, 
+          --protocolDistributionHighCapacityGroup, nlHostHighCapacityGroup
+          --nlMatrixHighCapacityGroup, nlMatrixTopNHighCapacityGroup, 
+          --alHostHighCapacityGroup,
+          --alMatrixHighCapacityGroup, alMatrixTopNHighCapacityGroup, 
+          --usrHistoryHighCapacityGroup
+          --not supported
+      INCLUDES { etherStatsHighCapacityGroup, 
+                 etherHistoryHighCapacityGroup, hcRMONInformationGroup }
+
+      ::= {f3CapabilityDefinitions 5}
+
+f3StandardCfmCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP Standard 8021.ag Capabilities for the F3 product family"
+      -- Following MIB modules are not supported 
+      --         SNMP-COMMUNITY-MIB,
+
+      SUPPORTS IEEE8021-CFM-MIB
+      INCLUDES  { dot1agCfmStackGroup, dot1agCfmDefaultMdGroup, dot1agCfmVlanIdGroup,
+                  dot1agCfmConfigErrorListGroup, dot1agCfmMdGroup, dot1agCfmMaGroup,
+                  dot1agCfmMepGroup, dot1agCfmMepDbGroup, dot1agCfmNotificationsGroup }
+          VARIATION  dot1agCfmDefaultMdDefIdPermission
+          SYNTAX     INTEGER {sendIdNone(1)}
+          DESCRIPTION "sendIdChassis(2), sendIdManage(3), sendIdChassisManage(4) 
+                        are not supported."
+          VARIATION  dot1agCfmDefaultMdIdPermission
+          SYNTAX     INTEGER {sendIdNone(1)}
+          DESCRIPTION "sendIdChassis(2), sendIdManage(3), sendIdChassisManage(4) 
+                        are not supported."
+          VARIATION  dot1agCfmMdMhfIdPermission
+          SYNTAX     INTEGER {sendIdNone(1)}
+          DESCRIPTION "sendIdChassis(2), sendIdManage(3), sendIdChassisManage(4) 
+                        are not supported."
+          VARIATION  dot1agCfmMaCompIdPermission
+          SYNTAX     INTEGER {sendIdNone(1)}
+          DESCRIPTION "sendIdChassis(2), sendIdManage(3), sendIdChassisManage(4) 
+                        are not supported."
+
+          VARIATION  dot1agCfmVlanRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2), notReady(3) and createAndWait(5) are not supported."
+          VARIATION  dot1agCfmMdRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+
+          DESCRIPTION "notInService(2), notReady(3) and createAndWait(5) are not supported."
+          VARIATION  dot1agCfmMaNetRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2), notReady(3) and createAndWait(5) are not supported."
+          VARIATION  dot1agCfmMaCompRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2), notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  dot1agCfmMaMepListRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2), notReady(3) and createAndWait(5) are not supported."
+          VARIATION  dot1agCfmMepRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2), notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  dot1agCfmMepFngState
+          ACCESS     not-implemented
+          DESCRIPTION "dot1agCfmMepFngState is not implemented"
+
+          VARIATION  dot1agCfmMepFngAlarmTime
+          ACCESS     not-implemented
+          DESCRIPTION "dot1agCfmMepFngAlarmTime is not implemented"
+
+          VARIATION  dot1agCfmMepFngResetTime
+          ACCESS     not-implemented
+          DESCRIPTION "dot1agCfmMepFngResetTime is not implemented"
+
+          VARIATION  dot1agCfmFaultAlarm
+          ACCESS     not-implemented
+          DESCRIPTION "dot1agCfmFaultAlarm is not implemented"
+
+          VARIATION  dot1agCfmMaCompNumberOfVids 
+          ACCESS     read-only 
+          DESCRIPTION "dot1agCfmMaCompNumberOfVids is restricted to read-only"
+            
+      ::= {f3CapabilityDefinitions 6}
+
+f3StandardBridgeCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP Standard Bridging Capabilities for the F3 product family"
+
+      SUPPORTS BRIDGE-MIB
+      -- No support for dot1dStpBridgeGroup, dot1dStpPortGroup, dot1dStpPortGroup2,
+      -- dot1dStpPortGroup3, dot1dTpBridgeGroup, dot1dTpFdbGroup, dot1dTpGroup,
+      -- dot1dStaticGroup, dot1dNotificationGroup  
+      INCLUDES { dot1dBaseBridgeGroup, dot1dBasePortGroup }
+          VARIATION  dot1dBasePortDelayExceededDiscards
+          ACCESS     not-implemented
+          DESCRIPTION "dot1dBasePortDelayExceededDiscards is not implemented"
+
+      SUPPORTS Q-BRIDGE-MIB
+      -- No support for qBridgeFdbUnicastGroup, qBridgeFdbMulticastGroup, 
+      -- qBridgeServiceRequirementsGroup, qBridgeFdbStaticGroup
+      -- qBridgeVlanGroup, qBridgeVlanStaticGroup, qBridgeVlanStatisticsGroup  
+      -- qBridgeVlanStatisticsOverflowGroup, qBridgeVlanHCStatisticsGroup 
+      -- qBridgeLearningConstraintsGroup, qBridgeLearningConstraintDefaultGroup
+      -- qBridgeClassificationDeviceGroup, qBridgeClassificationPortGroup
+      -- qBridgePortGroup2
+      INCLUDES { qBridgeBaseGroup, qBridgePortGroup }
+          VARIATION  dot1qPortGvrpFailedRegistrations
+          ACCESS     not-implemented
+          DESCRIPTION "dot1qPortGvrpFailedRegistrations is not implemented"
+
+          VARIATION  dot1qPortGvrpLastPduOrigin
+          ACCESS     not-implemented
+          DESCRIPTION "dot1qPortGvrpLastPduOrigin is not implemented"
+
+          VARIATION  dot1qGvrpStatus 
+          ACCESS     read-only 
+          DESCRIPTION "dot1qGvrpStatus is restricted to read-only"
+
+          VARIATION  dot1qPvid 
+          ACCESS     read-only 
+          DESCRIPTION "dot1qPvid is restricted to read-only"
+
+          VARIATION  dot1qPortAcceptableFrameTypes 
+          ACCESS     read-only 
+          DESCRIPTION "dot1qPortAcceptableFrameTypes is restricted to read-only"
+
+          VARIATION  dot1qPortIngressFiltering 
+          ACCESS     read-only 
+          DESCRIPTION "dot1qPortIngressFiltering is restricted to read-only"
+
+          VARIATION  dot1qPortGvrpStatus 
+          ACCESS     read-only 
+          DESCRIPTION " dot1qPortGvrpStatus is restricted to read-only"
+
+      SUPPORTS P-BRIDGE-MIB
+      -- No support for pBridgeDevicePriorityGroup, pBridgeDefaultPriorityGroup 
+      -- pBridgeAccessPriorityGroup, pBridgePortGarpGroup, pBridgePortGmrpGroup,
+      -- pBridgeHCPortGroup, pBridgePortOverflowGroup, pBridgePortGmrpGroup2
+      INCLUDES { pBridgeExtCapGroup, pBridgeDeviceGmrpGroup, 
+                 pBridgeDevicePriorityGroup,
+                 pBridgeDefaultPriorityGroup, pBridgeRegenPriorityGroup,
+                 pBridgePriorityGroup }
+          VARIATION  dot1dTrafficClassesEnabled 
+          ACCESS     read-only 
+          DESCRIPTION "dot1dTrafficClassesEnabled is restricted to read-only"
+
+          VARIATION  dot1dGmrpStatus 
+          ACCESS     read-only 
+          DESCRIPTION "dot1dGmrpStatus is restricted to read-only"
+
+          VARIATION  dot1dPortDefaultUserPriority 
+          ACCESS     read-only 
+          DESCRIPTION "dot1dPortDefaultUserPriority is restricted to read-only"
+
+          VARIATION  dot1dPortNumTrafficClasses 
+          ACCESS     read-only 
+          DESCRIPTION "dot1dPortNumTrafficClasses is restricted to read-only"
+
+      SUPPORTS EtherLike-MIB 
+      -- No support for deprecated groups : etherStatsGroup, etherStats100MbsGroup,
+      --     etherStatsBaseGroup, 
+      -- No support for : etherCollisionTableGroup, etherStatsLowSpeedGroup, 
+      --     etherStatsBaseGroup2, etherStatsHalfDuplexGroup, etherHCStatsGroup,
+      --     etherHCControlGroup, etherHCControlPauseGroup,
+      INCLUDES { etherStatsGroup, etherDuplexGroup, etherControlGroup, 
+                 etherControlPauseGroup, etherRateControlGroup }
+          VARIATION  dot3StatsFCSErrors 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsFCSErrors is not implemented"
+
+          VARIATION  dot3StatsSingleCollisionFrames 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsSingleCollisionFrames is not implemented"
+
+          VARIATION  dot3StatsMultipleCollisionFrames 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsMultipleCollisionFrames is not implemented"
+
+          VARIATION  dot3StatsSQETestErrors 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsSQETestErrors is not implemented"
+
+          VARIATION  dot3StatsDeferredTransmissions 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsDeferredTransmissions is not implemented"
+
+          VARIATION  dot3StatsLateCollisions 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsLateCollisions is not implemented"
+
+          VARIATION  dot3StatsExcessiveCollisions 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsExcessiveCollisions is not implemented"
+
+          VARIATION  dot3StatsInternalMacTransmitErrors
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsInternalMacTransmitErrors is not implemented"
+
+          VARIATION  dot3StatsCarrierSenseErrors
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsCarrierSenseErrors is not implemented"
+
+          VARIATION  dot3StatsInternalMacReceiveErrors
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsInternalMacReceiveErrors is not implemented"
+
+          VARIATION  dot3StatsEtherChipSet
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsEtherChipSet is not implemented"
+
+          VARIATION  dot3ControlInUnknownOpcodes
+          ACCESS     not-implemented
+          DESCRIPTION "dot3ControlInUnknownOpcodes is not implemented"
+
+          VARIATION  dot3InPauseFrames
+          ACCESS     not-implemented
+          DESCRIPTION "dot3InPauseFrames is not implemented"
+
+          VARIATION  dot3OutPauseFrames
+          ACCESS     not-implemented
+          DESCRIPTION "dot3OutPauseFrames is not implemented"
+
+      -- LLDP-MIB included only for Textual Conventions, no object groups supported
+
+      ::= {f3CapabilityDefinitions 7}
+
+f3StandardLAGCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP Standard Link Aggregation Capabilities for the F3 product family"
+
+      SUPPORTS IEEE8023-LAG-MIB
+      INCLUDES { dot3adAggGroup, dot3adAggPortListGroup, 
+                 dot3adAggPortGroup, dot3adAggPortStatsGroup, 
+                 dot3adAggPortDebugGroup, dot3adTablesLastChangedGroup }
+
+          VARIATION    dot3adAggPortActorAdminKey
+          ACCESS       read-only
+          DESCRIPTION  "dot3adAggPortActorAdminKey is restricted to read-only"
+
+          VARIATION    dot3adAggPortActorOperKey
+          ACCESS       read-only
+          DESCRIPTION  "dot3adAggPortActorOperKey is restricted to read-only"
+
+          VARIATION    dot3adAggPortPartnerAdminPort
+          ACCESS       read-only
+          DESCRIPTION  "dot3adAggPortPartnerAdminPort is restricted to read-only"
+
+          VARIATION    dot3adAggPortPartnerAdminPortPriority
+          ACCESS       read-only
+          DESCRIPTION  "dot3adAggPortPartnerAdminPortPriority is restricted to read-only"
+
+          VARIATION    dot3adAggPortPartnerAdminSystemID
+          ACCESS       read-only
+          DESCRIPTION  "dot3adAggPortPartnerAdminSystemID is restricted to read-only"
+          
+          VARIATION    dot3adAggPortPartnerAdminSystemPriority
+          ACCESS       read-only
+          DESCRIPTION  "dot3adAggPortPartnerAdminSystemPriority is restricted to read-only"
+
+          VARIATION    dot3adAggPortPartnerAdminKey
+          ACCESS       read-only
+          DESCRIPTION  "dot3adAggPortPartnerAdminKey is restricted to read-only"
+
+      ::= {f3CapabilityDefinitions 8}
+
+f3CommonVendorSpecificCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP Common vendor specific capabilities for the F3 products"
+
+      SUPPORTS ADVA-MIB
+      -- No support for adminGroup, softwareGroup, configGroup,
+      -- swAdminGroup, dbAdminGroup, snmpProxyGroup
+      INCLUDES { eventsGroup, neInfoGroup }
+          VARIATION   neTrapsinkAddress
+          ACCESS     not-implemented
+          DESCRIPTION "neTrapsinkAddress is not implemented"
+
+          VARIATION   neTrapsinkPort
+          ACCESS     not-implemented
+          DESCRIPTION "neTrapsinkPort is not implemented"
+
+          VARIATION   neTrapsinkCommunity
+          ACCESS     not-implemented
+          DESCRIPTION "neTrapsinkCommunity is not implemented"
+
+          VARIATION   neTrapsinkRowStatus
+          ACCESS     not-implemented
+          DESCRIPTION "neTrapsinkRowStatus is not implemented"
+
+          VARIATION   neTrapsinkVersion
+          ACCESS     not-implemented
+          DESCRIPTION "neTrapsinkVersion is not implemented"
+
+          VARIATION   neTrapsinkUserName
+          ACCESS     not-implemented
+          DESCRIPTION "neTrapsinkUserName is not implemented"
+
+          VARIATION   neMibVariant
+          ACCESS     not-implemented
+          DESCRIPTION "neMibVariant is not implemented"
+
+          VARIATION   neManufacturer
+          ACCESS     not-implemented
+          DESCRIPTION "neManufacturer is not implemented"
+
+          VARIATION   neDateAndTime
+          ACCESS     not-implemented
+          DESCRIPTION "neDateAndTime is not implemented"
+
+          VARIATION   neMemorySizeTotal
+          ACCESS     not-implemented
+          DESCRIPTION "neMemorySizeTotal is not implemented"
+
+          VARIATION   neMemorySizeFree
+          ACCESS     not-implemented
+          DESCRIPTION "neMemorySizeFree is not implemented"
+
+          VARIATION   neStorageIndex
+          ACCESS     not-implemented
+          DESCRIPTION "neStorageIndex is not implemented"
+
+          VARIATION   neStorageDescr
+          ACCESS     not-implemented
+          DESCRIPTION "neStorageDescr is not implemented"
+
+          VARIATION   neStorageCapacity
+          ACCESS     not-implemented
+          DESCRIPTION "neStorageCapacity is not implemented"
+
+          VARIATION   neStorageAvailable
+          ACCESS     not-implemented
+          DESCRIPTION "neStorageAvailable is not implemented"
+
+      -- {fsp150cm 2}
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroup, cmSystemNotifGroup }
+
+          VARIATION   tftpEnabled
+          ACCESS      read-only
+          DESCRIPTION "tftp is enabled by default and it is restricted to read-only"
+
+      -- {fsp150cm 6}
+      SUPPORTS CM-ALARM-MIB 
+      INCLUDES { cmAlmObjectGroup, cmAlmNotifGroup }
+
+      -- {fsp150cm 7}
+      SUPPORTS CM-PROTECTION-MIB 
+      INCLUDES { cmProtObjectGroup }
+          VARIATION  cmFacProtGroupRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmFacProtGroupStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+      -- {fsp150cm 8}
+      SUPPORTS CM-SA-MIB 
+      INCLUDES { cmServAssuranceGenNotifGroup }
+                
+      -- {fsp150cm 9}
+      -- No support for CM-TOPOLOGY-MIB
+
+      -- {fsp150cm 10}
+      SUPPORTS CM-SECURITY-MIB 
+      INCLUDES { cmSecurityObjectGroup }
+          VARIATION  cmSecurityUserRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmSecurityUserStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+      -- {fsp150cm 11}
+      SUPPORTS CM-IP-MIB 
+      INCLUDES { ipGroup }
+          VARIATION  cmStaticRouteRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmARPRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmProxyARPRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmProxyARPStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+          VARIATION  ipManagementTunnelRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  ipManagementTunnelStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+          
+          VARIATION  ipManagementTunnelQosQueueProfile
+          ACCESS     not-implemented
+          DESCRIPTION "ipManagementTunnelQosQueueProfile is not-implemented"
+      
+      ::= {f3CapabilityDefinitions 9}
+
+f3FacilityCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Facility capabilities for the F3 products"
+
+      -- {fsp150cm 4}
+      SUPPORTS CM-FACILITY-MIB   
+      INCLUDES { ethernetAccessPortGroup, ethernetNetworkPortGroup, 
+                 ethernetMgmtPortGroup, bitsPortGroup, 
+                 trafficGroup, prioMapGroup, pcpEncodeGroup, cpdV2Group,
+                 f3Gps10MhzPortGroup, f3PulsePerSecondPortGroup, 
+                 f3TimeOfDayPortGroup }
+          VARIATION  cmEthernetAccPortLinkLossFwdSignalType
+          ACCESS     read-only
+          DESCRIPTION "Deprecated object - not supported."
+
+          VARIATION  cmEthernetAccPortOamAdminDisposition
+		  SYNTAX     INTEGER { discard(1), peer(2), pass-thru(3) } 
+		  DESCRIPTION "not_applicable(0),use_group_setting(4),not_active(5) and use_port_setting(6) are not supported."
+
+		  VARIATION  cmEthernetAccPortRxPauseDisposition
+          SYNTAX     INTEGER { discard(1), peer(2), pass-thru(3) }
+          DESCRIPTION "not_applicable(0),use_group_setting(4),not_active(5) and use_port_setting(6) are not supported."
+
+          VARIATION  cmEthernetNetPortLinkLossFwdSignalType
+          ACCESS     read-only
+          DESCRIPTION "Deprecated object - not supported."
+
+          VARIATION  cmEthernetNetPortOamAdminDisposition
+          SYNTAX     INTEGER {discard(1), peer(2), pass-thru(3)}
+          DESCRIPTION "not_applicable(0), use_group_setting(4), not_active(5) and use_port_setting(6) are not supported."
+          
+          VARIATION  cmEthernetNetPortRxPauseDisposition
+          SYNTAX     INTEGER {discard(1), peer(2), pass-thru(3)}
+          DESCRIPTION "not_applicable(0), use_group_setting(4), not_active(5) and use_port_setting(6) are not supported."
+
+          VARIATION  cmFlowRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmFlowStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+          VARIATION  cmQosFlowPolicerRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmQosFlowPolicerStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+          VARIATION  cmQosShaperCIR 
+          ACCESS     read-only 
+          DESCRIPTION "cmQosShaperCIR is restricted to read-only" 
+
+          VARIATION  cmQosShaperCBS 
+          ACCESS     read-only 
+          DESCRIPTION "cmQosShaperCBS is restricted to read-only" 
+
+          VARIATION  cmQosShaperEIR 
+          ACCESS     read-only 
+          DESCRIPTION "cmQosShaperEIR is restricted to read-only" 
+
+          VARIATION  cmQosShaperEBS 
+          ACCESS     read-only 
+          DESCRIPTION "cmQosShaperEBS is restricted to read-only" 
+
+          VARIATION  cmQosShaperCIRHi 
+          ACCESS     read-only 
+          DESCRIPTION "cmQosShaperCIRHi is restricted to read-only" 
+
+          VARIATION  cmQosShaperEIRHi 
+          ACCESS     read-only 
+          DESCRIPTION "cmQosShaperEIRHi is restricted to read-only" 
+
+          VARIATION  cmQosShaperRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmQosShaperStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+          VARIATION  cmAccPortQosShaperCIRLo 
+          ACCESS     read-only 
+          DESCRIPTION "cmAccPortQosShaperCIRLo is restricted to read-only" 
+
+          VARIATION  cmAccPortQosShaperCBS 
+          ACCESS     read-only 
+          DESCRIPTION "cmAccPortQosShaperCBS is restricted to read-only" 
+
+          VARIATION  cmAccPortQosShaperEIRLo 
+          ACCESS     read-only 
+          DESCRIPTION "cmAccPortQosShaperEIRLo is restricted to read-only" 
+
+          VARIATION  cmAccPortQosShaperEBS 
+          ACCESS     read-only 
+          DESCRIPTION "cmAccPortQosShaperEBS is restricted to read-only" 
+
+          VARIATION  cmAccPortQosShaperCIRHi 
+          ACCESS     read-only 
+          DESCRIPTION "cmAccPortQosShaperCIRHi is restricted to read-only" 
+
+          VARIATION  cmAccPortQosShaperEIRHi 
+          ACCESS     read-only 
+          DESCRIPTION "cmAccPortQosShaperEIRHi is restricted to read-only" 
+
+          VARIATION  f3PulsePerSecondPortInputRate 
+          ACCESS     read-only 
+          DESCRIPTION "f3PulsePerSecondPortInputRate is restricted to read-only" 
+
+      -- {fsp150cm 5}
+      SUPPORTS CM-PERFORMANCE-MIB   
+      INCLUDES { cmPerfNotifGroup, ethernetAccessPortPMGroup, 
+                 ethernetNetworkPortPMGroup, trafficPMGroup }
+
+          VARIATION cmEthernetNetPortStatsL2PTRxFramesEncap
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetNetPortStatsL2PTRxFramesEncap is not supported"
+
+          VARIATION cmEthernetNetPortStatsL2PTTxFramesDecap
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetNetPortStatsL2PTTxFramesDecap is not supported"
+          
+          VARIATION cmEthernetNetPortHistoryL2PTRxFramesEncap
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetNetPortHistoryL2PTRxFramesEncap is not supported"
+
+          VARIATION cmEthernetNetPortHistoryL2PTTxFramesDecap
+          ACCESS    not-implemented
+          DESCRIPTION "cmEthernetNetPortHistoryL2PTTxFramesDecap is not supported"
+
+      ::= {f3CapabilityDefinitions 10}
+      
+f3Nid206Capabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - GE206"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteGe206CardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."	
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEGE206CardFineGrainedPmInterval
+          ACCESS     read-only 
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 11}
+
+
+f3Nid201SyncECapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - GE201 SyncE"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteGe201SyncECardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEGE201SyncECardFineGrainedPmInterval
+          ACCESS     read-only 
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 12}
+
+f3Nid201NonSyncECapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for 
+                      F3 product - GE201 Non-SyncE"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteGe201NonSyncECardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEGE201CardFineGrainedPmInterval
+          ACCESS     read-only 
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 13}
+
+f3Nid206FCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - GE206F"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteGe206FCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEGE206FCardFineGrainedPmInterval
+          ACCESS     read-only 
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 14}
+
+f3Nid112Capabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - GE112"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteGe112CardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEGE112CardFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported."
+
+      ::= {f3CapabilityDefinitions 15}
+
+f3Nid114Capabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - GE114"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteGe114CardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEGE114CardFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported."
+
+      ::= {f3CapabilityDefinitions 16}
+
+f3EcpaCapabilities	  AGENT-CAPABILITIES
+	PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP Ecpa capabilities for F3 product"
+
+      -- {fsp150cm 8}
+      SUPPORTS CM-SA-MIB 
+      INCLUDES { cmEcpaGroup }
+
+		  ::= {f3CapabilityDefinitions 17}
+
+f3EsaCapabilities	  AGENT-CAPABILITIES
+	PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP Esa capabilities for F3 product"
+
+      -- {fsp150cm 8}
+      SUPPORTS CM-SA-MIB 
+      INCLUDES {cmEsaGroup,
+      			cmServAssuranceEsaNotifGroup}
+
+          VARIATION  esaProbePktSize
+          SYNTAX     Integer32 (0|64..1512)
+          DESCRIPTION "MIB range (0|64..2000) is not supported."
+
+          VARIATION  esaProbeRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  esaProbeStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+          VARIATION  esaProbeSOAMPktSize
+          SYNTAX     Integer32 (0|64..2000)
+          DESCRIPTION "MIB range (0|64..9612) is not supported."
+
+          VARIATION  esaProbeScheduleGroupRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  esaProbeScheduleGroupStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+          VARIATION  esaReflectorRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  esaReflectorStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+          VARIATION  esaProbeCOSConfigRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  esaProbeCOSConfigStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+          VARIATION  esaProbeDestinationRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  esaProbeDestinationStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."    
+
+		  ::= {f3CapabilityDefinitions 18}	
+      
+	f3BridgeCapabilitiesCmHub   AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP Bridging Capabilities for the F3 product family - CMHUB"
+    
+      SUPPORTS BRIDGE-MIB
+      -- No support for dot1dStpBridgeGroup, dot1dStpPortGroup, dot1dStpPortGroup2,
+      -- dot1dStpPortGroup3, dot1dTpBridgeGroup, dot1dTpFdbGroup, dot1dTpGroup,
+      -- dot1dStaticGroup, dot1dNotificationGroup  
+      INCLUDES { dot1dBaseBridgeGroup, dot1dBasePortGroup }
+          VARIATION  dot1dBasePortDelayExceededDiscards
+          ACCESS     not-implemented
+          DESCRIPTION "dot1dBasePortDelayExceededDiscards is not implemented"
+
+      SUPPORTS Q-BRIDGE-MIB
+      -- No support for qBridgeFdbUnicastGroup, qBridgeFdbMulticastGroup, 
+      -- qBridgeServiceRequirementsGroup, qBridgeFdbStaticGroup
+      -- qBridgeVlanGroup, qBridgeVlanStaticGroup, qBridgeVlanStatisticsGroup  
+      -- qBridgeVlanStatisticsOverflowGroup, qBridgeVlanHCStatisticsGroup 
+      -- qBridgeLearningConstraintsGroup, qBridgeLearningConstraintDefaultGroup
+      -- qBridgeClassificationDeviceGroup, qBridgeClassificationPortGroup
+      -- qBridgePortGroup2
+      
+      INCLUDES { qBridgeBaseGroup, qBridgePortGroup }
+      
+          VARIATION  dot1qPortGvrpFailedRegistrations
+          ACCESS     not-implemented
+          DESCRIPTION "dot1qPortGvrpFailedRegistrations is not implemented"
+
+          VARIATION  dot1qPortGvrpLastPduOrigin
+          ACCESS     not-implemented
+          DESCRIPTION "dot1qPortGvrpLastPduOrigin is not implemented"
+
+          VARIATION  dot1qGvrpStatus 
+          ACCESS     read-only 
+          DESCRIPTION "dot1qGvrpStatus is restricted to read-only"
+
+          VARIATION  dot1qPvid 
+          ACCESS     read-only 
+          DESCRIPTION "dot1qPvid is restricted to read-only"
+
+          VARIATION  dot1qPortAcceptableFrameTypes 
+          ACCESS     read-only 
+          DESCRIPTION "dot1qPortAcceptableFrameTypes is restricted to read-only"
+
+          VARIATION  dot1qPortIngressFiltering 
+          ACCESS     read-only 
+          DESCRIPTION "dot1qPortIngressFiltering is restricted to read-only"
+
+          VARIATION  dot1qPortGvrpStatus 
+          ACCESS     read-only 
+          DESCRIPTION " dot1qPortGvrpStatus is restricted to read-only"
+
+      SUPPORTS P-BRIDGE-MIB
+      -- No support for pBridgeDevicePriorityGroup, pBridgeDefaultPriorityGroup 
+      -- pBridgeAccessPriorityGroup, pBridgePortGarpGroup, pBridgePortGmrpGroup,
+      -- pBridgeHCPortGroup, pBridgePortOverflowGroup, pBridgePortGmrpGroup2, 
+      -- pBridgeRegenPriorityGroup
+      
+      INCLUDES { pBridgeExtCapGroup, pBridgeDeviceGmrpGroup, 
+                 pBridgeDevicePriorityGroup,
+                 pBridgeDefaultPriorityGroup,
+                 pBridgePriorityGroup }
+                 
+          VARIATION  dot1dTrafficClassesEnabled 
+          ACCESS     read-only 
+          DESCRIPTION "dot1dTrafficClassesEnabled is restricted to read-only"
+
+          VARIATION  dot1dGmrpStatus 
+          ACCESS     read-only 
+          DESCRIPTION "dot1dGmrpStatus is restricted to read-only"
+
+          VARIATION  dot1dPortDefaultUserPriority 
+          ACCESS     read-only 
+          DESCRIPTION "dot1dPortDefaultUserPriority is restricted to read-only"
+
+          VARIATION  dot1dPortNumTrafficClasses 
+          ACCESS     read-only 
+          DESCRIPTION "dot1dPortNumTrafficClasses is restricted to read-only"
+          
+      SUPPORTS EtherLike-MIB 
+      -- No support for deprecated groups : etherStatsGroup, etherStats100MbsGroup,
+      --     etherStatsBaseGroup, 
+      -- No support for : etherCollisionTableGroup, etherStatsLowSpeedGroup, 
+      --     etherStatsBaseGroup2, etherStatsHalfDuplexGroup, etherHCStatsGroup,
+      --     etherHCControlGroup, etherHCControlPauseGroup,
+      INCLUDES { etherStatsGroup, etherDuplexGroup, etherControlGroup, 
+                 etherControlPauseGroup, etherRateControlGroup }
+          VARIATION  dot3StatsFCSErrors 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsFCSErrors is not implemented"
+
+          VARIATION  dot3StatsSingleCollisionFrames 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsSingleCollisionFrames is not implemented"
+
+          VARIATION  dot3StatsMultipleCollisionFrames 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsMultipleCollisionFrames is not implemented"
+
+          VARIATION  dot3StatsSQETestErrors 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsSQETestErrors is not implemented"
+
+          VARIATION  dot3StatsDeferredTransmissions 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsDeferredTransmissions is not implemented"
+
+          VARIATION  dot3StatsLateCollisions 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsLateCollisions is not implemented"
+
+          VARIATION  dot3StatsExcessiveCollisions 
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsExcessiveCollisions is not implemented"
+
+          VARIATION  dot3StatsInternalMacTransmitErrors
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsInternalMacTransmitErrors is not implemented"
+
+          VARIATION  dot3StatsCarrierSenseErrors
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsCarrierSenseErrors is not implemented"
+
+          VARIATION  dot3StatsInternalMacReceiveErrors
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsInternalMacReceiveErrors is not implemented"
+
+          VARIATION  dot3StatsEtherChipSet
+          ACCESS     not-implemented
+          DESCRIPTION "dot3StatsEtherChipSet is not implemented"
+
+          VARIATION  dot3ControlInUnknownOpcodes
+          ACCESS     not-implemented
+          DESCRIPTION "dot3ControlInUnknownOpcodes is not implemented"
+
+          VARIATION  dot3InPauseFrames
+          ACCESS     not-implemented
+          DESCRIPTION "dot3InPauseFrames is not implemented"
+
+          VARIATION  dot3OutPauseFrames
+          ACCESS     not-implemented
+          DESCRIPTION "dot3OutPauseFrames is not implemented"
+
+      -- LLDP-MIB included only for Textual Conventions, no object groups supported
+
+	::= {f3CapabilityDefinitions 19}
+
+f3CommonVendorSpecificCapabilitiesCmHub  AGENT-CAPABILITIES
+    
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP Common vendor specific capabilities for the F3 products"
+
+      SUPPORTS ADVA-MIB
+      -- No support for neInfoGroup, adminGroup, softwareGroup, configGroup,
+      -- swAdminGroup, dbAdminGroup, snmpProxyGroup
+      
+      INCLUDES { eventsGroup }
+          VARIATION   neTrapsinkAddress
+          ACCESS     not-implemented
+          DESCRIPTION "neTrapsinkAddress is not implemented"
+
+          VARIATION   neTrapsinkPort
+          ACCESS     not-implemented
+          DESCRIPTION "neTrapsinkPort is not implemented"
+
+          VARIATION   neTrapsinkCommunity
+          ACCESS     not-implemented
+          DESCRIPTION "neTrapsinkCommunity is not implemented"
+
+          VARIATION   neTrapsinkRowStatus
+          ACCESS     not-implemented
+          DESCRIPTION "neTrapsinkRowStatus is not implemented"
+
+          VARIATION   neTrapsinkVersion
+          ACCESS     not-implemented
+          DESCRIPTION "neTrapsinkVersion is not implemented"
+
+          VARIATION   neTrapsinkUserName
+          ACCESS     not-implemented
+          DESCRIPTION "neTrapsinkUserName is not implemented"
+
+      -- {fsp150cm 2}
+      SUPPORTS CM-SYSTEM-MIB   
+      INCLUDES { cmSystemObjectGroupCmHub, cmSystemNotifGroup }
+
+      -- {fsp150cm 6}
+      SUPPORTS CM-ALARM-MIB 
+      INCLUDES { cmAlmObjectGroup, cmAlmNotifGroup }
+
+      -- {fsp150cm 7}
+      SUPPORTS CM-PROTECTION-MIB 
+      INCLUDES { cmProtObjectGroup }
+          VARIATION  cmFacProtGroupRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmFacProtGroupStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+      -- {fsp150cm 8}
+      SUPPORTS CM-SA-MIB 
+      INCLUDES { cmServAssuranceGenNotifGroup }
+            
+      -- {fsp150cm 9}
+      SUPPORTS CM-TOPOLOGY-MIB
+      INCLUDES { cmTopologyObjectGroup }
+
+      -- {fsp150cm 10}
+      SUPPORTS CM-SECURITY-MIB 
+      INCLUDES { cmSecurityObjectGroup }
+          VARIATION  cmSecurityUserRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmSecurityUserStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+      -- {fsp150cm 11}
+      SUPPORTS CM-IP-MIB 
+      INCLUDES { ipGroup }
+          VARIATION  cmStaticRouteRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmARPRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmProxyARPRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmProxyARPStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+          VARIATION  ipManagementTunnelRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  ipManagementTunnelStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+          
+          VARIATION  ipManagementTunnelQosQueueProfile
+          ACCESS     not-implemented
+          DESCRIPTION "ipManagementTunnelQosQueueProfile is not-implemented"
+          
+      -- {fsp150cm 13}
+      -- no support for F3-CFM-MIB 
+
+      -- {fsp150cm 14}
+      -- no support for F3-LAG-MIB 
+
+      ::= {f3CapabilityDefinitions 20}
+
+f3FacilityCapabilitiesCmHub  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Facility capabilities for the F3 products"
+
+      -- {fsp150cm 4}
+      SUPPORTS CM-FACILITY-MIB   
+      INCLUDES { ethernetAccessPortGroup, ethernetNetworkPortGroup, 
+                 ethernetMgmtPortGroup, bitsPortGroup, 
+                 trafficGroupCmHub }
+                 
+          VARIATION  cmEthernetAccPortLinkLossFwdSignalType
+          ACCESS     read-only
+          DESCRIPTION "Deprecated object - not supported."
+
+		  VARIATION  cmEthernetAccPortOamAdminDisposition
+		  SYNTAX     INTEGER {discard(1), peer(2), pass-thru(3)}
+	      DESCRIPTION "not_applicable(0), use_group_setting(4), not_active(5) and use_port_setting(6) are not supported."
+
+		  VARIATION  cmEthernetAccPortRxPauseDisposition
+          SYNTAX     INTEGER { discard(1), peer(2), pass-thru(3) }
+          DESCRIPTION "not_applicable(0),use_group_setting(4),not_active(5) and use_port_setting(6) are not supported."
+
+          VARIATION  cmEthernetNetPortLinkLossFwdSignalType
+          ACCESS     read-only
+          DESCRIPTION "Deprecated object - not supported."
+
+		  VARIATION  cmEthernetNetPortOamAdminDisposition
+		  SYNTAX     INTEGER {discard(1), peer(2), pass-thru(3)}
+		  DESCRIPTION "not_applicable(0), use_group_setting(4), not_active(5) and use_port_setting(6) are not supported."
+
+	 	  VARIATION  cmEthernetNetPortRxPauseDisposition
+		  SYNTAX     INTEGER {discard(1), peer(2), pass-thru(3)}
+	 	  DESCRIPTION "not_applicable(0), use_group_setting(4), not_active(5) and use_port_setting(6) are not supported."
+
+          VARIATION  cmFlowRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmFlowStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+		  VARIATION  cmQosShaperCIR 
+          ACCESS     read-only 
+          DESCRIPTION "cmQosShaperCIR is restricted to read-only" 
+
+          VARIATION  cmQosShaperCBS 
+          ACCESS     read-only 
+          DESCRIPTION "cmQosShaperCBS is restricted to read-only" 
+
+          VARIATION  cmQosShaperEIR 
+          ACCESS     read-only 
+          DESCRIPTION "cmQosShaperEIR is restricted to read-only" 
+
+          VARIATION  cmQosShaperEBS 
+          ACCESS     read-only 
+          DESCRIPTION "cmQosShaperEBS is restricted to read-only" 
+
+          VARIATION  cmQosShaperCIRHi 
+          ACCESS     read-only 
+          DESCRIPTION "cmQosShaperCIRHi is restricted to read-only" 
+
+          VARIATION  cmQosShaperEIRHi 
+          ACCESS     read-only 
+          DESCRIPTION "cmQosShaperEIRHi is restricted to read-only" 
+
+          VARIATION  cmQosShaperRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cmQosShaperStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+
+      -- {fsp150cm 5}
+      SUPPORTS CM-PERFORMANCE-MIB   
+      INCLUDES { cmPerfNotifGroupCmHub, ethernetAccessPortPMGroup, 
+                 ethernetNetworkPortPMGroup, trafficPMGroupCmHub }
+                           
+      ::= {f3CapabilityDefinitions 21}
+
+f3EntityCmHubCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - HUBSHELF"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, fanGroup, hubshelfGroup }
+ 
+ 		  VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+ 
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only"
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+                     
+      ::= {f3CapabilityDefinitions 22} 
+
+f3Nid206VCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - GE206V"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteGe206VCardGroup, ge4ECCCardGroup, ge4SCCCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEGE206VCardFineGrainedPmInterval
+          ACCESS     read-only 
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 23}
+
+f3NidXG210Capabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - XG210"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteXg210CardGroup, xg1XCCCardGroup, xg1SCCCardGroup, ge8SCCCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEXG210CardFineGrainedPmInterval
+          ACCESS     read-only 
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 24}
+
+f3PtpCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific PTP capabilities for F3 product" 
+
+      -- {fsp150cm 18}
+      SUPPORTS F3-PTP-MIB
+      INCLUDES { f3PtpObjectGroup, f3PtpPerfObjectGroup }
+
+    ::= {f3CapabilityDefinitions 25}
+
+f3PseudoWireCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific PWE capabilities for F3 product"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { pseudoWireCardOcnStmCardGroup, pseudoWireCardE1T1CardGroup }
+
+      -- {fsp150cm 4}
+      SUPPORTS CM-FACILITY-MIB
+      INCLUDES { ocnStmGroup, stsVcPathGroup, vtVcPathGroup, e1t1InterfaceGroup }
+
+          VARIATION   ocnStmSfpLaserWaveLengthPicometer
+          ACCESS      not-implemented
+          DESCRIPTION "ocnStmSfpLaserWaveLengthPicometer is not implemented"
+
+          VARIATION   ocnStmInsertingAIS
+          ACCESS      not-implemented
+          DESCRIPTION "ocnStmInsertingAIS is not implemented"
+
+          VARIATION   stsVcPathInsertingAIS
+          ACCESS      not-implemented
+          DESCRIPTION "stsVcPathInsertingAIS is not implemented"
+
+          VARIATION   stsVcPathBerExcThreshold
+          ACCESS      not-implemented
+          DESCRIPTION "stsVcPathBerExcThreshold is not implemented"
+
+          VARIATION   stsVcPathBerDegThreshold
+          ACCESS      not-implemented
+          DESCRIPTION "stsVcPathBerDegThreshold is not implemented"
+          
+          VARIATION   stsVcPathTrailTraceFormat
+          ACCESS      not-implemented
+          DESCRIPTION "stsVcPathTrailTraceFormat is not implemented"     
+
+          VARIATION   vtVcPathInsertingAIS
+          ACCESS      not-implemented
+          DESCRIPTION "vtVcPathInsertingAIS is not implemented"
+
+          VARIATION   vtVcPathBerExcThreshold
+          ACCESS      not-implemented
+          DESCRIPTION "vtVcPathBerExcThreshold is not implemented"
+
+          VARIATION   vtVcPathBerDegThreshold
+          ACCESS      not-implemented
+          DESCRIPTION "vtVcPathBerDegThreshold is not implemented"
+
+          VARIATION   vtVcPathTrailTraceFormat
+          ACCESS      not-implemented
+          DESCRIPTION "vtVcPathTrailTraceFormat is not implemented"
+
+          VARIATION   e1t1InsertingAIS
+          ACCESS      not-implemented
+          DESCRIPTION "e1t1InsertingAIS is not implemented"
+
+      -- {fsp150cm 5}
+      SUPPORTS CM-PERFORMANCE-MIB
+      INCLUDES { ocnStmPortPerfGroup, stsVcPathPerfGroup, vtVcPathPerfGroup, e1T1PerfGroup }
+
+      -- {fsp150cm 19}
+      SUPPORTS F3-PWE3-MIB
+      INCLUDES { f3Pwe3ObjectGroup, f3Pwe3PerfObjectGroup }
+
+      ::= {f3CapabilityDefinitions 26}
+
+f3DS1Capabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific DS1 capabilities for F3 product"
+
+      -- {transmission 18}
+      SUPPORTS DS1-MIB
+      INCLUDES { ds1NearEndConfigGroup, ds1NearEndOptionalConfigGroup, 
+                 ds1NearEndStatisticsGroup, ds1FarEndGroup }
+
+         VARIATION   dsx1TimeElapsed
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1TimeElapsed is not implemented"
+
+         VARIATION   dsx1ValidIntervals
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1ValidIntervals is not implemented"
+
+         VARIATION  dsx1LineType
+         ACCESS     read-only
+         DESCRIPTION "dsx1LineType is restricted to read-only"
+
+         VARIATION   dsx1SendCode
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1SendCode is not implemented"
+
+         VARIATION   dsx1SignalMode
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1SignalMode is not implemented"
+
+         VARIATION   dsx1TransmitClockSource
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1TransmitClockSource is not implemented"
+
+         VARIATION   dsx1Fdl
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1Fdl is not implemented"
+
+         VARIATION   dsx1InvalidIntervals
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1InvalidIntervals is not implemented"
+
+         VARIATION   dsx1LineLength
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1LineLength is not implemented"
+
+         VARIATION   dsx1LoopbackStatus
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1LoopbackStatus is not implemented"
+
+         VARIATION   dsx1Ds1ChannelNumber
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1Ds1ChannelNumber is not implemented"
+
+         VARIATION   dsx1Channelization
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1Channelization is not implemented"
+
+         VARIATION   dsx1CurrentIndex
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1CurrentIndex is not implemented"
+
+         VARIATION   dsx1CurrentSEFSs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1CurrentSEFSs is not implemented"
+
+         VARIATION   dsx1CurrentCSSs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1CurrentCSSs is not implemented"
+
+         VARIATION   dsx1CurrentBESs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1CurrentBESs is not implemented"
+
+         VARIATION   dsx1CurrentDMs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1CurrentDMs is not implemented"
+
+         VARIATION   dsx1IntervalIndex
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1IntervalIndex is not implemented"
+
+         VARIATION   dsx1IntervalSEFSs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1IntervalSEFSs is not implemented"
+
+         VARIATION   dsx1IntervalCSSs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1IntervalCSSs is not implemented"
+
+         VARIATION   dsx1IntervalBESs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1IntervalBESs is not implemented"
+
+         VARIATION   dsx1IntervalDMs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1IntervalDMs is not implemented"
+
+         VARIATION   dsx1TotalIndex
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1TotalIndex is not implemented"
+
+         VARIATION   dsx1TotalSEFSs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1TotalSEFSs is not implemented"
+
+         VARIATION   dsx1TotalCSSs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1TotalCSSs is not implemented"
+
+         VARIATION   dsx1TotalBESs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1TotalBESs is not implemented"
+
+         VARIATION   dsx1TotalDMs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1TotalDMs is not implemented"
+
+         VARIATION   dsx1FarEndCurrentIndex
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndCurrentIndex is not implemented"
+
+         VARIATION   dsx1FarEndValidIntervals
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndValidIntervals is not implemented"
+
+         VARIATION   dsx1FarEndCurrentCSSs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndCurrentCSSs is not implemented"
+
+         VARIATION   dsx1FarEndCurrentBESs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndCurrentBESs is not implemented"
+
+         VARIATION   dsx1FarEndCurrentDMs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndCurrentDMs is not implemented"
+
+         VARIATION   dsx1FarEndInvalidIntervals
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndInvalidIntervals is not implemented"
+
+         VARIATION   dsx1FarEndIntervalIndex
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndIntervalIndex is not implemented"
+
+         VARIATION   dsx1FarEndIntervalCSSs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndIntervalCSSs is not implemented"
+
+         VARIATION   dsx1FarEndIntervalBESs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndIntervalBESs is not implemented"
+
+         VARIATION   dsx1FarEndIntervalDMs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndIntervalDMs is not implemented"
+
+         VARIATION   dsx1FarEndTotalIndex
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndTotalIndex is not implemented"
+
+         VARIATION   dsx1FarEndTotalCSSs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndTotalCSSs is not implemented"
+
+         VARIATION   dsx1FarEndTotalBESs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndTotalBESs is not implemented"
+
+         VARIATION   dsx1FarEndTotalDMs
+         ACCESS      not-implemented
+         DESCRIPTION "dsx1FarEndTotalDMs is not implemented"
+
+    ::= {f3CapabilityDefinitions 27}
+
+f3SonetCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Sonet capabilities for F3 product"
+
+       -- {transmission 39}
+       SUPPORTS SONET-MIB
+       INCLUDES { sonetMediumStuff2, sonetSectionStuff2, sonetLineStuff2,
+                  sonetFarEndLineStuff2, sonetPathStuff2, sonetFarEndPathStuff2,
+                  sonetVTStuff2, sonetFarEndVTStuff2 }
+
+         VARIATION   sonetMediumType
+         ACCESS      read-only
+         DESCRIPTION "sonetMediumType is restricted to read-only"
+
+         VARIATION   sonetMediumTimeElapsed
+         ACCESS      not-implemented
+         DESCRIPTION "sonetMediumTimeElapsed is not implemented"
+
+         VARIATION   sonetMediumValidIntervals
+         ACCESS      not-implemented
+         DESCRIPTION "sonetMediumValidIntervals is not implemented"
+
+         VARIATION   sonetMediumLineCoding
+         ACCESS      read-only
+         DESCRIPTION "sonetMediumLineCoding is restricted to read-only"
+
+         VARIATION   sonetMediumLineType
+         ACCESS      read-only
+         DESCRIPTION "sonetMediumLineType is restricted to read-only"
+
+         VARIATION   sonetMediumCircuitIdentifier
+         ACCESS      read-only
+         DESCRIPTION "sonetMediumCircuitIdentifier is restricted to read-only"
+
+         VARIATION   sonetMediumInvalidIntervals
+         ACCESS      not-implemented
+         DESCRIPTION "sonetMediumInvalidIntervals is not implemented"
+
+         VARIATION   sonetMediumLoopbackConfig
+         ACCESS      read-only
+         DESCRIPTION "sonetMediumLoopbackConfig is restricted to read-only"
+
+         VARIATION   sonetSESthresholdSet
+         ACCESS      read-only
+         DESCRIPTION "e1t1InsertingAIS is restricted to read-only"
+
+         VARIATION   sonetSectionCurrentStatus
+         ACCESS      not-implemented
+         DESCRIPTION "sonetSectionCurrentStatus is not implemented"
+
+         VARIATION   sonetLineCurrentStatus
+         ACCESS      not-implemented
+         DESCRIPTION "sonetLineCurrentStatus is not implemented"
+
+         VARIATION   sonetPathCurrentWidth
+         ACCESS      read-only
+         DESCRIPTION "sonetPathCurrentWidth is restricted to read-only"
+
+         VARIATION   sonetPathCurrentStatus
+         ACCESS      not-implemented
+         DESCRIPTION "sonetPathCurrentStatus is not implemented"
+
+         VARIATION   sonetFarEndPathIntervalESs
+         ACCESS      not-implemented
+         DESCRIPTION "sonetFarEndPathIntervalESs is not implemented"
+
+         VARIATION   sonetFarEndPathIntervalSESs
+         ACCESS      not-implemented
+         DESCRIPTION "sonetFarEndPathIntervalSESs is not implemented"
+
+         VARIATION   sonetFarEndPathIntervalCVs
+         ACCESS      not-implemented
+         DESCRIPTION "sonetFarEndPathIntervalCVs is not implemented"
+
+         VARIATION   sonetFarEndPathIntervalUASs
+         ACCESS      not-implemented
+         DESCRIPTION "sonetFarEndPathIntervalUASs is not implemented"
+
+         VARIATION   sonetFarEndPathIntervalValidData
+         ACCESS      not-implemented
+         DESCRIPTION "sonetFarEndPathIntervalValidData is not implemented"
+
+         VARIATION   sonetVTCurrentWidth
+         ACCESS      read-only
+         DESCRIPTION "sonetVTCurrentWidth is restricted to read-only"
+
+         VARIATION   sonetVTCurrentStatus
+         ACCESS      not-implemented
+         DESCRIPTION "sonetVTCurrentStatus is not implemented"
+
+    ::= {f3CapabilityDefinitions 28}
+
+f3SyncECapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Synchronous Ethernet capabilities for F3 product family." 
+
+      -- {fsp150cm 12}
+      SUPPORTS F3-SYNC-MIB 
+      INCLUDES { f3SyncObjectGroup }
+          VARIATION  f3SyncRefRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  f3SyncRefStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+    ::= {f3CapabilityDefinitions 29}
+
+f3CfmCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific CFM capabilities for F3 product family." 
+
+      -- {fsp150cm 13}
+      SUPPORTS F3-CFM-MIB 
+      INCLUDES { cfmGenGroup, cfmMepGroup, cfmPortShaperGroup, cfmServerMepGroup }
+          VARIATION  cfmServerMepRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  cfmServerMepStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+    ::= {f3CapabilityDefinitions 30}
+
+f3LAGCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific LAG capabilities for F3 product family." 
+
+      -- {fsp150cm 14}
+      SUPPORTS F3-LAG-MIB 
+      INCLUDES { f3LagObjectGroup }
+          VARIATION  f3LagRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  f3LagStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+          VARIATION  f3LagPortRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  f3LagPortStorageType
+          SYNTAX     INTEGER {nonVolatile(3)}
+          DESCRIPTION "other(1), volatile(2), permanent(4), readOnly(5) are not supported."
+
+
+    ::= {f3CapabilityDefinitions 31}
+
+f3PBBCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific PBB capabilities for F3 product family." 
+
+      -- {fsp150cm 21}
+      SUPPORTS F3-PBB-MIB 
+      INCLUDES { f3PbbConfigGroup, f3PbbStatsGroup }
+
+
+    ::= {f3CapabilityDefinitions 32}
+    
+f3Nid1804Capabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - T1804"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteT1804CardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  ethernetNTET1804CardFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported."
+
+          VARIATION  ethernetNTEGESyncProbeCardFineGrainedPmInterval 
+          ACCESS     read-only 
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 33}
+
+f3Nid3204Capabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - T3204"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteT3204CardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  ethernetNTET3204CardFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported."
+
+      ::= {f3CapabilityDefinitions 34}
+
+f3BertCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Bert capabilities for F3 product family." 
+
+      -- {fsp150cm 21}
+      SUPPORTS CM-SA-MIB
+      INCLUDES { cmBertGroup }
+
+    ::= {f3CapabilityDefinitions 35}
+
+
+f3NidSyncProbeCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - SyncProbe"
+
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, nteGeSyncProbeCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported."
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  neFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported"
+
+          VARIATION  ethernetNTEGESyncProbeCardFineGrainedPmInterval 
+          ACCESS     read-only 
+          DESCRIPTION "Restricted to read-only. Fine Grain PM is now at NE level."
+
+      ::= {f3CapabilityDefinitions 36}
+
+f3SyncJackCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific SyncJack capabilities for F3 product family." 
+
+      SUPPORTS F3-SYNCJACK-MIB
+      INCLUDES { f3SyncJObjectGroup, f3SyncJPerfObjectGroup, f3SyncJNotifGroup }
+
+    ::= {f3CapabilityDefinitions 37}
+
+f3EsmCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE   "F3- family of products"
+    STATUS            current
+    DESCRIPTION       "SNMP vendor specific ESM Breadcrumbs capabilities for F3 product family."
+    
+      SUPPORTS F3-ESM-MIB
+      INCLUDES { esmConfigGroup, esmNameValuePairGroup }
+                 
+    ::= {f3CapabilityDefinitions 38}
+
+f3AMPClientCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific AMP Client capabilities for F3 product family." 
+
+      SUPPORTS F3-AMP-MIB
+      INCLUDES { f3AmpConfigGroup, f3AmpStatsGroup }
+
+    ::= {f3CapabilityDefinitions 39}
+
+f3AMPServerCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific AMP Server capabilities for F3 product family." 
+
+      SUPPORTS F3-AMP-MIB
+      INCLUDES { f3AmpConfigGroup, f3AmpStatsGroup }
+
+    ::= {f3CapabilityDefinitions 40}
+
+f3Nid114HCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - GE114H"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteGe114HCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  ethernetNTEGE114HCardFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported."
+
+      ::= {f3CapabilityDefinitions 41}
+
+f3Nid114PHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - GE114PH"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteGe114PHCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  ethernetNTEGE114PHCardFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported."
+
+      ::= {f3CapabilityDefinitions 42}
+
+
+f3ERPCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific ERP capabilities for F3 product family." 
+
+      SUPPORTS F3-ERP-MIB
+      INCLUDES { f3ErpGroupGroup, f3ErpUnitGroup, f3ErpUnitStatsGroup }
+
+          VARIATION  f3ErpGroupMaxFpNum
+          ACCESS     not-implemented
+          DESCRIPTION "f3ErpGroupMaxFpNum is not implemented."
+
+    ::= {f3CapabilityDefinitions 43}
+
+f3ShgCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific SHG capabilities for F3 product family." 
+
+      SUPPORTS F3-SHG-MIB
+      INCLUDES { f3ShgGroup, f3ShgMemberPortGroup, f3ShgMemberFlowGroup }
+
+    ::= {f3CapabilityDefinitions 44}
+      
+f3Nid114SCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - GE114S"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteGe114SCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  ethernetNTEGE114SCardFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported."
+
+      ::= {f3CapabilityDefinitions 45}
+      
+f3Nid114SHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - GE114SH"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-ENTITY-MIB   
+      INCLUDES { commonEntityGroup, psuGroup, nteGe114SHCardGroup }
+
+          VARIATION  neRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  neStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  ethernetNTEGE114SHCardFineGrainedPmInterval
+          SYNTAX     INTEGER { interval-15min(1), interval-5min(4) }
+          DESCRIPTION "interval-1day(2), rollover(3) are not supported."
+
+      ::= {f3CapabilityDefinitions 46}
+      
+f3Ipv6Capabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - family"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-IP-MIB   
+      INCLUDES { ipv6Group }
+
+          VARIATION  cmProxyNDPRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  cmProxyNDPStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  cmNDPRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  cmNDPStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  cmIpv6OverIpv4TunnelRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  cmIpv6OverIpv4TunnelStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+      SUPPORTS IPV6-MIB   
+      INCLUDES { ipv6GeneralGroup }
+      
+          VARIATION  ipv6Forwarding
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6Forwarding is not implemented"          
+          
+          VARIATION  ipv6DefaultHopLimit
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6DefaultHopLimit is not implemented"       
+          
+          VARIATION  ipv6Interfaces
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6Interfaces is not implemented"       
+          
+          VARIATION  ipv6IfTableLastChange
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfTableLastChange is not implemented"       
+          
+          VARIATION  ipv6IfDescr
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfDescr is not implemented"       
+          
+          VARIATION  ipv6IfLowerLayer
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfLowerLayer is not implemented"       
+          
+          VARIATION  ipv6IfEffectiveMtu
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfEffectiveMtu is not implemented"       
+          
+          VARIATION  ipv6IfReasmMaxSize
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfReasmMaxSize is not implemented"       
+          
+          VARIATION  ipv6IfIdentifier
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfIdentifier is not implemented"       
+          
+          VARIATION  ipv6IfIdentifierLength
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfIdentifierLength is not implemented"       
+          
+          VARIATION  ipv6IfPhysicalAddress
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfPhysicalAddress is not implemented"       
+          
+          VARIATION  ipv6IfAdminStatus
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfAdminStatus is not implemented"       
+          
+          VARIATION  ipv6IfOperStatus
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfOperStatus is not implemented"       
+          
+          VARIATION  ipv6IfLastChange
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfLastChange is not implemented"       
+          
+          VARIATION  ipv6IfStatsInReceives
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsInReceives is not implemented"       
+          
+          VARIATION  ipv6IfStatsInHdrErrors
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsInHdrErrors is not implemented"       
+          
+          VARIATION  ipv6IfStatsInTooBigErrors
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsInTooBigErrors is not implemented"       
+          
+          VARIATION  ipv6IfStatsInNoRoutes
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsInNoRoutes is not implemented"       
+          
+          VARIATION  ipv6IfStatsInAddrErrors
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsInAddrErrors is not implemented"       
+          
+          VARIATION  ipv6IfStatsInUnknownProtos
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsInUnknownProtos is not implemented"       
+          
+          VARIATION  ipv6IfStatsInTruncatedPkts
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsInTruncatedPkts is not implemented"       
+          
+          VARIATION  ipv6IfStatsInDiscards
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsInDiscards is not implemented"       
+          
+          VARIATION  ipv6IfStatsInDelivers
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsInDelivers is not implemented"       
+          
+          VARIATION  ipv6IfStatsOutForwDatagrams
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsOutForwDatagrams is not implemented"       
+          
+          VARIATION  ipv6IfStatsOutRequests
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsOutRequests is not implemented"       
+          
+          VARIATION  ipv6IfStatsOutDiscards
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsOutDiscards is not implemented"       
+          
+          VARIATION  ipv6IfStatsOutFragOKs
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsOutFragOKs is not implemented"       
+          
+          VARIATION  ipv6IfStatsOutFragFails
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsOutFragFails is not implemented"       
+          
+          VARIATION  ipv6IfStatsOutFragCreates
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsOutFragCreates is not implemented"       
+          
+          VARIATION  ipv6IfStatsReasmReqds
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsReasmReqds is not implemented"       
+
+          VARIATION  ipv6IfStatsReasmOKs
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsReasmOKs is not implemented"       
+          
+          VARIATION  ipv6IfStatsReasmFails
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsReasmFails is not implemented"       
+          
+          VARIATION  ipv6IfStatsInMcastPkts
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsInMcastPkts is not implemented"       
+          
+          VARIATION  ipv6IfStatsOutMcastPkts
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfStatsOutMcastPkts is not implemented"       
+          
+          VARIATION  ipv6AddrPrefixOnLinkFlag
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6AddrPrefixOnLinkFlag is not implemented"       
+          
+          VARIATION  ipv6AddrPrefixAutonomousFlag
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6AddrPrefixAutonomousFlag is not implemented"       
+          
+          VARIATION  ipv6AddrPrefixAdvPreferredLifetime
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6AddrPrefixAdvPreferredLifetime is not implemented"       
+          
+          VARIATION  ipv6AddrPrefixAdvValidLifetime
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6AddrPrefixAdvValidLifetime is not implemented"       
+          
+          VARIATION  ipv6AddrPfxLength
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6AddrPfxLength is not implemented"       
+          
+          VARIATION  ipv6AddrType
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6AddrType is not implemented"       
+          
+          VARIATION  ipv6AddrAnycastFlag
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6AddrAnycastFlag is not implemented"       
+          
+          VARIATION  ipv6AddrStatus
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6AddrStatus is not implemented"       
+          
+          VARIATION  ipv6DiscardedRoutes
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6DiscardedRoutes is not implemented"       
+          
+          VARIATION  ipv6NetToMediaPhysAddress
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6NetToMediaPhysAddress is not implemented"       
+          
+          VARIATION  ipv6NetToMediaType
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6NetToMediaType is not implemented"       
+          
+          VARIATION  ipv6IfNetToMediaState
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfNetToMediaState is not implemented"       
+          
+          VARIATION  ipv6IfNetToMediaLastUpdated
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6IfNetToMediaLastUpdated is not implemented"       
+          
+          VARIATION  ipv6NetToMediaValid
+          ACCESS     not-implemented
+          DESCRIPTION "ipv6NetToMediaValid is not implemented"    
+          
+          VARIATION  ipv6RouteValid
+          ACCESS     read-only
+          DESCRIPTION "ipv6RouteValid is restricted to read-only"  
+             
+      ::= {f3CapabilityDefinitions 47}
+      
+f3SatCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3 - family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Entity capabilities for F3 product - family"
+
+      -- {fsp150cm 3}
+      SUPPORTS CM-SAT-MIB   
+      INCLUDES { cmSatGroup }
+
+          VARIATION  satControlRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  satControlStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  satStreamRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  satStreamStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  satSacProfileRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  satSacProfileStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+          VARIATION  satResponderSessionRowStatus
+          SYNTAX     INTEGER {active(1), createAndGo(4), destroy(6)}
+          DESCRIPTION "notInService(2),notReady(3) and createAndWait(5) are not supported." 
+
+          VARIATION  satResponderSessionStorageType
+          ACCESS     read-only 
+          DESCRIPTION "neStorageType is restricted to read-only" 
+
+      ::= {f3CapabilityDefinitions 48}
+
+f3JdsuCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific JDSU loopback capabilities for F3 product family." 
+
+      SUPPORTS CM-FACILITY-MIB
+      INCLUDES { ethernetAccessPortJdsuExtGroup, ethernetNetworkPortJdsuExtGroup }
+
+    ::= {f3CapabilityDefinitions 49}
+       
+f3PortMirrorCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Port Mirror capabilities for F3 product family." 
+
+      SUPPORTS F3-PORTMIRROR-MIB
+      INCLUDES { f3MirrorSessionGroup, f3PortMirrorAccPortExtGroup,
+                 f3MonitorPortStatsGroup, f3MirrorSessionStatsTable }
+
+    ::= {f3CapabilityDefinitions 50}
+
+f3JdsuGeneratorCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific JDSU Generator capabilities for F3 product family." 
+
+      SUPPORTS F3-JDSU-MIB
+      INCLUDES { f3JdsuGroup }
+
+    ::= {f3CapabilityDefinitions 51}
+
+
+f3TwampCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific TWAMP capabilities for F3 product family." 
+
+      SUPPORTS F3-TWAMP-MIB
+      INCLUDES { f3TwampIpInterfaceGroup, f3TwampServerGroup, f3TwampServerSessionReflectorGroup,
+                 f3TwampSessionReflectorGroup, f3TwampSessionGroup, f3TwampControlClientGroup,
+                 f3TwampControlClientSessionSenderGroup, f3TwampSessionSenderGroup,
+                 f3TwampStatisticsGroup, f3TwampDistributionStatisticsGroup, 
+                 f3TwampThresholdGroup }
+
+    ::= {f3CapabilityDefinitions 52}
+
+f3OspfCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific OSPF capabilities for F3 product family." 
+
+      SUPPORTS OSPF-MIB
+      INCLUDES  { ospfBasicGroup2, ospfNbrGroup2, ospfLsdbGroup, ospfAsLsdbGroup }
+            
+          VARIATION  ospfAreaBdrRtrStatus
+          ACCESS     not-implemented
+          DESCRIPTION "ospfAreaBdrRtrStatus is not implemented"
+
+          VARIATION  ospfTOSSupport
+          ACCESS     not-implemented
+          DESCRIPTION "ospfTOSSupport is not implemented"
+
+          VARIATION  ospfOriginateNewLsas
+          ACCESS     not-implemented
+          DESCRIPTION "ospfOriginateNewLsas is not implemented"
+          
+          VARIATION  ospfRxNewLsas
+          ACCESS     not-implemented
+          DESCRIPTION "ospfRxNewLsas is not implemented"
+          
+          VARIATION  ospfExtLsdbLimit
+          ACCESS     not-implemented
+          DESCRIPTION "ospfExtLsdbLimit is not implemented"
+          
+          VARIATION  ospfMulticastExtensions
+          ACCESS     not-implemented
+          DESCRIPTION "ospfMulticastExtensions is not implemented"
+          
+          VARIATION  ospfExitOverflowInterval
+          ACCESS     not-implemented
+          DESCRIPTION "ospfExitOverflowInterval is not implemented"
+          
+          VARIATION  ospfDemandExtensions
+          ACCESS     not-implemented
+          DESCRIPTION "ospfDemandExtensions is not implemented"
+          
+          VARIATION  ospfRFC1583Compatibility
+          ACCESS     not-implemented
+          DESCRIPTION "ospfRFC1583Compatibility is not implemented"
+          
+          VARIATION  ospfOpaqueLsaSupport
+          ACCESS     not-implemented
+          DESCRIPTION "ospfOpaqueLsaSupport is not implemented"
+          
+          VARIATION  ospfReferenceBandwidth
+          ACCESS     not-implemented
+          DESCRIPTION "ospfReferenceBandwidth is not implemented"
+          
+          VARIATION  ospfRestartSupport
+          ACCESS     not-implemented
+          DESCRIPTION "ospfRestartSupport is not implemented"
+          
+          VARIATION  ospfRestartInterval
+          ACCESS     not-implemented
+          DESCRIPTION "ospfRestartInterval is not implemented"
+          
+          VARIATION  ospfRestartStrictLsaChecking
+          ACCESS     not-implemented
+          DESCRIPTION "ospfRestartStrictLsaChecking is not implemented"
+          
+          VARIATION  ospfRestartStatus
+          ACCESS     not-implemented
+          DESCRIPTION "ospfRestartStatus is not implemented"
+          
+          VARIATION  ospfRestartExitReason
+          ACCESS     not-implemented
+          DESCRIPTION "ospfRestartExitReason is not implemented"
+
+          VARIATION  ospfAsLsaCount
+          ACCESS     not-implemented
+          DESCRIPTION "ospfAsLsaCount is not implemented"
+
+          VARIATION  ospfAsLsaCksumSum
+          ACCESS     not-implemented
+          DESCRIPTION "ospfAsLsaCksumSum is not implemented"
+
+          VARIATION  ospfStubRouterSupport
+          ACCESS     not-implemented
+          DESCRIPTION "ospfStubRouterSupport is not implemented"
+
+          VARIATION  ospfStubRouterAdvertisement
+          ACCESS     not-implemented
+          DESCRIPTION "ospfStubRouterAdvertisement is not implemented"
+
+          VARIATION  ospfDiscontinuityTime
+          ACCESS     not-implemented
+          DESCRIPTION "ospfDiscontinuityTime is not implemented"
+            
+          --ospfNbrTable
+          VARIATION  ospfNbrOptions
+          ACCESS     not-implemented
+          DESCRIPTION "ospfNbrOptions is not implemented"
+          
+          VARIATION  ospfNbrPriority
+          ACCESS     not-implemented
+          DESCRIPTION "ospfNbrPriority is not implemented"
+          
+          VARIATION  ospfNbrEvents
+          ACCESS     not-implemented
+          DESCRIPTION "ospfNbrEvents is not implemented"
+          
+          VARIATION  ospfNbrLsRetransQLen
+          ACCESS     not-implemented
+          DESCRIPTION "ospfNbrLsRetransQLen is not implemented"
+          
+          VARIATION  ospfNbmaNbrPermanence
+          ACCESS     not-implemented
+          DESCRIPTION "ospfNbmaNbrPermanence is not implemented"
+
+          VARIATION  ospfNbrHelloSuppressed
+          ACCESS     not-implemented
+          DESCRIPTION "ospfNbrHelloSuppressed is not implemented"
+
+          VARIATION  ospfNbrRestartHelperStatus
+          ACCESS     not-implemented
+          DESCRIPTION "ospfNbrRestartHelperStatus is not implemented"
+
+          VARIATION  ospfNbrRestartHelperAge
+          ACCESS     not-implemented
+          DESCRIPTION "ospfNbrRestartHelperAge is not implemented"
+
+          VARIATION  ospfNbrRestartHelperExitReason
+          ACCESS     not-implemented
+          DESCRIPTION "ospfNbrRestartHelperExitReason is not implemented"
+          
+      SUPPORTS F3-OSPF-MIB
+      INCLUDES  { f3OspfRouterGroup, f3OspfAreaGroup, f3OspfIpInterfaceExtGroup,
+                  f3OspfIpMgmtTunnelExtGroup, f3OspfNbrExtGroup }
+
+    ::= {f3CapabilityDefinitions 53}
+
+f3Mef35Capabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific MEF 35/36 capabilities for F3 product family." 
+
+      SUPPORTS MEF-SOAM-PM-MIB
+      INCLUDES  { mefSoamLmCfgMandatoryGroup,
+                  mefSoamLmCfgOptionalGroup,
+                  mefSoamLmCurrentAvailStatsMandatoryGroup, 
+                  mefSoamLmCurrentAvailStatsOptionalGroup, 
+                  mefSoamLmCurrentStatsMandatoryGroup, 
+                  mefSoamLmCurrentStatsOptionalGroup, 
+                  mefSoamLmHistoryAvailStatsMandatoryGroup, 
+                  mefSoamLmHistoryAvailStatsOptionalGroup, 
+                  mefSoamLmHistoryStatsMandatoryGroup, 
+                  mefSoamLmHistoryStatsOptionalGroup,
+                  mefSoamDmCfgMandatoryGroup,
+                  mefSoamDmCfgOptionalGroup,
+                  mefSoamDmCurrentStatsMandatoryGroup,
+                  mefSoamDmCurrentStatsOptionalGroup,
+                  mefSoamDmHistoryStatsMandatoryGroup,
+                  mefSoamDmHistoryStatsOptionalGroup,
+                  mefSoamDmCfgMeasBinMandatoryGroup,
+                  mefSoamDmCurrentStatsBinsMandatoryGroup,
+                  mefSoamDmHistoryStatsBinsMandatoryGroup }
+
+          -- mefSoamLmCfgTable
+
+          VARIATION  mefSoamLmCfgType
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgType is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgVersion
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgVersion is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgEnabled
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgEnabled is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgMeasurementEnable
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgMeasurementEnable is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgMessagePeriod
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgMessagePeriod is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgPriority
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgPriority is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgFrameSize
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgFrameSize is restricted to read-only. 
+                       It is not applicable for the lmLmm types 
+                       and in this case 0 will be returned."
+
+          VARIATION  mefSoamLmCfgDataPattern
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgDataPattern is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgTestTlvIncluded
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgTestTlvIncluded is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgTestTlvPattern
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmCfgTestTlvIncluded is not implemented"
+
+          VARIATION  mefSoamLmCfgMeasurementInterval
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgMeasurementInterval is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgNumIntervalsStored
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgNumIntervalsStored is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgDestMacAddress
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgDestMacAddress is restricted to read-only"
+          
+          VARIATION  mefSoamLmCfgDestMepId
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgDestMepId is restricted to read-only"          
+          
+          VARIATION  mefSoamLmCfgDestIsMepId
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgDestIsMepId is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgStartTimeType
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgStartTimeType is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgFixedStartDateAndTime
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgFixedStartDateAndTime is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgRelativeStartTime
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmCfgRelativeStartTime is not implemented"
+
+          VARIATION  mefSoamLmCfgStopTimeType
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgStopTimeType is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgFixedStopDateAndTime
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgFixedStopDateAndTime is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgRelativeStopTime
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmCfgRelativeStopTime is not implemented"
+
+          VARIATION  mefSoamLmCfgRepetitionTime
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgRepetitionTime is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgAlignMeasurementIntervals
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgAlignMeasurementIntervals is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgAlignMeasurementOffset
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgAlignMeasurementOffset is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgAvailabilityMeasurementInterval
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgAvailabilityMeasurementInterval is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgAvailabilityNumConsecutiveMeasPdus
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgAvailabilityNumConsecutiveMeasPdus is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgAvailabilityFlrThreshold
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgAvailabilityFlrThreshold is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgAvailabilityNumConsecutiveIntervals
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgAvailabilityNumConsecutiveIntervals is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgAvailabilityNumConsecutiveHighFlr
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmCfgAvailabilityNumConsecutiveHighFlr is not implemented"
+
+          VARIATION  mefSoamLmCfgSessionType
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgSessionType is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgSessionStatus
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgSessionStatus is restricted to read-only"
+
+          VARIATION  mefSoamLmCfgHistoryClear
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmCfgHistoryClear is not implemented"
+
+          VARIATION  mefSoamLmCfgRowStatus
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmCfgRowStatus is not implemented"
+
+          -- mefSoamLmCurrentAvailStatsTable
+
+          VARIATION  mefSoamLmCurrentAvailStatsForwardHighLoss
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmCurrentAvailStatsForwardHighLoss is not implemented"
+
+          VARIATION  mefSoamLmCurrentAvailStatsBackwardHighLoss
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmCurrentAvailStatsBackwardHighLoss is not implemented"
+
+          VARIATION  mefSoamLmCurrentAvailStatsForwardConsecutiveHighLoss
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmCurrentAvailStatsForwardConsecutiveHighLoss is not implemented"
+
+          VARIATION  mefSoamLmCurrentAvailStatsBackwardConsecutiveHighLoss
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmCurrentAvailStatsBackwardConsecutiveHighLoss is not implemented"
+          
+          -- mefSoamLmHistoryAvailStatsTable
+
+          VARIATION  mefSoamLmHistoryAvailStatsForwardHighLoss
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmHistoryAvailStatsForwardHighLoss is not implemented"
+
+          VARIATION  mefSoamLmHistoryAvailStatsBackwardHighLoss
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmHistoryAvailStatsBackwardHighLoss is not implemented"
+
+          VARIATION  mefSoamLmHistoryAvailStatsForwardConsecutiveHighLoss
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmHistoryAvailStatsForwardConsecutiveHighLoss is not implemented"
+
+          VARIATION  mefSoamLmHistoryAvailStatsBackwardConsecutiveHighLoss
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmHistoryAvailStatsBackwardConsecutiveHighLoss is not implemented"
+          
+          -- mefSoamLmCurrentStatsTable
+
+          VARIATION  mefSoamLmCurrentStatsSoamPdusSent
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmCurrentStatsSoamPdusSent is not implemented"
+
+          VARIATION  mefSoamLmCurrentStatsSoamPdusReceived
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmCurrentStatsSoamPdusReceived is not implemented"
+          
+          -- mefSoamLmHistoryStatsTable
+
+          VARIATION  mefSoamLmHistoryStatsSoamPdusSent
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmHistoryStatsSoamPdusSent is not implemented"
+
+          VARIATION  mefSoamLmHistoryStatsSoamPdusReceived
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamLmHistoryStatsSoamPdusReceived is not implemented"
+          
+          -- mefSoamDmCfgTable
+          
+          VARIATION  mefSoamDmCfgType
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgType is restricted to read-only"
+          
+          VARIATION  mefSoamLmCfgType
+          ACCESS     read-only
+          DESCRIPTION "mefSoamLmCfgType is restricted to read-only"
+          
+          VARIATION  mefSoamDmCfgVersion
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgVersion is restricted to read-only"
+          
+          VARIATION  mefSoamDmCfgEnabled
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgEnabled is restricted to read-only"
+          
+          VARIATION  mefSoamDmCfgMeasurementEnable
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgMeasurementEnable is restricted to read-only"
+          
+          VARIATION  mefSoamDmCfgMessagePeriod
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgMessagePeriod is restricted to read-only"
+          
+          VARIATION  mefSoamDmCfgPriority
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgPriority is restricted to read-only"
+          
+          VARIATION  mefSoamDmCfgFrameSize
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgFrameSize is restricted to read-only"
+          
+          VARIATION  mefSoamDmCfgDataPattern
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgDataPattern is restricted to read-only"
+          
+          VARIATION  mefSoamDmCfgTestTlvIncluded
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgTestTlvIncluded is restricted to read-only"
+          
+          VARIATION  mefSoamDmCfgTestTlvPattern
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamDmCfgTestTlvIncluded is not implemented"
+
+          VARIATION  mefSoamDmCfgMeasurementInterval
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgMeasurementInterval is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgNumIntervalsStored
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgNumIntervalsStored is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgDestMacAddress
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgDestMacAddress is restricted to read-only"
+          
+          VARIATION  mefSoamDmCfgDestMepId
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgDestMepId is restricted to read-only"          
+          
+          VARIATION  mefSoamDmCfgDestIsMepId
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgDestIsMepId is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgStartTimeType
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgStartTimeType is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgFixedStartDateAndTime
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgFixedStartDateAndTime is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgRelativeStartTime
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamDmCfgRelativeStartTime is not implemented"
+
+          VARIATION  mefSoamDmCfgStopTimeType
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgStopTimeType is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgFixedStopDateAndTime
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgFixedStopDateAndTime is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgRelativeStopTime
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamDmCfgRelativeStopTime is not implemented"
+
+          VARIATION  mefSoamDmCfgRepetitionTime
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgRepetitionTime is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgAlignMeasurementIntervals
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgAlignMeasurementIntervals is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgAlignMeasurementOffset
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgAlignMeasurementOffset is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgNumMeasBinsPerFrameDelayInterval
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgNumMeasBinsPerFrameDelayInterval is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgNumMeasBinsPerInterFrameDelayVariationInterval
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgNumMeasBinsPerInterFrameDelayVariationInterval is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgInterFrameDelayVariationSelectionOffset
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgInterFrameDelayVariationSelectionOffset is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgNumMeasBinsPerFrameDelayRangeInterval
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgNumMeasBinsPerFrameDelayRangeInterval is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgSessionType
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgSessionType is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgSessionStatus
+          ACCESS     read-only
+          DESCRIPTION "mefSoamDmCfgSessionStatus is restricted to read-only"
+
+          VARIATION  mefSoamDmCfgHistoryClear
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamDmCfgHistoryClear is not implemented"
+
+          VARIATION  mefSoamDmCfgRowStatus
+          ACCESS     not-implemented
+          DESCRIPTION "mefSoamDmCfgRowStatus is not implemented"
+
+          -- MEF-SOAM-TC-MIB included only for Textual Conventions, no object groups supported
+          
+    ::= {f3CapabilityDefinitions 54}
+
+f3Nid112ProCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE112Pro for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGe112ProCardGroup }
+
+    ::= {f3CapabilityDefinitions 55}
+
+f3Nid112ProMCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE112ProM for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGe112ProMCardGroup }
+
+    ::= {f3CapabilityDefinitions 56}
+
+f3Nid114ProCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE114Pro for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGe114ProCardGroup }
+
+    ::= {f3CapabilityDefinitions 57}
+
+f3Nid114ProCCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE114ProC for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGe114ProCCardGroup }
+
+    ::= {f3CapabilityDefinitions 58}
+
+f3Nid114ProSHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE114ProSH for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGe114ProSHCardGroup }
+
+    ::= {f3CapabilityDefinitions 59}
+
+f3Nid114ProCSHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE114ProCSH for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGe114ProCSHCardGroup }
+
+    ::= {f3CapabilityDefinitions 60}
+
+f3Nid114ProHECapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE114ProHE for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGe114ProHECardGroup }
+
+    ::= {f3CapabilityDefinitions 61}
+
+f3Nid112ProHCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE112ProH for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGe112ProHCardGroup }
+
+    ::= {f3CapabilityDefinitions 62}
+
+f3ConnectGuardCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Connect Guard capabilities for F3 product" 
+
+      SUPPORTS F3-CONNECTGUARD-MIB
+      INCLUDES { f3ConnectGuardObjectsGroup, f3ConnectGuardPerfGroup }
+
+      SUPPORTS IEEE8021-SECY-MIB
+      INCLUDES { secyIfCtrlGroup, secyTxSCGroup, secyTxSAGroup, secyRxSCGroup, 
+                 secyRxSAGroup, secyCipherSuiteGroup, secyTxSAStatsGroup, secyRxSAStatsGroup,
+                 secyTxSCStatsGroup, secyRxSCStatsGroup, secyStatsGroup }
+
+      VARIATION  secyIfProtectFramesEnable
+      ACCESS     read-only
+      DESCRIPTION "secyIfProtectFramesEnable is restricted to read-only"
+
+      VARIATION  secyIfValidateFrames
+      ACCESS     read-only
+      DESCRIPTION "secyIfValidateFrames is restricted to read-only"
+
+      VARIATION  secyIfReplayProtectEnable
+      ACCESS     read-only
+      DESCRIPTION "secyIfReplayProtectEnable is restricted to read-only"
+
+      VARIATION  secyIfReplayProtectWindow
+      ACCESS     read-only
+      DESCRIPTION "secyIfReplayProtectWindow is restricted to read-only"
+
+      VARIATION  secyIfCurrentCipherSuite
+      ACCESS     read-only
+      DESCRIPTION "secyIfCurrentCipherSuite is restricted to read-only"
+
+      VARIATION  secyIfAdminPt2PtMAC
+      ACCESS     read-only
+      DESCRIPTION "secyIfAdminPt2PtMAC is restricted to read-only"
+
+      VARIATION  secyIfIncludeSCIEnable
+      ACCESS     read-only
+      DESCRIPTION "secyIfIncludeSCIEnable is restricted to read-only"
+
+      VARIATION  secyIfUseESEnable
+      ACCESS     read-only
+      DESCRIPTION "secyIfUseESEnable is restricted to read-only"
+
+      VARIATION  secyIfUseSCBEnable
+      ACCESS     read-only
+      DESCRIPTION "secyIfUseSCBEnable is restricted to read-only"
+
+      VARIATION  secyRxSANextPN
+      ACCESS     read-only
+      DESCRIPTION "secyRxSANextPN is restricted to read-only"
+
+      VARIATION  secyCipherSuiteId
+      ACCESS     read-only
+      DESCRIPTION "secyCipherSuiteId is restricted to read-only"
+
+      VARIATION  secyCipherSuiteName
+      ACCESS     read-only
+      DESCRIPTION "secyCipherSuiteName is restricted to read-only"
+
+      VARIATION  secyCipherSuiteCapability
+      ACCESS     read-only
+      DESCRIPTION "secyCipherSuiteCapability is restricted to read-only"
+
+      VARIATION  secyCipherSuiteProtection
+      ACCESS     read-only
+      DESCRIPTION "secyCipherSuiteProtection is restricted to read-only"
+
+      VARIATION  secyCipherSuiteProtectionOffset
+      ACCESS     read-only
+      DESCRIPTION "secyCipherSuiteProtectionOffset is restricted to read-only"
+
+      VARIATION  secyCipherSuiteDataLengthChange
+      ACCESS     read-only
+      DESCRIPTION "secyCipherSuiteDataLengthChange is restricted to read-only"
+
+      VARIATION  secyCipherSuiteICVLength
+      ACCESS     read-only
+      DESCRIPTION "secyCipherSuiteICVLength is restricted to read-only"
+
+      VARIATION  secyCipherSuiteRowStatus
+      ACCESS     read-only
+      DESCRIPTION "secyCipherSuiteRowStatus is restricted to read-only"
+
+    ::= {f3CapabilityDefinitions 63}
+
+f3L3Capabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific L3 capabilities for F3 product" 
+
+      SUPPORTS F3-L3-MIB
+      INCLUDES { f3L3ObjectsGroup, f3L3PerfGroup }
+
+    ::= {f3CapabilityDefinitions 64}
+
+
+f3Nid114GCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific GE114G for F3 product family." 
+
+      SUPPORTS CM-ENTITY-MIB
+      INCLUDES { nteGe114GCardGroup }
+
+    ::= {f3CapabilityDefinitions 65}
+
+
+f3BfdCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific BFD for F3 product family." 
+
+      SUPPORTS F3-BFD-MIB
+      INCLUDES { f3BfdConfigGroup }
+
+      SUPPORTS BFD-STD-MIB
+      INCLUDES { bfdSessionGroup, bfdSessionReadOnlyGroup, 
+                 bfdSessionPerfGroup, bfdSessionPerfHCGroup }
+
+    ::= {f3CapabilityDefinitions 66}
+
+f3EoMplsCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific EoMpls for F3 product family." 
+
+      SUPPORTS F3-EOMPLS-MIB
+      INCLUDES { f3EoMplsConfigGroup }
+
+    ::= {f3CapabilityDefinitions 67}
+
+f3FpmCapabilities  AGENT-CAPABILITIES
+    PRODUCT-RELEASE  "F3- family of products"
+    STATUS           current
+    DESCRIPTION      "SNMP vendor specific Flowpoint Model capabilities for F3 product" 
+
+      SUPPORTS CM-FACILITY-MIB
+      INCLUDES { cmMPFlowGroup, cmMPFlowMemberGroup }
+
+      SUPPORTS F3-FPM-MIB
+      INCLUDES { f3AccFlowPointGroup, f3AccFpQosShaperGroup, f3AccFpQosPolicerGroup, 
+                 f3MPFlowExtGroup, f3AccFlowPointCpdV2Group, f3AccFlowPointLearningConfigGroup, 
+                 f3NetFlowPointGroup, f3NetFpQosShaperGroup, f3NetFpQosPolicerGroup, 
+                 f3NetFlowPointCpdV2Group, f3NetFlowPointLearningConfigGroup, f3AccFlowPointPerfGroup, 
+                 f3NetFlowPointPerfGroup, f3MPFlowPerfGroup, f3AccFpQosShaperPerfGroup, 
+                 f3NetFpQosShaperPerfGroup, f3AccFpQosPolicerPerfGroup, f3NetFpQosPolicerPerfGroup, 
+                 f3FpmPerfNotifGroup }
+
+    ::= {f3CapabilityDefinitions 68}
+
+END

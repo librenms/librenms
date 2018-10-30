@@ -1,18 +1,15 @@
 <?php
 
+use LibreNMS\Config;
+use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\OS;
+
 $valid['sensor'] = array();
 
-// Pre-cache data for later use
-$pre_cache = array();
-$pre_cache_file = 'includes/discovery/sensors/pre-cache/' . $device['os'] . '.inc.php';
-if (is_file($pre_cache_file)) {
-    echo "Pre-cache {$device['os']}: ";
-    include $pre_cache_file;
-    echo PHP_EOL;
-    d_echo($pre_cache);
-}
+/** @var OS $os */
+$pre_cache = $os->preCache();
 
-// Run custom sensors 
+// Run custom sensors
 require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
 require 'includes/discovery/sensors/entity-sensor.inc.php';
 require 'includes/discovery/sensors/ipmi.inc.php';
@@ -37,6 +34,10 @@ if (strstr($device['hardware'], 'ProLiant')) {
     include 'includes/discovery/sensors/state/hp.inc.php';
 }
 
+if ($device['os'] == 'gw-eydfa') {
+    include 'includes/discovery/sensors/gw-eydfa.inc.php';
+}
+
 $run_sensors = array(
     'airflow',
     'current',
@@ -53,7 +54,19 @@ $run_sensors = array(
     'temperature',
     'voltage',
     'snr',
+    'pressure',
+    'cooling',
+    'delay',
+    'quality_factor',
+    'chromatic_dispersion',
+    'ber',
+    'eer',
+    'waterflow',
 );
+
+// filter submodules
+$run_sensors = array_intersect($run_sensors, Config::get('discovery_submodules.sensors', $run_sensors));
+
 sensors($run_sensors, $device, $valid, $pre_cache);
 unset(
     $pre_cache,

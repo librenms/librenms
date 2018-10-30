@@ -11,9 +11,12 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+use LibreNMS\Authentication\LegacyAuth;
+
 header('Content-type: text/plain');
 
-if (is_admin() === false) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -22,6 +25,7 @@ if (!is_numeric($_POST['template_id'])) {
     exit;
 } else {
     if (dbDelete('alert_templates', '`id` =  ?', array($_POST['template_id']))) {
+        dbDelete('alert_template_map', 'alert_templates_id = ?', array($_POST['template_id']));
         echo 'Alert template has been deleted.';
         exit;
     } else {

@@ -5,9 +5,9 @@ foreach ($datas as $type) {
         if (is_file('pages/routing/overview/'.mres($type).'.inc.php')) {
             $g_i++;
             if (!is_integer($g_i / 2)) {
-                $row_colour = $list_colour_a;
+                $row_colour = $config['list_colour']['even'];
             } else {
-                $row_colour = $list_colour_b;
+                $row_colour = $config['list_colour']['odd'];
             }
 
             echo '<div style="background-color: '.$row_colour.';">';

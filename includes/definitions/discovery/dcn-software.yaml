@@ -1,0 +1,8 @@
+mib: DCN-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: switchCpuUsage
+                  num_oid: '.1.3.6.1.4.1.6339.100.1.11.10.{{ $index }}'
+                  descr: CPU Usage

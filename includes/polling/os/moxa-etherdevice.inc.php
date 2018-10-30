@@ -10,6 +10,16 @@
  * the source code distribution for details.
  */
 
+$oids = array(
+    'hardware' => $device['sysObjectID'].'.1.2.0',
+    'version' => $device['sysObjectID'].'.1.4.0',
+    'serial' => $device['sysObjectID'].'.1.78.0',
+);
+  
+$os_data = snmp_get_multi_oid($device, $oids);
 
-$version = snmp_get($device, "firmwareVersion.0", "-OQvs", "MOXA-IKS6726A-MIB");
-$hardware =  $poll_device['sysDescr'];
+foreach ($oids as $var => $oid) {
+    $$var = trim($os_data[$oid], '"');
+}
+
+unset($oids, $os_data);

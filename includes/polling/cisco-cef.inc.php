@@ -96,7 +96,7 @@ if ($device['os_group'] == 'cisco') {
     // FIXME - need to delete old ones. FIXME REALLY.
     print_r($cefs_db);
 
-    foreach ($cefs_db as $cef_switching_id) {
+    foreach ((array)$cefs_db as $cef_switching_id) {
         dbDelete('cef_switching', '`cef_switching_id` =  ?', array($cef_switching_id));
         echo '-';
     }

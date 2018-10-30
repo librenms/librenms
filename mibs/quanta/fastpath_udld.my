@@ -1,0 +1,190 @@
+NETGEAR-UDLD-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Switching MIB
+-- Copyright Netgear Inc (2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property. Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32                 FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue                                      FROM SNMPv2-TC
+    lb6m                                                            FROM QUANTA-LB6M-REF-MIB
+    DisplayString                                                       FROM RFC1213-MIB
+    ifIndex                                                             FROM IF-MIB;
+   
+    fastPathUdld MODULE-IDENTITY
+        LAST-UPDATED "200712030000Z" -- 03 December 2007 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The Netgear Private MIB for FastPath UDLD."
+
+        -- Revision history.
+        REVISION
+          "200802240000Z" -- 22 February 2008 12:00:00 GMT
+        DESCRIPTION
+          "Initial version."
+        ::= { lb6m 54 }
+
+agentUdldMIBObjects  OBJECT IDENTIFIER ::= { fastPathUdld 1 }
+agentUdldGlobal      OBJECT IDENTIFIER ::= { agentUdldMIBObjects 1 }
+agentUdldInterface   OBJECT IDENTIFIER ::= { agentUdldMIBObjects 2 }
+
+-- ***************************************************************************
+--
+-- The UDLD Global Group
+-- Manage Global UDLD settings.
+--
+-- ***************************************************************************
+
+agentUdldGlobalMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+                          enable(1),
+                          disable(2)
+                 } 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                "Indicates the mode of UDLDP feature on the device.
+                 enable -- Unidirectional Link Detection Protocol is 
+                           enabled on the device.
+
+                 disable -- Unidirectional Link Detection Protocol is
+                            disabled on the device."
+        ::= { agentUdldGlobal 1 }
+        
+agentUdldMessageInterval OBJECT-TYPE
+        SYNTAX      INTEGER  (7..90)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                    "Indicates interval in seconds at which each port
+                     sends a packet to all of its neighbors at
+                     steady state when the link has been identified as
+                     bidirectional."
+        ::= { agentUdldGlobal 2 }
+        
+agentUdldTimeoutInterval OBJECT-TYPE
+        SYNTAX      INTEGER  (5..60)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                    "Indicates Timeout interval in seconds."
+        ::= { agentUdldGlobal 3 }
+
+agentUdldReset OBJECT-TYPE
+    SYNTAX      INTEGER {
+                normalOperation(0),
+                reset(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Resets all interfaces that have been shutdown by UDLD. On read OID will always be 0."
+    ::= { agentUdldGlobal  4 }
+
+-- ****************************************************************************
+--
+-- The UDLD Interface Group
+-- Manage UDLD on interface.
+--
+-- ****************************************************************************
+
+agentUdldInterfaceTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF UdldInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The table containing the status 
+                 of UDLDP on the device's interfaces."
+        ::= { agentUdldInterface 1 }
+
+agentUdldInterfaceEntry OBJECT-TYPE
+        SYNTAX      UdldInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                  " An entry exists for each interface that supports 
+                   UDLDP."
+        INDEX { ifIndex }
+        ::= { agentUdldInterfaceTable 1 }
+
+UdldInterfaceEntry ::= SEQUENCE {
+      agentUdldInterfaceOperStatus     INTEGER,
+      agentUdldInterfaceAdminMode      INTEGER,
+      agentUdldInterfaceAggresiveMode  TruthValue
+}
+
+agentUdldInterfaceOperStatus OBJECT-TYPE
+        SYNTAX        INTEGER {
+                                shutdown(1), 
+                                undetermined(2),
+                                biDirectional(3), 
+                                notApplicable(4),
+                                undetermined-LinkDown(5)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+               " This mib object contains the following values,
+                 which has the meaning as:
+                 'shutdown'      - An Unidirectional link  has been 
+                                   detected and the port has been disabled.
+                 'undetermined'  - Unidirectional Link Detection  
+                                   protocol has not collected enough
+                                   information to determine if the 
+                                   link is bidirectional or not.
+                 'biDirectional' - A bidirectional link has been 
+                                   detected.
+                 'notApplicable' - Unidirectional Link Detection 
+                                   Protocol is disabled. 
+                 'undetermined-LinkDown' - The port would transition into 
+                                   this state when the port link physically 
+                                   goes down due to any reasons other than 
+                                   the port been put into D-Disable mode
+                                   by UDLD protocol on the switch.
+                "
+        ::= { agentUdldInterfaceEntry 1}
+
+agentUdldInterfaceAdminMode  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                          enable(1),
+                          disable(2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+                "Indicates the Administrative mode of Unidirectional 
+                 Link Detection Protocol Feature configured on this 
+                 interface.
+                 
+                 enable -- Unidirectional Link Detection Protocol is 
+                           enabled on this interface.
+
+                 disable -- Unidirectional Link Detection Protocol is
+                            disabled on this interface."
+        ::= { agentUdldInterfaceEntry 2}
+
+agentUdldInterfaceAggresiveMode OBJECT-TYPE
+     SYNTAX      TruthValue 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                "Indicates the mode of UDLDP feature on the interface.
+                 TRUE -- Aggressive mode is enabled on the interface.
+
+                 FALSE -- Aggressive mode is disabled on the interface."
+
+        ::= { agentUdldInterfaceEntry 3}
+
+END

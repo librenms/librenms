@@ -5,21 +5,29 @@ $diskio    = get_disks($device['device_id']);
 $mempools  = dbFetchCell('select count(*) from mempools WHERE device_id = ?', array($device['device_id'])) + count_mib_mempools($device);
 $processor = dbFetchCell('select count(*) from processors WHERE device_id = ?', array($device['device_id'])) + count_mib_processors($device);
 
-$charge       = dbFetchCell("select count(*) from sensors WHERE sensor_class='charge' AND device_id = ?", array($device['device_id']));
-$temperatures = dbFetchCell("select count(*) from sensors WHERE sensor_class='temperature' AND device_id = ?", array($device['device_id']));
-$humidity     = dbFetchCell("select count(*) from sensors WHERE sensor_class='humidity' AND device_id = ?", array($device['device_id']));
-$fans         = dbFetchCell("select count(*) from sensors WHERE sensor_class='fanspeed' AND device_id = ?", array($device['device_id']));
-$volts        = dbFetchCell("select count(*) from sensors WHERE sensor_class='voltage' AND device_id = ?", array($device['device_id']));
-$current      = dbFetchCell("select count(*) from sensors WHERE sensor_class='current' AND device_id = ?", array($device['device_id']));
-$freqs        = dbFetchCell("select count(*) from sensors WHERE sensor_class='frequency' AND device_id = ?", array($device['device_id']));
-$runtime      = dbFetchCell("select count(*) from sensors WHERE sensor_class='runtime' AND device_id = ?", array($device['device_id']));
-$power        = dbFetchCell("select count(*) from sensors WHERE sensor_class='power' AND device_id = ?", array($device['device_id']));
-$dBm          = dbFetchCell("select count(*) from sensors WHERE sensor_class='dBm' AND device_id = ?", array($device['device_id']));
-$states       = dbFetchCell("select count(*) from sensors WHERE sensor_class='state' AND device_id = ?", array($device['device_id']));
-$load         = dbFetchCell("select count(*) from sensors WHERE sensor_class='load' AND device_id = ?", array($device['device_id']));
-$signal       = dbFetchCell("select count(*) from sensors WHERE sensor_class='signal' AND device_id = ?", array($device['device_id']));
-$airflow      = dbFetchCell("select count(*) from sensors WHERE sensor_class='airflow' AND device_id = ?", array($device['device_id']));
-$snr          = dbFetchCell("select count(*) from sensors WHERE sensor_class='snr' AND device_id = ?", array($device['device_id']));
+$charge                = dbFetchCell("select count(*) from sensors WHERE sensor_class='charge' AND device_id = ?", array($device['device_id']));
+$temperatures          = dbFetchCell("select count(*) from sensors WHERE sensor_class='temperature' AND device_id = ?", array($device['device_id']));
+$humidity              = dbFetchCell("select count(*) from sensors WHERE sensor_class='humidity' AND device_id = ?", array($device['device_id']));
+$fans                  = dbFetchCell("select count(*) from sensors WHERE sensor_class='fanspeed' AND device_id = ?", array($device['device_id']));
+$volts                 = dbFetchCell("select count(*) from sensors WHERE sensor_class='voltage' AND device_id = ?", array($device['device_id']));
+$current               = dbFetchCell("select count(*) from sensors WHERE sensor_class='current' AND device_id = ?", array($device['device_id']));
+$freqs                 = dbFetchCell("select count(*) from sensors WHERE sensor_class='frequency' AND device_id = ?", array($device['device_id']));
+$runtime               = dbFetchCell("select count(*) from sensors WHERE sensor_class='runtime' AND device_id = ?", array($device['device_id']));
+$power                 = dbFetchCell("select count(*) from sensors WHERE sensor_class='power' AND device_id = ?", array($device['device_id']));
+$dBm                   = dbFetchCell("select count(*) from sensors WHERE sensor_class='dBm' AND device_id = ?", array($device['device_id']));
+$states                = dbFetchCell("select count(*) from sensors WHERE sensor_class='state' AND device_id = ?", array($device['device_id']));
+$load                  = dbFetchCell("select count(*) from sensors WHERE sensor_class='load' AND device_id = ?", array($device['device_id']));
+$signal                = dbFetchCell("select count(*) from sensors WHERE sensor_class='signal' AND device_id = ?", array($device['device_id']));
+$airflow               = dbFetchCell("select count(*) from sensors WHERE sensor_class='airflow' AND device_id = ?", array($device['device_id']));
+$snr                   = dbFetchCell("select count(*) from sensors WHERE sensor_class='snr' AND device_id = ?", array($device['device_id']));
+$pressure              = dbFetchCell("select count(*) from sensors WHERE sensor_class='pressure' AND device_id = ?", array($device['device_id']));
+$cooling               = dbFetchCell("select count(*) from sensors WHERE sensor_class='cooling' AND device_id = ?", array($device['device_id']));
+$delay                 = dbFetchCell("select count(*) from sensors WHERE sensor_class='delay' AND device_id = ?", array($device['device_id']));
+$quality_factor        = dbFetchCell("select count(*) from sensors WHERE sensor_class='quality_factor' AND device_id = ?", array($device['device_id']));
+$chromatic_dispersion  = dbFetchCell("select count(*) from sensors WHERE sensor_class='chromatic_dispersion' AND device_id = ?", array($device['device_id']));
+$ber                   = dbFetchCell("select count(*) from sensors WHERE sensor_class='ber' AND device_id = ?", array($device['device_id']));
+$eer                   = dbFetchCell("select count(*) from sensors WHERE sensor_class='eer' AND device_id = ?", array($device['device_id']));
+$waterflow             = dbFetchCell("select count(*) from sensors WHERE sensor_class='waterflow' AND device_id = ?", array($device['device_id']));
 
 unset($datas);
 $datas[] = 'overview';
@@ -99,26 +107,66 @@ if ($snr) {
     $datas[] = 'snr';
 }
 
-$type_text['overview']    = 'Overview';
-$type_text['charge']      = 'Battery Charge';
-$type_text['temperature'] = 'Temperature';
-$type_text['humidity']    = 'Humidity';
-$type_text['mempool']     = 'Memory';
-$type_text['storage']     = 'Disk Usage';
-$type_text['diskio']      = 'Disk I/O';
-$type_text['processor']   = 'Processor';
-$type_text['voltage']     = 'Voltage';
-$type_text['fanspeed']    = 'Fanspeed';
-$type_text['frequency']   = 'Frequency';
-$type_text['runtime']     = 'Runtime remaining';
-$type_text['current']     = 'Current';
-$type_text['power']       = 'Power';
-$type_text['dbm']         = 'dBm';
-$type_text['state']       = 'State';
-$type_text['load']        = 'Load';
-$type_text['signal']      = 'Signal';
-$type_text['airflow']     = 'Airflow';
-$type_text['snr']         = 'SNR';
+if ($pressure) {
+    $datas[] = 'pressure';
+}
+
+if ($cooling) {
+    $datas[] = 'cooling';
+}
+
+if ($delay) {
+    $datas[] = 'delay';
+}
+
+if ($quality_factor) {
+    $datas[] = 'quality_factor';
+}
+
+if ($chromatic_dispersion) {
+    $datas[] = 'chromatic_dispersion';
+}
+
+if ($ber) {
+    $datas[] = 'ber';
+}
+
+if ($eer) {
+    $datas[] = 'eer';
+}
+
+if ($waterflow) {
+    $datas[] = 'waterflow';
+}
+
+$type_text['overview']             = 'Overview';
+$type_text['charge']               = 'Battery Charge';
+$type_text['temperature']          = 'Temperature';
+$type_text['humidity']             = 'Humidity';
+$type_text['mempool']              = 'Memory';
+$type_text['storage']              = 'Disk Usage';
+$type_text['diskio']               = 'Disk I/O';
+$type_text['processor']            = 'Processor';
+$type_text['voltage']              = 'Voltage';
+$type_text['fanspeed']             = 'Fanspeed';
+$type_text['frequency']            = 'Frequency';
+$type_text['runtime']              = 'Runtime remaining';
+$type_text['current']              = 'Current';
+$type_text['power']                = 'Power';
+$type_text['dbm']                  = 'dBm';
+$type_text['state']                = 'State';
+$type_text['load']                 = 'Load';
+$type_text['signal']               = 'Signal';
+$type_text['airflow']              = 'Airflow';
+$type_text['snr']                  = 'SNR';
+$type_text['pressure']             = 'Pressure';
+$type_text['cooling']              = 'Cooling';
+$type_text['delay']                = 'Delay';
+$type_text['quality_factor']       = 'Quality factor';
+$type_text['chromatic_dispersion'] = 'Chromatic Dispersion';
+$type_text['ber']                  = 'Bit Error Rate';
+$type_text['eer']                  = 'Energy Efficiency Ratio';
+$type_text['waterflow']            = 'Water Flow Rate';
 
 $link_array = array(
     'page'   => 'device',
@@ -137,7 +185,6 @@ if (!$vars['metric']) {
 unset($sep);
 foreach ($datas as $type) {
     echo $sep;
-
     if ($vars['metric'] == $type) {
         echo '<span class="pagemenu-selected">';
     }

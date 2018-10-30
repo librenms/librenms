@@ -3,9 +3,7 @@
  * raspberry pi frequencies
  * requires snmp extend agent script from librenms-agent
  */
-$raspberry = snmp_get($device, 'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0', '-Osqnv');
-
-if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
+if (!empty($pre_cache['raspberry_pi_sensors'])) {
     $sensor_type = "raspberry_freq";
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
 
@@ -18,9 +16,11 @@ if (preg_match("/(bcm).+(boardrev)/", $raspberry)) {
                 $descr = "Core";
                 break;
         }
-        $value = snmp_get($device, $oid.$freq, '-Oqve');
+        $value = isset($pre_cache['raspberry_pi_sensors']["raspberry." . $freq]);
         if (is_numeric($value)) {
-            discover_sensor($valid['sensor'], 'frequency', $device, $oid.$freq, $freq, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
+            discover_sensor($valid['sensor'], 'frequency', $device, $oid . $freq, $freq, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
+        } else {
+            break;
         }
     }
 }

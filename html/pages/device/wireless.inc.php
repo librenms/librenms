@@ -72,9 +72,9 @@ if ($vars['metric'] == 'overview') {
     );
     foreach ($sensors as $sensor) {
         if (!is_integer($row++ / 2)) {
-            $row_colour = $list_colour_a;
+            $row_colour = $config['list_colour']['even'];
         } else {
-            $row_colour = $list_colour_b;
+            $row_colour = $config['list_colour']['odd'];
         }
 
         $sensor_descr = $sensor['sensor_descr'];

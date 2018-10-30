@@ -1,0 +1,14 @@
+{
+    "mempools": {
+        "discovery": {
+            "mempools": []
+        },
+        "poller": "matches discovery"
+    },
+    "processors": {
+        "discovery": {
+            "processors": []
+        },
+        "poller": "matches discovery"
+    }
+}

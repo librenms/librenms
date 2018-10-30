@@ -1,0 +1,68 @@
+mib: DELL-RAC-MIB:IDRAC-MIB-SMIv2
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: drsGlobalSystemStatus
+                    value: drsGlobalSystemStatus
+                    num_oid: .1.3.6.1.4.1.674.10892.2.2.1.
+                    descr: 'Global System Status'
+                    index: 'drsGlobalSystemStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: systemStateIDSDMCardUnitStatusCombined
+                    value: systemStateIDSDMCardUnitStatusCombined
+                    num_oid: .1.3.6.1.4.1.674.10892.5.4.200.10.1.58.
+                    descr: 'IDSDM Card Unit Combined Status'
+                    index: 'systemStateIDSDMCardUnitStatusCombined.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: systemStateIDSDMCardDeviceStatusCombined
+                    value: systemStateIDSDMCardDeviceStatusCombined
+                    num_oid: .1.3.6.1.4.1.674.10892.5.4.200.10.1.60.
+                    descr: 'IDSDM Card Device Combined Status'
+                    index: 'systemStateIDSDMCardDeviceStatusCombined.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: intrusionStatus
+                    value: intrusionStatus
+                    num_oid: .1.3.6.1.4.1.674.10892.5.4.300.70.1.5.
+                    descr: 'Intrusion Status'
+                    index: 'intrusionStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: intrusionReading
+                    value: intrusionReading
+                    num_oid: .1.3.6.1.4.1.674.10892.5.4.300.70.1.6.
+                    descr: 'Intrusion Reading'
+                    index: 'intrusionReading.{{ $index }}'
+                    states:
+                        - { value: 1, descr: chassisNotBreached, graph: 1, generic: 0 }
+                        - { value: 2, descr: chassisBreached, graph: 1, generic: 2 }
+                        - { value: 3, descr: chassisBreachedPrior, graph: 1, generic: 1 }
+                        - { value: 4, descr: chassisBreachSensorFailure, graph: 1, generic: 1 }

@@ -1559,7 +1559,7 @@ tr.search:nth-child(odd) {
 
 .scrollable-menu {
     height: auto;
-    max-height: 200px;
+    max-height: 600px;
     overflow-x: hidden;
 }
 
@@ -1588,6 +1588,12 @@ tr.search:nth-child(odd) {
 .navbar-brand {
   padding: 8px 15px 8px 15px !important;
   line-height: 32px;
+}
+
+@media (min-width: 992px) and (max-width: 1280px) {
+  .navbar-brand {
+    display: none !important;
+  }
 }
 
 .navbar-brand img {
@@ -1878,6 +1884,16 @@ label {
     color: white;
 }
 
+.blueCluster {
+    background-color: rgba(23,162,184, 0);
+    background-color: rgba(23,162,184,0.7);
+    text-align: center;
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 14px;
+    color: white;
+}
+
 .greenCluster {
     background-color: rgba(0,255,0, 0);
     background-color: rgba(110, 204, 57, 0.6);
@@ -1937,6 +1953,7 @@ label {
 }
 
 .availability-label {
+  border-radius: 0 .25em 0 .25em;
   float:right;
   margin:-8px;
 }
@@ -2122,15 +2139,16 @@ label {
 }
 
 .device-table-icon {
-    text-align: center;
-    display: block;
-    width: 70px;
-    height: 32px;
-    line-height: 32px;
+  padding-left:7px;
+  display: inline-block;
+  width: 64px;
+  height: 32px;
+  line-height: 32px;
 }
 
 .device-table-icon img {
-    width: 32px;
+  width: 32px;
+  max-height: 32px;
 }
 
 .device-icon img {
@@ -2150,26 +2168,40 @@ label {
   margin-right: 15px;
 }
 
-.severity-ok {
-  color: green;
+.alert-status {
+  display: inline-block;
+  width: 7px;
+  min-height: 27px;
+  height: 32px;
 }
 
-.severity-info {
-  color: royalblue;
+.device-services-page {
+  font-weight: bold;
+  margin-left: 20px;
+  vertical-align: middle;
 }
 
-.severity-notice {
-  color: gold;
+.device-services-page-no-service {
+  font-weight: bold;
+  vertical-align: middle;
+  padding: 15px;
 }
 
-.severity-warning {
-  color: darkorange;
+.validation:invalid {
+    border-color: red;
 }
 
-.severity-critical {
-  color: red;
+.eventlog-status {
+  display: inline-block;
+  margin-right: 8px;
+  float: left;
 }
 
-.severity-unknown {
-  color: darkgrey;
+/* Workaround for https://github.com/select2/select2/issues/291 */
+.select2-selection--multiple .select2-search--inline .select2-search__field {
+  width: auto !important;
+}
+
+.toast-top-right {
+  top: 34px;
 }

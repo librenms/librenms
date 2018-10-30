@@ -1,0 +1,261 @@
+NETGEAR-MMRP-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+-- MMRP private MIB for IEEE 802.1Q Devices
+-- -------------------------------------------------------------
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Counter32, Counter64, Unsigned32, TimeTicks, Integer32                  FROM SNMPv2-SMI
+    RowStatus, TruthValue, TimeInterval, TEXTUAL-CONVENTION, MacAddress     FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP                                         FROM SNMPv2-CONF
+    EnabledStatus                                                           FROM P-BRIDGE-MIB
+    agentDot1qMrpMxrp                                                       FROM NETGEAR-MRP-MIB;
+
+fastPathMMRP MODULE-IDENTITY
+    LAST-UPDATED "201104290000Z" -- 29 April 2011 12:00:00 GMT
+    ORGANIZATION "Netgear Inc"
+    CONTACT-INFO ""
+
+    DESCRIPTION
+          "The Netgear Private MIB for 802.1ak MMRP Configuration"
+
+      -- Revision history.
+    REVISION
+        "201104290000Z" -- 29 April 2011 12:00:00 GMT
+    DESCRIPTION
+        "Initial version."
+
+    ::= { agentDot1qMrpMxrp 1 }
+
+-- -------------------------------------------------------------
+-- groups in the MRP MIB
+-- -------------------------------------------------------------
+
+agentDot1qMmrp                OBJECT IDENTIFIER ::= { fastPathMMRP 1 }
+agentDot1qMrpMmrpStats        OBJECT IDENTIFIER ::= { fastPathMMRP 2 }
+
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+--
+-- The MRP Port Table
+--
+-- @purpose  Describes basic MRP per port functionality.
+--
+-- -------------------------------------------------------------
+
+agentDot1qPortMmrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1qPortMmrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of MRP control information about every bridge
+        port.  This is indexed by agentDot1qBasePort."
+    ::= { agentDot1qMmrp 1 }
+
+agentDot1qPortMmrpEntry OBJECT-TYPE
+    SYNTAX      Dot1qPortMmrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MRP control information for a bridge port."
+    INDEX   { agentDot1qMmrpPort }
+    ::= { agentDot1qPortMmrpTable 1 }
+
+Dot1qPortMmrpEntry ::=
+    SEQUENCE {
+        agentDot1qMmrpPort
+            Unsigned32,
+        agentDot1qPortMmrpMode
+            EnabledStatus
+     }
+
+agentDot1qMmrpPort OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION
+    "The MRP port number."
+    ::= { agentDot1qPortMmrpEntry 1 }
+
+agentDot1qPortMmrpMode OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       " Shows/Changes mode for MMRP. The
+        value enabled(1) indicates that MMRP is enabled on port.
+        A value of disabled(2) indicates that MMRP is disabled on port."
+    DEFVAL { disabled }
+    ::= { agentDot1qPortMmrpEntry 2 }
+ 
+-- -------------------------------------------------------------
+-- End of the MRP Port Table
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+--
+-- The MxRP Configuration
+--
+-- @purpose  Enable/Disable protocols of MxRP 
+--                    family.
+--
+-- -------------------------------------------------------------
+agentDot1qBridgeMmrpMode OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       " Shows/Changes mode for MMRP. The
+        value enabled(1) indicates that MMRP is enabled.
+        A value of disabled(2) indicates that MMRP is disabled."
+      DEFVAL { disabled }
+    ::= { agentDot1qMmrp 2 }
+
+agentDot1qBridgeMrpPeriodicStateMachineForMmrp OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       " Shows/Changes mode for MRP Periodic State Machine for MMRP. The
+        value enabled(1) indicates that it is enabled.
+        A value of disabled(2) indicates that if is disabled."
+      DEFVAL { disabled }
+    ::= { agentDot1qMmrp 3 }
+
+-- -------------------------------------------------------------
+-- End of the MxRP Configuration
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- MMRP Statistics
+-- -------------------------------------------------------------
+                          
+               
+agentDot1qMrpMmrpPktTx OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames was transmitted."
+    ::= { agentDot1qMrpMmrpStats 1 }
+
+agentDot1qMrpMmrpPktRx OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames was received."
+    ::= { agentDot1qMrpMmrpStats 2 }
+
+agentDot1qMrpMmrpPktRxBadHeader OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames with bad header was received."
+    ::= { agentDot1qMrpMmrpStats 3 }
+
+agentDot1qMrpMmrpPktRxBadFormat OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames with bad data field was not transmitted."
+    ::= { agentDot1qMrpMmrpStats 4 }
+
+agentDot1qMrpMmrpPktTxFailure OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames was not transmitted on interface."
+    ::= { agentDot1qMrpMmrpStats 5 }
+
+agentDot1qMrpMmrpStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1qMrpMmrpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which contains MMRP statistics per port."
+    ::= { agentDot1qMrpMmrpStats 6 }
+
+agentDot1qMrpMmrpStatisticsEntry OBJECT-TYPE
+    SYNTAX      Dot1qMrpMmrpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MMRP statistics entry."
+    INDEX { agentDot1qMrpMmrpIntf }
+    ::= { agentDot1qMrpMmrpStatsTable 1 }
+
+Dot1qMrpMmrpStatisticsEntry ::=
+    SEQUENCE {
+        agentDot1qMrpMmrpIntf   
+            INTEGER,
+        agentDot1qMrpMmrpPortPktTx
+            Counter32,
+        agentDot1qMrpMmrpPortPktRx
+            Counter32,
+        agentDot1qMrpMmrpPortPktRxBadHeader
+            Counter32,
+        agentDot1qMrpMmrpPortPktRxBadFormat
+            Counter32,
+        agentDot1qMrpMmrpPortPktTxFailure
+            Counter32
+    }
+
+agentDot1qMrpMmrpIntf OBJECT-TYPE
+    SYNTAX   INTEGER (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "Index of agentDot1qMrpMmrpStatistics table."
+    ::= { agentDot1qMrpMmrpStatisticsEntry 1 }
+    
+agentDot1qMrpMmrpPortPktTx OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames was transmitted on interface."
+    ::= { agentDot1qMrpMmrpStatisticsEntry 2 }
+
+agentDot1qMrpMmrpPortPktRx OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames was received on interface."
+    ::= { agentDot1qMrpMmrpStatisticsEntry 3 }
+
+agentDot1qMrpMmrpPortPktRxBadHeader OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames with bad header was received on interface."
+    ::= { agentDot1qMrpMmrpStatisticsEntry 4 }
+
+agentDot1qMrpMmrpPortPktRxBadFormat OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames with bad data field was not transmitted on interface."
+    ::= { agentDot1qMrpMmrpStatisticsEntry 5}
+
+agentDot1qMrpMmrpPortPktTxFailure OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+      "The number of frames was not transmitted on interface."
+    ::= { agentDot1qMrpMmrpStatisticsEntry 6 }
+
+-- -------------------------------------------------------------
+-- End of MMRP Statistics
+-- -------------------------------------------------------------
+
+END

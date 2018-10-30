@@ -3,10 +3,11 @@
 --
 -- January 1995, Jeffrey T. Johnson
 --
--- Copyright (c) 1995-2016 by cisco Systems, Inc.
+-- Copyright (c) 1995-2018 by cisco Systems, Inc.
 -- All rights reserved.
 -- 
 -- *****************************************************************
+
 
 CISCO-PRODUCTS-MIB DEFINITIONS ::= BEGIN
 
@@ -18,7 +19,7 @@ IMPORTS
 		FROM CISCO-SMI;
 
 ciscoProductsMIB MODULE-IDENTITY
-	LAST-UPDATED	"201607080000Z"
+	LAST-UPDATED	"201803150000Z"
 	ORGANIZATION	"Cisco Systems, Inc."
 	CONTACT-INFO
 		"       Cisco Systems
@@ -1534,6 +1535,7 @@ cisco819G4GAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 1495 } -- 
 cisco819G4GVK9                  OBJECT IDENTIFIER ::= { ciscoProducts 1496 } -- C819G-4G-V-K9 None-Hardened Fixed router with Verizon LTE modem
 cisco819G4GGK9                  OBJECT IDENTIFIER ::= { ciscoProducts 1497 } -- C819G-4G-G-K9 Non-Hardened Fixed router with Global SKU LTE modem
 
+
 ciscoUcsC200                    OBJECT IDENTIFIER ::= { ciscoProducts 1512 } -- The C200 is a Cisco Unified Computing System C-Series Rack-Mount Server. This is a high-density, two-socket, 1 Rack Unit rack-mount server
 ciscoUcsC210                    OBJECT IDENTIFIER ::= { ciscoProducts 1513 } -- The C210 is a Cisco Unified Computing System C-Series Rack-Mount Server. This is a general purpose, 2-socket, 2 rack unit (RU) rack-mount server
 ciscoUcsC250                    OBJECT IDENTIFIER ::= { ciscoProducts 1514 } -- The C250 is a Cisco Unified Computing System C-Series Rack-Mount Server. This is a high-performance, memory-intensive, 2-socket, 2 rack unit (RU) rack-mount server
@@ -1819,11 +1821,14 @@ ciscoN9KC93128TX                OBJECT IDENTIFIER ::= { ciscoProducts 1923 } -- 
 ciscoN9KC9396TX                 OBJECT IDENTIFIER ::= { ciscoProducts 1924 } -- 2RU TOR, 48x10GT+12x40G QSFP
 ciscoN9KC9396PX                 OBJECT IDENTIFIER ::= { ciscoProducts 1925 } -- 2RU TOR, 48x10GF+12x40G QSFP 
 ciscoUcsEN120S                  OBJECT IDENTIFIER ::= { ciscoProducts 1931 } -- UCS E-Series Network compute engine 2-Core Service module (UCS-EN120S-M2/K9)
+ciscoUcsEN140N                  OBJECT IDENTIFIER ::= { ciscoProducts 1932 } -- UCS E-Series Network compute engine 4-Core Network interface module (UCS-EN140N-M2/K9)
+ciscoUcsEN120E                  OBJECT IDENTIFIER ::= { ciscoProducts 1933 } -- UCS E-Series Network compute engine 2-Core Enhanced High-speed WAN interface card (UCS-EN120E-M2/K9)
 ciscoC68xxVirtualSwitch         OBJECT IDENTIFIER ::= { ciscoProducts 1934 } -- 68xx Virtual Switch 
 ciscoISR4431                    OBJECT IDENTIFIER ::= { ciscoProducts 1935 } -- Cisco ISR 4431 Router Chassis
 ciscoC6880x                     OBJECT IDENTIFIER ::= { ciscoProducts 1936 } -- Catalyst 6880 chassis 
 ciscoCPT50                      OBJECT IDENTIFIER ::= { ciscoProducts 1937 } -- Cisco Carrier Packet Transport (CPT) 50 
 ciscoAIRAP2702                  OBJECT IDENTIFIER ::= { ciscoProducts 1938 } -- Cisco Aironet 2700 Series (IEEE 802.11ac) Access Point
+ciscoNCS4016                    OBJECT IDENTIFIER ::= { ciscoProducts 1939 } -- NCS 4016 System 
 ciscoCSE340WG32K9               OBJECT IDENTIFIER ::= { ciscoProducts 1940 } -- Cisco Edge 340 Digital Media Player general model,equipped with 32G SSD, WiFi chip, support 2.4G
 ciscoCSE340WG32AK9              OBJECT IDENTIFIER ::= { ciscoProducts 1941 } -- Cisco Edge 340 Digital Media Player general model,equipped with 32G SSD, WiFi chip, support 2.4G, 5G(For American)
 ciscoCSE340WG32CK9              OBJECT IDENTIFIER ::= { ciscoProducts 1942 } -- Cisco Edge 340 Digital Media Player general model,equipped with 32G SSD, WiFi chip, support 2.4G, 5G(For China)
@@ -1908,6 +1913,15 @@ ciscoASR901DC10GS                   OBJECT IDENTIFIER ::= { ciscoProducts 2099 }
 ciscoASR92024SZIM                   OBJECT IDENTIFIER ::= { ciscoProducts 2100 } -- Cisco ASR920 Series - 24GE and 4-10GE- Modular PSU and IM 
 ciscoASR92024TZM                    OBJECT IDENTIFIER ::= { ciscoProducts 2101 } -- Cisco ASR920 Series - 24GE Copper and 4-10GE - Modular PSU
 ciscoASR92024SZM                    OBJECT IDENTIFIER ::= { ciscoProducts 2102 } -- Cisco ASR920 Series - 24GE Fiber and 4-10GE - Modular PSU  
+ciscoIR809GLTESTK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2103 } -- Cisco 809 4G LTE Industrial Integrated Service Routers with multi-mode  Sprint  LTE/HSPA+ 
+ciscoIR809GLTEVZK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2104 } -- Cisco 809 4G LTE Industrial Integrated Service Routers with multi-mode  Verizon  LTE/DoRA
+ciscoIR809GLTEGAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2105 } -- Cisco 809 4G LTE Industrial Integrated Service Routers with multi-mode  Global (Europe & Australia) LTE/HSPA+
+ciscoIR809GLTENAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2106 } -- Cisco 809 4G LTE Industrial Integrated Service Routers with multi-mode  AT&T and Canada  LTE/HSPA+
+ciscoIR829GWLTESTAK9                OBJECT IDENTIFIER ::= { ciscoProducts 2107 } -- Cisco 829 4G LTE Industrial Integrated Service Routers with multi-mode Sprint LTE/DoRa  with 802.11n, FCC compliant
+ciscoIR829GWLTEVZAK9                OBJECT IDENTIFIER ::= { ciscoProducts 2108 } -- Cisco 829 4G LTE Industrial Integrated Service Routers with multi-mode Verizon LTE/DoRa  with 802.11n, FCC compliant
+ciscoIR829GWLTEGAZK9                OBJECT IDENTIFIER ::= { ciscoProducts 2109 } -- Cisco 829 4G LTE Industrial Integrated Service Routers with multi-mode Global (Australia) LTE/HSPA+ with 802.11n, Australia Compliant 
+ciscoIR829GWLTEGAEK9                OBJECT IDENTIFIER ::= { ciscoProducts 2110 } -- Cisco 829 4G LTE Industrial Integrated Service Routers with multi-mode Global (Europe) LTE/HSPA+ with 802.11n, ETSI Compliant
+ciscoIR829GWLTENAAK9                OBJECT IDENTIFIER ::= { ciscoProducts 2111 } -- Cisco 829 4G LTE Industrial Integrated Service Routers with multi-mode ATT and Canada  LTE/HSPA+ with 802.11n, FCC compliant
 ciscoWallander1x1GESKU              OBJECT IDENTIFIER ::= { ciscoProducts 2112 } -- This is a giga-bit ethernet card which can be plugged into host such like ISR4451, this will provide one giga-bit eth interface (both RJ45 and SFP are supported).
 ciscoWallander2x1GESKU              OBJECT IDENTIFIER ::= { ciscoProducts 2113 } -- This is a giga-bit ethernet card which can be plugged into host such like ISR4451, this will provide two giga-bit eth interface (both RJ45 and SFP are supported).
 ciscoASA5506                        OBJECT IDENTIFIER ::= { ciscoProducts 2114 } -- ASA 5506 Adaptive Security Appliance
@@ -1926,6 +1940,8 @@ ciscoASA5508K7                      OBJECT IDENTIFIER ::= { ciscoProducts 2126 }
 ciscoASA5508K7sc                    OBJECT IDENTIFIER ::= { ciscoProducts 2127 } -- ASA 5508 Adaptive Security Appliance Security Context with No Payload Encryption
 ciscoASA5508K7sy                    OBJECT IDENTIFIER ::= { ciscoProducts 2128 } -- ASA 5508 Adaptive Security Appliance System Context with No Payload Encryption
 ciscoAIRAP1702                      OBJECT IDENTIFIER ::= { ciscoProducts 2129 } --  Cisco Aironet 1700 Series (IEEE 802.11ac) Access Point
+catwsC3560CX8ptS                    OBJECT IDENTIFIER ::= { ciscoProducts 2130 } -- Smirnoff catalyst 3560CX 8x GE downlink ,PoE+, 2x 1G copper UPOE uplinks.
+catwsC3560CX8XpdS                   OBJECT IDENTIFIER ::= { ciscoProducts 2131 } -- Smirnoff catalyst 3560CX 2x mGig + 6x GE  downlink ,PoE+, 2x SFP+ uplinks.
 catwsC3560CX12pdS                   OBJECT IDENTIFIER ::= { ciscoProducts 2132 } -- Smirnoff catalyst 3560CX 12x GE downlink, PoE+, 2x CU + 2x 10G SFP+ uplinks
 catwsC3560CX12tcS                   OBJECT IDENTIFIER ::= { ciscoProducts 2133 } -- Smirnoff catalyst 3560CX 12x GE downlink, 2x Copper + 2x SFP uplinks
 catwsC3560CX12pcS                   OBJECT IDENTIFIER ::= { ciscoProducts 2134 } -- Smirnoff catalyst 3560CX 12x GE downlink, PoE+, 2x copper + 2x SFP uplink
@@ -1935,6 +1951,10 @@ catwsC2960CX8tcL                    OBJECT IDENTIFIER ::= { ciscoProducts 2137 }
 cisco2911TK9                        OBJECT IDENTIFIER ::= { ciscoProducts 2138 } -- CISCO2911-T/K9 with 3 GE, 4 EHWIC,  1 SM , 256 MB CF, 512 MB DRAM, IPB, extended temperature range from -5 to 60 C
 ciscoSNS3495K9                      OBJECT IDENTIFIER ::= { ciscoProducts 2139 } -- Cisco Secure Network Server platform SNS-3495 appliance
 ciscoSNS3415K9                      OBJECT IDENTIFIER ::= { ciscoProducts 2140 } -- Cisco Secure Network Server platform SNS-3415 appliance
+ciscocBR8                           OBJECT IDENTIFIER ::= { ciscoProducts 2141 } -- Cisco cBR-8 CCAP(Converged Cable Access Platform) platform with 8 subscriber slots and 2 Supervisor slots (including WAN)
+ciscoPwrC2911DCPOE                  OBJECT IDENTIFIER ::= { ciscoProducts 2142 } -- Cisco 2911 DC Power Supply with Power Over Ethernet 
+ciscoASR1006X                       OBJECT IDENTIFIER ::= { ciscoProducts 2143 } -- Cisco Aggregation Services Router 1000 Series, ASR1006-X Chassis
+ciscoASR1009X                       OBJECT IDENTIFIER ::= { ciscoProducts 2144 } -- Cisco Aggregation Services Router 1000 Series, ASR1009-X Chassis
 ciscoAIRAP702w                      OBJECT IDENTIFIER ::= { ciscoProducts 2146 } -- Cisco Aironet 702w (IEEE 802.11n) Series Access Points
 ciscoAIRAP1572                      OBJECT IDENTIFIER ::= { ciscoProducts 2147 } -- Cisco Aironet 1570 (IEEE 802.11ac) Series Outdoor Access Points with two radio's
 cisco891x24XK9                      OBJECT IDENTIFIER ::= { ciscoProducts 2148 } -- C891-24X Router series with 2 Giga Ethernet WAN Xor'ed with SFP (Small Form-factor Pluggable), 24 Giga Ethernet LAN with 8 PoE 1 USB 2.0 port, 1 Console/Aux port, 256MB flash memory and 512MB/1GB DRAM
@@ -1976,6 +1996,7 @@ ciscoCDScde2802s21                  OBJECT IDENTIFIER ::= { ciscoProducts 2187 }
 ciscoCDScde2802h0                   OBJECT IDENTIFIER ::= { ciscoProducts 2188 } -- Cisco Content Delivery System Model CDE-280-2H0
 ciscoCDScde2802h13                  OBJECT IDENTIFIER ::= { ciscoProducts 2189 } -- Cisco Content Delivery System Model CDE-280-2H13
 ciscoCDScde2802h26                  OBJECT IDENTIFIER ::= { ciscoProducts 2190 } -- Cisco Content Delivery System Model CDE-280-2H26
+ciscoWSC2960CX8PCL                  OBJECT IDENTIFIER ::= { ciscoProducts 2191 } -- Smirnoff Catalyst 2960CX 8x GE downlink, PoE+, 2x Copper + 2x SFP uplink
 cisco1941WIK9                       OBJECT IDENTIFIER ::= { ciscoProducts 2192 } -- Cisco 1941W-I/K9 with 802.11 a/b/g/ n  Israel Compliant WLAN ISM
 ciscoFp7030K9	                    OBJECT IDENTIFIER ::= { ciscoProducts 2193  } -- Cisco FirePOWER 7030 Appliance, 1U
 ciscoFp7050K9	                    OBJECT IDENTIFIER ::= { ciscoProducts 2194  } -- Cisco FirePOWER 7050 Appliance, 1U
@@ -2032,6 +2053,7 @@ ciscoASA5506Hsy                     OBJECT IDENTIFIER ::= { ciscoProducts 2245 }
 ciscoASA5516sy                      OBJECT IDENTIFIER ::= { ciscoProducts 2246 } -- ASA 5516 Adaptive Security Appliance System Context
 ciscoIR829GWLTEMAAK9                OBJECT IDENTIFIER ::= { ciscoProducts 2248 } -- IR829 Hardened WAN GE 4G LTE secure platform multi-mode Sprint LTE/DoRa  with 802.11n, PoE, FCC compliant
 ciscoPwsX474812X48uE                OBJECT IDENTIFIER ::= { ciscoProducts 2249 } -- Switch 4500E  100/1000/2500/5000/10GBaseT (RJ45)+V E Series with 48 10GbaseT
+ciscoASR1002HX                      OBJECT IDENTIFIER ::= { ciscoProducts 2252 } -- Cisco Aggregation Services Router 1000 Series, ASR1002-HX Chassis
 ciscoRAISA1783SAD2T2Ssy             OBJECT IDENTIFIER ::= { ciscoProducts 2254 } -- Cisco Rockwell ISA 30002C2F (1783SAD2T2S)Industrial Security Appliance, System Context
 ciscoRAISA1783SAD4T0Ssy             OBJECT IDENTIFIER ::= { ciscoProducts 2255 } -- Cisco Rockwell ISA 30004C (1783SAD4T0S) Industrial Security Appliance, System Context
 ciscoISA30002C2Fsy                  OBJECT IDENTIFIER ::= { ciscoProducts 2256 } -- ISA 30002C2F Industrial Security Appliance, System Context
@@ -2062,6 +2084,7 @@ ciscoflowAgent3300                  OBJECT IDENTIFIER ::= { ciscoProducts 2284 }
 ciscoFpr9300K9                      OBJECT IDENTIFIER ::= { ciscoProducts 2285 } -- Cisco FirePOWER 9300 Security Appliance, 3U
 ciscoFpr9000SM24                    OBJECT IDENTIFIER ::= { ciscoProducts 2286 } -- Cisco FirePOWER 9000 Security Module 24
 ciscoFpr9000SM36                    OBJECT IDENTIFIER ::= { ciscoProducts 2288 } -- Cisco FirePOWER 9000 Security Module 36
+ciscoFpr4150K9                      OBJECT IDENTIFIER ::= { ciscoProducts 2292 } -- Cisco FirePOWER 4150 Security Appliance, 1U with embedded security module 44 
 ciscoFpr4140K9                      OBJECT IDENTIFIER ::= { ciscoProducts 2293 } -- Cisco FirePOWER 4140 Security Appliance, 1U with embedded security module 36
 ciscoFpr4120K9                      OBJECT IDENTIFIER ::= { ciscoProducts 2294 } -- Cisco FirePOWER 4120 Security Appliance, 1U with embedded security module 24
 ciscoFpr4110K9                      OBJECT IDENTIFIER ::= { ciscoProducts 2295 } -- Cisco FirePOWER 4110 Security Appliance, 1U with embedded security module 12
@@ -2082,6 +2105,7 @@ cisco819GLTEMNAK9                   OBJECT IDENTIFIER ::= { ciscoProducts 2309 }
 ciscoFpr4110SM12                    OBJECT IDENTIFIER ::= { ciscoProducts 2313 } -- Cisco FirePOWER 4110 Security Module 12
 ciscoFpr4120SM24                    OBJECT IDENTIFIER ::= { ciscoProducts 2314 } -- Cisco FirePOWER 4120 Security Module 24
 ciscoFpr4140SM36                    OBJECT IDENTIFIER ::= { ciscoProducts 2315 } -- Cisco FirePOWER 4140 Security Module 36
+ciscoFpr4150SM44                    OBJECT IDENTIFIER ::= { ciscoProducts 2316 } -- Cisco FirePOWER 4150 Security Module 44 
 ciscoNCS5001                        OBJECT IDENTIFIER ::= { ciscoProducts 2317 } -- Cisco NCS 5001 Series Router
 ciscoNCS5002                        OBJECT IDENTIFIER ::= { ciscoProducts 2318 } -- Cisco NCS 5002 Series Router
 ciscoFpvK9                          OBJECT IDENTIFIER ::= { ciscoProducts 2319 } -- Cisco FirePOWER Virtual Appliance
@@ -2095,7 +2119,15 @@ ciscoNcs4201                        OBJECT IDENTIFIER ::= { ciscoProducts 2326 }
 ciscoNcs4202                        OBJECT IDENTIFIER ::= { ciscoProducts 2327 } -- NCS 4202 System (1RU,12GE,4-10GE and 1 SLOT)
 ciscoNcs4206                        OBJECT IDENTIFIER ::= { ciscoProducts 2328 } -- NCS 4206 System (3RU and 6 SLOT)
 ciscoNcs4216                        OBJECT IDENTIFIER ::= { ciscoProducts 2329 } -- NCS 4216 System (7RU and 16 SLOT)
+ciscoIE10004TLM                     OBJECT IDENTIFIER ::= { ciscoProducts 2330 } -- Cisco IE1000 ruggedized Industrial Ethernet switch with 5x 10/100 BaseT Copper ports
+ciscoIE10006TLM                     OBJECT IDENTIFIER ::= { ciscoProducts 2331 } -- Cisco IE1000 ruggedized Industrial Ethernet switch with 8x 10/100 BaseT Copper ports
+ciscoIE10004PTSLM                   OBJECT IDENTIFIER ::= { ciscoProducts 2332 } -- Cisco IE1000 ruggedized Industrial Ethernet switch with 4x 10/100 BaseT downlink ports and 2X GE SFP uplink ports
+ciscoIE10008PTSLM                   OBJECT IDENTIFIER ::= { ciscoProducts 2333 } -- Cisco IE1000 ruggedized Industrial Ethernet switch with 8x 10/100 BaseT downlink ports and 2X GE SFP uplink ports
 ciscoVFTD                           OBJECT IDENTIFIER ::= { ciscoProducts 2334 } -- Cisco Virtual Firepower Threat Defense
+ciscoISR4451B                       OBJECT IDENTIFIER ::= { ciscoProducts 2335 } -- Cisco ISR 4451 Boost Router
+ciscoISR4351B                       OBJECT IDENTIFIER ::= { ciscoProducts 2337 } -- Cisco ISR 4351 Boost Router
+ciscoISR4331B                       OBJECT IDENTIFIER ::= { ciscoProducts 2338 } -- Cisco ISR 4331 Boost Router
+ciscoISR4321B                       OBJECT IDENTIFIER ::= { ciscoProducts 2339 } -- Cisco ISR 4321 Boost Router
 ciscoRAIE1783IMS28GNAC              OBJECT IDENTIFIER ::= { ciscoProducts 2340 } -- Cisco IE5000 for Rockwell Automation ruggedized Ethernet switch supports Lanbase license and AC power supply with 12x10/100/1000 BaseT Copper downlinks with POE/POE+, 12x100/1000BaseX Fiber SFP downlinks, 4x1G Fiber SFP+ uplinks, Timing module
 ciscoRAIE1783IMS28GNDC              OBJECT IDENTIFIER ::= { ciscoProducts 2341 } -- Cisco IE5000 for Rockwell Automation ruggedized Ethernet switch supports Lanbase license and DC power supply with 12x10/100/1000 BaseT Copper downlinks with POE/POE+, 12x100/1000BaseX Fiber SFP downlinks, 4x1G Fiber SFP+ uplinks, Timing module
 ciscoRAIE1783IMS28GRAC              OBJECT IDENTIFIER ::= { ciscoProducts 2342 } -- Cisco IE5000 for Rockwell Automation ruggedized Ethernet switch supports IP Service license and AC power supply with 12x10/100/1000 BaseT Copper downlinks with POE/POE+, 12x100/1000BaseX Fiber SFP downlinks, 4x1G Fiber SFP+ uplinks, Timing module
@@ -2104,15 +2136,33 @@ ciscoQSFP100GCWDM4S                 OBJECT IDENTIFIER ::= { ciscoProducts 2344 }
 cisco897VAGWLTEGAEK9                OBJECT IDENTIFIER ::= { ciscoProducts 2345 } -- C897VAGW-LTE-GAEK9 router with 1 Giga Ethernet WAN, 1 SFP (Small Form-factor Pluggable) Giga Ethernet WAN, 1 multi-mode VDSL2/ADSL2+ over POTS, 1 4G LTE secure platform multi-mode Global (Europe) LTE/HSPA+, 8 Giga Ethernet LAN, 4 PoE Optional, 1 Dual 2.4/5GHz with FCC compliant Wireless LAN, 1 USB 2.0 port, 1 Console/Aux port, 1GB flash memory and 1GB DRAM
 cisco886VAGLTEGAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2346 } -- C886VAG-LTE-GA-K9 router with 1 WAN VDSL2/ADSL2+ over ISDN, 1 4G LTE secure platform multi-mode Global (Europe) LTE/HSPA+, 4 Fast Ethernet LAN, 1 USB 2.0 port, 1 Console/Aux port, 256MB flash memory and 1GB DRAM
 ciscoNcs1002                        OBJECT IDENTIFIER ::= { ciscoProducts 2347 } -- NCS 1002 System (1RP, 3 FANs, 2 Powers)
+ciscoASR1001HX                      OBJECT IDENTIFIER ::= { ciscoProducts 2348 } -- Cisco Aggregation Services Router 1000 Series, ASR1001-HX Chassis
 ciscoNCS5508                        OBJECT IDENTIFIER ::= { ciscoProducts 2349 } -- Network Convergence Services NCS5500 8 Slot Single Chassis
+ciscoNCS5501SE                      OBJECT IDENTIFIER ::= { ciscoProducts 2350 } -- Network Convergence Services NCS5501 Fixed 40x10G and 4x100G Scale chassis
+ciscoNCS5502SE                      OBJECT IDENTIFIER ::= { ciscoProducts 2351 } -- Network Convergence Services NCS5502 Fixed 48x100G Scale chassis
 ciscoUnifiedSipProxy                OBJECT IDENTIFIER ::= { ciscoProducts 2352 } -- SIP-based stateless call routing engine
 cisco898EAGLTELAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2355 } -- 4G LTE Latin America router with 1 Giga Ethernet WAN, 1 SFP (Small Form-factor Pluggable) Giga Ethernet WAN, 1 EFM over G.SH DSL WAN, 8 Giga Ethernet LAN, 4 PoE Optional, 1 USB 2.0 port, 1 Console/Aux port, 1GB flash memory and 1GB DRAM
 cisco897VAGLTELAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2356 } -- 4G LTE  Latin America router with 1 Giga Ethernet WAN, 1 SFP (Small Form-factor Pluggable) Giga Ethernet WAN, 1 VDSL2/ADSL2+ Annex A Data Backup WAN, 8 Giga Ethernet LAN, 4 PoE Optional, 1 ISDN BRI S/T interface, 1 USB 2.0 port, 1 Console/Aux port, 1GB flash memory and 1GB DRAM
 cisco819GWLTELACK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2357 } -- C819GW-LTE-LA-CK9 Latin America router with 1 4G LTE interface, 4 Fast Ethernet LAN interfaces, 1GE WAN, 1 Serial(sync/async) interface, 2 terminal lines, 1 Virtual Private Network (VPN) Module, 1 cisco Embedded AP, 1 Console/Aux port, and 1GB FLASH
 cisco819GWLTELAQK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2358 } -- C819GW-LTE-LA-QK9 Latin America router with 1 4G LTE interface, 4 Fast Ethernet LAN interfaces, 1GE WAN, 1 Serial(sync/async) interface, 2 terminal lines, 1 Virtual Private Network (VPN) Module, 1 cisco Embedded AP, 1 Console/Aux port, and 1GB FLASH
 cisco819GWLTELANK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2359 } -- C819GW-LTE-LA-NK9 Latin America router with 1 4G LTE interface, 4 Fast Ethernet LAN interfaces, 1GE WAN, 1 Serial(sync/async) interface, 2 terminal lines, 1 Virtual Private Network (VPN) Module, 1 cisco Embedded AP, 1 Console/Aux port, and 1GB FLASH
+ciscoCatWSC2960L8TSLL               OBJECT IDENTIFIER ::= { ciscoProducts 2360 } -- Catalyst 2960L 8 x GE downlink, 2 x GE (2 SFP) uplinks
+ciscoCatWSC2960L8PSLL               OBJECT IDENTIFIER ::= { ciscoProducts 2361 } -- Catalyst 2960L 8 x GE downlink,POE support, 2 x GE (2 SFP) uplinks
+ciscoCatWSC2960L16TSLL              OBJECT IDENTIFIER ::= { ciscoProducts 2362 } -- Catalyst 2960L 16 x GE downlink, 2 x GE (2 SFP) uplinks
+ciscoCatWSC2960L16PSLL              OBJECT IDENTIFIER ::= { ciscoProducts 2363 } -- Catalyst 2960L 16 x GE downlink,POE support, 2 x GE (2 SFP) uplinks
+ciscoCatWSC2960L24TSLL              OBJECT IDENTIFIER ::= { ciscoProducts 2364 } -- Catalyst 2960L 24 x GE downlink, 4 x GE (4 SFP) uplinks
+ciscoCatWSC2960L24PSLL              OBJECT IDENTIFIER ::= { ciscoProducts 2365 } -- Catalyst 2960L 24 x GE downlink,POE support, 4 x GE (4 SFP) uplinks
+ciscoCatWSC2960L48TSLL              OBJECT IDENTIFIER ::= { ciscoProducts 2366 } -- Catalyst 2960L 48 x GE downlink, 4 x GE (4 SFP) uplinks
+ciscoCatWSC2960L48PSLL              OBJECT IDENTIFIER ::= { ciscoProducts 2367 } -- Catalyst 2960L 48 x GE downlink,POE support, 4 x GE (4 SFP) uplinks
+ciscoIE40104S24P                    OBJECT IDENTIFIER ::= { ciscoProducts 2368 } -- Cisco IE4010 ruggedized Ethernet switch with 24x 10/100/1000 BaseT Copper downlinks with POE/POE+, 4x 100/1000BaseX Fiber SFP Uplinks
+ciscoIE401016S12P                   OBJECT IDENTIFIER ::= { ciscoProducts 2369 } -- Cisco IE4010 ruggedized Ethernet switch with 12x 10/100/1000 BaseT Copper downlinks with POE/POE+, 12x 100/1000BaseX Fiber SFP downlinks, 4x 100 1000BaseX Fiber SFP Uplinks
+cisco867VAEK9V2                     OBJECT IDENTIFIER ::= { ciscoProducts 2378 } -- Cisco 867VAE Secure router with VDSL2/ADSL2+ over POTS
+cisco866VAEK9V2                     OBJECT IDENTIFIER ::= { ciscoProducts 2379 } -- Cisco 866VAE Secure router with VDSL2/ADSL2+ over ISDN
+cisco867VAEV2                       OBJECT IDENTIFIER ::= { ciscoProducts 2380 } -- Cisco 867VAE router with VDSL2/ADSL2+ over POTS
 cisco899GLTELAK9                    OBJECT IDENTIFIER ::= { ciscoProducts 2381 } -- C899G-LTE-LA-K9 4G router with 1 Giga Ethernet WAN, 1 SFP (Small Form-factor Pluggable) Giga Ethernet WAN, 1 EFM over G.SH DSL WAN, 8 Giga Ethernet LAN, 4 PoE Optional, 1 USB 2.0 port, 1 Console/Aux port, 1GB flash memory and 1GB DRAM
 cisco819GLTELAK9                    OBJECT IDENTIFIER ::= { ciscoProducts 2382 } -- C819G-LTE-LA-K9 Router with 1 Gigabit Ethernet WAN, 4 Fast Ethernet LAN, 1 AT&T LTE modem, 1 Serial, 1 Console/Aux ports,256MB flash memory, 512MB DRAM
+ciscoRAIE1783LMS5                   OBJECT IDENTIFIER ::= { ciscoProducts 2383 } -- Cisco Rockwell brand Industrial Ethernet 1000 switch with 5x 10/100 BaseT Copper ports 
+ciscoRAIE1783LMS8                   OBJECT IDENTIFIER ::= { ciscoProducts 2384 } -- Cisco Rockwell brand Industrial Ethernet 1000 switch with 8x 10/100 BaseT Copper ports 
 ciscoStealthWatch2404               OBJECT IDENTIFIER ::= { ciscoProducts 2385 } -- Cisco StealthWatch Packet Analyzer 2404
 ciscoStealthWatch2420               OBJECT IDENTIFIER ::= { ciscoProducts 2386 } -- Cisco StealthWatch Packet Analyzer 2420
 ciscoNamApp2404                     OBJECT IDENTIFIER ::= { ciscoProducts 2387 } -- Cisco Prime NAM Appliance 2404
@@ -2121,11 +2171,92 @@ cisco819HGLTEMNAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2392 }
 ciscoIR829GWLTEGASK9                OBJECT IDENTIFIER ::= { ciscoProducts 2393 } -- IR829 Hardened WAN GE 4G LTE secure platform multi-mode Global (Singapore) LTE/HSPA+ with 802.11n, PoE, Australia Compliant
 ciscoIR829GWLTEGACK9                OBJECT IDENTIFIER ::= { ciscoProducts 2394 } -- IR829 Hardened WAN GE 4G LTE secure platform multi-mode Global (Malaysia) LTE/HSPA+ with 802.11n, PoE, Australia Compliant
 ciscoCSP2100                        OBJECT IDENTIFIER ::= { ciscoProducts 2397 } -- Cloud Services Platform Model CSP-2100
+ciscoCDB8U                          OBJECT IDENTIFIER ::= { ciscoProducts 2398 } -- Catalyst Digital Building 8 Port UPoE 
+ciscoCDB8P                          OBJECT IDENTIFIER ::= { ciscoProducts 2399 } -- Catalyst Digital Building 8 Port PoE+ 
+ciscoNCS5501                        OBJECT IDENTIFIER ::= { ciscoProducts 2400 } -- Network Convergence Services NCS5501 Fixed 48x10G and 6x100G chassis
+ciscoNCS5502                        OBJECT IDENTIFIER ::= { ciscoProducts 2401 } -- Network Convergence Services NCS5502 Fixed 48x100G chassis
 ciscoNCS4216F2BSA                   OBJECT IDENTIFIER ::= { ciscoProducts 2402 } -- NCS 4216 Front to Back Shelf Assembly (16 slots - 14 RU) - Includes Air Deflector Plenum and Brackets/Guides
 ciscoFpr2110td                      OBJECT IDENTIFIER ::= { ciscoProducts 2404 } -- Cisco FirePOWER 2110 Security Appliance, 1U with embedded security module 
 ciscoFpr2120td                      OBJECT IDENTIFIER ::= { ciscoProducts 2405 } -- Cisco FirePOWER 2120 Security Appliance, 1U with embedded security module  
 ciscoFpr2130td                      OBJECT IDENTIFIER ::= { ciscoProducts 2406 } -- Cisco FirePOWER 2130 Security Appliance, 1U with embedded security module
 ciscoFpr2140td                      OBJECT IDENTIFIER ::= { ciscoProducts 2407 } -- Cisco FirePOWER 2140 Security Appliance, 1U with embedded security module 
-END
+ciscoFpr9000SM44                    OBJECT IDENTIFIER ::= { ciscoProducts 2409 } -- Cisco FirePOWER 9000 Security Module 44
+ciscoNCS5011                        OBJECT IDENTIFIER ::= { ciscoProducts 2411 } -- Cisco NCS 5011 Series Router
+ciscoNCS1001                        OBJECT IDENTIFIER ::= { ciscoProducts 2423 } -- NCS 1001 System (1RU, 3 SLOTS, 1 RP, 4 FANs, 2 PSU)
+ciscoIR809G3GGAK9                   OBJECT IDENTIFIER ::= { ciscoProducts 2425 } -- Cisco 809 3G Industrial Integrated Service Routers with multi-mode HSPA+, ETSI compliant
+ciscoIR809GLTELAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2426 } -- Cisco 809 4G LTE Industrial Integrated Service Routers with multi-mode LTE/HSPA+, ETSI compliant
+cisco3504WLC                        OBJECT IDENTIFIER ::= { ciscoProducts 2427 } -- Cisco 3500 Series Wireless Controller
+ciscoCXP2270GSR12                   OBJECT IDENTIFIER ::= { ciscoProducts 2433 } -- CXP2 Optical Transceiver with Optical Connector
+ciscoNCS4216F2B                     OBJECT IDENTIFIER ::= { ciscoProducts 2434 } -- NCS 4216-F2B System (14RU and 16 SLOT)
+catC930024T                         OBJECT IDENTIFIER ::= { ciscoProducts 2435 } -- Catalyst 9300 24-port data only switch
+catC930024P                         OBJECT IDENTIFIER ::= { ciscoProducts 2436 } -- Catalyst 9300 24-port PoE+ switch 
+ciscoASR914                         OBJECT IDENTIFIER ::= { ciscoProducts 2480 } -- ASR 914 Series Router
+ciscoNCSFFC2                        OBJECT IDENTIFIER ::= { ciscoProducts 2481 } -- NCS-F-FC2: NCS6000 Fabric Chassis 2nd Gen Fabric Card
+cisco2911A                          OBJECT IDENTIFIER ::= { ciscoProducts 2486 } -- CISCO2911A/K9 with 3 GE, 4 EHWIC, 2 DSP, 1 SM , 256 MB CF, 512 MB DRAM, IPB 
+ciscoUCSS3260                       OBJECT IDENTIFIER ::= { ciscoProducts 2487 } -- Cisco UCS S3260 Rack server
+ciscoWSC365048TSE                   OBJECT IDENTIFIER ::= { ciscoProducts 2491 } -- Catalyst Switch
+ciscoUCSC220M5                      OBJECT IDENTIFIER ::= { ciscoProducts 2492 } -- Cisco UCS C220 M5 Rack server
+ciscoUCSC240M5                      OBJECT IDENTIFIER ::= { ciscoProducts 2493 } -- Cisco UCS C240 M5 Rack server
+ciscoCatWSC2960L24TQLL              OBJECT IDENTIFIER ::= { ciscoProducts 2495 } -- Catalyst 2960L 24 x GE downlink, 4 x 10 GE (4 SFP+) uplinks 
+ciscoCatWSC2960L48TQLL              OBJECT IDENTIFIER ::= { ciscoProducts 2496 } -- Catalyst 2960L 48 x GE downlink, 4 x 10 GE (4 SFP+) uplinks 
+ciscoCatWSC2960L24PQLL              OBJECT IDENTIFIER ::= { ciscoProducts 2497 } -- Catalyst 2960L 24 x GE downlink, 4 x 10 GE (4 SFP+) uplinks, POE Support 
+ciscoCatWSC2960L48PQLL              OBJECT IDENTIFIER ::= { ciscoProducts 2498 } -- Catalyst 2960L 48 x GE downlink, 4 x 10 GE (4 SFP+) uplinks, POE Support 
+ciscoC9407R                         OBJECT IDENTIFIER ::= { ciscoProducts 2500 } -- Cisco Catalyst 9400 Series 7 slot 
+ciscoC9410R                         OBJECT IDENTIFIER ::= { ciscoProducts 2501 } -- Cisco Catalyst 9400 Series 10 slot
+ciscoASR903U                        OBJECT IDENTIFIER ::= { ciscoProducts 2502 } -- Cisco Aggregation Services Router 900U Series with 3RU Chassis  
+ciscoASR902U                        OBJECT IDENTIFIER ::= { ciscoProducts 2503 } -- Cisco Aggregation Services Router 900U Series with 2RU Chassis  
+ciscoASR920U16SZIM                  OBJECT IDENTIFIER ::= { ciscoProducts 2504 } -- Cisco ASR920U Series - 12GE and 4-10GE - Modular PSU and IM         
+ciscoIR807GLTEVZK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2559 } -- Cisco 807 4G LTE Industrial Integrated Service Routers with multi-mode  Verizon  LTE/DoRA
+ciscoIR807GLTEGAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2560 } -- Cisco 807 4G LTE Industrial Integrated Service Routers with multi-mode  Global (Europe & Australia) LTE/HSPA+
+ciscoIR807GLTENAK9                  OBJECT IDENTIFIER ::= { ciscoProducts 2561 } -- Cisco 807 4G LTE Industrial Integrated Service Routers with multi-mode  AT&T and Canada  LTE/HSPA+
+ciscoUCSE180DM3K9                   OBJECT IDENTIFIER ::= { ciscoProducts 2562 } -- UCSE 8 Core Double Wide service module
+ciscoUCSE1120DM3K9                  OBJECT IDENTIFIER ::= { ciscoProducts 2563 } -- UCSE 12 Core Double Wide service module
+ciscoNFVIS                          OBJECT IDENTIFIER ::= { ciscoProducts 2565 } -- Cisco Network Functions Virtualization Infrastructure Software (NFVIS)
+ciscoIR829GWLTEGAxK9                OBJECT IDENTIFIER ::= { ciscoProducts 2569 } -- Cisco 829 4G LTE Industrial Integrated Service Routers with multi-mode Global LTE/HSPA+ with 802.11n, contact pakulka2
+ciscoASR9906                        OBJECT IDENTIFIER ::= { ciscoProducts 2572 } -- Cisco Aggregation Services Router (ASR) 9906 Chassis 
+cisco9500FixedSwitchStack           OBJECT IDENTIFIER ::= { ciscoProducts 2593 } -- A stack of any Cisco Catalyst 9500 Fixed stack-able ethernet switches with unified identity (as a single unified switch), control and management 
+ciscoIR829MLTELAxK9                 OBJECT IDENTIFIER ::= { ciscoProducts 2609 } -- Cisco 829 Single LTE with mSATA card and POE
+ciscoIR829M2LTEEAxK9                OBJECT IDENTIFIER ::= { ciscoProducts 2610 } -- Cisco 829 Dual LTE with mSATA card and POE
+ciscoISA30004Ctd                    OBJECT IDENTIFIER ::= { ciscoProducts 2611 } -- ISA 30004C Industrial Security Appliance, Threat Defense 
+ciscoISA30002C2Ftd                  OBJECT IDENTIFIER ::= { ciscoProducts 2612 } -- ISA 30002C2F Industrial Security Appliance, Threat Defense
+ciscoRA1783SAD4T0Std                OBJECT IDENTIFIER ::= { ciscoProducts 2613 } -- Rockwell 1783SAD4T0S Industrial Security Appliance, Threat Defense
+ciscoRA1783SAD2T2Std                OBJECT IDENTIFIER ::= { ciscoProducts 2614 } -- Rockwell 1783SAD2T2S Industrial Security Appliance, Threat Defense
+ciscoEsxSECPA                       OBJECT IDENTIFIER ::= { ciscoProducts 2659 } -- Security Packet Analyzer running on ESX Hypervisor 
+ciscoKvmSECPA                       OBJECT IDENTIFIER ::= { ciscoProducts 2660 } -- Security Packet Analyzer running on KVM Hypervisor 
+ciscoIR1101K9                       OBJECT IDENTIFIER ::= { ciscoProducts 2661 } -- Next-generation Industrial Modular Router with 4 Copper Ports + 1 Combo Port + expansion slot, no Fog computing 
+ciscoISRAP1100ACME                  OBJECT IDENTIFIER ::= { ciscoProducts 2665 } -- Cisco Integrated Services Router 1K Series Mobility Express
+ciscoAP4800                         OBJECT IDENTIFIER ::= { ciscoProducts 2670 } -- Aironet 4800 Series with Mobility Express
+ciscoIR829M2LTELAxK9                OBJECT IDENTIFIER ::= { ciscoProducts 2672 } -- Cisco 829 Dual LTE with mSATA card and POE
+ciscoIR829MLTEEAxK9                 OBJECT IDENTIFIER ::= { ciscoProducts 2673 } -- Cisco 829 Single LTE with mSATA card and POE
+ciscoIR829BLTEEAxK9                 OBJECT IDENTIFIER ::= { ciscoProducts 2674 } -- Cisco 829 4G LTE Industrial Integrated Service Routers with multi-mode LTE/HSPA+ with 802.11n, no POE and no mSATA card, FCC compliant
+ciscoIR829BLTELAxK9                 OBJECT IDENTIFIER ::= { ciscoProducts 2675 } -- Cisco 829 4G LTE Industrial Integrated Service Routers with multi-mode LTE/HSPA+ with 802.11n, no POE and no mSATA card, FCC compliant
+ciscoIR829B2LTEEAxK9                OBJECT IDENTIFIER ::= { ciscoProducts 2676 } -- Cisco 829 4G LTE Dual-modem Industrial Integrated Service Routers with multi-mode LTE/HSPA+ with 802.11n, no POE and no mSATA card, FCC compliant
+ciscoIR829B2LTELAxK9                OBJECT IDENTIFIER ::= { ciscoProducts 2677 } -- Cisco 829 4G LTE Dual-modem Industrial Integrated Service Routers with multi-mode LTE/HSPA+ with 802.11n, no POE and no mSATA card, FCC compliant
+ciscoASR92012SZD                    OBJECT IDENTIFIER ::= { ciscoProducts 2678 } -- ASR920 Series - 12 port dual rate 10G/1G DC Power Supply
+ciscoASR92012SZA                    OBJECT IDENTIFIER ::= { ciscoProducts 2679 } -- ASR920 Series - 12 port dual rate 10G/1G AC Power Supply
+ciscoESS3300NCP                     OBJECT IDENTIFIER ::= { ciscoProducts 2681 } -- Cisco ESS-3300 Embedded Service Switch with 8 Gig Downlinks and 2x10G SFP+ Switch, Main Board, No cooling plate
+ciscoESS3300CON                     OBJECT IDENTIFIER ::= { ciscoProducts 2682 } -- Cisco ESS-3300 Embedded Service Switch with 8 Gig Downlinks and 2x10G SFP+ Switch, Main Board, Conduction cooled
+ciscoIE32008T2S                     OBJECT IDENTIFIER ::= { ciscoProducts 2683 } -- Cisco Industrial Ethernet 3200 Switch, Petra Fixed System 2 Port SFP + 8 Port GE Copper Basic
+ciscoIE32008P2S                     OBJECT IDENTIFIER ::= { ciscoProducts 2684 } -- Cisco Industrial Ethernet 3200 Switch, Petra Fixed System 2 Port SFP + 8 Port GE PoE+ Basic
+ciscoIE33008T2S                     OBJECT IDENTIFIER ::= { ciscoProducts 2685 } -- Cisco Industrial Ethernet 3300 Switch, Petra Expandable System 2 Port SFP + 8 Port GE Copper Basic
+ciscoIE33008P2S                     OBJECT IDENTIFIER ::= { ciscoProducts 2686 } -- Cisco Industrial Ethernet 3300 Switch, Petra Expandable System 2 Port SFP + 8 Port GE PoE+ Basic
+ciscoIE34008P2S                     OBJECT IDENTIFIER ::= { ciscoProducts 2687 } -- Cisco Industrial Ethernet 3400 Switch, Petra Expandable System 2 Port SFP + 8 Port GE PoE+ Adv
+ciscoNam2520                        OBJECT IDENTIFIER ::= { ciscoProducts 2689 } -- NAM Appliance 2520
+ciscoNam2540                        OBJECT IDENTIFIER ::= { ciscoProducts 2690 } -- NAM Appliance 2540
+ciscoCSPA2520                       OBJECT IDENTIFIER ::= { ciscoProducts 2691 } -- Cisco Security Packet Analyzer 2520
+ciscoIR1101XK9                      OBJECT IDENTIFIER ::= { ciscoProducts 2692 } -- Industrial ISR 1101 with 4-port FE, modular LTE and fog computing 
+cisco9200FixedSwitchStack           OBJECT IDENTIFIER ::= { ciscoProducts 2694 } -- A stack of any Cisco Catalyst 9200 Fixed stack-able ethernet switches with unified identity (as a single unified switch), control and management
+cisco9200RFixedSwitchStack          OBJECT IDENTIFIER ::= { ciscoProducts 2695 } -- A stack of any Cisco Catalyst 9200R Fixed stack-able ethernet switches with unified identity (as a single unified switch), control and management
+ciscoRAIE1783MMS10B                 OBJECT IDENTIFIER ::= { ciscoProducts 2697 } -- Cisco Rockwell Industrial Ethernet Stratix 5800 Switch, Network Essentials, Fixed System 2 Port SFP + 8 Port GE Copper Basic 
+ciscoRAIE1783MMS10BE                OBJECT IDENTIFIER ::= { ciscoProducts 2698 } -- Cisco Rockwell Industrial Ethernet Stratix 5800 Switch, Network Essentials, Fixed System 2 Port SFP + 8 Port GE PoE+ Basic 
+ciscoRAIE1783MMS10                  OBJECT IDENTIFIER ::= { ciscoProducts 2699 } -- Cisco Rockwell Industrial Ethernet Stratix 5800 Switch, Network Essentials, Expandable System  2 Port SFP + 8 Port GE Copper Basic           
+ciscoRAIE1783MMS10R                 OBJECT IDENTIFIER ::= { ciscoProducts 2700 } -- Cisco Rockwell Industrial Ethernet Stratix 5800 Switch, Network Advantage, Expandable System  2 Port SFP + 8 Port GE Copper Basic
+ciscoRAIE1783MMS10E                 OBJECT IDENTIFIER ::= { ciscoProducts 2701 } -- Cisco Rockwell Industrial Ethernet Stratix 5800 Switch, Network Essentials, Expandable System  2 Port SFP + 8 Port GE PoE+ Basic
+ciscoRAIE1783MMS10ER                OBJECT IDENTIFIER ::= { ciscoProducts 2702 } -- Cisco Rockwell Industrial Ethernet Stratix 5800 Switch, Network Advantage, Expandable System  2 Port SFP + 8 Port GE PoE+ Basic
+ciscoRAIE1783MMS10EA                OBJECT IDENTIFIER ::= { ciscoProducts 2703 } -- Cisco Rockwell Industrial Ethernet Stratix 5800 Switch, Network Essentials, Expandable System  2 Port SFP + 8 Port GE PoE+ Advanced
+ciscoRAIE1783MMS10EAR               OBJECT IDENTIFIER ::= { ciscoProducts 2704 } -- Cisco Rockwell Industrial Ethernet Stratix 5800 Switch, Network Advantage, Expandable System  2 Port SFP + 8 Port GE PoE+ Advanced
+ciscoASR92020SZM                    OBJECT IDENTIFIER ::= { ciscoProducts 2705 } -- ASR 920 Route Switch Processor, Base Scale, 64Gbps
 
+
+END
 

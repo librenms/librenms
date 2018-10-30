@@ -12,6 +12,8 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
+use LibreNMS\Authentication\LegacyAuth;
+
 /**
  * Compare $t with the value of $vars[$v], if that exists
  * @param string $v Name of the var to test
@@ -47,8 +49,8 @@ function var_get($v)
 function data_uri($file, $mime)
 {
     $contents = file_get_contents($file);
-    $base64   = base64_encode($contents);
-    return ('data:'.$mime.';base64,'.$base64);
+    $base64 = base64_encode($contents);
+    return ('data:' . $mime . ';base64,' . $base64);
 }//end data_uri()
 
 
@@ -57,6 +59,9 @@ function nicecase($item)
     switch ($item) {
         case 'dbm':
             return 'dBm';
+
+        case 'entropy':
+            return 'Random entropy';
 
         case 'mysql':
             return ' MySQL';
@@ -72,7 +77,7 @@ function nicecase($item)
 
         case 'nfs-v3-stats':
             return 'NFS v3 Stats';
-            
+
         case 'nfs-server':
             return 'NFS Server';
 
@@ -88,8 +93,14 @@ function nicecase($item)
         case 'os-updates':
             return 'OS Updates';
 
+        case 'smart':
+            return 'SMART';
+
         case 'powerdns-recursor':
             return 'PowerDNS Recursor';
+
+        case 'powerdns-dnsdist':
+            return 'PowerDNS dnsdist';
 
         case 'dhcp-stats':
             return 'DHCP Stats';
@@ -111,7 +122,7 @@ function nicecase($item)
 
         case 'fbsd-nfs-server':
             return 'FreeBSD NFS Server';
-        
+
         case 'php-fpm':
             return 'PHP-FPM';
 
@@ -120,6 +131,18 @@ function nicecase($item)
 
         case 'sdfsinfo':
             return 'SDFS info';
+
+        case 'pi-hole':
+            return 'Pi-hole';
+
+        case 'freeradius':
+            return 'FreeRADIUS';
+
+        case 'zfs':
+            return 'ZFS';
+
+        case 'asterisk':
+            return 'Asterisk';
 
         default:
             return ucfirst($item);
@@ -132,12 +155,12 @@ function toner2colour($descr, $percent)
     $colour = get_percentage_colours(100 - $percent);
 
     if (substr($descr, -1) == 'C' || stripos($descr, 'cyan') !== false) {
-        $colour['left']  = '55D6D3';
+        $colour['left'] = '55D6D3';
         $colour['right'] = '33B4B1';
     }
 
     if (substr($descr, -1) == 'M' || stripos($descr, 'magenta') !== false) {
-        $colour['left']  = 'F24AC8';
+        $colour['left'] = 'F24AC8';
         $colour['right'] = 'D028A6';
     }
 
@@ -145,14 +168,14 @@ function toner2colour($descr, $percent)
         || stripos($descr, 'giallo') !== false
         || stripos($descr, 'gul') !== false
     ) {
-        $colour['left']  = 'FFF200';
+        $colour['left'] = 'FFF200';
         $colour['right'] = 'DDD000';
     }
 
     if (substr($descr, -1) == 'K' || stripos($descr, 'black') !== false
         || stripos($descr, 'nero') !== false
     ) {
-        $colour['left']  = '000000';
+        $colour['left'] = '000000';
         $colour['right'] = '222222';
     }
 
@@ -160,9 +183,23 @@ function toner2colour($descr, $percent)
 }//end toner2colour()
 
 
+/**
+ * Find all links in some text and turn them into html links.
+ *
+ * @param string $text
+ * @return string
+ */
+function linkify($text)
+{
+    $regex = "#(http|https|ftp|ftps)://[a-z0-9\-.]*[a-z0-9\-]+(/\S*)?#i";
+
+    return preg_replace($regex, '<a href="$0">$0</a>', $text);
+}
+
+
 function generate_link($text, $vars, $new_vars = array())
 {
-    return '<a href="'.generate_url($vars, $new_vars).'">'.$text.'</a>';
+    return '<a href="' . generate_url($vars, $new_vars) . '">' . $text . '</a>';
 }//end generate_link()
 
 
@@ -170,12 +207,12 @@ function generate_url($vars, $new_vars = array())
 {
     $vars = array_merge($vars, $new_vars);
 
-    $url = $vars['page'].'/';
+    $url = $vars['page'] . '/';
     unset($vars['page']);
 
     foreach ($vars as $var => $value) {
         if ($value == '0' || $value != '' && strstr($var, 'opt') === false && is_numeric($var) === false) {
-            $url .= $var.'='.urlencode($value).'/';
+            $url .= $var . '=' . urlencode($value) . '/';
         }
     }
 
@@ -193,10 +230,10 @@ function generate_overlib_content($graph_array, $text)
 {
     global $config;
 
-    $overlib_content = '<div class=overlib><span class=overlib-text>'.$text.'</span><br />';
+    $overlib_content = '<div class=overlib><span class=overlib-text>' . $text . '</span><br />';
     foreach (array('day', 'week', 'month', 'year') as $period) {
         $graph_array['from'] = $config['time'][$period];
-        $overlib_content    .= escape_quotes(generate_graph_tag($graph_array));
+        $overlib_content .= escape_quotes(generate_graph_tag($graph_array));
     }
 
     $overlib_content .= '</div>';
@@ -215,19 +252,19 @@ function get_percentage_colours($percentage, $component_perc_warn = null)
 
     $background = array();
     if ($percentage > $perc_warn) {
-        $background['left']  = 'c4323f';
+        $background['left'] = 'c4323f';
         $background['right'] = 'C96A73';
     } elseif ($percentage > '75') {
-        $background['left']  = 'bf5d5b';
+        $background['left'] = 'bf5d5b';
         $background['right'] = 'd39392';
     } elseif ($percentage > '50') {
-        $background['left']  = 'bf875b';
+        $background['left'] = 'bf875b';
         $background['right'] = 'd3ae92';
     } elseif ($percentage > '25') {
-        $background['left']  = '5b93bf';
+        $background['left'] = '5b93bf';
         $background['right'] = '92b7d3';
     } else {
-        $background['left']  = '9abf5b';
+        $background['left'] = '9abf5b';
         $background['right'] = 'bbd392';
     }
 
@@ -237,7 +274,7 @@ function get_percentage_colours($percentage, $component_perc_warn = null)
 
 function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0)
 {
-    return '<img class="'.$class.'" width="'.$width.'" height="'.$height.'" src="graph.php?'.implode($sep, array('device='.$device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size")).'">';
+    return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="graph.php?' . implode($sep, array('device=' . $device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size")) . '">';
 }//end generate_minigraph_image()
 
 
@@ -266,7 +303,9 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
 
     $text = format_hostname($device, $text);
 
-    if (isset($config['os'][$device['os']]['over'])) {
+    if ($device['snmp_disable']) {
+        $graphs = $config['os']['ping']['over'];
+    } elseif (isset($config['os'][$device['os']]['over'])) {
         $graphs = $config['os'][$device['os']]['over'];
     } elseif (isset($device['os_group']) && isset($config['os'][$device['os_group']]['over'])) {
         $graphs = $config['os'][$device['os_group']]['over'];
@@ -277,34 +316,34 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
     $url = generate_device_url($device, $vars);
 
     // beginning of overlib box contains large hostname followed by hardware & OS details
-    $contents = '<div><span class="list-large">'.$device['hostname'].'</span>';
+    $contents = '<div><span class="list-large">' . $device['hostname'] . '</span>';
     if ($device['hardware']) {
-        $contents .= ' - '.$device['hardware'];
+        $contents .= ' - ' . $device['hardware'];
     }
 
     if ($device['os']) {
-        $contents .= ' - '.mres($config['os'][$device['os']]['text']);
+        $contents .= ' - ' . mres($config['os'][$device['os']]['text']);
     }
 
     if ($device['version']) {
-        $contents .= ' '.mres($device['version']);
+        $contents .= ' ' . mres($device['version']);
     }
 
     if ($device['features']) {
-        $contents .= ' ('.mres($device['features']).')';
+        $contents .= ' (' . mres($device['features']) . ')';
     }
 
     if (isset($device['location'])) {
-        $contents .= ' - '.htmlentities($device['location']);
+        $contents .= ' - ' . htmlentities($device['location']);
     }
 
     $contents .= '</div>';
 
     foreach ($graphs as $entry) {
-        $graph         = $entry['graph'];
+        $graph = $entry['graph'];
         $graphhead = $entry['text'];
         $contents .= '<div class="overlib-box">';
-        $contents .= '<span class="overlib-title">'.$graphhead.'</span><br />';
+        $contents .= '<span class="overlib-title">' . $graphhead . '</span><br />';
         $contents .= generate_minigraph_image($device, $start, $end, $graph);
         $contents .= generate_minigraph_image($device, $config['time']['week'], $end, $graph);
         $contents .= '</div>';
@@ -332,21 +371,21 @@ function overlib_link($url, $text, $contents, $class = null)
 {
     global $config;
 
-    $contents = "<div style=\'background-color: #FFFFFF;\'>".$contents.'</div>';
+    $contents = "<div style=\'background-color: #FFFFFF;\'>" . $contents . '</div>';
     $contents = str_replace('"', "\'", $contents);
     if ($class === null) {
-        $output   = '<a href="'.$url.'"';
+        $output = '<a href="' . $url . '"';
     } else {
-        $output   = '<a class="'.$class.'" href="'.$url.'"';
+        $output = '<a class="' . $class . '" href="' . $url . '"';
     }
 
     if ($config['web_mouseover'] === false) {
         $output .= '>';
     } else {
-        $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].",WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
+        $output .= " onmouseover=\"return overlib('" . $contents . "'" . $config['overlib_defaults'] . ",WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
     }
 
-    $output .= $text.'</a>';
+    $output .= $text . '</a>';
 
     return $output;
 }//end overlib_link()
@@ -359,21 +398,21 @@ function generate_graph_popup($graph_array)
     // Take $graph_array and print day,week,month,year graps in overlib, hovered over graph
     $original_from = $graph_array['from'];
 
-    $graph                 = generate_graph_tag($graph_array);
-    $content               = '<div class=list-large>'.$graph_array['popup_title'].'</div>';
-    $content              .= "<div style=\'width: 850px\'>";
+    $graph = generate_graph_tag($graph_array);
+    $content = '<div class=list-large>' . $graph_array['popup_title'] . '</div>';
+    $content .= "<div style=\'width: 850px\'>";
     $graph_array['legend'] = 'yes';
     $graph_array['height'] = '100';
-    $graph_array['width']  = '340';
-    $graph_array['from']   = $config['time']['day'];
-    $content              .= generate_graph_tag($graph_array);
-    $graph_array['from']   = $config['time']['week'];
-    $content              .= generate_graph_tag($graph_array);
-    $graph_array['from']   = $config['time']['month'];
-    $content              .= generate_graph_tag($graph_array);
-    $graph_array['from']   = $config['time']['year'];
-    $content              .= generate_graph_tag($graph_array);
-    $content              .= '</div>';
+    $graph_array['width'] = '340';
+    $graph_array['from'] = $config['time']['day'];
+    $content .= generate_graph_tag($graph_array);
+    $graph_array['from'] = $config['time']['week'];
+    $content .= generate_graph_tag($graph_array);
+    $graph_array['from'] = $config['time']['month'];
+    $content .= generate_graph_tag($graph_array);
+    $graph_array['from'] = $config['time']['year'];
+    $content .= generate_graph_tag($graph_array);
+    $content .= '</div>';
 
     $graph_array['from'] = $original_from;
 
@@ -393,15 +432,15 @@ function print_graph_popup($graph_array)
 function permissions_cache($user_id)
 {
     $permissions = array();
-    foreach (dbFetchRows("SELECT * FROM devices_perms WHERE user_id = '".$user_id."'") as $device) {
+    foreach (dbFetchRows("SELECT * FROM devices_perms WHERE user_id = '" . $user_id . "'") as $device) {
         $permissions['device'][$device['device_id']] = 1;
     }
 
-    foreach (dbFetchRows("SELECT * FROM ports_perms WHERE user_id = '".$user_id."'") as $port) {
+    foreach (dbFetchRows("SELECT * FROM ports_perms WHERE user_id = '" . $user_id . "'") as $port) {
         $permissions['port'][$port['port_id']] = 1;
     }
 
-    foreach (dbFetchRows("SELECT * FROM bill_perms WHERE user_id = '".$user_id."'") as $bill) {
+    foreach (dbFetchRows("SELECT * FROM bill_perms WHERE user_id = '" . $user_id . "'") as $bill) {
         $permissions['bill'][$bill['bill_id']] = 1;
     }
 
@@ -413,7 +452,7 @@ function bill_permitted($bill_id)
 {
     global $permissions;
 
-    if ($_SESSION['userlevel'] >= '5') {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif ($permissions['bill'][$bill_id]) {
         $allowed = true;
@@ -433,7 +472,7 @@ function port_permitted($port_id, $device_id = null)
         $device_id = get_device_id_by_port_id($port_id);
     }
 
-    if ($_SESSION['userlevel'] >= '5') {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif (device_permitted($device_id)) {
         $allowed = true;
@@ -456,7 +495,7 @@ function application_permitted($app_id, $device_id = null)
             $device_id = get_device_id_by_app_id($app_id);
         }
 
-        if ($_SESSION['userlevel'] >= '5') {
+        if (LegacyAuth::user()->hasGlobalRead()) {
             $allowed = true;
         } elseif (device_permitted($device_id)) {
             $allowed = true;
@@ -477,7 +516,7 @@ function device_permitted($device_id)
 {
     global $permissions;
 
-    if ($_SESSION['userlevel'] >= '5') {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif ($permissions['device'][$device_id]) {
         $allowed = true;
@@ -499,10 +538,10 @@ function generate_graph_tag($args)
 {
     $urlargs = array();
     foreach ($args as $key => $arg) {
-        $urlargs[] = $key.'='.urlencode($arg);
+        $urlargs[] = $key . '=' . urlencode($arg);
     }
 
-    return '<img src="graph.php?'.implode('&amp;', $urlargs).'" border="0" />';
+    return '<img src="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
 }//end generate_graph_tag()
 
 function generate_lazy_graph_tag($args)
@@ -523,28 +562,80 @@ function generate_lazy_graph_tag($args)
                 $lazy_w = $arg;
                 break;
         }
-        $urlargs[] = $key."=".urlencode($arg);
+        $urlargs[] = $key . "=" . urlencode($arg);
     }
 
     if (isset($lazy_w)) {
-        $w=$lazy_w;
+        $w = $lazy_w;
     }
 
     if ($config['enable_lazy_load'] === true) {
-        return '<img class="lazy img-responsive" data-original="graph.php?' . implode('&amp;', $urlargs).'" border="0" />';
+        return '<img class="lazy img-responsive" data-original="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
     } else {
-        return '<img class="img-responsive" src="graph.php?' . implode('&amp;', $urlargs).'" border="0" />';
+        return '<img class="img-responsive" src="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
     }
 }//end generate_lazy_graph_tag()
 
+function generate_dynamic_graph_tag($args)
+{
+    $urlargs = array();
+    $width = 0;
+    foreach ($args as $key => $arg) {
+        switch (strtolower($key)) {
+            case 'width':
+                $width = $arg;
+                $value = "{{width}}";
+                break;
+            case 'from':
+                $value = "{{start}}";
+                break;
+            case 'to':
+                $value = "{{end}}";
+                break;
+            default:
+                $value = $arg;
+                break;
+        }
+        $urlargs[] = $key . "=" . $value;
+    }
+
+    return '<img style="width:'.$width.'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+}//end generate_dynamic_graph_tag()
+
+function generate_dynamic_graph_js($args)
+{
+    $from = (is_numeric($args['from']) ? $args['from'] : '(new Date()).getTime() / 1000 - 24*3600');
+    $range = (is_numeric($args['to']) ? $args['to'] - $args['from'] : '24*3600');
+
+    $output = '<script src="js/RrdGraphJS/q-5.0.2.min.js"></script>
+        <script src="js/RrdGraphJS/moment-timezone-with-data.js"></script>
+        <script src="js/RrdGraphJS/rrdGraphPng.js"></script>
+          <script type="text/javascript">
+              q.ready(function(){
+                  var graphs = [];
+                  q(\'.graph\').forEach(function(item){
+                      graphs.push(
+                          q(item).rrdGraphPng({
+                              canvasPadding: 120,
+                                initialStart: ' . $from . ',
+                                initialRange: ' . $range . '
+                          })
+                      );
+                  });
+              });
+              // needed for dynamic height
+              window.onload = function(){ window.dispatchEvent(new Event(\'resize\')); }
+          </script>';
+    return $output;
+}//end generate_dynamic_graph_js()
 
 function generate_graph_js_state($args)
 {
     // we are going to assume we know roughly what the graph url looks like here.
     // TODO: Add sensible defaults
-    $from   = (is_numeric($args['from']) ? $args['from'] : 0);
-    $to     = (is_numeric($args['to']) ? $args['to'] : 0);
-    $width  = (is_numeric($args['width']) ? $args['width'] : 0);
+    $from = (is_numeric($args['from']) ? $args['from'] : 0);
+    $to = (is_numeric($args['to']) ? $args['to'] : 0);
+    $width = (is_numeric($args['width']) ? $args['width'] : 0);
     $height = (is_numeric($args['height']) ? $args['height'] : 0);
     $legend = str_replace("'", '', $args['legend']);
 
@@ -571,13 +662,13 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
     }
 
     $output = '
-        <div class="container" style="width:'.$width.'px; height:'.$height.'px;">
-        <div class="progress" style="min-width: 2em; background-color:#'.$right_background.'; height:'.$height.'px;">
+        <div style="width:'.$width.'px; height:'.$height.'px; position: relative;">
+        <div class="progress" style="min-width: 2em; background-color:#'.$right_background.'; height:'.$height.'px;margin-bottom:-'.$height.'px;">
         <div class="progress-bar" role="progressbar" aria-valuenow="'.$size_percent.'" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:'.$size_percent.'%; background-color: #'.$left_background.';">
         </div>
         </div>
-        <b class="pull-left" style="padding-left: 4px; height: '.$height.'px;margin-top:-'.($height * 2).'px; color:#'.$left_colour.';">'.$left_text.'</b>
-        <b class="pull-right" style="padding-right: 4px; height: '.$height.'px;margin-top:-'.($height * 2).'px; color:#'.$right_colour.';">'.$right_text.'</b>
+        <b style="padding-left: 2%; position: absolute; top: 0px; left: 0px;color:#'.$left_colour.';">'.$left_text.'</b>
+        <b style="padding-right: 2%; position: absolute; top: 0px; right: 0px;color:#'.$right_colour.';">'.$right_text.'</b>
         </div>
         ';
 
@@ -607,7 +698,7 @@ function generate_entity_link($type, $entity, $text = null, $graph_type = null)
             break;
 
         default:
-            $link = $entity[$type.'_id'];
+            $link = $entity[$type . '_id'];
     }
 
     return ($link);
@@ -638,27 +729,27 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = array_merge($port, device_by_id_cache($port['device_id']));
     }
 
-    $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName(addslashes(display($port['label']))).'</div>';
+    $content = '<div class=list-large>' . $port['hostname'] . ' - ' . fixifName(addslashes(display($port['label']))) . '</div>';
     if ($port['ifAlias']) {
-        $content .= addslashes(display($port['ifAlias'])).'<br />';
+        $content .= addslashes(display($port['ifAlias'])) . '<br />';
     }
 
-    $content              .= "<div style=\'width: 850px\'>";
-    $graph_array['type']   = $port['graph_type'];
+    $content .= "<div style=\'width: 850px\'>";
+    $graph_array['type'] = $port['graph_type'];
     $graph_array['legend'] = 'yes';
     $graph_array['height'] = '100';
-    $graph_array['width']  = '340';
-    $graph_array['to']     = $config['time']['now'];
-    $graph_array['from']   = $config['time']['day'];
-    $graph_array['id']     = $port['port_id'];
-    $content              .= generate_graph_tag($graph_array);
+    $graph_array['width'] = '340';
+    $graph_array['to'] = $config['time']['now'];
+    $graph_array['from'] = $config['time']['day'];
+    $graph_array['id'] = $port['port_id'];
+    $content .= generate_graph_tag($graph_array);
     if ($single_graph == 0) {
         $graph_array['from'] = $config['time']['week'];
-        $content            .= generate_graph_tag($graph_array);
+        $content .= generate_graph_tag($graph_array);
         $graph_array['from'] = $config['time']['month'];
-        $content            .= generate_graph_tag($graph_array);
+        $content .= generate_graph_tag($graph_array);
         $graph_array['from'] = $config['time']['year'];
-        $content            .= generate_graph_tag($graph_array);
+        $content .= generate_graph_tag($graph_array);
     }
 
     $content .= '</div>';
@@ -699,7 +790,7 @@ function generate_port_image($args)
         $args['bg'] = 'FFFFFF00';
     }
 
-    return "<img src='graph.php?type=".$args['graph_type'].'&amp;id='.$args['port_id'].'&amp;from='.$args['from'].'&amp;to='.$args['to'].'&amp;width='.$args['width'].'&amp;height='.$args['height'].'&amp;bg='.$args['bg']."'>";
+    return "<img src='graph.php?type=" . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . "'>";
 }//end generate_port_image()
 
 
@@ -707,10 +798,10 @@ function generate_port_thumbnail($port)
 {
     global $config;
     $port['graph_type'] = 'port_bits';
-    $port['from']       = $config['time']['day'];
-    $port['to']         = $config['time']['now'];
-    $port['width']      = 150;
-    $port['height']     = 21;
+    $port['from'] = $config['time']['day'];
+    $port['to'] = $config['time']['now'];
+    $port['width'] = 150;
+    $port['height'] = 21;
     return generate_port_image($port);
 }//end generate_port_thumbnail()
 
@@ -724,20 +815,24 @@ function print_port_thumbnail($args)
 function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)
 {
     echo '
-        <div class="well well-sm">
+        <div class="panel panel-default">
+        <div class="panel-heading">
         ';
 }//end print_optionbar_start()
 
 
 function print_optionbar_end()
 {
-    echo '  </div>';
+    echo '
+        </div>
+        </div>
+        ';
 }//end print_optionbar_end()
 
 
 function overlibprint($text)
 {
-    return "onmouseover=\"return overlib('".$text."');\" onmouseout=\"return nd();\"";
+    return "onmouseover=\"return overlib('" . $text . "');\" onmouseout=\"return nd();\"";
 }//end overlibprint()
 
 
@@ -785,13 +880,13 @@ function devclass($device)
 
 function getlocations()
 {
-    $locations           = array();
+    $locations = array();
 
     // Fetch regular locations
-    if ($_SESSION['userlevel'] >= '5') {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $rows = dbFetchRows('SELECT location FROM devices AS D GROUP BY location ORDER BY location');
     } else {
-        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array($_SESSION['user_id']));
+        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array(LegacyAuth::id()));
     }
 
     foreach ($rows as $row) {
@@ -808,30 +903,30 @@ function getlocations()
 }//end getlocations()
 
 
+/**
+ * Get the recursive file size and count for a directory
+ *
+ * @param string $path
+ * @return array [size, file count]
+ */
 function foldersize($path)
 {
-    $total_size  = 0;
-    $files       = scandir($path);
+    $total_size = 0;
     $total_files = 0;
 
-    foreach ($files as $t) {
-        if (is_dir(rtrim($path, '/').'/'.$t)) {
-            if ($t <> '.' && $t <> '..') {
-                $size        = foldersize(rtrim($path, '/').'/'.$t);
-                $total_size += $size;
-            }
+    foreach (glob(rtrim($path, '/').'/*', GLOB_NOSORT) as $item) {
+        if (is_dir($item)) {
+            list($folder_size, $file_count) = foldersize($item);
+            $total_size += $folder_size;
+            $total_files += $file_count;
         } else {
-            $size        = filesize(rtrim($path, '/').'/'.$t);
-            $total_size += $size;
+            $total_size += filesize($item);
             $total_files++;
         }
     }
 
-    return array(
-        $total_size,
-        $total_files,
-    );
-}//end foldersize()
+    return [$total_size, $total_files];
+}
 
 
 function generate_ap_link($args, $text = null, $type = null)
@@ -855,28 +950,28 @@ function generate_ap_link($args, $text = null, $type = null)
         $args = array_merge($args, device_by_id_cache($args['device_id']));
     }
 
-    $content = '<div class=list-large>'.$args['text'].' - '.fixifName($args['label']).'</div>';
+    $content = '<div class=list-large>' . $args['text'] . ' - ' . fixifName($args['label']) . '</div>';
     if ($args['ifAlias']) {
-        $content .= display($args['ifAlias']).'<br />';
+        $content .= display($args['ifAlias']) . '<br />';
     }
 
-    $content              .= "<div style=\'width: 850px\'>";
-    $graph_array           = array();
-    $graph_array['type']   = $args['graph_type'];
+    $content .= "<div style=\'width: 850px\'>";
+    $graph_array = array();
+    $graph_array['type'] = $args['graph_type'];
     $graph_array['legend'] = 'yes';
     $graph_array['height'] = '100';
-    $graph_array['width']  = '340';
-    $graph_array['to']     = $config['time']['now'];
-    $graph_array['from']   = $config['time']['day'];
-    $graph_array['id']     = $args['accesspoint_id'];
-    $content              .= generate_graph_tag($graph_array);
-    $graph_array['from']   = $config['time']['week'];
-    $content              .= generate_graph_tag($graph_array);
-    $graph_array['from']   = $config['time']['month'];
-    $content              .= generate_graph_tag($graph_array);
-    $graph_array['from']   = $config['time']['year'];
-    $content              .= generate_graph_tag($graph_array);
-    $content              .= '</div>';
+    $graph_array['width'] = '340';
+    $graph_array['to'] = $config['time']['now'];
+    $graph_array['from'] = $config['time']['day'];
+    $graph_array['id'] = $args['accesspoint_id'];
+    $content .= generate_graph_tag($graph_array);
+    $graph_array['from'] = $config['time']['week'];
+    $content .= generate_graph_tag($graph_array);
+    $graph_array['from'] = $config['time']['month'];
+    $content .= generate_graph_tag($graph_array);
+    $graph_array['from'] = $config['time']['year'];
+    $content .= generate_graph_tag($graph_array);
+    $content .= '</div>';
 
     $url = generate_ap_url($args);
     if (port_permitted($args['interface_id'], $args['device_id'])) {
@@ -895,7 +990,7 @@ function generate_ap_url($ap, $vars = array())
 function report_this_text($message)
 {
     global $config;
-    return $message.'\nPlease report this to the '.$config['project_name'].' developers at '.$config['project_issues'].'\n';
+    return $message . '\nPlease report this to the ' . $config['project_name'] . ' developers at ' . $config['project_issues'] . '\n';
 }//end report_this_text()
 
 
@@ -934,13 +1029,13 @@ function include_matching_files($dir, $match = '/\.php$/')
 
 function generate_pagination($count, $limit, $page, $links = 2)
 {
-    $end_page   = ceil($count / $limit);
-    $start      = (($page - $links) > 0) ? ($page - $links) : 1;
-    $end        = (($page + $links) < $end_page) ? ($page + $links) : $end_page;
-    $return     = '<ul class="pagination">';
+    $end_page = ceil($count / $limit);
+    $start = (($page - $links) > 0) ? ($page - $links) : 1;
+    $end = (($page + $links) < $end_page) ? ($page + $links) : $end_page;
+    $return = '<ul class="pagination">';
     $link_class = ($page == 1) ? 'disabled' : '';
-    $return    .= "<li><a href='' onClick='changePage(1,event);'>&laquo;</a></li>";
-    $return    .= "<li class='$link_class'><a href='' onClick='changePage($page - 1,event);'>&lt;</a></li>";
+    $return .= "<li><a href='' onClick='changePage(1,event);'>&laquo;</a></li>";
+    $return .= "<li class='$link_class'><a href='' onClick='changePage($page - 1,event);'>&lt;</a></li>";
 
     if ($start > 1) {
         $return .= "<li><a href='' onClick='changePage(1,event);'>1</a></li>";
@@ -949,7 +1044,7 @@ function generate_pagination($count, $limit, $page, $links = 2)
 
     for ($x = $start; $x <= $end; $x++) {
         $link_class = ($page == $x) ? 'active' : '';
-        $return    .= "<li class='$link_class'><a href='' onClick='changePage($x,event);'>$x </a></li>";
+        $return .= "<li class='$link_class'><a href='' onClick='changePage($x,event);'>$x </a></li>";
     }
 
     if ($end < $end_page) {
@@ -958,55 +1053,11 @@ function generate_pagination($count, $limit, $page, $links = 2)
     }
 
     $link_class = ($page == $end_page) ? 'disabled' : '';
-    $return    .= "<li class='$link_class'><a href='' onClick='changePage($page + 1,event);'>&gt;</a></li>";
-    $return    .= "<li class='$link_class'><a href='' onClick='changePage($end_page,event);'>&raquo;</a></li>";
-    $return    .= '</ul>';
+    $return .= "<li class='$link_class'><a href='' onClick='changePage($page + 1,event);'>&gt;</a></li>";
+    $return .= "<li class='$link_class'><a href='' onClick='changePage($end_page,event);'>&raquo;</a></li>";
+    $return .= '</ul>';
     return ($return);
 }//end generate_pagination()
-
-
-function is_admin()
-{
-    if ($_SESSION['userlevel'] >= '10') {
-        $allowed = true;
-    } else {
-        $allowed = false;
-    }
-
-    return $allowed;
-}//end is_admin()
-
-
-function is_read()
-{
-    if ($_SESSION['userlevel'] == '5') {
-        $allowed = true;
-    } else {
-        $allowed = false;
-    }
-
-    return $allowed;
-}//end is_read()
-
-function is_demo_user()
-{
-
-    if ($_SESSION['userlevel'] == 11) {
-        return true;
-    } else {
-        return false;
-    }
-}// end is_demo_user();
-
-function is_normal_user()
-{
-
-    if (is_admin() === false && is_read() === false && is_demo_user() === false) {
-        return true;
-    } else {
-        return false;
-    }
-}// end is_normal_user()
 
 function demo_account()
 {
@@ -1048,6 +1099,7 @@ function shorten_interface_type($string)
             'GigabitEthernet',
             'Port-Channel',
             'Ethernet',
+            'Bundle-Ether',
         ),
         array(
             'Fa',
@@ -1055,6 +1107,7 @@ function shorten_interface_type($string)
             'Gi',
             'Po',
             'Eth',
+            'BE',
         ),
         $string
     );
@@ -1071,16 +1124,15 @@ function clean_bootgrid($string)
 
 function get_config_by_group($group)
 {
-    $group = array($group);
     $items = array();
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = '?'", array($group)) as $config_item) {
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_group` = ?", array($group)) as $config_item) {
         $val = $config_item['config_value'];
         if (filter_var($val, FILTER_VALIDATE_INT)) {
-            $val = (int) $val;
+            $val = (int)$val;
         } elseif (filter_var($val, FILTER_VALIDATE_FLOAT)) {
-            $val = (float) $val;
+            $val = (float)$val;
         } elseif (filter_var($val, FILTER_VALIDATE_BOOLEAN)) {
-            $val = (boolean) $val;
+            $val = (boolean)$val;
         }
 
         if ($val === true) {
@@ -1096,9 +1148,8 @@ function get_config_by_group($group)
 
 function get_config_like_name($name)
 {
-    $name  = array($name);
     $items = array();
-    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE '%?%'", array($name)) as $config_item) {
+    foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE ?", array("%$name%")) as $config_item) {
         $items[$config_item['config_id']] = $config_item;
     }
 
@@ -1140,31 +1191,31 @@ function alert_details($details)
 
     $fault_detail = '';
     foreach ($details['rule'] as $o => $tmp_alerts) {
-        $fallback      = true;
-        $fault_detail .= '#'.($o + 1).':&nbsp;';
+        $fallback = true;
+        $fault_detail .= '#' . ($o + 1) . ':&nbsp;';
         if ($tmp_alerts['bill_id']) {
-            $fault_detail .= '<a href="'.generate_bill_url($tmp_alerts).'">'.$tmp_alerts['bill_name'].'</a>;&nbsp;';
-            $fallback      = false;
+            $fault_detail .= '<a href="' . generate_bill_url($tmp_alerts) . '">' . $tmp_alerts['bill_name'] . '</a>;&nbsp;';
+            $fallback = false;
         }
 
         if ($tmp_alerts['port_id']) {
             $tmp_alerts = cleanPort($tmp_alerts);
-            $fault_detail .= generate_port_link($tmp_alerts).';&nbsp;';
-            $fallback      = false;
+            $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
+            $fallback = false;
         }
 
         if ($tmp_alerts['accesspoint_id']) {
             $fault_detail .= generate_ap_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp;';
-            $fallback      = false;
+            $fallback = false;
         }
 
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
             if ($tmp_alerts['error'] == "") {
-                $fault_detail .= ' '.$tmp_alerts['type'].' - '.$tmp_alerts['label'].';&nbsp;';
+                $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
             } else {
-                $fault_detail .= ' '.$tmp_alerts['type'].' - '.$tmp_alerts['label'].' - '.$tmp_alerts['error'].';&nbsp;';
+                $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ' - ' . $tmp_alerts['error'] . ';&nbsp;';
             }
-            $fallback      = false;
+            $fallback = false;
         }
 
         if ($fallback === true) {
@@ -1192,9 +1243,9 @@ function dynamic_override_config($type, $name, $device)
         $checked = '';
     }
     if ($type == 'checkbox') {
-        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="'.$name.'" data-device_id="'.$device['device_id'].'" data-size="small" '.$checked.'>';
+        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . $name . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
     } elseif ($type == 'text') {
-        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="'.$name.'" data-device_id="'.$device['device_id'].'" value="'.$attrib_val.'">';
+        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . $name . '" data-device_id="' . $device['device_id'] . '" value="' . $attrib_val . '">';
     }
 }//end dynamic_override_config()
 
@@ -1205,15 +1256,15 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
 <div class="panel panel-default">
     <div class="panel-heading">
         <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#'.$anchor.'"><i class="fa fa-caret-down"></i> '.$title.'</a>
+            <a data-toggle="collapse" data-parent="#accordion" href="#' . $anchor . '"><i class="fa fa-caret-down"></i> ' . $title . '</a>
     ';
     if (!empty($transport)) {
-        $output .= '<button name="test-alert" id="test-alert" type="button" data-transport="'.$transport.'" class="btn btn-primary btn-xs pull-right">Test transport</button>';
+        $output .= '<button name="test-alert" id="test-alert" type="button" data-transport="' . $transport . '" class="btn btn-primary btn-xs pull-right">Test transport</button>';
     }
     $output .= '
         </h4>
     </div>
-    <div id="'.$anchor.'" class="panel-collapse collapse">
+    <div id="' . $anchor . '" class="panel-collapse collapse">
         <div class="panel-body">
     ';
 
@@ -1221,30 +1272,32 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
         foreach ($items as $item) {
             $output .= '
             <div class="form-group has-feedback">
-                <label for="'.$item['name'].'"" class="col-sm-4 control-label">'.$item['descr'].' </label>
-                <div data-toggle="tooltip" title="'.$config_groups[$item['name']]['config_descr'].'" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
+                <label for="' . $item['name'] . '"" class="col-sm-4 control-label">' . $item['descr'] . ' </label>
+                <div data-toggle="tooltip" title="' . $config_groups[$item['name']]['config_descr'] . '" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
                 <div class="col-sm-4">
             ';
             if ($item['type'] == 'checkbox') {
-                $output .= '<input id="'.$item['name'].'" type="checkbox" name="global-config-check" '.$config_groups[$item['name']]['config_checked'].' data-on-text="Yes" data-off-text="No" data-size="small" data-config_id="'.$config_groups[$item['name']]['config_id'].'">';
+                $output .= '<input id="' . $item['name'] . '" type="checkbox" name="global-config-check" ' . $config_groups[$item['name']]['config_checked'] . ' data-on-text="Yes" data-off-text="No" data-size="small" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">';
             } elseif ($item['type'] == 'text') {
+                $pattern = isset($item['pattern']) ? ' pattern="' . $item['pattern'] . '"' : "";
+                $pattern .= isset($item['required']) && $item['required'] ? " required" : "";
                 $output .= '
-                <input id="'.$item['name'].'" class="form-control" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
+                <input id="' . $item['name'] . '" class="form-control validation" type="text" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '"' . $pattern . '>
                 <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
                 ';
             } elseif ($item['type'] == 'password') {
                 $output .= '
-                <input id="'.$item['name'].'" class="form-control" type="password" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
+                <input id="' . $item['name'] . '" class="form-control" type="password" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
                 <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
                 ';
             } elseif ($item['type'] == 'numeric') {
                 $output .= '
-                <input id="'.$item['name'].'" class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
+                <input id="' . $item['name'] . '" class="form-control" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" type="text" name="global-config-input" value="' . $config_groups[$item['name']]['config_value'] . '" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
                 <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                 ';
             } elseif ($item['type'] == 'select') {
                 $output .= '
-                <select id="'.$config_groups[$item['name']]['name'].'" class="form-control" name="global-config-select" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
+                <select id="' . $config_groups[$item['name']]['name'] . '" class="form-control" name="global-config-select" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
                 ';
                 if (!empty($item['options'])) {
                     foreach ($item['options'] as $option) {
@@ -1256,14 +1309,14 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
                                 'description' => $tmp_opt,
                             );
                         }
-                        $output .= '<option value="'.$option['value'].'"';
+                        $output .= '<option value="' . $option['value'] . '"';
                         if ($option['value'] == $config_groups[$item['name']]['config_value']) {
                             $output .= ' selected';
                         }
-                        $output .= '>'.$option['description'].'</option>';
+                        $output .= '>' . $option['description'] . '</option>';
                     }
                 }
-                $output .='
+                $output .= '
                 </select>
                 <span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span>
                 ';
@@ -1287,7 +1340,7 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
 
 function get_ripe_api_whois_data_json($ripe_data_param, $ripe_query_param)
 {
-    $ripe_whois_url = 'https://stat.ripe.net/data/'. $ripe_data_param . '/data.json?resource=' . $ripe_query_param;
+    $ripe_whois_url = 'https://stat.ripe.net/data/' . $ripe_data_param . '/data.json?resource=' . $ripe_query_param;
     return json_decode(file_get_contents($ripe_whois_url), true);
 }//end get_ripe_api_whois_data_json()
 
@@ -1313,11 +1366,11 @@ function get_ports_from_type($given_types)
     #  entry in config.
     $search_types = array();
     foreach ($given_types as $type) {
-        if (isset($config[$type.'_descr']) === true) {
-            if (is_array($config[$type.'_descr']) === true) {
-                $search_types = array_merge($search_types, $config[$type.'_descr']);
+        if (isset($config[$type . '_descr']) === true) {
+            if (is_array($config[$type . '_descr']) === true) {
+                $search_types = array_merge($search_types, $config[$type . '_descr']);
             } else {
-                $search_types[] = $config[$type.'_descr'];
+                $search_types[] = $config[$type . '_descr'];
             }
         } else {
             $search_types[] = $type;
@@ -1333,30 +1386,17 @@ function get_ports_from_type($given_types)
 
     foreach ($search_types as $type) {
         if (!empty($type)) {
-            $type            = strtr($type, '@', '%');
-            $type_where     .= " $or `port_descr_type` LIKE ?";
-            $or              = 'OR';
-            $type_param[]    = $type;
+            $type = strtr($type, '@', '%');
+            $type_where .= " $or `port_descr_type` LIKE ?";
+            $or = 'OR';
+            $type_param[] = $type;
         }
     }
-    $type_where  .= ') ';
+    $type_where .= ') ';
 
     # Run the query with the generated 'where' and necessary parameters, and send it back.
     $ports = dbFetchRows("SELECT * FROM `ports` as I, `devices` AS D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias", $type_param);
     return $ports;
-}
-
-function ipmiSensorName($hardwareId, $sensorIpmi, $rewriteArray)
-{
-    if (count($rewriteArray[$hardwareId]) > 0) {
-        if ($rewriteArray[$hardwareId][$sensorIpmi] != "") {
-            return $rewriteArray[$hardwareId][$sensorIpmi];
-        } else {
-            return $sensorIpmi;
-        }
-    } else {
-        return $sensorIpmi;
-    }
 }
 
 /**
@@ -1394,12 +1434,12 @@ function search_oxidized_config($search_in_conf_textbox)
     );
     $opts = array('http' =>
         array(
-            'method'  => 'POST',
-            'header'  => 'Content-type: application/x-www-form-urlencoded',
+            'method' => 'POST',
+            'header' => 'Content-type: application/x-www-form-urlencoded',
             'content' => $postdata
         )
     );
-    $context  = stream_context_create($opts);
+    $context = stream_context_create($opts);
     return json_decode(file_get_contents($oxidized_search_url, false, $context), true);
 }
 
@@ -1425,17 +1465,17 @@ function eventlog_severity($eventlog_severity)
 {
     switch ($eventlog_severity) {
         case 1:
-            return "severity-ok"; //OK
+            return "label-success"; //OK
         case 2:
-            return "severity-info"; //Informational
+            return "label-info"; //Informational
         case 3:
-            return "severity-notice"; //Notice
+            return "label-primary"; //Notice
         case 4:
-            return "severity-warning"; //Warning
+            return "label-warning"; //Warning
         case 5:
-            return "severity-critical"; //Critical
+            return "label-danger"; //Critical
         default:
-            return "severity-unknown"; //Unknown
+            return "label-default"; //Unknown
     }
 } // end eventlog_severity
 
@@ -1472,11 +1512,19 @@ function get_oxidized_nodes_list()
 
     foreach ($data as $object) {
         $device = device_by_name($object['name']);
+        if (! device_permitted($device['device_id'])) {
+            //user cannot see this device, so let's skip it.
+            continue;
+        }
         $fa_color = $object['status'] == 'success' ? 'success' : 'danger';
         echo "
         <tr>
         <td>
-        " . generate_device_link($device) . "
+        " . generate_device_link($device);
+        if ($device['device_id'] == 0) {
+            echo "(device '" . $object['name'] . "' not in LibreNMS)";
+        }
+        echo "
         </td>
         <td>
         <i class='fa fa-square text-" . $fa_color . "'></i>
@@ -1489,6 +1537,25 @@ function get_oxidized_nodes_list()
         </td>
         <td>
         " . $object['group'] . "
+        </td>
+        <td>
+        ";
+        if (! $device['device_id'] == 0) {
+            echo "
+          <button class='btn btn-default btn-sm' name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "' onclick='refresh_oxidized_node(\"" . $device['hostname'] . "\")'>
+            <i class='fa fa-refresh'></i>
+          </button>
+          <a href='" . generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig')) . "'>
+            <i class='fa fa-align-justify fa-lg icon-theme'></i>
+          </a>
+            ";
+        } else {
+            echo "
+          <button class='btn btn-default btn-sm' disabled name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "'>
+            <i class='fa fa-refresh'></i>
+          </button>";
+        }
+        echo "
         </td>
         </tr>";
     }
@@ -1508,14 +1575,14 @@ function get_disks($device)
  */
 function get_fail2ban_jails($device_id)
 {
-    $options=array(
+    $options = array(
         'filter' => array(
             'type' => array('=', 'fail2ban'),
         ),
     );
 
-    $component=new LibreNMS\Component();
-    $f2bc=$component->getComponents($device_id, $options);
+    $component = new LibreNMS\Component();
+    $f2bc = $component->getComponents($device_id, $options);
 
     if (isset($f2bc[$device_id])) {
         $id = $component->getFirstComponentID($f2bc, $device_id);
@@ -1533,14 +1600,14 @@ function get_fail2ban_jails($device_id)
  */
 function get_postgres_databases($device_id)
 {
-    $options=array(
+    $options = array(
         'filter' => array(
-             'type' => array('=', 'postgres'),
+            'type' => array('=', 'postgres'),
         ),
     );
 
-    $component=new LibreNMS\Component();
-    $pgc=$component->getComponents($device_id, $options);
+    $component = new LibreNMS\Component();
+    $pgc = $component->getComponents($device_id, $options);
 
     if (isset($pgc[$device_id])) {
         $id = $component->getFirstComponentID($pgc, $device_id);
@@ -1550,20 +1617,30 @@ function get_postgres_databases($device_id)
     return array();
 }
 
-// takes the device array and app_id
+/**
+ * Get all disks (disk serial numbers) from the collected
+ * rrd files.
+ *
+ * @param array $device device for which we get the rrd's
+ * @param int   $app_id application id on the device
+ * @return array list of disks
+ */
 function get_disks_with_smart($device, $app_id)
 {
-    $all_disks=get_disks($device['device_id']);
-    $disks=array();
-    $all_disks_int=0;
-    while (isset($all_disks[$all_disks_int])) {
-        $disk=$all_disks[$all_disks_int]['diskio_descr'];
-        $rrd_filename = rrd_name($device['hostname'], array('app', 'smart', $app_id, $disk));
-        if (rrdtool_check_rrd_exists($rrd_filename)) {
-            $disks[]=$disk;
+    $disks = array();
+
+    $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', 'smart', $app_id);
+
+    foreach (glob($pattern) as $rrd) {
+        $filename = basename($rrd, '.rrd');
+
+        list(,,, $disk) = explode("-", $filename, 4);
+
+        if ($disk) {
+            array_push($disks, $disk);
         }
-        $all_disks_int++;
     }
+
     return $disks;
 }
 
@@ -1578,53 +1655,77 @@ function get_disks_with_smart($device, $app_id)
  */
 function get_dashboards($user_id = null)
 {
+    $user = is_null($user_id) ? Auth::user() : \App\Models\User::find($user_id);
     $default = get_user_pref('dashboard');
-    $dashboards = dbFetchRows(
-        "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
-        array(is_null($user_id) ? $_SESSION['user_id'] : $user_id)
-    );
 
-    $usernames = array(
-        $_SESSION['user_id'] => $_SESSION['username']
-    );
+    return \App\Models\Dashboard::allAvailable($user)->with('user')->get()->map(function ($dashboard) use ($default) {
+        $dash = $dashboard->toArray();
+        $dash['username'] = $dashboard->user ? $dashboard->user->username : '';
+        $dash['default'] = $default == $dashboard->dashboard_id;
 
-    $result = array();
-    foreach ($dashboards as $dashboard) {
-        $duid = $dashboard['user_id'];
-        if (!isset($usernames[$duid])) {
-            $user = get_user($duid);
-            $usernames[$duid] = $user['username'];
-        }
-
-        $dashboard['username'] = $usernames[$duid];
-        $dashboard['default'] = $dashboard['dashboard_id'] == $default;
-
-        $result[$dashboard['dashboard_id']] = $dashboard;
-    }
-
-    return $result;
+        return $dash;
+    })->keyBy('dashboard_id')->all();
 }
 
 /**
- * Generate javascript to fill in a select box from an ajax list
+ * Return stacked graphs information
  *
- * @param string $list_type type of list look in html/includes/list/
- * @param string $selector jquery selector for the target select element
- * @param int $selected the id of the item to mark as selected
- * @return string the javascript (not including <script> tags)
+ * @param string $transparency value of desired transparency applied to rrdtool options (values 01 - 99)
+ * @return array containing transparency and stacked setup
  */
-function generate_fill_select_js($list_type, $selector, $selected = null)
+
+use LibreNMS\Config;
+
+function generate_stacked_graphs($transparency = '88')
 {
-    return '$(document).ready(function() {
-    $select = $("' . $selector . '")
-    $.getJSON(\'ajax_list.php?id=' . $list_type . '\', function(data){
-        $.each(data, function(index,item) {
-            if (item.id == "' . $selected . '") {
-                $select.append("<option value=" + item.id + " selected>" + item.value + "</option>");
-            } else {
-                $select.append("<option value=" + item.id + ">" + item.value + "</option>");
-            }
-        });
-    });
-});';
+    if (Config::get('webui.graph_stacked') == true) {
+        return array('transparency' => $transparency, 'stacked' => '1');
+    } else {
+        return array('transparency' => '', 'stacked' => '-1');
+    }
+}
+
+/**
+ * Get the ZFS pools for a device... just requires the device ID
+ * an empty return means ZFS is not in use or there are currently no pools
+ * @param $device_id
+ * @return array
+ */
+function get_zfs_pools($device_id)
+{
+    $options=array(
+        'filter' => array(
+             'type' => array('=', 'zfs'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $zfsc=$component->getComponents($device_id, $options);
+
+    if (isset($zfsc[$device_id])) {
+        $id = $component->getFirstComponentID($zfsc, $device_id);
+        return json_decode($zfsc[$device_id][$id]['pools']);
+    }
+
+    return array();
+}
+
+/**
+ * Returns the sysname of a device with a html line break prepended.
+ * if the device has an empty sysname it will return device's hostname instead
+ * And finally if the device has no hostname it will return an empty string
+ * @param array device
+ * @return string
+ */
+function get_device_name($device)
+{
+    $ret_str = '';
+
+    if (format_hostname($device) !== $device['sysName']) {
+        $ret_str = $device['sysName'];
+    } elseif ($device['hostname'] !== $device['ip']) {
+        $ret_str = $device['hostname'];
+    }
+
+    return $ret_str;
 }

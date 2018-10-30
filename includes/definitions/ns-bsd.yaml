@@ -1,0 +1,16 @@
+os: ns-bsd
+text: 'Stormshield NS-BSD'
+type: firewall
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+icon: stormshield
+mib_dir:
+    - stormshield
+discovery:
+    -
+      sysObjectID:
+          - .1.3.6.1.4.1.8072.3.2.8
+      sysDescr_regex:
+          - '/^NS-BSD/'

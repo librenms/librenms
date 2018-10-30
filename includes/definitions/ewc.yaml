@@ -1,0 +1,15 @@
+os: ewc
+text: 'Extreme Wireless Convergence'
+type: wireless
+icon: extreme
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_wireless_ap-count, text: 'Connected APs' }
+    - { graph: device_wireless_clients, text: 'Connected Clients' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.4329.15.1.1.
+mib_dir:
+    - enterasys

@@ -1,0 +1,718 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-SYS-MON-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-SYS-MON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    software
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC;
+
+prvtSysMonMIB MODULE-IDENTITY
+    LAST-UPDATED "201312120000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "Information for system resources"
+    REVISION    "201312120000Z"
+    DESCRIPTION 
+        "add prvtSysMonDoorOpen table prvtSysMonDoorOpenTest notification."
+    REVISION    "200909040000Z"
+    DESCRIPTION 
+        "Sync to internal implementation."
+    ::= { software 3 }
+
+
+prvtSysMonNotifications OBJECT IDENTIFIER
+    ::= { prvtSysMonMIB 0 }
+
+prvtSysMonObjects OBJECT IDENTIFIER
+    ::= { prvtSysMonMIB 1 }
+
+prvtSysMonCurrentCpuUsage OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current CPU Utilization"
+    ::= { prvtSysMonObjects 1 }
+
+prvtSysMonCurrentCpuTemperature OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current CPU Temperature"
+    ::= { prvtSysMonObjects 2 }
+
+prvtSysMonCurrentRamUsage OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current RAM Utilization"
+    ::= { prvtSysMonObjects 3 }
+
+prvtSysMonSelfTestExecuteNow OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "When this object is set to '1', command
+         self-test execute-now.  Setting the variable to '0'
+         results in an 'inconsistentValue' error.
+         Setting it to any other value has no effect.
+         
+         When this object is read, the value '0' is returned."
+    ::= { prvtSysMonObjects 4 }
+
+prvtSysMonCpuUsage OBJECT IDENTIFIER
+    ::= { prvtSysMonObjects 5 }
+
+prvtSysMonCpuUsageShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shutdown cpu usage test"
+    ::= { prvtSysMonCpuUsage 1 }
+
+prvtSysMonCpuUsageLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send log if test failed"
+    ::= { prvtSysMonCpuUsage 2 }
+
+prvtSysMonCpuUsageLed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable led if test failed"
+    ::= { prvtSysMonCpuUsage 3 }
+
+prvtSysMonCpuUsageTrap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send trap if test failed"
+    ::= { prvtSysMonCpuUsage 4 }
+
+prvtSysMonCpuUsagePeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Test period in seconds"
+    ::= { prvtSysMonCpuUsage 5 }
+
+prvtSysMonCpuUsageLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Low threshold"
+    ::= { prvtSysMonCpuUsage 6 }
+
+prvtSysMonCpuUsageHighThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "High threshold"
+    ::= { prvtSysMonCpuUsage 7 }
+
+prvtSysMonCpuUsageLastStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status"
+    ::= { prvtSysMonCpuUsage 8 }
+
+prvtSysMonCPUTemperature OBJECT IDENTIFIER
+    ::= { prvtSysMonObjects 6 }
+
+prvtSysMonCpuTemperatureShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shutdown cpu usage test"
+    ::= { prvtSysMonCPUTemperature 1 }
+
+prvtSysMonCpuTemperatureLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send log if test failed"
+    ::= { prvtSysMonCPUTemperature 2 }
+
+prvtSysMonCpuTemperatureLed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable led if test failed"
+    ::= { prvtSysMonCPUTemperature 3 }
+
+prvtSysMonCpuTemperatureTrap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send trap if test failed"
+    ::= { prvtSysMonCPUTemperature 4 }
+
+prvtSysMonCpuTemperaturePeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Test period in seconds"
+    ::= { prvtSysMonCPUTemperature 5 }
+
+prvtSysMonCpuTemperatureLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-40..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Low threshold"
+    ::= { prvtSysMonCPUTemperature 6 }
+
+prvtSysMonCpuTemperatureHighThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-40..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "High threshold"
+    ::= { prvtSysMonCPUTemperature 7 }
+
+prvtSysMonCpuTemperatureLastStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status"
+    ::= { prvtSysMonCPUTemperature 8 }
+
+prvtSysMonRAMUsage OBJECT IDENTIFIER
+    ::= { prvtSysMonObjects 7 }
+
+prvtSysMonRamUsageShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shutdown cpu usage test"
+    ::= { prvtSysMonRAMUsage 1 }
+
+prvtSysMonRamUsageLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send log if test failed"
+    ::= { prvtSysMonRAMUsage 2 }
+
+prvtSysMonRamUsageLed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable led if test failed"
+    ::= { prvtSysMonRAMUsage 3 }
+
+prvtSysMonRamUsageTrap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send trap if test failed"
+    ::= { prvtSysMonRAMUsage 4 }
+
+prvtSysMonRamUsagePeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Test period in seconds"
+    ::= { prvtSysMonRAMUsage 5 }
+
+prvtSysMonRamUsageLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Low threshold"
+    ::= { prvtSysMonRAMUsage 6 }
+
+prvtSysMonRamUsageHighThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "High threshold"
+    ::= { prvtSysMonRAMUsage 7 }
+
+prvtSysMonRamUsageLastStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status"
+    ::= { prvtSysMonRAMUsage 8 }
+
+prvtSysMonPortStatistics OBJECT IDENTIFIER
+    ::= { prvtSysMonObjects 8 }
+
+prvtSysMonPortStatisticsShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shutdown cpu usage test"
+    ::= { prvtSysMonPortStatistics 1 }
+
+prvtSysMonPortStatisticsLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send log if test failed"
+    ::= { prvtSysMonPortStatistics 2 }
+
+prvtSysMonPortStatisticsLed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable led if test failed"
+    ::= { prvtSysMonPortStatistics 3 }
+
+prvtSysMonPortStatisticsTrap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send trap if test failed"
+    ::= { prvtSysMonPortStatistics 4 }
+
+prvtSysMonPortStatisticsPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Test period in seconds"
+    ::= { prvtSysMonPortStatistics 5 }
+
+prvtSysMonPortStatisticsLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Low threshold"
+    ::= { prvtSysMonPortStatistics 6 }
+
+prvtSysMonPortStatisticsHighThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "High threshold"
+    ::= { prvtSysMonPortStatistics 7 }
+
+prvtSysMonPortStatisticsLastStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status"
+    ::= { prvtSysMonPortStatistics 8 }
+
+prvtSysMonPortStatisticsLastFailedPorts OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status"
+    ::= { prvtSysMonPortStatistics 9 }
+
+prvtSysMonFan OBJECT IDENTIFIER
+    ::= { prvtSysMonObjects 9 }
+
+prvtSysMonFanShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shutdown cpu usage test"
+    ::= { prvtSysMonFan 1 }
+
+prvtSysMonFanLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send log if test failed"
+    ::= { prvtSysMonFan 2 }
+
+prvtSysMonFanLed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable led if test failed"
+    ::= { prvtSysMonFan 3 }
+
+prvtSysMonFanTrap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send trap if test failed"
+    ::= { prvtSysMonFan 4 }
+
+prvtSysMonFanPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Test period in seconds"
+    ::= { prvtSysMonFan 5 }
+
+prvtSysMonFanLastStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status"
+    ::= { prvtSysMonFan 6 }
+
+prvtSysMonOnboardPower OBJECT IDENTIFIER
+    ::= { prvtSysMonObjects 10 }
+
+prvtSysMonOnboardPowerShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shutdown cpu usage test"
+    ::= { prvtSysMonOnboardPower 1 }
+
+prvtSysMonOnboardPowerLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send log if test failed"
+    ::= { prvtSysMonOnboardPower 2 }
+
+prvtSysMonOnboardPowerLed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable led if test failed"
+    ::= { prvtSysMonOnboardPower 3 }
+
+prvtSysMonOnboardPowerTrap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send trap if test failed"
+    ::= { prvtSysMonOnboardPower 4 }
+
+prvtSysMonOnboardPowerPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Test period in seconds"
+    ::= { prvtSysMonOnboardPower 5 }
+
+prvtSysMonOnboardPowerLastStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status"
+    ::= { prvtSysMonOnboardPower 6 }
+
+prvtSysMonPowerSupply OBJECT IDENTIFIER
+    ::= { prvtSysMonObjects 11 }
+
+prvtSysMonPowerSupplyShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shutdown cpu usage test"
+    ::= { prvtSysMonPowerSupply 1 }
+
+prvtSysMonPowerSupplyLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send log if test failed"
+    ::= { prvtSysMonPowerSupply 2 }
+
+prvtSysMonPowerSupplyLed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable led if test failed"
+    ::= { prvtSysMonPowerSupply 3 }
+
+prvtSysMonPowerSupplyTrap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send trap if test failed"
+    ::= { prvtSysMonPowerSupply 4 }
+
+prvtSysMonPowerSupplyPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Test period in seconds"
+    ::= { prvtSysMonPowerSupply 5 }
+
+prvtSysMonPowerSupplyLastStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status"
+    ::= { prvtSysMonPowerSupply 6 }
+
+prvtSysMonPowerSupplyFan OBJECT IDENTIFIER
+    ::= { prvtSysMonObjects 12 }
+
+prvtSysMonPowerSupplyFanShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shutdown cpu usage test"
+    ::= { prvtSysMonPowerSupplyFan 1 }
+
+prvtSysMonPowerSupplyFanLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send log if test failed"
+    ::= { prvtSysMonPowerSupplyFan 2 }
+
+prvtSysMonPowerSupplyFanLed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable led if test failed"
+    ::= { prvtSysMonPowerSupplyFan 3 }
+
+prvtSysMonPowerSupplyFanTrap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send trap if test failed"
+    ::= { prvtSysMonPowerSupplyFan 4 }
+
+prvtSysMonPowerSupplyFanPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Test period in seconds"
+    ::= { prvtSysMonPowerSupplyFan 5 }
+
+prvtSysMonPowerSupplyFanLastStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status"
+    ::= { prvtSysMonPowerSupplyFan 6 }
+
+prvtSysMonDoorOpen OBJECT IDENTIFIER
+    ::= { prvtSysMonObjects 13 }
+
+prvtSysMonDoorOpenShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shutdown cpu usage test"
+    ::= { prvtSysMonDoorOpen 1 }
+
+prvtSysMonDoorOpenLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send log if test failed"
+    ::= { prvtSysMonDoorOpen 2 }
+
+prvtSysMonDoorOpenLed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable led if test failed"
+    ::= { prvtSysMonDoorOpen 3 }
+
+prvtSysMonDoorOpenTrap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Send trap if test failed"
+    ::= { prvtSysMonDoorOpen 4 }
+
+prvtSysMonDoorOpenPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Test period in seconds"
+    ::= { prvtSysMonDoorOpen 5 }
+
+prvtSysMonDoorOpenLastStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status"
+    ::= { prvtSysMonDoorOpen 6 }
+
+prvtSysMonCpuUtilization NOTIFICATION-TYPE
+    OBJECTS     { prvtSysMonCurrentCpuUsage, 
+                  prvtSysMonCpuUsageLowThreshold, 
+                  prvtSysMonCpuUsageHighThreshold }
+    STATUS      current
+    DESCRIPTION 
+        "CPU utilization test has passed the
+         program threshold."
+    ::= { prvtSysMonNotifications 1 }
+
+prvtSysMonRamUsage NOTIFICATION-TYPE
+    OBJECTS     { prvtSysMonCurrentRamUsage, 
+                  prvtSysMonRamUsageLowThreshold, 
+                  prvtSysMonRamUsageHighThreshold }
+    STATUS      current
+    DESCRIPTION 
+        "Memory utilization test has passed the
+         program threshold."
+    ::= { prvtSysMonNotifications 2 }
+
+prvtSysMonPowerSupplyTest NOTIFICATION-TYPE
+    OBJECTS     { prvtSysMonPowerSupplyLastStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Result from power supply test has changed."
+    ::= { prvtSysMonNotifications 3 }
+
+prvtSysMonFansTest NOTIFICATION-TYPE
+    OBJECTS     { prvtSysMonFanLastStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Result from fan test has changed."
+    ::= { prvtSysMonNotifications 4 }
+
+prvtSysMonCpuTemperature NOTIFICATION-TYPE
+    OBJECTS     { prvtSysMonCurrentCpuTemperature, 
+                  prvtSysMonCpuTemperatureLowThreshold, 
+                  prvtSysMonCpuTemperatureHighThreshold }
+    STATUS      current
+    DESCRIPTION 
+        "CPU temperature test has passed the
+         program threshold."
+    ::= { prvtSysMonNotifications 5 }
+
+prvtSysMonPortStatisticsTest NOTIFICATION-TYPE
+    OBJECTS     { prvtSysMonPortStatisticsLastFailedPorts }
+    STATUS      current
+    DESCRIPTION 
+        "Result from port statistics test has changed."
+    ::= { prvtSysMonNotifications 6 }
+
+prvtSysMonPowerSupplyFansTest NOTIFICATION-TYPE
+    OBJECTS     { prvtSysMonPowerSupplyFanLastStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Result from power-supply-fan test has changed."
+    ::= { prvtSysMonNotifications 7 }
+
+prvtSysMonOnBoardPowerSupplyTest NOTIFICATION-TYPE
+    OBJECTS     { prvtSysMonOnboardPowerLastStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Result from onboard-power test has changed."
+    ::= { prvtSysMonNotifications 8 }
+
+prvtSysMonDoorOpenTest NOTIFICATION-TYPE
+    OBJECTS     { prvtSysMonDoorOpenLastStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Result from door-open test has changed."
+    ::= { prvtSysMonNotifications 9 }
+
+END -- end of module PRVT-SYS-MON-MIB.

@@ -12,26 +12,28 @@
  * the source code distribution for details.
  */
 
-$eql_storage = snmpwalk_cache_oid($device, 'EqliscsiVolumeEntry', null, 'EQLVOLUME-MIB', 'equallogic');
+if ($device['os'] == 'equalogic') {
+    $eql_storage = snmpwalk_cache_oid($device, 'EqliscsiVolumeEntry', null, 'EQLVOLUME-MIB', 'equallogic');
 
-if (is_array($eql_storage)) {
-    echo 'EqliscsiVolumeEntry ';
-    foreach ($eql_storage as $index => $storage) {
-        $fstype = $storage['eqliscsiVolumeAdminStatus'];
-        $descr  = $storage['eqliscsiVolumeName'];
-        $units  = 1000000;
-        $size = $storage['eqliscsiVolumeSize'] * $units;
-        $used = $storage['eqliscsiVolumeStatusAllocatedSpace'] * $units;
-        if (is_int($index)) {
-            discover_storage($valid_storage, $device, $index, $fstype, 'eql-storage', $descr, $size, $units, $used);
-        } else {
-            // Trying to search the last '.' and take something after it as index
-            $arrindex = explode(".", $index);
-            $newindex = (int)(end($arrindex))+0;
-            if (is_int($newindex)) {
-                discover_storage($valid_storage, $device, $newindex, $fstype, 'eql-storage', $descr, $size, $units, $used);
+    if (is_array($eql_storage)) {
+        echo 'EqliscsiVolumeEntry ';
+        foreach ($eql_storage as $index => $storage) {
+            $fstype = $storage['eqliscsiVolumeAdminStatus'];
+            $descr = $storage['eqliscsiVolumeName'];
+            $units = 1000000;
+            $size = $storage['eqliscsiVolumeSize'] * $units;
+            $used = $storage['eqliscsiVolumeStatusAllocatedSpace'] * $units;
+            if (is_int($index)) {
+                discover_storage($valid_storage, $device, $index, $fstype, 'eql-storage', $descr, $size, $units, $used);
+            } else {
+                // Trying to search the last '.' and take something after it as index
+                $arrindex = explode(".", $index);
+                $newindex = (int)(end($arrindex)) + 0;
+                if (is_int($newindex)) {
+                    discover_storage($valid_storage, $device, $newindex, $fstype, 'eql-storage', $descr, $size, $units, $used);
+                }
             }
+            unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
         }
-        unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
 }

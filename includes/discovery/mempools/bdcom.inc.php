@@ -17,14 +17,11 @@
  */
 
 if ($device['os'] == 'bdcom') {
-    echo 'BDCOM, NMS-MEMORY-POOL-MIB: ';
+    echo 'BDCOM: ';
 
-    $memory_pool = snmp_get_multi_oid($device, 'nmsMemoryPoolTotalMemorySize.0 nmsMemoryPoolUtilization.0', '-OQUs', 'NMS-MEMORY-POOL-MIB');
+    $memory_pool = snmp_get_multi_oid($device, 'bdcomMemoryPoolUsed.0 bdcomMemoryPoolFree.0', '-OQUs', 'BDCOM-MEMORY-POOL-MIB');
 
-    $total = $memory_pool['nmsMemoryPoolTotalMemorySize.0'];
-    $perc  = $memory_pool['nmsMemoryPoolUtilization.0'];
-
-    if (is_numeric($total) && is_numeric($perc)) {
+    if (is_numeric($memory_pool['bdcomMemoryPoolUsed.0']) && is_numeric($memory_pool['bdcomMemoryPoolFree.0'])) {
         discover_mempool($valid_mempool, $device, 0, 'bdcom', 'Memory', '1', null, null);
     }
 }

@@ -1,0 +1,61 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "ntp-client",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "ntp-client",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "frequency",
+                    "value": 91.141,
+                    "value_prev": null,
+                    "app_type": "ntp-client"
+                },
+                {
+                    "metric": "jitter",
+                    "value": 2.581995,
+                    "value_prev": null,
+                    "app_type": "ntp-client"
+                },
+                {
+                    "metric": "noise",
+                    "value": 0.853,
+                    "value_prev": null,
+                    "app_type": "ntp-client"
+                },
+                {
+                    "metric": "offset",
+                    "value": 0.7029,
+                    "value_prev": null,
+                    "app_type": "ntp-client"
+                },
+                {
+                    "metric": "stability",
+                    "value": 0.025,
+                    "value_prev": null,
+                    "app_type": "ntp-client"
+                }
+            ]
+        }
+    }
+}

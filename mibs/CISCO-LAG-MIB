@@ -1,11 +1,12 @@
 -- *****************************************************************
 -- CISCO-LAG-MIB.my: Cisco LAG MIB
---
+--   
 -- October 2001,  Liwei Lue
---
--- Copyright (c) 2001-2003, 2004, 2006, 2008 by cisco Systems, Inc.
+--   
+-- Copyright (c) 2001-2003, 2004, 2006, 2008-2010, 2014 by cisco 
+-- Systems Inc.
 -- All rights reserved.
---
+--   
 -- *****************************************************************
 
 CISCO-LAG-MIB DEFINITIONS ::= BEGIN
@@ -18,19 +19,22 @@ IMPORTS
     MODULE-COMPLIANCE,
     OBJECT-GROUP
         FROM SNMPv2-CONF
-    TEXTUAL-CONVENTION
+    TEXTUAL-CONVENTION,
+    TruthValue
         FROM SNMPv2-TC
-    ciscoMgmt
-        FROM CISCO-SMI
     dot3adAggPortEntry,
     dot3adAggPortListEntry
         FROM IEEE8023-LAG-MIB
+    CiscoInterfaceIndexList
+      FROM CISCO-TC
     ifIndex
-        FROM IF-MIB;
+        FROM IF-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
 
 
 ciscoLagMIB MODULE-IDENTITY
-    LAST-UPDATED    "200801080000Z"
+    LAST-UPDATED    "201401140000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -51,6 +55,18 @@ ciscoLagMIB MODULE-IDENTITY
         This MIB provides Link Aggregation information that are
         either excluded by IEEE Std 802.3ad (IEEE8023-LAG-MIB)
         or specific to Cisco products."
+    REVISION     "201401140000Z"
+    DESCRIPTION
+        "Added clagAggPortListInterfaceIndexGroup."
+    REVISION     "201010200000Z"
+    DESCRIPTION
+        "Added new enum values vlanIp(5) and ipPort(6) to
+         ClagDistributionProtocol textual convention."
+    REVISION        "200911190000Z"
+    DESCRIPTION
+        "Added clagAggRateGroup, clagAggChannelIfLacpGroup,
+        clagAggChannelIfHashDistMethodGroup, clagAggChannelIfMinLinkGroup
+        and clagAggHashDistGlobalGroup."
     REVISION        "200801080000Z"
     DESCRIPTION
         "Modified the description of clagAggPortListPorts."
@@ -89,7 +105,7 @@ ClagDistributionProtocol ::= TEXTUAL-CONVENTION
     STATUS          current
     DESCRIPTION
         "An enumerated type for all the supported load balancing
-        algorithms used on the LACP interface to distribute 
+        algorithms used on the port channel interface to distribute 
         outgoing data frames among its component interaces, such 
         as IP address.  
 
@@ -97,12 +113,16 @@ ClagDistributionProtocol ::= TEXTUAL-CONVENTION
         mac(2)              MAC address 
         port(3)             port number
         vlanIpPort(4)       vlan number, IP address and
-                        port number"
+                            port number
+        vlanIp(5)           VLAN number and IP address
+        ipPort(6)           IP address and port number"
     SYNTAX          INTEGER  {
                         ip(1),
                         mac(2),
                         port(3),
-                        vlanIpPort(4)
+                        vlanIpPort(4),
+                        vlanIp(5),
+                        ipPort(6)
                     }
 
 ClagDistributionAddressMode ::= TEXTUAL-CONVENTION
@@ -111,9 +131,9 @@ ClagDistributionAddressMode ::= TEXTUAL-CONVENTION
         "An enumerated type for all the supported load
         balancing address modes to distribute traffic
         across multiple links.  The address mode can be 
-        source, destination, or both used on this LACP 
-        interface to distribute outgoing data frames among
-        its component interfaces. 
+        source, destination, or both used on this port 
+        channel interface to distribute outgoing data frames 
+        among its component interfaces. 
 
         source(1)         Source address.
         destination(2)    Destination address.
@@ -128,7 +148,7 @@ ClagDistributionMplsProtocol ::= TEXTUAL-CONVENTION
     STATUS          current
     DESCRIPTION
         "An enumerated type for all the supported load balancing
-        algorithms used on the LACP interface to distribute 
+        algorithms used on the port channel interface to distribute 
         outgoing MPLS (Multi-Protocol Label Switching) data 
         frames among its component interfaces, such as 
         MPLS label.
@@ -197,6 +217,9 @@ clagAggPort  OBJECT IDENTIFIER
 clagAggPortList  OBJECT IDENTIFIER
     ::= { clagMIBObjects 4 }
 
+clagAggChannelIntf  OBJECT IDENTIFIER
+    ::= { clagMIBObjects 5 }
+
 
 -- -------------------------------------------------------------
 --   
@@ -210,8 +233,8 @@ clagAggDistributionProtocol OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object controls the load balancing algorithms
-        used on this LACP interface to distribute outgoing data
-        frames among its component interfaces." 
+        used on this port channel interface to distribute outgoing 
+        data frames among its component interfaces." 
     ::= { clagGlobalConfigObjects 1 }
 
 clagAggDistributionAddressMode OBJECT-TYPE
@@ -228,8 +251,8 @@ clagAggDistributionMplsProtocol OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object controls the load balancing algorithms
-        used on this LACP interface to distribute outgoing MPLS
-        data frames among its component interfaces.
+        used on this port channel interface to distribute 
+        outgoing MPLS data frames among its component interfaces.
 
         This object is only instantiated on platforms which 
         support aggregation load balancing for MPLS packets." 
@@ -243,6 +266,24 @@ clagAggMaxAggregators OBJECT-TYPE
         "This object indicates the maximum number of aggregators
         supported by the device." 
     ::= { clagGlobalConfigObjects 4 }
+
+clagAggHashDistMethodGlobalConfig OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        adaptive(1),
+                        fixed(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specifies the global configuration for hash
+        distribution method applied on a port channel 
+        interface among its channel members.
+
+        adaptive(1)  :  Adaptive hash distribution for the bundle
+                        among port channel members.
+        fixed(2)     :  Fixed hash distribution for the bundle
+                        among port channel members." 
+    ::= { clagGlobalConfigObjects 5 }
 -- -------------------------------------------------------------
 -- The Aggregation Protocol Table
 -- -------------------------------------------------------------
@@ -317,11 +358,11 @@ clagAggPortEntry OBJECT-TYPE
         "An entry containing additional management information
         applicable to a particular aggregation port."
     AUGMENTS           { dot3adAggPortEntry  } 
- 
     ::= { clagAggPortTable 1 }
 
 ClagAggPortEntry ::= SEQUENCE {
-        clagAggPortAdminStatus ClagPortAdminStatus
+        clagAggPortAdminStatus ClagPortAdminStatus,
+        clagAggPortRate        INTEGER
 }
 
 clagAggPortAdminStatus OBJECT-TYPE
@@ -332,6 +373,22 @@ clagAggPortAdminStatus OBJECT-TYPE
         "The administrative status of the LACP protocol on this
         aggregation port." 
     ::= { clagAggPortEntry 1 }
+
+clagAggPortRate OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        fast(1),
+                        normal(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specifies the requested exchange rate of LACP packets
+        on this interface.
+        fast(1)  :    The device requests its peers to send LACP packets 
+                      at fast rate to this interface.
+        normal(2):    The decice requests its peers to send LACP packets
+                      at normal rate to this interface." 
+    ::= { clagAggPortEntry 2 }
  
 
 -- -------------------------------------------------------------
@@ -356,11 +413,11 @@ clagAggPortListEntry OBJECT-TYPE
     DESCRIPTION
         "A list of the ports associated with a given Aggregator."
     AUGMENTS           { dot3adAggPortListEntry  } 
- 
     ::= { clagAggPortListTable 1 }
 
 ClagAggPortListEntry ::= SEQUENCE {
-        clagAggPortListPorts OCTET STRING
+        clagAggPortListPorts              OCTET STRING,
+        clagAggPortListInterfaceIndexList CiscoInterfaceIndexList
 }
 
 clagAggPortListPorts OBJECT-TYPE
@@ -386,9 +443,128 @@ clagAggPortListPorts OBJECT-TYPE
     REFERENCE       "IEEE 802.3 Subclause 30.7.1.1.30" 
     ::= { clagAggPortListEntry 1 }
  
+clagAggPortListInterfaceIndexList OBJECT-TYPE
+    SYNTAX          CiscoInterfaceIndexList
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     
+        "This object contains a list of ports currently associated
+        with this Aggregator in the format of CiscoInterfaceIndexList."
+    REFERENCE       "IEEE 802.3 Subclause 30.7.1.1.30" 
+    ::= { clagAggPortListEntry 2}
+
 
 -- -------------------------------------------------------------
---   
+-- The Aggregation Channel Interface Table
+-- -------------------------------------------------------------
+
+clagAggChannelIfTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ClagAggChannelIfEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table providing port channel
+        configuration information for port channel
+        interfaces identified by ifIndex."
+    ::= { clagAggChannelIntf 1 }
+
+clagAggChannelIfEntry OBJECT-TYPE
+    SYNTAX          ClagAggChannelIfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing port channel
+        configuration information for port 
+        channel interfaces."
+    INDEX           { ifIndex } 
+    ::= { clagAggChannelIfTable 1 }
+
+ClagAggChannelIfEntry ::= SEQUENCE {
+        clagAggChannelIfFastSwitchOver      TruthValue,
+        clagAggChannelIfMaxBundle           Unsigned32,
+        clagAggChannelIfMinLink             Unsigned32,
+        clagAggChannelIfHashDistAdminMethod INTEGER,
+        clagAggChannelIfHashDistOperMethod  INTEGER
+}
+
+clagAggChannelIfFastSwitchOver OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specifies whether LACP protocol fast switchover
+        mode is enabled on this port channel interface
+        or not." 
+    ::= { clagAggChannelIfEntry 1 }
+
+clagAggChannelIfMaxBundle OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specifies the maximum number of member
+        ports that can be bundled on this port
+        channel interface for LACP protocol." 
+    ::= { clagAggChannelIfEntry 2 }
+
+clagAggChannelIfMinLink OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specifies the minimum number of bundled member ports that are
+        needed in order for this port channel interface to be
+        operational.
+        A value of zero for this object indicates that no minimum
+        number of bundled member ports are required for this port
+        channel interface to be operational." 
+    ::= { clagAggChannelIfEntry 3 }
+
+clagAggChannelIfHashDistAdminMethod OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        none(1),
+                        adaptive(2),
+                        fixed(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specifies the hash distribution method that is administratively
+        configured on this port channel interface upon its channel 
+        membership transition event. 
+
+        none(1)      :  Hash distribution algorithm on this 
+                        port channel interface is not specifically 
+                        configured and global configuration of 
+                        clagAggHashDistMethodGlobalConfig will
+                        be applied on this port channel interface.
+        adaptive(2)  :  Adaptive hash distribution for this port 
+                        channel interface among its channel members.
+        fixed(3)     :  Fixed hash distribution for this port channel
+                        interface among its channel members." 
+    ::= { clagAggChannelIfEntry 4 }
+
+clagAggChannelIfHashDistOperMethod OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        other(1),
+                        adaptive(2),
+                        fixed(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Specifies the operational hash distribution method
+        for this port channel interface among the port channel members.
+
+        other(1)        : None of the following. 
+        adaptive(2)     : Adaptive hash distribution for the 
+                          port channel interface among its 
+                          channel members.
+        fixed(3)        : Fixed hash distribution for the port
+                          channel among channel members." 
+    ::= { clagAggChannelIfEntry 5 }
+ 
+
 -- -------------------------------------------------------------
 -- Notifications
 -- -------------------------------------------------------------
@@ -517,7 +693,7 @@ clagMIBCompliance3 MODULE-COMPLIANCE
     ::= { clagMIBCompliances 3 }
 
 clagMIBCompliance4 MODULE-COMPLIANCE
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The compliance statement for entities which implement
         the Cisco Link Aggregation MIB"
@@ -559,6 +735,248 @@ clagMIBCompliance4 MODULE-COMPLIANCE
     DESCRIPTION
         "Write access is not required."
     ::= { clagMIBCompliances 4 }
+
+clagMIBCompliance5 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Link Aggregation MIB"
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        clagAggProtocolGroup,
+                        clagAggPortGroup
+                    }
+
+    GROUP           clagAggDistributionGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        supported aggregation load balancing."
+
+    GROUP           clagAggDistributionMplsGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        supported aggregation load balancing for MPLS
+        packets."
+
+    GROUP           clagAggPortListGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        supports dot1dBasePort value greater than 2048."
+
+    GROUP           clagAggMaxAggregatorsGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        provides the information about the maximum number
+        of aggregators supported by the device."
+
+    GROUP           clagAggRateGroup
+    DESCRIPTION
+        "This group is mandatory for devices that support
+        LACP packet ingression rate on interfaces."
+
+    GROUP           clagAggChannelIfLacpGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        support the LACP port channel configurations on  
+        port channel interfaces."
+
+    GROUP           clagAggChannelIfHashDistMethodGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        support the hash distribution method configurations on
+        port channel interfaces."
+
+    GROUP           clagAggHashDistGlobalGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which support
+        global configuration of hash distribution method on
+        port channel interface."
+
+    GROUP           clagAggChannelIfMinLinkGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        support minimum link configurations on port channel 
+        interfaces."
+
+    OBJECT          clagAggDistributionProtocol
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggDistributionAddressMode
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggDistributionMplsProtocol
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggHashDistMethodGlobalConfig
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggProtocolType
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggPortAdminStatus
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggPortRate
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggChannelIfFastSwitchOver
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggChannelIfMaxBundle
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggChannelIfMinLink
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggChannelIfHashDistAdminMethod
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { clagMIBCompliances 5 }
+
+clagMIBCompliance6 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Link Aggregation MIB"
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        clagAggProtocolGroup,
+                        clagAggPortGroup
+                    }
+
+    GROUP           clagAggDistributionGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        supported aggregation load balancing."
+
+    GROUP           clagAggDistributionMplsGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        supported aggregation load balancing for MPLS
+        packets."
+
+    GROUP           clagAggPortListGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        supports dot1dBasePort value greater than 2048."
+
+    GROUP           clagAggMaxAggregatorsGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        provides the information about the maximum number
+        of aggregators supported by the device."
+
+    GROUP           clagAggRateGroup
+    DESCRIPTION
+        "This group is mandatory for devices that support
+        LACP packet ingression rate on interfaces."
+
+    GROUP           clagAggChannelIfLacpGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        support the LACP port channel configurations on  
+        port channel interfaces."
+
+    GROUP           clagAggChannelIfHashDistMethodGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        support the hash distribution method configurations on
+        port channel interfaces."
+
+    GROUP           clagAggHashDistGlobalGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which support
+        global configuration of hash distribution method on
+        port channel interface."
+
+    GROUP           clagAggChannelIfMinLinkGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        support minimum link configurations on port channel 
+        interfaces."
+
+    GROUP           clagAggPortListInterfaceIndexGroup
+    DESCRIPTION
+        "This group is mandatory for the devices which
+        support Layer3 LACP interfaces."
+
+    OBJECT          clagAggDistributionProtocol
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggDistributionAddressMode
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggDistributionMplsProtocol
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggHashDistMethodGlobalConfig
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggProtocolType
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggPortAdminStatus
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggPortRate
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggChannelIfFastSwitchOver
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggChannelIfMaxBundle
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggChannelIfMinLink
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          clagAggChannelIfHashDistAdminMethod
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { clagMIBCompliances 6 }
+
 
 -- -------------------------------------------------------------
 -- Units of Conformance
@@ -620,4 +1038,69 @@ clagAggMaxAggregatorsGroup OBJECT-GROUP
         device."
     ::= { clagMIBGroups 6 }
 
+clagAggRateGroup OBJECT-GROUP
+    OBJECTS         { clagAggPortRate }
+    STATUS          current
+    DESCRIPTION
+        "A collection of object that provides information about
+        the rate at which LACP packets are ingressed on 
+        interfaces."
+    ::= { clagMIBGroups 7 }
+
+clagAggChannelIfLacpGroup OBJECT-GROUP
+    OBJECTS         {
+                        clagAggChannelIfFastSwitchOver,
+                        clagAggChannelIfMaxBundle
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects that provides information about
+        the LACP protocol configurations for port channel
+        interfaces."
+    ::= { clagMIBGroups 8 }
+
+clagAggChannelIfHashDistMethodGroup OBJECT-GROUP
+    OBJECTS         {
+                        clagAggChannelIfHashDistAdminMethod,
+                        clagAggChannelIfHashDistOperMethod
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects that provides information about
+        the port channel configurations of hash distribution
+        method on port channel interfaces."
+    ::= { clagMIBGroups 9 }
+
+clagAggHashDistGlobalGroup OBJECT-GROUP
+    OBJECTS         { clagAggHashDistMethodGlobalConfig }
+    STATUS          current
+    DESCRIPTION
+        "A collection of object that provides information about global
+        configuration of hash distribution method on port channel 
+        interface."
+    ::= { clagMIBGroups 10 }
+
+clagAggChannelIfMinLinkGroup OBJECT-GROUP
+    OBJECTS         {
+                        clagAggChannelIfMinLink
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects that provides information about
+        the minimum link configurations for port channel
+        interfaces."
+    ::= { clagMIBGroups 11 }
+
+clagAggPortListInterfaceIndexGroup OBJECT-GROUP
+    OBJECTS         {
+                        clagAggPortListInterfaceIndexList
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects that provides information about
+         ports in an aggregation in the format of 
+         CiscoInterfaceIndexList."
+    ::= { clagMIBGroups 12 }
+
 END
+

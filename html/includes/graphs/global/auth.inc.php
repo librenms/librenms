@@ -1,5 +1,7 @@
 <?php
 
-if ($_SESSION['userlevel'] >= '5') {
+use LibreNMS\Authentication\LegacyAuth;
+
+if (LegacyAuth::user()->hasGlobalRead()) {
     $auth = 1;
 }

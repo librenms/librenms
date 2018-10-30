@@ -1,9 +1,11 @@
 <h3> Applications </h3>
 <?php
 
+use LibreNMS\Config;
+
 // Load our list of available applications
 $applications = array();
-foreach (glob($config['install_dir'] . '/includes/polling/applications/*.inc.php') as $file) {
+foreach (glob(Config::get('install_dir') . '/includes/polling/applications/*.inc.php') as $file) {
     $name = basename($file, '.inc.php');
     $applications[$name] = $name;
 }
@@ -25,7 +27,9 @@ foreach ($applications as $app) {
     // check if the app exists in the enable apps array and check if it was automatically enabled
     if (isset($enabled_apps[$app])) {
         $modifiers = ' checked';
-        if ($enabled_apps[$app]) {
+        if ($enabled_apps[$app]
+            && is_dev_attrib_enabled($device, "poll_applications", Config::getOsSetting($device['os'], "poller_modules.applications"))
+        ) {
             $app_text .= '<span class="text-success"> (Discovered)</span>';
             $modifiers .= ' disabled';
         }

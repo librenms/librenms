@@ -1,0 +1,496 @@
+-- ============================================================================
+-- AT-INTERFACE.MIB, Allied Telesis enterprise MIB: Interfaces
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+-- Upgraded to SMIv2 compliance
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-INTERFACES-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+   MODULE-IDENTITY, 
+   OBJECT-TYPE, 
+   NOTIFICATION-TYPE
+   		FROM SNMPv2-SMI
+   DisplayString
+        FROM SNMPv2-TC
+   ifName, 
+   InterfaceIndexOrZero			   
+	    FROM IF-MIB
+   traps, 
+   atRouter
+   		FROM AT-SMI-MIB
+;	
+	   		
+arInterfaces MODULE-IDENTITY
+	LAST-UPDATED "200606140000Z"
+	ORGANIZATION "Allied Telesis, Inc."
+	CONTACT-INFO
+		"  http://www.alliedtelesis.com"
+	DESCRIPTION
+		"subtree beneath which interface ids are assigned.."
+	REVISION      "200606140000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+	::= { atRouter 5 }
+	   				
+
+--  Generic traps
+
+igmpTraps OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"object id for igmp traps."
+	::= { traps 1 }
+
+igmpGeneralQueryNotReceivedEvent NOTIFICATION-TYPE
+    OBJECTS { ifName }
+    STATUS  current
+    DESCRIPTION
+            "Triggered when no general IGMP-Query
+             message is received within a user-defined
+             time period on a specific interface."
+::= { igmpTraps 1 }
+
+
+	 
+--  Router interfaces tables.
+
+--  A router consists of a number of "boards". Each board may have a
+--  number of "positions", each of which contains a single router
+--  interface. Each boards may also have a number of "slots", which are
+--  places which can take other boards. Thus the physical construction
+--  of a router may be seen as a tree whose nodes are boards and
+--  interfaces, and whose links are positions and slots.
+--  For example, an AR720 with a single Ethernet ICM in Bay 1 has the
+--  following tree:
+--  Bd:AR720 base board
+--           === P1 === Int: Asyn0
+--           === P2 === Int: Asyn1
+--           === P3 === Int: Eth0
+--           === S1 (Bay0) === <empty>
+--           === S2 (Bay1) === Bd:Ethernet ICM === P1 === Int: Eth1
+--           === S3 (MAC) === <empty>
+--  The function of the interface MIB tables is to represent this tree
+--  and to map elements in this tree to other MIB variables. Note that
+--  any given board has a fixed configuration of positions and slots,
+--  it is what is contained in the slots that give different hardware
+--  configurations.
+
+--  The highest index of boards in this router. Boards will have indices
+--  from 1 to the value of this object. There may be gaps in the
+--  sequence if the router has hot-swap capability. If the router has no
+--  hot-swap capability, or no swapping has taken place since boot, the
+--  sequence of boards will have no gaps.
+
+arBoardMaxIndex OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The maximum index of boards in the board table. Index 1
+            is reserved for the main system board of the router."
+    ::= { arInterfaces 1 }
+
+--  Router boards table. This table describes all of the physical boards
+--  present in this router. A board is defined as a separate circuit
+--  board with its own serial number.
+
+arBoardTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ArBoardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "The table of boards in the AR router."
+    ::= { arInterfaces 2 }
+
+arBoardEntry OBJECT-TYPE
+    SYNTAX          ArBoardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "A single entry in the board table. Each entry consists
+            of information about one board in the router."
+    INDEX   { arBoardIndex }
+    ::= { arBoardTable 1 }
+
+ArBoardEntry ::=
+    SEQUENCE {
+        arBoardIndex
+            INTEGER,
+        arBoardId
+            OBJECT IDENTIFIER,
+        arBoardName
+            DisplayString,
+        arBoardRevision
+            DisplayString,
+        arBoardSerialNumber
+            DisplayString,
+        arBoardTotalSlots
+            INTEGER,
+        arBoardTotalPositions
+            INTEGER
+    }
+
+arBoardIndex OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The index of the board in the board table. Index 1 is
+            reserved for the main system board of the router. Other
+            boards will take index numbers as they are initialised
+            at router startup, or for routers with hot-swap
+            capability, as boards are added to and removed from the
+            router."
+    ::= { arBoardEntry 1 }
+
+arBoardId OBJECT-TYPE
+    SYNTAX          OBJECT IDENTIFIER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The type of board in this board entry. The values of
+            this object are taken from the pprXxx object IDs under
+            the boards sub-tree."
+   ::= { arBoardEntry 2 }
+
+arBoardName OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The name of the board in this board entry. This is a
+            readable string which identifies the board to the
+            manager."
+    ::= { arBoardEntry 3 }
+
+arBoardRevision OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The manufacturing revision of the board in this board
+            entry. This string has the format Xm-n, where X is P for
+            prototype, or M for manufacturing, m is the major
+            revision number for this board, and n is the field
+            upgrade revision number for this board."
+    ::= { arBoardEntry 4 }
+
+arBoardSerialNumber OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The serial number of the board in this board entry.
+            Serial numbers are strings of decimal numbers up to 10
+            digits in length. Each and every serial number is
+            globally unique. It is possible for the serial number of
+            a board to be invalid. In this case the value returned
+            for this object will be '*** Invalid ***'"
+    ::= { arBoardEntry 5 }
+
+arBoardTotalSlots OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The number of slots on this board. Each slot from 1 to
+            the value of this object may be empty or occupied by
+            another board. By searching the arSlotTable with this
+            board's board index and all values of slot index from 1
+            to the value of this object, a tree of the boards in
+            this router can be built. The value 0 for this object
+            means that it has no slots."
+    ::= { arBoardEntry 6 }
+
+arBoardTotalPositions OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The number of positions on this board. Each position
+            from 1 to the value of this object contains a single
+            router interface. Note that positions are different from
+            slots. An position contains an actual interface while a
+            slot contains a different board which itself may contain
+            interfaces in its positions."
+    ::= { arBoardEntry 7 }
+
+
+--  Router board slot table. This table is indexed by board index and
+--  slot index and gives the board index of the board occupying the
+--  given slot in the given board.
+
+arSlotTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ArSlotEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "The table of slots in the router, indexed by board
+            index and slot index."
+    ::= { arInterfaces 3 }
+
+arSlotEntry OBJECT-TYPE
+    SYNTAX          ArSlotEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "A single entry in the board slot table."
+    INDEX   { arSlotBoardIndex, arSlotSlotIndex }
+    ::= { arSlotTable 1 }
+
+ArSlotEntry ::=
+    SEQUENCE {
+        arSlotBoardIndex
+            INTEGER,
+        arSlotSlotIndex
+            INTEGER,
+        arSlotHeldBoardIndex
+            INTEGER,
+        arSlotDescription
+            DisplayString
+    }
+
+arSlotBoardIndex OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The index of the board for this slot entry. Index 1 is
+            reserved for the main system board of the router."
+    ::= { arSlotEntry 1 }
+
+arSlotSlotIndex OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The index of the slot for this slot entry. Indices
+            start from 1 and are specific to each different board
+            type. There are no gaps in the sequence of slot indices.
+            The maximum value for slot index is given by the value
+            of arBoardTotalSlots for this board."
+    ::= { arSlotEntry 2 }
+
+arSlotHeldBoardIndex OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The index of the board held in the slot for this slot
+            entry. This is an index into the arBoardTable. A value
+            of 0 for this object means that the slot is not
+            populated."
+    ::= { arSlotEntry 3 }
+
+arSlotDescription OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "A description for this slot entry. This is a textual
+            description which gives the manager a clue as to what
+            the slot for this entry is. For example, the slots on an
+            AR 720 have descriptions 'Bay0', 'Bay1' and 'MAC'."
+    ::= { arSlotEntry 4 }
+
+--  Router interfaces table. This table has an entry for each physical
+--  interface on the router. The indices for this table are the router
+--  board index and a board position index.
+
+arInterfaceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ArInterfaceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "The table of physical interfaces in the AR router."
+    ::= { arInterfaces 4 }
+
+arInterfaceEntry OBJECT-TYPE
+    SYNTAX          ArInterfaceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "A single entry in the interface table. Each entry consists of
+            information about one interface in the router, and is indexed
+            by the board index and the position of the interface on the
+            board."
+    INDEX   { arInterfaceBoardIndex, arInterfacePosition }
+    ::= { arInterfaceTable 1 }
+
+ArInterfaceEntry ::=
+    SEQUENCE {
+        arInterfaceBoardIndex
+            INTEGER,
+        arInterfacePosition
+            INTEGER,
+        arInterfaceIfIndex
+            InterfaceIndexOrZero,
+        arInterfaceName
+            DisplayString,
+        arInterfaceFullName
+            DisplayString
+    }
+
+arInterfaceBoardIndex OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The index of the board in the board table which contains this
+            interface. Index 1 is reserved for the main system board of the
+            router."
+    ::= { arInterfaceEntry 1 }
+
+arInterfacePosition OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The position of the interface on the board. Each board type
+            will have well-known positions which are the interfaces
+            provided by the board. The number of positions on a given board
+            is given by the object arBoardTotalPositions for this board."
+    ::= { arInterfaceEntry 2 }
+
+arInterfaceIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The ifIndex for the interface represented by this entry of the
+            interfaces table. This is the ifIndex of the ifEntry used to
+            represent the physical interface. The value 0 is used for
+            interfaces which don't have an ifIndex."
+    ::= { arInterfaceEntry 3 }
+
+arInterfaceName OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The name of this interface. This is the name that the manager
+            can use to refer to this interface in entering router
+            commands."
+    ::= { arInterfaceEntry 4 }
+
+
+arInterfaceFullName OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The fully qualified name for this interface. This identifies 
+            the path that must be followed to reach the interface. This 
+            name can be used in router commands. In routers don't support 
+            fully qualified names, this is the same as arInterfaceName."
+    ::= { arInterfaceEntry 5 }
+                                  
+--  =================================================================================
+--  Router interface extension table. This table extends ifTable to allow interface variables
+--  not covered in the standard MIB. Current variables include:
+--  1. 512s moving averages of interface throughput, bps and pps.
+
+arIfXTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF ArIfXEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "The table of interface statistics for the AR router.
+            This table extends the ifTable."
+    ::= { arInterfaces 5 }
+
+arIfXEntry OBJECT-TYPE
+    SYNTAX          ArIfXEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+            "A single entry in the interface extension table. Each entry consists of
+            extra interface information not covered in standard MIBs. The index for this
+            table is ifIndex, the same as for ifTable."
+    INDEX   { arIfXIndex }
+    ::= { arIfXTable 1 }
+
+ArIfXEntry ::=
+    SEQUENCE { 
+        arIfXIndex
+            INTEGER,
+        arIfXAverageInputBitsSecond
+            INTEGER,
+        arIfXAverageInputPacketsSecond
+            INTEGER,
+        arIfXAverageOutputBitsSecond
+            INTEGER,
+        arIfXAverageOutputPacketsSecond
+            INTEGER
+    }
+
+arIfXIndex OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The index of the ifTable."
+    ::= { arIfXEntry 1 }
+   
+arIfXAverageInputBitsSecond OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The average number of bits received per second on all 
+            interfaces over the past 8.5 minutes.
+
+            The average is calculated by an 8.5 minute (512s) decaying average, 
+            which is updated every 4 seconds using the following formula:
+            
+                X' = 127/128X + 1/128i
+                
+                where   X' is the new average
+                        X  is the old average
+                        i  is the most recent poll result
+            
+            The times and multiplier factors have been chosen to give the simplest
+            possible calculation using bit shifting operations."
+    ::= { arIfXEntry 2 }
+    
+ arIfXAverageInputPacketsSecond OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The average number of packets received per second on all 
+            interfaces over the past 8.5 minutes. See the description for
+            arIfXAverageInputBitsSecond for details of the way in which the
+            average is calculated."
+    ::= { arIfXEntry 3 }
+    
+ arIfXAverageOutputBitsSecond OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The average number of bits sent per second on all 
+            interfaces over the past 8.5 minutes. See the description for
+            arIfXAverageInputBitsSecond for details of the way in which the
+            average is calculated."
+    ::= { arIfXEntry 4 }
+    
+ arIfXAverageOutputPacketsSecond OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+            "The average number of bits sent per second on all 
+            interfaces over the past 8.5 minutes. See the description for
+            arIfXAverageInputBitsSecond for details of the way in which the
+            average is calculated."
+    ::= { arIfXEntry 5 }
+
+END

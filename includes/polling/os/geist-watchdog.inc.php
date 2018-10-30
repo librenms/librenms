@@ -23,5 +23,5 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$serial  = snmp_get($device, 'climateSerial', '-Oqv', 'GEIST-MIB-V3');
+$serial  = snmp_get($device, 'climateSerial.1', '-Oqv', 'GEIST-MIB-V3');
 $version = snmp_get($device, 'productVersion.0', '-Oqv', 'GEIST-MIB-V3');

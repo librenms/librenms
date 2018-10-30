@@ -1,0 +1,801 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-CR-LDP-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2006, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-CR-LDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,
+Unsigned32,Integer32
+FROM SNMPv2-SMI
+
+TEXTUAL-CONVENTION,
+TruthValue,
+RowStatus
+FROM SNMPv2-TC
+
+InterfaceIndexOrZero
+FROM IF-MIB
+
+ipSwitch
+FROM PRVT-SWITCH-MIB;
+
+prvtCrLdp MODULE-IDENTITY
+LAST-UPDATED "200801010000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+" BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+DESCRIPTION
+"The MIB module for management of the PRVT-CR-LDP"
+
+-- revision history
+REVISION "200801010000Z"
+DESCRIPTION
+"Initial"
+
+::= { mpls 3 }
+
+-- MPLS node definition
+
+mpls OBJECT IDENTIFIER ::= { ipSwitch 5 }
+
+prvtCrLdpObjects OBJECT IDENTIFIER ::= { prvtCrLdp 1 } -- tables
+-- Textual Conventions.
+
+PrvtCrldpAdminStatus ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"The value determines the desired administrative
+status of a PRVT-CR-LDP table entry.
+The up and down states indicate that the traffic
+flow is enabled or disabled respectively for the
+protocol."
+SYNTAX INTEGER {
+up(1), -- ready to pass packets
+down(2)
+}
+
+PrvtCrldpOperStatus ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"The value determines the operational status of a
+PRVT-CR-LDP table entry. The up and down states indicate
+that the traffic flow is enabled or disabled respectively."
+SYNTAX INTEGER {
+up(1), -- active
+down(2), -- inactive
+goingUp(3), -- activating
+goingDown(4), -- deactivating
+actFailed(5) -- activation failed
+}
+
+PrvtCrldpIndex ::= TEXTUAL-CONVENTION
+DISPLAY-HINT "d"
+STATUS current
+DESCRIPTION
+"A general purpose SNMP index into the prvtHafEntity table."
+SYNTAX Unsigned32
+
+-- End of textual conventions
+
+-- The PRVT-CR-LDP Signaling MIB. This table is used to create an
+-- instance of PRVT-CR-LDP Signaling, and to change its operational state.
+
+prvtcrldpSigTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtcrldpSigEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The table of active instances of PRVT-CR-LDP Signaling."
+
+::= { prvtCrLdpObjects 1 }
+
+prvtcrldpSigEntry OBJECT-TYPE
+SYNTAX PrvtcrldpSigEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Each of these entries represents an instance of
+PRVT-CR-LDP Signaling running in the HAF. Some of these instances
+will be the primary, and others may be backups."
+INDEX {prvtcrldpSigIndex}
+::= { prvtcrldpSigTable 1 }
+
+PrvtcrldpSigEntry ::= SEQUENCE {
+prvtcrldpSigIndex PrvtCrldpIndex,
+prvtcrldpSigPathManagerIndex PrvtCrldpIndex,
+prvtcrldpSigLsrIndex Unsigned32,
+prvtcrldpSigSocketIfIndex InterfaceIndexOrZero,
+prvtcrldpSigSessionBufPoolSize Integer32,
+prvtcrldpSigEMBufPoolSize Integer32,
+prvtcrldpSigAMBufPoolSize Integer32,
+prvtcrldpSigAdminStatus PrvtCrldpAdminStatus,
+prvtcrldpSigOperStatus PrvtCrldpOperStatus,
+prvtcrldpSigRowStatus RowStatus,
+prvtcrldpSigUseI3Interface TruthValue,
+prvtcrldpSigConformanceFlags BITS,
+prvtcrldpSigUseIPv6Transport TruthValue,
+prvtcrldpSigSessStatusTrapEnable TruthValue,
+prvtcrldpSigSessThreshTrapEnable TruthValue,
+prvtcrldpSigPathVecLimitTrapEnable TruthValue
+}
+
+prvtcrldpSigIndex OBJECT-TYPE
+SYNTAX PrvtCrldpIndex
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The index of this prvtcrldpSigEntry. This is the
+HAF entity index passed on the product create
+parameters."
+::= { prvtcrldpSigEntry 1 }
+
+prvtcrldpSigPathManagerIndex OBJECT-TYPE
+SYNTAX PrvtCrldpIndex
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The index of the Path Manager instance to which this
+instance of Signaling is to join. See prvtcrldpPmTable."
+::= { prvtcrldpSigEntry 2 }
+
+prvtcrldpSigLsrIndex OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The index of the PRVT-LMGR product instance to which this
+PRVT-CR-LDP Signaling is to join as its LDB interface provider.
+See prvtlmgrLsrEntityTable."
+::= { prvtcrldpSigEntry 3 }
+
+prvtcrldpSigSocketIfIndex OBJECT-TYPE
+SYNTAX InterfaceIndexOrZero
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Management assigned interface identifier for the IP Sockets
+component interface to PRVT-CR-LDP Signalling."
+::= { prvtcrldpSigEntry 4 }
+
+prvtcrldpSigSessionBufPoolSize OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The number of pre-reserved buffers available for sending
+sockets and LDI messages for each LDP session. This is used
+to pace the sockets and LDI data flows for each LDP session."
+DEFVAL { 8 }
+::= { prvtcrldpSigEntry 5 }
+
+prvtcrldpSigEMBufPoolSize OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The number of pre-reserved buffers available for sending
+sockets, LDBI, NHR and I3 messages within Entity Manager
+This is used to pace Entity Manager's sockets, LDBI, NHR
+and I3 data flows."
+DEFVAL { 8 }
+::= { prvtcrldpSigEntry 6 }
+
+prvtcrldpSigAMBufPoolSize OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The number of pre-reserved buffers available for sending
+sockets messages within Adjacency Manager. This is used
+to pace Adjacency Manager's sockets data flows."
+DEFVAL { 8 }
+::= { prvtcrldpSigEntry 7 }
+
+prvtcrldpSigAdminStatus OBJECT-TYPE
+SYNTAX PrvtCrldpAdminStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This object is used to activate the PRVT-CR-LDP Signaling instance."
+DEFVAL { up }
+::= { prvtcrldpSigEntry 8 }
+
+prvtcrldpSigOperStatus OBJECT-TYPE
+SYNTAX PrvtCrldpOperStatus
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The current operational status of this instance of
+PRVT-CR-LDP Signaling."
+::= { prvtcrldpSigEntry 9 }
+
+prvtcrldpSigRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Used to create and delete a PRVT-CR-LDP Signaling Table entry.
+When this object is set to 'active', only the
+prvtcrldpSigAdminStatus object in the row may be modified."
+::= { prvtcrldpSigEntry 10 }
+
+prvtcrldpSigUseI3Interface OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Used to indicate whether this PRVT-CR-LDP Signaling instance
+should use the I3 interface or the IPR interface to determine
+information regarding local interface configuration. Use of
+the IPR interface is deprecated, but nevertheless this field
+defaults to its use for back-compatibility reasons."
+DEFVAL { false }
+::= { prvtcrldpSigEntry 11 }
+
+prvtcrldpSigConformanceFlags OBJECT-TYPE
+SYNTAX BITS {
+maxPduLen (0)
+}
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Flags specifying how PRVT-LDP Session Controller should
+behave in situations either where the interpretation of
+strict conformance is debatable, or where strictly
+conformant behavior contradicts the general IETF principle
+of being liberal on receipt.
+
+maxPduLen If set, this flag means that PRVT-LDP should
+abort session initialization if the peer (in the passive
+role) proposes a max PDU length that is larger than
+PRVT-LDP's proposed value. The interpretation here is that
+the passive peer's value should be the already negotiated
+value, not its raw value."
+DEFVAL { {} }
+::= { prvtcrldpSigEntry 12 }
+
+prvtcrldpSigUseIPv6Transport OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Used to indicate whether the PRVT-CR-LDP signaling is to use
+IPv6 transport where possible.
+
+Note that if PRVT-LDP is configured with an IPv4 transport
+address, IPv4 transport will be used for multicast and
+IPv6 sockets using a IPv4 mapped IPv6 address will be used
+for unicast when this field is set to True."
+DEFVAL { false }
+::= { prvtcrldpSigEntry 13 }
+
+prvtcrldpSigSessStatusTrapEnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"If this object is true, then it enables the generation of
+mplsLdpSessionUp and mplsLdpSessionDown traps, otherwise
+these traps are not generated."
+DEFVAL { false }
+::= { prvtcrldpSigEntry 14 }
+
+prvtcrldpSigSessThreshTrapEnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"If this object is true, then it enables the generation of
+mplsLdpInitSessionThresholdExceeded traps, otherwise these
+traps are not generated."
+DEFVAL { false }
+::= { prvtcrldpSigEntry 15 }
+
+prvtcrldpSigPathVecLimitTrapEnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"If this object is true, then it enables the generation of
+mplsLdpPathVectorLimitMismatch traps, otherwise these
+traps are not generated."
+DEFVAL { false }
+::= { prvtcrldpSigEntry 16 }
+
+-- The PRVT-CR-LDP Path Manager MIB. This table is used to create an
+-- instance of PRVT-CR-LDP Path Manager, and to change its operational state.
+
+prvtcrldpPmTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtcrldpPmEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The table of active instances of PRVT-CR-LDP Path Manager."
+::= { prvtCrLdpObjects 2 }
+
+prvtcrldpPmEntry OBJECT-TYPE
+SYNTAX PrvtcrldpPmEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Each of these entries represents an instance of
+PRVT-CR-LDP Path Manager running in the HAF. Some of these instances
+will be the primary, and others may be backups."
+INDEX {prvtcrldpPmIndex}
+::= { prvtcrldpPmTable 1 }
+
+PrvtcrldpPmEntry ::= SEQUENCE {
+prvtcrldpPmIndex PrvtCrldpIndex,
+prvtcrldpPmLsrIndex Unsigned32,
+prvtcrldpPmLdpEntityAutoCreate TruthValue,
+prvtcrldpPmLdpEntityAutoStart TruthValue,
+prvtcrldpPmLdpEntityReuse TruthValue,
+prvtcrldpPmLdpVersion INTEGER,
+prvtcrldpPmUseLdpFt TruthValue,
+prvtcrldpPmAsNumber Integer32,
+prvtcrldpPmIprBufPoolSize Integer32,
+prvtcrldpPmLdpSupported TruthValue,
+prvtcrldpPmCrLdpSupported TruthValue,
+prvtcrldpPmQueryFECSupported TruthValue,
+prvtcrldpPmAdminStatus PrvtCrldpAdminStatus,
+prvtcrldpPmOperStatus PrvtCrldpOperStatus,
+prvtcrldpPmRowStatus RowStatus,
+prvtcrldpPmRestartCapable TruthValue,
+prvtcrldpPmReconnectTime Integer32,
+prvtcrldpPmRecoveryTime Integer32,
+prvtcrldpPmMaxPeerReconnect Integer32,
+prvtcrldpPmMaxPeerRecovery Integer32,
+prvtcrldpPmAdjDwnHoldTime Integer32,
+prvtcrldpPmOutSegProgOrder INTEGER,
+prvtcrldpPmSupportIpv6 TruthValue,
+prvtcrldpPmPolicySupportFlags BITS,
+prvtcrldpPmCheckOutSegIntfaceStat TruthValue
+}
+
+prvtcrldpPmIndex OBJECT-TYPE
+SYNTAX PrvtCrldpIndex
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The index of this prvtcrldpPmEntry. This is the
+HAF entity index passed on the product create
+parameters."
+::= { prvtcrldpPmEntry 1 }
+
+prvtcrldpPmLsrIndex OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The index of the PRVT-LMGR product instance to which this
+PRVT-CR-LDP Path Manager is to join as its LDB interface provider.
+See prvtlmgrLsrEntityTable."
+::= { prvtcrldpPmEntry 2 }
+
+prvtcrldpPmLdpEntityAutoCreate OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"When set to 'true', the Entity Manager component of PRVT-CR-LDP
+creates Entities automatically based on interfaces known to
+Entity Manager. When set to 'false' Entities are not
+automatically created."
+DEFVAL { true }
+::= { prvtcrldpPmEntry 3 }
+
+prvtcrldpPmLdpEntityAutoStart OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"When set to 'true', the Entity Manager component of PRVT-CR-LDP
+automatically starts Entities. Both configured and automatically
+created Entities are automatically started. When set to 'false'
+Entities are not automatically started."
+DEFVAL { true }
+::= { prvtcrldpPmEntry 4 }
+
+prvtcrldpPmLdpEntityReuse OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"When set to 'true', the same Entity can be used for multiple
+interfaces. That is, the per-platform label space behaves as
+a per-interface label space. When set to 'false', the same
+entity cannot be used for multiple interfaces."
+DEFVAL { true }
+::= { prvtcrldpPmEntry 5 }
+
+prvtcrldpPmLdpVersion OBJECT-TYPE
+SYNTAX INTEGER {
+version1(1)
+}
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"An indication of the LDP version supported."
+DEFVAL { 1 }
+::= { prvtcrldpPmEntry 6 }
+
+prvtcrldpPmUseLdpFt OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"When set to 'true', PRVT-CR-LDP implements fault tolerance
+procedures for LDP and CR-LDP. When set to 'false', fault
+tolerance procedures are not used."
+DEFVAL { false }
+::= { prvtcrldpPmEntry 7 }
+
+prvtcrldpPmAsNumber OBJECT-TYPE
+SYNTAX Integer32(0..65535)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The number identifying the autonomous system (AS) to which
+this node belongs."
+::= { prvtcrldpPmEntry 8 }
+
+prvtcrldpPmIprBufPoolSize OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The size of the buffer pool used for sending either
+(deprecated) IPRI messages or for sending NHR and I3
+messages. This is used to pace IPR/NHR+I3 data flows from
+PM."
+DEFVAL { 8 }
+::= { prvtcrldpPmEntry 9 }
+
+prvtcrldpPmLdpSupported OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"When set to 'true', PRVT-CR-LDP implements LDP
+functionality. When set to 'false' received LDP requests
+are rejected.
+Note that at least one of prvtcrldpPmLdpSupported and
+prvtcrldpPmCrLdpSupported must be set to 'true' before
+activating a prvtcrldpPmTable row. Both prvtcrldpPmLdpSupported
+and prvtcrldpPmCrLdpSupported may be set to 'true'."
+DEFVAL { false }
+::= { prvtcrldpPmEntry 10 }
+
+prvtcrldpPmCrLdpSupported OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"When set to 'true', PRVT-CR-LDP implements CR-LDP
+functionality. When set to 'false' received CR-LDP requests
+are rejected.
+Note that at least one of prvtcrldpPmLdpSupported and
+prvtcrldpPmCrLdpSupported must be set to 'true' before
+activating a prvtcrldpPmTable row. Both prvtcrldpPmLdpSupported
+and prvtcrldpPmCrLdpSupported may be set to 'true'."
+DEFVAL { false }
+::= { prvtcrldpPmEntry 11 }
+
+prvtcrldpPmQueryFECSupported OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"When set to 'true', PRVT-CR-LDP queries the routing stub
+when a label mapping for an unrecognized FEC is received
+to determine whether the FEC should be recognized and the
+corresponding switch programming performed or not. If set
+to 'false' PRVT-CR-LDP creates a dummy FEC for the mapping
+and retains or releases the mapping based on the label
+retention policy for the session."
+DEFVAL { false }
+::= { prvtcrldpPmEntry 12 }
+
+prvtcrldpPmAdminStatus OBJECT-TYPE
+SYNTAX PrvtCrldpAdminStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This object is used to activate the PRVT-CR-LDP Path Manager instance."
+DEFVAL { up }
+::= { prvtcrldpPmEntry 13 }
+
+prvtcrldpPmOperStatus OBJECT-TYPE
+SYNTAX PrvtCrldpOperStatus
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The current operational status of this instance of
+PRVT-CR-LDP Path Manager."
+::= { prvtcrldpPmEntry 14 }
+
+prvtcrldpPmRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Used to create and delete a PRVT-CR-LDP Path Manager Table entry.
+When this object is set to 'active', only the
+prvtcrldpPmAdminStatus object in the row may be modified."
+::= { prvtcrldpPmEntry 15 }
+
+prvtcrldpPmRestartCapable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"A flag to indicate whether the local node should advertise
+itself as LDP restart capable if the Label Switch
+Controller or Label Data Forwarder is capable of
+supporting the required procedures."
+DEFVAL { false }
+::= { prvtcrldpPmEntry 16 }
+
+prvtcrldpPmReconnectTime OBJECT-TYPE
+SYNTAX Integer32(0..2147483647)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The time in milliseconds that the local node takes to
+restart LDP and bring up the LDP sessions.
+This is advertised to neighbors in the FT Session TLV in
+Initialization messages.
+
+The value chosen should be large enough for LDP to be
+terminated and restarted.
+
+Only used if prvtcrldpPmRestartCapable is set to true."
+DEFVAL { 10000 }
+::= { prvtcrldpPmEntry 17 }
+
+prvtcrldpPmRecoveryTime OBJECT-TYPE
+SYNTAX Integer32(0..2147483647)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The period of time in milliseconds that the local node
+is willing to retain its MPLS forwarding state, if any,
+that it preserved across the restart.
+
+The time is from the end of the restart time configured
+above.
+
+Only used if prvtcrldpPmRestartCapable is set to true."
+DEFVAL { 10000 }
+::= { prvtcrldpPmEntry 18 }
+
+prvtcrldpPmMaxPeerReconnect OBJECT-TYPE
+SYNTAX Integer32(0..2147483647)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The maximum period of time in milliseconds that LDP
+should wait for a restart capable neighbor to restore an
+LDP session.
+
+LDP waits for the minimum of this time and the
+Reconnect Timeout advertised in the FT Session TLV in
+the Initialization message from the neighbor.
+
+Only used if prvtcrldpPmRestartCapable is set to true."
+DEFVAL { 10000 }
+::= { prvtcrldpPmEntry 19 }
+
+prvtcrldpPmMaxPeerRecovery OBJECT-TYPE
+SYNTAX Integer32(0..2147483647)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The maximum period of time in milliseconds that LDP
+should wait for a restart capable neighbor to refresh
+Label Mappings previously received from that neighbor
+before deleting the stale bindings.
+
+LDP waits for the minimum of this time and the
+Recovery Time advertised in the FT Session TLV in
+the Initialization message from the neighbor.
+
+Only used if prvtcrldpPmRestartCapable is set to true."
+DEFVAL { 10000 }
+::= { prvtcrldpPmEntry 20 }
+
+prvtcrldpPmAdjDwnHoldTime OBJECT-TYPE
+SYNTAX Integer32(0..2147483647)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The time in milliseconds to hold a failed LDP Hello
+adjacency to distinguish between LDP peer failure
+and interface failure.
+
+This field is used to ensure that LDP retains adjacency
+multi-link LSPs during peer restart recovery when the peer
+restarts and an LDP Hello adjacency goes down before the
+LDP session.
+
+When an LDP Hello adjacency fails, Path Manager waits
+until the adjacency holding timer expires before tearing
+down any LSP out segments associated with the adjacency.
+
+If the LDP session fails before the adjacency holding
+timer expires, Path Manager performs peer restart recovery
+instead of tearing down any LSP out segments.
+
+If the adjacency holding timer expires and the LDP session
+is still active then Path Manager assumes that the
+interface has failed but the peer is still active. In
+this case Path Manager tears down LSP out segments
+associated with the adjacency.
+
+The value chosen should be large enough for the LDP
+session to fail if the LDP peer has failed.
+
+Only used if _restart_capable_ is set to AMB_TRUE, and
+cannot be modified when the _row_status_ is ACTIVE."
+DEFVAL { 3000 }
+::= {prvtcrldpPmEntry 21 }
+
+prvtcrldpPmOutSegProgOrder OBJECT-TYPE
+SYNTAX INTEGER {
+default(0),
+connFirst(1)
+}
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This determines the order in which LDP connects and
+releases out segments.
+
+default: This will release all out-segments on a session
+before programming new out-segments on the same session.
+No ordering for out-segments across different sessions is
+enforced when ECMP is in use.
+
+connFirst: This mode forces all the out-segments for an
+LSP to be programmed before any out-segments are released.
+This ordering is only supported if the LSC stub supports
+implicit XCs."
+DEFVAL { default }
+::= {prvtcrldpPmEntry 22 }
+
+prvtcrldpPmSupportIpv6 OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This field indicates whether LDP Path Manager supports
+IPv6 addresses, FECs and routes.
+
+If this field is set to false then no IPv6 addresses will
+be accepted over the NHR and I3 interfaces and all LDP
+protocol messages for IPv6 addresses or FECs will be
+returned to the peer as an LDP status code of 'Unsupported
+Address Family'."
+DEFVAL { false }
+::= {prvtcrldpPmEntry 23 }
+
+prvtcrldpPmPolicySupportFlags OBJECT-TYPE
+SYNTAX BITS {
+policySupported(0),
+perFecOptimizationSupported(1),
+suppressAddressPolicy(2)
+}
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This field contains bit flags which indicate whether
+PRVT-LDP supports LDP Policy and if per FEC policy
+optimization is to be used.
+
+The supported bit flags are defined below.
+- policySupported
+- perFecOptimizationSupported
+- suppressAddressPolicy.
+
+The policySupported flag indicates that PRVT-LDP will
+enforce policy decisions made by the user through a number
+of user exits. If this flag is not set PRVT-LDP will not
+call policy user exits.
+
+The perFecOptimizationSupported flag indicates that PRVT-LDP
+provides policy on a per FEC basis as opposed to a per FEC
+per session basis. This results in policy user exits only
+being called once per FEC. This field is only significant
+if the policySupported flag is set. This feature is used
+to reduce the number of calls to the Policy User Exits
+particularly when a change in Policy is being implemented.
+
+If the perFecOptimizationSupported flag is not set then
+PRVT-LDP Path Manager enforces policy on a per FEC per peer
+basis.
+
+If this flag is set policy is enforced on a per FEC basis
+and the same policy decision is assumed to apply for all
+peers.
+
+The suppressAddressPolicy flag if set prevents PRVT-LDP from
+performing any Policy processing on receipt of a Address
+or Address Withdraw message from a peer.
+
+If this field is not set then its default value is
+determined by the RCP_USER_DO_POLICY compile time flag.
+
+Changes to the value of policy_support_flags are not
+permitted whilst the MIB row is active."
+
+::= {prvtcrldpPmEntry 24 }
+
+prvtcrldpPmCheckOutSegIntfaceStat OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This field indicates whether LDP Path Manager makes the
+programming of each out segment conditional on the status
+of the interface where the out segment is programmed.
+
+When set to false, LDP Path Manager assumes that the
+availability of interfaces for programming is reflected in
+the adjacency and session information that it receives
+from LDP Session Controller, and in the routing
+information that it receives from the NHR stub.
+
+When set to true, LDP Path Manager tracks interface
+status itself and uses this in addition to input from LDP
+Session Controller and the NHR stub to decide whether an
+out segment should be programmed on a particular
+interface. If the other inputs indicate 'yes', but the
+relevant interface is (or goes) down, LDP Path Manager
+will not program that out segment (or will remove the
+existing out segment on that interface).
+
+This field cannot be changed when the row is active."
+DEFVAL { false }
+::= {prvtcrldpPmEntry 25 }
+END

@@ -8,7 +8,7 @@ $bigdescrlen  = 15;
 $smalldescrlen = 15;
 $dostack      = 0;
 $printtotal      = 0;
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfsstats-'.$app['app_id'].'.rrd';
+$rrd_filename = get_rrd_dir($device['hostname']).'/app-nfsstats-'.$app['app_id'].'.rrd';
 $array        = array(
                  'total' => array(
                                     'descr'  => 'Total',
@@ -74,7 +74,7 @@ $array        = array(
 
 $i = 0;
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = $var['descr'];

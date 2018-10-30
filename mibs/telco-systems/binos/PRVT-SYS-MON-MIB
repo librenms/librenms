@@ -1,0 +1,699 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-SYS-MON-MIB
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+
+PRVT-SYS-MON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, 
+		Integer32 ,NOTIFICATION-TYPE
+          FROM SNMPv2-SMI       
+              
+      NOTIFICATION-GROUP
+FROM SNMPv2-CONF
+   TEXTUAL-CONVENTION
+        FROM SNMPv2-TC                                           
+		DisplayString    
+			FROM SNMPv2-TC
+		reportsL2IfaceUnit, reportsL2IfaceSlot,
+		reportsL2IfacePort, reportsIfJackIndex,
+		prvt-products
+	                                     FROM PRVT-SWITCH-MIB;  
+
+
+    prvtSysMonMib MODULE-IDENTITY
+  LAST-UPDATED    "200712270000Z"
+        ORGANIZATION "BATM Advanced Communication"
+        CONTACT-INFO
+        " BATM/Telco Systems Support team
+				Email: 
+				For North America: techsupport@telco.com
+				For North Europe: support@batm.de, info@batm.de
+				For the rest of the world: techsupport@telco.com"
+       
+        DESCRIPTION
+                "Information for system resources"
+
+	REVISION 			"200712270000Z"
+	DESCRIPTION 
+	"Added laser management"
+         REVISION     "200502160000Z"
+     	 DESCRIPTION
+			"Fixed spelling errors and changed the contact info." 
+
+        REVISION     "200311180000Z"
+        DESCRIPTION
+	"Add new notifications portsCRCErrExceeded, portsRuntsExceeded, 
+	portsOverSizeExceeded and support vars for them.
+	Change the MAX-ACCESS for all 
+	sysMonValues to accessible-for-notify"
+        REVISION     "200305130000Z"
+        DESCRIPTION
+                "Initial version."
+            ::= { software 3 }
+
+
+
+-------------------------------------------------------------------------------
+--     PRIVATE BRANCH  PRODUCTS
+-------------------------------------------------------------------------------
+    software        OBJECT IDENTIFIER ::= { prvt-products 111 }
+
+----------------------------------------------------------------------------
+-- Variable Type definitions
+----------------------------------------------------------------------------
+	EnableStatus ::= TEXTUAL-CONVENTION
+	STATUS       current
+	DESCRIPTION
+	"enable(1), disable(2)"
+	SYNTAX  INTEGER {
+		enable(1),
+		disable(2)
+	}
+
+    prvtSysMonNotifications OBJECT IDENTIFIER ::= { prvtSysMonMib 0 }
+    prvtSysMonObjects       OBJECT IDENTIFIER ::= { prvtSysMonMib 1 }
+    prvtSysMonConformance   OBJECT IDENTIFIER ::= { prvtSysMonMib 2 }
+
+    sysMonThreshold  OBJECT IDENTIFIER ::= {prvtSysMonObjects 1}
+    sysMonValues     OBJECT IDENTIFIER ::= {prvtSysMonObjects 2}
+	sysMonConfig		 OBJECT IDENTIFIER ::= {prvtSysMonObjects 3}
+
+    cpuUtilizationThreshold OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                "High limit in percent of normal CPU utilization"
+        ::= { sysMonThreshold 1 }
+
+    ramBytesFreeThreshold OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+                "Low limit in bytes free in the system memory"
+        ::= { sysMonThreshold 2 }
+
+    portErrorsThreshold OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+                "High limit in percent of communication errors on port"
+        ::= { sysMonThreshold 3 }
+
+    portsBroadcastThreshold OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+                "High limit in percent of exceeding broadcast-limit on port"
+        ::= { sysMonThreshold 4 }
+
+    portsCRCErrThreshold OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+                "High limit in percent of exceeding CRC error on port"
+        ::= { sysMonThreshold  5 }
+
+    portsRuntsThreshold OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+                "High limit in percent of exceeding runts on port"
+        ::= { sysMonThreshold 6 }
+
+    portsOverSizeThreshold OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+                "High limit in percent of exceeding over-size on port"
+        ::= { sysMonThreshold 7 }
+
+	laserPortThresholdTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF LaserPortThresholdEntry
+	MAX-ACCESS	not-accessible
+	STATUS			current
+	DESCRIPTION
+	"Defines thresholds for each port in the device"
+	::= { sysMonThreshold 8 }
+
+	laserPortThresholdEntry OBJECT-TYPE
+	SYNTAX LaserPortThresholdEntry
+	MAX-ACCESS	not-accessible
+	STATUS			current
+	DESCRIPTION
+	""
+	INDEX { reportsL2IfaceUnit, reportsL2IfaceSlot,	reportsL2IfacePort, reportsIfJackIndex}
+	::= { laserPortThresholdTable 1 }
+
+	LaserPortThresholdEntry ::= SEQUENCE {
+		laserTemperatureHighThreshold		Integer32,
+		laserTemperatureLowThreshold   	Integer32,
+		laserTxPowerHighThreshold      	Integer32,
+		laserTxPowerLowThreshold       	Integer32,
+		laserRxPowerHighThreshold    		Integer32,
+		laserRxPowerLowThreshold				Integer32
+	}
+
+	laserTemperatureHighThreshold OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+	"Configures high temperature threshold. The range is -128 to 128. The accuracy is 1C."
+	::= { laserPortThresholdEntry 1  }
+
+	laserTemperatureLowThreshold OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+	"Configures low temperature threshold. The range is -128 to 128. The accuracy is 1C."
+	::= { laserPortThresholdEntry 2  }
+
+	laserTxPowerHighThreshold OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+	"Configures Tx power high threshold. The range is -40 to 8."
+	::= { laserPortThresholdEntry 3  }
+
+	laserTxPowerLowThreshold OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+	"Configures Tx power low threshold. The range is -40 to 8."
+	::= { laserPortThresholdEntry 4  }
+
+	laserRxPowerHighThreshold OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+	"Configures Rx power high threshold. The range is -40 to 8."
+	::= { laserPortThresholdEntry 5  }
+
+	laserRxPowerLowThreshold OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+	"Configures Rx power low threshold. The range is -40 to 8."
+	::= { laserPortThresholdEntry 6  }
+
+    monCpuUtilization  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The current level in percent of CPU utilization"
+        ::= { sysMonValues 1 }
+
+    monRamBytesFree   OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+                "The number of bytes currently free in the system memory"
+        ::= { sysMonValues 2 }
+
+    monPortsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF MonPortsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+            "Defines the ports monitor Table for providing, via SNMP, the
+             last sampled parameters by the periodic monitor"
+	::= { sysMonValues 3 }
+
+    monPortsEntry OBJECT-TYPE
+        SYNTAX MonPortsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           "Defines an entry in the monPortsTable. The entries are indexed by
+            the physical location of the port in the device."
+        INDEX { reportsL2IfaceUnit, reportsL2IfaceSlot, reportsL2IfacePort }
+        ::= { monPortsTable 1 }
+
+    MonPortsEntry ::= SEQUENCE {
+        monPortErrors      Integer32,
+        monPortBroadcast   Integer32,
+        monPortCRCErr      Integer32,
+        monPortRunts       Integer32,
+        monPortOverSize    Integer32
+    }
+
+   monPortErrors      OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+                "The percentages of errors on the port that generated the notification."
+        ::= { monPortsEntry 1  }
+
+   monPortBroadcast  OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+                "The percentages of packets exceeding broadcast-limit on the port that generated the notification."
+        ::= { monPortsEntry 2  }
+
+   monPortCRCErr OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        accessible-for-notify
+        STATUS            current
+        DESCRIPTION
+                "The percentage of CRC errors on the port that generated the notification."
+        ::= { monPortsEntry  3 }
+
+   monPortRunts OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        accessible-for-notify
+        STATUS            current
+        DESCRIPTION
+                "The percentage of runt packets on the port that generated the notification."
+        ::= { monPortsEntry 4 }
+
+   monPortOverSize OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        accessible-for-notify
+        STATUS            current
+        DESCRIPTION
+                "The percentage of over-size packets on the port that generated the notification."
+        ::= { monPortsEntry 5 }
+
+	laserPortValueTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF LaserPortValueEntry
+	MAX-ACCESS 	not-accessible
+	STATUS 			current
+	DESCRIPTION
+	"This table displays the current laser-related values for each port in the device."
+	::= { sysMonValues 4 }
+
+	laserPortValueEntry OBJECT-TYPE
+	SYNTAX LaserPortValueEntry
+	MAX-ACCESS 	not-accessible
+	STATUS 			current
+	DESCRIPTION
+	""
+	INDEX { reportsL2IfaceUnit, reportsL2IfaceSlot, reportsL2IfacePort, reportsIfJackIndex }
+	::= { laserPortValueTable 1 }
+
+	LaserPortValueEntry ::= SEQUENCE {
+		sfpStatus      		INTEGER,
+		laserTemperature  Integer32,
+		laserTxPower      Integer32,
+		laserRxPower      Integer32
+	}
+
+	sfpStatus      OBJECT-TYPE
+	SYNTAX     INTEGER {
+		lm-supported(1),
+		lm-not-supported(2),
+		extracted(3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	"If value of this field is not supported, then 
+	the values of other fields are not relevant. 
+	The value is supported only if SFP compliant 
+	with SFF-8472 is inserted."
+	::= { laserPortValueEntry 1 }
+
+	laserTemperature      OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	"Represents module temperature.
+	The range is -128 to 128. The accuracy is 1C."
+	::= { laserPortValueEntry 2 }
+
+	laserTxPower OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	"Represents Tx power. The range is -40 to 8."
+	::= { laserPortValueEntry 3 }
+
+	laserRxPower OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	"Represents Rx power. The range is -40 to 8."
+	::= { laserPortValueEntry 4 }
+
+     cpuUtilizationExceeded NOTIFICATION-TYPE
+         OBJECTS { monCpuUtilization, cpuUtilizationThreshold}
+         STATUS  current
+         DESCRIPTION
+			"The cpuUtilizationExceeded notification indicates that the sending
+			 agent sense that the CPU utilization has passed the
+			 program threshold."
+	     ::= {prvtSysMonNotifications 1}
+
+     ramFreeSpaceExceeded NOTIFICATION-TYPE
+         OBJECTS { monRamBytesFree, ramBytesFreeThreshold}
+         STATUS  current
+         DESCRIPTION
+            "The ramFreeSpaceExceeded notification indicates that the sending
+             agent sense that the system memory utilization has passed the
+             program threshold."
+	::= {prvtSysMonNotifications 2}
+
+     portErrorsExceeded NOTIFICATION-TYPE
+         OBJECTS { monPortErrors, portErrorsThreshold}
+         STATUS  current
+         DESCRIPTION
+            "The portErrorsExceeded notification indicates that the sending
+             agent sense that the level of errors on the port
+             has passed the program threshold."
+	::= {prvtSysMonNotifications 3}
+
+     portsBroadcastExceeded NOTIFICATION-TYPE
+         OBJECTS { monPortBroadcast, portsBroadcastThreshold}
+         STATUS  current
+         DESCRIPTION
+            "The portsBroadcastExceeded notification indicates that the sending
+             agent sense that the level of broadcast-limit has passed the
+             program threshold."
+	::= {prvtSysMonNotifications 4}
+
+     portsCRCErrExceeded NOTIFICATION-TYPE
+         OBJECTS { monPortCRCErr, portsCRCErrThreshold}
+         STATUS  current
+         DESCRIPTION
+            "The portsCRCErrExceeded notification indicates that the sending
+             agent sense that the level of CRC error has passed the
+             program threshold."
+	::= {prvtSysMonNotifications 5}
+
+     portsRuntsExceeded NOTIFICATION-TYPE
+         OBJECTS { monPortRunts, portsRuntsThreshold}
+         STATUS  current
+         DESCRIPTION
+	   "The portsRuntsExceeded notification indicates that the sending
+            agent sense that the level of runts has passed the
+            program threshold."
+	 ::= {prvtSysMonNotifications 6}
+
+     portsOverSizeExceeded NOTIFICATION-TYPE
+         OBJECTS { monPortOverSize, portsOverSizeThreshold}
+         STATUS  current
+         DESCRIPTION
+	   "The portsOverSizeExceeded notification indicates that the sending
+            agent sense that the level of oversize has passed the
+            program threshold."
+     ::= {prvtSysMonNotifications 7}
+
+	laserTemperatureThresholdCrossed NOTIFICATION-TYPE
+				OBJECTS { laserTemperature, laserTemperatureHighThreshold, laserTemperatureLowThreshold }
+				STATUS  current
+			DESCRIPTION
+					"The laserTemperatureThresholdCrossed shall be generated 
+					when laserTemperature rises above laserHighTemperatureThreshold 
+					or falls below laserTemperatureLowThreshold. Also the 
+					notification shall be generated when laserTemperature
+				 	returns to the normal range between laserHighTemperatureThreshold 
+					and laserTemperatureLowThreshold."
+					::= { prvtSysMonNotifications 8 }
+
+				laserTxPowerThresholdCrossed NOTIFICATION-TYPE
+				OBJECTS { laserTxPower, laserTxPowerHighThreshold, laserTxPowerLowThreshold }
+				STATUS  current
+				DESCRIPTION
+							"The laserTxPowerThresholdCrossed shall be generated
+							when laserTxPower rises above laserHighTxPowerThreshold
+							or falls below laserTxPowerLowThreshold. Also the 
+							notification shall be generated when laserTxPower 
+							returns to the normal range between 
+							laserHighTxPowerThreshold and laserTxPowerLowThreshold."
+				::= { prvtSysMonNotifications 9 }
+  			
+				laserRxPowerThresholdCrossed NOTIFICATION-TYPE
+				OBJECTS { laserRxPower, laserRxPowerHighThreshold, laserRxPowerLowThreshold }
+				STATUS  current
+				DESCRIPTION
+							"The laserRxPowerThresholdCrossed shall be generated 
+							when laserRxPower rises above laserHighRxPowerThreshold 
+							or falls below laserRxPowerLowThreshold. Also the 
+							notification shall be generated when laserRxPower 
+							returns to the normal range between 
+							laserHighRxPowerThreshold and laserRxPowerLowThreshold."
+				::= { prvtSysMonNotifications 10 }
+			sfpMonStatusChanged NOTIFICATION-TYPE
+				OBJECTS { sfpMonStatus }
+				STATUS  current
+				DESCRIPTION 
+				"This trap will be send only if the SFP is inserted or extracted"							
+				::= { prvtSysMonNotifications 11 }
+sfpPortManTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF SfpPortManEntry
+	MAX-ACCESS 	not-accessible
+	STATUS 			current
+	DESCRIPTION
+	"This table  will be responsible for managing SFPs."
+	::= { sysMonValues 5 }
+
+	sfpPortManEntry OBJECT-TYPE
+	SYNTAX SfpPortManEntry
+	MAX-ACCESS 	not-accessible
+	STATUS 			current
+	DESCRIPTION
+	""
+	INDEX { reportsL2IfaceUnit, reportsL2IfaceSlot, reportsL2IfacePort, reportsIfJackIndex }
+	::= { sfpPortManTable 1 }
+
+	  SfpPortManEntry ::= SEQUENCE {
+		sfpMonStatus      		INTEGER,
+		sfpVendor				DisplayString,
+		sfpPN      				DisplayString,
+		sfpRevision       DisplayString,
+		sfpLenght					DisplayString,
+		sfpConnector			DisplayString
+	}
+
+	sfpMonStatus      OBJECT-TYPE
+	SYNTAX     INTEGER {
+		sfpInserted (1),
+		sfpExtracted (2),
+		sfpUnknown    (3)		
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	"This object gives information is SFP is inserted or not in the port."
+	::= { sfpPortManEntry 1 }
+	
+	sfpVendor      OBJECT-TYPE
+	SYNTAX          DisplayString (SIZE(0..9))
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION     "This object gives SFP vendor name."
+  DEFVAL          { ''H }
+    ::= { sfpPortManEntry 2 }
+    
+  sfpPN      OBJECT-TYPE
+	SYNTAX          DisplayString (SIZE(0..9))
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION     "This object gives SFP vendor name."
+  DEFVAL          { ''H }
+    ::= { sfpPortManEntry 3 }
+    
+  sfpRevision      OBJECT-TYPE
+	SYNTAX          DisplayString (SIZE(0..9))
+  MAX-ACCESS       read-only
+  STATUS          current
+  DESCRIPTION     "This object gives SFP vendor revision."
+  DEFVAL          { ''H }
+    ::= { sfpPortManEntry 4 }  
+  
+  sfpLenght     OBJECT-TYPE
+	SYNTAX          DisplayString (SIZE(0..9))
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION     "This object gives information regarding link length."
+  DEFVAL          { ''H }
+    ::= { sfpPortManEntry 5 }
+    
+  sfpConnector      OBJECT-TYPE
+	SYNTAX          DisplayString (SIZE(0..9))
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION     "This object gives SFP connector type."
+  DEFVAL          { ''H }
+    ::= { sfpPortManEntry 6 } 
+
+------------------------------------------------------------------------
+---------------------------sysMonConfig---------------------------------
+------------------------------------------------------------------------
+
+	sysMonConfigTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF SysMonConfigEntry
+	MAX-ACCESS 	not-accessible
+	STATUS 			current
+	DESCRIPTION
+	"This table configures periodic monitoring parameters."
+	::= { sysMonConfig 1 }
+
+	sysMonConfigEntry OBJECT-TYPE
+	SYNTAX SysMonConfigEntry
+	MAX-ACCESS 	not-accessible
+	STATUS 			current
+	DESCRIPTION
+	""
+	INDEX { sysMonIndicator }
+	::= { sysMonConfigTable 1 }
+
+	SysMonConfigEntry ::= SEQUENCE {
+		sysMonIndicator	INTEGER,
+		sysMonEnable		EnableStatus,
+		sysMonPeriod		Integer32,
+		sysMonTrap      EnableStatus,
+		sysMonLog       EnableStatus,
+		sysMonLed    		EnableStatus,
+		sysMonDefaults	INTEGER
+	}
+
+	sysMonIndicator      OBJECT-TYPE
+	SYNTAX     INTEGER {
+		cpu-usage(1),
+		ram-usage(2),
+		power-supply(3),
+		onboard-power(4),
+		fan(5),
+		temperature(6),
+		laser(7)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+	"Enumeration."
+	::= { sysMonConfigEntry 1 }
+
+	sysMonEnable OBJECT-TYPE
+	SYNTAX 			EnableStatus
+	MAX-ACCESS	read-write
+	STATUS 			current
+	DESCRIPTION
+	"Enabled/disabled"
+	::= { sysMonConfigEntry 2 }
+
+	sysMonPeriod OBJECT-TYPE
+	SYNTAX 			Integer32
+	MAX-ACCESS	read-write
+	STATUS 			current
+	DESCRIPTION
+	"Configure monitoring period in seconds."
+	::= { sysMonConfigEntry 3 }
+
+	sysMonTrap OBJECT-TYPE
+	SYNTAX 			EnableStatus
+	MAX-ACCESS	read-write
+	STATUS 			current
+	DESCRIPTION
+	"Enabled/disabled"
+	::= { sysMonConfigEntry 4 }
+
+	sysMonLog OBJECT-TYPE
+	SYNTAX 			EnableStatus
+	MAX-ACCESS	read-write
+	STATUS 			current
+	DESCRIPTION
+	"Enabled/disabled"
+	::= { sysMonConfigEntry 5 }
+
+	sysMonLed OBJECT-TYPE
+	SYNTAX 			EnableStatus
+	MAX-ACCESS	read-write
+	STATUS 			current
+	DESCRIPTION
+	"Enabled/disabled"
+	::= { sysMonConfigEntry 6 }
+
+	sysMonDefaults OBJECT-TYPE
+	SYNTAX 			INTEGER {
+		noop(0),
+		reset(1)
+	}
+	MAX-ACCESS	read-write
+	STATUS 			current
+	DESCRIPTION
+	"If set to 1, resets all configurations to defaults."
+	DEFVAL { noop }
+	::= { sysMonConfigEntry 7 }
+
+---*******************************************************************
+--------------Conformance Information---------------------------------
+---*******************************************************************
+
+    sysMonMIBGroups       OBJECT IDENTIFIER ::= { prvtSysMonConformance 2 }
+
+
+    sysMonNotificationGroup NOTIFICATION-GROUP
+    	NOTIFICATIONS {
+    		cpuUtilizationExceeded,
+    		ramFreeSpaceExceeded,
+		portErrorsExceeded,
+		portsBroadcastExceeded,
+		portsCRCErrExceeded,
+		portsRuntsExceeded,
+		portsOverSizeExceeded
+    	}
+	STATUS current
+     	DESCRIPTION
+        	"Private Notification Group."
+     ::= { sysMonMIBGroups 3 }
+
+
+END

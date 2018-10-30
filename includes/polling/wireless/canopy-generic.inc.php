@@ -58,17 +58,18 @@ if (strstr($hardware, 'CMM') == false) {
         unset($rrd_filename, $vertical, $horizontal, $combined);
     }
 
-    $rssi = snmp_get($device, "1.3.6.1.4.1.161.19.3.2.2.2.0", "-Ovqn", "");
-    if (is_numeric($rssi)) {
-        $rrd_def = RrdDefinition::make()->addDataset('rssi', 'GAUGE', 0, 5000);
-        $fields = array(
-            'rssi' => $rssi,
-        );
-        $tags = compact('rrd_def');
-        data_update($device, 'canopy-generic-rssi', $tags, $fields);
-        $graphs['canopy_generic_rssi'] = true;
-        unset($rrd_filename, $rssi);
-    }
+    // Implemented
+    // $rssi = snmp_get($device, "1.3.6.1.4.1.161.19.3.2.2.2.0", "-Ovqn", "");
+    // if (is_numeric($rssi)) {
+    //     $rrd_def = RrdDefinition::make()->addDataset('rssi', 'GAUGE', 0, 5000);
+    //     $fields = array(
+    //         'rssi' => $rssi,
+    //     );
+    //     $tags = compact('rrd_def');
+    //     data_update($device, 'canopy-generic-rssi', $tags, $fields);
+    //     $graphs['canopy_generic_rssi'] = true;
+    //     unset($rrd_filename, $rssi);
+    // }
 
     $jitter = snmp_get($device, "jitter.0", "-Ovqn", "WHISP-SM-MIB");
     if (is_numeric($jitter)) {
@@ -127,26 +128,27 @@ if (strstr($hardware, 'CMM') == false) {
         unset($rrd_filename, $horizontal, $vertical);
     }
 }
-
+// Convert to: https://docs.librenms.org/#Developing/Sensor-State-Support/
 if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 'CMM')) {
-    $gpsStatus = snmp_get($device, "whispGPSStats.0", "-Ovqn", "WHISP-APS-MIB");
-    if ($gpsStatus == 'generatingSync') {
-        $gpsStatus = 3;
-    } elseif ($gpsStatus == 'gpsLostSync') {
-        $gpsStatus = 2;
-    } elseif ($gpsStatus == 'gpsSynchronized') {
-        $gpsStatus = 1;
-    }
-    if (is_numeric($gpsStatus)) {
-        $rrd_def = RrdDefinition::make()->addDataset('whispGPSStats', 'GAUGE', 0, 4);
-        $fields = array(
-            'whispGPSStats' => $gpsStatus,
-        );
-        $tags = compact('rrd_def');
-        data_update($device, 'canopy-generic-whispGPSStats', $tags, $fields);
-        $graphs['canopy_generic_whispGPSStats'] = true;
-        unset($rrd_filename, $gpsStatus);
-    }
+    // Implemented
+    // $gpsStatus = snmp_get($device, "whispGPSStats.0", "-Ovqn", "WHISP-APS-MIB");
+    // if ($gpsStatus == 'generatingSync') {
+    //     $gpsStatus = 3;
+    // } elseif ($gpsStatus == 'gpsLostSync') {
+    //     $gpsStatus = 2;
+    // } elseif ($gpsStatus == 'gpsSynchronized') {
+    //     $gpsStatus = 1;
+    // }
+    // if (is_numeric($gpsStatus)) {
+    //     $rrd_def = RrdDefinition::make()->addDataset('whispGPSStats', 'GAUGE', 0, 4);
+    //     $fields = array(
+    //         'whispGPSStats' => $gpsStatus,
+    //     );
+    //     $tags = compact('rrd_def');
+    //     data_update($device, 'canopy-generic-whispGPSStats', $tags, $fields);
+    //     $graphs['canopy_generic_whispGPSStats'] = true;
+    //     unset($rrd_filename, $gpsStatus);
+    // }
 
     $visible = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.4.4.7.0", "-Ovqn", ""));
     $tracked = str_replace('"', "", snmp_get($device, ".1.3.6.1.4.1.161.19.3.4.4.8.0", "-Ovqn", ""));
@@ -193,22 +195,23 @@ if (strstr($version, 'AP') == false) {
         $graphs['canopy_generic_450_powerlevel'] = true;
         unset($lastLevel);
     }
+    
+    // Implemented
+    // $horizontal = str_replace('"', "", snmp_get($device, "signalToNoiseRatioHorizontal.2", "-Ovqn", "WHISP-APS-MIB"));
+    // $vertical = str_replace('"', "", snmp_get($device, "signalToNoiseRatioVertical.2", "-Ovqn", "WHISP-APS-MIB"));
+    // if (is_numeric($horizontal) && is_numeric($vertical)) {
+    //     $rrd_def = RrdDefinition::m    //         ->addDataset('horizontal', 'GAUGE', 0, 100)ake()
 
-    $horizontal = str_replace('"', "", snmp_get($device, "signalToNoiseRatioHorizontal.2", "-Ovqn", "WHISP-APS-MIB"));
-    $vertical = str_replace('"', "", snmp_get($device, "signalToNoiseRatioVertical.2", "-Ovqn", "WHISP-APS-MIB"));
-    if (is_numeric($horizontal) && is_numeric($vertical)) {
-        $rrd_def = RrdDefinition::make()
-            ->addDataset('horizontal', 'GAUGE', 0, 100)
-            ->addDataset('vertical', 'GAUGE', 0, 100);
-        $fields = array(
-            'horizontal' => $horizontal,
-            'vertical' => $vertical,
-        );
-        $tags = compact('rrd_def');
-        data_update($device, 'canopy-generic-450-ptpSNR', $tags, $fields);
-        $graphs['canopy_generic_450_ptpSNR'] = true;
-        unset($rrd_filename, $horizontal, $horizontal);
-    }
+    //         ->addDataset('vertical', 'GAUGE', 0, 100);
+    //     $fields = array(
+    //         'horizontal' => $horizontal,
+    //         'vertical' => $vertical,
+    //     );
+    //     $tags = compact('rrd_def');
+    //     data_update($device, 'canopy-generic-450-ptpSNR', $tags, $fields);
+    //     $graphs['canopy_generic_450_ptpSNR'] = true;
+    //     unset($rrd_filename, $horizontal, $horizontal);
+    // }
 
     $ssr = str_replace('"', "", snmp_get($device, "linkSignalStrengthRatio.2", "-Ovqn", "WHISP-APS-MIB"));
     if (is_numeric($ssr)) {
@@ -273,33 +276,35 @@ if (strstr($version, 'AP')) {
         unset($rrd_filename, $registered, $failed);
     }
 
-    if (is_numeric($freq)) {
-        $rrd_def = RrdDefinition::make()->addDataset('freq', 'GAUGE', 0, 100000);
-        if ($freq > 99999) {
-            $freq = $freq / 100000;
-        } else {
-            $freq = $freq / 10000;
-        }
-        $fields = array(
-            'freq' => $freq,
-        );
-        $tags = compact('rrd_def');
-        data_update($device, 'canopy-generic-freq', $tags, $fields);
-        $graphs['canopy_generic_freq'] = true;
-        unset($rrd_filename, $freq);
-    }
+    // Implemented
+    // if (is_numeric($freq)) {
+    //     $rrd_def = RrdDefinition::make()->addDataset('freq', 'GAUGE', 0, 100000);
+    //     if ($freq > 99999) {
+    //         $freq = $freq / 100000;
+    //     } else {
+    //         $freq = $freq / 10000;
+    //     }
+    //     $fields = array(
+    //         'freq' => $freq,
+    //     );
+    //     $tags = compact('rrd_def');
+    //     data_update($device, 'canopy-generic-freq', $tags, $fields);
+    //     $graphs['canopy_generic_freq'] = true;
+    //     unset($rrd_filename, $freq);
+    // }
 
-    if (is_numeric($downlinkutilization) && is_numeric($uplinkutilization)) {
-        $rrd_def = RrdDefinition::make()
-            ->addDataset('downlinkutilization', 'GAUGE', 0, 15000)
-            ->addDataset('uplinkutilization', 'GAUGE', 0, 15000);
-        $fields = array(
-            'downlinkutilization' => $downlinkutilization,
-            'uplinkutilization' => $uplinkutilization,
-        );
-        $tags = compact('rrd_def');
-        data_update($device, 'canopy-generic-frameUtilization', $tags, $fields);
-        $graphs['canopy-generic-frameUtilization'] = true;
-        unset($rrd_filename, $downlinkutilization, $uplinkutilization);
-    }
+    // implemented
+    // if (is_numeric($downlinkutilization) && is_numeric($uplinkutilization)) {
+    //     $rrd_def = RrdDefinition::make()
+    //         ->addDataset('downlinkutilization', 'GAUGE', 0, 15000)
+    //         ->addDataset('uplinkutilization', 'GAUGE', 0, 15000);
+    //     $fields = array(
+    //         'downlinkutilization' => $downlinkutilization,
+    //         'uplinkutilization' => $uplinkutilization,
+    //     );
+    //     $tags = compact('rrd_def');
+    //     data_update($device, 'canopy-generic-frameUtilization', $tags, $fields);
+    //     $graphs['canopy-generic-frameUtilization'] = true;
+    //     unset($rrd_filename, $downlinkutilization, $uplinkutilization);
+    // }
 }

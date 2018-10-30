@@ -1,0 +1,229 @@
+-- ************************************************************************
+-- HILLSTONE-DHCP-MIB
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V3    
+-- Description:	 Hillstone Networks DHCP MIB Object Identifier Assignments
+-- ************************************************************************
+--
+
+HILLSTONE-DHCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hillstoneDHCP
+		FROM HILLSTONE-SMI
+	OBJECT-TYPE
+		FROM RFC-1212;	
+
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+hillstoneDHCPServerMibObjects OBJECT IDENTIFIER ::= { hillstoneDHCP 1 }
+
+hillstoneDHCPPoolTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HillstoneDHCPPoolEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table containing the configuration informations of DHCP 
+		 server global pools, such as pool type, ip address, mask"
+	::= { hillstoneDHCPServerMibObjects 1 }
+
+HillstoneDHCPPoolEntry OBJECT-TYPE
+	SYNTAX HillstoneDHCPPoolEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "An entry containing the objects for configuring
+	    the network ip or host ip etc. to global pools for
+	    DHCP server"
+	INDEX { hillstoneDHCPPoolIndex }
+	::= { hillstoneDHCPPoolTable 1 }
+
+HillstoneDHCPPoolEntry ::=
+SEQUENCE { 
+    hillstoneDHCPPoolIndex
+	INTEGER,
+    hillstoneDHCPPoolName
+	DisplayString,
+    hillstoneDHCPPoolType
+	INTEGER,
+    hillstoneDHCPPoolNetworkMask
+	IpAddress
+ }
+ 
+hillstoneDHCPPoolIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	     "The Index of DHCP pool"
+	::= { HillstoneDHCPPoolEntry 1 }
+
+hillstoneDHCPPoolName OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	     "The name of DHCP pool"
+	::= { HillstoneDHCPPoolEntry 2 }
+
+hillstoneDHCPPoolType OBJECT-TYPE
+	SYNTAX INTEGER
+	    {
+	    network(1)
+	    }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "Type of a DHCP global pool. Any operations of
+	    this object will be bound with the operations
+	    of hillstoneDHCPPOOLNetwork and
+	    hillstoneDHCPPOOLNetworkMask or with the 
+	    operations of hillstoneDHCPPOOLHostIPAddr,
+	    hillstoneDHCPPOOLMask and
+	    hillstoneDHCPPOOLHostHAddr. That means any
+	    operation of this object alone will be regarded
+	    as invalid operation.
+	    The value means:
+	    network(1)- It is a pool with automatic allocation"
+	::= { HillstoneDHCPPoolEntry 3 }
+
+hillstoneDHCPPoolNetworkMask OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "Net mask of a DHCP Server global pool(network).
+	    The SET operation to this object ought to be with
+	    the SET of hillstoneDHCPPOOLNetwork together, and
+	    any SET operation alone to this object will be
+	    regarded as an invalid operation.
+	    When a network ip of a DHCP server global pool was 
+	    deleted, the net mask would also be deleted
+	    automatically, and no further operation needed"
+	::= { HillstoneDHCPPoolEntry 4 }
+
+-- pool address table
+
+hillstoneDHCPPoolAddrTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HillstoneDHCPPoolAddrEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "A table for configuring ip to DHCP server, which 
+	    don't allow to allocate to clients"
+	::= { hillstoneDHCPServerMibObjects 2 }
+
+HillstoneDHCPPoolAddrEntry OBJECT-TYPE
+	SYNTAX HillstoneDHCPPoolAddrEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "An entry for configuring ip to DHCP
+	    server"
+	INDEX { hillstoneDHCPPoolIPIndex,
+		hillstoneDHCPPoolIPStart }
+	::= { hillstoneDHCPPoolAddrTable 1 }
+
+HillstoneDHCPPoolAddrEntry ::=
+	SEQUENCE { 
+	    hillstoneDHCPPoolIPIndex
+		INTEGER,
+	    hillstoneDHCPPoolIPStart
+		IpAddress,
+	    hillstoneDHCPPoolIPEnd
+		IpAddress
+	 }
+
+hillstoneDHCPPoolIPIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	     "The Index of DHCP pool, same with hillstoneDHCPPoolIndex"
+	::= { HillstoneDHCPPoolAddrEntry 1 }
+
+hillstoneDHCPPoolIPStart   OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The start ip address of this ip pool."
+	::= { HillstoneDHCPPoolAddrEntry 2 }
+
+hillstoneDHCPPoolIPEnd   OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The end ip address of this ip pool."
+	::= { HillstoneDHCPPoolAddrEntry 3 }
+
+--  Part 3: For DHCP server, exclude ip
+-- 
+hillstoneDHCPFreeIPTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HillstoneDHCPFreeIPEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "A table for configuring free ip to DHCP server, which 
+	    don't allow to allocate to clients"
+	::= { hillstoneDHCPServerMibObjects 3 }
+
+HillstoneDHCPFreeIPEntry OBJECT-TYPE
+	SYNTAX HillstoneDHCPFreeIPEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "An entry for configuring free ip to DHCP
+	    server"
+	INDEX { hillstoneDHCPFreeIPIndex, 
+	        hillstoneDHCPFreeIPStart }
+	::= { hillstoneDHCPFreeIPTable 1 }
+
+HillstoneDHCPFreeIPEntry ::=
+	SEQUENCE { 
+	    hillstoneDHCPFreeIPIndex
+		INTEGER,
+	    hillstoneDHCPFreeIPStart
+		IpAddress,
+	    hillstoneDHCPFreeIPEnd
+		IpAddress
+	 }
+
+hillstoneDHCPFreeIPIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	     "The Index of DHCP pool, same with hillstoneDHCPPoolIndex"
+	::= { HillstoneDHCPFreeIPEntry 1 }
+
+
+hillstoneDHCPFreeIPStart OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "Start ip address of free ip"
+	::= { HillstoneDHCPFreeIPEntry 2 }
+
+hillstoneDHCPFreeIPEnd OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "End ip address of free ip"
+	::= { HillstoneDHCPFreeIPEntry 3 }
+
+END

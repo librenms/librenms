@@ -1,6 +1,10 @@
 <?php
 
-if ($_SESSION['userlevel'] < '5') {
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IPv6;
+
+if (!LegacyAuth::user()->hasGlobalRead()) {
     include 'includes/error-no-perm.inc.php';
 } else {
     $link_array = array(
@@ -191,7 +195,7 @@ if ($_SESSION['userlevel'] < '5') {
     print_optionbar_end();
 
     echo "<table border=0 cellspacing=0 cellpadding=5 width=100% class='table sortable'>";
-    echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>State</th><th width=200>Uptime / Updates</th></tr>';
+    echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th width=200>Uptime / Updates</th></tr>';
 
     if ($vars['type'] == 'external') {
         $where = 'AND D.bgpLocalAs != B.bgpPeerRemoteAs';
@@ -240,14 +244,15 @@ if ($_SESSION['userlevel'] < '5') {
             }
         }
 
-        if (filter_var($peer['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-            $peer_ip = Net_IPv6::compress($peer['bgpLocalAddr']);
-        } else {
+        try {
+            $peer_ip = new IPv6($peer['bgpLocalAddr']);
+        } catch (InvalidIpException $e) {
             $peer_ip = $peer['bgpLocalAddr'];
         }
-        if (filter_var($peer['bgpPeerIdentifier'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-            $peer_ident = Net_IPv6::compress($peer['bgpPeerIdentifier']);
-        } else {
+
+        try {
+            $peer_ident = new IPv6($peer['bgpPeerIdentifier']);
+        } catch (InvalidIpException $e) {
             $peer_ident = $peer['bgpPeerIdentifier'];
         }
 
@@ -297,6 +302,7 @@ if ($_SESSION['userlevel'] < '5') {
             <td width=50><b>$peer_type</b></td>
             <td width=50>".$peer['afi'].'</td>
             <td><strong>AS'.$peer['bgpPeerRemoteAs'].'</strong><br />'.$peer['astext']."</td>
+            <td>".$peer['bgpPeerDescr']."</td>
             <td><strong><span style='color: $admin_col;'>".$peer['bgpPeerAdminStatus']."</span><br /><span style='color: $col;'>".$peer['bgpPeerState'].'</span></strong></td>
             <td>'.formatUptime($peer['bgpPeerFsmEstablishedTime'])."<br />
             Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> ".format_si($peer['bgpPeerInUpdates'])."

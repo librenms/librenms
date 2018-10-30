@@ -1,0 +1,7 @@
+mib: COLUBRIS-USAGE-INFORMATION-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: coUsInfoCpuUseNow
+                  num_oid: '.1.3.6.1.4.1.8744.5.21.1.1.5.{{ $index }}'

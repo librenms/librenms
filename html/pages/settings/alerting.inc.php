@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\LegacyAuth;
+
 $no_refresh = true;
 
 ?>
@@ -36,7 +38,7 @@ $no_refresh = true;
 
                     <div class="form-group">
                         <label for="new_conf_value">API URL</label>
-                        <input type="text" class="form-control" name="new_conf_value" id="new_conf_value" placeholder="Enter the config value">
+                        <input type="text" class="form-control validation" name="new_conf_value" id="new_conf_value" placeholder="Enter the config value" required pattern="[a-zA-Z0-9]{1,5}://.*">
                     </div>
                 </form>
             </div>
@@ -60,7 +62,7 @@ $no_refresh = true;
                     </div>
                     <div class="form-group">
                         <label for="slack_value">Slack API URL</label>
-                        <input type="text" class="form-control" name="slack_value" id="slack_value" placeholder="Enter the Slack API url">
+                        <input type="text" class="form-control validation" name="slack_value" id="slack_value" placeholder="Enter the Slack API url" required pattern="[a-zA-Z0-9]{1,5}://.*">
                     </div>
                     <div class="form-group">
                         <label for="slack_extra">Slack options (specify one per line key=value)</label>
@@ -77,6 +79,34 @@ $no_refresh = true;
 </div>
 <!-- End Slack Modal -->
 
+<!-- Discord Modal -->
+<div class="modal fade" id="new-config-discord" role="dialog" aria-hidden="true" title="Create new config item">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form role="form" class="new_config_form">
+                    <div class="form-group">
+                        <span class="message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="discord_value">Discord API URL</label>
+                        <input type="text" class="form-control validation" name="discord_value" id="discord_value" placeholder="Enter the Discord API url" required pattern="[a-zA-Z0-9]{1,5}://.*">
+                    </div>
+                    <div class="form-group">
+                        <label for="discord_extra">Discord options (specify one per line key=value)</label>
+                        <textarea class="form-control" name="discord_extra" id="discord_extra" placeholder="Enter the config options"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="submit-discord">Add config</button>
+                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Discord Modal -->
+
 <!-- Rocket.Chat Modal -->
 <div class="modal fade" id="new-config-rocket" role="dialog" aria-hidden="true" title="Create new config item">
     <div class="modal-dialog">
@@ -88,7 +118,7 @@ $no_refresh = true;
                     </div>
                     <div class="form-group">
                         <label for="rocket_value">Rocket.Chat API URL</label>
-                        <input type="text" class="form-control" name="rocket_value" id="rocket_value" placeholder="Enter the Rocket.Chat API url">
+                        <input type="text" class="form-control validation" name="rocket_value" id="rocket_value" placeholder="Enter the Rocket.Chat API url" required pattern="[a-zA-Z0-9]{1,5}://.*">
                     </div>
                     <div class="form-group">
                         <label for="rocket_extra">Rocket.Chat options (specify one per line key=value)</label>
@@ -116,15 +146,15 @@ $no_refresh = true;
                     </div>
                     <div class="form-group">
                         <label for="hipchat_value">Hipchat API URL</label>
-                        <input type="text" class="form-control" name="hipchat_value" id="hipchat_value" placeholder="Enter the Hipchat API url">
+                        <input type="text" class="form-control validation" name="hipchat_value" id="hipchat_value" placeholder="Enter the Hipchat API url" required pattern="[a-zA-Z0-9]{1,5}://.*">
                     </div>
                     <div class="form-group">
                         <label for="new_room_id">Room ID</label>
-                        <input type="text" class="form-control" name="new_room_id" id="new_room_id" placeholder="Enter the room ID">
+                        <input type="text" class="form-control validation" name="new_room_id" id="new_room_id" placeholder="Enter the room ID" required pattern="[^\s]{1,100}">
                     </div>
                     <div class="form-group">
                         <label for="new_from">From</label>
-                        <input type="text" class="form-control" name="new_from" id="new_from" placeholder="Enter the from details">
+                        <input type="text" class="form-control validation" name="new_from" id="new_from" placeholder="Enter the from details" pattern=".{1,64}">
                     </div>
                     <div class="form-group">
                         <label for="hipchat_extra">Hipchat options (specify one per line key=value)</label>
@@ -152,11 +182,11 @@ $no_refresh = true;
                     </div>
                     <div class="form-group">
                         <label for="pushover_value">Pushover Apikey</label>
-                        <input type="text" class="form-control" name="pushover_value" id="pushover_value" placeholder="Enter the Pushover Apikey">
+                        <input type="text" class="form-control validation" name="pushover_value" id="pushover_value" placeholder="Enter the Pushover Apikey" required>
                     </div>
                     <div class="form-group">
                         <label for="new_userkey">Room ID</label>
-                        <input type="text" class="form-control" name="new_userkey" id="new_userkey" placeholder="Enter the Userkey">
+                        <input type="text" class="form-control validation" name="new_userkey" id="new_userkey" placeholder="Enter the Userkey" required>
                     </div>
                     <div class="form-group">
                         <label for="pushover_extra">Pushover options (specify one per line key=value)</label>
@@ -184,7 +214,7 @@ $no_refresh = true;
                     </div>
                     <div class="form-group">
                         <label for="boxcar_value">Boxcar Access token</label>
-                        <input type="text" class="form-control" name="boxcar_value" id="boxcar_value" placeholder="Enter the Boxcar Access token">
+                        <input type="text" class="form-control validation" name="boxcar_value" id="boxcar_value" placeholder="Enter the Boxcar Access token" required>
                     </div>
                     <div class="form-group">
                         <label for="boxcar_extra">Boxcar options (specify one per line key=value)</label>
@@ -212,11 +242,11 @@ $no_refresh = true;
                     </div>
                     <div class="form-group">
                         <label for="telegram_value">Telegram Chat ID</label>
-                        <input type="text" class="form-control" name="telegram_value" id="telegram_value" placeholder="Enter the Telegram Chat ID">
+                        <input type="text" class="form-control validation" name="telegram_value" id="telegram_value" placeholder="Enter the Telegram Chat ID" required pattern="-?[\d]+">
                     </div>
                     <div class="form-group">
                         <label for="telegram_token">Telegram Token</label>
-                        <input type="text" class="form-control" name="telegram_token" id="telegram_token" placeholder="Enter the Telegram Token">
+                        <input type="text" class="form-control validation" name="telegram_token" id="telegram_token" placeholder="Enter the Telegram Token" required>
                     </div>
                 </form>
             </div>
@@ -240,7 +270,7 @@ if (isset($_GET['account']) && isset($_GET['service_key']) && isset($_GET['servi
     set_config_name('alert.pagerduty.service', $_GET['service_name']);
 }
 
-if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && is_admin() === true) {
+if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && LegacyAuth::user()->hasGlobalAdmin()) {
     set_config_name('alert.transports.pagerduty', '');
     set_config_name('alert.pagerduty.account', '');
     set_config_name('alert.pagerduty.service', '');
@@ -248,7 +278,7 @@ if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && is_admin(
 
 $config_groups = get_config_by_group('alerting');
 
-if (isset($config['base_url'])) {
+if (isset($config['base_url']) && filter_var($config['base_url'].'/'.$_SERVER['REQUEST_URI'], FILTER_VALIDATE_URL)) {
     $callback = $config['base_url'].'/'.$_SERVER['REQUEST_URI'].'/';
 } else {
     $callback = get_url().'/';
@@ -281,18 +311,29 @@ $general_conf = array(
           'descr'              => 'Send alerts to default contact only',
           'type'               => 'checkbox',
     ),
+    array('name'               => 'alert.default_copy',
+          'descr'              => 'Copy all email alerts to default contact',
+          'type'               => 'checkbox',
+    ),
     array('name'               => 'alert.default_mail',
           'descr'              => 'Default contact',
           'type'               => 'text',
+          'pattern'            => '[a-zA-Z0-9_\-\.\+]+@[a-zA-Z0-9_\-\.]+\.[a-zA-Z]{2,18}',
     ),
     array('name'               => 'alert.tolerance_window',
           'descr'              => 'Tolerance window for cron',
-          'type'               => 'text',
+          'type'               => 'numeric',
+          'required'           => true,
     ),
     array('name'               => 'alert.fixed-contacts',
           'descr'              => 'Updates to contact email addresses not honored',
           'type'               => 'checkbox',
     ),
+    [
+        'name'                 => 'alert.ack_until_clear',
+        'descr'                => 'Default acknowledge until alert clears option',
+        'type'                 => 'checkbox',
+    ]
 );
 
 $mail_conf = array(
@@ -302,7 +343,7 @@ $mail_conf = array(
     ),
     array('name'               => 'email_backend',
           'descr'              => 'How to deliver mail',
-          'options'            => $dyn_config['email_backend'],
+          'options'            => $config['email_backend_options'],
           'type'               => 'select',
     ),
     array('name'               => 'email_user',
@@ -312,6 +353,7 @@ $mail_conf = array(
     array('name'               => 'email_from',
           'descr'              => 'From email address',
           'type'               => 'text',
+          'pattern'            => '[a-zA-Z0-9_\-\.\+]+@[a-zA-Z0-9_\-\.]+\.[a-zA-Z]{2,18}',
     ),
     array('name'               => 'email_html',
           'descr'              => 'Use HTML emails',
@@ -324,24 +366,27 @@ $mail_conf = array(
     array('name'               => 'email_smtp_host',
           'descr'              => 'SMTP Host',
           'type'               => 'text',
+          'pattern'            => '[a-zA-Z0-9_\-\.]+',
     ),
     array('name'               => 'email_smtp_port',
           'descr'              => 'SMTP Port',
-          'type'               => 'text',
+          'type'               => 'numeric',
+          'required'           => true,
     ),
     array('name'               => 'email_smtp_timeout',
           'descr'              => 'SMTP Timeout',
-          'type'               => 'text',
+          'type'               => 'numeric',
+          'required'           => true,
     ),
     array('name'               => 'email_smtp_secure',
           'descr'              => 'SMTP Secure',
           'type'               => 'select',
-          'options'            => $dyn_config['email_smtp_secure'],
+          'options'            => $config['email_smtp_secure_options'],
     ),
     array('name'               => 'email_auto_tls',
-        'descr'                => 'SMTP Auto TLS Support',
-        'type'                 => 'select',
-        'options'              => array('true', 'false'),
+          'descr'              => 'SMTP Auto TLS Support',
+          'type'               => 'select',
+          'options'            => array('true', 'false'),
     ),
     array('name'               => 'email_smtp_auth',
           'descr'              => 'SMTP Authentication',
@@ -363,7 +408,10 @@ echo '
 ';
 
 echo generate_dynamic_config_panel('General alert settings', $config_groups, $general_conf);
-echo generate_dynamic_config_panel('Email transport', $config_groups, $mail_conf, 'mail');
+
+echo generate_dynamic_config_panel('Email options', $config_groups, $mail_conf, 'mail');
+
+echo '<br /><div class="well"><strong class="text-danger">DEPRECATED</strong>: All options below are deprecated, please use the new Alert Transports section under Alerts to configure transports :: <a href="https://docs.librenms.org/Alerting/Transports/" target="_blank">Docs <i class="fa fa-book fa-1x"></i></a></div>';
 
 echo '
         <div class="panel panel-default">
@@ -545,6 +593,78 @@ foreach ($slack_urls as $slack_url) {
                         <div class="form-group has-feedback">
                             <div class="col-sm-offset-4 col-sm-4">
                                 <textarea class="form-control" name="global-config-textarea" id="upd_slack_extra" placeholder="Enter the config options" data-config_id="" data-type="slack"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#discord_transport_expand"><i class="fa fa-caret-down"></i> Discord transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="discord" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="discord_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-sm-8">
+                            <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-discord">Add Discord URL</button>
+                        </div>
+                    </div>';
+                    $discord_urls = get_config_like_name('alert.transports.discord.%.url');
+foreach ($discord_urls as $discord_url) {
+    unset($upd_discord_extra);
+    $new_discord_extra = array();
+    $discord_extras    = get_config_like_name('alert.transports.discord.'.$discord_url['config_id'].'.%');
+    foreach ($discord_extras as $extra) {
+        $split_extra = explode('.', $extra['config_name']);
+        if ($split_extra[4] != 'url') {
+            $new_discord_extra[] = $split_extra[4].'='.$extra['config_value'];
+        }
+    }
+
+    $upd_discord_extra = implode(PHP_EOL, $new_discord_extra);
+    echo '<div id="'.$discord_url['config_id'].'">
+                        <div class="form-group has-feedback">
+                            <label for="discord_url" class="col-sm-4 control-label">Discord URL </label>
+                            <div class="col-sm-4">
+                                <input id="discord_url" class="form-control" type="text" name="global-config-input" value="'.$discord_url['config_value'].'" data-config_id="'.$discord_url['config_id'].'">
+                                <span class="form-control-feedback">
+                                    <i class="fa" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-danger del-discord-config" name="del-discord-call" data-config_id="'.$discord_url['config_id'].'"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <div class="col-sm-offset-4 col-sm-4">
+                                <textarea class="form-control" name="global-config-textarea" id="upd_discord_extra" placeholder="Enter the config options" data-config_id="'.$discord_url['config_id'].'" data-type="discord">'.$upd_discord_extra.'</textarea>
+                                <span class="form-control-feedback">
+                                    <i class="fa" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>';
+}//end foreach
+
+                    echo '<div class="hide" id="discord_url_template">
+                        <div class="form-group has-feedback">
+                            <label for="discord_url" class="col-sm-4 control-label api-method">Discord URL </label>
+                            <div class="col-sm-4">
+                                <input id="discord_url" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
+                                <span class="form-control-feedback">
+                                    <i class="fa" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-danger del-discord-config" name="del-discord-call" data-config_id=""><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <div class="col-sm-offset-4 col-sm-4">
+                                <textarea class="form-control" name="global-config-textarea" id="upd_discord_extra" placeholder="Enter the config options" data-config_id="" data-type="discord"></textarea>
                             </div>
                         </div>
                     </div>
@@ -992,11 +1112,32 @@ echo '<div id="telegram_chat_id_template" class="hide">
                         <label for="victorops" class="col-sm-4 control-label">Post URL </label>
                         <div data-toggle="tooltip" title="'.$config_groups['alert.transports.victorops.url']['config_descr'].'" class="toolTip fa fa-question-circle"></div>
                         <div class="col-sm-4">
-                            <input id="victorops" class="form-control" type="text" name="global-config-input" value="'.$config_groups['alert.transports.victorops.url']['config_value'].'" data-config_id="'.$config_groups['alert.transports.victorops.url']['config_id'].'">
+                            <input id="victorops" class="form-control validation" type="text" name="global-config-input" value="'.$config_groups['alert.transports.victorops.url']['config_value'].'" data-config_id="'.$config_groups['alert.transports.victorops.url']['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#opsgenie_transport_expand"><i class="fa fa-caret-down"></i> OpsGenie</a> <button name="test-alert" id="test-alert" type="button" data-transport="opsgenie" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+        </div>
+        <div id="opsgenie_transport_expand" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div class="form-group has-feedback">
+                    <label for="opsgenie" class="col-sm-4 control-label">OpsGenie URL </label>
+                    <div data-toggle="tooltip" title="' . $config_groups['alert.transports.opsgenie.url']['config_descr'] . '" class="toolTip fa fa-question-circle"></div>
+                    <div class="col-sm-4">
+                        <input id="opsgenie" class="form-control validation" type="text" name="global-config-input" value="' . $config_groups['alert.transports.opsgenie.url']['config_value'] . '" data-config_id="' . $config_groups['alert.transports.opsgenie.url']['config_id'] . '" pattern="[a-zA-Z0-9]{1,5}://.*">
+                        <span class="form-control-feedback">
+                            <i class="fa" aria-hidden="true"></i>
+                        </span>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1062,7 +1203,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="playsms_url" class="col-sm-4 control-label">PlaySMS URL </label>
                         <div class="col-sm-4">
-                            <input id="playsms_url" class="form-control" type="text" name="global-config-input" value="'.$playsms_url['config_value'].'" data-config_id="'.$playsms_url['config_id'].'">
+                            <input id="playsms_url" class="form-control validation" type="text" name="global-config-input" value="'.$playsms_url['config_value'].'" data-config_id="'.$playsms_url['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1124,7 +1265,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="canopsis_host" class="col-sm-4 control-label">Canopsis Hostname </label>
                         <div class="col-sm-4">
-                            <input id="canopsis_host" class="form-control" type="text" name="global-config-input" value="'.$canopsis_host['config_value'].'" data-config_id="'.$canopsis_host['config_id'].'">
+                            <input id="canopsis_host" class="form-control validation" type="text" name="global-config-input" value="'.$canopsis_host['config_value'].'" data-config_id="'.$canopsis_host['config_id'].'" pattern="[a-zA-Z0-9_\-\.]+">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1133,7 +1274,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="canopsis_port" class="col-sm-4 control-label">Canopsis Port number </label>
                         <div class="col-sm-4">
-                            <input id="canopsis_port" class="form-control" type="text" name="global-config-input" value="'.$canopsis_port['config_value'].'" data-config_id="'.$canopsis_port['config_id'].'">
+                            <input id="canopsis_port" class="form-control" type="text" name="global-config-input" value="'.$canopsis_port['config_value'].'" data-config_id="'.$canopsis_port['config_id'].'" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1160,7 +1301,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="canopsis_vhost" class="col-sm-4 control-label">Vhost</label>
                         <div class="col-sm-4">
-                            <input id="canopsis_vhost" class="form-control" type="text" name="global-config-input" value="'.$canopsis_vhost['config_value'].'" data-config_id="'.$canopsis_vhost['config_id'].'">
+                            <input id="canopsis_vhost" class="form-control validation" type="text" name="global-config-input" value="'.$canopsis_vhost['config_value'].'" data-config_id="'.$canopsis_vhost['config_id'].'" pattern="[a-zA-Z0-9_\-\.]+">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1183,7 +1324,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="osticket_url" class="col-sm-4 control-label">osTicket API URL</label>
                         <div class="col-sm-4">
-                            <input id="osticket_url" class="form-control" type="text" name="global-config-input" value="'.$osticket_url['config_value'].'" data-config_id="'.$osticket_url['config_id'].'">
+                            <input id="osticket_url" class="form-control validation" type="text" name="global-config-input" value="'.$osticket_url['config_value'].'" data-config_id="'.$osticket_url['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1214,7 +1355,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="msteams_url" class="col-sm-4 control-label">Microsoft Teams Webhook URL</label>
                         <div class="col-sm-4">
-                            <input id="msteams_url" class="form-control" type="text" name="global-config-input" value="'.$msteams_url['config_value'].'" data-config_id="'.$msteams_url['config_id'].'">
+                            <input id="msteams_url" class="form-control validation" type="text" name="global-config-input" value="'.$msteams_url['config_value'].'" data-config_id="'.$msteams_url['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1276,7 +1417,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="smseagle_url" class="col-sm-4 control-label">SMSEagle URL </label>
                         <div class="col-sm-4">
-                            <input id="smseagle_url" class="form-control" type="text" name="global-config-input" value="'.$smseagle_url['config_value'].'" data-config_id="'.$smseagle_url['config_id'].'">
+                            <input id="smseagle_url" class="form-control validation" type="text" name="global-config-input" value="'.$smseagle_url['config_value'].'" data-config_id="'.$smseagle_url['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1327,7 +1468,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="syslog_host" class="col-sm-4 control-label">Syslog Host </label>
                         <div class="col-sm-4">
-                            <input id="syslog_host" class="form-control" type="text" name="global-config-input" value="'.$syslog_host['config_value'].'" data-config_id="'.$syslog_host['config_id'].'">
+                            <input id="syslog_host" class="form-control validation" type="text" name="global-config-input" value="'.$syslog_host['config_value'].'" data-config_id="'.$syslog_host['config_id'].'" pattern="[a-zA-Z0-9_\-\.]+">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1336,7 +1477,7 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="syslog_port" class="col-sm-4 control-label">Syslog Port </label>
                         <div class="col-sm-4">
-                            <input id="syslog_port" class="form-control" type="text" name="global-config-input" value="'.$syslog_port['config_value'].'" data-config_id="'.$syslog_port['config_id'].'">
+                            <input id="syslog_port" class="form-control" type="text" name="global-config-input" value="'.$syslog_port['config_value'].'" data-config_id="'.$syslog_port['config_id'].'" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1345,7 +1486,220 @@ echo '
                     <div class="form-group has-feedback">
                         <label for="syslog_facility" class="col-sm-4 control-label">Syslog Facility </label>
                         <div class="col-sm-4">
-                            <input id="syslog_facility" class="form-control" type="text" name="global-config-input" value="'.$syslog_facility['config_value'].'" data-config_id="'.$syslog_facility['config_id'].'">
+                            <input id="syslog_facility" class="form-control" type="text" name="global-config-input" value="'.$syslog_facility['config_value'].'" data-config_id="'.$syslog_facility['config_id'].'" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+	</div>';
+// Gitlab Transport Section
+
+$gitlab_host = get_config_by_name('alert.transports.gitlab.host');
+$gitlab_project = get_config_by_name('alert.transports.gitlab.project_id');
+$gitlab_key = get_config_by_name('alert.transports.gitlab.key');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#gitlab_transport_expand"><i class="fa fa-caret-down"></i> Gitlab transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="gitlab" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="gitlab_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="gitlab_host" class="col-sm-4 control-label">Gitlab Host</label>
+                        <div class="col-sm-4">
+                            <input id="gitlab_host" class="form-control validation" type="url" name="global-config-input" value="'.$gitlab_host['config_value'].'" data-config_id="'.$gitlab_host['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="gitlab_project" class="col-sm-4 control-label">Gitlab Project ID</label>
+                        <div class="col-sm-4">
+                            <input id="gitlab_project" class="form-control" type="text" name="global-config-input" value="'.$gitlab_project['config_value'].'" data-config_id="'.$gitlab_project['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="gitlab_key" class="col-sm-4 control-label">Gitlab API Key</label>
+                        <div class="col-sm-4">
+                            <input id="gitlab_key" class="form-control" type="text" name="global-config-input" value="'.$gitlab_key['config_value'].'" data-config_id="'.$gitlab_key['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+
+        // Philips Hue Transport Section
+
+$hue_bridge = get_config_by_name('alert.transports.hue.bridge');
+$hue_user = get_config_by_name('alert.transports.hue.user');
+$hue_duration = get_config_by_name('alert.transports.hue.duration');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#hue_transport_expand"><i class="fa fa-caret-down"></i> Philips Hue transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="hue" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="hue_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="hue_host" class="col-sm-4 control-label">Hue Host</label>
+                        <div class="col-sm-4">
+                            <input id="hue_host" class="form-control validation" type="url" name="global-config-input" value="'.$hue_bridge['config_value'].'" data-config_id="'.$hue_bridge['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="hue_user" class="col-sm-4 control-label">Philips Hue User</label>
+                        <div class="col-sm-4">
+                            <input id="hue_user" class="form-control" type="text" name="global-config-input" value="'.$hue_user['config_value'].'" data-config_id="'.$hue_user['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="hue_duration" class="col-sm-4 control-label">Philips Hue Duration</label>
+                        <div class="col-sm-4">
+                            <select id="hue_duration" class="form-control" name="global-config-select" data-config_id="'.$hue_duration['config_id'].'">
+                                <option '.( $hue_duration['config_value'] == "" ? "selected" : ""). ' value=""></option>
+                                <option '.( $hue_duration['config_value'] == "select" ? "selected" : ""). ' value="select">1 Second</option>
+                                <option '.( $hue_duration['config_value'] == "lselect" ? "selected" : ""). ' value="lselect">15 Seconds</option>
+                            </select>
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+
+
+// Jira Transport Section
+$jira_prj     = get_config_by_name('alert.transports.jira.prjkey');
+$jira_url    = get_config_by_name('alert.transports.jira.url');
+$jira_username   = get_config_by_name('alert.transports.jira.username');
+$jira_password   = get_config_by_name('alert.transports.jira.password');
+$jira_issuetype = get_config_by_name('alert.transports.jira.issuetype');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#jira_transport_expand"><i class="fa fa-caret-down"></i> Jira transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="jira" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="jira_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="jira_prj" class="col-sm-4 control-label">Jira Project Key </label>
+                        <div class="col-sm-4">
+                            <input id="jira_prj" class="form-control" type="text" name="global-config-input" value="'.$jira_prj['config_value'].'" data-config_id="'.$jira_prj['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="jira_url" class="col-sm-4 control-label">Jira URL </label>
+                        <div class="col-sm-4">
+                            <input id="jira_url" class="form-control validation" type="url" name="global-config-input" value="'.$jira_url['config_value'].'" data-config_id="'.$jira_url['config_id'].'" pattern="[a-zA-Z0-9]{1,5}://.*">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="jira_issuetype" class="col-sm-4 control-label">Jira Issue Type </label>
+                        <div class="col-sm-4">
+                            <input id="jira_issuetype" class="form-control" type="text" name="global-config-input" value="'.$jira_issuetype['config_value'].'" data-config_id="'.$jira_issuetype['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="jira_username" class="col-sm-4 control-label">Jira Username </label>
+                        <div class="col-sm-4">
+                            <input id="jira_username" class="form-control" type="text" name="global-config-input" value="'.$jira_username['config_value'].'" data-config_id="'.$jira_username['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="jira_password" class="col-sm-4 control-label">Jira Password </label>
+                        <div class="col-sm-4">
+                            <input id="jira_password" class="form-control" type="password" name="global-config-input" value="'.$jira_password['config_value'].'" data-config_id="'.$jira_password['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+
+// End Jira Transport Section
+
+$es_host     = get_config_by_name('alert.transports.elasticsearch.es_host');
+$es_port    = get_config_by_name('alert.transports.elasticsearch.es_port');
+$es_index    = get_config_by_name('alert.transports.elasticsearch.es_index');
+$es_proxy   = get_config_by_name('alert.transports.elasticsearch.es_proxy');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#es_transport_expand"><i class="fa fa-caret-down"></i> Elasticsearch transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="elasticsearch" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="es_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="es_host" class="col-sm-4 control-label">Elasticsearch Host </label>
+                        <div class="col-sm-4">
+                            <input id="es_host" class="form-control validation" type="text" name="global-config-input" value="'.$es_host['config_value'].'" data-config_id="'.$es_host['config_id'].'" pattern="[a-zA-Z0-9_\-\.]+">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="es_port" class="col-sm-4 control-label">Elasticsearch Port </label>
+                        <div class="col-sm-4">
+                            <input id="es_port" class="form-control" type="text" name="global-config-input" value="'.$es_port['config_value'].'" data-config_id="'.$es_port['config_id'].'" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="es_index" class="col-sm-4 control-label">Elasticsearch Index Pattern </label>
+                        <div class="col-sm-4">
+                            <input id="es_index" class="form-control" type="text" name="global-config-input" value="'.$es_index['config_value'].'" data-config_id="'.$es_index['config_id'].'">
+                            <span class="form-control-feedback">
+    <i class="fa" aria-hidden="true"></i>
+</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="es_proxy" class="col-sm-4 control-label">Use proxy if configured? </label>
+                        <div class="col-sm-4">
+                            <input id="es_proxy" type="checkbox" name="global-config-check" '.$es_proxy['config_value'].' data-on-text="Yes" data-off-text="No" data-size="small" data-config_id="'.$es_proxy['config_id'].'">
                             <span class="form-control-feedback">
     <i class="fa" aria-hidden="true"></i>
 </span>
@@ -1357,6 +1711,7 @@ echo '
     </form>
 </div>
 ';
+
 ?>
 
 <script>
@@ -1378,24 +1733,14 @@ echo '
             data: { type: "test-transport", transport: transport },
             dataType: "json",
             success: function(data){
-                if (data.status == 'ok') {
-                    $this.removeClass('btn-primary').addClass('btn-success');
-                    setTimeout(function(){
-                        $this.removeClass('btn-success').addClass('btn-primary');
-                    }, 2000);
-                }
-                else {
-                    $this.removeClass('btn-primary').addClass('btn-danger');
-                    setTimeout(function(){
-                        $this.removeClass('btn-danger').addClass('btn-primary');
-                    }, 2000);
+                if (data.status === 'ok') {
+                    toastr.success('Test to ' + transport + ' ok');
+                } else {
+                    toastr.error('Test to ' + transport + ' failed<br />' + data.message);
                 }
             },
             error: function(){
-                $this.removeClass('btn-primary').addClass('btn-danger');
-                setTimeout(function(){
-                    $this.removeClass('btn-danger').addClass('btn-primary');
-                }, 2000);
+                toastr.error('Test to ' + transport + ' failed - general error');
             }
         });
     });
@@ -1433,7 +1778,7 @@ echo '
                 }
             },
             error: function(){
-                $("#message").html('<div class="alert alert-info">Error creating config item</div>');
+                $("#message").html('<div class="alert alert-danger">Error creating config item</div>');
             }
         });
     });// End Add API config
@@ -1469,10 +1814,46 @@ echo '
                 }
             },
             error: function(){
-                $("#message").html('<div class="alert alert-info">Error creating config item</div>');
+                $("#message").html('<div class="alert alert-danger">Error creating config item</div>');
             }
         });
     });// End Add Slack config
+
+    // Add Discord config
+    discordIndex = 0;
+    $("button#submit-discord").click(function(){
+        var config_value = $('#discord_value').val();
+        var config_extra = $('#discord_extra').val();
+        $.ajax({
+            type: "POST",
+            url: "ajax_form.php",
+            data: {type: "config-item", action: 'add-discord', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value},
+            dataType: "json",
+            success: function(data){
+                if (data.status == 'ok') {
+                    discordIndex++;
+                    var $template = $('#discord_url_template'),
+                        $clone    = $template
+                            .clone()
+                            .removeClass('hide')
+                            .attr('id',data.config_id)
+                            .attr('discord-url-index', discordIndex)
+                            .insertBefore($template);
+                        $clone.find('[name="global-config-input"]').attr('data-config_id',data.config_id);
+                        $clone.find('[name="del-discord-call"]').attr('data-config_id',data.config_id);
+                        $clone.find('[name="global-config-input"]').attr('value', config_value);
+                        $clone.find('[name="global-config-textarea"]').val(config_extra);
+                        $clone.find('[name="global-config-textarea"]').attr('data-config_id',data.config_id);
+                    $("#new-config-discord").modal('hide');
+                } else {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                }
+            },
+            error: function(){
+                $("#message").html('<div class="alert alert-danger">Error creating config item</div>');
+            }
+        });
+    });// End Add Discord config
 
     // Add RocketChat config
     rocketIndex = 0;
@@ -1505,7 +1886,7 @@ echo '
                 }
             },
             error: function(){
-                $("#message").html('<div class="alert alert-info">Error creating config item</div>');
+                $("#message").html('<div class="alert alert-danger">Error creating config item</div>');
             }
         });
     });// End Add Slack config
@@ -1545,7 +1926,7 @@ echo '
                 }
             },
             error: function(){
-                $("#message").html('<div class="alert alert-info">Error creating config item</div>');
+                $("#message").html('<div class="alert alert-danger">Error creating config item</div>');
             }
         });
     });// End Add Hipchat config
@@ -1584,7 +1965,7 @@ echo '
                 }
             },
             error: function(){
-                $("#message").html('<div class="alert alert-info">Error creating config item</div>');
+                $("#message").html('<div class="alert alert-danger">Error creating config item</div>');
             }
         });
     });// End Add Pushover config
@@ -1620,7 +2001,7 @@ echo '
                 }
             },
             error: function(){
-                $("#message").html('<div class="alert alert-info">Error creating config item</div>');
+                $("#message").html('<div class="alert alert-danger">Error creating config item</div>');
             }
         });
     });// End Add Boxcar config
@@ -1656,7 +2037,7 @@ echo '
                 }
             },
             error: function(){
-                $("#message").html('<div class="alert alert-info">Error creating config item</div>');
+                $("#message").html('<div class="alert alert-danger">Error creating config item</div>');
             }
         });
     });// End Add Telegram config
@@ -1677,7 +2058,7 @@ echo '
                 }
             },
             error: function () {
-                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                $("#message").html('<div class="alert alert-danger">An error occurred.</div>');
             }
         });
     });// End delete api config
@@ -1698,10 +2079,31 @@ echo '
                 }
             },
             error: function () {
-                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                $("#message").html('<div class="alert alert-danger">An error occurred.</div>');
             }
         });
     });// End delete slack config
+
+    // Delete discord config
+    $(document).on('click', 'button[name="del-discord-call"]', function(event) {
+        var config_id = $(this).data('config_id');
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {type: "config-item", action: 'remove-discord', config_id: config_id},
+            dataType: "json",
+            success: function (data) {
+                if (data.status == 'ok') {
+                    $("#"+config_id).remove();
+                } else {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                }
+            },
+            error: function () {
+                $("#message").html('<div class="alert alert-danger">An error occurred.</div>');
+            }
+        });
+    });// End delete discord config
 
     // Delete Rocket.Chat config
     $(document).on('click', 'button[name="del-rocket-call"]', function(event) {
@@ -1719,7 +2121,7 @@ echo '
                 }
             },
             error: function () {
-                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                $("#message").html('<div class="alert alert-danger">An error occurred.</div>');
             }
         });
     });// End delete rocket config
@@ -1740,7 +2142,7 @@ echo '
                 }
             },
             error: function () {
-                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                $("#message").html('<div class="alert alert-danger">An error occurred.</div>');
             }
         });
     });// End delete hipchat config
@@ -1761,7 +2163,7 @@ echo '
                 }
             },
             error: function () {
-                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                $("#message").html('<div class="alert alert-danger">An error occurred.</div>');
             }
         });
     });// End delete pushover config
@@ -1782,7 +2184,7 @@ echo '
                 }
             },
             error: function () {
-                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                $("#message").html('<div class="alert alert-danger">An error occurred.</div>');
             }
         });
     });// End delete Boxcar config
@@ -1804,7 +2206,7 @@ echo '
                 }
             },
             error: function () {
-                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                $("#message").html('<div class="alert alert-danger">An error occurred.</div>');
             }
         });
     });// End delete Telegram config
@@ -1837,10 +2239,11 @@ echo '
                 }
             },
             error: function () {
-                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                $("#message").html('<div class="alert alert-danger">An error occurred.</div>');
             }
         });
     });
+
     $(document).on('blur', 'textarea[name="global-config-textarea"]', function(event) {
         event.preventDefault();
         var $this = $(this);
@@ -1870,8 +2273,9 @@ echo '
                 }
             },
             error: function () {
-                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                $("#message").html('<div class="alert alert-danger">An error occurred.</div>');
             }
         });
     });
 </script>
+

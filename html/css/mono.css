@@ -114,3 +114,10 @@
   100% { transform: rotate(360deg); transform: rotate(360deg); }
 }
 
+.pagemenu-selected {
+  background-color: #777;
+  border: 0;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+}

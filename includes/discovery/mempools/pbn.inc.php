@@ -7,7 +7,7 @@ if ($device['os'] == 'pbn') {
     d_echo($version);
 
     // specified MIB supported since build 16607
-    if ($version[build] >= 16607) {
+    if ($version['build'] >= 16607) {
         $usage = snmp_get($device, 'nmsMemoryPoolUtilization.0', '-OUvQ', 'NMS-MEMORY-POOL-MIB', 'pbn');
 
         if (is_numeric($usage)) {

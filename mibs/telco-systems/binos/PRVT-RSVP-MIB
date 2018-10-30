@@ -1,0 +1,1868 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename:   PRVT-RSVP-MIB.mib
+-- ** Project:    T-Metro Switches.
+-- ** Purpose:    Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications.  All rights reserved.
+--                             WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information.  This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM.  Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-RSVP-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE,
+      Integer32, Unsigned32, IpAddress
+                                        FROM SNMPv2-SMI
+
+      MODULE-COMPLIANCE, OBJECT-GROUP   FROM SNMPv2-CONF
+
+      TEXTUAL-CONVENTION, RowStatus, TruthValue
+                                        FROM SNMPv2-TC
+      InterfaceIndexOrZero              FROM IF-MIB
+      InetAddressIPv6                   FROM INET-ADDRESS-MIB
+        mpls				 		FROM PRVT-CR-LDP-MIB;
+
+
+
+  prvtRsvp MODULE-IDENTITY
+       LAST-UPDATED "200804140000Z" 
+      ORGANIZATION "BATM Advanced Communication"
+      CONTACT-INFO
+                   " BATM/Telco Systems Support team
+					Email: 
+				For North America: techsupport@telco.com
+				For North Europe: support@batm.de, info@batm.de
+				For the rest of the world: techsupport@telco.com"      
+				DESCRIPTION  "The MIB module for management of the PRVT-RSVP
+                    product."
+
+   -- Revision history.  
+    REVISION     "200804140000Z"
+    DESCRIPTION
+        "Added range constraints to
+         prvtRsvpProductLocalRepairDelay, prvtRsvpProductRefreshInterval,
+         prvtRsvpProductNotifyRRInterval, prvtRsvpProductNotifyRRLimit,
+         prvtRsvpProductInitPathRRInterval, prvtRsvpProductInitPathRRLimit."
+
+  
+    REVISION     "200606020000Z"
+    DESCRIPTION
+        "Initial version."
+
+  ::= { mpls 7 }
+
+  prvtRsvpObjects OBJECT IDENTIFIER ::= { prvtRsvp 1 } -- tables
+
+-- Textual conventions
+
+  PrvtRsvpAdminStatus ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION "The desired administrative state of an RSVP
+                   entity."
+      SYNTAX      INTEGER {
+                      up(1),
+                      down(2)
+                  }
+
+  PrvtRsvpOperStatus ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION "The current operational state of an RSVP entity."
+      SYNTAX      INTEGER {
+                      up(1),          -- active
+                      down(2),        -- inactive
+                      goingUp(3),     -- activating
+                      goingDown(4),   -- deactivating
+                      actFailed(5)    -- activation failed
+                  }
+
+  PrvtRsvpIndex ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION "The index value identifying an RSVP entity."
+      SYNTAX      Unsigned32
+
+  PrvtRsvpDiagReqIndex ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION
+          "The index value identifying an RSVP session that is being
+           diagnosed."
+      SYNTAX      Unsigned32
+
+  PrvtRsvpDiagNodeIndexType ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION
+          "The index value identifying a node within an RSVP session that is
+           being diagnosed."
+      SYNTAX      Unsigned32
+
+  PrvtRsvpDiagNodeTypeVal ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION "The type of a node in a session that is being diagnosed."
+      SYNTAX      INTEGER {
+                      missing(1),     -- no information received
+                      ingress(2),     -- the ingress node
+                      transit(3),     -- an intermediate node
+                      egress(4)       -- the egress node
+                  }
+
+-- End of textual conventions
+
+
+-- RSVP entity table
+-- This table is used to create and manage RSVP entities.
+
+  prvtRsvpProductTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF PrvtRsvpProductEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The table of RSVP entities."
+     ::= { prvtRsvpObjects 1 }
+
+  prvtRsvpProductEntry OBJECT-TYPE
+      SYNTAX      PrvtRsvpProductEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Each entry represents an RSVP entity."
+      INDEX { prvtRsvpProductIndex }
+     ::= { prvtRsvpProductTable 1 }
+
+  PrvtRsvpProductEntry ::= SEQUENCE {
+          prvtRsvpProductIndex                   PrvtRsvpIndex,
+          prvtRsvpProductASNumber                Integer32,
+          prvtRsvpProductSenderTTL               Integer32,
+          prvtRsvpProductMinTimerPeriod          Integer32,
+          prvtRsvpProductAPIIfIndex              InterfaceIndexOrZero,
+          prvtRsvpProductAPIAddress              OCTET STRING,
+          prvtRsvpProductAPIRefreshInterval      Integer32,
+          prvtRsvpProductLocalRepairDelay        Integer32,
+          prvtRsvpProductRefreshInterval         Integer32,
+          prvtRsvpProductRefreshMultiple         Integer32,
+          prvtRsvpProductRfrshSlewDenom          Integer32,
+          prvtRsvpProductRfrshSlewNumerator      Integer32,
+          prvtRsvpProductBlockadeMultiple        Integer32,
+          prvtRsvpProductSocketBufPoolSize       Integer32,
+          prvtRsvpProductSwitchBufPoolSize       Integer32,
+          prvtRsvpProductTeMibBufPoolSize        Integer32,
+          prvtRsvpProductRoutingBufPoolSize      Integer32,
+          prvtRsvpProductLSPSetupPriority        Integer32,
+          prvtRsvpProductLSPHoldingPriority      Integer32,
+          prvtRsvpProductAdminStatus             PrvtRsvpAdminStatus,
+          prvtRsvpProductOperStatus              PrvtRsvpOperStatus,
+          prvtRsvpProductRowStatus               RowStatus,
+          prvtRsvpProductLsrIndex                Unsigned32,
+          prvtRsvpProductTeMibIndex              Unsigned32,
+          prvtRsvpProductMultiStackSupport       Integer32,
+          prvtRsvpProductUseHopByHop             TruthValue,
+          prvtRsvpProductUseNotify               TruthValue,
+          prvtRsvpProductNotifyRRDecay           Integer32,
+          prvtRsvpProductNotifyRRInterval        Integer32,
+          prvtRsvpProductNotifyRRLimit           Integer32,
+          prvtRsvpProductAllowIPEncap            TruthValue,
+          prvtRsvpProductProtocolExtensions      BITS,
+          prvtRsvpProductPSRFlags                BITS,
+          prvtRsvpProductInitPathRRDecay         Integer32,
+          prvtRsvpProductInitPathRRInterval      Integer32,
+          prvtRsvpProductInitPathRRLimit         Integer32,
+          prvtRsvpProductEnableUni               TruthValue,
+          prvtRsvpProductRestartCapable          TruthValue,
+          prvtRsvpProductRestartTime             Unsigned32,
+          prvtRsvpProductRecoveryTime            Unsigned32,
+          prvtRsvpProductMinPeerRestart          Integer32,
+          prvtRsvpProductGracefulDelTimeout      Integer32,
+          prvtRsvpProductEgressDelBehavior       INTEGER,
+          prvtRsvpProductEnabUniConnSplicing     TruthValue,
+          prvtRsvpProductFastRerouteCaps         BITS,
+          prvtRsvpProductFastRroutBkpRtryInt     Integer32,
+          prvtRsvpProductErrorActionFlags        BITS,
+          prvtRsvpProductEnableNni               INTEGER,
+          prvtRsvpProductBehaviorFlags           BITS,
+          prvtRsvpProductLabelSetStyle           INTEGER,
+          prvtRsvpProductLabelSetOperStatus      INTEGER,
+          prvtRsvpProductLabelSetTrapEnable      TruthValue,
+          prvtRsvpProductLabelSetChngAct         Integer32,
+          prvtRsvpProductExtPrtAdminStatus       PrvtRsvpAdminStatus,
+          prvtRsvpProductUniIncSonetProfile      Unsigned32,
+          prvtRsvpProductFrrFacAdminStatus       PrvtRsvpAdminStatus,
+          prvtRsvpProductFrrFacOperStatus        PrvtRsvpOperStatus,
+          prvtRsvpProductIpv6AdminStatus         PrvtRsvpAdminStatus,
+          prvtRsvpProductIpv6OperStatus          PrvtRsvpOperStatus,
+          prvtRsvpProductAPIIpv6Address          InetAddressIPv6
+      }
+
+  prvtRsvpProductIndex OBJECT-TYPE
+      SYNTAX      PrvtRsvpIndex
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The index of this prvtRsvpProductEntry.  This is the
+           HAF entity index passed on the entity create parameters."
+     ::= { prvtRsvpProductEntry 1 }
+
+  prvtRsvpProductASNumber OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The number identifying the autonomous system (AS) to which
+        this node belongs."
+      DEFVAL { 1 }
+     ::= { prvtRsvpProductEntry 2 }
+
+  prvtRsvpProductSenderTTL OBJECT-TYPE
+      SYNTAX      Integer32 (0..255)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The TTL set on messages originating at this node.  A value
+        of 0 indicates this number is determined by other means."
+      DEFVAL { 0 }
+     ::= { prvtRsvpProductEntry 3 }
+
+  prvtRsvpProductMinTimerPeriod OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "milliseconds"
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The minimum granularity to allow an internal timer to be
+        set in the PRVT-RSVP product code."
+      DEFVAL { 200 }
+     ::= { prvtRsvpProductEntry 4 }
+
+  prvtRsvpProductAPIIfIndex OBJECT-TYPE
+      SYNTAX      InterfaceIndexOrZero
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "Management assigned interface identifier for the (internal) LRAPI
+        interface between RSVP and TE-MIB components.  This must be unique in
+        the interface index namespace of the node - it MUST not match any real
+        interface index.
+        It is recommended that this is set to zero or 0x7FFFFFFF."
+      DEFVAL { 2147483647 }
+     ::= { prvtRsvpProductEntry 5 }
+
+  prvtRsvpProductAPIAddress OBJECT-TYPE
+      SYNTAX      OCTET STRING (SIZE(4..16))
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "Management assigned IP address used to identify the (internal) LRAPI
+        interface between RSVP and TE-MIB components.
+        The configured API address MUST not be a real address in the network.
+        It is recommended that this is set to a non-zero reserved address
+        value, such as 224.0.0.0.
+        If multi-stack support is set to PHOP, this address must be unique for
+        each RSVP stack in the node.
+        The same address(es) can be used on all nodes in the network."
+      DEFVAL { 'E0000000'H } -- 224.0.0.0
+     ::= { prvtRsvpProductEntry 6 }
+
+  prvtRsvpProductAPIRefreshInterval OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "milliseconds"
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "This field is now deprecated."
+      DEFVAL { 30000 }
+     ::= { prvtRsvpProductEntry 7 }
+
+  prvtRsvpProductLocalRepairDelay OBJECT-TYPE
+      SYNTAX      Integer32 (-1 | 1000..2147483647)
+      UNITS       "milliseconds"
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "This object is used to set the delay between detection of a
+        path error and instigation of local repair procedures.  This
+        allows local routing updates to converge.
+        A value of -1 indicates that local
+        repair procedures should not take place, but that the error
+        should be propagated upstream.
+        Where FRR capabilities are supported at this node
+        local_repair_delay must be set to -1."
+
+
+      DEFVAL { 1000 }
+     ::= { prvtRsvpProductEntry 8 }
+
+  prvtRsvpProductRefreshInterval OBJECT-TYPE
+      SYNTAX      Integer32 (1000..2147483647)
+      UNITS       "milliseconds"
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "This RSVP value, R,  which is used to set the average
+        interval between refresh path and resv messages.
+        Note : If values for the if_refresh_interval and if_refresh_multiple
+        are configured such that the following inequality is not obeyed :
+        6 * refresh_interval * (refresh_multiple + 0.5) < 0x7FFFFFFF.
+        Then the time-to-die for the path value will be set to its maximum
+        value and it is probable that the lsp will time out before a refresh
+        arrives."
+      DEFVAL { 30000 }
+     ::= { prvtRsvpProductEntry 9 }
+
+  prvtRsvpProductRefreshMultiple OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The RSVP value, K, which is the number of unresponded Path
+        or Resv refresh attempts which must be made, spaced by
+        the refresh interval before the state is deemed to have
+        timed out.
+        Note : See note in prvtRsvpProductRefreshInterval above."
+      DEFVAL { 3 }
+     ::= { prvtRsvpProductEntry 10 }
+
+  prvtRsvpProductRfrshSlewDenom OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The denominator of the fraction, SlewMax, which is the
+        maximum allowable increase in the refresh interval, R, to
+        prevent state timeout while changing R.  R is increased by
+        this fraction until it reaches the new desired value."
+      DEFVAL { 10 }
+     ::= { prvtRsvpProductEntry 11 }
+
+  prvtRsvpProductRfrshSlewNumerator OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The numerator of the fraction, SlewMax, which is the maximum
+        allowable increase in the refresh interval, R, to prevent
+        state timeout while changing R.  R is increased by this
+        fraction until it reaches the new desired value."
+      DEFVAL { 3 }
+     ::= { prvtRsvpProductEntry 12 }
+
+  prvtRsvpProductBlockadeMultiple OBJECT-TYPE
+      SYNTAX      Integer32 (1..214783647)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The RSVP value, Kb, which is the number of refresh timeout
+        periods after which blockade state is deleted."
+      DEFVAL { 2 }
+     ::= { prvtRsvpProductEntry 13 }
+
+  prvtRsvpProductSocketBufPoolSize OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The number of pre-reserved buffers available for sending
+        sockets data.  This is used to pace the sockets data flows."
+      DEFVAL { 8 }
+     ::= { prvtRsvpProductEntry 14 }
+
+  prvtRsvpProductSwitchBufPoolSize OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The number of pre-reserved buffers available for programming
+        the switch.  This is used to ensure programming operations do
+        not fail in buffer shortage conditions."
+      DEFVAL { 8 }
+     ::= { prvtRsvpProductEntry 15 }
+
+  prvtRsvpProductTeMibBufPoolSize OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The number of pre-reserved buffers available for signalling
+        TE-MIB.  This is used to ensure signals are not lost in buffer
+        shortage conditions."
+      DEFVAL { 8 }
+     ::= { prvtRsvpProductEntry 16 }
+
+  prvtRsvpProductRoutingBufPoolSize OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The number of pre-reserved buffers available for route
+        queries.  This is used to ensure re-routing of many LSPs does
+        not fail in buffer shortage conditions."
+      DEFVAL { 8 }
+     ::= { prvtRsvpProductEntry 17 }
+
+  prvtRsvpProductLSPSetupPriority OBJECT-TYPE
+      SYNTAX      Integer32 (0..7)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The setup priority to apply to LSPs which are not
+        signalling this parameter.  0 represents the highest
+        priority, 7 the lowest.  The value of this object must be
+        numerically more or equal (so lower or equal priority)
+        than the value of the holding priority object."
+      DEFVAL { 4 }
+     ::= { prvtRsvpProductEntry 18 }
+
+  prvtRsvpProductLSPHoldingPriority OBJECT-TYPE
+      SYNTAX      Integer32 (0..7)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+      "The holding priority to apply to LSPs which are not
+       signalling this parameter.  0 represents the highest
+       priority, 7 the lowest.  The value of this object must be
+       numerically less or equal (so higher or equal priority)
+       than the value of the holding priority object."
+      DEFVAL { 3 }
+     ::= { prvtRsvpProductEntry 19 }
+
+  prvtRsvpProductAdminStatus OBJECT-TYPE
+      SYNTAX      PrvtRsvpAdminStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The desired administrative state of the RSVP entity."
+      DEFVAL { up }
+     ::= { prvtRsvpProductEntry 20 }
+
+  prvtRsvpProductOperStatus OBJECT-TYPE
+      SYNTAX      PrvtRsvpOperStatus
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The current operational state of this instance of PRVT-RSVP."
+     ::= { prvtRsvpProductEntry 21 }
+
+  prvtRsvpProductRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "Used to create and delete a PRVT-RSVP Product Table entry.
+        When this object is set to 'active', only the
+        prvtRsvpProductAdminStatus object in the row may be modified."
+      DEFVAL { active }
+     ::= { prvtRsvpProductEntry 22 }
+
+  prvtRsvpProductLsrIndex OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The index of the PRVT-LMGR product instance which this
+        PRVT-RSVP is to join to as its LDB interface provider.  If
+        this value is not specified, or the value of this object
+        is 0, PRVT-RSVP will use the prvtRsvpProductIndex value as the
+        Lsr index when joining on the LDB interface."
+      DEFVAL { 0 }
+     ::= { prvtRsvpProductEntry 23 }
+
+  prvtRsvpProductTeMibIndex OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The index of the TE-MIB product instance which this
+        PRVT-RSVP is to join to as its LRA interface provider. If
+        this value is not specified, or the value of this object
+        is 0, PRVT-RSVP will use the prvtRsvpProductIndex value as the
+        TeMib Index when joining on the LRA interface."
+       DEFVAL { 0 }
+      ::= { prvtRsvpProductEntry 24 }
+
+  prvtRsvpProductMultiStackSupport OBJECT-TYPE
+      SYNTAX      Integer32 (1..3)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "A flag to indicate if multiple RSVP stacks are present
+         in the same system as the current one and, if so, how
+         they are supported.  If set to PHOP, Path messages are
+         forwarded to PRVT-RSVP with the Previous Hop value set as
+         the hop prior to the incoming interface, not as the next
+         hop interface as normal.  If set to LIH, the hardware
+         location of the current RSVP stack is used as the LIH in
+         the HOP object."
+      DEFVAL { 1 }
+     ::= { prvtRsvpProductEntry 25 }
+
+  prvtRsvpProductUseHopByHop OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "A flag to indicate that PRVT-RSVP should use the hop by hop
+         addressing scheme for PATH and PATH-TEAR messages it
+         sends.  If set then the IP addresses used in the IP header
+         of PATH messages forwarded by PRVT-RSVP set source as the
+         local outgoing interface IP address, and destination as
+         the next hop router IP address."
+      DEFVAL { false }
+     ::= { prvtRsvpProductEntry 26 }
+
+  prvtRsvpProductUseNotify OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "A flag to indicate that PRVT-RSVP should attempt to insert
+         a Notify Request object in all Path requests that is sends
+         as ingress and all Resv requests that it sends as egress.
+         The precise behavior is modified by a user exit called by
+         the RSVP code.
+
+         This field is not used unless the mplsTunnelUpNotRecip or
+         mplsTunnelDownNotRecip fields in TE-MIB are set to 0.0.0.0."
+      DEFVAL { false }
+     ::= { prvtRsvpProductEntry 27 }
+
+  prvtRsvpProductNotifyRRDecay OBJECT-TYPE
+      SYNTAX      Integer32 (0..100)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "The percentage increase in the rapid retransmission
+         interval for each consecutive unacknowledged RSVP Notify
+         message.  A value of 0 indicates a constant retransmission
+         rate."
+      DEFVAL { 100 }
+     ::= { prvtRsvpProductEntry 28 }
+
+  prvtRsvpProductNotifyRRInterval OBJECT-TYPE
+      SYNTAX      Integer32 (1000..2147483647)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "The interval in milliseconds before a Notify message is
+         first resent if no acknowledgement is received."
+      DEFVAL { 2000 }
+     ::= { prvtRsvpProductEntry 29 }
+
+  prvtRsvpProductNotifyRRLimit OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "The maximum number of times a Notify message is resent if
+         no acknowledgement is received."
+      DEFVAL { 2 }
+     ::= { prvtRsvpProductEntry 30 }
+
+  prvtRsvpProductAllowIPEncap OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "A flag to indicate that PRVT-RSVP should support the use of
+         IP encapsulation of RSVP packets, which are required for
+         out-of-band signaling.  If set, then PRVT-RSVP will accept
+         incoming RSVP packets that are IP encapsulated, and will
+         IP encapsulate outgoing packets whenever the IP routing
+         stub indicates that it is required for a particular route."
+      DEFVAL { false }
+     ::= { prvtRsvpProductEntry 31 }
+
+  prvtRsvpProductProtocolExtensions OBJECT-TYPE
+      SYNTAX      BITS { bypassFastReroute(0),
+                         detourFastReroute(1),
+                         noResAffOnInIf(2)
+                       }
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "Specifies which extensions to the standard RSVP-TE protocol
+         are enabled.  For fully standards-compliant behavior, set
+         this parameter to zero (no bits set).  To enable specific
+         non-standard protocol extensions, set this parameter to the
+         bitwise OR of whichever of the following behaviors you wish
+         to enable.
+
+         - bypassFastReroute: Enable support for facility fast reroute
+         protection of LSPs (bypass LSP protection).  This flag is
+         deprecated in favour of the
+         prvtRsvpProductFrrFacAdminStatus field which can be
+         modified while RSVP is admin up, however either field can be
+         used.  When this flag is set RSVP automatically sets the
+         prvtRsvpProductFrrFacAdminStatus.
+
+         - detourFastReroute: Enable support for one-to-one fast
+         reroute protection of LSPs (detour LSP protection).
+
+         -  noResAffOnInIf: Disable resource affinity checking on
+         incoming interfaces for LSPs.  If this flag is set, RSVP
+         will accept Path messages which use invalid resource
+         affinities for the incoming interface used by the LSP."
+
+      DEFVAL { { } }
+     ::= { prvtRsvpProductEntry 32 }
+
+  prvtRsvpProductPSRFlags OBJECT-TYPE
+      SYNTAX      BITS { pathErrPSRSet(0),
+                         pathErrPSRNotSet(1),
+                         ldbCommonRcvd(2),
+                         ldbPreempted(3),
+                         routingError(4),
+                         invalidPathMsg(5),
+                         sessionExpired(6),
+                         unableToRepairRoute(7),
+                         unableToRepairIf(8),
+                         reachedRetryLimit(9),
+                         unableToRefresh(10),
+                         resvErrTurnaround(11),
+                         incomingIfDown(12),
+                         outgoingIfDown(13)
+                       }
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "This field is used by PRVT-RSVP to determine whether it
+         should set the Path State Removed flag on a PathErr (and
+         therefore remove corresponding state and generate a
+         PathTear).  Each bit of this flags field corresponds to a
+         situation where PRVT-RSVP may generate a PathErr.  Setting a
+         particular bit will result in PRVT-RSVP removing state,
+         setting the Path State Removed flag and generating a
+         PathTear in that corresponding situation.  The possible
+         bit values are
+
+         - pathErrPSRSet: PRVT-RSVP has received a PathErr message
+         with the Path State Removed flag set.
+
+         - pathErrPSRNotSet: PRVT-RSVP has received a PathErr message
+         with the Path State Removed flag unset.
+
+         - ldbCommonRcvd: PRVT-RSVP has received a negative response
+         to an ATG_LDB_RESERVE_LSP_XC or ATG_LDB_CONNECT_LSP_XC
+         message.
+
+         - ldbPreempted: PRVT-RSVP has received a Preemption message
+         from Label Manager.
+
+         - routingError: PRVT-RSVP has received a Negative response
+         to an ATG_IPR_QUERY_ROUTE message.
+
+         - invalidPathMsg: PRVT-RSVP has received an invalid Path
+         message.
+
+         - sessionExpired:  A session in PRVT-RSVP has expired.
+
+         - unableToRepairRoute:  A route has been removed and
+         PRVT-RSVP is unable to start local repair.
+
+         - unableToRepairIf:  An interface has been removed and
+         PRVT-RSVP is unable start local repair.
+
+         - reachedRetryLimit: An initial Path Message has reached
+         its retry limit.
+
+         - unableToRefresh: PRVT-RSVP has been unable to refresh an
+         LSP.
+
+         - resvErrTurnaround: PRVT-RSVP has received a ResvErr at the
+         Egress node containing a REROUTING object and this is to
+         be turned round into a PathErr.
+
+         - incomingIfDown: The incoming MPLS data interface for
+         an LSP has been deactivated.
+
+         - outgoingIfDown: The outgoing MPLS data interface for
+         an LSP has been deactivated."
+
+      DEFVAL { {} }
+     ::= { prvtRsvpProductEntry 33 }
+
+  prvtRsvpProductInitPathRRDecay OBJECT-TYPE
+      SYNTAX      Integer32 (0..100)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "The percentage increase in the rapid
+         retransmission interval for each consecutive
+         unacknowledged RSVP Initial Path message.  A value of 0
+         indicates a constant retransmission rate.
+
+         A Path message is treated as an initial Path if it is the
+         Path message which creates the LSP or a Path refresh
+         message which requires re-routing."
+      DEFVAL { 100 }
+     ::= { prvtRsvpProductEntry 34 }
+
+  prvtRsvpProductInitPathRRInterval OBJECT-TYPE
+      SYNTAX      Integer32  (1000..2147483647)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "The rapid retransmission interval in milliseconds before
+         an Initial Path message is first resent if no
+         acknowledgement is received.
+
+         A Path message is treated as an initial Path if it is the
+         Path message which creates the LSP or a Path refresh
+         message which requires re-routing."
+      DEFVAL { 2000 }
+     ::= { prvtRsvpProductEntry 35 }
+
+  prvtRsvpProductInitPathRRLimit OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "The maximum number of times an Initial Path message is
+         resent if no acknowledgement is received.
+
+         A Path message is treated as an initial Path if it is the
+         Path message which creates the LSP or a Path refresh
+         message which requires re-routing."
+      DEFVAL { 2 }
+     ::= { prvtRsvpProductEntry 36 }
+
+  prvtRsvpProductEnableUni OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "A flag to indicate whether the local node supports UNI
+           signaling messages."
+      DEFVAL { false }
+     ::= { prvtRsvpProductEntry 37 }
+
+  prvtRsvpProductRestartCapable OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "A flag to indicate whether the local node should advertise
+           itself as restart capable.  This should be set to true
+           if fault-tolerance is enabled in PRVT-MPLS or if the node
+           supports recovery procedures."
+      DEFVAL { false }
+     ::= { prvtRsvpProductEntry 38 }
+
+  prvtRsvpProductRestartTime OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "The time in milliseconds that the local node takes to
+         restart RSVP-TE and the communication channel used for
+         RSVP communication.  This is advertised to neighbors in
+         the Restart_Cap object in Hello messages.
+
+         The value chosen should be large enough for RSVP to be
+         terminated and restarted.  If fault-tolerance is enabled
+         in PRVT-MPLS, then sufficient time should be allowed for
+         RSVP to fail over, which should include the time taken for
+         the audit phase to complete.
+
+         A value of 0xFFFFFFFF may be configured to imply an infinite
+         restart time.
+
+         Only used if prvtRsvpProductRestartCapable is set to true.
+
+         Note that the maximum real time value that can be set is
+         0x7FFFFFFF.  If a value is requested greater than
+         0x7FFFFFFF and less than 0xFFFFFFFF the request will be
+         rejected."
+
+      DEFVAL { 10000 }
+     ::= { prvtRsvpProductEntry 39 }
+
+  prvtRsvpProductRecoveryTime OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "The period of time in milliseconds that the local node
+         would like neighbors to take to resyncronize RSVP and
+         MPLS forwarding information after the re-establishment of
+         Hello connectivity.  This is advertised to neighbors in
+         the Restart_Cap object in Hello messages.
+
+         A value of zero indicates that the node does not support
+         resynchronization following failure of the local node.
+
+         A value of 0xFFFFFFFF indicates an infinite recovery time.
+
+         Note that if fault-tolerance is not enabled in PRVT-MPLS and
+         the node is acting as an ingress for tunnels, then any
+         ingress tunnels that need to be recovered should be
+         configured during this recovery period.  These tunnels
+         should be configured in TE-MIB with the admin_status set
+         to UP, otherwise they will be lost from the switch
+         controller.
+
+         Only used if prvtRsvpProductRestartCapable is set to true.
+
+         Note that the maximum real time value that can be set is
+         0x7FFFFFFF.  If a value is requested greater than
+         0x7FFFFFFF and less than 0xFFFFFFFF the request will be
+         rejected."
+
+      DEFVAL { 10000 }
+     ::= { prvtRsvpProductEntry 40 }
+
+  prvtRsvpProductMinPeerRestart OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "The mininum period of time in milliseconds that RSVP
+         should wait for a restart capable neighbor to regain
+         Hello connectivity before invoking procedures related to
+         communication loss.
+
+         RSVP will wait for the maximum of this time and the
+         restart_time advertised in the RESTART_CAP object in Hello
+         messages from the neighbor."
+      DEFVAL { 0 }
+     ::= { prvtRsvpProductEntry 41 }
+
+  prvtRsvpProductGracefulDelTimeout OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "The time in milliseconds that PRVT-MPLS will wait for
+         graceful deletion to complete before the forced deletion
+         procedure is used instead."
+      DEFVAL { 30000 }
+     ::= { prvtRsvpProductEntry 42 }
+
+  prvtRsvpProductEgressDelBehavior OBJECT-TYPE
+      SYNTAX      INTEGER { delWithPathErr(1),
+                            delWithResvD(2)
+                          }
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "Specifies the action that an egress node should take in
+         the graceful deletion procedure on receipt of a Path
+         message containing an Admin Status object with the D
+         and R bits set.  The possible values are:-
+
+         - delWithPathErr:  Send a PathErr message with the
+         Path_State_removed flag set.
+
+         - delWithResvD:  Send a Resv message containing an Admin
+         Status object with the D bit set."
+      DEFVAL { delWithPathErr }
+     ::= { prvtRsvpProductEntry 43 }
+
+  prvtRsvpProductEnabUniConnSplicing OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "A flag to indicate whether UNI-N nodes should allow the
+         splicing of UNI connections with proprietary ON
+         connections."
+      DEFVAL { false }
+     ::= { prvtRsvpProductEntry 44 }
+
+  prvtRsvpProductFastRerouteCaps OBJECT-TYPE
+      SYNTAX      BITS { fastReroutePLR(0),
+                         fastRerouteMP(1),
+                         fastRerouteDetourRestart(2)
+                       }
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "Specifies what fast reroute capabilities are enabled
+         on this node.  This field is only valid if the fast
+         reroute extension is enabled in the
+         prvtRsvpProductProtocolExtensions field above.
+
+         -  PLR: Node provides fast reroute point of local repair
+         capability.
+
+         -  MP: Node provides fast reroute merge point capability.
+
+         -  DetourRestart: Node implements some protocol extensions
+         to recover detour fast reroute LSPs after a node restart
+         or an adjacent node restart.  This flag is only valid if
+         detourFastReroute flag is set in the
+         prvtRsvpProductProtocolExtensions field above.
+
+         Note that a node can still perform some FRR processing
+         even if the PLR and MP flags are clear (at a detour transit
+         for instance)."
+      DEFVAL { { } }
+     ::= { prvtRsvpProductEntry 45 }
+
+  prvtRsvpProductFastRroutBkpRtryInt OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "When this node is a PLR, this field specifies the period
+         that the node should wait before retrying the setup of a
+         backup LSP which failed last time because no route was
+         available.  In the case that a backup LSP is set up but an
+         error is received from upstream, setup will be attempted
+         again immediately.
+         This field is only valid if this node is defined as PLR
+         capable in the _prvtRsvpProductFastRerouteCapabilities_
+         field above."
+      DEFVAL { 30000 }
+     ::= { prvtRsvpProductEntry 46 }
+
+  prvtRsvpProductErrorActionFlags OBJECT-TYPE
+      SYNTAX      BITS { eafTearStateOnLSIErr(0)
+                       }
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "This field is used by PRVT-RSVP to determine whether it
+         should take any special action following certain types of
+         local errors.  Each bit of this flags field corresponds to
+         an error and a corresponding action.
+
+         When one of these errors occurs, the relevant bit flag is
+         checked - if set, the specified action is taken; if not
+         set, the normal action is taken according the RSVP
+         protocol.  The possible bit values are the following.
+
+         - eafTearStateOnLSIErr:  When PRVT-RSVP receives a negative
+           response to an ATG_LDB_CONNECT_LSP_XC message on a UNI
+           node, the Path state is torn down."
+
+      DEFVAL { {} }
+     ::= { prvtRsvpProductEntry 47 }
+
+  prvtRsvpProductEnableNni OBJECT-TYPE
+      SYNTAX      INTEGER {
+                      disabled(1),
+                      enabled(2),
+                      disabling(3)
+                  }
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "A flag to indicate whether the local node supports NNI
+         signaling messages."
+      DEFVAL { disabled }
+     ::= { prvtRsvpProductEntry 48 }
+
+  prvtRsvpProductBehaviorFlags OBJECT-TYPE
+      SYNTAX      BITS { enableTTLMatch(0)
+                       }
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "Specifies some detailed aspects of the behavior of
+         PRVT-RSVP.  This field may be changed while _admin_status_
+         is up.
+
+         - enableTTLMatch: Whether to discard received RSVP
+         packets sent with the Router Alert option if the IP and
+         RSVP TTL values do not match.  In certain circumstances
+         TTL comparison can identify RSVP service breaks, and allow
+         the discarding of packets that would otherwise disrupt
+         installed LSPs.
+
+         This option has no effect for Out Of Band operation.
+
+         This option should be left disabled for LSP hierarchy
+         operation (LSPs set up over existing LSPs) and for
+         Facility Fast Reroute (which sets up backup LSPs over
+         existing bypass LSPs)."
+
+      DEFVAL { {} }
+     ::= { prvtRsvpProductEntry 49 }
+
+  prvtRsvpProductLabelSetStyle OBJECT-TYPE
+      SYNTAX      INTEGER {
+                      excludeLabelHeader(1),
+                      includeLabelHeader(2)
+                  }
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "Specifies the style of LABEL_SET object that should be
+         used.  RFCs 3741 and 3743 are unclear whether the
+         LABEL_SET object should include LABEL headers.  The
+         correct interpretation is that the header should not be
+         present, but there are implementations that include the
+         LABEL header, so this option is included for compatibility
+         with these implementations.
+
+         - excludeLabelHeader:  The LABEL_SET object contains
+           concatenated LABEL values without the object headers.
+
+         - includeLabelHeader:  The LABEL_SET object contains
+           concatenated LABEL objects with the object headers."
+      DEFVAL { excludeLabelHeader }
+     ::= { prvtRsvpProductEntry 50 }
+
+  prvtRsvpProductLabelSetOperStatus OBJECT-TYPE
+      SYNTAX      INTEGER {
+                      excludeLabelHeader(1),
+                      includeLabelHeader(2),
+                      goingToExclude(3),
+                      goingToInclude(4)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "The current operational state of Label Set style.
+         - excludeLabelHeader:  The LABEL_SET object contains
+           concatenated LABEL values without the object headers.
+
+         - includeLabelHeader:  The LABEL_SET object contains
+           concatenated LABEL objects with the object headers.
+
+         - goingToExclude:  The Label Set Style is being changed
+           from includeLabelHeader to excludeLabelHeader.
+
+         - goingToInclude:  The Label Set Style is being changed
+           from excludeLabelHeader to includeLabelHeader."
+     ::= { prvtRsvpProductEntry 51 }
+
+  prvtRsvpProductLabelSetTrapEnable OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "This object is used to enable traps for the Label
+         Set style  oper_status object."
+      DEFVAL { false }
+     ::= { prvtRsvpProductEntry 52 }
+
+  prvtRsvpProductLabelSetChngAct OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "Specifies the action to take when the value of
+         prvtRsvpProductLabelSetStyle is changed.
+
+         - leaveLSPs:  All nodes should suppress refreshes and
+         switch to the new format while refreshes are suppressed.
+
+         - tearLSPs:   Any LSPs using label sets will be deleted
+         before switching all nodes to the new format, and any new
+         LSPs using label sets will be dropped/rejected until the
+         switch is complete."
+      DEFVAL { 1 }
+     ::= { prvtRsvpProductEntry 53 }
+
+  prvtRsvpProductExtPrtAdminStatus OBJECT-TYPE
+      SYNTAX      PrvtRsvpAdminStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "The desired operational state of support for the extended
+        PROTECTION object defined in
+        draft-lang-ccamp-gmpls-recovery-e2e-signaling."
+      DEFVAL { down }
+     ::= { prvtRsvpProductEntry 54 }
+
+  prvtRsvpProductUniIncSonetProfile OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..1)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "Specifies whether Sonet Profile is included on messages
+         to or from a UNI-C node."
+      DEFVAL { 0 }
+     ::= { prvtRsvpProductEntry 55 }
+
+  prvtRsvpProductFrrFacAdminStatus OBJECT-TYPE
+      SYNTAX      PrvtRsvpAdminStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "Specifies whether backup LSPs can be put in place for LSPs
+         requesting FRR using the facility method.
+
+         Setting this to UP means that LSPs that request FRR using
+         the facility method can have protection at this node.
+         Existing LSPs that request FRR facility protection will have
+         protection put in place when the next Path refresh is
+         received.
+
+         Setting this to DOWN means that LSPs that request FRR using
+         the facility method will not be protected at this node.
+         Existing LSPs that have FRR facility protection will lose
+         that protection, and if the LSP had been rerouted to use the
+         backup LSP then the protected LSP will be lost.
+
+         This field replaces the bypassFastReroute flag on the protocol
+         extensions field in this MIB (although the bypassFastReroute flag
+         is still supported for backwards compatibility). It can be
+         modified while RSVP is oper_status UP or DOWN.  When this field
+         is changed the bypassFastReroute flag is automatically modified
+         to mirror the change."
+
+      DEFVAL { down }
+     ::= { prvtRsvpProductEntry 56 }
+
+  prvtRsvpProductFrrFacOperStatus OBJECT-TYPE
+      SYNTAX      PrvtRsvpOperStatus
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The current operational status for FRR Facility support.
+         When this is UP backup LSPs will be put in place, when this
+         is down backup LSPs will not be put in place and there will
+         be no LSPs that have backup LSPs."
+     ::= { prvtRsvpProductEntry 57 }
+
+  prvtRsvpProductIpv6AdminStatus OBJECT-TYPE
+      SYNTAX      PrvtRsvpAdminStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+        "Specifies whether the local node supports IPv6 LSPs.
+
+         Setting this to UP means that this node supports IPv6 LSPs
+         being set up to, from and through this node.
+
+         Setting this to DOWN means that IPv6 LSPs are NOT supported by
+         this node.  Existing IPv6 LSPs for which this node is the
+         ingress, egress or transit are torn down.
+
+         This field can be modified while RSVP is oper_status UP or
+         DOWN.
+
+         The value of this field MUST match the value of the
+         dcMplsTeMibRsvpIpv6AdminStatus field in the
+         prvtMplsTeMibEntityTable."
+
+      DEFVAL { down }
+     ::= { prvtRsvpProductEntry 58 }
+
+  prvtRsvpProductIpv6OperStatus OBJECT-TYPE
+      SYNTAX      PrvtRsvpOperStatus
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current operational status for IPv6 support.  When
+         this is UP IPv6 LSPs can be set up to from or through this
+         node.  When this is down there will be no active IPv6 LSPs."
+     ::= { prvtRsvpProductEntry 59 }
+
+  prvtRsvpProductAPIIpv6Address OBJECT-TYPE
+      SYNTAX      InetAddressIPv6
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "Management assigned IPv6 address used to identify the
+         (internal) LRAPI interface between RSVP and TE-MIB
+         components.
+
+         The configured API IPv6 address MUST not be a real address
+         in the network.  It is recommended that this is set to a
+         non-zero reserved address value.  This MUST be an address
+         with global scope.
+
+         If multi-stack support is set to PHOP, this address must
+         be unique for each RSVP stack in the node.
+
+         The same address(es) can be used on all nodes in the
+         network."
+     ::= { prvtRsvpProductEntry 60 }
+
+-- Diagnostics table
+-- This table is used to control diagnostic requests and responses.
+
+  prvtRsvpDiagnosticTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF PrvtRsvpDiagnosticEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The table of sessions that are being diagnosed."
+     ::= { prvtRsvpObjects 2 }
+
+  prvtRsvpDiagnosticEntry OBJECT-TYPE
+      SYNTAX      PrvtRsvpDiagnosticEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Each entry represents a session that is being diagnosed."
+      INDEX { prvtRsvpDiagProductIndex,
+              prvtRsvpDiagRequestIndex }
+     ::= { prvtRsvpDiagnosticTable 1 }
+
+  PrvtRsvpDiagnosticEntry ::= SEQUENCE {
+          prvtRsvpDiagProductIndex               PrvtRsvpIndex,
+          prvtRsvpDiagRequestIndex               PrvtRsvpDiagReqIndex,
+          prvtRsvpDiagReqsInProgress             Unsigned32,
+          prvtRsvpDiagSessionEndPoint            IpAddress,
+          prvtRsvpDiagSessionTunnelId            Unsigned32,
+          prvtRsvpDiagSessionExtTunnelId         Unsigned32,
+          prvtRsvpDiagLastHop                    IpAddress,
+          prvtRsvpDiagSender                     IpAddress,
+          prvtRsvpDiagMaxHops                    Integer32,
+          prvtRsvpDiagHopByHopReply              TruthValue
+          -- prvtRsvpDiagRowStatus                  RowStatus
+      }
+
+  prvtRsvpDiagProductIndex OBJECT-TYPE
+      SYNTAX      PrvtRsvpIndex
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The index of the PRVT-RSVP product that is handling this query."
+     ::= { prvtRsvpDiagnosticEntry 1 }
+
+  prvtRsvpDiagRequestIndex OBJECT-TYPE
+      SYNTAX      PrvtRsvpDiagReqIndex
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The index of this prvtRsvpDiagnosticEntry.  This corresponds to a
+           particular session being diagnosed and is an arbitrary value,
+           defined on row creation."
+     ::= { prvtRsvpDiagnosticEntry 2 }
+
+  prvtRsvpDiagReqsInProgress OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The number of outstanding diagnostic requests relating to this
+           session."
+     ::= { prvtRsvpDiagnosticEntry 3 }
+
+  prvtRsvpDiagSessionEndPoint OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The IP address of the tunnel end point, from the LSP_TUNNEL_IPv4
+           session object."
+     ::= { prvtRsvpDiagnosticEntry 4 }
+
+  prvtRsvpDiagSessionTunnelId OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The tunnel ID, from the LSP_TUNNEL_IPv4 session object."
+     ::= { prvtRsvpDiagnosticEntry 5 }
+
+  prvtRsvpDiagSessionExtTunnelId OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The extended tunnel ID, from the LSP_TUNNEL_IPv4 session object."
+     ::= { prvtRsvpDiagnosticEntry 6 }
+
+  prvtRsvpDiagLastHop OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The IP address of the last hop to be queried. This is the address
+           to which the DREQ message is first sent."
+     ::= { prvtRsvpDiagnosticEntry 7 }
+
+  prvtRsvpDiagSender OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The IP address of the sender for the specified session."
+     ::= { prvtRsvpDiagnosticEntry 8 }
+
+  prvtRsvpDiagMaxHops OBJECT-TYPE
+      SYNTAX      Integer32 (0..255)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The maximum number of hops to diagnose."
+     ::= { prvtRsvpDiagnosticEntry 9 }
+
+  prvtRsvpDiagHopByHopReply OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "A flag to indicate that DREPs should be returned hop-by-
+          hop using the reverse of the path taken by the DREQ."
+     ::= { prvtRsvpDiagnosticEntry 10 }
+
+  -- prvtRsvpDiagRowStatus OBJECT-TYPE
+  --     SYNTAX      RowStatus
+  --     MAX-ACCESS  read-only
+  --     STATUS      current
+  --     DESCRIPTION
+  --      "Used to create or delete a PRVT-RSVP Diagnostic Table entry."
+  --    ::= { prvtRsvpDiagnosticEntry 11 }
+
+
+-- Diagnostic node table
+-- This table is used to present diagnostic information about nodes in a session.
+
+  prvtRsvpDiagNodeTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF PrvtRsvpDiagNodeEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The table of nodes within a session that is being diagnosed.
+
+           External management can extract information
+           from this table, but cannot modify information in it."
+
+     ::= { prvtRsvpObjects 3 }
+
+  prvtRsvpDiagNodeEntry OBJECT-TYPE
+      SYNTAX      PrvtRsvpDiagNodeEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Each entry represents a node within a session that is being diagnosed."
+      INDEX { prvtRsvpDiagNodeProductIndex,
+              prvtRsvpDiagNodeRequestIndex,
+              prvtRsvpDiagNodeIndex }
+     ::= { prvtRsvpDiagNodeTable 1 }
+
+  PrvtRsvpDiagNodeEntry ::= SEQUENCE {
+          prvtRsvpDiagNodeProductIndex           PrvtRsvpIndex,
+          prvtRsvpDiagNodeRequestIndex           PrvtRsvpDiagReqIndex,
+          prvtRsvpDiagNodeIndex                  PrvtRsvpDiagNodeIndexType,
+          prvtRsvpDiagNodeType                   PrvtRsvpDiagNodeTypeVal,
+          -- Below is the information that is returned in a DIAG_RESPONSE
+          prvtRsvpDiagNodeDreqArrivalTime        Unsigned32,
+          prvtRsvpDiagNodeIncomingIfAddr         IpAddress,
+          prvtRsvpDiagNodeOutgoingIfAddr         IpAddress,
+          prvtRsvpDiagNodePrevHopAddr            IpAddress,
+          prvtRsvpDiagNodeDTTL                   Integer32,
+          prvtRsvpDiagNodeMFlag                  TruthValue,
+          prvtRsvpDiagNodeRErr                   Integer32,
+          prvtRsvpDiagNodeKValue                 Integer32,
+          prvtRsvpDiagNodeTimerValue             Integer32,
+          -- Below are the objects that can be appended to a DIAG_RESPONSE
+          prvtRsvpDiagRsvpHopAddr                IpAddress,
+          prvtRsvpDiagRsvpHopLIH                 Unsigned32,
+          prvtRsvpDiagSenderTpltAddress          IpAddress,
+          prvtRsvpDiagSenderTpltLSPId            Integer32,
+          -- Info from SENDER_TSPEC and ADSPEC is covered by FLOWSPEC
+          prvtRsvpDiagFlowSpecCLBktRate          Unsigned32,
+          prvtRsvpDiagFlowSpecCLBktDep           Unsigned32,
+          prvtRsvpDiagFlowSpecCLPkDataRate       Unsigned32,
+          prvtRsvpDiagFlowSpecCLMinPolUnit       Unsigned32,
+          prvtRsvpDiagFlowSpecCLMaxPktSize       Unsigned32,
+          prvtRsvpDiagFlowSpecGQBktRate          Unsigned32,
+          prvtRsvpDiagFlowSpecGQBktDep           Unsigned32,
+          prvtRsvpDiagFlowSpecGQPkDataRate       Unsigned32,
+          prvtRsvpDiagFlowSpecGQMinPolUnit       Unsigned32,
+          prvtRsvpDiagFlowSpecGQMaxPktSize       Unsigned32,
+          prvtRsvpDiagFlowSpecGQRate             Unsigned32,
+          prvtRsvpDiagFlowSpecGQSlack            Unsigned32,
+          prvtRsvpDiagFlowSpecCoSCoS             Integer32,
+          prvtRsvpDiagFlowSpecCoSMTU             Integer32,
+          prvtRsvpDiagFilterSpecAddress          IpAddress,
+          prvtRsvpDiagFilterSpecLSPId            Integer32,
+          prvtRsvpDiagConfirmRcvAddr             IpAddress,
+          prvtRsvpDiagStyle                      Unsigned32
+          -- The SCOPE object is omitted
+      }
+
+  prvtRsvpDiagNodeProductIndex OBJECT-TYPE
+      SYNTAX      PrvtRsvpIndex
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The index of the PRVT-RSVP product that is handling this query."
+     ::= { prvtRsvpDiagNodeEntry 1 }
+
+  prvtRsvpDiagNodeRequestIndex OBJECT-TYPE
+      SYNTAX      PrvtRsvpDiagReqIndex
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The index of the corresponding request in prvtRsvpDiagnosticTable."
+     ::= { prvtRsvpDiagNodeEntry 2 }
+
+  prvtRsvpDiagNodeIndex OBJECT-TYPE
+      SYNTAX      PrvtRsvpDiagNodeIndexType
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The index of this prvtRsvpDiagNodeEntry. This is equivalent to the
+           hop number, with 1 being the ingress."
+     ::= { prvtRsvpDiagNodeEntry 3 }
+
+  prvtRsvpDiagNodeType OBJECT-TYPE
+      SYNTAX      PrvtRsvpDiagNodeTypeVal
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The type of the node: ingress, transit, egress or missing. Missing
+           indicates that no diagnostic response has been received for this
+           node, and this entry may in fact represent more than one node."
+     ::= { prvtRsvpDiagNodeEntry 4 }
+
+  prvtRsvpDiagNodeDreqArrivalTime OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The arrival time of the DREQ at the node, specified as a 32-bit
+           NTP timestamp."
+     ::= { prvtRsvpDiagNodeEntry 5 }
+
+  prvtRsvpDiagNodeIncomingIfAddr OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The IP address of the interface on which message from the sender
+           are expected to arrive at this node, or 0 if unknown."
+     ::= { prvtRsvpDiagNodeEntry 6 }
+
+  prvtRsvpDiagNodeOutgoingIfAddr OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The IP address of the interface through which the DREQ arrived
+           and to which messages flow from the given sender for the
+           specified session address, or 0 if unknown."
+     ::= { prvtRsvpDiagNodeEntry 7 }
+
+  prvtRsvpDiagNodePrevHopAddr OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The IP address from which this node receives RSVP PATH messages
+           for this source, or 0 if unknown. This is also the address to
+           which the DREQ was forwarded."
+     ::= { prvtRsvpDiagNodeEntry 8 }
+
+  prvtRsvpDiagNodeDTTL OBJECT-TYPE
+      SYNTAX      Integer32 (0..255)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The number of IP hops traversed by the DREQ between the downstream
+           RSVP node and this node."
+     ::= { prvtRsvpDiagNodeEntry 9 }
+
+  prvtRsvpDiagNodeMFlag OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "A flag that indicates whether the reservation described by the
+           response objects is merged with reservations from other downstream
+           interfaces before being forwarded upstream."
+     ::= { prvtRsvpDiagNodeEntry 10 }
+
+  prvtRsvpDiagNodeRErr OBJECT-TYPE
+      SYNTAX      Integer32 (0..7)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The error conditions at this node.
+           Bit 3 indicates ROUTE object too big;
+           Bit 2 indicates packet too big;
+           Bit 1 indicates no PATH state.
+           Bit 1 is the least significant bit."
+     ::= { prvtRsvpDiagNodeEntry 11 }
+
+  prvtRsvpDiagNodeKValue OBJECT-TYPE
+      SYNTAX      Integer32 (0..15)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The refresh timer multiple."
+     ::= { prvtRsvpDiagNodeEntry 12 }
+
+  prvtRsvpDiagNodeTimerValue OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      UNITS       "seconds"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The local refresh timer value in seconds."
+     ::= { prvtRsvpDiagNodeEntry 13 }
+
+  prvtRsvpDiagRsvpHopAddr OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The hop address from the session's RSVP_HOP object."
+     ::= { prvtRsvpDiagNodeEntry 14 }
+
+  prvtRsvpDiagRsvpHopLIH OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The LIH from the session's RSVP_HOP object."
+     ::= { prvtRsvpDiagNodeEntry 15 }
+
+  prvtRsvpDiagSenderTpltAddress OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The address from the session's SENDER_TEMPLATE object."
+     ::= { prvtRsvpDiagNodeEntry 16 }
+
+  prvtRsvpDiagSenderTpltLSPId OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The LSP ID from the session's SENDER_TEMPLATE object."
+     ::= { prvtRsvpDiagNodeEntry 17 }
+
+  prvtRsvpDiagFlowSpecCLBktRate OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Int-serv controlled load token bucket rate in bytes per second,
+           from the session's FLOWSPEC object.
+           This value is rounded to the nearest integer."
+     ::= { prvtRsvpDiagNodeEntry 18 }
+
+  prvtRsvpDiagFlowSpecCLBktDep OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Int-serv controlled load token bucket depth in bytes,
+           from the session's FLOWSPEC object.
+           This value is rounded to the nearest integer."
+     ::= { prvtRsvpDiagNodeEntry 19 }
+
+  prvtRsvpDiagFlowSpecCLPkDataRate OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Int-serv controlled load peak data rate in bytes per second,
+           from the session's FLOWSPEC object.
+           This value is rounded to the nearest integer."
+     ::= { prvtRsvpDiagNodeEntry 20 }
+
+  prvtRsvpDiagFlowSpecCLMinPolUnit OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Int-serv controlled load minimum policed unit
+           from the session's FLOWSPEC object."
+     ::= { prvtRsvpDiagNodeEntry 21 }
+
+  prvtRsvpDiagFlowSpecCLMaxPktSize OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Int-serv controlled load maximum packet size
+           from the session's FLOWSPEC object."
+     ::= { prvtRsvpDiagNodeEntry 22 }
+
+  prvtRsvpDiagFlowSpecGQBktRate OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Int-serv guaranteed QoS token bucket rate in bytes per second,
+           from the session's FLOWSPEC object.
+           This value is rounded to the nearest integer."
+     ::= { prvtRsvpDiagNodeEntry 23 }
+
+  prvtRsvpDiagFlowSpecGQBktDep OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Int-serv guaranteed QoS token bucket depth in bytes,
+           from the session's FLOWSPEC object.
+           This value is rounded to the nearest integer."
+     ::= { prvtRsvpDiagNodeEntry 24 }
+
+  prvtRsvpDiagFlowSpecGQPkDataRate OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Int-serv guaranteed QoS peak data rate in bytes per second,
+           from the session's FLOWSPEC object.
+           This value is rounded to the nearest integer."
+     ::= { prvtRsvpDiagNodeEntry 25 }
+
+  prvtRsvpDiagFlowSpecGQMinPolUnit OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Int-serv guaranteed QoS minimum policed unit
+           from the session's FLOWSPEC object."
+     ::= { prvtRsvpDiagNodeEntry 26 }
+
+  prvtRsvpDiagFlowSpecGQMaxPktSize OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Int-serv guaranteed QoS maximum packet size
+           from the session's FLOWSPEC object."
+     ::= { prvtRsvpDiagNodeEntry 27 }
+
+  prvtRsvpDiagFlowSpecGQRate OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Int-serv guaranteed QoS rate in bytes per second,
+           from the session's FLOWSPEC object.
+           This value is rounded to the nearest integer."
+     ::= { prvtRsvpDiagNodeEntry 28 }
+
+  prvtRsvpDiagFlowSpecGQSlack OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Int-serv guaranteed QoS slack in microseconds,
+           from the session's FLOWSPEC object."
+     ::= { prvtRsvpDiagNodeEntry 29 }
+
+  prvtRsvpDiagFlowSpecCoSCoS OBJECT-TYPE
+      SYNTAX      Integer32 (0..255)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "CoS class of service from the session's FLOWSPEC object."
+     ::= { prvtRsvpDiagNodeEntry 30 }
+
+  prvtRsvpDiagFlowSpecCoSMTU OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "CoS maximum packet size from the session's FLOWSPEC object."
+     ::= { prvtRsvpDiagNodeEntry 31 }
+
+  prvtRsvpDiagFilterSpecAddress OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The address from the session's FILTER_SPEC object."
+     ::= { prvtRsvpDiagNodeEntry 32 }
+
+  prvtRsvpDiagFilterSpecLSPId OBJECT-TYPE
+      SYNTAX      Integer32 (0..65535)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The LSP ID from the session's FILTER_SPEC object."
+     ::= { prvtRsvpDiagNodeEntry 33 }
+
+  prvtRsvpDiagConfirmRcvAddr OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The address from the session's CONFIRM object."
+     ::= { prvtRsvpDiagNodeEntry 34 }
+
+  prvtRsvpDiagStyle OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The style word from the session's STYLE object."
+     ::= { prvtRsvpDiagNodeEntry 35 }
+
+-- Module compliance.
+
+-- conformance
+prvtRsvpConformance  OBJECT IDENTIFIER ::= {prvtRsvp 2 }
+
+prvtRsvpCompliances OBJECT IDENTIFIER ::= { prvtRsvpConformance 1 }
+prvtRsvpGroups      OBJECT IDENTIFIER ::= { prvtRsvpConformance 2 }
+
+prvtRsvpCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for the PRVT-RSVP product MIB."
+    MODULE
+
+    GROUP prvtRsvpProductGroup
+    DESCRIPTION
+        "Product Table Objects."
+
+    GROUP prvtRsvpDiagGroup
+    DESCRIPTION
+        "Diagnostic Table Objects."
+
+    GROUP prvtRsvpDiagNodeGroup
+    DESCRIPTION
+        "Diag Node Table Objects."
+
+    ::= { prvtRsvpCompliances 1 }
+
+prvtRsvpProductGroup OBJECT-GROUP
+   OBJECTS {
+      prvtRsvpProductASNumber,
+      prvtRsvpProductSenderTTL,
+      prvtRsvpProductMinTimerPeriod,
+      prvtRsvpProductAPIIfIndex,
+      prvtRsvpProductAPIAddress,
+      prvtRsvpProductAPIRefreshInterval,
+      prvtRsvpProductLocalRepairDelay,
+      prvtRsvpProductRefreshInterval,
+      prvtRsvpProductRefreshMultiple,
+      prvtRsvpProductRfrshSlewDenom,
+      prvtRsvpProductRfrshSlewNumerator,
+      prvtRsvpProductBlockadeMultiple,
+      prvtRsvpProductSocketBufPoolSize,
+      prvtRsvpProductSwitchBufPoolSize,
+      prvtRsvpProductTeMibBufPoolSize,
+      prvtRsvpProductRoutingBufPoolSize,
+      prvtRsvpProductLSPSetupPriority,
+      prvtRsvpProductLSPHoldingPriority,
+      prvtRsvpProductAdminStatus,
+      prvtRsvpProductOperStatus,
+      prvtRsvpProductRowStatus,
+      prvtRsvpProductLsrIndex,
+      prvtRsvpProductTeMibIndex,
+      prvtRsvpProductMultiStackSupport,
+      prvtRsvpProductUseHopByHop,
+      prvtRsvpProductUseNotify,
+      prvtRsvpProductNotifyRRDecay,
+      prvtRsvpProductNotifyRRInterval,
+      prvtRsvpProductNotifyRRLimit,
+      prvtRsvpProductAllowIPEncap,
+      prvtRsvpProductProtocolExtensions,
+      prvtRsvpProductPSRFlags,
+      prvtRsvpProductInitPathRRDecay,
+      prvtRsvpProductInitPathRRInterval,
+      prvtRsvpProductInitPathRRLimit,
+      prvtRsvpProductEnableUni,
+      prvtRsvpProductRestartCapable,
+      prvtRsvpProductRestartTime,
+      prvtRsvpProductRecoveryTime,
+      prvtRsvpProductMinPeerRestart,
+      prvtRsvpProductGracefulDelTimeout,
+      prvtRsvpProductEgressDelBehavior,
+      prvtRsvpProductEnabUniConnSplicing,
+      prvtRsvpProductFastRerouteCaps,
+      prvtRsvpProductFastRroutBkpRtryInt,
+      prvtRsvpProductErrorActionFlags,
+      prvtRsvpProductEnableNni,
+      prvtRsvpProductBehaviorFlags,
+      prvtRsvpProductLabelSetStyle,
+      prvtRsvpProductLabelSetOperStatus,
+      prvtRsvpProductLabelSetTrapEnable,
+      prvtRsvpProductLabelSetChngAct,
+      prvtRsvpProductExtPrtAdminStatus,
+      prvtRsvpProductUniIncSonetProfile,
+      prvtRsvpProductFrrFacAdminStatus,
+      prvtRsvpProductFrrFacOperStatus,
+      prvtRsvpProductIpv6AdminStatus,
+      prvtRsvpProductIpv6OperStatus,
+      prvtRsvpProductAPIIpv6Address
+    }
+    STATUS  current
+    DESCRIPTION
+           "Product Table Objects."
+    ::= { prvtRsvpGroups 2 }
+
+prvtRsvpDiagGroup OBJECT-GROUP
+   OBJECTS {
+      prvtRsvpDiagReqsInProgress,
+      prvtRsvpDiagSessionEndPoint,
+      prvtRsvpDiagSessionTunnelId,
+      prvtRsvpDiagSessionExtTunnelId,
+      prvtRsvpDiagLastHop,
+      prvtRsvpDiagSender,
+      prvtRsvpDiagMaxHops,
+      prvtRsvpDiagHopByHopReply
+      -- prvtRsvpDiagRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+           "Diagnostic Table Objects."
+    ::= { prvtRsvpGroups 3 }
+
+prvtRsvpDiagNodeGroup OBJECT-GROUP
+   OBJECTS {
+      prvtRsvpDiagNodeType,
+      prvtRsvpDiagNodeDreqArrivalTime,
+      prvtRsvpDiagNodeIncomingIfAddr,
+      prvtRsvpDiagNodeOutgoingIfAddr,
+      prvtRsvpDiagNodePrevHopAddr,
+      prvtRsvpDiagNodeDTTL,
+      prvtRsvpDiagNodeMFlag,
+      prvtRsvpDiagNodeRErr,
+      prvtRsvpDiagNodeKValue,
+      prvtRsvpDiagNodeTimerValue,
+      prvtRsvpDiagRsvpHopAddr,
+      prvtRsvpDiagRsvpHopLIH,
+      prvtRsvpDiagSenderTpltLSPId,
+      prvtRsvpDiagSenderTpltAddress,
+      prvtRsvpDiagFlowSpecCLBktRate,
+      prvtRsvpDiagFlowSpecCLBktDep,
+      prvtRsvpDiagFlowSpecCLPkDataRate,
+      prvtRsvpDiagFlowSpecCLMinPolUnit,
+      prvtRsvpDiagFlowSpecCLMaxPktSize,
+      prvtRsvpDiagFlowSpecGQBktRate,
+      prvtRsvpDiagFlowSpecGQBktDep,
+      prvtRsvpDiagFlowSpecGQPkDataRate,
+      prvtRsvpDiagFlowSpecGQMinPolUnit,
+      prvtRsvpDiagFlowSpecGQMaxPktSize,
+      prvtRsvpDiagFlowSpecGQRate,
+      prvtRsvpDiagFlowSpecGQSlack,
+      prvtRsvpDiagFlowSpecCoSCoS,
+      prvtRsvpDiagFlowSpecCoSMTU,
+      prvtRsvpDiagFilterSpecAddress,
+      prvtRsvpDiagFilterSpecLSPId,
+      prvtRsvpDiagConfirmRcvAddr,
+      prvtRsvpDiagStyle
+    }
+    STATUS  current
+    DESCRIPTION
+           "Diag Node Table Objects."
+    ::= { prvtRsvpGroups 4 }
+
+END
+

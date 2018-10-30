@@ -1,60 +1,81 @@
 <?php
 
-echo("RFC1628 ");
+echo "RFC1628 ";
 
-$oids = trim(snmp_walk($device, ".1.3.6.1.2.1.33.1.4.3.0", "-OsqnU"));
-d_echo($oids."\n");
-list($unused,$numPhase) = explode(' ', $oids);
-for ($i = 1; $i <= $numPhase; $i++) {
-    $current_oid   = ".1.3.6.1.2.1.33.1.4.4.1.4.$i";
-    $descr      = "Output";
-    if ($numPhase > 1) {
-        $descr .= " Phase $i";
+$output_power = snmpwalk_group($device, 'upsOutputPower', 'UPS-MIB');
+foreach ($output_power as $index => $data) {
+    $descr = 'Output';
+    if (count($output_power) > 1) {
+        $descr .= " Phase $index";
     }
-    $current    = snmp_get($device, $current_oid, "-Oqv");
-    $type       = "rfc1628";
-    $precision  = 1;
-    $index      = 300+$i;
 
-    if (is_numeric($current)) {
-        discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
-    }
+    discover_sensor(
+        $valid['sensor'],
+        'power',
+        $device,
+        ".1.3.6.1.2.1.33.1.4.4.1.4.$index",
+        300+$index,
+        "rfc1628",
+        $descr,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $data['upsOutputPower']
+    );
 }
 
-$oids = trim(snmp_walk($device, ".1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
-d_echo($oids."\n");
-list($unused,$numPhase) = explode(' ', $oids);
-for ($i = 1; $i <= $numPhase; $i++) {
-    $current_oid   = ".1.3.6.1.2.1.33.1.3.3.1.5.$i";
-    $descr      = "Input";
-    if ($numPhase > 1) {
-        $descr .= " Phase $i";
-    }
-    $current    = snmp_get($device, $current_oid, "-Oqv");
-    $type       = "rfc1628";
-    $precision  = 1;
-    $index      = 100+$i;
 
-    if (is_numeric($current)) {
-        discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+$input_power = snmpwalk_group($device, 'upsInputTruePower', 'UPS-MIB');
+foreach ($input_power as $index => $data) {
+    $descr = 'Input';
+    if (count($input_power) > 1) {
+        $descr .= " Phase $index";
     }
+
+    discover_sensor(
+        $valid['sensor'],
+        'power',
+        $device,
+        ".1.3.6.1.2.1.33.1.3.3.1.5.$index",
+        100+$index,
+        "rfc1628",
+        $descr,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $data['upsInputTruePower']
+    );
 }
 
-$oids = trim(snmp_walk($device, ".1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
-d_echo($oids."\n");
-list($unused,$numPhase) = explode(' ', $oids);
-for ($i = 1; $i <= $numPhase; $i++) {
-    $current_oid   = ".1.3.6.1.2.1.33.1.5.3.1.4.$i";
-    $descr      = "Bypass";
-    if ($numPhase > 1) {
-        $descr .= " Phase $i";
+$bypass_power = snmpwalk_group($device, 'upsBypassPower', 'UPS-MIB');
+foreach ($bypass_power as $index => $data) {
+    $descr = 'Bypass';
+    if (count($bypass_power) > 1) {
+        $descr .= " Phase $index";
     }
-    $current    = snmp_get($device, $current_oid, "-Oqv");
-    $type       = "rfc1628";
-    $precision  = 1;
-    $index      = 200+$i;
 
-    if (is_numeric($current)) {
-        discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
-    }
+    discover_sensor(
+        $valid['sensor'],
+        'power',
+        $device,
+        ".1.3.6.1.2.1.33.1.5.3.1.4.$index",
+        200+$index,
+        "rfc1628",
+        $descr,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $data['upsBypassPower']
+    );
 }
+
+unset($output_power, $input_power, $bypass_power);

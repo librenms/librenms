@@ -25,28 +25,78 @@
 
 namespace LibreNMS\Tests;
 
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Yaml\Exception\ParseException;
+use JsonSchema\Constraints\Constraint;
+use LibreNMS\Config;
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Yaml;
 
-class YamlTest extends \PHPUnit_Framework_TestCase
+class YamlTest extends TestCase
 {
-
-    public function testYaml()
+    /**
+     * @group os
+     */
+    public function testOSDefinitionSchema()
     {
-        global $config;
+        $this->validateYamlFilesAgainstSchema('/includes/definitions', '/misc/os_schema.json');
+    }
 
-        $pattern = $config['install_dir'] . '/includes/definitions/*.yaml';
-        foreach (glob($pattern) as $file) {
+    /**
+     * @group os
+     */
+    public function testDiscoveryDefinitionSchema()
+    {
+        $this->validateYamlFilesAgainstSchema('/includes/definitions/discovery', '/misc/discovery_schema.json');
+    }
+
+    private function validateYamlFilesAgainstSchema($dir, $schema_file)
+    {
+        $schema = (object)['$ref' => 'file://' . Config::get('install_dir') . $schema_file];
+
+        foreach ($this->listFiles($dir . '/*.yaml') as $info) {
+            list($file, $path) = $info;
+
             try {
-                $data = Yaml::parse(file_get_contents($file));
+                $data = Yaml::parse(file_get_contents($path));
             } catch (ParseException $e) {
-                throw new PHPUnitException("$file Could not be parsed");
+                throw new PHPUnitException("$path Could not be parsed", null, $e);
             }
 
-            $this->assertArrayHasKey('os', $data, $file);
-            $this->assertArrayHasKey('type', $data, $file);
-            $this->assertArrayHasKey('text', $data, $file);
+            $validator = new \JsonSchema\Validator;
+            $validator->validate(
+                $data,
+                $schema,
+                Constraint::CHECK_MODE_TYPE_CAST  // | Constraint::CHECK_MODE_VALIDATE_SCHEMA
+            );
+
+            $errors = collect($validator->getErrors())
+                ->reduce(function ($out, $error) {
+                    return sprintf("%s[%s] %s\n", $out, $error['property'], $error['message']);
+                }, '');
+
+            $this->assertTrue($validator->isValid(), "$file does not validate. Violations:\n$errors");
         }
+    }
+
+    public function listOsDefinitionFiles()
+    {
+        return $this->listFiles('/includes/definitions/*.yaml');
+    }
+
+    public function listDiscoveryFiles()
+    {
+        return $this->listFiles('/includes/definitions/discovery/*.yaml');
+    }
+
+    private function listFiles($pattern)
+    {
+        $pattern = Config::get('install_dir') . $pattern;
+
+        return collect(glob($pattern))
+            ->reduce(function ($array, $file) {
+                $name = basename($file);
+                $array[$name] = [$name, $file];
+                return $array;
+            }, []);
     }
 }

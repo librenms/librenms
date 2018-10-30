@@ -5,13 +5,13 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'drbd';
 $app_instance = $app['app_instance'];
 $app_id = $app['app_id'];
-foreach (explode('|', $agent_data['app'][$name][$app_instance]) as $part) {
+$drbd_data = $agent_data['app'][$name][$app_instance];
+foreach (explode('|', $drbd_data) as $part) {
     list($stat, $val) = explode('=', $part);
     if (!empty($stat)) {
         $drbd[$stat] = $val;
     }
 }
-update_application($app, $agent_data['app'][$name][$app_instance]);
 
 $rrd_name = array('app', $name, $app_instance);
 $rrd_def = RrdDefinition::make()
@@ -44,5 +44,6 @@ $fields = array(
 
 $tags = array('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
+update_application($app, $drbd_data, $fields);
 
-unset($drbd);
+unset($drbd, $drbd_data);

@@ -1,0 +1,1113 @@
+ARRIS-C3-MAC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TimeInterval, RowStatus, TruthValue, DisplayString
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB      -- RFC2233
+    TenthdBmV
+        FROM DOCS-IF-MIB  -- RFC2670
+    TenthdB
+        FROM DOCS-IF-MIB  -- RFC2670
+    cmtsC3
+        FROM ARRIS-MIB;
+
+    cmtsC3MACMIB  MODULE-IDENTITY
+        LAST-UPDATED "200412030000Z" -- 3nd Dec 2004
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages the MAC software on the Cadant C3 CMTS."
+        REVISION "200411210000Z"
+        DESCRIPTION
+            "Changes to support fully programmable IF frequency.
+             Added support for downstream wireless mode.
+             Updated some mib descriptions for clarity and typos.
+             Added mixed mode to DocsisMacType definition which defines a
+             docsis downstream and euro-docsis upstream configuration that is
+             used by some customers in lieu of annex C mode which the CMTS does
+             not support in hardware.
+             Added support for downstream wireless mode."
+        REVISION "200411260000Z"
+        DESCRIPTION
+            "Added dcxMACUpChannelinitialRangingDelay."
+        REVISION "200412030000Z"
+        DESCRIPTION
+            "Added dcxMACUccMaxFailedAttempts."
+        ::= { cmtsC3 6 }
+
+    DocsisMacType ::= TEXTUAL-CONVENTION 
+        STATUS			current 
+        DESCRIPTION		"Indicates the DOCSIS Channel Type." 
+        SYNTAX			INTEGER { 
+                                docsis (1), 
+                                euroDocsis (2), 
+                                mixed (3), 
+                                custom(4)
+        }
+
+    dcxMACObjects OBJECT IDENTIFIER ::= { cmtsC3MACMIB 1 }
+
+    dcxMACCmtsMacTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DcxMACCmtsMacEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Additional columns for docsIfCmtsMacTable.
+                An entry in this table exists for each ifEntry with an 
+                ifType of docsCableMaclayer(127)."
+        ::= { dcxMACObjects 1 }
+
+    dcxMACCmtsMacEntry OBJECT-TYPE
+        SYNTAX DcxMACCmtsMacEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION 
+            "dcxMACCmtsMacEntry"
+        INDEX {ifIndex}
+        ::= { dcxMACCmtsMacTable 1 }
+
+    DcxMACCmtsMacEntry ::= SEQUENCE {
+        dcxMACCmtsMacMode DocsisMacType,
+        dcxMACCableAdvanceType INTEGER,
+        dcxMACPlantLength Unsigned32,
+        dcxMACFlapAgingTime Unsigned32,
+        dcxMACFlapInsertTime Unsigned32,
+        dcxMACFlapMissThresh Unsigned32,
+        dcxMACFlapListSize Unsigned32,
+        dcxMACCmOfflineAgingTime Unsigned32,
+        dcxMACUccMaxFailedAttempts Unsigned32
+        }
+
+    dcxMACCmtsMacMode OBJECT-TYPE
+        SYNTAX      DocsisMacType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates the mode in which the MAC is operating. A read to this
+            value may return any of the modes defined by DocsisMacType. Only
+            the modes docsis, euroDocsis and mixed may be written.
+            When set to docsis or euroDocsis, all downstream and upstream
+            channels in this MAC domain will be configured in DOCSIS or
+            EuroDOCSIS mode respectively. When set to mixed, the downstream
+            channels will be configured in DOCSIS and the upstream channels
+            will be running in EuroDOCSIS mode.
+            The value custom will be returned in a read operation if any of
+            the underlying channels has been reconfigured in such a way that
+            the MAC can not be described a docsis, euroDocsis or mixed."
+        ::= { dcxMACCmtsMacEntry 1 }
+        
+
+    dcxMACCableAdvanceType OBJECT-TYPE
+        SYNTAX      INTEGER { static(0), dynamic(1) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Cable Map Advance Type - 0 for Static, 1 for Dynamic."
+        ::= { dcxMACCmtsMacEntry 2 }
+        
+        
+    dcxMACPlantLength OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..161)
+        UNITS       "kilometers"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Cable Plant Length (1-way) in kilometers."
+        ::= { dcxMACCmtsMacEntry 3 }
+        
+        
+    dcxMACFlapAgingTime OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..864000)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Cable Flap List Aging Time in seconds."
+        ::= { dcxMACCmtsMacEntry 4 }
+        
+        
+    dcxMACFlapInsertTime OBJECT-TYPE
+        SYNTAX      Unsigned32 ( 0..86400 )
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Cable Flap List Insertion Time threshold in seconds."
+        ::= { dcxMACCmtsMacEntry 5 }
+        
+        
+    dcxMACFlapMissThresh OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..12)
+        UNITS       "misses"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Cable Flap List Miss Threshold in misses."
+        ::= { dcxMACCmtsMacEntry 6 }
+        
+        
+    dcxMACFlapListSize OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..6000)
+        UNITS       "entries"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Cable Flap List Maximum Number of Entries."
+        ::= { dcxMACCmtsMacEntry 8 }
+
+        
+    dcxMACCmOfflineAgingTime OBJECT-TYPE
+        SYNTAX      Unsigned32 (3600..864000)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Cable modem offline aging time in seconds. Minimum value
+            is 1 hour. Maximum time before aging a modem is 10 days.
+            Default value is 24 hours."
+        DEFVAL { 86400 }
+        ::= { dcxMACCmtsMacEntry 9 }
+
+        
+    dcxMACUccMaxFailedAttempts OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Maximum number of consecutive failed channel change attempts that
+            a modem is allowed before the CMTS decides to no longer use the
+            modem for load balancing purposes.
+            If a modem successfully completes a channel change before the
+            maximum number of attempts is reached, the number of consecutive
+            failed attempts for the modem is reset.
+            A value of 0 indicates no limit."
+        DEFVAL { 2 }
+        ::= { dcxMACCmtsMacEntry 10 }
+
+
+    dcxMACDownstreamChannelTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DcxMACDownstreamChannelEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Additional columns for docsIfDownstreamChannelTable.
+                An entry in this table exists for each ifEntry with an 
+                ifType of docsCableDownstream(128)."
+        ::= { dcxMACObjects 2 }
+
+    dcxMACDownstreamChannelEntry OBJECT-TYPE
+        SYNTAX DcxMACDownstreamChannelEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION 
+            "dcxMACDownstreamChannelEntry"
+        INDEX {ifIndex}
+        ::= { dcxMACDownstreamChannelTable 1 }
+
+    DcxMACDownstreamChannelEntry ::= SEQUENCE {
+        dcxMACDownChannelMacMode DocsisMacType,
+        dcxMACDownChannelUpconverter INTEGER,
+        dcxMACDownChannelIfFrequency Integer32,
+        dcxMACDownChannelWirelessMode INTEGER,
+        dcxMACDownChannelSymbolRate Integer32,
+        dcxMACDownChannelAlpha Integer32
+        }
+
+    dcxMACDownChannelMacMode OBJECT-TYPE
+        SYNTAX      DocsisMacType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Configures the downstream to DOCSIS or EuroDOCSIS.
+            When dcxMACDownChannelWirelessMode is disabled, changes to this
+            will impact the downstream annex type, modulation, symbol rate
+            and interleaver. When wireless mode is enabled, only the annex
+            type and interleaver will be changed."
+        ::= { dcxMACDownstreamChannelEntry 1 }
+
+    dcxMACDownChannelUpconverter OBJECT-TYPE
+        SYNTAX      INTEGER { internal(1), external(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Controls whether or not the internal upconverter is used.
+             If set to internal, the downstream IF frequency will operate
+             in read-only mode and will be configured internally by the
+             CMTS based on the downstream channel configuration.
+             If set to external, the IF frequency may be programmed to set the
+             frequency supplied to an external upconverter via the IF output.
+             In this mode, the downstream RF frequency and power will both
+             return 0 when read."
+        ::= { dcxMACDownstreamChannelEntry 2 }
+
+    dcxMACDownChannelIfFrequency OBJECT-TYPE
+        SYNTAX      Integer32 (10000000..60000000)
+        UNITS       "hertz"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The IF frequency output by the modulator for this channel."
+        ::= { dcxMACDownstreamChannelEntry 3 }
+        
+    dcxMACDownChannelWirelessMode OBJECT-TYPE
+        SYNTAX      INTEGER { active(1), inactive(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enabling this mode allows non-standard downstream modulations and
+            symbol rates to be configured which are suitable when using the
+            CMTS in a wireless application. Changes to dcxMACDownChannelMacMode
+            when wireless mode is active will only impact the downstream annex
+            type and interleaver settings. Modulation and symbol rates will
+            only be affected when wireless mode is disabled.
+            Disabling wireless mode will reset any non-standard modulation and
+            symbol rates settings in order to restore a standard DOCSIS or
+            EuroDOCSIS downstream.
+            If a set to active fails, a license may be required to activate the
+            feature."
+        ::= { dcxMACDownstreamChannelEntry 4 }
+
+    dcxMACDownChannelSymbolRate OBJECT-TYPE
+        SYNTAX      Integer32 (1250000..6952000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Sets the downstream symbol rate."
+        ::= { dcxMACDownstreamChannelEntry 5 }
+        
+    dcxMACDownChannelAlpha OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS        "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The percentage of excess bandwidth for the channel."
+        ::= { dcxMACDownstreamChannelEntry 6 }
+
+    dcxMACUpstreamChannelTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DcxMACUpstreamChannelEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Additional columns for docsIfUpstreamChannelTable.
+                An entry in this table exists for each ifEntry with an 
+                ifType of docsCableUpstream(129)."
+        ::= { dcxMACObjects 3 }
+
+    dcxMACUpstreamChannelEntry OBJECT-TYPE
+        SYNTAX DcxMACUpstreamChannelEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION 
+            "dcxMACUpstreamChannelEntry"
+        INDEX {ifIndex}
+        ::= { dcxMACUpstreamChannelTable 1 }
+
+    DcxMACUpstreamChannelEntry ::= SEQUENCE {
+        dcxMACUpChannelMacMode DocsisMacType,
+        dcxMACUpChannelAmpAttenuation TenthdBmV,
+        dcxMACUpChannelIngressCancellation INTEGER,
+        dcxMACUpChannelGroupId Unsigned32,
+        dcxMACUpChannelShortPollInterval TimeInterval,
+        dcxMACUpChannelPeriodicPollInterval TimeInterval,
+        dcxMACUpChannelInputPowerMode INTEGER,
+        dcxMACUpChannelPower TenthdBmV,
+        dcxMACUpChannelPlantLength Unsigned32,
+        dcxMACUpChannelMaxCmMapProcTime Unsigned32,
+        dcxMACUpChannelConcatenation TruthValue,
+        dcxMACUpChannelSpMgtTriggerIndex Unsigned32,
+        dcxMACUpChannelLowPowerOffset TenthdBmV,
+        dcxMACUpChannelHighPowerOffset TenthdBmV,
+        dcxMACUpChannelLogSnrAveTimeconstant Unsigned32,
+        dcxMACUpChannelImpulseMitigation INTEGER,
+        dcxMACUpChannelRngPreambleGuardSymbols Unsigned32,
+        dcxMACUpChannelNrngPreambleGuardSymbols Unsigned32,
+        dcxMACUpChannelExtendedFrequencyErrorDetect INTEGER,
+        dcxMACUpChannelLogC3SnrTimeconstant Unsigned32,
+        dcxMACUpChannelSignalNoise TenthdB,
+        dcxMACUpChannelSafeConfig TruthValue,
+        dcxMACUpChannelInitialRangingDelay Unsigned32
+        }
+
+    dcxMACUpChannelMacMode OBJECT-TYPE
+        SYNTAX      DocsisMacType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates the mode in which this upstream is operating. A read or
+            write to this may consist only of the values docsis or euroDocsis."
+        ::= { dcxMACUpstreamChannelEntry 1 }
+    
+    dcxMACUpChannelAmpAttenuation OBJECT-TYPE
+        SYNTAX      TenthdBmV
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The amplifier attenuation level for this logical 
+            channel."
+        ::= { dcxMACUpstreamChannelEntry 2 }
+    
+    dcxMACUpChannelIngressCancellation OBJECT-TYPE
+        SYNTAX      INTEGER { disabled(1), tdmaOnly(2), scdmaSec(3), scdmaInc1(4), scdmaInc2(5) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Sets the ingress noise cancellation mode for this
+            logical channel. Not all modes may be valid for a
+            given logical channel configuration or hardware."
+        ::= { dcxMACUpstreamChannelEntry 3 }
+
+    dcxMACUpChannelGroupId OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The group ID for this logical channel used to associate it 
+            with other upsteams on the same physical network. The group ID 
+            is an index into the dcxMACUpstreamGroupTable which defines common 
+            parameters for grouped upsteams. Upstreams do not have to be 
+            grouped and there may be more than one group on the same physical 
+            network. Spatially diverse upstreams should not have the same group ID."
+        ::= { dcxMACUpstreamChannelEntry 4 }
+
+    dcxMACUpChannelShortPollInterval OBJECT-TYPE
+        SYNTAX      TimeInterval (1..100)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The short interval for initial unicast maintanance on this logical 
+            channel."
+        ::= { dcxMACUpstreamChannelEntry 5 }
+
+    dcxMACUpChannelPeriodicPollInterval OBJECT-TYPE
+        SYNTAX      TimeInterval (100..10000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The periodic station maintanance interval on this logical channel."
+        ::= { dcxMACUpstreamChannelEntry 6 }
+    
+    dcxMACUpChannelInputPowerMode OBJECT-TYPE
+        SYNTAX      INTEGER { fixed(1), automatic(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The receiver input power mode for this logical channel. In fixed
+            mode the input power to the demodulator will remain fixed across 
+            symbol rate changes. In automatic mode the demodulator may vary the 
+            input power for optimal performance."
+        ::= { dcxMACUpstreamChannelEntry 7 }
+        
+    dcxMACUpChannelPower OBJECT-TYPE
+        SYNTAX      TenthdBmV
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The nominal receiver input  power for this logical channel."
+        ::= { dcxMACUpstreamChannelEntry 8 }
+    
+    dcxMACUpChannelPlantLength OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..320)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "The cable length in km to the most distant CM on this logical 
+                upstream."
+            ::= { dcxMACUpstreamChannelEntry 9 }
+            
+    dcxMACUpChannelMaxCmMapProcTime OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..1000000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The maximum time in microseconds allowed for modems on this logical 
+            channel to process the Upstream Bandwidth Allocation MAP."
+        ::= { dcxMACUpstreamChannelEntry 10 }
+
+    dcxMACUpChannelConcatenation OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables or disables the use of packet concatenation by Cable Modems on 
+            this logical channel."
+        ::= { dcxMACUpstreamChannelEntry 11 }
+    
+    dcxMACUpChannelSpMgtTriggerIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "An index into spectral management trigger table, identical 
+            to dcxMACSpMgtTriggerIndex in that table. All entries with 
+            the same value of dcxMACSpMgtTriggerIndex form a trigger group 
+            all assigned to the same logical upstream channel or group. 
+            Returns 0 if there are no triggers assigned to this logical 
+            channel."
+        ::= { dcxMACUpstreamChannelEntry 12 }
+        
+
+    dcxMACUpChannelLowPowerOffset OBJECT-TYPE
+        SYNTAX      TenthdBmV  (-100..-10)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The maximum power offset of a burst below the nominal
+            input power to the CMTS that will not cause a RNG-RSP
+            with status continue. Valid range is from -10 dBmV to
+            -1 dBmV in 1 dB increments."
+        DEFVAL { -60 }
+        ::= { dcxMACUpstreamChannelEntry 13 }
+
+
+    dcxMACUpChannelHighPowerOffset OBJECT-TYPE
+        SYNTAX      TenthdBmV  (10..100)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The maximum power offset of a burst above the nominal
+            input power to the CMTS that will not cause a RNG-RSP
+            with status continue. Valid range is from +1 dBmV to
+            +10 dBmV in 1 dB increments."
+        DEFVAL { 60 }
+        ::= { dcxMACUpstreamChannelEntry 14 }
+    
+    dcxMACUpChannelLogSnrAveTimeconstant OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..10)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The averaging timeconstant used to calculate the per-logical channel 
+            MIB variable docsIfSigQSignalNoise. The averaging uses a logarithmic
+            scale, so that the actual timeconstant used is 2^X, where X is the
+            value configured for this object. Increasing the value of X increases
+            the degree to which the SNR results are averaged over time, and reduces
+            the sensitivity of the reported channel SNR to local oscillations in
+            signal quality. Averaging can effectively be disabled by setting this
+            object to 0"
+        DEFVAL { 2 }
+        ::= { dcxMACUpstreamChannelEntry 15 }
+    
+    dcxMACUpChannelImpulseMitigation OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables or disables impulse noise mitigation for this 
+            logical channel."
+        ::= { dcxMACUpstreamChannelEntry 16 }
+    
+    dcxMACUpChannelRngPreambleGuardSymbols OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Number of guard symbols before the preamble pilot pattern for 
+            ranging bursts. Guard symbols may help the receiver to mitigate 
+            the effects of ISI and\or help with the detection of bursts with 
+            an early arrival time"
+        ::= { dcxMACUpstreamChannelEntry 17 }
+    
+    dcxMACUpChannelNrngPreambleGuardSymbols OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Number of guard symbols before the preamble pilot pattern for 
+            non-ranging bursts. Guard symbols may help the receiver to mitigate 
+            the effects of ISI and\or help with the detection of bursts with 
+            an early arrival time"
+        ::= { dcxMACUpstreamChannelEntry 18 }
+
+
+    dcxMACUpChannelExtendedFrequencyErrorDetect OBJECT-TYPE
+        SYNTAX      INTEGER { none(0),
+                              initialRanging(1),
+                              periodicRanging(2),
+                              allRanging(3) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Offsets in carrier frequency in the modem are corrected by the CMTS
+            during ranging. Typically most if not all off the frequency error is
+            removed in the initial ranging response with incremental changes removed
+            during periodic ranging. If large frequency offsets are expected during
+            initial or periodic ranging, this value may be configured to provide
+            extended frequency offset detection and correction."
+        DEFVAL { none }
+        ::= { dcxMACUpstreamChannelEntry 19 }
+
+
+    dcxMACUpChannelLogC3SnrTimeconstant OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The averaging timeconstant used to calculate the per-logical channel 
+            MIB variable dcxMACUpChannelSignalNoise. The averaging uses a logarithmic
+            scale, so that the actual timeconstant used is 2^X, where X is the
+            value configured for this object. Increasing the value of X increases
+            the degree to which the SNR results are averaged over time, and reduces
+            the sensitivity of the reported channel SNR to local oscillations in
+            signal quality. Averaging can effectively be disabled by setting this
+            object to 0"
+        ::= { dcxMACUpstreamChannelEntry 20 }
+    
+    
+    dcxMACUpChannelSignalNoise OBJECT-TYPE
+        SYNTAX      TenthdB
+        UNITS       "dB" 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A measurement of the average signal/noise ratio for the logical upstream.
+            The averaging may be controlled using the dcxMACUpChannelLogC3SnrTimeconstant
+            variable"
+        ::= { dcxMACUpstreamChannelEntry 21 }
+    
+    
+    dcxMACUpChannelSafeConfig OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "If true, MIB SETs which would cause this logical channel to go offline will return
+            a failure"
+        ::= { dcxMACUpstreamChannelEntry 22 }    
+
+         
+    dcxMACUpChannelInitialRangingDelay OBJECT-TYPE
+        SYNTAX      Unsigned32 (300..3000)
+        UNITS       "microseconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The number of extra microseconds to allow in a broadcast IUC3
+             grant to compensate for modems that perform initial ranging later
+             than expected."
+        ::= { dcxMACUpstreamChannelEntry 23 }
+    
+    dcxMACUpstreamGroupTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DcxMACUpstreamGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Entries containing definitions for group IDs
+                that can be associated with an upstream channel."
+        ::= { dcxMACObjects 4 }
+
+    dcxMACUpstreamGroupEntry OBJECT-TYPE
+        SYNTAX DcxMACUpstreamGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION 
+            "dcxMACUpstreamGroupEntry"
+        INDEX {
+                dcxMACUpstreamGroupId
+              }
+        ::= { dcxMACUpstreamGroupTable 1 }
+
+    DcxMACUpstreamGroupEntry ::= SEQUENCE {
+        dcxMACUpstreamGroupId Unsigned32,
+        dcxMACUpstreamGroupName OCTET STRING,
+        dcxMACUpstreamGroupLoadBalancing INTEGER,
+        dcxMACUpstreamGroupFrequencyIndex Unsigned32,
+        dcxMACUpstreamGroupSpMgtTriggerIndex Unsigned32,
+        dcxMACUpstreamGroupStatus RowStatus
+        }
+
+    dcxMACUpstreamGroupId OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..255)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The ID for this group."
+        ::= { dcxMACUpstreamGroupEntry 1 }
+    
+    dcxMACUpstreamGroupName OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(1..63))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The name associated with this group"
+        ::= { dcxMACUpstreamGroupEntry 2 }
+    
+    dcxMACUpstreamGroupLoadBalancing OBJECT-TYPE
+        SYNTAX      INTEGER { none(1), initialNumeric(2), periodic(3) }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Configures upstream load balancing for the group.
+            Options are: none, initialNumeric, periodic.
+            If set to none, no load balancing will be performed.
+            If set to initialNumeric, the CMTS may redirect modems to other active upstream
+            channels in the same group by setting the upstream channel ID override in the
+            RNG-RSP at any time up to the point where the modem successfully completes
+            periodic ranging. Once a modem has completed ranging it must be reset before it
+            may be moved to another upstream. The modems in a group will be distributed
+            evenly and numerically across the active channels in the group. When a modems
+            performs initial ranging, it will be sent to the upsteam with the least number
+            of active modems if the number of active modems on the current upsteam is greater
+            than the average number of modems per upsteam in the group. All channels are
+            treated equally when calculating loads.
+            If a modem fails to range on the desired channel following a ranging overide,
+            it will be allowed to remain on the channel on which it next performs initial
+            ranging.
+            If set to periodic, modems will be numerically distributed during initial ranging
+            and then selectively moved after registration using UCC. Periodic load balancing
+            will attempt to distribute the modems to maintain even bandwidth utilization across
+            the channels in a group."
+        DEFVAL { none }
+        ::= { dcxMACUpstreamGroupEntry 3 }
+
+    dcxMACUpstreamGroupFrequencyIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "An index into upstream frequency table, identical to 
+            dcxMACUpstreamFrequencyIndex in that table. All entries 
+            with the same value of dcxMACUpstreamFrequencyIndex form 
+            a spectral frequency group all assigned to the same 
+            upstream group. Returns 0 if there are no triggers assigned 
+            to this group."
+        ::= { dcxMACUpstreamGroupEntry 4 }
+    
+    dcxMACUpstreamGroupSpMgtTriggerIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "An index into spectral management trigger table, identical 
+            to dcxMACSpMgtTriggerIndex in that table. All entries with 
+            the same value of dcxMACSpMgtTriggerIndex form a trigger group 
+            all assigned to the same upstream group or channel. Returns 0 if 
+            there are no triggers assigned to this group."
+        ::= { dcxMACUpstreamGroupEntry 5 }
+        
+    dcxMACUpstreamGroupStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Used to create rows in this table"
+        ::= { dcxMACUpstreamGroupEntry 6 }
+    
+
+
+    dcxMACUpstreamFrequencyTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DcxMACUpstreamFrequencyEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Describes the upstream spectrum available for use by one or more
+                upstream groups. Entries are grouped by dcxMACUpstreamFrequencyIndex,
+                with each group assigned to one or more upstream groups."
+        ::= { dcxMACObjects 5 }
+
+    dcxMACUpstreamFrequencyEntry OBJECT-TYPE
+        SYNTAX DcxMACUpstreamFrequencyEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION 
+            "Describes a single contiguous region of upstream spectrum, available for
+            use by one or more upstream spectral groups."
+        INDEX { dcxMACUpstreamFrequencyIndex, dcxMACUpstreamFrequencyRegion }
+        ::= { dcxMACUpstreamFrequencyTable 1 }
+
+    DcxMACUpstreamFrequencyEntry ::= SEQUENCE {
+        dcxMACUpstreamFrequencyIndex Unsigned32,
+        dcxMACUpstreamFrequencyRegion Unsigned32,
+        dcxMACUpstreamFrequencyStart Integer32,
+        dcxMACUpstreamFrequencyStop Integer32,
+        dcxMACUpstreamFrequencyStatus RowStatus
+        }
+
+    dcxMACUpstreamFrequencyIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..255)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An index into the upstream frequency table representing 
+             a group of spectral regions, all associated with the 
+             same upstream spectral group." 
+        ::= { dcxMACUpstreamFrequencyEntry 1 }
+    
+    dcxMACUpstreamFrequencyRegion OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..255)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An index into the upstream frequency table which, when 
+             grouped with other frequency regions with the same frequency
+             index fully describe the upstream frequency spectrum available
+             for use by a given spectral group." 
+        ::= { dcxMACUpstreamFrequencyEntry 2 }
+     
+    dcxMACUpstreamFrequencyStart OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "hertz" 
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The start frequency for this upstream spectral region." 
+        ::= { dcxMACUpstreamFrequencyEntry 3 }
+    
+    dcxMACUpstreamFrequencyStop OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "hertz" 
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The stop frequency for this upstream spectral region." 
+        ::= { dcxMACUpstreamFrequencyEntry 4 }
+    
+    dcxMACUpstreamFrequencyStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Used to create entries in this table." 
+        ::= { dcxMACUpstreamFrequencyEntry 5 }
+    
+    
+    dcxMACSpectralMgtObjects OBJECT IDENTIFIER ::= { dcxMACObjects 6 } 
+    
+    dcxMACSpectralMgtTriggerTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DcxMACSpectralMgtTriggerEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Describes the spectral management triggers assigned to one 
+                or more upstream groups or channels. Entries are grouped by 
+                dcxMACSpMgtTriggerIndex, with each group assigned to one or more 
+                upstream channels or groups."
+        ::= { dcxMACSpectralMgtObjects 1 }
+
+    dcxMACSpectralMgtTriggerEntry OBJECT-TYPE
+        SYNTAX DcxMACSpectralMgtTriggerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION 
+            "Describes a single spectral management trigger, available for
+            use by one or more upstream channels or spectral groups."
+        INDEX { dcxMACSpMgtTriggerIndex, dcxMACSpMgtTriggerNumber }
+        ::= { dcxMACSpectralMgtTriggerTable 1 }
+
+    DcxMACSpectralMgtTriggerEntry::= SEQUENCE {
+        dcxMACSpMgtTriggerIndex Unsigned32,
+        dcxMACSpMgtTriggerNumber Unsigned32,
+        dcxMACSpMgtTriggerType Integer32,
+        dcxMACSpMgtTriggerAction Unsigned32,
+        dcxMACSpMgtTriggerParam1 Integer32,
+        dcxMACSpMgtTriggerParam2 Integer32,
+        dcxMACSpMgtTriggerParam3 Integer32,
+        dcxMACSpMgtTriggerParam4 Integer32,
+        dcxMACSpMgtTriggerParam5 Integer32,
+        dcxMACSpMgtTriggerParam6 Integer32,
+        dcxMACSpMgtTriggerParam7 Integer32,
+        dcxMACSpMgtTriggerParam8 Integer32,
+        dcxMACSpMgtTriggerStatus RowStatus
+        }
+
+    dcxMACSpMgtTriggerIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..255)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An index into the spectral managment trigger table 
+            representing a group of triggers, all assigned to
+             the same upstream channel or spectral group." 
+        ::= { dcxMACSpectralMgtTriggerEntry 1 }
+    
+    dcxMACSpMgtTriggerNumber OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..255)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An index into the spectral managment trigger table which, 
+            when grouped with other triggers with the same trigger
+            index fully describe the spectral mangement triggers
+            assigned to the same upstream channel or spectral group." 
+        ::= { dcxMACSpectralMgtTriggerEntry 2 }
+    
+    dcxMACSpMgtTriggerType OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Identifies the trigger type represented by this entry." 
+        ::= { dcxMACSpectralMgtTriggerEntry 3 }
+    
+    dcxMACSpMgtTriggerAction OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "An index into the spectral management action table,
+            identical to dcxMACSpMgtActionIndex in that table,
+            identifying the action to take if this trigger is
+            invoked. Returns 0 if there is no action associated
+            with this trigger." 
+        ::= { dcxMACSpectralMgtTriggerEntry 4 }
+    
+    dcxMACSpMgtTriggerParam1 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Parameter dependent on trigger type." 
+        ::= { dcxMACSpectralMgtTriggerEntry 5 }
+    
+    dcxMACSpMgtTriggerParam2 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Parameter dependent on trigger type." 
+        ::= { dcxMACSpectralMgtTriggerEntry 6 }
+     
+    dcxMACSpMgtTriggerParam3 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Parameter dependent on trigger type." 
+        ::= { dcxMACSpectralMgtTriggerEntry 7 }
+    
+    dcxMACSpMgtTriggerParam4 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Parameter dependent on trigger type." 
+        ::= { dcxMACSpectralMgtTriggerEntry 8 }
+     
+    dcxMACSpMgtTriggerParam5 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Parameter dependent on trigger type." 
+        ::= { dcxMACSpectralMgtTriggerEntry 9 }
+     
+    dcxMACSpMgtTriggerParam6 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Parameter dependent on trigger type." 
+        ::= { dcxMACSpectralMgtTriggerEntry 10 }
+     
+    dcxMACSpMgtTriggerParam7 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Parameter dependent on trigger type." 
+        ::= { dcxMACSpectralMgtTriggerEntry 11 }
+     
+    dcxMACSpMgtTriggerParam8 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Parameter dependent on trigger type." 
+        ::= { dcxMACSpectralMgtTriggerEntry 12 }
+    
+    dcxMACSpMgtTriggerStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Used to create and control the status of entries in this table." 
+        ::= { dcxMACSpectralMgtTriggerEntry 13 }
+         
+   
+   
+   dcxMACSpectralMgtActionTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DcxMACSpectralMgtActionEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Describes the spectral management actions assigned to one 
+                or more spectral managment triggers."
+        ::= { dcxMACSpectralMgtObjects 2 }
+
+    dcxMACSpectralMgtActionEntry OBJECT-TYPE
+        SYNTAX DcxMACSpectralMgtActionEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION 
+            "Describes a single spectral management action, assigned to
+            one or more spectral management triggers."
+        INDEX { dcxMACSpMgtActionIndex }
+        ::= { dcxMACSpectralMgtActionTable 1 }
+
+    DcxMACSpectralMgtActionEntry::= SEQUENCE {
+        dcxMACSpMgtActionIndex Unsigned32,
+        dcxMACSpMgtActionType Integer32,
+        dcxMACSpMgtActionParam1 Integer32,
+        dcxMACSpMgtActionParam2 Integer32,
+        dcxMACSpMgtActionParam3 Integer32,
+        dcxMACSpMgtActionParam4 Integer32,
+        dcxMACSpMgtActionParam5 Integer32,
+        dcxMACSpMgtActionParam6 Integer32,
+        dcxMACSpMgtActionParam7 Integer32,
+        dcxMACSpMgtActionParam8 Integer32,
+        dcxMACSpMgtActionStatus RowStatus
+        }
+
+    dcxMACSpMgtActionIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..255)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An index into the spectral managment actions table 
+            used to assign actions to spectral management triggers." 
+        ::= { dcxMACSpectralMgtActionEntry 1 }
+    
+    dcxMACSpMgtActionType OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Identifies the action type represented by this entry."
+        ::= { dcxMACSpectralMgtActionEntry 2 }
+    
+    dcxMACSpMgtActionParam1 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Parameter dependent on action type."
+        ::= { dcxMACSpectralMgtActionEntry 3 }
+    
+    dcxMACSpMgtActionParam2 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Parameter dependent on action type."
+        ::= { dcxMACSpectralMgtActionEntry 4 }
+    
+    dcxMACSpMgtActionParam3 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Parameter dependent on action type."
+        ::= { dcxMACSpectralMgtActionEntry 5 }
+    
+    dcxMACSpMgtActionParam4 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Parameter dependent on action type."
+        ::= { dcxMACSpectralMgtActionEntry 6 }
+    
+    dcxMACSpMgtActionParam5 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Parameter dependent on action type."
+        ::= { dcxMACSpectralMgtActionEntry 7 }
+    
+    dcxMACSpMgtActionParam6 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Parameter dependent on action type."
+        ::= { dcxMACSpectralMgtActionEntry 8 }
+    
+    dcxMACSpMgtActionParam7 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Parameter dependent on action type."
+        ::= { dcxMACSpectralMgtActionEntry 9 }
+    
+    dcxMACSpMgtActionParam8 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Parameter dependent on action type."
+        ::= { dcxMACSpectralMgtActionEntry 10 }
+    
+    dcxMACSpMgtActionStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Used to create and control the status of entries in this table."
+        ::= { dcxMACSpectralMgtActionEntry 11 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+-- Shared Secret configuration
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --      
+
+    dcxMACSharedSecretTable  OBJECT-TYPE        
+        SYNTAX  SEQUENCE OF DcxMACSharedSecretEntry        
+        MAX-ACCESS not-accessible        
+        STATUS     current        
+        DESCRIPTION                
+            "Set up shared secrets for this DOCSIS MAC Interface"        
+        ::= { dcxMACObjects 7 }    
+    
+    dcxMACSharedSecretEntry OBJECT-TYPE        
+        SYNTAX DcxMACSharedSecretEntry        
+        MAX-ACCESS  not-accessible        
+        STATUS  current        
+        DESCRIPTION             
+            "dcxMACSharedSecretEntry"        
+        INDEX {ifIndex, dcxMACSharedSecretId}        
+        ::= { dcxMACSharedSecretTable 1 }    
+        
+    DcxMACSharedSecretEntry ::= SEQUENCE {        
+        dcxMACSharedSecretId     Integer32,        
+        dcxMACSharedSecretStr    DisplayString,        
+        dcxMACSharedSecretStatus RowStatus            
+        }    
+    
+    dcxMACSharedSecretId OBJECT-TYPE        
+        SYNTAX      Integer32 (1..16)        
+        MAX-ACCESS  not-accessible       
+        STATUS      current        
+        DESCRIPTION            
+            "ID for the associated shared secret."        
+        ::= { dcxMACSharedSecretEntry 1 }      
+              
+    dcxMACSharedSecretStr OBJECT-TYPE        
+        SYNTAX      DisplayString        
+        MAX-ACCESS  read-create        
+        STATUS      current        
+        DESCRIPTION            
+            "This is the shared secret itself, which is considered write-only. It can be SET 
+             but when a GET operation is performed the value is not returned."        
+        ::= { dcxMACSharedSecretEntry 2 }            
+    
+    dcxMACSharedSecretStatus OBJECT-TYPE        
+        SYNTAX      RowStatus        
+        MAX-ACCESS  read-create        
+        STATUS      current        
+        DESCRIPTION            
+            "Row status."        
+        ::= { dcxMACSharedSecretEntry 3 }
+    
+END

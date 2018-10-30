@@ -3,7 +3,7 @@
 --
 -- August 1997, Fei Xu 
 --
--- Copyright (c) 1997, 1998-2004, 2005 by Cisco Systems, Inc.
+-- Copyright (c) 1997-2013 by Cisco Systems, Inc.
 -- All rights reserved.
 -- *****************************************************************
 CISCO-STP-EXTENSIONS-MIB DEFINITIONS ::= BEGIN
@@ -41,7 +41,7 @@ IMPORTS
                            FROM CISCO-SMI;
 
 ciscoStpExtensionsMIB MODULE-IDENTITY
-    LAST-UPDATED    "200512200000Z" 
+    LAST-UPDATED    "201303070000Z" 
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "       Cisco Systems
@@ -58,6 +58,9 @@ ciscoStpExtensionsMIB MODULE-IDENTITY
             "The MIB module for managing Cisco extensions to
             the 802.1D Spanning Tree Protocol (STP)."
 
+    REVISION    "201303070000Z"
+    DESCRIPTION 
+            "Added one new value network(5) to stpxFastStartPortMode."
     REVISION    "200512200000Z"
     DESCRIPTION 
             "Added bit value rstp(5) to stpxSMSTPortStatus and
@@ -1531,7 +1534,8 @@ stpxFastStartPortMode OBJECT-TYPE
                         enable(1),
                         disable(2), 
                         enableForTrunk(3),
-                        default(4)  
+                        default(4),
+                        network(5)  
                }
     MAX-ACCESS read-write
     STATUS     current 
@@ -1559,7 +1563,11 @@ stpxFastStartPortMode OBJECT-TYPE
 
                default -- whether the fast start feature is enabled
                           or not on this port depends on the object 
-                          value of stpxFastStartGlobalDefaultMode."
+                          value of stpxFastStartGlobalDefaultMode.
+
+               network -- the fast start network mode is enabled on 
+                          this port."  
+  
     ::= { stpxFastStartPortEntry 3 }
 
 stpxFastStartPortBpduGuardMode OBJECT-TYPE
@@ -5002,3 +5010,30 @@ stpxMSTGroup4 OBJECT-GROUP
     ::= { stpxMIBGroups 43 }
 
 END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

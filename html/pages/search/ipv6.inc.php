@@ -17,6 +17,7 @@
 <script>
 var grid = $("#ipv6-search").bootgrid({
     ajax: true,
+    rowCount: [50, 100, 250, -1],
     templates: {
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\">"+
@@ -26,12 +27,14 @@ var grid = $("#ipv6-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
+use LibreNMS\Authentication\LegacyAuth;
+
 $sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
 
-if (is_admin() === false && is_read() === false) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
     $where  .= ' WHERE `DP`.`user_id`=?';
-    $param[] = $_SESSION['user_id'];
+    $param[] = LegacyAuth::id();
 }
 
 $sql .= " $where ORDER BY `hostname`";

@@ -18,9 +18,9 @@ if (is_numeric($vars['vsvr'])) {
     echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
     foreach (dbFetchRows('SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? AND `vsvr_id` = ? ORDER BY `vsvr_name`', array($device['device_id'], $vars['vsvr'])) as $vsvr) {
         if (is_integer($i / 2)) {
-            $bg_colour = $list_colour_a;
+            $bg_colour = $config['list_colour']['even'];
         } else {
-            $bg_colour = $list_colour_b;
+            $bg_colour = $config['list_colour']['odd'];
         }
 
         if ($vsvr['vsvr_state'] == 'up') {
@@ -114,9 +114,9 @@ if (is_numeric($vars['vsvr'])) {
     $i = '0';
     foreach (dbFetchRows('SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? ORDER BY `vsvr_name`', array($device['device_id'])) as $vsvr) {
         if (is_integer($i / 2)) {
-            $bg_colour = $list_colour_a;
+            $bg_colour = $config['list_colour']['even'];
         } else {
-            $bg_colour = $list_colour_b;
+            $bg_colour = $config['list_colour']['odd'];
         }
 
         if ($vsvr['vsvr_state'] == 'up') {

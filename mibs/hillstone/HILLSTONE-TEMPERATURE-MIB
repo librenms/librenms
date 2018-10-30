@@ -1,0 +1,94 @@
+-- **************************************************************************
+-- HILLSTONE-TEMPERATURE-MIB
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V6   
+-- Description:	 Hillstone Networks TEMPERATURE MIB Object Identifier Assignments
+-- **************************************************************************
+--
+
+HILLSTONE-TEMPERATURE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hillstoneTemperature
+		FROM HILLSTONE-SMI
+	OBJECT-TYPE
+		FROM RFC-1212	
+        RowStatus		
+		FROM SNMPv2-TC;
+
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+hillstoneTemperatureObjects OBJECT IDENTIFIER ::= { hillstoneTemperature 1 }
+
+hillstoneTemperatureNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The number of temperatures."
+    ::= { hillstoneTemperatureObjects 1 } 
+
+hillstoneTemperatureTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HillstoneTemperatureEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "This table contains all the TEMPERATURE data."
+::= { hillstoneTemperatureObjects 2 }
+
+HillstoneTemperatureEntry OBJECT-TYPE
+	SYNTAX HillstoneTemperatureEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Define the parameters of TEMPERATURE."
+INDEX { hillstoneTemperatureIndex }
+::= { hillstoneTemperatureTable 1 }
+	
+HillstoneTemperatureEntry ::=
+SEQUENCE { 
+	hillstoneTemperatureIndex
+		INTEGER,
+	hillstoneTemperatureDescr
+		DisplayString,
+	hillstoneTemperatureValue
+		INTEGER
+	}
+
+hillstoneTemperatureIndex OBJECT-TYPE
+	SYNTAX INTEGER 
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The TEMPERATURE index ."
+::= { HillstoneTemperatureEntry 1 }
+
+hillstoneTemperatureDescr OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The TEMPERATURE description ."
+::= { HillstoneTemperatureEntry 2 }
+
+hillstoneTemperatureValue OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The TEMPERATURE value ."
+::= { HillstoneTemperatureEntry 3 }
+
+
+END

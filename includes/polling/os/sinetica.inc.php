@@ -25,7 +25,7 @@
 
 // Sinetica UPSController. Versions: App. 6.04.03,   OS 6.3,   Btldr 1.06.09,   H/w ZBBNC2 Rev 1.01.06
 
-list($os_temp, $os_ver, $btldr, $hardware_temp) = explode(',   ', $poll_device['sysDescr']);
+list($os_temp, $os_ver, $btldr, $hardware_temp) = explode(',   ', $device['sysDescr']);
 
 list($ignore, $version) = explode('App. ', $os_temp);
 $hardware = preg_replace('/H\/w /', '', $hardware_temp);

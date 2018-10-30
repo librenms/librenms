@@ -218,13 +218,43 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
             $result = '.' . $data[1];
         }
 
-        d_echo("[SNMP] snmpget $community $num_oid: $result\n");
+        d_echo("[SNMP] snmpget $community $oid ($num_oid): $result\n");
 
         return $result;
     } catch (Exception $e) {
-        d_echo("[SNMP] snmpget $community $num_oid: no data\n");
+        d_echo("[SNMP] snmpget $community $oid ($num_oid): no data\n");
         return false;
     }
+}
+
+
+function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
+{
+    if (!is_array($oids)) {
+        $oids = explode(' ', $oids);
+    }
+
+    $data = array();
+    foreach ($oids as $index => $oid) {
+        if (str_contains($options, 'n')) {
+            $oid_name = '.' . snmp_translate_number($oid, $mib, $mibdir);
+            $val = snmp_get($device, $oid_name, $options, $mib, $mibdir);
+        } elseif (str_contains($options, 's')
+            && str_contains($oid, '::')) {
+            $tmp = explode('::', $oid);
+            $oid_name = $tmp[1];
+            $val = snmp_get($device, $oid, $options, $mib, $mibdir);
+        } else {
+            $oid_name = $oid;
+            $val = snmp_get($device, $oid, $options, $mib, $mibdir);
+        }
+
+        if ($val !== false) {
+            $data[$oid_name] = $val;
+        }
+    }
+
+    return $data;
 }
 
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)

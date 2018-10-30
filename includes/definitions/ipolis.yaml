@@ -1,0 +1,9 @@
+os: ipolis
+text: 'Hanwha Techwin'
+type: camera
+icon: hanwhatechwin
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.36849.1.2.

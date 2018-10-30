@@ -1,0 +1,232 @@
+-- ============================================================================
+-- AT-PAE.MIB, Allied Telesis enterprise MIB: stacking module
+--
+-- Copied from AT-STACK.MIB of pre 2.9.1 release
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-STACK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+
+    DisplayString
+        FROM SNMPv2-TC
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+	hostId
+		FROM AT-SYSINFO-MIB
+;
+
+stack MODULE-IDENTITY
+    LAST-UPDATED "200605241222Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+	DESCRIPTION
+	    "This MIB file contains definitions of managed objects for the
+	    handling of stacking Allied Telesis switches. "
+
+    REVISION "200605030926Z"
+DESCRIPTION
+	"Initial Revision"
+
+::= { modules 120 }
+
+-- The stack group contains objects for managing stack members.
+
+stackId OBJECT-TYPE
+    SYNTAX  INTEGER (1..16) 
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The stack ID variable identifies the given device as belonging to the stack
+			with the given stack ID. The default stack ID is 1. To change the stack ID,
+			stacking must be disabled. Once the stack ID is changed and stacking
+			enabled again, the member joins an existing stack with the same stack ID or
+			forms a new stack with its stack ID."
+	DEFVAL { 1 }
+		::= { stack 1 }
+
+ stackSnmpHost OBJECT-TYPE
+    SYNTAX  INTEGER (1..32) 
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The SNMP host variable specifies the host ID of the stack member that
+			should responds to SNMP requests. It defaults to the lowest host ID that is
+			active in the stack, and is re-evaluated whenever the stack membership
+			changes. This ensures that the variable always has a value that corresponds
+			to a valid stack member."
+		::= { stack 2 }
+
+ stackStatus OBJECT-TYPE
+    SYNTAX  INTEGER {enabled(1), disabled (2)} 
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+			"The stack status variable specifies the current status of the stack module on
+			the current SNMP host. The default is disabled (1)."
+		::= { stack 3 }
+
+ stackInterface OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+			"The stack interface variable is used to specify the
+			interface on the current SNMP host that should be used to send and receive
+			stack messages. The default is none and can be replaced by an existing
+			VLAN."
+		::= { stack 4 }
+
+ stackAuth OBJECT-TYPE
+    SYNTAX  INTEGER {none (0), plaintext (1), md5 (2)} 
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+			"The stack authentication variable specifies whether stacking messages
+			should be authenticated with the password given as the value of the stack
+			password variable. By default, the authentication method is none (0). If
+			plaintext (1) is specified, a cleartext password authenticates stacking
+			messages. If MD5 (2) is specified, an encrypted password authenticates
+			stacking protocol packets. The authentication type"
+		::= { stack 5 }
+
+ stackPassword OBJECT-TYPE
+    SYNTAX  DisplayStringUnsized (SIZE(0..8))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+			"The stack password variable holds a text string that authenticates stack
+			messages. By default, this variable holds an empty string. This must be
+			changed before setting the stack authentication method to plaintext or MD5."
+		::= { stack 6 }
+
+counters     OBJECT IDENTIFIER ::= { stack 7 }
+
+	debugErrors OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Stack debug errors."
+	::= { counters 1 }
+
+rxPkts OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Stacking packets received."
+	::= { counters 2 }
+
+rxDiscards OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Stacking packets received and discarded."
+	::= { counters 3 }
+
+txPkts OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Stacking packets transmited."
+	::= { counters 4 }
+
+txFails OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Stacking packets transmit failures."
+	::= { counters 5 }
+
+sdrCount OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of stacking records in database."
+	::= { counters 6 }
+
+stackMemberTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF StackMemberEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table displays details about each of the stack members that are present
+		in the stack to which the current SNMP host belongs. The details provided
+		are the host ID, MAC address, designated and backup master, and state of
+		each host."
+		::= { stack 8 }
+
+stackMemberEntry OBJECT-TYPE
+	SYNTAX StackMemberEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"An entry in the ATR enterprise stackMemberTable table."
+	INDEX { hostId }
+		::= { stackMemberTable 1 }
+
+StackMemberEntry ::=
+	SEQUENCE {
+		memberHostId			INTEGER (1..32),
+		macAddress				DisplayString,
+		dedicatedMaster			INTEGER (1..32),
+		backupDedicatedMaster	INTEGER (1..32),
+		state					DisplayString
+	}
+
+memberHostId OBJECT-TYPE
+	SYNTAX INTEGER (1..32)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The host Id of this member."
+	::= { stackMemberEntry 1 }
+
+macAddress OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The MAC address of this member."
+	::= { stackMemberEntry 2 }
+
+dedicatedMaster OBJECT-TYPE
+	SYNTAX INTEGER (1..32)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Host Id of the dedicated master."
+	::= { stackMemberEntry 3 }
+
+backupDedicatedMaster OBJECT-TYPE
+	SYNTAX INTEGER (1..32)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Host Id of the backup dedicated master."
+	::= { stackMemberEntry 4 }
+
+state OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The state of this member."
+	::= { stackMemberEntry 5 }
+
+END

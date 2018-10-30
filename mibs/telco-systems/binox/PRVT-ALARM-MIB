@@ -1,0 +1,140 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-ALARM-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    software
+        FROM PRVT-SWITCH-MIB
+    Counter32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+prvtAlarmMIB MODULE-IDENTITY
+    LAST-UPDATED "201303250000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "Information for current snmp allarms"
+    REVISION    "201303250000Z"
+    DESCRIPTION 
+        "Initial implementation."
+    ::= { software 4 }
+
+
+prvtAlarmMIBObjects OBJECT IDENTIFIER
+    ::= { prvtAlarmMIB 1 }
+
+prvtUpdatedCurrentAlarmCounter OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last updated alarm counter"
+    ::= { prvtAlarmMIBObjects 1 }
+
+prvtAlarmCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtAlarmCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains current alarms."
+    ::= { prvtAlarmMIBObjects 2 }
+
+prvtAlarmCurrentEntry OBJECT-TYPE
+    SYNTAX      PrvtAlarmCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtAlarmCurrentTable containing the info of a 
+         current RAISED trap."
+    INDEX       { prvtAlarmCurrentCounter }
+    ::= { prvtAlarmCurrentTable 1 }
+
+PrvtAlarmCurrentEntry ::= SEQUENCE {
+    prvtAlarmCurrentCounter         Counter32,
+    prvtAlarmCurrentRaisedTime      Unsigned32,
+    prvtAlarmCurrentSeverity        INTEGER,
+    prvtAlarmCurrentDescription     OCTET STRING
+}
+
+prvtAlarmCurrentCounter OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A running counter of open alarms, the counter
+         is incremented on every new alarm. It is cleared after reset."
+    ::= { prvtAlarmCurrentEntry 1 }
+
+prvtAlarmCurrentRaisedTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The raised time of this alarm.
+         Time in seconds since January 1, 1970 00:00 UTC."
+    ::= { prvtAlarmCurrentEntry 2 }
+
+prvtAlarmCurrentSeverity OBJECT-TYPE
+    SYNTAX      INTEGER { clear(0), event(1), warning(2), minor(3), 
+                    major(4), critical(5), unknown(99) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current alarm severity"
+    ::= { prvtAlarmCurrentEntry 3 }
+
+prvtAlarmCurrentDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The alarm description."
+    ::= { prvtAlarmCurrentEntry 4 }
+
+END -- end of module PRVT-ALARM-MIB.

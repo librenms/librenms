@@ -1,0 +1,1906 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-SWITCH-MIB.mib
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+--
+--
+PRVT-SWITCH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,
+Counter32,
+Integer32,
+NOTIFICATION-TYPE
+FROM SNMPv2-SMI
+
+TEXTUAL-CONVENTION,
+DisplayString,
+TruthValue
+FROM SNMPv2-TC
+
+NOTIFICATION-GROUP
+FROM SNMPv2-CONF
+
+privateVendorOID
+FROM PRIV-VENDORDEF-MIB
+
+ifIndex,
+ifAdminStatus,
+ifOperStatus
+FROM IF-MIB;
+
+prvtSwitchMib MODULE-IDENTITY
+LAST-UPDATED "200906220000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+" BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"The switch MIB module for managing switch
+parameters"
+
+-- revision history
+REVISION "200906220000Z"
+DESCRIPTION
+"Add value unsupported(255) for object configL2IfaceAdminCrossOver."
+REVISION "200904140000Z"
+DESCRIPTION
+"Add description for reportsHardwareFanStatus 0."
+REVISION "200903080000Z"
+DESCRIPTION
+"Updated devices system OIDs."
+REVISION "200902200000Z"
+DESCRIPTION
+"Add support for temperature high limit (reportsHardwareTemperatureScale,reportsHardwareTemperatureHighLimit)."
+REVISION "200901120000Z"
+DESCRIPTION
+"Mark configL2IfaceDuplexSpeedSet. Add additional 10G value for
+configL2IfaceDuplexSpeedSet and reportsL2IfaceDuplexSpeedGet"
+REVISION "200809250000Z"
+DESCRIPTION
+"Add support for crossover and remote-fault-detect."
+REVISION "200803280000Z"
+DESCRIPTION
+"Updated devices system OIDs."
+REVISION "200802280000Z"
+DESCRIPTION
+"Added OIDs of various devices."
+REVISION "200712280000Z"
+DESCRIPTION
+"Added sysAssemblyNumber, sysPartNumber, sysCLEI, sysHwRevision, sysManufacturingDate objects"
+REVISION "200712120000Z"
+DESCRIPTION
+"Added configL2IfaceMtu."
+REVISION "200709260000Z"
+DESCRIPTION
+"Added new objects in configL2IfaceTable"
+REVISION "200704240000Z"
+DESCRIPTION
+"Updated OID definitions"
+REVISION "200702060000Z"
+DESCRIPTION
+"Updated description of reportsHardwarePSStatus object"
+REVISION "200610250000Z"
+DESCRIPTION
+"New OID group added"
+REVISION "200607020000Z"
+DESCRIPTION
+"Added T-Metro-ES and Alcatel system OID."
+REVISION "200606140000Z"
+DESCRIPTION
+"Changed mMiRIC-E1(89) to mMiRIC-E3(89)"
+REVISION "200604200000Z"
+DESCRIPTION
+"Added new duplex and speed values"
+REVISION "200602100000Z"
+DESCRIPTION
+"Added all missing port/module types"
+REVISION "200602020000Z"
+DESCRIPTION
+     	 "Defined the DUAL SFP module type"       
+REVISION "200512220000Z"
+DESCRIPTION
+"Added new object identifier for devices.
+Added new notification sysIntfModuleChange.
+Changed ModuleHwType modules that had '_' in them, should be with '-' instaead
+m100BaseGBIC_not_installed to m100BaseGBIC-not-installed.
+mCES_4TDM to mCES-4TDM,
+m1250BaseSingleFiber_SFP to m1250BaseSingleFiber-SFP."
+REVISION "200512080000Z"
+DESCRIPTION
+"Added the new sysIntfModuleChange notification for T-Metro devices."
+REVISION "200510030000Z"
+DESCRIPTION
+"Returned the old duplex-speed mixed object for backward compatability"
+REVISION "200509260000Z"
+DESCRIPTION
+"Separated the duplex mode and speed setting in the configL2Table"
+
+REVISION "200509070000Z"
+DESCRIPTION
+"Added the m1250BaseSingleFiber_SFP(87) port type"
+
+REVISION "200507200000Z"
+DESCRIPTION
+"Added the mCES_4TDM(86) port type"
+REVISION "200507080000Z"
+DESCRIPTION
+"Removed the range values for reportsL2IfaceUnit, reportsL2IfaceSlot and
+reportsL2IfacePort."
+
+REVISION "200503070000Z"
+DESCRIPTION
+"Added the mCES and 31000BaseX-SFP module types for T-Metro devices."
+
+REVISION "200502160000Z"
+DESCRIPTION
+"Fixed spelling errors and changed the contact info."
+
+REVISION "200502010000Z"
+DESCRIPTION
+"Added TMetro to sysProductsOids, added new module types: tMetroCES,
+tMetro2XSFPuplink, tMetro2F, tMetro1G"
+
+REVISION "200406290000Z"
+DESCRIPTION
+"Added T6Pro to sysProductsOids, added a new module type CPM"
+
+REVISION "200405030000Z"
+DESCRIPTION
+"Added support for exposing the switch series"
+
+REVISION "200403030000Z"
+DESCRIPTION
+"L2 Interface name (configL2IfaceName) max size changed from 16 to 256."
+
+REVISION "200402030000Z"
+DESCRIPTION
+"Addded m100BaseGBIC_not_installed to ModuleHwType."
+
+REVISION "200311180000Z"
+DESCRIPTION
+"Added sysManufacturing group,sysSerialNumber."
+
+REVISION "200310160000Z"
+DESCRIPTION
+"1. Added portRedundantLinkChange notification.
+2. Added reportsIfJack. This table enables support of interfaces attached to
+more then one physical interface.
+3. Added reportsL2IfaceActiveJackIndex."
+
+REVISION "200309090000Z"
+DESCRIPTION
+"Added SFP port types."
+
+REVISION "200307020000Z"
+DESCRIPTION
+"Added support for reporting hardware port type"
+
+REVISION "200305060000Z"
+DESCRIPTION
+"Move to SMI-V2."
+
+REVISION "200212120000Z"
+DESCRIPTION
+"Added support for controlling STP topology change detection"
+
+REVISION "200212010000Z"
+DESCRIPTION
+"Added support for Sniffer"
+
+REVISION "200211210000Z"
+DESCRIPTION
+"Added support for RSTP"
+
+REVISION "200211170000Z"
+DESCRIPTION
+"Added support for POS interface speed 155 & 622 M."
+
+REVISION "200209090000Z"
+DESCRIPTION
+"Added new module for T5Pro including ATM/MLP and 5 ports SM/MM."
+
+REVISION "200204100000Z"
+DESCRIPTION
+                "Add traps."
+REVISION "200108140000Z"
+DESCRIPTION
+"Distinction between set & get flow type to support flow auto-negotiation."
+REVISION "200107220000Z"
+DESCRIPTION
+"Added Default VLAN to configL2IfaceTable"
+REVISION "200107150000Z"
+DESCRIPTION
+"Added new sysIntfModule types m1000BaseGBIC_installed/not_installed"
+REVISION "200105170000Z"
+DESCRIPTION
+"Added t5ProRouter."
+REVISION "200105150000Z"
+DESCRIPTION
+"Added reportsHardware group."
+REVISION "200104190000Z"
+DESCRIPTION
+"Added config & reports group."
+REVISION "200104150000Z"
+DESCRIPTION
+"Added new modules to sysIntfModule."
+REVISION "200006280000Z"
+DESCRIPTION
+"Initial version."
+
+::= { switch 100 }
+
+--
+-- PRIVATE BRANCH PRODUCTS
+--
+prvt-products OBJECT IDENTIFIER ::= { privateVendorOID 1 }
+prvt-mgmt OBJECT IDENTIFIER ::= { privateVendorOID 2 }
+
+rptr OBJECT IDENTIFIER ::= { prvt-products 1 }
+bridge OBJECT IDENTIFIER ::= { prvt-products 2 }
+trclam OBJECT IDENTIFIER ::= { prvt-products 3 }
+router OBJECT IDENTIFIER ::= { prvt-products 4 }
+switch OBJECT IDENTIFIER ::= { prvt-products 5 }
+ipSwitch OBJECT IDENTIFIER ::= { prvt-products 6 }
+
+--
+-- L2 SWITCHES
+--
+
+bsw OBJECT IDENTIFIER ::= { switch 1 }
+tps OBJECT IDENTIFIER ::= { switch 2 }
+tpf OBJECT IDENTIFIER ::= { switch 3 }
+titan OBJECT IDENTIFIER ::= { switch 5 }
+titant5 OBJECT IDENTIFIER ::= { switch 7 }
+edgeLinkT4 OBJECT IDENTIFIER ::= { switch 15 }
+edgeLinkT5 OBJECT IDENTIFIER ::= { switch 17 }
+titanPro OBJECT IDENTIFIER ::= { switch 20}
+acs25L4282 OBJECT IDENTIFIER ::= { switch 500 }
+acs25L4282t5 OBJECT IDENTIFIER ::= { switch 502 }
+vol0215 OBJECT IDENTIFIER ::= { switch 999 }
+vol4000 OBJECT IDENTIFIER ::= { switch 998 }
+vol5000 OBJECT IDENTIFIER ::= { switch 996 }
+
+--
+-- Variable Type definitions
+--
+
+UnitIndex ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"This value represents the physical position of the unit inside the
+stack."
+SYNTAX INTEGER
+{
+master(1),
+slave1(2),
+slave2(3),
+slave3(4),
+slave4(5)
+}
+
+ModuleHwType ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"This value represents the physical type of the port or module."
+SYNTAX INTEGER
+{
+uninstalled(1),
+stacking(2),
+m100BaseTx(3),
+m100BaseFxVF45(4),
+
+m1000BaseSxSCMM850(6),
+m1000BaseLxSC1300(7), --Multi/Single Mode
+m1000BaseSCSMLDA(8),
+m1000BaseSCSMLDB(9),
+
+m1000BaseSxVF45MM850(10),
+m1000BaseLxVF451300(11), --Multi/Single Mode
+
+m1000BaseSxMTRJMM(12),
+m1000BaseLxMTRJ1300(13), --Multi/Single Mode
+
+m10BaseFlVF45(14),
+m10BaseFlVF45X4Ports(15),
+
+m100BaseFxSCMM(16),
+m100BaseFxSCSM(17),
+m100BaseFxSCSM2Port(18),
+m100BaseFxSCSMLD(19),
+m100BaseFxSCSMLD2Port(20),
+
+m100BaseFxMTRJMM(21),
+m100BaseFxMTRJSM(22),
+mDUAL-SFP(23),
+mDUAL-SFP-installed(24),
+
+m1000BaseTx(25),
+m1000BaseCx(26),
+
+mVDSLNT(30),
+mVDSLLT(31),
+
+mVDSLNTand100BaseTX(32),
+mVDSLLTand100BaseTX(33),
+
+mVDSLLT24Port(34),
+
+mLayer31000BaseSXSCMM(35),
+mLayer31000BaseLXSCSM(36),
+mLayer31000BaseSXSFFMM(37),
+mLayer31000BaseLXSFFSM(38),
+
+mLayer3100BaseFXSCMM2Port(39),
+mLayer3100BaseFXSCSM2Port(40),
+mLayer3100BaseFXSCMM4Port(41),
+mLayer3100BaseFXSCSM4Port(42),
+
+mLayer3100BaseFXSFFMM(43),
+mLayer3100BaseFXSFFSM(44),
+mLayer3100BaseTX(45),
+m1000BaseGBIC-installed(46),
+m1000BaseGBIC-not-installed(47),
+
+mLayer31000BaseSX-GIBIC(48),
+mLayer31000BaseLX-GIBIC(49),
+mLayer31000BaseCX-GIBIC(50),
+mLayer31000BaseT-GIBIC(51),
+mLayer3100BaseSMLCL-GIBIC(52),
+mLayer3100BaseM5o6SNI-GIBIC(53),
+mLayer31000BasePOSMM(54),
+mLayer31000BasePOSSM(55),
+mLayer3100BaseFXSFFMM20Port(56),
+mLayer3100BaseFXSFFSM20Port(57),
+mLayer3100BaseFXSFFMM5Port(58),
+mLayer3100BaseFXSFFSM5Port(59),
+mDS3ATM(60),
+mDS1MLP(61),
+mMLPmother(62),
+
+m1000BaseSFP-installed(63),
+mLayer31000BaseSX-SFP(65),
+mLayer31000BaseLX-SFP(66),
+mLayer31000BaseCX-SFP(67),
+mLayer31000BaseT-SFP(68),
+mLayer3100BaseSMLCL-SFP(69),
+mLayer3100BaseM5o6SNI-SFP(70),
+m100BaseGBIC-not-installed(71),
+mLayer310GBaseSR-XFP(72),
+mLayer310GBaseLR-XFP(73),
+mLayer310GBaseER-XFP(74),
+mLayer310GBaseSW-XFP(75),
+mLayer310GBaseLW-XFP(76),
+mLayer310GBaseEW-XFP(77),
+mLayer310GBase-XFP(78),
+m10000BaseMEDIA-not-installed(79),
+mCpmCard(80),
+mLayer310GBaseLRW-XFP(81),
+mLayer310GBaseERW-XFP(82),
+mLayer31000BaseX-SFP(83),
+mCES (84),
+mLayer3100BaseFX-SFP(85),
+mCES-4TDM(86),
+mLayer31000BaseLX-BD-SFP(87),
+mMiRIC-E1(88),
+mMiRIC-E3(89),
+mMiRIC-T1(90),
+mMiRIC-T3(91),
+
+mLayer31000BaseSFP-Unknown (92),
+m10000BaseXFP-Unknown (93),
+xAUI-1G-10G (94),
+mLayer3-10-1000BaseT (95),
+mLayer310GBaseSMSR-XFP (96),
+mLayer310GBaseSMLR-XFP (97),
+mLayer310GBaseSMER-XFP (98),
+mLayer310GBaseSMSW-XFP (99),
+mLayer310GBaseSMLW-XFP (101),
+mLayer310GBaseSMEW-XFP (102),
+mLayer310GBaseSMSRW-XFP (103),
+mLayer310GBaseSMLRW-XFP (104),
+mLayer310GBaseSMERW-XFP (105),
+mLayer310GBaseCpPgt-XFP (106),
+mLayer310GBaseSMZR-XFP (107),
+mLayer31000BaseZX-SFP (108),
+mLayer310GBaseSMZX-XFP (109),
+mLayer310GBaseSMEX-XFP (110),
+mLayer31000BaseT-WithoutAN-SFP(111),
+mLayer3100BaseLX-BD-SFP(112)
+}
+
+Series ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"This value represents the series of the switch."
+SYNTAX INTEGER
+{
+notExist(1),
+e-series(2),
+g-series(3),
+t-series(4)
+}
+--
+-- Groups
+--
+
+prvtSwitchNotifications OBJECT IDENTIFIER ::= { prvtSwitchMib 0 }
+sys OBJECT IDENTIFIER ::= { prvtSwitchMib 1 }
+config OBJECT IDENTIFIER ::= { prvtSwitchMib 2 }
+reports OBJECT IDENTIFIER ::= { prvtSwitchMib 3 }
+test OBJECT IDENTIFIER ::= { prvtSwitchMib 4 }
+commands OBJECT IDENTIFIER ::= { prvtSwitchMib 5 }
+prvtSwitchConformance OBJECT IDENTIFIER ::= { prvtSwitchMib 6 }
+
+--
+-- sys group
+--
+sysProductsOids OBJECT IDENTIFIER ::= { sys 1 }
+sysIntf OBJECT IDENTIFIER ::= { sys 2 }
+sysManufacturing OBJECT IDENTIFIER ::= { sys 3 }
+sysSwitchingHW OBJECT IDENTIFIER ::= { sys 4 }
+
+--
+-- sysOids Parameters
+--
+t4Router OBJECT IDENTIFIER ::= { sysProductsOids 1 }
+t5Router OBJECT IDENTIFIER ::= { sysProductsOids 2 }
+t5ProRouter OBJECT IDENTIFIER ::= { sysProductsOids 3 }
+t6Router OBJECT IDENTIFIER ::= { sysProductsOids 4 }
+t5c-48TRouter OBJECT IDENTIFIER ::= { sysProductsOids 5 }
+t5RNRouter OBJECT IDENTIFIER ::= { sysProductsOids 6 }
+t5c-24TRouter OBJECT IDENTIFIER ::= { sysProductsOids 7 }
+t5c-24MRouter OBJECT IDENTIFIER ::= { sysProductsOids 8 }
+t5c-24FRouter OBJECT IDENTIFIER ::= { sysProductsOids 9 }
+t5c-24GRouter OBJECT IDENTIFIER ::= { sysProductsOids 10 }
+t5c-24GTRouter OBJECT IDENTIFIER ::= { sysProductsOids 11 }
+t6pro-lc-20G OBJECT IDENTIFIER ::= { sysProductsOids 13 }
+t6pro-cpm OBJECT IDENTIFIER ::= { sysProductsOids 14 }
+tMetro OBJECT IDENTIFIER ::= { sysProductsOids 16 }
+tMarc OBJECT IDENTIFIER ::= { sysProductsOids 17 }
+aHUB1-A OBJECT IDENTIFIER ::= { sysProductsOids 18 }
+tMetro-ES OBJECT IDENTIFIER ::= { sysProductsOids 19 }
+
+tMarc-E OBJECT IDENTIFIER ::= { sysProductsOids 20 }
+tMarc-EW OBJECT IDENTIFIER ::= { sysProductsOids 21 }
+
+tMarc-WDB OBJECT IDENTIFIER ::= { sysProductsOids 22 }
+tMarc-WD OBJECT IDENTIFIER ::= { sysProductsOids 23 }
+tMarc-F OBJECT IDENTIFIER ::= { sysProductsOids 24 }
+
+t5c-XG OBJECT IDENTIFIER ::= { sysProductsOids 27 }
+
+compact OBJECT IDENTIFIER ::= { t6pro-cpm 1 }
+classic OBJECT IDENTIFIER ::= { t6pro-cpm 2 }
+
+as9205 OBJECT IDENTIFIER ::= { t5c-24TRouter 1 }
+as9205-F OBJECT IDENTIFIER ::= { t5c-24FRouter 1 }
+
+tMarc-250 OBJECT IDENTIFIER ::= { tMarc 1 }
+tMarc-254 OBJECT IDENTIFIER ::= { tMarc 2 }
+tMarc-254h OBJECT IDENTIFIER ::= { tMarc 3 }
+
+tMarc-340 OBJECT IDENTIFIER ::= { tMarc 10 }
+tMarc-380 OBJECT IDENTIFIER ::= { tMarc 11 }
+
+tMarc-340-E OBJECT IDENTIFIER ::= { tMarc-E 1 }
+tMarc-380-E OBJECT IDENTIFIER ::= { tMarc-E 2 }
+tMarc-340-EW OBJECT IDENTIFIER ::= { tMarc-EW 1 }
+tMarc-380-EW OBJECT IDENTIFIER ::= { tMarc-EW 2 }
+
+tMarc-340WD-B OBJECT IDENTIFIER ::= { tMarc-WDB 1 }
+
+tMarc-340WD OBJECT IDENTIFIER ::= { tMarc-WD 1 }
+
+tMarc-340-F OBJECT IDENTIFIER ::= { tMarc-F 1 }
+
+tMarc-280 OBJECT IDENTIFIER ::= { tMarc 20 }
+
+dm9225 OBJECT IDENTIFIER ::= { tMarc-250 1 }
+dm9225-E OBJECT IDENTIFIER ::= { tMarc-254 1 }
+dm9234 OBJECT IDENTIFIER ::= { tMarc-340 1 }
+
+alcatel-7250 OBJECT IDENTIFIER ::= { tMetro 1 }
+alcatel-7250-ES OBJECT IDENTIFIER ::= { tMetro-ES 1 }
+alcatel-7250-ESA OBJECT IDENTIFIER ::= { tMetro-ES 2 }
+
+tMetro-ESA OBJECT IDENTIFIER ::= { tMetro-ES 3 }
+
+as9220 OBJECT IDENTIFIER ::= { tMetro-ES 10 }
+tMetro-200S OBJECT IDENTIFIER ::= { tMetro-ES 11 }
+
+as9215 OBJECT IDENTIFIER ::= { t5c-XG 1 }
+
+bI-Ethernet OBJECT IDENTIFIER ::= { aHUB1-A 1 }
+fI-Ethernet OBJECT IDENTIFIER ::= { aHUB1-A 2 }
+
+-- Start L2 products
+t5c OBJECT IDENTIFIER ::= { sysProductsOids 100 }
+t5cgt OBJECT IDENTIFIER ::= { sysProductsOids 222 }
+t5g OBJECT IDENTIFIER ::= { sysProductsOids 333 }
+v24s OBJECT IDENTIFIER ::= { sysProductsOids 444 }
+
+-- Start VoIP products
+edgeGate281 OBJECT IDENTIFIER ::= { sysProductsOids 1000 }
+edgeGate281SYS OBJECT IDENTIFIER ::= { sysProductsOids 1001 }
+edgeGate231 OBJECT IDENTIFIER ::= { sysProductsOids 1010 }
+edgeGate282 OBJECT IDENTIFIER ::= { sysProductsOids 1020 }
+edgeGate282S OBJECT IDENTIFIER ::= { sysProductsOids 1021 }
+edgeGate482S OBJECT IDENTIFIER ::= { sysProductsOids 1022 }
+edgeGate483S OBJECT IDENTIFIER ::= { sysProductsOids 1023 }
+edgeGate483D OBJECT IDENTIFIER ::= { sysProductsOids 1024 }
+
+edgeGate201 OBJECT IDENTIFIER ::= { sysProductsOids 1031 }
+edgeGate232 OBJECT IDENTIFIER ::= { sysProductsOids 1041 }
+
+ac500 OBJECT IDENTIFIER ::= { sysProductsOids 1050 }
+ac505 OBJECT IDENTIFIER ::= { ac500 1 }
+ac512 OBJECT IDENTIFIER ::= { ac500 2 }
+ac524 OBJECT IDENTIFIER ::= { ac500 3 }
+
+--
+-- sys/Interfaces Parameters
+--
+sysIntfTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SysIntfEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains the interfaces module type."
+::= { sysIntf 1 }
+
+sysIntfEntry OBJECT-TYPE
+SYNTAX SysIntfEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"sysIntfEntry"
+INDEX { sysStackNo, sysSlotNo }
+::= { sysIntfTable 1 }
+
+SysIntfEntry ::= SEQUENCE {
+sysStackNo UnitIndex,
+sysSlotNo Integer32,
+sysIntfUnitExist INTEGER,
+sysIntfModule ModuleHwType
+}
+
+sysStackNo OBJECT-TYPE
+SYNTAX UnitIndex
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object identifies the switch"
+::= { sysIntfEntry 1 }
+
+sysSlotNo OBJECT-TYPE
+SYNTAX Integer32(0..256)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This indicates a single instance of a slot"
+::= { sysIntfEntry 2 }
+
+sysIntfUnitExist OBJECT-TYPE
+SYNTAX INTEGER {
+uninstalled(1),
+installed(2)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This indicates interface module type"
+::= { sysIntfEntry 3 }
+
+sysIntfModule OBJECT-TYPE
+SYNTAX ModuleHwType
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This indicates interface module type"
+::= { sysIntfEntry 4 }
+
+sysSerialNumber OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the device's serial number, which is entered during the manufacturing process.
+"
+::= { sysManufacturing 1 }
+
+sysSwitchModel OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "Specifies the equipment model"
+::= { sysManufacturing 2 }
+
+sysAssemblyNumber OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "Specifies the equipment assembly number"
+::= { sysManufacturing 3 }
+
+sysPartNumber OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "Specifies the equipment part number"
+::= { sysManufacturing 4 }
+
+sysCLEI OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "Specifies the common language equipment identification"
+::= { sysManufacturing 5 }
+
+sysHwRevision OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "Specifies the HW revision"
+::= { sysManufacturing 6 }
+
+sysManufacturingDate OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "Specifies the manufacturing date"
+::= { sysManufacturing 7 }
+
+sysSwitchSeries OBJECT-TYPE
+SYNTAX Series
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object displays the switch series."
+::= { sysSwitchingHW 1 }
+
+--
+-- config group
+--
+
+--
+-- L2 Group
+--
+--
+-- This group provides interface control and information not easily
+-- available from other MIBs.
+--
+configL2 OBJECT IDENTIFIER ::= { config 2 }
+
+configL2SpanOnOff OBJECT-TYPE
+SYNTAX INTEGER {
+enableSTP(1),
+disable(2),
+enableRSTP(3),
+enablePVST(4),
+enableMST(5)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Enables/disables Spanning Tree. When Spanning Tree is disabled, the switch's ports are placed in
+forwarding mode, regardless of the current Spanning Tree state. When re-enabled, the normal state
+transitions take place."
+::= { configL2 1 }
+
+configL2IfaceTable OBJECT-TYPE
+SYNTAX SEQUENCE OF ConfigL2IfaceEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of Interfaces and their properties"
+::= { configL2 2 }
+
+configL2IfaceEntry OBJECT-TYPE
+SYNTAX ConfigL2IfaceEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An index of interfaces."
+INDEX { configL2IfaceUnit, configL2IfaceSlot,configL2IfacePort }
+::= { configL2IfaceTable 1 }
+
+ConfigL2IfaceEntry ::= SEQUENCE {
+configL2IfaceUnit Integer32,
+configL2IfaceSlot Integer32,
+configL2IfacePort Integer32,
+configL2IfaceName DisplayString,
+configL2IfaceEnable INTEGER,
+configL2IfaceSTPEnable INTEGER,
+configL2IfaceDuplexSpeedSet INTEGER,
+configL2IfaceFlow INTEGER,
+configL2IfaceBackpressure INTEGER,
+configL2IfaceResetCounters INTEGER,
+configL2IfaceDefaultVID Integer32,
+configL2IfaceSnifferIfIndex Integer32,
+configL2TopologyChangeDetection TruthValue,
+configL2IfaceDuplexModeSet INTEGER,
+configL2IfaceSpeedSet INTEGER,
+configL2IfaceBroadcastRateLimit Integer32,
+configL2IfaceMulticastRateLimit Integer32,
+configL2IfaceUnknownRateLimit Integer32,
+configL2IfaceBroadcastBurstSize Integer32,
+configL2IfaceMulticastBurstSize Integer32,
+configL2IfaceUnknownBurstSize Integer32,
+configL2IfaceMtu Integer32,
+configL2IfaceAdminCrossOver INTEGER,
+configL2IfaceRemoteFaultDetect INTEGER
+}
+
+configL2IfaceUnit OBJECT-TYPE
+SYNTAX Integer32(1..1000)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"An index that uniquely identifies a unit in the
+Interface Table."
+::= { configL2IfaceEntry 1 }
+
+configL2IfaceSlot OBJECT-TYPE
+SYNTAX Integer32(1..1000)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"An index that uniquely identifies a slot within the unit
+in the Interface Table."
+::= { configL2IfaceEntry 2 }
+
+configL2IfacePort OBJECT-TYPE
+SYNTAX Integer32(1..1000)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"An index that uniquely identifies a port within the slot
+in the Interface Table."
+::= { configL2IfaceEntry 3 }
+
+configL2IfaceName OBJECT-TYPE
+SYNTAX DisplayString (SIZE (0..255))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The textual name of this interface, e.g., 'John'."
+::= { configL2IfaceEntry 4 }
+
+configL2IfaceEnable OBJECT-TYPE
+SYNTAX INTEGER {
+enable(1),
+disable(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Enables (1)or disables (2) control for the interface.
+For this product, this is the ONLY way to enable or
+disable the interface. 'ifAdminStatus' in RFC1213 and
+'dot1dStpPortEnable' in RFC1493 are both implemented
+as 'read-only'."
+::= { configL2IfaceEntry 5 }
+
+configL2IfaceSTPEnable OBJECT-TYPE
+SYNTAX INTEGER {
+enable(1),
+disable(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Enables (1) and disables (2) Spanning Tree operation for this
+interface."
+::= { configL2IfaceEntry 6 }
+
+configL2IfaceDuplexSpeedSet OBJECT-TYPE
+SYNTAX INTEGER {
+autonegotiate(1),
+half-10(2),
+full-10(3),
+half-100(4),
+full-100(5),
+half-1000(6),
+full-1000(7),
+pos-155(8),
+pos-622(9),
+full-10000(10),
+half-auto(11),
+full-auto(12),
+auto-10(13),
+auto-100(14),
+auto-1000 (16),
+illegal(99)
+}
+MAX-ACCESS read-write
+STATUS obsolete
+DESCRIPTION
+"The desired speed and duplex mode for the interface. If the selected
+control is not available for the interface, a value of illegal (99)
+is returned. If the port type does NOT support the
+default of autonegotiate (1), then the application will
+initialize the port to a valid value (e.g., 1000full (6)).
+Note that not all controls are available for all interfaces.
+For example, only full-1000 (6) is available for Gigabit
+Ethernet interfaces.
+
+As this object was marked as obsolete the following two
+configurable parameters of an interface should be used:
+configL2IfaceDuplexModeSet, configL2IfaceSpeedSet "
+::= { configL2IfaceEntry 7 }
+
+configL2IfaceFlow OBJECT-TYPE
+SYNTAX INTEGER {
+autonegotiate(1), -- only for giga
+flowon(2),
+flowoff(3)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The desired flow mode for the interface. If the selected control is not available
+on the interface, a value of illegal (99) is returned. If the port type does NOT support
+the default value of autonegotiate (1), then the application will initialize the port to a
+valid value (e.g., 1000full (6)).Note that not all controls are available for all interfaces.
+For example, only full-1000 (6) is available for Gigabit Ethernet interfaces."
+::= { configL2IfaceEntry 8 }
+
+configL2IfaceBackpressure OBJECT-TYPE
+SYNTAX INTEGER {
+backpressureon(1),
+backpressureoff(2),
+illegal(99)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The desired back-pressure mode for the interface.
+If the selected control is not available on the interface,
+a value of illegal (99) is returned."
+::= { configL2IfaceEntry 9 }
+
+configL2IfaceResetCounters OBJECT-TYPE
+SYNTAX INTEGER {
+noop(1),
+reset(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object enables resetting the statistics counters selected for this
+port."
+::= { configL2IfaceEntry 10 }
+
+configL2IfaceDefaultVID OBJECT-TYPE
+SYNTAX Integer32(1..4095)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object sets the default VLAN ID according to 802.1Q."
+::= { configL2IfaceEntry 11 }
+
+configL2IfaceSnifferIfIndex OBJECT-TYPE
+SYNTAX Integer32(0..2147483647)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object connects this port to a sniffer port indexed by the specified ifIndex.
+Setting this value to 0 disconnects this port from the sniffer."
+::= { configL2IfaceEntry 12 }
+
+configL2TopologyChangeDetection OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object controls the STP topology change detection for this interface."
+::= { configL2IfaceEntry 13 }
+
+configL2IfaceDuplexModeSet OBJECT-TYPE
+SYNTAX INTEGER {
+auto(1),
+full(2),
+half(3)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The duplex mode for the interface. If the port type does NOT support
+the default of autonegotiate (1), then the application will
+initialize the port to a valid value (e.g., full (2))."
+::= { configL2IfaceEntry 14 }
+
+configL2IfaceSpeedSet OBJECT-TYPE
+SYNTAX INTEGER {
+auto(1),
+speed-10(2),
+speed-100(3),
+speed-1000(4),
+speed-10000(5),
+pos-155(6),
+pos-622(7),
+illegal(99)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The desired speed and duplex mode for the interface. If the selected
+control is not available for the interface, a value of illegal (99)
+is returned. If the port type does NOT support the
+default of autonegotiate (1), then the application will
+initialize the port to a valid value (e.g., 1000 (3)).
+Note that not all controls are available for all interfaces.
+For example, only 1000 (4) is available for Gigabit
+Ethernet interfaces."
+::= { configL2IfaceEntry 15 }
+
+configL2IfaceBroadcastRateLimit OBJECT-TYPE
+SYNTAX Integer32(-1..2147483647)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Rate limit broadcast traffic. Must be a number between 64Kbps and 1Gbps,
+specified in Kbps."
+::= { configL2IfaceEntry 16 }
+
+configL2IfaceMulticastRateLimit OBJECT-TYPE
+SYNTAX Integer32(-1..2147483647)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Rate limit multicast traffic. Must be a number between 64Kbps and 1Gbps,
+specified in Kbps."
+::= { configL2IfaceEntry 17 }
+
+configL2IfaceUnknownRateLimit OBJECT-TYPE
+SYNTAX Integer32(-1..2147483647)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Rate limit unknown traffic. Must be a number between 64Kbps and 1Gbps,
+specified in Kbps. For detail information see documentation."
+::= { configL2IfaceEntry 18 }
+
+configL2IfaceBroadcastBurstSize OBJECT-TYPE
+SYNTAX Integer32(-1..2147483647)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Burst size broadcast traffic. Must be a number between 12Kbps and 1Mbps,
+specified in Kbps."
+::= { configL2IfaceEntry 19 }
+
+configL2IfaceMulticastBurstSize OBJECT-TYPE
+SYNTAX Integer32(-1..2147483647)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Burst size multicast traffic. Must be a number between 12Kbps and 1Mbps,
+specified in Kbps."
+::= { configL2IfaceEntry 20 }
+
+configL2IfaceUnknownBurstSize OBJECT-TYPE
+SYNTAX Integer32(-1..2147483647)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Burst size unknown traffic. Must be a number between 12Kbps and 1Mbps,
+specified in Kbps. For detail information see documentation."
+::= { configL2IfaceEntry 21 }
+
+configL2IfaceMtu OBJECT-TYPE
+SYNTAX Integer32 (512..9216)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The Maximum Transmission Unit (in octets) of the interface."
+DEFVAL { 1528 }
+::= { configL2IfaceEntry 22 }
+
+configL2IfaceAdminCrossOver OBJECT-TYPE
+SYNTAX INTEGER {
+auto(1),
+mdi(2),
+mdi-x(3),
+unsupported(255)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The administrative MDI/MDI-X cable connection status of ports, as specified in IEEE 803.2.
+The mdi-x mode (crossover) is configured (3), the interface works in MDI-X mode.
+The mdi mode (2) defines port to work in standard MDI mode.
+The auto (1) defines automatic crossover detection, and any type of MDI/MDI-X cabling can be used on the port.
+Note: This attribute can be configured only on interfaces that support that option."
+::= { configL2IfaceEntry 23 }
+
+configL2IfaceRemoteFaultDetect OBJECT-TYPE
+SYNTAX INTEGER {
+enableRemoteFaultDetect(1),
+disableRemoteFaultDetect(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Controls the remote fault detection on interfaces, connected to 100Base Fiber pair.
+Once enabled (1), the switch will indicate link-down event on the interface, once remote
+peer detects link down.
+Note: Relevant only on 100Base Fiber interfaces."
+::= { configL2IfaceEntry 24 }
+
+--
+-- reports group
+--
+reportsL2 OBJECT IDENTIFIER ::= { reports 1 }
+
+--
+-- L2 Group
+--
+--
+-- This group provides interface information not easily
+-- available from other MIBs.
+--
+
+reportsL2IfaceTable OBJECT-TYPE
+SYNTAX SEQUENCE OF ReportsL2IfaceEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of Interfaces and their properties"
+::= { reportsL2 1 }
+
+reportsL2IfaceEntry OBJECT-TYPE
+SYNTAX ReportsL2IfaceEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An index of interfaces."
+INDEX { reportsL2IfaceUnit, reportsL2IfaceSlot,reportsL2IfacePort }
+::= { reportsL2IfaceTable 1 }
+
+ReportsL2IfaceEntry ::= SEQUENCE {
+reportsL2IfaceUnit Integer32,
+reportsL2IfaceSlot Integer32,
+reportsL2IfacePort Integer32,
+reportsL2IfaceBridgeIndex Integer32,
+reportsL2IfaceType INTEGER,
+reportsL2IfaceLink INTEGER,
+reportsL2IfaceDuplexSpeedGet INTEGER,
+reportsL2IfaceTXOctetsNoErr Counter32,
+reportsL2IfaceTXPacketsNoErr Counter32,
+reportsL2IfaceRXOctetsNoErr Counter32,
+reportsL2IfaceRXPacketsNoErr Counter32,
+reportsL2IfaceIfInOctets Counter32,
+reportsL2IfaceIfInUcastPkts Counter32,
+reportsL2IfaceIfInNUcastPkts Counter32,
+reportsL2IfaceIfInDiscards Counter32,
+reportsL2IfaceIfInErrors Counter32,
+reportsL2IfaceIfInUnknownProtos Counter32,
+reportsL2IfaceIfOutOctets Counter32,
+reportsL2IfaceIfOutUcastPkts Counter32,
+reportsL2IfaceIfOutNUcastPkts Counter32,
+reportsL2IfaceIfOutDiscards Counter32,
+reportsL2IfaceIfOutErrors Counter32,
+reportsL2IfaceStatsDropEvents Counter32,
+reportsL2IfaceStatsOctets Counter32,
+reportsL2IfaceStatsPkts Counter32,
+reportsL2IfaceStatsBroadcastPkts Counter32,
+reportsL2IfaceStatsMulticastPkts Counter32,
+reportsL2IfaceStatsCRCAlignErrors Counter32,
+reportsL2IfaceStatsUndersizePkts Counter32,
+reportsL2IfaceStatsOversizePkts Counter32,
+reportsL2IfaceStatsFragments Counter32,
+reportsL2IfaceStatsJabbers Counter32,
+reportsL2IfaceStatsCollisions Counter32,
+reportsL2IfaceStatsPkts64Octets Counter32,
+reportsL2IfaceStatsPkts65to127Octets Counter32,
+reportsL2IfaceStatsPkts128to255Octets Counter32,
+reportsL2IfaceStatsPkts256to511Octets Counter32,
+reportsL2IfaceStatsPkts512to1023Octets Counter32,
+reportsL2IfaceStatsPkts1024to1518Octets Counter32,
+reportsL2IfaceFlow INTEGER,
+reportsL2IfaceHWType ModuleHwType,
+reportsL2IfaceActiveJackIndex Integer32
+}
+
+reportsL2IfaceUnit OBJECT-TYPE
+SYNTAX Integer32(1..1000)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"An index that uniquely identifies a unit in the
+Interface Table."
+::= { reportsL2IfaceEntry 1 }
+
+reportsL2IfaceSlot OBJECT-TYPE
+SYNTAX Integer32 (1..1000)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"An index that uniquely identifies a slot within the unit
+in the Interface Table."
+::= { reportsL2IfaceEntry 2 }
+
+reportsL2IfacePort OBJECT-TYPE
+SYNTAX Integer32(1..1000)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"An index that uniquely identifies a port within the slot
+in the Interface Table."
+::= { reportsL2IfaceEntry 3 }
+
+reportsL2IfaceBridgeIndex OBJECT-TYPE
+SYNTAX Integer32(1..1000)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This is the bridge index of this port."
+::= { reportsL2IfaceEntry 4 }
+
+reportsL2IfaceType OBJECT-TYPE
+SYNTAX INTEGER {
+other(1), -- none of the following
+regular1822(2),
+hdh1822(3),
+ddn-x25(4),
+rfc877-x25(5),
+ethernet-csmacd(6),
+iso88023-csmacd(7),
+iso88024-tokenBus(8),
+iso88025-tokenRing(9),
+iso88026-man(10),
+starLan(11),
+proteon-10Mbit(12),
+proteon-80Mbit(13),
+hyperchannel(14),
+fddi(15),
+lapb(16),
+sdlc(17),
+ds1(18), -- T-1
+e1(19), -- European equivalent of T-1
+basicISDN(20),
+primaryISDN(21), -- proprietary serial
+propPointToPointSerial(22),
+ppp(23),
+softwareLoopback(24),
+eon(25), -- CLNP over IP [11]
+ethernet-3Mbit(26),
+nsip(27), -- XNS over IP
+slip(28), -- generic SLIP
+ultra(29), -- ULTRA technologies
+ds3(30), -- T-3
+sip(31), -- SMDS
+frame-relay(32)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The type of interface, repeated here from the definitions
+in RFC1213 as a matter of convenience."
+::= { reportsL2IfaceEntry 5 }
+
+reportsL2IfaceLink OBJECT-TYPE
+SYNTAX INTEGER {
+up(1),
+down(2)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The state of Link Detect on the interface."
+::= { reportsL2IfaceEntry 6 }
+
+reportsL2IfaceDuplexSpeedGet OBJECT-TYPE
+SYNTAX INTEGER {
+unknown(1),
+half-10(2),
+full-10(3),
+half-100(4),
+full-100(5),
+half-1000(6),
+full-1000(7),
+pos-155(8),
+pos-622(9),
+full-10000(10),
+illegal(99)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The actual speed and duplex for the interface. If the
+interface is not configured to one of the acceptable
+values, a value of illegal (99) is returned."
+::= { reportsL2IfaceEntry 7 }
+
+reportsL2IfaceTXOctetsNoErr OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of octets transmitted from the interface. This
+number does not include octets with errors."
+::= { reportsL2IfaceEntry 8 }
+
+reportsL2IfaceTXPacketsNoErr OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of packets transmitted from the interface. This
+number does not include packets with errors."
+::= { reportsL2IfaceEntry 9 }
+
+reportsL2IfaceRXOctetsNoErr OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of octets received on the interface. This
+number does not include octets with errors."
+::= { reportsL2IfaceEntry 10 }
+
+reportsL2IfaceRXPacketsNoErr OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of packets received on the interface. This
+number does not include packets with errors."
+::= { reportsL2IfaceEntry 11 }
+
+reportsL2IfaceIfInOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of octets received on the
+interface, including framing characters."
+::= { reportsL2IfaceEntry 12 }
+
+reportsL2IfaceIfInUcastPkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of subnetwork-unicast packets
+delivered to a higher-layer protocol."
+::= { reportsL2IfaceEntry 13 }
+
+reportsL2IfaceIfInNUcastPkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of non-unicast (i.e., subnetwork-
+broadcast or subnetwork-multicast) packets
+delivered to a higher-layer protocol."
+::= { reportsL2IfaceEntry 14 }
+
+reportsL2IfaceIfInDiscards OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of inbound packets that were chosen
+to be discarded even if no errors that prevent their deliverability
+to a higher-layer protocol had been detected. One possible reason for
+discarding such a packet could be to free buffer space."
+::= { reportsL2IfaceEntry 15 }
+
+reportsL2IfaceIfInErrors OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of inbound packets that contained
+errors preventing them from being deliverable to a
+higher-layer protocol."
+::= { reportsL2IfaceEntry 16 }
+
+reportsL2IfaceIfInUnknownProtos OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of packets received via the interface
+that were discarded because of an unknown or
+unsupported protocol."
+::= { reportsL2IfaceEntry 17 }
+
+reportsL2IfaceIfOutOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of octets transmitted out of the
+interface, including framing characters."
+::= { reportsL2IfaceEntry 18 }
+
+reportsL2IfaceIfOutUcastPkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets that higher-level
+protocols requested to be transmitted to a
+subnetwork-unicast address, including those that
+were discarded or not sent."
+::= { reportsL2IfaceEntry 19 }
+
+reportsL2IfaceIfOutNUcastPkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets that higher-level
+protocols requested to be transmitted to a non-
+unicast (i.e., a subnetwork-broadcast or
+subnetwork-multicast) address, including those
+that were discarded or not sent."
+::= { reportsL2IfaceEntry 20 }
+
+reportsL2IfaceIfOutDiscards OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of outbound packets that were chosen
+to be discarded even if no errors that prevented their
+transmission had been detected. One
+possible reason for discarding such a packet could
+be to free up buffer space."
+::= { reportsL2IfaceEntry 21 }
+
+reportsL2IfaceIfOutErrors OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of outbound packets that could not be
+transmitted because of errors."
+::= { reportsL2IfaceEntry 22 }
+
+reportsL2IfaceStatsDropEvents OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of events in which packets
+were dropped by the probe due to lack of resources.
+Note that this number is not necessarily the number of
+packets dropped; it is just the number of times this
+condition has been detected."
+::= { reportsL2IfaceEntry 23 }
+
+reportsL2IfaceStatsOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of octets of data (including
+those in bad packets) received on the
+network (excluding framing bits but including
+FCS octets).
+
+This object can be used as a reasonable estimate of
+Ethernet utilization. If greater precision is
+desired, the etherStatsPkts and etherStatsOctets
+objects should be sampled before and after a common
+interval. The differences in the sampled values are
+Pkts and Octets, respectively, and the number of
+seconds in the interval is Interval. These values
+are used to calculate the Utilization as follows:
+
+Pkts * (9.6 + 6.4) + (Octets * .8)
+Utilization = -------------------------------------
+Interval * 10,000
+
+The result of this equation is the Ethernet segment utilization
+which is the percent utilization of the ethernet
+segment on a 0 to 100 percent scale."
+::= { reportsL2IfaceEntry 24 }
+
+reportsL2IfaceStatsPkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad packets,
+broadcast packets, and multicast packets) received."
+::= { reportsL2IfaceEntry 25 }
+
+reportsL2IfaceStatsBroadcastPkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of good packets received that were
+directed to the broadcast address. Note that this
+does not include multicast packets."
+::= { reportsL2IfaceEntry 26 }
+
+reportsL2IfaceStatsMulticastPkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of good packets received that were
+directed to a multicast address. Note that this
+number does not include packets directed to the
+broadcast address."
+::= { reportsL2IfaceEntry 27 }
+
+reportsL2IfaceStatsCRCAlignErrors OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets received that
+had a length (excluding framing bits, but
+including FCS octets) of between 64 and 1518
+octets, inclusive, but had either a bad
+Frame Check Sequence (FCS) with an integral
+number of octets (FCS Error) or a bad FCS with
+a non-integral number of octets (Alignment Error)."
+::= { reportsL2IfaceEntry 28 }
+
+reportsL2IfaceStatsUndersizePkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets received that were
+less than 64 octets long (excluding framing bits,
+but including FCS octets) and were otherwise well
+formed."
+::= { reportsL2IfaceEntry 29 }
+
+reportsL2IfaceStatsOversizePkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets received that were
+longer than 1518 octets (excluding framing bits,
+but including FCS octets) and were otherwise
+well formed."
+::= { reportsL2IfaceEntry 30 }
+
+reportsL2IfaceStatsFragments OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets received that were less
+than 64 octets in length (excluding framing bits but
+including FCS octets) and had either a bad Frame
+Check Sequence (FCS) with an integral number of
+octets (FCS Error) or a bad FCS with a non-integral
+number of octets (Alignment Error).
+
+Note that it is entirely normal for
+etherStatsFragments to increment. This is because
+it counts both runts (which are normal occurrences
+due to collisions) and noise hits."
+::= { reportsL2IfaceEntry 31 }
+
+reportsL2IfaceStatsJabbers OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets received that were
+longer than 1518 octets (excluding framing bits,
+but including FCS octets), and had either a bad
+Frame Check Sequence (FCS) with an integral number
+of octets (FCS Error) or a bad FCS with a
+non-integral number of octets (Alignment Error).
+
+Note that this definition of jabber is different
+from the definition in IEEE-802.3 section 8.2.1.5
+(10BASE5) and section 10.3.1.4 (10BASE2). These
+documents define jabber as the condition in which any
+packet exceeds 20 ms. The allowed range to detect
+jabber is between 20 ms and 150 ms."
+::= { reportsL2IfaceEntry 32 }
+
+reportsL2IfaceStatsCollisions OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The best estimate of the total number of collisions
+on this Ethernet segment.
+
+The value returned will depend on the RMON probe's location.
+Sections 8.2.1.3 (10BASE-5) and 10.3.1.3 (10BASE-2) of
+IEEE standard 802.3 states that a station must detect a collision in
+the receive mode if three or more stations are
+transmitting simultaneously. A repeater port must
+detect a collision when two or more stations are
+transmitting simultaneously. Thus a probe placed on
+a repeater port could record more collisions than a
+probe connected to a station on the same segment
+would.
+
+Probe location plays a much smaller role when
+considering 10BASE-T. Section 14.2.1.4 (10BASE-T) of IEEE
+standard 802.3 defines a collision as the
+simultaneous presence of signals on the DO and RD
+circuits (transmitting and receiving at the same
+time). A 10BASE-T station can only detect
+collisions when it is transmitting. Thus probes
+placed on a station and a repeater, should report
+the same number of collisions.
+
+Note also that an RMON probe inside a repeater
+should ideally report collisions between the
+repeater and one or more other hosts (transmit
+collisions as defined by IEEE 802.3k) plus receiver
+collisions observed on any coaxial segments to which
+the repeater is connected."
+::= { reportsL2IfaceEntry 33 }
+
+reportsL2IfaceStatsPkts64Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad
+packets) received that were 64 octets in length
+(excluding framing bits but including FCS octets)."
+::= { reportsL2IfaceEntry 34 }
+
+reportsL2IfaceStatsPkts65to127Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad
+packets) received that were between
+65 and 127 octets in length inclusive
+(excluding framing bits but including FCS octets)."
+::= { reportsL2IfaceEntry 35 }
+
+reportsL2IfaceStatsPkts128to255Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad
+packets) received that were between
+128 and 255 octets in length inclusive
+(excluding framing bits but including FCS octets)."
+::= { reportsL2IfaceEntry 36 }
+
+reportsL2IfaceStatsPkts256to511Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad
+packets) received that were between
+256 and 511 octets in length inclusive
+(excluding framing bits but including FCS octets)."
+::= { reportsL2IfaceEntry 37 }
+
+reportsL2IfaceStatsPkts512to1023Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad
+packets) received that were between
+512 and 1023 octets in length inclusive
+(excluding framing bits but including FCS octets)."
+::= { reportsL2IfaceEntry 38 }
+
+reportsL2IfaceStatsPkts1024to1518Octets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total number of packets (including bad
+packets) received that were between
+1024 and 1518 octets in length inclusive
+(excluding framing bits but including FCS octets)."
+::= { reportsL2IfaceEntry 39 }
+
+reportsL2IfaceFlow OBJECT-TYPE
+SYNTAX INTEGER {
+unknown(1),
+flowon(2),
+flowoff(3)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The flow control for the interface."
+::= { reportsL2IfaceEntry 40 }
+
+reportsL2IfaceHWType OBJECT-TYPE
+SYNTAX ModuleHwType
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The HW type of the interface."
+::= { reportsL2IfaceEntry 41 }
+
+reportsL2IfaceActiveJackIndex OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The current active jack index."
+::= { reportsL2IfaceEntry 42 }
+
+reportsHardware OBJECT IDENTIFIER ::= { reports 2 }
+--
+-- Hardware Group
+--
+--
+-- This group provides general hardware information not from other MIBs.
+--
+
+reportsHardwarePSStatus OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (1..16))
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Each OCTET holds the status of 1 power supply or if supported,
+a status of its corresponding power supply fan. Every octet can
+show one of the following states:
+0 - power supply not installed;
+1 - power supply is installed but does not function correctly;
+2 - power supply is installed and working OK;
+There are devices, which can also show status of the Fan,
+attached to the power supply. All devices which support the Power
+Supply fan, will display their status in series of octet pairs.
+The fan status octet will be displayed right after the supply
+status octet. "
+::= { reportsHardware 1 }
+
+reportsHardwareFanStatus OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (1..16))
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Each OCTET holds the status of 1 fan
+0 - Fan stopped
+1 - Fan failed
+2 - Fan OK"
+::= { reportsHardware 2 }
+
+reportsHardwareTemperature OBJECT-TYPE
+SYNTAX INTEGER
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The internal temperature of the unit in degrees Celsius."
+::= { reportsHardware 3 }
+
+reportsHardwarePSVoltage OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (1..16))
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Each OCTET holds the voltage of a corresponding power supply. Every octet can
+show one of the following states:
+0 - power supply not installed or voltage information is not supported;
+1-C - power supply in V, hexadecimal;"
+::= { reportsHardware 4 }
+
+reportsHardwareTemperatureScale OBJECT-TYPE
+SYNTAX INTEGER { celsius(1),
+fahrenheit(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Displays the scale used - Celsius (Centigrade) or Fahrenheit when measuring CPU temperature. The value of this object determines the type of scale used for the values of reportsHardwareTemperature and reportsHardwareTemperatureHighLimit objects."
+DEFVAL { celsius }
+::= { reportsHardware 5 }
+
+reportsHardwareTemperatureHighLimit OBJECT-TYPE
+SYNTAX INTEGER (20..70)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Displays the highest allowed Celsius (Centigrade) or Fahrenheit temperature at the unit CPU area. When this limit is reached an SNMP notification is sent."
+DEFVAL { 55 }
+-- Default value in Celsius is 55, or 131 in Fahrenheit; Allowed range is <20-70> for Celsius, <68-158> in Fahrenheit
+::= { reportsHardware 6 }
+
+reportsHardwareDoorStatus OBJECT-TYPE
+SYNTAX INTEGER (0..2)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Status of door
+0 - Door not installed
+1 - Door open
+2 - Door closed"
+::= { reportsHardware 7 }
+
+reportsIfJack OBJECT IDENTIFIER ::= { reports 3 }
+--
+-- Hardware Group
+--
+--
+-- This group provides general hardware information not from other MIBs.
+--
+
+reportsIfJackTable OBJECT-TYPE
+SYNTAX SEQUENCE OF ReportsIfJackEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Information about the external jacks attached to
+MAUs attached to an interface."
+::= { reportsIfJack 2 }
+
+reportsIfJackEntry OBJECT-TYPE
+SYNTAX ReportsIfJackEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the table, containing information
+about a particular jack."
+INDEX { reportsL2IfaceUnit,reportsL2IfaceSlot,
+reportsL2IfacePort,reportsIfJackIndex }
+::= { reportsIfJackTable 1 }
+
+ReportsIfJackEntry ::=
+SEQUENCE {
+reportsIfJackIndex Integer32,
+reportsIfJackType ModuleHwType
+}
+
+reportsIfJackIndex OBJECT-TYPE
+SYNTAX Integer32 (1..2147483647)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This variable uniquely identifies the jack
+described by this entry from among other jacks
+attached to the same MAU."
+::= { reportsIfJackEntry 1 }
+
+reportsIfJackType OBJECT-TYPE
+SYNTAX ModuleHwType
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The jack connector type, as it appears on the
+outer side of the system."
+::= { reportsIfJackEntry 2 }
+
+-- Notifications for use by prvtSwitchMib
+
+cpuTemperatureExceeded NOTIFICATION-TYPE
+OBJECTS { reportsHardwareTemperature }
+STATUS current
+DESCRIPTION
+"The cpuTemperatuteExceeded trap indicates that the sending
+agent senses that the internal temperature has passed the
+program threshold."
+::= {prvtSwitchNotifications 1}
+
+powerSupplyStatusChange NOTIFICATION-TYPE
+OBJECTS { reportsHardwarePSStatus }
+STATUS current
+DESCRIPTION
+"The powerSupplyStatusChange trap indicates that the sending
+agent senses a change in the status of one of the power supplies."
+::= {prvtSwitchNotifications 2}
+
+fanStatusChange NOTIFICATION-TYPE
+OBJECTS { reportsHardwareFanStatus }
+STATUS current
+DESCRIPTION
+"The fanStatusChange trap indicates that the sending
+agent senses a change in the status of one of the fans."
+::= {prvtSwitchNotifications 3}
+
+portSecurityViolation NOTIFICATION-TYPE
+OBJECTS { ifIndex }
+STATUS current
+DESCRIPTION
+"The port security violation notification indicates that a port security violation has been detected, e.g more MAC adresses have been learned on that port than the number allowed."
+::= { prvtSwitchNotifications 4}
+
+portRedundantLinkChange NOTIFICATION-TYPE
+OBJECTS { ifAdminStatus, ifOperStatus, reportsL2IfaceLink }
+STATUS current
+DESCRIPTION
+"The port redundant link change notification indicates that the physical state of a redundant (i.e.
+blocked or discarding) link has changed from link-up
+to link down or vice versa."
+::= { prvtSwitchNotifications 5}
+
+sysIntfModuleChange NOTIFICATION-TYPE
+OBJECTS { sysIntfModule}
+STATUS current
+DESCRIPTION
+"The System Interface Module change notification indicates
+that the physical status of a module in the
+unit has changed."
+::= { prvtSwitchNotifications 6}
+
+prvtLogNotifyFull NOTIFICATION-TYPE
+-- OBJECTS { }
+STATUS current
+DESCRIPTION
+"Log buffer is almost full."
+::= { prvtSwitchNotifications 7}
+
+doorStatusChange NOTIFICATION-TYPE
+OBJECTS { reportsHardwareDoorStatus }
+STATUS current
+DESCRIPTION
+"The doorStatusChange trap indicates that the sending
+agent senses a change in the status of the door."
+::= {prvtSwitchNotifications 8}
+
+-- *******************************************************************
+-- Conformance Information
+-- *******************************************************************
+
+prvtSwitchMIBGroups OBJECT IDENTIFIER ::= { prvtSwitchConformance 2 }
+
+prvtSwitchNotificationGroup NOTIFICATION-GROUP
+NOTIFICATIONS {
+cpuTemperatureExceeded,
+powerSupplyStatusChange,
+fanStatusChange,
+portSecurityViolation,
+portRedundantLinkChange,
+sysIntfModuleChange,
+doorStatusChange
+}
+STATUS current
+DESCRIPTION
+"Private Notification Group."
+::= { prvtSwitchMIBGroups 3 }
+
+END

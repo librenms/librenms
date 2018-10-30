@@ -7,7 +7,6 @@ $app_id = $app['app_id'];
 $options      = '-O qv';
 $oid          = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.13.102.98.115.100.110.102.115.115.101.114.118.101.114';
 $nfsserver = snmp_walk($device, $oid, $options);
-update_application($app, $nfsserver);
 
 list($getattr, $setattr, $lookup, $readlink, $read, $write, $create, $remove, $rename, $link, $symlink,
     $mkdir, $rmdir, $readdir, $rdirplus, $access, $mknod, $fsstat, $fsinfo, $pathconf, $commit, $retfailed,
@@ -81,3 +80,4 @@ $fields = array(
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
+update_application($app, $nfsserver, $fields);

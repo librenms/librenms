@@ -1,12 +1,12 @@
 <?php
 
-$device_id = mres($_POST['device_id']);
+$device_id = mres($vars['device_id']);
 
 $sql = " FROM `mempools` AS `M` LEFT JOIN `devices` AS `D` ON `M`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=?";
 $param[] = $device_id;
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `M`.`mempool_descr` LIKE '%$searchPhrase%' OR `S.`mempool_perc` LIKE '%$searchPhrase%' OR `M`.`mempool_perc_warn` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `M`.`mempool_descr` LIKE '%$searchPhrase%' OR `S`.`mempool_perc` LIKE '%$searchPhrase%' OR `M`.`mempool_perc_warn` LIKE '%$searchPhrase%')";
 }
 
 $count_sql = "SELECT COUNT(`mempool_id`) $sql";

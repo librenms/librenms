@@ -16,7 +16,7 @@ if ($device['os_group'] == 'cisco') {
                 $descr = str_replace('Cisco ', '', $descr);
                 $descr = str_replace('Network Processing Engine', '', $descr);
 
-                discover_mempool($valid_mempool, $device, $index, 'cemp', $descr, '1', $entPhysicalIndex, null);
+                discover_mempool($valid_mempool, $device, $index, 'cemp', ucwords($descr), '1', $entPhysicalIndex, null);
             }
         }
     }

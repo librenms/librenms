@@ -1,0 +1,345 @@
+PACKETLOGIC-SNOOPER-DHCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE,
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64,
+	Unsigned32, TimeTicks FROM SNMPv2-SMI
+	snoopers FROM PACKETLOGIC-MIB
+	DisplayString, DateAndTime FROM SNMPv2-TC
+	CounterBasedGauge64 FROM HCNUM-TC;
+
+dhcp MODULE-IDENTITY
+	LAST-UPDATED "201212131322Z"
+	ORGANIZATION "Procera Networks, Inc."
+	CONTACT-INFO "support@proceranetworks.com"
+	DESCRIPTION "MIB for dhcp snoopers"
+	REVISION "201212131322Z"
+	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
+
+	::={snoopers 1}
+
+DhcpEntry ::= SEQUENCE {
+	dhcpRequestsInQueue SIZE,
+	dhcpDynAddFailures MOMENT,
+	dhcpPLDBReconnects SIZE,
+	dhcpPLDBUptime TIMESPAN,
+	dhcpPLDBCommits MOMENT,
+	dhcpPLDReconnects SIZE,
+	dhcpPLDUptime TIMESPAN,
+	dhcpPLDOperations MOMENT,
+	dhcpPackets MOMENT,
+	dhcpUnparsablePackets MOMENT,
+	dhcpPacketsReq MOMENT,
+	dhcpPacketsAck MOMENT,
+	dhcpPacketsIgnored MOMENT,
+	dhcpEntryIndex Integer32
+}
+
+dhcpTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF DhcpEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	::= {dhcp 1}
+
+dhcpEntry	OBJECT-TYPE
+	SYNTAX DhcpEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	INDEX { dhcpEntryIndex }
+	::= {dhcpTable 1}
+
+dhcpEntryIndex	OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique Row Index for Conceptual Table"
+	::={dhcpEntry 999}
+
+dhcpRequestsInQueue	OBJECT IDENTIFIER ::={dhcpEntry 1}
+
+dhcpRequestsInQueueVal	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Queued requests"
+
+	::={dhcpRequestsInQueue 1}
+
+dhcpRequestsInQueueMax	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Queued requests"
+
+	::={dhcpRequestsInQueue 3}
+
+dhcpDynAddFailures	OBJECT IDENTIFIER ::={dhcpEntry 2}
+
+dhcpDynAddFailuresVal	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "dyn_add failures"
+
+	::={dhcpDynAddFailures 1}
+
+dhcpDynAddFailuresMom	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "dyn_add failures"
+
+	::={dhcpDynAddFailures 2}
+
+dhcpDynAddFailuresMax	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "dyn_add failures"
+
+	::={dhcpDynAddFailures 3}
+
+dhcpPLDBReconnects	OBJECT IDENTIFIER ::={dhcpEntry 3}
+
+dhcpPLDBReconnectsVal	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PLDB reconnects"
+
+	::={dhcpPLDBReconnects 1}
+
+dhcpPLDBReconnectsMax	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PLDB reconnects"
+
+	::={dhcpPLDBReconnects 3}
+
+dhcpPLDBUptime	OBJECT IDENTIFIER ::={dhcpEntry 4}
+
+dhcpPLDBUptimeVal	OBJECT-TYPE
+	SYNTAX	 TimeTicks
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PLDB conn uptime"
+
+	::={dhcpPLDBUptime 1}
+
+dhcpPLDBCommits	OBJECT IDENTIFIER ::={dhcpEntry 5}
+
+dhcpPLDBCommitsVal	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PLDB commits"
+
+	::={dhcpPLDBCommits 1}
+
+dhcpPLDBCommitsMom	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PLDB commits"
+
+	::={dhcpPLDBCommits 2}
+
+dhcpPLDBCommitsMax	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PLDB commits"
+
+	::={dhcpPLDBCommits 3}
+
+dhcpPLDReconnects	OBJECT IDENTIFIER ::={dhcpEntry 6}
+
+dhcpPLDReconnectsVal	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PLd reconnects"
+
+	::={dhcpPLDReconnects 1}
+
+dhcpPLDReconnectsMax	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PLd reconnects"
+
+	::={dhcpPLDReconnects 3}
+
+dhcpPLDUptime	OBJECT IDENTIFIER ::={dhcpEntry 7}
+
+dhcpPLDUptimeVal	OBJECT-TYPE
+	SYNTAX	 TimeTicks
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PLd conn uptime"
+
+	::={dhcpPLDUptime 1}
+
+dhcpPLDOperations	OBJECT IDENTIFIER ::={dhcpEntry 8}
+
+dhcpPLDOperationsVal	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PLd operations"
+
+	::={dhcpPLDOperations 1}
+
+dhcpPLDOperationsMom	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PLd operations"
+
+	::={dhcpPLDOperations 2}
+
+dhcpPLDOperationsMax	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "PLd operations"
+
+	::={dhcpPLDOperations 3}
+
+dhcpPackets	OBJECT IDENTIFIER ::={dhcpEntry 9}
+
+dhcpPacketsVal	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Packets"
+
+	::={dhcpPackets 1}
+
+dhcpPacketsMom	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Packets"
+
+	::={dhcpPackets 2}
+
+dhcpPacketsMax	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Packets"
+
+	::={dhcpPackets 3}
+
+dhcpUnparsablePackets	OBJECT IDENTIFIER ::={dhcpEntry 10}
+
+dhcpUnparsablePacketsVal	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Unparsable packets"
+
+	::={dhcpUnparsablePackets 1}
+
+dhcpUnparsablePacketsMom	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Unparsable packets"
+
+	::={dhcpUnparsablePackets 2}
+
+dhcpUnparsablePacketsMax	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Unparsable packets"
+
+	::={dhcpUnparsablePackets 3}
+
+dhcpPacketsReq	OBJECT IDENTIFIER ::={dhcpEntry 11}
+
+dhcpPacketsReqVal	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Packets (DHCPREQUEST)"
+
+	::={dhcpPacketsReq 1}
+
+dhcpPacketsReqMom	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Packets (DHCPREQUEST)"
+
+	::={dhcpPacketsReq 2}
+
+dhcpPacketsReqMax	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Packets (DHCPREQUEST)"
+
+	::={dhcpPacketsReq 3}
+
+dhcpPacketsAck	OBJECT IDENTIFIER ::={dhcpEntry 12}
+
+dhcpPacketsAckVal	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Packets (ACK)"
+
+	::={dhcpPacketsAck 1}
+
+dhcpPacketsAckMom	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Packets (ACK)"
+
+	::={dhcpPacketsAck 2}
+
+dhcpPacketsAckMax	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Packets (ACK)"
+
+	::={dhcpPacketsAck 3}
+
+dhcpPacketsIgnored	OBJECT IDENTIFIER ::={dhcpEntry 13}
+
+dhcpPacketsIgnoredVal	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Ignored packets"
+
+	::={dhcpPacketsIgnored 1}
+
+dhcpPacketsIgnoredMom	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Ignored packets"
+
+	::={dhcpPacketsIgnored 2}
+
+dhcpPacketsIgnoredMax	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Ignored packets"
+
+	::={dhcpPacketsIgnored 3}
+
+
+
+
+END

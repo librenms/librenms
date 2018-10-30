@@ -9,11 +9,13 @@
 !/.github/
 !/.codeclimate.yml
 !/.mention-bot
+!/.env.example
 
 # Others #
 ##########
+__pycache__
+*.pyc
 *.swp
-/composer.lock
 Thumbs.db
 config.php
 html/css/custom/*
@@ -22,11 +24,15 @@ html/plugins/*
 !html/plugins/Test/
 includes/custom/*
 junk
-logs
 nbproject
 patches
-rrd
 !/lib/yaml
 /vendor
+/node_modules
 composer.phar
+_ide_helper.php
+
+# Docs #
+########
+out
 librenms_theme

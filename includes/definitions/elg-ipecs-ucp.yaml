@@ -1,0 +1,9 @@
+os: elg-ipecs-ucp
+text: 'Ericsson LG iPECS UCP'
+type: appliance
+icon: ericsson
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.572.16838

@@ -1,8 +1,10 @@
 <?php
 
+use LibreNMS\Authentication\LegacyAuth;
+
 $bill_id = mres($vars['bill_id']);
 
-if ($_SESSION['userlevel'] >= '10') {
+if (LegacyAuth::user()->hasGlobalAdmin()) {
     include 'pages/bill/actions.inc.php';
 }
 
@@ -16,9 +18,9 @@ if (bill_permitted($bill_id)) {
     $tomorrow   = str_replace('-', '', dbFetchCell('SELECT DATE_ADD(CURDATE(), INTERVAL 1 DAY)'));
     $last_month = str_replace('-', '', dbFetchCell('SELECT DATE_SUB(CURDATE(), INTERVAL 1 MONTH)'));
 
-    $rightnow  = $today.date(His);
-    $before    = $yesterday.date(His);
-    $lastmonth = $last_month.date(His);
+    $rightnow  = $today.date('His');
+    $before    = $yesterday.date('His');
+    $lastmonth = $last_month.date('His');
 
     $bill_name  = $bill_data['bill_name'];
     $dayofmonth = $bill_data['bill_day'];
@@ -59,14 +61,13 @@ if (bill_permitted($bill_id)) {
         AND D.device_id = P.device_id',
         array($bill_id)
     );
-    
+
     if (!$vars['view']) {
         $vars['view'] = 'quick';
     }
 
-    function print_port_list()
+    function print_port_list($ports)
     {
-        global $ports;
         echo '<div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Billed Ports</h3>
@@ -85,11 +86,11 @@ if (bill_permitted($bill_id)) {
 
         echo '</div></div>';
     }//end print_port_list
-    
+
 ?>
 
     <h2><?php   echo "Bill: ${bill_data['bill_name']}"; ?></h2>
-    
+
 <?php
     print_optionbar_start();
     echo "<strong>Bill</strong> &raquo; ";
@@ -99,41 +100,41 @@ if (bill_permitted($bill_id)) {
         'transfer' => 'Transfer Graphs',
         'history' => 'Historical Graphs'
     );
-    if ($_SESSION['userlevel'] >= '10') {
-        $menu_options['edit'] = 'Edit';
-        $menu_options['delete'] = 'Delete';
-        $menu_options['reset'] = 'Reset';
-    }
+if (LegacyAuth::user()->hasGlobalAdmin()) {
+    $menu_options['edit'] = 'Edit';
+    $menu_options['delete'] = 'Delete';
+    $menu_options['reset'] = 'Reset';
+}
     $sep = '';
-    foreach ($menu_options as $option => $text) {
-        echo $sep;
-        if ($vars['view'] == $option) {
-            echo "<span class='pagemenu-selected'>";
-        }
-
-        echo generate_link($text, $vars, array('view' => $option));
-        if ($vars['view'] == $option) {
-            echo '</span>';
-        }
-
-        $sep = ' | ';
+foreach ($menu_options as $option => $text) {
+    echo $sep;
+    if ($vars['view'] == $option) {
+        echo "<span class='pagemenu-selected'>";
     }
-    
+
+    echo generate_link($text, $vars, array('view' => $option));
+    if ($vars['view'] == $option) {
+        echo '</span>';
+    }
+
+    $sep = ' | ';
+}
+
     echo '<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => 'bills')).'/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
 
     print_optionbar_end();
 
-    if ($vars['view'] == 'edit' && $_SESSION['userlevel'] >= '10') {
-        include 'pages/bill/edit.inc.php';
-    } elseif ($vars['view'] == 'delete' && $_SESSION['userlevel'] >= '10') {
-        include 'pages/bill/delete.inc.php';
-    } elseif ($vars['view'] == 'reset' && $_SESSION['userlevel'] >= '10') {
-        include 'pages/bill/reset.inc.php';
-    } elseif ($vars['view'] == 'history') {
-        include 'pages/bill/history.inc.php';
-    } elseif ($vars['view'] == 'transfer') {
-        include 'pages/bill/transfer.inc.php';
-    } elseif ($vars['view'] == 'quick' || $vars['view'] == 'accurate') {
+if ($vars['view'] == 'edit' && LegacyAuth::user()->hasGlobalAdmin()) {
+    include 'pages/bill/edit.inc.php';
+} elseif ($vars['view'] == 'delete' && LegacyAuth::user()->hasGlobalAdmin()) {
+    include 'pages/bill/delete.inc.php';
+} elseif ($vars['view'] == 'reset' && LegacyAuth::user()->hasGlobalAdmin()) {
+    include 'pages/bill/reset.inc.php';
+} elseif ($vars['view'] == 'history') {
+    include 'pages/bill/history.inc.php';
+} elseif ($vars['view'] == 'transfer') {
+    include 'pages/bill/transfer.inc.php';
+} elseif ($vars['view'] == 'quick' || $vars['view'] == 'accurate') {
 ?>
 
 <?php   if ($bill_data['bill_type'] == 'quota') { ?>
@@ -147,18 +148,18 @@ if (bill_permitted($bill_id)) {
 <br /><br />
 
 <div class="row">
-    <div class="col-lg-6 col-lg-push-6">
-        <?php print_port_list() ?>
+<div class="col-lg-6 col-lg-push-6">
+    <?php print_port_list($ports) ?>
+</div>
+<div class="col-lg-6 col-lg-pull-6">
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            Bill Summary
+        </h3>
     </div>
-    <div class="col-lg-6 col-lg-pull-6">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">
-                Bill Summary
-            </h3>
-        </div>
-        <table class="table">
-        <tr>
+    <table class="table">
+    <tr>
 <?php   if ($bill_data['bill_type'] == 'quota') {
             // The Customer is billed based on a pre-paid quota with overage in xB
             $percent    = round((($total_data) / $bill_data['bill_quota'] * 100), 2);
@@ -176,7 +177,7 @@ if (bill_permitted($bill_id)) {
         <tr>
             <td colspan="2">
 <?php
-            echo 'Predicated usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['total_data']));
+            echo 'Predicted usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['total_data']));
 ?>
             </td>
 <?php
@@ -198,23 +199,23 @@ if (bill_permitted($bill_id)) {
         <tr>
             <td colspan="2">
 <?php
-            echo 'Predicated usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']));
+            echo 'Predicted usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']));
 ?>
             </td>
 
 <?php           }//end if
 ?>
-        </tr>
-        </table>
-    </div>
-    </div>
-    </div>
+    </tr>
+    </table>
+</div>
+</div>
+</div>
 
 <?php
 
-        $lastmonth = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))');
-        $yesterday = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))');
-        $rightnow  = date(U);
+    $lastmonth = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))');
+    $yesterday = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))');
+    $rightnow  = date('U');
 
 if ($vars['view'] == 'accurate') {
     $bi  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
@@ -255,28 +256,28 @@ if ($vars['view'] == 'accurate') {
 }//end if
 
 ?>
-    <div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Billing View</h3>
-    </div>
-    <?php echo $bi ?>
-    </div>
-    
-    <div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">24 Hour View</h3>
-    </div>
-    <?php echo $di ?>
-    </div>
+<div class="panel panel-default">
+<div class="panel-heading">
+    <h3 class="panel-title">Billing View</h3>
+</div>
+<?php echo $bi ?>
+</div>
 
-    <div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Monthly View</h3>
-    </div>
-    <?php echo $mi ?>
-    </div>    
+<div class="panel panel-default">
+<div class="panel-heading">
+    <h3 class="panel-title">24 Hour View</h3>
+</div>
+<?php echo $di ?>
+</div>
+
+<div class="panel panel-default">
+<div class="panel-heading">
+    <h3 class="panel-title">Monthly View</h3>
+</div>
+<?php echo $mi ?>
+</div>
 <?php
-    } //end if
+} //end if
 } else {
     include 'includes/error-no-perm.inc.php';
 }//end if

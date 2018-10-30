@@ -22,7 +22,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$asn = $vars['asn'];
+$asn = $vars['bgpLocalAs'];
 
 ?>
 <div class="row">
@@ -44,7 +44,7 @@ $asn = $vars['asn'];
 <script>
     var grid = $("#ixlist").bootgrid({
         ajax: true,
-        rowCount: [25,50,100,250,-1],
+        rowCount: [50, 100, 250, -1],
         post: function ()
         {
             return {

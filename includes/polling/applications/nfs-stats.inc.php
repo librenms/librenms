@@ -9,7 +9,6 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.4';
 echo ' ' . $name;
 
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
-update_application($app, $nfsstats);
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -50,5 +49,6 @@ $fields = array(
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
+update_application($app, $nfsstats, $fields);
 
 unset($nfsstats, $rrd_name, $rrd_def, $data, $fields, $tags);

@@ -1,13 +1,15 @@
 <?php
 
-if ($_SESSION['userlevel'] < 10) {
+use LibreNMS\Authentication\LegacyAuth;
+
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     require 'includes/error-no-perm.inc.php';
     exit;
 }
 
 $pagetitle[] = "Delete device";
 
-if ($_SESSION['userlevel'] == 11) {
+if (LegacyAuth::user()->isDemoUser()) {
     demo_account();
 } else {
     if (is_numeric($_REQUEST['id'])) {
@@ -30,7 +32,7 @@ if ($_SESSION['userlevel'] == 11) {
       <input type="hidden" name="id" value="<?php echo $_REQUEST['id'] ?>" />
       <input type="hidden" name="confirm" value="1" />
       <!--<input type="hidden" name="remove_rrd" value="<?php echo $_POST['remove_rrd']; ?>">-->
-      <button type="submit" class="btn btn-danger">Confirm host deletion</button>
+      <button type="submit" class="btn btn-danger">Confirm device deletion</button>
     </div>
   </form>
 </center>
@@ -57,8 +59,9 @@ if ($_SESSION['userlevel'] == 11) {
                   <label for="id" class="col-sm-2 control-label">Device:</label>
                   <div class="col-sm-10">
                     <select name="id" class="form-control" id="id">
+                        <option disabled="disabled" selected="selected">Please select</option>
                     <?php
-                    foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data) {
+                    foreach (dbFetchRows("SELECT `device_id`, `hostname` FROM `devices` ORDER BY `hostname`") as $data) {
                         echo("<option value='".$data['device_id']."'>".$data['hostname']."</option>");
                     }
 

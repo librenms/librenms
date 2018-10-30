@@ -1,0 +1,1382 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-CES-MIB.mib
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-CES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,
+IpAddress,
+Gauge32,
+Integer32,
+Unsigned32,
+NOTIFICATION-TYPE
+FROM SNMPv2-SMI
+
+TimeStamp
+FROM SNMPv2-TC
+
+dsx1ConfigEntry
+FROM DS1-MIB
+
+TEXTUAL-CONVENTION
+FROM SNMPv2-TC
+
+MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+OBJECT-GROUP
+FROM SNMPv2-CONF
+
+switch
+FROM PRVT-SWITCH-MIB;
+
+prvtCESMib MODULE-IDENTITY
+LAST-UPDATED "200905180000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+"BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"This module includes configuration parameters for DS1 modules not included in
+DS1-MIB."
+
+-- revision history
+REVISION "200905180000Z"
+DESCRIPTION
+"OC3 Alarm Enhacements"
+
+REVISION "200905140000Z"
+DESCRIPTION
+"Add prvtCESApsTable"
+
+REVISION "200905050000Z"
+DESCRIPTION
+"Add prvtCESUpdateFirmwareTable"
+
+REVISION "200903190000Z"
+DESCRIPTION
+"Add new objects prvtCESServiceClock, prvtCESModuleServiceClock"
+
+REVISION "200902250000Z"
+DESCRIPTION
+"Add prvtCESCICTable, prvtCESCICMappTable,
+prvtCESModulePolicyLopsEnter, prvtCESModulePolicyLopsExit "
+REVISION "200902160000Z"
+DESCRIPTION
+"Modified values for objects
+prvtCESModulePolicyLops, prvtCESModulePolicyRbit,
+prvtCESModulePolicyRd"
+REVISION "200806190000Z"
+DESCRIPTION
+"Added new objects
+prvtCESClearPortStatistics, prvtCESModuleClearCircuitStatistics,
+prvtCESModuleLbit, prvtCESModulePolicyLops,
+prvtCESModulePolicyLbit, prvtCESModulePolicyRbit,
+prvtCESModulePolicyRd, prvtCESModulePolicyIdlePattern,
+prvtCESModulePolicyIdleSignalling"
+
+REVISION "200603070000Z"
+DESCRIPTION
+"Added an additional port index to the alarm table."
+
+REVISION "200602230000Z"
+DESCRIPTION
+"Added the TCA alarms table objects and the TCA alarm trap."
+
+REVISION "200503110000Z"
+DESCRIPTION
+"Initial version."
+
+::= { switch 111 }
+
+--
+-- Variable Type definitions
+--
+
+ConfigAction ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"This value is used to specify what is to be done with unapplied CES module configuration."
+SYNTAX INTEGER {
+noop(1),
+applyConfiguration(2),
+rejectConfiguration(3),
+restart(4)
+}
+
+E1Impedance ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"This value is used to configure E1 line type termination impedance."
+SYNTAX INTEGER {
+notApplicable(0),
+e1-75ohm(1),
+e1-75hrl(2),
+e1-120ohm(3),
+e1-120hrl(4)
+}
+
+T1LongCableLength ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"This value is used to configure T1 long cable length."
+SYNTAX INTEGER {
+notApplicable (1),
+neg75dB (2),
+neg15dB (3),
+neg225dB (4),
+zerodB (5)
+}
+
+T1GainLimit ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"This value is used to configure T1 type Tx or Rx gain limit."
+SYNTAX INTEGER {
+notApplicable(0),
+none(1),
+gain30(2),
+gain36(3)
+}
+
+CESLineType ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"This value is used to configure the line mode common for all TDM ports of the module."
+SYNTAX INTEGER {
+e1(1),
+t1(2),
+e1-sdh(3),
+t1-sdh(4),
+t1-sonet(5)
+}
+
+ServiceClock ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"This values are used to configure transmit clock as one of this modes."
+SYNTAX INTEGER{
+notAplicable(0),
+loopTiming (1),
+localTiming (2),
+adaptive	(3),
+differntial (4)
+}
+
+prvtCESNotifications OBJECT IDENTIFIER ::= { prvtCESMib 0 }
+prvtCESObjects OBJECT IDENTIFIER ::= { prvtCESMib 1 }
+prvtCESConformance OBJECT IDENTIFIER ::= { prvtCESMib 2 }
+
+--
+-- ces objects
+--
+prvtCESDsx1ExtTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCESDsx1ExtEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains object for configuring DS1 interfaces, not supported in dsx1ConfigTable."
+::= { prvtCESObjects 1 }
+
+prvtCESDsx1ExtEntry OBJECT-TYPE
+SYNTAX PrvtCESDsx1ExtEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"prvtCESDsx1ExtEntry"
+AUGMENTS { dsx1ConfigEntry }
+::= { prvtCESDsx1ExtTable 1 }
+
+PrvtCESDsx1ExtEntry ::= SEQUENCE {
+prvtCESE1Impedance E1Impedance,
+prvtCEST1GainLimit T1GainLimit,
+prvtCESPortShutdown INTEGER,
+prvtCESPortLineType INTEGER,
+prvtCEST1LongCableLength T1LongCableLength,
+prvtCESPortOperStatus INTEGER,
+prvtCESClearPortStatistics INTEGER,
+prvtCESServiceClock ServiceClock
+}
+
+prvtCESE1Impedance OBJECT-TYPE
+SYNTAX E1Impedance
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object configures temination impedance for TDM ports if the line type is E1."
+::= { prvtCESDsx1ExtEntry 1 }
+
+prvtCEST1GainLimit OBJECT-TYPE
+SYNTAX T1GainLimit
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object configures Tx or Rx gain limit for TDM ports if the line type is T1."
+::= { prvtCESDsx1ExtEntry 2 }
+
+prvtCESPortShutdown OBJECT-TYPE
+SYNTAX INTEGER {
+enable(1),
+disable(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Shutdown TDM port."
+::= { prvtCESDsx1ExtEntry 3 }
+
+prvtCESPortLineType OBJECT-TYPE
+SYNTAX INTEGER {
+other(1),
+dsx1ESF(2),
+dsx1D4(3),
+dsx1E1(4),
+dsx1E1CRC(5),
+dsx1E1MF(6),
+dsx1E1CRCMF(7),
+dsx1Unframed(8),
+dsx1E1Unframed(9),
+dsx1DS2M12(10),
+dsx1E2(11),
+dsx1E1Q50(12),
+dsx1E1Q50CRC(13),
+dsx1SFCAS(14),
+dsx1ESFCAS(15),
+notApplicable(16)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Additional line types. For reference see object dsx1LineType"
+::= { prvtCESDsx1ExtEntry 4 }
+
+prvtCEST1LongCableLength OBJECT-TYPE
+SYNTAX T1LongCableLength
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Long cable length options for T1 mode."
+::= { prvtCESDsx1ExtEntry 5 }
+
+prvtCESPortOperStatus OBJECT-TYPE
+SYNTAX INTEGER {
+up(1),
+down(2),
+testing(3),
+unknown(4),
+dormant(5),
+notPresent(6),
+lowerlayerDown(7)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"TDM link state."
+::= { prvtCESDsx1ExtEntry 6 }
+
+prvtCESClearPortStatistics OBJECT-TYPE
+SYNTAX INTEGER {
+none ( 0 ),
+clear ( 1 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Clear port statistics."
+::= { prvtCESDsx1ExtEntry 7 }
+
+prvtCESServiceClock OBJECT-TYPE
+SYNTAX ServiceClock
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Service Clock available only for DS1 interface."
+::= { prvtCESDsx1ExtEntry 8 }
+
+prvtCESUnappTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCESUnappEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table displays CES module configuration which will take effect
+after prvtCESModuleConf is set to applyConfiguration(2)."
+::= { prvtCESObjects 3 }
+
+prvtCESUnappEntry OBJECT-TYPE
+SYNTAX PrvtCESUnappEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"prvtCESUnappEntry"
+AUGMENTS { dsx1ConfigEntry }
+::= { prvtCESUnappTable 1 }
+
+PrvtCESUnappEntry ::= SEQUENCE {
+prvtCESUnappLineType INTEGER,
+prvtCESUnappLineCoding INTEGER,
+prvtCESUnappLoopbackConfig INTEGER,
+prvtCESUnappSignalMode INTEGER,
+prvtCESUnappTransmitClockSource INTEGER,
+prvtCESUnappTransmitClockBackup INTEGER,
+prvtCESUnappLineLength Integer32,
+prvtCESUnappLineMode INTEGER,
+prvtCESUnappLineBuildOut INTEGER,
+prvtCESUnappE1Impedance E1Impedance,
+prvtCESUnappT1GainLimit T1GainLimit,
+prvtCESUnappIPAddress IpAddress,
+prvtCESUnappIPAddressMask IpAddress,
+prvtCESUnappGateway IpAddress
+}
+
+prvtCESUnappLineType OBJECT-TYPE
+SYNTAX INTEGER {
+other(1),
+dsx1ESF(2),
+dsx1D4(3),
+dsx1E1(4),
+dsx1E1CRC(5),
+dsx1E1MF(6),
+dsx1E1CRCMF(7),
+dsx1Unframed(8),
+dsx1E1Unframed(9),
+dsx1DS2M12(10),
+dsx1E2(11),
+dsx1E1Q50(12),
+dsx1E1Q50CRC(13)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of dsx1LineType before configuration is applied."
+::= { prvtCESUnappEntry 1 }
+
+prvtCESUnappLineCoding OBJECT-TYPE
+SYNTAX INTEGER {
+dsx1JBZS (1),
+dsx1B8ZS (2),
+dsx1HDB3 (3),
+dsx1ZBTSI (4),
+dsx1AMI (5),
+other(6),
+dsx1B6ZS(7)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of dsx1LineCoding before configuration is applied."
+::= { prvtCESUnappEntry 2 }
+
+prvtCESUnappLoopbackConfig OBJECT-TYPE
+SYNTAX INTEGER {
+dsx1NoLoop(1),
+dsx1PayloadLoop(2),
+dsx1LineLoop(3),
+dsx1OtherLoop(4),
+dsx1InwardLoop(5),
+dsx1DualLoop(6)
+}
+
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of dsx1LoopbackConfig before configuration is applied."
+::= { prvtCESUnappEntry 3 }
+
+prvtCESUnappSignalMode OBJECT-TYPE
+SYNTAX INTEGER {
+none (1),
+robbedBit (2),
+bitOriented (3),
+messageOriented (4),
+other (5)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of dsx1SignalMode before configuration is applied."
+::= { prvtCESUnappEntry 4 }
+
+prvtCESUnappTransmitClockSource OBJECT-TYPE
+SYNTAX INTEGER {
+loopTiming(1),
+localTiming(2),
+throughTiming(3),
+adaptive (4),
+external-port (5)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of dsx1TransmitClockSource before configuration is applied."
+::= { prvtCESUnappEntry 5 }
+
+prvtCESUnappTransmitClockBackup OBJECT-TYPE
+SYNTAX INTEGER {
+enable (1),
+disable(2)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of dsx1TransmitClockBackup before configuration is applied."
+::= { prvtCESUnappEntry 6 }
+
+prvtCESUnappLineLength OBJECT-TYPE
+SYNTAX Integer32 (0..64000)
+UNITS "meters"
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of dsx1LineLength before configuration is applied."
+::= { prvtCESUnappEntry 7 }
+
+prvtCESUnappLineMode OBJECT-TYPE
+SYNTAX INTEGER {
+csu(1),
+dsu(2)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of dsx1LineMode before configuration is applied."
+::= { prvtCESUnappEntry 8 }
+
+prvtCESUnappLineBuildOut OBJECT-TYPE
+SYNTAX INTEGER {
+notApplicable (1),
+neg75dB (2),
+neg15dB (3),
+neg225dB (4),
+zerodB (5)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of dsx1LineBuildOut before configuration is applied."
+::= { prvtCESUnappEntry 9 }
+
+prvtCESUnappE1Impedance OBJECT-TYPE
+SYNTAX E1Impedance
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of prvtCESE1Impedance before configuration is applied."
+::= { prvtCESUnappEntry 10 }
+
+prvtCESUnappT1GainLimit OBJECT-TYPE
+SYNTAX T1GainLimit
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of prvtCEST1GainLimit before configuration is applied."
+::= { prvtCESUnappEntry 11 }
+
+prvtCESUnappIPAddress OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The CES Module IP address before configuration is applied."
+::= { prvtCESUnappEntry 12 }
+
+prvtCESUnappIPAddressMask OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The CES Module IP address mask before configuration is applied."
+::= { prvtCESUnappEntry 13 }
+
+prvtCESUnappGateway OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The CES Module Gateway before configuration is applied."
+::= { prvtCESUnappEntry 14 }
+
+prvtCESModuleConfTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCESModuleConfEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains object for configuring options that are applied to the entire module."
+::= { prvtCESObjects 2 }
+
+prvtCESModuleConfEntry OBJECT-TYPE
+SYNTAX PrvtCESModuleConfEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"prvtCESModuleConfEntry"
+INDEX {prvtCESModuleIndex}
+::= { prvtCESModuleConfTable 1 }
+
+PrvtCESModuleConfEntry ::= SEQUENCE {
+prvtCESModuleIndex Integer32,
+prvtCESModuleLineType CESLineType,
+prvtCESModuleTxClock INTEGER,
+prvtCESModuleTxBackupClock INTEGER,
+prvtCESModuleConfig ConfigAction,
+prvtCESModuleIPAddress IpAddress,
+prvtCESModuleIPAddressMask IpAddress,
+prvtCESModuleGateway IpAddress,
+prvtCESModuleUpTime TimeStamp,
+prvtCESModuleMACAddress OCTET STRING,
+prvtCESModuleHardwareRevision OCTET STRING,
+prvtCESModuleFirmwareVersion OCTET STRING,
+prvtCESModuleClearCircuitStatistics INTEGER,
+prvtCESModuleLbit INTEGER,
+prvtCESModulePolicyLops INTEGER,
+prvtCESModulePolicyLbit INTEGER,
+prvtCESModulePolicyRbit INTEGER,
+prvtCESModulePolicyRd INTEGER,
+prvtCESModulePolicyIdlePattern Unsigned32,
+prvtCESModulePolicyIdleSignalling Unsigned32,
+prvtCESModulePolicyLopsEnter Integer32,
+prvtCESModulePolicyLopsExit Integer32,
+prvtCESModulePolicyuUnstrLbit INTEGER,
+prvtCESModulePolicyuStrReplace INTEGER,
+prvtCESModulePolicyuUnstrReplace INTEGER,
+prvtCESModulePolicyuUnstrLops INTEGER,
+prvtCESModuleServiceClock ServiceClock,
+prvtCESModulePolicyuUnstrReplacePattern Integer32
+}
+
+prvtCESModuleIndex OBJECT-TYPE
+SYNTAX Integer32(1..65535)
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"Index of each CES module installed."
+::= { prvtCESModuleConfEntry 1 }
+
+prvtCESModuleLineType OBJECT-TYPE
+SYNTAX CESLineType
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Line mode for the module."
+::= { prvtCESModuleConfEntry 2 }
+
+prvtCESModuleTxClock OBJECT-TYPE
+SYNTAX INTEGER {
+loopTiming(1),
+localTiming(2),
+throughTiming(3),
+adaptive (4),
+external-port (5),
+line (6),
+ptp(7)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Configures Transmit Source Clock for the module."
+::= { prvtCESModuleConfEntry 3 }
+
+prvtCESModuleTxBackupClock OBJECT-TYPE
+SYNTAX INTEGER {
+enable (1),
+disable (2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Configures Backup Clock for the module."
+::= { prvtCESModuleConfEntry 4 }
+
+prvtCESModuleConfig OBJECT-TYPE
+SYNTAX ConfigAction
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"When this object is set to applyConfiguration(2), the module is restarted
+and the changes in dsx1ConfigTable or prvtCESConfTable are applied. The object
+must be set to rejectConfiguration(3) to remove unapplied changes. If the object
+is set to restart(4), the module is restarted with applying the changes.
+This object always returns a value of noop(1) when get."
+::= { prvtCESModuleConfEntry 5 }
+
+prvtCESModuleIPAddress OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The CES Module IP address after configuration is applied."
+::= { prvtCESModuleConfEntry 6 }
+
+prvtCESModuleIPAddressMask OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The CES Module IP address mask after configuration is applied."
+::= { prvtCESModuleConfEntry 7 }
+
+prvtCESModuleGateway OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+" CES Module Gateway after configuration is applied."
+::= { prvtCESModuleConfEntry 8 }
+
+prvtCESModuleUpTime OBJECT-TYPE
+SYNTAX TimeStamp
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"CES Up Time"
+::= { prvtCESModuleConfEntry 9 }
+
+prvtCESModuleMACAddress OBJECT-TYPE
+SYNTAX OCTET STRING
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"CES MAC Address"
+::= { prvtCESModuleConfEntry 10 }
+
+prvtCESModuleHardwareRevision OBJECT-TYPE
+SYNTAX OCTET STRING
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" CES Hardware revision"
+::= { prvtCESModuleConfEntry 11 }
+
+prvtCESModuleFirmwareVersion OBJECT-TYPE
+SYNTAX OCTET STRING
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" CES Firmware revision"
+::= { prvtCESModuleConfEntry 12 }
+
+prvtCESModuleClearCircuitStatistics OBJECT-TYPE
+SYNTAX INTEGER {
+none ( 0 ),
+clear ( 1 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Clear circuits statistics."
+::= { prvtCESModuleConfEntry 13 }
+
+prvtCESModuleLbit OBJECT-TYPE
+SYNTAX INTEGER {
+enable ( 1 ),
+disable ( 2 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Enable/disable L bit set upon AIS
+defect detection, in structure agnostic mode."
+::= { prvtCESModuleConfEntry 14 }
+
+prvtCESModulePolicyLops OBJECT-TYPE
+SYNTAX INTEGER {
+idle ( 0 ),
+all-one ( 1 ),
+channel-idle ( 2 ),
+none ( 3 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Controls policy lops. Object does not require module to be restarted."
+::= { prvtCESModuleConfEntry 15 }
+
+prvtCESModulePolicyLbit OBJECT-TYPE
+SYNTAX INTEGER {
+idle ( 0 ),
+all-one ( 1 ),
+channel-idle ( 2 ),
+none ( 3 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Controls policy lbit. Object does not require module to be restarted."
+::= { prvtCESModuleConfEntry 16 }
+
+prvtCESModulePolicyRbit OBJECT-TYPE
+SYNTAX INTEGER {
+none ( 0 ),
+rai ( 1 ),
+channel-idle ( 2 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Controls policy rbit. Object does not require module to be restarted."
+::= { prvtCESModuleConfEntry 17 }
+
+prvtCESModulePolicyRd OBJECT-TYPE
+SYNTAX INTEGER {
+none ( 0 ),
+rai ( 1 ),
+channel-idle ( 2 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Controls policy rd. Object does not require module to be restarted."
+::= { prvtCESModuleConfEntry 18 }
+
+prvtCESModulePolicyIdlePattern OBJECT-TYPE
+SYNTAX Unsigned32 (0..255)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Controls policy idle pattern. Object does not require module to be restarted."
+::= { prvtCESModuleConfEntry 19 }
+
+prvtCESModulePolicyIdleSignalling OBJECT-TYPE
+SYNTAX Unsigned32 (1..15)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Controls policy idle signalling. Object does not require module to be restarted."
+::= { prvtCESModuleConfEntry 20 }
+
+prvtCESModulePolicyLopsEnter OBJECT-TYPE
+SYNTAX Integer32 (1..1023)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Controls the number of consecutive missed
+packets required to enter LOPS state.
+Object does not require module to be restarted."
+::= {prvtCESModuleConfEntry 21}
+
+prvtCESModulePolicyLopsExit OBJECT-TYPE
+SYNTAX Integer32 (1..1023)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Controls the number of consecutive missed
+packets required to exit LOPS state.
+Object does not require module to be restarted."
+::= {prvtCESModuleConfEntry 22}
+
+prvtCESModulePolicyuUnstrLbit OBJECT-TYPE
+SYNTAX INTEGER{
+none(0),
+all-one(1)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"If a packet is received with L bit set, and the payload is present (not suppressed),
+one of the following is sent to the TDM line, according to a globally configurable unstructured L-flag policy:
+The AIS pattern all-one
+The received payload as-is none"
+DEFVAL { all-one }
+::= {prvtCESModuleConfEntry 23}
+
+prvtCESModulePolicyuStrReplace OBJECT-TYPE
+SYNTAX INTEGER{
+all-one(1),
+idle (2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"If a missing packet is detected, one of the following is sent to the TDM line,
+according to a globally configurable structured missing packet replacement policy:
+The AIS pattern all-one on the relevant timeslots
+The configured IDLE pattern"
+DEFVAL { all-one }
+::= {prvtCESModuleConfEntry 24}
+
+prvtCESModulePolicyuUnstrReplace OBJECT-TYPE
+SYNTAX INTEGER{
+all-one(1),
+idle (2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"If a missing packet is detected, one of the following is sent to the TDM line,
+according to a globally configurable unstructured missing packet replacement policy:
+The AIS pattern all-one
+The configured IDLE pattern"
+DEFVAL { all-one }
+::= {prvtCESModuleConfEntry 25}
+
+
+prvtCESModulePolicyuUnstrLops OBJECT-TYPE
+SYNTAX INTEGER{
+none(0),
+all-one(1)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"If a CES circuit enters the LOPS state, one of the following is sent to the TDM line,
+according to a globally configurable unstructured missing packet replacement policy:
+The AIS pattern all-one
+The contents of the jitter buffer - none"
+DEFVAL { all-one }
+::= {prvtCESModuleConfEntry 26}
+
+prvtCESModuleServiceClock OBJECT-TYPE
+SYNTAX ServiceClock
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Clock mode for CES module"
+::= {prvtCESModuleConfEntry 27}  
+
+
+prvtCESModulePolicyuUnstrReplacePattern OBJECT-TYPE
+SYNTAX Integer32 (1..255)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Unstructured packet replace policy pattern number"
+::= {prvtCESModuleConfEntry 28}  
+prvtCESDsx1AlarmTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCESDsx1AlarmEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains object for configuring and displaying TDM ports TCA thresholds."
+::= { prvtCESObjects 4 }
+
+prvtCESDsx1AlarmEntry OBJECT-TYPE
+SYNTAX PrvtCESDsx1AlarmEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"prvtCESDsx1AlarmEntry"
+INDEX {prvtCESDsx1AlarmPort,prvtCESDsx1AlarmIndex}
+::= { prvtCESDsx1AlarmTable 1 }
+
+PrvtCESDsx1AlarmEntry ::= SEQUENCE {
+prvtCESDsx1AlarmPort Integer32,
+prvtCESDsx1AlarmIndex Gauge32,
+prvtCESDsx1AlarmVariable OBJECT IDENTIFIER,
+prvtCESDsx1AlarmThreshold Integer32,
+prvtCESDsx1AlarmValue Integer32
+}
+
+prvtCESDsx1AlarmPort OBJECT-TYPE
+SYNTAX Integer32(1..65535)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" The DS1 port for which this alarm is configured. "
+::= { prvtCESDsx1AlarmEntry 1 }
+
+prvtCESDsx1AlarmIndex OBJECT-TYPE
+SYNTAX Gauge32
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" An integer uniquely identifying an alarm entry."
+::= { prvtCESDsx1AlarmEntry 2 }
+
+prvtCESDsx1AlarmVariable OBJECT-TYPE
+SYNTAX OBJECT IDENTIFIER
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The OID of the variable whose value is being monitored. Depending on the time interval,
+the error condition and the ifIndex of the TDM interface, this points to an object from an entry in
+dsx1CurrentTable or dsx1TotalTable."
+::= { prvtCESDsx1AlarmEntry 3 }
+
+prvtCESDsx1AlarmThreshold OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The alarm condition threshold for this alarm entry. The alarm is triggered if the value of the
+object pointed by prvtCESDsx1AlarmVariable remains above this threshold for more than 3 seconds."
+::= { prvtCESDsx1AlarmEntry 4 }
+
+prvtCESDsx1AlarmValue OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"The value of the object pointed to by prvtCESDsx1AlarmVariable, present for notification purposes."
+::= { prvtCESDsx1AlarmEntry 5 }
+
+prvtCESAlarmMonitor OBJECT-TYPE
+SYNTAX INTEGER {
+enable(1),
+disable(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"CES alarm monitor"
+DEFVAL { enable }
+::= { prvtCESObjects 5 }
+
+prvtCESCICTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCESCICEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains objects for configuring Clock Input Controller."
+::= { prvtCESObjects 6 }
+
+prvtCESCICEntry OBJECT-TYPE
+SYNTAX PrvtCESCICEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"prvtCESCICEntry"
+INDEX {prvtCESCICModuleId,prvtCESCICNumber}
+::= { prvtCESCICTable 1 }
+
+PrvtCESCICEntry ::= SEQUENCE {
+prvtCESCICModuleId Integer32,
+prvtCESCICNumber Gauge32,
+prvtCESCICClockNumber Integer32,
+prvtCESCICMode 	 INTEGER,
+prvtCESCICTdmPort Integer32,
+prvtCESCICCircuit Integer32,
+prvtCESCICStatus INTEGER,
+prvtCESCICState INTEGER
+}
+
+prvtCESCICModuleId OBJECT-TYPE
+SYNTAX Integer32 (1..255)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Slot of CES module installed."
+::= {prvtCESCICEntry 1}
+
+prvtCESCICNumber OBJECT-TYPE
+SYNTAX Gauge32
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" An integer uniquely identifying a Clock Input Controller."
+::= {prvtCESCICEntry 2}
+
+prvtCESCICClockNumber OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This variable indicates the index of the clock
+the clock input controller belongs to"
+::= {prvtCESCICEntry 3}
+
+prvtCESCICMode OBJECT-TYPE
+SYNTAX INTEGER {
+freeRun (1),
+acquisition (2),
+normal (3),
+holdover (4),
+fastAcquisiton (5)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The mode of the clock input controller. Not
+all clock input controllers support all modes.
+The clock input controller status is 'locked'
+only if the clock input controller is in
+'normal' mode."
+::= {prvtCESCICEntry 4}
+
+prvtCESCICTdmPort OBJECT-TYPE
+SYNTAX Integer32 (0..4)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"If the clock input controller recovers a clock
+from a port , this variable indicates the
+TDM Port. Otherwise, it must
+be set to zero."
+::= {prvtCESCICEntry 5}
+
+prvtCESCICCircuit OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"If the clock input controller recovers a clock
+from a circuit, this variable indicates the
+circuit ID. Otherwise, it
+must be set to zero."
+::= {prvtCESCICEntry 6}
+
+prvtCESCICStatus OBJECT-TYPE
+SYNTAX INTEGER {
+locked (1),
+notlocked (2),
+sourceInputLost (3),
+sourceInputDegraded (4),
+sourceTraceLost (5),
+sourceTraceDegraded (6),
+sourceFreqOffsetFailure (7),
+recoveredClockDegraded (8),
+localReferenceFailure (9),
+remoteReferenceFailure (10)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The status of the input reference.Reference
+is ok when the status is 'locked'. Otherwise,
+the status is 'notLocked'. Alternatively, if an
+error was detected at the input, the status
+indicates this error."
+::= {prvtCESCICEntry 7}
+
+prvtCESCICState OBJECT-TYPE
+SYNTAX INTEGER {
+active (1),
+backup (2)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The state is set to 'active' if the input
+controller was selected by the clock to drive
+the clock output. At least one input out of
+the clock-input-controllers attached to a
+clock must be in an 'active' state at any given
+time"
+::= {prvtCESCICEntry 8}
+
+--
+--
+--
+prvtCESCICMappTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCESCICMappEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains clock configuration and status monitoring information."
+::= { prvtCESObjects 7 }
+
+prvtCESCICMappEntry OBJECT-TYPE
+SYNTAX PrvtCESCICMappEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"prvtCESCICMappEntry"
+INDEX {prvtCESCICMappModuleId,prvtCESCICMappClockNumber,prvtCESCICMappCICNumber}
+::= { prvtCESCICMappTable 1 }
+
+PrvtCESCICMappEntry ::= SEQUENCE {
+prvtCESCICMappModuleId Integer32,
+prvtCESCICMappClockNumber Gauge32,
+prvtCESCICMappCICNumber Gauge32,
+prvtCESCICMappState INTEGER
+}
+
+prvtCESCICMappModuleId OBJECT-TYPE
+SYNTAX Integer32 (1..255)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Slot of CES module installed."
+::= {prvtCESCICMappEntry 1}
+
+prvtCESCICMappClockNumber OBJECT-TYPE
+SYNTAX Gauge32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Index for the conceptual row
+identifying a clock within this
+mapping table"
+::= {prvtCESCICMappEntry 2}
+
+prvtCESCICMappCICNumber OBJECT-TYPE
+SYNTAX Gauge32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Index for the conceptual row
+identifying a clock input within
+this mapping table"
+::= {prvtCESCICMappEntry 3}
+
+prvtCESCICMappState OBJECT-TYPE
+SYNTAX INTEGER {
+active (1),
+backup (2)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The state is set to 'active' if the input
+controller was selected by the clock to drive
+the clock output. At least one input out of
+the clock-input-controllers attached to a
+clock must be in an 'active' state at any given
+time This value of this variable is
+equal to the prvtCESCICState
+variable in the CIC table"
+::= {prvtCESCICMappEntry 4}
+
+prvtCESApsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCESApsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains objects needed APS configuration"
+::= { prvtCESObjects 8 }
+
+prvtCESApsEntry OBJECT-TYPE
+SYNTAX PrvtCESApsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"prvtCESApsEntry"
+INDEX {prvtCESModuleId}
+::= { prvtCESApsTable 1 }
+
+PrvtCESApsEntry ::= SEQUENCE {
+	prvtCESApsModuleId Integer32,
+	prvtCESApsEnable INTEGER,
+	prvtCESApsActiveLine Integer32,
+	prvtSdBerThreshold Integer32,
+	prvtSfBerThreshold Integer32
+}
+
+prvtCESApsModuleId OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An integer uniquely identifying slot of the CES module installed"
+::= {prvtCESApsEntry 1}
+
+prvtCESApsEnable OBJECT-TYPE
+SYNTAX INTEGER {
+enable (1),
+disable (2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Enable/Disable Automatic Protection Switching"
+DEFVAL { enable }
+::= {prvtCESApsEntry 2}
+
+prvtCESApsActiveLine OBJECT-TYPE
+SYNTAX Integer32(1..2)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"APS active line"
+::= {prvtCESApsEntry 3}
+
+prvtSdBerThreshold OBJECT-TYPE
+SYNTAX Integer32(5..9)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The Signal Degrade Bit Error Rate.
+The negated value of this number is used
+as the exponent of 10 for computing the
+threshold value for the Bit Error Rate
+(BER). For example, a value of 5 indicates
+a BER threshold of 10^-5."
+::= {prvtCESApsEntry 4}
+
+prvtSfBerThreshold OBJECT-TYPE
+SYNTAX Integer32(3..5)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The Signal Failure Bit Error Rate.
+The negated value of this number is used
+as the exponent of 10 for computing the
+threshold value for the Bit Error Rate
+(BER). For example, a value of 5 indicates
+a BER threshold of 10^-5."
+::= {prvtCESApsEntry 5}
+
+prvtCESUpdateFirmwareTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCESUpdateFirmwareEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains object needed in update firmware of CES module"
+::= { prvtCESObjects 9 }
+
+prvtCESUpdateFirmwareEntry OBJECT-TYPE
+SYNTAX PrvtCESUpdateFirmwareEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"prvtCESUpdateFirmwareEntry"
+INDEX {prvtCESModuleId}
+::= { prvtCESUpdateFirmwareTable 1 }
+
+PrvtCESUpdateFirmwareEntry ::= SEQUENCE {
+prvtCESModuleId Integer32,
+prvtCESFirmwareImageName OCTET STRING,
+prvtCESUpdateAction INTEGER,
+prvtCESUpdateStatus INTEGER,
+prvtCESTFTPServer IpAddress
+}
+
+prvtCESModuleId OBJECT-TYPE
+SYNTAX Integer32 (1..32000)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An integer uniquely identifying slot of the CES module installed"
+::= {prvtCESUpdateFirmwareEntry 1}
+
+prvtCESFirmwareImageName OBJECT-TYPE
+SYNTAX OCTET STRING
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Name of the firmware image file "
+::= {prvtCESUpdateFirmwareEntry 2}
+
+prvtCESUpdateAction OBJECT-TYPE
+SYNTAX INTEGER {
+none	(1),
+update (2),
+updateThroughUART (3)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Update CES firmware "
+::= {prvtCESUpdateFirmwareEntry 3}
+
+prvtCESUpdateStatus OBJECT-TYPE
+SYNTAX INTEGER {
+updateStatusUnknown (1),
+updateSuccess (2),
+updateInProgress (3),
+updateFailed (4)
+
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The status of the last update procedure, if any. This
+	object will have a value of updateStatusUnknown(2) if no
+	update process has been performed."
+::= {prvtCESUpdateFirmwareEntry 4}
+
+prvtCESTFTPServer OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"IP Address of Tftp Server"
+::= {prvtCESUpdateFirmwareEntry 5}
+
+prvtCESDsx1Alarm NOTIFICATION-TYPE
+OBJECTS {prvtCESDsx1AlarmVariable,prvtCESDsx1AlarmThreshold,prvtCESDsx1AlarmValue}
+STATUS current
+DESCRIPTION
+"This notification is sent when the value of a TDM port error condition statistic has exceeded the
+configured threshold."
+::= {prvtCESNotifications 1}
+
+prvtCESModuleAvailable NOTIFICATION-TYPE
+OBJECTS {prvtCESModuleIndex}
+STATUS current
+DESCRIPTION
+"prvtCESModuleAvailable trap"
+::= {prvtCESNotifications 2}
+
+prvtCESModuleUnAvailableDueExtract NOTIFICATION-TYPE
+OBJECTS {prvtCESModuleIndex}
+STATUS current
+DESCRIPTION
+"prvtCESModuleUnAvailableDueExtract trap."
+::= {prvtCESNotifications 3}
+
+prvtCESModuleUnAvailableDueReload NOTIFICATION-TYPE
+OBJECTS {prvtCESModuleIndex}
+STATUS current
+DESCRIPTION
+"prvtCESModuleUnAvailableDueReload trap"
+::= {prvtCESNotifications 4}
+--
+-- Conformance Information
+--
+
+prvtCESDsx1Compliances OBJECT IDENTIFIER ::= { prvtCESConformance 1 }
+prvtCESDsx1Groups OBJECT IDENTIFIER ::= { prvtCESConformance 2 }
+
+-- compliance statements
+prvtCESDsx1Compliance MODULE-COMPLIANCE
+STATUS current
+DESCRIPTION
+"The compliance statement for management of TDM ports."
+MODULE -- this module
+MANDATORY-GROUPS {
+prvtCESDsx1NotificationsGroup,
+prvtCESDsx1ROGroup
+}
+::= { prvtCESDsx1Compliances 1 }
+
+prvtCESDsx1NotificationsGroup NOTIFICATION-GROUP
+NOTIFICATIONS { prvtCESDsx1Alarm }
+STATUS current
+DESCRIPTION
+"The group of supported notifications."
+::= { prvtCESDsx1Groups 1 }
+prvtCESDsx1ROGroup OBJECT-GROUP
+OBJECTS { prvtCESE1Impedance,
+prvtCEST1GainLimit,
+prvtCESModuleLineType,
+prvtCESModuleTxClock,
+prvtCESModuleConfig,
+prvtCESModuleIPAddress,
+prvtCESModuleIPAddressMask,
+prvtCESModuleGateway,
+prvtCESDsx1AlarmThreshold
+}
+STATUS current
+DESCRIPTION
+"The group of objects with MAX-ACCESS read-write supported with read-only access for the first release."
+::= { prvtCESDsx1Groups 2 }
+
+END

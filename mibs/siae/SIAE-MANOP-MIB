@@ -1,0 +1,204 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-MANOP-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32, Unsigned32
+        FROM SNMPv2-SMI
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+           
+    manualOperation MODULE-IDENTITY
+        LAST-UPDATED "201403170000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Manual Operation management.
+            "
+        REVISION "201403170000Z"
+        DESCRIPTION
+            "Fixed DESCRIPTION of manualOpActiveSeverityCode
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of manualOpMibVersion
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 71 }
+
+----------------------------------------------------------------------------------
+--  object identifier inside the module
+----------------------------------------------------------------------------------
+
+    manualOpTrap OBJECT IDENTIFIER ::= { manualOperation 0 }
+
+----------------------------------------------------------------------------------
+--  SIAE manualOperation GROUP
+----------------------------------------------------------------------------------
+--
+--  The following listed objects are general object common to all SIAE equipment.
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+
+    manualOpMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {manualOperation 1}
+
+-------  Begin of equipManOpTable
+--
+    manualOpTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ManualOpRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with manual operation record."
+    ::= {manualOperation 2}
+
+    manualOpRecord  OBJECT-TYPE
+        SYNTAX      ManualOpRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Manual operation record."
+        INDEX {manualOpId}
+    ::= {manualOpTable 1}
+
+    ManualOpRecord  ::=
+        SEQUENCE {
+            manualOpId          Integer32,
+            manualOpObjectId    OBJECT IDENTIFIER,
+            manualOpEventTime   Unsigned32,
+            manualOpValueType   INTEGER,
+            manualOpIntegerVal  Integer32,
+            manualOpOidVal      OBJECT IDENTIFIER
+        }
+
+    manualOpId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Manual operation index."
+    ::= {manualOpRecord 1}
+
+    manualOpObjectId  OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Object identifier of the manual operation active element."
+    ::= {manualOpRecord 2}
+
+    manualOpEventTime  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The time (in seconds since 01-Gen-1970) when the event was 
+             registered in the table."
+    ::= {manualOpRecord 3}
+
+    manualOpValueType  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                              integer32  (1),
+                              objectId   (2)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of the value. One and only one of the value object
+             that follow is used for a given row in this table, based on
+             this type."
+    ::= {manualOpRecord 4}
+
+    manualOpIntegerVal  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value when manualOpValueType is 'integer32'."
+    ::= {manualOpRecord 5}
+
+    manualOpOidVal  OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value when manualOpValueType is 'objectId'."
+    ::= {manualOpRecord 6}
+
+--
+-------  End of equipManOpTable
+
+    manualOpActive  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Manual Operation active on the equipment."
+    ::= {manualOperation 3}
+
+    manualOpActiveSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to manualOpActive  
+             and enables/disables the trap generation on status change event."
+        DEFVAL {warningTrapEnable}
+    ::= {manualOperation 4}
+
+    manualOpTimeOut  OBJECT-TYPE
+        SYNTAX      INTEGER    (0..172800)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object defines the time (in seconds) after wich the manual
+             operations are cleared. The maximum value is equivalent to 48 hours.
+             A zero means no Time-out."
+        DEFVAL {2}
+    ::= {manualOperation 5}
+
+------ End group -------------------------------------------------------------
+
+END
+
+
+
+

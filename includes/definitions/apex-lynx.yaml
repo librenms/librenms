@@ -1,0 +1,10 @@
+os: apex-lynx
+text: 'Apex Lynx'
+type: wireless
+icon: trango
+mib_dir:
+    - trango
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr_regex: '/^Apex Lynx/'

@@ -1,0 +1,4195 @@
+BENU-WAG-STATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   Integer32, Unsigned32, MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, NOTIFICATION-TYPE, Counter64 
+      FROM SNMPv2-SMI
+
+   DisplayString, MacAddress
+      FROM SNMPv2-TC
+
+   InetAddressType, InetAddress
+      FROM INET-ADDRESS-MIB
+
+   benuWAG FROM BENU-WAG-MIB;
+
+
+benuWagStatsMIB  MODULE-IDENTITY
+            LAST-UPDATED  "201702020000Z" -- Feb 02, 2017
+
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+            DESCRIPTION
+               "This MIB module defines statistics of
+                Benu Wireless Access Gateway.
+
+                Copyright (C)  2012 by Benu Networks, Inc.
+                All rights reserved."
+
+            REVISION "201702210000Z" -- Feb 02, 2017
+            DESCRIPTION "Added fragmentation scalars."
+
+            REVISION "201701310000Z" -- Jan 31, 2017
+            DESCRIPTION "Removed bWagDsLiteProfileSubscribers from DSLite profile stats table."
+
+            REVISION "201701200000Z" -- Jan 20, 2017
+            DESCRIPTION "Added DSLite profile stats table and scalars."
+
+            REVISION "201607050000Z" -- July 05, 2016
+            DESCRIPTION "Added scalar bWagNumPreAuthenticatedSubscribersS2aPmip6."
+
+            REVISION "201607050000Z" -- July 05, 2016
+            DESCRIPTION "Added scalar bWagNumCurrentSSIDS2aSubscribersPmip6."
+
+            REVISION "201605300000Z" -- May 30, 2016
+            DESCRIPTION "Added 1 more scalar leaf bWagNumCurrentTunnelsDSLite 
+            to the bWagTunnelStatsMIBObject ."
+   
+            REVISION "201605270000Z" -- May 27, 2016
+            DESCRIPTION "Added 1 more leaf to the bWagSubscriberMIBObject
+                         bWagNumCurrentDSLiteSubscribers and Added new row 
+                         bWagSubscriberDsLiteActivationsCount in 
+                         bWagSubscriberTable."
+   
+	    REVISION "201603030000Z" -- March 03, 2016
+	    DESCRIPTION "Modified bWagCgnatAuthIpAddrHighThresholdReached and
+		         bWagCgnatAuthIpAddrLowThresholdReached traps."
+
+            REVISION "201510050000Z" -- October 05, 2015
+            DESCRIPTION "Added new rows in bWagSubscriberTable to
+			differentiate added and deleted subscribers count."
+
+            REVISION "201509300000Z" -- September 30, 2015
+            DESCRIPTION "Added scalars for bWagNumPreAuthSpwifiSubscribers and
+		         bWagNumPreAuthHomeSubscribers."
+
+            REVISION "201509290000Z" -- September 29, 2015
+            DESCRIPTION "Updated home profiles."
+
+            REVISION "201509260000Z" -- September 26, 2015
+            DESCRIPTION "Home profile scalars added."
+
+            REVISION "201509240000Z" -- September 24, 2015
+            DESCRIPTION "Updated home profiles."
+
+            REVISION "201509240001Z" -- September 24, 2015
+            DESCRIPTION "Added 2 more leaves to the bWagSubscriberMIBObject
+                         bWagNumCurrentHomeSubscribers
+                         bWagNumCurrentSPWiFiSubscribers"
+
+            REVISION "201509220001Z" -- September 22, 2015
+            DESCRIPTION "Added bWagVrgApiNotifObjects."
+
+            REVISION "201509220000Z" -- September 22, 2015
+            DESCRIPTION "Added new objects in tunnel table
+                         bWagTunnelDeletedDueToReject
+                         bWagTunnelDeletedDueToAbort
+                         bWagTunnelDeletedDueToMacResFail
+                         bWagTunnelDeletedDueToLifDown
+                         bWagTunnelDeletedDueToB2bSubsDelete."
+
+            REVISION "201509210000Z" -- September 21, 2015
+            DESCRIPTION "Added bWagMHNProfileStatsTable."
+
+            REVISION "201509150000Z" -- September 15, 2015
+            DESCRIPTION " Obsoleting MIB objects no longer valid and/or 
+            supported. Obseleting Upstream Processing Latency scalars."
+
+			REVISION "201509080000Z" -- September 08, 2015
+			DESCRIPTION "Obsoleting CGNAT port usage notifications."
+
+            REVISION "201508060000Z" -- August 06, 2015
+            DESCRIPTION "Added bWagDHCPv6Table."
+
+            REVISION "201507150000Z" -- July 15, 2015
+            DESCRIPTION "Added new scalar for number of subscribers with local authentication policy."
+
+            REVISION "201506260000Z" -- June 25, 2015
+            DESCRIPTION "Added new object bWagNumTunnelsDeletedDuetoLIFDown."
+
+            REVISION "201506240000Z" -- June 24, 2015
+            DESCRIPTION "Modified bWagDhcpTPSIntervalDuration description."
+
+            REVISION "201506120000Z" -- June 12, 2015
+            DESCRIPTION "Added new object for unauthenticated and authenticated
+	                 subscribers with IPv6 prefix
+                         bWagNumSubsUnauthenticatedWithIPv6Prefix and
+                         bWagNumSubsAuthenticatedWithIPv6Prefix. "
+
+            REVISION "201505210000Z" -- May 21, 2015
+            DESCRIPTION "Modified bWagDhcpTPSLowReached notification to
+                         bWagStatsNotifications."
+
+            REVISION "201505200000Z" -- May 20, 2015
+            DESCRIPTION "Modified description of bWagDhcpTPSIntervalDuration."
+
+            REVISION "201505120000Z" -- May 12, 2015
+            DESCRIPTION "Obsoleting MIB objects no longer valid and/or supported."
+
+            REVISION "201504150000Z" -- April 15, 2015
+            DESCRIPTION "Changed tunnel scalar SYNTAX."
+
+            REVISION "201504130000Z" -- April 13, 2015
+            DESCRIPTION "Added new object bWagNumTunnelsDeletedByB2B for tunnel deleted due to B2B
+                         subscriber delete."
+
+            REVISION "201504120000Z" -- April 12, 2015
+            DESCRIPTION "Added new row in bWagSubscriberTable."
+
+            REVISION "201503270000Z" -- March 27, 2015
+            DESCRIPTION "Added scalar:
+                               bWagNumCurrentSingleStaticSubscribers
+                               bWagNumCurrentRoutedSubnetSubscribers
+                         Added new object for authenticated subscriber for
+                               bWagSubscriberAuthenticationsCountViaSingleStatic
+                               bWagSubscriberAuthenticationsCountViaRoutedSubnet"                
+
+            REVISION "201502270000Z" -- February 27, 2015
+            DESCRIPTION "Added scalar bWagNumPreAuthenticatedSubscribers."
+            
+            REVISION "201502250000Z" -- February 25, 2015
+            DESCRIPTION "Added scalar bWagNumCurrent8021xSubscribers."
+
+            REVISION "201502200000Z" -- February 20, 2015
+            DESCRIPTION "Added bWagCgnatPoolGroupStatsTable"
+
+            REVISION "201502180000Z" -- February 18, 2015
+            DESCRIPTION "Added new object for authenticated subscriber via 802.1x.
+                         bWagSubscriberAuthenticationsCountVia8021x"
+
+            REVISION "201502170000Z" -- February 17, 2015
+            DESCRIPTION "Added new object for subscribers with IPv6 prefix.
+                         bWagNumSubsWithIPv6Prefix"
+
+            REVISION "201502160000Z" -- February 16, 2015
+            DESCRIPTION "Added new objects for current IPv4 & IPv6 tunnels.
+                         bWagNumCurrentTunnelsIPv4
+                         bWagNumCurrentTunnelsIPv6 "
+
+            REVISION "201501280000Z" -- January 28, 2015
+            DESCRIPTION "Obsoleting MIB objects no longer valid and/or supported."
+
+            REVISION "201501120000Z" -- January 12, 2015
+            DESCRIPTION "Updated status of WagDownstreamProcessingLatency
+                         scalars to obsolete."
+
+            REVISION "201501080000Z" -- January 08, 2015
+            DESCRIPTION "Added bWagCgnatProfileNATIPPoolGroup varbind in
+                         bWagCgnatAuthIpAddrLowThresholdReached and
+                         bWagCgnatAuthIpAddrHighThresholdReached traps."
+
+            REVISION "201501050000Z" -- January 05, 2015
+            DESCRIPTION "Updated notification assignments to comply with standards (RFC 2578)."
+
+            REVISION "201501020000Z" -- January 02, 2015
+            DESCRIPTION "Added bWagDhcpTPSTable, bWagDhcpTPSLowReached and bWagDhcpTPSHighReached"
+
+            REVISION "201409090000Z" -- Sept 09, 2014 
+            DESCRIPTION "Added Processing latency scalar objects."
+
+            REVISION "201404280000Z" -- April 28, 2014 
+            DESCRIPTION "Updated Subscriber Stats Table."
+
+            REVISION "201403050000Z" -- March 05, 2014 
+            DESCRIPTION "Updated descriptions for CGNAT Auth periodic table."
+
+            REVISION "201402250000Z" -- February 25, 2014 
+            DESCRIPTION "Updated descriptions for CGNAT periodic tables."
+
+            REVISION "201402190000Z" -- February 19, 2014 
+            DESCRIPTION "Clarified descriptions for CGNAT profile table."
+
+            REVISION "201402140000Z" -- February 14, 2014 
+            DESCRIPTION "Clarified descriptions for CGNAT tables & notifications."
+
+            REVISION "201401170000Z" -- January 17, 2014 
+            DESCRIPTION "Added CGNAT portblocks notifications."
+
+            REVISION "201401160000Z" -- January 16, 2014 
+            DESCRIPTION "Updated Subscriber Stats Table."
+
+            REVISION "201401090000Z" -- January 09, 2014 
+            DESCRIPTION "Added a new CGNAT variable."
+
+            REVISION "201312310000Z" -- 31 December 2013
+            DESCRIPTION "Added a new CGNAT scalar."
+
+            REVISION "201312230001Z" -- 23 December 2013
+            DESCRIPTION "Updated Subscriber Stats Table."
+
+            REVISION "201312170001Z" -- 17 December 2013
+            DESCRIPTION "Updated DHCP Stats Table."
+
+            REVISION "201312100001Z" -- 10 December 2013
+            DESCRIPTION "Updated SYNTAX of bWagCgnatAuthSubscriberMac."
+
+            REVISION "201312100000Z" -- 10 December 2013
+            DESCRIPTION "Updated description of object in
+                         CGNAT Auth Subscriber Port Utilization Table."
+
+            REVISION "201311290000Z" -- 29 November 2013
+            DESCRIPTION "Added notification definitions for 
+                         CGNAT Auth IP Address utilization."
+
+            REVISION "201311230000Z" -- 23 November 2013
+            DESCRIPTION "Updated object identifier for Policy Table.
+                         Cleaned up MIB based on smilint report."
+
+            REVISION "201311210000Z" -- 21 November 2013
+            DESCRIPTION "Updated the CGNAT Profile Stats Table."
+
+            REVISION "201311130000Z" -- 13 November 2013
+            DESCRIPTION "A separate table to show CGNAT subscribers
+                         actively utilizing ports greater than the 
+                         configured threshold."
+
+            REVISION "201309130000Z" -- 13 September 2013
+            DESCRIPTION "Initial Version"
+
+            REVISION "201607080000Z" -- 08 July 2016
+            DESCRIPTION "Added Mibs for L2tpv3 Tunnel"
+
+    ::= { benuWAG 3 }
+
+-- declare top-level MIB objects for each component
+
+bWagStatsNotifications OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "WAG stats notifications are defined in this branch."
+   ::= { benuWagStatsMIB 0 }
+
+bWagRadiusMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "WAG RADIUS statistics are defined in this branch."
+   ::= { benuWagStatsMIB 1 }
+
+bWagRadiusNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Notifications of WAG RADIUS statistics are defined in this branch."
+   ::= { benuWagStatsMIB 2 }
+
+bWagDhcpMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "WAG DHCP statistics are defined in this branch."
+   ::= { benuWagStatsMIB 3 }
+
+bWagDhcpNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Notifications of WAG DHCP statistics are defined in this branch."
+   ::= { benuWagStatsMIB 4 }
+
+bWagSubscriberMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "WAG subscriber statistics are defined in this branch."
+   ::= { benuWagStatsMIB 5 }
+
+bWagSubscriberNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Notifications of WAG subscriber statistics are defined in this branch."
+   ::= { benuWagStatsMIB 6 }
+
+bWagTunnelStatsMIBObjects    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "WAG tunnel statistics are defined in this branch."
+    ::= { benuWagStatsMIB 7 }
+
+bWagTunnelNotifObjects  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Notifications of WAG tunnel statistics are defined in this branch."
+    ::= { benuWagStatsMIB 8 }
+
+bWagCgnatMIBObjects    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "WAG CGNAT objects are defined in this branch."
+    ::= { benuWagStatsMIB 9 }
+
+bWagCgnatNotifObjects  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Notifications of WAG CGNAT are defined in this branch."
+    ::= { benuWagStatsMIB 10 }
+
+bWagProcessingLatencyMIBObjects    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "WAG Processing Latency objects are defined in this branch."
+    ::= { benuWagStatsMIB 11 }
+
+bWagProcessingLatencyNotifObjects  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Notifications of WAG Processing Latency are defined in this branch."
+    ::= { benuWagStatsMIB 12 }
+
+bWagDhcpv6MIBObjects OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "WAG DHCPv6 statistics are defined in this branch."
+   ::= { benuWagStatsMIB 13 }
+
+bWagMHNMIBObjects    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "WAG MHN objects are defined in this branch."
+    ::= { benuWagStatsMIB 14 }
+
+bWagVrgApiNotifObjects  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Notifications of WAG VrgApi are defined in this branch."
+    ::= { benuWagStatsMIB 15 }
+
+bWagDsLiteMIBObjects    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "WAG DSLite objects are defined in this branch."
+    ::= { benuWagStatsMIB 16 }
+
+bWagDsLiteNotifObjects  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Notifications of WAG DSLite are defined in this branch."
+    ::= { benuWagStatsMIB 17 }
+
+bWagIpSystemStatsMIBObjects   OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "WAG IP system statistics objects are defined in this branch."
+    ::= { benuWagStatsMIB 18 }
+
+
+-- RADIUS Stats Table
+
+bWagRadiusTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagRadiusEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of RADIUS statistics."
+   ::= { bWagRadiusMIBObjects 1 }
+
+bWagRadiusEntry  OBJECT-TYPE
+   SYNTAX      BWagRadiusEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bWagRadiusTable."
+   INDEX {
+      bWagRadiusStatsInterval
+   }
+   ::= { bWagRadiusTable 1 }
+
+BWagRadiusEntry ::= SEQUENCE {
+    bWagRadiusStatsInterval                        Integer32,
+    bWagRadiusIntervalDuration                     Integer32,
+    bWagRadiusAuthLatencyMin                       Unsigned32,
+    bWagRadiusAuthLatencyMax                       Unsigned32,
+    bWagRadiusAuthLatencyAvg                       Unsigned32,
+    bWagRadiusAuthLatencyLast                      Unsigned32,
+    bWagRadiusAcctLatencyMin                       Unsigned32,
+    bWagRadiusAcctLatencyMax                       Unsigned32,
+    bWagRadiusAcctLatencyAvg                       Unsigned32,
+    bWagRadiusAcctLatencyLast                      Unsigned32,
+    bWagRadiusAccessRequestSent                    Unsigned32,
+    bWagRadiusAccessAcceptReceived                 Unsigned32,
+    bWagRadiusAccessRejectReceived                 Unsigned32,
+    bWagRadiusAcctRequestSent                      Unsigned32,
+    bWagRadiusAcctResponseReceived                 Unsigned32,
+    bWagRadiusCoAAckSent                           Unsigned32,
+    bWagRadiusCoANackSent                          Unsigned32,
+    bWagRadiusCoARequestReceived                   Unsigned32,
+    bWagRadiusCoALatencyMin                        Unsigned32,
+    bWagRadiusCoALatencyMax                        Unsigned32,
+    bWagRadiusCoALatencyAvg                        Unsigned32,
+    bWagRadiusCoALatencyLast                       Unsigned32,
+    bWagRadiusDMLatencyMin                         Unsigned32,
+    bWagRadiusDMLatencyMax                         Unsigned32,
+    bWagRadiusDMLatencyAvg                         Unsigned32,
+    bWagRadiusDMLatencyLast                        Unsigned32,
+    bWagRadiusDMAckSent                            Unsigned32,
+    bWagRadiusDMNackSent                           Unsigned32,
+    bWagRadiusDMRequestReceived                    Unsigned32
+}
+
+bWagRadiusStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval where the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i <n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bWagRadiusEntry 1 }
+
+bWagRadiusIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of stats interval in minutes"
+   ::= { bWagRadiusEntry 2 }
+
+bWagRadiusAuthLatencyMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the minimum time interval, during the reporting
+       period, between all Access-Request message(s) sent by the 
+       Client Proxy to the AAA process residing in the WAG and the
+       corresponding Access-Accept/Reject message(s) received by the 
+       Client Proxy. The value is in microseconds."
+   ::= { bWagRadiusEntry 3 }
+
+bWagRadiusAuthLatencyMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the maximum time interval, during the reporting
+       period, between all Access-Request message(s) sent by the Client 
+       Proxy to the AAA process residing in the WAG and the corresponding 
+       Access-Accept/Reject message(s) received by the Client Proxy.
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 4 }
+
+bWagRadiusAuthLatencyAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the average time interval, during the reporting
+       period, between all Access-Request message(s) sent by the Client Proxy 
+       to the AAA process residing in the WAG and the corresponding Access-Accept/Reject 
+       message(s) received by the Client Proxy.
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 5 }
+
+bWagRadiusAuthLatencyLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the time interval, during the reporting period,
+       between the most recent Access-Request message(s) sent by the Client Proxy
+       to the AAA process residing in the WAG and the corresponding Access-Accept/Reject 
+       message(s) received by the Client Proxy.
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 6 }
+
+bWagRadiusAcctLatencyMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the minimum time interval, during the reporting
+       period, between all Accounting-Request message(s) (Start/Interim Update/Stop)
+       sent by the Client Proxy to the AAA process residing in the WAG and the corresponding 
+       Accounting-Response message received by the Client Proxy. 
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 7 }
+
+bWagRadiusAcctLatencyMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the maximum time interval, during the reporting
+       period, between all Accounting-Request message(s) (Start/Interim Update/Stop)
+       sent by the Client Proxy to the AAA process residing in the WAG and the 
+       corresponding Accounting-Response message(s) received by the Client Proxy. 
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 8 }
+
+bWagRadiusAcctLatencyAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the average time interval, during the reporting
+       period, between all Accounting-Request message(s) (Start/Interim Update/Stop)
+       sent by the Client Proxy to the AAA process residing in the WAG and the corresponding 
+       Accounting-Response message(s) received by the Client Proxy. 
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 9 }
+
+bWagRadiusAcctLatencyLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the time interval, during the reporting period,
+       between the most recent Accounting-Request message (Start/Interim Update/Stop)
+       sent by the Client Proxy to the AAA process residing in the WAG and the corresponding 
+       Accounting-Response message(s) received by the Client Proxy. 
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 10 }
+
+bWagRadiusAccessRequestSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Access-Request message(s) sent
+        during the reporting period."
+   ::= { bWagRadiusEntry 11 }
+
+bWagRadiusAccessAcceptReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Access-Accept message(s) received
+        during the reporting period."
+   ::= { bWagRadiusEntry 12 }
+
+bWagRadiusAccessRejectReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Access-Reject message(s) received
+        during the reporting period."
+   ::= { bWagRadiusEntry 13 }
+
+bWagRadiusAcctRequestSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Request message(s) sent
+        during the reporting period."
+   ::= { bWagRadiusEntry 14 }
+
+bWagRadiusAcctResponseReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Response message(s) received
+        during the reporting period."
+   ::= { bWagRadiusEntry 15 }
+
+bWagRadiusCoAAckSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of CoA-Ack message(s) sent
+        during the reporting period."
+   ::= { bWagRadiusEntry 16 }
+
+bWagRadiusCoANackSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of CoA-Nack message(s) sent
+        during the reporting period."
+   ::= { bWagRadiusEntry 17 }
+
+bWagRadiusCoARequestReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of CoA-Request message(s) received
+        during the reporting period."
+   ::= { bWagRadiusEntry 18 }
+
+bWagRadiusCoALatencyMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the minimum time interval, during the reporting
+       period, between all CoA-Request message(s) received from the AAA
+       and their corresponding CoA-Ack/Nack message(s) sent by the WAG.
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 19 }
+
+bWagRadiusCoALatencyMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the maximum time interval, during the reporting
+       period, between all CoA-Request message(s) received from the AAA
+       and their corresponding CoA-Ack/Nack message(s) sent by the WAG.
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 20 }
+
+bWagRadiusCoALatencyAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the average time interval, during the reporting
+       period, between all CoA-Request message(s) received from the AAA
+       and their corresponding CoA-Ack/Nack message(s) sent by the WAG.
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 21 }
+
+bWagRadiusCoALatencyLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the time interval, during the reporting period,
+       between the most recent CoA-Request message received from the AAA
+       and its corresponding CoA-Ack/Nack message received by the WAG.
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 22 }
+
+bWagRadiusDMLatencyMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the minimum time interval, during the reporting
+       period, between all DM message(s) received from the AAA
+       and their corresponding DM-Ack/Nack message(s) sent by the WAG.
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 23 }
+
+bWagRadiusDMLatencyMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the maximum time interval, during the reporting
+       period, between all DM message(s) received from the AAA
+       and their corresponding DM Ack/Nack message(s) sent by the WAG.
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 24 }
+
+bWagRadiusDMLatencyAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the average time interval, during the reporting
+       period, between all DM message(s) received from the AAA
+       and their corresponding DM Ack/Nack message(s) sent by the WAG.
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 25 }
+
+bWagRadiusDMLatencyLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the time interval, during the reporting period,
+       between the most recent DM message received from the AAA
+       and its corresponding DM Ack/Nack message received by the WAG.
+       The value is in microseconds."
+   ::= { bWagRadiusEntry 26 }
+
+bWagRadiusDMAckSent   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of DM-Ack message(s) sent
+        during the reporting period."
+   ::= { bWagRadiusEntry 27 }
+
+bWagRadiusDMNackSent   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of DM-Nack message(s) Sent
+        during the reporting period."
+   ::= { bWagRadiusEntry 28 }
+
+bWagRadiusDMRequestReceived   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of DM-Request message(s) received
+        during the reporting period."
+   ::= { bWagRadiusEntry 29 }
+
+-- DHCP Stats Table
+
+bWagDhcpTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagDhcpEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of DHCP periodic statistics."
+   ::= { bWagDhcpMIBObjects 1 }
+
+bWagDhcpEntry  OBJECT-TYPE
+   SYNTAX      BWagDhcpEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bWagDhcpTable."
+   INDEX {
+      bWagDhcpStatsInterval
+   }
+   ::= { bWagDhcpTable 1 }
+
+BWagDhcpEntry ::= SEQUENCE {
+    bWagDhcpStatsInterval                        Integer32,
+    bWagDhcpIntervalDuration                     Integer32,
+    bWagDhcpDiscoverAckIntervalMin               Unsigned32,
+    bWagDhcpDiscoverAckIntervalMax               Unsigned32,
+    bWagDhcpDiscoverAckIntervalAvg               Unsigned32,
+    bWagDhcpDiscoverAckIntervalLast              Unsigned32,
+    bWagDhcpRequestAckLatencyMin                 Unsigned32,
+    bWagDhcpRequestAckLatencyMax                 Unsigned32,
+    bWagDhcpRequestAckLatencyAvg                 Unsigned32,
+    bWagDhcpRequestAckLatencyLast                Unsigned32,
+    bWagDhcpDiscoverOfferLatencyMin              Unsigned32,
+    bWagDhcpDiscoverOfferLatencyMax              Unsigned32,
+    bWagDhcpDiscoverOfferLatencyAvg              Unsigned32,
+    bWagDhcpDiscoverOfferLatencyLast             Unsigned32,
+    bWagDhcpDiscoverReceived                     Unsigned32,
+    bWagDhcpOfferSent                            Unsigned32,
+    bWagDhcpRequestReceived                      Unsigned32,
+    bWagDhcpAckSent                              Unsigned32,
+    bWagDhcpNackSent                             Unsigned32,
+    bWagDhcpOfferRequestIntervalMin              Unsigned32,
+    bWagDhcpOfferRequestIntervalMax              Unsigned32,
+    bWagDhcpOfferRequestIntervalAvg              Unsigned32,
+    bWagDhcpOfferRequestIntervalLast             Unsigned32
+}
+
+bWagDhcpStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval where the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bWagDhcpEntry 1}
+
+bWagDhcpIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of stats interval in minutes"
+   ::= { bWagDhcpEntry 2}
+
+bWagDhcpDiscoverAckIntervalMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the minimum time interval, during the reporting period,
+        between all DHCP Discover message(s) received by the WAG and their corresponding
+        DHCP Ack message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 3 }
+
+bWagDhcpDiscoverAckIntervalMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the maximum time interval, during the reporting period,
+        between all DHCP Discover message(s) received by the WAG and their corresponding
+        DHCP Ack message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 4 }
+
+bWagDhcpDiscoverAckIntervalAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the average time interval, during the reporting period,
+        between all DHCP Discover message(s) received by the WAG and their corresponding
+        DHCP Ack message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 5 }
+
+bWagDhcpDiscoverAckIntervalLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the time interval, during the reporting period,
+        between the most recent DHCP Discover message received by the WAG
+        and its corresponding DHCP Ack message sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 6 }
+
+bWagDhcpRequestAckLatencyMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the minimum time interval, during the reporting period,
+        between all DHCP Request message(s) received by the WAG and their corresponding
+        DHCP Ack message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 7 }
+
+bWagDhcpRequestAckLatencyMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the maximum time interval, during the reporting period,
+        between all DHCP Request message(s) received by the WAG and their corresponding
+        DHCP Ack message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 8 }
+
+bWagDhcpRequestAckLatencyAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the average time interval, during the reporting period,
+        between all DHCP Request message(s) received by the WAG and their corresponding
+        DHCP Ack message(s) is sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 9 }
+
+bWagDhcpRequestAckLatencyLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the time interval, during the reporting period,
+        between the most recent DHCP Request message received by the WAG
+        and its corresponding DHCP Ack message sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 10 }
+
+bWagDhcpDiscoverOfferLatencyMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the minimum time interval, during the reporting period,
+        between all DHCP Discover message(s) received by the WAG and their corresponding
+        DHCP Offer message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 11 }
+
+bWagDhcpDiscoverOfferLatencyMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the maximum time interval, during the reporting period,
+        between all DHCP Discover message(s) received by the WAG and their corresponding
+        DHCP Offer message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 12 }
+
+bWagDhcpDiscoverOfferLatencyAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the average time interval, during the reporting period,
+        between all DHCP Discover message(s) received by the WAG and their corresponding
+        DHCP Offer message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 13 }
+
+bWagDhcpDiscoverOfferLatencyLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the time interval, during the reporting period,
+        between the most recent DHCP Discover message received by the WAG
+        and its corresponding DHCP Offer message sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 14 }
+
+bWagDhcpDiscoverReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of DHCP Discover message(s) received
+        during the reporting period."
+   ::= { bWagDhcpEntry 15 }
+
+bWagDhcpOfferSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of DHCP Offer message(s) sent
+        during the reporting period."
+   ::= { bWagDhcpEntry 16 }
+
+bWagDhcpRequestReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of DHCP Request message(s) received
+        during the reporting period."
+   ::= { bWagDhcpEntry 17 }
+
+bWagDhcpAckSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of DHCP Ack message(s) sent
+        during the reporting period."
+   ::= { bWagDhcpEntry 18 }
+
+bWagDhcpNackSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of DHCP Nack message(s) sent
+        during the reporting period."
+   ::= { bWagDhcpEntry 19 }
+
+bWagDhcpOfferRequestIntervalMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the minimum time interval, during the reporting period,
+        between all DHCP Offer message(s) sent by the WAG and the corresponding
+        DHCP Request message(s) received by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 20 }
+
+bWagDhcpOfferRequestIntervalMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the maximum time interval, during the reporting period,
+        between all DHCP Offer message(s) sent by the WAG and the corresponding
+        DHCP Request message(s) received by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 21 }
+
+bWagDhcpOfferRequestIntervalAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the average time interval, during the reporting period,
+        between all DHCP Offer message(s) sent by the WAG and the corresponding
+        DHCP Request message(s) received by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 22 }
+
+bWagDhcpOfferRequestIntervalLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the time interval, during the reporting period,
+        between the most recent DHCP Offer message sent by the WAG
+        and its corresponding DHCP Request message received by the WAG.
+        The value is in microseconds."
+   ::= { bWagDhcpEntry 23 }
+
+-- DHCP TPS Table
+
+bWagDhcpTPSTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagDhcpTPSEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of DHCP TPS periodic statistics."
+   ::= { bWagDhcpMIBObjects 2 }
+
+bWagDhcpTPSEntry  OBJECT-TYPE
+   SYNTAX      BWagDhcpTPSEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bWagDhcpTPSTable."
+   INDEX {
+      bWagDhcpTPSInterval
+   }
+   ::= { bWagDhcpTPSTable 1 }
+
+BWagDhcpTPSEntry ::= SEQUENCE {
+    bWagDhcpTPSInterval             Integer32,
+    bWagDhcpTPSIntervalDuration     Unsigned32,
+    bWagDhcpTPSLow                  Unsigned32,
+    bWagDhcpTPSHigh                 Unsigned32,
+    bWagDhcpTPS                     Unsigned32
+}
+
+bWagDhcpTPSInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval where the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bWagDhcpTPSEntry 1}
+
+bWagDhcpTPSIntervalDuration  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Configured interval duration of DHCP transactions in seconds"
+   ::= { bWagDhcpTPSEntry 2}
+
+bWagDhcpTPSLow  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The low value configured for the particular interval"
+   ::= { bWagDhcpTPSEntry 3 }
+
+bWagDhcpTPSHigh  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The high value configured for the particular interval"
+   ::= { bWagDhcpTPSEntry 4 }
+
+bWagDhcpTPS  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Total number of DHCP transactions for the DHCP tps interval"
+   ::= { bWagDhcpTPSEntry 5 }
+
+-- Subscriber Stats Table
+
+bWagSubscriberTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagSubscriberEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of WAG subscriber statistics."
+   ::= { bWagSubscriberMIBObjects 1 }
+
+bWagSubscriberEntry  OBJECT-TYPE
+   SYNTAX      BWagSubscriberEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bWagSubscriberTable."
+   INDEX {
+      bWagSubscriberStatsInterval
+   }
+   ::= { bWagSubscriberTable 1 }
+
+BWagSubscriberEntry ::= SEQUENCE {
+    bWagSubscriberStatsInterval                     Integer32,
+    bWagSubscriberIntervalDuration                  Integer32,
+    bWagSubscriberActivationsCount                  Unsigned32,
+    bWagSubscriberDeletionsCount                    Unsigned32,
+    bWagSubscriberAuthenticationsCount              Unsigned32,
+    bWagSubscriberRedirectionsCount                 Unsigned32,
+    bWagSubscriberRedirectionsByAcl                 Unsigned32,
+    bWagSubscriberAPMobilityOccurencesCount         Unsigned32,
+    bWagSubscriberDeletionsByDMCount                Unsigned32,
+    bWagSubscriberIdleTimeoutCount                  Unsigned32,
+    bWagSubscriberSessionTimeoutPreauthCount        Unsigned32,
+    bWagSubscriberSessionTimeoutAuthviaportalCount  Unsigned32,
+    bWagSubscriberDroppedByLicenseManagerCount      Unsigned32,
+    bWagSubscriberThrottlingOccurrencesCount        Unsigned32,
+    bWagSubscriberThrottledCount                    Unsigned32,
+    bWagSubscriberAbsoluteTimeoutCount              Unsigned32,
+    bWagSubscriberAuthsViaPortalCount               Unsigned32,
+    bWagSubscriberAuthenticationsCountVia8021x      Unsigned32,
+    bWagSubscriberAuthenticationsCountViaSingleStatic        Unsigned32,
+    bWagSubscriberAuthenticationsCountViaRoutedSubnet        Unsigned32,
+    bWagSubscriberSessionTimeoutAuthVia8021x        Unsigned32,
+    bWagSubscriberHomeTotalSubsDeleted              Unsigned32,
+    bWagSubscriberHomeTransientSubsDeleted          Unsigned32,
+    bWagSubscriberHomeUserStaticSubsDeleted         Unsigned32,
+    bWagSubscriberHomeDhcpStaticSubsDeleted         Unsigned32,
+    bWagSubscriberHomeDhcpDynSubsDeleted            Unsigned32,
+    bWagSubscriberHomePubStaticSubsDeleted          Unsigned32,
+    bWagSubscriberSpWifiActivationsCount            Unsigned32,
+    bWagSubscriberHomeActivationsCount              Unsigned32,
+    bWagSubscriberDsLiteActivationsCount            Unsigned32
+}
+
+bWagSubscriberStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval for acculating the measurements.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bWagSubscriberEntry 1 }
+
+bWagSubscriberIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of statistics interval (or reporting period) in minutes"
+   ::= { bWagSubscriberEntry 2 }
+
+bWagSubscriberActivationsCount  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber activations during the reporting period.
+       This includes all subscriber attaches into the WAG system. For example, if 
+       a subscriber attaches and then detaches and attaches again, it will be considered 
+       as 2 activations."
+   ::= { bWagSubscriberEntry 3 }
+
+bWagSubscriberDeletionsCount  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber deletions during the the reporting period."
+   ::= { bWagSubscriberEntry 4 }
+
+bWagSubscriberAuthenticationsCount  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of authentications during the reporting period.
+       Includes (a) number of times pre-authenticated subscribers
+                     are admitted into the WAG, and
+                (b) number of times subscribers have been authenticated via captive portal.
+
+       Note 1: A pre-authenticated subscriber is one for whom a captive 
+       portal URL is not received in the RADIUS Access-Accept message.
+       Note 2: Multiple successful authentications for the same subscriber
+       are counted independent of each other."
+   ::= { bWagSubscriberEntry 5 }
+
+bWagSubscriberRedirectionsCount  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber redirections to the captive portal 
+       during the reporting period. One subscriber can contribute multiple times this count."
+   ::= { bWagSubscriberEntry 6 }
+
+bWagSubscriberRedirectionsByAcl        OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete 
+   DESCRIPTION
+       "The total number of redirections of authenticated subscribers 
+       due to an ACL rule during the reporting period. This count will 
+       increment for each redirection of a HTTP-GET request for an 
+       authenticated subscriber if Benu-ACL-Redirect-URL VSA was 
+       received for the subscriber"
+   ::= { bWagSubscriberEntry 7 }
+
+bWagSubscriberAPMobilityOccurencesCount  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of AP mobility occurences for all 
+       subscribers during the reporting period."
+   ::= { bWagSubscriberEntry 8 }
+
+bWagSubscriberDeletionsByDMCount  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of subscriber deletions by Disconnect-Message 
+       during the reporting period."
+   ::= { bWagSubscriberEntry 9 }
+
+bWagSubscriberIdleTimeoutCount   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of automatic subscriber deletions due to 
+       idle timeout during the reporting period."
+   ::= { bWagSubscriberEntry 10 }
+
+bWagSubscriberSessionTimeoutPreauthCount   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of  automatic deletions due to session timeout 
+       of pre-authenticated subscribers during the reporting period."
+   ::= { bWagSubscriberEntry 11 }
+
+bWagSubscriberSessionTimeoutAuthviaportalCount   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of automatic deletions due to session timeout 
+        of subscribers that were authenticated via captive portal during 
+        the reporting period."
+   ::= { bWagSubscriberEntry 12 }
+
+bWagSubscriberDroppedByLicenseManagerCount   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of subscriber attach attempts that are dropped
+       due to license restrictions during the reporting period."
+   ::= { bWagSubscriberEntry 13 }
+
+bWagSubscriberThrottlingOccurrencesCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "The total number of times an attempt by any subscriber to reach
+      the captive portal was throttled during the reporting period."
+   ::= { bWagSubscriberEntry 14 }
+
+bWagSubscriberThrottledCount    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete 
+   DESCRIPTION
+      "The number of subscribers whose attempt to reach the captive portal
+      was throttled during the reporting period."
+   ::= { bWagSubscriberEntry 15 }
+
+bWagSubscriberAbsoluteTimeoutCount   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of automatic subscriber deletions due to 
+       absolute timeout during the reporting period."
+   ::= { bWagSubscriberEntry 16 }
+
+bWagSubscriberAuthsViaPortalCount   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of  authentications via captive portal 
+        during the reporting period."
+   ::= { bWagSubscriberEntry 17 }
+
+bWagSubscriberAuthenticationsCountVia8021x   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of  authentications via 802.1x 
+        during the reporting period."
+   ::= { bWagSubscriberEntry 18 }
+
+bWagSubscriberAuthenticationsCountViaSingleStatic   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of  authentications via B2B Single Static
+        during the reporting period."
+   ::= { bWagSubscriberEntry 19 }
+
+bWagSubscriberAuthenticationsCountViaRoutedSubnet   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of  authentications via B2B Routed Subnet
+        during the reporting period."
+   ::= { bWagSubscriberEntry 20 }
+
+bWagSubscriberSessionTimeoutAuthVia8021x   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of automatic deletions due to session timeout
+        of subscribers that were authenticated via 802.1x during the 
+        reporting period."
+   ::= { bWagSubscriberEntry 21 }
+
+bWagSubscriberHomeTotalSubsDeleted   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of home subscriber deletions during the the reporting period."
+   ::= { bWagSubscriberEntry 22 }
+
+bWagSubscriberHomeTransientSubsDeleted OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of home transient subscriber deletions during the the reporting period."
+   ::= { bWagSubscriberEntry 23 }
+
+bWagSubscriberHomeUserStaticSubsDeleted OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of home user static subscriber deletions during the the reporting period."
+   ::= { bWagSubscriberEntry 24 }
+
+bWagSubscriberHomeDhcpStaticSubsDeleted OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of home dhcp static subscriber deletions during the the reporting period."
+   ::= { bWagSubscriberEntry 25 }
+
+bWagSubscriberHomeDhcpDynSubsDeleted OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of home dhcp dynamic subscriber deletions during the the reporting period."
+   ::= { bWagSubscriberEntry 26 }
+
+bWagSubscriberHomePubStaticSubsDeleted OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of home public subscriber deletions during the the reporting period."
+   ::= { bWagSubscriberEntry 27 }
+
+bWagSubscriberSpWifiActivationsCount  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Spwifi subscriber activations during the reporting period.
+       This includes all Spwifi subscriber attaches into the WAG system. For example, if 
+       a subscriber attaches and then detaches and attaches again, it will be considered 
+       as 2 activations."
+   ::= { bWagSubscriberEntry 28 }
+
+bWagSubscriberHomeActivationsCount  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of Home subscriber activations during the reporting period.
+       This includes all Home subscriber attaches into the WAG system. For example, if 
+       a subscriber attaches and then detaches and attaches again, it will be considered 
+       as 2 activations."
+   ::= { bWagSubscriberEntry 29 }
+
+bWagSubscriberDsLiteActivationsCount  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of DSLite subscriber activations during the reporting period.
+       This includes all DSLite subscriber attaches into the WAG system. For example, if 
+       a subscriber attaches and then detaches and attaches again, it will be considered 
+       as 2 activations."
+   ::= { bWagSubscriberEntry 30 }
+
+
+-- WAG Subscriber Scalars
+
+bWagNumCurrentSubscribers     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of subscribers. This count includes authenticated,
+       unauthenticated, and home subscribers."
+   ::= { bWagSubscriberMIBObjects 2 }
+
+bWagNumAuthenticatedSubscribers    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of authenticated subscribers."
+   ::= { bWagSubscriberMIBObjects 3 }
+
+bWagNumUnauthenticatedSubscribers    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of unauthenticated subscribers."
+   ::= { bWagSubscriberMIBObjects 4 }
+
+bWagNumSubsWithPrivateIPAddress     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of subscribers with private IP address."
+   ::= { bWagSubscriberMIBObjects 5 }
+
+bWagNumAuthSubsWithPublicIPAddress     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of authenticated subscribers with public IP address."
+   ::= { bWagSubscriberMIBObjects 6 }
+
+bWagNumUnAuthSubsWithPublicIPAddress     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of un authenticated subscribers with public IP address."
+   ::= { bWagSubscriberMIBObjects 7 }
+
+bWagNumMigrantSubscribersCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of the total number of migrant subscribers. All
+      subscribers start out as migrant subscribers until an attempt
+      is made to get authenticated."
+   ::= { bWagSubscriberMIBObjects 8 }
+
+bWagNumRedirectedSubscribersCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of the total number of subscribers redirected to
+        captive portal. "
+   ::= { bWagSubscriberMIBObjects 9 }
+
+bWagNumSubsAuthenticatedWithIPv6Prefix     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of authenticated subscribers with IPv6 prefix."
+   ::= { bWagSubscriberMIBObjects 11 }
+
+bWagNumCurrent8021xSubscribers     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of 802.1x subscribers." 
+   ::= { bWagSubscriberMIBObjects 12 }
+
+bWagNumPreAuthenticatedSubscribers    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of pre-authenticated subscribers."
+   ::= { bWagSubscriberMIBObjects 13 }
+
+bWagNumCurrentSingleStaticSubscribers     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of Single Static subscribers."
+   ::= { bWagSubscriberMIBObjects 14 }
+
+bWagNumCurrentRoutedSubnetSubscribers     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of Routed Subnet subscribers."
+   ::= { bWagSubscriberMIBObjects 15 }
+
+bWagNumSubsUnauthenticatedWithIPv6Prefix     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of unauthenticated subscribers with IPv6 prefix."
+   ::= { bWagSubscriberMIBObjects 16 }
+ 
+bWagNumSubsViaStaticAuthPolicy     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of subscribers with static portal authentication
+      policy."
+   ::= { bWagSubscriberMIBObjects 17 }
+ 
+bWagNumCurrentHomeSubscribers     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of home subscribers."
+   ::= { bWagSubscriberMIBObjects 18 }
+
+bWagNumCurrentSPWiFiSubscribers     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of SP-WiFi subscribers."
+   ::= { bWagSubscriberMIBObjects 19 }
+
+bWagNumCurrentHomeTransientSubs     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of transient home subscribers."
+   ::= { bWagSubscriberMIBObjects 20 }
+
+bWagNumCurrentHomeUserStatSubs     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of user static home subscribers."
+   ::= { bWagSubscriberMIBObjects 21 }
+
+bWagNumCurrentHomeDhcpStatSubs     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of static DHCP home subscribers."
+   ::= { bWagSubscriberMIBObjects 22 }
+
+bWagNumCurrentHomeDhcpDynSubs     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of dynamic DHCP home subscribers."
+   ::= { bWagSubscriberMIBObjects 23 }
+
+bWagNumCurrentHomePubStatSubs     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number public static home subscribers."
+   ::= { bWagSubscriberMIBObjects 24 }
+
+bWagNumPreAuthSpwifiSubscribers OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of pre-authenticated SPWifi subscribers."
+   ::= { bWagSubscriberMIBObjects 25 }
+
+bWagNumPreAuthHomeSubscribers OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of pre-authenticated Home subscribers."
+   ::= { bWagSubscriberMIBObjects 26 }
+
+bWagNumPreAuthenticatedSubscribersS2aPmip6    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of pre-authenticated PMIPv6 subscribers."
+   ::= { bWagSubscriberMIBObjects 27 }
+
+bWagNumCurrentSSIDS2aSubscribersPmip6    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of PMIPv6 subscribers."
+   ::= { bWagSubscriberMIBObjects 28 }
+
+bWagNumCurrentDSLiteSubscribers     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The current number of DSLite subscribers."
+   ::= { bWagSubscriberMIBObjects 29 }
+
+-- Policy  Table
+
+bWagPolicyTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagPolicyEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of policies and the relevant subscription data"
+   ::= { bWagSubscriberMIBObjects 10 }
+
+bWagPolicyEntry  OBJECT-TYPE
+   SYNTAX      BWagPolicyEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bWagPolicyTable."
+   INDEX {
+      bWagPolicyType,
+      bWagPolicyIndex
+   }
+   ::= { bWagPolicyTable 1 }
+
+BWagPolicyEntry ::= SEQUENCE {
+    bWagPolicyType                         INTEGER,
+    bWagPolicyIndex                        Integer32,
+    bWagPolicyName                         DisplayString,
+    bWagNumOfSubscribersWithPolicy         Unsigned32,
+    bWagNumOfAuthSubscribersWithPolicy     Unsigned32,
+    bWagNumOfUnAuthSubscribersWithPolicy   Unsigned32
+
+}
+
+bWagPolicyType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            none(0),
+                            qos(1),
+                            li(2),
+                            acl(3)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object is used to identify the type of policy."
+    ::= { bWagPolicyEntry 1 }
+
+bWagPolicyIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A number uniquely identifying the policy."
+    ::= { bWagPolicyEntry 2 }
+
+bWagPolicyName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Name of the policy."
+   ::= { bWagPolicyEntry 3 }
+
+bWagNumOfSubscribersWithPolicy  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Total number subscribed to the policy."
+   ::= { bWagPolicyEntry 4 }
+
+bWagNumOfAuthSubscribersWithPolicy  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Total number of authenticated subscribers subscribed to the policy."
+   ::= { bWagPolicyEntry 5 }
+
+bWagNumOfUnAuthSubscribersWithPolicy  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Total number of unauthenticated subscribers subscribed to the policy."
+   ::= { bWagPolicyEntry 6 }
+
+
+-- WAG Tunnel Statistics Table
+
+bWagTunnelTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagTunnelEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of WAG Tunnel statistics."
+   ::= { bWagTunnelStatsMIBObjects 1 }
+
+bWagTunnelEntry     OBJECT-TYPE
+    SYNTAX      BWagTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A logical row in the bWagTunnelTable."
+    INDEX {
+        bWagTunnelStatsInterval
+    }
+    ::= { bWagTunnelTable 1 }
+
+BWagTunnelEntry ::= SEQUENCE {
+    bWagTunnelStatsInterval                         Integer32,
+    bWagTunnelIntervalDuration                      Integer32,
+    bWagTunnelPktsRxdGRE                            Unsigned32,
+    bWagTunnelPktsRxdGREPayloadTEB                  Unsigned32,
+    bWagTunnelPktsRxdGREPayloadMPLS                 Unsigned32,
+    bWagTunnelPktsEncapsulatedGRE                   Unsigned32,
+    bWagTunnelPktsDecapsulatedGRE                   Unsigned32,
+    bWagTunnelPktsRxdARP                            Unsigned32,
+    bWagTunnelPktsRxdDHCP                           Unsigned32,
+    bWagTunnelPktsRxdDNS                            Unsigned32,
+    bWagTunnelPktsRxdHTTP                           Unsigned32,
+    bWagTunnelPktsRxdHTTPGetReq                     Unsigned32,
+    bWagTunnelPktsTxdHTTP                           Unsigned32,
+    bWagTunnelPktsTxdHTTPRedir                      Unsigned32,
+    bWagTunnelPktsRxdHTTPS                          Unsigned32,
+    bWagTunnelPktsRxdTCPSyn                         Unsigned32,
+    bWagTunnelPktsTxdTCPSynAck                      Unsigned32,
+    bWagTunnelPktsTxdTCPFin                         Unsigned32,
+    bWagTunnelPktsRxdTCPFinAck                      Unsigned32,
+    bWagTunnelPktsTxdTCPAck2Fin                     Unsigned32,
+    bWagTunnelCreatedDynamically                    Unsigned32,
+    bWagTunnelCreatedStatically                     Unsigned32,
+    bWagTunnelDeleted                               Unsigned32,
+    bWagTunnelDeletedDueToInactivity                Unsigned32,
+    bWagTunnelDeletedByCommand                      Unsigned32,
+    bWagTunnelMaxSupported                          Unsigned32,
+    bWagTunnelMaxCountReached                       Unsigned32,
+    bWagTunnelTunnelsLookupFound                    Unsigned32,
+    bWagTunnelTunnelsLookupNotFound                 Unsigned32,
+    bWagTunnelCountHighThreshold                    Unsigned32,
+    bWagTunnelCountLowThreshold                     Unsigned32,
+    bWagTunnelDeletedDueToReject                    Unsigned32,
+    bWagTunnelDeletedDueToAbort                     Unsigned32,
+    bWagTunnelDeletedDueToMacResFail                Unsigned32,
+    bWagTunnelDeletedDueToLifDown                   Unsigned32,
+    bWagTunnelDeletedDueToB2bSubsDelete             Unsigned32,
+    bWagL2tpv3TunnelPktsRxd                         Unsigned32,
+    bWagL2tpv3TunnelPktsEncapsulated                Unsigned32,
+    bWagL2tpv3TunnelPktsDecapsulated                Unsigned32,
+    bWagL2tpv3TunnelPktsRxdARP                      Unsigned32,
+    bWagL2tpv3TunnelPktsRxdDHCP                     Unsigned32,
+    bWagL2tpv3TunnelPktsRxdDNS                      Unsigned32,
+    bWagL2tpv3TunnelCreatedDynamically              Unsigned32,
+    bWagL2tpv3TunnelDeleted                         Unsigned32,
+    bWagL2tpv3TunnelDeletedDueToInactivity          Unsigned32,
+    bWagL2tpv3TunnelDeletedByCommand                Unsigned32,
+    bWagL2tpv3TunnelDeletedDueToLifDown             Unsigned32
+}
+
+bWagTunnelStatsInterval     OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The interval during which the measurements are accumulated.
+        Interval index 1 indicates the latest interval for which
+        statistics accumulation is completed. Older the statistics,
+        greater the interval index value. In a system supporting a
+        history of n intervals with interval count 1 and interval
+        count n, the most and the least recent intervals respectively,
+        the following apply at the end of an interval:
+        - statistics for interval count n are discarded
+        - the statistics for interval count i become statistics
+          for interval count i + 1, where 1 <= i < n
+        - current statistics become statistics for interval count 1."
+    ::= { bWagTunnelEntry 1 }
+
+bWagTunnelIntervalDuration     OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Duration of statistics accumulation interval in minutes."
+    ::= { bWagTunnelEntry 2 }
+
+bWagTunnelPktsRxdGRE     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE packets received by WAGMGR over a GRE
+        tunnel during the measurement interval."
+    ::= { bWagTunnelEntry 3 }
+
+bWagTunnelPktsRxdGREPayloadTEB     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE packets of protocol type
+        Transparent Ethernet Bridging received by WAGMGR over
+        a GRE tunnel during the measurement interval,
+        i.e, GRE packets with protocol type field in the header
+        set to 0x6558."
+    ::= { bWagTunnelEntry 4 }
+
+bWagTunnelPktsRxdGREPayloadMPLS     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE packets of protocol type
+        Multiprotocol Label Switching received by WAGMGR over
+        a GRE tunnel during the measurement interval,
+        i.e, GRE packets with protocol type field in the header
+        set to 0x8847."
+    ::= { bWagTunnelEntry 5 }
+
+bWagTunnelPktsEncapsulatedGRE     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets encapsulated as GRE packets
+        by the WAGMGR to be tunneled during the measurement interval."
+    ::= { bWagTunnelEntry 6 }
+
+bWagTunnelPktsDecapsulatedGRE     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets received over a GRE tunnel
+        that are subsequently decapsulated by the WAGMGR during
+        the measurement interval."
+    ::= { bWagTunnelEntry 7 }
+
+bWagTunnelPktsRxdARP     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE-encapsulated ARP packets received
+        over a tunnel by the WAGMGR during the measurement interval."
+    ::= { bWagTunnelEntry 8 }
+
+bWagTunnelPktsRxdDHCP     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE-encapsulated DHCP packets received
+        over a tunnel by the WAGMGR during the measurement interval."
+    ::= { bWagTunnelEntry 9 }
+
+bWagTunnelPktsRxdDNS     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "The total number of GRE-encapsulated DNS packets received
+        over a tunnel by the WAGMGR during the measurement interval."
+    ::= { bWagTunnelEntry 10 }
+
+bWagTunnelPktsRxdHTTP     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "The total number of GRE-encapsulated HTTP packets received
+        over a tunnel by the WAGMGR during the measurement interval."
+    ::= { bWagTunnelEntry 11 }
+
+bWagTunnelPktsRxdHTTPGetReq     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "The total number of GRE-encapsulated HTTP-GET packets received
+        over a tunnel by the WAGMGR during the measurement interval."
+    ::= { bWagTunnelEntry 12 }
+
+bWagTunnelPktsTxdHTTP     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "The total number of GRE-encapsulated HTTP packets transmitted
+        by the WAGMGR over a tunnel during the measurement interval."
+    ::= { bWagTunnelEntry 13 }
+
+bWagTunnelPktsTxdHTTPRedir     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "The total number of GRE-encapsulated HTTP packets with
+        status code 302 transmitted by the WAGMGR over a tunnel
+        during the measurement interval."
+    ::= { bWagTunnelEntry 14 }
+
+bWagTunnelPktsRxdHTTPS     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "The total number of GRE-encapsulated HTTPS packets received
+        over a tunnel by the WAGMGR during the measurement interval."
+    ::= { bWagTunnelEntry 15 }
+
+bWagTunnelPktsRxdTCPSyn     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "The total number of GRE-encapsulated TCP SYN packets received
+        over a tunnel by the WAGMGR during the measurement interval."
+    ::= { bWagTunnelEntry 16 }
+
+bWagTunnelPktsTxdTCPSynAck     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "The total number of GRE-encapsulated TCP SYN-ACK packets
+        transmitted by the WAGMGR over a tunnel during the
+        measurement interval."
+    ::= { bWagTunnelEntry 17 }
+
+bWagTunnelPktsTxdTCPFin     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "The total number of GRE-encapsulated TCP FIN packets
+        transmitted by the WAGMGR over a tunnel during the
+        measurement interval."
+    ::= { bWagTunnelEntry 18 }
+
+bWagTunnelPktsRxdTCPFinAck     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "The total number of GRE-encapsulated TCP FIN/ACK packets
+        received over a tunnel by the WAGMGR during the
+        measurement interval."
+    ::= { bWagTunnelEntry 19 }
+
+bWagTunnelPktsTxdTCPAck2Fin     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "The total number of GRE-encapsulated TCP ACK packets transmitted
+        in response to a TCP FIN packet by the WAGMGR during the
+        measurement interval."
+    ::= { bWagTunnelEntry 20 }
+
+bWagTunnelCreatedDynamically     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of dynamically established GRE tunnels during
+        the measurement interval."
+    ::= { bWagTunnelEntry 21 }
+
+bWagTunnelCreatedStatically     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of statically established GRE tunnels during
+        the measurement interval."
+    ::= { bWagTunnelEntry 22 }
+
+bWagTunnelDeleted     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted during
+        the measurement interval."
+    ::= { bWagTunnelEntry 23 }
+
+bWagTunnelDeletedDueToInactivity     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted due to inactivity
+         during the measurement interval."
+    ::= { bWagTunnelEntry 24 }
+
+bWagTunnelDeletedByCommand     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted by an operator command
+        during the measurement interval."
+    ::= { bWagTunnelEntry 25 }
+
+bWagTunnelMaxSupported      OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE/L2TPV3 tunnels supported in WAG."
+    ::= { bWagTunnelEntry 26 }
+
+bWagTunnelMaxCountReached     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The maximum value of the total number of GRE/L2TPV3 tunnels reached
+        during the measurement interval."
+    ::= { bWagTunnelEntry 27 }
+
+bWagTunnelTunnelsLookupFound     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of successful tunnel lookup operations
+        performed in the WAGMGR during a measurement interval."
+    ::= { bWagTunnelEntry 28 }
+
+bWagTunnelTunnelsLookupNotFound     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of unsuccesful tunnel lookup operations
+        performed in the WAGMGR during a measurement interval."
+    ::= { bWagTunnelEntry 29 }
+
+bWagTunnelCountHighThreshold    OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The high threshold for the number of tunnels that are created.
+        If no bWagTunHighThresholdReached event was previously generated, or,
+        if a bWagTunLowThresholdReached event was previously generated, and
+        the current count of tunnels exceeds the value of
+        bWagTunnelCountHighThreshold, then a bWagTunHighThresholdReached event
+        will be generated. No more bWagTunHighThresholdReached events will be
+        generated until the value for the current count of tunnels becomes
+        equal to or less than the value of bWagTunnelCountLowThreshold."
+    ::= { bWagTunnelEntry 30 }
+
+bWagTunnelCountLowThreshold    OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The low threshold for the number of tunnels that are created.
+        If a bWagTunHighThresholdReached event was previously generated, and,
+        the current count of tunnels falls below the value of
+        bWagTunnelCountLowThreshold, then a bWagTunLowThresholdReached event
+        will be generated. No more bWagTunLowThresholdReached events will be
+        generated until the value for the current count of tunnels becomes
+        equal to or greater than the value of bWagTunnelCountHighThreshold."
+    ::= { bWagTunnelEntry 31 }
+
+bWagTunnelDeletedDueToReject     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted due to AAA Reject
+        during the measurement interval."
+    ::= { bWagTunnelEntry 32 }
+
+bWagTunnelDeletedDueToAbort     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted due to AAA Abort
+        during the measurement interval."
+    ::= { bWagTunnelEntry 33 }
+
+bWagTunnelDeletedDueToMacResFail     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted due to MAC resolution
+        failure during the measurement interval."
+    ::= { bWagTunnelEntry 34 }
+
+bWagTunnelDeletedDueToLifDown     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted due to LIF down
+         during the measurement interval."
+    ::= { bWagTunnelEntry 35 }
+
+bWagTunnelDeletedDueToB2bSubsDelete     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted due to B2B subscriber
+        delete during the measurement interval."
+    ::= { bWagTunnelEntry 36 }
+
+bWagL2tpv3TunnelPktsRxd     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of L2TPV3 packets received by WAGMGR over a L2TPV3
+        tunnel during the measurement interval."
+    ::= { bWagTunnelEntry 37 }
+
+bWagL2tpv3TunnelPktsEncapsulated     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets encapsulated as L2TPV3 packets
+        by the WAGMGR to be tunneled during the measurement interval."
+    ::= { bWagTunnelEntry 38 }
+
+bWagL2tpv3TunnelPktsDecapsulated     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of packets received over a L2TPV3 tunnel
+        that are subsequently decapsulated by the WAGMGR during
+        the measurement interval."
+    ::= { bWagTunnelEntry 39 }
+
+bWagL2tpv3TunnelPktsRxdARP     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of L2TPV3-encapsulated ARP packets received
+        over a tunnel by the WAGMGR during the measurement interval."
+    ::= { bWagTunnelEntry 40 }
+
+bWagL2tpv3TunnelPktsRxdDHCP     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of L2TPV3-encapsulated DHCP packets received
+        over a tunnel by the WAGMGR during the measurement interval."
+    ::= { bWagTunnelEntry 41 }
+
+bWagL2tpv3TunnelPktsRxdDNS     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "The total number of L2TPV3-encapsulated DNS packets received
+        over a tunnel by the WAGMGR during the measurement interval."
+    ::= { bWagTunnelEntry 42 }
+
+bWagL2tpv3TunnelCreatedDynamically     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of dynamically established L2TPV3 tunnels during
+        the measurement interval."
+    ::= { bWagTunnelEntry 43 }
+
+bWagL2tpv3TunnelDeleted     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of L2TPV3 tunnels deleted during
+        the measurement interval."
+    ::= { bWagTunnelEntry 44 }
+
+bWagL2tpv3TunnelDeletedDueToInactivity     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of L2TPV3 tunnels deleted due to inactivity
+         during the measurement interval."
+    ::= { bWagTunnelEntry 45 }
+
+bWagL2tpv3TunnelDeletedByCommand     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of L2TPV3 tunnels deleted by an operator command
+        during the measurement interval."
+    ::= { bWagTunnelEntry 46 }
+
+bWagL2tpv3TunnelDeletedDueToLifDown     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of L2TPV3 tunnels deleted due to LIF down
+         during the measurement interval."
+    ::= { bWagTunnelEntry 47 }
+
+-- WAG Tunnel Scalars
+
+bWagNumCurrentTunnels     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current number of tunnels."
+    ::= { bWagTunnelStatsMIBObjects 2 }
+
+bWagNumTunnelsCreatedDynamically     OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of dynamically established GRE tunnels."
+    ::= { bWagTunnelStatsMIBObjects 3 }
+
+bWagNumTunnelsCreatedStatically     OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of statically established GRE tunnels."
+    ::= { bWagTunnelStatsMIBObjects 4 }
+
+bWagNumTunnelsDeleted     OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted."
+    ::= { bWagTunnelStatsMIBObjects 5 }
+
+bWagNumTunnelsInactiveDeleted     OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted due to inactivity."
+    ::= { bWagTunnelStatsMIBObjects 6 }
+
+bWagNumTunnelsDeletedByCommand     OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted by an operator command."
+    ::= { bWagTunnelStatsMIBObjects 7 }
+
+bWagNumTunnelsSubsAssociated     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels with associated subscribers."
+    ::= { bWagTunnelStatsMIBObjects 8 }
+
+bWagNumTunnelsSchedDeletion     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels scheduled for automatic deletion."
+    ::= { bWagTunnelStatsMIBObjects 9 }
+
+
+bWagNumCurrentTunnelsIPv4     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current number of IPv4 tunnels."
+    ::= { bWagTunnelStatsMIBObjects 10 }
+
+bWagNumCurrentTunnelsIPv6     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current number of IPv6 tunnels."
+    ::= { bWagTunnelStatsMIBObjects 11 }
+
+bWagNumTunnelsDeletedByB2B     OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted due to B2B subscriber deletion."
+    ::= { bWagTunnelStatsMIBObjects 12 }
+
+bWagNumTunnelsDeletedDuetoLIFDown OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of GRE tunnels deleted due to logical interface down."
+    ::= { bWagTunnelStatsMIBObjects 13 }
+
+
+bWagNumCurrentTunnelsSpWiFi     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The  number of tunnels that currently serve Public Wi-Fi
+exclusively."
+    ::= { bWagTunnelStatsMIBObjects 14 }
+
+bWagNumCurrentTunnelsHome     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of tunnels that currently serve Home exclusively."
+    ::= { bWagTunnelStatsMIBObjects 15 }
+
+bWagNumCurrTunnHomeAndSpWiFi     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of tunnels that currently serve both Home and Public
+Wi-Fi ."
+    ::= { bWagTunnelStatsMIBObjects 16 }
+
+bWagNumCurrentTunnHomeInactive     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current number of tunnels for Home in the INACTIVE state."
+    ::= { bWagTunnelStatsMIBObjects 17 }
+
+bWagNumCurrentTunnHomeAccept     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current number of tunnels for Home in the ACCEPT state."
+    ::= { bWagTunnelStatsMIBObjects 18 }
+
+bWagNumL2tpv3TunnelsCreatedDynamically     OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of dynamically established L2TPV3 tunnels."
+    ::= { bWagTunnelStatsMIBObjects 19 }
+
+bWagNumL2tpv3TunnelsDeleted     OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of L2TPV3 tunnels deleted."
+    ::= { bWagTunnelStatsMIBObjects 20 }
+
+bWagNumL2tpv3TunnelsInactiveDeleted     OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of L2TPV3 tunnels deleted due to inactivity."
+    ::= { bWagTunnelStatsMIBObjects 21 }
+
+bWagNumL2tpv3TunnelsDeletedByCommand     OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of L2TPV3 tunnels deleted by an operator command."
+    ::= { bWagTunnelStatsMIBObjects 22 }
+
+bWagNumL2tpv3TunnelsSubsAssociated     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of L2TPV3 tunnels with associated subscribers."
+    ::= { bWagTunnelStatsMIBObjects 23 }
+
+bWagNumCurrentL2tpv3TunnelsIPv4     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current number of IPv4 L2TPV3 tunnels."
+    ::= { bWagTunnelStatsMIBObjects 24 }
+
+bWagNumL2tpv3TunnelsDeletedDuetoLIFDown OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of L2TPV3 tunnels deleted due to logical interface down."
+    ::= { bWagTunnelStatsMIBObjects 25 }
+
+bWagNumCurrentL2tpv3TunnelsSpWiFi     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of L2TPV3 tunnels that currently serve Public Wi-Fi exclusively."
+    ::= { bWagTunnelStatsMIBObjects 26 }
+
+bWagNumCurrentTunnelsDSLite     OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The  number of tunnels that currently serve DSLite exclusively."
+    ::= { bWagTunnelStatsMIBObjects 27 }
+
+-- CGNAT Profile Stats Table
+
+bWagCgnatProfileStatsTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagCgnatProfileStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of CGNAT statistics for profiles."
+   ::= { bWagCgnatMIBObjects 1 }
+
+bWagCgnatProfileStatsEntry  OBJECT-TYPE
+   SYNTAX      BWagCgnatProfileStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bWagCgnatProfileTable."
+   INDEX {
+      bWagCgnatProfileStatsIndex
+   }
+   ::= { bWagCgnatProfileStatsTable 1 }
+
+BWagCgnatProfileStatsEntry ::= SEQUENCE {
+    bWagCgnatProfileStatsIndex                 Integer32,
+    bWagCgnatProfileName                       DisplayString,
+    bWagCgnatProfileType                       DisplayString,
+    bWagCgnatProfileNATIPPoolGroup             DisplayString,
+    bWagCgnatProfileSubscribers                Unsigned32,
+    bWagCgnatProfileMaxIPAddresses             Unsigned32,
+    bWagCgnatProfileUsedIPAddresses            Unsigned32,
+    bWagCgnatProfileReservedIPAddresses        Unsigned32,
+    bWagCgnatProfileTotalPortBlocks            Unsigned32,
+    bWagCgnatProfilePortBlocksUsed             Unsigned32,
+    bWagCgnatProfilePortBlocksReused           Unsigned32,
+    bWagCgnatProfileTotalPoolIPAddresses       Unsigned32
+
+}
+
+bWagCgnatProfileStatsIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A number uniquely identifying this CGNAT profile."
+   ::= { bWagCgnatProfileStatsEntry 1 }
+
+bWagCgnatProfileName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The name of the CGNAT profile."
+   ::= { bWagCgnatProfileStatsEntry 2 }
+
+bWagCgnatProfileType  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The type of the CGNAT profile (AuthNapt/UnAuthNapt)."
+   ::= { bWagCgnatProfileStatsEntry 3 }
+
+bWagCgnatProfileNATIPPoolGroup  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "IP Pool group name associated with this profile."
+   ::= { bWagCgnatProfileStatsEntry 4 }
+
+bWagCgnatProfileSubscribers  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of authenticated subscribers currently active in this profile."
+   ::= { bWagCgnatProfileStatsEntry 5 }
+
+bWagCgnatProfileMaxIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The maximum number of public IP addresses required to fully service
+      the configured max-subscribers for the profile. This is calculated based
+      on three other configuration parameters: block-size, number of port blocks,
+      and the port range, as shown below:
+
+      1. Port Range = (Upper bound - Lower bound of port numbers) + 1
+      2. Number of subscribers per IP = Port Range/(block-size * blocks)
+      3. Max IP Addresses = ceiling(max-subscribers/Number of subscribers per IP)."
+   ::= { bWagCgnatProfileStatsEntry 6 }
+
+bWagCgnatProfileUsedIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of IP addresses in use in this profile."
+   ::= { bWagCgnatProfileStatsEntry 7 }
+
+bWagCgnatProfileReservedIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of IP addresses reserved in this profile."
+   ::= { bWagCgnatProfileStatsEntry 8 }
+
+bWagCgnatProfileTotalPortBlocks  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of total port blocks in this profile.
+      This is equivalent to (max-subscribers * block-size) in this profile."
+   ::= { bWagCgnatProfileStatsEntry 9 }
+
+bWagCgnatProfilePortBlocksUsed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Number of port blocks in use in this profile."
+   ::= { bWagCgnatProfileStatsEntry 10 }
+
+bWagCgnatProfilePortBlocksReused  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Number of port blocks reused in this profile.
+      This value will always be reported as zero for
+      an unauthenticated CGNAT profile."
+   ::= { bWagCgnatProfileStatsEntry 11 }
+
+bWagCgnatProfileTotalPoolIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of IP addresses available in the 
+       pool."
+   ::= { bWagCgnatProfileStatsEntry 12 }
+
+-- MHN Profile Stats Table
+
+bWagMHNProfileStatsTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagMHNProfileStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of statistics for the MHN profiles."
+   ::= { bWagMHNMIBObjects 1 }
+
+bWagMHNProfileStatsEntry  OBJECT-TYPE
+   SYNTAX      BWagMHNProfileStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bWagMHNProfileTable."
+   INDEX {
+      bWagMHNProfileStatsIndex
+   }
+   ::= { bWagMHNProfileStatsTable 1 }
+
+BWagMHNProfileStatsEntry ::= SEQUENCE {
+    bWagMHNProfileStatsIndex                 Integer32,
+    bWagMHNProfileName                       DisplayString,
+    bWagMHNProfileNATIPPoolGroup             DisplayString,
+    bWagMHNProfileMaxSubscribers                Unsigned32,
+    bWagMHNProfileMaxIPAddresses             Unsigned32,
+    bWagMHNProfileUsedIPAddresses            Unsigned32,
+    bWagMHNProfileTotalPortBlocks            Unsigned32,
+    bWagMHNProfileTotalPoolIPAddresses       Unsigned32
+}
+
+bWagMHNProfileStatsIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A number uniquely identifying this MHN profile."
+   ::= { bWagMHNProfileStatsEntry 1 }
+
+bWagMHNProfileName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The name of the MHN profile."
+   ::= { bWagMHNProfileStatsEntry 2 }
+
+bWagMHNProfileNATIPPoolGroup  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "IP Pool group name associated with this profile."
+   ::= { bWagMHNProfileStatsEntry 3 }
+
+bWagMHNProfileMaxSubscribers  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Maximum number of subscribers per MHN profile."
+   ::= { bWagMHNProfileStatsEntry 4 }
+
+bWagMHNProfileMaxIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The maximum number of public IP addresses required to fully service
+      the configured max-subscribers for the profile."
+   ::= { bWagMHNProfileStatsEntry 5 }
+
+bWagMHNProfileUsedIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of IP addresses in use in this profile."
+   ::= { bWagMHNProfileStatsEntry 6 }
+
+bWagMHNProfileTotalPortBlocks  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of total port blocks in this profile. This is equivalent to
+       (block-size) in this profile."
+   ::= { bWagMHNProfileStatsEntry 7 }
+
+bWagMHNProfileTotalPoolIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of IP addresses available in the 
+       pool."
+   ::= { bWagMHNProfileStatsEntry 8 }
+
+
+-- CGNAT Stats Table per IP address
+
+bWagCgnatIPStatsTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagCgnatIPStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of statistics per authenticated CGNAT IP address."
+   ::= { bWagCgnatMIBObjects 2 }
+
+bWagCgnatIPStatsEntry  OBJECT-TYPE
+   SYNTAX      BWagCgnatIPStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bWagCgnatIPStatsTable."
+   INDEX {
+     bWagCgnatIPStatsIndex 
+   }
+   ::= { bWagCgnatIPStatsTable 1 }
+
+BWagCgnatIPStatsEntry ::= SEQUENCE {
+    bWagCgnatIPStatsIndex                 Integer32,
+    bWagCgnatPublicIPAddressType          InetAddressType,
+    bWagCgnatPublicIPAddress              InetAddress,
+    bWagCgnatIPPortBlocksUsed             Unsigned32,
+    bWagCgnatIPPortBlocksFree             Unsigned32,
+    bWagCgnatIPPortBlocksReused           Unsigned32,
+    bWagCgnatIPSubActiveCount             Unsigned32,
+    bWagCgnatIPPacketsDropped             Unsigned32
+}
+
+bWagCgnatIPStatsIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A number uniquely identifying this row in the authenticated CGNAT IP statistics table."
+   ::= { bWagCgnatIPStatsEntry 1 }
+
+bWagCgnatPublicIPAddressType  OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "IP Address type (IPv4 or IPv6)."
+   ::= { bWagCgnatIPStatsEntry 2 }
+
+bWagCgnatPublicIPAddress  OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Public IP address assigned to authenticated CGNAT subscribers."
+   ::= { bWagCgnatIPStatsEntry 3 }
+
+bWagCgnatIPPortBlocksUsed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Number of port blocks in use by authenticated CGNAT subscribers with this public IP address.
+      This is obsolete. benuCgnatStatsMIB provides current CGNAT IP address and port usage statistics."
+   ::= { bWagCgnatIPStatsEntry 4 }
+
+bWagCgnatIPPortBlocksFree  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of port blocks for use by authenticated CGNAT subscribers with this public IP address."
+   ::= { bWagCgnatIPStatsEntry 5 }
+
+bWagCgnatIPPortBlocksReused  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Number of port blocks reused by authenticated CGNAT subscribers with this public IP address.
+      This is obsolete. benuCgnatStatsMIB provides current CGNAT IP address and port usage statistics."
+   ::= { bWagCgnatIPStatsEntry 6 }
+
+bWagCgnatIPSubActiveCount  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of authenticated CGNAT subscribers currently active with this public IP address."
+   ::= { bWagCgnatIPStatsEntry 7 }
+
+bWagCgnatIPPacketsDropped  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Number of packets dropped due to port exhaustion for this public IP address.
+      This value represents the sum of dropped packets for all authenticated CGNAT subscribers for whom NAT 
+      was applied with this public IP address.
+      This is obsolete. benuCgnatStatsMIB provides current CGNAT IP address and port usage statistics."
+   ::= { bWagCgnatIPStatsEntry 8 }
+
+-- CGNAT Periodic IP Stats Table
+
+bWagCgnatPeriodIpTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagCgnatPeriodIpEntry
+   MAX-ACCESS  not-accessible
+   STATUS      obsolete
+   DESCRIPTION
+      "A list of periodic statistics per authenticated CGNAT public IP address including the reserved IP address.
+      This is obsolete. benuCgnatStatsMIB provides current CGNAT IP address and port usage statistics."
+   ::= { bWagCgnatMIBObjects 3 }
+
+bWagCgnatPeriodIpEntry  OBJECT-TYPE
+   SYNTAX      BWagCgnatPeriodIpEntry
+   MAX-ACCESS  not-accessible
+   STATUS      obsolete
+   DESCRIPTION
+      "A logical row in the bWagCgnatPeriodIpTable."
+   INDEX {
+      bWagCgnatPeriodIpInterval,
+      bWagCgnatPeriodIpIndex
+   }
+   ::= { bWagCgnatPeriodIpTable 1 }
+
+BWagCgnatPeriodIpEntry ::= SEQUENCE {
+    bWagCgnatPeriodIpInterval       Integer32,
+    bWagCgnatPeriodIpIndex          Integer32,
+    bWagCgnatIPAddressType          InetAddressType,
+    bWagCgnatIPAddress              InetAddress,
+    bWagCgnatPacketsDropped         Unsigned32,
+    bWagCgnatPortBlockMaxUtil       Unsigned32,
+    bWagCgnatPortBlockMinUtil       Unsigned32,
+    bWagCgnatIntervalDuration       Unsigned32
+}
+
+bWagCgnatPeriodIpInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      obsolete
+   DESCRIPTION
+      "The interval for acculating the measurements.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bWagCgnatPeriodIpEntry 1 }
+
+bWagCgnatPeriodIpIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION 
+        "A number uniquely identifying the authenticated CGNAT public IP address."
+    ::= { bWagCgnatPeriodIpEntry 2 }
+
+bWagCgnatIPAddressType  OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "IP Address type (IPv4 or IPv6)."
+   ::= { bWagCgnatPeriodIpEntry 3 }
+
+bWagCgnatIPAddress  OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Public IP address assigned to authenticated CGNAT subscribers including
+      the reserved IP address."
+   ::= { bWagCgnatPeriodIpEntry 4 }
+
+bWagCgnatPacketsDropped  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Number of packets dropped due to port exhaustion for this public IP address
+      in this interval. This value represents the sum of dropped packets for all
+      authenticated CGNAT subscribers for whom NAT was applied with this public IP address in this interval."
+   ::= { bWagCgnatPeriodIpEntry 5 }
+
+bWagCgnatPortBlockMaxUtil   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+     "The maximum number of port blocks that were allocated to authenticated CGNAT subscribers at any given
+     time during the collection interval is recorded. The ratio of this value to the total number
+     of non-reserved port blocks allocated for this public IP address is calculated and reported as percentage
+     in this object.
+     Units: Percentage in the range 0 - 100."
+   ::= { bWagCgnatPeriodIpEntry 6 }
+
+bWagCgnatPortBlockMinUtil   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+     "The minimum number of port blocks that were allocated to authenticated CGNAT subscribers at any given
+     time during the collection interval is recorded. The ratio of this value to the total number
+     of non-reserved port blocks allocated for this public IP address is calculated and reported as percentage
+     in this object.
+     Units: Percentage in the range 0 - 100."
+   ::= { bWagCgnatPeriodIpEntry 7 }
+
+bWagCgnatIntervalDuration  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+       "Duration of statistics interval in minutes."
+   ::= { bWagCgnatPeriodIpEntry 8 }
+
+
+-- CGNAT Unauth Stats Table per IP address
+
+bWagCgnatUnauthIPStatsTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagCgnatUnauthIPStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of statistics per unauthenticated CGNAT IP address."
+   ::= { bWagCgnatMIBObjects 4 }
+
+bWagCgnatUnauthIPStatsEntry  OBJECT-TYPE
+   SYNTAX      BWagCgnatUnauthIPStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bWagCgnatUnauthIPStatsTable."
+   INDEX {
+     bWagCgnatUnauthIPStatsIndex 
+   }
+   ::= { bWagCgnatUnauthIPStatsTable 1 }
+
+BWagCgnatUnauthIPStatsEntry ::= SEQUENCE {
+    bWagCgnatUnauthIPStatsIndex                 Integer32,
+    bWagCgnatUnauthPublicIPAddressType          InetAddressType,
+    bWagCgnatUnauthPublicIPAddress              InetAddress,
+    bWagCgnatUnauthIPPortBlocksUsed             Unsigned32,
+    bWagCgnatUnauthIPPortBlocksFree             Unsigned32,
+    bWagCgnatUnauthIPPortBlocksReused           Unsigned32,
+    bWagCgnatUnauthIPSubActiveCount             Unsigned32
+}
+
+bWagCgnatUnauthIPStatsIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A number uniquely identifying this row in the unauthenticated CGNAT IP statistics table."
+   ::= { bWagCgnatUnauthIPStatsEntry 1 }
+
+bWagCgnatUnauthPublicIPAddressType  OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "IP Address type (IPv4 or IPv6)."
+   ::= { bWagCgnatUnauthIPStatsEntry 2 }
+
+bWagCgnatUnauthPublicIPAddress  OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Public IP address assigned to unauthenticated CGNAT subscribers."
+   ::= { bWagCgnatUnauthIPStatsEntry 3 }
+
+bWagCgnatUnauthIPPortBlocksUsed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Number of port blocks in use by unauthenticated CGNAT subscribers with this public IP address.
+      This is obsolete. benuCgnatStatsMIB provides current CGNAT IP address and port usage statistics."
+   ::= { bWagCgnatUnauthIPStatsEntry 4 }
+
+bWagCgnatUnauthIPPortBlocksFree  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of port blocks for use by unauthenticated CGNAT subscribers with this public IP address."
+   ::= { bWagCgnatUnauthIPStatsEntry 5 }
+
+bWagCgnatUnauthIPPortBlocksReused  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Number of port blocks reused by unauthenticated CGNAT subscribers with this public IP address.
+      This is obsolete. benuCgnatStatsMIB provides current CGNAT IP address and port usage statistics."
+   ::= { bWagCgnatUnauthIPStatsEntry 6 }
+
+bWagCgnatUnauthIPSubActiveCount  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of unauthenticated CGNAT subscribers currently active with this public IP address."
+   ::= { bWagCgnatUnauthIPStatsEntry 7 }
+
+-- CGNAT Unauth Periodic IP Stats Table
+
+bWagCgnatUnauthPeriodIpTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagCgnatUnauthPeriodIpEntry
+   MAX-ACCESS  not-accessible
+   STATUS      obsolete
+   DESCRIPTION
+      "A list of periodic statistics per unauthenicated CGNAT public IP address including the reserved IP address.
+      This is obsolete. benuCgnatStatsMIB provides current CGNAT IP address and port usage statistics."
+   ::= { bWagCgnatMIBObjects 5 }
+
+bWagCgnatUnauthPeriodIpEntry  OBJECT-TYPE
+   SYNTAX      BWagCgnatUnauthPeriodIpEntry
+   MAX-ACCESS  not-accessible
+   STATUS      obsolete
+   DESCRIPTION
+      "A logical row in the bWagCgnatUnauthPeriodIpTable."
+   INDEX {
+      bWagCgnatUnauthPeriodIpInterval,
+      bWagCgnatUnauthPeriodIpIndex
+   }
+   ::= { bWagCgnatUnauthPeriodIpTable 1 }
+
+BWagCgnatUnauthPeriodIpEntry ::= SEQUENCE {
+    bWagCgnatUnauthPeriodIpInterval       Integer32,
+    bWagCgnatUnauthPeriodIpIndex          Integer32,
+    bWagCgnatUnauthIPAddressType          InetAddressType,
+    bWagCgnatUnauthIPAddress              InetAddress,
+    bWagCgnatUnauthPortBlockMaxUtil       Unsigned32,
+    bWagCgnatUnauthPortBlockMinUtil       Unsigned32,
+    bWagCgnatUnauthIntervalDuration       Unsigned32
+}
+
+bWagCgnatUnauthPeriodIpInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      obsolete
+   DESCRIPTION
+      "The interval for acculating the measurements.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bWagCgnatUnauthPeriodIpEntry 1 }
+
+bWagCgnatUnauthPeriodIpIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION 
+        "A number uniquely identifying the unauthenticated CGNAT public IP address."
+    ::= { bWagCgnatUnauthPeriodIpEntry 2 }
+
+bWagCgnatUnauthIPAddressType  OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "IP Address type (IPv4 or IPv6)."
+   ::= { bWagCgnatUnauthPeriodIpEntry 3 }
+
+bWagCgnatUnauthIPAddress  OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Public IP address assigned to unauthenticated CGNAT subscribers
+      including the reserved IP address."
+   ::= { bWagCgnatUnauthPeriodIpEntry 4 }
+
+bWagCgnatUnauthPortBlockMaxUtil   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+     "The maximum number of port blocks that were allocated to unauthenticated CGNAT subscribers at any given time during the
+     collection interval is recorded. The ratio of this value to the total number of port blocks
+     available for this public IP address is calculated and reported as percentage in this object.
+     Units: Percentage in the range 0 - 100."
+   ::= { bWagCgnatUnauthPeriodIpEntry 5 }
+
+bWagCgnatUnauthPortBlockMinUtil   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+     "The minimum number of port blocks that were allocated to unauthenticated CGNAT subscribers at any given time during the
+     collection interval is recorded. The ratio of this value to the total number of port blocks
+     available for this public IP address is calculated and reported as percentage in this object.
+     Units: Percentage in the range 0 - 100."
+   ::= { bWagCgnatUnauthPeriodIpEntry 6 }
+
+bWagCgnatUnauthIntervalDuration  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+       "Duration of statistics interval in minutes."
+   ::= { bWagCgnatUnauthPeriodIpEntry 7 }
+
+-- CGNAT Auth Subscriber Port Utilization Table
+
+bWagCgnatAuthPortUtilTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagCgnatAuthPortUtilEntry
+   MAX-ACCESS  not-accessible
+   STATUS      obsolete
+   DESCRIPTION
+      "A list of CGNAT statistics for each authenticated subscriber that 
+      has crossed port utilization threshold.
+      This is obsolete. benuCgnatStatsMIB provides current CGNAT IP address and port usage statistics."
+   ::= { bWagCgnatMIBObjects 6 }
+
+bWagCgnatAuthPortUtilEntry  OBJECT-TYPE
+   SYNTAX      BWagCgnatAuthPortUtilEntry
+   MAX-ACCESS  not-accessible
+   STATUS      obsolete
+   DESCRIPTION
+      "A logical row in the bWagCgnatAuthPortUtilTable."
+   INDEX {
+      bWagCgnatAuthSubscriberMac
+   }
+   ::= { bWagCgnatAuthPortUtilTable 1 }
+
+BWagCgnatAuthPortUtilEntry ::= SEQUENCE {
+    bWagCgnatAuthSubscriberMac            MacAddress,
+    bWagCgnatAuthSubscriberPortsUtil      Unsigned32
+}
+
+bWagCgnatAuthSubscriberMac   OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+       "The MAC address of the authenticated CGNAT subscriber
+       for which the current ports in use has crossed the 
+       configured high water mark."
+    ::= { bWagCgnatAuthPortUtilEntry 1 }
+
+bWagCgnatAuthSubscriberPortsUtil   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Number of ports in use by the authenticated CGNAT subscriber. 
+        This does not include the number that can
+        be reclaimed. The value of this object is calculated
+        based on the reclaim time, the ports allocated, and the 
+        ports that can be reclaimed at the time of request."
+    ::= { bWagCgnatAuthPortUtilEntry 2 }
+
+-- CGNAT PoolGroup Stats Table
+
+bWagCgnatPoolGroupStatsTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagCgnatPoolGroupStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of CGNAT statistics for pool group."
+   ::= { bWagCgnatMIBObjects 8 }
+
+bWagCgnatPoolGroupStatsEntry  OBJECT-TYPE
+   SYNTAX      BWagCgnatPoolGroupStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bWagCgnatPoolGroupTable."
+   INDEX {
+      bWagCgnatPoolGroupType,
+      bWagCgnatPoolGroupIndex 
+   }
+   ::= { bWagCgnatPoolGroupStatsTable 1 }
+
+BWagCgnatPoolGroupStatsEntry ::= SEQUENCE {
+    bWagCgnatPoolGroupType                       INTEGER,
+    bWagCgnatPoolGroupIndex                      Unsigned32,
+    bWagCgnatPoolGroupName                       DisplayString,
+    bWagCgnatPoolGroupSubscribers                Unsigned32,
+    bWagCgnatPoolGroupUsedIPAddresses            Unsigned32,
+    bWagCgnatPoolGroupReservedIPAddresses        Unsigned32,
+    bWagCgnatPoolGroupTotalIPAddresses           Unsigned32
+}
+
+bWagCgnatPoolGroupType  OBJECT-TYPE
+  SYNTAX      INTEGER {
+                            none(0),
+                            unAuthNapt(1),
+                            authNapt(2)
+    }
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The type of the CGNAT profile (AuthNapt/UnAuthNapt)
+      that this pool group belongs to."
+   ::= { bWagCgnatPoolGroupStatsEntry 1 }
+
+bWagCgnatPoolGroupIndex OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Index of the IP Pool group  entry in the table."
+   ::= { bWagCgnatPoolGroupStatsEntry 2 }
+
+bWagCgnatPoolGroupName  OBJECT-TYPE
+   SYNTAX      DisplayString ( SIZE (1..32) )
+   MAX-ACCESS  read-only 
+   STATUS      current
+   DESCRIPTION
+      "The name of this pool group."
+   ::= { bWagCgnatPoolGroupStatsEntry 3 }
+
+bWagCgnatPoolGroupSubscribers  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of subscribers currently active with an IP address
+      belonging to this pool group."
+   ::= { bWagCgnatPoolGroupStatsEntry 4 }
+
+bWagCgnatPoolGroupUsedIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of IP addresses in use from this pool group."
+   ::= { bWagCgnatPoolGroupStatsEntry 5 }
+
+bWagCgnatPoolGroupReservedIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of IP addresses reserved from this pool group."
+   ::= { bWagCgnatPoolGroupStatsEntry 6 }
+
+bWagCgnatPoolGroupTotalIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of IP addresses available in this pool group."
+   ::= { bWagCgnatPoolGroupStatsEntry 7 }
+
+-- DHCPv6 Stats Table
+
+bWagDHCPv6Table  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagDHCPv6Entry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of DHCPv6 periodic statistics."
+   ::= { bWagDhcpv6MIBObjects 1 }
+
+bWagDHCPv6Entry  OBJECT-TYPE
+   SYNTAX      BWagDHCPv6Entry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bWagDHCPv6Table."
+   INDEX {
+      bWagDHCPv6StatsInterval
+   }
+   ::= { bWagDHCPv6Table 1 }
+
+BWagDHCPv6Entry ::= SEQUENCE {
+    bWagDHCPv6StatsInterval                      Integer32,
+    bWagDHCPv6IntervalDuration                   Integer32,
+    bWagDHCPv6SolicitReplyIntervalMin            Unsigned32,
+    bWagDHCPv6SolicitReplyIntervalMax            Unsigned32,
+    bWagDHCPv6SolicitReplyIntervalAvg            Unsigned32,
+    bWagDHCPv6SolicitReplyIntervalLast           Unsigned32,
+    bWagDHCPv6RequestReplyLatencyMin             Unsigned32,
+    bWagDHCPv6RequestReplyLatencyMax             Unsigned32,
+    bWagDHCPv6RequestReplyLatencyAvg             Unsigned32,
+    bWagDHCPv6RequestReplyLatencyLast            Unsigned32,
+    bWagDHCPv6SolicitAdvLatencyMin               Unsigned32,
+    bWagDHCPv6SolicitAdvLatencyMax               Unsigned32,
+    bWagDHCPv6SolicitAdvLatencyAvg               Unsigned32,
+    bWagDHCPv6SolicitAdvLatencyLast              Unsigned32,
+    bWagDHCPv6AdvRequestIntervalMin              Unsigned32,
+    bWagDHCPv6AdvRequestIntervalMax              Unsigned32,
+    bWagDHCPv6AdvRequestIntervalAvg              Unsigned32,
+    bWagDHCPv6AdvRequestIntervalLast             Unsigned32,
+    bWagDHCPv6SolicitReceived                    Unsigned32,
+    bWagDHCPv6AdvertisementSent                  Unsigned32,
+    bWagDHCPv6RequestReceived                    Unsigned32,
+    bWagDHCPv6ReplySent                          Unsigned32
+}
+
+bWagDHCPv6StatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval where the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bWagDHCPv6Entry 1}
+
+bWagDHCPv6IntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of stats interval in minutes"
+   ::= { bWagDHCPv6Entry 2}
+
+bWagDHCPv6SolicitReplyIntervalMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the minimum time interval, during the reporting period,
+        between all DHCPv6 Solicit message(s) received by the WAG and their corresponding
+        DHCPv6 Reply message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 3 }
+
+bWagDHCPv6SolicitReplyIntervalMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the maximum time interval, during the reporting period,
+        between all DHCPv6 Solicit message(s) received by the WAG and their corresponding
+        DHCPv6 Reply message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 4 }
+
+bWagDHCPv6SolicitReplyIntervalAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the average time interval, during the reporting period,
+        between all DHCPv6 Solicit message(s) received by the WAG and their corresponding
+        DHCPv6 Reply message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 5 }
+
+bWagDHCPv6SolicitReplyIntervalLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the time interval, during the reporting period,
+        between the most recent DHCPv6 Solicit message received by the WAG
+        and its corresponding DHCPv6 Reply message sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 6 }
+
+bWagDHCPv6RequestReplyLatencyMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the minimum time interval, during the reporting period,
+        between all DHCPv6 Request message(s) received by the WAG and their corresponding
+        DHCPv6 Reply message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 7 }
+
+bWagDHCPv6RequestReplyLatencyMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the maximum time interval, during the reporting period,
+        between all DHCPv6 Request message(s) received by the WAG and their corresponding
+        DHCPv6 Reply message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 8 }
+
+bWagDHCPv6RequestReplyLatencyAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the average time interval, during the reporting period,
+        between all DHCPv6 Request message(s) received by the WAG and their corresponding
+        DHCPv6 Reply message(s) is sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 9 }
+
+bWagDHCPv6RequestReplyLatencyLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the time interval, during the reporting period,
+        between the most recent DHCPv6 Request message received by the WAG
+        and its corresponding DHCPv6 Reply message sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 10 }
+
+bWagDHCPv6SolicitAdvLatencyMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the minimum time interval, during the reporting period,
+        between all DHCPv6 Solicit message(s) received by the WAG and their corresponding
+        DHCPv6 Advertisement message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 11 }
+
+bWagDHCPv6SolicitAdvLatencyMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the maximum time interval, during the reporting period,
+        between all DHCPv6 Solicit message(s) received by the WAG and their corresponding
+        DHCPv6 Advertisement message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 12 }
+
+bWagDHCPv6SolicitAdvLatencyAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the average time interval, during the reporting period,
+        between all DHCPv6 Solicit message(s) received by the WAG and their corresponding
+        DHCPv6 Advertisement message(s) sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 13 }
+
+bWagDHCPv6SolicitAdvLatencyLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the time interval, during the reporting period,
+        between the most recent DHCPv6 Solicit message received by the WAG
+        and its corresponding DHCPv6 Advertisement message sent by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 14 }
+
+bWagDHCPv6AdvRequestIntervalMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the minimum time interval, during the reporting period,
+        between all DHCPv6 Advertisement message(s) sent by the WAG and the corresponding
+        DHCPv6 Request message(s) received by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 15 }
+
+bWagDHCPv6AdvRequestIntervalMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the maximum time interval, during the reporting period,
+        between all DHCPv6 Advertisement message(s) sent by the WAG and the corresponding
+        DHCPv6 Request message(s) received by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 16 }
+
+bWagDHCPv6AdvRequestIntervalAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the average time interval, during the reporting period,
+        between all DHCPv6 Advertisement message(s) sent by the WAG and the corresponding
+        DHCPv6 Request message(s) received by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 17 }
+
+bWagDHCPv6AdvRequestIntervalLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The measure of the time interval, during the reporting period,
+        between the most recent DHCPv6 Advertisement message sent by the WAG
+        and its corresponding DHCPv6 Request message received by the WAG.
+        The value is in microseconds."
+   ::= { bWagDHCPv6Entry 18 }
+
+bWagDHCPv6SolicitReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of DHCPv6 Solicit message(s) received
+        during the reporting period."
+   ::= { bWagDHCPv6Entry 19 }
+
+bWagDHCPv6AdvertisementSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of DHCPv6 Advertisement message(s) sent
+        during the reporting period."
+   ::= { bWagDHCPv6Entry 20 }
+
+bWagDHCPv6RequestReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of DHCPv6 Request message(s) received
+        during the reporting period."
+   ::= { bWagDHCPv6Entry 21 }
+
+bWagDHCPv6ReplySent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of DHCPv6 Reply message(s) sent
+        during the reporting period."
+   ::= { bWagDHCPv6Entry 22 }
+
+-- CGNAT Scalars
+
+bWagCgnatAuthPortRisingThresholdCrossedSubCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "The count of the total number of authenticated CGNAT subscribers
+      whose port usage is above the configured rising threshold.
+      This is obsolete. benuCgnatStatsMIB provides current CGNAT IP address and port usage statistics."
+   ::= { bWagCgnatMIBObjects 7 }
+
+-- Processing Latency sclars
+
+bWagUpstreamProcessingLatencyPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "The count of the total number of subscriber upstream packets handled by
+WAG"
+   ::= { bWagProcessingLatencyMIBObjects 1 }
+
+bWagUpstreamProcessingLatencyMax     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Maximum processing time recorded for subscriber upstream packets
+handled in WAG"
+   ::= { bWagProcessingLatencyMIBObjects 2 }
+
+bWagUpstreamProcessingLatencyMin     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Minimum processing time recorded for subscriber upstream packets
+handled in WAG"
+   ::= { bWagProcessingLatencyMIBObjects 3 }
+
+bWagUpstreamProcessingLatencyAvg     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Average processing time for subscriber upstream packets handled in WAG"
+   ::= { bWagProcessingLatencyMIBObjects 4 }
+
+bWagDownstreamProcessingLatencyPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "The count of the total number of subscriber downstream packets handled
+by WAG"
+   ::= { bWagProcessingLatencyMIBObjects 5 }
+
+bWagDownstreamProcessingLatencyMax     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Maximum processing time recorded for subscriber downstream packets
+handled in WAG"
+   ::= { bWagProcessingLatencyMIBObjects 6 }
+
+bWagDownstreamProcessingLatencyMin     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Minimum processing time recorded for subscriber downstream packets
+handled in WAG."
+   ::= { bWagProcessingLatencyMIBObjects 7 }
+
+bWagDownstreamProcessingLatencyAvg     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Average processing time for subscriber downstream packets handled in
+WAG."
+   ::= { bWagProcessingLatencyMIBObjects 8 }
+
+-- Notification Definitions
+
+bWagCgnatProfileIPPoolGroup  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+      "IP Pool group name associated with this profile."
+   ::= { bWagCgnatNotifObjects 1 }
+
+bWagCgnatTotalPoolIPAddresses OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP addresses available 
+         in the pool."
+    ::= { bWagCgnatNotifObjects 2 }
+
+bWagCgnatAuthIpAddrUsedHighThreshold    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The high threshold for the number of used authenticated CGNAT 
+        IP addresses. If the number of used IP addresses exceeds
+        this value, a bWagCgnatAuthIpAddrHighThresholdReached event
+        will be generated. No more bWagCgnatAuthIpAddrHighThresholdReached
+        events will be generated until the value of the number of
+        used authenticated CGNAT IP addresses becomes equal to or less than
+        the value of bWagCgnatAuthIpAddrUsedLowThreshold."
+    ::= { bWagCgnatNotifObjects 3 }
+
+bWagCgnatAuthIpAddrUsedLowThreshold    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The low threshold for the number of used authenticated CGNAT 
+        IP addresses. If a bWagCgnatAuthIpAddrHighThresholdReached 
+        event had previously been generated, and if the number of 
+        used IP addresses equals to or falls below this value, a 
+        bWagCgnatAuthIpAddrLowThresholdReached event will be generated.
+        No more bWagCgnatAuthIpAddrLowThresholdReached events will be
+        generated until the value of the number of used authenticated CGNAT
+        IP addresses exceeds bWagCgnatAuthIpAddrUsedHighThreshold and a
+        bWagCgnatAuthIpAddrHighThresholdReached is first generated."
+    ::= { bWagCgnatNotifObjects 4 }
+
+bWagCgnatAuthIpAddrHighThresholdReached    NOTIFICATION-TYPE
+    OBJECTS     {
+                     bWagCgnatProfileIPPoolGroup,
+                     bWagCgnatTotalPoolIPAddresses,
+                     bWagCgnatAuthIpAddrUsedHighThreshold
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the current number of
+        used authenticated CGNAT IP addresses has risen above the value of
+        bWagCgnatAuthIpAddrUsedHighThreshold."
+    ::= { bWagStatsNotifications 1 }
+
+bWagCgnatAuthIpAddrLowThresholdReached    NOTIFICATION-TYPE
+    OBJECTS     {
+                     bWagCgnatProfileIPPoolGroup,
+                     bWagCgnatTotalPoolIPAddresses,
+                     bWagCgnatAuthIpAddrUsedLowThreshold
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the current number of 
+        used authenticated CGNAT IP addresses has fallen below the value of 
+        bWagCgnatAuthIpAddrUsedLowThreshold."
+    ::= { bWagStatsNotifications 2 }
+
+bWagCgnatAuthIpAddressesExhausted    NOTIFICATION-TYPE
+    OBJECTS     {
+                    bWagCgnatProfileIPPoolGroup,
+                    bWagCgnatTotalPoolIPAddresses
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the current number of 
+        used authenticated CGNAT IP addresses are exhausted from pool group"
+    ::= { bWagStatsNotifications 3 }
+
+bWagCgnatSubscriberMac  OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  accessible-for-notify
+   STATUS      obsolete
+   DESCRIPTION
+       "MAC address of the subscriber."
+    ::= { bWagCgnatNotifObjects 5 }
+
+bWagCgnatTotalPortBlocksPerSubscriber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+      "Number of port blocks available for the authenticated CGNAT subscriber." 
+    ::= { bWagCgnatNotifObjects 6 }
+
+bWagCgnatPortBlocksUsedHighThreshold    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+        "The high threshold for the number of used CGNAT port blocks by authenticated subscribers.
+        If the number of used port blocks exceeds this value, 
+        a bWagCgnatPortBlocksUsedHighThresholdReached event
+        will be generated. No more bWagCgnatPortBlocksUsedHighThresholdReached 
+        events will be generated until the value of the number of
+        used CGNAT port blocks becomes equal to or less than
+        the value of bWagCgnatPortBlocksUsedLowThreshold. The ratio of this
+        value to the total number of port blocks is reported as percentage in
+        this object.
+        Units: Percentage in the range 0 - 100."
+    ::= { bWagCgnatNotifObjects 7 }
+
+bWagCgnatPortBlocksUsedLowThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+        "The low threshold for the number of used CGNAT port blocks by authenticated subscribers.
+        If a bWagCgnatPortBlocksUsedHighThresholdReached 
+        event had previously been generated, and if the number of 
+        used port blocks equals to or falls below this value, a 
+        bWagCgnatPortBlocksUsedLowThresholdReached event will be generated.
+        No more bWagCgnatPortBlocksUsedLowThreshold events will be
+        generated until the value of the number of used CGNAT Port
+        blocks exceeds bWagCgnatPortBlocksUsedHighThresholdReached and a
+        bWagCgnatPortBlocksUsedHighThresholdReached is first generated.
+        The ratio of this value to the total number of port blocks is
+        reported as percentage in this object.
+        Units: Percentage in the range 0 - 100."
+        ::= { bWagCgnatNotifObjects 8 }
+
+bWagCgnatPortBlocksUsedHighThresholdReached  NOTIFICATION-TYPE
+    OBJECTS     {
+                     bWagCgnatSubscriberMac,
+                     bWagCgnatTotalPortBlocksPerSubscriber,
+                     bWagCgnatPortBlocksUsedHighThreshold
+                }
+    STATUS      obsolete
+    DESCRIPTION
+        "This notification signifies that the current number of 
+        used CGNAT port blocks used for an authenticated subscriber has risen above 
+        the value of  bWagCgnatPortBlocksUsedHighThreshold."
+    ::= { bWagStatsNotifications 4 }
+
+bWagCgnatPortBlocksUsedLowThresholdReached NOTIFICATION-TYPE
+    OBJECTS     {
+                     bWagCgnatSubscriberMac,
+                     bWagCgnatTotalPortBlocksPerSubscriber,
+                     bWagCgnatPortBlocksUsedLowThreshold 
+                }
+    STATUS      obsolete
+    DESCRIPTION
+        "This notification signifies that the current number of 
+        used CGNAT Port blocks for an authenticated subscriber has fallen below the value of 
+        bWagCgnatPortBlocksUsedLowThreshold."
+    ::= { bWagStatsNotifications 5 }
+
+bWagDhcpTPSLowReached  NOTIFICATION-TYPE
+    OBJECTS     {
+                     bWagDhcpTPS
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the total number of DHCP transactions
+        for the particular interval has fallen below the value bWagDhcpTPSLow."
+    ::= { bWagStatsNotifications 7 }
+
+bWagDhcpTPSHighReached  NOTIFICATION-TYPE
+    OBJECTS     {
+                     bWagDhcpTPS
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the total number of DHCP transactions
+        for the particular interval has risen above the value bWagDhcpTPSHigh."
+    ::= { bWagStatsNotifications 6 }
+
+bWagVrgApiIpAddrUsedHighThreshold    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The high threshold for the number of used IP addresses for VRGAPI subscribers.
+         If the number of used IP addresses exceeds
+        this value, a bWagVrgApiIpAddrUsedHighThresholdReached event
+        will be generated. No more bWagVrgApiIpAddrUsedHighThresholdReached 
+        events will be generated until the value of the number of
+        used IP addresses for VRGAPI subscribers becomes equal to or less than
+        the value of bWagVrgApiIpAddrUsedLowThreshold."
+    ::= { bWagVrgApiNotifObjects 1 }
+
+bWagVrgApiIpAddrUsedLowThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The low threshold for the number of used IP addresses for VRGAPI 
+	subscribers. If a bWagVrgApiIpAddrUsedHighThreshold event had 
+	previously been generated, and if the number of used IP addresses 
+	equals to or falls below this value, a 
+	bWagVrgApiIpAddrUsedLowThresholdReached event will be generated.
+        No more bWagVrgApiIpAddrUsedLowThresholdReached events will be
+        generated until the value of the number of used IP addresses for 
+	VRGAPI subscribers exceeds bWagVrgApiIpAddrUsedHighThreshold and a
+        bWagVrgApiIpAddrUsedHighThresholdReached is first generated."
+    ::= { bWagVrgApiNotifObjects 2 }
+
+bWagrgApiIPPoolGroup OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "IP Pool group name associated with Mhn profile."
+   ::= { bWagVrgApiNotifObjects 3 }
+
+bWagVRGApiIPoolIPAddresses OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP addresses available 
+         in the pool."
+    ::= { bWagVrgApiNotifObjects 4 }
+
+bWagVrgApiIpAddrUsedHighThresholdReached NOTIFICATION-TYPE
+    OBJECTS     {
+                     bWagrgApiIPPoolGroup,
+                     bWagVRGApiIPoolIPAddresses,
+                     bWagVrgApiIpAddrUsedHighThreshold 
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the current number of
+        used IP addresses for VRGAPI subscribers has risen above the value
+	of bWagVrgApiIpAddrUsedHighThreshold."
+    ::= { bWagStatsNotifications 8 }
+
+bWagVrgApiIpAddrUsedLowThresholdReached NOTIFICATION-TYPE
+    OBJECTS     {
+                     bWagrgApiIPPoolGroup,
+                     bWagVRGApiIPoolIPAddresses,
+                     bWagVrgApiIpAddrUsedLowThreshold 
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the current number of 
+        used IP addresses for VRGAPI subscribers has fallen below the value of 
+        bWagVrgApiIpAddrUsedLowThreshold."
+    ::= { bWagStatsNotifications 9 }
+
+bWagVrgApiIpAddressesExhausted    NOTIFICATION-TYPE
+    OBJECTS     {
+                    bWagrgApiIPPoolGroup,
+                    bWagVRGApiIPoolIPAddresses 
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the current number of 
+        used IP addresses VRGApisubscribers are exhausted from pool group"
+    ::= { bWagStatsNotifications 10 }
+
+-- DSLite Profile Stats Table
+
+bWagDsLiteProfileStatsTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BWagDsLiteProfileStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of DSLite CGNAT statistics for profiles."
+   ::= { bWagDsLiteMIBObjects 1 }
+
+bWagDsLiteProfileStatsEntry  OBJECT-TYPE
+   SYNTAX      BWagDsLiteProfileStatsEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bWagDsLiteProfileTable."
+   INDEX {
+      bWagDsLiteProfileStatsIndex
+   }
+   ::= { bWagDsLiteProfileStatsTable 1 }
+
+BWagDsLiteProfileStatsEntry ::= SEQUENCE {
+    bWagDsLiteProfileStatsIndex                 Integer32,
+    bWagDsLiteProfileName                       DisplayString,
+    bWagDsLiteProfileType                       DisplayString,
+    bWagDsLiteProfileNATIPPoolGroup             DisplayString,
+    bWagDsLiteProfileMaxIPAddresses             Unsigned32,
+    bWagDsLiteProfileUsedIPAddresses            Unsigned32,
+    bWagDsLiteProfileReservedIPAddresses        Unsigned32,
+    bWagDsLiteProfileTotalPoolIPAddresses       Unsigned32,
+    bWagDsLiteProfileMaxSubscribers             Unsigned32,
+    bWagDsLiteProfileMaxTunnels                 Unsigned32
+
+}
+
+bWagDsLiteProfileStatsIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A number uniquely identifying this DS-Lite profile."
+   ::= { bWagDsLiteProfileStatsEntry 1 }
+
+bWagDsLiteProfileName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The name of the DS-Lite profile."
+   ::= { bWagDsLiteProfileStatsEntry 2 }
+
+bWagDsLiteProfileType  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The type of the CGNAT profile DS-Lite."
+   ::= { bWagDsLiteProfileStatsEntry 3 }
+
+bWagDsLiteProfileNATIPPoolGroup  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "IP Pool group name associated with DS-Lite profile."
+   ::= { bWagDsLiteProfileStatsEntry 4 }
+
+bWagDsLiteProfileMaxIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This is the maximum number of IPs required to support the number of tunnels configured.
+	This is calculated based on three other configuration parameters: block-size, number
+	of port blocks, max-tunnels, as show below
+
+	MAX IP Adresses = (max-tunnels/(64512/(block-size*num-blocks)) rounded up to the 
+	next multiple of 4"
+   ::= { bWagDsLiteProfileStatsEntry 5 }
+
+bWagDsLiteProfileUsedIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of IP addresses in use in DS-Lite profile."
+   ::= { bWagDsLiteProfileStatsEntry 6 }
+
+bWagDsLiteProfileReservedIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of IP addresses reserved in DS-Lite profile."
+   ::= { bWagDsLiteProfileStatsEntry 7 }
+
+
+bWagDsLiteProfileTotalPoolIPAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of IP addresses available in the 
+       pool."
+   ::= { bWagDsLiteProfileStatsEntry 8 }
+
+bWagDsLiteProfileMaxSubscribers  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of max subscribers configured in this profile."
+   ::= { bWagDsLiteProfileStatsEntry 9 }
+
+bWagDsLiteProfileMaxTunnels  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      obsolete
+   DESCRIPTION
+      "Number of max tunnels configured in this profile."
+   ::= { bWagDsLiteProfileStatsEntry 10 }
+
+-- DSLite Port block Scalars
+
+bDSLitePortBlocksTotal	  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of DS-Lite port blocks." 
+   ::= { bWagDsLiteMIBObjects 2 }
+
+bDSLitePortBlocksInUse    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of DS-Lite port blocks in use."
+   ::= { bWagDsLiteMIBObjects 3 }
+
+-- DSLite Tunnel Scalars
+
+bDSLiteTunnelsUsingOnePortBlock    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of tunnels using one port block in DS-Lite."
+   ::= { bWagDsLiteMIBObjects 4 }
+
+bDSLiteTunnelsUsingTwoPortBlocks    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of tunnels using two port blocks in DS-Lite."
+   ::= { bWagDsLiteMIBObjects 5 }
+
+bDSLiteTunnelsUsingThreePortBlocks    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of tunnels using three port blocks in DS-Lite."
+   ::= { bWagDsLiteMIBObjects 6 }
+
+bDSLiteTunnelsUsingFourPortBlocks    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of tunnels using four port blocks in DS-Lite."
+   ::= { bWagDsLiteMIBObjects 7 }
+
+bDSLiteTunnelsUsingFivePortBlocks    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of tunnels using five port blocks in DS-Lite."
+   ::= { bWagDsLiteMIBObjects 8 }
+
+
+-- FRAGMENTATION Scalars
+
+bWagIpSystemStatsReasmReqds     OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of IP fragments received that needed to be
+            reassembled."
+   ::= { bWagIpSystemStatsMIBObjects 1 }
+
+bWagIpIfStatsOutFragOKs     OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of IP datagrams that have been successfully
+            fragmented."
+   ::= { bWagIpSystemStatsMIBObjects 2 }
+
+bWagIpSystemStatsReasmFails     OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of failures detected by the IP re-assembly
+            algorithm (for whatever reason: timed out, errors, etc.).
+            Note that this is not necessarily a count of discarded IP
+            fragments since some algorithms (notably the algorithm in
+            RFC 815) can lose track of the number of fragments by
+            combining them as they are received."
+   ::= { bWagIpSystemStatsMIBObjects 3 }
+
+bWagIpv6IfStatsReasmReqds     OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of IPv6 fragments received which needed
+         to be reassembled at this interface."
+   ::= { bWagIpSystemStatsMIBObjects 4 }
+
+bWagIpv6IfStatsOutFragOKs     OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The number of IPv6 datagrams that have been
+         successfully fragmented at output interface."
+   ::= { bWagIpSystemStatsMIBObjects 5 }
+
+bWagIpv6IfStatsReasmFails     OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+    "The number of failures detected by the IPv6 re-
+     assembly algorithm (for whatever reason: timed
+     out, errors, etc.)." 
+   ::= { bWagIpSystemStatsMIBObjects 6 }
+
+END

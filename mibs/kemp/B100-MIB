@@ -1,0 +1,585 @@
+B100-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+    Integer32, IpAddress, Counter32, Counter64
+        FROM SNMPv2-SMI
+ 
+    TimeInterval, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    InetAddress, InetAddressType, InetPortNumber
+	FROM INET-ADDRESS-MIB
+
+    one4net 
+	FROM ONE4NET-MIB;
+
+b100 MODULE-IDENTITY
+	LAST-UPDATED	"201112010000Z"
+	ORGANIZATION	"KEMP Technologies"
+	CONTACT-INFO	"email:      support@kemptechnologies.com"
+	DESCRIPTION	"Load Master configuration."
+	REVISION	"201112010000Z"
+	DESCRIPTION     "version V6.0"
+	::= { one4net 13 }
+
+
+--vsTable      OBJECT-TYPE
+--	SYNTAX		SEQUENCE OF VsDescEntry
+--	MAX-ACCESS	not-accessible
+--	STATUS		current
+--	DESCRIPTION	"Description global VS features."
+--	::= { b100 1 }
+
+
+b100VSTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF VSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A table containing ipvs Virtual Service (VS) specific information."
+	::= { b100 1 }
+
+
+b100RSTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A table containing ipvs Virtual Service (VS) specific information."
+	::= { b100 2 }
+
+b100NotificationsPrefix OBJECT IDENTIFIER
+	::= { b100 3 }
+
+-- BEGIN VSdesc --
+
+--vsDescEntry OBJECT-TYPE
+--	SYNTAX VsDescEntry
+--	MAX-ACCESS	not-accessible
+--	STATUS		current
+--	DESCRIPTION	"A table containing ipvs Virtual Service (VS) specific information."
+--	INDEX { numServices }
+--	::= { b100 0 1 }
+
+--VsDescEntry  ::= SEQUENCE {
+--        version		OCTET STRING,
+--        numServices	Integer32,
+--        hashTableSize	Integer32,
+--        tcpTimeOut	TimeInterval,
+--        tcpFinTimeOut	TimeInterval,
+--        udpTimeOut      TimeInterval,
+--        daemonState     Integer32,
+--        mcastInterface  OCTET STRING,
+--        hAstate         Integer32
+--        } 
+
+version OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..16))
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Version of the IPVS netfilter modules"
+        ::= { b100 0 1 }
+
+numServices OBJECT-TYPE
+        SYNTAX          Integer32 (0..1024)
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "current number of virtual services"
+        ::= { b100 0 2 }
+
+hashTableSize OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "size of hash table for L4 connection contexts"
+        ::= { b100 0 3 }
+
+tcpTimeOut OBJECT-TYPE
+        SYNTAX          TimeInterval
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "L4 TCP Timeout [s] for established connections"
+        ::= { b100 0 4 }
+
+tcpFinTimeOut OBJECT-TYPE
+        SYNTAX          TimeInterval
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "L4 TCP Timeout [s] for connections in FIN wait state"
+        ::= { b100 0 5 }
+
+udpTimeOut OBJECT-TYPE
+        SYNTAX          TimeInterval
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "L4 UDP Timeout [s]"
+        ::= { b100 0 6 }
+
+daemonState OBJECT-TYPE
+        SYNTAX          INTEGER {
+                          none(0),
+                          master(1),
+                          backup(2)
+                        }   
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "state of daemon for synchronisation of l4 connection contexts"
+        ::= { b100 0 7 }
+
+mcastInterface OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..16))
+        MAX-ACCESS	read-only
+        STATUS	current
+        DESCRIPTION "multicast interface used by l4 inter machine update daemon"
+        ::= { b100 0 8 }
+
+hAstate OBJECT-TYPE
+        SYNTAX          INTEGER {
+                          none(0),
+                          master(1),
+                          standby(2),
+			  passive(3)
+                        }   
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Current state of HA on current machine"
+        ::= { b100 0 9 }
+
+patchVersion OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..64))
+        MAX-ACCESS	read-only
+        STATUS	current
+        DESCRIPTION "Currently installed Software Patch version"
+        ::= { b100 0 10 }
+
+totalTps OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Total Current TPS"
+        ::= { b100 0 11 }
+
+sslTps OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Current SSL TPS"
+        ::= { b100 0 12 }
+
+-- END VSdesc --
+
+-- BEGIN VSentry --
+
+vsEntry OBJECT-TYPE
+	SYNTAX		VSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"information about a VS"
+	INDEX   { 	vSidx }
+	::= { b100VSTable 1 }
+
+VSEntry ::= SEQUENCE {
+        vSidx			Integer32,
+        vSip			InetAddress,
+        vSport			InetPortNumber,
+	vSaddrtype		InetAddressType,
+        vSprotocol		Integer32,
+        vSschedulingMethod	OCTET STRING,
+        vSpersistenceTimeout	TimeInterval,
+        vScheckerType		OCTET STRING,
+        vSadaptiveMethod	OCTET STRING,
+        vSnumDests              Integer32,
+        vSl7persist             OCTET STRING,
+        vSl7cookieId            OCTET STRING,
+        vSname                  OCTET STRING,
+        vSstate                 Integer32,
+        vSfollow                InetPortNumber,
+	vSConns         	Counter32,
+        vSInPkts        	Counter32,
+        vSOutPkts       	Counter32,
+        vSInBytes       	Counter64,
+        vSOutBytes      	Counter64,
+	vSActivConns		Integer32 }
+
+vSidx OBJECT-TYPE
+	SYNTAX		Integer32 (0..1024)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Unique VS Id"
+	::= { vsEntry 1 }
+    
+vSip OBJECT-TYPE
+	SYNTAX		InetAddress
+        MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"IP address of VS Differented by AddressType"
+        ::= { vsEntry 2 }
+
+vSport OBJECT-TYPE
+        SYNTAX		InetPortNumber
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"VS port number"
+	::= { vsEntry 3 }
+
+vSaddrtype OBJECT-TYPE
+        SYNTAX		InetAddressType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"VS address type"
+	::= { vsEntry 4 }
+
+vSprotocol  OBJECT-TYPE
+        SYNTAX		INTEGER {
+                          tcp(6),
+                          udp(17)
+                        }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"VS protocol TCP/UDP"
+	::= { vsEntry 5 }
+
+vSschedulingMethod OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"scheduling method"
+	::= { vsEntry 6 } 
+
+vSpersistenceTimeout OBJECT-TYPE
+        SYNTAX          TimeInterval
+        MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"timeout [s] for persistent connections"
+	::= { vsEntry 7 } 
+
+vScheckerType OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..32))
+        MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Type of checker associated with VS"
+	::= { vsEntry 8 } 
+
+vSadaptiveMethod OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..32))
+        MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Type of adaptiv method used with VS"
+	::= { vsEntry 9 } 
+
+vSnumDests  OBJECT-TYPE
+        SYNTAX		Integer32 (0..100)
+        MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Number of destinations (RS) for this VS"
+	::= { vsEntry 10 }
+
+vSl7persist OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Type of persistence used with VS"
+	::= { vsEntry 11 } 
+
+vSl7cookieId OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..128))
+        MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Name of the cookie associated with the VS"
+	::= { vsEntry 12 } 
+
+vSname OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..16))
+        MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Name of the VS"
+	::= { vsEntry 13 } 
+
+vSstate OBJECT-TYPE
+	SYNTAX		INTEGER {
+                                inService(1),
+                                outOfService(2),
+--                              failed(3),
+                                disabled(4),
+				sorry(5),
+				redirect(6),
+				errormsg(7)
+                        }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"state of VS"
+	::= { vsEntry 14 }    
+
+vSfollow OBJECT-TYPE
+        SYNTAX		InetPortNumber
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"VS follow port number"
+	::= { vsEntry 15 }
+
+vSConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of connections for this VS"
+	::= { vsEntry 16 }
+
+vSInPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of incomming pakets to this VS"
+	::= { vsEntry 17 }
+
+vSOutPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of outgoing pakets from this VS"
+	::= { vsEntry 18 }
+
+vSInBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of incomming bytes to this VS"
+	::= { vsEntry 19 }
+
+vSOutBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the number of outgoing bytes from this VS"
+	::= { vsEntry 20 }
+
+vSActivConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the current number of connections for this VS"
+	::= { vsEntry 21 }
+
+-- END VSentry --
+
+-- BEGIN RSentry --
+
+rsEntry OBJECT-TYPE
+	SYNTAX		RSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"information about an RS on a VS"
+	INDEX   { 	rSidx }
+	::= { b100RSTable 1 }
+
+RSEntry ::= SEQUENCE {
+        rSvsidx			Integer32,
+        rSip			InetAddress,
+        rSport			InetPortNumber,
+	rSaddrtype		InetAddressType,
+	rSidx			Integer32,
+        rSforwardingMethod	OCTET STRING,
+        rSweight		Integer32,
+        rSstate                 Integer32,
+	rSConns			Counter32,
+	rSInPkts        	Counter32,
+        rSOutPkts       	Counter32,
+        rSInBytes       	Counter64,
+        rSOutBytes      	Counter64,
+        rSActiveConns   	Counter32,
+        rSInactiveConns 	Counter32 }
+
+rSvsidx OBJECT-TYPE
+	SYNTAX		Integer32 (0..1024)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Id of associated VS"
+	::= { rsEntry 1 }
+    
+rSip OBJECT-TYPE
+	SYNTAX		InetAddress
+        MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"IP address of RS"
+        ::= { rsEntry 2 }
+
+rSport OBJECT-TYPE
+        SYNTAX		InetPortNumber
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"RS port number"
+	::= { rsEntry 3 }    
+
+rSaddrtype OBJECT-TYPE
+        SYNTAX		InetAddressType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"RS address type"
+	::= { rsEntry 4 }
+
+rSidx OBJECT-TYPE
+	SYNTAX		Integer32 (0..1024)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Unique Id of RS"
+	::= { rsEntry 5 }
+    
+rSforwardingMethod OBJECT-TYPE
+        SYNTAX		OCTET STRING (SIZE(0..32))
+        MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"forwarding method used for RS"
+	::= { rsEntry 6 }
+
+rSweight OBJECT-TYPE
+	SYNTAX		Integer32 (0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"configured weight of RS"
+	::= { rsEntry 7 }    
+
+rSstate OBJECT-TYPE
+	SYNTAX		INTEGER {
+                                inService(1),
+                                outOfService(2),
+--                              failed(3),
+                                disabled(4)
+                        }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"current state of RS"
+	::= { rsEntry 8 }    
+
+rSConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of connections for this RS"
+	::= { rsEntry 12 }
+
+rSInPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of incoming pakets to this RS"
+	::= { rsEntry 13 }
+
+rSOutPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of outgoing pakets from this RS"
+	::= { rsEntry 14 }
+
+rSInBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of incoming bytes from this RS"
+	::= { rsEntry 15 }
+
+rSOutBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of outgoing bytes from this RS"
+	::= { rsEntry 16 }
+
+rSActiveConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the number of active connection for this RS"
+	::= { rsEntry 17 }
+
+rSInactiveConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the number of inactive connection for this RS"
+	::= { rsEntry 18 }
+
+--rSLoad OBJECT-TYPE
+--	SYNTAX		Integer32 (0..65535)
+--	MAX-ACCESS	read-only
+--	STATUS		current
+--	DESCRIPTION	"Load on RS"
+--	::= { rsEntry 9 }    
+
+-- END RSentry --
+
+adaptivInterval OBJECT-TYPE
+	SYNTAX		Integer32 (0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Adaptiv scheduling: interval [s]"
+	::= { b100 13 }
+
+adaptivUrl OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..1023))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Adaptiv scheduling: URL with RS load"
+	::= { b100 14 }
+
+adaptivCtrlMinP OBJECT-TYPE
+	SYNTAX		Integer32 (0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Adaptiv scheduling: minimum (%) of ctrl variable"
+	::= { b100 15 }
+
+adaptivMinWeight OBJECT-TYPE
+	SYNTAX		Integer32 (1..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Adaptiv scheduling: min bound (>0) for adaptiv weight"
+	::= { b100 16 }
+
+--
+
+b100Notifications OBJECT IDENTIFIER
+	::= { b100NotificationsPrefix 1 }
+
+
+vSstateChange NOTIFICATION-TYPE
+	OBJECTS {
+		vSstate,
+		vSip,
+		vSport,
+		vSaddrtype,
+		vSname,
+		vSidx
+	}
+	STATUS  current
+	DESCRIPTION "Notification sent when a Virtual Service changes state."
+	::= { b100Notifications 1 }
+
+rSstateChange  NOTIFICATION-TYPE
+	OBJECTS {
+		rSstate,
+		rSip,
+		rSport,
+		rSaddrtype,
+		rSidx,
+		vSip,
+		vSport,
+		vSaddrtype,
+		vSname,
+		vSidx
+	}
+	STATUS  current
+	DESCRIPTION "Notification sent when a Real Server changes state."
+	::= { b100Notifications 2 }
+
+hAstateChange NOTIFICATION-TYPE
+	OBJECTS {
+		hAstate
+	}
+	STATUS  current
+	DESCRIPTION "Notification sent when a failover occurs."
+	::= { b100Notifications 3 }
+
+licenseExceeded NOTIFICATION-TYPE
+	STATUS  current
+	DESCRIPTION "Notification when a timed License has expired."
+	::= { b100Notifications 4 }
+
+END

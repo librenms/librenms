@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\IPv4;
+
 if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!= 0)) {
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
 } else {
@@ -14,9 +16,9 @@ foreach ($vrfs_lite_cisco as $vrf) {
         $data               = trim($data);
         list($oid,$ifIndex) = explode(' ', $data);
         $mask               = trim(snmp_get($device, "ipAdEntNetMask.$oid", '-Oqv', 'IP-MIB'));
-        $addr               = Net_IPv4::parseAddress("$oid/$mask");
-        $network            = $addr->network.'/'.$addr->bitmask;
-        $cidr               = $addr->bitmask;
+        $cidr               = IPv4::netmask2cidr($mask);
+        $network            = "$oid/$cidr";
+
 
         if (dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifIndex` = ?', array($device['device_id'], $ifIndex)) != '0' && $oid != '0.0.0.0' && $oid != 'ipAdEntIfIndex') {
             $port_id = dbFetchCell('SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $ifIndex));

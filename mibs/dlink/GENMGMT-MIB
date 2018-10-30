@@ -1,0 +1,3549 @@
+AGENT-GENERAL-MIB  DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        IpAddress, MODULE-IDENTITY,                        
+        OBJECT-TYPE,Integer32               FROM SNMPv2-SMI
+        TruthValue,RowStatus, MacAddress    FROM SNMPv2-TC
+        DisplayString                       FROM RFC1213-MIB
+        InetAddressType, InetAddress        FROM INET-ADDRESS-MIB
+        AgentNotifyLevel,dlink-common-mgmt  FROM DLINK-ID-REC-MIB
+	VlanId				    FROM Q-BRIDGE-MIB;
+
+      agentGeneralMgmt MODULE-IDENTITY
+            LAST-UPDATED "201206260000Z"
+            ORGANIZATION "D-Link Corp."
+            CONTACT-INFO
+                "http://support.dlink.com"
+            DESCRIPTION
+                    "The structure of general management information for enterprise."
+        ::= {  dlink-common-mgmt 1 }
+
+-- -----------------------------------------------------------------------------
+-- Textual Conventions
+-- -----------------------------------------------------------------------------
+-- This definition may be excluded if IPv6 is not supported
+Ipv6Address ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "2x:"
+        STATUS       current
+        DESCRIPTION
+                "This data type is used to model IPv6 addresses.
+                This is a binary string of 16 octets in network
+                byte-order."
+        SYNTAX       OCTET STRING (SIZE (16))
+
+UnitList                ::= OCTET STRING(SIZE (0..3))
+
+-- -----------------------------------------------------------------------------
+-- agentBasicInfo
+-- -----------------------------------------------------------------------------
+    agentBasicInfo          OBJECT IDENTIFIER ::= { agentGeneralMgmt 1 }
+
+    agentMgmtProtocolCapability OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    snmp-ip(2),
+                    snmp-ipx(3),
+                    snmp-ip-ipx(4)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The network management protocol(s) supported by this agent."
+        ::= { agentBasicInfo 1 }
+
+-- -----------------------------------------------------------------------------
+-- agentMibcapabilityTable
+-- -----------------------------------------------------------------------------
+    agentMibCapabilityTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentMibCapabilityEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of MIB capability entries supported by this agent."
+        ::= { agentBasicInfo 2 }
+
+    agentMibCapabilityEntry OBJECT-TYPE
+        SYNTAX  AgentMibCapabilityEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A MIB capability entry containing objects that describe a particular MIB
+             supported by this agent."
+        INDEX   { agentMibCapabilityIndex }
+        ::= { agentMibCapabilityTable 1 }
+
+    AgentMibCapabilityEntry ::=
+        SEQUENCE {
+            agentMibCapabilityIndex
+                Integer32,
+            agentMibCapabilityDescr
+                DisplayString,
+            agentMibCapabilityVersion
+                Integer32,
+            agentMibCapabilityType
+                INTEGER
+        }
+
+    agentMibCapabilityIndex OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "A list of Agent MIB Capability Description entries."
+        ::= { agentMibCapabilityEntry 1 }
+
+    agentMibCapabilityDescr OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..35))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The name of the MIB supported by the agent."
+        ::= { agentMibCapabilityEntry 2 }
+
+    agentMibCapabilityVersion OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The version of the MIB specified in this entry."
+        ::= { agentMibCapabilityEntry 3 }
+
+    agentMibCapabilityType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    standard(2),
+                    proprietary(3),
+                    experiment(4)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The type of MIB specified in this entry."
+        ::= { agentMibCapabilityEntry 4 }
+
+
+    agentStatusConsoleInUse   OBJECT-TYPE
+        SYNTAX INTEGER {
+               other(1),
+               in-use(2),
+               not-in-use(3)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This indicates whether the console is currently in use."
+        ::= { agentBasicInfo 3 }
+
+    agentStatusSaveCfg OBJECT-TYPE
+        SYNTAX INTEGER {
+               other(1),
+               proceeding(2),
+               completed(3),
+               failed(4)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This indicates the status of the device configuration.
+
+            other (1) - This entry is currently in use but the conditions under
+                     which it will remain so are determined by each of the following values.
+            proceeding (2) - The device configuration is currently being saved into NV-RAM.
+            completed (3) - All of the device configuration parameters have been
+                     saved into NV-RAM.
+            failed (4) - The process to save the device configuration has failed."
+        ::= { agentBasicInfo 4 }
+
+    agentStatusFileTransfer OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1) ,
+                    in-process(2),
+                    invalid-file(3),
+                    violation(4),
+                    file-not-found(5),
+                    disk-full(6),
+                    complete(7),
+                    time-out(8),
+                    not-format(9),
+                    memory-full(10)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The status of the firmware download control. If the value is stated as 'other',
+             the firmware has not been updated since the device was started."
+        ::= { agentBasicInfo 5 }
+
+-- -----------------------------------------------------------------------------
+-- agentCPUutilizationTable
+-- -----------------------------------------------------------------------------
+    agentCPUutilization          OBJECT IDENTIFIER ::= { agentBasicInfo 6 }
+
+    agentCPUutilizationIn5sec OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The time scale is set at 5 second intervals.
+             The value will be between 0% (idle) and 100% (very busy)."
+        ::= { agentCPUutilization 1 }
+
+    agentCPUutilizationIn1min OBJECT-TYPE
+        SYNTAX  Integer32
+
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The time scale is set at 1 minute intervals.
+             The value will be between 0% (idle) and 100% (very busy)."
+        ::= { agentCPUutilization 2 }
+
+    agentCPUutilizationIn5min OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The time scale is set at 5 minute intervals.
+             The value will be between 0% (idle) and 100% (very busy)."
+        ::= { agentCPUutilization 3 }
+
+   agentDualImageStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    not-supported(0),
+                    supported(1)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The dual image status."
+        ::= { agentBasicInfo 7 }
+
+-- -----------------------------------------------------------------------------
+-- agentPORTutilizationTable
+-- -----------------------------------------------------------------------------
+    agentPORTutilizationTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentPORTutilizationEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table specifies the current utilization of a specified port."
+        ::= { agentBasicInfo 8 }
+
+    agentPORTutilizationEntry OBJECT-TYPE
+        SYNTAX  AgentPORTutilizationEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information regarding the port utilization function."
+        INDEX   { agentPORTutilizationProtIndex }
+        ::= { agentPORTutilizationTable 1 }
+
+    AgentPORTutilizationEntry ::=
+        SEQUENCE {
+            agentPORTutilizationProtIndex
+                INTEGER,
+            agentPORTutilizationTX
+                INTEGER,
+            agentPORTutilizationRX
+                INTEGER,
+            agentPORTutilizationUtil
+                INTEGER,
+            agentPORTutilizationRXUtil
+                INTEGER,                                
+            agentPORTutilizationTXUtil
+                INTEGER
+        }
+
+    agentPORTutilizationProtIndex OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the module's port number."
+        ::= { agentPORTutilizationEntry 1 }
+
+    agentPORTutilizationTX OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The current rate of transmitted frames on the specified port."
+        ::= { agentPORTutilizationEntry 2 }
+
+    agentPORTutilizationRX OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The current rate of received frames on the specified port."
+        ::= { agentPORTutilizationEntry 3 }
+
+    agentPORTutilizationUtil OBJECT-TYPE
+        SYNTAX  INTEGER (0..100)
+        UNITS       "%"
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The current percentages regarding port statistics."
+        ::= { agentPORTutilizationEntry 4 }
+        
+    agentPORTutilizationRXUtil OBJECT-TYPE
+        SYNTAX  INTEGER (0..100)
+        UNITS       "%"
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The current percentages regarding port receive packets statistics."
+        ::= { agentPORTutilizationEntry 5 }  
+          
+    agentPORTutilizationTXUtil OBJECT-TYPE
+        SYNTAX  INTEGER (0..100)
+        UNITS       "%"
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The current percentages regarding port transmit packets statistics."
+        ::= { agentPORTutilizationEntry 6 }
+-- -----------------------------------------------------------------------------
+    agentDRAMutilizationTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentDRAMutilizationEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+             "Information about DRAM memory."
+        ::={agentBasicInfo 9}
+
+     agentDRAMutilizationEntry OBJECT-TYPE
+        SYNTAX   AgentDRAMutilizationEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION
+            "A list of information about DRAM memory."
+        INDEX {agentDRAMutilizationUnitID}
+        ::={agentDRAMutilizationTable 1}
+
+     AgentDRAMutilizationEntry ::=
+        SEQUENCE {
+                agentDRAMutilizationUnitID
+                         INTEGER,
+                agentDRAMutilizationTotalDRAM
+                         INTEGER,
+                agentDRAMutilizationUsedDRAM
+                         INTEGER,
+                agentDRAMutilization
+                         INTEGER
+                 }
+
+     agentDRAMutilizationUnitID OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+             "Specifies the unit ID.
+              If the ID equals zero, it means the current device."
+        ::={ agentDRAMutilizationEntry 1 }
+
+     agentDRAMutilizationTotalDRAM OBJECT-TYPE
+        SYNTAX  INTEGER
+        UNITS   "KB"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The size of total DRAM memory."
+        ::={agentDRAMutilizationEntry 2}
+
+     agentDRAMutilizationUsedDRAM OBJECT-TYPE
+        SYNTAX  INTEGER
+        UNITS   "KB"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The size of used DRAM memory."
+        ::={agentDRAMutilizationEntry 3}
+
+     agentDRAMutilization OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+             "The percentage of used DRAM memory of the total DRAM memory available.
+              The value will be between 0% (idle) and 100% (very busy)."
+        ::={agentDRAMutilizationEntry 4}
+
+-- -----------------------------------------------------------------------------
+    agentFLASHutilizationTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentFLASHutilizationEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+             "Information about the flash memory."
+        ::={agentBasicInfo 10}
+
+     agentFLASHutilizationEntry OBJECT-TYPE
+        SYNTAX   AgentFLASHutilizationEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION
+            "Information about the flash memory."
+        INDEX {agentFLASHutilizationUnitID}
+        ::={agentFLASHutilizationTable 1}
+
+     AgentFLASHutilizationEntry ::=
+        SEQUENCE {
+                 agentFLASHutilizationUnitID
+                         INTEGER,
+                 agentFLASHutilizationTotalFLASH
+                         INTEGER,
+                 agentFLASHutilizationUsedFLASH
+                         INTEGER,
+                 agentFLASHutilization
+                         INTEGER
+                 }
+
+     agentFLASHutilizationUnitID OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+             "Specifies the unit ID.
+              If the ID equals zero, it means the current device."
+        ::={ agentFLASHutilizationEntry 1 }
+
+     agentFLASHutilizationTotalFLASH OBJECT-TYPE
+        SYNTAX  INTEGER
+        UNITS   "KB"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total size of flash memory."
+        ::={agentFLASHutilizationEntry 2}
+
+     agentFLASHutilizationUsedFLASH OBJECT-TYPE
+        SYNTAX  INTEGER
+        UNITS   "KB"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The size of the used flash memory."
+        ::={agentFLASHutilizationEntry 3}
+
+     agentFLASHutilization OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+             "The percentage of used flash memory in total flash memory.
+              The value will be between 0% (idle) and 100% (very busy)."
+        ::={agentFLASHutilizationEntry 4}
+
+-- -----------------------------------------------------------------------------
+    agentStatusReset OBJECT-TYPE
+        SYNTAX INTEGER {
+               proceeding(1),
+               completed(2),
+               failed(3)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This indicates the status of 'agentReset'."
+        ::= { agentBasicInfo 11 }
+
+    agentSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A text string containing the serial number of this device."
+        ::= { agentBasicInfo 12 }
+
+-- -----------------------------------------------------------------------------
+    agentFirmwareType OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A text string containing the firmware type."
+        ::= { agentBasicInfo 13 }
+
+-- -----------------------------------------------------------------------------
+-- agentBasicConfig
+-- -----------------------------------------------------------------------------
+    agentBasicConfig        OBJECT IDENTIFIER ::= { agentGeneralMgmt 2 }
+
+    agentBscSwFileTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentBscSwFileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of MIB Basic Config entry support files updated by this agent."
+        ::= { agentBasicConfig 1 }
+
+    agentBscSwFileEntry OBJECT-TYPE
+        SYNTAX  AgentBscSwFileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A basic configuration entry containing the objects that describe a particular MIB
+             supported by this agent."
+        INDEX   { agentBscSwFileIndex }
+        ::= { agentBscSwFileTable 1 }
+
+    AgentBscSwFileEntry ::=
+        SEQUENCE {
+            agentBscSwFileIndex
+                Integer32,
+            agentBscSwFileDscr
+                DisplayString,
+            agentBscSwFileAddr
+                IpAddress,
+            agentBscSwFileTransferType
+                INTEGER,
+            agentBscSwFile
+                DisplayString,
+            agentBscSwFileLocateId
+                INTEGER,
+            agentBscSwFileLoadType
+                INTEGER,
+            agentBscSwFileCtrl
+                INTEGER,
+            agentBscSwFileBIncrement
+                TruthValue,
+            agentBscSwFileCtrlID
+                INTEGER,
+            agentBscSwFileCtrlUnitID
+                UnitList,
+            agentBscSwFileIPv6Addr
+                Ipv6Address,
+            agentBscSwFileBootUpImage
+                TruthValue,
+            agentBscSwFileForceAgree
+                TruthValue,
+            agentBscSwFileInterfaceName
+                DisplayString,
+            agentBscSwFileServerDomainName	 
+                DisplayString  				
+        }
+
+    agentBscSwFileIndex OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+                "The table index for the file entry"
+        ::= { agentBscSwFileEntry 1 }
+
+    agentBscSwFileDscr OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..64))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The description of the software file purpose in this entry.
+             Note: For systems that do not support a change to this object, setting a value for
+             this object will cause the system to return bad-value error messages."
+        ::= { agentBscSwFileEntry 2 }
+
+    agentBscSwFileAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IP address where the file that needs to be downloaded is located, or the IP address
+            where the file will be uploaded to."
+        ::= {  agentBscSwFileEntry 3 }
+
+    agentBscSwFileTransferType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    network-load(2),
+                    out-of-band-load(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The channel through which the file will be downloaded or uploaded.
+             Note: For systems that do not support all channels, setting a value to the unsupported
+             channel will cause the system to return bad-value error messages."
+        ::= { agentBscSwFileEntry 4 }
+
+    agentBscSwFile OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..128))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The name of the file to be downloaded from, or uploaded to, the TFTP server."
+        ::= { agentBscSwFileEntry 5 }
+
+     agentBscSwFileLocateId OBJECT-TYPE
+        SYNTAX  INTEGER (1..16)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object describes the type of file.
+             runtime-code (1),
+             log-file (2),
+             cfg-file (3)
+             Note: For systems that do not support changes to this object, setting a value for
+             this object will cause the system to return bad-value error messages."
+        ::= { agentBscSwFileEntry 6 }
+
+     agentBscSwFileLoadType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    upload(2),
+                    download(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "This object provides the user with a choice of uploading or downloading the selected file.
+                 Note: For systems  that do not support a change to this object, setting a value for this object
+                 will cause the system to return bad-value error messages."
+        ::= { agentBscSwFileEntry 7 }
+
+     agentBscSwFileCtrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    inactive(2),
+                    start(3),
+                    delete(4),
+                    config-as-bootup(5),
+                    apply(6)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object gives the user the option of downloading runtime software. This setting will take effect
+             when the system restarts. See Note (1) below
+
+                         Note:
+                         For systems that do not support changes to this object, setting a value to this object
+                         will cause the system to return bad-value error messages.
+
+                        start - Activate firmware.
+                delete (4) - Delete the firmware by indicated firmware ID.
+                config-as-bootup (5) - Configured as bootup firmware by the indicated
+            firmware(ID).
+            apply (6) - Apply the configuration to be the active configuration by the indicated config ID."
+        ::= { agentBscSwFileEntry 8 }
+
+        agentBscSwFileBIncrement OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates whether the previous configuration will remain
+             valid or not after downloading the configuration file.
+             True: Keep valid
+             False: Erase. "
+        ::= { agentBscSwFileEntry 9 }
+
+    agentBscSwFileCtrlID OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The section ID of the firmware image or configuration file.
+             A value of 0 indicates the boot-up firmware image or configuration file."
+        ::= { agentBscSwFileEntry 10 }
+
+    agentBscSwFileCtrlUnitID OBJECT-TYPE
+        SYNTAX   UnitList
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Specifies  which unit of the switch stack the firmware image will be downloaded from.
+             One or more units can be set in this list. Each bit from the left to the right represents the
+             switch from unit ID 1 to unit ID 12.
+             A null entry in this field denotes all switches in the switch stack."
+        ::= { agentBscSwFileEntry 11 }
+
+    agentBscSwFileIPv6Addr OBJECT-TYPE
+        SYNTAX  Ipv6Address
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IPv6 address where the file will be downloaded from or uploaded to."
+        ::= {  agentBscSwFileEntry 12 }
+
+    agentBscSwFileBootUpImage OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The result of the download will depend on whether the boot_up option is specified.
+             Case 1: In the case where the master unit provides the file system and the slave unit does
+                not provide the file system, when boot_up is specified, the file will be downloaded
+                to the boot_up image on the slave. If boot_up is not specified, then the file will
+                not be downloaded to this slave unit.
+
+             Case 2: In the case where the master unit does not provide the file system and the slave unit
+                provides the file system, when boot_up is specified, the file will be downloaded to
+                the boot_up image on the slave unit. If boot_up is not specified, the file will
+                not be downloaded to this slave unit.
+
+             Case 3: In the case where the master unit and the slave unit both support or do not support
+                the file system, the file will be downloaded to the specified file on the slave unit.
+                If boot_up is specified, the downloaded file will be assigned as the boot_up image.
+
+             True: boot_up option is specified.
+             False: boot_up option is not specified. "
+        ::= { agentBscSwFileEntry 13 }
+
+    agentBscSwFileForceAgree OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When the force_agree option is specified, the reboot command will be executed
+             immediately, without any further confirmation from the user.
+
+             True: force_agree option is specified.
+             False: force_agree option is not specified. "
+        ::= { agentBscSwFileEntry 14 }
+
+    agentBscSwFileInterfaceName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE(0..12))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This node is used to specify the interface name when the agentBscSwFileIPv6Addr
+             is the link local address."
+        ::= { agentBscSwFileEntry 15 }
+
+   agentBscSwFileServerDomainName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE(0..255))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the domain name of the TFTP server."
+        ::= {  agentBscSwFileEntry 16 }
+
+    agentFileTransfer OBJECT-TYPE
+                SYNTAX INTEGER {
+                                other(1),
+                                start(2),
+                                start-and-reset(3),
+                                noaction(4)
+                        }
+                MAX-ACCESS read-write
+                STATUS obsolete
+                DESCRIPTION
+                        "This object will execute the download or upload action. If start (2) is chosen, it will
+                         begin to download/upload and no reset will follow. If start-and-reset (3) is chosen,
+                         then the reset will be activated after completing the download or upload.
+                         No action if noaction (4) is chosen.
+
+                         Note:
+                         Because these functions will be limited by the support for the system in question,
+                         some of the selected items will be invalid. When the user selects an invalid entry,
+                         the system will respond with a bad-value status."
+                ::= { agentBasicConfig 2 }
+
+    agentSystemReset OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    cold-start(2),
+                    warm-start(3),
+                    no-reset(4)
+                }
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION
+            "This object indicates the agent system reset state. Setting this
+             object to no-reset (4) has no effect. Setting this object to
+             cold-start (2) or warm-start (3) will reset the agent. The agent
+             always returns to no-reset (4) when this object is read.
+
+                         This object is replaced by 'agentReset'."
+        ::= { agentBasicConfig 3 }
+
+    agentRs232PortConfig OBJECT-TYPE
+        SYNTAX  INTEGER  {
+                    other(1),
+                    console(2),
+                    out-of-band(3),
+                                        notAvail(4)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the RS-232C mode once the device has restarted."
+        ::= { agentBasicConfig 4 }
+
+    agentOutOfBandBaudRateConfig OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    baudRate-2400 (2),
+                    baudRate-9600 (3),
+                    baudRate-19200(4),
+                    baudRate-38400(5),
+                    baudRate-115200(6)
+                }
+        MAX-ACCESS  read-write
+        STATUS  obsolete
+        DESCRIPTION
+            "This object allows the user to specify an out-of-band baud rate, which
+             will take effect upon system restart.
+
+                         Note:
+                         Because these functions will be limited by the support for the system
+                         in question, some of the selected items will be invalid. When the user
+                         selects an invalid entry, the system will respond with a bad-value error message.
+                         "
+        ::= { agentBasicConfig 5 }
+
+
+
+     agentSaveCfg OBJECT-TYPE
+        SYNTAX INTEGER {
+                                other(1),
+                                cfg-id1(2),
+                                cfg-id2(3),
+                                log(4),
+                                all(5)
+                        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates the type of save command to be executed, when saving to NV-RAM.
+             other (1) - None of the following.
+             cfg-id1 (2) - Save configuration ID1.
+             cfg-id2 (3)- Save configuration ID2.
+             log (4) - Save log.
+             all (5) - Save both (active configuration and log)."
+        ::= { agentBasicConfig 6 }
+
+
+-- -----------------------------------------------------------------------------
+-- swMultiImageInfoTable
+-- -----------------------------------------------------------------------------
+    swMultiImageInfoTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwMultiImageInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            ""
+        ::= { agentBasicConfig 7 }
+
+    swMultiImageInfoEntry OBJECT-TYPE
+        SYNTAX  SwMultiImageInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information about multiple image management."
+        INDEX  { swMultiImageInfoID }
+        ::= { swMultiImageInfoTable 1 }
+
+    SwMultiImageInfoEntry ::=
+        SEQUENCE {
+            swMultiImageInfoID
+                INTEGER,
+            swMultiImageVersion
+                DisplayString,
+            swMultiImageSize
+                Integer32,
+            swMultiImageUpdateTime
+                DisplayString,
+            swMultiImageFrom
+                DisplayString,
+            swMultiImageSendUser
+                DisplayString,
+            swMultiImageFileName
+                DisplayString
+        }
+    swMultiImageInfoID OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The stacking section ID of the firmware image.
+             The stacking section ID = 256 * Unit ID + Image File ID."
+        ::= { swMultiImageInfoEntry 1 }
+
+    swMultiImageVersion OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The recorded downloaded firmware version."
+        ::= { swMultiImageInfoEntry 2 }
+
+    swMultiImageSize OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The recorded downloaded firmware size."
+        ::= { swMultiImageInfoEntry 3 }
+
+    swMultiImageUpdateTime OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The recorded firmware update time."
+        ::= { swMultiImageInfoEntry 4 }
+
+    swMultiImageFrom OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..100))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The recorded IP address of the TFTP server"
+        ::= { swMultiImageInfoEntry 5 }
+
+    swMultiImageSendUser OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The record of the user who downloaded the firmware."
+        ::= { swMultiImageInfoEntry 6 }
+
+     swMultiImageFileName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "When the system is set to boot from SD card, this object will display the recorded path name of the boot firmware file. "
+        ::= { swMultiImageInfoEntry 7 }
+        
+-- -----------------------------------------------------------------------------
+    agentMultiCfgMgmt OBJECT IDENTIFIER ::= { agentBasicConfig 8 }
+
+    swMultiCfgInfoTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwMultiCfgInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            ""
+        ::= { agentMultiCfgMgmt 1 }
+
+    swMultiCfgInfoEntry OBJECT-TYPE
+        SYNTAX  SwMultiCfgInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information about multiple configuration files."
+        INDEX  { swMultiCfgInfoID }
+        ::= { swMultiCfgInfoTable 1 }
+
+    SwMultiCfgInfoEntry ::=
+        SEQUENCE {
+            swMultiCfgInfoID
+                INTEGER,
+            swMultiCfgVersion
+                DisplayString,
+            swMultiCfgSize
+                Integer32,
+            swMultiCFgUpdateTime
+                DisplayString,
+            swMultiCfgFrom
+                DisplayString,
+            swMultiCfgSendUser
+                DisplayString,
+            swMultiCfgFileName
+                DisplayString
+        }
+    swMultiCfgInfoID OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The section ID of the configuration files."
+        ::= { swMultiCfgInfoEntry 1 }
+
+    swMultiCfgVersion OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The recorded downloaded configuration version."
+        ::= { swMultiCfgInfoEntry 2 }
+
+    swMultiCfgSize OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The recorded downloaded configuration size (in bytes).
+             "
+        ::= { swMultiCfgInfoEntry 3 }
+
+    swMultiCFgUpdateTime OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The recorded configuration update time
+            displayed in string format, i.e. yyyy/mon/dd hh:mm:ss."
+        ::= { swMultiCfgInfoEntry 4 }
+
+    swMultiCfgFrom OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..100))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The recorded IP address of the TFTP server."
+        ::= { swMultiCfgInfoEntry 5 }
+
+    swMultiCfgSendUser OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The record of the user who downloaded the configuration file"
+        ::= { swMultiCfgInfoEntry 6 }
+
+    swMultiCfgFileName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "When the system is set to boot from SD card, this object displays the recorded path name of the boot configuration file. "
+        ::= { swMultiCfgInfoEntry 7 }
+
+-- -----------------------------------------------------------------------------
+    swMultiCfgCurrentUsed OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The indicated configuration file ID of the system currently in use."
+        ::= { agentMultiCfgMgmt 2 }
+
+     swMultiCfgBootUp OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the configuration file ID which will take effect upon the next reboot."
+        ::= { agentMultiCfgMgmt 3 }
+
+
+
+-- -----------------------------------------------------------------------------
+-- swMultiCfgCtrlTable
+-- -----------------------------------------------------------------------------
+    swMultiCfgCtrlTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwMultiCfgCtrlEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            ""
+        ::= { agentMultiCfgMgmt 4 }
+
+    swMultiCfgCtrlEntry OBJECT-TYPE
+        SYNTAX  SwMultiCfgCtrlEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information about multiple configuration management."
+        INDEX  { swMultiCfgCtrlID }
+        ::= { swMultiCfgCtrlTable 1 }
+
+    SwMultiCfgCtrlEntry ::=
+        SEQUENCE {
+            swMultiCfgCtrlID
+                INTEGER,
+            swMultiCfgAction
+                INTEGER
+        }
+    swMultiCfgCtrlID OBJECT-TYPE
+        SYNTAX  INTEGER{
+                cfgId-1(1),
+                cfgId-2(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The section ID of the configuration file."
+        ::= { swMultiCfgCtrlEntry 1 }
+
+   swMultiCfgAction OBJECT-TYPE
+        SYNTAX  INTEGER
+             {
+                active(1),
+                delete(2),
+                apply(3),
+                none(4),
+                config-as-bootup-cfg(5)
+             }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "
+            save: Save configuration to active configuration ID when the parameter is omitted.
+                active: Set any valid configuration as the active configuration.
+                delete: Removes the configuration from the flash memory. This configuration
+                         cannot be the active or current configuration file.
+                apply: Loads the indicated configuration file and applies it to the system.
+                config-as-bootup-cfg: Configured as the boot-up configuration by the indicated configuration(ID)."
+        ::= { swMultiCfgCtrlEntry 2 }
+
+-- -----------------------------------------------------------------------------
+-- Add common severity control management
+-- -----------------------------------------------------------------------------
+   systemSeverityControlMgmt    OBJECT IDENTIFIER ::= { agentBasicConfig 9 }
+
+    systemSeverityTrapControl OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the level of trap severity control. The system has a severity level control
+             and each trap should have a severity control set. When trap events occur and its severity
+             is higher than the system severity control level, the trap works as defined. If the event
+             severity is lower than the system severity control level, the event is ignored as if it
+             did not occur."
+        ::= { systemSeverityControlMgmt 1 }
+
+    systemSeverityLogControl OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the level of trap severity control. The system has a severity level control and
+             each trap should have a severity control set. When trap events occur and its severity is
+             higher than the system severity control level, the trap works as defined. If the event
+             severity is lower than the system severity control level, the event is ignored as if
+             it did not occur."
+        ::= { systemSeverityControlMgmt 2 }
+
+-- -----------------------------------------------------------------------------
+-- agentTrustedHostMgmt
+-- -----------------------------------------------------------------------------
+    agentTrustedHostMgmt       OBJECT IDENTIFIER ::= { agentBasicConfig 10 }
+
+    agentTrustedHostTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentTrustedHostEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table contains the trusted host information."
+        ::= { agentTrustedHostMgmt 1 }
+
+    agentTrustedHostEntry OBJECT-TYPE
+        SYNTAX  AgentTrustedHostEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information about the trusted hosts."
+        INDEX  { agentTrustedHostIndex }
+        ::= { agentTrustedHostTable 1 }
+
+    AgentTrustedHostEntry ::=
+        SEQUENCE {
+            agentTrustedHostIndex
+                INTEGER,
+            agentTrustedHostIPAddress
+                IpAddress,
+            agentTrustedHostRowStatus
+                RowStatus,
+            agentTrustedHostIPSubnetMask
+                IpAddress,
+            agentTrustedHostForSNMP
+                INTEGER,
+            agentTrustedHostForTELNET
+                INTEGER,
+            agentTrustedHostForSSH
+                INTEGER,
+            agentTrustedHostForHTTP
+                INTEGER,
+            agentTrustedHostForHTTPS
+                INTEGER,
+            agentTrustedHostForPING
+                INTEGER,
+            agentTrustedHostAddrType
+                InetAddressType,
+            agentTrustedHostAddr
+                InetAddress,
+            agentTrustedHostIPv6PrefixLen
+                INTEGER                
+        }
+
+    agentTrustedHostIndex OBJECT-TYPE
+        SYNTAX  INTEGER (1..30)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The index of the trusted host entry."
+        ::= { agentTrustedHostEntry 1 }
+
+    agentTrustedHostIPAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Specifies the IP address of the trusted host."
+        ::= { agentTrustedHostEntry 2 }
+
+    agentTrustedHostRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Indicates the status of this entry. When creating a trusted host
+             entry, the IP address should also be set."
+        ::= { agentTrustedHostEntry 3 }
+
+    agentTrustedHostIPSubnetMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Specifies the IP subnet mask of the trusted host."
+        ::= { agentTrustedHostEntry 4 }
+        
+    agentTrustedHostForSNMP OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the trusted host for SNMP."
+        ::= { agentTrustedHostEntry 5 }
+
+    agentTrustedHostForTELNET OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the trusted host for Telnet."
+        ::= { agentTrustedHostEntry 6 }
+
+    agentTrustedHostForSSH OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the trusted host for SSH."
+        ::= { agentTrustedHostEntry 7 }
+
+    agentTrustedHostForHTTP OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the trusted host for HTTP."
+        ::= { agentTrustedHostEntry 8 }
+
+    agentTrustedHostForHTTPS OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION 
+            "Specifies the trusted host for HTTPS."
+        ::= { agentTrustedHostEntry 9 }      
+	  
+    agentTrustedHostForPING OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the trusted host for PING."
+        ::= { agentTrustedHostEntry 10 }
+	
+    agentTrustedHostAddrType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The type of trusted host address as specified by
+             the 'agentTrustedHostAddr' object."
+        ::= { agentTrustedHostEntry 11 }
+	
+    agentTrustedHostAddr OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the IP address of the trusted host."
+        ::= { agentTrustedHostEntry 12 }
+	
+     agentTrustedHostIPv6PrefixLen OBJECT-TYPE
+        SYNTAX  INTEGER (1..128)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the IPv6 prefix length of the IPv6 trusted host."
+        ::= { agentTrustedHostEntry 13 }
+
+-- -----------------------------------------------------------------------------
+-- agentTrustedHostDelAllState
+-- -----------------------------------------------------------------------------
+    agentTrustedHostDelAllState OBJECT-TYPE
+        SYNTAX	INTEGER{
+			    		none(1),
+			    		start(2)
+			    		}
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Used to delete all trusted host entries."
+        ::= { agentTrustedHostMgmt 2 }
+
+-- -----------------------------------------------------------------------------
+-- agentFDBMgmt
+-- -----------------------------------------------------------------------------
+    agentFDBMgmt       OBJECT IDENTIFIER ::= { agentBasicConfig 11 }
+    agentFDBClearAllState OBJECT-TYPE
+        SYNTAX  INTEGER{
+                other(1),
+                start(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Used to clear all FDB entries."
+        ::= { agentFDBMgmt 1 }
+	
+    agentFDBClearByPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentFDBClearByPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Used to clear FDB entries by port."
+        ::= { agentFDBMgmt 2 }
+	
+    agentFDBClearByPortEntry OBJECT-TYPE
+        SYNTAX  AgentFDBClearByPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This is an entry of the agentFDBClearByPortTable."
+        INDEX  { agentFDBClearPortIndex }
+        ::= { agentFDBClearByPortTable 1 }
+	
+    AgentFDBClearByPortEntry ::=
+        SEQUENCE {
+            agentFDBClearPortIndex
+                INTEGER,
+            agentFDBClearByPortAction
+                INTEGER
+        }
+    agentFDBClearPortIndex OBJECT-TYPE
+	SYNTAX		INTEGER(1..65535)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+        DESCRIPTION
+            "This object indicates the port number."
+        ::= { agentFDBClearByPortEntry 1 }	
+	
+    agentFDBClearByPortAction OBJECT-TYPE
+        SYNTAX  INTEGER{
+                other(1),
+                start(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates whether to clear FDB or not."
+        ::= { agentFDBClearByPortEntry 2 }
+	
+    agentFDBClearByVlanTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentFDBClearByVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Used to clear FDB entries by port."
+        ::= { agentFDBMgmt 3 }
+	
+    agentFDBClearByVlanEntry OBJECT-TYPE
+        SYNTAX  AgentFDBClearByVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This is an entry of agentFDBClearByPortTable."
+        INDEX  { agentFDBClearVid }
+        ::= { agentFDBClearByVlanTable 1 }
+	
+    AgentFDBClearByVlanEntry ::=
+        SEQUENCE {
+            agentFDBClearVid
+                VlanId,
+            agentFDBClearByVlanAction
+                INTEGER
+        }
+	
+    agentFDBClearVid OBJECT-TYPE
+        SYNTAX		VlanId
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+            "This object indicates the VLAN-ID."
+        ::= { agentFDBClearByVlanEntry 1 }
+		
+    agentFDBClearByVlanAction OBJECT-TYPE
+        SYNTAX  INTEGER{
+                other(1),
+                start(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates whether to clear the FDB or not."
+        ::= { agentFDBClearByVlanEntry 2 }
+
+	agentFDBSecurityTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentFDBSecurityEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Used to display the FDB entries that have been created by the security module."
+        ::= { agentFDBMgmt 4}
+	
+    agentFDBSecurityEntry OBJECT-TYPE
+        SYNTAX  AgentFDBSecurityEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This is an entry of agentFDBSecurityTable."
+        INDEX  { 
+                 agentFDBVid,
+                 agentFDBMacAddress
+                 }
+        ::= { agentFDBSecurityTable 1 }
+	
+    AgentFDBSecurityEntry ::=
+        SEQUENCE {
+            agentFDBVid
+                VlanId,
+            agentFDBMacAddress
+                MacAddress,
+            agentFDBPort
+                INTEGER, 
+            agentFDBType
+                INTEGER,
+            agentFDBStatus
+                INTEGER,
+            agentFDBSecurityModule
+                INTEGER
+        }
+		
+    agentFDBVid OBJECT-TYPE
+		SYNTAX		VlanId
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This object indicates the VLAN-ID."
+		::= { agentFDBSecurityEntry 1 }
+
+    agentFDBMacAddress OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This object indicates the MAC address."
+		::= { agentFDBSecurityEntry 2 }
+		
+    agentFDBPort OBJECT-TYPE
+		SYNTAX		INTEGER(1..65535)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"This object indicates the port number."
+		::= { agentFDBSecurityEntry 3 }
+		
+    agentFDBType OBJECT-TYPE
+		SYNTAX  INTEGER{
+	                dynamic(1),
+	                static(2)
+	                }
+		MAX-ACCESS	read-only
+		STATUS		current
+        DESCRIPTION
+            "This object indicates the MAC address type."
+        ::= { agentFDBSecurityEntry 4 }	
+		
+    agentFDBStatus OBJECT-TYPE
+        SYNTAX  INTEGER{
+                drop(1),
+                forward(2)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the MAC address's forwarding status."
+        ::= { agentFDBSecurityEntry 5}
+
+    agentFDBSecurityModule OBJECT-TYPE
+        SYNTAX  INTEGER{
+                dot1x(1),
+                wac(2),
+                jwac(3),
+                port-security(4),
+                mac-based-access-control(5),
+                compound-authentication(6)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION		
+            "This object is used to indicate which security module created the current MAC address.
+	    	dot1x: 802.1X.
+	    	wac: Web-based Access Control. 
+	    	jwac: Web-Based Access Control extension for Japan.
+	    	port-security: Port Security.
+	    	mac-based-access-control: MAC-based Access Control.
+	    	compound-authentication: Compound Authentication."
+        ::= { agentFDBSecurityEntry 6}
+
+
+-- -----------------------------------------------------------------------------
+-- agentARPMgmt
+-- -----------------------------------------------------------------------------
+    agentARPMgmt       OBJECT IDENTIFIER ::= { agentBasicConfig 12 }
+    agentARPClearAllState OBJECT-TYPE
+        SYNTAX  INTEGER{
+                other(1),
+                start(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Used to clear all ARP entries."
+        ::= { agentARPMgmt 1 }
+
+-- -----------------------------------------------------------------------------
+-- agentGratuitousARPMgmt
+-- -----------------------------------------------------------------------------
+      agentGratuitousARPMgmt  OBJECT IDENTIFIER ::={agentARPMgmt 2}
+
+      agentGratuitousARPSendIpifStatusUpState OBJECT-TYPE
+        SYNTAX  INTEGER{
+                   enabled(1),
+                   disabled(2)
+                }
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+              "This is used to enable/disable sending of gratuitous ARP request
+              packets while the IPIF interface comes up. This is used to automatically
+              announce the interface's IP address to other nodes. By default,
+               the state is enabled, and only one ARP packet will be broadcast."
+       DEFVAL { enabled }
+         ::={ agentGratuitousARPMgmt 1}
+
+      agentGratuitousARPSendDupIpDetectedState OBJECT-TYPE
+       SYNTAX INTEGER{
+                      enabled(1),
+                      disabled(2)
+                     }
+         MAX-ACCESS read-write
+         STATUS  current
+         DESCRIPTION
+               "This is used to enable/disable the sending of gratuitous ARP request
+                packets while a duplicate IP is detected. By default, the state is enabled.
+                The duplicate IP detected state indicates that the system has received an ARP request
+                packet that was sent by an IP address that matches the system's own IP address.
+                In this case, the system knows that somebody out there is using an IP address
+                that is in conflict with the system. In order to reclaim the correct host
+                of this IP address, the system can send out the gratuitous ARP request
+                packet for this duplicate IP address."
+        DEFVAL { enabled }
+         ::={ agentGratuitousARPMgmt 2}
+
+      agentGratuitousARPLearningState OBJECT-TYPE
+       SYNTAX INTEGER{
+                      enabled(1),
+                      disabled(2)
+                     }
+         MAX-ACCESS read-write
+         STATUS  current
+         DESCRIPTION
+                  "This is used to enable/disable learning of an ARP entry in the ARP
+                  cache based on the received gratuitous ARP packet. If the switch
+                  receives a gratuitous ARP request/reply packet and the sender's
+                  IP address is in its ARP table, it should update the ARP entry.
+                   By default, the state is disabled."
+         DEFVAL { disabled }
+         ::={ agentGratuitousARPMgmt 3}
+
+      agentGratuitousARPTable OBJECT-TYPE
+         SYNTAX SEQUENCE OF AgentGratuitousARPEntry
+         MAX-ACCESS not-accessible
+         STATUS current
+         DESCRIPTION
+           "Gratuitous ARP Table Information."
+         ::={ agentGratuitousARPMgmt 4}
+
+      agentGratuitousARPEntry OBJECT-TYPE
+        SYNTAX  AgentGratuitousARPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of information from the Gratuitous ARP Table."
+        INDEX {
+                 agentGratuitousARPInterfaceName
+              }
+        ::={ agentGratuitousARPTable 1 }
+
+       AgentGratuitousARPEntry ::=
+          SEQUENCE {
+                     agentGratuitousARPInterfaceName
+                          DisplayString,
+                     agentGratuitousARPPeriodicalSendInterval
+                            INTEGER,
+                       agentGratuitousARPTrapState
+                            INTEGER,
+                       agentGratuitousARPLogState
+                            INTEGER
+                   }
+
+       agentGratuitousARPInterfaceName  OBJECT-TYPE
+            SYNTAX  DisplayString
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+               "The name of the IP interface."
+            ::={agentGratuitousARPEntry 1}
+
+          agentGratuitousARPPeriodicalSendInterval OBJECT-TYPE
+               SYNTAX  INTEGER (0..65535)
+               UNITS        "seconds"
+               MAX-ACCESS read-write
+               STATUS  current
+               DESCRIPTION
+                 "This is used to configure the interval for the periodic sending of
+                 gratuitous ARP request packets.
+                 0 means do not send gratuitous ARP request packets periodically."
+               DEFVAL { 0 }
+                ::={agentGratuitousARPEntry  2}
+
+         agentGratuitousARPTrapState   OBJECT-TYPE
+               SYNTAX  INTEGER{
+                             enabled(1),
+                             disabled(2)
+                             }
+               MAX-ACCESS read-write
+               STATUS  current
+               DESCRIPTION
+                    "This indicates the state of the gratuitous ARP trap. The switch can
+                    trap the IP conflict events to inform the administrator.
+                     By default, the trap is disabled."
+                 DEFVAL { disabled }
+                ::={agentGratuitousARPEntry 3}
+
+         agentGratuitousARPLogState OBJECT-TYPE
+               SYNTAX  INTEGER{
+                             enabled(1),
+                             disabled(2)
+                             }
+               MAX-ACCESS read-write
+               STATUS  current
+               DESCRIPTION
+                    "This indicates the state of the gratuitous Log trap. The switch can
+                     log the IP conflict events to inform the administrator.
+                     By default, the event log is enabled."
+               DEFVAL { enabled }
+                ::={agentGratuitousARPEntry 4}
+                
+    agentARPTotalARPEntries OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Used to display the total number of ARP entries."
+        ::= { agentARPMgmt 3 }
+
+    agentARPRetryTimes OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This indicates the retry times of the ARP request."
+        ::= { agentARPMgmt 4 }
+        
+-- -----------------------------------------------------------------------------
+-- swMultiImageCtrlTable
+-- -----------------------------------------------------------------------------
+    swMultiImageCtrlTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwMultiImageCtrlEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            ""
+        ::= { agentBasicConfig 13 }
+
+    swMultiImageCtrlEntry OBJECT-TYPE
+        SYNTAX  SwMultiImageCtrlEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information about multiple image management."
+        INDEX  { swMultiImageCtrlID }
+        ::= { swMultiImageCtrlTable 1 }
+
+    SwMultiImageCtrlEntry ::=
+        SEQUENCE {
+                swMultiImageCtrlID
+                        INTEGER,
+                swMultiImageCtrlAction
+                        INTEGER
+                }
+
+    swMultiImageCtrlID OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The stacking section ID of the firmware image.
+             The stacking section ID = 256 * Unit ID + Image File ID."
+        ::= { swMultiImageCtrlEntry 1 }
+
+    swMultiImageCtrlAction OBJECT-TYPE
+        SYNTAX  INTEGER{
+                config-as-bootup-fw(1),
+                delete(2),
+                none(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the running status of the image which is
+             specified by swMultiImageCtrlID and swMultiImageCtrlUnitID.
+
+             config-as-bootup-fw (1) - Configured as the bootup firmware by the indicated firmware(ID).
+             delete (2) - Delete the firmware by indicated firmware ID.
+             none (3) - No action.
+             "
+        ::= { swMultiImageCtrlEntry 2 }
+
+-- -----------------------------------------------------------------------------
+    agentOutOfBandDataBits OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the out-of-band data bits."
+        ::= { agentBasicConfig 14 }
+
+    agentOutOfBandParityBits OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the out-of-band parity bits."
+        ::= { agentBasicConfig 15 }
+
+    agentOutOfBandStopBits OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the out-of-band stop bits."
+        ::= { agentBasicConfig 16 }
+
+    agentOutOfBandAutoLogoutConfig OBJECT-TYPE
+        SYNTAX  INTEGER {
+               never(1),
+               minutes-2(2),
+               minutes-5(3),
+               minutes-10(4),
+               minutes-15(5)
+               }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object allows the user to specify an out-of-band auto logout time."
+        ::= { agentBasicConfig 17 }
+
+-- -----------------------------------------------------------------------------
+-- agentBscFileSystemMgmt
+-- -----------------------------------------------------------------------------
+    agentBscFileSystemMgmt       OBJECT IDENTIFIER ::= { agentBasicConfig 18 }
+
+    agentBscFileSystemTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentBscFileSystemEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of MIB File System Basic Configuration entries supported
+             by the file update of this agent."
+        ::= { agentBscFileSystemMgmt 1 }
+
+    agentBscFileSystemEntry OBJECT-TYPE
+        SYNTAX  AgentBscFileSystemEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A File System basic configuration entry that contains objects
+             describing a particular MIB supported by this agent."
+        INDEX   { agentBscFileSystemIndex }
+        ::= { agentBscFileSystemTable 1 }
+
+    AgentBscFileSystemEntry ::=
+        SEQUENCE {
+                agentBscFileSystemIndex
+                        Integer32,
+                agentBscFileSystemDscr
+                        DisplayString,
+                agentBscFileSystemServerAddr
+                        IpAddress,
+                agentBscFileSystemServerIPv6Addr
+                        Ipv6Address,
+                agentBscFileSystemServerFileName
+                        DisplayString,
+                agentBscFileSystemDeviceDriverID
+                        INTEGER,
+                agentBscFileSystemDeviceFileName
+                        DisplayString,
+                agentBscFileSystemLoadType
+                        INTEGER,
+                agentBscFileSystemCtrlUnitID
+                        UnitList,
+                agentBscFileSystemBootUpImage
+                        TruthValue,
+                agentBscFileSystemForceAgree
+                        TruthValue,
+                agentBscFileSystemCtrl
+                        INTEGER,
+                agentBscFileSystemInterfaceName
+                        DisplayString,
+                agentBscFileSystemServerDomainName
+                        DisplayString,
+                agentBscFileSystemIncrement
+        		TruthValue,
+                agentBscFileSystemServerVrfName
+                        DisplayString
+
+        }
+
+    agentBscFileSystemIndex OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+        "The table index for the file entry.
+         This object describes the file type.
+             runtime-code (1),
+             log-file (2),
+             cfg-file (3),
+             attack-log-file (7)"
+        ::= { agentBscFileSystemEntry 1 }
+
+    agentBscFileSystemDscr OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The description of the software file purpose in this entry."
+        ::= { agentBscFileSystemEntry 2 }
+
+    agentBscFileSystemServerAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IP address where the file to be downloaded is located, or the IP address
+            where the file will be uploaded to."
+        ::= {  agentBscFileSystemEntry 3 }
+
+    agentBscFileSystemServerIPv6Addr OBJECT-TYPE
+        SYNTAX  Ipv6Address
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IPv6 address where the file is to be downloaded from or uploaded to."
+        ::= {  agentBscFileSystemEntry 4 }
+
+
+    agentBscFileSystemServerFileName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..64))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The name of the file to be downloaded from or uploaded to the TFTP server.
+        If agentBscFileSystemDeviceFileName is not set, the switch will default to using
+             the bootup file as the runtime image for the switch."
+        ::= { agentBscFileSystemEntry 5 }
+
+    agentBscFileSystemDeviceDriverID OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        none(1),
+                        a(2),
+                        b(3),
+                        c(4),
+                        d(5),
+                        e(6),
+                        f(7),
+                        g(8),
+                        h(9),
+                        i(10),
+                        j(11),
+                        k(12),
+                        l(13),
+                        m(14),
+                        n(15),
+                        o(16),
+                        p(17),
+                        q(18),
+                        r(19),
+                        s(20),
+                        t(21),
+                        u(22),
+                        v(23),
+                        w(24),
+                        x(25),
+                        y(26),
+                        z(27)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Specifies the drive of the device that the firmware to be uploaded/downloaded is located.
+             If none (1) is specified, the switch will default to the current drive."
+        ::= { agentBscFileSystemEntry 6 }
+
+    agentBscFileSystemDeviceFileName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..64))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The name of the file to be downloaded to the device, or uploaded from the
+            device. When downloading or uploading, the agentBscFileSystemServerFileName object must also be set."
+        ::= { agentBscFileSystemEntry 7 }
+
+
+     agentBscFileSystemLoadType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    upload(2),
+                    download(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "This object allows the user to select a download or upload function for the file.
+
+                         Note:
+                         For systems that do not support changes to this object, setting a value for
+                         this object will cause the system to return a bad-value error message.
+                         "
+        ::= { agentBscFileSystemEntry 8 }
+
+    agentBscFileSystemCtrlUnitID OBJECT-TYPE
+        SYNTAX   UnitList
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Specifies which unit of the switch stack the firmware image or configuration file should be downloaded from.
+             One or more units can be set in this list. Each bit from left to right represents the
+             switch from unit ID 1 to unit ID 12.
+             If this list is set to null it represents all stack switches."
+        ::= { agentBscFileSystemEntry 9 }
+
+    agentBscFileSystemBootUpImage OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The result of the download will depend on whether the boot_up option has been specified.
+             Case 1: In the case of the master unit providing the file system and the slave unit
+                not providing the file system, when the boot_up parameter is specified, then the file will
+                be downloaded to the boot_up image on the slave. If the boot_up parameter is not specified,
+                then the file will not be downloaded to this slave unit.
+
+             Case 2: In the case of the master unit not providing the file system and the slave unit
+                providing the file system, when the boot_up parameter is specified, then the file will be downloaded
+                to the boot_up image on the slave unit. If boot_up is not specified, then the file will
+                not be downloaded to this slave unit.
+
+             Case 3: In the case of the master unit and the slave unit both supporting or not supporting the
+                file system, the file will be downloaded to the specified file on the slave unit. If boot_up
+                is specified, the downloaded file will be assigned as the boot_up image.
+
+             True: boot_up option is specified.
+             False: boot_up option is not specified.. "
+        ::= { agentBscFileSystemEntry 10 }
+
+    agentBscFileSystemForceAgree OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When the force_agree option is specified, the reboot command will be executed immediately
+             without any further confirmation from the user.
+
+             True: force_agree option is specified.
+             False: force_agree option is not specified.. "
+        ::= { agentBscFileSystemEntry 11 }
+
+     agentBscFileSystemCtrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    inactive(2),
+                    start(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object allows the user to download runtime software. The settings
+                         will take effect when the system restarts. See Note (1) below
+
+                         Note 1:
+                         For systems which do not support value changes to this object,
+                         setting these values will cause the system to return a bad-value error message
+
+                        start (3) - activate firmware.
+        "
+        ::= { agentBscFileSystemEntry 12 }
+
+     agentBscFileSystemInterfaceName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..12))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "This node is used to specify the interface name when agentBscFileSystemServerIPv6Addr
+              is the local link address."
+        ::= {  agentBscFileSystemEntry 13 }
+        
+   agentBscFileSystemServerDomainName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE(0..255))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the domain name of the TFTP server."
+        ::= {  agentBscFileSystemEntry 14 }
+        
+   agentBscFileSystemIncrement OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "If increment is specified, then the existing configuration will not be cleared before applying
+             of the new configuration. If it is not specified, then the existing configuration will be cleared
+             before applying of the new configuration.
+             True : keep valid
+             False : erase. "
+       	 ::= { agentBscFileSystemEntry 15 } 
+        
+   agentBscFileSystemServerVrfName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE(0..12))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the VRF name of the TFTP server.Input string 'reserved' 
+            for the global space."
+        ::= {  agentBscFileSystemEntry 16}
+	
+-- --------------------------------------------------------------------------------
+     agentBscFileSystemSaveConfigDriverID OBJECT-TYPE
+       SYNTAX  INTEGER {
+                        none(1),
+                        a(2),
+                        b(3),
+                        c(4),
+                        d(5),
+                        e(6),
+                        f(7),
+                        g(8),
+                        h(9),
+                        i(10),
+                        j(11),
+                        k(12),
+                        l(13),
+                        m(14),
+                        n(15),
+                        o(16),
+                        p(17),
+                        q(18),
+                        r(19),
+                        s(20),
+                        t(21),
+                        u(22),
+                        v(23),
+                        w(24),
+                        x(25),
+                        y(26),
+                        z(27)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The drive on the device that the configuration file is will be saved to.
+             If none (1) is specified, the switch places the file on the current drive by default."
+        ::= { agentBscFileSystemMgmt 2 }
+
+     agentBscFileSystemSaveConfigFileName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..64))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The name of the configuration file that will be saved to the device.
+             When agentBscFileSystemSaveCfg  is set to cfg (2), and if the agentBscFileSystemSaveConfigFileName
+             is not null, the configuration file will be saved to the set file name.
+             If set to null, the configuration file will be saved to the boot_up CFG file. "
+        ::= { agentBscFileSystemMgmt 3 }
+
+     agentBscFileSystemSaveCfg OBJECT-TYPE
+        SYNTAX INTEGER {
+                                other(1),
+                                cfg(2),
+                                log(3),
+                                all(4)
+                        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This indicates the method of saving information to the NV-RAM of the device.
+             other (1) - None of the following.
+             cfg (2) - Save configuration.
+             log (3) - Save log.
+             all (4) - Save both ( active configuration and log)."
+        ::= { agentBscFileSystemMgmt 4 }
+
+-- -----------------------------------------------------------------------------
+    agentFileSystemConfigTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentFileSystemConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table indicates the information about the bootup files."
+        ::= { agentBscFileSystemMgmt 5 }
+
+    agentFileSystemConfigEntry OBJECT-TYPE
+        SYNTAX  AgentFileSystemConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information about the bootup files for each unit of the switch stack."
+        INDEX   { agentFileSystemUnit }
+        ::= { agentFileSystemConfigTable 1 }
+
+    AgentFileSystemConfigEntry ::=
+        SEQUENCE {
+                agentFileSystemUnit
+                        Integer32,
+                agentFileSystemDriverID
+                        INTEGER,
+                agentFileSystemBootImage
+                        DisplayString,
+                agentFileSystemBootConfig
+                        DisplayString,
+                agentFileSystemActConfig
+                        DisplayString
+
+        }
+
+    agentFileSystemUnit OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+                "The unit ID."
+        ::= { agentFileSystemConfigEntry 1 }
+
+     agentFileSystemDriverID OBJECT-TYPE
+       SYNTAX  INTEGER {
+                        none(1),
+                        a(2),
+                        b(3),
+                        c(4),
+                        d(5),
+                        e(6),
+                        f(7),
+                        g(8),
+                        h(9),
+                        i(10),
+                        j(11),
+                        k(12),
+                        l(13),
+                        m(14),
+                        n(15),
+                        o(16),
+                        p(17),
+                        q(18),
+                        r(19),
+                        s(20),
+                        t(21),
+                        u(22),
+                        v(23),
+                        w(24),
+                        x(25),
+                        y(26),
+                        z(27)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The drive on the device that the configuration file will be saved to.
+             If none (1) is specified, the switch will place  the file to the current drive by default."
+        ::= { agentFileSystemConfigEntry 2 }
+
+      agentFileSystemBootImage OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "When displayed, it shows the current bootup image file name.
+            When set, the set name will be set as the bootup image."
+        ::= { agentFileSystemConfigEntry 3 }
+
+      agentFileSystemBootConfig OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "When displayed, it shows the current bootup configuration file name.
+            When set, the set name will be set as the bootup configuration."
+        ::= { agentFileSystemConfigEntry 4 }
+
+      agentFileSystemActConfig OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "When displayed, it shows null.
+            When set, the set name will be active at once, but the set name
+            will not be set as the bootup configuration."
+        ::= { agentFileSystemConfigEntry 5 }
+
+-- -----------------------------------------------------------------------------
+    agentReboot OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    none(1),
+                    start(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Used to restart the switch."
+        ::= {  agentBasicConfig 19  }
+
+    agentReset OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    none(1),
+                    config(2),
+                    system(3),
+                                        reset(4),
+                    system-exclude-vlan(5),
+                    system-exclude-ip(6),
+                    system-exclude-vlan-ip(7)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Used to reset all switch parameters.
+
+                         none (1): No action. This is the default value of this object.
+                         config (2): All parameters are reset to default settings.
+                                                The device will neither save nor reboot.
+                         system (3): All parameters are reset to default settings.
+                                                The switch will then do a factory reset, save, and reboot.
+                         reset (4) : All parameters will be reset to default settings except for the
+                                                IP address, user account, and history log.
+                                                The device will neither save nor reboot.
+                         system-exclude-vlan(5)   : All parameters are reset to default settings except for VLAN.
+                                       The switch will then save its settings and reboot.
+             system-exclude-ip(6)     : All parameters are reset to default settings except IP address.
+                                       The switch will then save its settings and reboot.
+             system-exclude-vlan-ip(7): All parameters are reset to default settings except VLAN and IP address.
+                                       The switch will then save its settings and reboot.
+                        "
+        ::= {  agentBasicConfig 20  }
+
+-- -----------------------------------------------------------------------------
+-- agentFTPFileTable
+-- -----------------------------------------------------------------------------
+    agentFTPFileTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentFTPFileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of the MIB Basic Config entries support files updated by this agent."
+        ::= { agentBasicConfig 21 }
+
+    agentFTPFileEntry OBJECT-TYPE
+        SYNTAX  AgentFTPFileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A basic configuration entry containing the objects describing a particular MIB
+             supported by this agent."
+        INDEX   { agentFTPFileIndex }
+        ::= { agentFTPFileTable 1 }
+
+    AgentFTPFileEntry ::=
+        SEQUENCE {
+            agentFTPFileIndex
+                Integer32,
+            agentFTPFileDscr
+                DisplayString,
+            agentFTPFileLoadType
+                INTEGER,
+            agentFTPFileAddr
+                IpAddress,
+            agentFTPTCPPort
+                INTEGER,
+            agentFTPFileName
+                DisplayString,
+            agentFTPUserName
+                DisplayString,
+            agentFTPPassword
+                DisplayString,
+            agentFTPFileCtrlID
+                INTEGER,
+            agentFTPFileBIncrement
+                TruthValue,
+            agentFTPFileCtrl
+                INTEGER,               
+			agentFTPFileBootUpImage
+				TruthValue,
+			agentFTPFileForceAgree
+				TruthValue,  
+			agentFTPFileIPv6Addr
+				DisplayString,
+			agentFTPFileInterfaceName
+				DisplayString,
+			agentFTPFileUnitID
+				UnitList					               
+        }
+                    
+    agentFTPFileIndex OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+                "The table index for the file entry. This object describes the file type
+                 runtime-code (1),
+                 log-file (2),
+                 cfg-file (3)"
+        ::= { agentFTPFileEntry 1 }
+
+    agentFTPFileDscr OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..64))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The description of the software file purpose in this entry.
+             Note: For systems which do not support changes to this object, setting a value for
+             this object will cause the system to return bad-value error messages."
+        ::= { agentFTPFileEntry 2 }
+
+    agentFTPFileLoadType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    upload(2),
+                    download(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "This object provides the user with a choice of uploading or downloading the selected file.
+                 Note: For systems which do not support a change of this object, setting a value to this object
+                 will cause the system to return bad-value error messages."
+        ::= { agentFTPFileEntry 3 }
+
+    agentFTPFileAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IP address that the file to be downloaded is located on, or the IP address
+            where the file will be uploaded to."
+        ::= {  agentFTPFileEntry 4 }
+
+    agentFTPTCPPort  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The TCP port number being used to establish the command connection."
+        ::= { agentFTPFileEntry 5 }
+
+    agentFTPFileName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..128))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The name of the file to be downloaded from, or uploaded to, the FTP server."
+        ::= { agentFTPFileEntry 6 }
+
+     agentFTPUserName  OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This is the user name to enter in upload/download. "
+        ::= { agentFTPFileEntry 7 }
+
+     agentFTPPassword  OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This is the password to enter for an upload/download."
+        ::= { agentFTPFileEntry 8 }
+
+     agentFTPFileCtrlID OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The section ID of the firmware image or configuration file.
+             A value of 0 indicates the boot-up firmware image or configuration file."
+        ::= { agentFTPFileEntry 9 }
+
+      agentFTPFileBIncrement OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates whether the previous configuration will remain
+             valid or not after downloading the configuration file.
+             True: Keep valid
+             False: Erase. "
+        ::= { agentFTPFileEntry 10 }
+
+
+     agentFTPFileCtrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    start(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object gives the user the option to download runtime software. The setting will take effect
+             when the system restarts. See Note (1) below
+                  Note 1:
+                  For systems which do not support changes to this object, setting a value for this object
+                  will cause the system to return bad-value error messages. "
+        ::= { agentFTPFileEntry 11 }     
+            
+	agentFTPFileBootUpImage OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates whether to set the special file as a boot up file or not.
+			 True: The boot-up option is specified.
+			 False: The boot-up option is not specified."
+        ::= { agentFTPFileEntry 12 }    
+        
+	agentFTPFileForceAgree OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When the force-agree option is specified, the reboot command will be executed
+			immediately without any further confirmation from the user.
+			True: Force-agree option is specified.
+			False: Force-agree option is not specified."
+        ::= { agentFTPFileEntry 13 } 
+                
+	agentFTPFileIPv6Addr  OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IPv6 address where the file is to be downloaded from or uploaded to."
+        ::= { agentFTPFileEntry 14 }          
+	
+	agentFTPFileInterfaceName  OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This node is used to specify the interface name when agentFTPFileIPv6Addr
+			is the local link address. "
+        ::= { agentFTPFileEntry 15 }	
+
+ 	agentFTPFileUnitID OBJECT-TYPE
+        SYNTAX   UnitList
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Specifies which unit of the switch stack the firmware image or configuration 
+			file should be downloaded from. One or more units can be set in this list. Each 
+			bit from left to right represents the switch from unit ID 1 to unit ID 12.If this
+			list is set to null it represents all stack switches."
+        ::= { agentFTPFileEntry 16 }        
+-- -----------------------------------------------------------------------------
+-- agentSnmpTrapState
+-- -----------------------------------------------------------------------------
+     agentSnmpTrapState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates if the SNMP trap is enabled or disabled."
+        ::= { agentBasicConfig 22 }
+
+-- -----------------------------------------------------------------------------
+--  agentOutOfBandMgmt
+-- -----------------------------------------------------------------------------
+
+    agentOutOfBandMgmt     OBJECT IDENTIFIER ::= { agentBasicConfig 23 }
+
+    agentOutOfBandMgmtState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Enables or disables the interface."
+        ::= { agentOutOfBandMgmt 1 }
+
+    agentOutOfBandMgmtIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IP address for out of band management. This object can only take the
+            value of the unicast IP address."
+        ::= { agentOutOfBandMgmt 2 }
+
+    agentOutOfBandMgmtSubnetMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IP net mask for out of band management."
+        ::= { agentOutOfBandMgmt 3 }
+
+    agentOutOfBandMgmtGateway OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The gateway for out of band management. "
+        ::= { agentOutOfBandMgmt 4 }
+
+    agentOutOfBandMgmtLinkStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    link-up(1),
+                    link-down(2)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The current Link status for out of band management."
+        ::= { agentOutOfBandMgmt 5 }      
+        
+        
+        
+        
+        
+
+-- -----------------------------------------------------------------------------
+--  agentTrapMgmt
+-- -----------------------------------------------------------------------------
+
+    agentTrapMgmt     OBJECT IDENTIFIER ::= { agentBasicConfig 24 }
+    
+    agentTrapColdStart OBJECT-TYPE
+        SYNTAX  INTEGER {
+               enabled(1),
+               disabled(2)               
+            }
+    	MAX-ACCESS  read-write
+    	STATUS  current
+    	DESCRIPTION
+            "When enabled (1), whenever the device detects a cold start event,
+             a trap will be sent out."
+    ::= { agentTrapMgmt 1 }
+
+  agentTrapWarmStart OBJECT-TYPE
+    	SYNTAX  INTEGER {
+               enabled(1),
+               disabled(2) 
+            }
+    	MAX-ACCESS  read-write
+    	STATUS  current
+    	DESCRIPTION
+            "When enabled (1), whenever the device detects a warm start event,
+             a trap will be sent out."
+    ::= { agentTrapMgmt 2 }    
+    
+  agentTrapRmonRisingAlarm OBJECT-TYPE
+    	SYNTAX  INTEGER {
+               enabled(1),
+               disabled(2)
+            }
+    	MAX-ACCESS  read-write
+    	STATUS  current
+    	DESCRIPTION
+            "When enabled (1), whenever the device detects a RMON rising alarm 
+             event , a trap will be sent out."
+    ::= { agentTrapMgmt 3 }
+
+  agentTrapRmonFallingAlarm OBJECT-TYPE
+    	SYNTAX  INTEGER {
+               enabled(1),
+               disabled(2)
+            }
+    	MAX-ACCESS  read-write
+    	STATUS  current
+    	DESCRIPTION
+            "When enabled (1), whenever the device detects a RMON falling alarm 
+             event, a trap will be sent out."
+    ::= { agentTrapMgmt 4 }
+
+  agentTrapCfgSave OBJECT-TYPE
+    	SYNTAX  INTEGER {
+               enabled(1),
+               disabled(2) 
+            }
+    	MAX-ACCESS  read-write
+    	STATUS  current
+    	DESCRIPTION
+            "When enabled (1), whenever the device detects a configuration saving 
+             completed event, a trap will be sent out."
+    ::= { agentTrapMgmt 5 }  
+
+  agentTrapCfgUpload OBJECT-TYPE
+    	SYNTAX  INTEGER {
+               enabled(1),
+               disabled(2) 
+            }
+    	MAX-ACCESS  read-write
+    	STATUS  current
+    	DESCRIPTION
+            "When enabled (1), whenever the device detects a configuration 
+             uploading completed event, a trap will be sent out."
+    ::= { agentTrapMgmt 6 }  
+
+  agentTrapCfgDownload OBJECT-TYPE
+    	SYNTAX  INTEGER {
+               enabled(1),
+               disabled(2) 
+            }
+    	MAX-ACCESS  read-write
+    	STATUS  current
+    	DESCRIPTION
+            "When enabled (1), whenever the device detects a configuration 
+             downloading completed event, a trap will be sent out"
+    ::= { agentTrapMgmt 7 }  
+                               
+                              
+-- -----------------------------------------------------------------------------
+-- agentFTPFileSystemTable
+-- -----------------------------------------------------------------------------
+    agentFTPFileSystemTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentFTPFileSystemEntry 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The FTP management table for the file system"
+        ::= { agentBasicConfig 25 }    
+        
+    agentFTPFileSystemEntry OBJECT-TYPE
+        SYNTAX  AgentFTPFileSystemEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A File System basic configuration entry that contains objects
+			 describing a particular MIB supported by this agent."
+        INDEX   { agentFTPFileSystemIndex }
+        ::= { agentFTPFileSystemTable 1 }  
+        
+   AgentFTPFileSystemEntry ::=
+        SEQUENCE {
+                agentFTPFileSystemIndex
+                        Integer32,
+                agentFTPFileSystemDscr
+                        DisplayString,  
+ 				agentFTPFileSystemLoadType
+                        INTEGER,                          
+                agentFTPFileSystemAddressType
+                        InetAddressType,
+				agentFTPFileSystemAddress
+						InetAddress, 
+				agentFTPFileSystemTCPPort 
+						INTEGER,   
+                agentFTPFileSystemServerFileName
+                        DisplayString,  
+                agentFTPFileSystemDeviceFileName
+                        DisplayString,
+ 				agentFTPFileSystemUserName
+						DisplayString,
+				agentFTPFileSystemPassword
+						DisplayString,		                     
+  				agentFTPFileSystemCtrlUnitID             
+                        UnitList,
+                agentFTPFileSystemBootUpImage
+                        TruthValue,   
+                agentFTPFileSystemCtrl
+                        INTEGER,
+                agentFTPFileSystemVrfName
+                        DisplayString
+        }
+
+    agentFTPFileSystemIndex OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS    not-accessible
+        STATUS  current
+        DESCRIPTION
+           	"The table index for the file entry."
+        ::= { agentFTPFileSystemEntry 1 }   
+        
+	agentFTPFileSystemDscr OBJECT-TYPE
+	   SYNTAX  DisplayString
+	   MAX-ACCESS      read-only
+	   STATUS  current
+	   DESCRIPTION
+	   		"The description of the software file purpose in this entry."
+	   ::= { agentFTPFileSystemEntry 2 }   
+                 
+    agentFTPFileSystemLoadType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    upload(2),
+                    download(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "This object allows the user to select a download or upload function for the file."
+        ::= { agentFTPFileSystemEntry 3 }
+                 
+    agentFTPFileSystemAddressType OBJECT-TYPE   
+        SYNTAX  	InetAddressType
+        MAX-ACCESS  read-write
+        STATUS  	current
+        DESCRIPTION
+            "The address type of agentFTPFileSystemAddress."
+        ::= { agentFTPFileSystemEntry 4 }
+        
+     agentFTPFileSystemAddress OBJECT-TYPE
+     	SYNTAX 		InetAddress
+     	MAX-ACCESS	read-write
+     	STATUS	    current
+     	DESCRIPTION
+     		"This object indicates the FTP server address."
+     	::= {agentFTPFileSystemEntry 5}
+  
+	agentFTPFileSystemTCPPort  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The TCP port number being used to establish the control connection."
+        ::= { agentFTPFileSystemEntry 6 }
+  	   
+	agentFTPFileSystemServerFileName OBJECT-TYPE
+	   SYNTAX  DisplayString (SIZE (0..64))
+	   MAX-ACCESS      read-write
+	   STATUS  current
+	   DESCRIPTION
+	  	 	"The name of the file to be downloaded from or uploaded to the FTP server."
+	   ::= { agentFTPFileSystemEntry 7 }  
+	  
+    agentFTPFileSystemDeviceFileName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..64))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The name of the file to be downloaded to the device, or uploaded from the
+             device. 
+             If agentFTPFileSystemDeviceFileName is not set, the switch will default to
+        	 the bootup file."
+       ::= { agentFTPFileSystemEntry 8 }
+
+     agentFTPFileSystemUserName  OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the user name to access the FTP server."
+        ::= { agentFTPFileSystemEntry 9 }
+
+     agentFTPFileSystemPassword  OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the password to access the FTP server."
+        ::= { agentFTPFileSystemEntry 10 }
+                       
+    agentFTPFileSystemCtrlUnitID OBJECT-TYPE
+        SYNTAX   UnitList
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Specifies which unit of the switch stack the firmware image or configuration 
+			file should be downloaded from. One or more units can be set in this list. Each 
+			bit from left to right represents the switch from unit ID 1 to unit ID 12.If this
+			list is set to null it represents all stack switches."
+        ::= { agentFTPFileSystemEntry 11 }
+
+    agentFTPFileSystemBootUpImage OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates whether to set the special file as the boot up file or not.
+			 True: The boot-up option is specified.
+			 False: The boot-up option is not specified."
+        ::= { agentFTPFileSystemEntry 12 }	   
+	 
+	agentFTPFileSystemCtrl  OBJECT-TYPE
+		SYNTAX  INTEGER {
+                    other(1),
+                    start(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object allows the user to execute an FTP download/upload."
+        ::= { agentFTPFileSystemEntry 13 }
+                
+     agentFTPFileSystemVrfName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..12))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the VRF name of the FTP server.Input string 'reserved' 
+            for the global space."
+        ::= { agentFTPFileSystemEntry 14 }
+  
+-- -----------------------------------------------------------------------------
+-- agentBscCMDLogState
+-- -----------------------------------------------------------------------------
+   agentBscCMDLogState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the command logging state."
+        ::= { agentBasicConfig 26 } 
+
+-- -----------------------------------------------------------------------------
+-- agentBscBroadcastPingReplyState
+-- -----------------------------------------------------------------------------
+    agentBscBroadcastPingReplyState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the broadcast ping reply state."
+        ::= { agentBasicConfig 27 }
+	
+-- -----------------------------------------------------------------------------
+-- agentBscTftpConfigMgmt
+-- -----------------------------------------------------------------------------
+   agentBscTftpConfigMgmt       OBJECT IDENTIFIER ::= { agentBasicConfig 28 }
+
+   agentBscTftpCfgFirmwareFile OBJECT-TYPE
+	   SYNTAX  DisplayString (SIZE (0..64))
+	   MAX-ACCESS      read-write
+	   STATUS  current
+	   DESCRIPTION
+            "The firmware pathname that needs to be downloaded/uploaded from/to the TFTP server."
+        ::= {  agentBscTftpConfigMgmt 1 }
+
+   agentBscTftpCfgConfigFile OBJECT-TYPE
+	   SYNTAX  DisplayString (SIZE (0..64))
+	   MAX-ACCESS      read-write
+	   STATUS  current
+	   DESCRIPTION
+            "The configuration pathname that needs to be downloaded/uploaded from/to the TFTP server."
+        ::= {  agentBscTftpConfigMgmt 2 }
+        
+   agentBscTftpCfgLogFile OBJECT-TYPE
+	   SYNTAX  DisplayString (SIZE (0..64))
+	   MAX-ACCESS      read-write
+	   STATUS  current
+	   DESCRIPTION
+            "The log pathname that needs to be uploaded to the TFTP server."
+        ::= {  agentBscTftpConfigMgmt 3 }
+
+   agentBscTftpCfgAttackLogFile OBJECT-TYPE
+	   SYNTAX  DisplayString (SIZE (0..64))
+	   MAX-ACCESS      read-write
+	   STATUS  current
+	   DESCRIPTION
+            "The attack log pathname that needs to be uploaded to the TFTP server."            
+        ::= {  agentBscTftpConfigMgmt 4 }
+
+   agentBscTftpCfgCertificateFile OBJECT-TYPE
+	   SYNTAX  DisplayString (SIZE (0..64))
+	   MAX-ACCESS      read-write
+	   STATUS  current
+	   DESCRIPTION
+            "The certificate pathname that needs to be downloaded from the TFTP server."            
+        ::= {  agentBscTftpConfigMgmt 5 }
+        
+   agentBscTftpCfgKeyFile OBJECT-TYPE
+	   SYNTAX  DisplayString (SIZE (0..64))
+	   MAX-ACCESS      read-write
+	   STATUS  current
+	   DESCRIPTION
+            "The key pathname that needs to be downloaded from the TFTP server."            
+        ::= {  agentBscTftpConfigMgmt 6 }
+        
+   agentBscTftpCfgTechSuooprtFile OBJECT-TYPE
+	   SYNTAX  DisplayString (SIZE (0..64))
+	   MAX-ACCESS      read-write
+	   STATUS  current
+	   DESCRIPTION
+            "The technique's support information pathname that needs to be uploaded to the TFTP server."
+        ::= {  agentBscTftpConfigMgmt 7 }
+
+   agentBscTftpCfgDebugLogFile OBJECT-TYPE
+	   SYNTAX  DisplayString (SIZE (0..64))
+	   MAX-ACCESS      read-write
+	   STATUS  current
+	   DESCRIPTION
+            "The debug log pathname that needs to be uploaded to the TFTP server."
+        ::= {  agentBscTftpConfigMgmt 8 }
+        
+   agentBscTftpCfgSIMFirmwareFile OBJECT-TYPE
+	   SYNTAX  DisplayString (SIZE (0..64))
+	   MAX-ACCESS      read-write
+	   STATUS  current
+	   DESCRIPTION
+            "The firmware pathname that needs to be downloaded/uploaded from/to the TFTP server when it is SIM enabled."
+        ::= {  agentBscTftpConfigMgmt 9 }
+        
+   agentBscTftpCfgSIMConfigFile OBJECT-TYPE
+	   SYNTAX  DisplayString (SIZE (0..64))
+	   MAX-ACCESS      read-write
+	   STATUS  current
+	   DESCRIPTION
+            "The configuration pathname that needs to be downloaded/uploaded from/to the TFTP server when it is SIM enabled."
+        ::= {  agentBscTftpConfigMgmt 10 }
+        
+   agentBscTftpCfgSIMLogFile OBJECT-TYPE
+	   SYNTAX  DisplayString (SIZE (0..64))
+	   MAX-ACCESS      read-write
+	   STATUS  current
+	   DESCRIPTION
+            "The log pathname that needs to be uploaded to the TFTP server when it is SIM enabled."
+        ::= {  agentBscTftpConfigMgmt 11 }         
+
+   agentBscTftpCfgServerIPAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IPv4 address of the TFTP server."
+        ::= {  agentBscTftpConfigMgmt 12 }  
+
+   agentBscTftpCfgServerIPv6Addr OBJECT-TYPE
+        SYNTAX  Ipv6Address
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IPv6 address of the TFTP server."
+        ::= {  agentBscTftpConfigMgmt 13 }  
+
+   agentBscTftpCfgServerDomainName OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE(0..255))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The domain name of the TFTP server."
+        ::= {  agentBscTftpConfigMgmt 14 }  
+
+-- -----------------------------------------------------------------------------
+-- agentBscCommunityEncryptionState
+-- -----------------------------------------------------------------------------
+    agentBscCommunityEncryptionState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the encryption state on the SNMP community string."
+        ::= { agentBasicConfig 29 }
+ 
+-- -----------------------------------------------------------------------------
+-- agentSnmpUdpPort
+-- ----------------------------------------------------------------------------- 
+     agentSnmpUdpPort  OBJECT-TYPE
+         SYNTAX     INTEGER (1..65535)
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+             "This object indicates the snmp udp port number."
+         ::= { agentBasicConfig 30 } 
+
+-- -----------------------------------------------------------------------------
+-- agentResponseBroadcastRequest
+-- -----------------------------------------------------------------------------  
+     agentResponseBroadcastRequest  OBJECT-TYPE
+         SYNTAX     INTEGER {
+                     disabled(1),
+                     enabled(2)
+                 }
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+             "This object indicates the response broadcast request state."
+         ::= { agentBasicConfig 31 }
+
+-- -----------------------------------------------------------------------------
+-- agentIpProtocolConfig
+-- -----------------------------------------------------------------------------
+    agentIpProtoConfig      OBJECT IDENTIFIER ::= { agentGeneralMgmt 3 }
+
+    agentIpNumOfIf OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The total number of IP interfaces supported by this agent."
+        ::= {  agentIpProtoConfig 1 }
+
+    agentIpTftpServerAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  obsolete
+        DESCRIPTION
+            "The IP address of the TFTP Server."
+        ::= {  agentIpProtoConfig 2 }
+
+    agentIpGetIpFrom OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    bootp(3),
+                    dhcp(4)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates if the agent will get its system IP address
+             from a Bootp/DHCP server at start up."
+        ::= { agentIpProtoConfig 3 }
+
+    agentIpAutoconfig OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the status of automatically getting the configuration information
+             from a TFTP server connected to the device."
+        ::= { agentIpProtoConfig 4 }
+
+    agentIpAutoconfigTimeout OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This timer is used to limit the length of time for getting the configuration
+             information from a TFTP server connected to the device."
+        ::= { agentIpProtoConfig 5 }
+
+-- End of agentIpIfTable
+
+-- -----------------------------------------------------------------------------
+-- agentIptrapMangerTable
+-- -----------------------------------------------------------------------------
+        agentIpTrapManager      OBJECT IDENTIFIER ::= { agentGeneralMgmt 4 }
+
+--    agentIpTrapManagerTable OBJECT-TYPE-
+--        SYNTAX  SEQUENCE OF AgentIpTrapManagerEntry
+--        MAX-ACCESS  not-accessible
+--        STATUS  current
+--        DESCRIPTION
+--            "A list of trap managers that the SNMP traps will be sent to."
+--        ::= {  agentIpTrapManager 1 }
+
+--    agentIpTrapManagerEntry OBJECT-TYPE
+--        SYNTAX  AgentIpTrapManagerEntry
+--        MAX-ACCESS  not-accessible
+--        STATUS  obsolete
+--        DESCRIPTION
+--            "Each entry contains the particular trap manager settings."
+--        INDEX   { agentIpTrapManagerIpAddr }
+--        ::= { agentIpTrapManagerTable 1 }
+
+-- -----------------------------------------------------------------------------
+    agentTrapManagerTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentTrapManagerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of trap managers that the SNMP traps will be sent to."
+        ::= {  agentIpTrapManager 2 }
+
+    agentTrapManagerEntry OBJECT-TYPE
+        SYNTAX  AgentTrapManagerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Each entry contains the particular trap manager's settings."
+        INDEX   { agentTrapManagerIndex }
+        ::= { agentTrapManagerTable 1 }
+
+    AgentTrapManagerEntry ::=
+        SEQUENCE {
+                    agentTrapManagerIndex
+                        INTEGER,
+                    agentTrapManagerIpAddr
+                        IpAddress,
+                    agentTrapManagerComm
+                        DisplayString,
+                    agentTrapManagerMsgVer
+                        INTEGER,
+                    agentTrapManagerStatus
+                        INTEGER,
+                    agentTrapManagerUdpPort
+                    	INTEGER
+        }
+
+        agentTrapManagerIndex  OBJECT-TYPE
+            SYNTAX     INTEGER (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                "A value that uniquely identifies trapDestEntry."
+            ::= { agentTrapManagerEntry 1 }
+
+    agentTrapManagerIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The destination IP address for SNMP traps."
+        ::= { agentTrapManagerEntry 2 }
+
+    agentTrapManagerComm OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..20))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The community string used to encode SNMP trap packets being sent to the trap
+             manager."
+        ::= { agentTrapManagerEntry 3 }
+
+    agentTrapManagerMsgVer OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    snmpAgentVersionDependent(1),
+                    v1Trap(2),
+                    v2Trap(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the version of trap packets that will be sent to
+             this trap manager. The default setting is SNMP Agent Version Dependent.
+
+                         Note:
+                         Because some of these functions will be limited by the support of
+                         the system in question, some selected items may be invalid. If one
+                         of these items is selected, a bad value error message will prompt
+                         the user.
+"
+        ::= { agentTrapManagerEntry 4 }
+
+    agentTrapManagerStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates whether or not the trap should be sent to
+             the trap manager."
+        ::= { agentTrapManagerEntry 5 }  
+        
+     agentTrapManagerUdpPort  OBJECT-TYPE
+         SYNTAX     INTEGER (1..65535)
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+             "This object indicates the Trap udp port number."
+         ::= { agentTrapManagerEntry 6 }
+
+-- -----------------------------------------------------------------------------
+-- agentPortTrapStateTable
+-- -----------------------------------------------------------------------------
+     agentPortTrapStateTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentPortTrapStateEntry 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Use to Set/Get per port trap state."
+        ::= {  agentIpTrapManager 3 } 
+        
+    agentPortTrapStateEntry OBJECT-TYPE
+        SYNTAX  AgentPortTrapStateEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This is an entry of the agentPortTrapStateTable."
+        INDEX   { agentTrapStatePortIndex }
+        ::= { agentPortTrapStateTable 1 }
+
+     AgentPortTrapStateEntry ::=
+        SEQUENCE {
+                    agentTrapStatePortIndex
+                        INTEGER,
+                    agentPortTrapState
+                        INTEGER
+        }    
+        
+     agentTrapStatePortIndex  OBJECT-TYPE
+         SYNTAX     INTEGER (1..65535)
+         MAX-ACCESS not-accessible
+         STATUS     current
+         DESCRIPTION
+             "This object indicates the port number."
+         ::= { agentPortTrapStateEntry 1 }
+  
+     agentPortTrapState OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+         MAX-ACCESS  read-write
+         STATUS  current
+         DESCRIPTION
+             "This object indicates the port trap status."
+         ::= { agentPortTrapStateEntry 2 }      
+   
+-- -----------------------------------------------------------------------------
+-- Add for Slip_Console mode swtich 11-9-2001 WindChen
+-- -----------------------------------------------------------------------------
+--      agentConsoleModeManager OBJECT IDENTIFIER ::= { agentGeneralMgmt 5 }
+
+
+
+-- -----------------------------------------------------------------------------
+-- Slip Mode Manager
+-- -----------------------------------------------------------------------------
+--      agentSlipModeManager    OBJECT IDENTIFIER ::= { agentGeneralMgmt 6 }
+
+
+-- -----------------------------------------------------------------------------
+-- Add common trap management
+-- -----------------------------------------------------------------------------
+        agentNotify     OBJECT IDENTIFIER ::= { agentGeneralMgmt 7 }
+
+        agentNotifMgmt      OBJECT IDENTIFIER ::= { agentNotify 1 }
+        agentNotifFirmware   OBJECT IDENTIFIER ::= { agentNotify 2 }
+
+        agentNotifyPrefix OBJECT IDENTIFIER ::= { agentNotifFirmware 0 }
+
+-- -----------------------------------------------------------------------------
+-- agentNotifMgmt
+-- -----------------------------------------------------------------------------
+
+--  systemSeverityControl OBJECT-TYPE
+--      SYNTAX  AgentNotifyLevel
+--      MAX-ACCESS  read-write
+--      STATUS  current
+--      DESCRIPTION
+--          "Indicates the level of trap severity control. The system has a severity level control
+--           and each trap should have a severity control set. When trap events occur and its severity
+--           is higher than the system severity control level, the trap works as defined. If the event
+--           severity is lower than the system severity control level, the event is ignored as if it did not occur.
+--      "
+--      ::= { agentNotifMgmt 1 }
+
+
+    notifFirmwareMgmt OBJECT IDENTIFIER ::= { agentNotifMgmt 2 }
+
+
+
+
+
+-- -----------------------------------------------------------------------------
+-- agentNotifFirmware OBJECT IDENTIFIER ::= { agentNotifyPrefix 0 }
+
+-- -----------------------------------------------------------------------------
+-- agentNotifFirmware
+-- -----------------------------------------------------------------------------
+    agentsystemRestart NOTIFICATION-TYPE
+        OBJECTS {
+              trapInfosystemRestart
+                        }
+        STATUS  current
+        DESCRIPTION
+            "This trap contains the reboot information."
+
+                ::= { agentNotifyPrefix 1 }
+
+
+    agentSaveToNVRAM NOTIFICATION-TYPE
+        OBJECTS         { unitID
+                        }
+        STATUS  current
+        DESCRIPTION
+            "This trap is sent whenever all the device configuration has been saved to NV-RAM."
+
+        ::= { agentNotifyPrefix 2 }
+
+    agentFileTransferStatusChange NOTIFICATION-TYPE
+        OBJECTS         {
+                                                unitID,
+                          agentStatusFileTransfer
+                        }
+        STATUS          current
+        DESCRIPTION     "File transfer status change notification."
+        ::= { agentNotifyPrefix 3 }
+
+    agentSetToFactoryDefault NOTIFICATION-TYPE
+        OBJECTS         { unitID
+                        }
+        STATUS  current
+        DESCRIPTION
+            "This trap is sent whenever the 'set to factory default' setting has been processed. "
+
+        ::= { agentNotifyPrefix 4 }
+
+    agentGratuitousARPTrap  NOTIFICATION-TYPE
+        OBJECTS   {
+
+                    agentGratuitousARPIpAddr,
+                    agentGratuitousARPMacAddr,
+                    agentGratuitousARPPortNumber,
+                    agentGratuitousARPInterfaceName
+                  }
+        STATUS  current
+        DESCRIPTION
+           "This trap is sent when there is an IP address conflict."
+        ::={agentNotifyPrefix 5}
+
+        agentLoginFailTrap  NOTIFICATION-TYPE
+        OBJECTS   {
+                    agentLoginType,
+                    agentLoginAAAMethod,
+                    agentLoginUserName,
+                    agentLoginIpAddr,
+                    agentLoginMacAddr,
+                    agentLoginAAAServerAddr,
+                    agentLoginFailInfo
+                  }
+        STATUS  current
+        DESCRIPTION
+           "The trap is sent when a login has failed through one of the login types (console, Telnet, web, SSL or SSH)."
+        ::={agentNotifyPrefix 6}
+
+        agentFirmwareUpgrade NOTIFICATION-TYPE
+        OBJECTS {
+                    swMultiImageVersion
+                }
+        STATUS  current
+        DESCRIPTION
+            "This trap is sent when the process of upgrading the firmware via SNMP has finished."
+
+                ::= { agentNotifyPrefix 7 }
+
+        agentAccessFlashFailed  NOTIFICATION-TYPE
+        OBJECTS {
+                    agentAccessFlashOper,
+                    agentAccessFlashAddr
+                  }
+        STATUS  current
+        DESCRIPTION
+           "The trap is sent when access to the flash fails."
+        ::={agentNotifyPrefix 8}
+
+        agentCfgOperCompleteTrap  NOTIFICATION-TYPE
+        OBJECTS {
+                    unitID,
+                    agentCfgOperate,
+                    agentLoginUserName
+                  }
+        STATUS  current
+        DESCRIPTION
+           "The trap is sent when the configuration is completely saved, uploaded 
+            or downloaded."
+        ::={agentNotifyPrefix 9}        
+
+-- -----------------------------------------------------------------------------
+-- agentNotifEquipment
+-- -----------------------------------------------------------------------------
+
+-- -----------------------------------------------------------------------------
+-- notificationBindings
+-- -----------------------------------------------------------------------------
+    notificationBindings OBJECT IDENTIFIER ::= { agentNotifFirmware 1 }
+
+    unitID OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "The unit ID of the device which triggered the event."
+        ::= { notificationBindings 1 }
+
+    trapInfosystemRestart   OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the last time the device rebooted.
+            "
+        ::= { notificationBindings 2 }
+
+    agentGratuitousARPIpAddr       OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+           "A duplicate IP address with the switch already exists."
+        ::={notificationBindings 3}
+
+    agentGratuitousARPMacAddr     OBJECT-TYPE
+       SYNTAX    MacAddress
+       MAX-ACCESS accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+           "This object is the MAC address of the device which has the duplicate IP address."
+        ::={notificationBindings 4}
+
+   agentGratuitousARPPortNumber   OBJECT-TYPE
+        SYNTAX   DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+            "This indicates the portNum with a string.
+             For example, if the device is in standalone mode, and the port
+             number is 23, the string should be 23.
+             If the device is in stacking mode, and the unit ID is 2, and the
+             port number is 3, the string should be 2:3.
+            "
+        ::={notificationBindings 5}
+
+
+    agentLoginType OBJECT-TYPE
+                    SYNTAX  INTEGER {
+                            console(1),
+                            telnet(2),
+                            web(3),
+                            ssl(4),
+                            ssh(5)
+                        }
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "The type is the user login method type."
+        ::= { notificationBindings 6 }
+
+    agentLoginAAAMethod OBJECT-TYPE
+                    SYNTAX  INTEGER {
+                            none(1),
+                            local(2),
+                            server(3)
+                        }
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "This method is the AAA login method."
+        ::= { notificationBindings 7 }
+
+    agentLoginUserName OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "This object is the name of the user that failed to login to the switch."
+        ::= { notificationBindings 8 }
+
+
+    agentLoginIpAddr   OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+            "This object is the login type from the IP address."
+        ::= { notificationBindings 9 }
+
+
+    agentLoginMacAddr   OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+            "This object is the login type from a MAC address."
+        ::= { notificationBindings 10 }
+
+
+    agentLoginAAAServerAddr       OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+           "This object is the login type through a console authenticated by an AAA server."
+        ::= { notificationBindings 11 }
+
+    agentLoginFailInfo OBJECT-TYPE
+                    SYNTAX  INTEGER {
+                            other(1),
+                            authenticate-fail(2),
+                            server-timeout(3)
+                        }
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "This object indicates the reason for the login failure."
+        ::= { notificationBindings 12 }
+
+    agentAccessFlashOper OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "This object indicates the operation of the access flash failure."
+        ::= { notificationBindings 13 }
+
+    agentAccessFlashAddr OBJECT-TYPE
+                    SYNTAX  INTEGER
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "This object indicates the address of the access flash failure."
+        ::= { notificationBindings 14 }
+
+    agentCfgOperate OBJECT-TYPE
+        SYNTAX  INTEGER {
+                save(1),
+                upload(2),
+                download(3)
+                }    
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "This object indicates the operation type of the configuration."
+        ::= { notificationBindings 15 }
+
+END
+
+
+
+
+
+

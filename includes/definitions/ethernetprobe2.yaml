@@ -1,0 +1,11 @@
+os: ethernetprobe2
+text: 'Atal Ethernetprobe2'
+type: environment
+icon: atal
+mib_dir:
+    - atal
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr:
+        - EthernetProbe2

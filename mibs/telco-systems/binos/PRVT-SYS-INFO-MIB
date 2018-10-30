@@ -1,0 +1,389 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename:   PRVT-SYS-INFO-MIB.mib
+-- *********************************************************************
+-- (c) Copyright, 2003, BATM Advanced Communications.  All rights reserved.
+--                             WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information.  This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM.  Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+--
+PRVT-SYS-INFO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+                                             FROM SNMPv2-SMI
+        DisplayString                        FROM SNMPv2-TC
+               NOTIFICATION-TYPE
+          FROM SNMPv2-SMI       
+              
+      MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+OBJECT-GROUP
+FROM SNMPv2-CONF
+
+   ipSwitch, prvt-products
+	                                     FROM PRVT-SWITCH-MIB;  
+-------------------------------------------------------------------------------
+--     PRIVATE BRANCH  PRODUCTS
+-------------------------------------------------------------------------------
+
+    prvtSysInfMib MODULE-IDENTITY
+        LAST-UPDATED    "200801010000Z"
+        ORGANIZATION "BATM Advanced Communication"
+        CONTACT-INFO
+               "BATM/Telco Systems Support team
+				Email: 
+				For North America: techsupport@telco.com
+				For North Europe: support@batm.de, info@batm.de
+				For the rest of the world: techsupport@telco.com"
+        DESCRIPTION
+                "Information for system resources"
+		
+        -- revision history     
+         REVISION     "200801010000Z"
+     	 DESCRIPTION
+		"Removed redefined OIDs in private vendor extension definitions."   
+         REVISION     "200510050000Z"
+     	 DESCRIPTION
+		"Added new value task-pend(5) for taskStatus." 
+    
+         REVISION     "200502160000Z"
+     	 DESCRIPTION
+		"Fixed spelling errors and changed the contact info." 
+
+        REVISION     "200312090000Z"
+        DESCRIPTION
+                "Add new notification taskSuspended."
+        REVISION     "200305130000Z"
+        DESCRIPTION
+                "Initial version."
+            ::= { software 2 }
+    software        OBJECT IDENTIFIER ::= { prvt-products 111 }
+
+    prvtSysInfNotifications OBJECT IDENTIFIER ::= { prvtSysInfMib 0 }
+    prvtSysInfObjects       OBJECT IDENTIFIER ::= { prvtSysInfMib 1 }
+    prvtSysInfConformance    OBJECT IDENTIFIER ::= { prvtSysInfMib 2 }
+
+    sysMemory OBJECT IDENTIFIER ::= {prvtSysInfObjects 1}
+    sysTask OBJECT IDENTIFIER   ::= { prvtSysInfObjects 2 }
+
+--      Memory Group
+
+--      This group provides the memory usage information of device.
+
+
+    numBytesFree            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " The number of bytes free in the system memory "
+        ::= { sysMemory 1 }
+
+    numBlocksFree           OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " The number of blocks free in the system memory "
+        ::= { sysMemory 2 }
+
+    avgBlockSizeFree        OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " The average block size that is free in the system memory "
+        ::= { sysMemory 3 }
+
+    maxBlockSizeFree        OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " The largest block size that is free in the memory "
+        ::= { sysMemory 4 }
+
+    numBytesAlloc           OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " The number of bytes of system memory that have been allocated by
+                  tasks and system services "
+        ::= { sysMemory 5 }
+
+    numBlocksAlloc          OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " The number of blocks of system memory that have been allocated in
+                  the system "
+        ::= { sysMemory 6 }
+
+    avgBlockSizeAlloc       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " The average memory block size that has been allocated in the
+                system "
+        ::= { sysMemory 7 }
+
+
+
+--      Task Group
+
+--      This group provides access to the target's task table.
+--      Tasks can be suspended, created, resumed and deleted.
+
+
+
+    taskTable               OBJECT-TYPE
+        SYNTAX          SEQUENCE OF TaskEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Represents the OS task table. Each entry in this table
+                 represents a task"
+        ::= { sysTask 1 }
+
+    taskEntry               OBJECT-TYPE
+        SYNTAX          TaskEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                " Each entry contains information with regards to a task in the
+                system "
+        INDEX           { taskId }
+        ::= { taskTable 1 }
+
+    TaskEntry ::=
+        SEQUENCE {
+                taskId
+                        Integer32,
+                taskName
+                        DisplayString,
+                taskPriority
+                        Integer32,
+                taskStatus
+                        INTEGER,
+                taskOptions
+                        BITS,
+                taskMain
+                        DisplayString,
+                taskStackPtr
+                        Unsigned32,
+                taskStackBase
+                        Unsigned32,
+                taskStackPos
+                        Unsigned32,
+                taskStackEnd
+                        Unsigned32,
+                taskStackSize
+                        Unsigned32,
+                taskStackSizeUsage
+                        Unsigned32,
+                taskStackMaxUsed
+                        Unsigned32,
+                taskStackFree
+                        Unsigned32,
+                taskErrorStatus
+                        Integer32
+        }
+
+    taskId                  OBJECT-TYPE
+        SYNTAX          Integer32(1..2147483647)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " This is the task ID assigned by OS to a task in the
+                  system."
+        ::= { taskEntry 1 }
+
+    taskName                OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " This is the name of the task."
+        ::= { taskEntry 2 }
+
+    taskPriority            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The priority of the task.  This value can be
+                 in the range from 0, the highest priority,
+                 to 255, the lowest priority."
+        ::= { taskEntry 3 }
+
+    taskStatus              OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                task-ready(1),      -- Task is ready to run.
+                                task-suspended(2),  -- Task is suspended.
+                                task-delay(3),      -- Task is delayed.
+                                task-deleted(4),    -- Task is to be deleted.       
+                                task-pend(5)        -- Task is pended on a semaphore
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This field specifies the current task status."
+        ::= { taskEntry 4 }
+
+    taskOptions             OBJECT-TYPE
+        SYNTAX      BITS {
+           task-supervisor-mode(0),
+           task-unbreakable(1),
+           task-dealloc-stack(2),
+           task-fp-task(3),
+           task-stdio(4),
+           task-reserved-1(5),
+           task-reserved-2(6),
+           task-private-env(7),
+           task-no-stack-fill(8)
+       }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The option is toggled based on the current setting."
+        ::= { taskEntry 5 }
+
+    taskMain                OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the name of the entry function for the task."
+        ::= { taskEntry 6 }
+
+    taskStackPtr            OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the saved stack pointer for the task."
+        ::= { taskEntry 7 }
+
+
+    taskStackBase           OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the address of the bottom of the stack for the task."
+        ::= { taskEntry 8 }
+
+    taskStackPos            OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the effective top of the stack in the current task state."
+        ::= { taskEntry 9 }
+
+    taskStackEnd            OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the address of the top of the stack for the task."
+        ::= { taskEntry 10 }
+
+    taskStackSize           OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the actual size of the stack in bytes."
+        ::= { taskEntry 11 }
+
+    taskStackSizeUsage      OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of bytes currently in use by the task from the stack."
+        ::= { taskEntry 12 }
+
+    taskStackMaxUsed        OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the maximum number of bytes that have been used by the task 
+                from the stack."
+        ::= { taskEntry 13 }
+
+    taskStackFree           OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the number of bytes that are free currently in the task stack."
+        ::= { taskEntry 14 }
+
+    taskErrorStatus         OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the most recent error status for this task."
+        ::= { taskEntry 15 }
+     
+     -- Notifications for use by prvtSysInfMib
+
+     taskSuspended NOTIFICATION-TYPE
+         OBJECTS { taskName, taskId}
+         STATUS  current
+         DESCRIPTION
+			"The taskSuspended notification indicates that the sending
+			 agent senses that a task has been suspended."
+	     ::= {prvtSysInfNotifications 1}
+
+-- *******************************************************************
+--  Conformance Information
+-- *******************************************************************
+
+    sysInfMIBGroups       OBJECT IDENTIFIER ::= { prvtSysInfConformance 2 }
+
+
+    sysInfNotificationGroup NOTIFICATION-GROUP
+    	NOTIFICATIONS {
+    		taskSuspended
+    	}
+	STATUS current
+     	DESCRIPTION
+        	"Private system info Notification Group"
+     ::= { sysInfMIBGroups 3 }
+END

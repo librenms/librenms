@@ -12,16 +12,24 @@
  * the source code distribution for details.
  */
 
-$init_modules = array('web', 'auth', 'alerts');
-require realpath(__DIR__ . '/..') . '/includes/init.php';
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!$_SESSION['authenticated']) {
-    echo "Unauthenticated\n";
-    exit;
+session_start();
+if (isset($_SESSION['stage']) && $_SESSION['stage'] == 2) {
+    $init_modules = array('web', 'nodb');
+    require realpath(__DIR__ . '/..') . '/includes/init.php';
+} else {
+    $init_modules = array('web', 'auth', 'alerts');
+    require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+    if (!LegacyAuth::check()) {
+        echo "Unauthenticated\n";
+        exit;
+    }
 }
 
 set_debug($_REQUEST['debug']);
-$id = mres($_REQUEST['id']);
+$id = str_replace('/', '', $_REQUEST['id']);
 
 if (isset($id)) {
     require $config['install_dir'] . "/html/includes/output/$id.inc.php";

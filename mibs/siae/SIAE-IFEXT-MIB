@@ -1,0 +1,343 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-IFEXT-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32
+        FROM SNMPv2-SMI
+             DisplayString, RowStatus
+        FROM SNMPv2-TC
+             InterfaceIndex
+        FROM IF-MIB
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+    ifext MODULE-IDENTITY
+        LAST-UPDATED "201604180000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "SIAE's Interface Extension MIB.
+            "
+        REVISION "201604180000Z"
+        DESCRIPTION
+            "Added ifextCapability10gBps to ifextCapabilities.
+            "
+        REVISION "201507210000Z"
+        DESCRIPTION
+            "Added ifextCapabilityMabSensor and ifextCapabilityEncrypt to
+             ifextCapabilities.
+            "
+        REVISION "201412020000Z"
+        DESCRIPTION
+            "Added ifextCapability2g5Bps to ifextCapabilities.
+            "
+        REVISION "201409260000Z"
+        DESCRIPTION
+            "Changed MAX-ACCESS of ifextMediumSelection from read-write to
+             read-only
+             Changed MAX-ACCESS of ifextAlarmReportEnable from read-write
+             to read-create
+            "
+        REVISION "201406050000Z"
+        DESCRIPTION
+            "Added unused(0) to ifextPortUsage enumeration.
+            "
+        REVISION "201402210000Z"
+        DESCRIPTION
+            "Improved description of ifextMibVersion
+             Removed Autonegotiation alarm
+            "
+        REVISION "201310280000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+      ::= { siaeMib 73 }
+
+----------------------------------------------------------------------------------
+--  ifex GROUP
+----------------------------------------------------------------------------------
+--
+-- This group is used to extend IF MIB with proprietary info
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+    ifextMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {ifext 1}
+
+-------  Begin of ifextTable
+--
+    ifextTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     InterfaceExtensionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with SIAE's Interface extension records."
+    ::= {ifext 2}
+
+    ifextTableEntry  OBJECT-TYPE
+        SYNTAX      InterfaceExtensionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "SIAE's Interface extension record."
+        INDEX {ifextIfIndex}
+    ::= {ifextTable 1}
+
+    InterfaceExtensionEntry  ::=
+        SEQUENCE {
+            ifextIfIndex           InterfaceIndex,
+            ifextLabel             DisplayString,
+            ifextAdminStatus       INTEGER,
+            ifextPortUsage         INTEGER,
+            ifextMediumType        INTEGER,
+            ifextMediumSelection   INTEGER,
+            ifextAlarmReportEnable INTEGER,
+            ifextSfpId             Integer32,
+            ifextCapabilities      BITS,
+            ifextLosAlarm          AlarmStatus,
+            ifextRowStatus         RowStatus
+         }
+
+    ifextIfIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A unique value, greater than zero, for each
+            interface. This object is identical to the ifIndex
+            of the standard MIB-2 ifTable."
+    ::= {ifextTableEntry 1}
+
+    ifextLabel  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..31))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A textual string containing information about the
+            interface."
+    ::= {ifextTableEntry 2}
+
+    ifextAdminStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       up(1),        -- ready to pass packets
+                       down(2),
+                       testing(3),   -- in some test mode
+                       loopback(4)   -- loopback mode
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The desired state of the interface. This object
+             can be set only when the ifMainRowStatus of the
+             interface is active. This object has the semantics
+             of the ifAdminStatus of the standard ifTable.
+            
+             The testing(3) state indicates that no operational 
+             packets can be passed - this state is not currently
+             supported. 
+            
+             When a managed system initializes, all 
+             interfaces start with ifMainAdminStatus in the
+             down(2) state, it's a default state also. As a result
+             of either explicit management action or per 
+             configuration information retained by the managed
+             system, ifMainAdminStatus is then changed to
+             the up (1) state (or remains in the
+             down(2) state).
+
+             This object reflects the value of ifMainAdminStatus"
+         DEFVAL { down } 
+    ::= {ifextTableEntry 3}
+
+    ifextPortUsage  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       unused(0),
+                       lan(1),
+                       radio(2),
+                       mgmt(3),
+                       stack(4),
+                       aux(5),
+                       pwe3(6)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Port usage in the system. lan(1) and radio(2) are traffic ports,
+             mgmt(3) are ports dedicated to management traffic, stack(4) ports
+             are port to interconnect switch to stack, aux(5) ports are ports 
+             dedicated to other purpose, pwe3(6) ports are dedicated to pseudowire."
+    ::= {ifextTableEntry 4}
+
+    ifextMediumType  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       copper(1),
+                       fiber(2),
+                       combo(3),
+                       other(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Physical medium of this interface. Medium type 'combo'
+             can be set as copper or as fiber by ifextMediumSelection."
+    ::= {ifextTableEntry 5}
+
+    ifextMediumSelection  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       none(0),
+                       copper(1),
+                       fiber(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Selection of physical medium of this interface. Only 'combo' 
+             interfaces can be set as copper or as fiber."
+        DEFVAL { none }
+    ::= {ifextTableEntry 6}
+
+    ifextAlarmReportEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       disable(1),
+                       enable(2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "On interfaces with ifextPortUsage set to mgmg, this object enables
+             or disables collection and report of the alarms."
+        DEFVAL { enable }
+    ::= {ifextTableEntry 7}
+
+    ifextSfpId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object specifies a row in sfpTable. This object is 0 if
+             there isn't any SFP connectied to this interface."
+    ::= {ifextTableEntry 8}
+
+    ifextCapabilities OBJECT-TYPE
+        SYNTAX        BITS {
+            ifextCapabilityLoop(0),      -- Line Loop is supported
+            ifextCapability2g5Bps(1),    -- speed 2.5 Gbps is supported
+            ifextCapabilityMabSensor(2), -- MAB sensor is supported
+            ifextCapabilityEncrypt(3),   -- Radio encryption is supported
+            ifextCapability10gBps(4)     -- speed 10 Gbps is supported
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This indicates which capability is supported from this interface."
+    ::= {ifextTableEntry 9}
+
+    ifextLosAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Interface Loss of Signal alarm"
+    ::= {ifextTableEntry 10}
+
+    ifextRowStatus   OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of ifextTable"
+    ::= {ifextTableEntry 11}
+
+--
+-------  End of ifextTable
+
+
+-------  Begin of ifextMaintTable
+--
+    ifextMaintTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     InterfaceExtensionMaintEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with object used to maintain Interfaces described in 
+             ifextTable"
+    ::= {ifext 3}
+
+    ifextMaintTableEntry  OBJECT-TYPE
+        SYNTAX      InterfaceExtensionMaintEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "SIAE's Interface extension maintenance record."
+        INDEX {ifextIfIndex}
+    ::= {ifextMaintTable 1}
+
+    InterfaceExtensionMaintEntry  ::=
+        SEQUENCE {
+            ifextLineLoop           INTEGER
+         }
+
+    ifextLineLoop  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable  (1),
+                             enable   (2)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is set from admin status of an interface 
+             to enable/disable line loop."
+    ::= {ifextMaintTableEntry 1}
+
+--
+-------  End of ifextMaintTable
+
+    ifextLosAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the ifextLosAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {ifext 5}
+
+END
+
+
+
+

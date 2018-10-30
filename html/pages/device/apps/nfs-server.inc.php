@@ -72,7 +72,9 @@ $graphs['proc2'] = array(
 );
 
 $graphs['proc3'] = array(
-    'nfs-server_stats' => array('NFS v3 Statistics', 'proc3')
+    'nfs-server_stats_io' => array('NFS v3 Read/Write operations', 'proc3'),
+    'nfs-server_stats_read' => array('NFS v3 other read operations', 'proc3'),
+    'nfs-server_stats_write' => array('NFS v3 other write operations', 'proc3')
 );
 
 $graphs['proc4'] = array(

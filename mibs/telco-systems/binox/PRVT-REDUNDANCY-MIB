@@ -1,0 +1,150 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-REDUNDANCY-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-REDUNDANCY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    software
+        FROM PRVT-SWITCH-MIB
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI;
+
+prvtRedundancyMIB MODULE-IDENTITY
+    LAST-UPDATED "201312170000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "Monitoring of components redundancy protection"
+    REVISION    "201312170000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { software 5 }
+
+
+prvtRedundancyNotifications OBJECT IDENTIFIER
+    ::= { prvtRedundancyMIB 0 }
+
+prvtRedundancyObjects OBJECT IDENTIFIER
+    ::= { prvtRedundancyMIB 1 }
+
+prvtRedundancyChassisTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtRedundancyChassisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of slots in the chassis"
+    ::= { prvtRedundancyObjects 1 }
+
+prvtRedundancyChassisEntry OBJECT-TYPE
+    SYNTAX      PrvtRedundancyChassisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtRedundancyChassisTable"
+    INDEX       { prvtRedundancyChassisSlotId }
+    ::= { prvtRedundancyChassisTable 1 }
+
+PrvtRedundancyChassisEntry ::= SEQUENCE {
+    prvtRedundancyChassisSlotId         Unsigned32,
+    prvtRedundancyChassisLICType        INTEGER,
+    prvtRedundancyChassisStatus         INTEGER,
+    prvtRedundancyChassisEntryStatus    INTEGER
+}
+
+prvtRedundancyChassisSlotId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Index in the table."
+    ::= { prvtRedundancyChassisEntry 1 }
+
+prvtRedundancyChassisLICType OBJECT-TYPE
+    SYNTAX      INTEGER { lc-unknown(1), lc-8020-10GE(3), lc-8064-1GE(4), 
+                    lc-8032-1GE(19), lc-8062-1GE(20) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "LIC type"
+    ::= { prvtRedundancyChassisEntry 2 }
+
+prvtRedundancyChassisStatus OBJECT-TYPE
+    SYNTAX      INTEGER { protected(0), notProtected(1) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Chassis status"
+    ::= { prvtRedundancyChassisEntry 3 }
+
+prvtRedundancyChassisEntryStatus OBJECT-TYPE
+    SYNTAX      INTEGER { extracted(0), inserted(1) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Chassis Entry status"
+    ::= { prvtRedundancyChassisEntry 4 }
+
+licStatus NOTIFICATION-TYPE
+    OBJECTS     { prvtRedundancyChassisEntryStatus }
+    STATUS      current
+    DESCRIPTION 
+        "LIC  prvtRedundancyChassisEntryStatus has been changed.
+         Card slotId is present as a key."
+    ::= { prvtRedundancyNotifications 1 }
+
+switchover NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION 
+        "Switchover has happend - link between Active and Standby HUB is broken."
+    ::= { prvtRedundancyNotifications 2 }
+
+redundancyStatus NOTIFICATION-TYPE
+    OBJECTS     { prvtRedundancyChassisStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Chassis redundancy-status"
+    ::= { prvtRedundancyNotifications 3 }
+
+END -- end of module PRVT-REDUNDANCY-MIB.

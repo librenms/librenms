@@ -29,7 +29,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'tinydns';
 $app_id = $app['app_id'];
 if (!empty($agent_data['app'][$name]) && $app_id > 0) {
-    update_application($app, $name);
     echo ' tinydns';
     $rrd_name = array('app', $name, $app_id);
     $rrd_def = RrdDefinition::make()
@@ -54,6 +53,35 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
         ->addDataset('badclass', 'COUNTER', 0, 125000000000)
         ->addDataset('noquery', 'COUNTER', 0, 125000000000);
 
+    list(
+        $a, $ns, $cname, $soa, $ptr, $hinfo, $mx, $txt, $rp, $sig, $key, $aaaa, $axfr, $any,
+        $total, $other, $notauth, $notimpl, $badclass, $noquery
+        ) = explode(':', $agent_data['app'][$name]);
+
+    $fields = array(
+        'a'        => $a,
+        'ns'       => $ns,
+        'cname'    => $cname,
+        'soa'      => $soa,
+        'ptr'      => $ptr,
+        'hinfo'    => $hinfo,
+        'mx'       => $mx,
+        'txt'      => $txt,
+        'rp'       => $rp,
+        'sig'      => $sig,
+        'key'      => $key,
+        'aaaa'     => $aaaa,
+        'axfr'     => $axfr,
+        'any'      => $any,
+        'total'    => $total,
+        'other'    => $other,
+        'notauth'  => $notauth,
+        'notimpl'  => $notimpl,
+        'badclass' => $badclass,
+        'noquery'  => $noquery
+    );
+
     $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
     data_update($device, 'app', $tags, $fields);
+    update_application($app, $name, $fields);
 }//end if

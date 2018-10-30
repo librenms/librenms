@@ -1,0 +1,1130 @@
+F3-BRIDGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter64
+             FROM SNMPv2-SMI
+    TruthValue, MacAddress, VariablePointer, TEXTUAL-CONVENTION,
+    StorageType, RowStatus, DisplayString
+             FROM SNMPv2-TC
+    fsp150cm
+             FROM  ADVA-MIB 
+    PerfCounter64
+             FROM  CM-COMMON-MIB 
+    neIndex, shelfIndex, slotIndex, networkElementEntry
+             FROM CM-ENTITY-MIB
+    cmFlowEntry, cmEthernetAccPortIndex, cmFlowIndex, cmMPFlowIndex
+             FROM CM-FACILITY-MIB
+    cmFlowStatsEntry, cmFlowHistoryEntry
+             FROM CM-PERFORMANCE-MIB;
+
+f3BridgeMIB MODULE-IDENTITY
+    LAST-UPDATED        "201209130000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Jakub Zalewski
+                     ADVA Optical Networking, Inc.
+                Tel: +48 58 7716 411
+             E-mail: jzalewski@advaoptical.com
+             Postal: ul. Slaska 35/37
+                     81-310 Gdynia, Poland"
+    DESCRIPTION
+            "This module defines the Bridge MIB definitions 
+             used by the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201210090000Z"
+    DESCRIPTION
+        "
+         Notes from release 201210090000Z,
+         (1)MIB version ready for release FSP150CC 5.6CC." 
+
+    ::= {fsp150cm 26}    
+
+
+--
+-- Textual Conventions
+--
+LearningControl ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Learning Control:
+            none      - The forwarding function of the Flow does not dynamically learn.
+            macbased  - The forwarding function of the Flow dynamically learns based 
+                        on MAC address.
+            flowbased - The forwarding function of the Flow dynamically learns based on 
+                        EVC Membership."
+            
+    SYNTAX       INTEGER {
+                   none (1),
+                   macbased (2),
+                   flowbased (3)
+                 }
+
+ProtectLearningControl ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Protect Learning Control:
+            none     -  Learned entries for a Flow with the parent Port 
+                        as a destination can be updated to a different Port.
+            discard  -  Learned entries for a Flow with the parent Port 
+                        as a destination cannot be updated to a different Port.
+                        Frames received that would update the learned entry are discarded.
+            block    -  Learned entries for a Flow with the parent Port 
+                        as a destination cannot be updated to a different Port.
+                        After receiving a frame that would update a learned entry, 
+                        that frame is discarded, the Flow adds a secondary 
+                        state of BLOCKD, and all subsequent frames received on that 
+                        port that match the Flow membership shall be discarded until 
+                        the secondary state of BLCKD is cleared."
+    SYNTAX       INTEGER {
+                   none (1),
+                   discard (2),
+                   block (3)
+                 }
+
+LearningAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Learning Action:
+            block   - a frame with a matching destination MAC address is not forwarded
+            forward - a frame with a matching desintation MAC address is forwarded 
+                      to the destination Port
+        "
+    SYNTAX       INTEGER {
+                   block (1),
+                   forward (2)
+                 }
+
+LearningEntryType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Learning Entry Type"
+    SYNTAX       INTEGER {
+                   static (1),
+                   dynamic (2)
+                 }
+
+FlowLearningConfigAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Learning Action:
+            noAction        - No Action
+            flushFwdTable   - Removes all dynamic entries from the Forwarding table
+                              of a Flow.
+            clearBlock      - removes the secondary state of BLCKD and transitions 
+                              the flow to a state where frames are not blocked
+            resetAgingTimer - reset the aging timer
+            "
+    SYNTAX       INTEGER {
+                   noAction (1),
+                   flushFwdTable (2),
+                   clearBlock (3),
+                   resetAgingTimer(4)
+                 }
+
+RetrieveMacAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Retrieve Mac Address Action"
+    SYNTAX       INTEGER {
+                   notApllicable (0),
+                   retrieveMac (1)
+                 }
+
+
+-- 
+-- OID definitions
+-- 
+f3BridgeConfigObjects      OBJECT IDENTIFIER ::= {f3BridgeMIB 1}
+f3BridgeStatsObjects       OBJECT IDENTIFIER ::= {f3BridgeMIB 2}
+f3BridgeConformance        OBJECT IDENTIFIER ::= {f3BridgeMIB 3}
+
+--
+--  Flow table extension for Learning Control configuration
+--
+f3FlowLearningConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FlowLearningConfigEntry   
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table extends cmFlowTable to provide parameters for MAC Table control
+             configuration."
+    ::= { f3BridgeConfigObjects 1 }
+
+f3FlowLearningConfigEntry  OBJECT-TYPE
+    SYNTAX     F3FlowLearningConfigEntry   
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FlowLearningConfigTable."
+    AUGMENTS { cmFlowEntry }
+    ::= { f3FlowLearningConfigTable 1 }
+
+F3FlowLearningConfigEntry ::= SEQUENCE {
+    f3FlowLearningConfigAccIfLearningCtrl          LearningControl,
+    f3FlowLearningConfigNetIfLearningCtrl          LearningControl,
+    f3FlowLearningConfigAccMaxFwdEntries           Integer32,
+    f3FlowLearningConfigNetMaxFwdEntries           Integer32,
+    f3FlowLearningConfigAccIfProtectLearningCtrl   ProtectLearningControl,
+    f3FlowLearningConfigNetIfProtectLearningCtrl   ProtectLearningControl,
+    f3FlowLearningConfigAgingTimer                 Integer32,
+    f3FlowLearningConfigTableFullAction            LearningAction,
+    f3FlowLearningConfigAction                     FlowLearningConfigAction
+}
+
+f3FlowLearningConfigAccIfLearningCtrl OBJECT-TYPE
+    SYNTAX        LearningControl
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring Learning Control on Access Interface of 
+          this Flow."
+    ::= { f3FlowLearningConfigEntry 1 }
+
+f3FlowLearningConfigNetIfLearningCtrl OBJECT-TYPE
+    SYNTAX        LearningControl
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring Learning Control on Network Interface of 
+          this Flow."
+    ::= { f3FlowLearningConfigEntry 2 }
+
+f3FlowLearningConfigAccMaxFwdEntries OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring the maximum number of Forwarding Entires in
+          for the Access Interface Forwarding Table of this Flow."
+    ::= { f3FlowLearningConfigEntry 3 }
+    
+f3FlowLearningConfigNetMaxFwdEntries OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring the maximum number of Forwarding Entires in
+          for the Network Interface Forwarding Table of this Flow."
+    ::= { f3FlowLearningConfigEntry 4 }
+
+f3FlowLearningConfigAccIfProtectLearningCtrl OBJECT-TYPE
+    SYNTAX        ProtectLearningControl
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring Learning Control on Access Interface of 
+          this Flow."
+    ::= { f3FlowLearningConfigEntry 5 }
+   
+f3FlowLearningConfigNetIfProtectLearningCtrl OBJECT-TYPE
+    SYNTAX        ProtectLearningControl
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring Learning Control on Network Interface of 
+          this Flow."
+    ::= { f3FlowLearningConfigEntry 6 }
+
+f3FlowLearningConfigAgingTimer OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuration of the Aging Timer of this Flow in seconds.
+          Forwarding Entry will be removed from the forwarding table after 
+          an inactivity time represented by this entry. 
+          Setting the value of 0 disables aging."
+    ::= { f3FlowLearningConfigEntry 7 }
+
+f3FlowLearningConfigTableFullAction OBJECT-TYPE
+    SYNTAX        LearningAction
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuration of Action on ingress frames when the number 
+          of forwarding table entires has reached the maximum Fowarding Table size.
+          block - A frame with a Source MAC address not in the MAC Table 
+                    will be discarded.
+          forward - A frame with a Source MAC address not in the MAC table 
+                    will not be learned and will be forwarded based on 
+                    Destination MAC address of the frame.
+          Only applicable when f3FlowLearningConfigAccIfLearningCtrl is set to 'macbased' 
+          or when =f3FlowLearningConfigNetIfLearningCtrl is set to 'macbased'."
+    ::= { f3FlowLearningConfigEntry 8 }
+
+f3FlowLearningConfigAction OBJECT-TYPE
+    SYNTAX        FlowLearningConfigAction
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "This objects allows performing user action on Flow Learning Table."
+    ::= { f3FlowLearningConfigEntry 9 }
+
+--
+-- Static Forwading Table
+-- 
+f3FlowStaticFwdEntTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FlowStaticFwdEntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table allows configuration of Static Forwarding Entries in the
+             Forwarding Table of a Flow."
+    ::= { f3BridgeConfigObjects 2 }
+
+f3FlowStaticFwdEntEntry OBJECT-TYPE
+    SYNTAX     F3FlowStaticFwdEntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FlowStaticFwdEntTable."
+    INDEX { neIndex, 
+            shelfIndex, 
+            slotIndex, 
+            cmEthernetAccPortIndex, 
+            cmFlowIndex,
+            IMPLIED f3FlowStaticFwdEntDestMac}
+    ::= { f3FlowStaticFwdEntTable 1 }
+
+F3FlowStaticFwdEntEntry ::= SEQUENCE {
+    f3FlowStaticFwdEntDestMac     MacAddress,
+    f3FlowStaticFwdEntDestPort    VariablePointer,
+    f3FlowStaticFwdEntAction      LearningAction,
+    f3FlowStaticFwdEntStorageType StorageType,
+    f3FlowStaticFwdEntRowStatus   RowStatus,
+    f3FlowStaticFwdValid          TruthValue
+}
+
+f3FlowStaticFwdEntDestMac OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "The MAC address for matching a frame destination MAC address."
+    ::= { f3FlowStaticFwdEntEntry 1 }
+
+f3FlowStaticFwdEntDestPort OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring the destination port for a frame 
+          with a matching destination MAC address as specified in f3FlowStaticFwdEntDestMac."
+    ::= { f3FlowStaticFwdEntEntry 2 }
+
+f3FlowStaticFwdEntAction OBJECT-TYPE
+    SYNTAX        LearningAction
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "This object allows configuring the action for this Forwarding Entry."
+    ::= { f3FlowStaticFwdEntEntry 3 }
+
+f3FlowStaticFwdEntStorageType OBJECT-TYPE
+    SYNTAX        StorageType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+		   "The storage type for this conceptual row."
+    ::= { f3FlowStaticFwdEntEntry 4 }
+
+f3FlowStaticFwdEntRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3FlowStaticFwdEntRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3StaticFwdRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3StaticFwdRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3FlowStaticFwdEntEntry 5 }
+
+f3FlowStaticFwdValid OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+		   "This object represents Static FDB entry valid flag."
+    ::= { f3FlowStaticFwdEntEntry 6 }
+
+--
+-- Forwading Table
+-- 
+f3FlowFdbTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FlowFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table allows viewing Forwarding Table of a Flow."
+    ::= { f3BridgeConfigObjects 3 }
+
+f3FlowFdbEntry OBJECT-TYPE
+    SYNTAX     F3FlowFdbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FlowFdbTable."
+    INDEX { neIndex, 
+            shelfIndex, 
+            slotIndex, 
+            cmEthernetAccPortIndex, 
+            cmFlowIndex,
+            IMPLIED f3FlowFdbDestMac}
+    ::= { f3FlowFdbTable 1 }
+
+F3FlowFdbEntry ::= SEQUENCE {
+    f3FlowFdbDestMac     MacAddress,
+    f3FlowFdbDestPort    VariablePointer,
+    f3FlowFdbAction      LearningAction,
+    f3FlowFdbEntryType   LearningEntryType 
+}
+
+f3FlowFdbDestMac OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "The MAC address for matching a frame destination MAC address."
+    ::= { f3FlowFdbEntry 1 }
+
+f3FlowFdbDestPort OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "This object represents the destination port for a frame 
+          with a matching destination MAC address as specified in f3FlowFdbDestMac."
+    ::= { f3FlowFdbEntry 2 }
+
+f3FlowFdbAction OBJECT-TYPE
+    SYNTAX        LearningAction
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "This object represents the action for this Forwarding Entry."
+    ::= { f3FlowFdbEntry 3 }
+
+f3FlowFdbEntryType   OBJECT-TYPE
+    SYNTAX        LearningEntryType 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "This object represents the FDB entry type."
+    ::= { f3FlowFdbEntry 4 }
+
+f3MPFlowStaticFwdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3MPFlowStaticFwdEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Fwd."
+    ::= { f3BridgeConfigObjects 4 }
+
+f3MPFlowStaticFwdEntry OBJECT-TYPE
+    SYNTAX      F3MPFlowStaticFwdEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3MPFlowFwdTable."
+    INDEX { neIndex, cmMPFlowIndex, f3MPFlowStaticFwdMacAddress }
+    ::= { f3MPFlowStaticFwdTable 1 }
+
+F3MPFlowStaticFwdEntry ::= SEQUENCE {
+    f3MPFlowStaticFwdMacAddress                 MacAddress,
+    f3MPFlowStaticFwdFP                         VariablePointer,
+    f3MPFlowStaticFwdControlAction              LearningAction,
+    f3MPFlowStaticFwdValid                      TruthValue,
+    f3MPFlowStaticFwdStorageType                StorageType,
+    f3MPFlowStaticFwdRowStatus                  RowStatus
+}
+
+f3MPFlowStaticFwdMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "This object describes Assigned/learned MAC address." 
+    ::= { f3MPFlowStaticFwdEntry 1 }
+
+f3MPFlowStaticFwdFP OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "This object describes Assigned/learned MAC address related to." 
+    ::= { f3MPFlowStaticFwdEntry 2 }
+
+f3MPFlowStaticFwdControlAction OBJECT-TYPE
+    SYNTAX      LearningAction
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The action is read only as Forward that means the MAC 
+         address is always forwarded." 
+    ::= { f3MPFlowStaticFwdEntry 3 }
+
+f3MPFlowStaticFwdValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This Object describe it whether valid." 
+    ::= { f3MPFlowStaticFwdEntry 4 }
+
+f3MPFlowStaticFwdStorageType OBJECT-TYPE
+    SYNTAX        StorageType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+		   "The storage type for this conceptual row."
+    ::= { f3MPFlowStaticFwdEntry 5 }
+
+f3MPFlowStaticFwdRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "The status of this row.
+ 	        An entry MUST NOT exist in the active state unless all
+ 	        objects in the entry have an appropriate value, as described
+ 	        in the description clause for each writable object.
+ 	        
+ 	        The values of f3MPFlowFwdRowStatus supported are
+ 	        createAndGo(4) and destroy(6).  All mandatory attributes
+ 	        must be specified in a single SNMP SET request with
+ 	        cmFlowRowStatus value as createAndGo(4).
+ 	        Upon successful row creation, this object has a
+ 	        value of active(1).
+ 	        
+ 	        The f3MPFlowFwdRowStatus object may be modified if
+ 	        the associated instance of this object is equal to active(1).
+ 	        
+ 	        Note that flow creation and deletion is only supported
+ 	        with access port in connection-oriented evpl mode."
+    ::= { f3MPFlowStaticFwdEntry 6 }
+
+f3MPFlowFDBTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3MPFlowFDBEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to FDB."
+    ::= { f3BridgeConfigObjects 5 }
+
+f3MPFlowFDBEntry OBJECT-TYPE
+    SYNTAX      F3MPFlowFDBEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3MPFlowFwdTable."
+    INDEX { neIndex, cmMPFlowIndex, f3MPFlowFDBMacAddress }
+    ::= { f3MPFlowFDBTable 1 }
+
+F3MPFlowFDBEntry ::= SEQUENCE {
+    f3MPFlowFDBMacAddress                 MacAddress,
+    f3MPFlowFDBFP                         VariablePointer,
+    f3MPFlowFDBType                       LearningEntryType,
+    f3MPFlowFDBControlAction              LearningAction
+}
+
+f3MPFlowFDBMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "This object describes Assigned/learned MAC address." 
+    ::= { f3MPFlowFDBEntry 1 }
+
+f3MPFlowFDBFP OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object describes Assigned/learned MAC address related to." 
+    ::= { f3MPFlowFDBEntry 2 }
+
+f3MPFlowFDBType OBJECT-TYPE
+    SYNTAX      LearningEntryType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object describes the static or dynamic type for the relate mac." 
+    ::= { f3MPFlowFDBEntry 3 }
+
+f3MPFlowFDBControlAction OBJECT-TYPE
+    SYNTAX      LearningAction
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The action is read only as Forward that means the MAC 
+         address is always forwarded." 
+    ::= { f3MPFlowFDBEntry 4 }
+
+--
+--  f3FwdTSizeProfile Table 
+--
+f3FwdTSizeProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FwdTSizeProfileEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to FwdTSizeProfile."
+    ::= { f3BridgeConfigObjects 6 }
+
+f3FwdTSizeProfileEntry OBJECT-TYPE
+    SYNTAX      F3FwdTSizeProfileEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FwdTSizeProfileTable."
+    INDEX { f3FwdTSizeProfileIndex }
+    ::= { f3FwdTSizeProfileTable 1 }
+
+F3FwdTSizeProfileEntry ::= SEQUENCE {
+    f3FwdTSizeProfileIndex                Integer32,
+    f3FwdTSizeProfileName                 DisplayString,
+    f3FwdTSizeProfileTableSize            Integer32
+}
+
+f3FwdTSizeProfileIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "An integer index value used to uniquely identify this f3FwdTSizeProfileEntry." 
+    ::= { f3FwdTSizeProfileEntry 1 }
+
+f3FwdTSizeProfileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "his object allows SNMP management entities to provide a
+ 	        name identifier with the f3FwdTSizeProfileEntry." 
+    ::= { f3FwdTSizeProfileEntry 2 }
+
+f3FwdTSizeProfileTableSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object descpribes Maximum number of MAC Table Entries for the profile." 
+    ::= { f3FwdTSizeProfileEntry 3 }
+
+--
+--  MultiGroupRegistration Table 
+--
+f3MultiGroupRegistrationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3MultiGroupRegistrationEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to MultiGroupRegistration."
+    ::= { f3BridgeConfigObjects 7 }
+
+f3MultiGroupRegistrationEntry OBJECT-TYPE
+    SYNTAX      F3MultiGroupRegistrationEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3MultiGroupRegistrationTable."
+    INDEX { neIndex, cmMPFlowIndex, f3MGRMulticastAddress }
+    ::= { f3MultiGroupRegistrationTable 1 }
+
+F3MultiGroupRegistrationEntry ::= SEQUENCE {
+    f3MGRMulticastAddress    MacAddress,
+    f3MGRFPList              DisplayString,
+    f3MGRGroupAction         LearningAction,
+    f3MGRGroupType           LearningEntryType,
+    f3MGRGroupValid          TruthValue,
+    f3MGRGroupStorageType    StorageType,
+    f3MGRGroupRowStatus      RowStatus
+}
+
+f3MGRMulticastAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "This object describes MG Group MAC address." 
+    ::= { f3MultiGroupRegistrationEntry 1 }
+
+f3MGRFPList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object describes the fplist." 
+    ::= { f3MultiGroupRegistrationEntry 2 }
+
+f3MGRGroupAction OBJECT-TYPE
+    SYNTAX      LearningAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "it is only be forward for egx7.1." 
+    ::= { f3MultiGroupRegistrationEntry 3 }
+
+f3MGRGroupType OBJECT-TYPE
+    SYNTAX      LearningEntryType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object describes the group type is static or dynamic." 
+    ::= { f3MultiGroupRegistrationEntry 4 }
+
+f3MGRGroupValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "For GroupType as STATIC, if it is in Petra B, it is true; 
+         Otherwise it is false." 
+    ::= { f3MultiGroupRegistrationEntry 5 }
+
+f3MGRGroupStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "This is a conceptual row." 
+    ::= { f3MultiGroupRegistrationEntry 6 }
+
+f3MGRGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "The status of this row.
+ 	        An entry MUST NOT exist in the active state unless all
+ 	        objects in the entry have an appropriate value, as described
+ 	        in the description clause for each writable object.
+ 	        
+ 	        The values of f3MGRGroupRowStatus supported are
+ 	        createAndGo(4) and destroy(6).  All mandatory attributes
+ 	        must be specified in a single SNMP SET request with
+ 	        cmFlowRowStatus value as createAndGo(4).
+ 	        Upon successful row creation, this object has a
+ 	        value of active(1).
+ 	        
+ 	        The f3MGRGroupRowStatus object may be modified if
+ 	        the associated instance of this object is equal to active(1).
+ 	        
+ 	        Note that flow creation and deletion is only supported
+ 	        with access port in connection-oriented evpl mode."
+    ::= { f3MultiGroupRegistrationEntry 7 }
+
+--
+--  MGR Flow Pointer Member Table 
+--
+f3MGRFPMemberTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3MGRFPMemberEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to MGRFPMember."
+    ::= { f3BridgeConfigObjects 8 }
+
+f3MGRFPMemberEntry OBJECT-TYPE
+    SYNTAX      F3MGRFPMemberEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3MGRFPMemberTable."
+    INDEX { neIndex, cmMPFlowIndex, f3MGRMulticastAddress, f3MGRFPIndex }
+    ::= { f3MGRFPMemberTable 1 }
+
+F3MGRFPMemberEntry ::= SEQUENCE {
+    f3MGRFPIndex               VariablePointer,
+    f3MGRFPIndexRowStatus      RowStatus
+}
+
+f3MGRFPIndex OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "This object describes the relate Flow point." 
+    ::= { f3MGRFPMemberEntry 1 }
+
+f3MGRFPIndexRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "The status of this row.
+ 	        An entry MUST NOT exist in the active state unless all
+ 	        objects in the entry have an appropriate value, as described
+ 	        in the description clause for each writable object.
+ 	        
+ 	        The values of f3MGRFPIndexRowStatus supported are
+ 	        createAndGo(4) and destroy(6).  All mandatory attributes
+ 	        must be specified in a single SNMP SET request with
+ 	        cmFlowRowStatus value as createAndGo(4).
+ 	        Upon successful row creation, this object has a
+ 	        value of active(1).
+ 	        
+ 	        The f3MGRFPIndexRowStatus object may be modified if
+ 	        the associated instance of this object is equal to active(1).
+ 	        
+ 	        Note that flow creation and deletion is only supported
+ 	        with access port in connection-oriented evpl mode."
+    ::= { f3MGRFPMemberEntry 2 }
+
+networkElementBridgeParamsTable  OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NetworkElementBridgeParamsEntry
+    MAX-ACCESS  not-accessible
+    STATUS          current
+    DESCRIPTION
+         "Entries may be auto discovered, or can be explicitly created by 
+          SNMP Manager.  Each remotely discovered shelf is represented as 
+          a row in this table." 
+    ::= { f3BridgeConfigObjects 9 }
+
+networkElementBridgeParamsEntry  OBJECT-TYPE
+    SYNTAX          NetworkElementBridgeParamsEntry
+    MAX-ACCESS  not-accessible
+    STATUS          current
+    DESCRIPTION
+            "A conceptual row in the networkElementBridgeParamsTable."
+    AUGMENTS { networkElementEntry }
+    ::= { networkElementBridgeParamsTable 1 }
+
+
+NetworkElementBridgeParamsEntry ::= SEQUENCE {
+    neBridgeParamsRtrvMacAction                RetrieveMacAction
+}
+
+neBridgeParamsRtrvMacAction OBJECT-TYPE
+    SYNTAX          RetrieveMacAction  
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Before reading infomation from f3MPFlowFDBTable, neBridgeParamsRtrvMacAction should be operate firstly.
+        This object can help enhance the effciency for reading f3MPFlowFDBTable."
+    ::= { networkElementBridgeParamsEntry 1 }
+
+--
+--  Flow table extension for Learning Performance current data
+--
+f3FlowLearningStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FlowLearningStatsEntry   
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table extends cmFlowStatsTable to provide parameters for Learninig 
+             control configuration."
+    ::= { f3BridgeStatsObjects 1 }
+
+f3FlowLearningStatsEntry  OBJECT-TYPE
+    SYNTAX     F3FlowLearningStatsEntry   
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FlowLearningStatsTable."
+    AUGMENTS { cmFlowStatsEntry }
+    ::= { f3FlowLearningStatsTable 1 }
+
+F3FlowLearningStatsEntry ::= SEQUENCE {
+    f3FlowLearningStatsMacTableFlushes       PerfCounter64,
+    f3FlowLearningStatsFDStaticBlock         PerfCounter64,
+    f3FlowLearningStatsFDHairPin             PerfCounter64,
+    f3FlowLearningStatsFDNoDest              PerfCounter64,
+    f3FlowLearningStatsMacTableDiscards      PerfCounter64
+}
+
+
+f3FlowLearningStatsMacTableFlushes OBJECT-TYPE
+    SYNTAX        PerfCounter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Specifies current counter for number of times the MAC Table has been 
+          flushed of Dynacmic entries."
+    ::= { f3FlowLearningStatsEntry 1 }
+
+f3FlowLearningStatsFDStaticBlock OBJECT-TYPE
+    SYNTAX        PerfCounter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Specifies current counter for number of frames discarded due to a 
+          static entry in Mac Table."
+    ::= { f3FlowLearningStatsEntry 2 }
+
+f3FlowLearningStatsFDHairPin OBJECT-TYPE
+    SYNTAX        PerfCounter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Specifies current counter for number of frames discarded because 
+          destination Port is the ingress flowpoint or destination Port is in the 
+          same Split Horizon Group."
+    ::= { f3FlowLearningStatsEntry 3 }
+
+f3FlowLearningStatsFDNoDest OBJECT-TYPE
+    SYNTAX        PerfCounter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Specifies current counter for number of frames discarded because no 
+          destination Port is available due to 
+          secondaryStates of BLCK.
+          The counter is currently not supported and will return 0 value."
+    ::= { f3FlowLearningStatsEntry 4 }
+
+f3FlowLearningStatsMacTableDiscards OBJECT-TYPE
+    SYNTAX        PerfCounter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Specifies current counter for total number of MAC Table entries that have 
+          been or would have been learned, but have been failed due to a lack of 
+          storage space in the Filtering Database."
+    ::= { f3FlowLearningStatsEntry 5 }
+
+--
+--  Flow table extension for Learning Performance history data
+--
+f3FlowLearningHistoryTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FlowLearningHistoryEntry   
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table extends cmFlowHistoryTable to provide parameters for Learninig 
+             control configuration."
+    ::= { f3BridgeStatsObjects 2 }
+
+f3FlowLearningHistoryEntry  OBJECT-TYPE
+    SYNTAX     F3FlowLearningHistoryEntry   
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3FlowLearningHistoryTable."
+    AUGMENTS { cmFlowHistoryEntry }
+    ::= { f3FlowLearningHistoryTable 1 }
+
+F3FlowLearningHistoryEntry ::= SEQUENCE {
+    f3FlowLearningHistoryMacTableFlushes       PerfCounter64,
+    f3FlowLearningHistoryFDStaticBlock         PerfCounter64,
+    f3FlowLearningHistoryFDHairPin             PerfCounter64,
+    f3FlowLearningHistoryFDNoDest              PerfCounter64,
+    f3FlowLearningHistoryMacTableDiscards      PerfCounter64
+}
+
+
+f3FlowLearningHistoryMacTableFlushes OBJECT-TYPE
+    SYNTAX        PerfCounter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Specifies history bin for number of times the MAC Table has been 
+          flushed of Dynacmic entries."
+    ::= { f3FlowLearningHistoryEntry 1 }
+
+f3FlowLearningHistoryFDStaticBlock OBJECT-TYPE
+    SYNTAX        PerfCounter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Specifies history bin for number of frames discarded due to a 
+          static entry in Mac Table."
+    ::= { f3FlowLearningHistoryEntry 2 }
+
+f3FlowLearningHistoryFDHairPin OBJECT-TYPE
+    SYNTAX        PerfCounter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Specifies history bin for number of frames discarded because 
+          destination Port is the ingress flowpoint or destination Port is in the 
+          same Split Horizon Group."
+    ::= { f3FlowLearningHistoryEntry 3 }
+
+f3FlowLearningHistoryFDNoDest OBJECT-TYPE
+    SYNTAX        PerfCounter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Specifies history bin for number of frames discarded because no 
+          destination Port is available due to 
+          secondaryStates of BLCK.
+          The counter is currently not supported and will return 0 value."
+    ::= { f3FlowLearningHistoryEntry 4 }
+
+f3FlowLearningHistoryMacTableDiscards OBJECT-TYPE
+    SYNTAX        PerfCounter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Specifies history bin for total number of MAC Table entries that have 
+          been or would have been learned, but have been failed due to a lack of 
+          storage space in the Filtering Database."
+    ::= { f3FlowLearningHistoryEntry 5 }
+
+--
+-- Conformance
+--
+f3BridgeCompliances OBJECT IDENTIFIER ::= {f3BridgeConformance 1}
+f3BridgeGroups      OBJECT IDENTIFIER ::= {f3BridgeConformance 2}
+
+
+f3BridgeCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3-BRIDGE-MIB compliance."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3FlowLearningConfigGroup, 
+              f3FlowStaticFwdEntGroup, 
+              f3FlowLearningStatsGroup,
+              f3FlowLearningHistoryGroup,
+              f3FlowFdbGroup,
+              f3MPFlowStaticFwdGroup,
+              f3MPFlowFDBGroup,
+              f3FwdTSizeProfileGroup,
+              f3MGGroupFPGroup,
+              f3NetworkElementBridgeParamsGroup
+        }
+    ::= { f3BridgeCompliances 1 }
+
+f3FlowLearningConfigGroup OBJECT-GROUP
+    OBJECTS {
+       f3FlowLearningConfigAccIfLearningCtrl, 
+       f3FlowLearningConfigNetIfLearningCtrl,
+       f3FlowLearningConfigAccMaxFwdEntries,
+       f3FlowLearningConfigNetMaxFwdEntries,
+       f3FlowLearningConfigAccIfProtectLearningCtrl,
+       f3FlowLearningConfigNetIfProtectLearningCtrl,
+       f3FlowLearningConfigAgingTimer,
+       f3FlowLearningConfigTableFullAction,
+       f3FlowLearningConfigAction
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the Flow Learning Config group."
+    ::= { f3BridgeGroups 1 }
+
+f3FlowStaticFwdEntGroup OBJECT-GROUP
+    OBJECTS {
+       f3FlowStaticFwdEntDestPort,
+       f3FlowStaticFwdEntAction,
+       f3FlowStaticFwdEntStorageType,
+       f3FlowStaticFwdEntRowStatus,
+       f3FlowStaticFwdValid
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the Flow Static Forwarding group."
+    ::= { f3BridgeGroups 2 }
+
+f3FlowLearningStatsGroup OBJECT-GROUP
+    OBJECTS {
+       f3FlowLearningStatsMacTableFlushes,
+       f3FlowLearningStatsFDStaticBlock,
+       f3FlowLearningStatsFDHairPin,
+       f3FlowLearningStatsFDNoDest,
+       f3FlowLearningStatsMacTableDiscards
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the Flow Learning Statistics group."
+    ::= { f3BridgeGroups 3 }
+
+f3FlowLearningHistoryGroup OBJECT-GROUP
+    OBJECTS {
+       f3FlowLearningHistoryMacTableFlushes,
+       f3FlowLearningHistoryFDStaticBlock,
+       f3FlowLearningHistoryFDHairPin,
+       f3FlowLearningHistoryFDNoDest,
+       f3FlowLearningHistoryMacTableDiscards
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the Flow Learning History group."
+    ::= { f3BridgeGroups 4 }
+
+f3FlowFdbGroup OBJECT-GROUP
+    OBJECTS {
+       f3FlowFdbDestPort,
+       f3FlowFdbAction,
+       f3FlowFdbEntryType
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the Flow Forwarding group."
+    ::= { f3BridgeGroups 5 }
+
+f3MPFlowStaticFwdGroup OBJECT-GROUP
+    OBJECTS {
+       f3MPFlowStaticFwdMacAddress,
+       f3MPFlowStaticFwdFP,
+       f3MPFlowStaticFwdControlAction,
+       f3MPFlowStaticFwdValid,
+       f3MPFlowStaticFwdStorageType,
+       f3MPFlowStaticFwdRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the MPFlow Static Fwd group."
+    ::= { f3BridgeGroups 6 }
+
+f3MPFlowFDBGroup OBJECT-GROUP
+    OBJECTS {
+       f3MPFlowFDBMacAddress,
+       f3MPFlowFDBFP,
+       f3MPFlowFDBType,
+       f3MPFlowFDBControlAction
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the MPFlow FDB group."
+    ::= { f3BridgeGroups 7 }
+
+f3FwdTSizeProfileGroup OBJECT-GROUP
+    OBJECTS {
+       f3FwdTSizeProfileIndex,
+       f3FwdTSizeProfileName,
+       f3FwdTSizeProfileTableSize
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the f3FwdTSizeProfileGroup."
+    ::= { f3BridgeGroups 8 }
+
+f3MGGroupFPGroup OBJECT-GROUP
+    OBJECTS {
+       f3MGRMulticastAddress,
+       f3MGRFPList, f3MGRGroupAction,
+       f3MGRGroupType, f3MGRGroupValid,
+       f3MGRGroupRowStatus, f3MGRFPIndex,
+       f3MGRFPIndexRowStatus, f3MGRGroupStorageType
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the f3MGGroupFPGroup."
+    ::= { f3BridgeGroups 9 }
+
+f3NetworkElementBridgeParamsGroup OBJECT-GROUP
+    OBJECTS {
+       neBridgeParamsRtrvMacAction
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the f3FwdTSizeProfileGroup."
+    ::= { f3BridgeGroups 10 }
+
+END
+

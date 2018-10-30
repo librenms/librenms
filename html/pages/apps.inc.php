@@ -1,38 +1,36 @@
 <?php
-
+$pagetitle[] = 'Apps';
 $graphs['apache']    = array(
     'bits',
     'hits',
     'scoreboard',
     'cpu',
 );
-
 $graphs['drbd']      = array(
     'disk_bits',
     'network_bits',
     'queue',
     'unsynced',
 );
-
+$graphs['entropy']   = array(
+    'entropy',
+);
 $graphs['mysql']     = array(
     'network_traffic',
     'connections',
     'command_counters',
     'select_types',
 );
-
 $graphs['memcached'] = array(
     'bits',
     'commands',
     'data',
     'items',
 );
-
 $graphs['nginx']     = array(
     'connections',
     'req',
 );
-
 $graphs['postfix'] = array(
     'messages',
     'qstats',
@@ -41,30 +39,25 @@ $graphs['postfix'] = array(
     'deferral',
     'rejects',
 );
-
 $graphs['powerdns-recursor'] = array(
     'questions',
     'answers',
     'cache_performance',
     'outqueries'
 );
-
 $graphs['rrdcached'] = array(
     'queue_length',
     'events',
     'tree',
     'journal'
 );
-
 $graphs['bind']      = array('queries');
-
 $graphs['tinydns']   = array(
     'queries',
     'errors',
     'dnssec',
     'other',
 );
-
 $graphs['postgres'] = array(
     'backends',
     'cr',
@@ -73,7 +66,6 @@ $graphs['postgres'] = array(
     'index',
     'sequential'
 );
-
 $graphs['powerdns'] = array(
     'latency',
     'fail',
@@ -83,12 +75,10 @@ $graphs['powerdns'] = array(
     'queries',
     'queries_udp',
 );
-
 $graphs['ntp-client'] = array(
     'stats',
     'freq',
 );
-
 $graphs['ntp-server'] = array(
     'stats',
     'freq',
@@ -98,7 +88,6 @@ $graphs['ntp-server'] = array(
     'packets',
     'uptime',
 );
-
 $graphs['nfs-v3-stats'] = array(
     'stats',
     'io',
@@ -108,39 +97,27 @@ $graphs['nfs-v3-stats'] = array(
     'net',
     'rpc',
 );
-
 $graphs['nfs-server'] = array(
-    'stats_v2',
-    'stats',
-    'stats_v4',
-    'v4ops',
     'io',
-    'fh',
-    'rc',
-    'ra',
-    'net',
     'net_tcp_conns',
     'rpc',
 );
-
 $graphs['os-updates'] = array(
     'packages',
 );
-
 $graphs['dhcp-stats'] = array(
      'stats',
 );
-
 $graphs['fail2ban'] = array(
     'banned',
 );
-
 $graphs['freeswitch'] = array(
     'peak',
+    'calls',
+    'channels',
     'callsIn',
     'callsOut',
 );
-
 $graphs['ups-nut'] = array(
     'remaining',
     'load',
@@ -148,7 +125,6 @@ $graphs['ups-nut'] = array(
     'charge',
     'voltage_input',
 );
-
 $graphs['ups-apcups'] = array(
     'remaining',
     'load',
@@ -156,22 +132,18 @@ $graphs['ups-apcups'] = array(
     'charge',
     'voltage_input',
 );
-
 $graphs['gpsd'] = array(
     'satellites',
     'dop',
     'mode',
 );
-
 $graphs['exim-stats'] = array(
     'frozen',
     'queue'
 );
-
 $graphs['php-fpm'] = array(
     'stats'
 );
-
 $graphs['nvidia'] = array(
     'sm',
     'mem',
@@ -190,7 +162,6 @@ $graphs['nvidia'] = array(
     'sbecc',
     'dbecc',
 );
-
 $graphs['squid'] = array(
     'memory',
     'clients',
@@ -207,28 +178,24 @@ $graphs['squid'] = array(
     'pagefaults',
     'cputime',
 );
-
 $graphs['opengridscheduler'] = array(
     'ogs'
 );
-
 $graphs['fbsd-nfs-server'] = array(
     'stats',
     'cache',
     'gathering',
 );
-
 $graphs['fbsd-nfs-client'] = array(
     'stats',
     'cache',
     'rpc',
 );
-
 $graphs['unbound'] = array(
     'queries',
     'cache',
+    'operations',
 );
-
 $graphs['bind']      = array(
     'incoming',
     'outgoing',
@@ -246,7 +213,6 @@ $graphs['bind']      = array(
     'sockets_active',
     'sockets_errors',
 );
-
 $graphs['smart'] = array(
     'id5',
     'id10',
@@ -264,42 +230,76 @@ $graphs['smart'] = array(
     'id231',
     'id233',
 );
-
 $graphs['sdfsinfo'] = array(
     'volume',
     'blocks',
     'rates',
 );
-
-print_optionbar_start();
-
+$graphs['pi-hole'] = array(
+    'query_types',
+    'destinations',
+    'query_results',
+    'block_percent',
+    'blocklist',
+);
+$graphs['freeradius'] = array(
+    'access',
+    'auth',
+    'acct',
+    'proxy_access',
+    'proxy_auth',
+    'proxy_acct',
+    'queue',
+);
+$graphs['zfs'] = array(
+    'arc_misc',
+    'arc_size',
+    'arc_size_per',
+    'arc_size_breakdown',
+    'arc_efficiency',
+    'arc_cache_hits_by_list',
+    'arc_cache_hits_by_type',
+    'arc_cache_misses_by_type',
+    'arc_cache_hits',
+    'arc_cache_miss',
+);
+$graphs['powerdns-dnsdist'] = array(
+    'cache',
+    'downstream',
+    'dynamic_blocks',
+    'latency',
+    'queries_latency',
+    'queries_stats',
+    'rules_stats',
+    'queries_drop',
+);
+$graphs['asterisk'] = array(
+    'calls',
+    'channels',
+    'sip',
+);
+echo '<div class="panel panel-default">';
+echo '<div class="panel-heading">';
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
-
 unset($sep);
-
 $link_array = array(
     'page'   => 'device',
     'device' => $device['device_id'],
     'tab'    => 'apps',
 );
-
 foreach ($app_list as $app) {
     echo $sep;
-
     if ($vars['app'] == $app['app_type']) {
         echo "<span class='pagemenu-selected'>";
     }
-
     echo generate_link(nicecase($app['app_type']), array('page' => 'apps', 'app' => $app['app_type']));
     if ($vars['app'] == $app['app_type']) {
         echo '</span>';
     }
-
     $sep = ' | ';
 }
-
-print_optionbar_end();
-
+echo '</div>';
+echo '<div class="panel-body">';
 if ($vars['app']) {
     if (is_file('pages/apps/'.mres($vars['app']).'.inc.php')) {
         include 'pages/apps/'.mres($vars['app']).'.inc.php';
@@ -309,5 +309,4 @@ if ($vars['app']) {
 } else {
     include 'pages/apps/overview.inc.php';
 }
-
-$pagetitle[] = 'Apps';
+echo '</div>';

@@ -1,0 +1,934 @@
+EATON-ATS2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, 
+	Counter32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString
+		FROM SNMPv2-TC
+	sts
+		FROM EATON-OIDS;
+
+ats2 MODULE-IDENTITY
+	LAST-UPDATED "201407311200Z"
+	ORGANIZATION 
+		"Eaton Corporation"
+	CONTACT-INFO 
+		"www.eaton.com"
+	DESCRIPTION 
+		"The MIB module for Eaton ATS (Automatic Transfer Switch)."
+
+	REVISION "201407311200Z"
+	DESCRIPTION 
+		"Initial release."
+::= { sts 2 }
+
+
+-- EatonSTS-MIB { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) eaton(534) sts(10) ats2(2) }
+
+ats2Ident			OBJECT IDENTIFIER ::=  { ats2 1 }
+ats2Measure			OBJECT IDENTIFIER ::=  { ats2 2 }
+ats2Status			OBJECT IDENTIFIER ::=  { ats2 3 }
+ats2Config			OBJECT IDENTIFIER ::=  { ats2 4 }
+ats2Environment OBJECT IDENTIFIER ::= {ats2 5}
+ats2Traps			OBJECT IDENTIFIER ::=  { ats2 10 }
+
+-- Textual Conventions
+UnixTimeStamp ::= TEXTUAL-CONVENTION
+  DISPLAY-HINT      "dddddddddd"
+	STATUS     current
+	DESCRIPTION 
+		"Unix time stamp.  Measured in seconds since January 1, 1970."
+	SYNTAX  Counter32
+
+--
+-- Identification group
+ats2IdentManufacturer OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..16))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The manufacturer name."
+	::= { ats2Ident 1 }
+
+ats2IdentModel	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..32))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"Device model name."
+	::= { ats2Ident 2 }
+
+ats2IdentFWVersion OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..16))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"Device F/W version."
+	::= { ats2Ident 3 }
+
+ats2IdentRelease OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..16))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The released date."
+	::= { ats2Ident 4 }
+
+ats2IdentSerialNumber OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..20))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"Device serial number"
+	::= { ats2Ident 5 }
+
+ats2IdentPartNumber OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..20))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"Device part number"
+	::= { ats2Ident 6 }
+
+ats2IdentAgentVersion OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..20))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"Communication Card F/W version"
+	::= { ats2Ident 7 }
+
+--
+-- Mesurement group
+ats2Input		OBJECT IDENTIFIER ::=  { ats2Measure 1 }
+
+ats2InputDephasing OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS		"degrees"
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The dephasing in between Source 1 and Source 2."
+	::= { ats2Input 1 }
+
+ats2InputTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF ATSInputEntry
+	MAX-ACCESS  	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The table of input information."
+	::= { ats2Measure 2 }
+
+ats2Output			OBJECT IDENTIFIER ::=  { ats2Measure 3 }
+
+ats2OperationMode OBJECT-TYPE
+	SYNTAX		INTEGER {
+		initialization(1),
+		diagnosis(2),
+		off(3),
+		source1(4),
+		source2(5),
+		safe(6),
+		fault(7)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The operation mode."
+	::= { ats2Measure 4 }
+
+--
+-- Mesurement / Input group
+ats2InputEntry OBJECT-TYPE
+	SYNTAX		ATSInputEntry
+	MAX-ACCESS  	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The input information of each source input:
+		<node>.1   source1
+		<node>.2   source2"
+	INDEX { ats2InputIndex }
+	::= { ats2InputTable 1 }
+
+ATSInputEntry ::= SEQUENCE {
+	ats2InputIndex		INTEGER,
+	ats2InputVoltage		INTEGER,
+	ats2InputFrequency	INTEGER
+}
+
+ats2InputIndex OBJECT-TYPE
+	SYNTAX		INTEGER {
+		source1(1),
+		source2(2)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"Index to input."
+	::= { ats2InputEntry 1 }
+
+ats2InputVoltage OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS      "0.1 V"
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The input voltage in front of relay. Units are 0.1 V."
+	::= { ats2InputEntry 2 }
+
+ats2InputFrequency OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS      "0.1 Hz"
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The input frequency.  Units are 0.1 Hz."
+	::= { ats2InputEntry 3 }
+
+--
+-- Mesurement / Output group
+ats2OutputVoltage OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS		"0.1 V"
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The output voltage. Units are 0.1 V."
+	::= { ats2Output 1 }
+
+ats2OutputCurrent OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS		"0.1 A"
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The output current. Units are 0.1 A."
+	::= { ats2Output 2 }
+
+
+--
+-- Status group
+ats2InputStatus		OBJECT IDENTIFIER ::=  { ats2Status 1 }
+
+ats2InputStatusDephasing OBJECT-TYPE
+	SYNTAX		INTEGER {
+		normal (1),
+		outOfRange (2)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The dephasing status in between Source 1 and Source 2."
+	::= { ats2InputStatus 1 }
+
+ats2InputStatusTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF ATSInputStatusEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The table of input status."
+	::= { ats2Status 2 }
+
+ats2OutputStatus			OBJECT IDENTIFIER ::=  { ats2Status 3 }
+
+--
+-- Status / Input Flow group
+ats2InputStatusEntry OBJECT-TYPE
+	SYNTAX		ATSInputStatusEntry
+	MAX-ACCESS  	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The input flow status:
+		<node>.1   source1
+		<node>.2   source2"
+	INDEX { ats2InputStatusIndex }
+	::= { ats2InputStatusTable 1 }
+
+ATSInputStatusEntry ::= SEQUENCE {
+	ats2InputStatusIndex			INTEGER,
+	ats2InputStatusFrequency				INTEGER,
+	ats2InputStatusGood	INTEGER,
+	ats2InputStatusInternalFailure	INTEGER,
+	ats2InputStatusVoltage	INTEGER,
+	ats2InputStatusUsed			INTEGER
+}
+
+ats2InputStatusIndex OBJECT-TYPE
+	SYNTAX		INTEGER {
+		source1(1),
+		source2(2)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"Index of input entry."
+	::= { ats2InputStatusEntry 1 }
+
+ats2InputStatusFrequency OBJECT-TYPE
+	SYNTAX		INTEGER {
+		good (1),
+		outOfRange (2)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The status of input frequency."
+	::= { ats2InputStatusEntry 2 }
+
+ats2InputStatusGood OBJECT-TYPE
+	SYNTAX		INTEGER {
+		voltageOrFreqOutofRange(1),
+		voltageAndFreqNormalRange(2),
+		voltageDeratedRangeAndFreqNormalRange(3),
+		voltageAndFreqNormalRangeWaveformNok(4)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The summarized status of input AC flow."
+	::= { ats2InputStatusEntry 3 }
+
+ats2InputStatusInternalFailure OBJECT-TYPE
+	SYNTAX		INTEGER {
+		good (1),
+		internalFailure (2)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The internal fault status of input."
+	::= { ats2InputStatusEntry 4 }
+
+ats2InputStatusVoltage OBJECT-TYPE
+	SYNTAX		INTEGER {
+		normalRange(1),
+		deratedRange(2),
+		outofRange(3),
+    missing(4)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The status of input voltage."
+	::= { ats2InputStatusEntry 5 }
+
+ats2InputStatusUsed OBJECT-TYPE
+	SYNTAX		INTEGER {
+		notPoweringLoad(1),
+		poweringLoad(2)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The status of input relay."
+	::= { ats2InputStatusEntry 6 }
+
+--
+-- Status / Failure group
+ats2StatusInternalFailure OBJECT-TYPE
+	SYNTAX		INTEGER {
+		good (1),
+		internalFailure (2)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"Output fault."
+	::= { ats2OutputStatus 1 }
+
+ats2StatusOutput OBJECT-TYPE
+	SYNTAX		INTEGER {
+		outputNotPowered(1),
+		outputPowered(2)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"Output powered status."
+	::= { ats2OutputStatus 2 }
+
+ats2StatusOverload OBJECT-TYPE
+	SYNTAX		INTEGER {
+		noOverload(1),
+		warningOverload(2),
+		criticalOverload(3)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The output overload status."
+	::= { ats2OutputStatus 3 }
+
+ats2StatusOverTemperature OBJECT-TYPE
+	SYNTAX		INTEGER {
+		noOverTemperature(1),
+		overTemperature(2)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The over temperature status."
+	::= { ats2OutputStatus 4 }
+
+ats2StatusShortCircuit OBJECT-TYPE
+	SYNTAX		INTEGER {
+		noShortCircuit(1),
+		shortCircuit(2)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"Short circuit status."
+	::= { ats2OutputStatus 5 }
+
+ats2StatusCommunicationLost OBJECT-TYPE
+	SYNTAX		INTEGER {
+		good (1),
+		communicationLost (2)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"Communication failure status."
+	::= { ats2OutputStatus 6 }
+
+ats2StatusConfigurationFailure OBJECT-TYPE
+	SYNTAX		INTEGER {
+		good (1),
+		configurationFailure (2)
+	}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"Configuration failure status."
+	::= { ats2OutputStatus 7 }
+
+--
+-- Configuration group
+ats2ConfigTime		OBJECT IDENTIFIER ::=  { ats2Config 1 }
+
+ats2ConfigInputVoltageRating OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS      "1 V"
+	MAX-ACCESS    read-only
+	STATUS		current
+	DESCRIPTION
+		"The input voltage rating. Unit is 1 V."
+	::= { ats2Config 2 }
+
+ats2ConfigInputFrequencyRating OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS      "Hz"
+	MAX-ACCESS    read-only
+	STATUS		current
+	DESCRIPTION
+		"The input frequency rating. Unit is 1 Hz."
+	::= { ats2Config 3 }
+
+ats2ConfigOutputVoltage OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS      "1 V"
+	MAX-ACCESS    read-write
+	STATUS		current
+	DESCRIPTION
+		"The output voltage config. Unit is 1 V."
+	::= { ats2Config 4 }
+
+ats2ConfigPreferred OBJECT-TYPE
+	SYNTAX		INTEGER {
+		source1(1),
+		source2(2)
+	}
+	MAX-ACCESS    read-write
+	STATUS		current
+	DESCRIPTION
+		"The preferred source."
+	::= { ats2Config 5 }
+
+ats2ConfigSensitivity OBJECT-TYPE
+	SYNTAX		INTEGER {
+		normal(1),
+    highSensitivity (2),
+    lowSensitivity (3)
+	}
+	MAX-ACCESS    read-write
+	STATUS		current
+	DESCRIPTION
+		"The AC Blackout Sensitivity."
+	::= { ats2Config 6 }
+
+ats2ConfigTransferMode OBJECT-TYPE
+	SYNTAX		INTEGER {
+		standard(1),
+		gap(2)
+	}
+	MAX-ACCESS    read-write
+	STATUS		current
+	DESCRIPTION
+		"behavior configuration when transfering from one source to other source not synchronized."
+	::= { ats2Config 7 }
+
+ats2ConfigTransferTest OBJECT-TYPE
+	SYNTAX		INTEGER {
+    doneAndPassed (1),
+    doneAndWarning (2),            
+    doneAndError (3),
+    aborted (4),
+    inProgress (5),
+    noTestInitiated (6)
+	}
+	MAX-ACCESS    read-only
+	STATUS		current
+	DESCRIPTION
+		"The status of transfer test."
+	::= { ats2Config 8 }
+
+ats2ConfigBrownoutLow OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS      "1 V"
+	MAX-ACCESS    read-only
+	STATUS		current
+	DESCRIPTION
+		"Setting of input brownout low voltage. Unit is 1 V."
+	::= { ats2Config 9 }
+
+ats2ConfigBrownoutLowDerated OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS      "1 V"
+	MAX-ACCESS    read-only
+	STATUS		current
+	DESCRIPTION
+		"Setting of input brownout low derated voltage. Unit is 1 V."
+	::= { ats2Config 10 }
+
+ats2ConfigBrownoutHigh OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS      "1 V"
+	MAX-ACCESS    read-only
+	STATUS		current
+	DESCRIPTION
+		"Setting of input brownout high voltage. Unit is 1 V."
+	::= { ats2Config 11 }
+
+ats2ConfigHysteresisVoltage OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS      "1 V"
+	MAX-ACCESS    read-only
+	STATUS		current
+	DESCRIPTION
+		"Hysteresis between loss point and comeback point. Unit is 1 V."
+	::= { ats2Config 12 }
+
+--
+-- Configuration / Time group
+ats2ConfigTimeRTC  OBJECT-TYPE
+	SYNTAX     UnixTimeStamp
+	MAX-ACCESS     read-write
+	STATUS     current
+	DESCRIPTION 
+		"Clock value.  This could be from either a real-time clock (in which case
+		 it is likely writeable) or from a time server via NTP (probably read-only).
+     (since 1/1/1970 at 1:00:00)."
+	::= { ats2ConfigTime 1 }
+
+ats2ConfigTimeTextDate OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..10))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The present date in MM/DD/YYYY text format."
+	::= { ats2ConfigTime 2 }
+
+ats2ConfigTimeTextTime OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..8))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION
+		"The present time in hh:mm:ss text format."
+	::= { ats2ConfigTime 3 }
+
+
+--
+-- EMP group
+--
+-- The objects defined in this group are provided by the EMP.
+-- They are Temperature and Humidity readings and alarming limits,
+-- and the (two) contacts readings and setup information.
+-- These objects are related to the separate EMP probe that can be connected to
+-- the communication card.
+--
+-- Notices/Traps: traps related to the probe are 
+--      ats2tdRemoteTempBad
+--      ats2tdRemoteHumidityBad
+--      ats2tdContactActiveNotice
+--      ats2tdContactInactiveNotice
+
+
+ats2EnvRemoteTemp OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200)   
+    UNITS       "degrees Centigrade"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The reading of an EMP's temperature sensor."
+    ::= { ats2Environment  1 }
+
+ats2EnvRemoteHumidity OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)  
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The reading of an EMP's humidity sensor."
+    ::= { ats2Environment  2 }
+
+--
+-- The Environmental Contact Sensing Table
+--      Contains the table for monitoring all contacts (digital 
+--      inputs, normally 2 in an EMP).
+--
+
+ats2EnvNumContacts OBJECT-TYPE
+    SYNTAX  INTEGER (1..1024)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of Contacts in the ats2ContactSenseTable.
+        This object indicates the number of rows in the 
+        ats2ContactSenseTable."
+    ::= { ats2Environment  3 }
+
+ats2ContactSenseTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Ats2ContactsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "A list of Contact Sensing table entries.  
+        The number of entries is given by the value of 
+        ats2EnvNumContacts."
+    ::= { ats2Environment  4 }
+
+ats2ContactsTableEntry OBJECT-TYPE
+    SYNTAX  Ats2ContactsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "An entry containing information applicable 
+        to a particular Contact input."
+    INDEX   { ats2ContactIndex }
+    ::= { ats2ContactSenseTable  1 }
+
+Ats2ContactsTableEntry ::= SEQUENCE {
+    ats2ContactIndex   INTEGER,
+    ats2ContactType    INTEGER,
+    ats2ContactState   INTEGER,
+    ats2ContactDescr   DisplayString
+    }
+
+ats2ContactIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..1024)
+    MAX-ACCESS  read-only           -- actually not-accessible
+    STATUS  current
+    DESCRIPTION
+       "The Contact identifier; identical to the Contact Number.
+        This object is not-accessible to MIB browsers, but had to be changed to
+        read-only to satisfy SMIv2 syntax checkers if it is included in traps."
+    ::= { ats2ContactsTableEntry  1 }
+
+ats2ContactType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        normallyOpen(1),            -- or Input Normally High
+        normallyClosed(2),          -- or Input Normally Low
+        anyChange(3),               -- No normal Open/Closed state
+        notUsed(4)                  -- Contact not in service or not alarming
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The normal state for this contact.  The 'other' (not 'Normally')
+        state is the Active state for generating the ats2tdContactActiveNotice
+        trap.  If anyChange(3) is selected, then this trap is sent
+        any time the contact changes to either Open or Closed.
+        No traps are sent if the Contact is set to notUsed(4).
+        In many cases, the configuration for Contacts may be done by other 
+        means, so this object may be read-only."
+    ::= { ats2ContactsTableEntry  2 }
+
+ats2ContactState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        open(1),
+        closed(2),
+        openWithNotice(3),
+        closedWithNotice(4)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The current state of the Contact input;
+        the value is based on the open/closed input state 
+        and the setting for ats2ContactType.
+        When entering the openWithNotice(3) and closedWithNotice(4) 
+        states, no entries added to the ats2AlarmTable, but
+        the ats2tdContactActiveNotice trap is sent."
+    ::= { ats2ContactsTableEntry  3 }
+
+ats2ContactDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..63))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "A label identifying the Contact.  This object should be
+        set by the administrator."
+    ::= { ats2ContactsTableEntry  4 }
+
+ats2EnvRemoteTempLowerLimit OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200) 
+    UNITS       "degrees Centigrade"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Lower Limit of the EMP temperature; if ats2EnvRemoteTemp 
+        falls below this value, the ats2RemoteTempBad alarm will occur."
+    ::= { ats2Environment  5 }
+
+ats2EnvRemoteTempUpperLimit OBJECT-TYPE
+    SYNTAX  INTEGER (-100..200) 
+    UNITS       "degrees Centigrade"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Upper Limit of the EMP temperature; if ats2EnvRemoteTemp 
+        rises above this value, the ats2RemoteTempBad alarm will occur.
+        This value should be greater than ats2EnvRemoteTempLowerLimit."
+    ::= { ats2Environment  6 }
+
+ats2EnvRemoteHumidityLowerLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..100) 
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Lower Limit of the EMP humidity reading; if ats2EnvRemoteHumidity
+        falls below this value, the ats2RemoteHumidityBad alarm will occur."
+    ::= { ats2Environment  7 }
+
+ats2EnvRemoteHumidityUpperLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..100) 
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Upper Limit of the EMP humidity reading; if ats2EnvRemoteHumidity 
+        rises above this value, the ats2RemoteHumidityBad alarm will occur.
+        This value should be greater than ats2EnvRemoteHumidityLowerLimit."
+    ::= { ats2Environment  8 }
+
+
+--
+-- Traps / Notifications for the EMP in the PowerMIB style
+-- The special EMP traps are not normally provided by Power Xpert Gateways (which use
+-- the PXG-style traps instead) but could be provided by PowerMIB implementations
+-- These are found in the PowerMIB:
+--    ats2tdContactActiveNotice   
+--    ats2tdContactInactiveNotice 
+--    ats2tdRemoteTempBad         
+--    ats2tdRemoteHumidityBad     
+
+
+
+
+--
+-- Traps group
+ats2TrapCommunicationLost NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Communication with the ATS failed."
+	::= { ats2Traps 1 }
+
+ats2TrapCommunicationRecovered NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Communication with the ATS recovered."
+	::= { ats2Traps 2 }
+
+ats2TrapOutputPowered NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"The ATS powers the load."
+	::= { ats2Traps 3 }
+
+ats2TrapOutputNotPowered NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"The ATS does not powers the load."
+	::= { ats2Traps 4 }
+
+ats2TrapOverload NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"The ATS has sensed a critical overload."
+	::= { ats2Traps 5 }
+
+ats2TrapNoOverLoad NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"The critical overload disappeared."
+	::= { ats2Traps 6 }
+
+ats2TrapInternalFailure NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"The ATS has an internal failure (sum of all HW internal failure)."
+	::= { ats2Traps 7 }
+
+ats2TrapNoInternalFailure NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"The ATS internal failure disappeared."
+	::= { ats2Traps 8 }
+
+ats2TrapSource1Normal NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Source 1 returns to normal."
+	::= { ats2Traps 9 }
+
+ats2TrapSource1OutOfRange NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Source 1 out of range."
+	::= { ats2Traps 10 }
+
+ats2TrapSource2Normal NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Source 2 returns to normal."
+	::= { ats2Traps 11 }
+
+ats2TrapSource2OutOfRange NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Source 2 out of range."
+	::= { ats2Traps 12 }
+
+ats2TrapSourceDesynchronized NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Source 1 and Source 2 phase are desynchronized."
+	::= { ats2Traps 13 }
+
+ats2TrapSourceSynchronized NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Source 1 and Source 2 phase are synchronized."
+	::= { ats2Traps 14 }
+  
+ats2TrapOutputPoweredBySource1 NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Source 1 powers the output."
+	::= { ats2Traps 15 }
+  
+ats2TrapOutputPoweredBySource2 NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Source 2 powers the output."
+	::= { ats2Traps 16 }
+
+-- Added to provide additional information with the RemoteTemp and RemoteHumidity 
+ats2TrapRemoteTempLow NOTIFICATION-TYPE
+    STATUS     current
+    DESCRIPTION
+       "The remote temperature, ats2EnvRemoteTemp, has fallen below 
+    the set lower limit, ats2EnvRemoteTempLowerLimit." 
+    --#SEVERITY MAJOR 
+    ::= { ats2Traps 20 }
+
+ats2TrapRemoteTempHigh NOTIFICATION-TYPE
+    STATUS     current
+    DESCRIPTION
+       "The remote temperature, ats2EnvRemoteTemp, has risen above 
+    the set upper limit, xupsEnvRemoteTempUpperLimit." 
+    --#SEVERITY MAJOR 
+    ::= { ats2Traps 21 }
+
+ats2TrapRemoteTempNormal NOTIFICATION-TYPE
+    STATUS     current
+    DESCRIPTION
+       "The remote temperature, ats2EnvRemoteTemp, is inside the interval
+       defined by the lower limit and the upper limit." 
+    --#SEVERITY MAJOR 
+    ::= { ats2Traps 22 }
+
+ats2TrapRemoteHumidityLow NOTIFICATION-TYPE
+    STATUS     current
+    DESCRIPTION
+       "The remote humidity, ats2EnvRemoteHumidity, has fallen below 
+    the set lower limit, ats2EnvRemoteHumidityLowerLimit." 
+    --#SEVERITY MAJOR 
+    ::= { ats2Traps 23 }
+
+ats2TrapRemoteHumidityHigh NOTIFICATION-TYPE
+    STATUS     current
+    DESCRIPTION
+       "The remote humidity, ats2EnvRemoteHumidity, has risen above 
+    the set upper limit, ats2EnvRemoteHumidityUpperLimit." 
+    --#SEVERITY MAJOR 
+    ::= { ats2Traps 24 }
+
+ats2TrapRemoteHumidityNormal NOTIFICATION-TYPE
+    STATUS     current
+    DESCRIPTION
+       "The remote humidity, ats2EnvRemoteHumidity, is inside the interval
+       defined by the lower limit and the upper limit." 
+    --#SEVERITY MAJOR 
+    ::= { ats2Traps 25 }
+
+ats2Contact1ActiveNotice NOTIFICATION-TYPE
+    STATUS     current
+    DESCRIPTION
+    "The Contact 1 is in its Active state.
+     The following are the situations that generate this trap:
+        For ats2ContactType:    and     ats2ContactState: 
+            normallyOpen(1)     and     closedWithNotice(4)
+            normallyClosed(2)   and     openWithNotice(3)
+            anyChange(3)        and     openWithNotice(3) or closedWithNotice(4)"
+    --#SEVERITY MAJOR
+    ::= { ats2Traps 26 }
+
+ats2Contact1InactiveNotice NOTIFICATION-TYPE
+    STATUS     current
+    DESCRIPTION
+    "The Contact 1 has changed to its Inactive state."
+    --#SEVERITY INFORMATIONAL
+    ::= { ats2Traps 27 }
+
+ats2Contact2ActiveNotice NOTIFICATION-TYPE
+    STATUS     current
+    DESCRIPTION
+    "The Contact 2 is in its Active state.
+     The following are the situations that generate this trap:
+        For ats2ContactType:    and     ats2ContactState: 
+            normallyOpen(1)     and     closedWithNotice(4)
+            normallyClosed(2)   and     openWithNotice(3)
+            anyChange(3)        and     openWithNotice(3) or closedWithNotice(4)"
+    --#SEVERITY MAJOR
+    ::= { ats2Traps 28 }
+
+ats2Contact2InactiveNotice NOTIFICATION-TYPE
+    STATUS     current
+    DESCRIPTION
+    "The Contact 2 has changed to its Inactive state."
+    --#SEVERITY INFORMATIONAL
+    ::= { ats2Traps 29 }
+
+ats2TestTrap NOTIFICATION-TYPE
+    STATUS     current
+    DESCRIPTION
+    "Sent whenever the trap test feature is used by the communication card."
+    --#SEVERITY INFORMATIONAL
+    ::= { ats2Traps 40 }
+
+
+END

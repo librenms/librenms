@@ -1,0 +1,335 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: PING module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-PING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+ping	MODULE-IDENTITY
+	    LAST-UPDATED "200606281222Z"
+    	ORGANIZATION "Allied Telesis, Inc"
+		CONTACT-INFO
+		    "http://www.alliedtelesis.com"
+		DESCRIPTION
+		    "This MIB file contains definitions of managed objects for the
+	    	PING module. "
+
+	    REVISION "200606281222Z"
+		DESCRIPTION
+			"Initial Revision"
+
+::= { modules 58 }
+									  
+-- The ping group. This consists of a static and dynamic entry of ping
+-- information.
+-- This group was added on 30/Nov/2001 by Summer students on request from Telecom Italia.
+
+-- The ping table. This consists of a static and dynamic entry of ping
+-- information. The static information is used when initiating a ping operation
+-- unless the dynamic information has been written with different values since
+-- the completion of the last ping.
+
+-- The pingStatus is used to start and stop a ping and inform as to whether a 
+-- ping is currently active.
+
+-- The pingStatistics are the results from a ping carried out.
+
+-- A trap can be generated on completion of the ping. Generation of a trap is
+-- controlled by a variable in the ping table.
+
+-- The router or switch implementing this group can only support one concurrent
+-- ping operation controlled by SNMP at a time. Future support may include the ability
+-- to have more than one ping controlled by SNMP at a time.
+
+pingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of ping parameters, dynamic and static."
+    ::= { ping 1 }
+
+pingEntry OBJECT-TYPE
+    SYNTAX      PingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry of ping parameters. This contains the
+            parameters required to perform a ping from the router.
+            The ping specified by the dynamic parameters, can be 
+            initiated or stopped at any time by altering the pingStatus 
+            accordingly."
+    INDEX   { pingIndex }
+    ::= { pingTable 1 }
+
+PingEntry ::=   
+        SEQUENCE {
+            pingIndex
+                INTEGER,
+            pingProtocol
+                INTEGER,
+            pingAddress
+                OCTET STRING,
+            pingNumberOfPackets
+                INTEGER,
+            pingPacketSize
+                INTEGER,
+            pingTimeout
+                INTEGER,
+            pingDelay
+                INTEGER,
+            pingTrapOnCompletion
+                INTEGER, 
+            pingTypeOfService
+                INTEGER, 
+            pingPattern
+                Unsigned32  
+        }
+
+pingIndex OBJECT-TYPE
+    SYNTAX      INTEGER {
+                static(1),
+                dynamic(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "There are two sets of ping information, dynamic and static.
+            The dynamic information is used only once, for the next ping, then 
+            automatically replaced with the static information. The static information
+            is used whenever specific dynamic information is not specified. The dynamic 
+            information indicates the current ping parameters when a ping is in progress.
+            If static information is not specified, defaults are used.
+            
+            Static information can be changed at any time, but dynamic information 
+            cannot be changed while a ping is in progress. A change to the static
+            information when a ping is not currently active, also updates the
+            dynamic information."
+    ::= { pingEntry 1 }
+
+pingProtocol OBJECT-TYPE
+    SYNTAX      INTEGER {
+                undefined(0),
+                apple(1),
+                ip(2),
+                ipx(3),
+                osi(4)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The protocol that the ping will use. The protocol must
+            match the destination address. Ping supports both IP, IPX, 
+            Appletalk, and OSI addresses. The protocol must be specified 
+            before the address is set, because when the protocol is changed,
+            address is reset to undefined. The default value for this
+            variable is undefined(0)."
+    ::= { pingEntry 2 }
+
+pingAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The address specifies the destination address for ping
+            packets for Appletalk, IP, IPX and OSI networks, respectively.
+            The address format must match the protocol being used. The
+            protocol must be specified before the address is set, because 
+            changing the protocol resets the address to undefined. 
+            The default value for this variable is an undefined address which 
+            is coded as a zero length octet string."
+    ::= { pingEntry 3 }
+
+pingNumberOfPackets OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The number of ping packets to transmit."
+    ::= { pingEntry 4 }
+
+pingPacketSize OBJECT-TYPE
+    SYNTAX      INTEGER (0..1500)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The packet size parameter specifies the length in bytes, of data 
+            to include in the data portion of the ping packet. The protocol
+            packet header size and the size of headers for the particular link
+            protocol in use have to be added to the packet size to get the
+            total size of the ping packet. The maximum pingPacketSize can be
+            set to is 1500."
+    ::= { pingEntry 5 }
+     
+ pingTimeout OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Timeout specifies the amount of time, in seconds, to wait for a response to a 
+            ping packet."
+    ::= { pingEntry 6 }
+
+
+pingDelay OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The delay parameter specifies the time interval, in seconds, between 
+            ping packets."
+    ::= { pingEntry 7 }
+
+
+pingTrapOnCompletion OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Specifies whether a trap should be issued on completion of the sequence 
+            of pings."
+    ::= { pingEntry 8 }
+ 
+pingTypeOfService OBJECT-TYPE
+    SYNTAX      INTEGER (0..255) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The Type Of Service (TOS) parameter is only valid for IP addresses, 
+            and specifies the TOS field in the IP header of the ping packet, as a decimal 
+            in the range 0 to 255."
+    ::= { pingEntry 9 }       
+    
+pingPattern OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The pattern parameter specifies the data pattern to use in the 
+            data portion of the ping packet."
+    ::= { pingEntry 10 }  
+
+         
+-- The ping status value. This is used to start and stop a ping, report on the 
+-- status of the ping (running or stopped).
+
+pingStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                startRunning(1),    -- If status is '2' (stopped), set to '1' to start
+                stopStopped(2)      -- If status is '1' (running), set to '2' to stop 
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Status and action object for the ping module. A status of '1' indicates that
+            the ping is currently running, the status can be set to '2' to stop 
+            the ping.  A status of '2' indicates that the ping is currently stopped,
+            the pingStatus can be set to '1' to start the ping.
+            
+            The parameters for the ping can be altered in the pingTable.                
+            The destination ping address and protocol have defaults of undefined and 
+            must be specified before a ping can be started. 
+            The ping statistics are reset to defaults when a ping is started, and 
+            updated when the ping stops. 
+            
+            Dynamic pingTable information is used only once, for the next ping.
+            Static pingTable information is used for all pings by default, 
+            whenever the respective dynamic settings are not specified."
+    ::= { ping 2  }
+
+-- This contains the statistic results from a ping.
+
+pingStatistics OBJECT IDENTIFIER ::= { ping 3 }    
+
+pingSentPackets OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of ping packets sent to the target in the last ping.  The 
+            default before the completion of a ping is zero."
+    ::= { pingStatistics 1 }
+
+
+pingReceivedPackets OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets received from the target in the last ping.  The 
+            default before the completion of a ping is zero."
+    ::= { pingStatistics 2 }
+
+
+pingMinimumRoundTripTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The quickest round trip time taken by any of the ping packets 
+            in milliseconds in the last ping.  The default before the 
+            completion of a ping is zero."
+    ::= { pingStatistics 3 }
+
+
+pingAverageRoundTripTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The average round trip time taken by the ping packets in 
+            milliseconds in the last ping.  The default before the completion 
+            of a ping is zero."
+    ::= { pingStatistics 4 }
+           
+           
+pingMaximumRoundTripTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The slowest round trip time taken by any of the ping packets in 
+            milliseconds in the last ping.  The default before the completion 
+            of a ping is zero."
+    ::= { pingStatistics 5 }
+
+-- ping TRAPs.
+
+pingTraps	OBJECT IDENTIFIER ::= { ping 0 }
+pingTrap	NOTIFICATION-TYPE
+--		OBJECTS		{}
+	STATUS		current
+    DESCRIPTION
+                "A ping trap is generated when a ping has completed. Traps
+                are only generated if the variable pingTrapOnCompletion is
+                set to true(1) in the dynamic ping entry. A trap is still
+                generated if the ping is stopped prematurely by setting the
+                variable pingStatus to stop/stopped(2)."
+    ::= { pingTraps 1 }
+
+END

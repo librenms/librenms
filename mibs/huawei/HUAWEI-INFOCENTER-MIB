@@ -1,0 +1,624 @@
+-- =================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: info-center mangement mib
+-- Reference:   huawei enterprise mib
+-- Version:     V2.10
+-- History:
+--                initial version 2009-09-08
+-- =================================================================
+
+HUAWEI-INFOCENTER-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+            
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+                        
+    		RowStatus, DisplayString, TruthValue, RowStatus,  TEXTUAL-CONVENTION
+        		FROM SNMPv2-TC
+
+    		MODULE-IDENTITY, OBJECT-TYPE, Integer32, OBJECT-IDENTITY, IpAddress, Counter64, Unsigned32, NOTIFICATION-TYPE
+        		FROM SNMPv2-SMI  
+    
+    		OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP                                
+        		FROM SNMPv2-CONF    
+        
+        EnabledStatus            
+        		FROM P-BRIDGE-MIB   
+        		
+    		hwDatacomm
+        		FROM HUAWEI-MIB;
+                       
+
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25
+    hwInfoCenter MODULE-IDENTITY 
+        LAST-UPDATED "201708171754Z"           --Aug 17, 2017 at 17:54 GMT
+        ORGANIZATION 
+            "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO 
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+             "
+            DESCRIPTION 
+            "The HUAWEI-INFO-CENTER-MIB contains objects to manage the system info-center configuration. 
+            It defines the model used to represent configuration data that exists elsewhere 
+            in the system and in peripheral devices. The MIB is proper for system configuration.
+            NMS can query configuration change log message and operate configuration.
+            There are no constraints on this MIB."
+
+        REVISION "201708171754Z"           --Aug 17, 2017 at 17:54 GMT
+        DESCRIPTION 
+            "Add hwICLogFileNumThrd."
+
+        REVISION "201705162104Z"        -- may  16, 2017 at 21:04 GMT
+        DESCRIPTION 
+            "Add hwICLogFileNumThrd."
+
+        REVISION "201705112018Z"        -- may  11, 2017 at 15:44 GMT
+        DESCRIPTION 
+            "Add hwICLogFileStorageThreshold."
+
+         REVISION "201605281447Z"        -- may  28, 2016 at 14:47 GMT
+         DESCRIPTION 
+            "Add oper(3) and  security(4)."
+
+         REVISION "201605271447Z"        -- may  27, 2016 at 14:47 GMT
+         DESCRIPTION 
+            "Add hwICLogWriteFail and hwICLogWriteFailCleared . " 
+                    
+        REVISION "201508171544Z"        -- Aug  17, 2015 at 15:44 GMT
+        DESCRIPTION 
+            "Add hwICLogBufferLose."
+
+        REVISION "201408051150Z"        -- Aug  5, 2014 at 11:50 GMT
+        DESCRIPTION 
+            "Add hwICInsufficientSpace."
+        REVISION "201412161706Z"        -- Dec  16, 2014 at 17:06 GMT
+        DESCRIPTION 
+            "To compile on linux"
+        REVISION "201307111640Z"        -- Jul  11, 2013 at 16:40 GMT
+        DESCRIPTION 
+            "The initial revision of this MIB module ."            
+        REVISION "201307051710Z"        -- Jul  5, 2013 at 17:10 GMT
+        DESCRIPTION 
+            "The initial revision of this MIB module ."
+        REVISION "201108081200Z"        -- August 12, 2011 at 12:00 GMT
+        DESCRIPTION 
+            "The initial revision of this MIB module ."   
+            
+        ::= { hwDatacomm 212 }
+
+
+    --
+    -- Textual conventions
+    --
+
+    HWMessageLevel ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "Specify level of message of info-center.
+            Currently, following levels of message are provided:
+            emergencies(0):
+            alerts(1):
+            critical(2):
+            errors(3):
+            warnings(4):
+            notifications(5):
+            informational(6):
+            debugging(7):     
+            "
+            
+        SYNTAX INTEGER
+            {
+            emergencies(0),
+            alerts(1),
+            critical(2),
+            errors(3),
+            warnings(4),
+            notifications(5),
+            informational(6),
+            debugging(7)
+            }
+            
+     HWFacilityType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Specify loghost facility which generates messages."
+        SYNTAX INTEGER
+            {
+            -- kernel(0),
+            -- userLevel(1),
+            -- mailSystem(2),
+            -- systemDaemons(3),
+            -- securityAuthorization(4),
+            -- internallyMessages(5),
+            -- linePrinter(6),
+            -- networkNews(7),
+            -- uucp(8),
+            -- clockDaemon(9),
+            -- securityAuthorization2(10),
+            -- ftpDaemon(11),
+            -- ntp(12),
+            -- logAudit(13),
+            -- logAlert(14),
+            -- clockDaemon2(15),
+            local0(16),
+            local1(17),
+            local2(18),
+            local3(19),
+            local4(20),
+            local5(21),
+            local6(22),
+            local7(23)
+            }
+
+
+    --
+    -- Node definitions
+    --   
+    
+    -- ==========================================================================
+    -- hwInfoCenterObjects
+    -- ==========================================================================  
+    
+    -- 1.3.6.1.4.1.2011.5.25.212
+    hwInfoCenterObjects OBJECT IDENTIFIER ::= { hwInfoCenter 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.212.1
+    hwICEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The object control the state of INFO CENTER.
+            If the state is false, the device stop to generate or record
+            message through INFO CENTER. All the log, diagnose log and
+            trap won't record."
+        ::= { hwInfoCenterObjects 1 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.212.2
+    hwICLoghost OBJECT IDENTIFIER ::= { hwInfoCenterObjects 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.2.1
+    hwICLoghostSourceInterface OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The log host uses the bound source interface to send logs. All log hosts use the same source interface. For details about the value of this parameter, see ifEntry. If no source interface is configured, the value is NULL."
+        ::= { hwICLoghost 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.2.2
+    hwICLoghostTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwICLoghostEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table lists information center functions, including configuring and deleting syslog hosts and modifying common parameters of syslog hosts."
+        ::= { hwICLoghost 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.2.2.1
+    hwICLoghostEntry OBJECT-TYPE
+        SYNTAX HwICLoghostEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Information about a configuration loghost in the system."     
+        INDEX { hwICLoghostIpAddressType, 
+        				hwICLoghostIpAddress, 
+        				IMPLIED hwICLoghostVpnInstance }
+        ::= { hwICLoghostTable 1 }
+
+    HwICLoghostEntry ::=
+        SEQUENCE {
+            hwICLoghostIpAddressType
+                InetAddressType,
+            hwICLoghostIpAddress
+                InetAddress,
+            hwICLoghostVpnInstance
+                DisplayString,            
+            hwICLoghostChannel
+                Integer32,
+            hwICLoghostFacility
+                HWFacilityType,
+            hwICLoghostLanguage
+                INTEGER,
+            hwICLoghostRowStatus
+                RowStatus           
+         }        
+         
+    -- 1.3.6.1.4.1.2011.5.25.212.2.2.1.1
+    hwICLoghostIpAddressType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The ip address type of loghost."
+        ::= { hwICLoghostEntry 1 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.212.2.2.1.2
+    hwICLoghostIpAddress OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The ip address of the specified loghost."
+        ::= { hwICLoghostEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.212.2.2.1.3
+    hwICLoghostVpnInstance OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..31))    
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The vpn instance which the loghost uses. "  
+        ::= { hwICLoghostEntry 3 }    
+  
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.2.2.1.4
+    hwICLoghostChannel OBJECT-TYPE
+        SYNTAX Integer32             
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The channel which the loghost receives message. The value of this 
+            object identifies the index of the channel in the Channel Table.
+            The value is referenced from hwICChannelTable."
+        DEFVAL { 2 }                          
+        ::= { hwICLoghostEntry 4 }                           
+
+    -- 1.3.6.1.4.1.2011.5.25.212.2.2.1.5
+    hwICLoghostFacility OBJECT-TYPE
+        SYNTAX HWFacilityType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The operations staff can selectively filter the messages with priority 
+            which consists of facility that generates the message and severity of the
+            message."
+        DEFVAL { local7 }
+        ::= { hwICLoghostEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.212.2.2.1.6
+    hwICLoghostLanguage OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            chinese(1),
+            english(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The language of a loghost. If chinese is selected, the information which
+            the loghost receives is chinese content."
+        DEFVAL { english }
+        ::= { hwICLoghostEntry 6 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.212.2.2.1.7
+    hwICLoghostRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The row status of this table."  
+       ::= { hwICLoghostEntry 7 }
+    
+        -- 1.3.6.1.4.1.2011.5.25.212.3    
+    hwICChannel OBJECT IDENTIFIER ::= { hwInfoCenterObjects 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.212.3.1
+    hwICChannelTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwICChannelEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "A table of INFO CENTER channel."
+        ::= { hwICChannel 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.212.3.1.1
+    hwICChannelEntry OBJECT-TYPE
+        SYNTAX HwICChannelEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The channel entry of INFO CENTER."
+        INDEX { hwICChannelIndex }
+        ::= { hwICChannelTable 1 }
+
+    HwICChannelEntry ::=
+            SEQUENCE {
+        hwICChannelIndex
+            Integer32,
+        hwICChannelName
+            DisplayString
+        }
+
+    -- 1.3.6.1.4.1.2011.5.25.212.3.1.1.1
+    hwICChannelIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index of this table."
+        ::= { hwICChannelEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.3.1.2
+    hwICChannelName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..30))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The name of channel.
+             The channel name must be different from each other."
+        ::= { hwICChannelEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.4
+    hwICModule OBJECT IDENTIFIER ::= { hwInfoCenterObjects 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.4.1
+    hwICModuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwICModuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of INFO CENTER module."
+        ::= { hwICModule 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.4.1.1
+    hwICModuleEntry OBJECT-TYPE
+        SYNTAX HwICModuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The module entry of syslog."
+        INDEX { hwICModuleIndex }
+        ::= { hwICModuleTable 1 }
+    
+    HwICModuleEntry ::=
+        SEQUENCE {
+        hwICModuleIndex        Integer32,
+        hwICModuleName         DisplayString
+        }
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.4.1.1.1
+    hwICModuleIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The index of this table."
+        ::= { hwICModuleEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.4.1.1.2
+    hwICModuleName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..24))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The name of module."
+        ::= { hwICModuleEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.5
+    hwICLogFilter OBJECT IDENTIFIER ::= { hwInfoCenterObjects 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.5.1
+    hwICLogFilterTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwICLogFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entries in this table can be created, modified, or deleted. The entries indicate that the log control status on the current channel. When the status of the log is off, the level control does not take effect."
+        ::= { hwICLogFilter 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.5.1.1
+    hwICLogFilterEntry OBJECT-TYPE
+        SYNTAX HwICLogFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The log entry of INFO CENTER."
+        INDEX { hwICChannelIndex,
+                IMPLIED hwICModuleName
+              }
+        ::= { hwICLogFilterTable 1 }
+    
+    HwICLogFilterEntry ::=
+        SEQUENCE {
+            hwICLogFilterState           INTEGER,
+            hwICLogFilterLevel           HWMessageLevel,
+            hwICLogFilterRowStatus       RowStatus
+            }
+            
+    -- 1.3.6.1.4.1.2011.5.25.212.5.1.1.1
+    hwICLogFilterState OBJECT-TYPE
+        SYNTAX INTEGER
+        		{
+            on(1),
+            off(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The switch state of log."
+        ::= { hwICLogFilterEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.5.1.1.2
+    hwICLogFilterLevel OBJECT-TYPE
+        SYNTAX HWMessageLevel
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The level of log message."
+        ::= { hwICLogFilterEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.5.1.1.3
+    hwICLogFilterRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status of this table entry."
+        ::= { hwICLogFilterEntry 3 }
+   
+    --1.3.6.1.4.1.2011.5.25.212.6 
+    hwICLogFile OBJECT IDENTIFIER ::= { hwInfoCenterObjects 6 }
+     
+    -- 1.3.6.1.4.1.2011.5.25.212.6.1      
+    hwICLogFileType OBJECT-TYPE
+    SYNTAX INTEGER
+    		{
+        log(1),
+        diag(2),
+        oper(3),
+        security(4)
+       }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The logfile type."
+    ::= { hwICLogFile 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.212.6.2
+    hwICLogFileName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..256))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The logfile name."
+        ::= { hwICLogFile 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.212.6.3
+    hwICLogFileStorageUsage OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Storage space occupied by log files."
+        ::= { hwICLogFile 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.212.6.4
+    hwICLogFileCurNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The logfile number."
+        ::= { hwICLogFile 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.212.6.5
+    hwICLogFileThrdNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The logfile max number."
+        ::= { hwICLogFile 5 }  
+  
+    -- ==========================================================================
+    -- hwInfoCenterNotifications
+    -- ==========================================================================
+        
+    -- 1.3.6.1.4.1.2011.6.11.2
+    hwInfoCenterNotifications OBJECT IDENTIFIER ::= { hwInfoCenter 2 }  
+ 
+ 	hwICLogFileStorageThrd NOTIFICATION-TYPE
+		OBJECTS { hwICLogFileType }
+		STATUS current
+		DESCRIPTION 
+			"The notification for logfile storage limit."
+		::= { hwInfoCenterNotifications 1 }
+		
+	hwICLogFileAging NOTIFICATION-TYPE
+		OBJECTS { hwICLogFileName }
+		STATUS current
+		DESCRIPTION 
+			"The notification for logfile aging."
+		::= { hwInfoCenterNotifications 2 } 
+     
+	hwICInsufficientSpace NOTIFICATION-TYPE
+		STATUS current
+		DESCRIPTION 
+			"The notification for insufficient space."
+		::= { hwInfoCenterNotifications 3 }
+		
+	hwICLogBufferLose NOTIFICATION-TYPE
+		STATUS current
+		DESCRIPTION 
+			"The notification for logfile buffer lose."
+		::= { hwInfoCenterNotifications 4 }
+		 
+	hwICLogWriteFail NOTIFICATION-TYPE
+		OBJECTS { hwICLogFileType }
+		STATUS current
+		DESCRIPTION 
+			"Log written to the log file failed."
+		::= { hwInfoCenterNotifications 5 } 
+	
+	hwICLogWriteFailCleared NOTIFICATION-TYPE
+		OBJECTS { hwICLogFileType }
+ 		STATUS current
+		DESCRIPTION 
+			" Log  written successfully to logfile after writting fail."
+		::= { hwInfoCenterNotifications 6 }
+		                                  
+	hwICLogFileStorageThreshold NOTIFICATION-TYPE
+		OBJECTS { hwICLogFileStorageUsage }
+		STATUS current
+		DESCRIPTION 
+			" Alarm threshed for storage space occupied by log files."
+		::= { hwInfoCenterNotifications 7 }
+
+                     hwICLogFileNumThrd NOTIFICATION-TYPE
+                                         OBJECTS { hwICLogFileType, hwICLogFileCurNum, hwICLogFileThrdNum }
+                                         STATUS current
+                                         DESCRIPTION 
+                                                 " The notification for logfile number limit."
+                                          ::= { hwInfoCenterNotifications 8 }	
+    -- ==========================================================================
+    -- configuration save group
+    -- ==========================================================================
+
+    -- 1.3.6.1.4.1.2011.6.11.3
+    hwInfoCenterConformance OBJECT IDENTIFIER ::= { hwInfoCenter 3 }
+    
+    hwInfoCenterCompliances OBJECT IDENTIFIER ::= { hwInfoCenterConformance 1 } 
+    
+    hwInfoCenterCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for systems supporting the HUAWEI-INFOCENTER-MIB."
+        MODULE HUAWEI-INFOCENTER-MIB
+            MANDATORY-GROUPS { hwInfoCenterGroup }
+        ::= { hwInfoCenterCompliances 1 }
+            
+            
+    hwInfoCenterGroups OBJECT IDENTIFIER ::= { hwInfoCenterConformance 2 }
+    
+    hwInfoCenterGroup OBJECT-GROUP
+        OBJECTS { hwICEnable, hwICLoghostSourceInterface, hwICLogFileType, hwICLogFileName}
+        STATUS current
+        DESCRIPTION
+            "The infocenter group."
+        ::= { hwInfoCenterGroups 1 }
+            
+	hwInfoCenterTrapGroup NOTIFICATION-GROUP
+		NOTIFICATIONS { hwICLogFileStorageThrd, hwICLogFileAging,hwICLogBufferLose,hwICLogWriteFail ,hwICLogWriteFailCleared ,hwICLogFileNumThrd}
+		STATUS current
+		DESCRIPTION 
+			"The infocenter trap group."	
+		::= { hwInfoCenterGroups 2 }
+END
+
+--
+-- HUAWEI-INFO-CENTER-MIB.mib
+--

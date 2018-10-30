@@ -1,4 +1,5 @@
 source: Support/Example-Hardware-Setup.md
+path: blob/master/doc/
 ### Example hardware setups
 
 The information in this document is direct from users, it's a place for people to share their 
@@ -47,3 +48,54 @@ Running in Proxmox.
 | Ports          | 26745               | -                   |
 | Health sensors | 6238                | -                   |
 | Load           | < 0.5               | < 0.5               |
+
+#### [KKrumm](https://github.com/kkrumm1)
+
+> Home
+
+|                | LibreNMS            | MySQL               |
+| -------------- | ------------------- | ------------------- |
+| Type           | VM                  | Same Server         |
+| OS             | CentOS 7            |                     |
+| CPU            | 2 Sockets, 4 Cores  |                     |
+| Memory         | 4GB                 |                     |
+| Disk Type      | Raid 10, SAS Drives |                     |
+| Disk Space     | 40 GB               |                     |
+| Devices        | 12                  |                     |
+| Ports          | 130                 |                     |
+| Health sensors | 44                  |                     |
+| Load           | < 2.5               |                     |
+
+#### [KKrumm](https://github.com/kkrumm1)
+
+> Work
+
+|                | LibreNMS            | MySQL               |
+| -------------- | ------------------- | ------------------- |
+| Type           | HP Proliantdl380gen8| Same Server         |
+| OS             | CentOS 7            |                     |
+| CPU            | 2 Sockets, 24 Cores |                     |
+| Memory         | 32GB                |                     |
+| Disk Type      | Raid 10, SAS Drives |                     |
+| Disk Space     | 250 GB              |                     |
+| Devices        | 390                 |                     |
+| Ports          | 16167               |                     |
+| Health sensors | 3223                |                     |
+| Load           | < 14.5              |                     |
+
+#### [LaZyDK](https://github.com/lazydk)
+
+> Home
+
+|                | LibreNMS            | MariaDB             |
+| -------------- | ------------------- | ------------------- |
+| Type           | VM - QNAP TS-453 Pro| Same Server         |
+| OS             | Ubuntu 16.04        |                     |
+| CPU            | 1 vCore             |                     |
+| Memory         | 2GB                 |                     |
+| Disk Type      | Raid 1, SATA Drives |                     |
+| Disk Space     | 10 GB               |                     |
+| Devices        | 26                  |                     |
+| Ports          | 228                 |                     |
+| Health sensors | 117                 |                     |
+| Load           | < 0.92              |                     |

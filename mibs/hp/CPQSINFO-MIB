@@ -76,7 +76,7 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
 --    supporting the System Information MIB.
 --
 --     An Agent conforming to this document will return a
---     cpqSiMibRevMajor of one (1) and a cpqSiMibRevMinor of thirty-four (34).
+--     cpqSiMibRevMajor of one (1) and a cpqSiMibRevMinor of thirty-seven (39).
 --
 --
 -- ****************************************************************************
@@ -299,7 +299,8 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
             desktop(4),
             tower(5),
             mini-tower(6),
-            rack-mount(7)
+            rack-mount(7),
+            nultiboard-chasis(8)
             }
         ACCESS  read-write
         STATUS  mandatory
@@ -682,6 +683,19 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
              externalportdisabled(5)
                External USB Ports are disabled."
         ::= { cpqSiSecurity 14 }
+
+    cpqSiVirtualSerialPortControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            disabled(2),
+            enabled(3)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The state of the access control for the virtual serial port interface
+            embedded in the system board."
+        ::= { cpqSiSecurity 15 }   
 
 -- ****************************************************************************
 --   System Information System Board Group
@@ -1506,6 +1520,20 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
                TPM module is present in the system and currently not enabled."
        ::= { cpqSiSystemBoard 24 }
 
+    cpqSiTrustedModuleType OBJECT-TYPE
+        SYNTAX  INTEGER  (0..255)
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "Bits[3:0] = Trusted Module Type:
+                    1h = Not Specified
+                    2h = TPM 1.2
+                    3h = TPM 2.0
+                    4h = TM  1.0
+                    5h - 0Fh = Reserved."
+
+       ::= { cpqSiSystemBoard 25 }
+       
 -- ****************************************************************************
 --   System Information Board Revision Group
 --   =======================================
@@ -3278,8 +3306,10 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
              cpqSiRackEnclosureMgrName                DisplayString,
              cpqSiRackEnclosureMgrFwRev               DisplayString,
              cpqSiRackEnclosureMgrProductID           DisplayString,
-             cpqSiRackEnclosureMgrUUID                DisplayString
-                  }
+             cpqSiRackEnclosureMgrUUID                DisplayString,
+             cpqSiRackEnclosureMgrMatrix              INTEGER,
+             cpqSiRackEnclosureMgrMatrixID            DisplayString
+             }
 
      cpqSiRackEnclosureMgrIndex  OBJECT-TYPE
          SYNTAX  INTEGER
@@ -3294,7 +3324,8 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
             other(1),
             noEnclosureManagement(2),
             enclosureManagement(3),
-            onboardAdminManagement(4)
+            onboardAdminManagement(4),
+            multiboardchassis(5)
             }
         ACCESS  read-only
         STATUS  mandatory
@@ -3314,7 +3345,10 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
               
             onboardAdminManagement(4)
                The server is part of a rack/enclosure managed system with a
-               onboard Administrator."
+               onboard Administrator.
+               
+            multiboardchassis(5)
+               The server is part of a nultiple board chassis. "
          ::= { cpqSiRackEnclosureMgrEntry 2 }
 
      cpqSiRackEnclosureMgrIpAddr OBJECT-TYPE
@@ -3436,6 +3470,28 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
             "The Enclosure unique identifier. The string will be empty 
              if it could not be determined." 
          ::= { cpqSiRackEnclosureMgrEntry 11 }    
+
+     cpqSiRackEnclosureMgrMatrix   OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+            " Value 0 not configured in a BladeSystem Matrix environment. 
+                    1 configured in a BladeSystem Matrix environment."
+         ::= { cpqSiRackEnclosureMgrEntry 12 }
+
+     cpqSiRackEnclosureMgrMatrixID   OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  optional
+         DESCRIPTION
+             " Value BladeSystem Matrix vX.Y.Z Where 
+               X major version.   
+               Y minor version.  
+               Z update version. 
+               Is only valid if cpqSiRackEnclosureMgrMatrix value is a 1.  
+               By default is NULL"
+         ::= { cpqSiRackEnclosureMgrEntry 13 }
 
 -- ****************************************************************************
 --   System Information Server Blade Group
@@ -3595,7 +3651,10 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
         --#SEVERITY MAJOR
         --#TIMEINDEX 99
         --#STATE DEGRADED
-
+        --#SIMPLE_SEVERITY MAJOR
+        --#HWSTATUS_CATEGORY NONE
+        --#ACTION "Replace the cover, ensuring it is properly installed. Verify the system is in working order."
+        
         ::= 2001
 
     cpqSiMonitorConditionOK TRAP-TYPE
@@ -3614,6 +3673,8 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
         --#SEVERITY INFORMATIONAL
         --#TIMEINDEX 99
         --#STATE OPERATIONAL
+        --#SIMPLE_SEVERITY OK
+        --#HWSTATUS_CATEGORY NONE
         ::=  2002
 
 
@@ -3640,7 +3701,9 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
         --#SEVERITY MINOR
         --#TIMEINDEX 99
         --#STATE DEGRADED
-
+        --#SIMPLE_SEVERITY MAJOR
+        --#HWSTATUS_CATEGORY NONE
+        
        ::=  2003
 
      cpqSiMonitorConditionFailed TRAP-TYPE
@@ -3665,7 +3728,10 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
         --#SEVERITY CRITICAL
         --#TIMEINDEX 99
         --#STATE NONOPERATIONAL
-
+        --#SIMPLE_SEVERITY CRITICAL
+        --#HWSTATUS_CATEGORY NONE
+        --#ACTION "Replace the failed monitor."
+        
        ::=  2004
 
      cpqSiCorrMemErrStatusDegraded TRAP-TYPE
@@ -3685,12 +3751,15 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
              information on a component replacement."
 
         --#TYPE "Excessive Correctable Memory Errors (2005)"
-        --#SUMMARY "The Memory Module %d ECC status has been set to degraded."
+        --#SUMMARY "The memory module %d ECC status has been set to degraded."
         --#ARGUMENTS {3}
         --#SEVERITY MINOR
         --#TIMEINDEX 99
         --#STATE DEGRADED
-
+        --#SIMPLE_SEVERITY MAJOR
+        --#HWSTATUS_CATEGORY MEMORY
+        --#ACTION "Schedule maintenance for the system and replace the failing memory module."
+        
         ::=  2005
 
      cpqSiCorrMemErrStatusOk TRAP-TYPE
@@ -3704,12 +3773,14 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
              User Action: None."
 
         --#TYPE "Correctable Memory Errors Count OK (2006)"
-        --#SUMMARY "The Memory Module %d ECC status has been set to OK."
+        --#SUMMARY "The memory module %d ECC status has been set to ok."
         --#ARGUMENTS {3}
         --#SEVERITY INFORMATIONAL
         --#TIMEINDEX 99
         --#STATE OPERATIONAL
-
+        --#SIMPLE_SEVERITY OK
+        --#HWSTATUS_CATEGORY MEMORY
+        
        ::=  2006
 
      cpqSiMemConfigChange TRAP-TYPE
@@ -3730,6 +3801,8 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
         --#SEVERITY INFORMATIONAL
         --#TIMEINDEX 99
         --#STATE OPERATIONAL
+        --#SIMPLE_SEVERITY OK
+        --#HWSTATUS_CATEGORY MEMORY         
        ::=  2007
 
     cpqSiHotPlugSlotBoardRemoved TRAP-TYPE
@@ -3745,12 +3818,15 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
            User Action: None."
 
         --#TYPE "Hot Plug Slot Board Removed (2008)"
-        --#SUMMARY "Hot Plug Slot Board Removed from Chassis %d, Slot %d."
+        --#SUMMARY "Hot plug slot board removed from chassis %d, slot %d."
         --#ARGUMENTS {2, 3}
         --#SEVERITY INFORMATIONAL
         --#TIMEINDEX 99
         --#STATE OPERATIONAL
-
+        --#SIMPLE_SEVERITY OK
+        --#HWSTATUS_CATEGORY NONE
+        --#LIFECYCLE
+        
         ::= 2008
 
     cpqSiHotPlugSlotBoardInserted TRAP-TYPE
@@ -3766,12 +3842,15 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
            User Action: None."
 
         --#TYPE "Hot Plug Slot Board Inserted (2009)"
-        --#SUMMARY "Hot Plug Slot Board Inserted into Chassis %d, Slot %d."
+        --#SUMMARY "Hot plug slot board inserted into chassis %d, slot %d."
         --#ARGUMENTS {2, 3}
         --#SEVERITY INFORMATIONAL
         --#TIMEINDEX 99
         --#STATE OPERATIONAL
-
+        --#SIMPLE_SEVERITY OK
+        --#HWSTATUS_CATEGORY NONE
+        --#LIFECYCLE
+        
         ::= 2009
 
     cpqSiHotPlugSlotPowerUpFailed TRAP-TYPE
@@ -3789,12 +3868,15 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
            the replaced board."
 
         --#TYPE "Hot Plug Slot Board Failed (2010)"
-        --#SUMMARY "Hot Plug Slot Board Failed in Chassis %d, Slot %d, Error %d."
+        --#SUMMARY "Hot plug slot board failed in chassis %d, slot %d, error %d."
         --#ARGUMENTS {2, 3, 4}
         --#SEVERITY CRITICAL
         --#TIMEINDEX 99
         --#STATE FAILED
-
+        --#SIMPLE_SEVERITY CRITICAL
+        --#HWSTATUS_CATEGORY NONE
+        --#ACTION "Ensure the board and all cables are installed correctly and that the board type and revision are the same as the replaced board."
+        
         ::= 2010
 
     cpqSiSysBatteryFailure  TRAP-TYPE
@@ -3816,7 +3898,10 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
         --#SEVERITY MAJOR
         --#TIMEINDEX 99
         --#STATE DEGRADED
-
+        --#SIMPLE_SEVERITY MAJOR
+        --#HWSTATUS_CATEGORY NONE
+        --#ACTION "Replace the failed battery."
+        
         ::= 2011
 
     cpqSiSysBatteryChargingDegraded TRAP-TYPE
@@ -3840,6 +3925,9 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
         --#SEVERITY MAJOR
         --#TIMEINDEX 99
         --#STATE DEGRADED
+        --#SIMPLE_SEVERITY MAJOR
+        --#HWSTATUS_CATEGORY NONE        
+        --#ACTION "Replace the failing battery."        
         ::= 2012
 
 
@@ -3862,6 +3950,9 @@ CPQSINFO-MIB DEFINITIONS ::= BEGIN
         --#SEVERITY MAJOR
         --#TIMEINDEX 99
         --#STATE DEGRADED
+        --#SIMPLE_SEVERITY MAJOR
+        --#HWSTATUS_CATEGORY NONE
+        --#ACTION "Replace the failing battery."        
         ::= 2013
 
 END

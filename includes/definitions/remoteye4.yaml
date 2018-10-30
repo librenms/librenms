@@ -1,0 +1,12 @@
+os: remoteye4
+text: 'Toshiba RemotEye4'
+type: power
+icon: toshiba
+mib_dir:
+    - toshiba
+discovery:
+    -
+      sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+      snmpget:
+          oid: 'UPS-MIB::upsIdentAgentSoftwareVersion.0'
+          value: RemotEye4

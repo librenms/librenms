@@ -1,121 +1,168 @@
 site_name: LibreNMS Docs
 docs_dir: doc
-theme_dir: 'librenms_theme'
-theme: null
+theme:
+  name: material
+  logo: img/librenms.svg
+  language: en
+  palette: null
+  font:
+    text: 'Roboto'
+    code: 'Roboto Mono'
+  feature: null
 site_dir: out
 site_url: http://docs.librenms.org
 markdown_extensions:
     - pymdownx.tasklist
-    - mdx_del_ins
+    - pymdownx.tilde
 extra_css:
+    - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     - librenms.css
-include_next_prev: false
+extra:
+    article_nav_top: false
+    article_nav_bottom: true
 site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
-repo_url: https://github.com/librenms/librenms
+repo_url: https://github.com/librenms/librenms/
+edit_uri: edit/master/doc
 repo_name: GitHub
 google_analytics: ['UA-79149977-2', 'docs.librenms.org']
-pages:
-- Home: index.md
-- Installation:
-    - Installing LibreNMS: Installation/Installing-LibreNMS.md
-    - Ubuntu VM Image: Installation/Ubuntu-image.md
-    - CentOS VM Image: Installation/CentOS-image.md
-    - Ubuntu 16.04 (Nginx): Installation/Installation-Ubuntu-1604-Nginx.md
-    - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
-    - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
-    - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
-    - Older Docs: Installation/Installing-LibreNMS.md
-    - Migrating from Observium: Installation/Migrating-from-Observium.md
-- General:
-    - General/Acknowledgement.md
-    - General/Callback-Stats-and-Privacy.md
-    - General/Changelog.md
-    - General/CODE_OF_CONDUCT.md
-    - General/Contributing.md
-    - General/Credits.md
-    - General/Updating.md
-    - General/Releases.md
-    - General/Security.md
-    - General/Welcome-to-Observium-users.md
-- Extensions:
-    - Extensions/Alerting.md
-    - Extensions/Applications.md
-    - Extensions/Authentication.md
-    - Extensions/Auto-Discovery.md
-    - Extensions/Billing-Module.md
-    - Extensions/Component.md
-    - Extensions/Dell-OpenManage.md
-    - Extensions/Device-Groups.md
-    - Extensions/Distributed-Poller.md
-    - Extensions/Email-Alerting.md
-    - Extensions/Globe-Frontpage.md
-    - Extensions/Graylog.md
-    - Extensions/Graphite.md
-    - Extensions/IRC-Bot.md
-    - Extensions/IRC-Bot-Extensions.md
-    - Extensions/InfluxDB.md
-    - Extensions/Interface-Description-Parsing.md
-    - Extensions/MIB-based-polling.md
-    - Extensions/Memcached.md
-    - Extensions/Network-Map.md
-    - Extensions/NFSen.md
-    - Extensions/Oxidized.md
-    - Extensions/PeeringDB.md
-    - Extensions/Plugin-System.md
-    - Extensions/Poller-Service.md
-    - Extensions/Port-Description-Parser.md
-    - Extensions/Proxmox.md
-    - Extensions/RRDCached.md
-    - Extensions/RRDTune.md
-    - Extensions/SNMP-Proxy.md
-    - Extensions/SNMP-Trap-Handler.md
-    - Extensions/Services.md
-    - Extensions/Smokeping.md
-    - Extensions/Sub-Directory.md
-    - Extensions/Syslog.md
-    - Extensions/Two-Factor-Auth.md
-    - Extensions/Varnish.md
-- Developing:
-    - Developing/Using-Git.md
-    - Developing/Code-Guidelines.md
-    - Developing/Style-Guidelines.md
-    - Developing/Validating-Code.md
-    - Developing/Code-Structure.md
-
-    - Developing/Creating-Documentation.md
-    - Adding support for a new OS: Developing/Support-New-OS.md
-    - Developing/Dynamic-Config.md
-    - Developing/Sensor-State-Support.md
-
-    - Developing/Merging-Pull-Requests.md
-    - Developing/Creating-Release.md
-- API: API/API-Docs.md
-- Support:
-    - Support/1-Minute-Polling.md
-    - Support/Configuration.md
-    - Support/Discovery Support.md
-    - Support/Example-Hardware-Setup.md
-    - Support/FAQ.md
-    - Support/Features.md
-    - Support/Install Validation.md
-    - Support/Performance.md
-    - Support/Poller Support.md
-    - Support/Remote-Monitoring-VPN.md
-    - Support/SNMP-Configuration-Examples.md
-- hidden:
-    - Ubuntu 14.04 (Nginx): Installation/Installation-Ubuntu-1404-Nginx.md
-    - Ubuntu 14.04 (Apache): Installation/Installation-Ubuntu-1404-Apache.md
-    - Ubuntu 14.04 (Lighttpd): Installation/Installation-Ubuntu-1404-Lighttpd.md
-    - CentOS 6 (Apache/Nginx): Installation/Installation-CentOS-6-Apache-Nginx.md
-    - Installation/Installation-(Debian-Ubuntu).md
-    - Installation/Installation-(RHEL-CentOS).md
-    - Support/Support-New-OS.md
-    - Extensions/Agent-Setup.md
-    - Extensions/RRDCached-Security.md
-    - Developing/os/Initial-Detection.md
-    - Developing/os/Mem-CPU-Information.md
-    - Developing/os/Test-Units.md
-    - Developing/os/Health-Information.md
-    - Developing/os/Wireless-Sensors.md
-    - Developing/os/Custom-Graphs.md
+nav:
+  - Home: index.md
+  - 1. General:
+      - Acknowledgements: General/Acknowledgement.md
+      - General/Changelog.md
+      - Code of Conduct: General/CODE_OF_CONDUCT.md
+      - Support/Features.md
+      - General/Welcome-to-Observium-users.md
+  - 2. Installing:
+      - Installing LibreNMS: Installation/index.md
+      - Ubuntu VM Image: Installation/Ubuntu-image.md
+      - CentOS VM Image: Installation/CentOS-image.md
+      - Ubuntu 18.04 (Nginx): Installation/Installation-Ubuntu-1804-Nginx.md
+      - Ubuntu 18.04 (Apache): Installation/Installation-Ubuntu-1804-Apache.md
+      - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
+      - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
+      - Migrating from Observium: Installation/Migrating-from-Observium.md
+  - 3. Getting started:
+      - Choosing a release: General/Releases.md
+      - Adding a device: Support/Adding-a-Device.md
+      - Grouping Devices: Extensions/Device-Groups.md
+      - Submitting stats: General/Callback-Stats-and-Privacy.md
+      - Updating an install: General/Updating.md
+  - 4. Basic Setup:
+      - Extensions/Applications.md
+      - Check_MK Setup: Extensions/Agent-Setup.md
+      - Extensions/Billing-Module.md
+      - Extensions/Dell-OpenManage.md
+      - Extensions/World-Map.md
+      - Extensions/Interface-Description-Parsing.md
+      - Extensions/Network-Map.md
+      - Extensions/Syslog.md
+      - Extensions/Dashboards.md
+  - 5. Advanced Setup:
+      - Support/1-Minute-Polling.md
+      - Fast Ping Checking: Extensions/Fast-Ping-Check.md
+      - Support/Environment-Variables.md
+      - Configuration docs: Support/Configuration.md
+      - Authentication Options: Extensions/Authentication.md
+      - Two-Factor Auth: Extensions/Two-Factor-Auth.md
+      - Auto-discovery Setup: Extensions/Auto-Discovery.md
+      - Scaling LibreNMS: Extensions/Distributed-Poller.md
+      - Extensions/RRDCached.md
+      - Sub-directory Support: Extensions/Sub-Directory.md
+      - Extensions/Varnish.md
+      - Poller Service (BETA): Extensions/Poller-Service.md
+      - Extensions/RRDTune.md
+      - Extensions/IRC-Bot.md
+      - Extensions/IRC-Bot-Extensions.md
+      - Extensions/SNMP-Proxy.md
+      - Extensions/SNMP-Trap-Handler.md
+      - Support/Cleanup-options.md
+  - 6. 3rd Party Integration:
+      - Extensions/Gateone.md
+      - Extensions/Graylog.md
+      - Nagios Plugins: Extensions/Services.md
+      - Extensions/NFSen.md
+      - Extensions/Oxidized.md
+      - Extensions/Rancid.md
+      - Extensions/PeeringDB.md
+      - Extensions/Proxmox.md
+      - Storing Metrics:
+          - Intro: Extensions/Metric-Storage.md
+          - Extensions/metrics/Graphite.md
+          - Extensions/metrics/InfluxDB.md
+          - Extensions/metrics/OpenTSDB.md
+          - Extensions/metrics/Prometheus.md
+      - Extensions/Smokeping.md
+      - Extensions/Weathermap.md
+  - 7. API:
+      - Using the API: API/index.md
+      - API/Devices.md
+      - API/DeviceGroups.md
+      - API/Ports.md
+      - API/PortGroups.md
+      - API/Alerts.md
+      - API/Routing.md
+      - API/Switching.md
+      - API/Inventory.md
+      - API/Bills.md
+      - API/ARP.md
+      - API/Services.md
+      - API/System.md
+      - API/Logs.md
+  - 8. Alerting:
+      - Intro: Alerting/index.md
+      - Alerting/Introduction.md
+      - Alerting/Rules.md
+      - Alerting/Templates.md
+      - Alerting/Transports.md
+      - Alerting/Creating-Transport.md
+      - Alerting/Entities.md
+      - Alerting/Macros.md
+      - Alerting/Testing.md
+      - Alerting/Device-Dependencies.md
+  - 9. Getting help:
+      - How to get help: Support/index.md
+      - Support/FAQ.md
+      - Support/Install Validation.md
+      - Support/Performance.md
+      - Support/Discovery Support.md
+      - Support/Poller Support.md
+      - Support/Example-Hardware-Setup.md
+      - Support/Remote-Monitoring-VPN.md
+      - Support/SNMP-Configuration-Examples.md
+      - Support/SSL-Configuration.md
+      - Support/Device-Troubleshooting.md
+      - Support/Device-Sensors.md
+  - 10. Contributing + Developing:
+      - Contributing: Developing/index.md
+      - Developing/Using-Git.md
+      - Developing/Code-Guidelines.md
+      - Developing/Style-Guidelines.md
+      - Developing/Validating-Code.md
+      - Developing/Code-Structure.md
+      - Developing/Creating-Documentation.md
+      - Developing/Licensing.md
+      - Extensions/Component.md
+      - Mib Based Polling (ALPHA): Extensions/MIB-based-polling.md
+      - Support for a new OS:
+          - Intro: Developing/Support-New-OS.md
+          - Developing/os/Initial-Detection.md
+          - Developing/os/Mem-CPU-Information.md
+          - Developing/os/Test-Units.md
+          - Developing/os/Health-Information.md
+          - Developing/os/Wireless-Sensors.md
+          - Developing/os/Custom-Graphs.md
+          - Developing/os/Settings.md
+          - Developing/Sensor-State-Support.md
+      - Developing/SNMP-Traps.md
+      - Developing/Dynamic-Config.md
+      - Developing/Merging-Pull-Requests.md
+      - Developing/Creating-Release.md
+      - Extensions/Plugin-System.md
+  - 11. Misc:
+      - Security information: General/Security.md
+      - CLI Scripts: Support/CLI-Tools.md
+      - Device Notes:
+          - Intro: Support/Device-Notes/index.md
+          - Carel pCOweb: Support/Device-Notes/Carel-pCOweb-Devices.md

@@ -1,0 +1,784 @@
+
+NETGEAR-SNTP-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter32, Gauge32
+                                                        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP                     FROM SNMPv2-CONF
+    InetAddressType, InetAddress, InetPortNumber        FROM INET-ADDRESS-MIB
+    lb6m                                            FROM QUANTA-LB6M-REF-MIB
+    InterfaceIndexOrZero                                FROM IF-MIB;
+
+agentSntpClientMIB MODULE-IDENTITY
+    LAST-UPDATED "201112140000Z" -- 14 Dec 2011 12:00:00 GMT
+    ORGANIZATION "Netgear Inc"
+    CONTACT-INFO ""
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         the Netgear Inc enterprise OID pertaining to
+         SNTP client configuration and statistical collection."
+
+      -- Revision history.
+    REVISION
+        "201410290000Z" -- 03 Nov 2014 12:00:00 GMT
+    DESCRIPTION
+        "sntp server KoD Rate Exceeded State Added."
+    REVISION
+        "201112140000Z" -- 14 Dec 2011 12:00:00 GMT
+    DESCRIPTION
+        "sntp source interface object added."
+    REVISION
+        "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+    DESCRIPTION
+        "Postal address updated."
+    REVISION
+        "200705230000Z" -- 23 May 2007 12:00:00 GMT
+    DESCRIPTION
+        "Netgear branding related changes."
+    REVISION    
+        "200312181629Z"  -- Fri Dec 18 16:29 GMT 2003
+    DESCRIPTION 
+        "Initial version of this MIB module."
+    ::= { lb6m 17 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+SntpClientAdminMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "An SNTP client may operate in any of several modes.
+         At least one mode other than disabled must be supported
+         by a client.
+
+            disabled
+              - SNTP is not administrative.  No SNTP requests are sent
+                from the client nor are any received SNTP messages
+                processed.
+
+            unicast
+              - SNTP operates in a point-to-point fashion.  A unicast
+                client sends a request to a designated server
+                at its unicast address and expects a reply from which
+                it can determine the time and, optionally, the
+                round-trip delay and local clock offset relative to the
+                server.
+
+            broadcast
+              - SNTP operates using the local broadcast address.
+                The broadcast address has a single subnet scope.
+                The SNTP server uses a broadcast address to send
+                unsolicited SNTP messages to clients.  The client
+                listens on this address and sends no requests for
+                updates. The broadcast address is determined
+                by the address and netmask of the service port over
+                which the SNTP client is operating.
+
+            multicast
+              - SNTP operates in a point-to-multipoint fashion. A
+                multicast client listens on the dedicated broadcast
+                address or multicast group address."
+
+    REFERENCE
+        "RFC 2030 - Simple Network Time Protocol (SNTP) Version 4
+                    for IPv4, IPv6 and OSI; Section 2."
+    SYNTAX BITS {
+      disabled(0),
+      unicast(1),
+      broadcast(2),
+      multicast(3)
+    }
+
+SntpClientUpdateStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The status of the last received response or broadcast from a
+         configured server. These values are appropriate for all
+         administrative modes.
+
+          other
+            - None of the following enumeration values.
+
+          success
+            - The SNTP operation was successful and the system time
+              was updated.
+
+          requestTimedOut
+            - An SNTP poll request timed out without receiving a
+              response from the SNTP server.
+
+          badDateEncoded
+            - The time provided by the SNTP server was not valid.
+
+          versionNotSupported
+            - The SNTP version supported by the server is not compatible
+              with the version supported by the client. This is indicated
+              by the server returning a version later than the version
+              configured for that server or a version of '0'.
+
+          serverUnsychronized
+            - The SNTP server is not synchronized with its peers.  This
+              is indicated via the 'leap indicator' field on the SNTP
+              message.
+
+          serverKissOfDeath
+            - The SNTP server indicated that no further polls are to be
+              sent to this server. This is indicated by a stratum field
+              field equal to 0 in a message received from a server.
+
+          serverKoDRateExceeded
+            - The SNTP server has temporarily denied access because
+              the client exceeded the rate threshold."
+
+
+    REFERENCE
+        "RFC 2030 - Simple Network Time Protocol (SNTP) Version 4
+                    for IPv4, IPv6 and OSI; Section 4."
+    SYNTAX INTEGER {
+      other(1),
+      success(2),
+      requestTimedOut(3),
+      badDateEncoded(4),
+      versionNotSupported(5),
+      serverUnsychronized(6),
+      serverKissOfDeath(7),
+      serverKoDRateExceeded(8)      
+    }
+
+-- -------------------------------------------------------------
+-- MIB Objects
+-- -------------------------------------------------------------
+
+agentSntpClientObjects   OBJECT IDENTIFIER ::= { agentSntpClientMIB 1 }
+
+agentSntpClient          OBJECT IDENTIFIER
+         ::= { agentSntpClientObjects 1 }
+
+agentSntpClientUnicast   OBJECT IDENTIFIER
+         ::= { agentSntpClientObjects 2 }
+
+agentSntpClientBroadcast OBJECT IDENTIFIER
+         ::= { agentSntpClientObjects 3 }
+
+
+-- -------------------------------------------------------------
+-- SNTP Client Group
+-- -------------------------------------------------------------
+
+agentSntpClientVersion OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    version1(1),
+                    version2(2),
+                    version3(3),
+                    version4(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The highest SNTP version this client supports.  Per
+         RFC 2030, higher versions are required to be backwards
+         compatible with all lower versions with the exception of
+         version 0."
+    REFERENCE
+        "RFC 2030 - Simple Network Time Protocol (SNTP) Version 4
+                    for IPv4, IPv6 and OSI; Section 5."
+    ::= { agentSntpClient 1 }
+
+agentSntpClientSupportedMode OBJECT-TYPE
+    SYNTAX      SntpClientAdminMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SNTP client administrative modes that this device supports.
+         A client may support more than one administrative mode."
+    ::= { agentSntpClient 2 }
+
+agentSntpClientMode OBJECT-TYPE
+    SYNTAX INTEGER {
+      disabled(0),
+      unicast(1),
+      broadcast(2),
+      multicast(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current administrative mode of the SNTP client.  A SET
+         of this object will cause the SNTP client to change
+         administrative modes.  A SET request MUST have only 1 bit
+         set since is not possible to operate in multiple modes
+         simultaneously.  SETs of this object are limited
+         to values supported by the device as specified by
+         agentSntpClientSupportedMode."
+    DEFVAL { disabled }
+    ::= { agentSntpClient 3 }
+
+agentSntpClientPort OBJECT-TYPE
+    SYNTAX      InetPortNumber (123|1025..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The local port number used to listen for broadcasts and
+         responses from servers."
+    DEFVAL { 123 }
+    ::= { agentSntpClient 4 }
+
+agentSntpClientLastUpdateTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local date and time that the SNTP client last updated the
+         system time on the device since agent reboot.  This time is
+         updated for all non-disabled administrative modes of the SNTP
+         client.  If the SNTP client has not updated the time then
+         the client MUST return '00000000'H."
+    DEFVAL { '00000000'H }
+    ::= { agentSntpClient 5 }
+
+agentSntpClientLastAttemptTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local date and time of the last SNTP request or
+         unsolicited SNTP message for this SNTP client since agent
+         reboot.  This value is a timestamp for the
+         agentSntpClientLastAttemptStatus object.  When the
+         agentSntpClientLastAttemptStatus has a value of success(2),
+         this object's value should be equal to the value returned by
+         agentSntpClientLastUpdateTime.  If no SNTP frames have been
+         processed by the SNTP client then the client MUST return
+         '00000000'H.  This object is updated for all non-disabled
+         administrative modes of the SNTP client."
+    DEFVAL { '00000000'H }
+    ::= { agentSntpClient 6 }
+
+agentSntpClientLastAttemptStatus OBJECT-TYPE
+    SYNTAX      SntpClientUpdateStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the last SNTP request or unsolicited SNTP
+         message for this SNTP client since agent reboot.  The status is
+         updated for all non-disabled administrative modes of the SNTP
+         client."
+    DEFVAL { other }
+    ::= { agentSntpClient 7 }
+
+agentSntpClientServerAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address type of the SNTP server as identified
+         by the last received packet. Support for all address
+         types is NOT REQUIRED."
+    ::= { agentSntpClient 8 }
+
+agentSntpClientServerAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The encoded address of the SNTP server as identified
+         by the last received packet."
+    ::= { agentSntpClient 9 }
+
+agentSntpClientServerMode OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a 3-bit integer identifying the mode of the server as
+         indicated in the last received packet with values defined as
+         follows:
+
+        Mode Meaning
+        ------------------------------------
+        0 reserved
+        1 symmetric active
+        2 symmetric passive
+        3 client
+        4 server
+        5 broadcast
+        6 reserved for NTP control message
+        7 reserved for private use "
+
+    ::= { agentSntpClient 10 }
+
+agentSntpClientServerStratum OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is an 8-bit integer identifying the stratum of the server as
+         indicated in the last received packet with values defined as
+         follows:
+
+        Stratum Meaning
+        ------------------------------------
+        0    unspecified
+        1    primary reference
+        2-15    secondary reference
+        16-255 reserved"
+
+    ::= { agentSntpClient 11 }
+
+agentSntpClientServerRefClkId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "This is the value of the Reference Identifier in the last
+       received packet defined as follows.
+       Reference Identifier: This is a 32-bit bitstring identifying
+       the particular reference source. In the case of NTP Version 3 or
+       Version 4 stratum-0 (unspecified) or stratum-1 (primary) servers,
+       this is a four-character ASCII string, left justified and zero
+       padded to 32 bits. In NTP Version 3 secondary servers, this is the
+       32-bit IPv4 address of the reference source. In NTP Version 4
+       secondary servers, this is the low order 32 bits of the latest
+       transmit timestamp of the reference source."
+
+    ::= { agentSntpClient 12 }
+
+agentSntpClientPollInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (6..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The minimum number of seconds between successive SNTP polls
+         of the server in seconds as a power of two.  This
+         polling interval is used for SNTP requests in
+         unicast(1) or broadcast(2) administrative mode."
+    DEFVAL { 6 }
+
+    ::= { agentSntpClient 13 }
+
+agentSntpClientSourceInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A source-interface selection on an Interface Index (like vlan based
+         routing interface, port based routing interface, loopback interface,
+         tunnel interface). A non-zero value indicates ifIndex for the
+         corresponding interface entry in the ifTable is selected.
+         A zero value indicates the source-interface un-selection."
+    ::= { agentSntpClient 14 }
+
+-- -------------------------------------------------------------
+-- SNTP Client Unicast Group
+-- -------------------------------------------------------------
+
+agentSntpClientUnicastPollInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (6..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum number of seconds between successive SNTP polls
+         of the server in seconds as a power of two.  This
+         polling interval is used for SNTP requests in
+         unicast(1) administrative mode."
+   DEFVAL { 6 }
+    ::= { agentSntpClientUnicast 1 }
+
+agentSntpClientUnicastPollTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..30)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds to wait for a response from a SNTP
+         server before considering the attempt to have 'timed out'.
+         This timeout is used for SNTP requests in unicast(1)
+         administrative mode."
+    DEFVAL { 5 }
+    ::= { agentSntpClientUnicast 2 }
+
+agentSntpClientUnicastPollRetry OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of times to retry a request to the same SNTP server
+         that has 'timed out.'.  This retry count is
+         used for directed SNTP requests in unicast(1) administrative mode.
+         For example, assume this object has been SET to a value of 2.
+         When the SNTP client queries a given server it will send 1 SNTP
+         request frame.  If that original attempt fails, the client will
+         retry up to a maximum of 2 more times before declaring the unicast
+         poll unsuccessful and attempting the next server."
+    DEFVAL { 1 }
+    ::= { agentSntpClientUnicast 3 }
+
+agentSntpClientUcastServerMaxEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of server entries that are allowed in the
+         agentSntpClientUcastServerTable."
+    ::= { agentSntpClientUnicast 4 }
+
+agentSntpClientUcastServerCurrEntries OBJECT-TYPE
+    SYNTAX      Gauge32 (0..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of server entries in the
+         agentSntpClientUcastServerTable."
+    ::= { agentSntpClientUnicast 5 }
+
+-- -------------------------------------------------------------
+-- SNTP Client Unicast Server Table
+-- -------------------------------------------------------------
+
+agentSntpClientUcastServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AgentSntpClientUcastServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing configuration and statistical
+         information for unicast SNTP servers.  Each server
+         entry is represented by single conceptual row in this
+         table."
+    ::= { agentSntpClientUnicast 6 }
+
+agentSntpClientUcastServerEntry OBJECT-TYPE
+    SYNTAX      AgentSntpClientUcastServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information for a particular unicast SNTP server."
+    INDEX { agentSntpClientUcastServerIndex }
+    ::= { agentSntpClientUcastServerTable 1 }
+
+AgentSntpClientUcastServerEntry ::=
+    SEQUENCE {
+        agentSntpClientUcastServerIndex
+            Unsigned32,
+        agentSntpClientUcastServerAddressType
+            InetAddressType,
+        agentSntpClientUcastServerAddress
+            InetAddress,
+        agentSntpClientUcastServerPort
+            InetPortNumber,
+        agentSntpClientUcastServerVersion
+            INTEGER,
+        agentSntpClientUcastServerPrecedence
+            Unsigned32,
+        agentSntpClientUcastServerLastUpdateTime
+            DateAndTime,
+        agentSntpClientUcastServerLastAttemptTime
+            DateAndTime,
+        agentSntpClientUcastServerLastAttemptStatus
+            SntpClientUpdateStatus,
+        agentSntpClientUcastServerNumRequests
+            Counter32,
+        agentSntpClientUcastServerNumFailedRequests
+            Counter32,
+        agentSntpClientUcastServerRowStatus
+            RowStatus
+    }
+
+agentSntpClientUcastServerIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object uniquely identifies the entry in the table."
+    ::= { agentSntpClientUcastServerEntry 1 }
+
+agentSntpClientUcastServerAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies how agentSntpClientUcastServerAddr is
+         encoded.  Support for all possible enumerations defined by
+         InetAddressType is NOT REQUIRED."
+    ::= { agentSntpClientUcastServerEntry 2 }
+
+agentSntpClientUcastServerAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(1..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The encoded internet address of an SNTP server.
+         Unicast SNTP requests will be sent to this address.  If this
+         address is a DNS hostname, then that hostname SHOULD be
+         resolved into an IP address each time a SNTP request is sent
+         to it."
+    ::= { agentSntpClientUcastServerEntry 3 }
+
+agentSntpClientUcastServerPort OBJECT-TYPE
+    SYNTAX      InetPortNumber (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The port number on the server to which poll requests are sent.
+         A set request MUST NOT use a value of 0 for this object."
+    DEFVAL { 123 }
+    ::= { agentSntpClientUcastServerEntry 4 }
+
+agentSntpClientUcastServerVersion OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    version1(1),
+                    version2(2),
+                    version3(3),
+                    version4(4)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The SNTP version this server supports.  This is the value
+         that will be encoded in NTP polls when operating in unicast(1)
+         administrative mode."
+    REFERENCE
+        "RFC 2030 - Simple Network Time Protocol (SNTP) Version 4
+                    for IPv4, IPv6 and OSI; Section 5."
+::= { agentSntpClientUcastServerEntry 5}
+
+agentSntpClientUcastServerPrecedence OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..3)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The precedence that this server has in relation to its peers
+         in the determining the sequence of servers to which SNTP requests
+         will be sent. The client continues sending requests to
+         different servers until a successful response is received or
+         all servers are exhausted.  This object indicates the order in
+         which to query the servers.  A server entry with a precedence
+         of 1 will be queried before a server with a precedence of 2,
+         and so forth.  If more than one server has the same precedence
+         then the request order will follow the lexicographical
+         ordering of the entries in this table."
+    DEFVAL { 1 }
+    ::= { agentSntpClientUcastServerEntry 6 }
+
+agentSntpClientUcastServerLastUpdateTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local date and time that the response from this server was
+         used to update the system time on the device since agent
+         reboot.  If the SNTP client has not updated the time using
+         a response from this server then this object MUST return
+         '00000000'H."
+    DEFVAL { '00000000'H }
+    ::= { agentSntpClientUcastServerEntry 7 }
+
+agentSntpClientUcastServerLastAttemptTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local date and time that this SNTP server was last queried
+         since agent reboot.  Essentially, this value is a
+         timestamp for the agentSntpClientUcastServerLastAttemptStatus
+         object.  If this server has not been queried then this object
+         MUST return '00000000'H."
+    DEFVAL { '00000000'H }
+    ::= { agentSntpClientUcastServerEntry 8 }
+
+agentSntpClientUcastServerLastAttemptStatus OBJECT-TYPE
+    SYNTAX      SntpClientUpdateStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the last SNTP request to this server since
+         agent reboot.  If no requests have been made then this object
+         should return 'other'."
+    DEFVAL { other }
+    ::= { agentSntpClientUcastServerEntry 9 }
+
+agentSntpClientUcastServerNumRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of SNTP requests made to this server since
+         the last agent reboot.  This includes retry attempts to
+         the server."
+    ::= { agentSntpClientUcastServerEntry 10 }
+
+agentSntpClientUcastServerNumFailedRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of SNTP requests made to this server that did
+         not result in a successful response since the last agent
+         reboot.  This includes retry attempts to the server."
+    ::= { agentSntpClientUcastServerEntry 11 }
+
+agentSntpClientUcastServerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status of this conceptual row in the table.
+
+         active
+            - The server is available for use in SNTP client operations.
+              Other writable leaves in this table MAY be modified while
+              the row is in the active state.
+
+         notInService
+            - The entry is fully configured but is not available for
+              use in SNTP client operations.  The agent MAY transition
+              a row from the active to notInService upon
+              receipt of a kiss of death packet from the server.
+
+         createAndGo
+            - This is the preferred mechanism for creating conceptual
+              rows in this table.  This value can never be read as
+              the row will always transition immediately to either active
+              or notInService.
+
+         destroy
+            - This will remove the conceptual row from the table and
+              make it unavailable for SNTP client operations. "
+
+    ::= { agentSntpClientUcastServerEntry 12 }
+
+
+-- -------------------------------------------------------------
+-- SNTP Client Broadcast Group
+-- -------------------------------------------------------------
+
+agentSntpClientBroadcastCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of unsolicited broadcast SNTP messages that have
+         been received and processed by the SNTP client.  Unsolicited
+         SNTP broadcast frames will not be counted unless the SNTP
+         agent is operating in broadcast(3) mode, as specified by
+         agentSntpClientMode."
+    ::= { agentSntpClientBroadcast 1 }
+
+agentSntpClientBroadcastInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (6..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds the client will wait before
+         processing another broadcast packet expressed as a
+         power of two. Packets received during the wait interval
+         are silently discarded."
+    DEFVAL { 6 }
+    ::= { agentSntpClientBroadcast 2}
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+agentSntpClientConformance OBJECT IDENTIFIER
+          ::= { agentSntpClientMIB 2 }
+
+agentSntpClientGroups      OBJECT IDENTIFIER
+          ::= { agentSntpClientConformance 1 }
+
+agentSntpClientCompliances OBJECT IDENTIFIER
+          ::= { agentSntpClientConformance 2 }
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+agentSntpClientDeviceGroup OBJECT-GROUP
+    OBJECTS {
+        agentSntpClientVersion,
+        agentSntpClientSupportedMode,
+        agentSntpClientMode,
+        agentSntpClientLastUpdateTime,
+        agentSntpClientLastAttemptTime,
+        agentSntpClientLastAttemptStatus,
+        agentSntpClientServerAddressType,
+        agentSntpClientServerAddress,
+        agentSntpClientServerMode,
+        agentSntpClientServerStratum,
+        agentSntpClientServerRefClkId
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing device level control of
+         an SNTP client on NETGEAR enabled devices."
+    ::= { agentSntpClientGroups 1 }
+
+agentSntpClientUnicastGroup OBJECT-GROUP
+    OBJECTS {
+        agentSntpClientUnicastPollInterval,
+        agentSntpClientUnicastPollTimeout,
+        agentSntpClientUnicastPollRetry,
+        agentSntpClientUcastServerMaxEntries,
+        agentSntpClientUcastServerCurrEntries,
+        agentSntpClientUcastServerAddress,
+        agentSntpClientUcastServerAddressType,
+        agentSntpClientUcastServerPrecedence,
+        agentSntpClientUcastServerLastUpdateTime,
+        agentSntpClientUcastServerLastAttemptTime,
+        agentSntpClientUcastServerLastAttemptStatus,
+        agentSntpClientUcastServerNumRequests,
+        agentSntpClientUcastServerNumFailedRequests,
+        agentSntpClientUcastServerRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing control and statistics for
+         an SNTP client capable of operating in unicast mode."
+    ::= { agentSntpClientGroups 2 }
+
+
+agentSntpClientBroadcastGroup OBJECT-GROUP
+    OBJECTS {
+        agentSntpClientBroadcastCount,
+        agentSntpClientBroadcastInterval
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing control and statistics for
+         an SNTP client capable of operating in broadcast mode."
+    ::= { agentSntpClientGroups 3 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+agentSntpClientCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support
+         agentSntpClient."
+
+    MODULE
+        MANDATORY-GROUPS { agentSntpClientDeviceGroup }
+
+        GROUP       agentSntpClientUnicastGroup
+        DESCRIPTION
+            "This group is REQUIRED for devices supporting operation
+             of an SNTP client in unicast mode."
+
+        GROUP       agentSntpClientBroadcastGroup
+        DESCRIPTION
+            "This group is REQUIRED for devices supporting operation
+             of a SNTP client in broadcast mode."
+
+
+    ::= { agentSntpClientCompliances 1 }
+
+END

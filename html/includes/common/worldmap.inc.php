@@ -4,12 +4,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
@@ -21,6 +21,12 @@
  * @package LibreNMS
  * @subpackage Frontpage
  */
+
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
+
+require_once $config['install_dir'] . '/includes/alerts.inc.php';
+require_once $config['install_dir'] . '/includes/device-groups.inc.php';
 
 if ($config['map']['engine'] == 'leaflet') {
     if (defined('SHOW_SETTINGS') && $config['front_page'] == "pages/front/tiles.php") {
@@ -120,13 +126,13 @@ if ($config['map']['engine'] == 'leaflet') {
         if (!empty($widget_settings['group_radius'])) {
             $group_radius = $widget_settings['group_radius'];
         } else {
-            $group_radius = 80;
+            $group_radius = Config::get('leaflet.group_radius', 80);
         }
         if (empty($widget_settings['status']) && $widget_settings['status'] != '0') {
             $widget_settings['status'] = '0,1';
         }
-        $map_init = "[" . $init_lat . ", " . $init_lng . "], " . sprintf("%01.0f", $init_zoom);
-        $temp_output .= 'var map = L.map(\'leaflet-map\').setView('.$map_init.');
+        $map_init = "[" . $init_lat . ", " . $init_lng . "], " . sprintf("%01.1f", $init_zoom);
+        $temp_output .= 'var map = L.map(\'leaflet-map\', { zoomSnap: 0.1 } ).setView('.$map_init.');
 L.tileLayer(\'//'.$config['leaflet']['tile_url'].'/{z}/{x}/{y}.png\', {
     attribution: \'&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors\'
 }).addTo(map);
@@ -136,32 +142,43 @@ var markers = L.markerClusterGroup({
     iconCreateFunction: function (cluster) {
         var markers = cluster.getAllChildMarkers();
         var n = 0;
-        newClass = "greenCluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
+        color = "green"
+        newClass = "Cluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
         for (var i = 0; i < markers.length; i++) {
+            if (markers[i].options.icon.options.markerColor == "blue" && color != "red") {
+                color = "blue";
+            }
             if (markers[i].options.icon.options.markerColor == "red") {
-                newClass = "redCluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
+                color = "red";
             }
         }
-        return L.divIcon({ html: cluster.getChildCount(), className: newClass, iconSize: L.point(40, 40) });
+        return L.divIcon({ html: cluster.getChildCount(), className: color+newClass, iconSize: L.point(40, 40) });
     },
   });
 var redMarker = L.AwesomeMarkers.icon({
     icon: \'server\',
     markerColor: \'red\', prefix: \'fa\', iconColor: \'white\'
   });
+var blueMarker = L.AwesomeMarkers.icon({
+      icon: \'server\',
+      markerColor: \'blue\', prefix: \'fa\', iconColor: \'white\'
+    });
 var greenMarker = L.AwesomeMarkers.icon({
     icon: \'server\',
     markerColor: \'green\', prefix: \'fa\', iconColor: \'white\'
   });
         ';
+        $status_select = explode(',', $widget_settings['status']);
+
         // Checking user permissions
-        if (is_admin() || is_read()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
         // Admin or global read-only - show all devices
             $sql = "SELECT DISTINCT(`device_id`),`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
                     WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
-                      AND `status` IN (".$widget_settings['status'].")
-                    ORDER BY `status` ASC, `hostname`";
+                    AND `status` IN " . dbGenPlaceholders(count($status_select)) .
+                    " ORDER BY `status` ASC, `hostname`";
+            $param = $status_select;
         } else {
         // Normal user - grab devices that user has permissions to
             $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`devices`.`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng`
@@ -169,10 +186,11 @@ var greenMarker = L.AwesomeMarkers.icon({
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
                     WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
                     AND `devices`.`device_id` = `devices_perms`.`device_id`
-                    AND `devices_perms`.`user_id` = ? AND `status` IN (".$widget_settings['status'].")
-                    ORDER BY `status` ASC, `hostname`";
-            $param[] = $_SESSION['user_id'];
+                    AND `devices_perms`.`user_id` = ? AND `status` IN " . dbGenPlaceholders(count($status_select)) .
+                    " ORDER BY `status` ASC, `hostname`";
+            $param = array_merge([LegacyAuth::id()], $status_select);
         }
+
         foreach (dbFetchRows($sql, $param) as $map_devices) {
             $icon = 'greenMarker';
             $z_offset = 0;
@@ -182,8 +200,17 @@ var greenMarker = L.AwesomeMarkers.icon({
                 $map_devices['lng'] = $tmp_loc['lng'];
             }
             if ($map_devices['status'] == 0) {
-                $icon = 'redMarker';
-                $z_offset = 10000;  // move marker to foreground
+                if (IsMaintenance($map_devices['device_id'])) {
+                    if ($widget_settings['status'] == '0') { // Don't show icon if only down devices should be shown
+                        continue;
+                    } else {
+                        $icon = 'blueMarker';
+                        $z_offset = 5000;
+                    }
+                } else {
+                    $icon = 'redMarker';
+                    $z_offset = 10000;  // move marker to foreground
+                }
             }
             $temp_output .= "var title = '<a href=\"" . generate_device_url($map_devices) . "\"><img src=\"".getIcon($map_devices)."\" width=\"32\" height=\"32\" alt=\"\"> ".format_hostname($map_devices)."</a>';
 var tooltip = '".format_hostname($map_devices)."';
@@ -194,10 +221,10 @@ marker.bindPopup(title);
         $temp_output .= 'map.addLayer(markers);
 map.scrollWheelZoom.disable();
 $(document).ready(function(){
-    $("#leaflet-map").on("click", function(event) {  
+    $("#leaflet-map").on("click", function(event) {
         map.scrollWheelZoom.enable();
     });
-    $("#leaflet-map").mouseleave(function(event) {  
+    $("#leaflet-map").mouseleave(function(event) {
         map.scrollWheelZoom.disable();
     });
 });

@@ -1,0 +1,112 @@
+-- ============================================================================
+-- AT-PAE.MIB, Allied Telesis enterprise MIB: Protocol Independant Multicast
+--
+-- Copied from ATR-PIM.MIB of pre 2.9.1 release
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-PIM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+	pimNeighborIfIndex,
+	pimInterfaceStatus 	 	
+	    FROM PIM-MIB
+    DisplayString
+        FROM SNMPv2-TC
+    modules
+	    FROM AT-SMI-MIB
+;
+
+
+pim4 MODULE-IDENTITY
+    LAST-UPDATED "200501201525Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+	DESCRIPTION
+	    "Contains definitions of managed objects for the
+	    handling PIM4 enterprise functions on AT switches. "
+REVISION "200501201525Z"
+    DESCRIPTION
+	"Initial Revision"
+::= { modules 97 }
+
+pim4Events OBJECT IDENTIFIER ::= { pim4 0 }
+
+pim4NeighbourAddedTrap NOTIFICATION-TYPE
+	OBJECTS {
+	   pimNeighborIfIndex
+	}
+	STATUS	current
+	DESCRIPTION
+	        "A pim4NeighbourAddedTrap trap signifies that a PIM neighbour has been
+	         added"
+	::= { pim4Events 1 }
+
+pim4NeighbourDeletedTrap NOTIFICATION-TYPE
+	OBJECTS {
+	   pimNeighborIfIndex
+	}
+	STATUS	current
+	DESCRIPTION
+	        "A pim4NeighbourDeletedTrap trap signifies that a PIM neighbour has been
+	         deleted"
+	::= { pim4Events 2 }
+
+pim4InterfaceUpTrap NOTIFICATION-TYPE
+	OBJECTS {
+	   pimInterfaceStatus
+	}
+	STATUS	current
+	DESCRIPTION
+	        "A pimInterfaceUp trap signifies that a PIM interface has been
+	         enabled and is active"
+	::= { pim4Events 3 }
+
+pim4InterfaceDownTrap NOTIFICATION-TYPE
+	OBJECTS {
+	   pimInterfaceStatus
+	}
+	STATUS	current
+	DESCRIPTION
+	        "A pimInterfaceDown trap signifies that a PIM interface has been
+	         disabled and is inactive"
+	::= { pim4Events 4 }
+
+pim4ErrorTrap NOTIFICATION-TYPE
+	OBJECTS {
+	   pim4ErrorTrapType
+	}
+	STATUS	current
+	DESCRIPTION
+	        "A pim4ErrorTrap trap is generated when a PIM error is incremented"
+	::= { pim4Events 5 }
+
+pim4ErrorTrapType OBJECT-TYPE
+    SYNTAX  INTEGER {
+		pim4InvalidPacket (1),
+    	pim4InvalidDestinationError (2), 
+    	pim4FragmentError (3), 
+    	pim4LengthError (4), 
+    	pim4GroupaddressError (5), 
+    	pim4SourceaddressError (6),
+	    pim4MissingOptionError (7), 
+	    pim4GeneralError (8), 
+	    pim4InternalError (9), 
+	    pim4RpaddressError (10)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "The type of the last error that resulted in a error trap being sent.
+            The default value is 0 if no errors have been detected"
+    ::= { pim4 1 }
+
+    END

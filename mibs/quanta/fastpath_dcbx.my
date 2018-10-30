@@ -1,0 +1,459 @@
+NETGEAR-DCBX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    Integer32, Unsigned32                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,MacAddress,RowStatus
+    FROM SNMPv2-TC
+    InterfaceIndex                       FROM IF-MIB
+    lb6m                             FROM QUANTA-LB6M-REF-MIB;
+
+    fastPathDCBX MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 January 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The MIB definitions Data Center Bridging Exchange Protocol."
+
+      -- Revision history.
+    REVISION        "201104200000Z" --20 April 2011 12:00:00 GMT 
+    DESCRIPTION
+        "Initial version."
+       
+    ::= { lb6m 58 }
+
+  DcbxPortRole ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "."
+    SYNTAX      INTEGER  {
+            manual(1),
+            autoup(2),
+            autodown(3),
+            configSource(4)
+    }
+
+  DcbxVersion ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "."
+    SYNTAX      INTEGER  {
+            auto(1),
+            ieee(2),
+            cin(3),
+            cee(4)
+    }
+  
+--*********************************************************************
+--   agentDcbxGroup
+--*********************************************************************
+agentDcbxGroup      OBJECT IDENTIFIER ::= { fastPathDCBX 1 }
+--*********************************************************************
+--   agentDcbxTable
+--   DCBX Configuration table (per-interface)
+--*********************************************************************
+    agentDcbxTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentDcbxEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table providing configuration of DCBX per interface."
+
+         ::= { agentDcbxGroup 1 }
+
+    agentDcbxEntry OBJECT-TYPE
+         SYNTAX      AgentDcbxEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "DCBX configuration for a port."
+         INDEX   { agentDcbxIntfIndex }
+         ::= { agentDcbxTable 1 }
+
+    AgentDcbxEntry::=
+         SEQUENCE {
+            agentDcbxIntfIndex
+                InterfaceIndex,
+            agentDcbxAutoCfgPortRole
+                DcbxPortRole,
+            agentDcbxVersion
+                DcbxVersion,
+            agentDcbxSupportedTLVs
+                BITS,
+            agentDcbxConfigTLVsTxEnable
+                BITS           
+         }
+
+    agentDcbxIntfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This is a unique index for an entry in the
+                     agentDcbxTable. A non-zero value indicates
+                     the ifIndex for the corresponding interface entry
+                     in the ifTable."
+
+         ::= { agentDcbxEntry 1 }
+
+    agentDcbxAutoCfgPortRole OBJECT-TYPE
+         SYNTAX      DcbxPortRole   
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     " Ports operating in the manual role do not have their 
+                       configuration affected by peer devices or by internal 
+                       propagation of configuration. These ports will advertise 
+                       their configuration to their peer if DCBX is enabled 
+                       on that port.
+
+                       Auto-up: Advertises a configuration, but is also willing 
+                       to accept a configuration from the link-partner and 
+                       propagate it internally to the auto-downstream ports 
+                       as well as receive configuration propagated internally 
+                       by other auto-upstream ports.
+
+                       Auto-down: Advertises a configuration but is not willing 
+                       to accept one from the link partner. However, the port 
+                       will accept a configuration propagated internally by the 
+                       configuration source.
+
+                       Configuration Source:In this role, the port has been 
+                       manually selected to be the configuration source. 
+                       Configuration received over this port is propagated 
+                       to the other auto-configuration ports."
+         DEFVAL { 1 }
+
+         ::= { agentDcbxEntry 2 }
+
+    agentDcbxVersion OBJECT-TYPE
+         SYNTAX      DcbxVersion 
+         MAX-ACCESS  read-write
+         STATUS      deprecated
+         DESCRIPTION
+                     "CIN is Cisco Intel Nuova DCBX (version 1.0). 
+                      CEE is converged enhanced ethernet DCBX (version 1.06). 
+                      IEEE is 802-1 az version.
+                      The default value is auto.
+
+                      DCBX supports the legacy implementations v1.0 (CIN) and v1.06 (CEE) 
+                      in addition to standard IEEE version 2.4 DCBX.
+
+                      1.DCBX starts in standard IEEE mode by sending an IEEE standard 
+                        version 2.4 DCBX frame. If the peer responds, 
+                        then IEEE standard version 2.4 DCBX is used,Starts means 
+                        after a link up, a DCBX timeout (or multiple peer condition) 
+                        or when commanded by the network operator. 
+                        If DCBX receives a DCBX frame with an OUI indicating a 
+                        legacy version, it immediately switches into legacy mode 
+                        for the detected version and does not wait for the 3x LLDP fast timeout.
+                      2.If no IEEE DCBX response is received within 3 times the LLDP 
+                        fast transmit timeout period, DCBX immediately transmits 
+                        a version 1.06 DCBX frame with the appropriate version number.  
+                        If DCBX receives a DCBX frame with an OUI indicating IEEE standard support, 
+                        it immediately switches into IEEE standard mode and does 
+                        not wait for the timer. If DCBX receives a DCBX frame with an 
+                        OUI indicating legacy mode and a version number indicating 
+                        version 1.0 support, it immediately switches into legacy 1.0 
+                        mode and does not wait for the timer.
+                       3.If no version 1.06 response is received within 3 times the DCBX 
+                         fast transmit timeout period, DCBX falls back to version 1.0 
+                         and immediately transmits a version 1.0 frame. If no response 
+                         is received within 3 times the DCBX fast transmit period, 
+                         DCBX waits the standard LLDP timeout period, and then begins 
+                         again with step 1. If DCBX receives a DCBX frame with an OUI 
+                         indicating IEEE standard mode, it immediately switches into 
+                         IEEE standard mode."
+         DEFVAL { 1 }
+
+         ::= { agentDcbxEntry 3 }
+
+    agentDcbxSupportedTLVs      OBJECT-TYPE
+         SYNTAX       BITS {
+                        pfc(0),
+                        etsConfig(1),
+                        etsRecom(2),
+                        applicationPriority(3)
+         }
+
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION  "Bitmap that includes the supported set of DCBX LLDP
+            TLVs the device is capable of and whose transmission is allowed on
+            the local LLDP agent by network management.
+
+            Having the bit 'pfc(0)' set indicates that the LLDP
+            transmit PFC TLV as part of DCBX TLVs.
+
+            Having the bit 'etcConfig(1)' set indicates that the LLDP
+            transmit ETS configuration TLV as part of DCBX TLVs.
+
+            Having the bit 'etsRecom(2)' set indicates that
+            transmit ETS Recomdenation TLV as part of DCBX TLVs.
+
+            Having the bit 'applicationPriority(3)' set indicates that
+            the LLDP transmit applicationPriority TLV as part of DCBX TLVs."
+
+         ::= { agentDcbxEntry 4 }
+
+
+    agentDcbxConfigTLVsTxEnable OBJECT-TYPE
+         SYNTAX       BITS {
+                        pfc(0),
+                        etsConfig(1),
+                        etsRecom(2),
+                        applicationPriority(3)
+         }
+  
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                      "Bitmap that includes the DCBX defined set of LLDP
+            TLVs the device is capable of and whose transmission is allowed on
+            the local LLDP agent by network management.
+
+            Having the bit 'pfc(0)' set indicates that the LLDP
+            transmit PFC TLV as part of DCBX TLVs.
+
+            Having the bit 'etcConfig(1)' set indicates that the LLDP
+            transmit ETS configuration TLV as part of DCBX TLVs.
+
+            Having the bit 'etsRecom(2)' set indicates that
+            transmit ETS Recomdenation TLV as part of DCBX TLVs.
+
+            Having the bit 'applicationPriority(3)' set indicates that
+            the LLDP transmit applicationPriority TLV as part of DCBX TLVs."
+
+         ::= { agentDcbxEntry 5 }
+         
+
+--*********************************************************************
+--   agentDcbxStatusTable
+--*********************************************************************
+    agentDcbxStatusTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentDcbxStatusEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "."
+
+         ::= { agentDcbxGroup 2 }
+
+    agentDcbxStatusEntry OBJECT-TYPE
+         SYNTAX      AgentDcbxStatusEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "."
+         INDEX   { agentDcbxIntfIndex}
+         ::= { agentDcbxStatusTable 1 }
+
+    AgentDcbxStatusEntry::=
+         SEQUENCE {
+            agentDcbxIntfIndex
+                InterfaceIndex, 
+            agentDcbxOperVersion
+                DcbxVersion,
+            agentDcbxPeerMACaddress
+                MacAddress,
+            agentDcbxCfgSource
+                INTEGER,
+            agentDcbxMultiplePeerCount
+                Unsigned32,
+            agentDcbxPeerRemovedCount
+                Unsigned32,
+            agentDcbxPeerOperVersionNum
+                Unsigned32,
+            agentDcbxPeerMaxVersion
+                Unsigned32,
+            agentDcbxSeqNum
+                Unsigned32,
+            agentDcbxAckNum
+                Unsigned32,
+            agentDcbxPeerRcvdAckNum
+                Unsigned32,
+            agentDcbxTxCount
+                Unsigned32,
+            agentDcbxRxCount
+                Unsigned32,
+            agentDcbxErrorFramesCount
+                Unsigned32,
+            agentDcbxUnknownTLVsCount
+                Unsigned32 
+         }
+
+
+    agentDcbxOperVersion OBJECT-TYPE
+         SYNTAX      DcbxVersion
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Specifies the DCBX mode in which  the interface is currently operating."
+         DEFVAL { 1 }
+         ::= { agentDcbxStatusEntry 2 }
+
+    agentDcbxPeerMACaddress   OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "MAC Address of the DCBX peer."
+         ::= { agentDcbxStatusEntry 3 }
+    agentDcbxCfgSource      OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       true(1),
+                       false(0)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "Indicates if this port is the source of configuration information 
+                     for auto-* ports."     
+         ::= { agentDcbxStatusEntry 4 }
+
+    agentDcbxMultiplePeerCount  OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "Indicates number of times multiple peers were detected. 
+                     A duplicate peer is when more than one DCBX peer is detected on a port."
+         ::= { agentDcbxStatusEntry 5 }
+
+    agentDcbxPeerRemovedCount  OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "."
+         ::= { agentDcbxStatusEntry 6 }
+
+ 
+    agentDcbxPeerOperVersionNum  OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "Specifies the operational version of the peer DCBX device. 
+                     Valid only when peer device is a CEE/CIN DCBX device."
+         ::= { agentDcbxStatusEntry 7 }
+
+    agentDcbxPeerMaxVersion  OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "Specifies the max version of the peer DCBX device. 
+                     Valid only when peer device is CEE/CIN DCBX device."
+         ::= { agentDcbxStatusEntry 8 }
+
+    agentDcbxSeqNum  OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "Specifies the current sequence number that is sent 
+                     in DCBX control TLVs in CEE/CIN Mode."
+         ::= { agentDcbxStatusEntry 9 }
+
+    agentDcbxAckNum  OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "Specifies the current ACK number that is to be sent 
+                      to peer in DCBX control TLVs in CEE/CIN Mode."
+         ::= { agentDcbxStatusEntry 10 }
+
+    agentDcbxPeerRcvdAckNum  OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "Specifies the current ACK number that is sent by peer 
+                     in DCBX control TLV in CEE/CIN Mode."
+         ::= { agentDcbxStatusEntry 11 }
+
+    agentDcbxTxCount  OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "The number of DCBX frames transmitted per interface."
+         ::= { agentDcbxStatusEntry 12 }
+
+    agentDcbxRxCount  OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "The number of DCBX frames received per interface."
+         ::= { agentDcbxStatusEntry 13 }
+
+    agentDcbxErrorFramesCount  OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "The number of DCBX frames discarded due to errors in the frame."
+         ::= { agentDcbxStatusEntry 14 }
+
+    agentDcbxUnknownTLVsCount  OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "The number of DCBX 
+                     (PFC, ETS, Application Priority or other) TLVs not recognized."
+         ::= { agentDcbxStatusEntry 15 }
+
+--*********************************************************************
+--   DCBX Global Configuration OIDs
+--*********************************************************************
+
+agentDcbxGroupGlobalConfGroup       OBJECT IDENTIFIER ::= { agentDcbxGroup 3} 
+
+    agentDcbxGlobalConfVersion OBJECT-TYPE
+         SYNTAX      DcbxVersion 
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "CIN is Cisco Intel Nuova DCBX (version 1.0). 
+                      CEE is converged enhanced ethernet DCBX (version 1.06). 
+                      IEEE is 802-1 az version.
+                      The default value is auto.
+
+                      DCBX supports the legacy implementations v1.0 (CIN) and v1.06 (CEE) 
+                      in addition to standard IEEE version 2.4 DCBX.
+
+                      1.DCBX starts in standard IEEE mode by sending an IEEE standard 
+                        version 2.4 DCBX frame. If the peer responds, 
+                        then IEEE standard version 2.4 DCBX is used,Starts means 
+                        after a link up, a DCBX timeout (or multiple peer condition) 
+                        or when commanded by the network operator. 
+                        If DCBX receives a DCBX frame with an OUI indicating a 
+                        legacy version, it immediately switches into legacy mode 
+                        for the detected version and does not wait for the 3x LLDP fast timeout.
+                      2.If no IEEE DCBX response is received within 3 times the LLDP 
+                        fast transmit timeout period, DCBX immediately transmits 
+                        a version 1.06 DCBX frame with the appropriate version number.  
+                        If DCBX receives a DCBX frame with an OUI indicating IEEE standard support, 
+                        it immediately switches into IEEE standard mode and does 
+                        not wait for the timer. If DCBX receives a DCBX frame with an 
+                        OUI indicating legacy mode and a version number indicating 
+                        version 1.0 support, it immediately switches into legacy 1.0 
+                        mode and does not wait for the timer.
+                       3.If no version 1.06 response is received within 3 times the DCBX 
+                         fast transmit timeout period, DCBX falls back to version 1.0 
+                         and immediately transmits a version 1.0 frame. If no response 
+                         is received within 3 times the DCBX fast transmit period, 
+                         DCBX waits the standard LLDP timeout period, and then begins 
+                         again with step 1. If DCBX receives a DCBX frame with an OUI 
+                         indicating IEEE standard mode, it immediately switches into 
+                         IEEE standard mode."
+         DEFVAL { 1 }
+
+         ::= { agentDcbxGroupGlobalConfGroup 1 }
+
+
+END

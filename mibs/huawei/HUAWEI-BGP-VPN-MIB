@@ -1,0 +1,2074 @@
+-- ============================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI-BGP-VPN-MIB , this Mib module for management 
+--              of BGP/VPN protocol.
+-- Reference: This MIB was extracted from RFC 4271 
+-- Version: V2.15
+-- History:
+--    <wangchong >, <2008-12-28>, <publish>
+--    <xiaoyaqun>, <2009-09-14>, <publish>
+-- ============================================================================
+
+    HUAWEI-BGP-VPN-MIB DEFINITIONS ::= BEGIN
+  
+        IMPORTS
+            entPhysicalIndex
+                FROM ENTITY-MIB
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            ifIndex, ifName            
+                FROM IF-MIB            
+            InetAddressType, InetAddress            
+                FROM INET-ADDRESS-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            IpAddress, Integer32, Unsigned32, Gauge32, Counter32, Counter64, 
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC
+                        mplsL3VpnVrfPerfCurrNumRoutes, mplsL3VpnVrfConfMidRteThresh
+                            FROM MPLS-L3VPN-STD-MIB;    
+    
+-- Jan 19, 2015 at 15:02 GMT
+        hwBgpMIB MODULE-IDENTITY 
+            LAST-UPDATED "201708171556Z"        -- Aug 17, 2017 at 1556 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+
+            DESCRIPTION 
+                "The Mib module for management of BGP/VPN. Huawei Technologies co.,Ltd. 
+                Supplementary information may be available at: 
+                http://www.huawei.com"
+
+           REVISION "201708171556Z"
+           DESCRIPTION 
+           "Modify description of MIB nodes, include: 'hwBgpPeerSessionNum', 'hwIBgpPeerSessionNum', 'hwEBgpPeerSessionNum', ;hwBgpPeerAddrFamilySafi'."
+            
+           REVISION "201612061110Z"
+           DESCRIPTION 
+           "Add two MIB nodes for counting total massages, include: 'hwBgpPeerInTotalMsgs', 'hwBgpPeerInTotalMsgs'."
+           
+           REVISION "201612061110Z"
+           DESCRIPTION 
+           "Add a MIB tables for getting BGP statistic information, include: 'hwBgpPeerStatisticTable', and add two MIB nodes for counting total update massages, include: 'hwBgpPeerTotalInUpdateMsgs', 'hwBgpPeerTotalOutUpdateMsgs'."
+                
+           REVISION "201605120955Z"
+           DESCRIPTION 
+           "Modify trap nodes name, include: 'hwBgpPeerSessionThresholdExceed', 'hwBgpPeerSessionThresholdClear', 'hwBgpPeerSessionThreshold'"
+
+           REVISION "201603010954Z"
+           DESCRIPTION 
+           "Modify trap nodes name, include: 'hwBgpDynamicPeerSessionNum', 'hwBgpDynamicPeerSessionMaxNum', 'hwBgpDynamicPeerSessionExceed', 'hwBgpDynamicPeerSessionExceedClear'"
+
+           REVISION "201602271010Z"
+           DESCRIPTION 
+           "Modify trap nodes name, include: 'hwBgpDynamicPeerSessionNum', 'hwBgpDynamicPeerSessionMaxNum', 'hwBgpDynamicPeerSessionMaxExceed', 'hwBgpDynamicPeerSessionMaxClear'"
+				
+				
+           REVISION "201502101010Z"
+           DESCRIPTION 
+           "Modify trap nodes name, include: 'hwBgpPeerSessionMaxNum', 'hwBgpPeerSessionExceed', 'hwBgpPeerSessionExceedClear'"
+
+           REVISION "201501311435Z"
+           DESCRIPTION 
+           "Add two trap node for sending the number threshold alarms of BGP peers, include: 'hwBgpPeerSessionNumMaxNum', 'hwBgpPeerSessionNumMaxExceed', 'hwBgpPeerSessionNumMaxClear' "
+
+           REVISION "201501191115Z"
+           DESCRIPTION 
+           "Update"
+
+           REVISION "201411201115Z"
+           DESCRIPTION 
+           "Update"
+
+           REVISION "201406181140Z"
+           DESCRIPTION 
+           "Add some trap nodes for sending BGP routes threshold alarms, include: 'hwBgpRouteThresholdExceed',  'hwBgpRouteThresholdClear', 'hwBgpRouteMaxExceed', 'hwBgpRouteMaxClear'. "
+
+           REVISION "201405301540Z"
+           DESCRIPTION 
+           "Add some MIB nodes for getting BGP protocol resource information, include: 'hwBgpPeerSessionNum',  'hwIBgpPeerSessionNum', 'hwEBgpPeerSessionNum', 'hwConfiguredVrfs', 'hwConfiguredIpv4Vrfs','hwConfiguredIpv6Vrfs'."
+           
+           REVISION "201403181502Z"
+           DESCRIPTION 
+           "Update"
+
+           REVISION "201403100955Z"
+           DESCRIPTION 
+           "Update"
+
+           REVISION "200812260955Z"
+           DESCRIPTION 
+           "Update"
+
+            ::= { hwDatacomm 177 }
+        
+-- 
+-- Textual conventions
+-- 
+        HWBgpAfi ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Address Family Identifier(AFI) for BGP peer."
+            SYNTAX INTEGER
+                {
+                ipv4(1),
+                ipv6(2),
+                vpls(25),
+                l2vpn(196)
+                }
+            
+        HWBgpSafi ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Subsequent Address Family Identifier(SAFI) for BGP peer."
+            SYNTAX INTEGER
+                {
+                unicast(1),
+                multicast(2),
+                mpls(4),
+                mcast-vpn(5),
+                vpls(65),
+                mdt(66),
+                vpn(128),
+                route-target(132)
+                }
+      
+        MplsL3VpnName ::= TEXTUAL-CONVENTION
+             STATUS        current
+             DESCRIPTION
+                    "An identifier that is assigned to each MPLS/BGP VPN and
+                    is used to uniquely identify it.  This is assigned by the
+                    system operator or NMS and SHOULD be unique throughout
+                    the MPLS domain.  If this is the case, then this identifier
+                    can then be used at any LSR within a specific MPLS domain
+                    to identify this MPLS/BGP VPN.  It may also be possible to
+                    preserve the uniqueness of this identifier across MPLS
+                    domain boundaries, in which case this identifier can then
+                    be used to uniquely identify MPLS/BGP VPNs on a more global
+                    basis.  This object MAY be set to the VPN ID as defined in
+                    RFC 2685."
+            REFERENCE
+                   "RFC 2685 Fox B., et al, 'Virtual Private
+                   Networks Identifier', September 1999."
+            SYNTAX OCTET STRING (SIZE (0..31))             
+    
+--
+-- Node definitions
+--
+        -- 1.3.6.1.4.1.2011.5.25.177.1
+        hwBgpObjects OBJECT IDENTIFIER ::= { hwBgpMIB 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1
+        hwBgpPeers OBJECT IDENTIFIER ::= { hwBgpObjects 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.1
+        hwBgpPeerAddrFamilyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBgpPeerAddrFamilyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "BGP Peer Address Family Table.  
+                This table contains information about the address family for BGP peers."
+            ::= { hwBgpPeers 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.1.1
+        hwBgpPeerAddrFamilyEntry OBJECT-TYPE
+            SYNTAX HwBgpPeerAddrFamilyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The information about the address family for BGP peers."
+            INDEX { hwBgpPeerInstanceId, hwBgpPeerAddrFamilyAfi, hwBgpPeerAddrFamilySafi, hwBgpPeerType, hwBgpPeerIPAddr
+                 }
+            ::= { hwBgpPeerAddrFamilyTable 1 }
+        
+        HwBgpPeerAddrFamilyEntry ::=
+            SEQUENCE { 
+                hwBgpPeerInstanceId
+                    Unsigned32,
+                hwBgpPeerAddrFamilyAfi
+                    HWBgpAfi,
+                hwBgpPeerAddrFamilySafi
+                    HWBgpSafi,
+                hwBgpPeerType
+                    InetAddressType,
+                hwBgpPeerIPAddr
+                    InetAddress,
+                hwBgpPeerVrfName
+                    OCTET STRING
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.1.1.1
+        hwBgpPeerInstanceId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the instance for the remote BGP peer."
+            ::= { hwBgpPeerAddrFamilyEntry 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.1.1.2
+        hwBgpPeerAddrFamilyAfi OBJECT-TYPE
+            SYNTAX HWBgpAfi
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the address family for the remote BGP peer."
+            ::= { hwBgpPeerAddrFamilyEntry 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.1.1.3
+        hwBgpPeerAddrFamilySafi OBJECT-TYPE
+            SYNTAX HWBgpSafi
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the index of a sub-address family of a remote BGP peer."
+            ::= { hwBgpPeerAddrFamilyEntry 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.1.1.4
+        hwBgpPeerType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The type of the address family for the remote BGP peer."
+            ::= { hwBgpPeerAddrFamilyEntry 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.1.1.5
+        hwBgpPeerIPAddr OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The IP address of the remote BGP peer."
+            ::= { hwBgpPeerAddrFamilyEntry 5 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.1.1.6
+        hwBgpPeerVrfName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of the VPN instance."
+            ::= { hwBgpPeerAddrFamilyEntry 6 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.2
+        hwBgpPeerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBgpPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "BGP Peer Table.  
+                This table contains information about the connections for BGP peers."
+            ::= { hwBgpPeers 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.2.1
+        hwBgpPeerEntry OBJECT-TYPE
+            SYNTAX HwBgpPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The information about the connections with BGP peers."
+            AUGMENTS { hwBgpPeerAddrFamilyEntry }
+            ::= { hwBgpPeerTable 1 }
+        
+        HwBgpPeerEntry ::=
+            SEQUENCE { 
+                hwBgpPeerNegotiatedVersion
+                    Unsigned32,
+                hwBgpPeerRemoteAs
+                    Unsigned32,
+                hwBgpPeerRemoteAddr
+                    InetAddress,
+                hwBgpPeerState
+                    INTEGER,
+                hwBgpPeerFsmEstablishedCounter
+                    Unsigned32,
+                hwBgpPeerFsmEstablishedTime
+                    Gauge32,
+                hwBgpPeerGRStatus
+                    INTEGER,
+                hwBgpPeerLastError
+                    OCTET STRING,
+                hwBgpPeerUnAvaiReason
+                    Unsigned32
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.2.1.1
+        hwBgpPeerNegotiatedVersion OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The version negotiated with the remote BGP peer."
+            ::= { hwBgpPeerEntry 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.2.1.2
+        hwBgpPeerRemoteAs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The AS number of the remote BGP peer."
+            ::= { hwBgpPeerEntry 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.2.1.4
+        hwBgpPeerRemoteAddr OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IP address of the remote BGP peer."
+            ::= { hwBgpPeerEntry 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.2.1.5
+        hwBgpPeerState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                idle(1),
+                connect(2),
+                active(3),
+                opensent(4),
+                openconfirm(5),
+                established(6)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the remote BGP peer, including:
+                1: Idle(1) 
+                2: Connect(2) 
+                3: Active(3) 
+                4: Opensent(4) 
+                5: Openconfirm(5) 
+                6: Established(6) "
+            ::= { hwBgpPeerEntry 5 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.2.1.6
+        hwBgpPeerFsmEstablishedCounter OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Counter That Records the Times the Remote BGP Peer Is Correctly Connected
+                The counter is increased by one if the remote BGP peer is correctly connected once.
+                The counter could be set to zero."
+            ::= { hwBgpPeerEntry 6 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.2.1.7
+        hwBgpPeerFsmEstablishedTime OBJECT-TYPE
+            SYNTAX Gauge32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The counter that records the times the remote BGP peer is correctly connected."
+            ::= { hwBgpPeerEntry 7 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.2.1.8
+        hwBgpPeerGRStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                peerNotBeingHelped(1),
+                peerRestarting(2),
+                peerFinishRestart(3),
+                peerHelping(4)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Graceful restart status of the BGP peer, including:
+                1: peerNotBeingHelped, indicating that the BGP peer will not be helped during restarting. 
+                2: peerRestarting, indicating that the BGP peer is detected restarting.
+                3: peerFinishRestart, indicating that the BGP peer finishes the latest GR.
+                4: peerHelping, indicating that the BGP peer is helping the local end to perform GR."
+            ::= { hwBgpPeerEntry 8 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.2.1.9
+        hwBgpPeerLastError OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The last error code and subcode seen by this
+                peer on this connection.  If no error has
+                occurred, this field is zero.  Otherwise, the
+                first byte of this two byte OCTET STRING
+                contains the error code, and the second byte
+                contains the subcode."
+            ::= { hwBgpPeerEntry 9 }
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.2.1.10
+        hwBgpPeerUnAvaiReason OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Bgp peer down reason including:
+                1: Configuration lead peer down(1)
+                2: Receive notification(2)
+                3: Receive error packet(3) 
+                4: Hold timer expire(4)
+                5: Remote peer not reachable(5) 
+                6: Direct connect-interface down(6) 
+                7: Route limit(7)"
+            ::= { hwBgpPeerEntry 10 }
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.3
+        hwBgpPeerRouteTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBgpPeerRouteEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Route table for BGP Peers
+                This table contains routing information about the BGP peers."
+            ::= { hwBgpPeers 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.3.1
+        hwBgpPeerRouteEntry OBJECT-TYPE
+            SYNTAX HwBgpPeerRouteEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The routing information about the BGP peers."
+            AUGMENTS { hwBgpPeerAddrFamilyEntry }
+            ::= { hwBgpPeerRouteTable 1 }
+        
+        HwBgpPeerRouteEntry ::=
+            SEQUENCE { 
+                hwBgpPeerPrefixRcvCounter
+                    Counter32,
+                hwBgpPeerPrefixActiveCounter
+                    Counter32,
+                hwBgpPeerPrefixAdvCounter
+                    Counter32
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.3.1.1
+        hwBgpPeerPrefixRcvCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of prefixes received from the remote BGP peer."
+            ::= { hwBgpPeerRouteEntry 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.3.1.2
+        hwBgpPeerPrefixActiveCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of active prefixes received from the remote BGP peer."
+            ::= { hwBgpPeerRouteEntry 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.3.1.3
+        hwBgpPeerPrefixAdvCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of prefixes sent to the remote BGP peer."
+            ::= { hwBgpPeerRouteEntry 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4
+        hwBgpPeerMessageTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBgpPeerMessageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Protocol Packet Table for BGP Peers
+                This table contains information about the protocol packets of BGP peers."
+            ::= { hwBgpPeers 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1
+        hwBgpPeerMessageEntry OBJECT-TYPE
+            SYNTAX HwBgpPeerMessageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The information about the protocol packets of the BGP peers."
+            AUGMENTS { hwBgpPeerAddrFamilyEntry }
+            ::= { hwBgpPeerMessageTable 1 }
+        
+        HwBgpPeerMessageEntry ::=
+            SEQUENCE { 
+                hwBgpPeerInTotalMsgCounter
+                    Counter32,
+                hwBgpPeerOutTotalMsgCounter
+                    Counter32,
+                hwBgpPeerInOpenMsgCounter
+                    Counter32,
+                hwBgpPeerInUpdateMsgCounter
+                    Counter32,
+                hwBgpPeerInNotificationMsgCounter
+                    Counter32,
+                hwBgpPeerInKeepAliveMsgCounter
+                    Counter32,
+                hwBgpPeerInRouteFreshMsgCounter
+                    Counter32,
+                hwBgpPeerOutOpenMsgCounter
+                    Counter32,
+                hwBgpPeerOutUpdateMsgCounter
+                    Counter32,
+                hwBgpPeerOutNotificationMsgCounter
+                    Counter32,
+                hwBgpPeerOutKeepAliveMsgCounter
+                    Counter32,
+                hwBgpPeerOutRouteFreshMsgCounter
+                    Counter32
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1.1
+        hwBgpPeerInTotalMsgCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of protocol packets received from the remote BGP peer."
+            ::= { hwBgpPeerMessageEntry 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1.2
+        hwBgpPeerOutTotalMsgCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of protocol packets sent to the remote BGP peer."
+            ::= { hwBgpPeerMessageEntry 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1.3
+        hwBgpPeerInOpenMsgCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Open packets received from the remote BGP peer."
+            ::= { hwBgpPeerMessageEntry 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1.4
+        hwBgpPeerInUpdateMsgCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Update packets received from the remote BGP peer."
+            ::= { hwBgpPeerMessageEntry 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1.5
+        hwBgpPeerInNotificationMsgCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Notification packets received from the remote BGP peer."
+            ::= { hwBgpPeerMessageEntry 5 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1.6
+        hwBgpPeerInKeepAliveMsgCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Keepalive packets received from the remote BGP peer."
+            ::= { hwBgpPeerMessageEntry 6 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1.7
+        hwBgpPeerInRouteFreshMsgCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Route-Refresh packets received from the remote BGP peer."
+            ::= { hwBgpPeerMessageEntry 7 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1.8
+        hwBgpPeerOutOpenMsgCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Open packets sent to the remote BGP peer."
+            ::= { hwBgpPeerMessageEntry 8 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1.9
+        hwBgpPeerOutUpdateMsgCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Update packets sent to the remote BGP peer."
+            ::= { hwBgpPeerMessageEntry 9 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1.10
+        hwBgpPeerOutNotificationMsgCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Notification packets sent to the remote BGP peer."
+            ::= { hwBgpPeerMessageEntry 10 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1.11
+        hwBgpPeerOutKeepAliveMsgCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Keepalive packets sent to the remote BGP peer."
+            ::= { hwBgpPeerMessageEntry 11 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.4.1.12
+        hwBgpPeerOutRouteFreshMsgCounter OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Route-Refresh packets sent to the remote BGP peer."
+            ::= { hwBgpPeerMessageEntry 12 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.5
+        hwBgpPeerConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBgpPeerConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "BGP Peer Configuration Table.  
+                This table contains the configurations of BGP peers."
+            ::= { hwBgpPeers 5 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.5.1
+        hwBgpPeerConfigEntry OBJECT-TYPE
+            SYNTAX HwBgpPeerConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the configurations of BGP peers."
+            AUGMENTS { hwBgpPeerAddrFamilyEntry }
+            ::= { hwBgpPeerConfigTable 1 }
+        
+        HwBgpPeerConfigEntry ::=
+            SEQUENCE { 
+                hwBgpPeerConfigRouteLimitNum
+                    Unsigned32,
+                hwBgpPeerConfigRouteLimitThreshold
+                    Unsigned32
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.5.1.1
+        hwBgpPeerConfigRouteLimitNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the maximum number of routes received from the BGP peer."
+            ::= { hwBgpPeerConfigEntry 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.5.1.2
+        hwBgpPeerConfigRouteLimitThreshold OBJECT-TYPE
+            SYNTAX Unsigned32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the alarm threshold (%) of the maximum number of routes received from the BGP peer."
+            ::= { hwBgpPeerConfigEntry 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.6
+        hwBgpPeerSessionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBgpPeerSessionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "BGP Peer Session Table.
+                This table contains BGP peer session informations."
+            ::= { hwBgpPeers 6 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.6.1
+        hwBgpPeerSessionEntry OBJECT-TYPE
+            SYNTAX HwBgpPeerSessionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The information about the BGP peer sessions."
+            INDEX { hwBgpPeerSessionVrfName, hwBgpPeerSessionRemoteAddrType, hwBgpPeerSessionRemoteAddr }
+            ::= { hwBgpPeerSessionTable 1 }
+        
+        HwBgpPeerSessionEntry ::=
+            SEQUENCE { 
+                hwBgpPeerSessionVrfName
+                    OCTET STRING,
+                hwBgpPeerSessionRemoteAddrType
+                    InetAddressType,
+                hwBgpPeerSessionRemoteAddr
+                    InetAddress,
+                hwBgpPeerSessionLocalAddrType
+                    InetAddressType,
+                hwBgpPeerSessionLocalAddr
+                    InetAddress,
+                hwBgpPeerSessionUnavailableType
+                    INTEGER,
+                hwBgpPeerSessionLocalIfName
+                    OCTET STRING,                        
+                hwBgpPeerSessionReason
+                    INTEGER
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.6.1.1
+        hwBgpPeerSessionVrfName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Bgp Vrf id."
+            ::= { hwBgpPeerSessionEntry 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.6.1.2
+        hwBgpPeerSessionRemoteAddrType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Bgp peer session remote address type."
+            ::= { hwBgpPeerSessionEntry 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.6.1.3
+        hwBgpPeerSessionRemoteAddr OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Bgp peer session remote address."
+            ::= { hwBgpPeerSessionEntry 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.6.1.4
+        hwBgpPeerSessionLocalAddrType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Bgp peer session local address type."
+            ::= { hwBgpPeerSessionEntry 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.6.1.5
+        hwBgpPeerSessionLocalAddr OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Bgp peer session local address."
+            ::= { hwBgpPeerSessionEntry 5 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.6.1.6
+        hwBgpPeerSessionUnavailableType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                uptodown(1),
+                alwaysdown(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Bgp peer unavailable type including:
+                1: Up To Down(1)
+                2: Always Down(2)"
+            ::= { hwBgpPeerSessionEntry 6 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.6.1.7
+        hwBgpPeerSessionLocalIfName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Bgp peer session local IFName."
+            ::= { hwBgpPeerSessionEntry 7 }        
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.6.1.8
+        hwBgpPeerSessionReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                configurationLeadPeerDown(1),
+                receiveNotification(2),
+                receiveErrorPacket(3),
+                holdTimerExpire(4),
+                remotePeerNotReachable(5),
+                directConnectInterfaceDown(6),
+                routeLimit(7),
+                peerIsNotUpForASpecifiedPeriodOfTime(8),
+                alarmClear(100)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Bgp peer down reason including:
+                1: Configuration lead peer down(1)
+                2: Receive notification(2)
+                3: Receive error packet(3) 
+                4: Hold timer expire(4)
+                5: Remote peer not reachable(5) 
+                6: Direct connect-interface down(6) 
+                7: Route limit(7)
+                8: Peer is not up for a specified long time(8)
+                100: Alarm clear(100)"
+            ::= { hwBgpPeerSessionEntry 8 }
+ 
+        --1.3.6.1.4.1.2011.5.25.177.1.1.7    
+        hwBgpPeerStatisticTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBgpPeerStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "BGP peer statistic table.  This table contains,
+                one entry per BGP peer, information about
+                the connections with BGP peers."
+            ::= { hwBgpPeers 7 }  
+        
+        --1.3.6.1.4.1.2011.5.25.177.1.1.7.1
+        hwBgpPeerStatisticEntry OBJECT-TYPE
+            SYNTAX HwBgpPeerStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry containing information about the
+                connection with a BGP peer."
+        INDEX { hwBgpProcessId, hwBgpPeerVrfInstanceId, hwBgpPeerAddr}
+            ::= { hwBgpPeerStatisticTable 1 }
+
+    HwBgpPeerStatisticEntry ::= 
+        SEQUENCE {
+                hwBgpProcessId
+                    Unsigned32,
+                hwBgpPeerVrfInstanceId
+                    Unsigned32,
+                hwBgpPeerAddr
+                    InetAddress,
+                hwBgpPeerFsmEstablishedTransitions
+                    Counter32, 
+                hwBgpPeerDownCounts
+                    Counter32, 
+                hwBgpPeerInUpdateMsgs
+                    Counter32,
+                hwBgpPeerOutUpdateMsgs
+                    Counter32,
+                hwBgpPeerInTotalMsgs
+                    Counter32,
+                hwBgpPeerOutTotalMsgs
+                    Counter32    
+        }
+
+        --1.3.6.1.4.1.2011.5.25.177.1.1.7.1.1
+        hwBgpProcessId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The process ID of the BGP instance."
+        ::= { hwBgpPeerStatisticEntry 1 }
+ 
+	--1.3.6.1.4.1.2011.5.25.177.1.1.7.1.2
+        hwBgpPeerVrfInstanceId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the vpn instance Id for the remote BGP peer."
+        ::= { hwBgpPeerStatisticEntry 2 }
+
+        --1.3.6.1.4.1.2011.5.25.177.1.1.7.1.3
+        hwBgpPeerAddr OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The IP address of the remote BGP peer."
+            ::= { hwBgpPeerStatisticEntry 3 }
+
+        --1.3.6.1.4.1.2011.5.25.177.1.1.7.1.4
+        hwBgpPeerFsmEstablishedTransitions OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Counter That Records the Times the Remote BGP Peer Is Correctly Connected
+                The counter is increased by one if the remote BGP peer is correctly connected once.
+                The counter could be set to zero."
+            ::= { hwBgpPeerStatisticEntry 4 }
+        
+        --1.3.6.1.4.1.2011.5.25.177.1.1.7.1.5    
+         hwBgpPeerDownCounts OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of times the BGP FSM
+ 	             transitioned from establish to the other state.
+                The counter could be set to zero."
+            ::= { hwBgpPeerStatisticEntry 5 }
+           
+        --1.3.6.1.4.1.2011.5.25.177.1.1.7.1.6
+        hwBgpPeerInUpdateMsgs OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Update packets received from the remote BGP peer."
+            ::= { hwBgpPeerStatisticEntry 6 }
+     
+        --1.3.6.1.4.1.2011.5.25.177.1.1.7.1.7
+        hwBgpPeerOutUpdateMsgs OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Update packets sent to the remote BGP peer."
+            ::= { hwBgpPeerStatisticEntry 7 }
+        
+        --1.3.6.1.4.1.2011.5.25.177.1.1.7.1.8
+        hwBgpPeerInTotalMsgs OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets received from the remote BGP peer."
+            ::= { hwBgpPeerStatisticEntry 8 }
+     
+        --1.3.6.1.4.1.2011.5.25.177.1.1.7.1.9
+        hwBgpPeerOutTotalMsgs OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets sent to the remote BGP peer."
+            ::= { hwBgpPeerStatisticEntry 9 }
+                   
+        -- 1.3.6.1.4.1.2011.5.25.177.1.2
+        hwBgpRoute OBJECT IDENTIFIER ::= { hwBgpObjects 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.2.1
+        hwBgpRouteLimitTable OBJECT IDENTIFIER ::= { hwBgpRoute 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.2.1.1
+        hwBgpRouteLimitindex   OBJECT-TYPE
+		    SYNTAX INTEGER
+                {
+                ipv4(1),
+                ipv6(2),
+                ipv4vrf(3),
+                ipv6vrf(4),
+                ipv4public(5),
+                ipv6public(6),
+                l2ad(7)
+                }
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The index of bgp route limit, including:
+	1.ipv4(1): total ipv4 routes number.
+	2.ipv6(2): total ipv6 routes number.
+	3.ipv4vrf(3): ipv4 vrf routes number.
+	4.ipv6vrf(4): ipv6 vrf routes number.
+	5.ipv4public(5): ipv4 public routes number.
+	6.ipv6public(6): ipv6 public routes number.
+	7.l2ad(7): l2ad routes number."
+            ::= { hwBgpRouteLimitTable 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.2.1.2
+        hwBgpRouteCurNum   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The current number of bgp routes."
+            ::= { hwBgpRouteLimitTable 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.2.1.3
+        hwBgpRouteMaxNum   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The maximum number of bgp routes."
+            ::= { hwBgpRouteLimitTable 3 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.2.1.4
+        hwBgpRouteThreshold   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The threshold number of bgp routes."
+            ::= { hwBgpRouteLimitTable 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3
+        hwBgpTraps OBJECT IDENTIFIER ::= { hwBgpObjects 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.1
+        hwBgpPeerRouteNumThresholdExceed NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerConfigRouteLimitNum, hwBgpPeerConfigRouteLimitThreshold }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the number of routes received from the BGP peer exceeds the alarm threshold."
+            ::= { hwBgpTraps 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.2
+        hwBgpPeerRouteNumThresholdClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerConfigRouteLimitNum, hwBgpPeerConfigRouteLimitThreshold }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the number of routes received from the BGP peer decreases below the alarm threshold."
+            ::= { hwBgpTraps 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.3
+        hwBgpPeerGRStatusChange NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerGRStatus }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the graceful restart status described by hwBgpPeerGRStatus changes."
+            ::= { hwBgpTraps 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.4
+        hwBgpPeerUnavailable NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerSessionLocalAddrType, hwBgpPeerSessionLocalAddr, 
+                hwBgpPeerSessionUnavailableType, hwBgpPeerSessionLocalIfName, hwBgpPeerSessionReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when bgp peer session state change from up to down."
+            ::= { hwBgpTraps 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.5
+        hwBgpPeerAvailable NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerSessionLocalAddrType, hwBgpPeerSessionLocalAddr, 
+                hwBgpPeerSessionUnavailableType, hwBgpPeerSessionLocalIfName, hwBgpPeerSessionReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when bgp peer session state change from down to up."
+            ::= { hwBgpTraps 5 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.6
+        hwBgpPeerRouteExceed NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerConfigRouteLimitNum, hwBgpPeerConfigRouteLimitThreshold }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when bgp peer session route number exceed."
+            ::= { hwBgpTraps 6 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.7
+        hwBgpPeerRouteExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerConfigRouteLimitNum, hwBgpPeerConfigRouteLimitThreshold }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when bgp peer session route number exceed clear."
+            ::= { hwBgpTraps 7 }
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.8
+        hwL3vpnVrfRouteMidThreshCleared NOTIFICATION-TYPE
+            OBJECTS     { mplsL3VpnVrfPerfCurrNumRoutes, mplsL3VpnVrfConfMidRteThresh }
+            STATUS      current
+            DESCRIPTION
+                "This notification is generated when the number of routes
+                contained by the specified VRF exceeds the value indicated by
+                mplsL3VpnVrfMidRouteThreshold, and then falls below this value.  
+                A single notification MUST be generated when this threshold is 
+                exceeded, and no other notifications of this type should be issued 
+                until the value of mplsL3VpnVrfPerfCurrNumRoutes has fallen below 
+                that of mplsL3VpnVrfConfMidRteThresh."
+            ::= { hwBgpTraps 8 }   
+                                  
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.9
+        hwBgpPeerEstablished NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerLastError, hwBgpPeerState }
+            STATUS current
+            DESCRIPTION 
+                "The BGP Established event is generated when
+                the BGP FSM enters the ESTABLISHED state."
+            ::= { hwBgpTraps 9 }
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.10
+        hwBgpPeerBackwardTransition NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerLastError, hwBgpPeerState, hwBgpPeerUnAvaiReason, ifName }
+            STATUS current
+            DESCRIPTION 
+                "The BGPBackwardTransition Event is generated
+                when the BGP FSM moves from a higher numbered
+                state to a lower numbered state."
+            ::= { hwBgpTraps 10 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.11
+        hwBgpRouteThresholdExceed NOTIFICATION-TYPE
+            OBJECTS { hwBgpRouteLimitindex, hwBgpRouteCurNum, hwBgpRouteThreshold, hwBgpRouteMaxNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the number of bgp routes exceeds the threshold."
+            ::= { hwBgpTraps 11 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.12
+        hwBgpRouteThresholdClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpRouteLimitindex }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the number of routes decreases below the threshold."
+            ::= { hwBgpTraps 12 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.13
+        hwBgpRouteMaxExceed NOTIFICATION-TYPE
+            OBJECTS { hwBgpRouteLimitindex, hwBgpRouteMaxNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the number of routes exceeds the maximum number."
+            ::= { hwBgpTraps 13 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.14
+        hwBgpRouteMaxClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpRouteLimitindex }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the number of routes decreases below the maximum number."
+            ::= { hwBgpTraps 14 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.15
+        hwBgpPeerSessionExceed NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerSessionMaxNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the number of peer sessions exceeds the maximum number."
+            ::= { hwBgpTraps 15 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.16
+        hwBgpPeerSessionExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerSessionMaxNum, hwBgpPeerSessionNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the number of peer sessions decreases below the maximum number."
+            ::= { hwBgpTraps 16 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.17
+        hwBgpDynamicPeerSessionExceed NOTIFICATION-TYPE
+            OBJECTS { hwBgpDynamicPeerSessionMaxNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the number of dynamic peer sessions exceeds the maximum number."
+            ::= { hwBgpTraps 17 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.18
+        hwBgpDynamicPeerSessionExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpDynamicPeerSessionMaxNum, hwBgpDynamicPeerSessionNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the number of dynamic peer sessions decreases below the maximum number."
+            ::= { hwBgpTraps 18 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.19
+        hwBgpPeerSessionThresholdExceed NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerSessionNum, hwBgpPeerSessionThreshold, hwBgpPeerSessionMaxNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the number of peer sessions exceeds the threshold number."
+            ::= { hwBgpTraps 19 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.3.20
+        hwBgpPeerSessionThresholdClear NOTIFICATION-TYPE
+            OBJECTS { hwBgpPeerSessionNum, hwBgpPeerSessionThreshold, hwBgpPeerSessionMaxNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the number of peer sessions decreases below the threshold number."
+            ::= { hwBgpTraps 20 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.4
+        hwBgpScalars OBJECT IDENTIFIER ::= { hwBgpObjects 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.4.1
+        hwBgpPeerSessionNum   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The value of this object identifies the total number of BGP peers, including IPv4/IPv6 public peers and VPNv4/VPNv6 peers."
+            ::= { hwBgpScalars 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.4.2
+        hwIBgpPeerSessionNum   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The value of this object identifies the total number of IBGP peers, including IPv4/IPv6 public peers and VPNv4/VPNv6 peers."
+            ::= { hwBgpScalars 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.4.3
+        hwEBgpPeerSessionNum   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The value of this object identifies the total number of EBGP peers, including IPv4/IPv6 public peers and VPNv4/VPNv6 peers."
+            ::= { hwBgpScalars 3 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.1.4.4
+        hwBgpPeerSessionMaxNum   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The max number of BGP peer sessions configured."
+            ::= { hwBgpScalars 4 }
+
+		-- 1.3.6.1.4.1.2011.5.25.177.1.4.5
+        hwBgpDynamicPeerSessionNum   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The total number of BGP dynamic peer sessions configured."
+            ::= { hwBgpScalars 5 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.177.1.4.6
+        hwBgpDynamicPeerSessionMaxNum   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The max number of BGP dynamic peer sessions configured."
+            ::= { hwBgpScalars 6 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.177.1.4.7
+        hwBgpPeerSessionThreshold   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The threshold number of BGP peer sessions configured."
+            ::= { hwBgpScalars 7 } 
+              
+        -- 1.3.6.1.4.1.2011.5.25.177.1.4.8           
+        hwBgpPeerTotalInUpdateMsgs OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of update packets received from all the remote BGP peers."
+            ::= { hwBgpScalars 8 }   
+            
+        -- 1.3.6.1.4.1.2011.5.25.177.1.4.9  
+        hwBgpPeerTotalOutUpdateMsgs OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Update packets sent to all the remote BGP peers."
+            ::= { hwBgpScalars 9 }           
+			
+        -- 1.3.6.1.4.1.2011.5.25.177.2
+        hwBgpVpnObjects OBJECT IDENTIFIER ::= { hwBgpMIB 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1
+        hwBgpVpnTunnelTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBgpVpnTunnelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPN-tunnel bearing relation table that shows detailed information about the tunnel that bears the VPN service."
+            ::= { hwBgpVpnObjects 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1
+        hwBgpVpnTunnelEntry OBJECT-TYPE
+            SYNTAX HwBgpVpnTunnelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates detailed information about the tunnel bearing VPN services. This object can be queried, but not be set or created."
+            INDEX { hwBgpVpnTunnelVrfName, hwBgpVpnTunnelPublicNetNextHop, hwBgpVpnTunnelId }
+            ::= { hwBgpVpnTunnelTable 1 }
+        
+        HwBgpVpnTunnelEntry ::=
+            SEQUENCE { 
+                hwBgpVpnTunnelVrfName
+                    OCTET STRING,
+                hwBgpVpnTunnelPublicNetNextHop
+                    IpAddress,
+                hwBgpVpnTunnelId
+                    Unsigned32,
+                hwBgpVpnTunnelDestAddr
+                    IpAddress,
+                hwBgpVpnTunnelType
+                    Unsigned32,
+                hwBgpVpnTunnelSrcAddr
+                    IpAddress,
+                hwBgpVpnTunnelOutIfName
+                    OCTET STRING,
+                hwBgpVpnTunnelIsLoadBalance
+                    Unsigned32,
+                hwBgpVpnTunnelLspIndex
+                    Unsigned32,
+                hwBgpVpnTunnelLspOutIfName
+                    OCTET STRING,
+                hwBgpVpnTunnelLspOutLabel
+                    Unsigned32,
+                hwBgpVpnTunnelLspNextHop
+                    IpAddress,
+                hwBgpVpnTunnelLspFec
+                    IpAddress,
+                hwBgpVpnTunnelLspFecPfxLen
+                    IpAddress,
+                hwBgpVpnTunnelLspIsBackup
+                    Unsigned32,
+                hwBgpVpnTunnelSignalProtocol
+                    Integer32,
+                hwBgpVpnTunnelSessionTunnelId
+                    Integer32,
+                hwBgpVpnTunnelTunnelName
+                    OCTET STRING
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.1
+        hwBgpVpnTunnelVrfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VRF name."
+            ::= { hwBgpVpnTunnelEntry 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.2
+        hwBgpVpnTunnelPublicNetNextHop OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the next hop in the public network."
+            ::= { hwBgpVpnTunnelEntry 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.3
+        hwBgpVpnTunnelId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the tunnel ID."
+            ::= { hwBgpVpnTunnelEntry 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.4
+        hwBgpVpnTunnelDestAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the destination address of the tunnel."
+            ::= { hwBgpVpnTunnelEntry 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.5
+        hwBgpVpnTunnelType OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the tunnel type."
+            ::= { hwBgpVpnTunnelEntry 5 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.6
+        hwBgpVpnTunnelSrcAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the source address of the tunnel."
+            ::= { hwBgpVpnTunnelEntry 6 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.7
+        hwBgpVpnTunnelOutIfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the outgoing interface for the tunnel."
+            ::= { hwBgpVpnTunnelEntry 7 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.8
+        hwBgpVpnTunnelIsLoadBalance OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether load balancing is performed."
+            ::= { hwBgpVpnTunnelEntry 8 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.9
+        hwBgpVpnTunnelLspIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the index of the primary LSP for the tunnel."
+            ::= { hwBgpVpnTunnelEntry 9 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.10
+        hwBgpVpnTunnelLspOutIfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the outgoing interface for the primary LSP of the tunnel."
+            ::= { hwBgpVpnTunnelEntry 10 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.11
+        hwBgpVpnTunnelLspOutLabel OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the outgoing label for the primary LSP of the tunnel."
+            ::= { hwBgpVpnTunnelEntry 11 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.12
+        hwBgpVpnTunnelLspNextHop OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the next hop for the primary LSP of the tunnel."
+            ::= { hwBgpVpnTunnelEntry 12 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.13
+        hwBgpVpnTunnelLspFec OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the FEC for the primary LSP of the tunnel."
+            ::= { hwBgpVpnTunnelEntry 13 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.14
+        hwBgpVpnTunnelLspFecPfxLen OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the length of the FEC for the primary LSP of the tunnel."
+            ::= { hwBgpVpnTunnelEntry 14 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.15
+        hwBgpVpnTunnelLspIsBackup OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether the LSP is the backup LSP."
+            ::= { hwBgpVpnTunnelEntry 15 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.16
+        hwBgpVpnTunnelSignalProtocol OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies signaling protocol type of the tunnel."
+            ::= { hwBgpVpnTunnelEntry 16 }
+     
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.17
+        hwBgpVpnTunnelSessionTunnelId OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies ID of the tunnel configured through the command."
+            ::= { hwBgpVpnTunnelEntry 17 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.2.1.1.18
+        hwBgpVpnTunnelTunnelName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the tunnel name."
+            ::= { hwBgpVpnTunnelEntry 18 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.2
+        hwBgpVpnServiceIdTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBgpVpnServiceIdEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the Service-id of the L3VPN services."
+            ::= { hwBgpVpnObjects 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.2.1
+        hwBgpVpnServiceIdEntry OBJECT-TYPE
+            SYNTAX HwBgpVpnServiceIdEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates detailed information about the Service-id of L3VPN services. This object can be queried, set but not created."
+            INDEX { hwBgpVpnServiceIdVrfName }
+            ::= { hwBgpVpnServiceIdTable 1 }
+        
+        HwBgpVpnServiceIdEntry ::=
+            SEQUENCE { 
+                hwBgpVpnServiceIdVrfName
+                    OCTET STRING,
+                hwBgpVpnServiceIdValue
+                    Unsigned32
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.2.2.1.1
+        hwBgpVpnServiceIdVrfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VRF name."
+            ::= { hwBgpVpnServiceIdEntry 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.2.2.1.2
+        hwBgpVpnServiceIdValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the Service-id."
+            DEFVAL { '0'b }
+            ::= { hwBgpVpnServiceIdEntry 2 }
+
+         -- 1.3.6.1.4.1.2011.5.25.177.2.3
+         hwBgpVpnScalars OBJECT IDENTIFIER ::= { hwBgpVpnObjects 3 }
+        
+         -- 1.3.6.1.4.1.2011.5.25.177.2.3.1
+         hwConfiguredVrfs OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The number of VRFs that are configured on this node."
+            ::= { hwBgpVpnScalars 1 }
+
+         -- 1.3.6.1.4.1.2011.5.25.177.2.3.2
+         hwConfiguredIpv4Vrfs  OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The number of IPv4-family VRFs that are configured on this node."
+            ::= { hwBgpVpnScalars 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.2.3.3
+         hwConfiguredIpv6Vrfs  OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The number of IPv6-family VRFs that are configured on this node."
+            ::= { hwBgpVpnScalars 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.3
+        hwBgpConformance OBJECT IDENTIFIER ::= { hwBgpMIB 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.3.1
+        hwBgpCompliances OBJECT IDENTIFIER ::= { hwBgpConformance 1 }
+        
+-- this module
+        -- 1.3.6.1.4.1.2011.5.25.177.3.1.1
+        hwBgpCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for Huawei-BGP-VPN MIB"
+            MODULE -- this module
+                MANDATORY-GROUPS { hwBgpPeer, hwBgpPeerRoute, hwBgpPeerMessage }
+            ::= { hwBgpCompliances 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.3.2
+        hwBgpGroups OBJECT IDENTIFIER ::= { hwBgpConformance 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.3.2.1
+        hwBgpPeerAddrFamily OBJECT-GROUP
+            OBJECTS { hwBgpPeerVrfName }
+            STATUS current
+            DESCRIPTION 
+                "Address Family Group for BGP peers
+                This table contains members of the address family for BGP peers"
+            ::= { hwBgpGroups 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.3.2.2
+        hwBgpPeer OBJECT-GROUP
+            OBJECTS { hwBgpPeerNegotiatedVersion, hwBgpPeerRemoteAs, hwBgpPeerRemoteAddr, hwBgpPeerState, hwBgpPeerFsmEstablishedCounter, 
+                hwBgpPeerGRStatus, hwBgpPeerFsmEstablishedTime, hwBgpPeerLastError, hwBgpPeerUnAvaiReason }
+            STATUS current
+            DESCRIPTION 
+                "BGP Peer Group.  
+                This table contains members of the connections with BGP peers."
+            ::= { hwBgpGroups 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.3.2.3
+        hwBgpPeerRoute OBJECT-GROUP
+            OBJECTS { hwBgpPeerPrefixRcvCounter, hwBgpPeerPrefixActiveCounter, hwBgpPeerPrefixAdvCounter }
+            STATUS current
+            DESCRIPTION 
+                "Route Group for BGP Peers
+                This table contains members of the routes with BGP peers."
+            ::= { hwBgpGroups 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.3.2.4
+        hwBgpPeerMessage OBJECT-GROUP
+            OBJECTS { hwBgpPeerInTotalMsgCounter, hwBgpPeerOutTotalMsgCounter, hwBgpPeerInOpenMsgCounter, hwBgpPeerInUpdateMsgCounter, hwBgpPeerInNotificationMsgCounter, 
+                hwBgpPeerInKeepAliveMsgCounter, hwBgpPeerInRouteFreshMsgCounter, hwBgpPeerOutOpenMsgCounter, hwBgpPeerOutUpdateMsgCounter, hwBgpPeerOutNotificationMsgCounter, 
+                hwBgpPeerOutKeepAliveMsgCounter, hwBgpPeerOutRouteFreshMsgCounter }
+            STATUS current
+            DESCRIPTION 
+                "Protocol Packet Group for BGP Peers
+                This table contains members of the protocol packets with BGP peers."
+            ::= { hwBgpGroups 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.3.2.5
+        hwBgpPeerConfig OBJECT-GROUP
+            OBJECTS { hwBgpPeerConfigRouteLimitNum, hwBgpPeerConfigRouteLimitThreshold }
+            STATUS current
+            DESCRIPTION 
+                "Configuration Group for BGP Peers.  
+                This table contains members of the configurations of BGP peers."
+            ::= { hwBgpGroups 5 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.3.2.6
+        hwBgpTrap NOTIFICATION-GROUP
+            NOTIFICATIONS { hwBgpPeerRouteNumThresholdExceed, hwBgpPeerRouteNumThresholdClear, hwBgpPeerGRStatusChange, hwBgpPeerEstablished, hwBgpPeerBackwardTransition,
+                            hwL3vpnVrfRouteMidThreshCleared, hwBgpPeerUnavailable, hwBgpPeerRouteExceed, hwBgpPeerRouteExceedClear, hwBgpPeerAvailable
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Trap Group for BGP Peers.  
+                This table contains members of the traps of BGP peers."
+            ::= { hwBgpGroups 6 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.5
+        hwBgpVpnConformance OBJECT IDENTIFIER ::= { hwBgpMIB 5 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.5.1
+        hwBgpVpnCompliances OBJECT IDENTIFIER ::= { hwBgpVpnConformance 1 }
+        
+-- this module
+        -- 1.3.6.1.4.1.2011.5.25.177.5.1.1
+        hwBgpVpnCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for Route Management MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwBgpVpnTunnelGroup, hwBgpVpnServiceIdGroup }
+            ::= { hwBgpVpnCompliances 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.5.2
+        hwBgpVpnExtGroups OBJECT IDENTIFIER ::= { hwBgpVpnConformance 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.5.2.1
+        hwBgpVpnTunnelGroup OBJECT-GROUP
+            OBJECTS { hwBgpVpnTunnelDestAddr, hwBgpVpnTunnelType, hwBgpVpnTunnelSrcAddr, hwBgpVpnTunnelIsLoadBalance, hwBgpVpnTunnelLspIndex, 
+                hwBgpVpnTunnelLspOutLabel, hwBgpVpnTunnelLspNextHop, hwBgpVpnTunnelLspFec, hwBgpVpnTunnelLspFecPfxLen, hwBgpVpnTunnelOutIfName, 
+                hwBgpVpnTunnelLspOutIfName, hwBgpVpnTunnelLspIsBackup, hwBgpVpnTunnelTunnelName, hwBgpVpnTunnelSessionTunnelId, hwBgpVpnTunnelSignalProtocol }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwBgpVpnExtGroups 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.5.2.2
+        hwBgpVpnServiceIdGroup OBJECT-GROUP
+            OBJECTS { hwBgpVpnServiceIdValue }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the Service-id of the L3VPN services."
+            ::= { hwBgpVpnExtGroups 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.6
+        hwTnl2VpnTrapObjects OBJECT IDENTIFIER ::= { hwBgpMIB 6 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.6.1
+        hwTnl2VpnTrapTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwTnl2VpnTrapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Tnl2Vpn Trap table.
+                This table contains the trap information.
+                This table is only used for sending trap messages and does not support the get/getnext/set operation."
+            ::= { hwTnl2VpnTrapObjects 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.6.1.1
+        hwTnl2VpnTrapEntry OBJECT-TYPE
+            SYNTAX HwTnl2VpnTrapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates detailed information about the trap message."
+            INDEX { hwVpnId }
+            ::= { hwTnl2VpnTrapTable 1 }
+        
+        HwTnl2VpnTrapEntry ::=
+            SEQUENCE { 
+                hwVpnId
+                    Unsigned32,
+                hwVpnPublicNextHop
+                    IpAddress,
+                hwTunnelReachablityEvent
+                    Unsigned32,
+                hwVpnTrapCkeyValue
+                    Unsigned32
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.6.1.1.1
+        hwVpnId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPN index."
+            ::= { hwTnl2VpnTrapEntry 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.6.1.1.2
+        hwVpnPublicNextHop OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the public next-hop address."
+            ::= { hwTnl2VpnTrapEntry 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.6.1.1.3
+        hwTunnelReachablityEvent OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4096)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the tunnel is reachable.
+                1--tunnel reachable.
+                2--tunnel unreachable."
+            ::= { hwTnl2VpnTrapEntry 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.6.1.1.4
+        hwVpnTrapCkeyValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the ckey value.
+                This value is used for getting next-hop information."
+            ::= { hwTnl2VpnTrapEntry 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.7
+        hwTnl2VpnTrapConformance OBJECT IDENTIFIER ::= { hwBgpMIB 7 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.7.1
+        hwTnl2VpnTrapConformances OBJECT IDENTIFIER ::= { hwTnl2VpnTrapConformance 1 }
+        
+--   this module
+        -- 1.3.6.1.4.1.2011.5.25.177.7.1.1
+        hwTnl2VpnTrapCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for Huawei-BGP-VPN MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwTnl2VpnTrapGroup, hwTnl2VpnTrapNotificationGroup }
+            ::= { hwTnl2VpnTrapConformances 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.7.2
+        hwTnl2VpnTrapGroups OBJECT IDENTIFIER ::= { hwTnl2VpnTrapConformance 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.7.2.1
+        hwTnl2VpnTrapGroup OBJECT-GROUP
+            OBJECTS { hwVpnId, hwVpnPublicNextHop, hwVpnTrapCkeyValue, hwTunnelReachablityEvent }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwTnl2VpnTrapGroups 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.7.2.2
+        hwTnl2VpnTrapNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwTnl2VpnTrapEvent }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwTnl2VpnTrapGroups 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.8
+        hwTnl2VpnTrapNotification OBJECT IDENTIFIER ::= { hwBgpMIB 8 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.8.1
+        hwTnl2VpnTrapEvent NOTIFICATION-TYPE
+            OBJECTS { hwVpnId, hwVpnPublicNextHop, hwVpnTrapCkeyValue, hwTunnelReachablityEvent }
+            STATUS current
+            DESCRIPTION 
+                "This trap indicates whether the tunnel used by a VPN is reachable,
+                If the tunnel is unreachable, a trap is sent to notify the user, hwTunnelReachablityEvent is 2.
+                If the tunnel is reachable, a trap is sent to notify the user, hwTunnelReachablityEvent is 1."
+            ::= { hwTnl2VpnTrapNotification 1 }
+        hwPeerDistributeObjects OBJECT IDENTIFIER ::= { hwBgpMIB 9 }
+
+        hwBgpTotalRouteNumber OBJECT-TYPE
+            SYNTAX     Unsigned32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                "The total number of BGP routes."
+            ::= { hwPeerDistributeObjects 1 }
+
+        hwOsNodeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwOsNodeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table contains some statistic information entries orgnized by os-node."
+            ::= { hwPeerDistributeObjects 2 }
+
+        hwOsNodeEntry OBJECT-TYPE
+            SYNTAX HwOsNodeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Every entry contains some statistic infomation on specific os-node."
+            INDEX { entPhysicalIndex }
+            ::= { hwOsNodeTable 1 }
+        
+        HwOsNodeEntry ::=
+            SEQUENCE { 
+                hwCurrSlot
+                    Unsigned32,
+                hwPeerNumber
+                    Unsigned32,
+                hwRouteNumber
+                    Unsigned32
+             }
+    
+        hwCurrSlot OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of specific slot."
+            ::= { hwOsNodeEntry 1 }
+
+        hwPeerNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of the neighbors on the specific os-group."
+            ::= { hwOsNodeEntry 4 }
+
+        hwRouteNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of the routes on the specific os-group."
+            ::= { hwOsNodeEntry 5 }
+
+        hwDistributeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDistributeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table contains some information entries orgnized by distribute-instance."
+            ::= { hwPeerDistributeObjects 3 }
+
+        hwDistributeEntry OBJECT-TYPE
+            SYNTAX HwDistributeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Every entry contains some infomation on specific distribute-instance."
+            INDEX { hwDistributeName }
+            ::= { hwDistributeTable 1 }
+        
+        HwDistributeEntry ::=
+            SEQUENCE { 
+                hwDistributeLocId
+                    Unsigned32, 
+                hwDistributeName
+                    OCTET STRING,
+                hwMigrateSrcSlot
+                    OCTET STRING,
+                hwMigrateDestSlot
+                    OCTET STRING,
+                hwMigrateReason
+                    INTEGER
+             }
+    
+        hwDistributeLocId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The id of specific distribute-instance."
+            ::= { hwDistributeEntry 1 }
+        
+        hwDistributeName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The name of specific distribute-instance."
+            ::= { hwDistributeEntry 2 }
+
+        hwMigrateSrcSlot OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The source slot name the distribute-instances is from when migration happens."
+            ::= { hwDistributeEntry 3 }
+
+        hwMigrateDestSlot OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The destination slot name the distribute-instances is aboute to go when migration happens."
+            ::= { hwDistributeEntry 4 }
+
+        hwMigrateReason OBJECT-TYPE
+	    SYNTAX INTEGER
+	    {
+	    memoryoverload(1),
+	    cpuoverload(2)
+	    }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The reason of a migration when it happens."
+            ::= { hwDistributeEntry 5 }
+
+        hwPeerDistributeTraps OBJECT IDENTIFIER ::= { hwPeerDistributeObjects 4 }
+         
+        -- 1.3.6.1.4.1.2011.5.25.177.11
+        hwRpkiObjects OBJECT IDENTIFIER ::= { hwBgpMIB 11 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.11.1
+        hwRpkiSessions OBJECT IDENTIFIER ::= { hwRpkiObjects 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.11.1.1
+        hwRpkiSessionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRpkiSessionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "RPKI Session Table.  
+                This table contains information about the RPKI sessions."
+            ::= { hwRpkiSessions 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.11.1.1.1
+        hwRpkiSessionEntry OBJECT-TYPE
+            SYNTAX HwRpkiSessionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The information about the RPKI session."
+            INDEX { hwRpkiSessionVrfName, hwRpkiSessionType, hwSessionIPAddr }
+            ::= { hwRpkiSessionTable 1 }
+        
+        HwRpkiSessionEntry ::=
+            SEQUENCE { 
+                hwRpkiSessionVrfName
+                    MplsL3VpnName,
+                hwRpkiSessionType
+                    InetAddressType,
+                hwSessionIPAddr
+                    InetAddress,
+                hwRpkiSessionRoaLimitNum
+                	Unsigned32           
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.177.11.1.1.1.1
+        hwRpkiSessionVrfName OBJECT-TYPE 
+            SYNTAX MplsL3VpnName
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the instance for the session."
+            ::= { hwRpkiSessionEntry 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.1.1.1.1.2
+        hwRpkiSessionType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of the address family for the remote session."
+            ::= { hwRpkiSessionEntry 2 }
+                    
+        -- 1.3.6.1.4.1.2011.5.25.177.11.1.1.1.3
+        hwSessionIPAddr OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IP address of the session."
+            ::= { hwRpkiSessionEntry 3 } 
+            
+        -- 1.3.6.1.4.1.2011.5.25.177.11.1.1.1.4
+        hwRpkiSessionRoaLimitNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IP address of the session."
+            ::= { hwRpkiSessionEntry 4 }
+        
+                                   
+        -- 1.3.6.1.4.1.2011.5.25.177.11.2
+        hwRpkiTraps OBJECT IDENTIFIER ::= { hwRpkiObjects 2 } 
+               
+        -- 1.3.6.1.4.1.2011.5.25.177.11.2.1
+        hwRpkiSessionRoaExceed NOTIFICATION-TYPE
+            OBJECTS { hwRpkiSessionRoaLimitNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when rpki session ROA number exceed."
+            ::= { hwRpkiTraps 1 } 
+            
+        -- 1.3.6.1.4.1.2011.5.25.177.11.2.2
+        hwRpkiSessionRoaExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwRpkiSessionRoaLimitNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when rpki session ROA number exceed clear."
+            ::= { hwRpkiTraps 2 } 
+        
+       -- 1.3.6.1.4.1.2011.5.25.177.11.3
+        hwRpkiConformance OBJECT IDENTIFIER ::= { hwRpkiObjects 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.11.3.1
+        hwRpkiCompliances OBJECT IDENTIFIER ::= { hwRpkiConformance 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.11.3.1.1
+        hwRpkiCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for Huawei-BGP-VPN MIB"
+            MODULE -- this module
+                MANDATORY-GROUPS { hwRpkiSession }
+            ::= { hwRpkiCompliances 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.11.3.2
+        hwRpkiGroups OBJECT IDENTIFIER ::= { hwRpkiConformance 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.177.11.3.2.1
+        hwRpkiSession OBJECT-GROUP
+            OBJECTS { hwRpkiSessionVrfName, hwRpkiSessionType, hwSessionIPAddr, hwRpkiSessionRoaLimitNum }
+            STATUS current
+            DESCRIPTION 
+                "Session Group for RPKI sessions
+                This table contains members of session for RPKI"
+            ::= { hwRpkiGroups 1 }
+                        
+        -- 1.3.6.1.4.1.2011.5.25.177.11.3.2.2
+        hwRpkiTrap NOTIFICATION-GROUP
+            NOTIFICATIONS { hwRpkiSessionRoaExceed, hwRpkiSessionRoaExceedClear }
+            STATUS current
+            DESCRIPTION 
+                "Trap Group for RPKI Sessions.  
+                This table contains members of the traps of RPKI Sessions."
+            ::= { hwRpkiGroups 2 }
+
+END
+
+--
+-- HUAWEI-BGP-VPN-MIB.mib
+--

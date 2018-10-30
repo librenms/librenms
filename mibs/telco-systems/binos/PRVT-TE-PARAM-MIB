@@ -1,0 +1,657 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-TE-PARAM-MIB
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+
+PRVT-TE-PARAM-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32, Gauge32, IpAddress
+         FROM SNMPv2-SMI
+
+      TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+      ifIndex
+         FROM IF-MIB
+
+      InetAddressType, InetAddress
+         FROM INET-ADDRESS-MIB
+		 mpls
+		 		FROM PRVT-CR-LDP-MIB;
+
+prvtTeParamMib  MODULE-IDENTITY
+      LAST-UPDATED "200712110000Z"
+      ORGANIZATION "BATM Advanced Communication"
+      CONTACT-INFO
+                   " BATM/Telco Systems Support team
+					Email: 
+				For North America: techsupport@telco.com
+				For North Europe: support@batm.de, info@batm.de
+				For the rest of the world: techsupport@telco.com"      
+      DESCRIPTION  "The MIB module for management of TE-params entities."
+
+			REVISION "200712110000Z"
+			DESCRIPTION "changed prvtTeParamAdminGroupName length to 32"
+
+			REVISION "200710250000Z"
+			DESCRIPTION "changed ospfOpaqueEngSupport description"
+			
+			REVISION "200708100000Z"
+			DESCRIPTION "changed object descriptions"
+
+			REVISION "200706080000Z"
+			DESCRIPTION "initial version"
+      ::= { mpls 9 }
+
+   -- Top level components of this MIB module
+
+   -- Notifications
+   prvtTeParamMibNotifications OBJECT IDENTIFIER ::= { prvtTeParamMib 0 }
+   -- Tables, Scalars
+    prvtTeParamMibObjects       OBJECT IDENTIFIER ::= {  prvtTeParamMib 1 }
+   -- Conformance
+    prvtTeParamMibConformance   OBJECT IDENTIFIER ::= { prvtTeParamMib 2 }
+
+-- text convention
+
+ TeLinkBandwidth ::= TEXTUAL-CONVENTION
+      STATUS       current
+      DESCRIPTION
+          "This type is used to represent link bandwidth in bps.  This
+           value is represented using a 4 octet IEEE floating point
+           format [IEEE].  The floating point representation is not
+           used to represent fractional value but rather to allow
+           specification of large numbers that cannot be expressed
+           with 32-bit integers."
+      REFERENCE
+          "IEEE Standard for Binary Floating-Point Arithmetic,
+           Standard 754-1985"
+      SYNTAX       OCTET STRING (SIZE(4))
+
+
+   -- TE Link Table
+
+   prvtTeParamTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF PrvtTeParamEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION		"A list of ip interface entries."
+      ::= {  prvtTeParamMibObjects 4 }
+
+   prvtTeParamEntry OBJECT-TYPE
+      SYNTAX        PrvtTeParamEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "An entry in this table exists for each entry from
+				 ipInterfaceTable. An ipInterfaceEntry in the ipInterfaceTable
+				 must exist. If a ip interface entry in the ipInterfaceTable
+				 is destroyed, then so is the corresponding entry in this 
+				 table. The administrative and operational status 
+				 values are controlled from the ifEntry and ipInterfaceEntry."
+      INDEX         { ifIndex }
+      ::= { prvtTeParamTable 1 }
+
+   PrvtTeParamEntry ::= SEQUENCE {
+     prvtTeParamLinkAddressType                 InetAddressType,
+     prvtTeParamMetric                      		Unsigned32,
+		 prvtTeParamLinkType												INTEGER,
+		 prvtTeParamPhysicalBandwidth								TeLinkBandwidth,
+     prvtTeParamMaximumReservableBandwidth  		TeLinkBandwidth,
+     prvtTeParamMaxReservableBandwidthPrio0			TeLinkBandwidth,
+     prvtTeParamMaxReservableBandwidthPrio1			TeLinkBandwidth,
+     prvtTeParamMaxReservableBandwidthPrio2			TeLinkBandwidth,
+     prvtTeParamMaxReservableBandwidthPrio3			TeLinkBandwidth,
+     prvtTeParamMaxReservableBandwidthPrio4			TeLinkBandwidth,
+     prvtTeParamMaxReservableBandwidthPrio5			TeLinkBandwidth,
+     prvtTeParamMaxReservableBandwidthPrio6			TeLinkBandwidth,
+     prvtTeParamMaxReservableBandwidthPrio7			TeLinkBandwidth,
+     prvtTeParamReservedBandwidthPrio0					TeLinkBandwidth,
+     prvtTeParamReservedBandwidthPrio1					TeLinkBandwidth,
+     prvtTeParamReservedBandwidthPrio2					TeLinkBandwidth,
+     prvtTeParamReservedBandwidthPrio3					TeLinkBandwidth,
+     prvtTeParamReservedBandwidthPrio4					TeLinkBandwidth,
+     prvtTeParamReservedBandwidthPrio5					TeLinkBandwidth,
+     prvtTeParamReservedBandwidthPrio6					TeLinkBandwidth,
+     prvtTeParamReservedBandwidthPrio7					TeLinkBandwidth,
+     prvtTeParamUnreservedBandwidthPrio0				TeLinkBandwidth,
+     prvtTeParamUnreservedBandwidthPrio1				TeLinkBandwidth,
+     prvtTeParamUnreservedBandwidthPrio2				TeLinkBandwidth,
+     prvtTeParamUnreservedBandwidthPrio3				TeLinkBandwidth,
+     prvtTeParamUnreservedBandwidthPrio4				TeLinkBandwidth,
+     prvtTeParamUnreservedBandwidthPrio5				TeLinkBandwidth,
+     prvtTeParamUnreservedBandwidthPrio6				TeLinkBandwidth,
+     prvtTeParamUnreservedBandwidthPrio7				TeLinkBandwidth,
+		 prvtTeParamResourceClass										Unsigned32
+   }
+
+ prvtTeParamAdminGroupTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF PrvtTeParamAdminGroupEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "Table for administrative groups manipulation."
+      ::= {  prvtTeParamMibObjects 5 }
+
+   prvtTeParamAdminGroupEntry OBJECT-TYPE
+      SYNTAX        PrvtTeParamAdminGroupEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "prvtTeParamAdminGroupTable allows specifiying of a group-name to each
+          existing administrative group. Each group is uniquely identified by its prvtTeParamAdminGroupId."
+      INDEX         { prvtTeParamAdminGroupId }
+      ::= { prvtTeParamAdminGroupTable 1 }
+
+	PrvtTeParamAdminGroupEntry ::= SEQUENCE {
+			prvtTeParamAdminGroupId					Integer32,
+			prvtTeParamAdminGroupName 			OCTET STRING
+	}
+
+  ospfOpaqueEngSupport OBJECT-TYPE
+  	SYNTAX  INTEGER {enable(1), disable(2)}
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+				"Controls ospf opaque support."
+		DEFVAL { enable }
+		::= { prvtTeParamMibObjects  1 }
+
+  ospfTeRouterId OBJECT-TYPE
+  	SYNTAX  IpAddress
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+				"Traffic engineering router ID."
+		::= { prvtTeParamMibObjects  2 }
+
+ospfTrafficEngSupport OBJECT-TYPE
+  	SYNTAX  INTEGER {enable(1), disable(2)}
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+				"Controls traffic engeneering support. Read-only for current implementation."
+		DEFVAL { enable }
+		::= { prvtTeParamMibObjects  3 }
+
+
+   prvtTeParamLinkAddressType OBJECT-TYPE
+      SYNTAX        InetAddressType
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "The type of Internet address for the TE link."
+      ::= { prvtTeParamEntry 1 }
+
+    prvtTeParamMetric OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+          "The traffic engineering metric for the TE link is
+           derived from its component links.  All component links
+           within the TE link must have the same traffic
+           engineering metric."
+      REFERENCE
+          "Link Bundling in MPLS Traffic Engineering (TE), RFC 4201"
+      ::= { prvtTeParamEntry 2 }
+
+	prvtTeParamLinkType OBJECT-TYPE
+       SYNTAX    INTEGER {
+                           multiAccess (1),
+                           pointToPoint (2)
+                        }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "This indicates the type of the link such as point-to-point
+   or multi-access"
+   ::= {prvtTeParamEntry  3 }
+
+prvtTeParamPhysicalBandwidth  OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+          "Physical bandwidth for the TE link."
+      ::= { prvtTeParamEntry 4 }
+
+   prvtTeParamMaximumReservableBandwidth OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+          "Maximum reservable bandwidth for the TE link."
+      ::= { prvtTeParamEntry 5 }
+
+	prvtTeParamMaxReservableBandwidthPrio0 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+          "Maximum reservable bandwidth for the TE link with priority 0."
+      ::= { prvtTeParamEntry 6 }
+
+	prvtTeParamMaxReservableBandwidthPrio1 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+          "Maximum reservable bandwidth for the TE link with priority 1."
+      ::= { prvtTeParamEntry 7 }
+
+	prvtTeParamMaxReservableBandwidthPrio2 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+          "Maximum reservable bandwidth for the TE link with priority 2."
+      ::= { prvtTeParamEntry 8 }
+
+	prvtTeParamMaxReservableBandwidthPrio3 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+          "Maximum reservable bandwidth for the TE link with priority 3."
+      ::= { prvtTeParamEntry 9 }
+
+	prvtTeParamMaxReservableBandwidthPrio4 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+          "Maximum reservable bandwidth for the TE link with priority 4."
+      ::= { prvtTeParamEntry 10 }
+
+	prvtTeParamMaxReservableBandwidthPrio5 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+          "Maximum reservable bandwidth for the TE link with priority 5."
+      ::= { prvtTeParamEntry 11 }
+
+	prvtTeParamMaxReservableBandwidthPrio6 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+          "Maximum reservable bandwidth for the TE link with priority 6."
+      ::= { prvtTeParamEntry 12 }
+
+	prvtTeParamMaxReservableBandwidthPrio7 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+          "Maximum reservable bandwidth for the TE link with priority 7."
+      ::= { prvtTeParamEntry 13 }
+
+prvtTeParamReservedBandwidthPrio0 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Reserved bandwidth for the TE link with priority 0."
+      ::= { prvtTeParamEntry 14 }
+
+prvtTeParamReservedBandwidthPrio1 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Reserved bandwidth for the TE link with priority 1."
+      ::= { prvtTeParamEntry 15 }
+
+prvtTeParamReservedBandwidthPrio2 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Reserved bandwidth for the TE link with priority 2."
+      ::= { prvtTeParamEntry 16 }
+
+prvtTeParamReservedBandwidthPrio3 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Reserved bandwidth for the TE link with priority 3."
+      ::= { prvtTeParamEntry 17 }
+
+prvtTeParamReservedBandwidthPrio4 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Reserved bandwidth for the TE link with priority 4."
+      ::= { prvtTeParamEntry 18 }
+
+prvtTeParamReservedBandwidthPrio5 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Reserved bandwidth for the TE link with priority 5."
+      ::= { prvtTeParamEntry 19 }
+
+prvtTeParamReservedBandwidthPrio6 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Reserved bandwidth for the TE link with priority 6."
+      ::= { prvtTeParamEntry 20 }
+
+prvtTeParamReservedBandwidthPrio7 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Reserved bandwidth for the TE link with priority 7."
+      ::= { prvtTeParamEntry 21 }
+
+prvtTeParamUnreservedBandwidthPrio0 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Unreserved bandwidth for the TE link with priority 0."
+      ::= { prvtTeParamEntry 22 }
+
+prvtTeParamUnreservedBandwidthPrio1 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Unreserved bandwidth for the TE link with priority 1."
+      ::= { prvtTeParamEntry 23 }
+
+prvtTeParamUnreservedBandwidthPrio2 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Unreserved bandwidth for the TE link with priority 2."
+      ::= { prvtTeParamEntry 24 }
+
+prvtTeParamUnreservedBandwidthPrio3 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Unreserved bandwidth for the TE link with priority 3."
+      ::= { prvtTeParamEntry 25 }
+
+prvtTeParamUnreservedBandwidthPrio4 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Unreserved bandwidth for the TE link with priority 4."
+      ::= { prvtTeParamEntry 26 }
+
+prvtTeParamUnreservedBandwidthPrio5 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Unreserved bandwidth for the TE link with priority 5."
+      ::= { prvtTeParamEntry 27 }
+
+prvtTeParamUnreservedBandwidthPrio6 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Unreserved bandwidth for the TE link with priority 6."
+      ::= { prvtTeParamEntry 28 }
+
+prvtTeParamUnreservedBandwidthPrio7 OBJECT-TYPE
+      SYNTAX        TeLinkBandwidth
+      UNITS         "bps"
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Unreserved bandwidth for the TE link with priority 7."
+      ::= { prvtTeParamEntry 29 }
+
+ prvtTeParamResourceClass OBJECT-TYPE
+		 SYNTAX 				Unsigned32
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+          "This attribute specifies the TE link resource class.
+           The resource class is a 32 bit bitfield.  The resource class
+           for a link bundle is derived from the resource class of its
+           TE links.  All TE links within a link bundle must have the
+           same resource class.  Encoding of the resource class is
+           described in the 'Traffic Engineering (TE) Extensions to
+           OSPF Version 2' document."
+      ::= { prvtTeParamEntry 30 }
+
+prvtTeParamAdminGroupId OBJECT-TYPE
+		SYNTAX	 		Integer32 (0..2147483647)
+		MAX-ACCESS 	read-only
+		STATUS			current
+		DESCRIPTION "The prvtTeParamAdminGroupId object uniquely identifes an administrative group. Supported are 
+		 32 administrative groups."
+		::= {prvtTeParamAdminGroupEntry 1}
+
+prvtTeParamAdminGroupName OBJECT-TYPE
+		SYNTAX	 		OCTET STRING (SIZE(0..32))
+		MAX-ACCESS 	read-write
+		STATUS			current
+		DESCRIPTION "The prvtTeParamAdminGroupId object specifies the administrative group name."
+		::= {prvtTeParamAdminGroupEntry 2}
+
+prvtCspfStatisticsTable OBJECT-TYPE
+  SYNTAX        SEQUENCE OF PrvtCspfStatisticsEntry
+  MAX-ACCESS    not-accessible
+  STATUS        current
+  DESCRIPTION
+     "Table containing  the statistics relating to the running CSPF."
+  ::= {  prvtTeParamMibObjects 6 }
+
+   prvtCspfStatisticsEntry OBJECT-TYPE
+  SYNTAX        PrvtCspfStatisticsEntry
+  MAX-ACCESS    not-accessible
+  STATUS        current
+  DESCRIPTION
+     "Each entry contains the statistics relating to the running CSPF."
+  INDEX {  prvtCspfEntIndex }
+  ::= { prvtCspfStatisticsTable  1 }
+
+  PrvtCspfStatisticsEntry ::= SEQUENCE {
+	 		 prvtCspfEntIndex										Unsigned32,
+       prvtCspfStatNumRtQueries           Counter32,
+       prvtCspfStatNumRtsClcd             Counter32,
+       prvtCspfStatNumRtsInCache          Gauge32,
+       prvtCspfStatNumUpdatesRcvd         Counter32,
+       prvtCspfStatNumEntriesDeleted      Counter32,
+       prvtCspfStatNumLinkEntries         Gauge32,
+       prvtCspfStatNumNetworkEntries      Gauge32,
+       prvtCspfStatNumReturnedCaches      Counter32,
+       prvtCspfStatNumBkupQueries         Counter32,
+       prvtCspfStatNumBkupPathsFound      Counter32,
+       prvtCspfStatNumRouteUpdates        Counter32,
+       prvtCspfStatNumDiscardedRoutes     Counter32
+    }
+
+   prvtCspfEntIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Identifies a CSPF entity."
+    ::= {  prvtCspfStatisticsEntry 1 }
+
+  prvtCspfStatNumRtQueries OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of ATG_QCTE_QUERY_CSPF_ROUTE queries sent in to this
+      CSPF process."
+   ::= {  prvtCspfStatisticsEntry 2 }
+
+  prvtCspfStatNumRtsClcd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of routes successfully calculated by this CSPF process.
+      This statistic is incremented for each positive response to an
+      ATG_QCTE_QUERY_CSPF_ROUTE query."
+   ::= {  prvtCspfStatisticsEntry 3 }
+
+  prvtCspfStatNumRtsInCache OBJECT-TYPE
+   SYNTAX      Gauge32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPF trees currently stored in the cache.  Each tree
+      corresponds to a different set of constraints."
+   ::= {  prvtCspfStatisticsEntry 4 }
+
+  prvtCspfStatNumUpdatesRcvd OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of database updates signals that have been received by
+      this CSPF process, to indicate a new, updated or deleted database
+      entry."
+   ::= {  prvtCspfStatisticsEntry 5 }
+
+  prvtCspfStatNumEntriesDeleted OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Database updates signals that have been received by this
+      CSPF process to indicate a database entry to delete."
+   ::= {  prvtCspfStatisticsEntry 6 }
+
+  prvtCspfStatNumLinkEntries OBJECT-TYPE
+   SYNTAX      Gauge32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of entries stored in the CSPF database for Traffic
+      Engineering links."
+   ::= {  prvtCspfStatisticsEntry 7 }
+
+  prvtCspfStatNumNetworkEntries OBJECT-TYPE
+   SYNTAX      Gauge32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of entries stored in the CSPF database for networks."
+   ::= {  prvtCspfStatisticsEntry 8 }
+
+  prvtCspfStatNumReturnedCaches OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of queries that have been satisfied through returning a route
+      stored in the cache."
+   ::= {  prvtCspfStatisticsEntry 9 }
+
+  prvtCspfStatNumBkupQueries OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of queries that have requested a backup path."
+   ::= {  prvtCspfStatisticsEntry 10 }
+
+  prvtCspfStatNumBkupPathsFound OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of queries that have been returned with a backup path
+      successfully calculated."
+   ::= {  prvtCspfStatisticsEntry 11 }
+
+  prvtCspfStatNumRouteUpdates OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of incremental route updates which have been made to routes
+      held in the cache."
+   ::= {  prvtCspfStatisticsEntry 12 }
+
+  prvtCspfStatNumDiscardedRoutes OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of routes which have been discarded from the cache due to
+      new TE information being received."
+   ::= {  prvtCspfStatisticsEntry 13 }
+   END

@@ -1,0 +1,209 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-TEMIB-ENTITY-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-TEMIB-ENTITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    mpls
+        FROM PRVT-SWITCH-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtTeMibEntityMIB MODULE-IDENTITY
+    LAST-UPDATED "200712060000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The MIB module for management of TE-MIB entities."
+    REVISION    "200712060000Z"
+    DESCRIPTION 
+        "Initial."
+    ::= { mpls 8 }
+
+
+PrvtTeMibAdminStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The desired administrative state of a TE-MIB entity."
+    SYNTAX      INTEGER { up(1), down(2) }
+
+PrvtTeMibOperStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The current operational state of a TE-MIB entity."
+    SYNTAX      INTEGER { up(1), down(2), goingUp(3), goingDown(4), 
+                    actFailed(5) }
+
+PrvtTeMibEntityIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The index value identifying a TE-MIB entity."
+    SYNTAX      Unsigned32
+
+PrvtTeMibPartnerStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The state of a TE-MIB entity partner."
+    SYNTAX      INTEGER { initial(0), activating(1), active(2), 
+                    deactivating(3), failedOver(4), failed(5), 
+                    unavailable(6) }
+
+prvtTeMibEntityMIBObjects OBJECT IDENTIFIER
+    ::= { prvtTeMibEntityMIB 1 }
+
+prvtMplsTeMibEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtMplsTeMibEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The table of TE-MIB entities."
+    ::= { prvtTeMibEntityMIBObjects 1 }
+
+prvtMplsTeMibEntityEntry OBJECT-TYPE
+    SYNTAX      PrvtMplsTeMibEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry represents a TE-MIB entity."
+    INDEX       { prvtMplsTeMibEntityIndex }
+    ::= { prvtMplsTeMibEntityTable 1 }
+
+PrvtMplsTeMibEntityEntry ::= SEQUENCE {
+    prvtMplsTeMibEntityIndex        PrvtTeMibEntityIndex,
+    prvtMplsTeMibEntityRowStatus    RowStatus,
+    prvtMplsTeMibDynFacilityBypass  TruthValue
+}
+
+prvtMplsTeMibEntityIndex OBJECT-TYPE
+    SYNTAX      PrvtTeMibEntityIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The index of this TE-MIB entity table entry. This is the
+         HAF entity index passed on the entity create parameters."
+    ::= { prvtMplsTeMibEntityEntry 1 }
+
+prvtMplsTeMibEntityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The row status for the TE-MIB entity table entry, used to create
+         and destroy TE-MIB entities.
+         When prvtMplsTeMibEntityRowStatus is 'active' and
+         prvtMplsTeMibEntityAdminStatus is 'up' the TE-MIB entity is active
+         and only these two fields can be modified."
+    ::= { prvtMplsTeMibEntityEntry 2 }
+
+prvtMplsTeMibDynFacilityBypass OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object gives the user ability to globally enable/disable 
+         automatically creation of bypass tunnels for all LSPs. Bypass 
+         tunnels will be created on FRR tunnel request automatically.
+         The default value is true. The creation of Dynamic bypass tunnels 
+         is enabled"
+    ::= { prvtMplsTeMibEntityEntry 3 }
+
+mplsTunnelHoldTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..120)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Defines a period in seconds needed to wait before rebuilding backup 
+         or primary tunnels if a frr condition occurs
+         Currently no more than 10 seconds are allowed"
+    ::= { prvtTeMibEntityMIBObjects 2 }
+
+prvtMplsTeMibEntityScalarTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtMplsTeMibEntityScalarEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The mplsTeMibEntityScalarTable contains all MPLS Tunnel
+         scalars."
+    ::= { prvtTeMibEntityMIBObjects 3 }
+
+prvtMplsTeMibEntityScalarEntry OBJECT-TYPE
+    SYNTAX      PrvtMplsTeMibEntityScalarEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The mplsTeMibEntityScalarTable contains all MPLS Tunnel
+         scalars."
+    INDEX       { prvtMplsTeMibEntityIndex }
+    ::= { prvtMplsTeMibEntityScalarTable 1 }
+
+PrvtMplsTeMibEntityScalarEntry ::= SEQUENCE {
+    mplsTunnelConfigured    Unsigned32,
+    mplsTunnelActive        Unsigned32
+}
+
+mplsTunnelConfigured OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of tunnels configured on this device. A
+         tunnel is considered configured if the
+         mplsTunnelRowStatus is active(1)."
+    ::= { prvtMplsTeMibEntityScalarEntry 1 }
+
+mplsTunnelActive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of tunnels active on this device. A
+         tunnel is considered active if the
+         mplsTunnelOperStatus is up(1)."
+    ::= { prvtMplsTeMibEntityScalarEntry 2 }
+
+END -- end of module PRVT-TEMIB-ENTITY-MIB.

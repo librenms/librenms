@@ -1,8 +1,8 @@
 <?php
 $unit_text     = 'Dctcd Uncor Bad';
 $unitlen       = 20;
-$bigdescrlen   = 5;
-$smalldescrlen = 5;
+$bigdescrlen   = 15;
+$smalldescrlen = 15;
 
 $rrdVar='id183';
 

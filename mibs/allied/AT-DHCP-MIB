@@ -1,0 +1,345 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: DHCP module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-DHCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+    ifIndex
+        FROM IF-MIB
+
+    modules,
+    DisplayStringUnsized
+        FROM AT-SMI-MIB
+;
+                                 
+dhcp    MODULE-IDENTITY
+        LAST-UPDATED "200904010200Z" -- April 1, 2009
+        ORGANIZATION "Allied Telesis, Inc"
+        CONTACT-INFO
+            "http://www.alliedtelesis.com"
+        DESCRIPTION
+            "This MIB file contains definitions of managed objects for the
+            DHCP module. "
+
+        REVISION "200904010200Z" -- April 1, 2009
+        DESCRIPTION
+            "Added a new TRAP (dhcpRangeExceededThresholdTrap) which will be 
+            generated when the number of clients allocated for that range exceeds
+            a preset threshold."
+
+        REVISION "200606281222Z" -- June 28, 2006
+        DESCRIPTION
+            "Initial Revision"
+
+::= { modules 70 }
+									  
+-- The DHCP (Dynamic Host Configuration Protocol) module. This group provides
+-- management information for DHCP, which will be implemented in a number of
+-- stages.
+-- stage 1, May/2002, Tony van der Peet
+--         No DHCP MIB has been found in an RFC, so DHCP has to be supported
+--         in the enterprise MIB. Basic request is for a TRAP when a DHCP
+--         host range is exhausted. Some basic variables for the range
+--         information are provided in order to allow lookup of the exhausted
+--         range. Also provided are variables for the express purpose of
+--         adding to the TRAP message.
+
+-- The DHCP range table. Each entry in the table gives information about a
+-- single DHCP range currently configured in the switch/router.
+
+dhcpRangeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DhcpRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of DHCP ranges."
+    ::= { dhcp 1 }
+
+dhcpRangeEntry OBJECT-TYPE
+    SYNTAX      DhcpRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry of the DHCP range table. This contains
+            information about a single DHCP range configured on this
+            device."
+    INDEX   { dhcpRangeIndex }
+    ::= { dhcpRangeTable 1 }
+
+DhcpRangeEntry ::=
+        SEQUENCE {
+            dhcpRangeIndex
+                INTEGER,
+            dhcpRangeName
+                DisplayStringUnsized,
+            dhcpRangeBaseAddress
+                IpAddress,
+            dhcpRangeNumberOfAddresses
+                INTEGER,
+            dhcpRangeGateway
+                IpAddress
+        }
+
+dhcpRangeIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of this DHCP range. DHCP ranges are stored in a list
+            which is ordered by range name. The index gives the place in the
+            list. Note that if ranges are added or deleted, the index for a
+            given range will change. Since this table is read-only, this will
+            not have an undue effect, but if in future this table is made
+            read-write, a mechanism will have to be created to lock the indices
+            of the range table while SET operations are proceeding."
+    ::= { dhcpRangeEntry 1 }
+
+dhcpRangeName OBJECT-TYPE
+    SYNTAX      DisplayStringUnsized (SIZE (1..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name given to identify this DHCP range. This is the ultimate
+            method for uniquely identifying this range. Names are compared without
+            regard to case, for example >range1< will be treated as the same as
+            >RANGE1<."
+    ::= { dhcpRangeEntry 2 }
+
+dhcpRangeBaseAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The base address of this range. This address defines the lower bound
+            of the range of IP addresses which can be allocated to devices
+            requesting an IP address via DHCP."
+    ::= { dhcpRangeEntry 3 }
+
+dhcpRangeNumberOfAddresses OBJECT-TYPE
+    SYNTAX      INTEGER (1..256)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of IP address in this range. This number defines the upper
+            bound of the range of IP addresses which can be allocated to devices
+            requesting an IP address via DHCP."
+    ::= { dhcpRangeEntry 4 }
+
+dhcpRangeGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IP address of the BOOTP relay agent which will be relaying DHCP
+            requests for this range. If this address is 0.0.0.0, then there will
+            be no BOOTP relay agent and the range will be allocated to devices
+            directly connected to this device."
+    ::= { dhcpRangeEntry 5 }
+
+-- DHCP traps.
+
+-- DHCP trap variables. special variables set up to act as reference points for
+-- variables sent in TRAPs.
+
+dhcpTrapVariable OBJECT IDENTIFIER ::= { dhcp 2 }
+
+dhcpRangeExhaustedGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Whenever a DHCP client attempts to lease an IP address and
+            the DHCP server cannot provide an address, this variable is
+            set to the gateway address of the DHCP request. The gateway
+            address is the IP address of the gateway acting as a BOOTP
+            relay agent for the request. If there is no gateway, the
+            address will be 0.0.0.0. If the gateway address is non-zero,
+            the DHCP range from which the allocation should have been
+            made will able to be identified by lookup in the DHCP range
+            table."
+    ::= { dhcpTrapVariable 1 }
+
+dhcpRangeExhaustedInterface OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Whenever a DHCP client attempts to lease an IP address and
+            the DHCP server cannot provide an address, this variable is
+            set to the IP address of the interface which received the
+            DHCP request. If the gateway address associated with the
+            failed DHCP request is 0.0.0.0, the interface address will
+            be able to be used to lookup the range that was exhausted
+            and from which the allocation should have been made."
+    ::= { dhcpTrapVariable 2 }
+
+dhcpRangeExceededRange OBJECT-TYPE
+    SYNTAX      DisplayStringUnsized (SIZE (1..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Whenever a DHCP client attempts to lease an IP address and
+            the DHCP server has exceeded a pre-defined threshold this variable
+            is set to the name of the range which received the DHCP request."
+    ::= { dhcpTrapVariable 3 }
+	
+dhcpRangeExceededClients OBJECT-TYPE
+    SYNTAX      INTEGER (1..1024)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of IP addresses statically defined for a range upon creation. 
+            Based on the starting IP address for a range, this number determines the
+            upper bound of IP addresses which can be allocated to devices requesting
+            an IP address via DHCP."
+    ::= { dhcpTrapVariable 4 }
+	
+dhcpRangeExceededRemaining OBJECT-TYPE
+    SYNTAX      INTEGER (1..1024)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of IP addresses still available to be allocated in this
+            range."
+    ::= { dhcpTrapVariable 5 }
+
+dhcpRangeExceededPercentage OBJECT-TYPE
+    SYNTAX      INTEGER (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The percentage of IP addresses in a range that are currently in use."
+    ::= { dhcpTrapVariable 6 }
+
+dhcpTraps	OBJECT IDENTIFIER ::= { dhcp 0 }
+dhcpRangeExhaustedTrap NOTIFICATION-TYPE
+    OBJECTS   	{ dhcpRangeExhaustedGateway , dhcpRangeExhaustedInterface }
+	STATUS		current
+    DESCRIPTION
+                "This trap is generated when a DHCP client makes a request for
+                an IP address and the request cannot be satisfied because all
+                addresses in the range are already allocated to other devices."
+    ::= { dhcpTraps 1 }
+	
+dhcpRangeExceededThresholdTrap NOTIFICATION-TYPE
+    OBJECTS   	{ dhcpRangeExhaustedInterface, dhcpRangeExceededRange,
+				  dhcpRangeExceededClients, dhcpRangeExceededRemaining,
+				  dhcpRangeExceededPercentage }
+	STATUS		current
+    DESCRIPTION
+                "This trap is generated when a DHCP client makes a request for
+                an IP address and a pre-defined usage threshold has been exceeded.
+                The IP addresses will continue to be allocated until the range
+                is exhausted."
+    ::= { dhcpTraps 2 }
+
+dhcpRangeExceededThresholdClearTrap NOTIFICATION-TYPE
+    OBJECTS   	{ dhcpRangeExhaustedInterface, dhcpRangeExceededRange,
+				  dhcpRangeExceededClients, dhcpRangeExceededRemaining,
+				  dhcpRangeExceededPercentage }
+	STATUS		current
+    DESCRIPTION
+                "This trap is generated when the number of allocated clients  
+                in a designated range falls below a pre-defined usage threshold."
+    ::= { dhcpTraps 3 }
+
+-- The DHCP client status table. Each entry in the table gives information about 
+-- ip addresses currently configured on created ranges on the switch/router.
+-- Information shown are the client ip address, clientID, ClientState, ClientType,
+-- ClientExpiry
+-- This group was added on 6/Jan/2004 by Sean Lin on request from ATKK for Yahoo!BB
+
+dhcpClientTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DhcpClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of defined DHCP range client addresses."
+    ::= { dhcp 3 }
+
+dhcpClientEntry OBJECT-TYPE
+    SYNTAX      DhcpClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry of the DHCP range client table. This contains
+            information about a single DHCP range client address."
+    INDEX   { dhcpRangeIndex, dhcpClientIpAddress }
+    ::= { dhcpClientTable 1 }
+
+DhcpClientEntry ::=
+        SEQUENCE {
+            dhcpClientIpAddress
+                IpAddress,
+            dhcpClientID
+                OCTET STRING,
+            dhcpClientState
+                INTEGER,
+            dhcpClientType
+                INTEGER,
+            dhcpClientExpiry
+                OCTET STRING
+        }
+
+dhcpClientIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An IP address from the range of available addresses."
+    ::= { dhcpClientEntry 1 }
+
+dhcpClientID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The hardware address of the client, if any, that has been
+            assigned the IP address."
+    ::= { dhcpClientEntry 2 }
+
+dhcpClientState OBJECT-TYPE
+    SYNTAX      INTEGER {unused (0), reclaiming (1), inuse (2), offered (3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The state of the IP address; one of unused, inuse or 
+            reclaim."
+    ::= { dhcpClientEntry 3 }
+
+dhcpClientType OBJECT-TYPE
+    SYNTAX      INTEGER {auto (1), dyn (2), static (3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of allocation mechanism applied to the IP address; 
+            one of static, auto or dyn."
+    ::= { dhcpClientEntry 4 }
+
+dhcpClientExpiry OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The expiry date for dynamically allocated IP address."
+    ::= { dhcpClientEntry 5 }
+
+END

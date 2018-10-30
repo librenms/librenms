@@ -1,0 +1,125 @@
+-- This module defines enterprise MIBs for VPN IP pool
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-IPPOOL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenVpn, netscreenVpnMibModule
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenIppoolMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor 
+         VPN IP pool"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311130000Z" -- November 13, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "no comment"
+    REVISION      "200008270000Z" -- August 27, 2000
+    DESCRIPTION
+        "Creation date"
+    ::= { netscreenVpnMibModule 9 }
+
+NsVpnIpPoolEntry ::= SEQUENCE
+{
+    nsVpnIpPoolIndex   Integer32,
+    nsVpnIpPoolName    DisplayString,
+    nsVpnIpPoolStartIp IpAddress,
+    nsVpnIpPoolEndIp   IpAddress,
+    nsVpnIpPoolIpUsed  Integer32
+}
+
+nsVpnIpPool OBJECT IDENTIFIER ::= { netscreenVpn 9 }
+
+nsVpnIpPoolTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnIpPoolEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table collects all ip pool configuration in NetScreen
+         device."
+    ::= { nsVpnIpPool 1 }
+
+nsVpnIpPoolEntry OBJECT-TYPE
+    SYNTAX        NsVpnIpPoolEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsVpnIpPoolEntry holds a set of
+         configuration parameters associated with an instance IP pool."
+    INDEX
+        { nsVpnIpPoolIndex }
+    ::= { nsVpnIpPoolTable 1 }
+
+nsVpnIpPoolIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for ip pool.  Its value ranges between 0 and
+         65535 and may not be contiguous."
+    ::= { nsVpnIpPoolEntry 1 }
+
+nsVpnIpPoolName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ip pool name"
+    ::= { nsVpnIpPoolEntry 2 }
+
+nsVpnIpPoolStartIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "IP pool's start ip address."
+    ::= { nsVpnIpPoolEntry 3 }
+
+nsVpnIpPoolEndIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "IP pool's end ip address."
+    ::= { nsVpnIpPoolEntry 4 }
+
+nsVpnIpPoolIpUsed OBJECT-TYPE
+    SYNTAX        Integer32 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Total number of addresses in use from this pool." 
+    ::= { nsVpnIpPoolEntry 5 }
+
+END
+
+

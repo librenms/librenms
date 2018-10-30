@@ -7,7 +7,7 @@ require 'includes/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'sub10systems');
 
 
-if (file_exists($rrdfilename)) {
+if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                        Now    Min     Max\\n'";
     $rrd_options .= ' DEF:sub10RadioLclRxPowe='.$rrdfilename.':sub10RadioLclRxPowe:AVERAGE ';
     $rrd_options .= " LINE1:sub10RadioLclRxPowe#CC0000:'Rx Power             ' ";

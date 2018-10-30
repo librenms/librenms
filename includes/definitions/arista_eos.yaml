@@ -10,3 +10,14 @@ over:
 discovery:
     - sysDescr:
         - Arista Networks EOS
+poller_modules:
+    wireless: false
+    ipmi: false
+    applications: false
+    services: false
+    ntp: false
+discovery_modules:
+    cisco-vrf-lite: false
+    services: false
+    ntp: false
+    wireless: false

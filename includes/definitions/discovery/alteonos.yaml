@@ -1,0 +1,7 @@
+mib: ALTEON-CHEETAH-SWITCH-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: mpCpuStatsUtil1Second
+                  num_oid: '.1.3.6.1.4.1.1872.2.5.1.2.2.1.{{ $index }}'

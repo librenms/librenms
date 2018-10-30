@@ -1,0 +1,217 @@
+-- This module defines enterprise MIBs for VPN certificate
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-CERTIFICATE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenVpn, netscreenVpnMibModule
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenCertificateMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor 
+         VPN certificates"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311120000Z" -- November 12, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No comment"
+    REVISION      "200105150000Z" -- May 15, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenVpnMibModule 7 }
+
+NsVpnCertCfgEntry ::= SEQUENCE
+{
+    nsVpnCertCfgIndex   Integer32,
+    nsVpnCertCfgType    INTEGER,
+    nsVpnCertCfgSubject DisplayString,
+    nsVpnCertCfgExpire  DisplayString,
+    nsVpnCertCfgIssuer  DisplayString,
+    nsVpnCertCfgVsys    Integer32
+}
+
+NsVpnCertDefEntry ::= SEQUENCE
+{
+    nsVpnCertDefIndex   Integer32,
+    nsVpnCertDefLdap    DisplayString,
+    nsVpnCertDefCrlUrl  DisplayString,
+    nsVpnCertDefRefresh DisplayString,
+    nsVpnCertDefX509    INTEGER,
+    nsVpnCertDefVsys    Integer32
+}
+
+nsVpnCert OBJECT IDENTIFIER ::= { netscreenVpn 7 }
+
+nsVpnCertDefTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnCertDefEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Certificate default setting table collects the default
+         certificates used when establish a secure VPN connection in
+         NetScreen device."
+    ::= { nsVpnCert 1 }
+
+nsVpnCertDefEntry OBJECT-TYPE
+    SYNTAX        NsVpnCertDefEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing attributes of a certificate"
+    INDEX
+        { nsVpnCertDefIndex }
+    ::= { nsVpnCertDefTable 1 }
+
+nsVpnCertDefIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Table index using as primary key when retrieving the table."
+    ::= { nsVpnCertDefEntry 1 }
+
+nsVpnCertDefLdap OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "LDAP server name."
+    ::= { nsVpnCertDefEntry 2 }
+
+nsVpnCertDefCrlUrl OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "URL of CRL."
+    ::= { nsVpnCertDefEntry 3 }
+
+nsVpnCertDefRefresh OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "CRL Refresh Frequency."
+    ::= { nsVpnCertDefEntry 4 }
+
+nsVpnCertDefX509 OBJECT-TYPE
+    SYNTAX        INTEGER {
+        partial(0),
+        full(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "X509 Certificate Path Validation Level."
+    ::= { nsVpnCertDefEntry 5 }
+
+nsVpnCertDefVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vsys the cert setting belongs to."
+    ::= { nsVpnCertDefEntry 6 }
+
+nsVpnCertCfgTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnCertCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table collects detail certificate information."
+    ::= { nsVpnCert 2 }
+
+nsVpnCertCfgEntry OBJECT-TYPE
+    SYNTAX        NsVpnCertCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsVpnCertCfgTable contains a set of
+         attributes for a certificate"
+    INDEX
+        { nsVpnCertCfgIndex }
+    ::= { nsVpnCertCfgTable 1 }
+
+nsVpnCertCfgIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for certification table.  Its value ranges
+         between 0 and 65535 and may not be contiguous."
+    ::= { nsVpnCertCfgEntry 1 }
+
+nsVpnCertCfgType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        ca(0),
+        local(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Certificate type."
+    ::= { nsVpnCertCfgEntry 2 }
+
+nsVpnCertCfgSubject OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Certificate subject."
+    ::= { nsVpnCertCfgEntry 3 }
+
+nsVpnCertCfgExpire OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Certificate expire date."
+    ::= { nsVpnCertCfgEntry 4 }
+
+nsVpnCertCfgIssuer OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..64))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Certificate configuration details."
+    ::= { nsVpnCertCfgEntry 5 }
+
+nsVpnCertCfgVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Certificate's vsys."
+    ::= { nsVpnCertCfgEntry 6 }
+
+END
+
+

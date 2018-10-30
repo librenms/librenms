@@ -1,0 +1,1909 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-STATISTICS-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    sapEntry, sdpEntry
+        FROM PRVT-SERV-MIB
+    switch
+        FROM PRVT-SWITCH-MIB
+    Counter64, Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtStatisticsMIB MODULE-IDENTITY
+    LAST-UPDATED "201401080000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The SNMP MIB module to manage the statistics."
+    REVISION    "201401080000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { switch 181 }
+
+
+StatType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Choose to count packets,bytes or both."
+    SYNTAX      INTEGER { packet(1), bytes(2), all(3) }
+
+prvtStatObjects OBJECT IDENTIFIER
+    ::= { prvtStatisticsMIB 1 }
+
+prvtStatIngressPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStatIngressPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Create ingress policy"
+    ::= { prvtStatObjects 1 }
+
+prvtStatIngressPolicyEntry OBJECT-TYPE
+    SYNTAX      PrvtStatIngressPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtStatIngressPolicyTable"
+    INDEX       { prvtStatIngressPolicyName }
+    ::= { prvtStatIngressPolicyTable 1 }
+
+PrvtStatIngressPolicyEntry ::= SEQUENCE {
+    prvtStatIngressPolicyName                       OCTET STRING,
+    prvtStatIngressPolicyRowStatus                  RowStatus,
+    prvtStatIngressPolicyDetailed                   TruthValue,
+    prvtStatIngressPolicyDescription                OCTET STRING,
+    prvtStatIngressPolicyFc                         TruthValue,
+    prvtStatIngressPolicyFcBwMeasurement            StatType,
+    prvtStatIngressPolicyColor                      TruthValue,
+    prvtStatIngressPolicyColorBwMeasurement         StatType,
+    prvtStatIngressPolicyUnicast                    TruthValue,
+    prvtStatIngressPolicyUnicastBwMeasurement       StatType,
+    prvtStatIngressPolicyBroadcast                  TruthValue,
+    prvtStatIngressPolicyBroadcastBwMeasurement     StatType,
+    prvtStatIngressPolicyMulticast                  TruthValue,
+    prvtStatIngressPolicyMulticastBwMeasurement     StatType
+}
+
+prvtStatIngressPolicyName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Policy Name"
+    ::= { prvtStatIngressPolicyEntry 1 }
+
+prvtStatIngressPolicyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Create entry in table."
+    ::= { prvtStatIngressPolicyEntry 2 }
+
+prvtStatIngressPolicyDetailed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable detailed statistics."
+    ::= { prvtStatIngressPolicyEntry 3 }
+
+prvtStatIngressPolicyDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..120))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configue description string."
+    ::= { prvtStatIngressPolicyEntry 4 }
+
+prvtStatIngressPolicyFc OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable internal priority statistics."
+    ::= { prvtStatIngressPolicyEntry 5 }
+
+prvtStatIngressPolicyFcBwMeasurement OBJECT-TYPE
+    SYNTAX      StatType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure internal priority statistics
+         to count packets,byte or both."
+    ::= { prvtStatIngressPolicyEntry 6 }
+
+prvtStatIngressPolicyColor OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable internal priority and color statistics."
+    ::= { prvtStatIngressPolicyEntry 7 }
+
+prvtStatIngressPolicyColorBwMeasurement OBJECT-TYPE
+    SYNTAX      StatType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure internal priority and color
+         statistics to count packets,byte or both."
+    ::= { prvtStatIngressPolicyEntry 8 }
+
+prvtStatIngressPolicyUnicast OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable unicast statistics."
+    ::= { prvtStatIngressPolicyEntry 9 }
+
+prvtStatIngressPolicyUnicastBwMeasurement OBJECT-TYPE
+    SYNTAX      StatType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure unicast statistics to count packets,byte or both."
+    ::= { prvtStatIngressPolicyEntry 10 }
+
+prvtStatIngressPolicyBroadcast OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable broadcast statistics."
+    ::= { prvtStatIngressPolicyEntry 11 }
+
+prvtStatIngressPolicyBroadcastBwMeasurement OBJECT-TYPE
+    SYNTAX      StatType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure broadcast statistics to count packets,byte or both."
+    ::= { prvtStatIngressPolicyEntry 12 }
+
+prvtStatIngressPolicyMulticast OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable muticast statistics."
+    ::= { prvtStatIngressPolicyEntry 13 }
+
+prvtStatIngressPolicyMulticastBwMeasurement OBJECT-TYPE
+    SYNTAX      StatType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure multicast statistics to count packets,byte or both."
+    ::= { prvtStatIngressPolicyEntry 14 }
+
+prvtStatEgressPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStatEgressPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Create ingress policy"
+    ::= { prvtStatObjects 2 }
+
+prvtStatEgressPolicyEntry OBJECT-TYPE
+    SYNTAX      PrvtStatEgressPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtStatEgressPolicyTable"
+    INDEX       { prvtStatEgressPolicyName }
+    ::= { prvtStatEgressPolicyTable 1 }
+
+PrvtStatEgressPolicyEntry ::= SEQUENCE {
+    prvtStatEgressPolicyName                    OCTET STRING,
+    prvtStatEgressPolicyRowStatus               RowStatus,
+    prvtStatEgressPolicyDetailed                TruthValue,
+    prvtStatEgressPolicyDescription             OCTET STRING,
+    prvtStatEgressPolicyFc                      TruthValue,
+    prvtStatEgressPolicyFcBwMeasurement         StatType,
+    prvtStatEgressPolicyColor                   TruthValue,
+    prvtStatEgressPolicyColorBwMeasurement      StatType,
+    prvtStatEgressPolicyDaType                  TruthValue,
+    prvtStatEgressPolicyDaTypeBwMeasurement     StatType
+}
+
+prvtStatEgressPolicyName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Policy Name"
+    ::= { prvtStatEgressPolicyEntry 1 }
+
+prvtStatEgressPolicyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Create entry in table."
+    ::= { prvtStatEgressPolicyEntry 2 }
+
+prvtStatEgressPolicyDetailed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable detailed statistics."
+    ::= { prvtStatEgressPolicyEntry 3 }
+
+prvtStatEgressPolicyDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..120))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configue description string."
+    ::= { prvtStatEgressPolicyEntry 4 }
+
+prvtStatEgressPolicyFc OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable internal priority statistics."
+    ::= { prvtStatEgressPolicyEntry 5 }
+
+prvtStatEgressPolicyFcBwMeasurement OBJECT-TYPE
+    SYNTAX      StatType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure internal priority statistics
+         to count packets,byte or both."
+    ::= { prvtStatEgressPolicyEntry 6 }
+
+prvtStatEgressPolicyColor OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable internal priority and color statistics."
+    ::= { prvtStatEgressPolicyEntry 7 }
+
+prvtStatEgressPolicyColorBwMeasurement OBJECT-TYPE
+    SYNTAX      StatType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure internal priority and color
+         statistics to count packets,byte or both."
+    ::= { prvtStatEgressPolicyEntry 8 }
+
+prvtStatEgressPolicyDaType OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable unicast/broadcast statistics"
+    ::= { prvtStatEgressPolicyEntry 9 }
+
+prvtStatEgressPolicyDaTypeBwMeasurement OBJECT-TYPE
+    SYNTAX      StatType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure unicast/broadcast statistics to count packets,byte or both."
+    ::= { prvtStatEgressPolicyEntry 10 }
+
+prvtStatSapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStatSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Apply policy on sap"
+    ::= { prvtStatObjects 3 }
+
+prvtStatSapEntry OBJECT-TYPE
+    SYNTAX      PrvtStatSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtStatSapTable"
+    AUGMENTS    { sapEntry }
+    ::= { prvtStatSapTable 1 }
+
+PrvtStatSapEntry ::= SEQUENCE {
+    prvtStatSapIngressPolicy        OCTET STRING,
+    prvtStatSapEgressPolicy         OCTET STRING,
+    prvtStatSapClear                TruthValue,
+    prvtStatSapInPackets            Counter64,
+    prvtStatSapInBytes              Counter64,
+    prvtStatSapDropPackets          Counter64,
+    prvtStatSapDropBytes            Counter64,
+    prvtStatSapUnicastPackets       Counter64,
+    prvtStatSapUnicastBytes         Counter64,
+    prvtStatSapMulticastPackets     Counter64,
+    prvtStatSapMulticastBytes       Counter64,
+    prvtStatSapBroadcastPackets     Counter64,
+    prvtStatSapBroadcastBytes       Counter64,
+    prvtStatSapPri0Packets          Counter64,
+    prvtStatSapPri0Bytes            Counter64,
+    prvtStatSapPri1Packets          Counter64,
+    prvtStatSapPri1Bytes            Counter64,
+    prvtStatSapPri2Packets          Counter64,
+    prvtStatSapPri2Bytes            Counter64,
+    prvtStatSapPri3Packets          Counter64,
+    prvtStatSapPri3Bytes            Counter64,
+    prvtStatSapPri4Packets          Counter64,
+    prvtStatSapPri4Bytes            Counter64,
+    prvtStatSapPri5Packets          Counter64,
+    prvtStatSapPri5Bytes            Counter64,
+    prvtStatSapPri6Packets          Counter64,
+    prvtStatSapPri6Bytes            Counter64,
+    prvtStatSapPri7Packets          Counter64,
+    prvtStatSapPri7Bytes            Counter64,
+    prvtStatSapPri0yPackets         Counter64,
+    prvtStatSapPri0yBytes           Counter64,
+    prvtStatSapPri1yPackets         Counter64,
+    prvtStatSapPri1yBytes           Counter64,
+    prvtStatSapPri2yPackets         Counter64,
+    prvtStatSapPri2yBytes           Counter64,
+    prvtStatSapPri3yPackets         Counter64,
+    prvtStatSapPri3yBytes           Counter64,
+    prvtStatSapPri4yPackets         Counter64,
+    prvtStatSapPri4yBytes           Counter64,
+    prvtStatSapPri5yPackets         Counter64,
+    prvtStatSapPri5yBytes           Counter64,
+    prvtStatSapPri6yPackets         Counter64,
+    prvtStatSapPri6yBytes           Counter64,
+    prvtStatSapPri7yPackets         Counter64,
+    prvtStatSapPri7yBytes           Counter64,
+    prvtStatSapEgPackets            Counter64,
+    prvtStatSapEgBytes              Counter64,
+    prvtStatSapEgUnicastPackets     Counter64,
+    prvtStatSapEgUnicastBytes       Counter64,
+    prvtStatSapEgMulticastPackets   Counter64,
+    prvtStatSapEgMulticastBytes     Counter64,
+    prvtStatSapEgBroadcastPackets   Counter64,
+    prvtStatSapEgBroadcastBytes     Counter64,
+    prvtStatSapEgPri0Packets        Counter64,
+    prvtStatSapEgPri0Bytes          Counter64,
+    prvtStatSapEgPri1Packets        Counter64,
+    prvtStatSapEgPri1Bytes          Counter64,
+    prvtStatSapEgPri2Packets        Counter64,
+    prvtStatSapEgPri2Bytes          Counter64,
+    prvtStatSapEgPri3Packets        Counter64,
+    prvtStatSapEgPri3Bytes          Counter64,
+    prvtStatSapEgPri4Packets        Counter64,
+    prvtStatSapEgPri4Bytes          Counter64,
+    prvtStatSapEgPri5Packets        Counter64,
+    prvtStatSapEgPri5Bytes          Counter64,
+    prvtStatSapEgPri6Packets        Counter64,
+    prvtStatSapEgPri6Bytes          Counter64,
+    prvtStatSapEgPri7Packets        Counter64,
+    prvtStatSapEgPri7Bytes          Counter64,
+    prvtStatSapEgPri0yPackets       Counter64,
+    prvtStatSapEgPri0yBytes         Counter64,
+    prvtStatSapEgPri1yPackets       Counter64,
+    prvtStatSapEgPri1yBytes         Counter64,
+    prvtStatSapEgPri2yPackets       Counter64,
+    prvtStatSapEgPri2yBytes         Counter64,
+    prvtStatSapEgPri3yPackets       Counter64,
+    prvtStatSapEgPri3yBytes         Counter64,
+    prvtStatSapEgPri4yPackets       Counter64,
+    prvtStatSapEgPri4yBytes         Counter64,
+    prvtStatSapEgPri5yPackets       Counter64,
+    prvtStatSapEgPri5yBytes         Counter64,
+    prvtStatSapEgPri6yPackets       Counter64,
+    prvtStatSapEgPri6yBytes         Counter64,
+    prvtStatSapEgPri7yPackets       Counter64,
+    prvtStatSapEgPri7yBytes         Counter64
+}
+
+prvtStatSapIngressPolicy OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Ingress policy Name"
+    ::= { prvtStatSapEntry 1 }
+
+prvtStatSapEgressPolicy OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Egress policy Name"
+    ::= { prvtStatSapEntry 2 }
+
+prvtStatSapClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Clear sap statistics"
+    ::= { prvtStatSapEntry 3 }
+
+prvtStatSapInPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Matched frames per second"
+    ::= { prvtStatSapEntry 4 }
+
+prvtStatSapInBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Matched frames per second"
+    ::= { prvtStatSapEntry 5 }
+
+prvtStatSapDropPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Matched frames per second"
+    ::= { prvtStatSapEntry 6 }
+
+prvtStatSapDropBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Matched frames per second"
+    ::= { prvtStatSapEntry 7 }
+
+prvtStatSapUnicastPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Uni-pkt"
+    ::= { prvtStatSapEntry 8 }
+
+prvtStatSapUnicastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Uni-bts"
+    ::= { prvtStatSapEntry 9 }
+
+prvtStatSapMulticastPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "multi-pkt"
+    ::= { prvtStatSapEntry 10 }
+
+prvtStatSapMulticastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "multi-bytes"
+    ::= { prvtStatSapEntry 11 }
+
+prvtStatSapBroadcastPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "broad-pkt"
+    ::= { prvtStatSapEntry 12 }
+
+prvtStatSapBroadcastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "broad-bytes"
+    ::= { prvtStatSapEntry 13 }
+
+prvtStatSapPri0Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be (green)"
+    ::= { prvtStatSapEntry 14 }
+
+prvtStatSapPri0Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be (green)"
+    ::= { prvtStatSapEntry 15 }
+
+prvtStatSapPri1Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 (green)"
+    ::= { prvtStatSapEntry 16 }
+
+prvtStatSapPri1Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 (green)"
+    ::= { prvtStatSapEntry 17 }
+
+prvtStatSapPri2Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af green"
+    ::= { prvtStatSapEntry 18 }
+
+prvtStatSapPri2Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af green"
+    ::= { prvtStatSapEntry 19 }
+
+prvtStatSapPri3Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1(green)"
+    ::= { prvtStatSapEntry 20 }
+
+prvtStatSapPri3Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1(green)"
+    ::= { prvtStatSapEntry 21 }
+
+prvtStatSapPri4Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2(green)"
+    ::= { prvtStatSapEntry 22 }
+
+prvtStatSapPri4Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2(green)"
+    ::= { prvtStatSapEntry 23 }
+
+prvtStatSapPri5Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef(green)"
+    ::= { prvtStatSapEntry 24 }
+
+prvtStatSapPri5Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef(green)"
+    ::= { prvtStatSapEntry 25 }
+
+prvtStatSapPri6Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1(green)"
+    ::= { prvtStatSapEntry 26 }
+
+prvtStatSapPri6Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1(green)"
+    ::= { prvtStatSapEntry 27 }
+
+prvtStatSapPri7Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc(green)"
+    ::= { prvtStatSapEntry 28 }
+
+prvtStatSapPri7Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc(green)"
+    ::= { prvtStatSapEntry 29 }
+
+prvtStatSapPri0yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be yellow packets"
+    ::= { prvtStatSapEntry 30 }
+
+prvtStatSapPri0yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be yellow bytes"
+    ::= { prvtStatSapEntry 31 }
+
+prvtStatSapPri1yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 yellow packets"
+    ::= { prvtStatSapEntry 32 }
+
+prvtStatSapPri1yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 yellow bytes"
+    ::= { prvtStatSapEntry 33 }
+
+prvtStatSapPri2yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af yellow packets"
+    ::= { prvtStatSapEntry 34 }
+
+prvtStatSapPri2yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af yellow bytes"
+    ::= { prvtStatSapEntry 35 }
+
+prvtStatSapPri3yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1 yellow packets"
+    ::= { prvtStatSapEntry 36 }
+
+prvtStatSapPri3yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1 yellow bytes"
+    ::= { prvtStatSapEntry 37 }
+
+prvtStatSapPri4yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2 yellow packets"
+    ::= { prvtStatSapEntry 38 }
+
+prvtStatSapPri4yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2 yellow bytes"
+    ::= { prvtStatSapEntry 39 }
+
+prvtStatSapPri5yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef yellow packets"
+    ::= { prvtStatSapEntry 40 }
+
+prvtStatSapPri5yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef yellow bytes"
+    ::= { prvtStatSapEntry 41 }
+
+prvtStatSapPri6yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1 yellow packets"
+    ::= { prvtStatSapEntry 42 }
+
+prvtStatSapPri6yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1 yellow bytes"
+    ::= { prvtStatSapEntry 43 }
+
+prvtStatSapPri7yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc yellow packets"
+    ::= { prvtStatSapEntry 44 }
+
+prvtStatSapPri7yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc yellow bytes"
+    ::= { prvtStatSapEntry 45 }
+
+prvtStatSapEgPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Matched frames per second"
+    ::= { prvtStatSapEntry 46 }
+
+prvtStatSapEgBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Matched frames per second"
+    ::= { prvtStatSapEntry 47 }
+
+prvtStatSapEgUnicastPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Uni-pkt"
+    ::= { prvtStatSapEntry 48 }
+
+prvtStatSapEgUnicastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Uni-bts"
+    ::= { prvtStatSapEntry 49 }
+
+prvtStatSapEgMulticastPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "multi-pkt"
+    ::= { prvtStatSapEntry 50 }
+
+prvtStatSapEgMulticastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "multi-bytes"
+    ::= { prvtStatSapEntry 51 }
+
+prvtStatSapEgBroadcastPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "broad-pkt"
+    ::= { prvtStatSapEntry 52 }
+
+prvtStatSapEgBroadcastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "broad-bytes"
+    ::= { prvtStatSapEntry 53 }
+
+prvtStatSapEgPri0Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be (green)"
+    ::= { prvtStatSapEntry 54 }
+
+prvtStatSapEgPri0Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be (green)"
+    ::= { prvtStatSapEntry 55 }
+
+prvtStatSapEgPri1Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 (green)"
+    ::= { prvtStatSapEntry 56 }
+
+prvtStatSapEgPri1Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 (green)"
+    ::= { prvtStatSapEntry 57 }
+
+prvtStatSapEgPri2Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af green"
+    ::= { prvtStatSapEntry 58 }
+
+prvtStatSapEgPri2Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af green"
+    ::= { prvtStatSapEntry 59 }
+
+prvtStatSapEgPri3Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1(green)"
+    ::= { prvtStatSapEntry 60 }
+
+prvtStatSapEgPri3Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1(green)"
+    ::= { prvtStatSapEntry 61 }
+
+prvtStatSapEgPri4Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2(green)"
+    ::= { prvtStatSapEntry 62 }
+
+prvtStatSapEgPri4Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2(green)"
+    ::= { prvtStatSapEntry 63 }
+
+prvtStatSapEgPri5Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef(green)"
+    ::= { prvtStatSapEntry 64 }
+
+prvtStatSapEgPri5Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef(green)"
+    ::= { prvtStatSapEntry 65 }
+
+prvtStatSapEgPri6Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1(green)"
+    ::= { prvtStatSapEntry 66 }
+
+prvtStatSapEgPri6Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1(green)"
+    ::= { prvtStatSapEntry 67 }
+
+prvtStatSapEgPri7Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc(green)"
+    ::= { prvtStatSapEntry 68 }
+
+prvtStatSapEgPri7Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc(green)"
+    ::= { prvtStatSapEntry 69 }
+
+prvtStatSapEgPri0yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be yellow packets"
+    ::= { prvtStatSapEntry 70 }
+
+prvtStatSapEgPri0yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be yellow bytes"
+    ::= { prvtStatSapEntry 71 }
+
+prvtStatSapEgPri1yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 yellow packets"
+    ::= { prvtStatSapEntry 72 }
+
+prvtStatSapEgPri1yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 yellow bytes"
+    ::= { prvtStatSapEntry 73 }
+
+prvtStatSapEgPri2yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af yellow packets"
+    ::= { prvtStatSapEntry 74 }
+
+prvtStatSapEgPri2yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af yellow bytes"
+    ::= { prvtStatSapEntry 75 }
+
+prvtStatSapEgPri3yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1 yellow packets"
+    ::= { prvtStatSapEntry 76 }
+
+prvtStatSapEgPri3yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1 yellow bytes"
+    ::= { prvtStatSapEntry 77 }
+
+prvtStatSapEgPri4yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2 yellow packets"
+    ::= { prvtStatSapEntry 78 }
+
+prvtStatSapEgPri4yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2 yellow bytes"
+    ::= { prvtStatSapEntry 79 }
+
+prvtStatSapEgPri5yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef yellow packets"
+    ::= { prvtStatSapEntry 80 }
+
+prvtStatSapEgPri5yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef yellow bytes"
+    ::= { prvtStatSapEntry 81 }
+
+prvtStatSapEgPri6yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1 yellow packets"
+    ::= { prvtStatSapEntry 82 }
+
+prvtStatSapEgPri6yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1 yellow bytes"
+    ::= { prvtStatSapEntry 83 }
+
+prvtStatSapEgPri7yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc yellow packets"
+    ::= { prvtStatSapEntry 84 }
+
+prvtStatSapEgPri7yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc yellow bytes"
+    ::= { prvtStatSapEntry 85 }
+
+prvtStatSdpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStatSdpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Apply policy on sap"
+    ::= { prvtStatObjects 4 }
+
+prvtStatSdpEntry OBJECT-TYPE
+    SYNTAX      PrvtStatSdpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtStatSdpTable"
+    AUGMENTS    { sdpEntry }
+    ::= { prvtStatSdpTable 1 }
+
+PrvtStatSdpEntry ::= SEQUENCE {
+    prvtStatSdpIngressPolicy        OCTET STRING,
+    prvtStatSdpEgressPolicy         OCTET STRING,
+    prvtStatSdpClear                TruthValue,
+    prvtStatSdpInPackets            Counter64,
+    prvtStatSdpInBytes              Counter64,
+    prvtStatSdpDropPackets          Counter64,
+    prvtStatSdpDropBytes            Counter64,
+    prvtStatSdpUnicastPackets       Counter64,
+    prvtStatSdpUnicastBytes         Counter64,
+    prvtStatSdpMulticastPackets     Counter64,
+    prvtStatSdpMulticastBytes       Counter64,
+    prvtStatSdpBroadcastPackets     Counter64,
+    prvtStatSdpBroadcastBytes       Counter64,
+    prvtStatSdpPri0Packets          Counter64,
+    prvtStatSdpPri0Bytes            Counter64,
+    prvtStatSdpPri1Packets          Counter64,
+    prvtStatSdpPri1Bytes            Counter64,
+    prvtStatSdpPri2Packets          Counter64,
+    prvtStatSdpPri2Bytes            Counter64,
+    prvtStatSdpPri3Packets          Counter64,
+    prvtStatSdpPri3Bytes            Counter64,
+    prvtStatSdpPri4Packets          Counter64,
+    prvtStatSdpPri4Bytes            Counter64,
+    prvtStatSdpPri5Packets          Counter64,
+    prvtStatSdpPri5Bytes            Counter64,
+    prvtStatSdpPri6Packets          Counter64,
+    prvtStatSdpPri6Bytes            Counter64,
+    prvtStatSdpPri7Packets          Counter64,
+    prvtStatSdpPri7Bytes            Counter64,
+    prvtStatSdpPri0yPackets         Counter64,
+    prvtStatSdpPri0yBytes           Counter64,
+    prvtStatSdpPri1yPackets         Counter64,
+    prvtStatSdpPri1yBytes           Counter64,
+    prvtStatSdpPri2yPackets         Counter64,
+    prvtStatSdpPri2yBytes           Counter64,
+    prvtStatSdpPri3yPackets         Counter64,
+    prvtStatSdpPri3yBytes           Counter64,
+    prvtStatSdpPri4yPackets         Counter64,
+    prvtStatSdpPri4yBytes           Counter64,
+    prvtStatSdpPri5yPackets         Counter64,
+    prvtStatSdpPri5yBytes           Counter64,
+    prvtStatSdpPri6yPackets         Counter64,
+    prvtStatSdpPri6yBytes           Counter64,
+    prvtStatSdpPri7yPackets         Counter64,
+    prvtStatSdpPri7yBytes           Counter64,
+    prvtStatSdpEgPackets            Counter64,
+    prvtStatSdpEgBytes              Counter64,
+    prvtStatSdpEgUnicastPackets     Counter64,
+    prvtStatSdpEgUnicastBytes       Counter64,
+    prvtStatSdpEgMulticastPackets   Counter64,
+    prvtStatSdpEgMulticastBytes     Counter64,
+    prvtStatSdpEgBroadcastPackets   Counter64,
+    prvtStatSdpEgBroadcastBytes     Counter64,
+    prvtStatSdpEgPri0Packets        Counter64,
+    prvtStatSdpEgPri0Bytes          Counter64,
+    prvtStatSdpEgPri1Packets        Counter64,
+    prvtStatSdpEgPri1Bytes          Counter64,
+    prvtStatSdpEgPri2Packets        Counter64,
+    prvtStatSdpEgPri2Bytes          Counter64,
+    prvtStatSdpEgPri3Packets        Counter64,
+    prvtStatSdpEgPri3Bytes          Counter64,
+    prvtStatSdpEgPri4Packets        Counter64,
+    prvtStatSdpEgPri4Bytes          Counter64,
+    prvtStatSdpEgPri5Packets        Counter64,
+    prvtStatSdpEgPri5Bytes          Counter64,
+    prvtStatSdpEgPri6Packets        Counter64,
+    prvtStatSdpEgPri6Bytes          Counter64,
+    prvtStatSdpEgPri7Packets        Counter64,
+    prvtStatSdpEgPri7Bytes          Counter64,
+    prvtStatSdpEgPri0yPackets       Counter64,
+    prvtStatSdpEgPri0yBytes         Counter64,
+    prvtStatSdpEgPri1yPackets       Counter64,
+    prvtStatSdpEgPri1yBytes         Counter64,
+    prvtStatSdpEgPri2yPackets       Counter64,
+    prvtStatSdpEgPri2yBytes         Counter64,
+    prvtStatSdpEgPri3yPackets       Counter64,
+    prvtStatSdpEgPri3yBytes         Counter64,
+    prvtStatSdpEgPri4yPackets       Counter64,
+    prvtStatSdpEgPri4yBytes         Counter64,
+    prvtStatSdpEgPri5yPackets       Counter64,
+    prvtStatSdpEgPri5yBytes         Counter64,
+    prvtStatSdpEgPri6yPackets       Counter64,
+    prvtStatSdpEgPri6yBytes         Counter64,
+    prvtStatSdpEgPri7yPackets       Counter64,
+    prvtStatSdpEgPri7yBytes         Counter64
+}
+
+prvtStatSdpIngressPolicy OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Ingress policy Name"
+    ::= { prvtStatSdpEntry 1 }
+
+prvtStatSdpEgressPolicy OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Egress policy Name"
+    ::= { prvtStatSdpEntry 2 }
+
+prvtStatSdpClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Clear SDP statistics"
+    ::= { prvtStatSdpEntry 3 }
+
+prvtStatSdpInPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Matched frames per second"
+    ::= { prvtStatSdpEntry 4 }
+
+prvtStatSdpInBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Matched frames per second"
+    ::= { prvtStatSdpEntry 5 }
+
+prvtStatSdpDropPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Matched frames per second"
+    ::= { prvtStatSdpEntry 6 }
+
+prvtStatSdpDropBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Matched frames per second"
+    ::= { prvtStatSdpEntry 7 }
+
+prvtStatSdpUnicastPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Uni-pkt"
+    ::= { prvtStatSdpEntry 8 }
+
+prvtStatSdpUnicastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Uni-bts"
+    ::= { prvtStatSdpEntry 9 }
+
+prvtStatSdpMulticastPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "multi-pkt"
+    ::= { prvtStatSdpEntry 10 }
+
+prvtStatSdpMulticastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "multi-bytes"
+    ::= { prvtStatSdpEntry 11 }
+
+prvtStatSdpBroadcastPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "broad-pkt"
+    ::= { prvtStatSdpEntry 12 }
+
+prvtStatSdpBroadcastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "broad-bytes"
+    ::= { prvtStatSdpEntry 13 }
+
+prvtStatSdpPri0Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be (green)"
+    ::= { prvtStatSdpEntry 14 }
+
+prvtStatSdpPri0Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be (green)"
+    ::= { prvtStatSdpEntry 15 }
+
+prvtStatSdpPri1Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 (green)"
+    ::= { prvtStatSdpEntry 16 }
+
+prvtStatSdpPri1Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 (green)"
+    ::= { prvtStatSdpEntry 17 }
+
+prvtStatSdpPri2Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af green"
+    ::= { prvtStatSdpEntry 18 }
+
+prvtStatSdpPri2Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af green"
+    ::= { prvtStatSdpEntry 19 }
+
+prvtStatSdpPri3Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1(green)"
+    ::= { prvtStatSdpEntry 20 }
+
+prvtStatSdpPri3Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1(green)"
+    ::= { prvtStatSdpEntry 21 }
+
+prvtStatSdpPri4Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2(green)"
+    ::= { prvtStatSdpEntry 22 }
+
+prvtStatSdpPri4Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2(green)"
+    ::= { prvtStatSdpEntry 23 }
+
+prvtStatSdpPri5Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef(green)"
+    ::= { prvtStatSdpEntry 24 }
+
+prvtStatSdpPri5Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef(green)"
+    ::= { prvtStatSdpEntry 25 }
+
+prvtStatSdpPri6Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1(green)"
+    ::= { prvtStatSdpEntry 26 }
+
+prvtStatSdpPri6Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1(green)"
+    ::= { prvtStatSdpEntry 27 }
+
+prvtStatSdpPri7Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc(green)"
+    ::= { prvtStatSdpEntry 28 }
+
+prvtStatSdpPri7Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc(green)"
+    ::= { prvtStatSdpEntry 29 }
+
+prvtStatSdpPri0yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be yellow packets"
+    ::= { prvtStatSdpEntry 30 }
+
+prvtStatSdpPri0yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be yellow bytes"
+    ::= { prvtStatSdpEntry 31 }
+
+prvtStatSdpPri1yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 yellow packets"
+    ::= { prvtStatSdpEntry 32 }
+
+prvtStatSdpPri1yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 yellow bytes"
+    ::= { prvtStatSdpEntry 33 }
+
+prvtStatSdpPri2yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af yellow packets"
+    ::= { prvtStatSdpEntry 34 }
+
+prvtStatSdpPri2yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af yellow bytes"
+    ::= { prvtStatSdpEntry 35 }
+
+prvtStatSdpPri3yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1 yellow packets"
+    ::= { prvtStatSdpEntry 36 }
+
+prvtStatSdpPri3yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1 yellow bytes"
+    ::= { prvtStatSdpEntry 37 }
+
+prvtStatSdpPri4yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2 yellow packets"
+    ::= { prvtStatSdpEntry 38 }
+
+prvtStatSdpPri4yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2 yellow bytes"
+    ::= { prvtStatSdpEntry 39 }
+
+prvtStatSdpPri5yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef yellow packets"
+    ::= { prvtStatSdpEntry 40 }
+
+prvtStatSdpPri5yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef yellow bytes"
+    ::= { prvtStatSdpEntry 41 }
+
+prvtStatSdpPri6yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1 yellow packets"
+    ::= { prvtStatSdpEntry 42 }
+
+prvtStatSdpPri6yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1 yellow bytes"
+    ::= { prvtStatSdpEntry 43 }
+
+prvtStatSdpPri7yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc yellow packets"
+    ::= { prvtStatSdpEntry 44 }
+
+prvtStatSdpPri7yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc yellow bytes"
+    ::= { prvtStatSdpEntry 45 }
+
+prvtStatSdpEgPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Matched frames per second"
+    ::= { prvtStatSdpEntry 46 }
+
+prvtStatSdpEgBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Matched frames per second"
+    ::= { prvtStatSdpEntry 47 }
+
+prvtStatSdpEgUnicastPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Uni-pkt"
+    ::= { prvtStatSdpEntry 48 }
+
+prvtStatSdpEgUnicastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Uni-bts"
+    ::= { prvtStatSdpEntry 49 }
+
+prvtStatSdpEgMulticastPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "multi-pkt"
+    ::= { prvtStatSdpEntry 50 }
+
+prvtStatSdpEgMulticastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "multi-bytes"
+    ::= { prvtStatSdpEntry 51 }
+
+prvtStatSdpEgBroadcastPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "broad-pkt"
+    ::= { prvtStatSdpEntry 52 }
+
+prvtStatSdpEgBroadcastBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "broad-bytes"
+    ::= { prvtStatSdpEntry 53 }
+
+prvtStatSdpEgPri0Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be (green)"
+    ::= { prvtStatSdpEntry 54 }
+
+prvtStatSdpEgPri0Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be (green)"
+    ::= { prvtStatSdpEntry 55 }
+
+prvtStatSdpEgPri1Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 (green)"
+    ::= { prvtStatSdpEntry 56 }
+
+prvtStatSdpEgPri1Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 (green)"
+    ::= { prvtStatSdpEntry 57 }
+
+prvtStatSdpEgPri2Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af green"
+    ::= { prvtStatSdpEntry 58 }
+
+prvtStatSdpEgPri2Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af green"
+    ::= { prvtStatSdpEntry 59 }
+
+prvtStatSdpEgPri3Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1(green)"
+    ::= { prvtStatSdpEntry 60 }
+
+prvtStatSdpEgPri3Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1(green)"
+    ::= { prvtStatSdpEntry 61 }
+
+prvtStatSdpEgPri4Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2(green)"
+    ::= { prvtStatSdpEntry 62 }
+
+prvtStatSdpEgPri4Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2(green)"
+    ::= { prvtStatSdpEntry 63 }
+
+prvtStatSdpEgPri5Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef(green)"
+    ::= { prvtStatSdpEntry 64 }
+
+prvtStatSdpEgPri5Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef(green)"
+    ::= { prvtStatSdpEntry 65 }
+
+prvtStatSdpEgPri6Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1(green)"
+    ::= { prvtStatSdpEntry 66 }
+
+prvtStatSdpEgPri6Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1(green)"
+    ::= { prvtStatSdpEntry 67 }
+
+prvtStatSdpEgPri7Packets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc(green)"
+    ::= { prvtStatSdpEntry 68 }
+
+prvtStatSdpEgPri7Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc(green)"
+    ::= { prvtStatSdpEntry 69 }
+
+prvtStatSdpEgPri0yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be yellow packets"
+    ::= { prvtStatSdpEntry 70 }
+
+prvtStatSdpEgPri0yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority be yellow bytes"
+    ::= { prvtStatSdpEntry 71 }
+
+prvtStatSdpEgPri1yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 yellow packets"
+    ::= { prvtStatSdpEntry 72 }
+
+prvtStatSdpEgPri1yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l2 yellow bytes"
+    ::= { prvtStatSdpEntry 73 }
+
+prvtStatSdpEgPri2yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af yellow packets"
+    ::= { prvtStatSdpEntry 74 }
+
+prvtStatSdpEgPri2yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority af yellow bytes"
+    ::= { prvtStatSdpEntry 75 }
+
+prvtStatSdpEgPri3yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1 yellow packets"
+    ::= { prvtStatSdpEntry 76 }
+
+prvtStatSdpEgPri3yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority l1 yellow bytes"
+    ::= { prvtStatSdpEntry 77 }
+
+prvtStatSdpEgPri4yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2 yellow packets"
+    ::= { prvtStatSdpEntry 78 }
+
+prvtStatSdpEgPri4yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h2 yellow bytes"
+    ::= { prvtStatSdpEntry 79 }
+
+prvtStatSdpEgPri5yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef yellow packets"
+    ::= { prvtStatSdpEntry 80 }
+
+prvtStatSdpEgPri5yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority ef yellow bytes"
+    ::= { prvtStatSdpEntry 81 }
+
+prvtStatSdpEgPri6yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1 yellow packets"
+    ::= { prvtStatSdpEntry 82 }
+
+prvtStatSdpEgPri6yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority h1 yellow bytes"
+    ::= { prvtStatSdpEntry 83 }
+
+prvtStatSdpEgPri7yPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc yellow packets"
+    ::= { prvtStatSdpEntry 84 }
+
+prvtStatSdpEgPri7yBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "priority nc yellow bytes"
+    ::= { prvtStatSdpEntry 85 }
+
+END -- end of module PRVT-STATISTICS-MIB.

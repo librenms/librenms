@@ -2,37 +2,6 @@
 
 echo ' Siklu Wireless ';
 
-$mib_oids = array(
-    'rfAverageRssi'          => array(
-        '1',
-        'rfAverageRssi',
-        'Signal Strength',
-        'GAUGE',
-    ),
-    'rfAverageCinr'          => array(
-        '1',
-        'rfAverageCinr',
-        'Signal to noise ratio',
-        'GAUGE',
-    ),
-    'rfOperationalFrequency' => array(
-        '1',
-        'rfOperFreq',
-        'Operational Frequency',
-        'GAUGE',
-    ),
-);
-
-$mib_graphs = array(
-    'siklu_rfAverageRssi',
-    'siklu_rfAverageCinr',
-    'siklu_rfOperationalFrequency',
-);
-
-unset($graph, $oids, $oid);
-
-poll_mib_def($device, 'RADIO-BRIDGE-MIB:siklu-wireless', 'siklu', $mib_oids, $mib_graphs, $graphs);
-
 // Poll interface statistics
 $mib_oids = array(
     'rfInPkts'          => array(

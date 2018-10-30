@@ -31,7 +31,7 @@ Participating
 -------------
 
 You can participate in the project by:
-- Talking to us on IRC ([##librenms on Freenode][4]) or [Twitter][3].
+- Talking to us on [Discord](https://t.libren.ms/discord) or [Twitter][3].
 - Joining the [LibreNMS Community](https://community.librenms.org)
 - Improving the [documentation][5].
 - Cloning the [repo][2] and filing [bug reports][18] and [pull requests][19] on github.
@@ -83,7 +83,7 @@ exception):
 [1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
 [2]: https://github.com/librenms/librenms "Main LibreNMS GitHub repo"
 [3]: https://twitter.com/librenms "@LibreNMS on Twitter"
-[4]: irc://irc.freenode.net/##librenms "LibreNMS IRC channel"
+[4]: https://t.libren.ms/discord "Discord LibreNMS Server"
 [5]: https://github.com/librenms/librenms/tree/master/doc/
 [6]: http://freenode.net/changuide "Freenode channel guidelines"
 [7]: http://freenode.net/catalysts "Freenode community catalysts"
@@ -98,3 +98,57 @@ exception):
 [17]: http://docs.librenms.org/General/Acknowledgement/
 [18]: https://github.com/librenms/librenms/issues
 [19]: https://github.com/librenms/librenms/pulls
+
+
+## Backers
+
+Support us with a monthly donation and help us continue our activities. [[Become a backer](https://opencollective.com/librenms#backer)]
+
+<a href="https://opencollective.com/librenms/backer/0/website" target="_blank"><img src="https://opencollective.com/librenms/backer/0/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/1/website" target="_blank"><img src="https://opencollective.com/librenms/backer/1/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/2/website" target="_blank"><img src="https://opencollective.com/librenms/backer/2/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/3/website" target="_blank"><img src="https://opencollective.com/librenms/backer/3/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/4/website" target="_blank"><img src="https://opencollective.com/librenms/backer/4/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/5/website" target="_blank"><img src="https://opencollective.com/librenms/backer/5/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/6/website" target="_blank"><img src="https://opencollective.com/librenms/backer/6/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/7/website" target="_blank"><img src="https://opencollective.com/librenms/backer/7/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/8/website" target="_blank"><img src="https://opencollective.com/librenms/backer/8/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/9/website" target="_blank"><img src="https://opencollective.com/librenms/backer/9/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/10/website" target="_blank"><img src="https://opencollective.com/librenms/backer/10/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/11/website" target="_blank"><img src="https://opencollective.com/librenms/backer/11/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/12/website" target="_blank"><img src="https://opencollective.com/librenms/backer/12/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/13/website" target="_blank"><img src="https://opencollective.com/librenms/backer/13/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/14/website" target="_blank"><img src="https://opencollective.com/librenms/backer/14/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/15/website" target="_blank"><img src="https://opencollective.com/librenms/backer/15/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/16/website" target="_blank"><img src="https://opencollective.com/librenms/backer/16/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/17/website" target="_blank"><img src="https://opencollective.com/librenms/backer/17/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/18/website" target="_blank"><img src="https://opencollective.com/librenms/backer/18/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/19/website" target="_blank"><img src="https://opencollective.com/librenms/backer/19/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/20/website" target="_blank"><img src="https://opencollective.com/librenms/backer/20/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/21/website" target="_blank"><img src="https://opencollective.com/librenms/backer/21/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/22/website" target="_blank"><img src="https://opencollective.com/librenms/backer/22/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/23/website" target="_blank"><img src="https://opencollective.com/librenms/backer/23/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/24/website" target="_blank"><img src="https://opencollective.com/librenms/backer/24/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/25/website" target="_blank"><img src="https://opencollective.com/librenms/backer/25/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/26/website" target="_blank"><img src="https://opencollective.com/librenms/backer/26/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/27/website" target="_blank"><img src="https://opencollective.com/librenms/backer/27/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/28/website" target="_blank"><img src="https://opencollective.com/librenms/backer/28/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/backer/29/website" target="_blank"><img src="https://opencollective.com/librenms/backer/29/avatar.svg"></a>
+
+
+## Sponsors
+
+Become a sponsor and get your logo on our README on Github with a link to your site. [[Become a sponsor](https://opencollective.com/librenms#sponsor)]
+
+<a href="https://opencollective.com/librenms/sponsor/0/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/1/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/2/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/3/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/4/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/5/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/6/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/7/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/8/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/librenms/sponsor/9/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/9/avatar.svg"></a>
+
+

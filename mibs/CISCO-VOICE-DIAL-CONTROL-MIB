@@ -3,7 +3,7 @@
 --   
 -- September 1996  Hongchi Shih
 --   
--- Copyright (c) 1996-1999, 2000-2003, 2004-2006, 2009-2011 by cisco Systems Inc.
+-- Copyright (c) 1996-1999, 2000-2003, 2004-2006, 2009-2012 by cisco Systems Inc.
 -- All rights reserved.
 -- *****************************************************************
 
@@ -16,7 +16,8 @@ IMPORTS
     IpAddress,
     Gauge32,
     Integer32,
-    Unsigned32
+    Unsigned32,
+    Counter32
         FROM SNMPv2-SMI
     MODULE-COMPLIANCE,
     OBJECT-GROUP,
@@ -25,7 +26,10 @@ IMPORTS
     TEXTUAL-CONVENTION,
     DisplayString,
     RowStatus,
-    TruthValue
+    TruthValue,
+    TimeStamp,
+    PhysAddress,
+    DateAndTime
         FROM SNMPv2-TC
     callActiveSetupTime,
     callActiveIndex,
@@ -61,7 +65,7 @@ IMPORTS
 
 
 ciscoVoiceDialControlMIB MODULE-IDENTITY
-    LAST-UPDATED    "201105310000Z"
+    LAST-UPDATED    "201205150000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -112,6 +116,37 @@ ciscoVoiceDialControlMIB MODULE-IDENTITY
         RPH    - Resource Priority Header
 
         DSCP   - Diffserv Code Points"
+    REVISION        "201205150000Z"
+    DESCRIPTION
+        "[1] Added New OBJECT-GROUP cvCallVolumeStatsHistory
+        in cvGatewayCallHistory.
+        [2] Added following tables
+         cvCallRateStatsTable,
+         cvCallLegRateStatsTable,
+         cvActiveCallStatsTable,
+         cvCallDurationStatsTable,
+         cvSipMsgRateStatsTable under cvCallVolumeStatsHistory
+        [3] Added following tables
+         cvCallRateWMTable,
+         cvCallLegRateWMTable,
+         cvActiveCallWMTable,
+         cvSipMsgRateWMTable under cvCallVolumeStatsHistory
+        [4] Added following textual conversation 
+         CvCallVolumeStatsIntvlType &
+         CvCallVolumeWMIntvlType         
+        [5] Added new cvdcCallVolumeStatsHistory conformance group 
+         in cvdcMIBGroups. 
+        [6] Added cvdcMIBComplianceRev22 depricating cvdcMIBComplianceRev21"
+    REVISION        "201107110000Z"
+    DESCRIPTION
+        "[1] Added cvVoIPCallActiveSessionId in cvVoIPCallActiveEntry and
+        cvVoIPCallHistorySessionId in cvVoIPCallHistoryEntry
+        [2] Added cvVoIPCallActiveSessionId and
+        cvVoIPCallHistorySessionId to cvVoIPCallGroupSup3
+        [3] Deprecated cvVoIPCallGroupSup2 and superceded it with
+        cvVoIPCallGroupSup3
+        [4] Deprecated cvdcMIBComplianceRev20 and superceded it with
+        with cvdcMIBComplianceRev21"
     REVISION        "201105310000Z"
     DESCRIPTION
         "The following changes is done for RPH to DSCP mapping and Media
@@ -468,6 +503,37 @@ ciscoVoiceDialControlMIB MODULE-IDENTITY
     ::= { ciscoMgmt 63 }
 
 
+
+CvCallVolumeWMIntvlType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents the Id of the watermark table.
+        Here is what different values represent
+
+        1 : Seconds Table: Here the entries are among last 60 second
+        2 : Minutes Table: Here the entries are among last 60 minutes
+        3 : Hours Table: Here the entries are among last 72 Hours
+        4 : Uptime Table: Here the entries are from last reload/reboot"
+    SYNTAX          INTEGER  {
+                        secondStats(1),
+                        minuteStats(2),
+                        hourStats(3),
+                        fromReloadStats(4)
+                    }
+
+CvCallVolumeStatsIntvlType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents the ids of the stats vlolume table
+        Here is what each entry corresponds.
+        1 : Seconds Table: Here each entry corresponds to a second
+        2 : Minutes Table: Here each entry corresponds to a minute
+        3 : Hours Table: Here each entry corresponds to an hour"
+    SYNTAX          INTEGER  {
+                        secondStats(1),
+                        minuteStats(2),
+                        hourStats(3)
+                    }
 
 -- Textual Conventions
 --   
@@ -2310,7 +2376,8 @@ CvVoIPCallActiveEntry ::= SEQUENCE {
         cvVoIPCallActiveCallId                       Unsigned32,
         cvVoIPCallActiveCallReferenceId              CvcCallReferenceIdOrZero,
         ccVoIPCallActivePolicyName                   DisplayString,
-        cvVoIPCallActiveReversedDirectionPeerAddress DisplayString
+        cvVoIPCallActiveReversedDirectionPeerAddress DisplayString,
+        cvVoIPCallActiveSessionId                    Unsigned32
 }
 
 cvVoIPCallActiveConnectionId OBJECT-TYPE
@@ -2815,6 +2882,16 @@ cvVoIPCallActiveReversedDirectionPeerAddress OBJECT-TYPE
         If the call is ingress then it contains called number and if the
         call is egress then it contains calling number." 
     ::= { cvVoIPCallActiveEntry 45 }
+
+cvVoIPCallActiveSessionId OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the active session ID assigned by the
+        call manager to identify call legs that belong to the same call
+        session." 
+    ::= { cvVoIPCallActiveEntry 46 }
  
 
 
@@ -3377,7 +3454,8 @@ CvVoIPCallHistoryEntry ::= SEQUENCE {
         cvVoIPCallHistoryChannels                 Integer32,
         cvVoIPCallHistoryCoderMode                CvIlbcFrameMode,
         cvVoIPCallHistoryCallId                   Unsigned32,
-        cvVoIPCallHistoryCallReferenceId          CvcCallReferenceIdOrZero
+        cvVoIPCallHistoryCallReferenceId          CvcCallReferenceIdOrZero,
+        cvVoIPCallHistorySessionId                Unsigned32
 }
 
 cvVoIPCallHistoryConnectionId OBJECT-TYPE
@@ -3919,8 +3997,783 @@ cvVoIPCallHistoryCallReferenceId OBJECT-TYPE
         call entry in cVideoSessionActive of CISCO-VIDEO-SESSION-MIB, in
         which the call reference ID is also identified." 
     ::= { cvVoIPCallHistoryEntry 47 }
+
+cvVoIPCallHistorySessionId OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the session ID assigned by the call
+        manager to identify call legs that belong to the same call
+        session.  This session ID (history) represents a completed call
+        session, whereas the active session ID
+        (cvVoIPCallActiveSessionId) represents an ongoing session." 
+    ::= { cvVoIPCallHistoryEntry 48 }
  
 
+cvCallVolumeStatsHistory  OBJECT IDENTIFIER
+    ::= { cvGatewayCallHistory 3 }
+
+
+cvCallRateStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvCallRateStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represents voice call rate measurement in various
+        interval lengths defined by the 
+        CvCallVolumeStatsIntvlType object.
+
+        Each interval may contain one or more entries to allow for
+        detailed measurement to be collected."
+    ::= { cvCallVolumeStatsHistory 1 }
+
+cvCallRateStatsEntry OBJECT-TYPE
+    SYNTAX          CvCallRateStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is a conceptual-row in cvCallRateStatsTable
+        This entry is created at the system initialization and is
+        updated at every epoch based on CvCallVolumeStatsIntvlType"
+    INDEX           {
+                        cvCallRateStatsIntvlDurUnits,
+                        cvCallRateStatsIntvlDur
+                    } 
+    ::= { cvCallRateStatsTable 1 }
+
+CvCallRateStatsEntry ::= SEQUENCE {
+        cvCallRateStatsIntvlDurUnits CvCallVolumeStatsIntvlType,
+        cvCallRateStatsIntvlDur      Unsigned32,
+        cvCallRateStatsMaxVal        Unsigned32,
+        cvCallRateStatsAvgVal        Unsigned32
+}
+
+cvCallRateStatsIntvlDurUnits OBJECT-TYPE
+    SYNTAX          CvCallVolumeStatsIntvlType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Object indexes in Call Rate Table to select one among three
+        interval-tables.
+
+        The different types in this table are represented by 
+        CvCallVolumeStatsIntvlType" 
+    ::= { cvCallRateStatsEntry 1 }
+
+cvCallRateStatsIntvlDur OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..72)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is an index that references to the different past periods
+        in given in interval of call rate table.
+        This range is 1-60 for Seconds and Minutes table 
+        wherein 1-72 for hours table." 
+    ::= { cvCallRateStatsEntry 2 }
+
+cvCallRateStatsMaxVal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "calls-per-second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the maximum calls per second
+        that occured for the given period for the given interval." 
+    ::= { cvCallRateStatsEntry 3 }
+
+cvCallRateStatsAvgVal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "calls-per-second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average calls per second
+        that occured for the given period for the given interval." 
+    ::= { cvCallRateStatsEntry 4 }
+ 
+
+
+cvCallLegRateStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvCallLegRateStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "cvCallLegRateStatsTable table represents voice call leg rate
+        measurement in various interval lengths defined by 
+        the CvCallVolumeStatsIntvlType object.
+        Each interval may contain one or more entries to allow for
+        detailed measurement to be collected."
+    ::= { cvCallVolumeStatsHistory 2 }
+
+cvCallLegRateStatsEntry OBJECT-TYPE
+    SYNTAX          CvCallLegRateStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is a conceptual-row in cvCallLegRateStatsTable
+        This entry is created at the system initialization and is
+        updated at every epoch based on CvCallVolumeStatsIntvlType"
+    INDEX           {
+                        cvCallLegRateStatsIntvlDurUnits,
+                        cvCallLegRateStatsIntvlDur
+                    } 
+    ::= { cvCallLegRateStatsTable 1 }
+
+CvCallLegRateStatsEntry ::= SEQUENCE {
+        cvCallLegRateStatsIntvlDurUnits CvCallVolumeStatsIntvlType,
+        cvCallLegRateStatsIntvlDur      Unsigned32,
+        cvCallLegRateStatsMaxVal        Unsigned32,
+        cvCallLegRateStatsAvgVal        Unsigned32
+}
+
+cvCallLegRateStatsIntvlDurUnits OBJECT-TYPE
+    SYNTAX          CvCallVolumeStatsIntvlType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Object indexes in Call Leg Rate Table to select one among
+        three
+        interval-tables.
+
+        The different types in this table are represented by 
+        CvCallVolumeStatsIntvlType" 
+    ::= { cvCallLegRateStatsEntry 1 }
+
+cvCallLegRateStatsIntvlDur OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..72)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is an index that references to the different past periods
+        in given in interval of call rate table.
+        This range is 1-60 for Seconds and Minutes table 
+        wherein 1-72 for hours table." 
+    ::= { cvCallLegRateStatsEntry 2 }
+
+cvCallLegRateStatsMaxVal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "call-legs per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the maximum call-legs per second
+        that occured for the given period for the given interval." 
+    ::= { cvCallLegRateStatsEntry 3 }
+
+cvCallLegRateStatsAvgVal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "call-legs per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average call-legs per second
+        that occured for the given period for the given interval." 
+    ::= { cvCallLegRateStatsEntry 4 }
+ 
+
+
+cvActiveCallStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvActiveCallStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represents the active voice calls in various
+        interval lengths defined by the 
+        CvCallVolumeStatsIntvlType object.
+
+        Each interval may contain one or more entries to allow for
+        detailed measurement to be collected."
+    ::= { cvCallVolumeStatsHistory 3 }
+
+cvActiveCallStatsEntry OBJECT-TYPE
+    SYNTAX          CvActiveCallStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is a conceptual-row in cvActiveCallStatsTable
+        This entry is created at the system initialization and is
+        updated at every epoch based on CvCallVolumeStatsIntvlType"
+    INDEX           {
+                        cvActiveCallStatsIntvlDurUnits,
+                        cvActiveCallStatsIntvlDur
+                    } 
+    ::= { cvActiveCallStatsTable 1 }
+
+CvActiveCallStatsEntry ::= SEQUENCE {
+        cvActiveCallStatsIntvlDurUnits CvCallVolumeStatsIntvlType,
+        cvActiveCallStatsIntvlDur      Unsigned32,
+        cvActiveCallStatsMaxVal        Unsigned32,
+        cvActiveCallStatsAvgVal        Unsigned32
+}
+
+cvActiveCallStatsIntvlDurUnits OBJECT-TYPE
+    SYNTAX          CvCallVolumeStatsIntvlType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Object indexes in Active Call Rate Table (con-current calls
+        table) to select one among three interval-tables.
+
+        The different types in this table are represented by 
+        CvCallVolumeStatsIntvlType" 
+    ::= { cvActiveCallStatsEntry 1 }
+
+cvActiveCallStatsIntvlDur OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..72)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is an index that references to the different past periods
+        in given in interval of active call table.
+        This range is 1-60 for Seconds and Minutes table 
+        wherein 1-72 for hours table." 
+    ::= { cvActiveCallStatsEntry 2 }
+
+cvActiveCallStatsMaxVal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "calls"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the maximum number of active call
+        that occured for the given period for the given interval." 
+    ::= { cvActiveCallStatsEntry 3 }
+
+cvActiveCallStatsAvgVal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "calls"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average number of active calls
+        that occured for the given period for the given interval." 
+    ::= { cvActiveCallStatsEntry 4 }
+ 
+
+
+cvCallDurationStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvCallDurationStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represents the number of calls below a specific
+        duration in various interval length defined by 
+        the CvCallVolumeStatsIntvlType object.  
+
+        The specific duration is configurable value of 
+         cvCallDurationStatsThreshold object.
+
+        Each interval may contain one or more entries to allow for 
+        detailed measurement to be collected."
+    ::= { cvCallVolumeStatsHistory 4 }
+
+cvCallDurationStatsEntry OBJECT-TYPE
+    SYNTAX          CvCallDurationStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is a conceptual-row in cvCallDurationStatsTable
+        This entry is created at the system initialization and is
+        updated at every epoch based on CvCallVolumeStatsIntvlType"
+    INDEX           {
+                        cvCallDurationStatsIntvlDurUnits,
+                        cvCallDurationStatsIntvlDur
+                    } 
+    ::= { cvCallDurationStatsTable 1 }
+
+CvCallDurationStatsEntry ::= SEQUENCE {
+        cvCallDurationStatsIntvlDurUnits CvCallVolumeStatsIntvlType,
+        cvCallDurationStatsIntvlDur      Unsigned32,
+        cvCallDurationStatsMaxVal        Unsigned32,
+        cvCallDurationStatsAvgVal        Unsigned32
+}
+
+cvCallDurationStatsIntvlDurUnits OBJECT-TYPE
+    SYNTAX          CvCallVolumeStatsIntvlType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Object indexes in Call Duration Table to select one among
+        three interval-tables.
+
+        The different types in this table are represented by 
+        CvCallVolumeStatsIntvlType" 
+    ::= { cvCallDurationStatsEntry 1 }
+
+cvCallDurationStatsIntvlDur OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..72)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is an index that references to the different past periods
+        in given in interval of call Duration table.
+        This range is 1-60 for Seconds and Minutes table 
+        wherein 1-72 for hours table." 
+    ::= { cvCallDurationStatsEntry 2 }
+
+cvCallDurationStatsMaxVal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "calls"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the maximum number of calls having a
+        duration which is below the threshold for the given interval." 
+    ::= { cvCallDurationStatsEntry 3 }
+
+cvCallDurationStatsAvgVal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "calls"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average number of calls having a
+        duration which is below the threshold for the given interval." 
+    ::= { cvCallDurationStatsEntry 4 }
+ 
+
+
+cvSipMsgRateStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvSipMsgRateStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represents the SIP message rate measurement in
+        various interval length defined by the 
+        CvCallVolumeStatsIntvlType object.
+
+        Each interval may contain one or more entries to allow for
+        detailed measurement to be collected"
+    ::= { cvCallVolumeStatsHistory 5 }
+
+cvSipMsgRateStatsEntry OBJECT-TYPE
+    SYNTAX          CvSipMsgRateStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is a conceptual-row in cvSipMsgRateStatsTable
+        This entry is created at the system initialization and is
+        updated at every epoch based on CvCallVolumeStatsIntvlType"
+    INDEX           {
+                        cvSipMsgRateStatsIntvlDurUnits,
+                        cvSipMsgRateStatsIntvlDur
+                    } 
+    ::= { cvSipMsgRateStatsTable 1 }
+
+CvSipMsgRateStatsEntry ::= SEQUENCE {
+        cvSipMsgRateStatsIntvlDurUnits CvCallVolumeStatsIntvlType,
+        cvSipMsgRateStatsIntvlDur      Unsigned32,
+        cvSipMsgRateStatsMaxVal        Unsigned32,
+        cvSipMsgRateStatsAvgVal        Unsigned32
+}
+
+cvSipMsgRateStatsIntvlDurUnits OBJECT-TYPE
+    SYNTAX          CvCallVolumeStatsIntvlType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Object indexes in SIP Message Rate Table to select one
+        among three interval-tables.
+
+        The different types in this table are represented by 
+        CvCallVolumeStatsIntvlType" 
+    ::= { cvSipMsgRateStatsEntry 1 }
+
+cvSipMsgRateStatsIntvlDur OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..72)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is an index that references to the different past
+        periods in given in interval of SIP message rate table.
+        This range is 1-60 for Seconds and Minutes table 
+        wherein 1-72 for hours table." 
+    ::= { cvSipMsgRateStatsEntry 2 }
+
+cvSipMsgRateStatsMaxVal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "SIP messages per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the maximum SIP messages  per second that
+        is received for the given interval." 
+    ::= { cvSipMsgRateStatsEntry 3 }
+
+cvSipMsgRateStatsAvgVal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "SIP messages per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average SIP messages per second that
+        is received for the given interval." 
+    ::= { cvSipMsgRateStatsEntry 4 }
+ 
+
+
+cvCallRateWMTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvCallRateWMEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represents high watermarks achieved
+        by call rate in various interval length defined 
+        by CvCallVolumeWMIntvlType. 
+
+        Each interval may contain one or more entries to allow for 
+        detailed measurement to be collected"
+    ::= { cvCallVolumeStatsHistory 6 }
+
+cvCallRateWMEntry OBJECT-TYPE
+    SYNTAX          CvCallRateWMEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is a conceptual-row in cvCallRateWMTable
+        This entry is created at the system initialization and is
+        updated whenever 
+        a) This entry is obsolete OR
+        b) A new/higher entry is available.
+        These entries are reinitialised/added/deleted  if
+        cvCallVolumeWMTableSize is changed"
+    INDEX           {
+                        cvCallRateWMIntvlDurUnits,
+                        cvCallRateWMIndex
+                    } 
+    ::= { cvCallRateWMTable 1 }
+
+CvCallRateWMEntry ::= SEQUENCE {
+        cvCallRateWMIntvlDurUnits CvCallVolumeWMIntvlType,
+        cvCallRateWMIndex         Unsigned32,
+        cvCallRateWMValue         Unsigned32,
+        cvCallRateWMts            DateAndTime
+}
+
+cvCallRateWMIntvlDurUnits OBJECT-TYPE
+    SYNTAX          CvCallVolumeWMIntvlType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Object indexes in call rate Water mark Table to select one
+        among four interval-tables.
+
+        The different types in this table are represented by 
+        CvCallVolumeWMIntvlType" 
+    ::= { cvCallRateWMEntry 1 }
+
+cvCallRateWMIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..10)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is an index that references to different peaks in
+        past period in call rate watermark table.
+
+        The number of watermarks entries stored for each table are 
+        based on cvCallVolumeWMTableSize" 
+    ::= { cvCallRateWMEntry 2 }
+
+cvCallRateWMValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "calls per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates high watermark value achieved by the
+        calls per second for the given interval" 
+    ::= { cvCallRateWMEntry 3 }
+
+cvCallRateWMts OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates date and Time when the high watermark
+        is achieved for calls per second for the given interval" 
+    ::= { cvCallRateWMEntry 4 }
+ 
+
+
+cvCallLegRateWMTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvCallLegRateWMEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "cvCallLegRateWMTable table represents high watermarks achieved
+        by call-leg rate in various interval length defined 
+        by CvCallVolumeWMIntvlType. 
+
+        Each interval may contain one or more entries to allow for 
+        detailed measurement to be collected"
+    ::= { cvCallVolumeStatsHistory 7 }
+
+cvCallLegRateWMEntry OBJECT-TYPE
+    SYNTAX          CvCallLegRateWMEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is a conceptual-row in cvCallLegRateWMTable
+        This entry is created at the system initialization and is
+        updated whenever 
+        a) This entry is obsolete OR
+        b) A new/higher entry is available.
+        These entries are reinitialised/added/deleted  if
+        cvCallVolumeWMTableSize is changed"
+    INDEX           {
+                        cvCallLegRateWMIntvlDurUnits,
+                        cvCallLegRateWMIndex
+                    } 
+    ::= { cvCallLegRateWMTable 1 }
+
+CvCallLegRateWMEntry ::= SEQUENCE {
+        cvCallLegRateWMIntvlDurUnits CvCallVolumeWMIntvlType,
+        cvCallLegRateWMIndex         Unsigned32,
+        cvCallLegRateWMValue         Unsigned32,
+        cvCallLegRateWMts            DateAndTime
+}
+
+cvCallLegRateWMIntvlDurUnits OBJECT-TYPE
+    SYNTAX          CvCallVolumeWMIntvlType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Object indexes in call leg rate Water mark Table to select
+        one
+        among four interval-tables.
+
+        The different types in this table are represented by 
+        CvCallVolumeWMIntvlType" 
+    ::= { cvCallLegRateWMEntry 1 }
+
+cvCallLegRateWMIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..10)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is an index that references to different peaks in
+        past period in call leg rate watermark table.
+
+        The number of watermarks entries stored for each table are 
+        based on cvCallVolumeWMTableSize" 
+    ::= { cvCallLegRateWMEntry 2 }
+
+cvCallLegRateWMValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "call legs per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates high watermark value achieved by the
+        call legs per second for the given interval" 
+    ::= { cvCallLegRateWMEntry 3 }
+
+cvCallLegRateWMts OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates date and time when the high watermark
+        is achieved for call-legs per second for the given interval" 
+    ::= { cvCallLegRateWMEntry 4 }
+ 
+
+
+cvActiveCallWMTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvActiveCallWMEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represents high watermarks achieved
+        by active calls in various interval length defined 
+        by CvCallVolumeWMIntvlType. 
+
+        Each interval may contain one or more entries to allow 
+        for detailed measurement to be collected."
+    ::= { cvCallVolumeStatsHistory 8 }
+
+cvActiveCallWMEntry OBJECT-TYPE
+    SYNTAX          CvActiveCallWMEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is a conceptual-row in cvActiveCallWMTable
+        This entry is created at the system initialization and is
+        updated whenever 
+        a) This entry is obsolete OR
+        b) A new/higher entry is available.
+        These entries are reinitialised/added/deleted  if
+        cvCallVolumeWMTableSize is changed"
+    INDEX           {
+                        cvActiveCallWMIntvlDurUnits,
+                        cvActiveCallWMIndex
+                    } 
+    ::= { cvActiveCallWMTable 1 }
+
+CvActiveCallWMEntry ::= SEQUENCE {
+        cvActiveCallWMIntvlDurUnits CvCallVolumeWMIntvlType,
+        cvActiveCallWMIndex         Unsigned32,
+        cvActiveCallWMValue         Unsigned32,
+        cvActiveCallWMts            DateAndTime
+}
+
+cvActiveCallWMIntvlDurUnits OBJECT-TYPE
+    SYNTAX          CvCallVolumeWMIntvlType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Object indexes in active call Water mark Table to select
+        one among four interval-tables.
+
+        The different types in this table are represented by 
+        CvCallVolumeWMIntvlType" 
+    ::= { cvActiveCallWMEntry 1 }
+
+cvActiveCallWMIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..10)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is an index that references to different peaks in
+        past period in acive call watermark table.
+
+        The number of watermarks entries stored for each table are 
+        based on cvCallVolumeWMTableSize" 
+    ::= { cvActiveCallWMEntry 2 }
+
+cvActiveCallWMValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "calls"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates high watermark value achieved by the
+        active calls for the given interval" 
+    ::= { cvActiveCallWMEntry 3 }
+
+cvActiveCallWMts OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates date and time when the high watermark
+        is achieved for active calls for the given interval" 
+    ::= { cvActiveCallWMEntry 4 }
+ 
+
+
+cvSipMsgRateWMTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CvSipMsgRateWMEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represents of high watermarks achieved
+        by SIP message rate in various interval length defined 
+        by CvCallVolumeWMIntvlType. 
+
+        Each interval may contain one or more entries to allow for
+        detailed measurement to be collected"
+    ::= { cvCallVolumeStatsHistory 9 }
+
+cvSipMsgRateWMEntry OBJECT-TYPE
+    SYNTAX          CvSipMsgRateWMEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is a conceptual-row in cvSipMsgRateWMTable.
+        This entry is created at the system initialization and is
+        updated whenever 
+        a) This entry is obsolete OR
+        b) A new/higher entry is available.
+        These entries are reinitialised/added/deleted if
+        cvCallVolumeWMTableSize is changed"
+    INDEX           {
+                        cvSipMsgRateWMIntvlDurUnits,
+                        cvSipMsgRateWMIndex
+                    } 
+    ::= { cvSipMsgRateWMTable 1 }
+
+CvSipMsgRateWMEntry ::= SEQUENCE {
+        cvSipMsgRateWMIntvlDurUnits CvCallVolumeWMIntvlType,
+        cvSipMsgRateWMIndex         Unsigned32,
+        cvSipMsgRateWMValue         Unsigned32,
+        cvSipMsgRateWMts            DateAndTime
+}
+
+cvSipMsgRateWMIntvlDurUnits OBJECT-TYPE
+    SYNTAX          CvCallVolumeWMIntvlType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Object indexes in SIP Message rate Water mark Table to
+        select one among four interval-tables.
+
+        The different types in this table are represented by 
+        CvCallVolumeWMIntvlType" 
+    ::= { cvSipMsgRateWMEntry 1 }
+
+cvSipMsgRateWMIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..10)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This is an index that references to different peaks in
+        past period in sip message rate watermark table.
+
+        The number of watermarks entries stored for each table are 
+        based on cvCallVolumeWMTableSize" 
+    ::= { cvSipMsgRateWMEntry 2 }
+
+cvSipMsgRateWMValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "SIP messages per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates high watermark value achieved by the
+        SIP messages per second for the given interval" 
+    ::= { cvSipMsgRateWMEntry 3 }
+
+cvSipMsgRateWMts OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates date and time when the high watermark
+        is achieved for SIP messages per second for the given interval" 
+    ::= { cvSipMsgRateWMEntry 4 }
+ 
+
+
+cvCallDurationStatsThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..3600)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This Object specifies the thresold duration in seconds.
+        cvCallDurationStatsTable will monitor all the calls below this 
+        threshold.
+
+        Decresing the value of the threshold will reset this table."
+    DEFVAL          { 5 } 
+    ::= { cvCallVolumeStatsHistory 10 }
+
+cvCallVolumeWMTableSize OBJECT-TYPE
+    SYNTAX          Unsigned32 (3..10)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This Object specifies the number of entries the watermark table
+        will maintain.
+
+        This value will decide the number of elements in
+        cvCallRateWMTable,
+        cvCallLegRateWMTable, cvActiveCallWMTable and
+        cvSipMsgRateWMTable."
+    DEFVAL          { 5 } 
+    ::= { cvCallVolumeStatsHistory 11 }
 -- *********************************************************************
 -- Notifications
 -- *********************************************************************
@@ -4846,7 +5699,7 @@ cvdcMIBComplianceRev19 MODULE-COMPLIANCE
     ::= { cvdcMIBCompliances 20 }
 
 cvdcMIBComplianceRev20 MODULE-COMPLIANCE
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The compliance statement for the entities
         that implement CISCO-VOICE-DIAL-CONTROL-MIB."
@@ -4926,6 +5779,173 @@ cvdcMIBComplianceRev20 MODULE-COMPLIANCE
         "The notifications for the CISCO-VOICE-DIAL-CONTROL-MIB."
     ::= { cvdcMIBCompliances 21 }
 
+cvdcMIBComplianceRev21 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the entities
+        that implement CISCO-VOICE-DIAL-CONTROL-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cvdcGeneralCfgGroupRev6 }
+
+    GROUP           cvdcVoiceCfgGroupRev2
+    DESCRIPTION
+        "This group is mandatory for voice dial control
+        configuration which is related to GSTN(General Switched
+        Telephony Network).
+        GSTN encompasses analog, ISDN, Cellular - essentially
+        anything circuit switched over the TDM infrastructure."
+
+    GROUP           cvdcVoIPCfgGroupRev4
+    DESCRIPTION
+        "This group is mandatory for VoIP dial control configuration
+        which is related to transmit voice packet via IP network."
+
+    GROUP           cvCallGroupRev5
+    DESCRIPTION
+        "This group is mandatory for all voice related active call
+        and call history via GSTN."
+
+    GROUP           cvVoIPCallGroupRev6
+    DESCRIPTION
+        "This group is mandatory for all VoIP related active call
+        and call history via IP network."
+
+    GROUP           cvdcVoIPCfgAmrNbGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms
+        which support GSM AMR-NB codec configuration."
+
+    GROUP           cvVoIPCallAmrNbGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms
+        which support GSM AMR-NB codec."
+
+    GROUP           cvdcVoIPCfgIlbcGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms
+        which support iLBC codec configuration."
+
+    GROUP           cvVoIPCallIlbcGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms
+        which support iLBC codec."
+
+    GROUP           cvCallGroupSup1
+    DESCRIPTION
+        "This group is mandatory to track voice-related active
+        calls and call-history via GSTN."
+
+    GROUP           cvCallVolumeGroup
+    DESCRIPTION
+        "This group is mandatory to track per-protocol active
+        calls."
+
+    GROUP           cvCallRateMonitorGroup
+    DESCRIPTION
+        "This group is mandatory to track call-rate."
+
+    GROUP           cvdcVoIPCfgISACGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms which support
+        iSAC codec configuration."
+
+    GROUP           cvVoIPCallGroupSup3
+    DESCRIPTION
+        "This group is mandatory for all VoIP calls.  It supplements
+        cvVoIPCallGroup to provide the call identifier and policy for the VoIP
+        leg of the gateway call."
+
+    GROUP           cvdcNotificationGroupRev4
+    DESCRIPTION
+        "The notifications for the CISCO-VOICE-DIAL-CONTROL-MIB."
+    ::= { cvdcMIBCompliances 22 }
+
+cvdcMIBComplianceRev22 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the entities
+        that implement CISCO-VOICE-DIAL-CONTROL-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cvdcGeneralCfgGroupRev6 }
+
+    GROUP           cvdcVoiceCfgGroupRev2
+    DESCRIPTION
+        "This group is mandatory for voice dial control
+        configuration which is related to GSTN(General Switched
+        Telephony Network).
+        GSTN encompasses analog, ISDN, Cellular - essentially
+        anything circuit switched over the TDM infrastructure."
+
+    GROUP           cvdcVoIPCfgGroupRev4
+    DESCRIPTION
+        "This group is mandatory for VoIP dial control configuration
+        which is related to transmit voice packet via IP network."
+
+    GROUP           cvCallGroupRev5
+    DESCRIPTION
+        "This group is mandatory for all voice related active call
+        and call history via GSTN."
+
+    GROUP           cvVoIPCallGroupRev6
+    DESCRIPTION
+        "This group is mandatory for all VoIP related active call
+        and call history via IP network."
+
+    GROUP           cvdcVoIPCfgAmrNbGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms
+        which support GSM AMR-NB codec configuration."
+
+    GROUP           cvVoIPCallAmrNbGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms
+        which support GSM AMR-NB codec."
+
+    GROUP           cvdcVoIPCfgIlbcGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms
+        which support iLBC codec configuration."
+
+    GROUP           cvVoIPCallIlbcGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms
+        which support iLBC codec."
+
+    GROUP           cvCallGroupSup1
+    DESCRIPTION
+        "This group is mandatory to track voice-related active
+        calls and call-history via GSTN."
+
+    GROUP           cvCallVolumeGroup
+    DESCRIPTION
+        "This group is mandatory to track per-protocol active
+        calls."
+
+    GROUP           cvCallRateMonitorGroup
+    DESCRIPTION
+        "This group is mandatory to track call-rate."
+
+    GROUP           cvdcVoIPCfgISACGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms which support
+        iSAC codec configuration."
+
+    GROUP           cvVoIPCallGroupSup3
+    DESCRIPTION
+        "This group is mandatory for all VoIP calls.  It supplements
+        cvVoIPCallGroup to provide the call identifier and policy for the VoIP
+        leg of the gateway call."
+
+    GROUP           cvdcNotificationGroupRev4
+    DESCRIPTION
+        "The notifications for the CISCO-VOICE-DIAL-CONTROL-MIB."
+
+    GROUP           cvdcCallVolumeStatsHistory
+    DESCRIPTION
+        "This group is mandatory to track voice related call volume
+        stats history"
+    ::= { cvdcMIBCompliances 23 }
+
 -- units of conformance
 
 cvdcGeneralCfgGroup OBJECT-GROUP
@@ -4938,7 +5958,8 @@ cvdcGeneralCfgGroup OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the general
-        Voice Gateway Call Dial Control configuration capability."
+        Voice Gateway Call Dial Control configuration capability.
+        cvdcGeneralCfgGroup group is superseded by cvdcGeneralCfgGroupRev1."
     ::= { cvdcMIBGroups 1 }
 
 cvdcVoiceCfgGroup OBJECT-GROUP
@@ -4953,7 +5974,8 @@ cvdcVoiceCfgGroup OBJECT-GROUP
         capability.
         GSTN (General Switched Telephony Network), which is
         supposed to encompass analog, ISDN, Cellular - essentially
-        anything circuit switched over the TDM infrastructure."
+        anything circuit switched over the TDM infrastructure.
+        cvdcVoiceCfgGroup group is superseded by cvdcVoiceCfgGroupRev1."
     ::= { cvdcMIBGroups 2 }
 
 cvdcVoIPCfgGroup OBJECT-GROUP
@@ -4974,7 +5996,8 @@ cvdcVoIPCfgGroup OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the VoIP Dial Control
-        configuration capability."
+        configuration capability.
+        cvdcVoIPCfgGroup group is superseded by cvdcVoIPCfgGroupRev1."
     ::= { cvdcMIBGroups 3 }
 
 cvCallGroup OBJECT-GROUP
@@ -5005,7 +6028,8 @@ cvCallGroup OBJECT-GROUP
         Switched Telephony Network Voice Call capability.
         GSTN (General Switched Telephony Network), which is
         supposed to encompass analog, ISDN, Cellular - essentially
-        anything circuit switched over the TDM infrastructure."
+        anything circuit switched over the TDM infrastructure.
+        cvCallGroup group is superseded by cvCallGroupRev1."
     ::= { cvdcMIBGroups 4 }
 
 cvVoIPCallGroup OBJECT-GROUP
@@ -5049,7 +6073,8 @@ cvVoIPCallGroup OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the VoIP Call
-        capability."
+        capability.
+        cvVoIPCallGroup group is superseded by cvVoIPCallGroupRev1."
     ::= { cvdcMIBGroups 5 }
 
 cvdcGeneralCfgGroupRev1 OBJECT-GROUP
@@ -5065,7 +6090,8 @@ cvdcGeneralCfgGroupRev1 OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the general
-        Voice Gateway Call Dial Control configuration capability."
+        Voice Gateway Call Dial Control configuration capability.
+        cvdcGeneralCfgGroupRev1 group is superseded by cvdcGeneralCfgGroupRev2."
     ::= { cvdcMIBGroups 6 }
 
 cvdcVoiceCfgGroupRev1 OBJECT-GROUP
@@ -5082,7 +6108,8 @@ cvdcVoiceCfgGroupRev1 OBJECT-GROUP
         capability.
         GSTN (General Switched Telephony Network), which is
         supposed to encompass analog, ISDN, Cellular - essentially
-        anything circuit switched over the TDM infrastructure."
+        anything circuit switched over the TDM infrastructure.
+        cvdcVoiceCfgGroupRev1 group is superseded by cvdcVoiceCfgGroupRev2."
     ::= { cvdcMIBGroups 7 }
 
 cvVoIPCallGroupRev1 OBJECT-GROUP
@@ -5132,7 +6159,8 @@ cvVoIPCallGroupRev1 OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the VoIP Call
-        capability."
+        capability.
+        cvVoIPCallGroupRev1 group is superseded by cvVoIPCallGroupRev2."
     ::= { cvdcMIBGroups 8 }
 
 cvCallGroupRev1 OBJECT-GROUP
@@ -5166,7 +6194,8 @@ cvCallGroupRev1 OBJECT-GROUP
         capability.
         GSTN (General Switched Telephony Network), which is
         supposed to encompass analog, ISDN, Cellular - essentially
-        anything circuit switched over the TDM infrastructure."
+        anything circuit switched over the TDM infrastructure.
+        cvCallGroupRev1 group is superseded by cvCallGroupRev2."
     ::= { cvdcMIBGroups 9 }
 
 cvdcGeneralCfgGroupRev2 OBJECT-GROUP
@@ -5183,7 +6212,8 @@ cvdcGeneralCfgGroupRev2 OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the general
-        Voice Gateway Call Dial Control configuration capability."
+        Voice Gateway Call Dial Control configuration capability.
+        cvdcGeneralCfgGroupRev2 group is superseded by cvdcGeneralCfgGroupRev3."
     ::= { cvdcMIBGroups 10 }
 
 cvdcVoIPCfgGroupRev1 OBJECT-GROUP
@@ -5206,7 +6236,8 @@ cvdcVoIPCfgGroupRev1 OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the VoIP Dial Control
-        configuration capability."
+        configuration capability.
+        cvdcVoIPCfgGroupRev1 group is superseded by cvdcVoIPCfgGroupRev2."
     ::= { cvdcMIBGroups 11 }
 
 cvdcGeneralCfgGroupRev3 OBJECT-GROUP
@@ -5224,7 +6255,8 @@ cvdcGeneralCfgGroupRev3 OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the general
-        Voice Gateway Call Dial Control configuration capability."
+        Voice Gateway Call Dial Control configuration capability.
+        cvdcGeneralCfgGroupRev3 group is superseded by cvdcGeneralCfgGroupRev4."
     ::= { cvdcMIBGroups 12 }
 
 cvdcVoiceCfgGroupRev2 OBJECT-GROUP
@@ -5270,7 +6302,8 @@ cvdcVoIPCfgGroupRev2 OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the VoIP Dial Control
-        configuration capability."
+        configuration capability.
+        cvdcVoIPCfgGroupRev2 group is superseded by cvdcVoIPCfgGroupRev3."
     ::= { cvdcMIBGroups 14 }
 
 cvVoIPCallGroupRev3 OBJECT-GROUP
@@ -5316,14 +6349,16 @@ cvVoIPCallGroupRev3 OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the VoIP Call
-        capability."
+        capability.
+        cvVoIPCallGroupRev3 group is superseded by cvVoIPCallGroupRev4."
     ::= { cvdcMIBGroups 15 }
 
 cvdcNotificationGroup NOTIFICATION-GROUP
    NOTIFICATIONS    { cvdcPoorQoVNotification }
     STATUS          deprecated
     DESCRIPTION
-        "The notifications for the CISCO-VOICE-DIAL-CONTROL-MIB"
+        "The notifications for the CISCO-VOICE-DIAL-CONTROL-MIB
+        cvdcNotificationGroup group is superseded by cvdcNotificationGroupRev1."
     ::= { cvdcMIBGroups 16 }
 
 cvCallGroupRev2 OBJECT-GROUP
@@ -5362,7 +6397,8 @@ cvCallGroupRev2 OBJECT-GROUP
         capability.
         GSTN (General Switched Telephony Network), which is
         supposed to encompass analog, ISDN, Cellular - essentially
-        anything circuit switched over the TDM infrastructure."
+        anything circuit switched over the TDM infrastructure.
+        cvCallGroupRev2 group is superseded by cvCallGroupRev3."
     ::= { cvdcMIBGroups 17 }
 
 cvdcGeneralCfgGroupRev4 OBJECT-GROUP
@@ -5386,7 +6422,8 @@ cvdcGeneralCfgGroupRev4 OBJECT-GROUP
     DESCRIPTION
         "A collection of objects providing the general
         Voice Gateway Call Dial Control configuration
-        capability."
+        capability.
+        cvdcGeneralCfgGroupRev4 group is superseded by cvdcGeneralCfgGroupRev5."
     ::= { cvdcMIBGroups 18 }
 
 cvVoIPCallGroupRev4 OBJECT-GROUP
@@ -5444,14 +6481,16 @@ cvVoIPCallGroupRev4 OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the VoIP Call
-        capability."
+        capability.
+        cvVoIPCallGroupRev4 group is superseded by cvVoIPCallGroupRev5."
     ::= { cvdcMIBGroups 19 }
 
 cvdcNotificationGroupRev1 NOTIFICATION-GROUP
    NOTIFICATIONS    { cvdcPoorQoVNotificationRev1 }
     STATUS          deprecated
     DESCRIPTION
-        "The notifications for the CISCO-VOICE-DIAL-CONTROL-MIB"
+        "The notifications for the CISCO-VOICE-DIAL-CONTROL-MIB
+        cvdcNotificationGroupRev1 group is superseded by cvdcNotificationGroupRev2."
     ::= { cvdcMIBGroups 20 }
 
 cvdcVoIPCfgGroupRev3 OBJECT-GROUP
@@ -5477,7 +6516,8 @@ cvdcVoIPCfgGroupRev3 OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the VoIP Dial Control
-        configuration capability."
+        configuration capability.
+        cvdcVoIPCfgGroupRev3 group is superseded by cvdcVoIPCfgGroupRev4."
     ::= { cvdcMIBGroups 21 }
 
 cvdcGeneralCfgGroupRev5 OBJECT-GROUP
@@ -5502,7 +6542,8 @@ cvdcGeneralCfgGroupRev5 OBJECT-GROUP
     DESCRIPTION
         "A collection of objects providing the general
         Voice Gateway Call Dial Control configuration
-        capability."
+        capability.
+        cvdcGeneralCfgGroupRev5 group is superseded by cvdcGeneralCfgGroupRev6."
     ::= { cvdcMIBGroups 22 }
 
 cvdcVoIPCfgGroupRev4 OBJECT-GROUP
@@ -5576,7 +6617,8 @@ cvCallGroupRev3 OBJECT-GROUP
         capability.
         GSTN (General Switched Telephony Network), which is
         supposed to encompass analog, ISDN, Cellular - essentially
-        anything circuit switched over the TDM infrastructure."
+        anything circuit switched over the TDM infrastructure.
+        cvCallGroupRev3 group is superseded by cvCallGroupRev4."
     ::= { cvdcMIBGroups 24 }
 
 cvCallGroupRev4 OBJECT-GROUP
@@ -5617,7 +6659,8 @@ cvCallGroupRev4 OBJECT-GROUP
         capability.
         GSTN (General Switched Telephony Network), which is
         supposed to encompass analog, ISDN, Cellular - essentially
-        anything circuit switched over the TDM infrastructure."
+        anything circuit switched over the TDM infrastructure.
+        cvCallGroupRev4 group is superseded by cvCallGroupRev5."
     ::= { cvdcMIBGroups 25 }
 
 cvVoIPCallGroupRev5 OBJECT-GROUP
@@ -5677,7 +6720,8 @@ cvVoIPCallGroupRev5 OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing the VoIP Call
-        capability."
+        capability.
+        cvVoIPCallGroupRev5 group is superseded by cvVoIPCallGroupRev6."
     ::= { cvdcMIBGroups 26 }
 
 cvCallGroupRev5 OBJECT-GROUP
@@ -5734,7 +6778,8 @@ cvdcNotificationGroupRev2 NOTIFICATION-GROUP
                     }
     STATUS          deprecated
     DESCRIPTION
-        "The notifications for the CISCO-VOICE-DIAL-CONTROL-MIB"
+        "The notifications for the CISCO-VOICE-DIAL-CONTROL-MIB
+        cvdcNotificationGroupRev2 group is superseded by cvdcNotificationGroupRev3."
     ::= { cvdcMIBGroups 28 }
 
 cvVoIPCallGroupRev6 OBJECT-GROUP
@@ -5840,7 +6885,8 @@ cvdcNotificationGroupRev3 NOTIFICATION-GROUP
         "The notifications for the CISCO-VOICE-DIAL-CONTROL-MIB.
 
         This group  cvdcNotificationGroupRev3 is deprecated and replaced
-        by cvdcNotificationGroupRev4."
+        by cvdcNotificationGroupRev4.
+        cvdcNotificationGroupRev3 group is superseded by cvdcNotificationGroupRev4."
     ::= { cvdcMIBGroups 31 }
 
 cvdcVoIPCfgAmrNbGroup OBJECT-GROUP
@@ -5997,518 +7043,60 @@ cvVoIPCallGroupSup2 OBJECT-GROUP
                         cvVoIPCallHistoryCallId,
                         cvVoIPCallHistoryCallReferenceId
                     }
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
-        "This group supplements cvVoIPCallGroup to
-        provide the call identifier and policy for the VoIP
-        leg of the gateway call."
+        "This group supplements cvVoIPCallGroup to provide the call
+        identifier and policy for the VoIP leg of the gateway call.
+        cvVoIPCallGroupSup2 group is superseded by cvVoIPCallGroupSup3."
     ::= { cvdcMIBGroups 42 }
 
+cvVoIPCallGroupSup3 OBJECT-GROUP
+    OBJECTS         {
+                        cvVoIPCallActiveReversedDirectionPeerAddress,
+                        ccVoIPCallActivePolicyName,
+                        cvVoIPCallActiveCallId,
+                        cvVoIPCallActiveCallReferenceId,
+                        cvVoIPCallActiveSessionId,
+                        cvVoIPCallHistoryCallId,
+                        cvVoIPCallHistoryCallReferenceId,
+                        cvVoIPCallHistorySessionId
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group supplements cvVoIPCallGroup to identify the VoIP leg
+        of the gateway call."
+    ::= { cvdcMIBGroups 43 }
+
+cvdcCallVolumeStatsHistory OBJECT-GROUP
+    OBJECTS         {
+                        cvCallRateStatsMaxVal,
+                        cvCallRateStatsAvgVal,
+                        cvCallLegRateStatsMaxVal,
+                        cvCallLegRateStatsAvgVal,
+                        cvActiveCallStatsMaxVal,
+                        cvActiveCallStatsAvgVal,
+                        cvCallDurationStatsMaxVal,
+                        cvCallDurationStatsAvgVal,
+                        cvSipMsgRateStatsMaxVal,
+                        cvSipMsgRateStatsAvgVal,
+                        cvCallRateWMValue,
+                        cvCallRateWMts,
+                        cvActiveCallWMValue,
+                        cvActiveCallWMts,
+                        cvSipMsgRateWMValue,
+                        cvSipMsgRateWMts,
+                        cvCallDurationStatsThreshold,
+                        cvCallVolumeWMTableSize,
+                        cvCallLegRateWMValue,
+                        cvCallLegRateWMts
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group provides the information about the Call Volume Stats
+        History information in the voice gateway."
+    ::= { cvdcMIBGroups 44 }
+
 END
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

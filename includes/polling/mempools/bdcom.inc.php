@@ -18,9 +18,9 @@
 
 echo 'BDCOM Memory Pool';
 
-$memory_pool = snmp_get_multi_oid($device, 'nmsMemoryPoolTotalMemorySize.0 nmsMemoryPoolUtilization.0', '-OQUs', 'NMS-MEMORY-POOL-MIB');
+$memory_pool = snmp_get_multi_oid($device, 'bdcomMemoryPoolUsed.0 bdcomMemoryPoolFree.0', '-OQUs', 'BDCOM-MEMORY-POOL-MIB');
 
-$mempool['total'] = $memory_pool['nmsMemoryPoolTotalMemorySize.0'];
-$mempool['perc']  = $memory_pool['nmsMemoryPoolUtilization.0'];
-$mempool['used']  = ($mempool['total'] / 100 * $mempool['perc']);
-$mempool['free']  = ($mempool['total'] - $mempool['used']);
+$mempool['free']  = ['bdcomMemoryPoolFree.0'];
+$mempool['used']  = $memory_pool['bdcomMemoryPoolUsed.0'];
+$mempool['total'] = $mempool['free'] + $mempool['used'];
+$mempool['perc']  = $mempool['used'] / $mempool['total'];
