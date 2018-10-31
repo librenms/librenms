@@ -13,51 +13,51 @@ to LibreNMS - localhost is a good one. This is needed in order for alerting to w
 
 List of pre installed plugins in the format: \<GUI name\> - \<documentation URL\>
 
-Most of these are from [monitoring-plugins.org](https://www.monitoring-plugins.org/doc/man/index.html). 
+Many of these are from [monitoring-plugins.org](https://www.monitoring-plugins.org/doc/man/index.html). 
 
 Plugins will only load if they are prefixed with "check_" and they have that stripped out when displaying in the "Add Serice" GUI "Type" dropdown list.
 
 * ajp -
-* apt -
+* apt - https://www.monitoring-plugins.org/doc/man/check_apt.html
 * backuppc -
 * bgpstate -
-* breeze -
-* by_ssh -
+* breeze - https://www.monitoring-plugins.org/doc/man/check_breeze.html
+* by_ssh - https://www.monitoring-plugins.org/doc/man/check_by_ssh.html
 * cert_expire -
 * checksums -
 * clamav -
-* clamd -
-* cluster -
+* clamd - https://www.monitoring-plugins.org/doc/man/check_clamd.html
+* cluster - https://www.monitoring-plugins.org/doc/man/check_cluster.html
 * cups -
-* dbi -
-* dhcp -
-* dig -
-* disk -
-* disk_smb -
-* dns -
+* dbi - https://www.monitoring-plugins.org/doc/man/check_dbi.html
+* dhcp - https://www.monitoring-plugins.org/doc/man/check_dhcp.html
+* dig - https://www.monitoring-plugins.org/doc/man/check_dig.html
+* disk - https://www.monitoring-plugins.org/doc/man/check_disk.html
+* disk_smb - https://www.monitoring-plugins.org/doc/man/check_disk_smb.html
+* dns - https://www.monitoring-plugins.org/doc/man/check_dns.html
 * dnssec_delegation -
 * drbd -
-* dummy -
+* dummy - https://www.monitoring-plugins.org/doc/man/check_dummy.html
 * email_delivery -
 * email_delivery_epn -
 * entropy -
 * etc_hosts -
 * etc_resolv -
-* file_age -
-* flexlm -
-* fping -
+* file_age - https://www.monitoring-plugins.org/doc/man/check_file_age.html
+* flexlm - https://www.monitoring-plugins.org/doc/man/check_flexlm.html
+* fping - https://www.monitoring-plugins.org/doc/man/check_fping.html
 * ftp -
-* game -
+* game - https://www.monitoring-plugins.org/doc/man/check_game.html
 * graphite -
 * haproxy -
 * haproxy_stats -
 * host -
 * hp_bladechassis -
 * hpasm -
-* hpjd -
+* hpjd - https://www.monitoring-plugins.org/doc/man/check_hpjd.html
 * http - [check_http docs](https://www.monitoring-plugins.org/doc/man/check_http.html)
 * httpd_status -
-* icmp -
+* icmp - https://www.monitoring-plugins.org/doc/man/check_icmp.html
 * ide_smart -
 * ifoperstatus -
 * ifstatus -
@@ -67,75 +67,75 @@ Plugins will only load if they are prefixed with "check_" and they have that str
 * imap_receive -
 * imap_receive_epn -
 * ipmi_sensor -
-* ircd -
-* jabber -
-* ldap -
+* ircd - https://www.monitoring-plugins.org/doc/man/check_ircd.html
+* jabber - https://www.monitoring-plugins.org/doc/man/check_jabber.html
+* ldap - https://www.monitoring-plugins.org/doc/man/check_ldap.html
 * ldap_root -
-* ldaps -
+* ldaps - https://www.monitoring-plugins.org/doc/man/check_ldaps.html
 * libs -
 * libvirt -
 * lm_sensors -
-* load -
-* log -
-* mailq -
+* load - https://www.monitoring-plugins.org/doc/man/check_load.html
+* log - https://www.monitoring-plugins.org/doc/man/check_log.html
+* mailq - https://www.monitoring-plugins.org/doc/man/check_mailq.html
 * memcached -
 * memory -
 * mongodb -
-* mrtg -
-* mrtgtraf -
+* mrtg - https://www.monitoring-plugins.org/doc/man/check_mrtg.html
+* mrtgtraf - https://www.monitoring-plugins.org/doc/man/check_mrtgtraf.html
 * multipath -
-* mysql -
+* mysql - https://www.monitoring-plugins.org/doc/man/check_mysql.html
 * mysql_health -
-* mysql_query -
-* nagios -
+* mysql_query - https://www.monitoring-plugins.org/doc/man/check_mysql_query.html
+* nagios - https://www.monitoring-plugins.org/doc/man/check_nagios.html
 * nfsmounts -
-* nntp -
-* nntps -
-* nt -
-* ntp -
-* ntp_peer -
-* ntp_time -
-* nwstat -
-* oracle -
-* overcr -
+* nntp - https://www.monitoring-plugins.org/doc/man/check_nntp.html
+* nntps - https://www.monitoring-plugins.org/doc/man/check_nntps.html
+* nt - https://www.monitoring-plugins.org/doc/man/check_nt.html
+* ntp - https://www.monitoring-plugins.org/doc/man/check_ntp.html
+* ntp_peer - https://www.monitoring-plugins.org/doc/man/check_ntp_peer.html
+* ntp_time - https://www.monitoring-plugins.org/doc/man/check_ntp_time.html
+* nwstat - https://www.monitoring-plugins.org/doc/man/check_nwstat.html
+* oracle - https://www.monitoring-plugins.org/doc/man/check_oracle.html
+* overcr - https://www.monitoring-plugins.org/doc/man/check_overcr.html
 * packages -
-* pgsql -
-* ping -
-* pop -
+* pgsql - https://www.monitoring-plugins.org/doc/man/check_pgsql.html
+* ping - https://www.monitoring-plugins.org/doc/man/check_ping.html
+* pop - https://www.monitoring-plugins.org/doc/man/check_pop.html
 * printer -
-* procs -
+* procs - https://www.monitoring-plugins.org/doc/man/check_procs.html
 * raid -
 * rbl -
-* real -
+* real - https://www.monitoring-plugins.org/doc/man/check_real.html
 * redis -
-* rpc -
+* rpc - https://www.monitoring-plugins.org/doc/man/check_rpc.html
 * rta_multi -
 * running_kernel -
-* sensors -
+* sensors - https://www.monitoring-plugins.org/doc/man/check_sensors.html
 * shutdown -
-* simap -
+* simap - https://www.monitoring-plugins.org/doc/man/check_simap.html
 * smstools -
-* smtp -
+* smtp - https://www.monitoring-plugins.org/doc/man/check_smtp.html
 * smtp_send -
 * smtp_send_epn -
-* snmp -
+* snmp - https://www.monitoring-plugins.org/doc/man/check_snmp.html
 * snmp_environment -
 * snmp_time -
 * soas -
-* spop -
-* ssh -
+* spop - https://www.monitoring-plugins.org/doc/man/check_spop.html
+* ssh - https://www.monitoring-plugins.org/doc/man/check_ssh.html
 * ssl_cert -
-* ssmtp -
+* ssmtp - https://www.monitoring-plugins.org/doc/man/check_ssmtp.html
 * statusfile -
-* swap -
-* tcp -
-* time -
-* udp -
-* ups -
-* uptime -
-* users -
+* swap - https://www.monitoring-plugins.org/doc/man/check_swap.html
+* tcp - https://www.monitoring-plugins.org/doc/man/check_tcp.html
+* time - https://www.monitoring-plugins.org/doc/man/check_time.html
+* udp - https://www.monitoring-plugins.org/doc/man/check_udp.html
+* ups - https://www.monitoring-plugins.org/doc/man/check_ups.html
+* uptime - https://www.monitoring-plugins.org/doc/man/check_uptime.html
+* users - https://www.monitoring-plugins.org/doc/man/check_wave.html
 * v46 -
-* wave -
+* wave - https://www.monitoring-plugins.org/doc/man/check_wave.html
 * webinject -
 * whois -
 * zone_auth -
