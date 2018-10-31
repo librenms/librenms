@@ -1,11 +1,143 @@
 source: Extensions/Services.md
 path: blob/master/doc/
-# Setting up Services
+[TOC]
+
+# Setting up services
 
 Services within LibreNMS provides the ability to use Nagios plugins to perform additional monitoring outside of SNMP.
 
 **These services are tied into an existing device so you need at least one device to be able to add it
 to LibreNMS - localhost is a good one. This is needed in order for alerting to work properly.**
+
+## Pre installed plugins
+
+List of pre installed plugins in the format: \<GUI name\> - \<documentation URL\>
+
+Most of these are from [monitoring-plugins.org](https://www.monitoring-plugins.org/doc/man/index.html). Any plugin with the prefix "check_" have that stripped out when displaying in the "Add Serice" GUI "Type" dropdown list.
+
+* ajp -
+* apt -
+* backuppc -
+* bgpstate -
+* breeze -
+* by_ssh -
+* cert_expire -
+* checksums -
+* clamav -
+* clamd -
+* cluster -
+* cups -
+* dbi -
+* dhcp -
+* dig -
+* disk -
+* disk_smb -
+* dns -
+* dnssec_delegation -
+* drbd -
+* dummy -
+* email_delivery -
+* email_delivery_epn -
+* entropy -
+* etc_hosts -
+* etc_resolv -
+* file_age -
+* flexlm -
+* fping -
+* ftp -
+* game -
+* graphite -
+* haproxy -
+* haproxy_stats -
+* host -
+* hp_bladechassis -
+* hpasm -
+* hpjd -
+* http - [check_http docs](https://www.monitoring-plugins.org/doc/man/check_http.html)
+* httpd_status -
+* icmp -
+* ide_smart -
+* ifoperstatus -
+* ifstatus -
+* imap -
+* imap_quota -
+* imap_quota_epn -
+* imap_receive -
+* imap_receive_epn -
+* ipmi_sensor -
+* ircd -
+* jabber -
+* ldap -
+* ldap_root -
+* ldaps -
+* libs -
+* libvirt -
+* lm_sensors -
+* load -
+* log -
+* mailq -
+* memcached -
+* memory -
+* mongodb -
+* mrtg -
+* mrtgtraf -
+* multipath -
+* mysql -
+* mysql_health -
+* mysql_query -
+* nagios -
+* nfsmounts -
+* nntp -
+* nntps -
+* nt -
+* ntp -
+* ntp_peer -
+* ntp_time -
+* nwstat -
+* oracle -
+* overcr -
+* packages -
+* pgsql -
+* ping -
+* pop -
+* printer -
+* procs -
+* raid -
+* rbl -
+* real -
+* redis -
+* rpc -
+* rta_multi -
+* running_kernel -
+* sensors -
+* shutdown -
+* simap -
+* smstools -
+* smtp -
+* smtp_send -
+* smtp_send_epn -
+* snmp -
+* snmp_environment -
+* snmp_time -
+* soas -
+* spop -
+* ssh -
+* ssl_cert -
+* ssmtp -
+* statusfile -
+* swap -
+* tcp -
+* time -
+* udp -
+* ups -
+* uptime -
+* users -
+* v46 -
+* wave -
+* webinject -
+* whois -
+* zone_auth -
+* zone_rrsig_expiration -
 
 ## Setup
 
