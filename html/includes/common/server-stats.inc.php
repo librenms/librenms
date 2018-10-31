@@ -68,12 +68,12 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
     if (device_permitted($device_id)) {
         $cpu = dbFetchCell("SELECT AVG(processor_usage) from processors WHERE device_id = ?", array($device_id));
         $mem = dbFetchRows("SELECT mempool_descr,
-                                ROUND(mempool_used / (1024*1024), 0) as used,
-                                ROUND(mempool_total /(1024*1024), 0) as total
+                                mempool_used as used,
+                                mempool_total as total
                                 FROM mempools WHERE device_id = ?", array($device_id));
         $disk = dbFetchRows("SELECT storage_descr,
-                                ROUND(storage_used / (1024*1024), 0) as used,
-                                ROUND(storage_size / (1024*1024), 0) as total
+                                storage_used as used,
+                                storage_size as total
                                 FROM storage WHERE device_id = ?", array($device_id));
         $colno = 12 / $column;
         if (!$cpu) {
@@ -87,34 +87,96 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 
         $i = 0;
         foreach ($mem as $m) {
+            $mem_used = $m['used'];
+            $mem_total = $m['total'];
+            $mem_label = "";
+
+            $mc=0;
+            while ($mem_total > 1024) {
+                $mem_used = round($mem_used / 1024, 2);
+                $mem_total = round($mem_total / 1024, 2);
+
+                $mc++;
+            }
+
+            switch ($mc) {
+                case 0:
+                    $mem_label = "B";
+                    break;
+                case 1:
+                    $mem_label = "KB";
+                    break;
+                case 2:
+                    $mem_label = "MB";
+                    break;
+                case 3:
+                    $mem_label = "GB";
+                    break;
+                case 4:
+                    $mem_label = "TB";
+                    break;
+            }
+
             $common_output[] = '<div class="col-sm-' . $colno . '">
                 <div id="mem-' . $i . '-' . $unique_id . '" ></div>
         </div>';
             $mem_js_output .= "var memgauge" . $i . " = new JustGage({
             id: 'mem-" . $i . "-" . $unique_id . "',
-            value: " . $m['used'] . ",
+            value: " . $mem_used . ",
             min: 0,
-            max: " . $m['total'] . ",
-            label: 'Mbytes',
+            max: " . $mem_total . ",
+            label: '" . $mem_used . "',
             valueFontSize: '2px',
-            title: '" . $m['mempool_descr'] . " Usage'
+            title: '" . $m['mempool_descr'] . "',
+            symbol: '" . $mem_label . "'
         });\n";
             $i++;
         }
 
         $i = 0;
         foreach ($disk as $d) {
+            $disk_used = $d['used'];
+            $disk_total = $d['total'];
+            $disk_label = "";
+
+            $dc=0;
+            while ($disk_total > 1024) {
+                $disk_used = round($disk_used / 1024, 2);
+                $disk_total = round($disk_total / 1024, 2);
+
+                $dc++;
+            }
+
+            switch ($dc) {
+                case 0:
+                    $disk_label = "B";
+                    break;
+                case 1:
+                    $disk_label = "KB";
+                    break;
+                case 2:
+                    $disk_label = "MB";
+                    break;
+                case 3:
+                    $disk_label = "GB";
+                    break;
+                case 4:
+                    $disk_label = "TB";
+                    break;
+            }
+
             $common_output[] = '<div class="col-sm-' . $colno . '">
                 <div id="disk-' . $i . '-' . $unique_id . '" ></div>
         </div>';
             $disk_js_output .= "var diskgauge" . $i . " = new JustGage({
             id: 'disk-" . $i . "-" . $unique_id . "',
-            value: " . $d['used'] . ",
+            value: " . $disk_used . ",
             min: 0,
-            max: " . $d['total'] . ",
-            label: 'Mbytes',
+            max: " . $disk_total . ",
+            label: '" . $disk_used . "',
             valueFontSize: '2px',
-            title: '" . substr($d['storage_descr'], 0, 20) . " Usage'
+            title: '" . substr($d['storage_descr'], 0, 20) . "',
+            symbol: '" . $disk_label . "'
         });\n";
             $i++;
         }
