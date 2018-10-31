@@ -91,9 +91,9 @@ class Telegram extends Transport
                     'descr' => 'Telegram format',
                     'type' => 'select',
                     'options' => [
+                        '' => '',
                         'Markdown' => 'Markdown',
-                        'HTML' => 'HTML',
-                        '' => ''
+                        'HTML' => 'HTML'
                     ]                    
                 ]
             ],
