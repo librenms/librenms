@@ -53,7 +53,7 @@ Plugins will only load if they are prefixed with "check_" and they have that pre
 * [hp_bladechassis]() - 
 * [hpasm]() - 
 * [hpjd](https://www.monitoring-plugins.org/doc/man/check_hpjd.html) - monitoring-plugins
-* [http]() -  [check_http docs](https://www.monitoring-plugins.org/doc/man/check_http.html) - monitoring-plugins)
+* [http](https://www.monitoring-plugins.org/doc/man/check_http.html) - monitoring-plugins
 * [httpd_status]() - 
 * [icmp](https://www.monitoring-plugins.org/doc/man/check_icmp.html) - monitoring-plugins
 * [ide_smart]() - 
