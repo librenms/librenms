@@ -13,7 +13,9 @@ to LibreNMS - localhost is a good one. This is needed in order for alerting to w
 
 List of pre installed plugins in the format: \<GUI name\> - \<documentation URL\>
 
-Most of these are from [monitoring-plugins.org](https://www.monitoring-plugins.org/doc/man/index.html). Any plugin with the prefix "check_" have that stripped out when displaying in the "Add Serice" GUI "Type" dropdown list.
+Most of these are from [monitoring-plugins.org](https://www.monitoring-plugins.org/doc/man/index.html). 
+
+Plugins will only load if they are prefixed with "check_" and they have that stripped out when displaying in the "Add Serice" GUI "Type" dropdown list.
 
 * ajp -
 * apt -
