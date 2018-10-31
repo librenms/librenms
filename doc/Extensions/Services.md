@@ -131,7 +131,7 @@ Plugins will only load if they are prefixed with "check_" and they have that pre
 * [udp](https://www.monitoring-plugins.org/doc/man/check_udp.html) - monitoring-plugins
 * [ups](https://www.monitoring-plugins.org/doc/man/check_ups.html) - monitoring-plugins
 * [uptime](https://www.monitoring-plugins.org/doc/man/check_uptime.html) - monitoring-plugins
-* [users](https://www.monitoring-plugins.org/doc/man/check_wave.html) - monitoring-plugins
+* [users](https://www.monitoring-plugins.org/doc/man/check_users.html) - monitoring-plugins
 * [v46]() - 
 * [wave](https://www.monitoring-plugins.org/doc/man/check_wave.html) - monitoring-plugins
 * [webinject]() - 
