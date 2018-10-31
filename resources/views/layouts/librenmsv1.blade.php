@@ -67,7 +67,7 @@
         <script src="{{ asset('js/lazyload.js') }}"></script>
     @endif
     <script src="{{ asset('js/select2.min.js') }}"></script>
-    <script src="{{ asset('js/librenms.js?ver=20180512') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=20181028') }}"></script>
     <script type="text/javascript">
 
         <!-- Begin
