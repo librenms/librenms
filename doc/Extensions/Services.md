@@ -15,18 +15,18 @@ List of pre installed plugins in the format: \<name\> - \<origin\>
 
 Plugins will only load if they are prefixed with "check_" and they have that prefix stripped out when displaying in the "Add Serice" GUI "Type" dropdown list.
 
-* [ajp]() - 
+* [ajp](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_ajp) - pkg-nagios-plugins-contrib
 * [apt](https://www.monitoring-plugins.org/doc/man/check_apt.html) - monitoring-plugins
-* [backuppc]() - 
-* [bgpstate]() - 
+* [backuppc](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_backuppc) - pkg-nagios-plugins-contrib
+* [bgpstate](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_bgpstate) - pkg-nagios-plugins-contrib
 * [breeze](https://www.monitoring-plugins.org/doc/man/check_breeze.html) - monitoring-plugins
 * [by_ssh](https://www.monitoring-plugins.org/doc/man/check_by_ssh.html) - monitoring-plugins
 * [cert_expire]() - 
-* [checksums]() - 
-* [clamav]() - 
+* [checksums](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_checksums) - pkg-nagios-plugins-contrib
+* [clamav](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_clamav) - 
 * [clamd](https://www.monitoring-plugins.org/doc/man/check_clamd.html) - monitoring-plugins
 * [cluster](https://www.monitoring-plugins.org/doc/man/check_cluster.html) - monitoring-plugins
-* [cups]() - 
+* [cups](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_cups) - pkg-nagios-plugins-contrib
 * [dbi](https://www.monitoring-plugins.org/doc/man/check_dbi.html) - monitoring-plugins
 * [dhcp](https://www.monitoring-plugins.org/doc/man/check_dhcp.html) - monitoring-plugins
 * [dig](https://www.monitoring-plugins.org/doc/man/check_dig.html) - monitoring-plugins
@@ -34,9 +34,9 @@ Plugins will only load if they are prefixed with "check_" and they have that pre
 * [disk_smb](https://www.monitoring-plugins.org/doc/man/check_disk_smb.html) - monitoring-plugins
 * [dns](https://www.monitoring-plugins.org/doc/man/check_dns.html) - monitoring-plugins
 * [dnssec_delegation]() - 
-* [drbd]() - 
+* [drbd](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_drbd) - pkg-nagios-plugins-contrib
 * [dummy](https://www.monitoring-plugins.org/doc/man/check_dummy.html) - monitoring-plugins
-* [email_delivery]() - 
+* [email_delivery](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_email_delivery) - pkg-nagios-plugins-contrib
 * [email_delivery_epn]() - 
 * [entropy]() - 
 * [etc_hosts]() - 
@@ -46,15 +46,15 @@ Plugins will only load if they are prefixed with "check_" and they have that pre
 * [fping](https://www.monitoring-plugins.org/doc/man/check_fping.html) - monitoring-plugins
 * [ftp]() - 
 * [game](https://www.monitoring-plugins.org/doc/man/check_game.html) - monitoring-plugins
-* [graphite]() - 
-* [haproxy]() - 
-* [haproxy_stats]() - 
+* [graphite](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_graphite) - pkg-nagios-plugins-contrib
+* [haproxy](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_haproxy) - pkg-nagios-plugins-contrib
+* [haproxy_stats](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_haproxy_stats) - pkg-nagios-plugins-contrib
 * [host]() - 
-* [hp_bladechassis]() - 
-* [hpasm]() - 
+* [hp_bladechassis](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_hp_bladechassis) - pkg-nagios-plugins-contrib
+* [hpasm](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_hpasm) - 
 * [hpjd](https://www.monitoring-plugins.org/doc/man/check_hpjd.html) - monitoring-plugins
 * [http](https://www.monitoring-plugins.org/doc/man/check_http.html) - monitoring-plugins
-* [httpd_status]() - 
+* [httpd_status](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_httpd_status) - pkg-nagios-plugins-contrib
 * [icmp](https://www.monitoring-plugins.org/doc/man/check_icmp.html) - monitoring-plugins
 * [ide_smart]() - 
 * [ifoperstatus]() - 
@@ -70,23 +70,23 @@ Plugins will only load if they are prefixed with "check_" and they have that pre
 * [ldap](https://www.monitoring-plugins.org/doc/man/check_ldap.html) - monitoring-plugins
 * [ldap_root]() - 
 * [ldaps](https://www.monitoring-plugins.org/doc/man/check_ldaps.html) - monitoring-plugins
-* [libs]() - 
-* [libvirt]() - 
+* [libs](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_libs) - pkg-nagios-plugins-contrib
+* [libvirt](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_libvirt) - pkg-nagios-plugins-contrib
 * [lm_sensors]() - 
 * [load](https://www.monitoring-plugins.org/doc/man/check_load.html) - monitoring-plugins
 * [log](https://www.monitoring-plugins.org/doc/man/check_log.html) - monitoring-plugins
 * [mailq](https://www.monitoring-plugins.org/doc/man/check_mailq.html) - monitoring-plugins
-* [memcached]() - 
-* [memory]() - 
-* [mongodb]() - 
+* [memcached](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_memcached) - pkg-nagios-plugins-contrib
+* [memory](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_memory) - pkg-nagios-plugins-contrib
+* [mongodb](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_mongodb) - pkg-nagios-plugins-contrib
 * [mrtg](https://www.monitoring-plugins.org/doc/man/check_mrtg.html) - monitoring-plugins
 * [mrtgtraf](https://www.monitoring-plugins.org/doc/man/check_mrtgtraf.html) - monitoring-plugins
-* [multipath]() - 
+* [multipath](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_multipath) - pkg-nagios-plugins-contrib
 * [mysql](https://www.monitoring-plugins.org/doc/man/check_mysql.html) - monitoring-plugins
-* [mysql_health]() - 
+* [mysql_health](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_mysql_health) - pkg-nagios-plugins-contrib
 * [mysql_query](https://www.monitoring-plugins.org/doc/man/check_mysql_query.html) - monitoring-plugins
 * [nagios](https://www.monitoring-plugins.org/doc/man/check_nagios.html) - monitoring-plugins
-* [nfsmounts]() - 
+* [nfsmounts](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_nfsmounts) - pkg-nagios-plugins-contrib
 * [nntp](https://www.monitoring-plugins.org/doc/man/check_nntp.html) - monitoring-plugins
 * [nntps](https://www.monitoring-plugins.org/doc/man/check_nntps.html) - monitoring-plugins
 * [nt](https://www.monitoring-plugins.org/doc/man/check_nt.html) - monitoring-plugins
@@ -100,29 +100,29 @@ Plugins will only load if they are prefixed with "check_" and they have that pre
 * [pgsql](https://www.monitoring-plugins.org/doc/man/check_pgsql.html) - monitoring-plugins
 * [ping](https://www.monitoring-plugins.org/doc/man/check_ping.html) - monitoring-plugins
 * [pop](https://www.monitoring-plugins.org/doc/man/check_pop.html) - monitoring-plugins
-* [printer]() - 
+* [printer](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_printer) - pkg-nagios-plugins-contrib
 * [procs](https://www.monitoring-plugins.org/doc/man/check_procs.html) - monitoring-plugins
-* [raid]() - 
-* [rbl]() - 
+* [raid](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_raid) - pkg-nagios-plugins-contrib
+* [rbl](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_rbl) - pkg-nagios-plugins-contrib
 * [real](https://www.monitoring-plugins.org/doc/man/check_real.html) - monitoring-plugins
-* [redis]() - 
+* [redis](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_redis) - pkg-nagios-plugins-contrib
 * [rpc](https://www.monitoring-plugins.org/doc/man/check_rpc.html) - monitoring-plugins
 * [rta_multi]() - 
 * [running_kernel]() - 
 * [sensors](https://www.monitoring-plugins.org/doc/man/check_sensors.html) - monitoring-plugins
 * [shutdown]() - 
 * [simap](https://www.monitoring-plugins.org/doc/man/check_simap.html) - monitoring-plugins
-* [smstools]() - 
+* [smstools](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_smstools) - pkg-nagios-plugins-contrib
 * [smtp](https://www.monitoring-plugins.org/doc/man/check_smtp.html) - monitoring-plugins
 * [smtp_send]() - 
 * [smtp_send_epn]() - 
 * [snmp](https://www.monitoring-plugins.org/doc/man/check_snmp.html) - monitoring-plugins
-* [snmp_environment]() - 
-* [snmp_time]() - 
+* [snmp_environment](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_snmp_environment) - pkg-nagios-plugins-contrib
+* [snmp_time](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_snmp_time) - pkg-nagios-plugins-contrib
 * [soas]() - 
 * [spop](https://www.monitoring-plugins.org/doc/man/check_spop.html) - monitoring-plugins
 * [ssh](https://www.monitoring-plugins.org/doc/man/check_ssh.html) - monitoring-plugins
-* [ssl_cert]() - 
+* [ssl_cert](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_ssl_cert) - pkg-nagios-plugins-contrib
 * [ssmtp](https://www.monitoring-plugins.org/doc/man/check_ssmtp.html) - monitoring-plugins
 * [statusfile]() - 
 * [swap](https://www.monitoring-plugins.org/doc/man/check_swap.html) - monitoring-plugins
@@ -132,12 +132,12 @@ Plugins will only load if they are prefixed with "check_" and they have that pre
 * [ups](https://www.monitoring-plugins.org/doc/man/check_ups.html) - monitoring-plugins
 * [uptime](https://www.monitoring-plugins.org/doc/man/check_uptime.html) - monitoring-plugins
 * [users](https://www.monitoring-plugins.org/doc/man/check_users.html) - monitoring-plugins
-* [v46]() - 
+* [v46](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_v46) - pkg-nagios-plugins-contrib
 * [wave](https://www.monitoring-plugins.org/doc/man/check_wave.html) - monitoring-plugins
-* [webinject]() - 
-* [whois]() - 
-* [zone_auth]() - 
-* [zone_rrsig_expiration]() - 
+* [webinject](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_webinject) - pkg-nagios-plugins-contrib
+* [whois](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_whois) - pkg-nagios-plugins-contrib
+* [zone_auth](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_zone_auth) - pkg-nagios-plugins-contrib
+* [zone_rrsig_expiration](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_zone_rrsig_expiration) - pkg-nagios-plugins-contrib
 
 ## Setup
 
