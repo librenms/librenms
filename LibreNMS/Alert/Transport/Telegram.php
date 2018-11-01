@@ -94,7 +94,7 @@ class Telegram extends Transport
                         '' => '',
                         'Markdown' => 'Markdown',
                         'HTML' => 'HTML'
-                    ]                    
+                    ]
                 ]
             ],
             'validation' => [
