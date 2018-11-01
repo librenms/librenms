@@ -175,7 +175,7 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.9.1.8.' . $index,
                 'mikrotik-60g-tx',
                 $index,
-                'Tx Rate', 
+                'Tx Rate',
                 $entry['mtxrWl60G'],
                 $multiplier = 1000000
             );
@@ -193,7 +193,7 @@ class Routeros extends OS implements
         }
         return $this->data;
     }
-   public function discoverWirelessDistance()
+    public function discoverWirelessDistance()
     {
         $data = $this->fetchData();
         $sensors = array();
