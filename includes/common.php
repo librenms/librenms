@@ -616,13 +616,18 @@ function format_si($value, $round = '2', $sf = '3')
 
 function format_bi($value, $round = '2', $sf = '3')
 {
+    return format_bi_hash($value, $round, $sf)['combined'];
+}
+
+function format_bi_hash($value, $round = '2', $sf = '3', $mm = 0)
+{
     if ($value < "0") {
         $neg = 1;
         $value = $value * -1;
     }
-    $sizes = array('', 'k', 'M', 'G', 'T', 'P', 'E');
+    $sizes = array('', 'K', 'M', 'G', 'T', 'P', 'E');
     $ext = $sizes[0];
-    for ($i = 1; (($i < count($sizes)) && ($value >= 1024)); $i++) {
+    for ($i = 1; ((($i < count($sizes)) && ($value >= 1024)) || ($mm != 0 && $i < $mm)); $i++) {
         $value = $value / 1024;
         $ext  = $sizes[$i];
     }
@@ -631,7 +636,13 @@ function format_bi($value, $round = '2', $sf = '3')
         $value = $value * -1;
     }
 
-    return number_format(round($value, $round), $sf, '.', '').$ext;
+    $ret = array();
+    $ret['units'] = $ext;
+    $ret['multiplier'] = $i;
+    $ret['value'] = number_format(round($value, $round), $sf, '.', '');
+    $ret['combined'] = $value.$string;
+
+    return $ret;
 }
 
 function format_number($value, $base = '1000', $round = 2, $sf = 3)

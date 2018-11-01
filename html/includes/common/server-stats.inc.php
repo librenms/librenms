@@ -87,96 +87,42 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 
         $i = 0;
         foreach ($mem as $m) {
-            $mem_used = $m['used'];
-            $mem_total = $m['total'];
-            $mem_label = "";
-
-            $mc=0;
-            while ($mem_total > 1024) {
-                $mem_used = round($mem_used / 1024, 2);
-                $mem_total = round($mem_total / 1024, 2);
-
-                $mc++;
-            }
-
-            switch ($mc) {
-                case 0:
-                    $mem_label = "B";
-                    break;
-                case 1:
-                    $mem_label = "KB";
-                    break;
-                case 2:
-                    $mem_label = "MB";
-                    break;
-                case 3:
-                    $mem_label = "GB";
-                    break;
-                case 4:
-                    $mem_label = "TB";
-                    break;
-            }
+            $mem_total = format_bi_hash($m['total'], 2);
+            $mem_used = format_bi_hash($m['used'], 2, '3', $mem_total['multiplier']);
 
             $common_output[] = '<div class="col-sm-' . $colno . '">
                 <div id="mem-' . $i . '-' . $unique_id . '" ></div>
         </div>';
             $mem_js_output .= "var memgauge" . $i . " = new JustGage({
             id: 'mem-" . $i . "-" . $unique_id . "',
-            value: " . $mem_used . ",
+            value: " . $mem_used['value'] . ",
             min: 0,
-            max: " . $mem_total . ",
-            label: '" . $mem_used . "',
+            max: " . $mem_total['value'] . ",
+            label: '" . $mem_used['value'] . "',
             valueFontSize: '2px',
             title: '" . $m['mempool_descr'] . "',
-            symbol: '" . $mem_label . "'
+            symbol: '" . $mem_total['unit'] . "'
         });\n";
             $i++;
         }
 
         $i = 0;
         foreach ($disk as $d) {
-            $disk_used = $d['used'];
-            $disk_total = $d['total'];
-            $disk_label = "";
-
-            $dc=0;
-            while ($disk_total > 1024) {
-                $disk_used = round($disk_used / 1024, 2);
-                $disk_total = round($disk_total / 1024, 2);
-
-                $dc++;
-            }
-
-            switch ($dc) {
-                case 0:
-                    $disk_label = "B";
-                    break;
-                case 1:
-                    $disk_label = "KB";
-                    break;
-                case 2:
-                    $disk_label = "MB";
-                    break;
-                case 3:
-                    $disk_label = "GB";
-                    break;
-                case 4:
-                    $disk_label = "TB";
-                    break;
-            }
+            $disk_total = format_bi_hash($d['total'], 2);
+            $disk_used = format_bi_hash($d['total'], 2, '3', $disk_total['multiplier']);
 
             $common_output[] = '<div class="col-sm-' . $colno . '">
                 <div id="disk-' . $i . '-' . $unique_id . '" ></div>
         </div>';
             $disk_js_output .= "var diskgauge" . $i . " = new JustGage({
             id: 'disk-" . $i . "-" . $unique_id . "',
-            value: " . $disk_used . ",
+            value: " . $disk_used['value'] . ",
             min: 0,
-            max: " . $disk_total . ",
-            label: '" . $disk_used . "',
+            max: " . $disk_total['value'] . ",
+            label: '" . $disk_used['value'] . "',
             valueFontSize: '2px',
             title: '" . substr($d['storage_descr'], 0, 20) . "',
-            symbol: '" . $disk_label . "'
+            symbol: '" . $disk_total['unit'] . "'
         });\n";
             $i++;
         }
