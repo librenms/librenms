@@ -109,7 +109,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         $i = 0;
         foreach ($disk as $d) {
             $disk_total = format_bi_hash($d['total'], 2);
-            $disk_used = format_bi_hash($d['total'], 2, '3', $disk_total['multiplier']);
+            $disk_used = format_bi_hash($d['used'], 2, '3', $disk_total['multiplier']);
 
             $common_output[] = '<div class="col-sm-' . $colno . '">
                 <div id="disk-' . $i . '-' . $unique_id . '" ></div>
