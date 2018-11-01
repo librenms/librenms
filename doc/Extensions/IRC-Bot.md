@@ -1,4 +1,5 @@
 source: Extensions/IRC-Bot.md
+path: blob/master/doc/
 [TOC]
 
 # About

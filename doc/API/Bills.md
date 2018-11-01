@@ -1,4 +1,5 @@
 source: API/Bills.md
+path: blob/master/doc/
 
 ### `list_bills`
 

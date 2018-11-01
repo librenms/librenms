@@ -15,6 +15,6 @@ if (is_numeric($sessions)) {
     );
 
     $tags = compact('rrd_def');
-    data_update($device, 'apm_sessions', $tags, $fields);
-    $graphs['apm_sessions'] = true;
+    data_update($device, 'bigip_apm_sessions', $tags, $fields);
+    $graphs['bigip_apm_sessions'] = true;
 }

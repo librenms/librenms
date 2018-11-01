@@ -1,4 +1,5 @@
 source: Alerting/Testing.md
+path: blob/master/doc/
 
 ### Rules
 

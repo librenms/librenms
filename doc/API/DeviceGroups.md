@@ -1,4 +1,5 @@
 source: API/DeviceGroups.md
+path: blob/master/doc/
 
 ### `get_devicegroups`
 

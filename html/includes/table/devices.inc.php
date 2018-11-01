@@ -208,8 +208,8 @@ foreach (dbFetchRows($sql, $param) as $device) {
     }
 
     if ($subformat == 'detail') {
-        $platform = $device['hardware'] . '<br>' . $device['features'];
-        $os = $device['os_text'] . '<br>' . $device['version'];
+        $platform = $device['hardware'];
+        $os = $device['os_text'] . '<br>' . $device['version'] . (empty($device['features'])? "" : " ({$device['features']})");
         $device['ip'] = inet6_ntop($device['ip']);
         $uptime = formatUptime($device['uptime'], 'short');
         $hostname .= '<br />' . get_device_name($device);
