@@ -4,7 +4,7 @@ path: blob/master/doc/
 
 > NOTE: Read the above note again!
 
-We have available for download a pre-built image based on Ubuntu 16.04 LTS. Details of the image are below:
+We have available for download a pre-built image based on Ubuntu 18.04 LTS. Details of the image are below:
 
 The image is built with VirtualBox, a vmdk is provided along with an ova which was exported using OFV 1.0 version. 
 These should be supported in VMWare Fusion, Workstation, Player and VirtualBox.
@@ -12,47 +12,79 @@ These should be supported in VMWare Fusion, Workstation, Player and VirtualBox.
 * NOTE: It's highly recommended that you update by doing the following. 
 ```bash
 cd /opt/librenms
-./daily.sh
+./daily.sh && ./validate.php
 ```
+
 * Any issues and or help with these images should be reported via [Community Fourm](https://community.librenms.org) or our [Discord server](https://t.libren.ms/discord)
 
-#### Setup
+### LibreNMS version
+```
+Component | Version
+--------- | -------
+LibreNMS  | 1.45-6-g07162ae1f
+DB Schema | 270
+PHP       | 7.2.10-0ubuntu0.18.04.1
+MySQL     | 10.1.34-MariaDB-0ubuntu0.18.04.1
+RRDTool   | 1.7.0
+SNMP      | NET-SNMP 5.7.3
+```
+
+### Setup
 
   - UK Keyboard
   - Etc/UTC Timezone
   - LVM for disk setup
   - 4 Poller Wrapper threads
 
-#### Software
+### Software
 
-  - PHP 7
+  - PHP 7.2
   - MariaDB
   - Syslog-ng
+  - Certbot (Secure your install with Let's Encrypt)
 
 ### Features
 
-  - Oxidized install but not configured
   - Weathermap plugin enabled
   - Billing enabled
   - RRDCached enabled
   - Service checks enabled
   - Syslog enabled
+  
+### Configuration
 
-#### Download
+By default, the configured nginx vhost is `librenms.example.com`
+
+Before use, you must configure a valid FQDN and change it in the nginx vhost.
+
+    vi /etc/nginx/conf.d/librenms.conf
+
+Edit `server_name` as required:
+```nginx
+server {
+ ...
+ server_name librenms.example.com;
+ ...
+```
+And restart nginx:
+
+    systemctl restart nginx
+
+### Download
 
 [OVA Image](http://www.lathwood.co.uk/librenms/librenms_ubuntu_1604.ova) - 1.6G
 
-  - md5sum: 18c13c521aa5a6f5e96be2641324a626
+  - md5sum: FIXME
 
-  - sha256sum: 78c09dcd441633ea633118fbc51090e032257752b1f0698fcd084b2b025b6343
+  - sha256sum: FIXME
 
 [VMDK Image](http://www.lathwood.co.uk/librenms/librenms_ubuntu_1604.vmdk) - 4.0G
 
-  - md5sum: fc072de8ee6c95ccee1a7a4cd8d08f4c
+  - md5sum: FIXME
 
-  - sha256sum: 36a2252a6f6f7a3a8d7b5e2fda00eb7949a8d9d1fb637a440773aac5ebf838f3
+  - sha256sum: FIXME
 
-#### Credentials
+### Credentials
 
 > Please note the second character of the SSH password is a CAPITAL EYE
 
@@ -72,3 +104,5 @@ cd /opt/librenms
   - WebUI
     - username: librenms
     - password: `D32fwefwef`
+
+> NOTE: Again, We highly advice that you change all passwords on this image when you deploy it!!
