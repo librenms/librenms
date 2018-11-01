@@ -101,7 +101,6 @@ class Telegram extends Transport
                 'telegram-chat-id' => 'required|string',
                 'telegram-token' => 'required|string',
                 'telegram-format' => 'string',
-
             ]
         ];
     }
