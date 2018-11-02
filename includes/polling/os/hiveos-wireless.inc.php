@@ -17,16 +17,14 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2015 Søren Friis Rosiak
- * @author     sorenrosiak@gmail.com
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
 
-$apmodel = snmp_get($device, 'ahDeviceMode.0', '-Ovq', 'AH-SYSTEM-MIB');
-    $data = snmp_get_multi_oid($device, 'ahSystemSerial.0 ahDeviceMode.0 ahFirmwareVersion.0', '-OQUs', 'AH-SYSTEM-MIB');
+$apmodel = snmp_get($device,'ahDeviceMode.0','-Ovq','AH-SYSTEM-MIB');
+    $data = snmp_get_multi_oid($device,'ahSystemSerial.0 ahDeviceMode.0 ahFirmwareVersion.0','-OQUs','AH-SYSTEM-MIB');
     $hardware = $data['ahDeviceMode.0'];
     $version2 = $data['ahFirmwareVersion.0'];
     // Version has 'HiveOS ' included. We want to remove it so OS doesn't show HiveOS twice.
-    $version = preg_replace('/^HiveOS /', '', $version2);
+    $version = preg_replace('/^HiveOS /','',$version2);
     $serial = $data['ahSystemSerial.0'];
