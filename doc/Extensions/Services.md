@@ -23,7 +23,7 @@ Plugins will only load if they are prefixed with "check_" and they have that pre
 * [by_ssh](https://www.monitoring-plugins.org/doc/man/check_by_ssh.html) - monitoring-plugins
 * [cert_expire](https://github.com/bzed/pkg-nagios-plugins-contrib/blob/5c25f573a59345cc9fa000d3143eb668f3350c8a/dsa/checks/dsa-check-cert-expire) - pkg-nagios-plugins-contrib
 * [checksums](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_checksums) - pkg-nagios-plugins-contrib
-* [clamav](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_clamav) - 
+* [clamav](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_clamav) - pkg-nagios-plugins-contrib
 * [clamd](https://www.monitoring-plugins.org/doc/man/check_clamd.html) - monitoring-plugins
 * [cluster](https://www.monitoring-plugins.org/doc/man/check_cluster.html) - monitoring-plugins
 * [cups](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_cups) - pkg-nagios-plugins-contrib
@@ -51,7 +51,7 @@ Plugins will only load if they are prefixed with "check_" and they have that pre
 * [haproxy_stats](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_haproxy_stats) - pkg-nagios-plugins-contrib
 * [host]() - 
 * [hp_bladechassis](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_hp_bladechassis) - pkg-nagios-plugins-contrib
-* [hpasm](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_hpasm) - 
+* [hpasm](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_hpasm) - pkg-nagios-plugins-contrib
 * [hpjd](https://www.monitoring-plugins.org/doc/man/check_hpjd.html) - monitoring-plugins
 * [http](https://www.monitoring-plugins.org/doc/man/check_http.html) - monitoring-plugins
 * [httpd_status](https://github.com/bzed/pkg-nagios-plugins-contrib/tree/master/check_httpd_status) - pkg-nagios-plugins-contrib
