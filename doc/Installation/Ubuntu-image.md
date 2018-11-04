@@ -6,7 +6,7 @@ path: blob/master/doc/
 
 We have available for download a pre-built image based on Ubuntu 18.04 LTS. Details of the image are below:
 
-The image is built with VirtualBox, a vmdk is provided along with an ova which was exported using OFV 1.0 version. 
+The image is built with VirtualBox, The ova was exported using OFV 1.0 version. 
 These should be supported in VMWare Fusion, Workstation, Player and VirtualBox.
 
 * NOTE: It's highly recommended that you update by doing the following. 
@@ -42,6 +42,7 @@ SNMP      | NET-SNMP 5.7.3
   - MariaDB
   - Syslog-ng
   - Certbot (Secure your install with Let's Encrypt)
+  - Snmptrapd configured
 
 ### Features
 
@@ -55,9 +56,9 @@ SNMP      | NET-SNMP 5.7.3
 
 By default, the configured nginx vhost is `librenms.example.com`
 
-Before use, you must configure a valid FQDN and change it in the nginx vhost.
+Direct IP access is **disabled**. Before use, you must configure a valid FQDN and change it in the nginx vhost.
 
-    vi /etc/nginx/conf.d/librenms.conf
+    sudo vi /etc/nginx/conf.d/librenms.conf
 
 Edit `server_name` as required:
 ```nginx
@@ -68,17 +69,11 @@ server {
 ```
 And restart nginx:
 
-    systemctl restart nginx
+    sudo systemctl restart nginx
 
 ### Download
 
 [OVA Image](http://www.lathwood.co.uk/librenms/librenms_ubuntu_1604.ova) - 1.6G
-
-  - md5sum: FIXME
-
-  - sha256sum: FIXME
-
-[VMDK Image](http://www.lathwood.co.uk/librenms/librenms_ubuntu_1604.vmdk) - 4.0G
 
   - md5sum: FIXME
 
@@ -105,4 +100,4 @@ And restart nginx:
     - username: librenms
     - password: `D32fwefwef`
 
-> NOTE: Again, We highly advice that you change all passwords on this image when you deploy it!!
+> NOTE: Again, We highly advise that you change all passwords on this image when you deploy it!!
