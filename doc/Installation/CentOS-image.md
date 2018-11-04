@@ -73,7 +73,7 @@ And restart nginx:
 
 ### Download
 
-[OVA Image](http://www.lathwood.co.uk/librenms/librenms_centos_7.ova) - 1.1G
+[OVA Image](FIXME) - XG
 
   - md5sum: FIXME
 
