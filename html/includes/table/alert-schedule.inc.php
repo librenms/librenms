@@ -31,7 +31,13 @@ if (empty($total)) {
     $total = 0;
 }
 
-if (!isset($sort) || empty($sort)) {
+if (isset($sort) && !empty($sort)) {
+    list($sort_column, $sort_order) = explode(' ', trim($sort));
+    if ($sort_column == 'status') {
+        $sort_by_status = true;
+        $sort = "`S`.`start`  $sort_order";
+    }
+} else {
     $sort = '`S`.`start` DESC ';
 }
 
@@ -106,6 +112,18 @@ foreach (dbFetchRows($sql, $param) as $schedule) {
         'id'                    => $schedule['schedule_id'],
         'status'                => $status,
     );
+}
+
+if (isset($sort_by_status) && $sort_by_status) {
+    if ($sort_order == 'asc') {
+        usort($response, function ($a, $b) {
+            return $a['status'] - $b['status'];
+        });
+    } else {
+        usort($response, function ($a, $b) {
+            return $b['status'] - $a['status'];
+        });
+    }
 }
 
 $output = array(
