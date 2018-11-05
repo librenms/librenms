@@ -29,12 +29,16 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\OS;
 
 class Aprisa extends OS implements 
     WirelessPowerDiscovery, 
     WirelessRssiDiscovery,
-    WirelessSnrDiscovery
+    WirelessSnrDiscovery,
+    WirelessErrorsDiscovery,
+    WirelessFrequencyDiscovery
 {
     /**
      * Discover wireless tx power. This is in dBm. Type is power.
@@ -77,4 +81,36 @@ class Aprisa extends OS implements
             new WirelessSensor('snr', $this->getDeviceId(), $oid, 'aprisaossnr', 1, 'SNR', null, 1, 100),
         );
     }
-}
+
+    /**
+     * Discover wireless bit errors.  This is in total bits. Type is errors.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessErrors()
+    {
+        $oidcorrectable = '.1.3.6.1.4.1.14817.7.3.1.2.6.1.0';
+        $oiduncorrectable = '.1.3.6.1.4.1.14817.7.3.1.2.6.2.0';
+        return array(
+            new WirelessSensor('errors', $this->getDeviceId(), $oidcorrectable, 'aprisaoscerrors', 1, 'Correctable Errors', null, 1, 1),
+            new WirelessSensor('errors', $this->getDeviceId(), $oiduncorrectable, 'aprisaosuerrors', 1, 'Uncorrectable Errors', null, 1, 1),
+        );
+    }
+
+    /**
+     * Discover wireless frequency.  This is in MHz. Type is frequency.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessFrequency()
+    {
+        $oidrx = '.1.3.6.1.4.1.14817.7.3.1.2.51.5.0';
+        $oidtx = '.1.3.6.1.4.1.14817.7.3.1.2.36.7.0';
+        return array(
+            new WirelessSensor('frequency', $this->getDeviceId(), $oidrx, 'aprisarx', 1, 'Rx Frequency', null, 1, 1000000),
+            new WirelessSensor('frequency', $this->getDeviceId(), $oidtx, 'aprisatx', 1, 'Tx Frequency', null, 1, 1000000),
+        );
+    }
+} 
