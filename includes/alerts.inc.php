@@ -864,6 +864,7 @@ function ExtTransports($obj)
         if (class_exists($class)) {
             $transport_title = ($item['legacy'] === true) ? "{$item['transport_type']} (legacy)" : $item['transport_type'];
             $obj['transport'] = $item['transport_type'];
+            $obj['transport_name'] = $item['transport_name'];
             $obj['alert']     = new AlertData($obj);
             $obj['title']     = $type->getTitle($obj);
             $obj['alert']['title'] = $obj['title'];
