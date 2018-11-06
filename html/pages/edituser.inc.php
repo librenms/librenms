@@ -436,7 +436,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
             }//end if !empty($users_details)
         }//end if
     } else {
-        $userlist = User::thisAuth()->all();
+        $userlist = User::thisAuth()->get();
 
         echo '<h3>Select a user to edit</h3>';
 
