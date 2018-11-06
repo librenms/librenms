@@ -124,11 +124,7 @@ $config['int_customers'] = 1;
 // Enable Customer Port Parsing
 $config['customers_descr'] = 'cust';
 $config['transit_descr'][]   = 'transit';
-<<<<<<< HEAD
-// Add custom transit descriptions (can be an string) 
-=======
 // Add custom transit descriptions (can be an string)
->>>>>>> 07162ae1fe2ddeb35ef5566498a39641b4244e82
 $config['peering_descr'][] = 'peering';
 // Add custom peering descriptions (can be an string)
 $config['core_descr'][] = 'core';
