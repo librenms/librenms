@@ -87,7 +87,7 @@ class AppServiceProvider extends ServiceProvider
                     return $app->make(\App\ApiClients\NominatimApi::class);
                 default:
                 case 'google':
-                    Log::debug('Google Maps geocode engine');
+                    Log:    :debug('Google Maps geocode engine');
                     return $app->make(\App\ApiClients\GoogleMapsApi::class);
             }
         });
