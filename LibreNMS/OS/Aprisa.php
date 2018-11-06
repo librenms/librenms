@@ -31,8 +31,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\OS;
 
-class Aprisa extends OS implements 
-    WirelessPowerDiscovery, 
+class Aprisa extends OS implements
+    WirelessPowerDiscovery,
     WirelessRssiDiscovery,
     WirelessSnrDiscovery,
     WirelessErrorsDiscovery,
@@ -111,4 +111,4 @@ class Aprisa extends OS implements
             new WirelessSensor('frequency', $this->getDeviceId(), $oidtx, 'radio', 1, 'Tx Frequency', null, 1, 1000000),
         );
     }
-} 
+}
