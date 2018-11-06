@@ -2,7 +2,7 @@
 /**
  * Application.php
  *
- * -Description-
+ * Extension of base application class
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,15 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-/**
- * Created by IntelliJ IDEA.
- * User: murrant
- * Date: 11/3/18
- * Time: 7:52 PM
- */
-
 namespace App;
-
 
 class Application extends \Illuminate\Foundation\Application
 {

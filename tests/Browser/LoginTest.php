@@ -15,10 +15,9 @@ use LibreNMS\Tests\DuskTestCase;
 class LoginTest extends DuskTestCase
 {
     /**
-     * @test
      * @throws \Throwable
      */
-    public function user_can_login()
+    public function testUserCanLogin()
     {
         $this->browse(function (Browser $browser) {
             $password = 'some_password';

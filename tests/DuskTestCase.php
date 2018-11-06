@@ -39,5 +39,4 @@ abstract class DuskTestCase extends BaseTestCase
 
         return RemoteWebDriver::create('http://localhost:9515', $capability);
     }
-
 }
