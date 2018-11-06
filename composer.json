@@ -52,18 +52,20 @@
         "doctrine/dbal": "^2.9"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.2",
+        "barryvdh/laravel-ide-helper": "^2.5",
         "beyondcode/laravel-dump-server": "^1.0",
         "filp/whoops": "^2.0",
         "fzaninotto/faker": "^1.4",
+        "jakub-onderka/php-console-highlighter": "*",
+        "jakub-onderka/php-parallel-lint": "*",
+        "justinrainbow/json-schema": "^5.2",
+        "laravel/dusk": "^5.0",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^2.0",
         "phpunit/phpunit": "^7.0",
         "squizlabs/php_codesniffer": "^2.9.1",
-        "jakub-onderka/php-parallel-lint": "*",
-        "jakub-onderka/php-console-highlighter": "*",
-        "barryvdh/laravel-ide-helper": "^2.5",
-        "barryvdh/laravel-debugbar": "^3.2",
-        "justinrainbow/json-schema": "^5.2"
+        "staudenmeir/dusk-updater": "^1.0"
     },
     "suggest": {
         "ext-memcached": "Required if you utilize distributed polling",
