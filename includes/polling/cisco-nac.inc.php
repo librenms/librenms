@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Util\IP;
+
 if (!get_dev_attrib($device, 'poll_cisco-nac', 'true')) {
     echo "\nCisco-NAC\n";
     $ports_mapped = get_ports_mapped($device['device_id'], true);
@@ -13,7 +14,7 @@ if (!get_dev_attrib($device, 'poll_cisco-nac', 'true')) {
         $port_auth_id_nac = substr($port_auth_id_nac, 0, -1);
         $port_auth_id_nac = substr($port_auth_id_nac, 1);
         $CheckExistIndex = dbFetchRow('SELECT * FROM `ports_nac` WHERE `port_index` = ?', $port_index_nac);
-        $CheckExistAuth = dbFetchRow('SELECT * FROM `ports_nac` WHERE `auth_id` = ?', $port_auth_id_nac);        
+        $CheckExistAuth = dbFetchRow('SELECT * FROM `ports_nac` WHERE `auth_id` = ?', $port_auth_id_nac);
         $IPHextoDec = IP::fromHexString($PortAuthSessionEntryParameters['cafSessionClientAddress']);
         if ($CheckExistIndex['port_index'] != null) {
             echo "Port Index Was Found. Updating...\n";
@@ -41,9 +42,9 @@ if (!get_dev_attrib($device, 'poll_cisco-nac', 'true')) {
                 dbQuery("UPDATE `ports_nac` SET `PortSessionMethod` = '".$port_method_nac."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."' AND `ports_nac`.`port_index` = '".$port_index_nac."';");
                 dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthcStatus` = '".$cafSessionMethodsInfoEntryParameters['cafSessionMethodState']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
             }
-        }
+        } 
         else {
-            if ($CheckExistAuth == null) { 
+            if ($CheckExistAuth == null) {
                 echo "Auth ID Not Found. Creating...\n";
                 dbInsert(array('auth_id' => $port_auth_id_nac), 'ports_nac');
                 $IPHextoDec = IP::fromHexString($PortAuthSessionEntryParameters['cafSessionClientAddress']);
@@ -69,10 +70,10 @@ if (!get_dev_attrib($device, 'poll_cisco-nac', 'true')) {
                     dbQuery("UPDATE `ports_nac` SET `PortSessionMethod` = '".$port_method_nac."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."' AND `ports_nac`.`port_index` = '".$port_index_nac."';");
                     dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthcStatus` = '".$cafSessionMethodsInfoEntryParameters['cafSessionMethodState']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
                 }
-            }
+            } 
             else {
                 echo "Auth ID Found.";
-            }    
+            }
         }
     }
     foreach ($ports_mapped['maps']['ifIndex'] as $ports_mapped_index => $ports_mapped_id) {
