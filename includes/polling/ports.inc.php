@@ -3,7 +3,6 @@
 // Build SNMP Cache Array
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Util\IP;
 
 $data_oids = array(
     'ifName',
@@ -363,55 +362,6 @@ if ($config['enable_ports_poe']) {
         $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
     }
 }
-            
-//NAC Polling
-if ($config['enable_ports_nac']) {
-    if ($device['os'] == 'iosxe' || 'ios') {
-        echo "\nCisco-NAC\n";
-        $PortAuthSessionEntry = snmpwalk_cache_oid($device, 'cafSessionEntry', array(), 'CISCO-AUTH-FRAMEWORK-MIB');
-        foreach ($PortAuthSessionEntry as $PortAuthSessionEntryNAC => $PortAuthSessionEntryParameters) {
-            $port_index_nac = substr($PortAuthSessionEntryNAC, 0, strpos($PortAuthSessionEntryNAC, "."));
-            $port_auth_id_nac = strstr($PortAuthSessionEntryNAC, "'");
-            $port_auth_id_nac = substr($port_auth_id_nac, 0, -1);
-            $port_auth_id_nac = substr($port_auth_id_nac, 1);
-            $dbreult = dbFetchRow('SELECT * FROM `ports_nac` WHERE `auth_id` = ?', $port_auth_id_nac);
-            if ($dbreult == null) {
-                echo "Not found\n";
-                dbInsert(array('auth_id' => $port_auth_id_nac), 'ports_nac');
-            }
-            $IPHextoDec = IP::fromHexString($PortAuthSessionEntryParameters['cafSessionClientAddress']);
-            dbUpdate(array(
-                'port_index' => $port_index_nac,
-                'PortAuthSessionMacAddress' => $PortAuthSessionEntryParameters['cafSessionClientMacAddress'],
-                'PortAuthSessionIPAddress' => $IPHextoDec,
-                'PortAuthSessionAuthzStatus' => $PortAuthSessionEntryParameters['cafSessionStatus'],
-                'PortAuthSessionDomain' => $PortAuthSessionEntryParameters['cafSessionDomain'],
-                'PortAuthSessionHostMode' => $PortAuthSessionEntryParameters['cafSessionAuthHostMode'],
-                'PortAuthSessionUserName' => $PortAuthSessionEntryParameters['cafSessionAuthUserName'],
-                'PortAuthSessionAuthzBy' => $PortAuthSessionEntryParameters['cafSessionAuthorizedBy'],
-                'PortAuthSessionTimeOut' => $PortAuthSessionEntryParameters['cafSessionTimeout'],
-                'PortAuthSessionTimeLeft' => $PortAuthSessionEntryParameters['cafSessionTimeLeft'],
-                'device_id' => $device['device_id']
-            ), 'ports_nac', '`auth_id` = ?', array($port_auth_id_nac));
-        }
-        foreach ($ports_mapped['maps']['ifIndex'] as $ports_mapped_index => $ports_mapped_id) {
-            dbQuery("UPDATE `ports_nac` SET `port_id` = '".$ports_mapped_id."' WHERE `ports_nac`.`port_index` = '".$ports_mapped_index."';");
-        }
-        foreach ($ports_mapped['maps']['ifDescr'] as $ports_mapped_desc => $ports_mapped_id) {
-            dbQuery("UPDATE `ports_nac` SET `port_descr` = '".$ports_mapped_desc."' WHERE `ports_nac`.`port_id` = '".$ports_mapped_id."';");
-        }
-        $cafSessionMethodsInfoEntry = snmpwalk_cache_oid($device, 'cafSessionMethodsInfoEntry', array(), 'CISCO-AUTH-FRAMEWORK-MIB');
-        foreach ($cafSessionMethodsInfoEntry as $cafSessionMethodsInfoEntryNAC => $cafSessionMethodsInfoEntryParameters) {
-            $port_index_nac = substr($cafSessionMethodsInfoEntryNAC, 0, strpos($cafSessionMethodsInfoEntryNAC, "."));
-            $port_method_nac = substr(strstr(substr(strstr($cafSessionMethodsInfoEntryNAC, "."), 1), "."), 1);
-            $port_auth_id_nac = substr($cafSessionMethodsInfoEntryNAC, 0, strpos($cafSessionMethodsInfoEntryNAC, '.', strpos($cafSessionMethodsInfoEntryNAC, '.')+1));
-            $port_auth_id_nac = strstr($port_auth_id_nac, '.');
-            $port_auth_id_nac = substr($port_auth_id_nac, 1);
-            dbQuery("UPDATE `ports_nac` SET `PortSessionMethod` = '".$port_method_nac."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."' AND `ports_nac`.`port_index` = '".$port_index_nac."';");
-            dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthcStatus` = '".$cafSessionMethodsInfoEntryParameters['cafSessionMethodState']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
-        }
-    }
-}//End NAC Polling
 
 if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     foreach ($pagp_oids as $oid) {
