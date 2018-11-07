@@ -22,6 +22,7 @@ poller_modules:
     cisco-otv: true
     ipmi: false
     cisco-vpdn: true
+    cisco-nac: false
 discovery_modules:
     cisco-cef: true
     cisco-sla: true
