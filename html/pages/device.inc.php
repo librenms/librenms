@@ -435,8 +435,8 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                 </a>
                 </li>';
         }
-        
-        if ($config['enable_ports_nac'] == 1) {
+
+        if (dbFetchCell("SELECT 1 FROM devices_attribs WHERE device_id = ? AND attrib_value = 1", array($device['device_id']))) {
             echo '<li role="presentation" '.$select['nac'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'nac')).'">
                 <i class="fa fa-lock fa-lg icon-theme"  aria-hidden="true"></i> NAC
