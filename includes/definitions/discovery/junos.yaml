@@ -1,4 +1,4 @@
-mib: JUNIPER-IFOPTICS-MIB:JNX-OPT-IF-EXT-MIB:IF-MIB:JUNIPER-MIB:JUNIPER-SRX5000-SPU-MONITORING-MIB
+mib: JUNIPER-IFOPTICS-MIB:JNX-OPT-IF-EXT-MIB:IF-MIB:JUNIPER-MIB:JUNIPER-SRX5000-SPU-MONITORING-MIB:JUNIPER-ALARM-MIB
 modules:
     processors:
           data:
@@ -18,6 +18,7 @@ modules:
             data:
                 - oid:
                     - ifDescr
+                    - jnxFruName
         chromatic_dispersion:
             data:
                 -
@@ -113,3 +114,43 @@ modules:
                     divisor: 1000
                     descr: '{{ $ifDescr }} Tx Bias'
                     index: 'jnxPMCurTxLaserBiasCurrent.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: jnxYellowAlarmState
+                    value: jnxYellowAlarmState
+                    num_oid: .1.3.6.1.4.1.2636.3.4.2.2.1.
+                    descr: 'Yellow Alarm'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: off, graph: 1, generic: 0 }
+                        - { value: 3, descr: on, graph: 1, generic: 2 }
+                -
+                    oid: jnxRedAlarmState
+                    value: jnxRedAlarmState
+                    num_oid: .1.3.6.1.4.1.2636.3.4.2.3.1.
+                    descr: 'Red Alarm'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: off, graph: 1, generic: 0 }
+                        - { value: 3, descr: on, graph: 1, generic: 2 }
+                -
+                    oid: jnxFruState
+                    value: jnxFruState
+                    num_oid: .1.3.6.1.4.1.2636.3.1.15.1.8.
+                    descr: '{{ $jnxFruName }}'
+                    skip_values: 2
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: empty, graph: 1, generic: 3 }
+                        - { value: 3, descr: present, graph: 1, generic: 1 }
+                        - { value: 4, descr: ready, graph: 1, generic: 0 }
+                        - { value: 5, descr: announceOnline, graph: 1, generic: 0 }
+                        - { value: 6, descr: online, graph: 1, generic: 0 }
+                        - { value: 7, descr: anounceOffline, graph: 1, generic: 1 }
+                        - { value: 8, descr: offline, graph: 1, generic: 2 }
+                        - { value: 9, descr: diagnostic, graph: 1, generic: 3 }
+                        - { value: 10, descr: standby, graph: 1, generic: 3 }
