@@ -42,8 +42,7 @@ if (!get_dev_attrib($device, 'poll_cisco-nac', 'true')) {
                 dbQuery("UPDATE `ports_nac` SET `PortSessionMethod` = '".$port_method_nac."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."' AND `ports_nac`.`port_index` = '".$port_index_nac."';");
                 dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthcStatus` = '".$cafSessionMethodsInfoEntryParameters['cafSessionMethodState']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
             }
-        } 
-        else {
+        } else {
             if ($CheckExistAuth == null) {
                 echo "Auth ID Not Found. Creating...\n";
                 dbInsert(array('auth_id' => $port_auth_id_nac), 'ports_nac');
@@ -70,8 +69,7 @@ if (!get_dev_attrib($device, 'poll_cisco-nac', 'true')) {
                     dbQuery("UPDATE `ports_nac` SET `PortSessionMethod` = '".$port_method_nac."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."' AND `ports_nac`.`port_index` = '".$port_index_nac."';");
                     dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthcStatus` = '".$cafSessionMethodsInfoEntryParameters['cafSessionMethodState']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
                 }
-            } 
-            else {
+            } else {
                 echo "Auth ID Found.";
             }
         }
