@@ -182,11 +182,14 @@ echo "
     <div class='form-group'>
       <input type=hidden name='action' value='changenote'>
       <div class='form-group'>
-        <label for='dashboard' class='col-sm-2 control-label'>Add schedule notes to devices notes</label>
+        <label for='dashboard' class='col-sm-3 control-label'>Add schedule notes to devices notes</label>
         <div class='col-sm-4'>
           <input id='notetodevice' type='checkbox' name='notetodevice' data-size='small' " . ((get_user_pref('add_schedule_note_to_device', false)) ? 'checked' : '') . ">
-          <br>
-          <center><button type='submit' class='btn btn-default'>Update preferences</button></center>
+        </div>
+      </div>
+      <div class='form-group'>
+          <div class='col-sm-4 col-sm-offset-3'>
+              <button type='submit' class='btn btn-default'>Update preferences</button>
         </div>
         <div class='col-sm-6'></div>
       </div>
