@@ -129,6 +129,11 @@ if ($sub_type == 'new-maintenance') {
             foreach ($_POST['maps'] as $target) {
                 $target = target_to_id($target);
                 $item   = dbInsert(array('schedule_id' => $schedule_id, 'target' => $target), 'alert_schedule_items');
+                if ($notes && get_user_pref('add_schedule_note_to_device', false)) {
+                    $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', array($target));
+                    $device_notes.= ((empty($device_notes)) ? '' : PHP_EOL) . date("Y-m-d H:i") . ' Alerts delayed: ' . $notes;
+                    dbUpdate(array('notes' => $device_notes), 'devices', '`device_id` = ?', array($target));
+                }
                 if ($item > 0) {
                     array_push($items, $item);
                 } else {
