@@ -7,4 +7,3 @@ preg_match('/Router Model: ([\w ]+), Version: ([\w\.]+)/', $poll_device['sysDesc
 $hardware = $tmp_draytek[1];
 $version  = $tmp_draytek[2];
 unset($tmp_draytek);
-
