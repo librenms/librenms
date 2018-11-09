@@ -1,0 +1,708 @@
+COMMON-4RF DEFINITIONS ::= BEGIN
+
+--
+-- File: $Id: 4RF-COMMON-MIB.txt,v 1.23 2007/07/11 22:04:16 di Exp $
+--
+-- Copyright: 2004  4RF COMMUNICATIONS LTD
+--
+-- Description:
+--   Common MIB sub-tree for 4RF Communications Ltd., used by all products.
+--   It defines some useful TEXT-CONVENTIONS and basic MIB objects relating
+--   to 4RF products.
+--
+-- Versions:
+--
+-- Notes:
+--  None
+--
+
+IMPORTS
+
+    -- Standard imports
+    MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, NOTIFICATION-TYPE,
+    Integer32, Unsigned32, Counter32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+
+    -- 4RF Specific imports
+    fourRFCommon
+        FROM PRODUCTS-MIB-4RF
+    FourRFImageVersion, FourRFSerialNumber, FourRFResetType, 
+    FourRFProcessResultType, FourRFTftpFileName, FourRFFileSize,
+    FourRFImageStatus, FourRFImageType, FourRFWebUserEnabled, 
+    FourRFWebUserGroup, FourRFTimeZone
+        FROM COMMON-TC-4RF
+    fourRFGeneric, fourRFModules
+        FROM MIB-4RF;
+
+
+-- Module Identification
+fourRFCommonModule MODULE-IDENTITY
+    LAST-UPDATED "200704300000Z"
+    ORGANIZATION "www.4rf.com"
+    CONTACT-INFO    
+         "postal:   4RF Communications Ltd
+                    26 Glover Street
+                    Ngauranga
+                    PO Box 13-506
+                    Wellington 6032
+                    New Zealand
+                    
+          phone:    +64 4 499 6000
+          email:    support@4rf.com"
+    DESCRIPTION "Common 4RF MIB Objects."
+
+	-- Revision history
+    -- (in reverse chronological order)
+
+    REVISION    "200704300000Z"
+    DESCRIPTION "Second draft"
+
+    REVISION    "200502110000Z"
+    DESCRIPTION "First draft"
+    ::= { fourRFModules 3 }
+
+
+--
+-- Currently the MIB is still being defined, all objects are placed
+-- under fourRFExperimental, when the MIB has been completed these
+-- objects will be moved to fourRFGeneric.
+--
+
+
+fourRFGroups OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "The root of the OID sub-tree for the 4RF common object groups."
+    ::= { fourRFCommon 1 } 
+        
+fourRFObjects OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "The root of the OID sub-tree for the 4RF common objects."
+    ::= { fourRFCommon 2 } 
+    
+fourRFEvents OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "The root of the OID sub-tree for the 4RF common events."
+    ::= { fourRFCommon 3 } 
+
+fourRFEventsV2 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "The root of the OID sub-tree for the 4RF common events."
+    ::= { fourRFEvents 0 } 
+
+
+-- ***************************************************************************
+-- Basic terminal details
+--
+-- The name, location and contact details are stored in the MIB-II System 
+-- entries sysName, sysLocation and sysContact respectively.
+--
+-- ***************************************************************************
+
+fourRFSystem OBJECT IDENTIFIER ::= { fourRFObjects 1 }
+
+fourRFSystemID OBJECT-TYPE
+    SYNTAX      DisplayString ( SIZE (0..255) )
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The terminal identifier, user defined."
+    ::= { fourRFSystem 1 }
+
+fourRFSystemSoftwareVersion OBJECT-TYPE
+    SYNTAX      FourRFImageVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The terminal software version details."
+    ::= { fourRFSystem 2 }
+
+fourRFSystemIpAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IP address of terminal, care should be taken when changing
+                 this value."
+    ::= { fourRFSystem 3 }
+
+fourRFSystemRemoteIpAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IP address of remote terminal, this is the other end of the
+                 radio link. This must be configured at commissioning."
+    ::= { fourRFSystem 4 }
+
+fourRFSystemSubnetMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The subnet mask for the terminal. This must be configured at
+                 commissioning."
+    ::= { fourRFSystem 5 }
+
+fourRFSystemDefaultGateway  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The default gateway for the terminal. This must be configured
+                 at commissioning."
+    ::= { fourRFSystem 6 }
+
+fourRFSystemIpAssignment  OBJECT-TYPE
+    SYNTAX      INTEGER { useDHCP      (0),
+                          userAssigned (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This indicates how the terminal IP address is configured.
+                 This must be configured at commissioning. The IP address can
+                 be assigned manually or by a DHCP server."
+    ::= { fourRFSystem 7 }
+
+fourRFSystemDateAndTime  OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This indicates the current time from the terminal's real-time clock,
+                 the time is measured in seconds since Midnight GMT on January 1 1970."
+    ::= { fourRFSystem 8 }
+    
+fourRFSystemTftpServerAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IP address of TFTP server used for uploading and downloading files."
+    ::= { fourRFSystem 9 }
+        
+fourRFSystemSerialNumber  OBJECT-TYPE
+    SYNTAX      FourRFSerialNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The unique serial number for the terminal."
+    ::= { fourRFSystem 10 }
+
+fourRFSystemLastReset  OBJECT-TYPE
+    SYNTAX      FourRFResetType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The type of the last system reset."
+    ::= { fourRFSystem 11 }    
+    
+fourRFSystemTimeZone  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This indicates the offset from UTC time in minutes."
+    ::= { fourRFSystem 12 }
+    
+fourRFSystemSyslogAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP address of a remote syslogd server used to log system events."
+    ::= { fourRFSystem 13 }
+    
+fourRFSystemSyslogPort  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The port to use when logging to a remote syslogd, the default is port 514."
+    ::= { fourRFSystem 14 }
+ 
+fourRFSystemTimeDaylightSavings  OBJECT-TYPE
+    SYNTAX      INTEGER { daylightSavingsDisabled (0),
+                          daylightSavingsEnabled  (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates whether daylight savings is in use."
+    ::= { fourRFSystem 15 }
+    
+fourRFSystemTimeZoneGMTOffset  OBJECT-TYPE
+    SYNTAX      FourRFTimeZone 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This indicates the timezone offset from GMT."
+    ::= { fourRFSystem 16 }
+    
+fourRFSystemMACAddress  OBJECT-TYPE
+    SYNTAX      DisplayString ( SIZE (0..32) )
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The MAC Address for the terminal."
+    ::= { fourRFSystem 17 }
+
+fourRFSystemLocalRadioBIpAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IP address of local Radio B terminal, this is the partner
+                 radio of a SD link. This must be configured at commissioning."
+    ::= { fourRFSystem 18 }
+
+fourRFSystemRemoteRadioBIpAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IP address of remote Radio B terminal, this is the partner
+                 radio of a SD link. This must be configured at commissioning."
+    ::= { fourRFSystem 19 }
+
+fourRFSystemLocalRadioAIpAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IP address of local Radio A terminal, this is the partner
+                 radio of a SD link. This must be configured at commissioning."
+    ::= { fourRFSystem 20 }
+    
+fourRFSystemGroup OBJECT-GROUP
+    OBJECTS     { fourRFSystemID,
+                  fourRFSystemSoftwareVersion,
+                  fourRFSystemIpAddress,
+                  fourRFSystemRemoteIpAddress,
+                  fourRFSystemSubnetMask,
+                  fourRFSystemDefaultGateway,
+                  fourRFSystemIpAssignment,
+                  fourRFSystemDateAndTime,
+                  fourRFSystemTftpServerAddress,
+                  fourRFSystemSerialNumber,
+                  fourRFSystemLastReset,
+                  fourRFSystemTimeZone,
+                  fourRFSystemSyslogAddress,
+                  fourRFSystemSyslogPort,
+                  fourRFSystemTimeDaylightSavings,
+                  fourRFSystemTimeZoneGMTOffset,
+                  fourRFSystemMACAddress,
+		  fourRFSystemLocalRadioBIpAddress,
+		  fourRFSystemRemoteRadioBIpAddress,
+		  fourRFSystemLocalRadioAIpAddress
+    }
+    STATUS      current
+    DESCRIPTION "The 4RF common system settings group."
+    ::= { fourRFGroups 1 } 
+
+
+-- ***************************************************************************
+-- System reset handling
+--
+-- These MIB entries allow the system to be reset, currently two types
+-- of reset are possible, shutdown and a restart. It may be that other 
+-- options should be supported to reset just the Linux software or to
+-- perform a complete hardware reset. A reset can be instigated immediately
+-- or at a specified time. In the case of a timed reset the reset may be 
+-- cancelled if required.
+--
+-- An SNMP trap reset4RFEvent will be generated just before the reset is 
+-- performed.
+--
+-- ***************************************************************************
+
+fourRFReset OBJECT IDENTIFIER ::= { fourRFObjects 2 }
+
+fourRFResetType  OBJECT-TYPE
+    SYNTAX      INTEGER { none      (0),
+                          softReset (1),
+                          hardReset (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Identifies the type of reset operation:
+                  none - do nothing!
+                  hardReset - complete reset of all components
+                  softReset - reset of the CPU only, traffic is unaffected.
+             
+                 The values mirror the ResetType textual convention but the
+                 user cannot instigate a watchdog reset. This value is not
+                 therefore not allowed."
+    ::= { fourRFReset 1 }
+
+fourRFResetTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Identifies the time of a delayed reset operation. This allows an
+                 absolute  time to be specified based on the system real-time clock.
+                 The time is measured in seconds since Midnight GMT on January 1 1970."
+    ::= { fourRFReset 2 }
+    
+fourRFResetCommand  OBJECT-TYPE
+    SYNTAX      INTEGER { none        (0),
+                          resetNow    (1),
+                          timedReset  (2),
+                          cancelReset (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Command to instigate or cancel a system reset, the reset may
+                 happen immediately or at a specified time. Only a timed reset
+                 can be cancelled."
+    ::= { fourRFReset 3 } 
+
+fourRFResetGroup OBJECT-GROUP
+    OBJECTS     { fourRFResetType,
+                  fourRFResetTime,
+                  fourRFResetCommand
+    }
+    STATUS      current
+    DESCRIPTION "The 4RF common reset group."
+    ::= { fourRFGroups 2 } 
+    
+
+-- ***************************************************************************
+-- MIB configuration backup/restore
+--
+-- These objects are used to control the backup of the MIB configuration 
+-- data. The configuration is downloaded to the TFTP server as a backup.
+--
+-- SNMP traps will be generated each time a backup is performed to 
+-- indicate whether the file transfer was successful or not.
+--
+-- ***************************************************************************
+
+fourRFMibBackup OBJECT IDENTIFIER ::= { fourRFObjects 3 }
+
+fourRFMibBackupFile  OBJECT-TYPE
+    SYNTAX      FourRFTftpFileName
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Path and file name for remote (TFTP) backup, relative to TFTP root."
+    ::= { fourRFMibBackup 1 }
+
+fourRFMibBackupCommand  OBJECT-TYPE
+    SYNTAX      INTEGER { none         (0),
+                          remoteBackup (1),
+                          localBackup  (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Configuration command to backup a configuration setting the value
+                 to localBackup or remoteBackup will instigate the backup. A local
+                 backup simply stores the current MIB configuration into Flash memory
+                 in the terminal. A remoteBackup uploads the MIB configuration to the
+                 currently specified TFTP server"
+    ::= { fourRFMibBackup 2 }
+        
+fourRFMibBackupResult  OBJECT-TYPE
+    SYNTAX      FourRFProcessResultType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Configuration backup status, if no backup has been performed the
+                 value is none otherwise the result from the last backup will be
+                 returned. If a backup is in progress executing is returned."
+    ::= { fourRFMibBackup 3 }
+
+fourRFMibBackupGroup OBJECT-GROUP
+    OBJECTS     { fourRFMibBackupFile,
+                  fourRFMibBackupCommand,
+                  fourRFMibBackupResult
+    }
+    STATUS      current
+    DESCRIPTION "The 4RF common configuration backup group."
+    ::= { fourRFGroups 3 } 
+
+
+-- ***************************************************************************
+-- File upload handling, files will always be uploaded to the backup location
+-- in flash so we don't overwrite the currently running image/configuration.
+-- This means we don't need to specify a target location for the download.
+--
+-- It is possible to upload four types of files, a kernel image, a root file
+-- system, MIB configuration and firmware (FPGA). The images may have extra 
+-- data added to allow the version information to be determined easily or 
+-- this could be coded into the file name. File uploads are always performed 
+-- immediately.
+--
+-- ***************************************************************************
+
+fourRFUpload OBJECT IDENTIFIER ::= { fourRFObjects 4 } 
+    
+fourRFUploadType  OBJECT-TYPE
+    SYNTAX      FourRFImageType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Identifies the type of image to be uploaded."
+    ::= { fourRFUpload 1 }
+
+fourRFUploadFile  OBJECT-TYPE
+    SYNTAX      FourRFTftpFileName
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Path and file name for remote (TFTP) upload/download, relative
+                 to the TFTP server root."
+    ::= { fourRFUpload 2 }
+
+fourRFUploadCommand  OBJECT-TYPE
+    SYNTAX      INTEGER { none   (0),
+                          upload (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Command used to instigate a file upload."
+    ::= { fourRFUpload 3 }
+
+fourRFUploadResult  OBJECT-TYPE
+    SYNTAX      FourRFProcessResultType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Status of a file upload, this will have to be polled to follow
+                 the upload progress."
+    ::= { fourRFUpload 4 }    
+
+fourRFUploadGroup OBJECT-GROUP
+    OBJECTS     { fourRFUploadType,
+                  fourRFUploadFile,
+                  fourRFUploadCommand,
+                  fourRFUploadResult
+    }
+    STATUS      current
+    DESCRIPTION "The 4RF common file upload group."
+    ::= { fourRFGroups 4 } 
+    
+    
+--
+-- Image table, gives details of all the images currently stored in flash.
+-- The details include the image type, status and version. Only one image of 
+-- each kernel or rootfs type may be active at any time. We may have one or more 
+-- inactive images however.
+--
+-- The approach here allows the different elements making up the running 
+-- software to be updated and configured independently. It also also makes 
+-- it easier to  handle more than two images if required. 
+--
+-- Example
+--
+--  imageIndex  imageType       imageStatus     imageVersion
+--  1           kernel          active          2.4.20
+--  2           rootfs          inactive        version 1
+--  3           kernel          inactive        2.4.21
+--  4           configuration   active          Working version 5.0 29/6/03
+--
+-- MIB images are not stored in this table
+--
+
+fourRFImageTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FourRFImageTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table is used to report the image information for each
+                 image stored in flash."
+    ::= { fourRFObjects 5 }
+
+fourRFImageTableEntry OBJECT-TYPE
+    SYNTAX      FourRFImageTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Identifies the image table index."
+    INDEX   { fourRFImageIndex }
+    ::= { fourRFImageTable 1 }
+    
+FourRFImageTableEntry ::= SEQUENCE {
+        fourRFImageIndex   Integer32,
+        fourRFImageType    INTEGER,
+        fourRFImageStatus  INTEGER,
+        fourRFImageSize    Unsigned32,
+        fourRFImageVersion OCTET STRING
+    }
+    
+fourRFImageIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The image table index."
+    ::= { fourRFImageTableEntry 1 }
+
+fourRFImageType OBJECT-TYPE
+    SYNTAX      FourRFImageType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The type of image, kernel, rootfs or firmware."
+    ::= { fourRFImageTableEntry 2 }    
+
+fourRFImageStatus OBJECT-TYPE
+    SYNTAX      FourRFImageStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The image status, if current then the image is the current
+                 running image. If selected the image will be used following
+                 the next system reboot."
+    ::= { fourRFImageTableEntry 3 }
+
+fourRFImageSize OBJECT-TYPE
+    SYNTAX      FourRFFileSize
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The image size in bytes."
+    ::= { fourRFImageTableEntry 4 }
+    
+fourRFImageVersion OBJECT-TYPE
+    SYNTAX      FourRFImageVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The image version, string which can be used to identify the
+                 image. This may include the firmware type, version number or
+                 the build date. The exect format of this string will product
+                 and/or image specific."
+    ::= { fourRFImageTableEntry 5 }
+
+
+-- ***************************************************************************
+-- The following objects allow the status of an image to be updated. A new
+-- image can be selected to run. The new image will pnly be used following
+-- a system reboot.
+--
+-- ***************************************************************************
+
+fourRFImageControl OBJECT IDENTIFIER ::= { fourRFObjects 6 } 
+    
+fourRFImageTableIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The image table index, the table entry to be updated."
+    ::= { fourRFImageControl 1 }
+    
+fourRFImageTableCommand OBJECT-TYPE
+    SYNTAX      INTEGER { none            (0),
+                          deactivateImage (1),
+                          activateImage   (2),
+                          deleteImage     (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Allows an image to be activated or deactivated, activating an
+                 image will change its state to selected but the new image will
+                 only be used following a reboot of the system."
+    ::= { fourRFImageControl 2 }
+
+fourRFImageControlGroup OBJECT-GROUP
+    OBJECTS     { fourRFImageTableIndex,
+                  fourRFImageTableCommand
+    }
+    STATUS      current
+    DESCRIPTION "The 4RF common image control group."
+    ::= { fourRFGroups 6 } 
+
+
+-- ***************************************************************************
+-- Web User Management
+--
+-- These objects are used to control webaccess to the terminal. It allows
+-- users to be added, deleted and modified.
+--
+-- ***************************************************************************
+
+fourRFWebUserManagementTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FourRFWebUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table is used to view and modify the current web
+                 interface users. Up to 16 different users may be defined."
+    ::= { fourRFObjects 7 }
+
+fourRFWebUserEntry OBJECT-TYPE
+    SYNTAX      FourRFWebUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Identifies the user management table index."
+    INDEX   { fourRFWebUserIndex }
+    ::= { fourRFWebUserManagementTable 1 }
+    
+FourRFWebUserEntry ::= SEQUENCE {
+        fourRFWebUserIndex            Integer32,
+        fourRFWebUserName             OCTET STRING,
+        fourRFWebUserPassword         OCTET STRING,
+        fourRFWebUserGroup            INTEGER,
+        fourRFWebUserEnabled          INTEGER,
+        fourRFWebUserPasswordConfirm  OCTET STRING
+    }
+    
+fourRFWebUserIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..10)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The user management table index."
+    ::= { fourRFWebUserEntry 1 }
+
+fourRFWebUserName OBJECT-TYPE
+    SYNTAX      DisplayString ( SIZE (0..32) )
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The web user name."
+    ::= { fourRFWebUserEntry 2 }
+    
+fourRFWebUserPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING ( SIZE (4..32) )
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The password entry of a given user."
+    ::= { fourRFWebUserEntry 3 }
+    
+fourRFWebUserGroup OBJECT-TYPE
+    SYNTAX      FourRFWebUserGroup
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The group to which the user belongs."
+    ::= { fourRFWebUserEntry 4 }    
+    
+fourRFWebUserEnabled OBJECT-TYPE
+    SYNTAX      FourRFWebUserEnabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Determines if the user is enabled."
+    ::= { fourRFWebUserEntry 5 }    
+    
+fourRFWebUserPasswordConfirm OBJECT-TYPE
+    SYNTAX      OCTET STRING ( SIZE (4..32) )
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Dummy OID used for password confirmation in the web management interface."
+    ::= { fourRFWebUserEntry 6 }
+    
+
+-- ***************************************************************************
+-- Common traps
+--
+-- ***************************************************************************
+
+--
+-- Reset event, triggered when the terminal is about to reset.
+--
+
+fourRFResetEvent NOTIFICATION-TYPE
+    OBJECTS     { fourRFResetType }
+    STATUS      current
+    DESCRIPTION "Event indicating that a system reset is about to occur."
+    ::= { fourRFEventsV2 1 }
+
+--
+-- Backup status event, used to indicate whether a MIB configuration backup 
+-- to the TFTP server was successful
+--
+
+fourRFMibBackupStatusEvent NOTIFICATION-TYPE
+    OBJECTS     { fourRFMibBackupFile,
+                  fourRFMibBackupCommand,
+                  fourRFMibBackupResult
+    }
+    STATUS      current
+    DESCRIPTION "Event indicating the status of a configuration backup operation."
+    ::= { fourRFEventsV2 2 }
+  
+--
+-- Upload status event, used to indicate whether a file upload from 
+-- the TFTP server was successful
+--
+
+fouRFUploadStatusEvent NOTIFICATION-TYPE
+    OBJECTS     { fourRFUploadFile,
+                  fourRFUploadType,
+                  fourRFUploadResult
+    }
+    STATUS      current
+    DESCRIPTION "Event indicating the status of a file upload operation."
+    ::= { fourRFEventsV2 3 }
+    
+END
