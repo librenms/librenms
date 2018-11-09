@@ -566,10 +566,10 @@ function location_to_latlng($device)
                         d_echo("No geocode API key set\n");
                     }
                     break;
-		case "bing":
-		    d_echo("Bing geocode engine being used\n");
-		    $api_key = ($config['geoloc']['api_key']);
-		    if (!empty($api_key)) {
+                case "bing":
+                    d_echo("Bing geocode engine being used\n");
+                    $api_key = ($config['geoloc']['api_key']);
+                    if (!empty($api_key)) {
                         d_echo("Use Bingo API key: $api_key\n");
                         $api_url = "http://dev.virtualearth.net/REST/v1/Locations?addressLine=$new_device_location&key=$api_key";
                     } else {
@@ -602,12 +602,12 @@ function location_to_latlng($device)
                     } else {
                         $bad_loc = true;
                     }
-		    break;
-		case "bing":
-		    if ($data['statusDescription'] == 'OK'){
-		   	$loc['lat'] = $data['resourceSets'][0]["resources"][0]["point"]["coordinates"][0];
-			$loc['lng'] = $data['resourceSets'][0]["resources"][0]["point"]["coordinates"][1];
-		   } else {
+                    break;
+                case "bing":
+                    if ($data['statusDescription'] == 'OK'){
+                        $loc['lat'] = $data['resourceSets'][0]["resources"][0]["point"]["coordinates"][0];
+                        $loc['lng'] = $data['resourceSets'][0]["resources"][0]["point"]["coordinates"][1];
+                    } else {
                         $bad_loc = true;
                     }
                     break;
