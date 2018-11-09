@@ -550,7 +550,7 @@ function location_to_latlng($device)
                     d_echo("Google geocode engine being used\n");
                     $api_key = ($config['geoloc']['api_key']);
                     if (!empty($api_key)) {
-                        d_echo("Use Google API key: $api_key\n");
+                        //d_echo("Use Google API key: $api_key\n");
                         $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location&key=$api_key";
                     } else {
                         d_echo("No geocode API key set\n");
@@ -560,7 +560,7 @@ function location_to_latlng($device)
                     d_echo("Mapquest geocode engine being used\n");
                     $api_key = ($config['geoloc']['api_key']);
                     if (!empty($api_key)) {
-                        d_echo("Use Mapquest API key: $api_key\n");
+                        //d_echo("Use Mapquest API key: $api_key\n");
                         $api_url = "http://open.mapquestapi.com/geocoding/v1/address?key=$api_key&location=$new_device_location&thumbMaps=false";
                     } else {
                         d_echo("No geocode API key set\n");
@@ -570,7 +570,7 @@ function location_to_latlng($device)
                     d_echo("Bing geocode engine being used\n");
                     $api_key = ($config['geoloc']['api_key']);
                     if (!empty($api_key)) {
-                        d_echo("Use Bingo API key: $api_key\n");
+                        //d_echo("Use Bingo API key: $api_key\n");
                         $api_url = "http://dev.virtualearth.net/REST/v1/Locations?addressLine=$new_device_location&key=$api_key";
                     } else {
                         d_echo("No geocode API key set\n");
