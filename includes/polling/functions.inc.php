@@ -585,7 +585,7 @@ function location_to_latlng($device)
             curl_setopt($curl_init, CURLOPT_CONNECTTIMEOUT, 5);
             $data = json_decode(curl_exec($curl_init), true);
             // Parse the data from the specific Geocode services.
-            d_echo(print_r($data));
+            d_echo(json_encode($data));
             switch ($config['geoloc']['engine']) {
                 case "google":
                 default:
