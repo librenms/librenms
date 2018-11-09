@@ -553,7 +553,7 @@ function location_to_latlng($device)
                         d_echo("Use Google API key: $api_key\n");
                         $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location&key=$api_key";
                     } else {
-                        $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location";
+                        d_echo("No geocode API key set\n");
                     }
                     break;
                 case "mapquest":
@@ -575,6 +575,7 @@ function location_to_latlng($device)
                     } else {
                         d_echo("No geocode API key set\n");
                     }
+                    break;
             }
             $curl_init = curl_init($api_url);
             set_curl_proxy($curl_init);
@@ -584,8 +585,7 @@ function location_to_latlng($device)
             curl_setopt($curl_init, CURLOPT_CONNECTTIMEOUT, 5);
             $data = json_decode(curl_exec($curl_init), true);
             // Parse the data from the specific Geocode services.
-           d_echo($api_url."\n"); 
-           d_echo($data."\n");
+            d_echo(print_r($data));
             switch ($config['geoloc']['engine']) {
                 case "google":
                 default:
@@ -604,7 +604,7 @@ function location_to_latlng($device)
                     }
                     break;
                 case "bing":
-                    if ($data['statusDescription'] == 'OK'){
+                    if ($data['statusDescription'] == 'OK') {
                         $loc['lat'] = $data['resourceSets'][0]["resources"][0]["point"]["coordinates"][0];
                         $loc['lng'] = $data['resourceSets'][0]["resources"][0]["point"]["coordinates"][1];
                     } else {
