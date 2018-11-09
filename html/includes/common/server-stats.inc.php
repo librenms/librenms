@@ -87,40 +87,42 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 
         $i = 0;
         foreach ($mem as $m) {
-            $mem_values = format_graph_bi($m['used'], $m['total']);
+            $mem_total = format_graph_bi($m['total']);
+            $mem_used = format_graph_bi($m['used'], $mem_total['round'], $mem_total['power']);
 
             $common_output[] = '<div class="col-sm-' . $colno . '">
                 <div id="mem-' . $i . '-' . $unique_id . '" ></div>
         </div>';
             $mem_js_output .= "var memgauge" . $i . " = new JustGage({
             id: 'mem-" . $i . "-" . $unique_id . "',
-            value: " . $mem_values['current'] . ",
+            value: " . $mem_used['value'] . ",
             min: 0,
-            max: " . $mem_values['total'] . ",
-            label: '" . $mem_values['current'] . "',
+            max: " . $mem_total['value'] . ",
+            label: '" . $mem_used['value'] . "',
             valueFontSize: '2px',
             title: '" . $m['mempool_descr'] . "',
-            symbol: '" . $mem_values['unit'] . "'
+            symbol: '" . $mem_total['unit'] . "'
         });\n";
             $i++;
         }
 
         $i = 0;
         foreach ($disk as $d) {
-            $disk_values = format_graph_bi($d['used'], $d['total']);
+            $disk_total = format_graph_bi($d['total']);
+            $disk_used = format_graph_bi($d['used'], $disk_total['round'], $disk_total['power']);
 
             $common_output[] = '<div class="col-sm-' . $colno . '">
                 <div id="disk-' . $i . '-' . $unique_id . '" ></div>
         </div>';
             $disk_js_output .= "var diskgauge" . $i . " = new JustGage({
             id: 'disk-" . $i . "-" . $unique_id . "',
-            value: " . $disk_values['current'] . ",
+            value: " . $disk_used['value'] . ",
             min: 0,
-            max: " . $disk_values['total'] . ",
-            label: '" . $disk_values['current'] . "',
+            max: " . $disk_total['value'] . ",
+            label: '" . $disk_used['value'] . "',
             valueFontSize: '2px',
             title: '" . substr($d['storage_descr'], 0, 20) . "',
-            symbol: '" . $disk_values['unit'] . "'
+            symbol: '" . $disk_total['unit'] . "'
         });\n";
             $i++;
         }

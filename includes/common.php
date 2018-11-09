@@ -634,21 +634,23 @@ function format_bi($value, $round = '2', $sf = '3')
     return number_format(round($value, $round), $sf, '.', '').$ext;
 }
 
-function format_graph_bi($current, $total, $round = 2)
+function format_graph_bi($value, $round = 2, $pow = 0)
 {
     $sizes = array("B", "KB", "MB", "GB", "TB", "PB", "EB");
 
-    $total = max($total, 0);
-    $pow = floor(($total ? log($total) : 0) / log(1024));
-    $pow = min($pow, count($sizes) - 1);
+    if ($pow == 0) {
+        $value = max($value, 0);
+        $pow = floor(($value ? log($value) : 0) / log(1024));
+        $pow = min($pow, count($sizes) - 1);
+    }
 
-    $total /= pow(1024, $pow);
-    $current /= pow(1024, $pow);
+    $value /= pow(1024, $pow);
 
     $ret = array();
-    $ret['current'] = round($current, $round);
-    $ret['total'] = round($total, $round);
+    $ret['value'] = round($value, $round);
+    $ret['power'] = $pow;
     $ret['unit'] = $sizes[$pow];
+    $ret['round'] = $round;
 
     return $ret;
 }
