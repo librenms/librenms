@@ -1,4 +1,5 @@
 source: API/Inventory.md
+path: blob/master/doc/
 
 ### `get_inventory`
 

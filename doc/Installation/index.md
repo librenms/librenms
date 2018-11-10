@@ -1,6 +1,10 @@
 source: Installation/index.md
+path: blob/master/doc/
 
 # Installing LibreNMS
+
+## Docker
+An official LibreNMS docker image based on Alpine Linux and Nginx is available on [DockerHub](https://hub.docker.com/r/librenms/librenms/) and [Quay](https://quay.io/repository/librenms/librenms). Documentation can be found on the [Github repository](https://github.com/librenms/docker).
 
 ## Images
 We have some pre-built VirtualBox images you can use to get started. Please note that these images are pre-built for VirtualBox, hence they might not work with other hypervisors without converting them:

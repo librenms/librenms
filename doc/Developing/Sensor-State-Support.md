@@ -1,4 +1,5 @@
 source: Developing/Sensor-State-Support.md
+path: blob/master/doc/
 # Sensor State Support
 
 ### Introduction

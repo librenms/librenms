@@ -32,6 +32,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\OS;
 
 class Routeros extends OS implements
@@ -40,7 +41,8 @@ class Routeros extends OS implements
     WirelessFrequencyDiscovery,
     WirelessNoiseFloorDiscovery,
     WirelessRateDiscovery,
-    WirelessRssiDiscovery
+    WirelessRssiDiscovery,
+    WirelessDistanceDiscovery
 {
     private $data;
 
@@ -170,10 +172,10 @@ class Routeros extends OS implements
             $sensors[] = new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.14988.1.1.1.8.1.13.' . $index,
-                'mikrotik-rate',
+                '.1.3.6.1.4.1.14988.1.1.1.9.1.8.' . $index,
+                'mikrotik-60g-tx',
                 $index,
-                'SSID: ' . $entry['mtxrWl60GSsid'],
+                'Tx Rate',
                 $entry['mtxrWl60G'],
                 $multiplier = 1000000
             );
@@ -185,9 +187,30 @@ class Routeros extends OS implements
         if (is_null($this->data)) {
             $wl60 = snmpwalk_cache_oid($this->getDevice(), 'mtxrWl60GTable', array(), 'MIKROTIK-MIB');
             $wlap = snmpwalk_cache_oid($this->getDevice(), 'mtxrWlApTable', array(), 'MIKROTIK-MIB');
+            $wl60sta = snmpwalk_cache_oid($this->getDevice(), 'mtxrWl60GStaTable', array(), 'MIKROTIK-MIB');
             $this->data = $wl60+$wlap;
+            $this->data = $this->data+$wl60sta;
         }
         return $this->data;
+    }
+    public function discoverWirelessDistance()
+    {
+        $data = $this->fetchData();
+        $sensors = array();
+        foreach ($data as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'distance',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.1.8.1.13.' . $index,
+                'mikrotik',
+                $index,
+                'SSID: ' . $entry['mtxrWl60GSsid'],
+                $entry['mtxrWl60G'],
+                null,
+                100000
+            );
+        }
+        return $sensors;
     }
     private function discoverSensor($type, $oid, $num_oid_base)
     {

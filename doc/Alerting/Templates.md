@@ -1,4 +1,5 @@
 source: Alerting/Templates.md
+path: blob/master/doc/
 
 # Templates
 
@@ -60,7 +61,8 @@ Placeholders are special variables that if used within the template will be repl
 - Rule: `$alert->rule`
 - Rule-Name: `$alert->name`
 - Timestamp: `$alert->timestamp`
-- Transport name: `$alert->transport`
+- Transport type: `$alert->transport`
+- Transport name: `$alert->transport_name`
 - Contacts, must be iterated in a foreach, `$key` holds email and `$value` holds name: `$alert->contacts`
 
 Placeholders can be used within the subjects for templates as well although $faults is most likely going to be worthless.

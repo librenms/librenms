@@ -1,4 +1,5 @@
 source: Alerting/Transports.md
+path: blob/master/doc/
 
 # Transports
 
@@ -434,6 +435,7 @@ Click on 'Add Telegram config' and put your chat id and token into the relevant 
 | ------ | ------- |
 | Chat ID | 34243432 |
 | Token | 3ed32wwf235234 |
+| Format | HTML or MARKDOWN |
 
 ## Twilio SMS
 
