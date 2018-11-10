@@ -119,7 +119,7 @@ modules:
                 -
                     oid: jnxYellowAlarmState
                     value: jnxYellowAlarmState
-                    num_oid: .1.3.6.1.4.1.2636.3.4.2.2.1.
+                    num_oid: '.1.3.6.1.4.1.2636.3.4.2.2.1.{{ $index }}'
                     descr: 'Yellow Alarm'
                     index: '{{ $index }}'
                     states:
@@ -129,7 +129,7 @@ modules:
                 -
                     oid: jnxRedAlarmState
                     value: jnxRedAlarmState
-                    num_oid: .1.3.6.1.4.1.2636.3.4.2.3.1.
+                    num_oid: '.1.3.6.1.4.1.2636.3.4.2.3.1.{{ $index }}'
                     descr: 'Red Alarm'
                     index: '{{ $index }}'
                     states:
@@ -139,7 +139,7 @@ modules:
                 -
                     oid: jnxFruState
                     value: jnxFruState
-                    num_oid: .1.3.6.1.4.1.2636.3.1.15.1.8.
+                    num_oid: '.1.3.6.1.4.1.2636.3.1.15.1.8.{{ $index }}'
                     descr: '{{ $jnxFruName }}'
                     skip_values: 2
                     index: '{{ $index }}'

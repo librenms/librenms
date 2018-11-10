@@ -6,7 +6,7 @@ modules:
                 -
                     oid: upsmgOutputPhaseTable
                     value: mgoutputLoadPerPhase
-                    num_oid: .1.3.6.1.4.1.705.1.7.2.1.4.
+                    num_oid: '.1.3.6.1.4.1.705.1.7.2.1.4.{{ $index }}'
                     multiplier: 1000
                     descr: 'Output (VA) Phase {{ $index }}'
                     index: 'kva.mgoutputLoadPerPhase.{{ $index }}'
@@ -15,21 +15,21 @@ modules:
                 -
                     oid: upsmgInputPhaseTable
                     value: mginputCurrent
-                    num_oid: .1.3.6.1.4.1.705.1.6.2.1.6.
+                    num_oid: '.1.3.6.1.4.1.705.1.6.2.1.6.{{ $index }}'
                     divisor: 10
                     descr: 'Input Current Phase {{ $index }}'
                     index: 'mginputCurrent.{{ $index }}'
                 -
                     oid: upsmgOutputPhaseTable
                     value: mgoutputCurrent
-                    num_oid: .1.3.6.1.4.1.705.1.7.2.1.5.
+                    num_oid: '.1.3.6.1.4.1.705.1.7.2.1.5.{{ $index }}'
                     divisor: 10
                     descr: 'Output Current Phase {{ $index }}'
                     index: 'mgoutputCurrent.{{ $index }}'
                 -
                     oid: upsmgBattery
                     value: upsmgBatteryCurrent
-                    num_oid: .1.3.6.1.4.1.705.1.5.6.
+                    num_oid: '.1.3.6.1.4.1.705.1.5.6.{{ $index }}'
                     divisor: 10
                     descr: 'Battery'
                     index: 'upsmgBatteryCurrent.{{ $index }}'
@@ -38,7 +38,7 @@ modules:
                 -
                     oid: upsmgBattery
                     value: upsmgBatteryTemperature
-                    num_oid: .1.3.6.1.4.1.705.1.5.7.
+                    num_oid: '.1.3.6.1.4.1.705.1.5.7.{{ $index }}'
                     descr: 'Battery'
                     index: 'upsmgBatteryTemperature.{{ $index }}'
         frequency:
@@ -46,14 +46,14 @@ modules:
                 -
                     oid: upsmgInputPhaseTable
                     value: mginputFrequency
-                    num_oid: .1.3.6.1.4.1.705.1.6.2.1.3.
+                    num_oid: '.1.3.6.1.4.1.705.1.6.2.1.3.{{ $index }}'
                     divisor: 10
                     descr: 'Input Frequency Phase {{ $index }}'
                     index: 'mginputFrequency.{{ $index }}'
                 -
                     oid: upsmgOutputPhaseTable
                     value: mgoutputFrequency
-                    num_oid: .1.3.6.1.4.1.705.1.7.2.1.3.
+                    num_oid: '.1.3.6.1.4.1.705.1.7.2.1.3.{{ $index }}'
                     divisor: 10
                     descr: 'Output Frequency Phase {{ $index }}'
                     index: 'mgoutputFrequency.{{ $index }}'
@@ -62,7 +62,7 @@ modules:
                 -
                     oid: upsmgBattery
                     value: upsmgBatteryRemainingTime
-                    num_oid: .1.3.6.1.4.1.705.1.5.1.
+                    num_oid: '.1.3.6.1.4.1.705.1.5.1.{{ $index }}'
                     descr: 'Remaining time'
                     index: 'upsmgBatteryRemainingTime.{{ $index }}'
         charge:
@@ -70,7 +70,7 @@ modules:
                 -
                     oid: upsmgBattery
                     value: upsmgBatteryLevel
-                    num_oid: .1.3.6.1.4.1.705.1.5.2.
+                    num_oid: '.1.3.6.1.4.1.705.1.5.2.{{ $index }}'
                     descr: 'Remaining battery capacity'
                     index: 'upsmgBatteryLevel.{{ $index }}'
         voltage:
@@ -78,21 +78,21 @@ modules:
                 -
                     oid: upsmgInputPhaseTable
                     value: mginputVoltage
-                    num_oid: .1.3.6.1.4.1.705.1.6.2.1.2.
+                    num_oid: '.1.3.6.1.4.1.705.1.6.2.1.2.{{ $index }}'
                     divisor: 10
                     descr: 'Input Phase/Phase {{ $index }}'
                     index: 'mginputVoltage.{{ $index }}'
                 -
                     oid: upsmgOutputPhaseTable
                     value: mgoutputVoltage
-                    num_oid: .1.3.6.1.4.1.705.1.7.2.1.2.
+                    num_oid: '.1.3.6.1.4.1.705.1.7.2.1.2.{{ $index }}'
                     divisor: 10
                     descr: 'Output Phase/Phase {{ $index }}'
                     index: 'mgoutputVoltage.{{ $index }}'
                 -
                     oid: upsmgBattery
                     value: upsmgBatteryVoltage
-                    num_oid: .1.3.6.1.4.1.705.1.5.5.
+                    num_oid: '.1.3.6.1.4.1.705.1.5.5.{{ $index }}'
                     divisor: 10
                     descr: 'Battery'
                     index: 'upsmgBatteryVoltage.{{ $index }}'
@@ -102,7 +102,7 @@ modules:
                 -
                     oid: upsmgOutputOnBattery
                     value: upsmgOutputOnBattery
-                    num_oid: .1.3.6.1.4.1.705.1.7.3.
+                    num_oid: '.1.3.6.1.4.1.705.1.7.3.{{ $index }}'
                     descr: 'Input Status'
                     index: 'upsmgOutputOnBattery.{{ $index }}'
                     state_name: upsmgOutputOnBattery
@@ -112,7 +112,7 @@ modules:
                 -
                     oid: upsmgOutputOnByPass
                     value: upsmgOutputOnByPass
-                    num_oid: .1.3.6.1.4.1.705.1.7.4.
+                    num_oid: '.1.3.6.1.4.1.705.1.7.4.{{ $index }}'
                     descr: 'Bypass Status'
                     index: 'upsmgOutputOnBypass.{{ $index }}'
                     state_name: upsmgOutputOnByPass
@@ -122,7 +122,7 @@ modules:
                 -
                     oid: upsmgOutputUtilityOff
                     value: upsmgOutputUtilityOff
-                    num_oid: .1.3.6.1.4.1.705.1.7.7.
+                    num_oid: '.1.3.6.1.4.1.705.1.7.7.{{ $index }}'
                     descr: 'Utility Status'
                     index: 'upsmgOutputUtilityOff.{{ $index }}'
                     state_name: upsmgOutputUtilityOff
@@ -132,7 +132,7 @@ modules:
                 -
                     oid: upsmgOutputInverterOff
                     value: upsmgOutputInverterOff
-                    num_oid: .1.3.6.1.4.1.705.1.7.9.
+                    num_oid: '.1.3.6.1.4.1.705.1.7.9.{{ $index }}'
                     descr: 'UPS Inverter Status'
                     index: 'upsmgOutputInverterOff.{{ $index }}'
                     state_name: upsmgOutputInverterOff
@@ -142,7 +142,7 @@ modules:
                 -
                     oid: upsmgOutputOverLoad
                     value: upsmgOutputOverLoad
-                    num_oid: .1.3.6.1.4.1.705.1.7.10.
+                    num_oid: '.1.3.6.1.4.1.705.1.7.10.{{ $index }}'
                     descr: 'Output OverLoad'
                     index: 'upsmgOutputOverLoad.{{ $index }}'
                     state_name: upsmgOutputOverLoad
@@ -152,7 +152,7 @@ modules:
                 -
                     oid: upsmgOutputOverTemp
                     value: upsmgOutputOverTemp
-                    num_oid: .1.3.6.1.4.1.705.1.7.11.
+                    num_oid: '.1.3.6.1.4.1.705.1.7.11.{{ $index }}'
                     descr: 'Over Temperature'
                     index: 'upsmgOutputOverTemp.{{ $index }}'
                     state_name: upsmgOutputOverTemp
@@ -162,7 +162,7 @@ modules:
                 -
                     oid: upsmgBattery
                     value: upsmgBatteryFaultBattery
-                    num_oid: .1.3.6.1.4.1.705.1.5.9.
+                    num_oid: '.1.3.6.1.4.1.705.1.5.9.{{ $index }}'
                     descr: 'Battery Fault'
                     index: 'upsmgBatteryFaultBattery.{{ $index }}'
                     state_name: upsmgBatteryFaultBattery
@@ -172,7 +172,7 @@ modules:
                 -
                     oid: upsmgBattery
                     value: upsmgBatteryReplacement
-                    num_oid: .1.3.6.1.4.1.705.1.5.11.
+                    num_oid: '.1.3.6.1.4.1.705.1.5.11.{{ $index }}'
                     descr: 'Battery Replacement Status'
                     index: 'upsmgBatteryReplacement.{{ $index }}'
                     state_name: upsmgBatteryReplacement
@@ -182,7 +182,7 @@ modules:
                 -
                     oid: upsmgBattery
                     value: upsmgBatteryLowBattery
-                    num_oid: .1.3.6.1.4.1.705.1.5.14.
+                    num_oid: '.1.3.6.1.4.1.705.1.5.14.{{ $index }}'
                     descr: 'Battery Charge Status'
                     index: 'upsmgBatteryLowBattery.{{ $index }}'
                     state_name: upsmgBatteryLowBattery
@@ -192,7 +192,7 @@ modules:
                 -
                     oid: upsmgBattery
                     value: upsmgBatteryChargerFault
-                    num_oid: .1.3.6.1.4.1.705.1.5.15.
+                    num_oid: '.1.3.6.1.4.1.705.1.5.15.{{ $index }}'
                     descr: 'Battery Charger Status'
                     index: 'upsmgBatteryChargerFault.{{ $index }}'
                     state_name: upsmgBatteryChargerFault
@@ -202,7 +202,7 @@ modules:
                 -
                     oid: upsmgBattery
                     value: upsmgBatteryLowCondition
-                    num_oid: .1.3.6.1.4.1.705.1.5.16.
+                    num_oid: '.1.3.6.1.4.1.705.1.5.16.{{ $index }}'
                     descr: 'Battery Condition'
                     index: 'upsmgBatteryLowCondition.{{ $index }}'
                     state_name: upsmgBatteryLowCondition
@@ -212,7 +212,7 @@ modules:
                 -
                     oid: upsmgInputBadStatus
                     value: upsmgInputBadStatus
-                    num_oid: .1.3.6.1.4.1.705.1.6.3.
+                    num_oid: '.1.3.6.1.4.1.705.1.6.3.{{ $index }}'
                     descr: 'Input Status'
                     index: 'upsmgInputBadStatus.{{ $index }}'
                     state_name: upsmgInputBadStatus
@@ -222,7 +222,7 @@ modules:
                 -
                     oid: upsmgInputLineFailCause
                     value: upsmgInputLineFailCause
-                    num_oid: .1.3.6.1.4.1.705.1.6.4.
+                    num_oid: '.1.3.6.1.4.1.705.1.6.4.{{ $index }}'
                     descr: 'Input Line Fail Cause'
                     index: 'upsmgInputLineFailCause.{{ $index }}'
                     state_name: upsmgInputLineFailCause
