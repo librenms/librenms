@@ -25,5 +25,5 @@ if (preg_match('/(SYS-(SW[0-9]+-)?5-CONFIG_I|VSHD-5-VSHD_SYSLOG_CONFIG_I): Confi
 } elseif (preg_match('/IMI.+.Startup-config saved on .+ by (?P<user>.+) via .*/', $msg, $matches)) {
     oxidized_node_update($hostname, $msg, $matches['user']); //Alliedware Plus devices. Requires at least V5.4.8-2.1
 } elseif (preg_match('/System configuration saved/', $msg, $matches)) {
-    oxidized_node_update($hostname, $msg, $matches['user']); //ScreenOS
+    oxidized_node_update($hostname, $msg); //ScreenOS
 }
