@@ -1,4 +1,5 @@
 <?php
+//FIXME remove Deprecated template
 /**
  * convert-template.inc.php
  *
