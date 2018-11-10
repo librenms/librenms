@@ -6,7 +6,7 @@ modules:
                 -
                     oid: ostPoePortCfgTable
                     value: ostPoePortPseStatus
-                    num_oid: .1.3.6.1.4.1.7342.15.2.1.7.
+                    num_oid: '.1.3.6.1.4.1.7342.15.2.1.7.{{ $index }}'
                     descr: 'PSE Port Status {{ $index }}'
                     state_name: PoePortPseStatus
                     index: 'pseStatus.{{ $index }}'
@@ -19,7 +19,7 @@ modules:
                 -
                     oid: ostPoePortCfgTable
                     value: ostPoEPortHeartbeatStatus
-                    num_oid: .1.3.6.1.4.1.7342.15.2.1.14.
+                    num_oid: '.1.3.6.1.4.1.7342.15.2.1.14.{{ $index }}'
                     descr: 'PSE Port Heartbeat Status {{ $index }}'
                     index: 'pseHeart.{{ $index }}'
                     state_name: PoePortHeartbeatStatus
@@ -32,7 +32,7 @@ modules:
                 -
                     oid: ostEnvironmentalStatusTable
                     value: ostEnvironmentalPs1Status
-                    num_oid: .1.3.6.1.4.1.7342.2.1.11.1.1.
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.1.{{ $index }}'
                     descr: 'PS1 Status'
                     index: 'ps1Status.{{ $index }}'
                     state_name: PSstatus
@@ -44,7 +44,7 @@ modules:
                 -
                     oid: ostEnvironmentalStatusTable
                     value: ostEnvironmentalPs2Status
-                    num_oid: .1.3.6.1.4.1.7342.2.1.11.1.5.
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.5.{{ $index }}'
                     descr: 'PS2 Status'
                     index: 'ps2Status.{{ $index }}'
                     state_name: PSstatus
@@ -58,7 +58,7 @@ modules:
                 -
                     oid: ostPoePortCfgTable
                     value: ostPoePortPseCurrentSupplied
-                    num_oid: .1.3.6.1.4.1.7342.15.2.1.6.
+                    num_oid: '.1.3.6.1.4.1.7342.15.2.1.6.{{ $index }}'
                     divisor: 1000
                     descr: 'PSE Port Ouput Current {{ $index }}'
                     index: 'pseCurrent.{{ $index }}'
@@ -67,7 +67,7 @@ modules:
                 -
                     oid: ostPoeGlobalCfgTable
                     value: ostPoeGlobalCfgTotalPwr
-                    num_oid: .1.3.6.1.4.1.7342.15.1.2.
+                    num_oid: '.1.3.6.1.4.1.7342.15.1.2.{{ $index }}'
                     descr: Total Power
                     index: 'pwr.{{ $index }}'
 
@@ -76,13 +76,13 @@ modules:
                 -
                     oid: moduleMgtCfgTable
                     value: cpuTemperature
-                    num_oid: .1.3.6.1.4.1.7342.2.1.3.1.38.
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.3.1.38.{{ $index }}'
                     descr: CPU Ambient Temperature
                     index: 'cpuTemp.{{ $index }}'
                 -
                     oid: ostEnvironmentalStatusTable
                     value: ostEnvironmentalTemperature
-                    num_oid: .1.3.6.1.4.1.7342.2.1.11.1.9.
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.9.{{ $index }}'
                     descr: Module Internal Ambient Temperature
                     index: 'envTemp.{{ $index }}'
         voltage:
@@ -90,48 +90,48 @@ modules:
                 -
                     oid: ostPoePortCfgTable
                     value: ostPoePortPseVoltageSupplied
-                    num_oid: .1.3.6.1.4.1.7342.15.2.1.5.
+                    num_oid: '.1.3.6.1.4.1.7342.15.2.1.5.{{ $index }}'
                     descr: 'PSE Port Output Voltage {{ $index }}'
                     index: 'pseVoltage.{{ $index }}'
                 -
                     oid: moduleMgtCfgTable
                     value: cpuVoltageIn
                     divisor: 1000
-                    num_oid: .1.3.6.1.4.1.7342.2.1.3.1.36.
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.3.1.36.{{ $index }}'
                     descr: CPU Input Voltage
                     index: 'cpuVoltIn.{{ $index }}'
                 -
                     oid: moduleMgtCfgTable
                     value: cpuVoltageOut
-                    num_oid: .1.3.6.1.4.1.7342.2.1.3.1.37.
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.3.1.37.{{ $index }}'
                     divisor: 1000
                     descr: CPU Output Voltage
                     index: 'cpuVoltOut{{ $index }}'
                 -
                     oid: ostEnvironmentalStatusTable
                     value: ostEnvironmentalPs1VoltageIn
-                    num_oid: .1.3.6.1.4.1.7342.2.1.11.1.2.
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.2.{{ $index }}'
                     divisor: 1000
                     descr: PS1 Input Voltage
                     index: 'ps1VoltIn.{{ $index }}'
                 -
                     oid: ostEnvironmentalStatusTable
                     value: ostEnvironmentalPs1VoltageOut
-                    num_oid: .1.3.6.1.4.1.7342.2.1.11.1.3.
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.3.{{ $index }}'
                     divisor: 1000
                     descr: PS1 Output Votlage
                     index: 'ps1VoltOut.{{ $index }}'
                 -
                     oid: ostEnvironmentalStatusTable
                     value: ostEnvironmentalPs2VoltageIn
-                    num_oid: .1.3.6.1.4.1.7342.2.1.11.1.6.
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.6.{{ $index }}'
                     divisor: 1000
                     descr: PS2 Input Voltage
                     index: 'ps2VoltIn.{{ $index }}'
                 -
                     oid: ostEnvironmentalStatusTable
                     value: ostEnvironmentalPs2VoltageOut
-                    num_oid: .1.3.6.1.4.1.7342.2.1.11.1.7.
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.7.{{ $index }}'
                     divisor: 1000
                     descr: PS2 Output Voltage
                     index: 'ps2VoltOut.{{ $index }}'
