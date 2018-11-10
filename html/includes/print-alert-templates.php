@@ -14,25 +14,27 @@ require_once 'includes/modal/delete_alert_template.inc.php';
             <th data-column-id="id" data-searchable="false" data-identifier="true" data-type="numeric">#</th>
             <th data-column-id="templatename">Name</th>
             <th data-column-id="actions" data-searchable="false" data-formatter="commands">Action</th>
+            <th data-column-id="template" data-searchable="false" data-visible="false">Template</th>
           </tr>
       </thead>
       <tbody>
-          <tr data-row-id="0">
-            <td>0</td>
-            <td>Default Alert Template</td>
-            <td></td>
-          </tr>
 <?php
-$full_query = "SELECT id, name from alert_templates";
-foreach (dbFetchRows($full_query, $param) as $template) {
+$full_query = dbFetchRows("SELECT id, name, template from alert_templates", $param);
+foreach ($full_query as $template) {
     if ($template['name'] == 'Default Alert Template') {
         $default_tplid = $template['id'];
-        continue;
+        $template['id'] = 0;
     }
+    $templates[] = $template;
+}
+$template_ids = array_column($templates, 'id');
+array_multisort($templates, SORT_ASC, $template_ids);
+foreach ($templates as $template) {
     echo '<tr data-row-id="'.$template['id'].'">
             <td>'.$template['id'].'</td>
             <td>'.$template['name'].'</td>
             <td></td>
+            <td>'.$template['template'].'</td>
           </tr>';
 }
 
@@ -62,10 +64,15 @@ $(document).ready(function() {
         formatters: {
             "commands": function(column, row) {
                 var response = '';
+                template = row.template;
+                //FIXME remove Deprecated template
+                if (template.indexOf("{/if}") >= 0) {
+                    response = "<button type='button' class='btn btn-xs btn-warning' data-content=' class='btn btn-xs btn-warning' data-content='><i class='fa fa-exclamation-triangle' title='This is a legacy template and needs converting, please edit this template and click convert then save'><i class='fa fa-exclamation-triangle'></i></button> ";
+                }
                 if(row.id == 0) {
-                    response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" disabled=\"disabled\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
+                    response = response + "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" disabled=\"disabled\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
                 } else {
-                    response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-toggle=\"modal\" data-target='#confirm-delete-alert-template' data-template_id=\"" + row.id + "\" name='delete-alert-template'><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
+                    response = response + "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-toggle=\"modal\" data-target='#confirm-delete-alert-template' data-template_id=\"" + row.id + "\" name='delete-alert-template'><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
                 }
                 return response;
             }

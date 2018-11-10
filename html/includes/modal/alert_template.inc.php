@@ -50,6 +50,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
                             <input type="text" class="form-control input-sm" id="title_rec" name="title_rec" placeholder="Recovery Title">
                         </div>
                         <button type="button" class="btn btn-primary btn-sm" name="create-template" id="create-template">Create template</button>
+                        <!--//FIXME remove Deprecated template-->
                         <button type="button" class="btn btn-default btn-sm" name="convert-template" id="convert-template" title="Convert template to new syntax" style="display: none">Convert template</button>
                     </div>
                 </div>
@@ -113,6 +114,7 @@ $('#alert-template').on('show.bs.modal', function (event) {
                     return data.text;
                 }
             }).val(selected_rules).trigger("change");
+            //FIXME remove Deprecated template
             if(output['template'].indexOf("{/if}")>=0){
                 toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old_Templates/');
                 $('#convert-template').show();
@@ -133,6 +135,7 @@ $('#alert-template').on('hide.bs.modal', function(event) {
     $('#reset-default').remove();
     $('#name').prop("disabled",false);
     $('#error').val('');
+    //FIXME remove Deprecated template
     $('#convert-template').hide();
 });
 
@@ -153,6 +156,7 @@ $('#create-template').click('', function(e) {
     alertTemplateAjaxOps(template, name, template_id, title, title_rec, rules_items.join(','));
 });
 
+//FIXME remove Deprecated template
 $('#convert-template').click('', function(e) {
     e.preventDefault();
     var template = $("#template").val();

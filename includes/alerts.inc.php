@@ -605,7 +605,7 @@ function IssueAlert($alert)
 
     $obj = DescribeAlert($alert);
     if (is_array($obj)) {
-        echo 'Issuing Alert-UID #'.$alert['id'].'/'.$alert['state'].': ';
+        echo 'Issuing Alert-UID #'.$alert['id'].'/'.$alert['state'].':' . PHP_EOL;
         ExtTransports($obj);
 
         echo "\r\n";
@@ -861,20 +861,27 @@ function ExtTransports($obj)
 
     foreach ($transport_maps as $item) {
         $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($item['transport_type']);
+        //FIXME remove Deprecated noteice
+        $dep_notice = 'DEPRECATION NOTICE: https://t.libren.ms/deprecation-alerting';
         if (class_exists($class)) {
-            $transport_title = ($item['legacy'] === true) ? "{$item['transport_type']} (legacy)" : $item['transport_type'];
+            //FIXME remove Deprecated transport
+            $transport_title = ($item['legacy'] === true) ? "Transport {$item['transport_type']} (%YTransport $dep_notice%n)" : "Transport {$item['transport_type']}";
             $obj['transport'] = $item['transport_type'];
             $obj['transport_name'] = $item['transport_name'];
             $obj['alert']     = new AlertData($obj);
             $obj['title']     = $type->getTitle($obj);
             $obj['alert']['title'] = $obj['title'];
             $obj['msg']       = $type->getBody($obj);
-            echo "$transport_title => ";
+            //FIXME remove Deprecated template check
+            if (preg_match('/{\/if}/', $type->getTemplate()->template)) {
+                c_echo(" :: %YTemplate $dep_notice :: Please update your template " . $type->getTemplate()->name . "%n" . PHP_EOL);
+            }
+            c_echo(" :: $transport_title => ");
             $instance = new $class($item['transport_id']);
             $tmp = $instance->deliverAlert($obj, $item['opts']);
             AlertLog($tmp, $obj, $obj['transport']);
             unset($instance);
-            echo '; ';
+            echo PHP_EOL;
         }
     }
 

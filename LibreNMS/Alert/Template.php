@@ -56,12 +56,14 @@ class Template
     public function getTitle($data)
     {
         $data['parsed_title'] = $this->bladeTitle($data);
+        //FIXME remove Deprecated template
         return $this->legacyTitle($data);
     }
 
     public function getBody($data)
     {
         $data['template']['parsed_template'] = $this->bladeBody($data);
+        //FIXME remove Deprecated template
         return $this->legacyBody($data);
     }
 
@@ -108,6 +110,7 @@ class Template
      */
     public function legacyBody($data)
     {
+        //FIXME remove Deprecated template
         $tpl    = $data['template']->parsed_template;
         $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
         $parsed = $msg;
@@ -183,6 +186,7 @@ class Template
      */
     public function legacyTitle($data)
     {
+        //FIXME remove Deprecated template
         if (strstr($data['parsed_title'], '%')) {
             return RunJail('$ret = "'.populate(addslashes($data['parsed_title'])).'";', $data);
         } else {
