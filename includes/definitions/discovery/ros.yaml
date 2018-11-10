@@ -5,7 +5,7 @@ modules:
             data:
                 -
                     oid: rcDeviceStsPowerSupply1
-                    num_oid: .1.3.6.1.4.1.15004.4.2.2.4.
+                    num_oid: '.1.3.6.1.4.1.15004.4.2.2.4.{{ $index }}'
                     descr: 'Power Supply 1 Status'
                     index: 'rcDeviceStsPowerSupply1.{{ $index }}'
                     states:
@@ -15,7 +15,7 @@ modules:
                         - { descr: notConnected, graph: 0, value: 4, generic: 1 }
                 -
                     oid: rcDeviceStsPowerSupply2
-                    num_oid: .1.3.6.1.4.1.15004.4.2.2.5.
+                    num_oid: '.1.3.6.1.4.1.15004.4.2.2.5.{{ $index }}'
                     descr: 'Power Supply 2 Status'
                     index: 'rcDeviceStsPowerSupply2.{{ $index }}'
                     states:
@@ -25,7 +25,7 @@ modules:
                         - { descr: notConnected, graph: 0, value: 4, generic: 1 }
                 -
                     oid: rcDeviceStsFailSafeRelay
-                    num_oid: .1.3.6.1.4.1.15004.4.2.2.7.
+                    num_oid: '.1.3.6.1.4.1.15004.4.2.2.7.{{ $index }}'
                     descr: Fail Safe Relay
                     index: 'rcDeviceStsFailSafeRelay.{{ $index }}'
                     states:
@@ -33,7 +33,7 @@ modules:
                         - { descr: deEnergized, graph: 0, value: 2, generic: 2 }
                 -
                     oid: rcDeviceStsFanBank1
-                    num_oid: .1.3.6.1.4.1.15004.4.2.2.10.
+                    num_oid: '.1.3.6.1.4.1.15004.4.2.2.10.{{ $index }}'
                     descr: 'Fan Bank Module 1'
                     index: 'rcDeviceStsFanBank1.{{ $index }}'
                     states:
@@ -44,7 +44,7 @@ modules:
                         - { descr: on, graph: 0, value: 5, generic: 0 }
                 -
                     oid: rcDeviceStsFanBank2
-                    num_oid: .1.3.6.1.4.1.15004.4.2.2.11.
+                    num_oid: '.1.3.6.1.4.1.15004.4.2.2.11.{{ $index }}'
                     descr: 'Fan Bank Module 2'
                     index: 'rcDeviceStsFanBank2.{{ $index }}'
                     states:
@@ -57,7 +57,7 @@ modules:
             data:
                 -
                     oid: rcDeviceStsTemperature
-                    num_oid: .1.3.6.1.4.1.15004.4.2.2.3.
+                    num_oid: '.1.3.6.1.4.1.15004.4.2.2.3.{{ $index }}'
                     index: 'rcDeviceStsTemperature.{{ $index }}'
                     descr: System Temperature
                     divisor: 1
