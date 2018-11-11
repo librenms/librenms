@@ -278,12 +278,12 @@ $config['os']['iosxr']['syslog_hook'][] = Array('regex' => '/%GBL-CONFIG-6-DB_CO
 $config['os']['junos']['syslog_hook'][] = Array('regex' => '/%UI_COMMIT:/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
 ```
 #### Juniper ScreenOS
- ```ssh
+```ssh
 $config['os']['screenos']['syslog_hook'][] = Array('regex' => '/System configuration saved/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
 ```
 
 #### Allied Telesis Alliedware Plus
-**Note:** At least software version 5.4.8-2.1 is required. ```log host x.x.x.x level notices program imi``` may also be required depending on configuration. This is to ensure the syslog hook log message gets sent to the syslog server. 
+**Note:** At least software version 5.4.8-2.1 is required. `log host x.x.x.x level notices program imi` may also be required depending on configuration. This is to ensure the syslog hook log message gets sent to the syslog server. 
 
 ```ssh
 $config['os']['awplus']['syslog_hook'][] = Array('regex' => '/IMI.+.Startup-config saved on/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
