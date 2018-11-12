@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Takes traps for interface state changes on Adva Ethernet Devices. 
+ * Takes traps for interface state changes on Adva Ethernet Devices.
  * On an interface state change serveral traps (6 observed) are sent via
  * CM-SYSTEM-MIB::cmStateChangeTrap. This handler creates log entries based
  * on the unit that sent the trap.
@@ -50,27 +50,22 @@ class AdvaStateChangeTrap implements SnmptrapHandler
 
         $device_array = $device->toArray();
 
-	# Trap for the physical access ports
-	if ($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortAdminState')) {
-		$adminState = $trap->getOidData($trap_oid);
-		$opState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortOperationalState'));
-        	$portName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
-		log_event("Port state change: $portName Admin State: $adminState Operational State: $opState", $device_array , 'trap', 2);
-	}
-	# Trap for a flow service
-	elseif($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmFlowAdminState')) {
-                $adminState = $trap->getOidData($trap_oid);
-                $opState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmFlowOperationalState'));
-                $flowID = substr($trap->findOid('CM-FACILITY-MIB::cmFlowAdminState'), 34);
-		$flowID = str_replace(".", "-", $flowID);
-                log_event("Flow state change: $flowID Admin State: $adminState Operational State: $opState", $device_array , 'trap', 2);
-	}
-        # Trap for the physical net ports
-	elseif ($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortAdminState')) {
-                $adminState = $trap->getOidData($trap_oid);
-                $opState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortOperationalState'));
-                $portName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
-                log_event("Port state change: $portName Admin State: $adminState Operational State: $opState", $device_array , 'trap', 2);
-        }	
+        if ($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortAdminState')) {
+            $adminState = $trap->getOidData($trap_oid);
+            $opState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortOperationalState'));
+            $portName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
+            log_event("Port state change: $portName Admin State: $adminState Operational State: $opState", $device_array, 'trap', 2);
+        } elseif ($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmFlowAdminState')) {
+            $adminState = $trap->getOidData($trap_oid);
+            $opState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmFlowOperationalState'));
+            $flowID = substr($trap->findOid('CM-FACILITY-MIB::cmFlowAdminState'), 34);
+            $flowID = str_replace(".", "-", $flowID);
+            log_event("Flow state change: $flowID Admin State: $adminState Operational State: $opState", $device_array, 'trap', 2);
+        } elseif ($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortAdminState')) {
+            $adminState = $trap->getOidData($trap_oid);
+            $opState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortOperationalState'));
+            $portName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
+            log_event("Port state change: $portName Admin State: $adminState Operational State: $opState", $device_array, 'trap', 2);
+        }
     }
 }

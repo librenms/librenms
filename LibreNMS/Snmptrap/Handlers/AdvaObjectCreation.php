@@ -19,7 +19,7 @@
  *
  * Traps when Adva objects are created. This includes Remote User Login object,
  * Flow Creation object, and LAG Creation object.
- * 
+ *
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc
@@ -46,22 +46,17 @@ class AdvaObjectCreation implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
 
-	$device_array = $device->toArray();
+        $device_array = $device->toArray();
 
-	# Trap for user object created
         if ($trap_oid = $trap->findOid('CM-SECURITY-MIB::cmSecurityUserName')) {
-		$UserName = $trap->getOidData($trap_oid);
-		log_event("User object $UserName created.", $device_array , 'trap', 2);
-	}
-	# Trap for flow created
-	elseif ($trap->findOid('CM-FACILITY-MIB::cmFlow')) {
-		$flowID = str_replace(".", "-", substr($trap->findOid('CM-FACILITY-MIB::cmFlowAdminState'), 34));
-		log_event("Flow $flowID created.", $device_array , 'trap', 2);
-	}
-	# Trap for LAG created
-	elseif ($trap_oid = $trap->findOid('F3-LAG-MIB::f3LagName')) {	
-		$lagID = substr($trap_oid, -1);
-		log_event("LAG $lagID created.", $device_array , 'trap', 2);
-	}
+            $UserName = $trap->getOidData($trap_oid);
+            log_event("User object $UserName created.", $device_array, 'trap', 2);
+        } elseif ($trap->findOid('CM-FACILITY-MIB::cmFlow')) {
+            $flowID = str_replace(".", "-", substr($trap->findOid('CM-FACILITY-MIB::cmFlowAdminState'), 34));
+            log_event("Flow $flowID created.", $device_array, 'trap', 2);
+        } elseif ($trap_oid = $trap->findOid('F3-LAG-MIB::f3LagName')) {
+            $lagID = substr($trap_oid, -1);
+            log_event("LAG $lagID created.", $device_array, 'trap', 2);
+        }
     }
 }

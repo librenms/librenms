@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Adva network element is in an alarm state. Gets the alarm description 
+ * Adva network element is in an alarm state. Gets the alarm description
  * and severity assigned by the Adva.
  *
  * @package    LibreNMS
@@ -31,7 +31,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class AdvaNetworkElementAlmTrap implements SnmptrapHandler
 {
@@ -46,28 +45,28 @@ class AdvaNetworkElementAlmTrap implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $device_array = $device->toArray();
-		
-        $alSeverity = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmNotifCode'));
-	switch ($alSeverity) {
-		case "critical":
-			$logSeverity = 5;
-			break;
-		case "major":
-			$logSeverity = 4;
-			break;
-		case "minor":
-			$logSeverity = 3;
-                        break;
-		case "cleared":
-			$logSeverity = 1;
-                        break;
-		default:
-			$logSeverity = 2;
-                        break;
-	}
 
-	$almDescr = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmDescr'));
-	$almObjName = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmObjectName'));
-	log_event("$almObjName $almDescr state $alSeverity", $device_array , 'trap', $logSeverity);
+        $alSeverity = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmNotifCode'));
+        switch ($alSeverity) {
+            case "critical":
+                $logSeverity = 5;
+                break;
+            case "major":
+                $logSeverity = 4;
+                break;
+            case "minor":
+                $logSeverity = 3;
+                break;
+            case "cleared":
+                $logSeverity = 1;
+                break;
+            default:
+                $logSeverity = 2;
+                break;
+        }
+
+        $almDescr = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmDescr'));
+        $almObjName = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmObjectName'));
+        log_event("$almObjName $almDescr state $alSeverity", $device_array, 'trap', $logSeverity);
     }
 }
