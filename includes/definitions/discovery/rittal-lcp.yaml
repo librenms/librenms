@@ -7,7 +7,7 @@ modules:
                     oid: cmcIIIUnitStatus
                     value: cmcIIIUnitStatus
                     state_name: cmcIIIUnitStatus
-                    num_oid: .1.3.6.1.4.1.2606.7.2.1.
+                    num_oid: '.1.3.6.1.4.1.2606.7.2.1.{{ $index }}'
                     index: 'cmcIIIUnitStatus.{{ $index }}'
                     descr: Unit Status
                     states:

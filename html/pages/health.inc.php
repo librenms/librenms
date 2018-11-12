@@ -15,6 +15,8 @@
  * @author     LibreNMS Contributors
 */
 
+$no_refresh = true;
+
 $datas = array('mempool','processor','storage');
 if ($used_sensors['temperature']) {
     $datas[] = 'temperature';

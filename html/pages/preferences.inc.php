@@ -33,6 +33,14 @@ if (LegacyAuth::user()->isDemoUser()) {
             $updatedashboard_message = "User default dashboard updated";
         }
     }
+    if ($vars['action'] === 'changenote') {
+        set_user_pref('add_schedule_note_to_device', (bool)$vars['notetodevice']);
+        if ($vars['notetodevice']) {
+            $updatenote_message = "Schedule notes will now be added to device notes";
+        } else {
+            $updatenote_message = "Schedule notes will no longer be added to device notes";
+        }
+    }
 
     include 'includes/update-preferences-password.inc.php';
 
@@ -163,6 +171,34 @@ echo "
 </div>";
 
 
+echo "<h3>Add schedule notes to devices notes</h3>
+<hr>
+<div class='well'>";
+if (!empty($updatenote_message)) {
+    print_message($updatenote_message);
+}
+echo "
+  <form method='post' action='preferences/' class='form-horizontal' role='form'>
+    <div class='form-group'>
+      <input type=hidden name='action' value='changenote'>
+      <div class='form-group'>
+        <label for='dashboard' class='col-sm-3 control-label'>Add schedule notes to devices notes</label>
+        <div class='col-sm-4'>
+          <input id='notetodevice' type='checkbox' name='notetodevice' data-size='small' " . ((get_user_pref('add_schedule_note_to_device', false)) ? 'checked' : '') . ">
+        </div>
+      </div>
+      <div class='form-group'>
+          <div class='col-sm-4 col-sm-offset-3'>
+              <button type='submit' class='btn btn-default'>Update preferences</button>
+        </div>
+        <div class='col-sm-6'></div>
+      </div>
+    </div>
+  </form>
+</div>";
+
+
+
 echo "<h3>Device Permissions</h3>";
 echo "<hr>";
 echo '<div class="well">';
@@ -183,3 +219,5 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
 }
 
 echo '</div>';
+
+echo "<script>$(\"[name='notetodevice']\").bootstrapSwitch('offColor','danger');</script>";
