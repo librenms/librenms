@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Adva SNMP Dying Gasp Trap. Trap that is sent when the Adva loses 
+ * Adva SNMP Dying Gasp Trap. Trap that is sent when the Adva loses
  * power and about to shut off.
  *
  * @package    LibreNMS
@@ -31,7 +31,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class AdvaSnmpDyingGaspTrap implements SnmptrapHandler
 {
@@ -46,8 +45,8 @@ class AdvaSnmpDyingGaspTrap implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $device_array = $device->toArray();
-		
-	log_event("Dying Gasp received", $device_array , 'trap', 5);
+
+        log_event("Dying Gasp received", $device_array, 'trap', 5);
 
     }
 }

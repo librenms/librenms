@@ -46,28 +46,28 @@ class AdvaSysAlmTrap implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $device_array = $device->toArray();
-		
-	$alSeverity = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmNotifCode'));
-        switch ($alSeverity) {
-                case "critical":
-                        $logSeverity = 5;
-                        break;
-                case "major":
-                        $logSeverity = 4;
-                        break;
-                case "minor":
-                        $logSeverity = 3;
-                        break;
-                case "cleared":
-                        $logSeverity = 1;
-                        break;
-                default:
-                        $logSeverity = 2;
-                        break;
-        }       
 
-	$sysAlmDescr = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmDescr'));
-	$sysAlmState = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmNotifCode'));
-	log_event("System Alarm: $sysAlmDescr Status: $sysAlmState", $device_array , 'trap', $logSeverity);
+        $alSeverity = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmNotifCode'));
+        switch ($alSeverity) {
+            case "critical":
+                $logSeverity = 5;
+                break;
+            case "major":
+                $logSeverity = 4;
+                break;
+            case "minor":
+                $logSeverity = 3;
+                break;
+            case "cleared":
+                $logSeverity = 1;
+                break;
+            default:
+                $logSeverity = 2;
+                break;
+        }
+
+        $sysAlmDescr = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmDescr'));
+        $sysAlmState = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmNotifCode'));
+        log_event("System Alarm: $sysAlmDescr Status: $sysAlmState", $device_array, 'trap', $logSeverity);
     }
 }
