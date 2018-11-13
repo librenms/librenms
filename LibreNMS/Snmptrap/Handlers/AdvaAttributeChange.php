@@ -80,8 +80,6 @@ class AdvaAttributeChange implements SnmptrapHandler
                 log_event("UTC offset (timezone) change to $dstOffset", $device_array, 'trap', 2);
             }
         } elseif ($trap->findOid('CM-SYSTEM-MIB::ntp')) {
-            $ntpEnabled = $trap->getOidData($trap->findOid('CM-SYSTEM-MIB::ntpClientEnabled'));
-            if ('true' === $ntpEnabled && $trap->findOid('CM-SYSTEM-MIB::ntpClientEnabled')) {}
             if ($trap->findOid('CM-SYSTEM-MIB::ntpPrimaryServer')) {
                 $primaryIP = $trap->getOidData($trap->findOid('CM-SYSTEM-MIB::ntpPrimaryServer'));
                 log_event("Primary NTP server IP $primaryIP", $device_array, 'trap', 2);
@@ -171,7 +169,6 @@ class AdvaAttributeChange implements SnmptrapHandler
                 $netPort = str_replace(".", "-", $netPort);
                 log_event("Network Port $netPort modified", $device_array, 'trap', 2);
             }
-
         } elseif ($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPort')) {
             if ($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortConfigSpeed')) {
                 $accPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortConfigSpeed'), 46);
@@ -229,17 +226,14 @@ class AdvaAttributeChange implements SnmptrapHandler
             $flowID = substr($trap->findOid('CM-FACILITY-MIB::cmQosFlow'), -13, 9);
             $flowID = str_replace(".", "-", $flowID);
             log_event("QoS on flow $flowID modified.", $device_array, 'trap', 2);
-
         } elseif ($trap->findOid('CM-FACILITY-MIB::cmQosShaper')) {
             $flowID = substr($trap->findOid('CM-FACILITY-MIB::cmQosShaper'), -13, 9);
             $flowID = str_replace(".", "-", $flowID);
             log_event("QoS on flow $flowID modified.", $device_array, 'trap', 2);
-
         } elseif ($trap->findOid('CM-FACILITY-MIB::cmAccPort')) {
             $shaperID = substr($trap->findOid('CM-FACILITY-MIB::cmAccPort'), -9);
             $shaperID = str_replace(".", "-", $shaperID);
             log_event("Shaper modified on access port $shaperID modified.", $device_array, 'trap', 2);
-
         }
     }
 }
