@@ -5,7 +5,7 @@ modules:
             data:
                 -
                     oid: panSysHAMode
-                    num_oid: .1.3.6.1.4.1.25461.2.1.2.1.13.
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.1.13.{{ $index }}'
                     index: 'panSysHAMode.{{ $index }}'
                     descr: High Availability Mode
                     states:
@@ -13,7 +13,7 @@ modules:
                         - { value: 2, generic: 0, graph: 1, descr: active-active }
                 -
                     oid: panSysHAState
-                    num_oid: .1.3.6.1.4.1.25461.2.1.2.1.11.
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.1.11.{{ $index }}'
                     index: 'panSysHAState.{{ $index }}'
                     descr: High Availability Local Status
                     states:
@@ -22,7 +22,7 @@ modules:
                         - { value: 3, generic: 2, graph: 1, descr: suspended }
                 -
                     oid: panSysHAPeerState
-                    num_oid: .1.3.6.1.4.1.25461.2.1.2.1.12.
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.1.12.{{ $index }}'
                     index: 'panSysHAPeerState.{{ $index }}'
                     descr: High Availability Peer Status
                     states:

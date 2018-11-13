@@ -12,14 +12,14 @@ modules:
                 -
                     oid: HILLSTONE-TEMPERATURE-MIB::HillstoneTemperatureEntry
                     value: hillstoneTemperatureValue
-                    num_oid: .1.3.6.1.4.1.28557.2.28.1.2.1.3.
+                    num_oid: '.1.3.6.1.4.1.28557.2.28.1.2.1.3.{{ $index }}'
                     descr: '{{ $hillstoneTemperatureDescr }}'
         state:
             data:
                 -
                     oid: HILLSTONE-POWER-MIB::HillstonePowerEntry
                     value: hillstonePowerState
-                    num_oid: .1.3.6.1.4.1.28557.2.27.1.2.1.3.
+                    num_oid: '.1.3.6.1.4.1.28557.2.27.1.2.1.3.{{ $index }}'
                     descr: '{{ $hillstonePowerDescr }}'
                     index: 'hillstonePowerIndex.{{ $index }}'
                     state_name: hillstonePowerState
