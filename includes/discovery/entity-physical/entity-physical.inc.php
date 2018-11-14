@@ -269,7 +269,7 @@ unset(
     $entity_array
 );
 
-// Function which returns an array in Entity format based on the supplied variables
+// Function which returns an array in Entity format based on the supplied input variables
 function return_entity_array($descr, $vendortype, $containedin, $class, $parentrelpos,
      $name, $hardwarerev, $firmwarerev, $softwarerev, $serialnum, $mfgname, $modelname, $alias, $assetid, $isfru)
 {
