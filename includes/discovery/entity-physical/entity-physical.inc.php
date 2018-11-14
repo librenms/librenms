@@ -18,12 +18,54 @@ if ($device['os'] == 'junos') {
         echo ' entAliasMappingIdentifier';
         $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
     }
+    echo json_encode($entity_array);
 }
 if ($device['os'] == 'vrp') {
     echo ' hwEntityBoardType';
     $entity_array = snmpwalk_cache_oid($device, 'hwEntityBoardType', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
     echo ' hwEntityBomEnDesc';
     $entity_array = snmpwalk_cache_oid($device, 'hwEntityBomEnDesc', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
+}
+if ($device['os'] == 'saf-cfml4') {
+    $entity_array = array();
+    $device_array = array();
+    echo ' saf-cfml4Anatomy';
+    $oid = '.1.3.6.1.4.1.7571.100.1.1.2.22';
+    $row = 0;
+    $device_array = snmpwalk_cache_oid($device, $oid, $entity_array, 'SAF-MPMMUX-MIB');
+    $oid = '3.6.1.4.1.7571.100.1.1.2.22';
+    // Descr, VendorType, ContainedIn, Class, ParentRelPos,
+    //  Name, HardwareRev, FirmwareRev, SoftwareRev, SerialNum, MfgName, ModelName, Alias, Alias, AssetID, IsFRU
+    $entity_array[++$row] = return_entity_array('CFM L4', 'CFM L4', '0', 'chassis', '-1',
+        'Chassis', '', '', '', $device_array[$oid.'.1.13.0']['iso'], 'SAF', 'CFM L4', '', '', 'true');
+    $entity_array[++$row] = return_entity_array($device_array[$oid.'.3.3.0']['iso'], 'radio', '1', 'module', '1',
+        'Radio 1', '', '', '', '', '', '', '', '', 'true' );
+    $entity_array[++$row] = return_entity_array($device_array[$oid.'.4.3.0']['iso'], 'radio', '1', 'module', '2',
+        'Radio 2', '', '', '', '', '', '', '', '', 'true' );
+    $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', '3',
+        'Slot 1', '', '', '', '', '', '', '', '', 'false');
+    $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', '4',
+        'Slot 2', '', '', '', '', '', '', '', '', 'false');
+    $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', '5',
+        'Slot 3', '', '', '', '', '', '', '', '', 'false');
+    $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', '6',
+        'Slot 4', '', '', '', '', '', '', '', '', 'false');
+    if (!preg_match('/N\/A/', $device_array[$oid.'.6.1.2.0']['iso'])) {
+        $entity_array[++$row] = return_entity_array($device_array[$oid.'.6.1.2.0']['iso'], 'module', '4', 'module', '1',
+            'Module 1', '', '', '', '', '', '', '', '', 'true');
+    }
+    if (!preg_match('/N\/A/', $device_array[$oid.'.6.2.2.0']['iso'])) {
+        $entity_array[++$row] = return_entity_array($device_array[$oid.'.6.2.2.0']['iso'], 'module', '5', 'module', '1',
+            'Module 2', '', '', '', '', '', '', '', '', 'true');
+    }
+    if (!preg_match('/N\/A/', $device_array[$oid.'.6.3.2.0']['iso'])) {
+        $entity_array[++$row] = return_entity_array($device_array[$oid.'.6.3.2.0']['iso'], 'module', '6', 'module', '1',
+            'Module 3', '', '', '', '', '', '', '', '', 'true');
+    }
+    if (!preg_match('/N\/A/', $device_array[$oid.'.6.4.2.0']['iso'])) {
+        $entity_array[++$row] = return_entity_array($device_array[$oid.'.6.4.2.0']['iso'], 'module', '7', 'module', '1',
+            'Module 4', '', '', '', '', '', '', '', '', 'true');
+    }
 }
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
@@ -202,3 +244,24 @@ unset(
     $entry,
     $entity_array
 );
+
+// Function which returns an array in Entity format based on the supplied variables
+function return_entity_array($descr, $vendortype, $containedin, $class, $parentrelpos, $name, $hardwarerev, $firmwarerev, $softwarerev, $serialnum, $mfgname, $modelname, $alias, $assetid, $isfru) {
+    return array(
+            'entPhysicalDescr' => $descr,
+            'entPhysicalVendorType' => $vendortype,
+            'entPhysicalContainedIn' => $containedin,
+            'entPhysicalClass' => $class,
+            'entPhysicalParentRelPos' => $parentrelpos,
+            'entPhysicalName' => $name,
+            'entPhysicalHardwareRev' => $hardwarerev,
+            'entPhysicalFirmwareRev' => $firmwarerev,
+            'entPhysicalSoftwareRev' => $softwarerev,
+            'entPhysicalSerialNum' => $serialnum,
+            'entPhysicalMfgName' => $mfgname,
+            'entPhysicalModelName' => $modelname,
+            'entPhysicalAlias' => $alias,
+            'entPhysicalAssetID' => $assetid,
+            'entPhysicalIsFRU' => $isfru
+        );
+}

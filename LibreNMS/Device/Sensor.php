@@ -358,9 +358,12 @@ class Sensor implements DiscoveryModule, PollerModule
             $snmp_data = array_merge($snmp_data, $multi_data);
         }
 
-        // deal with string values that may be surrounded by quotes
+        // deal with string values that may be surrounded by quotes, scientific number format and remove non numerical characters
         array_walk($snmp_data, function (&$oid) {
-            $oid = trim($oid, '"') + 0;
+            $oid = preg_replace('/[^-0-9.e]/', '', $oid);
+            $oid = number_format($oid, 16);
+            $oid = rtrim($oid, '0');
+            $oid = preg_replace('~  (?! ^ \-)  [^\d.]  ~x', '', $oid);
         });
 
         return $snmp_data;
