@@ -270,7 +270,9 @@ unset(
 );
 
 // Function which returns an array in Entity format based on the supplied variables
-function return_entity_array($descr, $vendortype, $containedin, $class, $parentrelpos, $name, $hardwarerev, $firmwarerev, $softwarerev, $serialnum, $mfgname, $modelname, $alias, $assetid, $isfru) {
+function return_entity_array($descr, $vendortype, $containedin, $class, $parentrelpos,
+     $name, $hardwarerev, $firmwarerev, $softwarerev, $serialnum, $mfgname, $modelname, $alias, $assetid, $isfru)
+{
     return array(
             'entPhysicalDescr' => $descr,
             'entPhysicalVendorType' => $vendortype,
