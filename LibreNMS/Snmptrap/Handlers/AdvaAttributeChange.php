@@ -48,18 +48,16 @@ class AdvaAttributeChange implements SnmptrapHandler
         $device_array = $device->toArray();
 
         if ($trap->findOid('CM-SYSTEM-MIB::sysLog')) {
+            $syslogEntry = substr($trap->findOid('CM-SYSTEM-MIB::sysLog'), -1);
             if ($trap->findOid('CM-SYSTEM-MIB::sysLogIpVersion')) {
-                $syslogEntry = substr($trap->findOid('CM-SYSTEM-MIB::sysLogIpVersion'), 29);
                 $ipVer = $trap->getOidData($trap->findOid('CM-SYSTEM-MIB::sysLogIpVersion'));
                 log_event("Syslog server $syslogEntry IP version set to $ipVer.", $device_array, 'trap', 2);
             }
             if ($trap->findOid('CM-SYSTEM-MIB::sysLogIpAddress')) {
-                $syslogEntry = substr($trap->findOid('CM-SYSTEM-MIB::sysLogIpAddress'), 31);
                 $ipAddr = $trap->getOidData($trap->findOid('CM-SYSTEM-MIB::sysLogIpAddress'));
                 log_event("Syslog server $syslogEntry IP address changed to $ipAddr.", $device_array, 'trap', 2);
             }
             if ($trap->findOid('CM-SYSTEM-MIB::sysLogPort')) {
-                $syslogEntry = substr($trap->findOid('CM-SYSTEM-MIB::sysLogPort'), 26);
                 $syslogPort = $trap->getOidData($trap->findOid('CM-SYSTEM-MIB::sysLogPort'));
                 log_event("Syslog server $syslogEntry IP address changed to $syslogPort.", $device_array, 'trap', 2);
             }
@@ -89,17 +87,15 @@ class AdvaAttributeChange implements SnmptrapHandler
                 log_event("Backup NTP server IP $backupIP", $device_array, 'trap', 2);
             }
         } elseif ($trap->findOid('CM-SECURITY-MIB::cmRemoteAuthServer')) {
+            $serverEntry = substr($trap->findOid('CM-SECURITY-MIB::cmRemoteAuthServer'), -1);
             if ($trap->findOid('CM-SECURITY-MIB::cmRemoteAuthServerIpAddress')) {
-                $serverEntry = substr($trap->findOid('CM-SECURITY-MIB::cmRemoteAuthServerIpAddress'), 45);
                 $serverIP = $trap->getOidData($trap->findOid('CM-SECURITY-MIB::cmRemoteAuthServerIpAddress'));
                 log_event("Authentication server $serverEntry IP changed to $serverIP", $device_array, 'trap', 2);
             }
             if ($trap->findOid('CM-SECURITY-MIB::cmRemoteAuthServerSecret')) {
-                $serverEntry = substr($trap->findOid('CM-SECURITY-MIB::cmRemoteAuthServerSecret'), 42);
                 log_event("Authentication server $serverEntry secret changed.", $device_array, 'trap', 2);
             }
             if ($trap->findOid('CM-SECURITY-MIB::cmRemoteAuthServerEnabled')) {
-                $serverEntry = substr($trap->findOid('CM-SECURITY-MIB::cmRemoteAuthServerEnabled'), 44);
                 $serverEnable = $trap->getOidData($trap->findOid('CM-SECURITY-MIB::cmRemoteAuthServerEnabled'));
                 if ('true' === $serverEnable) {
                     log_event("Authentication server $serverEntry enabled.", $device_array, 'trap', 2);
@@ -124,27 +120,21 @@ class AdvaAttributeChange implements SnmptrapHandler
                 log_event("SNMP Dying Gasp is disabled.", $device_array, 'trap', 2);
             }
         } elseif ($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPort')) {
+            $netPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPort'), -7);
+            $netPort = str_replace(".", "-", $netPort);
             if ($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortConfigSpeed')) {
-                $netPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortConfigSpeed'), 46);
-                $netPort = str_replace(".", "-", $netPort);
                 $netSpeed = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortConfigSpeed'));
                 log_event("Network Port $netPort changed speed to $netSpeed.", $device_array, 'trap', 2);
             }
             if ($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortMediaType')) {
-                $netPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortMediaType'), 44);
-                $netPort = str_replace(".", "-", $netPort);
                 $netMedia = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortMediaType'));
                 log_event("Network Port $netPort changed media to $netMedia.", $device_array, 'trap', 2);
             }
             if ($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortMDIXType')) {
-                $netPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortMDIXType'), 43);
-                $netPort = str_replace(".", "-", $netPort);
                 $netMDIX = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortMDIXType'));
                 log_event("Network Port $netPort changed MDIX to $netMDIX.", $device_array, 'trap', 2);
             }
             if ($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortAutoDiagEnabled')) {
-                $netPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortAutoDiagEnabled'), 50);
-                $netPort = str_replace(".", "-", $netPort);
                 $netAutoDiag = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortAutoDiagEnabled'));
                 if ('true' === $netAutoDiag && $trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortAutoDiagEnabled')) {
                     log_event("Network Port $netPort AutoDiagnostic enabled.", $device_array, 'trap', 2);
@@ -153,44 +143,32 @@ class AdvaAttributeChange implements SnmptrapHandler
                 }
             }
             if ($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortAdminState')) {
-                $netPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortAdminState'), 45);
-                $netPort = str_replace(".", "-", $netPort);
                 $netAdminState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortAdminState'));
                 log_event("Network Port $netPort administrative state changed to $netAdminState.", $device_array, 'trap', 2);
             }
             if ($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortMTU')) {
-                $netPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortMTU'), 38);
-                $netPort = str_replace(".", "-", $netPort);
                 $netMTU = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortMTU'));
                 log_event("Network Port $netPort MTU changed to $netMTU bytes.", $device_array, 'trap', 2);
             } else {
                 /* Catch all other Access Port changes and give a generic message */
-                $netPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPort'), -7);
-                $netPort = str_replace(".", "-", $netPort);
                 log_event("Network Port $netPort modified", $device_array, 'trap', 2);
             }
         } elseif ($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPort')) {
+            $accPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPort'), -7);
+            $accPort = str_replace(".", "-", $accPort);
             if ($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortConfigSpeed')) {
-                $accPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortConfigSpeed'), 46);
-                $accPort = str_replace(".", "-", $accPort);
                 $accSpeed = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortConfigSpeed'));
                 log_event("Access Port $accPort changed speed to $accSpeed.", $device_array, 'trap', 2);
             }
             if ($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortMediaType')) {
-                $accPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortMediaType'), 44);
-                $accPort = str_replace(".", "-", $accPort);
                 $accMedia = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortMediaType'));
                 log_event("Access Port $accPort changed media to $accMedia.", $device_array, 'trap', 2);
             }
             if ($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortMDIXType')) {
-                $accPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortMDIXType'), 43);
-                $accPort = str_replace(".", "-", $accPort);
                 $accMDIX = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortMDIXType'));
                 log_event("Access Port $accPort changed MDIX to $accMDIX.", $device_array, 'trap', 2);
             }
             if ($trap->findOid('CM-FACILITY-MIB::cmEtheraccAccPortAutoDiagEnabled')) {
-                $accPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortAutoDiagEnabled'), 50);
-                $accPort = str_replace(".", "-", $accPort);
                 $accAutoDiag = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortAutoDiagEnabled'));
                 if ('true' === $accAutoDiag && $trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortAutoDiagEnabled')) {
                     log_event("Access Port $accPort AutoDiagnostic enabled.", $device_array, 'trap', 2);
@@ -199,20 +177,14 @@ class AdvaAttributeChange implements SnmptrapHandler
                 }
             }
             if ($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortAdminState')) {
-                $accPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortAdminState'), 45);
-                $accPort = str_replace(".", "-", $accPort);
                 $accAdminState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortAdminState'));
                 log_event("Access Port $accPort administrative state changed to $accAdminState.", $device_array, 'trap', 2);
             }
             if ($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortMTU')) {
-                $accPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortMTU'), 38);
-                $accPort = str_replace(".", "-", $accPort);
                 $accMTU = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortMTU'));
                 log_event("Access Port $accPort MTU changed to $accMTU bytes.", $device_array, 'trap', 2);
             } else {
                 /* Catch all other Access Port changes and give a generic message */
-                $accPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPort'), -7);
-                $accPort = str_replace(".", "-", $accPort);
                 log_event("Access Port $accPort modified", $device_array, 'trap', 2);
             }
         } elseif ($trap->findOid('CM-FACILITY-MIB::cmFlow')) {
