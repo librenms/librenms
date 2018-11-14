@@ -47,7 +47,7 @@ class SafCfml4 extends OS implements
     public function discoverWirelessFrequency()
     {
         return array(
-            // SAF-MPMMUX-MIB::cfml4radioTxFrequency
+            // SAF-MPMUX-MIB::cfml4radioTxFrequency
             new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
@@ -59,7 +59,7 @@ class SafCfml4 extends OS implements
                 1,
                 1
             ),
-            // SAF-MPMMUX-MIB::cfml4radioRxFrequency
+            // SAF-MPMUX-MIB::cfml4radioRxFrequency
             new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
@@ -82,7 +82,7 @@ class SafCfml4 extends OS implements
                 1,
                 1
             ),
-            // SAF-MPMMUX-MIB::cfml4radioRxFrequency
+            // SAF-MPMUX-MIB::cfml4radioRxFrequency
             new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
@@ -106,7 +106,7 @@ class SafCfml4 extends OS implements
     public function discoverWirelessPower()
     {
         return array(
-            // SAF-MPMMUX-MIB::rf1TxLevel
+            // SAF-MPMUX-MIB::rf1TxLevel
             new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
@@ -115,7 +115,7 @@ class SafCfml4 extends OS implements
                 'cfml4radioR1TxPower',
                 'Radio 1 Tx Power'
             ),
-            // SAF-MPMMUX-MIB::rf1RxLevel
+            // SAF-MPMUX-MIB::rf1RxLevel
             new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
@@ -124,7 +124,7 @@ class SafCfml4 extends OS implements
                 'cfml4radioR1RxLevel',
                 'Radio 1 Rx Level'
             ),
-            // SAF-MPMMUX-MIB::rf2TxLevel
+            // SAF-MPMUX-MIB::rf2TxLevel
             new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
@@ -133,7 +133,7 @@ class SafCfml4 extends OS implements
                 'cfml4radioR2TxPower',
                 'Radio 2 Tx Power'
             ),
-            // SAF-MPMMUX-MIB::rf2RxLevel
+            // SAF-MPMUX-MIB::rf2RxLevel
             new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
@@ -154,7 +154,7 @@ class SafCfml4 extends OS implements
     public function discoverWirelessErrors()
     {
         return array(
-            // SAF-MPMMUX-MIB::termFrameErrors
+            // SAF-MPMUX-MIB::termFrameErrors
             new WirelessSensor(
                 'errors',
                 $this->getDeviceId(),
@@ -163,7 +163,7 @@ class SafCfml4 extends OS implements
                 'cfml4termFrameErrors',
                 'Frame errors'
             ),
-            // SAF-MPMMUX-MIB::termBFrameErr
+            // SAF-MPMUX-MIB::termBFrameErr
             new WirelessSensor(
                 'errors',
                 $this->getDeviceId(),

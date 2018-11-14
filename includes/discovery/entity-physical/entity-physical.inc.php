@@ -23,6 +23,33 @@
  * @author     Janno Schouwenburg <handel@janno.nl>
  */
 
+// Function which returns an array in Entity format based on the supplied input variables
+if (!function_exists('return_entity_array'))
+{
+    function return_entity_array($descr, $vendortype, $containedin, $class, $parentrelpos,
+        $name, $hardwarerev, $firmwarerev, $softwarerev, $serialnum, $mfgname, $modelname, $alias, $assetid, $isfru)
+    {
+        return array(
+            'entPhysicalDescr' => $descr,
+            'entPhysicalVendorType' => $vendortype,
+            'entPhysicalContainedIn' => $containedin,
+            'entPhysicalClass' => $class,
+            'entPhysicalParentRelPos' => $parentrelpos,
+            'entPhysicalName' => $name,
+            'entPhysicalHardwareRev' => $hardwarerev,
+            'entPhysicalFirmwareRev' => $firmwarerev,
+            'entPhysicalSoftwareRev' => $softwarerev,
+            'entPhysicalSerialNum' => $serialnum,
+            'entPhysicalMfgName' => $mfgname,
+            'entPhysicalModelName' => $modelname,
+            'entPhysicalAlias' => $alias,
+            'entPhysicalAssetID' => $assetid,
+            'entPhysicalIsFRU' => $isfru
+        );
+    }
+}
+
+
 echo "\nCaching OIDs:";
 
 if ($device['os'] == 'junos') {
@@ -56,7 +83,7 @@ if ($device['os'] == 'saf-cfml4') {
     echo ' saf-cfml4Anatomy';
     $oid = '.1.3.6.1.4.1.7571.100.1.1.2.22';
     $row = 0;
-    $device_array = snmpwalk_cache_oid($device, $oid, $entity_array, 'SAF-MPMMUX-MIB');
+    $device_array = snmpwalk_cache_oid($device, $oid, $entity_array, 'SAF-MPMUX-MIB');
     $oid = '3.6.1.4.1.7571.100.1.1.2.22';
     // Descr, VendorType, ContainedIn, Class, ParentRelPos,
     //  Name, HardwareRev, FirmwareRev, SoftwareRev, SerialNum, MfgName, ModelName, Alias, Alias, AssetID, IsFRU
@@ -268,26 +295,3 @@ unset(
     $entry,
     $entity_array
 );
-
-// Function which returns an array in Entity format based on the supplied input variables
-function return_entity_array($descr, $vendortype, $containedin, $class, $parentrelpos,
-     $name, $hardwarerev, $firmwarerev, $softwarerev, $serialnum, $mfgname, $modelname, $alias, $assetid, $isfru)
-{
-    return array(
-            'entPhysicalDescr' => $descr,
-            'entPhysicalVendorType' => $vendortype,
-            'entPhysicalContainedIn' => $containedin,
-            'entPhysicalClass' => $class,
-            'entPhysicalParentRelPos' => $parentrelpos,
-            'entPhysicalName' => $name,
-            'entPhysicalHardwareRev' => $hardwarerev,
-            'entPhysicalFirmwareRev' => $firmwarerev,
-            'entPhysicalSoftwareRev' => $softwarerev,
-            'entPhysicalSerialNum' => $serialnum,
-            'entPhysicalMfgName' => $mfgname,
-            'entPhysicalModelName' => $modelname,
-            'entPhysicalAlias' => $alias,
-            'entPhysicalAssetID' => $assetid,
-            'entPhysicalIsFRU' => $isfru
-        );
-}
