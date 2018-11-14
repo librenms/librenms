@@ -5,7 +5,7 @@ modules:
                 -
                     oid: CMM4-MIB::cmm4PortPowerStatus
                     value: cmm4PortPowerStatus
-                    num_oid: .1.3.6.1.4.1.161.19.3.6.3.1.1.4.
+                    num_oid: '.1.3.6.1.4.1.161.19.3.6.3.1.1.4.{{ $index }}'
                     index: cmm4PortPowerStatus.{{ $index }}
                     descr: Power Status {{ $index }}
                     states:

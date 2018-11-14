@@ -116,7 +116,7 @@
                                             },
                                             "num_oid": {
                                                 "type": "string",
-                                                "pattern": "^(\\.\\d+)+\\.?$"
+                                                "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
                                             },
                                             "descr": {
                                                 "type": "string"
@@ -286,7 +286,7 @@
                     },
                     "num_oid": {
                         "type": "string",
-                        "pattern": "^(\\.\\d+)+\\.?$"
+                        "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
                     },
                     "index": {
                         "type": ["integer", "string"]
