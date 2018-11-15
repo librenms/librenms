@@ -1,13 +1,24 @@
 <?php
 
 // Function which returns an array in Entity format based on the supplied input variables
-if (!function_exists('return_entity_array'))
-{
-    function return_entity_array($descr, $vendortype, $containedin, $class, $parentrelpos,
-        $name, $hardwarerev, $firmwarerev, $softwarerev, $serialnum, $mfgname, $modelname, $alias, $assetid, $isfru)
-    {
-        return array(
-            'entPhysicalDescr' => $descr,
+if (!function_exists('return_entity_array')) {
+    function return_entity_array($descr,
+        $vendortype,
+        $containedin,
+        $class,
+        $parentrelpos,
+        $name,
+        $hardwarerev,
+        $firmwarerev,
+        $softwarerev,
+        $serialnum,
+        $mfgname,
+        $modelname,
+        $alias,
+        $assetid,
+        $isfru
+    ) {
+        return array('entPhysicalDescr' => $descr,
             'entPhysicalVendorType' => $vendortype,
             'entPhysicalContainedIn' => $containedin,
             'entPhysicalClass' => $class,
@@ -62,20 +73,16 @@ if ($device['os'] == 'saf-cfml4') {
     $device_array = snmpwalk_cache_oid($device, $oid, $entity_array, 'SAF-MPMUX-MIB');
     // Descr, VendorType, ContainedIn, Class, ParentRelPos,
     //  Name, HardwareRev, FirmwareRev, SoftwareRev, SerialNum, MfgName, ModelName, Alias, Alias, AssetID, IsFRU
-    $entity_array[++$row] = return_entity_array('CFM L4', 'CFM L4', '0', 'chassis', '-1',
-        'Chassis', '', '', '', $device_array[0]['serialNumber'], 'SAF', 'CFM L4', '', '', 'true');
+    $entity_array[++$row] = return_entity_array('CFM L4', 'CFM L4', '0', 'chassis', '-1', 'Chassis', '', '', '', $device_array[0]['serialNumber'], 'SAF', 'CFM L4', '', '', 'true');
     for ($i = 1; $i <= 2; $i++) {
-        $entity_array[++$row] = return_entity_array($device_array[0]['rf' . $i . 'Version'], 'radio', '1', 'module', $i,
-            'Radio ' . $i, '', '', '', '', '', '', '', '', 'true' );
+        $entity_array[++$row] = return_entity_array($device_array[0]['rf' . $i . 'Version'], 'radio', '1', 'module', $i, 'Radio ' . $i, '', '', '', '', '', '', '', '', 'true' );
     }
     for ($i = 1; $i <= 4; $i++) {
-        $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', $i+2,
-            'Slot ' . $i, '', '', '', '', '', '', '', '', 'false');
+        $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', $i+2, 'Slot ' . $i, '', '', '', '', '', '', '', '', 'false');
     }
     for ($i = 1; $i <= 4; $i++) {
         if (!preg_match('/N\/A/', $device_array[0]['m' . $i . 'Description'])) {
-            $entity_array[++$row] = return_entity_array($device_array[0]['m' . $i . 'Description'], 'module', 3+$i, 'module', '1',
-                'Module 1', '', '', '', '', '', '', '', '', 'true');
+            $entity_array[++$row] = return_entity_array($device_array[0]['m' . $i . 'Description'], 'module', 3+$i, 'module', '1', 'Module 1', '', '', '', '', '', '', '', '', 'true');
         }
     }
 }
