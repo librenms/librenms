@@ -83,7 +83,6 @@ class MapquestApi implements Geocoder
                 return $this->parseLatLng($response_data);
             } else {
                 Log::error("Geocoding failed.", ['errors' => $this->parseMessages($response_data)]);
-
             }
         } catch (TransferException $e) {
             Log::error("Geocoding failed: " . $e->getMessage());

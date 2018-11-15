@@ -8,7 +8,6 @@ $device_model = Device::find($device['device_id']);
 
 if ($_POST['editing']) {
     if (LegacyAuth::user()->hasGlobalAdmin()) {
-
         if (isset($_POST['parent_id'])) {
             $parents = array_diff((array)$_POST['parent_id'], ['0']);
             // TODO avoid loops!
