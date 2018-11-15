@@ -1,27 +1,4 @@
 <?php
-/**
- * entity-physical.inc.php
- *
- * Saf CFM L4 wireless radios
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    LibreNMS
- * @link       http://librenms.org
- * @copyright  2018 Janno Schouwenburg
- * @author     Janno Schouwenburg <handel@janno.nl>
- */
 
 // Function which returns an array in Entity format based on the supplied input variables
 if (!function_exists('return_entity_array'))
@@ -84,38 +61,23 @@ if ($device['os'] == 'saf-cfml4') {
     $oid = '.1.3.6.1.4.1.7571.100.1.1.2.22';
     $row = 0;
     $device_array = snmpwalk_cache_oid($device, $oid, $entity_array, 'SAF-MPMUX-MIB');
-    $oid = '3.6.1.4.1.7571.100.1.1.2.22';
     // Descr, VendorType, ContainedIn, Class, ParentRelPos,
     //  Name, HardwareRev, FirmwareRev, SoftwareRev, SerialNum, MfgName, ModelName, Alias, Alias, AssetID, IsFRU
     $entity_array[++$row] = return_entity_array('CFM L4', 'CFM L4', '0', 'chassis', '-1',
-        'Chassis', '', '', '', $device_array[$oid.'.1.13.0']['iso'], 'SAF', 'CFM L4', '', '', 'true');
-    $entity_array[++$row] = return_entity_array($device_array[$oid.'.3.3.0']['iso'], 'radio', '1', 'module', '1',
-        'Radio 1', '', '', '', '', '', '', '', '', 'true' );
-    $entity_array[++$row] = return_entity_array($device_array[$oid.'.4.3.0']['iso'], 'radio', '1', 'module', '2',
-        'Radio 2', '', '', '', '', '', '', '', '', 'true' );
-    $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', '3',
-        'Slot 1', '', '', '', '', '', '', '', '', 'false');
-    $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', '4',
-        'Slot 2', '', '', '', '', '', '', '', '', 'false');
-    $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', '5',
-        'Slot 3', '', '', '', '', '', '', '', '', 'false');
-    $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', '6',
-        'Slot 4', '', '', '', '', '', '', '', '', 'false');
-    if (!preg_match('/N\/A/', $device_array[$oid.'.6.1.2.0']['iso'])) {
-        $entity_array[++$row] = return_entity_array($device_array[$oid.'.6.1.2.0']['iso'], 'module', '4', 'module', '1',
-            'Module 1', '', '', '', '', '', '', '', '', 'true');
+        'Chassis', '', '', '', $device_array[0]['serialNumber'], 'SAF', 'CFM L4', '', '', 'true');
+    for ($i = 1; $i <= 2; $i++) {
+        $entity_array[++$row] = return_entity_array($device_array[0]['rf' . $i . 'Version'], 'radio', '1', 'module', $i,
+            'Radio ' . $i, '', '', '', '', '', '', '', '', 'true' );
     }
-    if (!preg_match('/N\/A/', $device_array[$oid.'.6.2.2.0']['iso'])) {
-        $entity_array[++$row] = return_entity_array($device_array[$oid.'.6.2.2.0']['iso'], 'module', '5', 'module', '1',
-            'Module 2', '', '', '', '', '', '', '', '', 'true');
+    for ($i = 1; $i <= 4; $i++) {
+        $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', $i+2,
+            'Slot ' . $i, '', '', '', '', '', '', '', '', 'false');
     }
-    if (!preg_match('/N\/A/', $device_array[$oid.'.6.3.2.0']['iso'])) {
-        $entity_array[++$row] = return_entity_array($device_array[$oid.'.6.3.2.0']['iso'], 'module', '6', 'module', '1',
-            'Module 3', '', '', '', '', '', '', '', '', 'true');
-    }
-    if (!preg_match('/N\/A/', $device_array[$oid.'.6.4.2.0']['iso'])) {
-        $entity_array[++$row] = return_entity_array($device_array[$oid.'.6.4.2.0']['iso'], 'module', '7', 'module', '1',
-            'Module 4', '', '', '', '', '', '', '', '', 'true');
+    for ($i = 1; $i <= 4; $i++) {
+        if (!preg_match('/N\/A/', $device_array[0]['m' . $i . 'Description'])) {
+            $entity_array[++$row] = return_entity_array($device_array[0]['m' . $i . 'Description'], 'module', 3+$i, 'module', '1',
+                'Module 1', '', '', '', '', '', '', '', '', 'true');
+        }
     }
 }
 
