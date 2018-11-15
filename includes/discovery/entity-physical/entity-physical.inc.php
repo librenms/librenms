@@ -46,7 +46,6 @@ if ($device['os'] == 'junos') {
         echo ' entAliasMappingIdentifier';
         $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
     }
-    echo json_encode($entity_array);
 }
 if ($device['os'] == 'vrp') {
     echo ' hwEntityBoardType';
