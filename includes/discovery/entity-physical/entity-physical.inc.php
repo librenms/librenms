@@ -1,8 +1,7 @@
 <?php
 
 // Function which returns an array in Entity format based on the supplied input variables
-if (!function_exists('return_entity_array')) {
-    function return_entity_array($descr,
+if (!function_exists('return_entity_array')) { function return_entity_array($descr,
         $vendortype,
         $containedin,
         $class,
@@ -75,7 +74,7 @@ if ($device['os'] == 'saf-cfml4') {
     //  Name, HardwareRev, FirmwareRev, SoftwareRev, SerialNum, MfgName, ModelName, Alias, Alias, AssetID, IsFRU
     $entity_array[++$row] = return_entity_array('CFM L4', 'CFM L4', '0', 'chassis', '-1', 'Chassis', '', '', '', $device_array[0]['serialNumber'], 'SAF', 'CFM L4', '', '', 'true');
     for ($i = 1; $i <= 2; $i++) {
-        $entity_array[++$row] = return_entity_array($device_array[0]['rf' . $i . 'Version'], 'radio', '1', 'module', $i, 'Radio ' . $i, '', '', '', '', '', '', '', '', 'true' );
+        $entity_array[++$row] = return_entity_array($device_array[0]['rf' . $i . 'Version'], 'radio', '1', 'module', $i, 'Radio ' . $i, '', '', '', '', '', '', '', '', 'true');
     }
     for ($i = 1; $i <= 4; $i++) {
         $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', $i+2, 'Slot ' . $i, '', '', '', '', '', '', '', '', 'false');
