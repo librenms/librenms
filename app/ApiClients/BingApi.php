@@ -81,6 +81,6 @@ class BingApi extends BaseApi implements Geocoder
      */
     protected function checkResponse($response, $data)
     {
-        return isset($data['statusDescription']) && $data['statusDescription'] == 'OK';
+        return $response->getStatusCode() == 200 && !empty($data['resourceSets'][0]['resources']);
     }
 }
