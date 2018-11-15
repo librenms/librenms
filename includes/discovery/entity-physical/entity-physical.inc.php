@@ -2,7 +2,8 @@
 
 // Function which returns an array in Entity format based on the supplied input variables
 if (!function_exists('return_entity_array')) {
-    function return_entity_array($descr,
+    function return_entity_array(
+        $descr,
         $vendortype,
         $containedin,
         $class,
