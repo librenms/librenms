@@ -45,9 +45,18 @@ class SchemaTest extends TestCase
         "devices" => [
             "Columns" => [
                 ["Field" => "device_id", "Type" => "int(11) unsigned", "Null" => false, "Extra" => "auto_increment"],
+                ["Field" => "location_id", "Type" => "int(11)", "Null" => true, "Extra" => ""],
             ],
             "Indexes" => [
                 "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["device_id"], "Unique" => true, "Type" => "BTREE"],
+            ]
+        ],
+        "locations" => [
+            "Columns" => [
+                ["Field" => "id", "Type" => "int(11)", "Null" => false, "Extra" => "auto_increment"],
+            ],
+            "Indexes" => [
+                "PRIMARY" => ["Name" => "PRIMARY", "Columns" => ["id"], "Unique" => true, "Type" => "BTREE"],
             ]
         ],
         "ports" => [
@@ -123,7 +132,8 @@ class SchemaTest extends TestCase
         $expected = [
             'bills' => [],
             'bill_ports' => ['bills', 'ports'],
-            'devices' => [],
+            'devices' => ['locations'],
+            'locations' => [],
             'ports' => ['devices'],
             'sensors' => ['devices'],
             'sensors_to_state_indexes' => ['sensors', 'state_indexes'],
@@ -139,6 +149,7 @@ class SchemaTest extends TestCase
         $schema = $this->getSchemaMock();
 
         $this->assertEquals(['devices'], $schema->findRelationshipPath('devices'));
+        $this->assertEquals(['locations', 'devices'], $schema->findRelationshipPath('locations'));
         $this->assertEquals(['devices', 'ports'], $schema->findRelationshipPath('ports'));
         $this->assertEquals(['devices', 'ports', 'bill_ports'], $schema->findRelationshipPath('bill_ports'));
         $this->assertEquals(['devices', 'ports', 'bill_ports', 'bills'], $schema->findRelationshipPath('bills'));
