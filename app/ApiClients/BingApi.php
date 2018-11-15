@@ -1,6 +1,6 @@
 <?php
 /**
- * GoogleGeocodeApi.php
+ * BingApi.php
  *
  * -Description-
  *
@@ -25,16 +25,16 @@
 
 namespace App\ApiClients;
 
-use League\Flysystem\Exception;
+use Exception;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Geocoder;
 
-class GoogleMapsApi extends BaseApi implements Geocoder
+class BingApi extends BaseApi implements Geocoder
 {
     use GeocodingHelper;
 
-    protected $base_uri = 'https://maps.googleapis.com';
-    protected $geocoding_uri = '/maps/api/geocode/json';
+    protected $base_uri = 'http://dev.virtualearth.net';
+    protected $geocoding_uri = '/REST/v1/Locations';
 
     /**
      * Get latitude and longitude from geocode response
@@ -42,25 +42,11 @@ class GoogleMapsApi extends BaseApi implements Geocoder
      * @param array $data
      * @return array
      */
-    private function parseLatLng($data)
+    protected function parseLatLng($data)
     {
         return [
-            'lat' => isset($data['results'][0]['geometry']['location']['lat']) ? $data['results'][0]['geometry']['location']['lat'] : null,
-            'lng' => isset($data['results'][0]['geometry']['location']['lng']) ? $data['results'][0]['geometry']['location']['lng'] : null,
-        ];
-    }
-
-    /**
-     * Get messages from response.
-     *
-     * @param array $data
-     * @return array
-     */
-    protected function parseMessages($data)
-    {
-        return [
-            'error' => isset($data['error_message']) ? $data['error_message'] : '',
-            'response' => $data,
+            'lat' => isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][0]) ? $data['resourceSets'][0]['resources'][0]['point']['coordinates'][0] : null,
+            'lng' => isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][1]) ? $data['resourceSets'][0]['resources'][0]['point']['coordinates'][1] : null,
         ];
     }
 
@@ -75,13 +61,13 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     {
         $api_key = Config::get('geoloc.api_key');
         if (!$api_key) {
-            throw new Exception('Google Maps API key missing, set geoloc.api_key');
+            throw new Exception("Bing API key missing, set geoloc.api_key");
         }
 
         return [
             'query' => [
                 'key' => $api_key,
-                'address' => $address,
+                'addressLine' => $address,
             ]
         ];
     }
@@ -95,6 +81,6 @@ class GoogleMapsApi extends BaseApi implements Geocoder
      */
     protected function checkResponse($response, $data)
     {
-        return $response->getReasonPhrase() == 'OK';
+        return isset($data['statusDescription']) && $data['statusDescription'] == 'OK';
     }
 }

@@ -25,71 +25,16 @@
 
 namespace App\ApiClients;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
+use Exception;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Geocoder;
-use Log;
 
-class MapquestApi implements Geocoder
+class MapquestApi extends BaseApi implements Geocoder
 {
-    private $client;
+    use GeocodingHelper;
 
-    private $base_uri = 'https://open.mapquestapi.com';
-    private $geocoding_uri = '/geocoding/v1/address';
-
-    public function __construct()
-    {
-        $this->client = new Client([
-            'base_uri' => $this->base_uri,
-            'tiemout' => 2,
-        ]);
-
-        Log::debug('MapQuest geocode engine being used');
-    }
-
-    /**
-     * Try to get the coordinates of a given address.
-     * If unsuccessful, the returned array will be empty
-     *
-     * @param string $address
-     * @return array ['lat' => 0, 'lng' => 0]
-     */
-    public function getCoordinates($address)
-    {
-        if (!Config::get('geoloc.latlng')) {
-            Log::debug('Geocoding disabled');
-            return [];
-        }
-
-        $api_key = Config::get('geoloc.api_key');
-        if (!$api_key) {
-            Log::error('MapQuest API key missing, set geoloc.api_key');
-            return [];
-        }
-
-        $options = [
-            'query' => [
-                'key' => $api_key,
-                'location' => $address,
-                'thumbMaps' => 'false',
-            ]
-        ];
-
-        try {
-            $response = $this->client->get($this->geocoding_uri, $options);
-            $response_data = json_decode($response->getBody(), true);
-            if ($response->getStatusCode() == 200 && $response_data['info']['statuscode'] == 0) {
-                return $this->parseLatLng($response_data);
-            } else {
-                Log::error("Geocoding failed.", ['errors' => $this->parseMessages($response_data)]);
-            }
-        } catch (TransferException $e) {
-            Log::error("Geocoding failed: " . $e->getMessage());
-        }
-
-        return [];
-    }
+    protected $base_uri = 'https://open.mapquestapi.com';
+    protected $geocoding_uri = '/geocoding/v1/address';
 
     /**
      * Get latitude and longitude from geocode response
@@ -97,7 +42,7 @@ class MapquestApi implements Geocoder
      * @param array $data
      * @return array
      */
-    private function parseLatLng($data)
+    protected function parseLatLng($data)
     {
         return [
             'lat' => isset($data['results'][0]['locations'][0]['latLng']['lat']) ? $data['results'][0]['locations'][0]['latLng']['lat'] : null,
@@ -106,17 +51,36 @@ class MapquestApi implements Geocoder
     }
 
     /**
-     * Get messages from response.
+     * Build Guzzle request option array
      *
-     * @param array $data
+     * @param string $address
      * @return array
+     * @throws Exception you may throw an Exception if validation fails
      */
-    private function parseMessages($data)
+    protected function buildGeocodingOptions($address)
     {
-        if (isset($data['info']['messages']) && is_array($data['info']['messages'])) {
-            return $data['info']['messages'];
+        $api_key = Config::get('geoloc.api_key');
+        if (!$api_key) {
+            throw new Exception("MapQuest API key missing, set geoloc.api_key");
         }
 
-        return [];
+        return [
+            'query' => [
+                'key' => $api_key,
+                'location' => $address,
+                'thumbMaps' => 'false',
+            ]
+        ];
+    }
+
+    /**
+     * Checks if the request was a success
+     *
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param array $data decoded response data
+     * @return bool
+     */
+    protected function checkResponse($response, $data) {
+        return $response->getStatusCode() == 200 && $data['info']['statuscode'] == 0;
     }
 }

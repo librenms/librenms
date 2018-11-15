@@ -13,3 +13,5 @@ CREATE UNIQUE INDEX locations_location_uindex ON locations (location);
 UPDATE alert_rules SET builder=REPLACE(builder, 'devices.location', 'locations.location');
 UPDATE device_groups SET pattern=REPLACE(pattern, 'devices.location', 'locations.location');
 
+INSERT INTO config (config_name,config_value,config_default,config_descr,config_group,config_group_order,config_sub_group,config_sub_group_order,config_hidden,config_disabled) values ('geoloc.engine','','','Geocoding Engine','external',0,'location',0,'0','0');
+INSERT INTO config (config_name,config_value,config_default,config_descr,config_group,config_group_order,config_sub_group,config_sub_group_order,config_hidden,config_disabled) values ('geoloc.api_key','','','Geocoding API Key (Required to function)','external',0,'location',0,'0','0');

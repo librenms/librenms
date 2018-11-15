@@ -90,9 +90,14 @@ class AppServiceProvider extends ServiceProvider
             $engine = Config::get('geoloc.engine');
 
             if ($engine == 'mapquest') {
+                Log::debug('MapQuest geocode engine');
                 return $app->make(\App\ApiClients\MapquestApi::class);
+            } elseif ($engine == 'bing') {
+                Log::debug('Bing geocode engine');
+                return $app->make(\App\ApiClients\BingApi::class);
             } else {
                 // fallback/default
+                Log::debug('Google Maps geocode engine');
                 return $app->make(\App\ApiClients\GoogleMapsApi::class);
             }
         });
