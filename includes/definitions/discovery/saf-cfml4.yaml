@@ -269,7 +269,7 @@ modules:
           state_name: termRf1CablePowerStatus
           states: 
             - 
-              descr: false
+              descr: 'false'
               generic: 1
               graph: 1
               value: 0
@@ -301,7 +301,7 @@ modules:
           state_name: termRf2CablePowerStatus
           states: 
             - 
-              descr: false
+              descr: 'false'
               generic: 1
               graph: 1
               value: 0
