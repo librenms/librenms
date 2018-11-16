@@ -56,7 +56,7 @@ echo '</table>';
                 if (row.nac_domain == 'data'){
                     return "<i class=\"fa fa-desktop fa-lg icon-theme\"  aria-hidden=\"true\"></i>";
                     }
-                if (row.nac_domain == 'other'){
+                if (row.nac_domain == 'Disabled'){
                     return "<i class=\"fa fa-desktop fa-lg icon-theme\"  aria-hidden=\"true\"></i>";
                     }
                 else{
@@ -94,7 +94,7 @@ echo '</table>';
                     return "<span class=\"label label-primary\">MAB</span>";
                     }
                 if (row.nac_method == 'other'){
-                    return "<span class=\"label label-danger\">Other</span>";
+                    return "<span class=\"label label-danger\">Disabled</span>";
                     }
                 else{
                     return "<span class=\'label label-default\'>" + row.nac_method + "</span>";
