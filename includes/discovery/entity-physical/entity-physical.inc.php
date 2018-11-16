@@ -44,7 +44,7 @@ if ($device['os'] == 'saf-cfml4') {
     $entity_array[$row]['entPhysicalMfgName'] = 'SAF';
     $entity_array[$row]['entPhysicalModelName'] = 'CFM L4';
     $entity_array[$row]['entPhysicalIsFRU'] = 'true';
-    foreach(range(1,2) as $i) {
+    foreach (range(1, 2) as $i) {
         $entity_array[++$row] = array();
         $entity_array[$row]['entPhysicalDescr'] = $device_array[0]['rf' . $i . 'Version'];
         $entity_array[$row]['entPhysicalVendorType'] = 'radio';
@@ -54,7 +54,7 @@ if ($device['os'] == 'saf-cfml4') {
         $entity_array[$row]['entPhysicalName'] = 'Radio' . $i;
         $entity_array[$row]['entPhysicalIsFRU'] = 'true';
     }
-    foreach(range(1,4) as $i) {
+    foreach (range(1, 4) as $i) {
         $entity_array[++$row] = array();
         $entity_array[$row]['entPhysicalDescr'] =  'Module Container';
         $entity_array[$row]['entPhysicalVendorType'] = 'containerSlot';
@@ -64,7 +64,7 @@ if ($device['os'] == 'saf-cfml4') {
         $entity_array[$row]['entPhysicalName'] = 'Slot ' . $i;
         $entity_array[$row]['entPhysicalIsFRU'] = 'false';
     }
-    foreach(range(1,4) as $i) {
+    foreach (range(1, 4) as $i) {
         if (!preg_match('/N\/A/', $device_array[0]['m' . $i . 'Description'])) {
             $entity_array[++$row] = array();
             $entity_array[$row]['entPhysicalDescr'] = $device_array[0]['m' . $i . 'Description'];
