@@ -43,7 +43,7 @@ echo '</table>';
                     return "<i class=\"fa fa-check-circle fa-lg icon-theme\"  aria-hidden=\"true\" style=\"color:green;\"></i>";
                     }
                 if (row.nac_authz == 'authorizationFailed'){
-                    return "<i class=\"fa fa-times-circle fa-lg icon-theme\" aria-hidden=\"true\" style=\"color:red;\"></i><";
+                    return "<i class=\"fa fa-times-circle fa-lg icon-theme\" aria-hidden=\"true\" style=\"color:red;\"></i>";
                     }
                 else{
                     return "<span class=\'label label-default\'>" + row.nac_authz + "</span>";
