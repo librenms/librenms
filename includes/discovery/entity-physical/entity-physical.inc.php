@@ -1,44 +1,5 @@
 <?php
 
-// Function which returns an array in Entity format based on the supplied input variables
-if (!function_exists('return_entity_array')) {
-    function return_entity_array(
-        $descr,
-        $vendortype,
-        $containedin,
-        $class,
-        $parentrelpos,
-        $name,
-        $hardwarerev,
-        $firmwarerev,
-        $softwarerev,
-        $serialnum,
-        $mfgname,
-        $modelname,
-        $alias,
-        $assetid,
-        $isfru
-    ) {
-        return array('entPhysicalDescr' => $descr,
-            'entPhysicalVendorType' => $vendortype,
-            'entPhysicalContainedIn' => $containedin,
-            'entPhysicalClass' => $class,
-            'entPhysicalParentRelPos' => $parentrelpos,
-            'entPhysicalName' => $name,
-            'entPhysicalHardwareRev' => $hardwarerev,
-            'entPhysicalFirmwareRev' => $firmwarerev,
-            'entPhysicalSoftwareRev' => $softwarerev,
-            'entPhysicalSerialNum' => $serialnum,
-            'entPhysicalMfgName' => $mfgname,
-            'entPhysicalModelName' => $modelname,
-            'entPhysicalAlias' => $alias,
-            'entPhysicalAssetID' => $assetid,
-            'entPhysicalIsFRU' => $isfru
-        );
-    }
-}
-
-
 echo "\nCaching OIDs:";
 
 if ($device['os'] == 'junos') {
@@ -72,18 +33,47 @@ if ($device['os'] == 'saf-cfml4') {
     $oid = '.1.3.6.1.4.1.7571.100.1.1.2.22';
     $row = 0;
     $device_array = snmpwalk_cache_oid($device, $oid, $entity_array, 'SAF-MPMUX-MIB');
-    // Descr, VendorType, ContainedIn, Class, ParentRelPos,
-    //  Name, HardwareRev, FirmwareRev, SoftwareRev, SerialNum, MfgName, ModelName, Alias, Alias, AssetID, IsFRU
-    $entity_array[++$row] = return_entity_array('CFM L4', 'CFM L4', '0', 'chassis', '-1', 'Chassis', '', '', '', $device_array[0]['serialNumber'], 'SAF', 'CFM L4', '', '', 'true');
-    for ($i = 1; $i <= 2; $i++) {
-        $entity_array[++$row] = return_entity_array($device_array[0]['rf' . $i . 'Version'], 'radio', '1', 'module', $i, 'Radio ' . $i, '', '', '', '', '', '', '', '', 'true');
+    $entity_array[++$row] = array();
+    $entity_array[$row]['entPhysicalDescr'] = 'CFM L4';
+    $entity_array[$row]['entPhysicalVendorType'] = 'CFM L4';
+    $entity_array[$row]['entPhysicalContainedIn'] = '0';
+    $entity_array[$row]['entPhysicalClass'] = 'chassis';
+    $entity_array[$row]['entPhysicalParentRelPos'] = '-1';
+    $entity_array[$row]['entPhysicalName'] = 'Chassis';
+    $entity_array[$row]['entPhysicalSerialNum'] = $device_array[0]['serialNumber'];
+    $entity_array[$row]['entPhysicalMfgName'] = 'SAF';
+    $entity_array[$row]['entPhysicalModelName'] = 'CFM L4';
+    $entity_array[$row]['entPhysicalIsFRU'] = 'true';
+    foreach(range(1,2) as $i)) {
+        $entity_array[++$row] = array();
+        $entity_array[$row]['entPhysicalDescr'] = $device_array[0]['rf' . $i . 'Version'];
+        $entity_array[$row]['entPhysicalVendorType'] = 'radio';
+        $entity_array[$row]['entPhysicalContainedIn'] = '1';
+        $entity_array[$row]['entPhysicalClass'] = 'module';
+        $entity_array[$row]['entPhysicalParentRelPos'] = $i;
+        $entity_array[$row]['entPhysicalName'] = 'Radio' . $i;
+        $entity_array[$row]['entPhysicalIsFRU'] = 'true';
     }
-    for ($i = 1; $i <= 4; $i++) {
-        $entity_array[++$row] = return_entity_array('Module Container', 'containerSlot', '1', 'container', $i+2, 'Slot ' . $i, '', '', '', '', '', '', '', '', 'false');
+    foreach(range(1,4) as $i) {
+        $entity_array[++$row] = array();
+        $entity_array[$row]['entPhysicalDescr'] =  'Module Container';
+        $entity_array[$row]['entPhysicalVendorType'] = 'containerSlot';
+        $entity_array[$row]['entPhysicalContainedIn'] = '1';
+        $entity_array[$row]['entPhysicalClass'] = 'container';
+        $entity_array[$row]['entPhysicalParentRelPos'] = $i+2;
+        $entity_array[$row]['entPhysicalName'] = 'Slot ' . $i;
+        $entity_array[$row]['entPhysicalIsFRU'] = 'false';
     }
-    for ($i = 1; $i <= 4; $i++) {
+    foreach(range(1,4) as $i) {
         if (!preg_match('/N\/A/', $device_array[0]['m' . $i . 'Description'])) {
-            $entity_array[++$row] = return_entity_array($device_array[0]['m' . $i . 'Description'], 'module', 3+$i, 'module', '1', 'Module 1', '', '', '', '', '', '', '', '', 'true');
+            $entity_array[++$row] = array();
+            $entity_array[$row]['entPhysicalDescr'] = $device_array[0]['m' . $i . 'Description'];
+            $entity_array[$row]['entPhysicalVendorType'] = 'module';
+            $entity_array[$row]['entPhysicalContainedIn'] = 3+$i;
+            $entity_array[$row]['entPhysicalClass'] = 'module';
+            $entity_array[$row]['entPhysicalParentRelPos'] = 1;
+            $entity_array[$row]['entPhysicalName'] = 'Module ' . $i;
+            $entity_array[$row]['entPhysicalIsFRU'] = 'true';
         }
     }
 }
@@ -145,21 +135,21 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalAlias        = $entry['entPhysicalAlias'];
         $entPhysicalAssetID      = $entry['entPhysicalAssetID'];
     } else {
-        $entPhysicalDescr        = $entry['entPhysicalDescr'];
-        $entPhysicalContainedIn  = $entry['entPhysicalContainedIn'];
-        $entPhysicalClass        = $entry['entPhysicalClass'];
-        $entPhysicalName         = $entry['entPhysicalName'];
-        $entPhysicalSerialNum    = $entry['entPhysicalSerialNum'];
-        $entPhysicalModelName    = $entry['entPhysicalModelName'];
-        $entPhysicalMfgName      = $entry['entPhysicalMfgName'];
-        $entPhysicalVendorType   = $entry['entPhysicalVendorType'];
-        $entPhysicalParentRelPos = $entry['entPhysicalParentRelPos'];
-        $entPhysicalHardwareRev  = $entry['entPhysicalHardwareRev'];
-        $entPhysicalFirmwareRev  = $entry['entPhysicalFirmwareRev'];
-        $entPhysicalSoftwareRev  = $entry['entPhysicalSoftwareRev'];
-        $entPhysicalIsFRU        = $entry['entPhysicalIsFRU'];
-        $entPhysicalAlias        = $entry['entPhysicalAlias'];
-        $entPhysicalAssetID      = $entry['entPhysicalAssetID'];
+        $entPhysicalDescr        = array_key_exists('entPhysicalDescr', $entry)        ? $entry['entPhysicalDescr']        : '';
+        $entPhysicalContainedIn  = array_key_exists('entPhysicalContainedIn', $entry)  ? $entry['entPhysicalContainedIn']  : '';
+        $entPhysicalClass        = array_key_exists('entPhysicalClass', $entry)        ? $entry['entPhysicalClass']        : '';
+        $entPhysicalName         = array_key_exists('entPhysicalName', $entry)         ? $entry['entPhysicalName']         : '';
+        $entPhysicalSerialNum    = array_key_exists('entPhysicalSerialNum', $entry)    ? $entry['entPhysicalSerialNum']    : '';
+        $entPhysicalModelName    = array_key_exists('entPhysicalModelName', $entry)    ? $entry['entPhysicalModelName']    : '';
+        $entPhysicalMfgName      = array_key_exists('entPhysicalMfgName', $entry)      ? $entry['entPhysicalMfgName']      : '';
+        $entPhysicalVendorType   = array_key_exists('entPhysicalVendorType', $entry)   ? $entry['entPhysicalVendorType']   : '';
+        $entPhysicalParentRelPos = array_key_exists('entPhysicalParentRelPos', $entry) ? $entry['entPhysicalParentRelPos'] : '';
+        $entPhysicalHardwareRev  = array_key_exists('entPhysicalHardwareRev', $entry)  ? $entry['entPhysicalHardwareRev']  : '';
+        $entPhysicalFirmwareRev  = array_key_exists('entPhysicalFirmwareRev', $entry)  ? $entry['entPhysicalFirmwareRev']  : '';
+        $entPhysicalSoftwareRev  = array_key_exists('entPhysicalSoftwareRev', $entry)  ? $entry['entPhysicalSoftwareRev']  : '';
+        $entPhysicalIsFRU        = array_key_exists('entPhysicalIsFRU', $entry)        ? $entry['entPhysicalIsFRU']        : '';
+        $entPhysicalAlias        = array_key_exists('entPhysicalAlias', $entry)        ? $entry['entPhysicalAlias']        : '';
+        $entPhysicalAssetID      = array_key_exists('entPhysicalAssetID', $entry)      ? $entry['entPhysicalAssetID']      : '';
     }//end if
 
     if (isset($entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'])) {
