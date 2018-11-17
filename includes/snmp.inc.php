@@ -227,7 +227,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
     }
     $oid_number = count($oids);
 
-    $oid_chunks = array_chunk($oids,$oid_limit);
+    $oid_chunks = array_chunk($oids, $oid_limit);
     $data = [];
     foreach ($oid_chunks as $chunk) {
         $partial_oids = implode(' ', $chunk);
