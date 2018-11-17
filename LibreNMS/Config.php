@@ -454,7 +454,7 @@ class Config
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         // make sure we have full path to binaries in case PATH isn't set
-        foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool') as $bin) {
+        foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6') as $bin) {
             if (!is_executable(self::get($bin))) {
                 self::set($bin, self::locateBinary($bin), $persist, $bin, "Path to $bin", 'external', 'paths');
             }

@@ -50,6 +50,9 @@ Placeholders are special variables that if used within the template will be repl
 - ping min (if icmp enabled): `$alert->ping_min`
 - ping max (if icmp enabled): `$alert->ping_max`
 - ping avg (if icmp enabled): `$alert->ping_avg`
+- debug (array) This will contain:
+  - traceroute (if enabled you will receive traceroute output): `$alert->debug['traceroute']`
+  - output (if the traceroute fails this will contain why): `$alert->debug['output']`
 - Title for the Alert: `$alert->title`
 - Time Elapsed, Only available on recovery (`$alert->state == 0`): `$alert->elapsed`
 - Rule Builder (the actual rule) (use `{!! $alert->builder !!}`): `$alert->builder`
@@ -108,7 +111,7 @@ More info: https://laravel.com/docs/5.4/blade#extending-a-layout
 
 ## Examples
 
-Default Template:
+#### Default Template:
 ```text
 {{ $alert->title }}
 Severity: {{ $alert->severity }}
@@ -126,7 +129,7 @@ Alert sent to:
   {{ $value }} <{{ $key }}>
 @endforeach
 ```
-Ports Utilization Template:
+#### Ports Utilization Template:
 ```text
 {{ $alert->title }}
 Device Name: {{ $alert->hostname }}
@@ -143,7 +146,7 @@ Outbound Utilization: {{ (($value['ifOutOctets_rate']*8)/$value['ifSpeed'])*100 
 @endforeach
 ```
 
-Storage:
+#### Storage:
 ```text
 {{ $alert->title }}
 
@@ -165,7 +168,7 @@ Percent Utilized: {{ $value['storage_perc'] }}
 @endforeach
 ```
 
-Temperature Sensors:
+#### Temperature Sensors:
 ```text
 {{ $alert->title }}
 
@@ -191,7 +194,7 @@ High Temperature Limit: {{ $value['sensor_limit'] }} °C
 @endif
 ```
 
-Value Sensors:
+#### Value Sensors:
 ```text
 {{ $alert->title }}
 
@@ -217,7 +220,7 @@ Limit: {{ $value['sensor_limit'] }}
 @endif
 ```
 
-Memory Alert:
+#### Memory Alert:
 ```text
 {{ $alert->title }}
 
@@ -237,12 +240,23 @@ Percent Utilized: {{ $value['mempool_perc'] }}
 @endforeach 
 ```
 
+### Advanced options
 
+#### Conditional formatting
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
 ```text
 @if ($alert->transport == mail)<a href="https://my.librenms.install/device/device={{ $alert->hostname }}/">{{ $alert->hostname }}</a>
 @else
 {{ $alert->hostname }}
+@endif
+```
+
+#### Traceroute debugs
+```text
+@if ($alert->status == 0)
+    @if ($alert->status == icmp)
+        {{ $alert->debug['traceroute'] }}
+    @endif
 @endif
 ```
 
@@ -277,7 +291,7 @@ Service Alert:
 </div>
 ```
 
-Processor Alert with Graph:
+#### Processor Alert with Graph:
 ```
 {{ $alert->title }} <br>
 Severity: {{ $alert->severity }}  <br>

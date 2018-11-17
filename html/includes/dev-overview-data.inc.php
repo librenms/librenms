@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\DevicePerf;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
@@ -126,12 +127,32 @@ if (is_array($loc)) {
 if ($uptime) {
     echo "<tr>
         <td>$uptime_text</td>
-        <td>".$uptime."</td>
+        <td>$uptime</td>
       </tr>";
 }
 
 echo '</table>
       </div>
       </div>
-      </div>
       </div>';
+
+$perf_info = DevicePerf::where('device_id', $device['device_id'])->latest('timestamp')->first();
+$perf_debug = json_decode($perf_info['debug'], true);
+if ($perf_debug['traceroute']) {
+    echo "<div class='row'>
+     <div class='col-md-12'>
+         <div class='panel panel-default'>
+             <div class='panel-heading'>
+                 <h3 class='panel-title'>Traceroute ({$perf_info['timestamp']})</h3>
+             </div>
+             <div class='panel-body'>
+                 <pre>{$perf_debug['traceroute']}</pre>
+            </div>
+         </div>
+     </div>
+ </div>";
+}
+
+echo '</div>';
+
+
