@@ -56,6 +56,8 @@ class DocTest extends TestCase
         'Installation/Installation-Ubuntu-1604-Nginx.md',
         'Installation/Installing-LibreNMS.md',
         'Support/Support-New-OS.md',
+        'Installation/Ubuntu-image.md',
+        'Installation/CentOS-image.md',
     ];
     
     public function testDocExist()
