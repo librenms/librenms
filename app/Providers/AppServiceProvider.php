@@ -90,17 +90,21 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\LibreNMS\Interfaces\Geocoder::class, function ($app) {
             $engine = Config::get('geoloc.engine');
 
-            if ($engine == 'mapquest') {
-                Log::debug('MapQuest geocode engine');
-                return $app->make(\App\ApiClients\MapquestApi::class);
-            } elseif ($engine == 'bing') {
-                Log::debug('Bing geocode engine');
-                return $app->make(\App\ApiClients\BingApi::class);
+            switch ($engine) {
+                case 'mapquest':
+                    Log::debug('MapQuest geocode engine');
+                    return $app->make(\App\ApiClients\MapquestApi::class);
+                case 'bing':
+                    Log::debug('Bing geocode engine');
+                    return $app->make(\App\ApiClients\BingApi::class);
+                case 'google':
+                    Log::debug('Google Maps geocode engine');
+                    return $app->make(\App\ApiClients\GoogleMapsApi::class);
+                default:
+                case 'openstreetmap':
+                    Log::debug('OpenStreetMap geocode engine');
+                    return $app->make(\App\ApiClients\NominatimApi::class);
             }
-
-            // fallback/default
-            Log::debug('Google Maps geocode engine');
-            return $app->make(\App\ApiClients\GoogleMapsApi::class);
         });
     }
 }

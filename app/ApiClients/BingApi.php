@@ -45,8 +45,8 @@ class BingApi extends BaseApi implements Geocoder
     protected function parseLatLng($data)
     {
         return [
-            'lat' => isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][0]) ? $data['resourceSets'][0]['resources'][0]['point']['coordinates'][0] : null,
-            'lng' => isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][1]) ? $data['resourceSets'][0]['resources'][0]['point']['coordinates'][1] : null,
+            'lat' => $data['resourceSets'][0]['resources'][0]['point']['coordinates'][0],
+            'lng' => $data['resourceSets'][0]['resources'][0]['point']['coordinates'][1],
         ];
     }
 
@@ -55,7 +55,7 @@ class BingApi extends BaseApi implements Geocoder
      *
      * @param string $address
      * @return array
-     * @throws Exception you may throw an Exception if validation fails
+     * @throws \Exception you may throw an Exception if validation fails
      */
     protected function buildGeocodingOptions($address)
     {
@@ -68,6 +68,7 @@ class BingApi extends BaseApi implements Geocoder
             'query' => [
                 'key' => $api_key,
                 'addressLine' => $address,
+                'maxResults' => 1,
             ]
         ];
     }
@@ -81,6 +82,6 @@ class BingApi extends BaseApi implements Geocoder
      */
     protected function checkResponse($response, $data)
     {
-        return $response->getStatusCode() == 200 && !empty($data['resourceSets'][0]['resources']);
+        return $response->getStatusCode() == 200 && isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][0], $data['resourceSets'][0]['resources'][0]['point']['coordinates'][1]);
     }
 }

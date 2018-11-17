@@ -22,13 +22,6 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-/**
- * Created by IntelliJ IDEA.
- * User: murrant
- * Date: 11/14/18
- * Time: 10:48 PM
- */
-
 namespace App\ApiClients;
 
 use Exception;
@@ -82,7 +75,8 @@ trait GeocodingHelper
      * @param array $data decoded response data
      * @return bool
      */
-    protected function checkResponse($response, $data) {
+    protected function checkResponse($response, $data)
+    {
         return $response->getStatusCode() == 200;
     }
 
@@ -99,7 +93,7 @@ trait GeocodingHelper
      *
      * @param string $address
      * @return array
-     * @throws Exception you may throw an Exception if validation fails
+     * @throws \Exception you may throw an Exception if validation fails
      */
     abstract protected function buildGeocodingOptions($address);
 }

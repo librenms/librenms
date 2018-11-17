@@ -1,6 +1,6 @@
 <?php
 /**
- * MapquestGeocodeApi.php
+ * NominatimApi.php
  *
  * -Description-
  *
@@ -25,16 +25,14 @@
 
 namespace App\ApiClients;
 
-use Exception;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Geocoder;
 
-class MapquestApi extends BaseApi implements Geocoder
+class NominatimApi extends BaseApi implements Geocoder
 {
     use GeocodingHelper;
 
-    protected $base_uri = 'https://open.mapquestapi.com';
-    protected $geocoding_uri = '/geocoding/v1/address';
+    protected $base_uri = 'http://nominatim.openstreetmap.org';
+    protected $geocoding_uri = '/search';
 
     /**
      * Get latitude and longitude from geocode response
@@ -45,8 +43,8 @@ class MapquestApi extends BaseApi implements Geocoder
     protected function parseLatLng($data)
     {
         return [
-            'lat' => $data['results'][0]['locations'][0]['latLng']['lat'],
-            'lng' => $data['results'][0]['locations'][0]['latLng']['lng'],
+            'lat' => $data[0]['lat'],
+            'lng' => $data[0]['lon'],
         ];
     }
 
@@ -59,18 +57,15 @@ class MapquestApi extends BaseApi implements Geocoder
      */
     protected function buildGeocodingOptions($address)
     {
-        $api_key = Config::get('geoloc.api_key');
-        if (!$api_key) {
-            throw new Exception("MapQuest API key missing, set geoloc.api_key");
-        }
-
         return [
             'query' => [
-                'key' => $api_key,
-                'location' => $address,
-                'thumbMaps' => 'false',
-                'outFormat' => 'json',
-                'maxResults' => 1,
+                'q' => $address,
+                'format' => 'json',
+                'limit' => 1,
+            ],
+            'headers' => [
+                'User-Agent' => 'LibreNMS',
+                'Accept'     => 'application/json',
             ]
         ];
     }
@@ -84,6 +79,6 @@ class MapquestApi extends BaseApi implements Geocoder
      */
     protected function checkResponse($response, $data)
     {
-        return $response->getStatusCode() == 200 && $data['info']['statuscode'] == 0 && isset($data['results'][0]['locations'][0]['latLng']['lat'], $data['results'][0]['locations'][0]['latLng']['lng']);
+        return $response->getStatusCode() == 200 && isset($data[0]['lat'], $data[0]['lon']);
     }
 }

@@ -9,13 +9,17 @@ $location_conf = [
         'name'    => 'geoloc.engine',
         'descr'   => 'Geocoding Engine',
         'type'    => 'select',
-        'options' => ['google', 'mapquest', 'bing'],
+        'options' => [
+            ['value' => 'openstreetmap', 'description' => 'OpenStreetMap'],
+            ['value' => 'google', 'description' => 'Google Maps'],
+            ['value' => 'mapquest', 'description' => 'MapQuest'],
+            ['value' => 'bing', 'description' => 'Bing Maps'],
+        ]
     ],
     [
         'name'     => 'geoloc.api_key',
         'descr'    => 'Geocoding API Key',
         'type'     => 'text',
-        'required' => true,
     ],
 ];
 
