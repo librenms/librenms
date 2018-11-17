@@ -1356,11 +1356,16 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
                     'sensors_to_state_indexes.sensor_id',
                     "sensors.$target",
                 ));
-            } elseif ($table == 'application_metrics' && $target = 'device_id') {
+            } elseif ($table == 'application_metrics' && $target == 'device_id') {
                 return array_merge($last, array(
                     'application_metrics.app_id',
                     "applications.$target",
                 ));
+            } elseif ($table == 'locations' && $target == 'device_id') {
+                return array_merge($last, [
+                    'locations.id',
+                    'devices.device_id.location_id'
+                ]);
             }
 
             $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"', array($table));
