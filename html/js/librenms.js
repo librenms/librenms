@@ -290,3 +290,11 @@ function refresh_oxidized_node(device_hostname){
         }
     });
 }
+
+$(document).ready(function () {
+    setInterval(function () {
+        $('.bootgrid-table').each(function() {
+            $(this).bootgrid('reload');
+        });
+    }, 300000);
+});

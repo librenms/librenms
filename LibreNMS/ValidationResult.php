@@ -132,6 +132,13 @@ class ValidationResult
         return $this->fix;
     }
 
+    /**
+     * The commands (generally) to fix the issue.
+     * If there are multiple, use an array.
+     *
+     * @param string|array $fix
+     * @return ValidationResult $this
+     */
     public function setFix($fix)
     {
         $this->fix = $fix;
@@ -146,7 +153,10 @@ class ValidationResult
         c_echo(str_pad('[' . $this->getStatusText($this->status) . ']', 12) . $this->message . PHP_EOL);
 
         if (isset($this->fix)) {
-            c_echo("\t[%BFIX%n] %B$this->fix%n\n");
+            c_echo("\t[%BFIX%n]: \n");
+            foreach ((array)$this->fix as $fix) {
+                c_echo("\t%B$fix%n\n");
+            }
         }
 
         if (!empty($this->list)) {

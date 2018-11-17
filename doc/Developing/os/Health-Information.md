@@ -1,4 +1,5 @@
 source: Developing/os/Health-Information.md
+path: blob/master/doc/
 
 #### Sensors
 
@@ -57,7 +58,7 @@ modules:
                     oid: airFlowSensorTable
                     value: airFlowSensorValue
                     divisor: 10
-                    num_oid: .1.3.6.1.4.1.5528.100.4.1.5.1.2.
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.1.5.1.2.{{ $index }}'
                     descr: airFlowSensorLabel
                     index: 'airFlowSensorValue.{{ $index }}'
 ```

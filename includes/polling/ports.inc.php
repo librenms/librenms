@@ -683,7 +683,7 @@ foreach ($ports as $port) {
                 }
             } else {
                 if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
-                    if ($port[$oid . '_prev'] != $this_port[$oid]) {
+                    if ($port[$oid.'_prev'] == null) {
                         $port['update'][$oid . '_prev'] = $this_port[$oid];
                     }
                 }

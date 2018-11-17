@@ -852,7 +852,7 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         if ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.') && !starts_with($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
             return 1;
         }
-    } elseif ($device['os'] == 'eaton-mgeups') {
+    } elseif ($device['os'] == 'apc-mgeups') {
         if ($sensor_type == 'voltage') {
             return 10;
         }
@@ -1034,7 +1034,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                 d_echo("Final sensor value: $value\n");
 
                 if (can_skip_sensor($value, $data, $sensor_options, $raw_data[$index]) === false && is_numeric($value)) {
-                    $oid = $data['num_oid'] . $index;
+                    $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
 
                     // process the description
                     $descr = dynamic_discovery_get_value('descr', $index, $data, $pre_cache);

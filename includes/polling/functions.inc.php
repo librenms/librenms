@@ -550,10 +550,27 @@ function location_to_latlng($device)
                     d_echo("Google geocode engine being used\n");
                     $api_key = ($config['geoloc']['api_key']);
                     if (!empty($api_key)) {
-                        d_echo("Use Google API key: $api_key\n");
                         $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location&key=$api_key";
                     } else {
-                        $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location";
+                        d_echo("No geocode API key set\n");
+                    }
+                    break;
+                case "mapquest":
+                    d_echo("Mapquest geocode engine being used\n");
+                    $api_key = ($config['geoloc']['api_key']);
+                    if (!empty($api_key)) {
+                        $api_url = "http://open.mapquestapi.com/geocoding/v1/address?key=$api_key&location=$new_device_location&thumbMaps=false";
+                    } else {
+                        d_echo("No geocode API key set\n");
+                    }
+                    break;
+                case "bing":
+                    d_echo("Bing geocode engine being used\n");
+                    $api_key = ($config['geoloc']['api_key']);
+                    if (!empty($api_key)) {
+                        $api_url = "http://dev.virtualearth.net/REST/v1/Locations?addressLine=$new_device_location&key=$api_key";
+                    } else {
+                        d_echo("No geocode API key set\n");
                     }
                     break;
             }
@@ -565,11 +582,28 @@ function location_to_latlng($device)
             curl_setopt($curl_init, CURLOPT_CONNECTTIMEOUT, 5);
             $data = json_decode(curl_exec($curl_init), true);
             // Parse the data from the specific Geocode services.
+            d_echo(json_encode($data));
             switch ($config['geoloc']['engine']) {
                 case "google":
                 default:
                     if ($data['status'] == 'OK') {
                         $loc = $data['results'][0]['geometry']['location'];
+                    } else {
+                        $bad_loc = true;
+                    }
+                    break;
+                case "mapquest":
+                    if ($data['info']['statuscode'] == 0) {
+                        $loc['lat'] = $data['results'][0]['locations'][0]['latLng']['lat'];
+                        $loc['lng'] = $data['results'][0]['locations'][0]['latLng']['lng'];
+                    } else {
+                        $bad_loc = true;
+                    }
+                    break;
+                case "bing":
+                    if ($data['statusDescription'] == 'OK') {
+                        $loc['lat'] = $data['resourceSets'][0]["resources"][0]["point"]["coordinates"][0];
+                        $loc['lng'] = $data['resourceSets'][0]["resources"][0]["point"]["coordinates"][1];
                     } else {
                         $bad_loc = true;
                     }

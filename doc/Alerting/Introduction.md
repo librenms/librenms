@@ -1,4 +1,5 @@
 source: Alerting/Introduction.md
+path: blob/master/doc/
 
 # Introduction
 

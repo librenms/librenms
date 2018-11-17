@@ -1,4 +1,5 @@
 source: Alerting/index.md
+path: blob/master/doc/
 
 # About
 

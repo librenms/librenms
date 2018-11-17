@@ -17,4 +17,5 @@ discovery:
         sysDescr_regex:
             - '/^Galaxy/'
             - '/^GALAXY/'
+            - '/^MGE Galaxy/'
             # Upsilon too (no data)

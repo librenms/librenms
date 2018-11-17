@@ -1,4 +1,5 @@
 source: Developing/Creating-Documentation.md
+path: blob/master/doc/
 # Creating Documentation
 
 One of the goals of the LibreNMS project is to enable users to get all of the help they need from our documentation.

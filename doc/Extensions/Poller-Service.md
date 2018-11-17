@@ -1,4 +1,5 @@
 source: Extensions/Poller-Service.md
+path: blob/master/doc/
 # Poller Service
 
 > Status: BETA

@@ -138,7 +138,7 @@ if (!empty($entity_oids)) {
                     $valid_sensor = false;
                 }
             }
-            if ($current == '-127' || ($device['os'] == 'asa' && str_contains($device['hardware'], 'sc'))) {
+            if ($current == '-127' || ($device['os'] == 'asa' && ends_with($device['hardware'], 'sc'))) {
                 $valid_sensor = false;
             }
             // Check for valid sensors

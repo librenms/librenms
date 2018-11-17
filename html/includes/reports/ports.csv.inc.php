@@ -159,7 +159,7 @@ foreach ($ports as $port) {
         $port['out_rate'] = formatRates(($port['ifOutOctets_rate'] * 8));
         $port             = cleanPort($port, $device);
         $csv[]            = array(
-            $port['hostname'],
+            format_hostname($port, $port['hostname']),
             fixIfName($port['label']),
             $speed,
             $port['in_rate'],
