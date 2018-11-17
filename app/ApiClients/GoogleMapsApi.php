@@ -45,8 +45,8 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     private function parseLatLng($data)
     {
         return [
-            'lat' => $data['results'][0]['geometry']['location']['lat'],
-            'lng' => $data['results'][0]['geometry']['location']['lng'],
+            'lat' => isset($data['results'][0]['geometry']['location']['lat']) ? $data['results'][0]['geometry']['location']['lat'] : 0,
+            'lng' => isset($data['results'][0]['geometry']['location']['lng']) ? $data['results'][0]['geometry']['location']['lng'] : 0,
         ];
     }
 
@@ -92,10 +92,9 @@ class GoogleMapsApi extends BaseApi implements Geocoder
      * @param \Psr\Http\Message\ResponseInterface $response
      * @param array $data decoded response data
      * @return bool
-     * @throws \Exception you may throw an Exception if validation fails
      */
     protected function checkResponse($response, $data)
     {
-        return $response->getStatusCode() == 200 && $data['status'] == 'OK' && isset($data['results'][0]['geometry']['location']['lat'], $data['results'][0]['geometry']['location']['lng']);
+        return $response->getStatusCode() == 200 && $data['status'] == 'OK';
     }
 }

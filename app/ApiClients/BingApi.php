@@ -45,8 +45,8 @@ class BingApi extends BaseApi implements Geocoder
     protected function parseLatLng($data)
     {
         return [
-            'lat' => $data['resourceSets'][0]['resources'][0]['point']['coordinates'][0],
-            'lng' => $data['resourceSets'][0]['resources'][0]['point']['coordinates'][1],
+            'lat' => isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][0]) ? $data['resourceSets'][0]['resources'][0]['point']['coordinates'][0] : 0,
+            'lng' => isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][1]) ? $data['resourceSets'][0]['resources'][0]['point']['coordinates'][1] : 0,
         ];
     }
 
@@ -68,7 +68,6 @@ class BingApi extends BaseApi implements Geocoder
             'query' => [
                 'key' => $api_key,
                 'addressLine' => $address,
-                'maxResults' => 1,
             ]
         ];
     }
@@ -82,6 +81,6 @@ class BingApi extends BaseApi implements Geocoder
      */
     protected function checkResponse($response, $data)
     {
-        return $response->getStatusCode() == 200 && isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][0], $data['resourceSets'][0]['resources'][0]['point']['coordinates'][1]);
+        return $response->getStatusCode() == 200 && !empty($data['resourceSets'][0]['resources']);
     }
 }

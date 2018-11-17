@@ -43,8 +43,8 @@ class NominatimApi extends BaseApi implements Geocoder
     protected function parseLatLng($data)
     {
         return [
-            'lat' => $data[0]['lat'],
-            'lng' => $data[0]['lon'],
+            'lat' => isset($data[0]['lat']) ? $data[0]['lat'] : 0,
+            'lng' => isset($data[0]['lon']) ? $data[0]['lon'] : 0,
         ];
     }
 
@@ -68,17 +68,5 @@ class NominatimApi extends BaseApi implements Geocoder
                 'Accept'     => 'application/json',
             ]
         ];
-    }
-
-    /**
-     * Checks if the request was a success
-     *
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param array $data decoded response data
-     * @return bool
-     */
-    protected function checkResponse($response, $data)
-    {
-        return $response->getStatusCode() == 200 && isset($data[0]['lat'], $data[0]['lon']);
     }
 }

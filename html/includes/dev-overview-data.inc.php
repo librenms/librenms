@@ -101,16 +101,18 @@ if ($device['sysContact']) {
 }
 
 if ($device['location_id']) {
-    $location = dbFetchRow('SELECT * FROM locations where id=?', [$device['location_id']]);
-    echo '<tr>
+    $location = \App\Models\Location::find($device['location_id']);
+        echo '<tr>
         <td>Location</td>
-        <td>'.$location['location'].'</td>
+        <td>' . $location->location . '</td>
       </tr>';
 
-    echo '<tr>
+    if ($location->coordinatesValid()) {
+        echo '<tr>
         <td>Lat / Lng</td>
-        <td>['.$location['lat'].','.$location['lng'].'] <div class="pull-right"><a href="https://maps.google.com/?q='.$location['lat'].'+'.$location['lng'].'" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</button></div></a></td>
+        <td>[' . $location->lat . ',' . $location->lng . '] <div class="pull-right"><a href="https://maps.google.com/?q=' . $location->lat . '+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</button></div></a></td>
     </tr>';
+    }
 }
 
 if ($uptime) {

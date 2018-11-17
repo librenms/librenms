@@ -64,6 +64,16 @@ class Location extends Model
     }
 
     /**
+     * Check if the coordinates are valid
+     * Even though 0,0 is a valid coordinate, we consider it invalid for ease
+     */
+    public function coordinatesValid()
+    {
+        return $this->lat && $this->lng &&
+            abs($this->lat) <= 90 && abs($this->lng) <= 180;
+    }
+
+    /**
      * Call geocoding API to resolve latitude and longitude.
      */
     public function lookupCoordinates()

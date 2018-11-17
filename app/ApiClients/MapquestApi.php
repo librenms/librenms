@@ -45,8 +45,8 @@ class MapquestApi extends BaseApi implements Geocoder
     protected function parseLatLng($data)
     {
         return [
-            'lat' => $data['results'][0]['locations'][0]['latLng']['lat'],
-            'lng' => $data['results'][0]['locations'][0]['latLng']['lng'],
+            'lat' => isset($data['results'][0]['locations'][0]['latLng']['lat']) ? $data['results'][0]['locations'][0]['latLng']['lat'] : 0,
+            'lng' => isset($data['results'][0]['locations'][0]['latLng']['lng']) ? $data['results'][0]['locations'][0]['latLng']['lng'] : 0,
         ];
     }
 
@@ -69,8 +69,6 @@ class MapquestApi extends BaseApi implements Geocoder
                 'key' => $api_key,
                 'location' => $address,
                 'thumbMaps' => 'false',
-                'outFormat' => 'json',
-                'maxResults' => 1,
             ]
         ];
     }
@@ -82,8 +80,7 @@ class MapquestApi extends BaseApi implements Geocoder
      * @param array $data decoded response data
      * @return bool
      */
-    protected function checkResponse($response, $data)
-    {
-        return $response->getStatusCode() == 200 && $data['info']['statuscode'] == 0 && isset($data['results'][0]['locations'][0]['latLng']['lat'], $data['results'][0]['locations'][0]['latLng']['lng']);
+    protected function checkResponse($response, $data) {
+        return $response->getStatusCode() == 200 && $data['info']['statuscode'] == 0;
     }
 }
