@@ -81,11 +81,11 @@ foreach (array('sysContact', 'sysObjectID', 'sysName', 'sysDescr') as $elem) {
 
 if ($device['override_sysLocation'] == 0 && $poll_device['sysLocation']) {
     /** @var \App\Models\Location $location */
-    $location = \App\Models\Location::firstOrNew(['location' => $poll_device['sysLocation']]);
+    $location = \App\Models\Location::firstOrCreate(['location' => $poll_device['sysLocation']]);
     if (!$location->hasCoordinates()) {
         $location->lookupCoordinates();
+        $location->save();
     }
-    $location->save();
 
     if ($device['location_id'] != $location->id) {
         $update_array['location_id'] = $location->id;

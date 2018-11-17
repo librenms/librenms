@@ -86,6 +86,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function registerGeocoder()
     {
+        $this->app->alias(\LibreNMS\Interfaces\Geocoder::class, 'geocoder');
         $this->app->bind(\LibreNMS\Interfaces\Geocoder::class, function ($app) {
             $engine = Config::get('geoloc.engine');
 
@@ -95,11 +96,11 @@ class AppServiceProvider extends ServiceProvider
             } elseif ($engine == 'bing') {
                 Log::debug('Bing geocode engine');
                 return $app->make(\App\ApiClients\BingApi::class);
-            } else {
-                // fallback/default
-                Log::debug('Google Maps geocode engine');
-                return $app->make(\App\ApiClients\GoogleMapsApi::class);
             }
+
+            // fallback/default
+            Log::debug('Google Maps geocode engine');
+            return $app->make(\App\ApiClients\GoogleMapsApi::class);
         });
     }
 }
