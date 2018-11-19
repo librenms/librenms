@@ -555,6 +555,7 @@ device_perf:
     - { Field: min, Type: 'double(8,2)', 'Null': false, Extra: '' }
     - { Field: max, Type: 'double(8,2)', 'Null': false, Extra: '' }
     - { Field: avg, Type: 'double(8,2)', 'Null': false, Extra: '' }
+    - { Field: debug, Type: text, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }

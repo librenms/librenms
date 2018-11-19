@@ -2208,6 +2208,19 @@ function recordSnmpStatistic($stat, $start_time)
     return $runtime;
 }
 
+function runTraceroute($device)
+{
+    $address_family = snmpTransportToAddressFamily($device['transport']);
+    $trace_name = $address_family == 'ipv6' ? 'traceroute6' : 'traceroute';
+    $trace_path = Config::get($trace_name, $trace_name);
+    $process = new Process([$trace_path, '-q', '1', '-w', '1', $device['hostname']]);
+    $process->run();
+    if ($process->isSuccessful()) {
+        return ['traceroute' => $process->getOutput()];
+    }
+    return ['output' => $process->getErrorOutput()];
+}
+
 /**
  * @param $device
  * @param bool $record_perf
@@ -2221,7 +2234,12 @@ function device_is_up($device, $record_perf = false)
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = array('NOW()');
 
-    if ($record_perf === true && can_ping_device($device['attribs']) === true) {
+    if ($record_perf === true && can_ping_device($device['attribs'])) {
+        $trace_debug = [];
+        if ($ping_response['result'] === false && Config::get('debug.run_trace', false)) {
+            $trace_debug = runTraceroute($device);
+        }
+        $device_perf['debug'] = json_encode($trace_debug);
         dbInsert($device_perf, 'device_perf');
     }
     $response              = array();
