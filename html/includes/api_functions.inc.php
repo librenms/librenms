@@ -1973,9 +1973,10 @@ function list_vlans()
 function list_links()
 {
     $app        = \Slim\Slim::getInstance();
+    $router     = $app->router()->getCurrentRoute()->getParams();
     $sql        = '';
     $sql_params = array();
-    $hostname   = $_GET['hostname'];
+    $hostname   = $router['hostname'];
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         check_device_permission($device_id);

@@ -60,6 +60,8 @@ $app->group(
                         $app->patch('/:hostname/rename/:new_hostname', 'authToken', 'rename_device')->name('rename_device');
                         $app->get('/:hostname/vlans', 'authToken', 'get_vlans')->name('get_vlans');
                         // api/v0/devices/$hostname/vlans
+                        $app->get('/:hostname/links', 'authToken', 'list_links')->name('get_links');
+                        // api/v0/devices/$hostname/links
                         $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');
                         // api/v0/devices/$hostname/graphs
                         $app->get('/:hostname/health(/:type)(/:sensor_id)', 'authToken', 'list_available_health_graphs')->name('list_available_health_graphs');
