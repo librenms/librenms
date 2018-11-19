@@ -6,11 +6,11 @@ matrix:
   fast_finish: true
   include:
   - php: 7.3
-    env: SKIP_STYLE_CHECK=1 SKIP_BROWSER_TEST=1
+    env: SKIP_STYLE_CHECK=1
   - php: 7.2
-    env: SKIP_UNIT_CHECK=1
+    env: SKIP_UNIT_CHECK=1 BROWSER_TEST=1
   - php: 7.1
-    env: SKIP_STYLE_CHECK=1 SKIP_BROWSER_TEST=1 EXECUTE_BUILD_DOCS=true
+    env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
 
 cache:
   directories:
@@ -37,7 +37,7 @@ script:
   - php scripts/pre-commit.php -q -l
   - php scripts/pre-commit.php -q -s
   - php scripts/pre-commit.php -u --db --snmpsim --fail-fast
-  - test "$SKIP_BROWSER_TEST" -eq 1 || ((php artisan serve 2>/dev/null &) && php artisan dusk:update && php artisan dusk)
+  - test -z "$BROWSER_TEST" || ((php artisan serve 2>/dev/null &) && php artisan dusk:update && php artisan dusk)
   - bash -n daily.sh
   - pylint -E poller-wrapper.py discovery-wrapper.py
   - bash scripts/deploy-docs.sh
