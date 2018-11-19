@@ -50,7 +50,7 @@ Placeholders are special variables that if used within the template will be repl
 - ping min (if icmp enabled): `$alert->ping_min`
 - ping max (if icmp enabled): `$alert->ping_max`
 - ping avg (if icmp enabled): `$alert->ping_avg`
-- debug (array) This will contain:
+- debug (array) If `$config['debug']['run_trace] = true;` is set then this will contain:
   - traceroute (if enabled you will receive traceroute output): `$alert->debug['traceroute']`
   - output (if the traceroute fails this will contain why): `$alert->debug['output']`
 - Title for the Alert: `$alert->title`
