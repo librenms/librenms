@@ -100,6 +100,15 @@ $config['icmp_check'] = false;
 
 If you would like to do this on a per device basis then you can do so under Device -> Edit -> Misc -> Disable ICMP Test? On
 
+#### traceroute
+LibreNMS uses traceroute / traceroute6 to record debug information when a device is down due to icmp AND you have `$config['debug']['run_trace] = true;`
+set.
+
+```php
+$config['traceroute']  = '/usr/bin/traceroute';
+$config['traceroute6'] = '/usr/bin/traceroute6';
+```
+
 #### SNMP
 
 ```php
