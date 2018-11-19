@@ -154,5 +154,3 @@ if ($perf_debug['traceroute']) {
 }
 
 echo '</div>';
-
-
