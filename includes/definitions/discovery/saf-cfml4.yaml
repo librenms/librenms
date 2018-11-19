@@ -18,26 +18,10 @@ modules:
           oid: activeLink
           state_name: activeLink
           states: 
-            - 
-              descr: Unknown
-              generic: 1
-              graph: 1
-              value: 0
-            - 
-              descr: 'Link 1'
-              generic: 0
-              graph: 1
-              value: 1
-            - 
-              descr: 'Link 2'
-              generic: 0
-              graph: 1
-              value: 2
-            - 
-              descr: Error
-              generic: 2
-              graph: 1
-              value: 255
+            - { value: 0, descr: Unknown, graph: 1, generic: 1 }
+            - { value: 1, descr: 'Link 1', graph: 1, generic: 0 }
+            - { value: 2, descr: 'Link 2', graph: 1, generic: 0 }
+            - { value: 255, descr: Error, graph: 1, generic: 2 }
         - 
           descr: 'Active TX'
           index: 'activeTx.{{ $index }}'
@@ -45,26 +29,10 @@ modules:
           oid: activeTx
           state_name: activeTx
           states: 
-            - 
-              descr: None
-              generic: 2
-              graph: 1
-              value: 0
-            - 
-              descr: 'Link 1'
-              generic: 0
-              graph: 1
-              value: 1
-            - 
-              descr: 'Link 2'
-              generic: 0
-              graph: 1
-              value: 2
-            - 
-              descr: Both
-              generic: 0
-              graph: 1
-              value: 3
+            - { value: 0, descr: None, graph: 1, generic: 2 }
+            - { value: 1, descr: 'Link 1', graph: 1, generic: 0 }
+            - { value: 2, descr: 'Link 2', graph: 1, generic: 0 }
+            - { value: 3, descr: Both, graph: 1, generic: 0 }
         - 
           descr: 'Forced link'
           index: 'forcedLink.{{ $index }}'
@@ -72,26 +40,10 @@ modules:
           oid: forcedLink
           state_name: forcedLink
           states: 
-            - 
-              descr: Off
-              generic: 0
-              graph: 1
-              value: 0
-            - 
-              descr: 'Link 1'
-              generic: 0
-              graph: 1
-              value: 1
-            - 
-              descr: 'Link 2'
-              generic: 0
-              graph: 1
-              value: 2
-            - 
-              descr: Error
-              generic: 2
-              graph: 1
-              value: 255
+            - { value: 0, descr: Off, graph: 1, generic: 0 }
+            - { value: 1, descr: 'Link 1', graph: 1, generic: 0 }
+            - { value: 2, descr: 'Link 2', graph: 1, generic: 0 }
+            - { value: 255, descr: Error, graph: 1, generic: 2 }
         - 
           descr: 'Switch mode'
           index: 'switchMode.{{ $index }}'
@@ -99,26 +51,10 @@ modules:
           oid: switchMode
           state_name: switchMode
           states: 
-            - 
-              descr: Unknown
-              generic: 1
-              graph: 1
-              value: 0
-            - 
-              descr: 'Frequency diversity'
-              generic: 0
-              graph: 1
-              value: 1
-            - 
-              descr: 'Hot standby'
-              generic: 0
-              graph: 1
-              value: 2
-            - 
-              descr: Independent
-              generic: 0
-              graph: 1
-              value: 3
+            - { value: 0, descr: Unknown, graph: 1, generic: 1 }
+            - { value: 1, descr: 'Frequency diversity', graph: 1, generic: 0 }
+            - { value: 2, descr: 'Hot standby', graph: 1, generic: 0 }
+            - { value: 3, descr: Independent, graph: 1, generic: 0 }
         - 
           descr: 'Switch enabled for RX BER'
           index: 'switchEnabledForRxBer.{{ $index }}'
@@ -126,16 +62,8 @@ modules:
           oid: switchEnabledForRxBer
           state_name: switchEnabledForRxBer
           states: 
-            - 
-              descr: Disabled
-              generic: 0
-              graph: 1
-              value: 0
-            - 
-              descr: Enabled
-              generic: 0
-              graph: 1
-              value: 1
+            - { value: 0, descr: Disabled, graph: 1, generic: 0 }
+            - { value: 1, descr: Enabled, graph: 1, generic: 0 }
         - 
           descr: Sync
           index: 'bbSyncLostAlarm.{{ $index }}'
@@ -143,16 +71,8 @@ modules:
           oid: bbSyncLostAlarm
           state_name: bbSyncLostAlarm
           states: 
-            - 
-              descr: Ok
-              generic: 0
-              graph: 1
-              value: 0
-            - 
-              descr: Alarm
-              generic: 2
-              graph: 1
-              value: 1
+            - { value: 0, descr: Ok, graph: 1, generic: 0 }
+            - { value: 1, descr: Alarm, graph: 1, generic: 2 }
         - 
           descr: 'R1 Operation'
           index: 'rf1Operation.{{ $index }}'
@@ -160,36 +80,12 @@ modules:
           oid: rf1Operation
           state_name: rf1Operation
           states: 
-            - 
-              descr: None
-              generic: 1
-              graph: 1
-              value: 0
-            - 
-              descr: Booting
-              generic: 1
-              graph: 1
-              value: 1
-            - 
-              descr: Ok
-              generic: 0
-              graph: 1
-              value: 2
-            - 
-              descr: Testing
-              generic: 1
-              graph: 1
-              value: 3
-            - 
-              descr: Error
-              generic: 2
-              graph: 1
-              value: 4
-            - 
-              descr: 'No data from ODU'
-              generic: 2
-              graph: 1
-              value: 5
+            - { value: 0, descr: None, graph: 1, generic: 1 }
+            - { value: 1, descr: Booting, graph: 1, generic: 1 }
+            - { value: 2, descr: Ok, graph: 1, generic: 0 }
+            - { value: 3, descr: Testing, graph: 1, generic: 1 }
+            - { value: 4, descr: Error, graph: 1, generic: 2 }
+            - { value: 5, descr: 'No data from ODU', graph: 1, generic: 2 }
         - 
           descr: 'R2 Operation'
           index: 'rf2Operation.{{ $index }}'
@@ -197,36 +93,12 @@ modules:
           oid: rf2Operation
           state_name: rf2Operation
           states: 
-            - 
-              descr: None
-              generic: 1
-              graph: 1
-              value: 0
-            - 
-              descr: Booting
-              generic: 1
-              graph: 1
-              value: 1
-            - 
-              descr: Ok
-              generic: 0
-              graph: 1
-              value: 2
-            - 
-              descr: Testing
-              generic: 1
-              graph: 1
-              value: 3
-            - 
-              descr: Error
-              generic: 2
-              graph: 1
-              value: 4
-            - 
-              descr: 'No data from ODU'
-              generic: 2
-              graph: 1
-              value: 5
+            - { value: 0, descr: None, graph: 1, generic: 1 }
+            - { value: 1, descr: Booting, graph: 1, generic: 1 }
+            - { value: 2, descr: Ok, graph: 1, generic: 0, descr: Ok }
+            - { value: 3, descr: Testing, graph: 1, generic: 1 }
+            - { value: 4, descr: Error, graph: 1, generic: 2 }
+            - { value: 5, descr: 'No data from ODU', graph: 1, generic: 2 }
         - 
           descr: 'R1 Humidity'
           index: 'rf1OduHumidity.{{ $index }}'
@@ -234,16 +106,8 @@ modules:
           oid: rf1OduHumidity
           state_name: rf1OduHumidity
           states: 
-            - 
-              descr: Low
-              generic: 0
-              graph: 1
-              value: 0
-            - 
-              descr: High
-              generic: 1
-              graph: 1
-              value: 1
+            - { value: 0, descr: Low, graph: 1, generic: 0 }
+            - { value: 1, descr: High, graph: 1, generic: 1 }
         - 
           descr: 'R2 Humidity'
           index: 'rf2OduHumidity.{{ $index }}'
@@ -251,16 +115,8 @@ modules:
           oid: rf2OduHumidity
           state_name: rf2OduHumidity
           states: 
-            - 
-              descr: Low
-              generic: 0
-              graph: 1
-              value: 0
-            - 
-              descr: High
-              generic: 1
-              graph: 1
-              value: 1
+            - { value: 0, descr: Low, graph: 1, generic: 0 }
+            - { value: 1, descr: High, graph: 1, generic: 1 }
         - 
           descr: R1CblPwrStat
           index: 'termRf1CablePowerStatus.{{ $index }}'
@@ -268,31 +124,11 @@ modules:
           oid: termRf1CablePowerStatus
           state_name: termRf1CablePowerStatus
           states: 
-            - 
-              descr: 'false'
-              generic: 1
-              graph: 1
-              value: 0
-            - 
-              descr: ok
-              generic: 0
-              graph: 1
-              value: 1
-            - 
-              descr: short
-              generic: 2
-              graph: 1
-              value: 2
-            - 
-              descr: error
-              generic: 2
-              graph: 1
-              value: 3
-            - 
-              descr: power-off
-              generic: 2
-              graph: 1
-              value: 4
+            - { value: 0, descr: 'false', graph: 1, generic: 1 }
+            - { value: 1, descr: ok, graph: 1, generic: 0 }
+            - { value: 2, descr: short, graph: 1, generic: 2 }
+            - { value: 3, descr: error, graph: 1, generic: 2 }
+            - { value: 4, descr: power-off, graph: 1, generic: 2 }
         - 
           descr: R2CblPwrStat
           index: 'termRf2CablePowerStatus.{{ $index }}'
@@ -300,31 +136,11 @@ modules:
           oid: termRf2CablePowerStatus
           state_name: termRf2CablePowerStatus
           states: 
-            - 
-              descr: 'false'
-              generic: 1
-              graph: 1
-              value: 0
-            - 
-              descr: ok
-              generic: 0
-              graph: 1
-              value: 1
-            - 
-              descr: short
-              generic: 2
-              graph: 1
-              value: 2
-            - 
-              descr: error
-              generic: 2
-              graph: 1
-              value: 3
-            - 
-              descr: power-off
-              generic: 2
-              graph: 1
-              value: 4
+            - { value: 0, descr: 'false', graph: 1, generic: 1 }
+            - { value: 1, descr: ok, graph: 1, generic: 0 }
+            - { value: 2, descr: short, graph: 1, generic: 2 }
+            - { value: 3, descr: error, graph: 1, generic: 2 }
+            - { value: 4, descr: power-off, graph: 1, generic: 2 }
     signal: 
       data: 
         - 
