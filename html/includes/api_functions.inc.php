@@ -1970,6 +1970,63 @@ function list_vlans()
 }
 
 
+function list_links()
+{
+    $app        = \Slim\Slim::getInstance();
+    $router     = $app->router()->getCurrentRoute()->getParams();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $router['hostname'];
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `links`.`local_device_id`=?";
+        $sql_params = array($device_id);
+    }
+    if (!LegacyAuth::user()->hasGlobalRead()) {
+        $sql .= " AND `links`.`local_device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = LegacyAuth::id();
+    }
+
+    $links       = array();
+    foreach (dbFetchRows("SELECT `links`.* FROM `links` LEFT JOIN `devices` ON `links`.`local_device_id` = `devices`.`device_id` WHERE `links`.`id` IS NOT NULL $sql", $sql_params) as $link) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $links[] = $link;
+    }
+    $total_links = count($links);
+    if ($total_links == 0) {
+        api_error(404, 'Links do not exist');
+    }
+
+    api_success($links, 'links');
+}
+
+
+function get_link()
+{
+    check_is_read();
+
+    $app    = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $linkId  = $router['id'];
+    if (!is_numeric($linkId)) {
+        api_error(400, 'Invalid id has been provided');
+    }
+
+    $link       = dbFetchRows("SELECT * FROM `links` WHERE `id` IS NOT NULL AND `id` = ?", array($linkId));
+    $link_count = count($link);
+    if ($link_count == 0) {
+        api_error(404, "Link $linkId does not exist");
+    }
+
+    api_success($link, 'link');
+}
+
+
 function list_ip_addresses()
 {
     check_is_read();
