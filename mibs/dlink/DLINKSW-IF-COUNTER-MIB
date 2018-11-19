@@ -1,0 +1,949 @@
+--  *****************************************************************
+--  DLINKSW-IF-COUNTER-MIB.mib : Interface Counters MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-IF-COUNTER-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Unsigned32,
+        Counter64
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, 
+        OBJECT-GROUP
+            FROM SNMPv2-CONF
+        ifIndex,
+        InterfaceIndexOrZero         
+            FROM IF-MIB
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+    dlinkSwIfCounterMIB MODULE-IDENTITY
+        LAST-UPDATED "201302050000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for displaying counters."
+
+        REVISION "201302050000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file."
+        ::= { dlinkIndustrialCommon 66 }
+
+-- -----------------------------------------------------------------------------
+    dIfCounterNotifications    OBJECT IDENTIFIER ::= { dlinkSwIfCounterMIB 0 }
+    dIfCounterObjects          OBJECT IDENTIFIER ::= { dlinkSwIfCounterMIB 1 }
+    dIfCounterConformance      OBJECT IDENTIFIER ::= { dlinkSwIfCounterMIB 2 }
+
+
+-- -----------------------------------------------------------------------------
+--  Objects
+-- -----------------------------------------------------------------------------
+    dIfCounterGernal              OBJECT IDENTIFIER ::= {dIfCounterObjects 1}
+    dIfCounterClearCtrl           OBJECT IDENTIFIER ::= {dIfCounterObjects 2}
+    dIfCounterRxStatistics        OBJECT IDENTIFIER ::= {dIfCounterObjects 3}
+    dIfCounterTxStatistics        OBJECT IDENTIFIER ::= {dIfCounterObjects 4}
+   
+-- -----------------------------------------------------------------------------
+    dIfCounterIfLinkChangeTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIfCounterIfLinkChangeEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION           
+            "This table is used to display the number of interface link 
+            change events."
+        ::= { dIfCounterGernal 1}    
+
+    dIfCounterIfLinkChangeEntry OBJECT-TYPE
+        SYNTAX          DIfCounterIfLinkChangeEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entry containing the number of interface link change events for a 
+            particular interface."
+        INDEX                 { ifIndex }
+        ::= { dIfCounterIfLinkChangeTable 1 }
+        
+    DIfCounterIfLinkChangeEntry ::= SEQUENCE     	{
+    	dIfCounterIfLinkChange        Counter64
+    }
+    
+    dIfCounterIfLinkChange OBJECT-TYPE 
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of interface link change events."
+        ::= { dIfCounterIfLinkChangeEntry 1 } 
+  
+-- -----------------------------------------------------------------------------
+    dIfCounterIfUtilizationTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIfCounterIfUtilizationEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION           
+            "This table is used to display the utilization of ports."
+        ::= { dIfCounterGernal 2}    
+
+    dIfCounterIfUtilizationEntry OBJECT-TYPE
+        SYNTAX          DIfCounterIfUtilizationEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entry contains the utilization information of a port."
+        INDEX                 { ifIndex }
+        ::= { dIfCounterIfUtilizationTable 1 }
+        
+    DIfCounterIfUtilizationEntry ::= SEQUENCE     	{
+        dIfCounterIfUtilizationRx        Unsigned32,
+    	dIfCounterIfUtilizationTx        Unsigned32,
+    	dIfCounterIfUtilizationUtil      Unsigned32
+    }
+
+    dIfCounterIfUtilizationRx OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "packets per second"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current rate of received frames on the
+            interface."
+        ::= { dIfCounterIfUtilizationEntry 1 }
+            
+    dIfCounterIfUtilizationTx OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "packets per second"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current rate of transmitted frames on the
+            interface."
+        ::= { dIfCounterIfUtilizationEntry 2 }
+        
+    dIfCounterIfUtilizationUtil OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..100)
+        UNITS           "percentage"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the percentage of the utilization on the
+            interface."
+        ::= { dIfCounterIfUtilizationEntry 3 }  
+                              
+
+-- -----------------------------------------------------------------------------
+    dIfCounterClearAll  OBJECT-TYPE
+        SYNTAX        INTEGER     {
+            clear(1),
+            noOp(2)
+            }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "This object clears all counters, when set to 'clear'. 
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        ::= { dIfCounterClearCtrl 1}
+       
+    dIfCounterClearIf OBJECT-TYPE 
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS	    read-write
+        STATUS		    current
+        DESCRIPTION
+            "This object indicates the ifIndex of the physical 
+            port interface on which the counters will be cleared.            
+            When read, a value of 0 is returned."   
+        ::= { dIfCounterClearCtrl 2 } 
+ 
+-- -----------------------------------------------------------------------------
+    dIfRxStatsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIfRxStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current 
+        DESCRIPTION           
+            "This table is used to display the receiving statistics 
+            not covered in standard MIBs (IF-MIB, 
+            RMON, BRIDGE-MIB, Etherlike-MIB) or extend the standard defined 
+            objects to 64 bits."
+        ::= { dIfCounterRxStatistics 1}    
+
+    dIfRxStatsEntry OBJECT-TYPE
+        SYNTAX           DIfRxStatsEntry
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION
+            "An entry contains receiving statistics on an interface."
+        INDEX                 { ifIndex }
+        ::= { dIfRxStatsTable 1 }
+        
+    DIfRxStatsEntry ::= SEQUENCE     	{
+    	dIfRxStatsHCPkts                    Counter64,
+    	dIfRxStatsHCPkts64Octets            Counter64,
+    	dIfRxStatsHCPkts65to127Octets       Counter64,
+    	dIfRxStatsHCPkts128to255Octets      Counter64,
+    	dIfRxStatsHCPkts256to511Octets      Counter64,
+    	dIfRxStatsHCPkts512to1023Octets     Counter64,
+    	dIfRxStatsHCPkts1024to1518Octets    Counter64,
+    	dIfRxStatsHCPkts1519to1522Octets    Counter64,
+    	dIfRxStatsHCPkts1519to2047Octets    Counter64,
+    	dIfRxStatsHCPkts2048to4095Octets    Counter64,
+    	dIfRxStatsHCPkts4096to9216Octets    Counter64
+    }
+
+    dIfRxStatsHCPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of packets received on the interface.  
+            This object is a 64-bit version of etherStatsPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+        ::= { dIfRxStatsEntry 1 } 
+
+    dIfRxStatsHCPkts64Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets)
+            received that were 64 octets in length (excluding 
+            framing bits but including FCS octets).
+            This object is a 64-bit version of etherStatsPkts64Octets.
+           
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfRxStatsEntry 2 } 
+
+    dIfRxStatsHCPkts65to127Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets)
+            received that were between 65 and 127 octets in length
+            inclusive (excluding framing bits but including FCS octets).
+            This object is a 64-bit version of etherStatsPkts65to127Octets.
+           
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfRxStatsEntry 3 }   	
+    	
+    dIfRxStatsHCPkts128to255Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets)
+            received that were between 128 and 255 octets in length
+            inclusive (excluding framing bits but including FCS octets).
+            This object is a 64-bit version of etherStatsPkts128to255Octets.           
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfRxStatsEntry 4 }     	
+    	
+    dIfRxStatsHCPkts256to511Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets)
+            received that were between 256 and 511 octets in length
+            inclusive (excluding framing bits but including FCS octets).
+            This object is a 64-bit version of etherStatsPkts256to511Octets.           
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfRxStatsEntry 5 } 
+    	    	
+    dIfRxStatsHCPkts512to1023Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets)
+            received that were between 512 and 1023 octets in length
+            inclusive (excluding framing bits but including FCS octets.
+            This object is a 64-bit version of etherStatsPkts512to1023Octets.           
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfRxStatsEntry 6 } 
+    	    	
+    dIfRxStatsHCPkts1024to1518Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets)
+            received that were between 1024 and 1518 octets in length
+            inclusive (excluding framing bits but including FCS octets).  
+            This object is a 64-bit version of etherStatsPkts1024to1518Octets.           
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfRxStatsEntry 7 } 
+    	    	
+    dIfRxStatsHCPkts1519to1522Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of good VLAN packets received that were
+            between 1519 and 1522 octets in length inclusive
+            (excluding framing bits but including FCS octets).  
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfRxStatsEntry 8 } 
+    	    	
+    dIfRxStatsHCPkts1519to2047Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets)
+            received that were between 1519 and 2047 octets in length
+            inclusive (excluding framing bits but including FCS octets).  
+ 
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfRxStatsEntry 9 } 
+    	    	
+    dIfRxStatsHCPkts2048to4095Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets) 
+            received that were between 2048 and 4095 octets in length
+            inclusive (excluding framing bits but including FCS octets).  
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+       ::= { dIfRxStatsEntry 10 } 
+    	    	
+    dIfRxStatsHCPkts4096to9216Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets) 
+            received that were between 4096 and 9216 octets in length
+            inclusive (excluding framing bits but including FCS octets).  
+ 
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfRxStatsEntry 11 } 
+
+-- -----------------------------------------------------------------------------
+    dIfCounterRxDropTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIfCounterRxDropEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of receiving statistics for discarded 
+            packets on interfaces."
+        ::= { dIfCounterRxStatistics 2 }
+
+    dIfCounterRxDropEntry OBJECT-TYPE
+        SYNTAX          DIfCounterRxDropEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains the receiving statistics for discarded packets on 
+            an interface."
+        INDEX   { ifIndex }
+        ::= { dIfCounterRxDropTable 1 }
+
+    DIfCounterRxDropEntry ::= SEQUENCE     	{
+        dIfCounterRxBufferFullDrops	            Counter64,
+        dIfCounterRxACLDrops                    Counter64,
+        dIfCounterRxMulticastDrops              Counter64,
+        dIfCounterRxVLANIngressDrops            Counter64,
+        dIfCounterRxIPv6Drops                   Counter64,
+        dIfCounterRxSTPDrops                    Counter64,
+        dIfCounterRxStormAndTableDiscard        Counter64,
+        dIfCounterRxMTUDrops                    Counter64,
+        dIfCounterRxInvalidDestPort             Counter64,   
+        dIfCounterRxBandwidthCtrlDrops          Counter64
+   	}
+
+    dIfCounterRxBufferFullDrops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets discarded while input buffer full."
+    	::= { dIfCounterRxDropEntry 1 }
+
+    dIfCounterRxACLDrops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of received packets denied by ACLs."
+    	::= { dIfCounterRxDropEntry 2 }
+
+    dIfCounterRxMulticastDrops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of received multicast packet that is discarded."
+    	::= { dIfCounterRxDropEntry 3 }
+
+    dIfCounterRxVLANIngressDrops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets discarded by VLAN ingress checking."
+    	::= { dIfCounterRxDropEntry 4 }    	
+
+    dIfCounterRxIPv6Drops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of IPv6 packets dropped by routing process."
+    	::= { dIfCounterRxDropEntry 5 }
+
+    dIfCounterRxSTPDrops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets discarded when ingress 
+             port is not in forwarding state."
+    	::= { dIfCounterRxDropEntry 6 }
+
+    dIfCounterRxStormAndTableDiscard OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets discarded by receiving policy
+            (e.g. the source or destination MAC is not allowed, rate limit, etc.)"
+    	::= { dIfCounterRxDropEntry 7 }
+
+    dIfCounterRxMTUDrops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets discarded by frames received, which 
+            exceeds Maximum Frame in length and contains a valid or invalid FCS."
+    	::= { dIfCounterRxDropEntry 8 }
+
+    dIfCounterRxInvalidDestPort OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets dropped due to no destination port can
+            be forwarded to."
+    	::= { dIfCounterRxDropEntry 9 }
+
+    dIfCounterRxBandwidthCtrlDrops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets discarded by port ingress bandwidth 
+            control."
+    	::= { dIfCounterRxDropEntry 10 }
+
+-- -----------------------------------------------------------------------------
+    dIfTxStatsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIfTxStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current 
+        DESCRIPTION           
+            "This table is used to display the transmitting statistics 
+            information not covered in standard MIBs (IF-MIB, 
+            RMON, BRIDGE-MIB, Etherlike-MIB) or extend the standard defined 
+            objects to 64 bits.
+            "
+        ::= { dIfCounterTxStatistics 1}    
+
+    dIfTxStatsEntry OBJECT-TYPE
+        SYNTAX          DIfTxStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains transmitting statistics on an interface."
+        INDEX                 { ifIndex }
+        ::= { dIfTxStatsTable 1 }
+        
+    DIfTxStatsEntry ::= SEQUENCE     	{
+    	dIfTxStatsHCPkts                        Counter64,
+    	dIfTxStatsHCPkts64Octets                Counter64,
+    	dIfTxStatsHCPkts65to127Octets           Counter64,
+    	dIfTxStatsHCPkts128to255Octets          Counter64,
+    	dIfTxStatsHCPkts256to511Octets          Counter64,
+    	dIfTxStatsHCPkts512to1023Octets         Counter64,
+    	dIfTxStatsHCPkts1024to1518Octets        Counter64,
+    	dIfTxStatsHCPkts1519to1522Octets        Counter64,
+    	dIfTxStatsHCPkts1519to2047Octets        Counter64,
+    	dIfTxStatsHCPkts2048to4095Octets        Counter64,
+    	dIfTxStatsHCPkts4096to9216Octets        Counter64,
+    	dIfTxStatsFCSErrors                     Counter64
+    }
+
+    dIfTxStatsHCPkts OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of packets transmitted on the interface.  
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+        ::= { dIfTxStatsEntry 1 } 
+
+    dIfTxStatsHCPkts64Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets)
+            transmitted that were 64 octets in length (excluding
+            framing bits but including FCS octets).       
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfTxStatsEntry 2 } 
+
+    dIfTxStatsHCPkts65to127Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets)
+            transmitted that were between 65 and 127 octets in length
+            inclusive (excluding framing bits but including FCS octets).          
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfTxStatsEntry 3 }   	
+    	
+    dIfTxStatsHCPkts128to255Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets) 
+            transmitted that were between 128 and 255 octets in length
+            inclusive (excluding framing bits but including FCS octets).         
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+        ::= { dIfTxStatsEntry 4 }     	
+    	
+    dIfTxStatsHCPkts256to511Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets) 
+            transmitted that were between 256 and 511 octets in length
+            inclusive (excluding framing bits but including FCS octets).
+           
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfTxStatsEntry 5 }     	
+    	
+    dIfTxStatsHCPkts512to1023Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets) 
+            transmitted that were between 512 and 1023 octets in length 
+            inclusive (excluding framing bits but including FCS octets).
+           
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfTxStatsEntry 6 }     	
+    	
+    dIfTxStatsHCPkts1024to1518Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets) 
+            transmitted that were between 1024 and 1518 octets in length 
+            inclusive (excluding framing bits but including FCS octets).           
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfTxStatsEntry 7 }     	
+    	
+    dIfTxStatsHCPkts1519to1522Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of good VLAN packets transmitted that were 
+            between 1519 and 1522 octets in length inclusive 
+            (excluding framing bits but including FCS octets).  
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfTxStatsEntry 8 }     	
+    	
+    dIfTxStatsHCPkts1519to2047Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets) 
+            transmitted that were between 1519 and 2047 octets in length 
+            inclusive (excluding framing bits but including FCS octets).  
+ 
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfTxStatsEntry 9 }     	
+    	
+    dIfTxStatsHCPkts2048to4095Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets) 
+            transmitted that were between 2048 and 4095 octets in length 
+            inclusive (excluding framing bits but including FCS octets).  
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfTxStatsEntry 10 }     	
+    	
+    dIfTxStatsHCPkts4096to9216Octets OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets (including bad packets) 
+            transmitted that were between 4096 and 9216 octets in length 
+            inclusive (excluding framing bits but including FCS octets).  
+ 
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."           
+        ::= { dIfTxStatsEntry 11 } 
+
+    dIfTxStatsFCSErrors OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of packets to be transmitted that 
+            are not pass the FCS check."           
+        ::= { dIfTxStatsEntry 12 }
+
+-- -----------------------------------------------------------------------------
+    dIfCounterTxDropTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIfCounterTxDropEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current 
+        DESCRIPTION           
+            "This table is used to display transmiting statistics for 
+            discarded packets on interfaces."
+        ::= { dIfCounterTxStatistics 2}    
+
+    dIfCounterTxDropEntry OBJECT-TYPE
+        SYNTAX          DIfCounterTxDropEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains transmiting statistics for discarded packets
+            on an interface"
+        INDEX                 { ifIndex }
+        ::= { dIfCounterTxDropTable 1 }
+        
+    DIfCounterTxDropEntry ::= SEQUENCE 
+    	{
+            dIfCounterTxSTPDrops      Counter64,
+            dIfCounterTxHOLDrops      Counter64,
+            dIfCounterTxCOS0Drops     Counter64,
+            dIfCounterTxCOS1Drops     Counter64,
+            dIfCounterTxCOS2Drops     Counter64,
+            dIfCounterTxCOS3Drops     Counter64,
+            dIfCounterTxCOS4Drops     Counter64,
+            dIfCounterTxCOS5Drops     Counter64,
+            dIfCounterTxCOS6Drops     Counter64,
+            dIfCounterTxCOS7Drops     Counter64       
+    	}
+
+    dIfCounterTxSTPDrops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Incremented for packets dropped when egress port is
+            not in forwarding state."
+    	::= { dIfCounterTxDropEntry 1}
+    	
+    dIfCounterTxHOLDrops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Incremented for each packet dropped due to Head Of Line blocking."
+    	::= { dIfCounterTxDropEntry 2 }
+
+    dIfCounterTxCOS0Drops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Incremented for each packet dropped due to Head of Line blocking
+            on the egress CoS queue 0."
+    	::= { dIfCounterTxDropEntry 3 }
+
+    dIfCounterTxCOS1Drops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Incremented for each packet drop due to Head of Line blocking  
+            on the egress CoS queue 1."
+    	::= { dIfCounterTxDropEntry 4 }
+ 
+     dIfCounterTxCOS2Drops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Incremented for each packet drop due to
+            Head of Line blocking on the egress CoS queue 2."
+    	::= { dIfCounterTxDropEntry 5 }
+ 
+    dIfCounterTxCOS3Drops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Incremented for each packet drop due to
+            Head of Line blocking on the egress CoS queue 3."
+    	::= { dIfCounterTxDropEntry 6 } 
+ 
+    dIfCounterTxCOS4Drops OBJECT-TYPE
+	    SYNTAX          Counter64
+	    MAX-ACCESS      read-only
+	    STATUS          current
+	    DESCRIPTION
+            "Incremented for each packet drop due to
+            Head of Line blocking on the egress CoS queue 4."
+    	::= { dIfCounterTxDropEntry 7 } 
+ 
+    dIfCounterTxCOS5Drops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Incremented for each packet drop due to
+            Head of Line blocking on the egress CoS queue 5."
+    	::= { dIfCounterTxDropEntry 8 } 
+ 
+    dIfCounterTxCOS6Drops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Incremented for each packet drop due to
+            Head of Line blocking on the egress CoS queue 6."
+    	::= { dIfCounterTxDropEntry 9 } 
+ 
+    dIfCounterTxCOS7Drops OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Incremented for each packet drop due to
+            Head of Line blocking on the egress CoS queue 7."
+    	::= { dIfCounterTxDropEntry 10 } 
+
+-- -----------------------------------------------------------------------------
+    dIfCounterCompliances OBJECT IDENTIFIER ::= { dIfCounterConformance 1 }
+    dIfCounterGroups	OBJECT IDENTIFIER ::= { dIfCounterConformance 2 }
+
+--  compliance statements
+
+    dIfCounterCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION
+            "The compliance statement for entities which implement the
+            DLINKSW-IF-COUNTER-MIB."
+
+        MODULE  -- this module
+        MANDATORY-GROUPS 
+            { 
+            	dIfCounterUtilizationGroup,
+            	dIfCounterClearCtrlGroup,
+            	dIfCounterHCStatsGroup
+            }
+
+        GROUP dIfCounterIfLinkChangeGroup
+            DESCRIPTION
+                "This group is mandatory for those devices support counting
+                the number of link change events."
+
+        GROUP dIfCounterDropStatsGroup
+            DESCRIPTION
+                "This group is mandatory for those devices support statistics
+                information dropped by specified interface."
+        ::= { dIfCounterCompliances 1 }
+
+--  units of conformance
+    dIfCounterIfLinkChangeGroup OBJECT-GROUP
+        OBJECTS             {
+            dIfCounterIfLinkChange
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects providing information about 
+            interface link change."
+        ::= { dIfCounterGroups 1 }
+
+    dIfCounterUtilizationGroup OBJECT-GROUP
+        OBJECTS             {
+            dIfCounterIfUtilizationRx,
+            dIfCounterIfUtilizationTx,
+            dIfCounterIfUtilizationUtil
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects providing information about
+            interface utilization."
+        ::= { dIfCounterGroups 2 }
+        
+    dIfCounterClearCtrlGroup OBJECT-GROUP
+        OBJECTS             {
+            dIfCounterClearAll,
+            dIfCounterClearIf
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects for clearing counters on interfaces."
+        ::= { dIfCounterGroups 3 }
+
+    dIfCounterHCStatsGroup OBJECT-GROUP
+        OBJECTS             {
+            dIfRxStatsHCPkts,
+            dIfRxStatsHCPkts64Octets,
+            dIfRxStatsHCPkts65to127Octets,
+            dIfRxStatsHCPkts128to255Octets,
+            dIfRxStatsHCPkts256to511Octets,
+            dIfRxStatsHCPkts512to1023Octets,
+            dIfRxStatsHCPkts1024to1518Octets,
+            dIfRxStatsHCPkts1519to1522Octets,
+            dIfRxStatsHCPkts1519to2047Octets,
+            dIfRxStatsHCPkts2048to4095Octets,
+            dIfRxStatsHCPkts4096to9216Octets,
+            dIfTxStatsHCPkts,
+            dIfTxStatsHCPkts64Octets,
+            dIfTxStatsHCPkts65to127Octets,
+            dIfTxStatsHCPkts128to255Octets,
+            dIfTxStatsHCPkts256to511Octets,
+            dIfTxStatsHCPkts512to1023Octets,
+            dIfTxStatsHCPkts1024to1518Octets,
+            dIfTxStatsHCPkts1519to1522Octets,
+            dIfTxStatsHCPkts1519to2047Octets,
+            dIfTxStatsHCPkts2048to4095Octets,
+            dIfTxStatsHCPkts4096to9216Octets,
+            dIfTxStatsFCSErrors
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects providing additional statistics which are 
+            not covered in standard MIBs."
+        ::= { dIfCounterGroups 4 }
+        
+    dIfCounterDropStatsGroup OBJECT-GROUP
+        OBJECTS             {
+            dIfCounterRxBufferFullDrops,
+            dIfCounterRxACLDrops,
+            dIfCounterRxMulticastDrops,
+            dIfCounterRxVLANIngressDrops,
+            dIfCounterRxIPv6Drops,
+            dIfCounterRxSTPDrops,
+            dIfCounterRxStormAndTableDiscard,
+            dIfCounterRxMTUDrops,
+            dIfCounterRxInvalidDestPort,
+            dIfCounterRxBandwidthCtrlDrops,
+            dIfCounterTxSTPDrops,
+            dIfCounterTxHOLDrops,
+            dIfCounterTxCOS0Drops,
+            dIfCounterTxCOS1Drops,
+            dIfCounterTxCOS2Drops,
+            dIfCounterTxCOS3Drops,
+            dIfCounterTxCOS4Drops,
+            dIfCounterTxCOS5Drops,
+            dIfCounterTxCOS6Drops,
+            dIfCounterTxCOS7Drops
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects providing interface-specific statistics for  
+            dropped packets."
+        ::= { dIfCounterGroups 5 }
+
+END

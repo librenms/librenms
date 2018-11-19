@@ -1,0 +1,260 @@
+--  *****************************************************************
+--  DLINKSW-DHCP6-RELAY-MIB.mib : DHCPv6 Relay MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+DLINKSW-DHCP6-RELAY-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+		    FROM SNMPv2-CONF 
+        InterfaceIndex,
+        InterfaceIndexOrZero
+            FROM IF-MIB
+        TruthValue,
+        RowStatus,
+        DisplayString
+            FROM SNMPv2-TC        
+        InetAddressIPv6
+        	FROM INET-ADDRESS-MIB
+        dlinkIndustrialCommon			
+			FROM DLINK-ID-REC-MIB;
+
+     
+    dlinkSwDhcp6RelayMIB MODULE-IDENTITY
+        LAST-UPDATED "201309050000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "         D-Link Corporation
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:    +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for DHCPv6 Relay."
+
+        REVISION     "201301180000Z"
+        DESCRIPTION 
+            "First release of this MIB."
+
+        REVISION     "201309050000Z"
+        DESCRIPTION 
+            "Add dDhcp6RIfRelayDestOutIfIndex into the dDhcp6RIfRelayDestEntry INDEX"
+        ::= { dlinkIndustrialCommon 88 }
+
+--
+-- Textual conventions
+--	
+	RemoteIdType ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION 
+			"Represents a remote-id type to determine the content encoded in
+			relay agent Remote ID option.
+            default(1) - VLAN ID (2 bytes) + Module ID (1 byte) + 
+                         Port ID (1 byte) + System MAC address (6 bytes)
+            cidWithUserDefine(2) - VLAN ID (2 bytes) + Module ID (1 byte) + 
+                         Port ID (1 byte) + dDhcp6RRemoteIdUdfValue
+            userDefine(3) - dDhcp6RRemoteIdUdfValue             
+            " 
+								
+		SYNTAX INTEGER	{   
+			default(1),
+			cidWithUserDefine(2),
+			userDefine(3)
+	    }
+	    
+-- -----------------------------------------------------------------------------
+    dDhcp6RelayMIBNotifications    OBJECT IDENTIFIER ::= { dlinkSwDhcp6RelayMIB 0 }
+    dDhcp6RelayMIBObjects          OBJECT IDENTIFIER ::= { dlinkSwDhcp6RelayMIB 1 }
+    dDhcp6RelayMIBConformance      OBJECT IDENTIFIER ::= { dlinkSwDhcp6RelayMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dDhcp6RelayGeneral          OBJECT IDENTIFIER ::= { dDhcp6RelayMIBObjects 1 }
+    
+    dDhcp6RRemoteIdInsertEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the DHCPv6 relay agent inserts relay
+            agent Remote ID option (option 37)."            
+        DEFVAL          { false } 
+        ::= { dDhcp6RelayGeneral 1 }
+
+    dDhcp6RRemoteIdPolicy OBJECT-TYPE
+        SYNTAX          INTEGER { drop(1), keep(2)}
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the re-forwarding policy of DHCPv6 relay agent
+             Remote ID (option 37).              
+             drop (1)    - discards the packet that already has option 37.  
+             keep (2)    - the DHCP requests packet that already has option 37 
+                           is left unchanged and directly relayed to the 
+                           DHCPv6 server."
+        DEFVAL          { keep }
+        ::= { dDhcp6RelayGeneral 2 }
+    
+    dDhcp6RRemoteIdFormat OBJECT-TYPE
+        SYNTAX          RemoteIdType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the encoding type of relay agent remote ID."
+        ::= { dDhcp6RelayGeneral 3 }
+        
+    dDhcp6RRemoteIdUdfType OBJECT-TYPE
+        SYNTAX  INTEGER {
+		    string(1),
+		    hex(2)
+		}
+	    MAX-ACCESS      read-write
+	    STATUS          current
+	    DESCRIPTION
+		    "This object indicates the type of dDhcp6RRemoteIdUdfValue.
+		    string(1): The type of option value is character string. 		               
+		    hex(2)   : The type of option value is hexadecimal string."		   
+	    ::= { dDhcp6RelayGeneral 4 }
+	    
+    dDhcp6RRemoteIdUdfValue OBJECT-TYPE
+	    SYNTAX          DisplayString
+	    MAX-ACCESS      read-write
+	    STATUS          current
+	    DESCRIPTION
+		    "This object indicates the user defined field which will be used to
+		    encode the relay agent Remote ID option.
+		    dDhcp6RRemoteIdUdfValue is always interpreted within the context
+		    of an dDhcp6RRemoteIdUdfType value."		    	   		    
+	    ::= { dDhcp6RelayGeneral 5 }  
+
+-- -----------------------------------------------------------------------------        
+    dDhcp6RelayIfObjects          OBJECT IDENTIFIER ::= { dDhcp6RelayMIBObjects 2 }
+    
+    dDhcp6RIfRelayDestTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DDhcp6RIfRelayDestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table is a list of destination addresses for DHCPv6 relay. 
+            Once a destination address is configured on an interface, the DHCPv6
+            relay function is enabled on that interface. Multiple relay addresses
+            can be configured for an interface. If all relay addresses of an 
+            interface are removed, the DHCPv6 relay function on that interface
+            is disabled."
+        ::= { dDhcp6RelayIfObjects 1 }
+
+    dDhcp6RIfRelayDestEntry OBJECT-TYPE
+        SYNTAX          DDhcp6RIfRelayDestEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+              "An entry in dDhcp6RIfRelayDestTable containing the information about
+              DHCPv6 relay on an interface."
+        INDEX   { 
+            dDhcp6RIfRelayDestIndex,
+            dDhcp6RIfRelayDestDestAddr,
+            dDhcp6RIfRelayDestOutIfIndex }
+        ::= { dDhcp6RIfRelayDestTable 1 }
+
+    DDhcp6RIfRelayDestEntry ::= SEQUENCE {
+        dDhcp6RIfRelayDestIndex             InterfaceIndex,
+        dDhcp6RIfRelayDestDestAddr          InetAddressIPv6,
+        dDhcp6RIfRelayDestOutIfIndex        InterfaceIndexOrZero,
+        dDhcp6RIfRelayDestRowStatus      	RowStatus
+    }
+
+    dDhcp6RIfRelayDestIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex of the DHCPv6 relay interface.
+            Only VLAN interfaces are valid interfaces. "
+        ::= { dDhcp6RIfRelayDestEntry 1 }
+
+    dDhcp6RIfRelayDestDestAddr OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The DHCPv6 Relay destination address."
+        ::= { dDhcp6RIfRelayDestEntry 2 }
+        
+    dDhcp6RIfRelayDestOutIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex value of the destination VLAN 
+            interface.
+            The special value 0 indicates the output interface for the relay
+            destination is unspecified."
+        ::= { dDhcp6RIfRelayDestEntry 3 }
+        
+    dDhcp6RIfRelayDestRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dDhcp6RIfRelayDestEntry 4 }
+
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************
+    dDhcp6RelayCompliances OBJECT IDENTIFIER ::= { dDhcp6RelayMIBConformance 1 }
+		
+	dDhcp6RelayCompliance MODULE-COMPLIANCE
+		STATUS          current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINKSW-DHCP6-RELAY-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+		    dDhcp6RBasicGroup		    
+		}					
+		GROUP       dDhcp6RelayOption37Group
+        DESCRIPTION
+              "This group is required only if the agent supports relay agent
+              Remote ID (option 37)."
+                		                    
+	    ::= { dDhcp6RelayCompliances 1 }
+		
+	dDhcp6RelayGroups OBJECT IDENTIFIER ::= { dDhcp6RelayMIBConformance 2 }
+	
+	dDhcp6RBasicGroup OBJECT-GROUP
+		OBJECTS {
+		    dDhcp6RIfRelayDestRowStatus 
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to  
+		    DHCPv6 relay configuration on an interface."
+		::= { dDhcp6RelayGroups 1 }
+
+		
+	dDhcp6RelayOption37Group OBJECT-GROUP
+		OBJECTS { 
+		    dDhcp6RRemoteIdInsertEnabled, 
+		    dDhcp6RRemoteIdPolicy, 
+		    dDhcp6RRemoteIdFormat, 
+		    dDhcp6RRemoteIdUdfType, 
+		    dDhcp6RRemoteIdUdfValue		    
+	    }
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to  
+		    DHCPv6 relay agent Remote ID configuration."
+		::= { dDhcp6RelayGroups 2 }
+
+
+END
+

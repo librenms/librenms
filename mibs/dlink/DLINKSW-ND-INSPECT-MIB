@@ -1,0 +1,295 @@
+-- *****************************************************************
+-- DLINKSW-ND-INSPECT-MIB: ND Inspection MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+DLINKSW-ND-INSPECT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Unsigned32,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    TruthValue,
+    RowStatus,
+    DisplayString
+        FROM SNMPv2-TC
+
+    ifIndex
+        FROM IF-MIB
+
+    dlinkIndustrialCommon
+        FROM DLINK-ID-REC-MIB;
+
+dlinkSwNdInspecMIB MODULE-IDENTITY
+    LAST-UPDATED "201307180000Z"
+    ORGANIZATION "D-Link Corp."
+    CONTACT-INFO
+        "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+        "
+    DESCRIPTION
+        "This MIB module defines objects for ND Inspection."
+    REVISION    "201307180000Z"
+    DESCRIPTION
+         "This is the first version of the MIB file.
+         "
+    ::= { dlinkIndustrialCommon 144 }
+
+--
+-- Textual Conventions
+--
+
+
+-- -----------------------------------------------------------------------------
+dNdInspecNotifications  OBJECT IDENTIFIER ::= { dlinkSwNdInspecMIB 0 }
+dNdInspecObjects        OBJECT IDENTIFIER ::= { dlinkSwNdInspecMIB 1 }
+dNdInspecConformance    OBJECT IDENTIFIER ::= { dlinkSwNdInspecMIB 2 }
+
+dNdInspecPolicy         OBJECT IDENTIFIER ::= { dNdInspecObjects 1 }
+dNdInspecInterface      OBJECT IDENTIFIER ::= { dNdInspecObjects 2 }
+
+-- -----------------------------------------------------------------------------
+    dNdInspecPolicyNumber  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of entries present in ND inspection policy
+             table."
+        ::= { dNdInspecPolicy 1 }
+
+    dNdInspecPolicyTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DNdInspecPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains information about ND inspection policies."
+        ::= { dNdInspecPolicy 2 }
+
+    dNdInspecPolicyEntry OBJECT-TYPE
+        SYNTAX          DNdInspecPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry defined in dNdInspecPolicyTable. An entry is 
+            created/removed when an ND inspection policy is created/deleted."
+        INDEX { dNdInspecPolicyName }
+        ::= { dNdInspecPolicyTable 1 }
+
+    DNdInspecPolicyEntry ::= SEQUENCE {
+        dNdInspecPolicyName              DisplayString,
+        dNdInspecPolicyDeviceRole        INTEGER,
+        dNdInspecPolicyValidateSrcMac    TruthValue,
+        dNdInspecPolicyRowStatus         RowStatus
+    }
+
+    dNdInspecPolicyName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of the ND inspection policy."
+        ::= { dNdInspecPolicyEntry 1 }
+
+    dNdInspecPolicyDeviceRole OBJECT-TYPE
+        SYNTAX      INTEGER {
+            host(1),
+            router(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Indicates the role of the attached device.
+             host: The NS/NA messages will be inspected.
+             router: The NS/NA inspection is not performed.
+            "
+        DEFVAL { host }
+        ::= { dNdInspecPolicyEntry 2 }
+        
+    dNdInspecPolicyValidateSrcMac OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether check the source MAC address against 
+             the link-layer address for ND messages.
+            "
+        DEFVAL { false }
+        ::= { dNdInspecPolicyEntry 3 }
+        
+    dNdInspecPolicyRowStatus  OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object allows the dynamic creation and deletion of a policy."
+        ::= { dNdInspecPolicyEntry 99 }
+
+-- -----------------------------------------------------------------------------
+    dNdInspecIfConfigTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DNdInspecIfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the mechanism to attach ND inspection policy at
+            each physical interface capable of this feature.
+            "
+        ::= { dNdInspecInterface 1 }
+
+    dNdInspecIfConfigEntry OBJECT-TYPE
+        SYNTAX          DNdInspecIfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A row instance contains the configuration to enable or
+             disable state for ND inspection at each physical interface 
+             capable of this feature.
+            "
+        INDEX { ifIndex }
+        ::= { dNdInspecIfConfigTable 1 }
+
+    DNdInspecIfConfigEntry ::= SEQUENCE {
+        dNdInspecIfEnabled       TruthValue
+    }
+
+    dNdInspecIfEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the state of ND inspection on the interface.
+
+            If this object is set to 'true', ND inspection is enabled on the
+            interface.
+        
+            If this object is set to 'false', ND inspection is disabled on the
+            interface. 
+            "
+    ::= { dNdInspecIfConfigEntry 1 }
+
+-- -----------------------------------------------------------------------------
+    dNdInspecIfAttachTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DNdInspecIfAttachEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the mechanism to configure the policy attaching
+            state for ND inspection at each physical interface capable of this feature.
+            "
+        ::= { dNdInspecInterface 2 }
+
+    dNdInspecIfAttachEntry OBJECT-TYPE
+        SYNTAX          DNdInspecIfAttachEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A row instance contains the configuration to attach ND inspection policy 
+            at each physical interface capable of this feature.
+            "
+        INDEX { ifIndex }
+        ::= { dNdInspecIfAttachTable 1 }
+
+    DNdInspecIfAttachEntry ::= SEQUENCE {
+        dNdInspecIfAttachPolicy       DisplayString,
+        dNdInspecIfAttachRowStatus    RowStatus
+    }
+
+    dNdInspecIfAttachPolicy OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of ND inspection policy attached on
+            the interface.
+            "
+        ::= { dNdInspecIfAttachEntry 1 }
+
+    dNdInspecIfAttachRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+            and removal conventions for conceptual rows."
+        ::= { dNdInspecIfAttachEntry 99 }
+
+-- Conformance
+
+dNdInspecMIBCompliances     OBJECT IDENTIFIER ::= { dNdInspecConformance 1 }
+
+dNdInspecMIBGroups          OBJECT IDENTIFIER ::= { dNdInspecConformance 2 }
+
+dNdInspecMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for DLINKSW-ND-INSPECT-MIB."
+    MODULE
+    MANDATORY-GROUPS {
+            dNdInspecIfConfigGroup
+    }
+
+    GROUP dNdInspecPolicyGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which supports
+         the configuration of ND inspection policy."
+
+    GROUP dNdInspecIfAttachGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which supports
+         attaching ND inspection policy per interface."
+
+    ::= { dNdInspecMIBCompliances 1 }
+
+-- Units of Conformance
+
+dNdInspecIfConfigGroup OBJECT-GROUP
+    OBJECTS {
+        dNdInspecIfEnabled
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects which are used to configure as
+         well as show information regarding the ND inspection feature
+         per interface."
+    ::= { dNdInspecMIBGroups 1 }
+
+dNdInspecPolicyGroup OBJECT-GROUP
+    OBJECTS {
+        dNdInspecPolicyNumber,
+        dNdInspecPolicyDeviceRole,
+        dNdInspecPolicyValidateSrcMac,
+        dNdInspecPolicyRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects which are used to configure as
+         well as show information regarding the ND inspection policy."
+    ::= { dNdInspecMIBGroups 2 }
+
+dNdInspecIfAttachGroup OBJECT-GROUP
+    OBJECTS {
+        dNdInspecIfAttachPolicy,
+        dNdInspecIfAttachRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of object which are used to configure as
+         well as show information regarding the attaching policy 
+         of interface."
+    ::= { dNdInspecMIBGroups 3 }
+
+END
+
+
