@@ -84,7 +84,6 @@ class Location extends Model
     public function lookupCoordinates()
     {
         if ($this->location) {
-            \Log::debug('Looking up location coordinates via API');
             /** @var \LibreNMS\Interfaces\Geocoder $api */
             $api = app(\LibreNMS\Interfaces\Geocoder::class);
             $this->fill($api->getCoordinates($this->location));
