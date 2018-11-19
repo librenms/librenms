@@ -80,7 +80,8 @@ class MapquestApi extends BaseApi implements Geocoder
      * @param array $data decoded response data
      * @return bool
      */
-    protected function checkResponse($response, $data) {
+    protected function checkResponse($response, $data)
+    {
         return $response->getStatusCode() == 200 && $data['info']['statuscode'] == 0;
     }
 }
