@@ -25,6 +25,10 @@ function printEntPhysical($device, $ent, $level, $class)
             }
         } elseif ($ent['entPhysicalClass'] == 'backplane') {
             echo '<i class="fa fa-bars fa-lg icon-theme" aria-hidden="true"></i> ';
+        } elseif ($ent['entPhysicalClass'] == 'stack') {
+            echo '<i class="fa fa-list-ol fa-lg icon-theme" aria-hidden="true"></i> ';
+        } elseif ($ent['entPhysicalClass'] == 'powerSupply') {
+            echo '<i class="fa fa-bolt fa-lg icon-theme" aria-hidden="true"></i> ';
         }
 
         if ($ent['entPhysicalParentRelPos'] > '-1') {
@@ -96,6 +100,14 @@ function printEntPhysical($device, $ent, $level, $class)
         }
 
         echo "<br /><div class='interface-desc' style='margin-left: 20px;'>".$ent['entPhysicalDescr'];
+
+        if ($ent['entPhysicalAlias'] && $ent['entPhysicalAssetID']) {
+            echo " <br />Alias: ".$ent['entPhysicalAlias']." - AssetID: ".$ent['entPhysicalAssetID'];
+        } elseif ($ent['entPhysicalAlias']) {
+            echo " <br />Alias: ".$ent['entPhysicalAlias'];
+        } elseif ($ent['entPhysicalAssetID']) {
+            echo " <br />AssetID: ".$ent['entPhysicalAssetID'];
+        }
 
         if ($ent['entPhysicalSerialNum']) {
             echo " <br /><span style='color: #000099;'>Serial No. ".$ent['entPhysicalSerialNum'].'</span> ';
