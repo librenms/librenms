@@ -1,5 +1,7 @@
 sudo: required
 language: php
+addons:
+  chrome: stable
 services:
   - mysql
 env:
