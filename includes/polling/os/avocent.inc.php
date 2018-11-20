@@ -7,9 +7,9 @@ $serial   = $avocent_tmp['pmSerialNumber.0'];
 $version  = $avocent_tmp['pmFirmwareVersion.0'];
 
 if (empty($hardware)) {
-    if (str_start($poll_device['sysObjectID'], '.1.3.6.1.4.1.10418.16')) {
+    if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.10418.16')) {
         $avocent_oid = '.1.3.6.1.4.1.10418.16.2.1';
-    } elseif (str_start($poll_device['sysObjectID'], '.1.3.6.1.4.1.10418.26')) {
+    } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.10418.26')) {
         $avocent_oid = '.1.3.6.1.4.1.10418.26.2.1';
     }
     if ($avocent_oid) {
