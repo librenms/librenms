@@ -1256,7 +1256,7 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
     if (!empty($items)) {
         foreach ($items as $item) {
             $output .= '
-            <div class="form-group has-feedback">
+            <div class="form-group has-feedback ' . (isset($item['class']) ? $item['class'] : '') . '">
                 <label for="' . $item['name'] . '"" class="col-sm-4 control-label">' . $item['descr'] . ' </label>
                 <div data-toggle="tooltip" title="' . $config_groups[$item['name']]['config_descr'] . '" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
                 <div class="col-sm-4">
@@ -1282,7 +1282,7 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
                 ';
             } elseif ($item['type'] == 'select') {
                 $output .= '
-                <select id="' . $config_groups[$item['name']]['name'] . '" class="form-control" name="global-config-select" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
+                <select id="' . ($config_groups[$item['name']]['name'] ?: $item['name']) . '" class="form-control" name="global-config-select" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
                 ';
                 if (!empty($item['options'])) {
                     foreach ($item['options'] as $option) {
