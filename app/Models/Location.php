@@ -25,6 +25,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -84,9 +85,13 @@ class Location extends Model
     public function lookupCoordinates()
     {
         if ($this->location) {
-            /** @var \LibreNMS\Interfaces\Geocoder $api */
-            $api = app(\LibreNMS\Interfaces\Geocoder::class);
-            $this->fill($api->getCoordinates($this->location));
+            try {
+                /** @var \LibreNMS\Interfaces\Geocoder $api */
+                $api = app(\LibreNMS\Interfaces\Geocoder::class);
+                $this->fill($api->getCoordinates($this->location));
+            } catch (BindingResolutionException $e) {
+                // could not resolve geocoder, Laravel isn't booted. Fail silently.
+            }
         }
     }
 
