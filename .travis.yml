@@ -3,7 +3,8 @@ language: php
 services:
   - mysql
 env:
-  APP_ENV=testing
+  global:
+    APP_ENV=testing
 matrix:
   fast_finish: true
   include:
