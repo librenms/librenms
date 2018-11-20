@@ -97,13 +97,13 @@ class AppServiceProvider extends ServiceProvider
                 case 'bing':
                     Log::debug('Bing geocode engine');
                     return $app->make(\App\ApiClients\BingApi::class);
-                case 'google':
-                    Log::debug('Google Maps geocode engine');
-                    return $app->make(\App\ApiClients\GoogleMapsApi::class);
-                default:
                 case 'openstreetmap':
                     Log::debug('OpenStreetMap geocode engine');
                     return $app->make(\App\ApiClients\NominatimApi::class);
+                default:
+                case 'google':
+                    Log::debug('Google Maps geocode engine');
+                    return $app->make(\App\ApiClients\GoogleMapsApi::class);
             }
         });
     }

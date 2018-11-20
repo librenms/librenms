@@ -10,8 +10,8 @@ $location_conf = [
         'descr'   => 'Geocoding Engine',
         'type'    => 'select',
         'options' => [
-            ['value' => 'openstreetmap', 'description' => 'OpenStreetMap'],
             ['value' => 'google', 'description' => 'Google Maps'],
+            ['value' => 'openstreetmap', 'description' => 'OpenStreetMap'],
             ['value' => 'mapquest', 'description' => 'MapQuest'],
             ['value' => 'bing', 'description' => 'Bing Maps'],
         ]
