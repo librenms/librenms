@@ -45,6 +45,12 @@ if ($used_sensors['current']) {
 if ($used_sensors['power']) {
     $datas[] = 'power';
 }
+if ($used_sensors['power_consumed']) {
+    $datas[] = 'power_consumed';
+}
+if ($used_sensors['power_factor']) {
+    $datas[] = 'power_factor';
+}
 if ($used_sensors['dbm']) {
     $datas[] = 'dbm';
 }
@@ -102,6 +108,8 @@ $type_text['frequency'] = "Frequency";
 $type_text['runtime'] = "Runtime";
 $type_text['current'] = "Current";
 $type_text['power'] = "Power";
+$type_text['power_consumed'] = "Power Consumed";
+$type_text['power_factor'] = "Power Factor";
 $type_text['toner'] = "Toner";
 $type_text['dbm'] = "dBm";
 $type_text['load'] = "Load";

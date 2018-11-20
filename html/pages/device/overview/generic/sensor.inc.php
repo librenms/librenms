@@ -34,6 +34,12 @@ if (count($sensors)) {
         case "power":
             $sensor_fa_icon = "fa-power-off";
             break;
+        case "power_consumed":
+            $sensor_fa_icon = "fa-plug";
+            break;
+        case "power_factor":
+            $sensor_fa_icon = "fa-calculator";
+            break;
         case "dBm":
             $sensor_fa_icon = "fa-signal";
             break;

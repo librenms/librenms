@@ -23,6 +23,8 @@ Currently we have support for the following health metrics along with the values
 | humidity                        | %                           |
 | load                            | %                           |
 | power                           | W                           |
+| power_consumed                  | kWh                         |
+| power_factor                    | ratio                       |
 | pressure                        | kPa                         |
 | quality_factor                  | dB                          |
 | runtime                         | Min                         |

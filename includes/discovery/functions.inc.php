@@ -401,6 +401,10 @@ function sensor_low_limit($class, $current)
         case 'power':
             $limit = null;
             break;
+        case 'power_consumed':
+        case 'power_factor':
+            $limit = -1;
+            break;
         case 'signal':
             $limit = -80;
             break;
@@ -446,6 +450,10 @@ function sensor_limit($class, $current)
         case 'current':
         case 'power':
             $limit = $current * 1.50;
+            break;
+        case 'power_consumed':
+        case 'power_factor':
+            $limit = 1;
             break;
         case 'fanspeed':
             $limit = $current * 1.80;

@@ -48,6 +48,8 @@ $run_sensors = array(
     'humidity',
     'load',
     'power',
+    'power_consumed',
+    'power_factor',
     'runtime',
     'signal',
     'state',
