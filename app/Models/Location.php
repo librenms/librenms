@@ -82,8 +82,12 @@ class Location extends Model
         if (!$this->hasCoordinates() && $this->location) {
             $this->parseCoordinates();
 
-            if (!$this->hasCoordinates() && \LibreNMS\Config::get('geoloc.latlng', true)) {
+            if (!$this->hasCoordinates() &&
+                \LibreNMS\Config::get('geoloc.latlng', true) &&
+                $this->timestamp->diffInDays() > 2
+            ) {
                 $this->fetchCoordinates();
+                $this->updateTimestamps();
             }
         }
     }
