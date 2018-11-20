@@ -1,0 +1,51 @@
+mib: SCHLEIFENBAUER-DATABUS-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: sdbMgmtStsRingState
+                    num_oid: '.1.3.6.1.4.1.31034.12.1.1.1.1.5.{{ $index }}'
+                    entPhysicalIndex: '2'
+                    descr: 'Databus Ring State'
+                    index: 'sdbMgmtStsRingState.{{ $index }}'
+                    state_name: sdbMgmtStsRingState
+                    states:
+                        - { value: 0, generic: 2, graph: 0, descr: open }
+                        - { value: 1, generic: 0, graph: 1, descr: closed }
+                -
+                    oid: sdbMgmtStsDuplicateDevices
+                    num_oid: '.1.3.6.1.4.1.31034.12.1.1.1.1.4.{{ $index }}'
+                    entPhysicalIndex: '3'
+                    descr: 'Duplicate Device Addresses'
+                    index: 'sdbMgmtStsDuplicateDevices.{{ $index }}'
+                    state_name: sdbMgmtStsDuplicateDevices
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: no duplicates }
+                        - { value: 1, generic: 2, graph: 1, descr: 1 duplicate detected }
+                        - { value: 2, generic: 2, graph: 2, descr: 2 duplicates detected }
+                        - { value: 3, generic: 2, graph: 3, descr: 3 duplicates detected }
+                        - { value: 4, generic: 2, graph: 4, descr: 4 duplicates detected }
+                        - { value: 5, generic: 2, graph: 5, descr: 5 duplicates detected }
+                        - { value: 6, generic: 2, graph: 6, descr: 6 duplicates detected }
+                        - { value: 7, generic: 2, graph: 7, descr: 7 duplicates detected }
+                        - { value: 8, generic: 2, graph: 8, descr: 8 duplicates detected }
+                        - { value: 9, generic: 2, graph: 9, descr: 9 duplicates detected }
+                -
+                    oid: sdbMgmtStsNewDevices
+                    num_oid: '.1.3.6.1.4.1.31034.12.1.1.1.1.3.{{ $index }}'
+                    entPhysicalIndex: '4'
+                    descr: 'New Device Detection'
+                    index: 'sdbMgmtStsNewDevices.{{ $index }}'
+                    state_name: sdbMgmtStsNewDevices
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: no new devices }
+                        - { value: 1, generic: 1, graph: 1, descr: 1 new device detected }
+                        - { value: 2, generic: 1, graph: 2, descr: 2 new devices detected }
+                        - { value: 3, generic: 1, graph: 3, descr: 3 new devices detected }
+                        - { value: 4, generic: 1, graph: 4, descr: 4 new devices detected }
+                        - { value: 5, generic: 1, graph: 5, descr: 5 new devices detected }
+                        - { value: 6, generic: 1, graph: 6, descr: 6 new devices detected }
+                        - { value: 7, generic: 1, graph: 7, descr: 7 new devices detected }
+                        - { value: 8, generic: 1, graph: 8, descr: 8 new devices detected }
+                        - { value: 9, generic: 1, graph: 9, descr: 9 new devices detected }
