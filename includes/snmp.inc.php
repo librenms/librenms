@@ -222,27 +222,24 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
 {
     $time_start = microtime(true);
     $oid_limit = get_device_oid_limit($device);
+
     if (!is_array($oids)) {
         $oids = explode(" ", $oids);
     }
-    $oid_number = count($oids);
 
-    $oid_chunks = array_chunk($oids, $oid_limit);
     $data = [];
-    foreach ($oid_chunks as $chunk) {
+    foreach (array_chunk($oids, $oid_limit) as $chunk) {
         $partial_oids = implode(' ', $chunk);
         $cmd = gen_snmpget_cmd($device, $partial_oids, $options, $mib, $mibdir);
-        $query = trim(external_exec($cmd));
-        if (!empty($query)) {
-            dump($query);
-            $data[] = $query;
+        $result = trim(external_exec($cmd));
+        if ($result) {
+            array_merge($data, explode("\n", $result));
         }
     }
-    $data = implode("\n", $data);
 
     $array = array();
     $oid = '';
-    foreach (explode("\n", $data) as $entry) {
+    foreach ($data as $entry) {
         if (str_contains($entry, '=')) {
             list($oid,$value)  = explode('=', $entry, 2);
             $oid               = trim($oid);
