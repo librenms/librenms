@@ -61,7 +61,7 @@ Usage:
 $os_name = false;
 if (isset($options['o'])) {
     $os_name = $options['o'];
-} elseif (isset($os_list['os'])) {
+} elseif (isset($options['os'])) {
     $os_name = $options['os'];
 }
 
