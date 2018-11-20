@@ -20,6 +20,7 @@ $location_conf = [
         'name'     => 'geoloc.api_key',
         'descr'    => 'Geocoding API Key',
         'type'     => 'text',
+        'class'    => 'geoloc_api_key'
     ],
 ];
 
@@ -109,7 +110,17 @@ echo generate_dynamic_config_panel('Unix-agent integration', $config_groups, $un
 echo generate_dynamic_config_panel('RRDTool Setup', $config_groups, $rrdtool_conf);
 echo generate_dynamic_config_panel('PeeringDB Integration', $config_groups, $peeringdb_conf);
 
-echo '
+?>
+
     </form>
 </div>
-';
+<script>
+    $('#geoloc\\.engine').change(function () {
+        var engine = this.value;
+        if (engine === 'openstreetmap') {
+            $('.geoloc_api_key').hide();
+        } else {
+            $('.geoloc_api_key').show();
+        }
+    }).change(); // trigger initially
+</script>
