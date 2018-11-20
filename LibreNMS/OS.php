@@ -184,7 +184,7 @@ class OS implements ProcessorDiscovery
             }
         }
 
-        d_echo("OS initiliazed as Generic\n");
+        d_echo("OS initialized as Generic\n");
         return new Generic($device);
     }
 
