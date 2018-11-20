@@ -47,13 +47,7 @@ class Location extends Model
 
         static::creating(function (Location $location) {
             // parse coordinates for new locations
-            if (!$location->hasCoordinates()) {
-                $location->parseCoordinates();
-
-                if (!$location->hasCoordinates() && \LibreNMS\Config::get('geoloc.latlng', true)) {
-                    $location->lookupCoordinates();
-                }
-            }
+            $location->lookupCoordinates();
         });
     }
 
@@ -80,17 +74,16 @@ class Location extends Model
     }
 
     /**
-     * Call geocoding API to resolve latitude and longitude.
+     * Try to parse coordinates then
+     * call geocoding API to resolve latitude and longitude.
      */
     public function lookupCoordinates()
     {
-        if ($this->location) {
-            try {
-                /** @var \LibreNMS\Interfaces\Geocoder $api */
-                $api = app(\LibreNMS\Interfaces\Geocoder::class);
-                $this->fill($api->getCoordinates($this->location));
-            } catch (BindingResolutionException $e) {
-                // could not resolve geocoder, Laravel isn't booted. Fail silently.
+        if (!$this->hasCoordinates() && $this->location) {
+            $this->parseCoordinates();
+
+            if (!$this->hasCoordinates() && \LibreNMS\Config::get('geoloc.latlng', true)) {
+                $this->fetchCoordinates();
             }
         }
     }
@@ -109,6 +102,17 @@ class Location extends Model
     {
         if (preg_match($this->location_regex, $this->location, $parsed)) {
             $this->fill($parsed);
+        }
+    }
+
+    protected function fetchCoordinates()
+    {
+        try {
+            /** @var \LibreNMS\Interfaces\Geocoder $api */
+            $api = app(\LibreNMS\Interfaces\Geocoder::class);
+            $this->fill($api->getCoordinates($this->location));
+        } catch (BindingResolutionException $e) {
+            // could not resolve geocoder, Laravel isn't booted. Fail silently.
         }
     }
 
