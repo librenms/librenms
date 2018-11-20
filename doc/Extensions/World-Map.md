@@ -64,11 +64,11 @@ $config['geoloc']['api_key'] = "abcdefghijklmnopqrstuvwxyz";
 ```
 Google:
 Pros: fast, accurate
-Cons: requares a credit card even for free account
+Cons: requires a credit card even for a free account
 
 MapQuest:
 Pros: free, no credit card required
-Cons: inaccurate: most addresses are retured location at center of US
+Cons: inaccurate: most addresses are returned as locations at the center of the US
 
 Bing:
 Pros: free, no credit card required, accurate
