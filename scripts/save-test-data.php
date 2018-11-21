@@ -94,7 +94,6 @@ if ($os_name) {
     $os_list = ModuleTestHelper::findOsWithData($modules);
 }
 
-$output_file = null;
 if (isset($options['f'])) {
     if (count($os_list) != 1) {
         echo "Failed to create test data, -f/--file option can be used with one os/variant combination.\n";
