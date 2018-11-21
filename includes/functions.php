@@ -2479,22 +2479,20 @@ function db_schema_is_current()
  */
 function get_device_oid_limit($device)
 {
-    global $config;
-
-    //Some Os only work with specific max_oid values
-    if ((isset($device['os'], $config['os'][$device['os']]['snmp_max_oid']) && $config['os'][$device['os']]['snmp_max_oid'])) {
-        $max_oid = $config['os'][$device['os']]['snmp_max_oid'];
-    } else {
-        $max_oid = $device['snmp_max_oid'];
+    // device takes priority
+    if ($device['snmp_max_oid'] > 0) {
+        return $device['snmp_max_oid'];
     }
 
-    if (isset($max_oid) && $max_oid > 0) {
-        return $max_oid;
-    } elseif (isset($config['snmp']['max_oid']) && $config['snmp']['max_oid'] > 0) {
-        return $config['snmp']['max_oid'];
-    } else {
-        return 10;
+    // then os
+    $os_max = Config::getOsSetting($device['os'], 'snmp_max_oid', 0);
+    if ($os_max > 0) {
+        return $os_max;
     }
+
+    // then global
+    $global_max = Config::get('snmp.max_oid', 10);
+    return $global_max > 0 ? $global_max : 10;
 }
 
 /**
