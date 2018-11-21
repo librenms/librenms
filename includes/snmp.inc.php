@@ -221,17 +221,25 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
 function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
 {
     $time_start = microtime(true);
+    $oid_limit = get_device_oid_limit($device);
 
-    if (is_array($oids)) {
-        $oids = implode(' ', $oids);
+    if (!is_array($oids)) {
+        $oids = explode(" ", $oids);
     }
 
-    $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd));
+    $data = [];
+    foreach (array_chunk($oids, $oid_limit) as $chunk) {
+        $partial_oids = implode(' ', $chunk);
+        $cmd = gen_snmpget_cmd($device, $partial_oids, $options, $mib, $mibdir);
+        $result = trim(external_exec($cmd));
+        if ($result) {
+            $data = array_merge($data, explode("\n", $result));
+        }
+    }
 
     $array = array();
     $oid = '';
-    foreach (explode("\n", $data) as $entry) {
+    foreach ($data as $entry) {
         if (str_contains($entry, '=')) {
             list($oid,$value)  = explode('=', $entry, 2);
             $oid               = trim($oid);
