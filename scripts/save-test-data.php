@@ -94,6 +94,15 @@ if ($os_name) {
     $os_list = ModuleTestHelper::findOsWithData($modules);
 }
 
+if (isset($options['f'])) {
+    if (count($os_list) != 1) {
+        echo "Failed to create test data, -f/--file option can be used with one os/variant combination.\n";
+        echo "Multiple combinations (".count($os_list).") found.\n";
+        exit(1);
+    }
+    $output_file = $options['f'];
+}
+
 
 // Now use the saved data to update the saved database data
 $snmpsim = new Snmpsim();
@@ -121,7 +130,9 @@ try {
 
         update_os_cache(true); // Force update of OS Cache
         $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
-
+        if (!$no_save && !empty($output_file)) {
+            $tester->setJsonSavePath($output_file);
+        }
         $test_data = $tester->generateTestData($snmpsim, $no_save);
 
         if ($no_save) {
