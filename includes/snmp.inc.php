@@ -233,7 +233,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
         $cmd = gen_snmpget_cmd($device, $partial_oids, $options, $mib, $mibdir);
         $result = trim(external_exec($cmd));
         if ($result) {
-            array_merge($data, explode("\n", $result));
+            $data = array_merge($data, explode("\n", $result));
         }
     }
 
