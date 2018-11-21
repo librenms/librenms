@@ -17,7 +17,7 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 if (empty($results_limit)) {
     $results_limit = 25;
@@ -55,10 +55,10 @@ if (!empty($filter_device)) {
             "<option value=\"\">All devices</option>"+
 ';
 
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $results = dbFetchRows("SELECT `hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
     } else {
-        $results = dbFetchRows("SELECT `D`.`hostname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hostname` ORDER BY `hostname`", array(Auth::id()));
+        $results = dbFetchRows("SELECT `D`.`hostname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hostname` ORDER BY `hostname`", array(LegacyAuth::id()));
     }
 
     foreach ($results as $data) {

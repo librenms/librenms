@@ -12,9 +12,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
@@ -30,6 +30,7 @@ if (!is_numeric($config_id)) {
 } elseif ($action == 'update-textarea') {
     $extras = explode(PHP_EOL, $_POST['config_value']);
     $x=0;
+    $db_id = [];
     foreach ($extras as $option) {
         list($k,$v) = explode('=', $option, 2);
         if (!empty($k) || !empty($v)) {
@@ -56,28 +57,28 @@ if (!is_numeric($config_id)) {
         }
     }
 
-    $db_inserts = implode(',', $db_id);
-    if (!empty($db_inserts) || empty($_POST['config_value'])) {
+    if (!empty($db_id) || empty($_POST['config_value'])) {
         if (empty($_POST['config_value'])) {
-            $db_inserts = 0;
+            $db_id = [0];
         }
+        $placeholders = dbGenPlaceholders(count($db_id));
 
         if ($config_type == 'slack') {
-            dbDelete('config', "(`config_name` LIKE 'alert.transports.slack.$config_id.%' AND `config_name` != 'alert.transports.slack.$config_id.url' AND `config_id` NOT IN ($db_inserts))");
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.slack.$config_id.%' AND `config_name` != 'alert.transports.slack.$config_id.url' AND `config_id` NOT IN $placeholders)", $db_id);
         } elseif ($config_type == 'rocket') {
-            dbDelete('config', "(`config_name` LIKE 'alert.transports.rocket.$config_id.%' AND `config_name` != 'alert.transports.rocket.$config_id.url' AND `config_id` NOT IN ($db_inserts))");
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.rocket.$config_id.%' AND `config_name` != 'alert.transports.rocket.$config_id.url' AND `config_id` NOT IN $placeholders)", $db_id);
         } elseif ($config_type == 'hipchat') {
-            dbDelete('config', "(`config_name` LIKE 'alert.transports.hipchat.$config_id.%' AND (`config_name` != 'alert.transports.hipchat.$config_id.url' AND `config_name` != 'alert.transports.hipchat.$config_id.room_id' AND `config_name` != 'alert.transports.hipchat.$config_id.from') AND `config_id` NOT IN ($db_inserts))");
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.hipchat.$config_id.%' AND (`config_name` != 'alert.transports.hipchat.$config_id.url' AND `config_name` != 'alert.transports.hipchat.$config_id.room_id' AND `config_name` != 'alert.transports.hipchat.$config_id.from') AND `config_id` NOT IN $placeholders)", $db_id);
         } elseif ($config_type == 'pushover') {
-            dbDelete('config', "(`config_name` LIKE 'alert.transports.pushover.$config_id.%' AND (`config_name` != 'alert.transports.pushover.$config_id.appkey' AND `config_name` != 'alert.transports.pushover.$config_id.userkey') AND `config_id` NOT IN ($db_inserts))");
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.pushover.$config_id.%' AND (`config_name` != 'alert.transports.pushover.$config_id.appkey' AND `config_name` != 'alert.transports.pushover.$config_id.userkey') AND `config_id` NOT IN $placeholders)", $db_id);
         } elseif ($config_type == 'boxcar') {
-            dbDelete('config', "(`config_name` LIKE 'alert.transports.boxcar.$config_id.%' AND (`config_name` != 'alert.transports.boxcar.$config_id.access_token' AND `config_name` != 'alert.transports.boxcar.$config_id.userkey') AND `config_id` NOT IN ($db_inserts))");
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.boxcar.$config_id.%' AND (`config_name` != 'alert.transports.boxcar.$config_id.access_token' AND `config_name` != 'alert.transports.boxcar.$config_id.userkey') AND `config_id` NOT IN $placeholders)", $db_id);
         } elseif ($config_type == 'clickatell') {
-            dbDelete('config', "(`config_name` LIKE 'alert.transports.clickatell.to.%' AND `config_id` NOT IN ($db_inserts))");
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.clickatell.to.%' AND `config_id` NOT IN $placeholders)", $db_id);
         } elseif ($config_type == 'playsms') {
-            dbDelete('config', "(`config_name` LIKE 'alert.transports.playsms.to.%' AND `config_id` NOT IN ($db_inserts))");
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.playsms.to.%' AND `config_id` NOT IN $placeholders)", $db_id);
         } elseif ($config_type == 'smseagle') {
-            dbDelete('config', "(`config_name` LIKE 'alert.transports.smseagle.to.%' AND `config_id` NOT IN ($db_inserts))");
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.smseagle.to.%' AND `config_id` NOT IN $placeholders)", $db_id);
         }
     }
 

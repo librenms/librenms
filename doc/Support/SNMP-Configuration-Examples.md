@@ -1,4 +1,5 @@
 source: Support/SNMP-Configuration-Examples.md
+path: blob/master/doc/
 
 # SNMP configuration examples
 

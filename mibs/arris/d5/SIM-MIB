@@ -1,0 +1,2823 @@
+SIM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter32, IpAddress, BITS, enterprises 
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DisplayString 
+        FROM SNMPv2-TC 
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+        FROM SNMPv2-CONF;
+
+simMIB MODULE-IDENTITY
+   LAST-UPDATED "9707021700Z"
+ORGANIZATION "DVB Simulcrypt Technical Group" CONTACT-INFO " --- "
+   DESCRIPTION
+"The MIB module for defining DVB Simulcrypt Conditional
+ Access System configuration information."
+ ::= { enterprises 2696  1  1 }
+
+ECMGCSuCasId ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+       "Adding this to fix compile issue"
+   SYNTAX Unsigned32
+
+Signed16 ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+       "Adding this to fix compile issue"
+   SYNTAX INTEGER (0..65535)
+
+AdministrativeState ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"Administrative state as defined by ITU-T Recommendation X.734"
+   SYNTAX BITS
+   {
+      locked(0),
+      unlocked(1),
+      shuttingDown(2)
+   }
+
+CaDescInsMode ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"Conditional Access Descriptor Insertion Type."
+   SYNTAX BITS
+   {
+      psigInsertion(0),
+      noPsigInsertion(1)
+   }
+
+DelayType ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+      "Delay type."
+   SYNTAX BITS
+   {
+      immediate(0),
+      synchronized(1)
+   }
+ 
+DescriptorStatus ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"The return status of descriptor insertion."
+   SYNTAX BITS
+   {
+      success(0),
+      unknownTrigger(1),
+      unknownLocation(2),
+      unsupportedDelay(3),
+      unknownContext(4),
+      unknownOtherTS(5),
+      unknownNetwork(6),
+      unknownTS(7),
+      unknownES(8),
+      unknownBouquet(9),
+      unknownEvent(10),
+      tableNotSupported(11),
+      tableFull(12),
+      other(13)
+   }
+ 
+ECMGChannelId ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"The ECM_channel_ID is represented as a 2 bytes unsigned integer." 
+SYNTAX INTEGER (0..65535)
+
+ECMGDelayValue ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"The value od xxx_Delay_Start / _Stop in ECMG protocol."
+   SYNTAX Signed16
+
+ECMTriggerType ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"The type of an ECM trigger in a PSI generator."
+   SYNTAX BITS
+   {
+      ecmStreamOpen(0),
+      ecmStreamClose(1),
+      ecmStreamChange(2),
+      accessCriteriaChange(3)
+   }
+
+EMMGChannelId ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"Indicates the Data Channel Id." 
+SYNTAX INTEGER (0..65535)
+
+EMMGCommCapability ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"Type of communications capability between EMMG/PDG and Multiplexer:
+ TCP or UDP or both."
+   SYNTAX BITS
+   {
+      both(0),
+      tcp(1),
+      udp(2)
+   }
+
+EMMGCommType ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"Type of communications capability between EMMG/PDG and Multiplexer:
+ TCP or UDP."
+   SYNTAX BITS
+   {
+      tcp(0),
+      udp(1)
+   }
+
+EMMGDataType ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"Type of data carried in the EMMG/PDG Multiplexer stream."
+   SYNTAX BITS
+   {
+      emm(0),
+      other(1)
+   }
+ 
+FlowId ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"The flow identifier is represented as a 2 bytes unsigned integer." 
+SYNTAX INTEGER (0..65535)
+
+FlowType ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"Type of Flow: EMM, ECM, or private data."
+   SYNTAX BITS
+   {
+      ecm(0),
+      emm(1),
+      privatedata(2)
+   }
+
+InsertLocation ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+      "Descriptor insertion location."
+   SYNTAX BITS
+   {
+      pmtLoop1(0),
+      pmtLoop2(1),
+      cat(2),
+      nitLopp1ActualNet(3),
+      nitLoop2ActualNet(4),
+      nitLopp1OtherNet(5),
+      nitLoop2OtherNet(6),
+      batLoop1(7),
+      batLoop2(8),
+      sdtActualTS(9),
+      sdtOtherTS(10),
+      eitPFActualTS(11),
+      eitPFOtherTS(12),
+      eitScheduleActualTS(13),
+      eitScheduleOtherTS(14)
+   }
+
+ProvTableId ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+      "Provision table identifier."
+   SYNTAX BITS
+   {
+      pat(0),
+      cat(1),
+      pmt(2),
+      nitActualNet(3),
+      nitOtherNet(4),
+      bat(5),
+      sdtActualTS(6),
+      sdtOtherTS(7),
+      eitPFActualTS(8),
+      eitPFOtherTS(9),
+      eitScheduleActualTS(10),
+      eitScheduleOtherTS(11)
+   }
+
+PsigType ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+      "Psig type."
+   SYNTAX BITS
+   {
+      sig(0),
+      psig(1),
+      psisig(2)
+   }
+ 
+SectionTSPktFlag ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"Format of ECM, EMM, Private data datagrams: section or TS packet."
+   SYNTAX BITS
+   {
+      section(0),
+      tspacket(1)
+   }
+
+StreamId ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"The Stream_ID is represented as a 2 bytes unsigned integer." 
+SYNTAX INTEGER (0..65535)
+
+SuperCasId ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"SuperCASId / Client_ID: a unsigned 32-bit identifier."
+   SYNTAX Unsigned32
+
+TriggerType ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION
+"The type of a trigger in a PSI generator."
+   SYNTAX BITS
+   {
+      dvbEvent(0),
+      futureDvbEvent(1),
+      newEcmStream(2),
+      flowPidChange(3),
+      accessCriteriaChange(4),
+      ecmStreamClosure(5),
+      pdStreamCEvent(6)
+   }
+
+
+simMIBObjects	OBJECT IDENTIFIER ::= { simMIB 1 }
+simMIBConformance	OBJECT IDENTIFIER ::= { simMIB 2 } 
+
+simIdent	OBJECT IDENTIFIER ::= { simMIBObjects 1 } 
+simECMG	OBJECT IDENTIFIER ::= { simMIBObjects 2 } 
+simEMMG	OBJECT IDENTIFIER ::= { simMIBObjects 3 } 
+simCPSI	OBJECT IDENTIFIER ::= { simMIBObjects 4 } 
+simPSI	OBJECT IDENTIFIER ::= { simMIBObjects 5 }
+
+
+-- ---------------------------------------------------------------------------------
+-- Ident Group - This group is used for software configuration management
+-- of all Simulcrypt components and includes the following objects:
+--
+
+simSofwareVersion OBJECT-TYPE
+SYNTAX DisplayString (SIZE (80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"This contains a display string that defines the current version
+ of the software for this unit."
+ ::= { simIdent 1 }
+
+simMIBVersion OBJECT-TYPE
+SYNTAX DisplayString (SIZE (80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"This contains a display string that defines the current version
+ of the MIB."
+ ::= { simIdent 2}
+
+simMIBPrivateVersion OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"This contains a display string that defines the current private
+ version of the MIB."
+ ::= { simIdent 3}
+
+simAgentVersion OBJECT-TYPE
+SYNTAX DisplayString (SIZE (80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"This contains a display string that defines the current version
+ of the agent."
+ ::= { simIdent 4 }
+
+
+-- ---------------------------------------------------------------------------------
+-- ECM Generator Group - This group is used for configuration management and status
+-- monitoring of ECM Generators. It identifies each one of the ECM Generators by the
+-- IP Address and TCP/UDP Port Number. It also associates Super_CAS_IDs, ECM_Channel_IDs,
+-- and ECM_Stream_IDs with ECM Generators. It also associates status information and
+-- statistics with channels and streams. The ECM Generator Group consists of three
+-- conceptual tables. The first table is the interconnection table and is used for
+-- the Headend Network Manager to query the IP addresses and the port number to be used
+-- by an SCS to create a channel. It is indexed by a unique EcmgIndex which is an integer
+-- assigned by the ECMG agent.
+--
+
+simEcmgTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimEcmgEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table specifies the IP addresses and Port numbers of ECM Generators
+ to be used by headend managers to configure SCSs. This table is to be
+ used in ECM Generators and ECM Generator proxies."
+ ::= { simECMG 1 }
+
+simEcmgEntry OBJECT-TYPE
+   SYNTAX SimEcmgEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. Depending on whether this is
+an ECMG agent or ECMG proxy agent different table entries can 
+be omitted." 
+INDEX { simEcmgIndex}
+ ::= { simEcmgTable 1 }
+
+SimEcmgEntry ::= SEQUENCE {
+   simEcmgIndex      INTEGER ,
+   simEcmgIpAddress   IpAddress,
+   simEcmgTcpPort	   INTEGER,
+   simEcmgSuCasId	   SuperCasId,
+   simEcmgChannels    Counter32,
+   simEcmgCwPrs      Counter32,
+   simEcmgErrs       Counter32,
+   simEcmgTargetCpsig	INTEGER,
+   simEcmgCaMib	   OBJECT IDENTIFIER
+}
+
+simEcmgIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The ECM Generator Table unique index."
+ ::= { simEcmgEntry 1 }
+
+simEcmgIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"IP address of the host of the ECMG."
+ ::= { simEcmgEntry 2 }
+
+simEcmgTcpPort OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"TCP port of the ECMG."
+ ::= { simEcmgEntry 3 }
+
+simEcmgSuCasId OBJECT-TYPE
+   SYNTAX SuperCasId
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The Super_VAS_ID is formed by concatenation of the CA_system_id
+ (16 bit) and the CA_subsystem_ID (16 bit). It defines uniquely a
+ set of ECMGs for a given SCS."
+ ::= { simEcmgEntry 4 }
+
+simEcmgChannels OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of channels this ECMG is currently maintaining."
+ ::= { simEcmgEntry 5 }
+
+simEcmgCwPrs OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of CW provisioning requests received by this ECMG."
+ ::= { simEcmgEntry 6 }
+
+simEcmgErrs OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of communications errors for this ECMG."
+ ::= { simEcmgEntry 7 } 
+
+simEcmgTargetCpsig OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The index into the C(P)SIG table identifying the C(P)SIG associated
+ with this ECMG."
+ ::= { simEcmgEntry 8 }
+
+simEcmgCaMib OBJECT-TYPE
+   SYNTAX OBJECT IDENTIFIER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The pointer to a provider proprietary MIB (like ifSpecific 
+in the interfaces group of MIB II."
+ ::= { simEcmgEntry 9 }
+
+-- ---------------------------------------------------------------------------------
+-- ECMG Channel Table - Used for monitoring channel information. It is indexed
+-- by the ECMG Index from the ECMG table and the ChannelId.
+--
+
+simEcmgCTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimEcmgCEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table specifies information relating to ECMG/SCS channels including
+ the IP addresses and Port numbers of SCSs communicating
+ with the ECMG Generators. "
+ ::= { simECMG 2 }
+
+simEcmgCEntry OBJECT-TYPE
+   SYNTAX SimEcmgCEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. Depending on whether this is
+ an ECMG agent or ECMG proxy agent different table entries can be 
+ omitted." 
+INDEX { simEcmgIndex, simEcmgChannelId}
+ ::= { simEcmgCTable 1 }
+
+SimEcmgCEntry ::= SEQUENCE {
+   simEcmgChannelId      ECMGChannelId,
+   simEcmgCScsIpAddress   IpAddress,
+   simEcmgCScsTcpPort	   INTEGER,
+   simEcmgCStreams       Counter32,
+   simEcmgCCwPrs	      Counter32,
+   simEcmgCErrs         Counter32,
+   simEcmgCSuCasId       ECMGCSuCasId,
+   simEcmgFormat	      SectionTSPktFlag,
+   simACDelayStart       ECMGDelayValue,
+   simACDelayStop	      ECMGDelayValue,
+   simDelayStart	      ECMGDelayValue,
+   simDelayStop         ECMGDelayValue,
+   simTransitionDelayStart ECMGDelayValue,
+   simTransitionDelayStop	ECMGDelayValue,
+   simECMRepPeriod       INTEGER,
+   simMaxStreams	      Counter32,
+   simMinCPDuration      INTEGER,
+   simLeadCW	         Counter32,
+   simCWPerMsg          Counter32,
+   simMaxCompTime	      INTEGER
+   }
+
+simEcmgChannelId OBJECT-TYPE
+   SYNTAX ECMGChannelId
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The ECMG/SCS Channel identifier."
+ ::= { simEcmgCEntry 1 }
+
+simEcmgCScsIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"IP address of the SCS."
+ ::= { simEcmgCEntry 2 } 
+
+simEcmgCScsTcpPort OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"TCP port of the SCS."
+ ::= { simEcmgCEntry 3 }
+
+simEcmgCStreams OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of streams this ECMG is currently maintaining on this channel."
+ ::= { simEcmgCEntry 4 }
+
+simEcmgCCwPrs OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+ "The total number of CW provisioning requests received by this ECMG on this channel."
+ ::= { simEcmgCEntry 5 }
+
+simEcmgCErrs OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+ 		"The total number of communications errors for this ECMG on this channel."
+ ::= { simEcmgCEntry 6 }
+
+simEcmgCSuCasId OBJECT-TYPE
+   SYNTAX ECMGCSuCasId
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+ 		"The SuperCASId of the current Channel."
+ ::= { simEcmgCEntry 7 }
+
+simEcmgFormat OBJECT-TYPE
+   SYNTAX SectionTSPktFlag
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+  		"Format of datagrams : section or TS Packet."
+ ::= { simEcmgCEntry 8 }
+
+simACDelayStart OBJECT-TYPE
+   SYNTAX ECMGDelayValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Value of AC_Delay_Start parameter in ECMG protocol, imposed by CAS."
+ ::= { simEcmgCEntry 9 }
+
+simACDelayStop OBJECT-TYPE
+   SYNTAX ECMGDelayValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Value of AC_Delay_Stop parameter in ECMG protocol, imposed by CAS."
+ ::= { simEcmgCEntry 10 }
+
+simDelayStart OBJECT-TYPE
+   SYNTAX ECMGDelayValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Value of Delay_Start parameter in ECMG protocol, imposed by CAS."
+ ::= { simEcmgCEntry 11 }
+
+simDelayStop OBJECT-TYPE
+   SYNTAX ECMGDelayValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Value of Delay_Stop parameter in ECMG protocol, imposed by CAS."
+ ::= { simEcmgCEntry 12 }
+
+simTransitionDelayStart OBJECT-TYPE
+   SYNTAX ECMGDelayValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Value of Transition_Delay_Start parameter in ECMG protocol, imposed by CAS."
+ ::= { simEcmgCEntry 13 }
+
+simTransitionDelayStop OBJECT-TYPE
+   SYNTAX ECMGDelayValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Value of Transition_Delay_Stop parameter in ECMG protocol, imposed by CAS."
+ ::= { simEcmgCEntry 14 }
+
+simECMRepPeriod OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Repeating period of ECM defined by CAS and applied by SCS."
+ ::= { simEcmgCEntry 15 }
+
+simMaxStreams OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Max number of streams supported by the ECMG."
+ ::= { simEcmgCEntry 16 }
+
+simMinCPDuration OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Min crypto-period length supported by the ECMG."
+ ::= { simEcmgCEntry 17 }
+
+simLeadCW OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Number of CW the ecmg needs in advance."
+ ::= { simEcmgCEntry 18 }
+
+simCWPerMsg OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Number of CW the ecmg needs in each ECM request."
+ ::= { simEcmgCEntry 19 }
+
+simMaxCompTime OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Max delay supported by the ECMG for providing an ECM."
+ ::= { simEcmgCEntry 20 }
+
+
+-- ---------------------------------------------------------------------------------
+-- ECMG Stream Table - Used for monitoring stream information. It is indexed
+-- by the ECMG Index from the ECMG table, the ChannelId from the Channel Table
+-- and the StreamId.
+--
+
+simEcmgSTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimEcmgSEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table specifies information relating to ECMG/SCS streams. "
+ ::= { simECMG 3 }
+
+simEcmgSEntry OBJECT-TYPE
+   SYNTAX SimEcmgSEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. Depending on whether this is
+an ECMG agent or ECMG proxy agent different table entries can be omitted." 
+   INDEX { simEcmgIndex, simEcmgChannelId, simEcmgStreamId}
+ ::= { simEcmgSTable 1 }
+
+SimEcmgSEntry ::= SEQUENCE {
+   simEcmgStreamId    StreamId,
+   simEcmgEcmId      FlowId,
+   simEcmgSLastCp	   Unsigned32,
+   simEcmgSCwPrs	   Counter32,
+   simEcmgSErrs      Counter32
+   }
+
+simEcmgStreamId OBJECT-TYPE
+   SYNTAX StreamId
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The ECMG/SCS Stream identifier."
+ ::= { simEcmgSEntry 1 }
+
+simEcmgEcmId OBJECT-TYPE
+   SYNTAX FlowId
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The unique ECM flow identifier."
+ ::= { simEcmgSEntry 2 }
+
+simEcmgSLastCp OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The number of the crypto-period last processed on this stream."
+ ::= { simEcmgSEntry 3 }
+
+simEcmgSCwPrs OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of CW provisioning requests received by this ECMG on this stream."
+ ::= { simEcmgSEntry 4 }
+
+simEcmgSErrs OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of communications errors for this ECMG on this stream."
+ ::= { simEcmgSEntry 5 }
+
+-- ---------------------------------------------------------------------------------
+-- EMM/PD Generator Group - This group is used for management of EMM/PD Generators.
+-- It identifies each one of the EMM/PD Generators by the IP Address and TCP/UDP Port
+-- Number.It also associates Client_IDs, Data_stream_IDs, and Data_Channel_IDs with EMM/PD
+-- Generators. It also associates status information and statistics with streams. The
+-- EMMG/PDG Generator Group consists of four conceptual tables. The first table is used
+-- for information relevant to EMMG/PDG and is indexed by a unique EmOrPdIndex which is
+-- assigned by the EMMG/PDG agent.
+--
+
+simEmOrPdTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimEmOrPdEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table defines the EMMG or PDG interfaces to the MUX and is to be
+ used in EMMGs/PDGs and optionally the multiplexer."
+ ::= { simEMMG 1 }
+
+simEmOrPdEntry OBJECT-TYPE
+   SYNTAX SimEmOrPdEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. Depending on whether this is an
+ EMMG/PDG or multiplexer agent different table entries can be omitted." 
+   INDEX { simEmOrPdIndex }
+ ::= { simEmOrPdTable 1 }
+
+SimEmOrPdEntry ::= SEQUENCE {
+   simEmOrPdIndex	      INTEGER,
+   simEmOrPdDataType	   EMMGDataType,
+   simEmOrPdClientId	   SuperCasId,
+   simEmOrPdCommCapability EMMGCommCapability,
+   simEmOrPdErrs	      Counter32,
+   simEmOrPdTargetCpsig   INTEGER,
+   simEmOrPdCaMib	      OBJECT IDENTIFIER
+   }
+
+simEmOrPdIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Unique index into the EMMG or PDG table. "
+ ::= { simEmOrPdEntry 1 }
+
+simEmOrPdDataType OBJECT-TYPE
+   SYNTAX EMMGDataType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Data_type: Type of data handled by this EMMG/PDG. "
+ ::= { simEmOrPdEntry 2 }
+
+simEmOrPdClientId OBJECT-TYPE
+   SYNTAX SuperCasId
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Client_ID: The Client_ID is a 32-bit identifier. It shall identify uniquely
+ an EMMG/PDG across all the EMMGs/PDGs connected to a given MUX. To facilitate
+ uniqueness of this value, the following rules apply:
+* In the case of EMMs or other CA related data, the two first bytes of the
+ client_id should be equal to the two bytes of the corresponding CA_system_ID.
+* In other cases a value allocated by DVB for this purpose should be used."
+ ::= { simEmOrPdEntry 3 }
+
+simEmOrPdCommCapability OBJECT-TYPE
+   SYNTAX EMMGCommCapability
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Communication capability between EMMG/PDG and the multiplexer. Currently
+ TCP or UDP or both."
+ ::= { simEmOrPdEntry 4 }
+
+simEmOrPdErrs OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of communications errors for this EMMG/PDG."
+ ::= { simEmOrPdEntry 5 }
+
+simEmOrPdTargetCpsig OBJECT-TYPE
+   SYNTAX	INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The index into the C(P)SIG table identifying the C(P)SIG associated
+ with this EMMG/PDG."
+ ::= { simEmOrPdEntry 6 }
+
+simEmOrPdCaMib OBJECT-TYPE
+   SYNTAX OBJECT IDENTIFIER
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Pointer to a vendor proprietary extension to the EMMG/PDG MIB group."
+ ::= { simEmOrPdEntry 7 }
+
+
+-- ---------------------------------------------------------------------------------
+-- EMMG/PDG Logical Access Point Table - The second EMM Generator/ PD Generator table
+-- is used for configuration of the EMMGs/PDGs. It is uniquely indexed by the
+-- EmOrPdLapIndex which is a globally assigned quantity (with respect to the headend)
+-- and associates globally assigned Logical Access Points (LAPs) with mux ports.
+--
+
+simEmOrPdLapTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimEmOrPdLapEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table is used for configuration of EMM/PD Generators."
+ ::= { simEMMG 2 }
+
+simEmOrPdLapEntry OBJECT-TYPE
+   SYNTAX SimEmOrPdLapEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry." 
+   INDEX { simEmOrPdLapIndex }
+ ::= { simEmOrPdLapTable 1 }
+
+SimEmOrPdLapEntry ::= SEQUENCE {
+   simEmOrPdLapIndex	      INTEGER,
+   simEmOrPdLapAdminState	   AdministrativeState,
+   simEmOrPdLapCommType      EMMGCommType,
+   simEmOrPdLapMuxIpAddress   IpAddress,
+   simEmOrPdLapMuxPort       INTEGER,
+   simEmOrPdLapStatus	      RowStatus,
+   simEmOrPdLapMuxUIpAddress	IpAddress,
+   simEmOrPdLapMuxUPort      INTEGER
+   }
+
+simEmOrPdLapIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Unique Logical Access Point (LAP) identifier. "
+ ::= { simEmOrPdLapEntry 1 }
+
+simEmOrPdLapAdminState OBJECT-TYPE
+   SYNTAX AdministrativeState
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+" Used by an authorized manager to lock a conceptual row for exclusive
+ write and create access."
+ ::= { simEmOrPdLapEntry 2 }
+
+simEmOrPdLapCommType OBJECT-TYPE
+   SYNTAX EMMGCommType
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Type of communication between EMMG/PDG and the multiplexer. Currently TCP or UDP."
+ ::= { simEmOrPdLapEntry 3}
+
+simEmOrPdLapMuxIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"IP address of the multiplexer for EMMG/PDG TCP communication."
+ ::= { simEmOrPdLapEntry 4 }
+
+simEmOrPdLapMuxPort OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Port number (TCP) of the multiplexer for EMMG/PDG TCP communication."
+ ::= { simEmOrPdLapEntry 5 }
+
+simEmOrPdLapStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Used for table row creation management."
+ ::= { simEmOrPdLapEntry 6 }
+
+simEmOrPdLapMuxUIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"IP address of the multiplexer for EMMG/PDG UDP communication."
+ ::= { simEmOrPdLapEntry 7 } 
+
+simEmOrPdLapMuxUPort OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Port number (UDP) of the multiplexer for EMMG/PDG UDP communication."
+ ::= { simEmOrPdLapEntry 8 }
+
+-- ---------------------------------------------------------------------------------
+-- EMMG/PDG Logical Access Point Group Table - The third EMM Generator/ PD Generator table 
+-- is used for configuration of the EMMGs/PDG. It associates LAP Groups and LAPs and is
+-- uniquely indexed by the EmOrPdLapGroup, and EmOrPdLapIndex.
+--
+
+simEmOrPdLapGTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimEmOrPdLapGEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table is used for configuration of EMM/PD Generators."
+ ::= { simEMMG 3 }
+
+simEmOrPdLapGEntry OBJECT-TYPE
+   SYNTAX SimEmOrPdLapGEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry." 
+INDEX { simEmOrPdLapGroup, simEmOrPdLapIndex }
+ ::= { simEmOrPdLapGTable 1 }
+
+SimEmOrPdLapGEntry ::= SEQUENCE {
+   simEmOrPdLapGroup	   INTEGER,
+   simEmOrPdLapGAdminState AdministrativeState,
+   simEmOrPdLapGStatus    RowStatus
+   }
+
+simEmOrPdLapGroup OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Logical Access Point (LAP) group. "
+ ::= { simEmOrPdLapGEntry 1 }
+
+simEmOrPdLapGAdminState OBJECT-TYPE
+   SYNTAX AdministrativeState
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+" Used by an authorized manager to lock a conceptual row for exclusive
+ write and create access."
+ ::= { simEmOrPdLapGEntry 2 }
+
+simEmOrPdLapGStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Used for table row creation management."
+ ::= { simEmOrPdLapGEntry 3 }
+ 
+-- ---------------------------------------------------------------------------------
+-- EMMG/PDG Channel Table - Used for monitoring of EMM / PD Generator channels.
+--
+
+simEmOrPdCTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimEmOrPdCEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table is used for monitoring of channels between Muxes and EMMGs/PDGs."
+ ::= { simEMMG 4 }
+
+simEmOrPdCEntry OBJECT-TYPE
+   SYNTAX SimEmOrPdCEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry."
+INDEX { simEmOrPdIndex, simEmOrPdLapIndex, simEmOrPdChannelId }
+ ::= { simEmOrPdCTable 1 }
+
+SimEmOrPdCEntry ::= SEQUENCE {
+   simEmOrPdChannelId	   EMMGChannelId,
+   simEmOrPdCommType	   EMMGCommType,
+   simEmOrPdCIpAddress    IpAddress,
+   simEmOrPdCPort	      INTEGER,
+   simEmOrPdCErrs	      Counter32,
+   simEmOrPdCFormat       SectionTSPktFlag,
+   simEmOrPdCUIpAddress   IpAddress,
+   simEmOrPdCUPort       INTEGER
+   }
+
+simEmOrPdChannelId OBJECT-TYPE
+   SYNTAX EMMGChannelId
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Data_channel_ID: This identifier uniquely identifies a
+ EMM/Private Data channel within a client_ID."
+ ::= { simEmOrPdCEntry 1 }
+
+simEmOrPdCommType OBJECT-TYPE
+   SYNTAX EMMGCommType
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Communications type: TCP or UDP."
+ ::= { simEmOrPdCEntry 2 }
+
+simEmOrPdCIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"IP address of the host of the EMMG or PDG."
+ ::= { simEmOrPdCEntry 3 }
+
+simEmOrPdCPort OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Port number *TCP or UDP of the EMMG or PDG."
+ ::= { simEmOrPdCEntry 4 }
+
+simEmOrPdCErrs OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of communications errors on this channel."
+ ::= { simEmOrPdCEntry 5 }
+
+simEmOrPdCFormat OBJECT-TYPE
+   SYNTAX SectionTSPktFlag
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Format of datagrams : section or TS Packet."
+ ::= { simEmOrPdCEntry 6 }
+
+simEmOrPdCUIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"IP address of the host of the EMMG or PDG for UDP."
+ ::= { simEmOrPdCEntry 7 }
+
+simEmOrPdCUPort OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Port number (UDP) of the EMMG or PDG."
+ ::= { simEmOrPdCEntry 8 }
+ 
+-- ---------------------------------------------------------------------------------
+-- EMMG/PDG Stream Table - Used for monitoring of EMM / PD Generator streams.
+--
+
+simEmOrPdSTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimEmOrPdSEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table is used for monitoring of streams between Muxes and EMMGs/PDGs."
+ ::= { simEMMG 5 }
+
+simEmOrPdSEntry OBJECT-TYPE
+   SYNTAX SimEmOrPdSEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry."
+   INDEX { simEmOrPdIndex, simEmOrPdLapIndex, simEmOrPdDataId }
+ ::= { simEmOrPdSTable 1 }
+
+SimEmOrPdSEntry ::= SEQUENCE {
+   simEmOrPdDataId       FlowId,
+   simEmOrPdSChannelId    EMMGChannelId,
+   simEmOrPdBwidth       Unsigned32,
+   simEmOrPdStreamId	   StreamId,
+   simEmOrPdSErrs	      Counter32,
+   simEmOrPdSBytes       Counter32,
+   simEmOrPdSReqBwidth    Unsigned32
+   }
+
+simEmOrPdDataId OBJECT-TYPE
+   SYNTAX FlowId
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"DataID: This identifier uniquely identifies a EMM/Private Data stream."
+ ::= { simEmOrPdSEntry 1 }
+
+simEmOrPdSChannelId OBJECT-TYPE
+   SYNTAX EMMGChannelId
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Channel identifier."
+ ::= { simEmOrPdSEntry 2 }
+
+simEmOrPdBwidth OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Negotiated Bandwidth."
+ ::= { simEmOrPdSEntry 3 }
+
+simEmOrPdStreamId OBJECT-TYPE
+   SYNTAX StreamId
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Data_stream_ID: This identifier uniquely identifies a EMM/Private
+ Data stream within a channel."
+ ::= { simEmOrPdSEntry 4 }
+
+simEmOrPdSErrs OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of communications errors on this stream."
+ ::= { simEmOrPdSEntry 5 }
+
+simEmOrPdSBytes OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of bytes sent by this EMMG/PDG on this stream."
+ ::= { simEmOrPdSEntry 6 }
+
+simEmOrPdSReqBwidth OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+" Bandwidth as requested by CAS."
+ ::= { simEmOrPdSEntry 7 }
+
+-- ---------------------------------------------------------------------------------
+-- C(P)SIG) Group - This Group is used for management of some aspects of interaction
+-- between the custom PSI Generators (C(P)SIG)) and the PSI Generator. It consists of
+-- three tables. The first table is used for advertising C(P)SIG) information by the
+-- C(P)SIG) host. The second table is used for the manager to configure the C(P)SIG).
+-- The third and fourth tables are used for C(P)SIG) channel and stream monitoring.
+--
+
+
+simCpsigTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimCpsigEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table defines the C(P)SIG) interfaces to the Mux and is to be
+ used in the C(P)SIG and optionally the multiplexer."
+ ::= { simCPSI 1 }
+
+simCpsigEntry OBJECT-TYPE
+   SYNTAX SimCpsigEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. Depending on whether this is an
+ EMMG/PDG or multiplexer agent different table entries can be omitted." 
+   INDEX { simCpsigIndex }
+ ::= { simCpsigTable 1 }
+
+SimCpsigEntry ::= SEQUENCE {
+   simCpsigIndex	      INTEGER,
+   simCpsigSuperCasId	   SuperCasId,
+   simCpsigErrs         Counter32,
+   simCpsigChannels      Counter32,
+   simCpsigCpsigIpAddress	IpAddress,
+   simCpsigCpsigPort	   INTEGER,
+   simCpsigCaMib	      OBJECT IDENTIFIER
+   }
+
+simCpsigIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Unique index into the Cpsig table. "
+ ::= { simCpsigEntry 1 }
+
+simCpsigSuperCasId OBJECT-TYPE
+   SYNTAX SuperCasId
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "super_CAS_id "
+ ::= { simCpsigEntry 2 }
+
+simCpsigErrs OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of communication errors for this C(P)SIG)."
+ ::= { simCpsigEntry 3 }
+
+simCpsigChannels OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of channels for this C(P)SIG)."
+ ::= { simCpsigEntry 4 }
+
+simCpsigCpsigIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The IP Address of the C(P)SIG)."
+ ::= { simCpsigEntry 5 }
+
+simCpsigCpsigPort OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The TCP port number of the C(P)SIG)."
+ ::= { simCpsigEntry 6 }
+ 
+simCpsigCaMib OBJECT-TYPE
+   SYNTAX OBJECT IDENTIFIER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+" Pointer to a vendor proprietary extension to the C(P)SIG) MIB group."
+ ::= { simCpsigEntry 7 }
+
+
+-- ---------------------------------------------------------------------------------
+-- C(P)SIG) Channel Table - Used for monitoring of C(P)SIG channels.
+--
+
+simCpsigCTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimCpsigCEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table is used for monitoring of channels between (P)SIGs and C(P)SIGs."
+ ::= { simCPSI 2 }
+
+simCpsigCEntry OBJECT-TYPE
+   SYNTAX SimCpsigCEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+" Information about a single table entry." 
+   INDEX { simCpsigIndex, simCpsigChannelId }
+ ::= { simCpsigCTable 1 }
+
+SimCpsigCEntry ::= SEQUENCE {
+   simCpsigChannelId	   INTEGER,
+   simCpsigPsigIpAddress	IpAddress,
+   simCpsigPsigPort      INTEGER,
+   simCpsigCErrs	      Counter32,
+   simCpsigCTstrms       Counter32,
+   simCpsigCSstrms       Counter32
+   }
+
+simCpsigChannelId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"ChannelId identifies the C(P)SIG channel."
+ ::= { simCpsigCEntry 1 }
+
+simCpsigPsigIpAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"IP address of the host of the (P)SIG."
+ ::= { simCpsigCEntry 2 }
+
+simCpsigPsigPort OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"TCP Port number of the (P)SIG."
+ ::= { simCpsigCEntry 3 }
+
+simCpsigCErrs OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of communication errors on this channel."
+ ::= { simCpsigCEntry 4 }
+
+simCpsigCTstrms OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of transport streams on this channel."
+ ::= { simCpsigCEntry 5 }
+
+simCpsigCSstrms OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of service streams on this channel."
+ ::= { simCpsigCEntry 6 }
+ 
+-- ---------------------------------------------------------------------------------
+-- C(P)SIG Stream Table - Used for monitoring of C(P)SIG) streams.
+--
+
+simCpsigStreamTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimCpsigStreamEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table is used for monitoring of streams between Muxes and C(P)SIG)s."
+ ::= { simCPSI 3 }
+
+simCpsigStreamEntry OBJECT-TYPE
+   SYNTAX SimCpsigStreamEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry."
+   INDEX { simCpsigIndex, simCpsigChannelId, simCpsigStreamId }
+ ::= { simCpsigStreamTable 1 }
+
+SimCpsigStreamEntry ::= SEQUENCE {
+   simCpsigStreamId         INTEGER,
+   simCpsigStreamTStreamId    INTEGER,
+   simCpsigStreamNid	      INTEGER,
+   simCpsigStreamOnid	      INTEGER,
+   simCpsigStreamMaxCompTime	INTEGER,
+   simCpsigStreamTriggerEnable TriggerType,
+   simCpsigStreamLastTrigger	TriggerType,
+   simCpsigStreamLastEventId	INTEGER, 
+   simCpsigStreamLastServiceId INTEGER,
+   simCpsigStreamLastEsId	   INTEGER,
+   simCpsigStreamLastEcmPid   INTEGER,
+   simCpsigStreamErrs	      Counter32,
+   simCpsigStreamBytes       Counter32
+   }
+
+simCpsigStreamId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This identifier uniquely identifies a C(P)SIG) stream"
+ ::= { simCpsigStreamEntry 1 } 
+
+simCpsigStreamTStreamId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"This identifier uniquely identifies a C(P)SIG transport stream"
+ ::= { simCpsigStreamEntry 2 }
+
+simCpsigStreamNid OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"This identifier uniquely identifies the network id associated with the stream"
+ ::= { simCpsigStreamEntry 3 }
+
+simCpsigStreamOnid OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"This identifier uniquely identifies the original network 
+ id associated with the stream"
+ ::= { simCpsigStreamEntry 4 }
+
+simCpsigStreamMaxCompTime OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Max Computation time by the C(P)SIG."
+ ::= { simCpsigStreamEntry 5 }
+
+simCpsigStreamTriggerEnable OBJECT-TYPE
+   SYNTAX TriggerType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Triggers enabled by the C(P)SIG."
+ ::= { simCpsigStreamEntry 6 }
+
+simCpsigStreamLastTrigger OBJECT-TYPE
+   SYNTAX TriggerType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Last trigger processed by the C(P)SIG."
+ ::= { simCpsigStreamEntry 7 }
+
+simCpsigStreamLastEventId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Last event id processed by the C(P)SIG."
+ ::= { simCpsigStreamEntry 8 }
+
+simCpsigStreamLastServiceId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Last service id processed by the C(P)SIG."
+ ::= { simCpsigStreamEntry 9 } 
+
+simCpsigStreamLastEsId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Last elementary stream id processed by the C(P)SIG."
+ ::= { simCpsigStreamEntry 10 } 
+
+simCpsigStreamLastEcmPid OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Last ECM pid processed by the C(P)SIG."
+ ::= { simCpsigStreamEntry 11 }
+
+simCpsigStreamErrs OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of communication errors on this stream."
+ ::= { simCpsigStreamEntry 12 }
+
+simCpsigStreamBytes OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The total number of bytes sent by this EMMG/PDG on this stream."
+ ::= { simCpsigStreamEntry 13 }
+
+-- ---------------------------------------------------------------------------------
+-- (P)SIG Group - This Group is used for the synchronization and information
+-- exchange between the PSI Generator and Custom PSI Generators and
+-- between the SI Generator and Custom SI Generators.
+--
+
+simPsigTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimPsigEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table advertises the (P)SIG configuration information. "
+ ::= { simPSI 1 }
+
+simPsigEntry OBJECT-TYPE
+   SYNTAX SimPsigEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. " 
+INDEX { simPsigIndex }
+ ::= { simPsigTable 1 }
+
+SimPsigEntry ::= SEQUENCE {
+   simPsigIndex         INTEGER,
+   simPsigType          PsigType,
+   simPsigTriggerSupport	TriggerType,
+   simPsigNetworkId      INTEGER,
+   simPsigONetworkId	   INTEGER,
+   simPsigTransStreamId   INTEGER,
+   simPsigTSServices	   OCTET STRING
+   }
+
+simPsigIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The unique index into the table."
+ ::= { simPsigEntry 1 }
+
+simPsigType OBJECT-TYPE
+   SYNTAX PsigType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Psig type"
+ ::= { simPsigEntry 2 }
+
+simPsigTriggerSupport OBJECT-TYPE
+   SYNTAX TriggerType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Identifies which trigger types the PSIG supports."
+ ::= { simPsigEntry 3 }
+
+simPsigNetworkId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Network identifier. "
+ ::= { simPsigEntry 4 }
+
+simPsigONetworkId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Original Network identifier. "
+ ::= { simPsigEntry 5 } 
+
+simPsigTransStreamId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Transport Stream identifier. "
+ ::= { simPsigEntry 6 }
+
+simPsigTSServices OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE(0..511))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"List of service identifies on the transport stream. "
+ ::= { simPsigEntry 7 }
+
+--
+--
+
+simPsigConfigTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimPsigConfigEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table configures the (P)SIG/(C)PSIG communication. "
+ ::= { simPSI 2 }
+
+simPsigConfigEntry OBJECT-TYPE
+   SYNTAX SimPsigConfigEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. "
+   INDEX { simPsigConfigCustCasId, simPsigConfigIndex , simPsigIndex}
+ ::= { simPsigConfigTable 1 }
+
+SimPsigConfigEntry ::= SEQUENCE {
+   simPsigConfigIndex	      INTEGER,
+   simPsigConfigAdminState    AdministrativeState,
+   simPsigConfigCpsigType	   PsigType,
+   simPsigConfigCustCasId	   SuperCasId,
+   simPsigConfigMaxCompTime   INTEGER,
+   simPsigConfigServiceId	   INTEGER,
+   simPsigConfigTriggerEnable	TriggerType,
+   simPsigConfigCADInsMode    CaDescInsMode,
+   simPsigConfigEntryStatus   RowStatus
+   }
+
+simPsigConfigIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"The unique index into the table."
+ ::= { simPsigConfigEntry 1 }
+ 
+simPsigConfigAdminState OBJECT-TYPE
+   SYNTAX AdministrativeState
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Used by an authorized manager to lock a conceptual row for exclusive
+ write and create access."
+ ::= { simPsigConfigEntry 2 }
+
+simPsigConfigCpsigType OBJECT-TYPE
+   SYNTAX PsigType
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "C(P)SIG type."
+ ::= { simPsigConfigEntry 3 }
+
+simPsigConfigCustCasId OBJECT-TYPE
+   SYNTAX SuperCasId
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Custom CAS Identifier."
+ ::= { simPsigConfigEntry 4 }
+
+simPsigConfigMaxCompTime OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Maximum Computing Time. "
+ ::= { simPsigConfigEntry 5 } 
+ 
+simPsigConfigServiceId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Service identifier. "
+ ::= { simPsigConfigEntry 6 }
+
+simPsigConfigTriggerEnable OBJECT-TYPE
+   SYNTAX TriggerType
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Trigger types enabled. "
+ ::= { simPsigConfigEntry 7 }
+
+simPsigConfigCADInsMode OBJECT-TYPE
+   SYNTAX CaDescInsMode
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Conditional Access Descriptor Insert mode. "
+ ::= { simPsigConfigEntry 8 }
+
+simPsigConfigEntryStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Used for table row creation management."
+ ::= { simPsigConfigEntry 9 }
+
+--
+--
+
+simPsigEcmTrTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimPsigEcmTrEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table contains all the active ECM Triggers."
+ ::= { simPSI 3 }
+
+simPsigEcmTrEntry OBJECT-TYPE
+   SYNTAX SimPsigEcmTrEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. " 
+   INDEX { simPsigEcmTrIndex }
+ ::= { simPsigEcmTrTable 1 }
+
+SimPsigEcmTrEntry ::= SEQUENCE {
+   simPsigEcmTrIndex	      INTEGER,
+   simPsigEcmTrNetworkId	   INTEGER,
+   simPsigEcmTrONetworkId	   INTEGER,
+   simPsigEcmTrTransStreamId	INTEGER,
+   simPsigEcmTrServiceId	   INTEGER,
+   simPsigEcmTrEsId         INTEGER,
+   simPsigEcmTrType         ECMTriggerType,
+   simPsigEcmTrSuCasId       SuperCasId,
+   simPsigEcmTrEcmId	      FlowId,
+   simPsigEcmTrEcmPid	      INTEGER, 
+   simPsigEcmTrAccessCriteria	OCTET STRING
+   }
+
+simPsigEcmTrIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "The trigger index."
+ ::= { simPsigEcmTrEntry 1 } 
+
+simPsigEcmTrNetworkId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "The Network Identifier."
+ ::= { simPsigEcmTrEntry 2 }
+ 
+simPsigEcmTrONetworkId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The Original Network Identifier."
+ ::= { simPsigEcmTrEntry 3 }
+
+simPsigEcmTrTransStreamId OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Transport Stream Identifier. "
+ ::= { simPsigEcmTrEntry 4 }
+
+simPsigEcmTrServiceId OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Service Identifier. "
+ ::= { simPsigEcmTrEntry 5 }
+
+simPsigEcmTrEsId OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Elementary Stream Identifier. "
+ ::= { simPsigEcmTrEntry 6 }
+
+simPsigEcmTrType OBJECT-TYPE
+   SYNTAX ECMTriggerType
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"ECM Trigger Type. "
+ ::= { simPsigEcmTrEntry 7 }
+
+simPsigEcmTrSuCasId OBJECT-TYPE
+   SYNTAX SuperCasId
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"ECM Client Identifier. "
+ ::= { simPsigEcmTrEntry 8 }
+
+simPsigEcmTrEcmId OBJECT-TYPE
+   SYNTAX FlowId
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"ECM Stream Identifier. "
+ ::= { simPsigEcmTrEntry 9 } 
+ 
+simPsigEcmTrEcmPid OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "ECM PID "
+ ::= { simPsigEcmTrEntry 10 }
+
+simPsigEcmTrAccessCriteria OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(0..127))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Access criteria. "
+ ::= { simPsigEcmTrEntry 11 }
+
+--
+--
+
+simPsigFlowTrTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimPsigFlowTrEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table contains all the active Flow Triggers."
+ ::= { simPSI 4 }
+
+simPsigFlowTrEntry OBJECT-TYPE
+   SYNTAX SimPsigFlowTrEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. " 
+   INDEX { simPsigFlowTrIndex }
+ ::= { simPsigFlowTrTable 1 }
+
+SimPsigFlowTrEntry ::= SEQUENCE {
+   simPsigFlowTrIndex	   INTEGER,
+   simPsigFlowTrType	   FlowType,
+   simPsigFlowTrSuCasId   SuperCasId,
+   simPsigFlowTrFlowId    FlowId,
+   simPsigFlowTrFlowPID   INTEGER
+   }
+
+simPsigFlowTrIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "The trigger index."
+ ::= { simPsigFlowTrEntry 1 }
+
+simPsigFlowTrType OBJECT-TYPE
+   SYNTAX FlowType
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Flow Type. "
+ ::= { simPsigFlowTrEntry 2 }
+
+simPsigFlowTrSuCasId OBJECT-TYPE
+   SYNTAX SuperCasId
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Flow Super CAS identifier. "
+ ::= { simPsigFlowTrEntry 3 }
+
+simPsigFlowTrFlowId OBJECT-TYPE
+   SYNTAX FlowId
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Flow Stream Identifier. "
+ ::= { simPsigFlowTrEntry 4 } 
+
+simPsigFlowTrFlowPID OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Flow PID "
+ ::= { simPsigFlowTrEntry 5 }
+
+--
+--
+
+simPsigEvntTrTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimPsigEvntTrEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table contains all the active EVNT Triggers."
+ ::= { simPSI 5 }
+ 
+simPsigEvntTrEntry OBJECT-TYPE
+   SYNTAX SimPsigEvntTrEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. " 
+   INDEX { simPsigEvntTrIndex}
+ ::= { simPsigEvntTrTable 1 }
+
+SimPsigEvntTrEntry ::= SEQUENCE {
+   simPsigEvntTrIndex	      INTEGER,
+   simPsigEvntTrNetworkId	   INTEGER,
+   simPsigEvntTrONetworkId    INTEGER,
+   simPsigEvntTrTransStreamId	INTEGER,
+   simPsigEvntTrServiceId	   INTEGER,
+   simPsigEvntTrEventId      INTEGER,
+   simPsigEvntTrStartTime	   OCTET STRING,
+   simPsigEvntTrDuration	   OCTET STRING,
+   simPsigEvntTrPrivateData   OCTET STRING
+   }
+
+simPsigEvntTrIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"The event trigger index."
+ ::= { simPsigEvntTrEntry 1 } 
+
+simPsigEvntTrNetworkId OBJECT-TYPE 
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "The Network Identifier."
+ ::= { simPsigEvntTrEntry 2 } 
+
+simPsigEvntTrONetworkId OBJECT-TYPE 
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The Original Network Identifier."
+ ::= { simPsigEvntTrEntry 3 }
+
+simPsigEvntTrTransStreamId OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Transport Stream Identifier. "
+ ::= { simPsigEvntTrEntry 4 } 
+ 
+simPsigEvntTrServiceId OBJECT-TYPE 
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+" Event trigger service identifier. "
+ ::= { simPsigEvntTrEntry 5 } 
+ 
+simPsigEvntTrEventId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Event Identifier. "
+ ::= { simPsigEvntTrEntry 6 }
+
+simPsigEvntTrStartTime OBJECT-TYPE
+   SYNTAX OCTET STRING(SIZE (0..4))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Event start time. "
+ ::= { simPsigEvntTrEntry 7 }
+ 
+simPsigEvntTrDuration OBJECT-TYPE
+   SYNTAX OCTET STRING(SIZE (0..2))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Event duration. "
+ ::= { simPsigEvntTrEntry 8 }
+
+simPsigEvntTrPrivateData OBJECT-TYPE
+   SYNTAX OCTET STRING(SIZE (0..256))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"EVNT Channel Identifier. "
+ ::= { simPsigEvntTrEntry 9 }
+
+--
+--
+ 
+simPsigDescInsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimPsigDescInsEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table contains all the information related to descriptor insertion."
+ ::= { simPSI 6 }
+
+simPsigDescInsEntry OBJECT-TYPE
+   SYNTAX SimPsigDescInsEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. " 
+INDEX { simPsigDescInsIndex}
+ ::= { simPsigDescInsTable 1 }
+
+SimPsigDescInsEntry ::= SEQUENCE {
+   simPsigDescInsIndex          INTEGER,
+   simPsigDescInsAdminState      AdministrativeState,
+   simPsigDescInsTrIndex	      INTEGER,
+   simPsigDescInsTrType         TriggerType,
+   simPsigDescInsLocationId      InsertLocation,
+   simPsigDescInsNetworkId       INTEGER,
+   simPsigDescInsONetworkId      INTEGER,
+   simPsigDescInsTransStreamId    INTEGER,
+   simPsigDescInsServiceId       INTEGER,
+   simPsigDescInsElmStreamId	   INTEGER,
+   simPsigDescInsBouquetId       INTEGER,
+   simPsigDescInsEventId	      INTEGER,
+   simPsigDescInsONetworkId2loop	INTEGER,
+   simPsigDescInsNetworkIdOther   INTEGER, 
+   simPsigDescInsTransStreamId2OrO INTEGER,
+   simPsigDescInsDelayType       DelayType,
+   simPsigDescInsDelay          OCTET STRING,
+   simPsigDescPrivDataSpfier	   INTEGER,
+   simPsigDescInsEntryStatus	   RowStatus
+   }
+
+simPsigDescInsIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The unique index into the table."
+ ::= { simPsigDescInsEntry 1 }
+
+simPsigDescInsAdminState OBJECT-TYPE
+   SYNTAX AdministrativeState
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Used by an authorized manager to lock a conceptual row for exclusive
+ write and create access."
+ ::= { simPsigDescInsEntry 2 }
+
+simPsigDescInsTrIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The unique index into the corresponding trigger table."
+ ::= { simPsigDescInsEntry 3 }
+
+simPsigDescInsTrType OBJECT-TYPE
+   SYNTAX TriggerType
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The type of the trigger that caused this descriptor insert."
+ ::= { simPsigDescInsEntry 4 }
+
+simPsigDescInsLocationId OBJECT-TYPE
+   SYNTAX InsertLocation
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The type of target table for insertion."
+ ::= { simPsigDescInsEntry 5 } 
+
+simPsigDescInsNetworkId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "The Network Identifier."
+ ::= { simPsigDescInsEntry 6 } 
+
+simPsigDescInsONetworkId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The Original Network Identifier."
+ ::= { simPsigDescInsEntry 7 }
+
+simPsigDescInsTransStreamId OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Transport Stream Identifier. "
+ ::= { simPsigDescInsEntry 8 }
+
+simPsigDescInsServiceId OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Service Identifier. "
+ ::= { simPsigDescInsEntry 9 }
+
+simPsigDescInsElmStreamId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Elementary stream identifier. "
+ ::= { simPsigDescInsEntry 10 } 
+
+simPsigDescInsBouquetId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Event trigger bouquet identifier. "
+ ::= { simPsigDescInsEntry 11 }
+ 
+simPsigDescInsEventId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "EVNT Identifier. "
+ ::= { simPsigDescInsEntry 12 }
+
+simPsigDescInsONetworkId2loop OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The Original Network Identifier second loop."
+ ::= { simPsigDescInsEntry 13 }
+
+simPsigDescInsNetworkIdOther OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The Network Identifier other."
+ ::= { simPsigDescInsEntry 14 }
+
+simPsigDescInsTransStreamId2OrO OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Transport Stream Identifier second loop or other. "
+ ::= { simPsigDescInsEntry 15 }
+
+simPsigDescInsDelayType OBJECT-TYPE
+   SYNTAX DelayType
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Delay type, immediate or synchronized. "
+ ::= { simPsigDescInsEntry 16 }
+
+simPsigDescInsDelay OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(0..1))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Insert delay"
+ ::= { simPsigDescInsEntry 17 }
+
+simPsigDescPrivDataSpfier OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Private data specifier"
+ ::= { simPsigDescInsEntry 18 }
+
+simPsigDescInsEntryStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Other transport stream identifiers."
+ ::= { simPsigDescInsEntry 19 }
+
+--
+--
+
+simPsigDescInsDescTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimPsigDescInsDescEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table contains all the descriptors to be inserted."
+ ::= { simPSI 7 }
+ 
+simPsigDescInsDescEntry OBJECT-TYPE
+   SYNTAX SimPsigDescInsDescEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. "
+INDEX { simPsigDescInsIndex, simPsigDescInsDescIndex }
+ ::= { simPsigDescInsDescTable 1 }
+
+SimPsigDescInsDescEntry ::= SEQUENCE {
+   simPsigDescInsDescIndex       INTEGER,
+   simPsigDescInsDescAdminState   AdministrativeState,
+   simPsigDescInsDescriptor      OCTET STRING,
+   simPsigDescInsDescriptorStatus	DescriptorStatus,
+   simPsigDescInsDescEntryStatus	RowStatus
+   }
+
+simPsigDescInsDescIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The unique index into the table."
+ ::= { simPsigDescInsDescEntry 1 }
+ 
+simPsigDescInsDescAdminState OBJECT-TYPE
+   SYNTAX AdministrativeState
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Used by an authorized manager to lock a conceptual row for exclusive
+ write and create access."
+ ::= { simPsigDescInsDescEntry 2 }
+
+simPsigDescInsDescriptor OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(0..8191))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The descriptor to be inserted."
+ ::= { simPsigDescInsDescEntry 3 }
+
+simPsigDescInsDescriptorStatus OBJECT-TYPE
+   SYNTAX DescriptorStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The insertion status of the descriptor."
+ ::= { simPsigDescInsDescEntry 4 }
+
+simPsigDescInsDescEntryStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Other transport stream identifiers."
+ ::= { simPsigDescInsDescEntry 5 }
+
+--
+--
+
+simPsigTblProvTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimPsigTblProvEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table is the interface to obtaining all PSI/SI information."
+ ::= { simPSI 8 }
+
+simPsigTblProvEntry OBJECT-TYPE
+   SYNTAX SimPsigTblProvEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. " 
+INDEX { simPsigTblProvIndex }
+ ::= { simPsigTblProvTable 1 }
+
+SimPsigTblProvEntry ::= SEQUENCE {
+   simPsigTblProvIndex       INTEGER,
+   simPsigTblProvTableId	   ProvTableId,
+   simPsigTblNetworkId       INTEGER,
+   simPsigTblONetworkId      INTEGER,
+   simPsigTblTransStreamId    INTEGER,
+   simPsigTblServiceId       INTEGER,
+   simPsigTblBouquetId       INTEGER,
+   simPsigTblEventId	      INTEGER,
+   simPsigTblONetworkId2loop	INTEGER,
+   simPsigTblNetworkIdOther   INTEGER, 
+   simPsigTblTransStreamId2OrO INTEGER,
+   simPsigTblSegmentNr       INTEGER,
+   simPsigTblProvPart	      OCTET STRING,
+   simPsigTblProvPartNumber   INTEGER
+   }
+
+simPsigTblProvIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The unique index into the table."
+ ::= { simPsigTblProvEntry 1 }
+
+simPsigTblProvTableId OBJECT-TYPE
+   SYNTAX ProvTableId
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"The table identifier of the table."
+ ::= { simPsigTblProvEntry 2 }
+
+simPsigTblNetworkId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "The Network Identifier."
+ ::= { simPsigTblProvEntry 3 } 
+
+simPsigTblONetworkId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The Original Network Identifier."
+ ::= { simPsigTblProvEntry 4 }
+
+simPsigTblTransStreamId OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Transport Stream Identifier. "
+ ::= { simPsigTblProvEntry 5 }
+
+simPsigTblServiceId OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Service Identifier. "
+ ::= { simPsigTblProvEntry 6 }
+
+simPsigTblBouquetId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Event trigger bouquet identifier. "
+ ::= { simPsigTblProvEntry 7 }
+ 
+simPsigTblEventId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Event Identifier "
+ ::= { simPsigTblProvEntry 8 }
+
+simPsigTblONetworkId2loop OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The Original Network Identifier second loop."
+ ::= { simPsigTblProvEntry 9 } 
+
+simPsigTblNetworkIdOther OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The Network Identifier other."
+ ::= { simPsigTblProvEntry 10 }
+
+simPsigTblTransStreamId2OrO OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Transport Stream Identifier second loop or other. "
+ ::= { simPsigTblProvEntry 11 }
+
+simPsigTblSegmentNr OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Segment Number "
+ ::= { simPsigTblProvEntry 12 }
+
+simPsigTblProvPart OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE(0..8191))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Event Identifier "
+ ::= { simPsigTblProvEntry 13 }
+ 
+simPsigTblProvPartNumber OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Each table is subdivided into parts for SNMP transport if necessary.
+ The part number identifies the table part of this entry. "
+ ::= { simPsigTblProvEntry 14 }
+
+--
+--
+
+simPsigPIDProvTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimPsigPIDProvEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This is the PID provisioning table."
+ ::= { simPSI 9 }
+
+simPsigPIDProvEntry OBJECT-TYPE
+   SYNTAX SimPsigPIDProvEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. "
+INDEX { simPsigPIDProvSuCasId, simPsigPIDProvFlowId }
+ ::= { simPsigPIDProvTable 1 }
+
+SimPsigPIDProvEntry ::= SEQUENCE {
+   simPsigPIDProvFlowType	FlowType,
+   simPsigPIDProvSuCasId	SuperCasId,
+   simPsigPIDProvFlowId   FlowId,
+   simPsigPIDProvFlowPID	INTEGER
+   }
+
+simPsigPIDProvFlowType OBJECT-TYPE
+   SYNTAX FlowType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Flow Type. "
+ ::= { simPsigPIDProvEntry 1 }
+
+simPsigPIDProvSuCasId OBJECT-TYPE
+   SYNTAX SuperCasId
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Flow Super CAS identifier. "
+ ::= { simPsigPIDProvEntry 2 }
+
+simPsigPIDProvFlowId OBJECT-TYPE
+   SYNTAX FlowId
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+"Flow Stream Identifier. "
+ ::= { simPsigPIDProvEntry 3 } 
+
+simPsigPIDProvFlowPID OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Flow PID "
+ ::= { simPsigPIDProvEntry 4 }
+
+--
+--
+
+simPsigPdTrTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SimPsigPdTrEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"This table contains all the active Private Data Triggers."
+ ::= { simPSI 10 }
+
+simPsigPdTrEntry OBJECT-TYPE
+   SYNTAX SimPsigPdTrEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+"Information about a single table entry. " 
+INDEX { simPsigPdTrIndex }
+ ::= { simPsigPdTrTable 1 }
+
+SimPsigPdTrEntry ::= SEQUENCE {
+   simPsigPdTrIndex         INTEGER,
+   simPsigPdTrNetworkId      INTEGER,
+   simPsigPdTrONetworkId	   INTEGER,
+   simPsigPdTrTransStreamId   INTEGER,
+   simPsigPdTrServiceId      INTEGER,
+   simPsigPdTrEsId          INTEGER,
+   simPsigPdTrType          ECMTriggerType,
+   simPsigPdTrSuCasId	      SuperCasId,
+   simPsigPdTrPdId          FlowId,
+   simPsigPdTrPdPid         INTEGER,
+   simPsigPdTrPdStreamType    INTEGER,
+   simPsigPdTrPrivateData	   OCTET STRING 
+   }
+ 
+
+simPsigPdTrIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+      "The trigger index."
+ ::= { simPsigPdTrEntry 1 } 
+
+simPsigPdTrNetworkId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "The Network Identifier."
+ ::= { simPsigPdTrEntry 2 } 
+
+simPsigPdTrONetworkId OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"The Original Network Identifier."
+ ::= { simPsigPdTrEntry 3 }
+
+simPsigPdTrTransStreamId OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Transport Stream Identifier. "
+ ::= { simPsigPdTrEntry 4 }
+
+simPsigPdTrServiceId OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "Service Identifier. "
+ ::= { simPsigPdTrEntry 5 }
+
+simPsigPdTrEsId OBJECT-TYPE
+   SYNTAX INTEGER(0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Elementary Stream Identifier. "
+ ::= { simPsigPdTrEntry 6 }
+
+simPsigPdTrType OBJECT-TYPE
+   SYNTAX ECMTriggerType
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"ECM Trigger Type. "
+ ::= { simPsigPdTrEntry 7 }
+
+simPsigPdTrSuCasId OBJECT-TYPE
+   SYNTAX SuperCasId
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"ECM Client Identifier. "
+ ::= { simPsigPdTrEntry 8 }
+
+simPsigPdTrPdId OBJECT-TYPE
+   SYNTAX FlowId
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"ECM Stream Identifier. "
+ ::= { simPsigPdTrEntry 9 }
+ 
+simPsigPdTrPdPid OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+      "ECM PID "
+ ::= { simPsigPdTrEntry 10 }
+
+simPsigPdTrPdStreamType OBJECT-TYPE
+   SYNTAX INTEGER (0..255)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Stream type of Private Data Stream"
+ ::= { simPsigPdTrEntry 11 }
+
+simPsigPdTrPrivateData OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(0..127))
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+"Private Data string. "
+ ::= { simPsigPdTrEntry 12}
+
+-- ---------------------------------------------------------------------------------
+--
+-- Conformance Information
+--
+
+simCompliances	OBJECT IDENTIFIER ::= { simMIBConformance 1 }
+simGroups	OBJECT IDENTIFIER ::= { simMIBConformance 2 }
+
+simEcmgCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+"The compliance statement for SNMP Entities which host or represent ECMGs"
+MODULE -- this module
+MANDATORY-GROUPS { simIdentGroup, simEcmgGroup}
+ ::= { simCompliances 1}
+
+simEmOrPdCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+"The compliance statement for SNMP Entities which host or
+ represent EMMGs or PDGs" 
+MODULE -- this module
+MANDATORY-GROUPS { simIdentGroup, simEmOrPdGroup}
+   GROUP simEmOrPdLapGGroup
+   DESCRIPTION
+"Allows for grouping of LAPs "
+ ::= { simCompliances 2}
+
+simCpsigCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+"The compliance statement for SNMP Entities which host or
+ 		  represent C(P)SIG)s" 
+MODULE -- this module
+MANDATORY-GROUPS { simIdentGroup, simCpsigGroup}
+ ::= { simCompliances 3}
+
+simPsigCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+"The compliance statement for SNMP Entities which host or
+ represent (P)SIG)s" 
+MODULE -- this module
+MANDATORY-GROUPS { simIdentGroup, simPsigGroup}
+ ::= { simCompliances 4}
+
+simIdentGroup OBJECT-GROUP
+   OBJECTS {
+      simSofwareVersion,
+      simMIBVersion,
+      simMIBPrivateVersion,
+      simAgentVersion
+   }
+   STATUS current
+   DESCRIPTION
+"A collection of objects providing software configuration infomation."
+ ::= { simGroups 1 }
+
+simEcmgGroup OBJECT-GROUP
+   OBJECTS {
+      simEcmgIndex,
+      simEcmgIpAddress,
+      simEcmgTcpPort,
+      simEcmgSuCasId,
+      simEcmgChannels,
+      simEcmgCwPrs,
+      simEcmgErrs,
+      simEcmgTargetCpsig,
+      simEcmgCaMib ,
+      simEcmgChannelId,
+      simEcmgCScsIpAddress,
+      simEcmgCScsTcpPort,
+      simEcmgCStreams,
+      simEcmgCCwPrs,
+      simEcmgCErrs,
+      simEcmgStreamId,
+      simEcmgEcmId,
+      simEcmgSLastCp,
+      simEcmgSCwPrs,
+      simEcmgSErrs
+   }
+   STATUS current
+   DESCRIPTION
+" A collection of objects providing ECMG infomation."
+ ::= { simGroups 2 }
+
+simEmOrPdGroup OBJECT-GROUP
+   OBJECTS {
+      simEmOrPdIndex,
+      simEmOrPdDataType,
+      simEmOrPdClientId,
+      simEmOrPdCommCapability,
+      simEmOrPdErrs,
+      simEmOrPdTargetCpsig ,
+      simEmOrPdCaMib,
+      simEmOrPdLapIndex,
+      simEmOrPdLapAdminState,
+      simEmOrPdLapCommType,
+      simEmOrPdLapMuxIpAddress,
+      simEmOrPdLapMuxPort,
+      simEmOrPdLapStatus,
+      simEmOrPdChannelId,
+      simEmOrPdCommType,
+      simEmOrPdCIpAddress,
+      simEmOrPdCPort,
+      simEmOrPdCErrs,
+      simEmOrPdDataId,
+      simEmOrPdSChannelId,
+      simEmOrPdBwidth,
+      simEmOrPdStreamId,
+      simEmOrPdSErrs,
+      simEmOrPdSBytes
+   }
+   STATUS current
+   DESCRIPTION
+" A collection of objects providing EMMG/PDG infomation."
+ ::= { simGroups 3 }
+
+simEmOrPdLapGGroup OBJECT-GROUP
+   OBJECTS {
+      simEmOrPdLapGroup,
+      simEmOrPdLapGAdminState,
+      simEmOrPdLapGStatus
+   }
+   STATUS current
+   DESCRIPTION
+" A collection of objects providing LAPG infomation."
+ ::= { simGroups 4 }
+
+simCpsigGroup OBJECT-GROUP
+   OBJECTS {
+      simCpsigIndex,
+      simCpsigSuperCasId,
+      simCpsigErrs,
+      simCpsigChannels,
+      simCpsigCpsigIpAddress,
+      simCpsigCpsigPort,
+      simCpsigCaMib,
+      simCpsigChannelId,
+      simCpsigPsigIpAddress,
+      simCpsigPsigPort,
+      simCpsigCErrs,
+      simCpsigCTstrms,
+      simCpsigCSstrms,
+      simCpsigStreamTStreamId,
+      simCpsigStreamNid,
+      simCpsigStreamOnid,
+      simCpsigStreamMaxCompTime,
+      simCpsigStreamTriggerEnable,
+      simCpsigStreamLastTrigger,
+      simCpsigStreamLastEventId,
+      simCpsigStreamLastServiceId,
+      simCpsigStreamLastEsId,
+      simCpsigStreamLastEcmPid,
+      simCpsigStreamErrs,
+      simCpsigStreamBytes
+   }
+   STATUS current
+   DESCRIPTION
+"A collection of objects providing C(P)SIG) infomation."
+ ::= { simGroups 5 }
+
+
+simPsigGroup OBJECT-GROUP
+   OBJECTS {
+      simPsigIndex,
+      simPsigType,
+      simPsigTriggerSupport,
+      simPsigNetworkId,
+      simPsigONetworkId,
+      simPsigTransStreamId,
+      simPsigTSServices,
+      simPsigConfigAdminState,
+      simPsigConfigCustCasId,
+      simPsigConfigMaxCompTime,
+      simPsigConfigServiceId,
+      simPsigConfigTriggerEnable,
+      simPsigConfigEntryStatus,
+      simPsigConfigCpsigType,
+      simPsigConfigCADInsMode,
+      simPsigEcmTrNetworkId,
+      simPsigEcmTrONetworkId,
+      simPsigEcmTrTransStreamId,
+      simPsigEcmTrServiceId,
+      simPsigEcmTrEsId,
+      simPsigEcmTrType,
+      simPsigEcmTrSuCasId,
+      simPsigEcmTrEcmId,
+      simPsigEcmTrEcmPid,
+      simPsigEcmTrAccessCriteria,
+      simPsigEvntTrNetworkId,
+      simPsigEvntTrONetworkId,
+      simPsigEvntTrTransStreamId,
+      simPsigEvntTrServiceId,
+      simPsigEvntTrEventId,
+      simPsigEvntTrStartTime,
+      simPsigEvntTrDuration,
+      simPsigEvntTrPrivateData,
+      simPsigFlowTrIndex,
+      simPsigFlowTrType,
+      simPsigFlowTrSuCasId,
+      simPsigFlowTrFlowId,
+      simPsigFlowTrFlowPID,
+      simPsigDescInsIndex,
+      simPsigDescInsAdminState,
+      simPsigDescInsTrIndex,
+      simPsigDescInsTrType,
+      simPsigDescInsLocationId,
+      simPsigDescInsNetworkId,
+      simPsigDescInsONetworkId,
+      simPsigDescInsTransStreamId,
+      simPsigDescInsServiceId,
+      simPsigDescInsElmStreamId,
+      simPsigDescInsBouquetId,
+      simPsigDescInsEventId,
+      simPsigDescInsNetworkIdOther,
+      simPsigDescInsONetworkId2loop,
+      simPsigDescInsTransStreamId2OrO,
+      simPsigDescInsDelayType,
+      simPsigDescInsDelay,
+      simPsigDescPrivDataSpfier,
+      simPsigDescInsEntryStatus,
+      simPsigDescInsDescIndex,
+      simPsigDescInsDescAdminState,
+      simPsigDescInsDescriptor,
+      simPsigDescInsDescriptorStatus,
+      simPsigDescInsDescEntryStatus,
+      simPsigTblProvIndex,
+      simPsigTblProvTableId	   ,
+      simPsigTblNetworkId,
+      simPsigTblONetworkId   ,
+      simPsigTblTransStreamId    ,
+      simPsigTblServiceId ,
+      simPsigTblBouquetId,
+      simPsigTblEventId	,
+      simPsigTblNetworkIdOther,
+      simPsigTblONetworkId2loop,
+      simPsigTblTransStreamId2OrO,
+      simPsigTblSegmentNr,
+      simPsigTblProvPart,
+      simPsigTblProvPartNumber,
+      simPsigPIDProvFlowType,
+      simPsigPIDProvSuCasId,
+      simPsigPIDProvFlowId,
+      simPsigPIDProvFlowPID,
+      simPsigPdTrNetworkId,
+      simPsigPdTrONetworkId,
+      simPsigPdTrTransStreamId,
+      simPsigPdTrServiceId,
+      simPsigPdTrEsId,
+      simPsigPdTrType,
+      simPsigPdTrSuCasId,
+      simPsigPdTrPdId,
+      simPsigPdTrPdPid,
+      simPsigPdTrPdStreamType,
+      simPsigPdTrPrivateData
+   }
+   STATUS current
+   DESCRIPTION
+"A collection of objects providing (P)SIG) infomation."
+ ::= { simGroups 6 }
+ 
+END

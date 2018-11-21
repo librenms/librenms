@@ -1,4 +1,5 @@
 source: Support/FAQ.md
+path: blob/master/doc/
 ### Getting started
  - [How do I install LibreNMS?](#faq1)
  - [How do I add a device?](#faq2)
@@ -31,6 +32,10 @@ source: Support/FAQ.md
  - [Why does modifying 'Default Alert Template' fail?](#faq31)
  - [Why would alert un-mute itself](#faq32)
  - [How do I change the Device Type?](#faq33)
+ - [Where do I update my database credentials?](#faq-where-do-i-update-my-database-credentials)
+ - [My reverse proxy is not working](#my-reverse-proxy-is-not-working)
+ - [My alerts aren't being delivered on time](#my-alerts-aren't-being-delivered-on-time)
+
 ### Developing
  - [How do I add support for a new OS?](#faq8)
  - [What information do you need to add a new OS?](#faq20)
@@ -352,6 +357,40 @@ mysql -u librenms -p < sql-schema/202.sql
 If alert un-mutes itself then it most likely means that the alert cleared and is then triggered again.
 Please review eventlog as it will tell you in there.
 
-### <a name ="faq33"> How do I change the Device Type?</a>
+### <a name="faq33"> How do I change the Device Type?</a>
 You can change the Device Type by going to the device you would like to change, then click on the Gear Icon -> Edit.
 If you would like to define custom types, we suggest using [Device Groups](/Extensions/Device-Groups/). They will be listed in the menu similarly to device types.
+
+### <a name="faq-where-do-i-update-my-database-credentials">Where do I update my database credentials?</a>
+If you've changed your database credentials then you will need to update LibreNMS with those new details.
+Please edit both `config.php` and `.env`
+
+config.php:
+```php
+$config['db_host'] = '';
+$config['db_user'] = '';
+$config['db_pass'] = '';
+$config['db_name'] = '';
+```
+
+[.env](../Support/Environment-Variables.md#database):
+```bash
+DB_HOST=
+DB_DATABASE=
+DB_USERNAME=
+DB_PASSWORD=
+DB_PORT=
+```
+
+### <a name='my-reverse-proxy-is-not-working'>My reverse proxy is not working</a>
+
+Make sure your proxy is passing the proper variables.
+At a minimum: X-Forwarded-For and X-Forwarded-Proto (X-Forwarded-Port if needed)
+
+You also need to [Set the proxy or proxies as trusted](../Support/Environment-Variables.md#trusted-reverse-proxies)
+
+If you are using a subdirectory on the reverse proxy and not on the actual web server,
+you may need to set [APP_URL](../Support/Environment-Variables.md#base-url) and `$config['base_url']`.
+
+### <a name='my-alerts-aren't-being-delivered-on-time'>My alerts aren't being delivered on time</a>
+If you're running MySQL/MariaDB on a separate machine or container make sure the timezone is set properly on both the LibreNMS **and**  MySQL/MariaDB instance. Alerts will be delivered according to MySQL/MariaDB's time, so a mismatch between the two can cause alerts to be delivered late if LibreNMS is on a timezone later than MySQL/MariaDB.

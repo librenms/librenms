@@ -12,9 +12,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
@@ -51,7 +51,7 @@ if ($sub_type == 'new-maintenance') {
     if (!in_array($recurring, array(0,1))) {
         $message .= 'Missing recurring choice<br />';
     }
-    
+
     // check values if recurring is set to yes
     if ($recurring == 1) {
         if (empty($start_recurring_dt)) {
@@ -72,21 +72,21 @@ if ($sub_type == 'new-maintenance') {
         } else {
             $end_recurring_dt = null;
         }
-        
+
         if (empty($start_recurring_hr)) {
             $message .= 'Missing start recurring hour<br />';
         }
-                
+
         if (empty($end_recurring_hr)) {
             $message .= 'Missing end recurring hour<br />';
         }
-        
+
         if (isset($_POST['recurring_day']) && is_array($_POST['recurring_day']) && !empty($_POST['recurring_day'])) {
             $recurring_day = implode(',', $_POST['recurring_day']);
         } else {
             $recurring_day = null;
         }
-        
+
         // recurring = 1 => empty no reccurency values to be sure.
         $start = '0000-00-00 00:00:00';
         $end = '0000-00-00 00:00:00';
@@ -94,11 +94,11 @@ if ($sub_type == 'new-maintenance') {
         if (empty($start)) {
             $message .= 'Missing start date<br />';
         }
-    
+
         if (empty($end)) {
             $message .= 'Missing end date<br />';
         }
-        
+
         // recurring = 0 => empty no reccurency values to be sure.
         $start_recurring_dt = '1970-01-02';
         $end_recurring_dt = '1970-01-02';
@@ -129,6 +129,11 @@ if ($sub_type == 'new-maintenance') {
             foreach ($_POST['maps'] as $target) {
                 $target = target_to_id($target);
                 $item   = dbInsert(array('schedule_id' => $schedule_id, 'target' => $target), 'alert_schedule_items');
+                if ($notes && get_user_pref('add_schedule_note_to_device', false)) {
+                    $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', array($target));
+                    $device_notes.= ((empty($device_notes)) ? '' : PHP_EOL) . date("Y-m-d H:i") . ' Alerts delayed: ' . $notes;
+                    dbUpdate(array('notes' => $device_notes), 'devices', '`device_id` = ?', array($target));
+                }
                 if ($item > 0) {
                     array_push($items, $item);
                 } else {

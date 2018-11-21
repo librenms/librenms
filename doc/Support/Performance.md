@@ -1,4 +1,5 @@
 source: Support/Performance.md
+path: blob/master/doc/
 # Performance optimisations
 
 This document will give you some guidance on optimising your setup.
@@ -26,6 +27,9 @@ MySQL crashes or your server does but it provides an amazing difference in IO us
 
 
 ### Polling modules
+
+Review the graph of poller module time take under gear > pollers > performance to see what modules are consuming poller time.
+This data is shown per device under device > graphs > poller.
 
 Disable polling (and discovery) modules that you do not need. You can do this globally in `config.php` like:
 

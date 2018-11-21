@@ -12,7 +12,7 @@
  */
 
 use Illuminate\Database\Events\QueryExecuted;
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
@@ -37,8 +37,6 @@ function set_debug($state = true, $silence = false)
 
     $debug = $state; // set to global
 
-    $db = \LibreNMS\DB\Eloquent::DB();
-
     restore_error_handler(); // disable Laravel error handler
 
     if (isset($debug) && $debug) {
@@ -47,75 +45,16 @@ function set_debug($state = true, $silence = false)
         ini_set('log_errors', 0);
         error_reporting(E_ALL & ~E_NOTICE);
 
-        if (class_exists('Log')) {
-            $logger = Log::getMonolog();
-
-            // only install if not existing
-            $install = true;
-            $logfile = Config::get('log_file', base_path('logs/librenms.log'));
-            foreach ($logger->getHandlers() as $handler) {
-                if ($handler instanceof \Monolog\Handler\StreamHandler) {
-                    if ($handler->getUrl() == 'php://stdout') {
-                        $install = false;
-                    } elseif ($handler->getUrl() == $logfile) {
-                        // send to librenms log file if not a cli app
-                        if (!App::runningInConsole()) {
-                            set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-                                Log::error("$errno $errfile:$errline $errstr");
-                            });
-                            $handler->setLevel(\Monolog\Logger::DEBUG);
-                        }
-                    }
-                }
-            }
-
-            if ($install) {
-                $handler = new \Monolog\Handler\StreamHandler(
-                    'php://stdout',
-                    \Monolog\Logger::DEBUG
-                );
-
-                $handler->setFormatter(new LibreNMS\Util\CliColorFormatter());
-
-                $logger->pushHandler($handler);
-            }
-        }
-
-        if ($db && !$db->getEventDispatcher()->hasListeners('Illuminate\Database\Events\QueryExecuted')) {
-            $db->listen(function (QueryExecuted $query) {
-                // collect bindings and make them a little more readable
-                $bindings = collect($query->bindings)->map(function ($item) {
-                    if ($item instanceof \Carbon\Carbon) {
-                        return $item->toDateTimeString();
-                    }
-
-                    return $item;
-                })->toJson();
-
-                if (class_exists('Log')) {
-                    Log::debug("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n", ['color' => true]);
-                } else {
-                    c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
-                }
-            });
-        }
+        \LibreNMS\Util\Laravel::enableCliDebugOutput();
+        \LibreNMS\Util\Laravel::enableQueryDebug();
     } else {
         ini_set('display_errors', 0);
         ini_set('display_startup_errors', 0);
         ini_set('log_errors', 1);
         error_reporting($silence ? 0 : E_ERROR);
 
-        if (class_exists('Log')) {
-            $handlers = Log::getMonolog()->getHandlers();
-            if (isset($handlers[0]) && $handlers[0]->getUrl() == 'php://stdout') {
-                Log::getMonolog()->popHandler();
-            }
-        }
-
-        if ($db) {
-            // remove all query executed event handlers
-            $db->getEventDispatcher()->flush('Illuminate\Database\Events\QueryExecuted');
-        }
+        \LibreNMS\Util\Laravel::disableCliDebugOutput();
+        \LibreNMS\Util\Laravel::disableQueryDebug();
     }
 
     return $debug;
@@ -502,20 +441,16 @@ function getImageName($device, $use_database = true, $dir = 'images/os/')
 
 function renamehost($id, $new, $source = 'console')
 {
-    global $config;
+    $host = gethostbyid($id);
 
-    $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
     if (!is_dir(get_rrd_dir($new)) && rename(get_rrd_dir($host), get_rrd_dir($new)) === true) {
-        dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
+        dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
-    } else {
-        log_event("Renaming of $host failed", $id, 'system', 5);
-        if (__FILE__ === $_SERVER['SCRIPT_FILE_NAME']) {
-            echo "Renaming of $host failed\n";
-        } else {
-            return "Renaming of $host failed\n";
-        }
+        return '';
     }
+
+    log_event("Renaming of $host failed", $id, 'system', 5);
+    return "Renaming of $host failed\n";
 }
 
 function delete_device($id)
@@ -978,7 +913,7 @@ function get_astext($asn)
         return $cache['astext'][$asn];
     }
 
-    $result = dns_get_record("AS$asn.asn.cymru.com", DNS_TXT);
+    $result = @dns_get_record("AS$asn.asn.cymru.com", DNS_TXT);
     if (!empty($result[0]['txt'])) {
         $txt = explode('|', $result[0]['txt']);
         $result = trim($txt[4], ' "');
@@ -1011,7 +946,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         'datetime' => array("NOW()"),
         'severity' => $severity,
         'message' => $text,
-        'username'  => isset(Auth::user()->username) ? Auth::user()->username : '',
+        'username'  => isset(LegacyAuth::user()->username) ? LegacyAuth::user()->username : '',
      );
 
     dbInsert($insert, 'eventlog');
@@ -1045,45 +980,53 @@ function send_mail($emails, $subject, $message, $html = false)
 {
     global $config;
     if (is_array($emails) || ($emails = parse_email($emails))) {
-        $mail = new PHPMailer();
-        $mail->Hostname = php_uname('n');
+        d_echo("Attempting to email $subject to: " . implode('; ', array_keys($emails)) . PHP_EOL);
+        $mail = new PHPMailer(true);
+        try {
+            $mail->Hostname = php_uname('n');
 
-        foreach (parse_email($config['email_from']) as $from => $from_name) {
-            $mail->setFrom($from, $from_name);
+            foreach (parse_email($config['email_from']) as $from => $from_name) {
+                $mail->setFrom($from, $from_name);
+            }
+            foreach ($emails as $email => $email_name) {
+                $mail->addAddress($email, $email_name);
+            }
+            $mail->Subject = $subject;
+            $mail->XMailer = $config['project_name_version'];
+            $mail->CharSet = 'utf-8';
+            $mail->WordWrap = 76;
+            $mail->Body = $message;
+            if ($html) {
+                $mail->isHTML(true);
+            }
+            switch (strtolower(trim($config['email_backend']))) {
+                case 'sendmail':
+                    $mail->Mailer = 'sendmail';
+                    $mail->Sendmail = $config['email_sendmail_path'];
+                    break;
+                case 'smtp':
+                    $mail->isSMTP();
+                    $mail->Host       = $config['email_smtp_host'];
+                    $mail->Timeout    = $config['email_smtp_timeout'];
+                    $mail->SMTPAuth   = $config['email_smtp_auth'];
+                    $mail->SMTPSecure = $config['email_smtp_secure'];
+                    $mail->Port       = $config['email_smtp_port'];
+                    $mail->Username   = $config['email_smtp_username'];
+                    $mail->Password   = $config['email_smtp_password'];
+                    $mail->SMTPAutoTLS= $config['email_auto_tls'];
+                    $mail->SMTPDebug  = false;
+                    break;
+                default:
+                    $mail->Mailer = 'mail';
+                    break;
+            }
+            $mail->send();
+            return true;
+        } catch (phpmailerException $e) {
+            return $e->errorMessage();
+        } catch (Exception $e) {
+            return $e->getMessage();
         }
-        foreach ($emails as $email => $email_name) {
-            $mail->addAddress($email, $email_name);
-        }
-        $mail->Subject = $subject;
-        $mail->XMailer = $config['project_name_version'];
-        $mail->CharSet = 'utf-8';
-        $mail->WordWrap = 76;
-        $mail->Body = $message;
-        if ($html) {
-            $mail->isHTML(true);
-        }
-        switch (strtolower(trim($config['email_backend']))) {
-            case 'sendmail':
-                $mail->Mailer = 'sendmail';
-                $mail->Sendmail = $config['email_sendmail_path'];
-                break;
-            case 'smtp':
-                $mail->isSMTP();
-                $mail->Host       = $config['email_smtp_host'];
-                $mail->Timeout    = $config['email_smtp_timeout'];
-                $mail->SMTPAuth   = $config['email_smtp_auth'];
-                $mail->SMTPSecure = $config['email_smtp_secure'];
-                $mail->Port       = $config['email_smtp_port'];
-                $mail->Username   = $config['email_smtp_username'];
-                $mail->Password   = $config['email_smtp_password'];
-                $mail->SMTPAutoTLS= $config['email_auto_tls'];
-                $mail->SMTPDebug  = false;
-                break;
-            default:
-                $mail->Mailer = 'mail';
-                break;
-        }
-        return $mail->send() ? true : $mail->ErrorInfo;
     }
 
     return "No contacts found";
@@ -2265,6 +2208,19 @@ function recordSnmpStatistic($stat, $start_time)
     return $runtime;
 }
 
+function runTraceroute($device)
+{
+    $address_family = snmpTransportToAddressFamily($device['transport']);
+    $trace_name = $address_family == 'ipv6' ? 'traceroute6' : 'traceroute';
+    $trace_path = Config::get($trace_name, $trace_name);
+    $process = new Process([$trace_path, '-q', '1', '-w', '1', $device['hostname']]);
+    $process->run();
+    if ($process->isSuccessful()) {
+        return ['traceroute' => $process->getOutput()];
+    }
+    return ['output' => $process->getErrorOutput()];
+}
+
 /**
  * @param $device
  * @param bool $record_perf
@@ -2278,7 +2234,12 @@ function device_is_up($device, $record_perf = false)
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = array('NOW()');
 
-    if ($record_perf === true && can_ping_device($device['attribs']) === true) {
+    if ($record_perf === true && can_ping_device($device['attribs'])) {
+        $trace_debug = [];
+        if ($ping_response['result'] === false && Config::get('debug.run_trace', false)) {
+            $trace_debug = runTraceroute($device);
+        }
+        $device_perf['debug'] = json_encode($trace_debug);
         dbInsert($device_perf, 'device_perf');
     }
     $response              = array();
@@ -2344,6 +2305,8 @@ function cache_peeringdb()
             $rand = rand(3, 30);
             echo "No cached PeeringDB data found, sleeping for $rand seconds" . PHP_EOL;
             sleep($rand);
+            $peer_keep = [];
+            $ix_keep = [];
             foreach (dbFetchRows("SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`") as $as) {
                 $asn = $as['bgpLocalAs'];
                 $get = Requests::get($peeringdb_url . '/net?depth=2&asn=' . $asn, array(), array('proxy' => get_proxy()));
@@ -2366,7 +2329,7 @@ function cache_peeringdb()
                         );
                         $pdb_ix_id = dbInsert($insert, 'pdb_ix');
                     }
-                    $keep = $pdb_ix_id;
+                    $ix_keep[] = $pdb_ix_id;
                     $get_ix = Requests::get("$peeringdb_url/netixlan?ix_id=$ixid", array(), array('proxy' => get_proxy()));
                     $ix_json = $get_ix->body;
                     $ix_data = json_decode($ix_json);
@@ -2396,11 +2359,19 @@ function cache_peeringdb()
                             $peer_keep[] = dbInsert($peer_insert, 'pdb_ix_peers');
                         }
                     }
-                    $pdb_ix_peers_ids = implode(',', $peer_keep);
-                    dbDelete('pdb_ix_peers', "`pdb_ix_peers_id` NOT IN ($pdb_ix_peers_ids)");
                 }
-                $pdb_ix_ids = implode(',', $keep);
-                dbDelete('pdb_ix', "`pdb_ix_id` NOT IN ($pdb_ix_ids)");
+            }
+
+            // cleanup
+            if (empty($peer_keep)) {
+                dbDelete('pdb_ix_peers');
+            } else {
+                dbDelete('pdb_ix_peers', "`pdb_ix_peers_id` NOT IN " . dbGenPlaceholders(count($peer_keep)), $peer_keep);
+            }
+            if (empty($ix_keep)) {
+                dbDelete('pdb_ix');
+            } else {
+                dbDelete('pdb_ix', "`pdb_ix_id` NOT IN " . dbGenPlaceholders(count($ix_keep)), $ix_keep);
             }
         } else {
             echo "Cached PeeringDB data found....." . PHP_EOL;
@@ -2614,3 +2585,26 @@ function is_disk_valid($disk, $device)
     }
     return true;
 }
+
+
+/**
+ * Queues a hostname to be refreshed by Oxidized
+ * Settings: oxidized.url
+ *
+ * @param string $hostname
+ * @param string $msg
+ * @param string $username
+ * @return bool
+ */
+function oxidized_node_update($hostname, $msg, $username = 'not_provided')
+{
+    // Work around https://github.com/rack/rack/issues/337
+    $msg = str_replace("%", "", $msg);
+    $postdata = ["user" => $username, "msg" => $msg];
+    $oxidized_url = Config::get('oxidized.url');
+    if (!empty($oxidized_url)) {
+        Requests::put("$oxidized_url/node/next/$hostname", [], json_encode($postdata), ['proxy' => get_proxy()]);
+        return true;
+    }
+    return false;
+}//end oxidized_node_update()

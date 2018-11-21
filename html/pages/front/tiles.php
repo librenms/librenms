@@ -16,17 +16,18 @@
  * Code for Gridster.sort_by_row_and_col_asc(serialization) call is from http://gridster.net/demos/grid-from-serialize.html
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh   = true;
 $default_dash = get_user_pref('dashboard', 0);
 
 require_once 'includes/modal/alert_notes.inc.php';
+require_once 'includes/modal/alert_ack.inc.php';
 
 // get all dashboards this user can access and put them into two lists user_dashboards and shared_dashboards
 $dashboards = get_dashboards();
 list($user_dashboards, $shared_dashboards) = array_reduce($dashboards, function ($ret, $dash) {
-    if ($dash['user_id'] == Auth::id()) {
+    if ($dash['user_id'] == LegacyAuth::id()) {
         $ret[0][] = $dash;
     } else {
         $ret[1][] = $dash;
@@ -44,16 +45,16 @@ if (!isset($dashboards[$default_dash])) {
 if ($default_dash == 0 && empty($user_dashboards)) {
     $new_dash = array(
         'dashboard_name'=>'Default',
-        'user_id'=>Auth::id(),
+        'user_id'=>LegacyAuth::id(),
     );
 
     $dashboard_id = dbInsert($new_dash, 'dashboards');
     $new_dash['dashboard_id'] = $dashboard_id;
-    $new_dash['username'] = Auth::user()->username;
+    $new_dash['username'] = LegacyAuth::user()->username;
     $vars['dashboard'] = $new_dash;
 
-    if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?', array(Auth::id(),0)) == 1) {
-        dbUpdate(array('dashboard_id'=>$dashboard_id), 'users_widgets', 'user_id = ? && dashboard_id = ?', array(Auth::id(), 0));
+    if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?', array(LegacyAuth::id(),0)) == 1) {
+        dbUpdate(array('dashboard_id'=>$dashboard_id), 'users_widgets', 'user_id = ? && dashboard_id = ?', array(LegacyAuth::id(), 0));
     }
 } else {
     // load a dashboard
@@ -87,43 +88,42 @@ $data        = serialize(json_encode($data));
 $dash_config = unserialize(stripslashes($data));
 
 if (empty($vars['bare']) || $vars['bare'] == "no") {
-?>
+    ?>
 <div class="row">
   <div class="col-md-6">
     <div class="btn-group btn-lg">
       <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">Dashboards</span></button>
       <div class="btn-group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left"><?php echo ($vars['dashboard']['user_id'] != Auth::id() ? $vars['dashboard']['username'].':' : ''); ?><?php echo $vars['dashboard']['dashboard_name']; ?></span>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left"><?php echo ($vars['dashboard']['user_id'] != LegacyAuth::id() ? $vars['dashboard']['username'].':' : ''); ?><?php echo $vars['dashboard']['dashboard_name']; ?></span>
           <span class="pull-right">
             <span class="caret"></span>
             <span class="sr-only">Toggle Dropdown</span>
           </span>
         </button>
         <ul class="dropdown-menu">
-<?php
+    <?php
 
-
-$nodash = true;
-foreach ($user_dashboards as $dash) {
-    if ($dash['dashboard_id'] != $vars['dashboard']['dashboard_id']) {
-        echo '          <li><a href="'.rtrim($config['base_url'], '/').'/overview/dashboard='.$dash['dashboard_id'].'">'.$dash['dashboard_name'].'</a></li>';
-        $nodash = false;
-    }
-}
-if ($nodash) {
-    echo  '          <li><a>No other Dashboards</a></li>';
-}
-
-if (!empty($shared_dashboards)) {
-    echo '          <li role="separator" class="divider"></li>';
-    echo '          <li class="dropdown-header">Shared Dashboards</li>';
-    foreach ($shared_dashboards as $dash) {
+    $nodash = true;
+    foreach ($user_dashboards as $dash) {
         if ($dash['dashboard_id'] != $vars['dashboard']['dashboard_id']) {
-            echo '          <li><a href="'.rtrim($config['base_url'], '/').'/overview/dashboard='.$dash['dashboard_id'].'">&nbsp;&nbsp;&nbsp;'.$dash['username'].':'.$dash['dashboard_name'].($dash['access'] == 1 ? ' (Read)' : '').'</a></li>';
+            echo '          <li><a href="'.rtrim($config['base_url'], '/').'/overview/dashboard='.$dash['dashboard_id'].'">'.$dash['dashboard_name'].'</a></li>';
+            $nodash = false;
         }
     }
-}
-?>
+    if ($nodash) {
+        echo  '          <li><a>No other Dashboards</a></li>';
+    }
+
+    if (!empty($shared_dashboards)) {
+        echo '          <li role="separator" class="divider"></li>';
+        echo '          <li class="dropdown-header">Shared Dashboards</li>';
+        foreach ($shared_dashboards as $dash) {
+            if ($dash['dashboard_id'] != $vars['dashboard']['dashboard_id']) {
+                echo '          <li><a href="'.rtrim($config['base_url'], '/').'/overview/dashboard='.$dash['dashboard_id'].'">&nbsp;&nbsp;&nbsp;'.$dash['username'].':'.$dash['dashboard_name'].($dash['access'] == 1 ? ' (Read)' : '').'</a></li>';
+            }
+        }
+    }
+    ?>
         </ul>
       </div>
       <button class="btn btn-default edit-dash-btn" href="#edit_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="Edit Dashboard"><i class="fa fa-pencil-square-o fa-fw"></i></button>
@@ -165,11 +165,11 @@ if (!empty($shared_dashboards)) {
               </span>
               <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="<?php echo $vars['dashboard']['dashboard_name']; ?>" style="width:160px;">
               <select class="form-control" name="access" style="width:160px;">
-<?php
-foreach (array('Private','Shared (Read)','Shared') as $k => $v) {
-    echo '                <option value="'.$k.'"'.($vars['dashboard']['access'] == $k ? 'selected' : '').'>'.$v.'</option>';
-}
-?>
+    <?php
+    foreach (array('Private','Shared (Read)','Shared') as $k => $v) {
+        echo '                <option value="'.$k.'"'.($vars['dashboard']['access'] == $k ? 'selected' : '').'>'.$v.'</option>';
+    }
+    ?>
               </select>
               <span class="input-group-btn pull-left">
                 <button class="btn btn-primary" type="submit">Update</button>
@@ -196,11 +196,11 @@ foreach (array('Private','Shared (Read)','Shared') as $k => $v) {
               </span>
             </button>
             <ul class="dropdown-menu">
-<?php
-foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widgets) {
-    echo '              <li><a href="#" onsubmit="return false;" class="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a></li>';
-}
-?>
+    <?php
+    foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widgets) {
+        echo '              <li><a href="#" onsubmit="return false;" class="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a></li>';
+    }
+    ?>
             </ul>
           </div>
         </div>
@@ -270,13 +270,14 @@ if (strpos($dash_config, 'globe') !== false) {
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
+                        toastr.success(data.message);
                     }
                     else {
-                        $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                        toastr.error(data.message);
                     }
                 },
-                error: function () {
-                    $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                error: function (data) {
+                    toastr.error(data.message);
                 }
             });
         }
@@ -362,13 +363,14 @@ if (strpos($dash_config, 'globe') !== false) {
                     success: function (data) {
                         if (data.status == 'ok') {
                             gridster.remove_all_widgets();
+                            toastr.success(data.message);
                         }
                         else {
-                            $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                            toastr.error(data.message);
                         }
                     },
-                    error: function () {
-                        $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                    error: function (data) {
+                        toastr.error(data.message);
                     }
                 });
             }
@@ -392,13 +394,14 @@ if (strpos($dash_config, 'globe') !== false) {
                         if (data.status == 'ok') {
                             widget_dom(data.extra);
                             updatePos(gridster);
+                            toastr.success(data.message);
                         }
                         else {
-                            $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                            toastr.error(data.message);
                         }
                     },
-                    error: function () {
-                        $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                    error: function (data) {
+                        toastr.error(data.message);
                     }
                 });
             }
@@ -409,19 +412,25 @@ if (strpos($dash_config, 'globe') !== false) {
             $.ajax({
                 type: 'POST',
                 url: 'ajax_form.php',
-                data: {type: "update-dashboard-config", sub_type: 'remove', widget_id: widget_id, dashboard_id: dashboard_id},
+                data: {
+                    type: "update-dashboard-config",
+                    sub_type: 'remove',
+                    widget_id: widget_id,
+                    dashboard_id: dashboard_id
+                },
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
                         gridster.remove_widget($('#'+widget_id));
                         updatePos(gridster);
+                        toastr.success(data.message);
                     }
                     else {
-                        $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                        toastr.error(data.message);
                     }
                 },
-                error: function () {
-                    $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                error: function (data) {
+                    toastr.error(data.message);
                 }
             });
         });
@@ -459,16 +468,24 @@ if (strpos($dash_config, 'globe') !== false) {
         $.ajax({
             type: 'POST',
             url: 'ajax_form.php',
-            data: {type: 'delete-dashboard', dashboard_id: $(data).data('dashboard')},
+            data: {
+                type: 'delete-dashboard',
+                dashboard_id: $(data).data('dashboard')
+            },
             dataType: "json",
             success: function (data) {
                 if( data.status == "ok" ) {
-                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                    window.location.href="<?php echo rtrim($config['base_url'], '/'); ?>/overview";
+                    toastr.success(data.message);
+                    setTimeout(function (){
+                        window.location.href="<?php echo rtrim($config['base_url'], '/'); ?>/overview";
+                    }, 500);
+
+                } else {
+                    toastr.error(data.message);
                 }
-                else {
-                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                }
+            },
+            error: function (data) {
+                toastr.error(data.message);
             }
         });
     }
@@ -499,12 +516,17 @@ if (strpos($dash_config, 'globe') !== false) {
                 dataType: "json",
                 success: function (data) {
                     if (data.status == "ok") {
-                        $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                        window.location.href = "<?php echo rtrim($config['base_url'], '/'); ?>/overview/dashboard=" + dashboard_id;
+                        toastr.success(data.message);
+                        setTimeout(function (){
+                            window.location.href = "<?php echo rtrim($config['base_url'], '/'); ?>/overview/dashboard=" + dashboard_id;
+                        }, 500);
                     }
                     else {
-                        $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                        toastr.error(data.message);
                     }
+                },
+                error: function(data) {
+                    toastr.error(data.message);
                 }
             });
         }
@@ -523,12 +545,17 @@ if (strpos($dash_config, 'globe') !== false) {
             dataType: "json",
             success: function (data) {
                 if( data.status == "ok" ) {
-                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                    window.location.href="<?php echo rtrim($config['base_url'], '/'); ?>/overview/dashboard="+data.dashboard_id;
+                    toastr.success(data.message);
+                    setTimeout(function (){
+                        window.location.href="<?php echo rtrim($config['base_url'], '/'); ?>/overview/dashboard="+data.dashboard_id;
+                    }, 500);
                 }
                 else {
-                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                    toastr.error(data.message);
                 }
+            },
+            error: function(data) {
+                toastr.error(data.message);
             }
         });
     }
@@ -539,7 +566,7 @@ if (strpos($dash_config, 'globe') !== false) {
               '</span>'+
               '<span class="fade-edit pull-right">'+
                 <?php
-                if (($vars['dashboard']['access'] == 1 && Auth::id() === $vars['dashboard']['user_id']) ||
+                if (($vars['dashboard']['access'] == 1 && LegacyAuth::id() === $vars['dashboard']['user_id']) ||
                         ($vars['dashboard']['access'] == 0 || $vars['dashboard']['access'] == 2)) {
                         echo "'<i class=\"fa fa-pencil-square-o edit-widget\" data-widget-id=\"'+data.user_widget_id+'\" aria-label=\"Settings\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Settings\">&nbsp;</i>&nbsp;'+";
                 }
@@ -584,10 +611,14 @@ if (strpos($dash_config, 'globe') !== false) {
                 success: function (data) {
                     if( data.status == "ok" ) {
                         widget_reload(widget_id,widget_type);
+                        toastr.success(data.message);
                     }
                     else {
-                        $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                        toastr.error(data.message);
                     }
+                },
+                error: function (data) {
+                    toastr.error(data.message);
                 }
             });
         }
@@ -606,7 +637,12 @@ if (strpos($dash_config, 'globe') !== false) {
         $.ajax({
             type: 'POST',
             url: 'ajax_dash.php',
-            data: {type: data_type, id: id, dimensions: {x:$("#widget_body_"+id).innerWidth()-50, y:$("#widget_body_"+id).innerHeight()-50}, settings:settings},
+            data: {
+                type: data_type,
+                id: id,
+                dimensions: {x:$("#widget_body_"+id).innerWidth()-50, y:$("#widget_body_"+id).innerHeight()-50},
+                settings:settings
+            },
             dataType: "json",
             success: function (data) {
                 if (data.status == 'ok') {
@@ -617,8 +653,12 @@ if (strpos($dash_config, 'globe') !== false) {
                     $("#widget_body_"+id).html('<div class="alert alert-info">' + data.message + '</div>');
                 }
             },
-            error: function () {
-                $("#widget_body_"+id).html('<div class="alert alert-info">Problem with backend</div>');
+            error: function (data) {
+                if (data.responseJSON.error) {
+                    $("#widget_body_"+id).html('<div class="alert alert-info">' + data.responseJSON.error + '</div>');
+                } else {
+                    $("#widget_body_"+id).html('<div class="alert alert-info">Problem with backend</div>');
+                }
             }
         });
     }

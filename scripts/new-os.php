@@ -121,7 +121,7 @@ discovery:
                 -
                     oid: $table_name
                     value: $value
-                    num_oid: {$tmp_table[$value]}.
+                    num_oid: {$tmp_table[$value]}.{{ \$index }}
                     descr: $descr";
                     if ($multiplier) {
                         $discovery[$type] .= "\n                    multiplier: $multiplier";

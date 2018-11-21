@@ -1,56 +1,61 @@
 <?php
 
-/*
- * LibreNMS
+/**
+ * Laravel - A PHP Framework For Web Artisans
  *
- * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
- *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.  Please see LICENSE.txt at the top level of
- * the source code distribution for details.
+ * @package  Laravel
+ * @author   Taylor Otwell <taylor@laravel.com>
  */
 
-use LibreNMS\Authentication\Auth;
+/*
+|--------------------------------------------------------------------------
+| Register The Auto Loader
+|--------------------------------------------------------------------------
+|
+| Composer provides a convenient, automatically generated class loader for
+| our application. We just need to utilize it! We'll simply require it
+| into the script here so that we don't have to worry about manual
+| loading any of our classes later on. It feels great to relax.
+|
+*/
 
-$init_modules = array('web', 'auth');
-require realpath(__DIR__ . '/..') . '/includes/init.php';
+require __DIR__.'/../bootstrap/autoload.php';
 
-set_debug($_REQUEST['debug']);
+/*
+|--------------------------------------------------------------------------
+| Turn On The Lights
+|--------------------------------------------------------------------------
+|
+| We need to illuminate PHP development, so let us turn on the lights.
+| This bootstraps the framework and gets it ready for use, then it
+| will load up this application so that we can run it and send
+| the responses back to the browser and delight our users.
+|
+*/
 
-if (!Auth::check()) {
-    echo 'unauthenticated';
-    exit;
-}
+$app = require_once __DIR__.'/../bootstrap/app.php';
 
-$type = mres($_POST['type']);
+/*
+|--------------------------------------------------------------------------
+| Run The Application
+|--------------------------------------------------------------------------
+|
+| Once we have the application, we can handle the incoming request
+| through the kernel, and send the associated response back to
+| the client's browser allowing them to enjoy the creative
+| and wonderful application we have prepared for them.
+|
+*/
 
-if ($type == 'placeholder') {
-    $output = "<span style='text-align:left;'><br><h3>Click on the Edit Dashboard button (next to the list of dashboards) to add widgets</h3><br><h4><strong>Remember:</strong> You can only move & resize widgets when you're in <strong>Edit Mode</strong>.</h4><span>";
-    $status = 'ok';
-    $title = 'Placeholder';
-} elseif (is_file('includes/common/'.$type.'.inc.php')) {
-    $results_limit     = 10;
-    $typeahead_limit   = $config['webui']['global_search_result_limit'];
-    $no_form           = true;
-    $unique_id         = str_replace(array("-","."), "_", uniqid($type, true));
-    $widget_id         = mres($_POST['id']);
-    $widget_settings   = json_decode(dbFetchCell('select settings from users_widgets where user_widget_id = ?', array($widget_id)), true);
-    $widget_dimensions = $_POST['dimensions'];
-    if (!empty($_POST['settings'])) {
-        define('SHOW_SETTINGS', true);
-    }
-    include 'includes/common/'.$type.'.inc.php';
-    $output = implode('', $common_output);
-    $status = 'ok';
-    $title  = display($widget_settings['title']) ?: ucfirst(display($type));
-}
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
-$response = array(
-                  'status' => $status,
-                  'html' => $output,
-                  'title' => $title,
-                 );
-header('Content-type: application/json');
-echo _json_encode($response);
+// rewrite the request uri
+$_SERVER['REQUEST_URI'] = '/legacy_ajax_dash';
+
+$response = $kernel->handle(
+    $request = Illuminate\Http\Request::capture()
+);
+
+$response->send();
+
+$kernel->terminate($request, $response);

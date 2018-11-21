@@ -1,4 +1,5 @@
 source: Extensions/World-Map.md
+path: blob/master/doc/
 # World Map Configuration
 
 LibreNMS comes with a configurable Geo Map based on World Map Widget to visualize where your equipment is located geographically.
@@ -55,6 +56,24 @@ $config['leaflet']['default_lng']                       = "5.350342";
 $config['leaflet']['default_zoom']                      = 8;    
 $config['leaflet']['group_radius']                      = 1;    // Device grouping radius in KM default 80KM
 ```
+
+### Geocode engine config
+```php
+$config['geoloc']['engine'] = "google";// Valid options are google, mapquest or bing
+$config['geoloc']['api_key'] = "abcdefghijklmnopqrstuvwxyz";
+```
+Google:
+Pros: fast, accurate
+Cons: requares a credit card even for free account
+
+MapQuest:
+Pros: free, no credit card required
+Cons: inaccurate: most addresses are retured location at center of US
+
+Bing:
+Pros: free, no credit card required, accurate
+Cons: Microsoft(debatable)
+
 
 ### Jquery-Mapael config
 Further custom options are available to load different maps of the world, set default coordinates of where the map will zoom and the zoom level by default. An example of

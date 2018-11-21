@@ -13085,18 +13085,6 @@
         },
         "poller": "matches discovery"
     },
-    "bgp-peers": {
-        "discovery": {
-            "devices": [
-                {
-                    "bgpLocalAs": null
-                }
-            ],
-            "bgpPeers": [],
-            "bgpPeers_cbgp": []
-        },
-        "poller": "matches discovery"
-    },
     "vlans": {
         "discovery": {
             "vlans": [
@@ -13187,21 +13175,21 @@
         "discovery": {
             "sensors": [
                 {
-                    "sensor_deleted": "0",
+                    "sensor_deleted": 0,
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.6027.3.26.1.3.4.1.13.1",
                     "sensor_index": "1",
                     "sensor_type": "dnos",
                     "sensor_descr": "Unit 1",
-                    "sensor_divisor": "1",
-                    "sensor_multiplier": "1",
-                    "sensor_current": "62",
-                    "sensor_limit": "82",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 62,
+                    "sensor_limit": 82,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": "52",
+                    "sensor_limit_low": 52,
                     "sensor_limit_low_warn": null,
-                    "sensor_alert": "1",
+                    "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,

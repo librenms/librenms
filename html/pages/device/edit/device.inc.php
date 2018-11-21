@@ -1,10 +1,10 @@
 <?php
 
 use App\Models\Device;
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 if ($_POST['editing']) {
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (LegacyAuth::user()->hasGlobalAdmin()) {
         $updated = 0;
 
         if (isset($_POST['parent_id'])) {
@@ -61,7 +61,7 @@ if ($_POST['editing']) {
             $update_message = "Device record update error.";
         }
         if (isset($_POST['hostname']) && $_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
-            if (Auth::user()->hasGlobalAdmin()) {
+            if (LegacyAuth::user()->hasGlobalAdmin()) {
                 $result = renamehost($device['device_id'], $_POST['hostname'], 'webui');
                 if ($result == "") {
                     print_message("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");

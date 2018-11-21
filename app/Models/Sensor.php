@@ -5,7 +5,7 @@ namespace App\Models;
 class Sensor extends BaseModel
 {
     public $timestamps = false;
-    protected $primaryKey = 'sensors_id';
+    protected $primaryKey = 'sensor_id';
 
     protected static $icons = array(
         'fanspeed' => 'tachometer',
@@ -63,5 +63,10 @@ class Sensor extends BaseModel
     public function device()
     {
         return $this->belongsTo('App\Models\Device', 'device_id');
+    }
+
+    public function events()
+    {
+        return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
     }
 }

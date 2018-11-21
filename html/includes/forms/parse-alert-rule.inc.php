@@ -13,9 +13,9 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
@@ -70,12 +70,13 @@ if (is_array($rule)) {
 
     header('Content-type: application/json');
     echo json_encode([
-        'extra'    => isset($rule['extra']) ? json_decode($rule['extra']) : null,
-        'maps'     => $maps,
+        'extra'      => isset($rule['extra']) ? json_decode($rule['extra']) : null,
+        'maps'       => $maps,
         'transports' => $transports,
-        'name'     => $rule['name'],
-        'proc'     => $rule['proc'],
-        'builder'  => $builder,
-        'severity' => $rule['severity'],
+        'name'       => $rule['name'],
+        'proc'       => $rule['proc'],
+        'builder'    => $builder,
+        'severity'   => $rule['severity'],
+        'adv_query'  => $rule['query'],
     ]);
 }

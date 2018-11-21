@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
 
 $no_refresh = true;
@@ -10,15 +10,15 @@ $pagetitle[] = 'Preferences';
 echo '<h2>User Preferences</h2>';
 echo '<hr>';
 
-if (Auth::user()->isDemoUser()) {
+if (LegacyAuth::user()->isDemoUser()) {
     demo_account();
 } else {
     if ($_POST['action'] == 'changepass') {
-        if (Auth::get()->authenticate(Auth::user()->username, $_POST['old_pass'])) {
+        if (LegacyAuth::get()->authenticate(LegacyAuth::user()->username, $_POST['old_pass'])) {
             if ($_POST['new_pass'] == '' || $_POST['new_pass2'] == '') {
                 $changepass_message = 'Password must not be blank.';
             } elseif ($_POST['new_pass'] == $_POST['new_pass2']) {
-                Auth::get()->changePassword(Auth::user()->username, $_POST['new_pass']);
+                LegacyAuth::get()->changePassword(LegacyAuth::user()->username, $_POST['new_pass']);
                 $changepass_message = 'Password Changed.';
             } else {
                 $changepass_message = "Passwords don't match.";
@@ -33,10 +33,18 @@ if (Auth::user()->isDemoUser()) {
             $updatedashboard_message = "User default dashboard updated";
         }
     }
+    if ($vars['action'] === 'changenote') {
+        set_user_pref('add_schedule_note_to_device', (bool)$vars['notetodevice']);
+        if ($vars['notetodevice']) {
+            $updatenote_message = "Schedule notes will now be added to device notes";
+        } else {
+            $updatenote_message = "Schedule notes will no longer be added to device notes";
+        }
+    }
 
     include 'includes/update-preferences-password.inc.php';
 
-    if (Auth::get()->canUpdatePasswords(Auth::user()->username)) {
+    if (LegacyAuth::get()->canUpdatePasswords(LegacyAuth::user()->username)) {
         echo '<h3>Change Password</h3>';
         echo '<hr>';
         echo "<div class='well'>";
@@ -75,103 +83,61 @@ if (Auth::user()->isDemoUser()) {
     }//end if
 
     if ($config['twofactor'] === true) {
-        if ($_POST['twofactorremove'] == 1) {
-            if (!isset($_POST['twofactor'])) {
-                echo '<div class="well"><form class="form-horizontal" role="form" action="" method="post" name="twofactorform">';
-                echo '<input type="hidden" name="twofactorremove" value="1" />';
-                echo TwoFactor::getForm(false);
-                echo '</form></div>';
-            } else {
-                $twofactor = get_user_pref('twofactor');
-                if (empty($twofactor)) {
-                    echo '<div class="alert alert-danger">Error: How did you even get here?!</div><script>window.location = "preferences/";</script>';
-                }
-
-                if (TwoFactor::verifyHOTP($twofactor['key'], $_POST['twofactor'], $twofactor['counter'])) {
-                    if (!set_user_pref('twofactor', array())) {
-                        echo '<div class="alert alert-danger">Error while disabling TwoFactor.</div>';
-                    } else {
-                        echo '<div class="alert alert-success">TwoFactor Disabled.</div>';
-                    }
-                } else {
-                    session_destroy();
-                    echo '<div class="alert alert-danger">Error: Supplied TwoFactor Token is wrong, you\'ve been logged out.</div><script>window.location = "' . $config['base_url'] . '";</script>';
-                }
-            }//end if
-        } else {
-            $twofactor = get_user_pref('twofactor');
-            echo '<script src="js/jquery.qrcode.min.js"></script>';
-            echo '<div class="well"><h3>Two-Factor Authentication</h3>';
-            if (!empty($twofactor)) {
-                $twofactor['text'] = "<div class='form-group'>
+        $twofactor = get_user_pref('twofactor');
+        echo '<script src="js/jquery.qrcode.min.js"></script>';
+        echo '<h3>Two-Factor Authentication</h3>';
+        echo '<hr>';
+        echo '<div class="well">';
+        if (!empty($twofactor)) {
+            $twofactor['text'] = "<div class='form-group'>
   <label for='twofactorkey' class='col-sm-2 control-label'>Secret Key</label>
   <div class='col-sm-4'>
     <input type='text' name='twofactorkey' autocomplete='off' disabled class='form-control input-sm' value='".$twofactor['key']."' />
   </div>
 </div>";
-                if ($twofactor['counter'] !== false) {
-                    $twofactor['uri']   = 'otpauth://hotp/'.Auth::user()->username.'?issuer=LibreNMS&counter='.$twofactor['counter'].'&secret='.$twofactor['key'];
-                    $twofactor['text'] .= "<div class='form-group'>
+            if ($twofactor['counter'] !== false) {
+                $twofactor['uri']   = 'otpauth://hotp/'.LegacyAuth::user()->username.'?issuer=LibreNMS&counter='.$twofactor['counter'].'&secret='.$twofactor['key'];
+                $twofactor['text'] .= "<div class='form-group'>
   <label for='twofactorcounter' class='col-sm-2 control-label'>Counter</label>
   <div class='col-sm-4'>
     <input type='text' name='twofactorcounter' autocomplete='off' disabled class='form-control input-sm' value='".$twofactor['counter']."' />
   </div>
 </div>";
-                } else {
-                    $twofactor['uri'] = 'otpauth://totp/'.Auth::user()->username.'?issuer=LibreNMS&secret='.$twofactor['key'];
-                }
+            } else {
+                $twofactor['uri'] = 'otpauth://totp/'.LegacyAuth::user()->username.'?issuer=LibreNMS&secret='.$twofactor['key'];
+            }
 
-                echo '<div id="twofactorqrcontainer">
+            echo '<div id="twofactorqrcontainer">
 <div id="twofactorqr"></div>
 <button class="btn btn-default" onclick="$(\'#twofactorkeycontainer\').show(); $(\'#twofactorqrcontainer\').hide();">Manual</button>
 </div>';
-                echo '<div id="twofactorkeycontainer">
+            echo '<div id="twofactorkeycontainer">
 <form id="twofactorkey" class="form-horizontal" role="form">'.$twofactor['text'].'</form>
 <button class="btn btn-default" onclick="$(\'#twofactorkeycontainer\').hide(); $(\'#twofactorqrcontainer\').show();">QR</button>
 </div>';
-                echo '<script>$("#twofactorqr").qrcode({"text": "'.$twofactor['uri'].'"}); $("#twofactorkeycontainer").hide();</script>';
-                echo '<br/><form method="post" class="form-horizontal" role="form">
-  <input type="hidden" name="twofactorremove" value="1" />
+            echo '<script>$("#twofactorqr").qrcode({"text": "'.$twofactor['uri'].'"}); $("#twofactorkeycontainer").hide();</script>';
+            echo '<br/><form method="post" class="form-horizontal" role="form" action="2fa/remove">
   <button class="btn btn-danger" type="submit">Disable TwoFactor</button>
 </form>';
-            } else {
-                if (isset($_POST['gentwofactorkey']) && isset($_POST['twofactortype'])) {
-                    $chk = get_user_pref('twofactor');
-                    if (empty($chk)) {
-                        $twofactor = array('key' => TwoFactor::genKey());
-                        if ($_POST['twofactortype'] == 'counter') {
-                            $twofactor['counter'] = 1;
-                        } else {
-                            $twofactor['counter'] = false;
-                        }
-
-                        if (!set_user_pref('twofactor', $twofactor)) {
-                            echo '<div class="alert alert-danger">Error inserting TwoFactor details. Please try again later and contact Administrator if error persists.</div>';
-                        } else {
-                            echo '<div class="alert alert-success">Added TwoFactor credentials. Please reload page.</div><script>window.location = "preferences/";</script>';
-                        }
-                    } else {
-                        echo '<div class="alert alert-danger">TwoFactor credentials already exists.</div>';
-                    }
-                } else {
-                    echo '<form method="post" class="form-horizontal" role="form">
-  <input type="hidden" name="gentwofactorkey" value="1" />
+        } else {
+                echo '<form method="post" class="form-horizontal" role="form" action="2fa/add">
   <div class="form-group">
     <label for="twofactortype" class="col-sm-2 control-label">TwoFactor Type</label>
     <div class="col-sm-4">
-      <select name="twofactortype">
-        <option value=""></option>
-        <option value="counter">Counter Based (HOTP)</option>
+      <select name="twofactortype" class="select">
         <option value="time">Time Based (TOTP)</option>
+        <option value="counter">Counter Based (HOTP)</option>
       </select>
     </div>
   </div>
-  <button class="btn btn-default" type="submit">Generate TwoFactor Secret Key</button>
+  <div class="form-group">
+      <div class="col-sm-4 col-sm-offset-1">
+        <button class="btn btn-default" type="submit">Generate TwoFactor Secret Key</button>
+      </div>
+  </div>
 </form>';
-                }//end if
-            }//end if
-            echo '</div>';
         }//end if
+        echo '</div>';
     }//end if
 }//end if
 
@@ -205,15 +171,43 @@ echo "
 </div>";
 
 
+echo "<h3>Add schedule notes to devices notes</h3>
+<hr>
+<div class='well'>";
+if (!empty($updatenote_message)) {
+    print_message($updatenote_message);
+}
+echo "
+  <form method='post' action='preferences/' class='form-horizontal' role='form'>
+    <div class='form-group'>
+      <input type=hidden name='action' value='changenote'>
+      <div class='form-group'>
+        <label for='dashboard' class='col-sm-3 control-label'>Add schedule notes to devices notes</label>
+        <div class='col-sm-4'>
+          <input id='notetodevice' type='checkbox' name='notetodevice' data-size='small' " . ((get_user_pref('add_schedule_note_to_device', false)) ? 'checked' : '') . ">
+        </div>
+      </div>
+      <div class='form-group'>
+          <div class='col-sm-4 col-sm-offset-3'>
+              <button type='submit' class='btn btn-default'>Update preferences</button>
+        </div>
+        <div class='col-sm-6'></div>
+      </div>
+    </div>
+  </form>
+</div>";
+
+
+
 echo "<h3>Device Permissions</h3>";
 echo "<hr>";
-echo "<div style='background-color: #e5e5e5; border: solid #e5e5e5 10px;  margin-bottom:10px;'>";
-if (Auth::user()->hasGlobalAdmin()) {
+echo '<div class="well">';
+if (LegacyAuth::user()->hasGlobalAdmin()) {
     echo "<strong class='blue'>Global Administrative Access</strong>";
-} elseif (Auth::user()->hasGlobalRead()) {
+} elseif (LegacyAuth::user()->hasGlobalRead()) {
     echo "<strong class='green'>Global Viewing Access</strong>";
 } else {
-    foreach (dbFetchRows('SELECT * FROM `devices_perms` AS P, `devices` AS D WHERE `user_id` = ? AND P.device_id = D.device_id', array(Auth::id())) as $perm) {
+    foreach (dbFetchRows('SELECT * FROM `devices_perms` AS P, `devices` AS D WHERE `user_id` = ? AND P.device_id = D.device_id', array(LegacyAuth::id())) as $perm) {
     // FIXME generatedevicelink?
         echo "<a href='device/device=".$perm['device_id']."'>".$perm['hostname'].'</a><br />';
         $dev_access = 1;
@@ -225,3 +219,5 @@ if (Auth::user()->hasGlobalAdmin()) {
 }
 
 echo '</div>';
+
+echo "<script>$(\"[name='notetodevice']\").bootstrapSwitch('offColor','danger');</script>";

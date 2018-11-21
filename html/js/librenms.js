@@ -269,3 +269,32 @@ $(document).ready(function() {
         }
     });
 });
+
+function refresh_oxidized_node(device_hostname){
+    $.ajax({
+        type: 'POST',
+        url: 'ajax_form.php',
+        data: {
+            type: "refresh-oxidized-node",
+            device_hostname: device_hostname
+        },
+        success: function (data) {
+            if(data['status'] == 'ok') {
+                toastr.success(data['message']);
+            } else {
+                toastr.error(data['message']);
+            }
+        },
+        error:function(){
+            toastr.error('An error occured while queuing refresh for an oxidized node (hostname: ' + device_hostname + ')');
+        }
+    });
+}
+
+$(document).ready(function () {
+    setInterval(function () {
+        $('.bootgrid-table').each(function() {
+            $(this).bootgrid('reload');
+        });
+    }, 300000);
+});

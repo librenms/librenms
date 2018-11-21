@@ -1,4 +1,5 @@
 source: Extensions/MIB-based-polling.md
+path: blob/master/doc/
 ## WARNING ##
 
 MIB-based polling is unmaintained and may be removed in the future.  It might overload your LibreNMS server,
