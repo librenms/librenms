@@ -9,4 +9,4 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     - sysDescr_regex:
-        - '/^NFT 2N/'
+        - '/^NFT 2/'
