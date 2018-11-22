@@ -22,6 +22,10 @@ if (is_numeric($srx_sess_data[0]['jnxJsSPUMonitoringCurrentFlowSession'])) {
 
 $version = snmp_get($device, 'jnxVirtualChassisMemberSWVersion.0', '-Oqv', 'JUNIPER-VIRTUALCHASSIS-MIB');
 if (empty($version)) {
+    preg_match('/kernel JUNOS (\S+),/', $device['sysDescr'], $jun_ver);
+    $version = $jun_ver[1];
+}
+if (empty($version)) {
     preg_match('/\[(.+)\]/', snmp_get($device, '.1.3.6.1.2.1.25.6.3.1.2.2', '-Oqv', 'HOST-RESOURCES-MIB'), $jun_ver);
     $version = $jun_ver[1];
 }
