@@ -81,10 +81,10 @@ function poll_sensor($device, $class)
             } elseif ($class == 'state') {
                 if (!is_numeric($sensor_value)) {
                     $state_value = dbFetchCell(
-                        'SELECT `state_value` 
-                        FROM `state_translations` LEFT JOIN `sensors_to_state_indexes` 
-                        ON `state_translations`.`state_index_id` = `sensors_to_state_indexes`.`state_index_id` 
-                        WHERE `sensors_to_state_indexes`.`sensor_id` = ? 
+                        'SELECT `state_value`
+                        FROM `state_translations` LEFT JOIN `sensors_to_state_indexes`
+                        ON `state_translations`.`state_index_id` = `sensors_to_state_indexes`.`state_index_id`
+                        WHERE `sensors_to_state_indexes`.`sensor_id` = ?
                         AND `state_translations`.`state_descr` LIKE ?',
                         array($sensor['sensor_id'], $sensor_value)
                     );
@@ -828,4 +828,39 @@ function json_app_get($device, $extend, $min_version = 1)
     }
 
     return $parsed_json;
+}
+
+/**
+ * Some data arrays returned with json_app_get are deeper than
+ * update_application likes. This recurses through the array
+ * and flattens it out so it can nicely be inserted into the
+ * database.
+ *
+ * One argument is taken and that is the array to flatten.
+ *
+ * @param array $array
+ * @param string $prefix What to prefix to the name. Defaults to '', nothing.
+ * @param string $joiner The string to join the prefix, if set to something other
+ *                       than '', and array keys with.
+ *
+ * @return array The flattened array.
+ */
+function data_flatten($array, $prefix = '', $joiner = '_')
+{
+    $return = array();
+    foreach ($array as $key => $value) {
+        if (is_array($value)) {
+            if (strcmp($prefix, '')) {
+                $key=$prefix.$joiner.$key;
+            }
+            $return = array_merge($return, data_flatten($value, $key, $joiner));
+        } else {
+            if (strcmp($prefix, '')) {
+                $key=$prefix.$joiner.$key;
+            }
+            $return[$key] = $value;
+        }
+    }
+
+    return $return;
 }
