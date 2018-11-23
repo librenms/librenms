@@ -91,8 +91,8 @@ class Aprisa extends OS implements
         $oidcorrectable = '.1.3.6.1.4.1.14817.7.3.1.2.6.1.0';
         $oiduncorrectable = '.1.3.6.1.4.1.14817.7.3.1.2.6.2.0';
         return array(
-            new WirelessSensor('errors', $this->getDeviceId(), $oidcorrectable, 'radio', 1, 'Correctable Errors', null, 1, 1),
-            new WirelessSensor('errors', $this->getDeviceId(), $oiduncorrectable, 'radio', 1, 'Uncorrectable Errors', null, 1, 1),
+            new WirelessSensor('errors', $this->getDeviceId(), $oidcorrectable, 'radio', 1, 'Correctable Errors'),
+            new WirelessSensor('errors', $this->getDeviceId(), $oiduncorrectable, 'radio', 2, 'Uncorrectable Errors'),
         );
     }
 
@@ -107,8 +107,8 @@ class Aprisa extends OS implements
         $oidrx = '.1.3.6.1.4.1.14817.7.3.1.2.51.5.0';
         $oidtx = '.1.3.6.1.4.1.14817.7.3.1.2.36.7.0';
         return array(
-            new WirelessSensor('frequency', $this->getDeviceId(), $oidrx, 'radio', 1, 'Rx Frequency', null, 1, 1000000),
-            new WirelessSensor('frequency', $this->getDeviceId(), $oidtx, 'radio', 1, 'Tx Frequency', null, 1, 1000000),
+            new WirelessSensor('frequency', $this->getDeviceId(), $oidrx, 'radio', 'rx', 'Rx Frequency', null, 1, 1000000),
+            new WirelessSensor('frequency', $this->getDeviceId(), $oidtx, 'radio', 'tx', 'Tx Frequency', null, 1, 1000000),
         );
     }
 }
