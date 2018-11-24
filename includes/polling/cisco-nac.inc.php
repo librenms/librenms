@@ -20,8 +20,8 @@ if (!get_dev_attrib($device, 'poll_cisco-nac', 'true')) {
         $CheckExistDomain = dbFetchRow('SELECT PortAuthSessionDomain FROM `ports_nac` WHERE `PortAuthSessionDomain` = ? AND `port_index` = ?', array($port_auth_domain, $port_index_nac));
         if ($CheckExistAuth['auth_id'] == $port_auth_id_nac) {
             echo "Auth ID Found.\n";
-        }
-        elseif ($CheckExistAuth['auth_id'] == null AND $CheckExistIndex['port_index'] == null){
+        } 
+        elseif ($CheckExistAuth['auth_id'] == null and $CheckExistIndex['port_index'] == null) {
             echo "Auth ID and Interface Index not found. Creating...\n";
             dbInsert(array('auth_id' => $port_auth_id_nac), 'ports_nac');
             $IPHextoDec = IP::fromHexString($PortAuthSessionEntryParameters['cafSessionClientAddress']);
@@ -64,7 +64,7 @@ if (!get_dev_attrib($device, 'poll_cisco-nac', 'true')) {
                 'PortAuthSessionTimeOut' => $PortAuthSessionEntryParameters['cafSessionTimeout'],
                 'PortAuthSessionTimeLeft' => $PortAuthSessionEntryParameters['cafSessionTimeLeft'],
                 'device_id' => $device['device_id']
-            ), 'ports_nac', '`port_index` = ? AND `PortAuthSessionDomain` = ?' ,  array($port_index_nac, $PortAuthSessionEntryParameters['cafSessionDomain']));
+            ),'ports_nac', '`port_index` = ? AND `PortAuthSessionDomain` = ?' ,  array($port_index_nac, $PortAuthSessionEntryParameters['cafSessionDomain']));
             foreach ($cafSessionMethodsInfoEntry as $cafSessionMethodsInfoEntryNAC => $cafSessionMethodsInfoEntryParameters) {
                 $port_index_nac = substr($cafSessionMethodsInfoEntryNAC, 0, strpos($cafSessionMethodsInfoEntryNAC, "."));
                 $port_method_nac = substr(strstr(substr(strstr($cafSessionMethodsInfoEntryNAC, "."), 1), "."), 1);
@@ -75,7 +75,7 @@ if (!get_dev_attrib($device, 'poll_cisco-nac', 'true')) {
                 dbQuery("UPDATE `ports_nac` SET `PortSessionMethod` = '".$port_method_nac."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."' AND `ports_nac`.`port_index` = '".$port_index_nac."';");
                 dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthcStatus` = '".$cafSessionMethodsInfoEntryParameters['cafSessionMethodState']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
             }
-        } elseif (($CheckExistAuth['auth_id'] == null) && ($CheckExistIndex['port_index'] == $port_index_nac) && ($CheckExistDomain['PortAuthSessionDomain'] == null)){
+        } elseif (($CheckExistAuth['auth_id'] == null) && ($CheckExistIndex['port_index'] == $port_index_nac) && ($CheckExistDomain['PortAuthSessionDomain'] == null)) {
             echo "Auth ID not found. Creating...\n";
             dbInsert(array('auth_id' => $port_auth_id_nac), 'ports_nac');
             $IPHextoDec = IP::fromHexString($PortAuthSessionEntryParameters['cafSessionClientAddress']);
@@ -101,11 +101,11 @@ if (!get_dev_attrib($device, 'poll_cisco-nac', 'true')) {
                 dbQuery("UPDATE `ports_nac` SET `PortSessionMethod` = '".$port_method_nac."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."' AND `ports_nac`.`port_index` = '".$port_index_nac."';");
                 dbQuery("UPDATE `ports_nac` SET `PortAuthSessionAuthcStatus` = '".$cafSessionMethodsInfoEntryParameters['cafSessionMethodState']."' WHERE `ports_nac`.`auth_id` = '".$port_auth_id_nac."';");
             }
-        }
+        } 
         else {
             echo 'Nothing';
         }
-    unset($CheckExistIndex, $CheckExistAuth, $CheckExistDomain);
+        unset($CheckExistIndex, $CheckExistAuth, $CheckExistDomain);
     }
     foreach ($ports_mapped['maps']['ifIndex'] as $ports_mapped_index => $ports_mapped_id) {
         dbQuery("UPDATE `ports_nac` SET `port_id` = '".$ports_mapped_id."' WHERE `ports_nac`.`port_index` = '".$ports_mapped_index."';");
