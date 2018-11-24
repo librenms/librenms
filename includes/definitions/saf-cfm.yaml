@@ -1,5 +1,5 @@
-os: saf-cfml4
-text: 'SAF CFM L4'
+os: saf-cfm
+text: 'SAF CFM'
 type: wireless
 icon: saf
 group: saf

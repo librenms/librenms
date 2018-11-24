@@ -26,9 +26,9 @@ if ($device['os'] == 'vrp') {
     echo ' hwEntityBomEnDesc';
     $entity_array = snmpwalk_cache_oid($device, 'hwEntityBomEnDesc', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
 }
-if ($device['os'] == 'saf-cfml4') {
+if ($device['os'] == 'saf-cfm') {
     $entity_array = [];
-    echo ' saf-cfml4Anatomy';
+    echo ' saf-cfmAnatomy';
     $oid = '.1.3.6.1.4.1.7571.100.1.1.2.22';
     $device_array = snmpwalk_cache_oid($device, $oid, [], 'SAF-MPMUX-MIB')[0];
 
@@ -41,7 +41,7 @@ if ($device['os'] == 'saf-cfml4') {
         'entPhysicalName' => 'Chassis',
         'entPhysicalSerialNum' => $device_array['serialNumber'],
         'entPhysicalMfgName' => 'SAF',
-        'entPhysicalModelName' => 'CFM L4',
+        'entPhysicalModelName' => $device_array['serialNumber'],
         'entPhysicalIsFRU' => 'true',
     ];
 

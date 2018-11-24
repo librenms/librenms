@@ -2,7 +2,7 @@
 /**
  * SafCfml4.php
  *
- * Saf CFM L4 wireless radios
+ * Saf CFM wireless radios
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessQualityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
 use LibreNMS\OS;
 
-class SafCfml4 extends OS implements
+class SafCfm extends OS implements
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
     WirelessErrorsDiscovery

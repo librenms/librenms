@@ -7,7 +7,7 @@ modules:
         num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.28.{{ $index }}'
         oid: cpuUsage
         precision: 1
-        type: saf-cfml4
+        type: saf-cfm
   sensors: 
     state: 
       data: 
