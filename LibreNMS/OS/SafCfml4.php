@@ -54,10 +54,7 @@ class SafCfml4 extends OS implements
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.3.6.0',
                 'saf-cfml4-tx',
                 'cfml4radioR1TxFrequency',
-                'Radio 1 Tx Frequency',
-                null,
-                1,
-                1
+                'Radio 1 Tx Frequency'
             ),
             // SAF-MPMUX-MIB::cfml4radioRxFrequency
             new WirelessSensor(
@@ -66,10 +63,7 @@ class SafCfml4 extends OS implements
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.3.7.0',
                 'saf-cfml4-rx',
                 'cfml4radioR1RxFrequency',
-                'Radio 1 Rx Frequency',
-                null,
-                1,
-                1
+                'Radio 1 Rx Frequency'
             ),
             new WirelessSensor(
                 'frequency',
@@ -77,10 +71,7 @@ class SafCfml4 extends OS implements
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.4.6.0',
                 'saf-cfml4-tx',
                 'cfml4radioR2TxFrequency',
-                'Radio 2 Tx Frequency',
-                null,
-                1,
-                1
+                'Radio 2 Tx Frequency'
             ),
             // SAF-MPMUX-MIB::cfml4radioRxFrequency
             new WirelessSensor(
@@ -89,10 +80,7 @@ class SafCfml4 extends OS implements
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.4.7.0',
                 'saf-cfml4-rx',
                 'cfml4radioR2RxFrequency',
-                'Radio 2 Rx Frequency',
-                null,
-                1,
-                1
+                'Radio 2 Rx Frequency'
             ),
         );
     }
