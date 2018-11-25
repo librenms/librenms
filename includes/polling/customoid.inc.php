@@ -43,7 +43,7 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
 
     $rrd_name = array('customoid', $customoid['customoid_descr']);
     if ($customoid['customoid_datatype'] == 'COUNTER') { 
-        $datatype = $customoid['customoid_datatype']
+        $datatype = $customoid['customoid_datatype'];
     } else {
         $datatype = 'GAUGE';
     }
