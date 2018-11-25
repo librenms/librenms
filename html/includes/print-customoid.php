@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 require_once 'includes/modal/new_customoid.inc.php';
 require_once 'includes/modal/delete_customoid.inc.php';
