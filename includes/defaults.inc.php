@@ -792,6 +792,7 @@ $config['poller_modules']['stp']                         = true;
 $config['poller_modules']['ntp']                         = true;
 $config['poller_modules']['loadbalancers']               = false;
 $config['poller_modules']['mef']                         = false;
+$config['poller_modules']['customoid']                   = true;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.

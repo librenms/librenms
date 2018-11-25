@@ -20,6 +20,10 @@ $config['os_group'][$os_group]['over'][0]['text']   = 'Processor Usage';
 $config['os_group'][$os_group]['over'][1]['graph']  = 'device_ucd_memory';
 $config['os_group'][$os_group]['over'][1]['text']   = 'Memory Usage';
 
+//custom oid graphs
+$config['graph_types']['device']['customoid']['section'] = 'customoid';
+$config['graph_types']['device']['customoid']['order']   = '0';
+$config['graph_types']['device']['customoid']['descr']   = 'Custom OID';
 
 // Device  - AirFIBER
 $config['graph_types']['device']['ubnt_airfiber_RadioFreqs']['section'] = 'wireless';
@@ -279,10 +283,6 @@ $config['graph_types']['device']['pf_memdropped']['section']         = 'firewall
 $config['graph_types']['device']['pf_memdropped']['order']           = '10';
 $config['graph_types']['device']['pf_memdropped']['descr']           = 'MemDropped';
 
-
-
-
-
 //Pulse Secure Graphs
 $config['graph_types']['device']['pulse_users']['section']         = 'firewall';
 $config['graph_types']['device']['pulse_users']['order']           = '0';
@@ -529,7 +529,6 @@ $config['graph_types']['device']['riverbed_passthrough']['descr'] = 'Bandwidth P
 $config['graph_types']['device']['routeros_leases']['section'] = 'network';
 $config['graph_types']['device']['routeros_leases']['order'] = 0;
 $config['graph_types']['device']['routeros_leases']['descr'] = 'DHCP Lease Count';
-
 
 //CheckPoint SPLAT specific graphs
 $config['graph_types']['device']['secureplatform_sessions']['section'] = 'firewall';
