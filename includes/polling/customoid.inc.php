@@ -45,7 +45,7 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     if ($customoid['customoid_datatype'] == 'COUNTER') { 
         $datatype = $customoid['customoid_datatype']
     } else {
-        $datatype = 'GAUGE'
+        $datatype = 'GAUGE';
     }
     $rrd_def = RrdDefinition::make()
         ->addDataset('oid_value', $datatype, 0);
