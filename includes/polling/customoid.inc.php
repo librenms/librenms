@@ -42,8 +42,13 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     );
 
     $rrd_name = array('customoid', $customoid['customoid_descr']);
+    if ($customoid['customoid_datatype'] == 'COUNTER') { 
+        $datatype = $customoid['customoid_datatype']
+    } else {
+        $datatype = 'GAUGE'
+    }
     $rrd_def = RrdDefinition::make()
-        ->addDataset('oid_value', $customoid['customoid_datatype'], 0);
+        ->addDataset('oid_value', $datatype, 0);
 
     $tags = compact('rrd_name', 'rrd_def');
 
