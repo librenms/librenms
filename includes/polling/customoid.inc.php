@@ -4,7 +4,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AND `device_id` = ?", array($device['device_id'])) as $customoid) {
     d_echo($customoid);
-    echo 'Custom OID '.$customoid['customoid_descr'].': ';
 
     $prev_oid_value = $customoid['customoid_current'];
 
@@ -35,7 +34,8 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
         $oid_value = $customoid['user_func']($oid_value);
     }
 
-    echo $oid_value.' '.$customoid['customoid_unit'].'\n';
+    echo 'Custom OID '.$customoid['customoid_descr'].': ';
+    echo $oid_value.' '.$customoid['customoid_unit']."\n\n";
 
     $fields = array(
         'oid' => $oid_value,
@@ -48,7 +48,7 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
         $datatype = 'GAUGE';
     }
     $rrd_def = RrdDefinition::make()
-        ->addDataset('oid_value', $datatype, 0);
+        ->addDataset('oid_value', $datatype);
 
     $tags = compact('rrd_name', 'rrd_def');
 
@@ -58,7 +58,6 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
         dbUpdate(array('customoid_prev' => $prev_oid_value), 'customoids', '`customoid_id` = ?', array($customoid['customoid_id']));
     }
 
-    echo '\n';
 }//end foreach
 
 unset($customoid, $prev_oid_value, $rawdata, $user_funcs, $oid_value, $error, $fields, $rrd_def, $rrd_name, $tags);
