@@ -46,78 +46,75 @@ if ($maps_engine == 'google' && $maps_api) {
     echo "<script src='https://unpkg.com/leaflet.gridlayer.googlemutant@latest/Leaflet.GoogleMutant.js'></script>";
 }
 
-echo '
+//foreach (Location::hasAccess(Auth::user())->get() as $location) {
+//    /** @var Location $location */
+//    $num = $location->devices()->count();
+//    $net = $location->devices()->where('type', 'network')->count();
+//    $srv = $location->devices()->where('type', 'server')->count();
+//    $fwl = $location->devices()->where('type', 'firewall')->count();
+//    $hostalerts = $location->devices()->isDown()->count();
+//
+//    if ($hostalerts) {
+//        $alert = '<i class="fa fa-flag" style="color:red" aria-hidden="true"></i>';
+//    } else {
+//        $alert = '';
+//    }
+//
+//    $gps = $location->hasCoordinates() ? $location->lat . ',&nbsp;' . $location->lng : 'N/A';
+//
+//    if ($location != '') {
+//        echo '      <tr class="locations">
+//            <td class="interface" width="300"><a class="list-bold" href="devices/location=' . $location->id . '/">' . display($location->location) . '</a></td>
+//            <td>' . $gps . '</td>
+//            <td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#edit-location" data-id="' . $location->id . '" data-location="' . $location->location . '" data-lat="' . $location->lat . '" data-lng="' . $location->lng . '">Edit</button></td>
+//            <td>' . $alert . '</td>
+//            <td>' . $num . '</td>
+//            <td>' . $net . '</td>
+//            <td>' . $srv . '</td>
+//            <td>' . $fwl . '</td>
+//            </tr>
+//            ';
+//
+//        if ($vars['view'] == 'traffic') {
+//            echo '<tr></tr><tr class="locations"><td colspan=8>';
+//
+//            $graph_array['type'] = 'location_bits';
+//            $graph_array['height'] = '100';
+//            $graph_array['width'] = '220';
+//            $graph_array['to'] = $config['time']['now'];
+//            $graph_array['legend'] = 'no';
+//            $graph_array['id'] = $location->id;
+//
+//            include 'includes/print-graphrow.inc.php';
+//
+//            echo '</tr></td>';
+//        }
+//
+//        $done = 'yes';
+//    }//end if
+//}//end foreach
+?>
+
 <div class="panel panel-default">
     <div class="panel-heading">Locations</div>
     <div class="panel-body">
-        <table class="table" width="100%">
-            <thead>
-            <tr>
-                <th>Location</th>
-                <th>Coordinates</th>
-                <th>Edit</th>
-                <th>Alert</th>
-                <th>Devices</th>
-                <th>Network</th>
-                <th>Servers</th>
-                <th>Firewalls</th>
-            </tr>
-            </thead>
-            <tbody>
-';
-
-foreach (Location::hasAccess(Auth::user())->get() as $location) {
-    /** @var Location $location */
-    $num = $location->devices()->count();
-    $net = $location->devices()->where('type', 'network')->count();
-    $srv = $location->devices()->where('type', 'server')->count();
-    $fwl = $location->devices()->where('type', 'firewall')->count();
-    $hostalerts = $location->devices()->isDown()->count();
-
-    if ($hostalerts) {
-        $alert = '<i class="fa fa-flag" style="color:red" aria-hidden="true"></i>';
-    } else {
-        $alert = '';
-    }
-
-    $gps = $location->hasCoordinates() ? $location->lat . ',&nbsp;' . $location->lng : 'N/A';
-
-    if ($location != '') {
-        echo '      <tr class="locations">
-            <td class="interface" width="300"><a class="list-bold" href="devices/location=' . $location->id . '/">' . display($location->location) . '</a></td>
-            <td>' . $gps . '</td>
-            <td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#edit-location" data-id="' . $location->id . '" data-location="' . $location->location . '" data-lat="' . $location->lat . '" data-lng="' . $location->lng . '">Edit</button></td>
-            <td>' . $alert . '</td>
-            <td>' . $num . '</td>
-            <td>' . $net . '</td>
-            <td>' . $srv . '</td>
-            <td>' . $fwl . '</td>
-            </tr>
-            ';
-
-        if ($vars['view'] == 'traffic') {
-            echo '<tr></tr><tr class="locations"><td colspan=8>';
-
-            $graph_array['type'] = 'location_bits';
-            $graph_array['height'] = '100';
-            $graph_array['width'] = '220';
-            $graph_array['to'] = $config['time']['now'];
-            $graph_array['legend'] = 'no';
-            $graph_array['id'] = $location->id;
-
-            include 'includes/print-graphrow.inc.php';
-
-            echo '</tr></td>';
-        }
-
-        $done = 'yes';
-    }//end if
-}//end foreach
-?>
-
-</tbody>
-</table>
-</div>
+        <div class="table-responsive">
+            <table id="locations" class="table table-hover table-condensed table-striped">
+                <thead>
+                <tr>
+                    <th data-column-id="location" data-order="desc">Location</th>
+                    <th data-column-id="coordinates">Coordinates</th>
+                    <th data-column-id="alert">Alert</th>
+                    <th data-column-id="devices">Devices</th>
+                    <th data-column-id="network">Network</th>
+                    <th data-column-id="servers">Servers</th>
+                    <th data-column-id="firewalls">Firewalls</th>
+                    <?php echo Auth::user()->isAdmin() ? '<th data-column-id="actions">Actions</th>' : ''?>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="edit-location" tabindex="-1" role="dialog" aria-labelledby="edit-location-title">
@@ -143,6 +140,12 @@ foreach (Location::hasAccess(Auth::user())->get() as $location) {
     var locationMap = null;
     var locationMarker = null;
     var locationId = 0;
+
+    var locations_grid = $("#locations").bootgrid({
+        ajax: true,
+        rowCount: [50, 100, 250, -1],
+        url: "ajax/table/location"
+    });
 
     function init_map() {
         locationMap = L.map('location-edit-map');
@@ -175,7 +178,6 @@ foreach (Location::hasAccess(Auth::user())->get() as $location) {
         //         '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
         //         'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
         //     id: 'satellite-streets-v9',
-        //     // token: 'pk.eyJ1IjoibXVycmF5dG9ueSIsImEiOiJjam91cXRjbHUxY3g1M2tudnBnZjZzcXkyIn0.mMZNncizayWxHygotCI8Sw'
         //     token: ''
         // });
 
@@ -227,25 +229,48 @@ foreach (Location::hasAccess(Auth::user())->get() as $location) {
 
     $('#save-location').click(function () {
         var loc = locationMarker.getLatLng();
-        console.log(locationId);
-        console.log("ajax/location/" + locationId);
         $.ajax({
             method: 'PATCH',
             url: "ajax/location/" + locationId,
             data: {lat: loc.lat, lng: loc.lng}
         }).success(function () {
             modal.modal('hide');
-            toastr.success('Location updated')
+            locations_grid.bootgrid('reload');
+            toastr.success('Location updated');
         }).error(function (e) {
+            var msg = 'Failed to update location: ' + e.statusText;
             var data = e.responseJSON;
-            var msg = '';
-            if (data.lat) {
-                msg += data.lat.join(' ') + '<br />';
+            if (data) {
+                if (data.hasOwnProperty('lat')) {
+                    msg = data.lat.join(' ') + '<br />';
+                }
+                if (data.hasOwnProperty('lng')) {
+                    if (!data.hasOwnProperty('lat')) {
+                        msg = '';
+                    }
+
+                    msg += data.lng.join(' ')
+                }
             }
-            if (data.lng) {
-                msg += data.lng.join(' ')
-            }
+
             toastr.error(msg)
         });
-    })
+    });
+
+    function delete_location(locationId) {
+        $.ajax({
+            method: 'DELETE',
+            url: "ajax/location/" + locationId
+        }).success(function () {
+            locations_grid.bootgrid('reload');
+            toastr.success('Location deleted');
+        }).error(function (e) {
+            var data = e.responseJSON;
+            if (data && data.hasOwnProperty('id')) {
+                toastr.error(data.id.join(' '));
+            } else {
+                toastr.error('Failed to delete location: ' + e.statusText)
+            }
+        });
+    }
 </script>
