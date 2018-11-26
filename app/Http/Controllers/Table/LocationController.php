@@ -26,9 +26,14 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Location;
+use LibreNMS\Util\Html;
 
 class LocationController extends TableController
 {
+    public function searchFields($request)
+    {
+        return ['location'];
+    }
 
     /**
      * Defines the base query for this resource
@@ -47,20 +52,27 @@ class LocationController extends TableController
      */
     public function formatItem($location)
     {
-        $edit = '<button type="button" class="btn btn-primary" data-id="' . $location->id .
-            '" data-location="' . $location->location . '" data-lat="' . $location->lat . '" data-lng="' .
-            $location->lng . '" onclick="$(\'#edit-location\').modal(\'show\', this)"><i class="fa fa-pencil" aria-hidden="true"></i>' .
-            '<span class="hidden-sm"> Edit</span></button>';
+        $admin = \Request::user()->isAdmin();
 
+        $buttons = [];
 
-        $delete = ' <button type="button" class="btn btn-danger" onclick="delete_location(' . $location->id . ')"';
-        if ($location->devices()->exists()) {
-            $delete .= 'disabled title="Cannot delete locations used by devices"';
+        $buttons[] = '<button type="button" class="btn btn-primary" onclick="toggle_location_graphs(' . $location->id . ', this)">' .
+            '<i class="fa fa-bar-chart" aria-hidden="true"></i><span class="hidden-sm"> Traffic</span></button>';
+
+        if ($admin) {
+            $buttons[] = '<button type="button" class="btn btn-default" data-id="' . $location->id .
+                '" data-location="' . $location->location . '" data-lat="' . $location->lat . '" data-lng="' .
+                $location->lng . '" onclick="$(\'#edit-location\').modal(\'show\', this)"><i class="fa fa-pencil" aria-hidden="true"></i>' .
+                '<span class="hidden-sm"> Edit</span></button>';
+
+            $delete = ' <button type="button" class="btn btn-danger" onclick="delete_location(' . $location->id . ')"';
+            if ($location->devices()->exists()) {
+                $delete .= 'disabled title="Cannot delete locations used by devices"';
+            }
+
+            $delete .= '><i class="fa fa-trash" aria-hidden="true"></i><span class="hidden-sm"> Delete</span></button>';
+            $buttons[] = $delete;
         }
-
-        $delete .= '><i class="fa fa-trash" aria-hidden="true"></i><span class="hidden-sm"> Delete</span></button>';
-
-
 
         return [
             'location' => $location->location,
@@ -70,7 +82,7 @@ class LocationController extends TableController
             'network' => '<span class="label label-default">' . $location->devices()->where('type', 'network')->count() . '</span>',
             'servers' => '<span class="label label-default">' . $location->devices()->where('type', 'server')->count() . '</span>',
             'firewalls' => '<span class="label label-default">' . $location->devices()->where('type', 'firewall')->count() . '</span>',
-            'actions' => '<span style="white-space:nowrap">' . $edit . $delete . '</span>',
+            'actions' => '<span style="white-space:nowrap">' . implode(' ', $buttons). '</span>',
         ];
     }
 }

@@ -1,114 +1,59 @@
 <?php
 
-use App\Models\Location;
-
 $pagetitle[] = 'Locations';
-
-print_optionbar_start();
-
-echo '<span style="font-weight: bold;">Locations</span> &#187; ';
-
-$menu_options = [
-    'basic' => 'Basic',
-    'traffic' => 'Traffic',
-];
-
-if (!$vars['view']) {
-    $vars['view'] = 'basic';
-}
-
-$sep = '';
-foreach ($menu_options as $option => $text) {
-    echo $sep;
-    if ($vars['view'] == $option) {
-        echo "<span class='pagemenu-selected'>";
-    }
-
-    echo '<a href="locations/view=' . $option . '/">' . $text . '</a>';
-    if ($vars['view'] == $option) {
-        echo '</span>';
-    }
-
-    $sep = ' | ';
-}
-
-unset($sep);
-
-print_optionbar_end();
 
 $maps_api = \LibreNMS\Config::get('geoloc.api_key');
 $maps_engine = $maps_api ? \LibreNMS\Config::get('geoloc.engine') : '';
 
-
 echo '<script src="js/leaflet.js"></script>';
-if ($maps_engine == 'google' && $maps_api) {
+echo '<link rel="stylesheet" href="js/L.Control.Locate.min.css"/>';
+echo '<script src="js/L.Control.Locate.min.js"></script>';
+
+if ($maps_engine == 'google') {
     echo "<script src='https://maps.googleapis.com/maps/api/js?key=$maps_api' async defer></script>";
-    echo "<script src='https://unpkg.com/leaflet.gridlayer.googlemutant@latest/Leaflet.GoogleMutant.js'></script>";
+    echo "<script src='js/Leaflet.GoogleMutant.js'></script>";
 }
 
-//foreach (Location::hasAccess(Auth::user())->get() as $location) {
-//    /** @var Location $location */
-//    $num = $location->devices()->count();
-//    $net = $location->devices()->where('type', 'network')->count();
-//    $srv = $location->devices()->where('type', 'server')->count();
-//    $fwl = $location->devices()->where('type', 'firewall')->count();
-//    $hostalerts = $location->devices()->isDown()->count();
-//
-//    if ($hostalerts) {
-//        $alert = '<i class="fa fa-flag" style="color:red" aria-hidden="true"></i>';
-//    } else {
-//        $alert = '';
-//    }
-//
-//    $gps = $location->hasCoordinates() ? $location->lat . ',&nbsp;' . $location->lng : 'N/A';
-//
-//    if ($location != '') {
-//        echo '      <tr class="locations">
-//            <td class="interface" width="300"><a class="list-bold" href="devices/location=' . $location->id . '/">' . display($location->location) . '</a></td>
-//            <td>' . $gps . '</td>
-//            <td><button type="button" class="btn btn-default" data-toggle="modal" data-target="#edit-location" data-id="' . $location->id . '" data-location="' . $location->location . '" data-lat="' . $location->lat . '" data-lng="' . $location->lng . '">Edit</button></td>
-//            <td>' . $alert . '</td>
-//            <td>' . $num . '</td>
-//            <td>' . $net . '</td>
-//            <td>' . $srv . '</td>
-//            <td>' . $fwl . '</td>
-//            </tr>
-//            ';
-//
-//        if ($vars['view'] == 'traffic') {
-//            echo '<tr></tr><tr class="locations"><td colspan=8>';
-//
-//            $graph_array['type'] = 'location_bits';
-//            $graph_array['height'] = '100';
-//            $graph_array['width'] = '220';
-//            $graph_array['to'] = $config['time']['now'];
-//            $graph_array['legend'] = 'no';
-//            $graph_array['id'] = $location->id;
-//
-//            include 'includes/print-graphrow.inc.php';
-//
-//            echo '</tr></td>';
-//        }
-//
-//        $done = 'yes';
-//    }//end if
-//}//end foreach
 ?>
 
+<script id="location-graph-template" type="text/x-handlebars-template">
+    <tr class="bg-fixer-{{id}}"></tr>
+    <tr id="location-graph-{{id}}" class="location_graphs"><td colspan=8>
+    <?php
+        \Librenms\Config::set('enable_lazy_load', false);
+        $return_data = true;
+        $graph_array = [
+            'type' => 'location_bits',
+            'height' => '100',
+            'width' => '220',
+            'legend' => 'no',
+            'id' => '{{id}}',
+        ];
+        include 'includes/print-graphrow.inc.php';
+        foreach ($graph_data as $graph) {
+            echo "<div class='col-md-3'>";
+            echo str_replace('%7B%7Bid%7D%7D', '{{id}}', $graph); // restore handlebars
+            echo "</div>";
+        }
+    ?>
+    </td></tr>
+</script>
+
+
 <div class="panel panel-default">
-    <div class="panel-heading">Locations</div>
+    <div class="panel-heading"><h4 class="panel-title">Locations</h4></div>
     <div class="panel-body">
         <div class="table-responsive">
             <table id="locations" class="table table-hover table-condensed table-striped">
                 <thead>
                 <tr>
                     <th data-column-id="location" data-order="desc">Location</th>
-                    <th data-column-id="coordinates">Coordinates</th>
-                    <th data-column-id="alert">Alert</th>
-                    <th data-column-id="devices">Devices</th>
-                    <th data-column-id="network">Network</th>
-                    <th data-column-id="servers">Servers</th>
-                    <th data-column-id="firewalls">Firewalls</th>
+                    <th data-column-id="coordinates" data-sortable="false">Coordinates</th>
+                    <th data-column-id="alert" data-sortable="false">Alert</th>
+                    <th data-column-id="devices" data-sortable="false">Devices</th>
+                    <th data-column-id="network" data-sortable="false">Network</th>
+                    <th data-column-id="servers" data-sortable="false">Servers</th>
+                    <th data-column-id="firewalls" data-sortable="false">Firewalls</th>
                     <?php echo Auth::user()->isAdmin() ? '<th data-column-id="actions">Actions</th>' : ''?>
                 </tr>
                 </thead>
@@ -143,7 +88,7 @@ if ($maps_engine == 'google' && $maps_api) {
 
     var locations_grid = $("#locations").bootgrid({
         ajax: true,
-        rowCount: [50, 100, 250, -1],
+        rowCount: [25, 50, 100, -1],
         url: "ajax/table/location"
     });
 
@@ -195,6 +140,10 @@ if ($maps_engine == 'google' && $maps_api) {
         <?php } ?>
 
         L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(locationMap);
+        if (location.protocol === 'https:') {
+            // can't request location permission without https
+            L.control.locate().addTo(locationMap);
+        }
 
         // move marker on drag
         locationMap.on('drag', function () {
@@ -272,5 +221,32 @@ if ($maps_engine == 'google' && $maps_api) {
                 toastr.error('Failed to delete location: ' + e.statusText)
             }
         });
+    }
+
+    var locationsGraphTemplate = Handlebars.compile(document.getElementById("location-graph-template").innerHTML);
+    function toggle_location_graphs(locationId, source) {
+        var $btn = $(source);
+        var $row = $btn.closest('tr');
+        if ($btn.hasClass('active')) {
+            // hide
+            $btn.removeClass('active');
+            $('#location-graph-' + locationId).hide();
+            $('#bg-fix-' + locationId).hide();
+            // $row.next('.bg-fix').remove();
+            // $('#location-graph-' + locationId).detach().appendTo($('#graph-holder')).hide();
+        } else {
+            // show
+            $btn.addClass('active');
+            $existing = $('#location-graph-' + locationId);
+            if ($existing.length) {
+                $existing.show();
+                $('#bg-fix-' + locationId).show();
+            } else {
+                var html = locationsGraphTemplate({id: locationId});
+                console.log(html);
+                $(html).insertAfter($row);
+            }
+            // $('#location-graph-' + locationId).detach().insertAfter($row).show().before('<tr class="bg-fix"></tr>');
+        }
     }
 </script>
