@@ -154,15 +154,16 @@ $('#create-oid-form').on('show.bs.modal', function(e) {
                     $('#limit_warn').val(data.limit_warn);
                     $('#limit_low').val(data.limit_low);
                     $('#limit_low_warn').val(data.limit_low_warn);
-                    $("#alerts").prop("checked", data.alerts);
-                    $("#passed").val(data.passed);
-                    $("#cpassed").prop("checked", data.passed);
+                    $('#alerts').prop('checked', data.alerts);
+                    $('#passed').val(data.passed);
+                    $('#cpassed').prop('checked', data.passed);
                 }
         });
     } else {
         $('#name').val('');
         $('#oid').val('');
         $('#datatype').val('GAUGE');
+        $('#datatype').prop('disabled', false);
         $('#unit').val('');
         $('#divisor').val('');
         $('#multiplier').val('');
@@ -171,9 +172,9 @@ $('#create-oid-form').on('show.bs.modal', function(e) {
         $('#limit_warn').val('');
         $('#limit_low').val('');
         $('#limit_low_warn').val('');
-        $("#alerts").prop("checked", false);
-        $("#passed").val('');
-        $("#cpassed").prop("checked", false);
+        $('#alerts').prop('checked', false);
+        $('#passed').val('');
+        $('#cpassed').prop('checked', false);
     }
 });
 $('#save-oid-button').on('click', function (e) {
