@@ -53,11 +53,12 @@ class LocationController extends TableController
     public function formatItem($location)
     {
         $admin = \Request::user()->isAdmin();
+        $total_devices = $location->devices()->count();
 
         $buttons = [];
 
         $buttons[] = '<button type="button" class="btn btn-primary" onclick="toggle_location_graphs(' . $location->id . ', this)">' .
-            '<i class="fa fa-bar-chart" aria-hidden="true"></i><span class="hidden-sm"> Traffic</span></button>';
+            '<i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> Traffic</span></button>';
 
         if ($admin) {
             $buttons[] = '<button type="button" class="btn btn-default" data-id="' . $location->id .
@@ -65,8 +66,8 @@ class LocationController extends TableController
                 $location->lng . '" onclick="$(\'#edit-location\').modal(\'show\', this)"><i class="fa fa-pencil" aria-hidden="true"></i>' .
                 '<span class="hidden-sm"> Edit</span></button>';
 
-            $delete = ' <button type="button" class="btn btn-danger" onclick="delete_location(' . $location->id . ')"';
-            if ($location->devices()->exists()) {
+            $delete = '<button type="button" class="btn btn-danger" onclick="delete_location(' . $location->id . ')"';
+            if ($total_devices > 0) {
                 $delete .= 'disabled title="Cannot delete locations used by devices"';
             }
 
@@ -78,7 +79,7 @@ class LocationController extends TableController
             'location' => $location->location,
             'coordinates' => $location->hasCoordinates() ? $location->lat . ', ' . $location->lng : 'N/A',
             'alert' => $location->devices()->isDown()->count() ? '<i class="fa fa-flag" style="color:red" aria-hidden="true"></i>' : '',
-            'devices' => '<span class="label label-primary">' . $location->devices()->count() . '</span>',
+            'devices' => '<span class="label label-primary">' . $total_devices . '</span>',
             'network' => '<span class="label label-default">' . $location->devices()->where('type', 'network')->count() . '</span>',
             'servers' => '<span class="label label-default">' . $location->devices()->where('type', 'server')->count() . '</span>',
             'firewalls' => '<span class="label label-default">' . $location->devices()->where('type', 'firewall')->count() . '</span>',
