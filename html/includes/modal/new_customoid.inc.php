@@ -145,6 +145,7 @@ $('#create-oid-form').on('show.bs.modal', function(e) {
                     $('#name').val(data.name);
                     $('#oid').val(data.oid);
                     $('#datatype').val(data.datatype);
+                    $('#datatype').prop('disabled', true);
                     $('#unit').val(data.unit);
                     $('#divisor').val(data.divisor);
                     $('#multiplier').val(data.multiplier);

@@ -58,7 +58,7 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
         dbUpdate(array('customoid_prev' => $prev_oid_value), 'customoids', '`customoid_id` = ?', array($customoid['customoid_id']));
     }
 
-    echo "\n";
+    echo '\n';
 }//end foreach
 
 unset($customoid, $prev_oid_value, $rawdata, $user_funcs, $oid_value, $error, $fields, $rrd_def, $rrd_name, $tags);
