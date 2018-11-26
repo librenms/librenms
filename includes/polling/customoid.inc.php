@@ -35,14 +35,14 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     }
 
     echo 'Custom OID '.$customoid['customoid_descr'].': ';
-    echo $oid_value.' '.$customoid['customoid_unit']."\n\n";
+    echo $oid_value.' '.$customoid['customoid_unit']."\n";
 
     $fields = array(
         'oid' => $oid_value,
     );
 
     $rrd_name = array('customoid', $customoid['customoid_descr']);
-    if ($customoid['customoid_datatype'] == 'COUNTER') { 
+    if ($customoid['customoid_datatype'] == 'COUNTER') {
         $datatype = $customoid['customoid_datatype'];
     } else {
         $datatype = 'GAUGE';
@@ -57,7 +57,6 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     if ($oid_value != $prev_oid_value) {
         dbUpdate(array('customoid_prev' => $prev_oid_value), 'customoids', '`customoid_id` = ?', array($customoid['customoid_id']));
     }
-
 }//end foreach
 
 unset($customoid, $prev_oid_value, $rawdata, $user_funcs, $oid_value, $error, $fields, $rrd_def, $rrd_name, $tags);
