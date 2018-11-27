@@ -121,11 +121,11 @@ if ($device['location_id']) {
       </div>
       <div class="row">
         <div class="col-sm-4">Lat / Lng</div>
-        <div class="col-sm-8"><i class="fa fa-lg fa-angle-right"></i> <span id="toggle-map-button" data-toggle="collapse" data-target="#toggle-map" class="collapsed">';
+        <div class="col-sm-8"><span id="toggle-map-button" data-toggle="collapse" data-target="#toggle-map" class="collapsed"><i class="fa fa-lg fa-angle-right"></i> <span id="location-text">';
         if ($location->coordinatesValid()) {
-            echo $location->lat . ', ' . $location->lng . '</span> <div class="pull-right"><a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . '+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a></div>';
+            echo $location->lat . ', ' . $location->lng . '</span></span> <div class="pull-right"><a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . '+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a></div>';
         } else {
-            echo 'N/A</span>';
+            echo 'N/A</span></span>';
         }
         echo '
         </div>
@@ -147,7 +147,7 @@ if ($device['location_id']) {
                     if (confirm("Update location to " + new_location)) {
                         update_location(' . $location->id . ', new_location, function(success) {
                             if (success) {
-                                $("#toggle-map-button").text(new_location.lat.toFixed(5) + ", " + new_location.lng.toFixed(5));
+                                $("#location-text").text(new_location.lat.toFixed(5) + ", " + new_location.lng.toFixed(5));
                                 $("#map-it-button").attr("href", "https://maps.google.com/?q=" + new_location.lat + "+" + new_location.lng );
                             }
                         });
