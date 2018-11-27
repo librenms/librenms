@@ -125,13 +125,13 @@ if ($device['location_id']) {
       <div class="row">
         <div class="col-sm-4">Lat / Lng</div>
         <div class="col-sm-8"><span id="toggle-map-text" data-toggle="collapse" data-target="#toggle-map" class="collapsed"><i class="fa fa-lg fa-angle-right"></i> <span id="location-text">';
-        echo $location_coords . '</span></span><div class="pull-right">';
+    echo $location_coords . '</span></span><div class="pull-right">';
 
-        echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> View</button>';
-        if ($location->coordinatesValid()) {
-            echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . '+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
-        }
-        echo '</div>
+    echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> View</button>';
+    if ($location->coordinatesValid()) {
+        echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . '+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
+    }
+    echo '</div>
         </div>
     </div>
     </div>
@@ -161,7 +161,6 @@ if ($device['location_id']) {
         });
     </script>
     ';
-
 }
 ?>
 
