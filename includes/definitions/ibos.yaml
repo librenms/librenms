@@ -1,0 +1,57 @@
+os: ibos
+text: 'Waystream iBOS'
+type: network
+icon: waystream
+group: waystream
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+bad_if:
+  - downstream0
+  - Lo0
+  - Null0
+  - system0
+discovery:
+    - sysObjectID:
+    
+        # ASR 5k products
+        - .1.3.6.1.4.1.9303.1.1.50      # asr5124Cacco
+        - .1.3.6.1.4.1.9303.1.1.51      # asr5124Cdcco
+        - .1.3.6.1.4.1.9303.1.1.52      # asr5224FMacco
+        - .1.3.6.1.4.1.9303.1.1.53      # asr5224FMdcco
+        - .1.3.6.1.4.1.9303.1.1.54      # asr5624FSacco
+        - .1.3.6.1.4.1.9303.1.1.55      # asr5624FSdcco
+        - .1.3.6.1.4.1.9303.1.1.56      # asr5724FLacco
+        - .1.3.6.1.4.1.9303.1.1.57      # asr5724FLdcco
+        
+        # Service Engine
+        - .1.3.6.1.4.1.9303.1.1.58      # SE1
+        - .1.3.6.1.4.1.9303.1.1.59      # SE2
+
+        # ASR 6K Products
+        - .1.3.6.1.4.1.9303.1.1.60      # ASR6026AC - 2 1/10GE SFP+, 20 100/1000 SFP Slots, 4 BaseTX/SFP combo, Central Office AC
+        - .1.3.6.1.4.1.9303.1.1.61      # ASR6026DC - 2 1/10GE SFP+, 20 100/1000 SFP Slots, 4 BaseTX/SFP combo, Central Office DC
+        - .1.3.6.1.4.1.9303.1.1.62      # ASR6126AC - 2 1/10GE SFP+, 20 10/100/1000BaseTX ports, 4 BaseTX/SFP combo, Central Office AC
+        - .1.3.6.1.4.1.9303.1.1.63      # ASR6126DC - 2 1/10GE SFP+, 20 10/100/1000BaseTX ports, 4 BaseTX/SFP combo, Central Office DC
+        
+        - .1.3.6.1.4.1.9303.1.1.78      # ASR6226AC - 2 1/10GE SFP+, 20 100/1000 SFP Slots, 4 BaseTX/SFP combo, Central Office AC
+        - .1.3.6.1.4.1.9303.1.1.79      # ASR6226DC - 2 1/10GE SFP+, 20 100/1000 SFP Slots, 4 BaseTX/SFP combo, Central Office DC
+        - .1.3.6.1.4.1.9303.1.1.80      # ASR6326AC - 2 1/10GE SFP+, 20 10/100/1000BaseTX ports, 4 BaseTX/SFP combo, Central Office AC
+        - .1.3.6.1.4.1.9303.1.1.81      # ASR6326DC - 2 1/10GE SFP+, 20 10/100/1000BaseTX ports, 4 BaseTX/SFP combo, Central Office DC
+
+        # Metrostar products
+        - .1.3.6.1.4.1.9303.1.5.3       # MS3028AC
+        - .1.3.6.1.4.1.9303.1.5.4       # MS3028DC
+        - .1.3.6.1.4.1.9303.1.5.5       # MS3128AC
+        - .1.3.6.1.4.1.9303.1.5.6       # MS3128DC
+        
+        - .1.3.6.1.4.1.9303.1.5.64      # MS4026AC - 2 1/10GE SFP+, 20 100/1000 SFP Slots, 4 BaseTX/SFP combo, Central Office AC
+        - .1.3.6.1.4.1.9303.1.5.65      # MS4026DC - 2 1/10GE SFP+, 20 100/1000 SFP Slots, 4 BaseTX/SFP combo, Central Office DC
+        - .1.3.6.1.4.1.9303.1.5.66      # MS4126AC - 2 1/10GE SFP+, 20 10/100/1000BaseTX ports, 4 BaseTX/SFP combo, Central Office AC
+        - .1.3.6.1.4.1.9303.1.5.67      # MS4126DC - 2 1/10GE SFP+, 20 10/100/1000BaseTX ports, 4 BaseTX/SFP combo, Central Office DC
+
+        - .1.3.6.1.4.1.9303.1.5.82      # MS4226AC - 2 1/10GE SFP+, 20 100/1000 SFP Slots, 4 BaseTX/SFP combo, Central Office AC
+        - .1.3.6.1.4.1.9303.1.5.83      # MS4226DC - 2 1/10GE SFP+, 20 100/1000 SFP Slots, 4 BaseTX/SFP combo, Central Office DC
+        - .1.3.6.1.4.1.9303.1.5.84      # MS4326AC - 2 1/10GE SFP+, 20 10/100/1000BaseTX ports, 4 BaseTX/SFP combo, Central Office AC
+        - .1.3.6.1.4.1.9303.1.5.85      # MS4326DC - 2 1/10GE SFP+, 20 10/100/1000BaseTX ports, 4 BaseTX/SFP combo, Central Office DC
