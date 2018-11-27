@@ -8,7 +8,6 @@ $components = $components[$device['device_id']];
 
 if (count($components) > 0) {
     ?>
-    <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-default panel-condensed">
@@ -44,6 +43,5 @@ if (count($components) > 0) {
                 </div>
             </div>
         </div>
-    </div>
     <?php
 }

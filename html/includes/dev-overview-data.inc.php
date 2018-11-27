@@ -1,24 +1,25 @@
 <?php
 
-use App\Models\DevicePerf;
+use App\Models\Location;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
-echo '<script src="js/leaflet.js"></script>';
-echo '<link rel="stylesheet" href="js/L.Control.Locate.min.css"/>';
-echo '<script src="js/L.Control.Locate.min.js"></script>';
-
-echo '<div class="container-fluid">';
 echo "<div class='row'>
       <div class='col-md-12'>
           <div class='panel panel-default panel-condensed overview'>
             <div class='panel-heading'>";
 
 if ($config['overview_show_sysDescr']) {
-    echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>'.$device['sysDescr'].'</strong>';
+    echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>';
+    echo Config::get('overview_show_sysDescr', true) ? $device['sysDescr'] : 'System';
+    echo '</strong>';
 }
 
 echo '</div><div class="panel-body">';
+
+echo '<script src="js/leaflet.js"></script>';
+echo '<script src="js/L.Control.Locate.min.js"></script>';
 
 $uptime = formatUptime($device['uptime']);
 $uptime_text = 'Uptime';
@@ -111,23 +112,26 @@ if ($uptime) {
 }
 
 if ($device['location_id']) {
-    $maps_api = \LibreNMS\Config::get('geoloc.api_key');
-    $maps_engine = $maps_api ? \LibreNMS\Config::get('geoloc.engine') : '';
+    $maps_api = Config::get('geoloc.api_key');
+    $maps_engine = $maps_api ? Config::get('geoloc.engine') : '';
 
-    $location = \App\Models\Location::find($device['location_id']);
-        echo '<div class="row">
+    $location = Location::find($device['location_id']);
+    $location_coords = $location->coordinatesValid() ? $location->lat . ', ' . $location->lng : 'N/A';
+
+    echo '<div class="row">
         <div class="col-sm-4">Location</div>
         <div class="col-sm-8">' . $location->location . '</div>
       </div>
       <div class="row">
         <div class="col-sm-4">Lat / Lng</div>
-        <div class="col-sm-8"><span id="toggle-map-button" data-toggle="collapse" data-target="#toggle-map" class="collapsed"><i class="fa fa-lg fa-angle-right"></i> <span id="location-text">';
+        <div class="col-sm-8"><span id="toggle-map-text" data-toggle="collapse" data-target="#toggle-map" class="collapsed"><i class="fa fa-lg fa-angle-right"></i> <span id="location-text">';
+        echo $location_coords . '</span></span><div class="pull-right">';
+
+        echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> View</button>';
         if ($location->coordinatesValid()) {
-            echo $location->lat . ', ' . $location->lng . '</span></span> <div class="pull-right"><a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . '+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a></div>';
-        } else {
-            echo 'N/A</span></span>';
+            echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . '+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
         }
-        echo '
+        echo '</div>
         </div>
     </div>
     </div>
@@ -159,45 +163,26 @@ if ($device['location_id']) {
     ';
 
 }
-
-echo '</div>
-      </div>
-      </div>
-      </div>';
-
-$perf_info = DevicePerf::where('device_id', $device['device_id'])->latest('timestamp')->first();
-$perf_debug = json_decode($perf_info['debug'], true);
-if ($perf_debug['traceroute']) {
-    echo "<div class='row'>
-     <div class='col-md-12'>
-         <div class='panel panel-default'>
-             <div class='panel-heading'>
-                 <h3 class='panel-title'>Traceroute ({$perf_info['timestamp']})</h3>
-             </div>
-             <div class='panel-body'>
-                 <pre>{$perf_debug['traceroute']}</pre>
-            </div>
-         </div>
-     </div>
- </div>";
-}
-
-echo '</div>';
-
 ?>
+
+    </div>
+  </div>
+</div>
 
 <style>
     #location-map {
         padding: 15px;
         height: 400px;
+        font-family: "DejaVu Sans";
     }
 
-    #toggle-map-button { cursor: pointer; }
-    #toggle-map-button i { transition: .3s transform ease-in-out; }
-    #toggle-map-button:not(.collapsed) i { transform: rotate(90deg); }
+    #toggle-map-text { cursor: pointer; }
+    #toggle-map-text i { transition: .3s transform ease-in-out; }
+    #toggle-map-text:not(.collapsed) i { transform: rotate(90deg); }
 
-    .overview .panel-body { padding-top: 0; padding-bottom: 0; }
-    .overview .panel-body .row:nth-child(odd) { background-color: #f9f9f9; }
-    .overview .panel-body .row:hover { background-color: #f5f5f5; }
-    .overview .panel-body .row>div { padding: 3px 5px; }
+    .overview>.panel-body { padding-top: 0; padding-bottom: 0; }
+    .overview>.panel-body>.row:nth-child(odd) { background-color: #f9f9f9; }
+    .overview>.panel-body>.row:hover { background-color: #f5f5f5; }
+    .overview>.panel-body>.row>div { padding: 3px 5px; }
+    .overview>.panel-body>.row>div:first-child { font-weight: 500; }
 </style>

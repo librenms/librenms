@@ -3,7 +3,7 @@
 $processors = dbFetchRows('SELECT * FROM `processors` WHERE device_id = ?', array($device['device_id']));
 
 if (count($processors)) {
-    echo '<div class="container-fluid ">
+    echo '
       <div class="row">
         <div class="col-md-12 ">
           <div class="panel panel-default panel-condensed">
@@ -107,7 +107,6 @@ if (count($processors)) {
     }
 
     echo '</table>
-        </div>
         </div>
         </div>
         </div>';

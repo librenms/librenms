@@ -54,7 +54,7 @@ if (count($sensors)) {
             break;
     }//end switch
 
-    echo '<div class="container-fluid ">
+    echo '
         <div class="row">
         <div class="col-md-12">
         <div class="panel panel-default panel-condensed">
@@ -149,7 +149,6 @@ if (count($sensors)) {
     }//end foreach
 
     echo '</table>';
-    echo '</div>';
     echo '</div>';
     echo '</div>';
     echo '</div>';

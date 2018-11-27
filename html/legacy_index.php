@@ -97,6 +97,7 @@ if (empty($config['favicon'])) {
   <link href="css/leaflet.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
+  <link href="css/L.Control.Locate.min.css" rel="stylesheet" type="text/css" />
   <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
   <link href="css/select2.min.css" rel="stylesheet" type="text/css" />
   <link href="css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
