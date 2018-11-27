@@ -144,7 +144,7 @@ if ($device['location_id']) {
                 
                 device_map.on("dragend", function () {
                     var new_location = device_marker.getLatLng();
-                    if (confirm("Update location to " + new_location)) {
+                    if (confirm("Update location to " + new_location + "? This will update this location for all devices!")) {
                         update_location(' . $location->id . ', new_location, function(success) {
                             if (success) {
                                 $("#location-text").text(new_location.lat.toFixed(5) + ", " + new_location.lng.toFixed(5));
