@@ -92,69 +92,6 @@ if ($maps_engine == 'google') {
         url: "ajax/table/location"
     });
 
-    function init_map() {
-        locationMap = L.map('location-edit-map');
-        locationMarker = L.marker([10, 10]);
-        locationMarker.addTo(locationMap);
-
-        <?php if ($maps_engine == 'google') { ?>
-        var roads = L.gridLayer.googleMutant({
-            type: 'roadmap'	// valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-        });
-        var satellite = L.gridLayer.googleMutant({
-            type: 'satellite'
-        });
-
-        var baseMaps = {
-            "Streets": roads,
-            "Satellite": satellite
-        };
-        roads.addTo(locationMap);
-
-        <?php } else { ?>
-
-        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        });
-        // var mbx = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={token}', {
-        //     maxZoom: 18,
-        //     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-        //         '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-        //         'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        //     id: 'satellite-streets-v9',
-        //     token: ''
-        // });
-
-        //
-        // var esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        //     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-        // });
-
-        var baseMaps = {
-            "OpenStreetMap": osm
-            // "MapBox": mbx,
-            // "Esri": esri
-        };
-        osm.addTo(locationMap);
-        <?php } ?>
-
-        L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(locationMap);
-        if (location.protocol === 'https:') {
-            // can't request location permission without https
-            L.control.locate().addTo(locationMap);
-        }
-
-        // move marker on drag
-        locationMap.on('drag', function () {
-            locationMarker.setLatLng(locationMap.getCenter());
-        });
-        // center map on zoom
-        locationMap.on('zoom', function () {
-            locationMap.setView(locationMarker.getLatLng());
-        });
-    }
-
     var modal = $('#edit-location');
 
     modal.on('show.bs.modal', function (e) {
@@ -168,7 +105,8 @@ if ($maps_engine == 'google') {
         console.log(locationId);
 
         if (locationMap === null) {
-            init_map();
+            locationMap = init_map('location-edit-map', '<?php echo $maps_engine; ?>', '<?php echo $maps_api; ?>');
+            locationMarker = init_map_marker(locationMap, location);
         }
 
         // move the map (which will trigger a move event and update the marker
@@ -177,32 +115,11 @@ if ($maps_engine == 'google') {
     });
 
     $('#save-location').click(function () {
-        var loc = locationMarker.getLatLng();
-        $.ajax({
-            method: 'PATCH',
-            url: "ajax/location/" + locationId,
-            data: {lat: loc.lat, lng: loc.lng}
-        }).success(function () {
-            modal.modal('hide');
-            locations_grid.bootgrid('reload');
-            toastr.success('Location updated');
-        }).error(function (e) {
-            var msg = 'Failed to update location: ' + e.statusText;
-            var data = e.responseJSON;
-            if (data) {
-                if (data.hasOwnProperty('lat')) {
-                    msg = data.lat.join(' ') + '<br />';
-                }
-                if (data.hasOwnProperty('lng')) {
-                    if (!data.hasOwnProperty('lat')) {
-                        msg = '';
-                    }
-
-                    msg += data.lng.join(' ')
-                }
+        update_location(locationId, locationMarker.getLatLng(), function(success) {
+            if (success) {
+                modal.modal('hide');
+                locations_grid.bootgrid('reload');
             }
-
-            toastr.error(msg)
         });
     });
 
@@ -232,8 +149,6 @@ if ($maps_engine == 'google') {
             $btn.removeClass('active');
             $('#location-graph-' + locationId).hide();
             $('#bg-fix-' + locationId).hide();
-            // $row.next('.bg-fix').remove();
-            // $('#location-graph-' + locationId).detach().appendTo($('#graph-holder')).hide();
         } else {
             // show
             $btn.addClass('active');
@@ -246,7 +161,6 @@ if ($maps_engine == 'google') {
                 console.log(html);
                 $(html).insertAfter($row);
             }
-            // $('#location-graph-' + locationId).detach().insertAfter($row).show().before('<tr class="bg-fix"></tr>');
         }
     }
 </script>

@@ -298,3 +298,107 @@ $(document).ready(function () {
         });
     }, 300000);
 });
+
+function loadScript(src, callback) {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    if(callback)script.onload=callback;
+    document.getElementsByTagName("head")[0].appendChild(script);
+    script.src = src;
+}
+
+function init_map(id, engine, api_key) {
+    var leaflet = L.map(id);
+    var baseMaps = {};
+    leaflet.setView([0, 0], 15);
+
+    if (engine === 'google') {
+        var roads, satellite;
+        loadScript('https://maps.googleapis.com/maps/api/js?key=' + api_key, function () {
+            loadScript('js/Leaflet.GoogleMutant.js', function () {
+                roads = L.gridLayer.googleMutant({
+                    type: 'roadmap'	// valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
+                });
+                satellite = L.gridLayer.googleMutant({
+                    type: 'satellite'
+                });
+
+                baseMaps = {
+                    "Streets": roads,
+                    "Satellite": satellite
+                };
+                L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+                roads.addTo(leaflet);
+            });
+        });
+    } else {
+        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        });
+
+        // var esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        //     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        // });
+
+        baseMaps = {
+            "OpenStreetMap": osm
+            // "Satellite": esri
+        };
+        osm.addTo(leaflet);
+    }
+
+    if (location.protocol === 'https:') {
+        // can't request location permission without https
+        L.control.locate().addTo(leaflet);
+    }
+
+    return leaflet;
+}
+
+function init_map_marker(leaflet, latlng) {
+    var marker = L.marker(latlng);
+    marker.addTo(leaflet);
+    leaflet.setView(latlng);
+
+    // move marker on drag
+    leaflet.on('drag', function () {
+        marker.setLatLng(leaflet.getCenter());
+    });
+    // center map on zoom
+    leaflet.on('zoom', function () {
+        leaflet.setView(marker.getLatLng());
+    });
+
+    return marker;
+}
+
+function update_location(id, latlng, callback) {
+    $.ajax({
+        method: 'PATCH',
+        url: "ajax/location/" + id,
+        data: {lat: latlng.lat, lng: latlng.lng}
+    }).success(function () {
+        toastr.success('Location updated');
+        typeof callback === 'function' && callback(true);
+    }).error(function (e) {
+        var msg = 'Failed to update location: ' + e.statusText;
+        var data = e.responseJSON;
+        if (data) {
+            if (data.hasOwnProperty('lat')) {
+                msg = data.lat.join(' ') + '<br />';
+            }
+            if (data.hasOwnProperty('lng')) {
+                if (!data.hasOwnProperty('lat')) {
+                    msg = '';
+                }
+
+                msg += data.lng.join(' ')
+            }
+        }
+
+        toastr.error(msg);
+        typeof callback === 'function' && callback(false);
+
+    });
+}
