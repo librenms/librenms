@@ -100,28 +100,19 @@ if ($device['sysContact']) {
       </tr>';
 }
 
-if ($device['location']) {
-    echo '<tr>
-        <td>Location</td>
-        <td>'.$device['location'].'</td>
-      </tr>';
-    if (get_dev_attrib($device, 'override_sysLocation_bool') && !empty($device['real_location'])) {
+if ($device['location_id']) {
+    $location = \App\Models\Location::find($device['location_id']);
         echo '<tr>
-        <td>SNMP Location</td>
-        <td>'.$device['real_location'].'</td>
+        <td>Location</td>
+        <td>' . $location->location . '</td>
       </tr>';
-    }
-}
 
-$loc = parse_location($device['location']);
-if (!is_array($loc)) {
-    $loc = dbFetchRow("SELECT `lat`,`lng` FROM `locations` WHERE `location`=? LIMIT 1", array($device['location']));
-}
-if (is_array($loc)) {
-    echo '<tr>
+    if ($location->coordinatesValid()) {
+        echo '<tr>
         <td>Lat / Lng</td>
-        <td>['.$loc['lat'].','.$loc['lng'].'] <div class="pull-right"><a href="https://maps.google.com/?q='.$loc['lat'].'+'.$loc['lng'].'" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</button></div></a></td>
+        <td>[' . $location->lat . ',' . $location->lng . '] <div class="pull-right"><a href="https://maps.google.com/?q=' . $location->lat . '+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</button></div></a></td>
     </tr>';
+    }
 }
 
 if ($uptime) {
