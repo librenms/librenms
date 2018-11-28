@@ -1,0 +1,770 @@
+APRISAXE-EVENTS-4RF DEFINITIONS ::= BEGIN
+
+--
+-- File: $Id: 4RF-APRISAXE-EVENTS.txt,v 1.40 2007/07/20 02:50:01 ma Exp $
+--
+-- Copyright: 2004  4RF COMMUNICATIONS LTD
+--
+-- Description:
+--  Event MIB for AprisaXE project, the values in this file are not accessible
+--  except as notifications.
+--
+-- Versions:
+--
+-- Release 3
+-- Added support for 4-wire cards and configurable cross-connections
+--
+-- Notes:
+--  None
+--
+
+
+IMPORTS
+
+    -- Standard imports
+    MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, NOTIFICATION-TYPE,
+    Integer32, Unsigned32, Counter32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+
+    -- 4RF Specific imports
+    fourRFAprisaXE
+        FROM PRODUCTS-MIB-4RF
+    FourRFAlarmStatus, FourRFAlarmSeverity, FourRFAlarmEnabled, FourRFAlarmPresent,
+    FourRFImageVersion, FourRFHardwareVersion
+        FROM COMMON-TC-4RF
+    AprisaXEAlarmType, AprisaXECardType, AprisaXESlotNumber, 
+    AprisaXEDataStatus, AprisaXEPortNumber
+        FROM APRISAXE-TC-4RF
+    aprisaXEObjects, aprisaXEEvents
+        FROM APRISAXE-MIB-4RF
+    fourRFModules
+        FROM MIB-4RF;
+
+
+-- Module Identification
+aprisaXE4RFEventModule MODULE-IDENTITY
+    LAST-UPDATED "200704300000Z"
+    ORGANIZATION "www.4rf.com"
+    CONTACT-INFO    
+         "postal:   4RF Communications Ltd
+                    26 Glover Street
+                    Ngauranga
+                    PO Box 13-506
+                    Wellington 6032
+                    New Zealand
+                    
+          phone:    +64 4 499 6000
+          email:    support@4rf.com"
+    DESCRIPTION "Event MIB for the AprisaXE project"
+
+	-- Revision history
+    -- (in reverse chronological order)
+
+    REVISION    "200704300000Z"
+    DESCRIPTION "Second draft"
+
+    REVISION    "200411300334Z"
+    DESCRIPTION "First draft"
+    ::= { fourRFModules 7 }
+    
+   
+-- Trap Values
+
+aprisaXEEventValues OBJECT IDENTIFIER ::= { aprisaXEObjects 1000 }
+
+
+-- Alarm event values
+
+aprisaXEEventAlarmStatus OBJECT-TYPE
+    SYNTAX      FourRFAlarmPresent
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The status of an alarm event."
+    ::= { aprisaXEEventValues 1 }
+
+aprisaXEEventAlarmSeverity OBJECT-TYPE
+    SYNTAX      FourRFAlarmSeverity
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The severity of the alarm."
+    ::= { aprisaXEEventValues 2 }
+
+aprisaXEEventAlarmValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Indicatesthe current value."
+    ::= { aprisaXEEventValues 3 }
+    
+aprisaXEEventAlarmThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Indicates the level at which the alarm was set."
+    ::= { aprisaXEEventValues 4 }
+    
+aprisaXEEventAlarmType OBJECT-TYPE
+    SYNTAX      AprisaXEAlarmType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The alarm type."
+    ::= { aprisaXEEventValues 5 }
+    
+    
+-- Card mismatch event values
+
+aprisaXEEventCardExpected OBJECT-TYPE
+    SYNTAX      AprisaXECardType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The type of MUX card expected in a slot."
+    ::= { aprisaXEEventValues 6 }
+    
+aprisaXEEventCardInstalled OBJECT-TYPE
+    SYNTAX      AprisaXECardType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The type of MUX card found in a slot."
+    ::= { aprisaXEEventValues 7 }
+    
+aprisaXEEventCardSlot OBJECT-TYPE
+    SYNTAX      AprisaXESlotNumber
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The slot containing the unexpected card."
+    ::= { aprisaXEEventValues 8 }
+    
+aprisaXEEventCardStatus OBJECT-TYPE
+    SYNTAX      FourRFAlarmPresent
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Indicates whether the alarm is present or has been cleared."
+    ::= { aprisaXEEventValues 9 }
+
+aprisaXEEventCardPort OBJECT-TYPE
+    SYNTAX      AprisaXEPortNumber
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The port reporting the event."
+    ::= { aprisaXEEventValues 10 }
+
+
+-- Characterisation Data Status
+
+aprisaXEEventCharacterisationStatus OBJECT-TYPE
+    SYNTAX      AprisaXEDataStatus
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Indicates whether the characterisation is valid or invalid."
+    ::= { aprisaXEEventValues 15 }
+
+
+-- MIB Data Status
+
+aprisaXEEventMibStatus OBJECT-TYPE
+    SYNTAX      AprisaXEDataStatus
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Indicates whether the MIB is valid or invalid."
+    ::= { aprisaXEEventValues 16 }
+    
+    
+-- ***************************************************************************
+-- Traps
+-- ***************************************************************************
+
+aprisaXELinkAlarmsEvents OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "The events for the link alarms."
+    ::= { aprisaXEEvents 1 }
+    
+aprisaXELinkAlarmsEventsV2 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "The SNMPv2 events for the link alarms."
+    ::= { aprisaXELinkAlarmsEvents 0 }
+
+aprisaXEThresholdAlarmEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus,
+              aprisaXEEventAlarmSeverity,
+              aprisaXEEventAlarmValue,
+              aprisaXEEventAlarmThreshold,
+              aprisaXEEventAlarmType
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of a threshold alarm.
+                 It will be sent whenever the status of the alarm changes from
+                 noAlarm to alarmPresent and vice versa."
+    ::= { aprisaXELinkAlarmsEventsV2 1 }
+ 
+ 
+-- ***************************************************************************
+-- Receiver Traps
+-- ***************************************************************************
+
+aprisaXERxSynthOutOfLockAlarmEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the Rx synthesizer out of lock alarm.
+                 It will be sent whenever the status of the alarm changes from
+                 noAlarm to alarmPresent and vice versa."
+    ::= { aprisaXELinkAlarmsEventsV2 10 }
+    
+aprisaXEAlarmRxCDataEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCharacterisationStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the receiver 
+                 characterisation data alarm."
+    ::= { aprisaXELinkAlarmsEventsV2 11 }
+  
+aprisaXEAlarmRx12VStatusEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the Rx synthesizer out of lock alarm.
+                 It will be sent whenever the status of the alarm changes from
+                 noAlarm to alarmPresent and vice versa."
+    ::= { aprisaXELinkAlarmsEventsV2 12 }
+    
+aprisaXEAlarmRxOffEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of receiver, when it is
+                 turned on or off.
+                 It will be sent whenever the status of the alarm changes from
+                 noAlarm to alarmPresent and vice versa."
+    ::= { aprisaXELinkAlarmsEventsV2 13 }
+    
+aprisaXEAlarmRxBadMibEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventMibStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the receiver 
+                 MIB data alarm."
+    ::= { aprisaXELinkAlarmsEventsV2 14 }
+    
+    
+-- ***************************************************************************
+-- Transmitter Traps
+-- ***************************************************************************
+
+aprisaXEAlarmTxCDataEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCharacterisationStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the transmitter 
+                 characterisation data alarm."
+    ::= { aprisaXELinkAlarmsEventsV2 20 }
+    
+aprisaXEAlarmTxSynthOutOfLockEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the transmitter 
+                 synthesiser out of lock alarm."
+    ::= { aprisaXELinkAlarmsEventsV2 21 }
+    
+aprisaXEAlarmTx28VStatusEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the transmitter 
+                 28V supply status alarm."
+    ::= { aprisaXELinkAlarmsEventsV2 22 }
+    
+aprisaXEAlarmTx11VStatusEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the transmitter 
+                 11V supply status alarm."
+    ::= { aprisaXELinkAlarmsEventsV2 23 }
+
+aprisaXEAlarmTx5VStatusEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the transmitter 
+                 5V digital supply status alarm."
+    ::= { aprisaXELinkAlarmsEventsV2 24 }
+    
+aprisaXEAlarmTxAmplifierBalanceEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the transmitter 
+                 amplifier balance status alarm."
+    ::= { aprisaXELinkAlarmsEventsV2 25 }
+    
+aprisaXEAlarmTxBadMibEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventMibStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the transmitter 
+                 MIB data alarm."
+    ::= { aprisaXELinkAlarmsEventsV2 26 }
+
+aprisaXEAlarmTxNeg5VStatusEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the transmitter 
+                 Negative 5V digital supply status alarm."
+    ::= { aprisaXELinkAlarmsEventsV2 27 }    
+
+
+-- ***************************************************************************
+-- Modem Traps
+-- ***************************************************************************
+
+aprisaXEModemSyncEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the modem lock."
+    ::= { aprisaXELinkAlarmsEventsV2 30 }
+    
+aprisaXEModemTDMAlignmentEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the modem TDM alignment."
+    ::= { aprisaXELinkAlarmsEventsV2 31 }   
+
+aprisaXEModemDemodAlignmentEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the modem demodulator alignment."
+    ::= { aprisaXELinkAlarmsEventsV2 32 }
+
+aprisaXEModemRefAStatusEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the Ref A clock."
+    ::= { aprisaXELinkAlarmsEventsV2 33 }
+    
+aprisaXEModemRefBStatusEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the Ref B clock."
+    ::= { aprisaXELinkAlarmsEventsV2 34 }
+
+aprisaXEModemUCEPresentEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating the presence of uncorrectable errors."
+    ::= { aprisaXELinkAlarmsEventsV2 35 }
+
+
+-- ***************************************************************************
+-- QuadE1 Traps
+-- ***************************************************************************
+
+aprisaXEQuadE1LOSEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in LOS state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 40 }
+    
+aprisaXEQuadE1AISEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in AIS state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 41 }
+
+aprisaXEQuadE1RAIEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in RAI state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 42 }
+    
+aprisaXEQuadE1RMAIEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in RMAI state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 43 }
+    
+aprisaXEQuadE1TS16AISEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in TS16AIS state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 44 }
+
+aprisaXEQuadE1TS16LOSEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in TS16LOS state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 45 }
+
+aprisaXEQuadE1LOFEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in loss of frame state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 46 }
+
+
+-- ***************************************************************************
+-- FXO Traps
+-- ***************************************************************************
+
+aprisaXEFXOCodecOvldEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in Codec Ovld state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 50 }
+    
+aprisaXEFXOBillToneOvldEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in Billing Tone Ovld state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 51 }    
+    
+aprisaXEFXOCurrentOvldEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in Current Ovld state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 52 } 
+       
+aprisaXEFXOUnplugEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in Unplug state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 53 }  
+
+
+-- ***************************************************************************
+-- FXS Traps
+-- ***************************************************************************
+
+aprisaXEFXSCalibrateErrorEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a common mode error during Pro-SLIC initialisation."
+    ::= { aprisaXELinkAlarmsEventsV2 60 }
+    
+aprisaXEFXSDCDCErrorEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS obsolete
+    DESCRIPTION "Event indicating a DC-DC converter error during Pro-SLIC initialisation "
+    ::= { aprisaXELinkAlarmsEventsV2 61 } 
+    
+aprisaXEFXSCASLockEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating the FPGA has not locked onto a CAS frame. "
+    ::= { aprisaXELinkAlarmsEventsV2 62 }
+
+
+-- ***************************************************************************
+-- HSS Traps
+-- ***************************************************************************
+
+aprisaXEHSSTDMLockEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating an HSS TDM Lock error."
+    ::= { aprisaXELinkAlarmsEventsV2 70 }
+    
+aprisaXEHSS32MHzResetEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a 32MHz clock reset error."
+    ::= { aprisaXELinkAlarmsEventsV2 71 }
+
+aprisaXEHSSTDMResetEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a TDM reset error."
+    ::= { aprisaXELinkAlarmsEventsV2 72 }
+
+aprisaXEHSSPatternLossEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a Pattern Loss error."
+    ::= { aprisaXELinkAlarmsEventsV2 73 }
+
+aprisaXEHSSRxFifoFullEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating an Rx FIFO Full error."
+    ::= { aprisaXELinkAlarmsEventsV2 74 }
+
+aprisaXEHSSRxFifoEmptyEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating an Rx FIFO Empty error."
+    ::= { aprisaXELinkAlarmsEventsV2 75 }
+
+aprisaXEHSSTxFifoFullEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a Tx FIFO Full error."
+    ::= { aprisaXELinkAlarmsEventsV2 76 }
+
+aprisaXEHSSTxFifoEmptyEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a Tx FIFO Empty error."
+    ::= { aprisaXELinkAlarmsEventsV2 77 }
+
+aprisaXEHSSRxClockValidEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating an Rx Clock Valid error."
+    ::= { aprisaXELinkAlarmsEventsV2 78 }
+
+aprisaXEHSSTxClockValidEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a Tx Clock Valid error."
+    ::= { aprisaXELinkAlarmsEventsV2 79 }
+
+
+-- ***************************************************************************
+-- V24 Traps
+-- ***************************************************************************
+
+aprisaXEV24ControlLineLossEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating V24 control line aren't in sync."
+    ::= { aprisaXELinkAlarmsEventsV2 80 }
+
+
+-- ***************************************************************************
+-- Other Traps
+-- ***************************************************************************
+
+aprisaXEUnexpectedCardEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardExpected,
+              aprisaXEEventCardInstalled,
+              aprisaXEEventCardStatus 
+    }
+    STATUS current
+    DESCRIPTION "Event indicating an mismatch between the MIB and the installed
+                 MUX cards. The radio will not operate correctly if the MIB and
+                 MUX cards do not match."
+    ::= { aprisaXELinkAlarmsEventsV2 100 }
+      
+aprisaXECLKSyncEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the clock sync state."
+    ::= { aprisaXELinkAlarmsEventsV2 110 }
+    
+aprisaXENetClkConfigEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the network clock config."
+    ::= { aprisaXELinkAlarmsEventsV2 111 }
+    
+aprisaXECharacterisationEEFailEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardInstalled,
+              aprisaXEEventCharacterisationStatus 
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a failed read of characterisation data from
+                 EEPROM."
+    ::= { aprisaXELinkAlarmsEventsV2 120 }
+
+aprisaXEMibEEFailEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardInstalled,
+              aprisaXEEventMibStatus 
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a failed read of mib data from EEPROM."
+    ::= { aprisaXELinkAlarmsEventsV2 121 }
+
+aprisaXEMhsbSwitchToStandbyEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a Monitored Hot Standby switch to Standby Event."
+    ::= { aprisaXELinkAlarmsEventsV2 130 }
+    
+aprisaXEAlternateImageTableEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating an Alternate Image Table Event."
+    ::= { aprisaXELinkAlarmsEventsV2 131 }
+    
+aprisaXEDefaultImageTableEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a Default Image Table Event."
+    ::= { aprisaXELinkAlarmsEventsV2 132 }
+    
+aprisaXEUploadFailEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating the failure of the previous upload."
+    ::= { aprisaXELinkAlarmsEventsV2 133 }
+
+
+-- ***************************************************************************
+-- Psc Traps
+-- ***************************************************************************
+
+aprisaXEPscDemuxAlignmentEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the PSC Demux alignment ."
+    ::= { aprisaXELinkAlarmsEventsV2 140 }   
+  
+    
+aprisaXEPscTDMAlignmentEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a change in state of the PSC TDM alignment."
+    ::= { aprisaXELinkAlarmsEventsV2 141 }
+
+aprisaXEPscMuxAlignmentErrorEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating if the TDM mux loses alignment to the TDM bus."
+    ::= { aprisaXELinkAlarmsEventsV2 142 }
+
+aprisaXEPscCompanionTxFailEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating that the HRSD Companion transmitter has failed."
+    ::= { aprisaXELinkAlarmsEventsV2 143 }
+
+aprisaXEPscSoftwareOverrideEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating a software override of the PSC Mode Switch."
+    ::= { aprisaXELinkAlarmsEventsV2 144 }
+
+aprisaXEPscInvalidSwitchValueEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating that the PSC Mode Switch value is invalid."
+    ::= { aprisaXELinkAlarmsEventsV2 145 }
+
+
+-- ***************************************************************************
+-- DualE1 Traps
+-- ***************************************************************************
+
+aprisaXEDualE1LOSEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in LOS state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 150 }
+    
+aprisaXEDualE1AISEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in AIS state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 151 }
+
+
+-- ***************************************************************************
+-- SingleE1 Traps
+-- ***************************************************************************
+
+aprisaXESingleE1LOSEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in LOS state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 160 }
+    
+aprisaXESingleE1AISEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventCardSlot,
+              aprisaXEEventCardPort,
+              aprisaXEEventAlarmStatus
+    }
+    STATUS current
+    DESCRIPTION "Event indicating a change in AIS state for a port."
+    ::= { aprisaXELinkAlarmsEventsV2 161 }
+
+    
+-- ***************************************************************************
+-- HRSD Traps
+-- ***************************************************************************
+
+aprisaXEHrsdCompareOidEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating that an OID failed its comparison check."
+    ::= { aprisaXELinkAlarmsEventsV2 170 }
+
+aprisaXEHrsdCompanionLostEvent NOTIFICATION-TYPE
+    OBJECTS { aprisaXEEventAlarmStatus }
+    STATUS current
+    DESCRIPTION "Event indicating that the HRSD Companion Heartbeat is lost."
+    ::= { aprisaXELinkAlarmsEventsV2 171 }
+
+-- ***************************************************************************
+-- End Traps
+-- ***************************************************************************
+
+END
