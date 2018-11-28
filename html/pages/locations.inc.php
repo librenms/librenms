@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
+use App\Models\Location;
 
 $pagetitle[] = 'Locations';
 
@@ -38,20 +38,13 @@ print_optionbar_end();
 
 echo '<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">';
 
-foreach (getlocations() as $location) {
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
-        $num        = dbFetchCell('SELECT COUNT(device_id) FROM devices WHERE location = ?', array($location));
-        $net        = dbFetchCell("SELECT COUNT(device_id) FROM devices WHERE location = ? AND type = 'network'", array($location));
-        $srv        = dbFetchCell("SELECT COUNT(device_id) FROM devices WHERE location = ? AND type = 'server'", array($location));
-        $fwl        = dbFetchCell("SELECT COUNT(device_id) FROM devices WHERE location = ? AND type = 'firewall'", array($location));
-        $hostalerts = dbFetchCell("SELECT COUNT(device_id) FROM devices WHERE location = ? AND status = '0'", array($location));
-    } else {
-        $num        = dbFetchCell('SELECT COUNT(D.device_id) FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND location = ?', array(LegacyAuth::id(), $location));
-        $net        = dbFetchCell("SELECT COUNT(D.device_id) FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND location = ? AND D.type = 'network'", array(LegacyAuth::id(), $location));
-        $srv        = dbFetchCell("SELECT COUNT(D.device_id) FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND location = ? AND type = 'server'", array(LegacyAuth::id(), $location));
-        $fwl        = dbFetchCell("SELECT COUNT(D.device_id) FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND location = ? AND type = 'firewall'", array(LegacyAuth::id(), $location));
-        $hostalerts = dbFetchCell("SELECT COUNT(device_id) FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND location = ? AND status = '0'", array(LegacyAuth::id(), $location));
-    }
+foreach (Location::hasAccess(Auth::user())->get() as $location) {
+    /** @var Location $location */
+    $num = $location->devices()->count();
+    $net = $location->devices()->where('type', 'network')->count();
+    $srv = $location->devices()->where('type', 'server')->count();
+    $fwl = $location->devices()->where('type', 'firewall')->count();
+    $hostalerts = $location->devices()->isDown()->count();
 
     if ($hostalerts) {
         $alert = '<i class="fa fa-flag" style="color:red" aria-hidden="true"></i>';
@@ -61,7 +54,7 @@ foreach (getlocations() as $location) {
 
     if ($location != '') {
         echo '      <tr class="locations">
-            <td class="interface" width="300"><a class="list-bold" href="devices/location='.urlencode($location).'/">'.$location.'</a></td>
+            <td class="interface" width="300"><a class="list-bold" href="devices/location='.$location->id.'/">'.display($location->location).'</a></td>
             <td width="100">'.$alert.'</td>
             <td width="100">'.$num.' devices</td>
             <td width="100">'.$net.' network</td>
@@ -78,7 +71,7 @@ foreach (getlocations() as $location) {
             $graph_array['width']  = '220';
             $graph_array['to']     = $config['time']['now'];
             $graph_array['legend'] = 'no';
-            $graph_array['id']     = $location;
+            $graph_array['id']     = $location->id;
 
             include 'includes/print-graphrow.inc.php';
 
