@@ -1,0 +1,448 @@
+COMMON-TC-4RF DEFINITIONS ::= BEGIN
+
+--
+-- File: $Id: 4RF-COMMON-TC.txt,v 1.27 2007/05/07 00:19:51 pk Exp $
+--
+-- Copyright: 2004  4RF COMMUNICATIONS LTD
+--
+-- Description:
+--   Common MIB sub-tree for 4RF Communications Ltd., used by all products.
+--   It defines some useful TEXT-CONVENTIONS relating to 4RF products.
+--
+-- Versions:
+--
+-- Notes:
+--  None
+--
+
+IMPORTS
+
+    -- Standard imports
+    MODULE-IDENTITY, OBJECT-IDENTITY
+    Integer32, Unsigned32, Counter32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, DateAndTime
+        FROM SNMPv2-TC
+
+    -- 4RF Specific imports
+    fourRFGeneric, fourRFModules
+        FROM MIB-4RF;
+        
+        
+-- Module Identification
+fourRFCommonTCModule MODULE-IDENTITY
+    LAST-UPDATED "200704300000Z"
+    ORGANIZATION "www.4rf.com"
+    CONTACT-INFO    
+         "postal:   4RF Communications Ltd
+                    26 Glover Street
+                    Ngauranga
+                    PO Box 13-506
+                    Wellington 6032
+                    New Zealand
+                    
+          phone:    +64 4 499 6000
+          email:    support@4rf.com"
+    DESCRIPTION "Common 4RF MIB Textual Conventions."
+
+	-- Revision history
+    -- (in reverse chronological order)
+
+    REVISION    "200704300000Z"
+    DESCRIPTION "Second draft"
+
+    REVISION    "200402130000Z"
+    DESCRIPTION "First draft"
+    ::= { fourRFModules 4 }
+
+
+--
+-- LED control types
+--
+
+FourRFSimpleLedState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The possible states for a simple LED."
+    SYNTAX      INTEGER { off (0),
+                          on  (1)
+                }
+
+FourRFTriColourLedState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The possible states of a three-colour LED."
+    SYNTAX      INTEGER { off    (0),
+                          green  (1),
+                          red    (2),
+                          orange (3) }
+
+
+--
+-- Basic alarm control types
+--
+
+FourRFAlarmSeverity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The possible alarm severities, not all values need be used."
+    SYNTAX      INTEGER { noSeverity (0),
+                                          -- informational (1),
+                                          -- warning (2),
+                          minor (3),
+                          major (4)
+                                          -- critical (5)
+                }
+
+FourRFAlarmPresent ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The possible alarm states, alarmPresent indicates that the
+                 alarm is active."
+    SYNTAX      INTEGER { noAlarmPresent (0),
+                          alarmPresent   (1)
+                }
+ 
+FourRFAlarmEnabled ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Indicates whether an alarm is enabled or not, it may be useful
+                 to allow specific alarms to be enabled or disabled by the user."
+    SYNTAX      INTEGER { disabled (0),
+                          enabled  (1)
+                }
+
+FourRFAlarmStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to identify current alarm status."
+    SYNTAX      INTEGER { noAlarm          (0),
+                          informationAlarm (1),
+                          warningAlarm     (2),
+                          minorAlarm       (3),
+                          majorAlarm       (4),
+                          criticalAlarm    (5)
+                }
+                        
+FourRFMHSBStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to give the state of an MHSB terminal."
+    SYNTAX      INTEGER { notAvailable       (0),
+                          active             (1),
+                          standby            (2)
+                }
+
+FourRFMHSBCommand ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to send a command to an MHSB terminal."
+    SYNTAX      INTEGER { noCommand          (0),
+                          clearSwitchedAlarm (1),
+                          forceSwitchover    (2)
+                }
+
+
+-- 
+-- Hardware version - an 8 bit integer value
+--
+
+FourRFHardwareVersion ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The hardware version details."
+    SYNTAX      DisplayString ( SIZE (0..32) )      
+
+
+-- 
+-- Terminal/Module Serial Number
+--
+
+FourRFSerialNumber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A module/terminal serial number format xxxx-xxx."
+    SYNTAX      OCTET STRING ( SIZE (8) )
+
+
+--
+-- Reset types
+--
+
+FourRFResetType  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The possible types of reset."
+    SYNTAX      INTEGER { none          (0),
+                          softReset     (1),
+                          hardReset     (2),
+                          watchdogReset (3)
+                }
+
+
+--
+-- Image details 
+--
+
+FourRFImageType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The possible image types to upload."
+    SYNTAX      INTEGER { none          (0),
+                          kernel        (1),
+                          rootfs        (2),
+                          mib           (3),
+                          configuration (4),
+                          firmware      (5)
+                }
+
+FourRFImageStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The possible image status values, currentImage means it is the running.
+         selectedImage means that the image has been selected and will be used
+         following the next reboot of the system, currentNotSelected means that 
+         the image is currently in use but won't be following a reboot."
+    SYNTAX      INTEGER { inactiveImage      (0), 
+                          currentImage       (1), 
+                          currentNotSelected (2), 
+                          selectedImage      (3) 
+                }
+
+FourRFImageVersion ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The image version details."
+    SYNTAX      DisplayString ( SIZE (0..64) )  
+
+  
+-- 
+-- Other Types
+--
+
+FourRFProcessResultType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The possible states for a process which takes time to complete."
+    SYNTAX      INTEGER { none           (0),
+                          executing      (1),
+                          writingToFlash (2),
+                          succeeded      (3),
+                          failed         (4)
+                }
+          
+FourRFTftpFileName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The name of a file to transfered using TFTP."
+    SYNTAX      DisplayString ( SIZE (0..255) )
+
+FourRFFileSize ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A size of a file in bytes."
+    SYNTAX      Unsigned32        
+
+
+--
+-- Useful Radio Related Types
+--
+
+FourRFFrequency ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A frequency value in Hz."
+    SYNTAX      Unsigned32 
+        
+FourRFTxPower ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A transmitter power value in dBm."
+    SYNTAX      INTEGER { noPower              (0), 
+                          dbm10                (10), 
+                          dbm11                (11), 
+                          dbm12                (12),
+                          dbm13                (13),
+                          dbm14                (14),
+                          dbm15                (15),
+                          dbm16                (16),
+                          dbm17                (17),
+                          dbm18                (18),
+                          dbm19                (19),
+                          dbm20                (20),
+                          dbm21                (21),
+                          dbm22                (22),
+                          dbm23                (23),
+                          dbm24                (24),
+                          dbm25                (25),
+                          dbm26                (26),
+                          dbm27                (27),
+                          dbm28                (28),
+                          dbm29                (29),
+                          dbm30                (30),
+                          dbm31                (31),
+                          dbm32                (32),
+                          dbm33                (33),
+                          dbm34                (34),
+                          dbm35                (35),
+                          dbm36                (36),
+                          dbm37                (37),
+                          dbm38                (38),
+                          dbm39                (39),
+                          dbm40                (40)
+                }
+        
+FourRFChannelWidth ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The possible channel width values."
+    SYNTAX      INTEGER { invalidChannel       (0),
+                          channel20KHz         (1),
+                          channel25KHz         (2), 
+                          channel50KHz         (3),
+                          channel75KHz         (4),
+                          channel100KHz        (5),
+                          channel125KHz        (6),
+                          channel150KHz        (7),
+                          channel200KHz        (9),
+                          channel250KHz        (10),
+                          channel400KHz        (13), 
+                          channel500KHz        (20),
+                          channel800KHz        (25), 
+                          channel1MHz          (30),
+                          channel1point25MHz   (33),
+                          channel1point35MHz   (35),
+                          channel1point75MHz   (40),
+                          channel2MHz          (42),
+                          channel2point5MHz    (45),
+                          channel3point5MHz    (50),
+                          channel5point25MHz   (55),
+                          channel7MHz          (60),
+                          channel14MHz         (70) 
+                }
+
+FourRFNetworkClockStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The possible modulation types for the radio."
+    SYNTAX      INTEGER { active               (0),
+                          inactive             (1),
+                          holdover             (2)
+                }
+
+FourRFRSSI ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS      current
+    DESCRIPTION "A receiver RSSI value, in dBm."
+    SYNTAX      Integer32(-2000..2000)        
+    
+FourRFSNR ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS      current
+    DESCRIPTION "A signal to noise ratio in dBm."
+    SYNTAX      Integer32      
+    
+FourRFModulationType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The possible modulation types for the radio."
+    SYNTAX      INTEGER { modQPSK              (0),
+                          mod16QAM             (1),
+                          mod32QAM             (2),
+                          mod64QAM             (3),
+                          mod128QAM            (4),
+                          mod256QAM            (5),
+                          
+                          -- Modulation off
+                          modNone              (6)
+                }
+                        
+FourRFTemperature ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A temperature value in degrees Celcius."
+    SYNTAX      Integer32    
+
+FourRFErrorCounter ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An error counter, e.g. for the uncorrectable error count."
+    SYNTAX      Counter32    
+                        
+FourRFRfBand ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to identify the frequency band of the transmitter
+                 The bands are: 
+                     330 to 400 MHz (300 MHz)
+                     400 to 470 MHz (400 MHz)
+                     1350 to 1550 MHz (1400 MHz) ."
+    SYNTAX      INTEGER { invalidBand (0),
+                          band300MHz  (10), 
+                          band400MHz  (20), 
+                          band700MHz  (24), 
+                          band800MHz  (26), 
+                          band900MHz  (28), 
+                          band1400MHz (30)
+                }
+
+FourRFFanStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to identify current fan status."
+    SYNTAX      INTEGER { notFitted (0),
+                          fanOkay   (1),
+                          fanFailed (2)
+                }
+                        
+FourRFClockSource ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to identify the clock source for the terminal."
+    SYNTAX      INTEGER { networkClock  (0),
+                          linkClock     (1),
+                          internalClock (2)
+                }
+
+FourRFNetworkClockSelect ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to select the priority of the clocks to use." 
+    SYNTAX      INTEGER { none        (0),
+                          primary     (1),
+                          secondary   (2)
+                }
+
+FourRFLoopback ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to control loopback or monitor status."
+    SYNTAX      INTEGER { loopbackOff  (0),
+                          loopbackOn   (1)
+                }
+                        
+                        
+--
+-- Web User Handling
+--
+
+FourRFWebUserGroup ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to identify the group to which a web user belongs."
+    SYNTAX      INTEGER { readOnlyGroup  (0),
+                          readWriteGroup (1),
+                          adminGroup     (2)
+                }
+                        
+FourRFWebUserEnabled ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to identify whether a web user is enabled."
+    SYNTAX      INTEGER { userDisabled (0),
+                          userEnabled  (1)
+                }
+                        
+FourRFTimeZone ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to assign an offset in minutes based on GMT timezone." 
+    SYNTAX      INTEGER { gmtMinusTwelve         (-720),
+                          gmtMinusEleven         (-660),
+                          gmtMinusTen            (-600),
+                          gmtMinusNine           (-540),
+                          gmtMinusEight          (-480),
+                          gmtMinusSeven          (-420),
+                          gmtMinusSix            (-360),
+                          gmtMinusFive           (-300),
+                          gmtMinusFour           (-240),
+                          gmtMinusThreePointFive (-210),
+                          gmtMinusThree          (-180),
+                          gmtMinusTwo            (-120),
+                          gmtMinusOne            (-60),
+                          gmt                    (0),
+                          gmtPlusOne             (60),
+                          gmtPlusTwo             (120),
+                          gmtPlusThree           (180),
+                          gmtPlusFour            (240),
+                          gmtPlusFive            (300),
+                          gmtPlusSix             (360),
+                          gmtPlusSeven           (420),
+                          gmtPlusEight           (480),
+                          gmtPlusNine            (540),
+                          gmtPlusTen             (600),
+                          gmtPlusEleven          (660),
+                          gmtPlusTwelve          (720),
+                          gmtPlusThirteen        (800)
+                }
+
+END
