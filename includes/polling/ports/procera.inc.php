@@ -72,7 +72,7 @@ foreach ($packetlogic_stats as $index => $port) {
         $procera_port['ifSpeed'] = $mediaType[$negotiatedMedia]['ifSpeed'];
         $procera_port['ifDuplex'] = $mediaType[$negotiatedMedia]['ifDuplex'];
         $procera_port['ifType'] = 'ethernetCsmacd';
-        array_push($port_stats, $procera_port);
+        $port_stats[$index] = $procera_port;
     }
 }
 
