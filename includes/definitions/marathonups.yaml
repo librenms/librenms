@@ -4,7 +4,6 @@ type: power
 icon: marathon
 rfc1628_compat: true
 over:
-    - { graph: device_curr, text: Current }
     - { graph: device_load, text: Load }
     - { graph: device_voltage, text: Voltage }
 discovery:
