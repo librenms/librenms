@@ -103,9 +103,11 @@
                         return '<span class="label label-default">' + row[column.id] + '</span>';
                     },
                     "actions": function (column, row) {
-                        var buttons = '<div style="white-space:nowrap">' +
-                            '<button type="button" class="btn btn-sm btn-primary" onclick="toggle_location_graphs(' + row.id + ', this)">' +
-                            '<i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> @lang('Traffic')</span></button>';
+                        var buttons = '<div style="white-space:nowrap"><button type="button" class="btn btn-sm btn-primary" onclick="toggle_location_graphs(' + row.id + ', this)"';
+                        if (row.devices < 1) {
+                            buttons += ' disabled title="@lang('Location must have devices to show graphs')"';
+                        }
+                        buttons += '><i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> @lang('Traffic')</span></button>';
 
                         @admin
                         buttons += ' <button type="button" class="btn btn-sm btn-default" data-id="' + row.id +
@@ -115,7 +117,7 @@
 
                         buttons += ' <button type="button" class="btn btn-sm btn-danger" onclick="delete_location(' + row.id + ')"';
                         if (row.devices > 0) {
-                            buttons += ' disabled title="Cannot delete locations used by devices"';
+                            buttons += ' disabled title="@lang('Cannot delete locations used by devices')"';
                         }
                         buttons += '><i class="fa fa-trash" aria-hidden="true"></i><span class="hidden-sm">  @lang('Delete')</span></button>';
                         @endadmin
