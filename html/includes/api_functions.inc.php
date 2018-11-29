@@ -313,14 +313,14 @@ function list_devices()
     }
 
     $select = " d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname, `lat`, `lng` ";
-    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` LEFT JOIN `locations` ON `locations`.`location` = `d`.`location`";
+    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` LEFT JOIN `locations` ON `locations`.`id` = `d`.`location_id`";
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
     } elseif ($type == 'active') {
         $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
-        $sql = "`d`.`location` LIKE '%".$query."%'";
+        $sql = "`locations`.`location` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
         $sql = "`d`.`ignore`='1' AND `d`.`disabled`='0'";
     } elseif ($type == 'up') {
@@ -1296,7 +1296,7 @@ function list_oxidized()
         $params = array($hostname);
     }
 
-    foreach (dbFetchRows("SELECT hostname,sysname,sysDescr,hardware,os,location,ip AS ip FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
+    foreach (dbFetchRows("SELECT hostname,sysname,sysDescr,hardware,os,locations.location,ip AS ip FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id LEFT JOIN locations ON devices.location_id = locations.id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
         // Convert from packed value to human value
         $device['ip'] = inet6_ntop($device['ip']);
 

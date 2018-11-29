@@ -118,8 +118,9 @@
                     @if($locations)
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
-                            <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> Geo Locations</a>
+                            <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('Geo Locations')</a>
                             <ul class="dropdown-menu scrollable-menu">
+                                <li><a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('All Locations')</a></li>
                             @foreach($locations as $location)
                                     <li><a href="{{ url("devices/location=" . urlencode($location)) }}"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> {{ $location }}</a></li>
                             @endforeach
