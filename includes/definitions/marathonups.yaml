@@ -1,5 +1,5 @@
 os: marathonups
-text: 'MarathonUPS'
+text: 'Marathon UPS'
 type: power
 icon: marathon
 rfc1628_compat: true
