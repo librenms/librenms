@@ -73,7 +73,7 @@ if (isset($_REQUEST['search'])) {
                     if (LegacyAuth::user()->hasGlobalRead()) {
                         $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ?', array($result['device_id']));
                     } else {
-                        $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `I`.`device_id` = `D`.`device_id` AND D.device_id = ?', array(LegacyAuth::id(), $result['device_id']));    
+                        $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `I`.`device_id` = `D`.`device_id` AND D.device_id = ?', array(LegacyAuth::id(), $result['device_id']));
                     }
 
                     $device[] = array(
