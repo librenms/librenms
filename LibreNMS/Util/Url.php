@@ -218,9 +218,9 @@ class Url
 
         if (Config::get('enable_lazy_load', true)) {
             return '<img class="lazy img-responsive" data-original="graph.php?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
-        } else {
-            return '<img class="img-responsive" src="graph.php?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
         }
+
+        return '<img class="img-responsive" src="graph.php?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
     }
 
     public static function overlibLink($url, $text, $contents, $class = null)

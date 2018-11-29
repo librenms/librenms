@@ -74,7 +74,7 @@ class Html
         $graph_array['height'] = round($graph_array['width'] / 2.15);
 
         $graph_data = [];
-        foreach ($periods as $period => $period_tex) {
+        foreach ($periods as $period => $period_text) {
             $graph_array['from'] = Config::get("time.$period");
             $graph_array_zoom = $graph_array;
             $graph_array_zoom['height'] = '150';

@@ -340,11 +340,12 @@ function init_map(id, engine, api_key) {
         // var esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         //     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
         // });
-
-        baseMaps = {
-            "OpenStreetMap": osm
-            // "Satellite": esri
-        };
+        //
+        // baseMaps = {
+        //     "OpenStreetMap": osm,
+        //     "Satellite": esri
+        // };
+        // L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
         osm.addTo(leaflet);
     }
 

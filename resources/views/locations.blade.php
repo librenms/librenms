@@ -90,7 +90,6 @@
                         return '@lang('N/A')';
                     },
                     "down": function (column, row) {
-                        console.log(row);
                         if (row.down > 0) {
                             return '<span class="label label-danger">' + row.down + '</span>';
                         }
@@ -138,7 +137,6 @@
                 var $btn = $(e.relatedTarget);
                 var location = new L.LatLng($btn.data('lat'), $btn.data('lng'));
                 locationId = $btn.data('id');
-                console.log(locationId);
 
                 if (locationMap === null) {
                     locationMap = init_map('location-edit-map', '{{ $maps_engine }}', '{{ $maps_api }}');
@@ -183,9 +181,7 @@
             });
         }
 
-
         function toggle_location_graphs(locationId, source) {
-            console.log(source);
             var $btn = $(source);
             var $row = $btn.closest('tr');
             if ($btn.hasClass('active')) {
@@ -202,7 +198,6 @@
                     $('#bg-fix-' + locationId).show();
                 } else {
                     var html = locationsGraphTemplate({id: locationId});
-                    console.log(html);
                     $(html).insertAfter($row);
                 }
             }
