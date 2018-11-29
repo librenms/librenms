@@ -21,6 +21,8 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         return view('laravel');
     });
 
+    Route::get('locations', 'LocationController@index');
+
     // old route redirects
     Route::get('poll-log', function () {
         return redirect('pollers/tab=log/');

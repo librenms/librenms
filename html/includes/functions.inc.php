@@ -203,21 +203,10 @@ function generate_link($text, $vars, $new_vars = array())
 }//end generate_link()
 
 
-function generate_url($vars, $new_vars = array())
+function generate_url($vars, $new_vars = [])
 {
-    $vars = array_merge($vars, $new_vars);
-
-    $url = $vars['page'] . '/';
-    unset($vars['page']);
-
-    foreach ($vars as $var => $value) {
-        if ($value == '0' || $value != '' && strstr($var, 'opt') === false && is_numeric($var) === false) {
-            $url .= $var . '=' . urlencode($value) . '/';
-        }
-    }
-
-    return ($url);
-}//end generate_url()
+    return \LibreNMS\Util\Url::generate($vars, $new_vars);
+}
 
 
 function escape_quotes($text)
@@ -369,26 +358,8 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
 
 function overlib_link($url, $text, $contents, $class = null)
 {
-    global $config;
-
-    $contents = "<div style=\'background-color: #FFFFFF;\'>" . $contents . '</div>';
-    $contents = str_replace('"', "\'", $contents);
-    if ($class === null) {
-        $output = '<a href="' . $url . '"';
-    } else {
-        $output = '<a class="' . $class . '" href="' . $url . '"';
-    }
-
-    if ($config['web_mouseover'] === false) {
-        $output .= '>';
-    } else {
-        $output .= " onmouseover=\"return overlib('" . $contents . "'" . $config['overlib_defaults'] . ",WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
-    }
-
-    $output .= $text . '</a>';
-
-    return $output;
-}//end overlib_link()
+    return \LibreNMS\Util\Url::overlibLink($url, $text, $contents, $class);
+}
 
 
 function generate_graph_popup($graph_array)
@@ -536,45 +507,13 @@ function print_graph_tag($args)
 
 function generate_graph_tag($args)
 {
-    $urlargs = array();
-    foreach ($args as $key => $arg) {
-        $urlargs[] = $key . '=' . urlencode($arg);
-    }
-
-    return '<img src="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
-}//end generate_graph_tag()
+    return \LibreNMS\Util\Url::graphTag($args);
+}
 
 function generate_lazy_graph_tag($args)
 {
-    global $config;
-    $urlargs = array();
-    $w = 0;
-    $h = 0;
-    foreach ($args as $key => $arg) {
-        switch (strtolower($key)) {
-            case 'width':
-                $w = $arg;
-                break;
-            case 'height':
-                $h = $arg;
-                break;
-            case 'lazy_w':
-                $lazy_w = $arg;
-                break;
-        }
-        $urlargs[] = $key . "=" . urlencode($arg);
-    }
-
-    if (isset($lazy_w)) {
-        $w = $lazy_w;
-    }
-
-    if ($config['enable_lazy_load'] === true) {
-        return '<img class="lazy img-responsive" data-original="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
-    } else {
-        return '<img class="img-responsive" src="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
-    }
-}//end generate_lazy_graph_tag()
+    return \LibreNMS\Util\Url::lazyGraphTag($args);
+}
 
 function generate_dynamic_graph_tag($args)
 {
