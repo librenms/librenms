@@ -2,6 +2,7 @@ os: marathonups
 text: 'MarathonUPS'
 type: power
 icon: marathon
+rfc1628_compat: true
 over:
     - { graph: device_load, text: Load }
     - { graph: device_voltage, text: Voltage }
