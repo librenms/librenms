@@ -328,7 +328,7 @@ if ($format == "graph") {
     foreach (getlocations() as $location_row) {
         $location = clean_bootgrid($location_row['location']);
         $location_id = $location_row['id'];
-        if ($location == $vars['location'] || $location_id == $vars['location']) {
+        if (isset($vars['location']) && ($location_id == $vars['location'] || $location == $vars['location'])) {
             $location_selected = 'selected';
         } else {
             $location_selected = '';

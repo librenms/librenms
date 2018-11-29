@@ -415,7 +415,7 @@ function DescribeAlert($alert)
 {
     $obj         = array();
     $i           = 0;
-    $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, sysContact, os, type, ip, hardware, version, purpose, notes, uptime, status, status_reason, locations.location FROM devices, locations WHERE locations.id = location_id && device_id = ?', array($alert['device_id']));
+    $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, sysContact, os, type, ip, hardware, version, purpose, notes, uptime, status, status_reason, locations.location FROM devices LEFT JOIN locations ON locations.id = devices.location_id WHERE device_id = ?', array($alert['device_id']));
     $attribs     = get_dev_attribs($alert['device_id']);
 
     $obj['hostname']      = $device['hostname'];

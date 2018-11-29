@@ -320,8 +320,13 @@ foreach ($vars as $var => $value) {
                 $param[] = "%" . $value . "%";
                 break;
             case 'location':
-                $where .= " AND L.location LIKE ?";
-                $param[] = "%" . $value . "%";
+                if (is_int($value)) {
+                    $where .= " AND L.id = ?";
+                    $param[] = $value;
+                } else {
+                    $where .= " AND L.location LIKE ?";
+                    $param[] = "%" . $value . "%";
+                }
                 break;
             case 'device_id':
                 $where .= " AND D.device_id = ?";
@@ -404,13 +409,13 @@ if ($ignore_filter == 0 && $disabled_filter == 0) {
     $where .= " AND `I`.`ignore` = 0 AND `I`.`disabled` = 0 AND `I`.`deleted` = 0";
 }
 
-$query = "SELECT * FROM `ports` AS I, `devices` AS D, `locations` AS L WHERE I.device_id = D.device_id D.location_id = L.id" . $where . " " . $query_sort;
-
+$query = "SELECT * FROM `ports` AS I, `devices` AS D LEFT JOIN `locations` AS L ON D.location_id = L.id WHERE I.device_id = D.device_id" . $where . " " . $query_sort;
 $row = 1;
 
 list($format, $subformat) = explode("_", $vars['format']);
 
-$ports = dbFetchRows($query, $param);
+// only grab list of ports for graph pages, table uses ajax
+$ports = $format == 'graph' ? dbFetchRows($query, $param) : [];
 
 switch ($vars['sort']) {
     case 'traffic':
