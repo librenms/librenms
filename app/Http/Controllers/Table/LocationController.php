@@ -93,7 +93,11 @@ class LocationController extends TableController
             case 'down':
                 return function ($query) {
                     $query->on('devices.location_id', 'locations.id')
-                        ->where('devices.status', 0);
+                        ->where([
+                            ['status', '=', 0],
+                            ['ignore', '=', 0],
+                            ['disabled', '=', 0]
+                        ]);
                 };
             case 'network':
                 return function ($query) {
