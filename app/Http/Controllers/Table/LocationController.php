@@ -61,20 +61,20 @@ class LocationController extends TableController
         $total_devices = $location->devices()->count();
 
         $buttons = ['<button type="button" class="btn btn-primary" onclick="toggle_location_graphs(' . $location->id . ', this)">' .
-            '<i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> Traffic</span></button>'];
+            '<i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> ' . __('Traffic') . '</span></button>'];
 
         if (\Request::user()->isAdmin()) {
             $buttons[] = '<button type="button" class="btn btn-default" data-id="' . $location->id .
                 '" data-location="' . $location->location . '" data-lat="' . $location->lat . '" data-lng="' .
                 $location->lng . '" onclick="$(\'#edit-location\').modal(\'show\', this)"><i class="fa fa-pencil" aria-hidden="true"></i>' .
-                '<span class="hidden-sm"> Edit</span></button>';
+                '<span class="hidden-sm"> ' . __('Edit') . '</span></button>';
 
             $delete = '<button type="button" class="btn btn-danger" onclick="delete_location(' . $location->id . ')"';
             if ($total_devices > 0) {
                 $delete .= 'disabled title="Cannot delete locations used by devices"';
             }
 
-            $delete .= '><i class="fa fa-trash" aria-hidden="true"></i><span class="hidden-sm"> Delete</span></button>';
+            $delete .= '><i class="fa fa-trash" aria-hidden="true"></i><span class="hidden-sm"> ' . __('Delete') . '</span></button>';
             $buttons[] = $delete;
         }
 
