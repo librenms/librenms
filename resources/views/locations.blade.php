@@ -20,14 +20,14 @@
                 <table id="locations" class="table table-hover table-condensed table-striped">
                     <thead>
                     <tr>
-                        <th data-column-id="location" data-order="desc">@lang('Location')</th>
-                        <th data-column-id="coordinates" data-sortable="false">@lang('Coordinates')</th>
-                        <th data-column-id="alert" data-sortable="false">@lang('Alert')</th>
-                        <th data-column-id="devices" data-sortable="false">@lang('Devices')</th>
-                        <th data-column-id="network" data-sortable="false">@lang('Network')</th>
-                        <th data-column-id="servers" data-sortable="false">@lang('Servers')</th>
-                        <th data-column-id="firewalls" data-sortable="false">@lang('Firewalls')</th>
-                        <th data-column-id="actions">@lang('Actions')</th>
+                        <th data-column-id="location" data-formatter="location" data-order="desc">@lang('Location')</th>
+                        <th data-column-id="coordinates" data-formatter="coordinates" data-sortable="false">@lang('Coordinates')</th>
+                        <th data-column-id="devices" data-formatter="primaryLabel" data-sortable="false">@lang('Devices')</th>
+                        <th data-column-id="network" data-formatter="defaultLabel" data-sortable="false">@lang('Network')</th>
+                        <th data-column-id="servers" data-formatter="defaultLabel" data-sortable="false">@lang('Servers')</th>
+                        <th data-column-id="firewalls" data-formatter="defaultLabel" data-sortable="false">@lang('Firewalls')</th>
+                        <th data-column-id="down" data-formatter="down" data-sortable="false">@lang('Down')</th>
+                        <th data-column-id="actions" data-formatter="actions" data-sortable="false">@lang('Actions')</th>
                     </tr>
                     </thead>
                 </table>
@@ -72,12 +72,60 @@
         var locationMarker = null;
         var locationId = 0;
         var locationsGraphTemplate = '';
+        var locations_grid = null;
 
         $(document).ready(function () {
-            var locations_grid = $("#locations").bootgrid({
+            locations_grid = $("#locations").bootgrid({
                 ajax: true,
                 rowCount: [25, 50, 100, -1],
-                url: "ajax/table/location"
+                url: "ajax/table/location",
+                formatters: {
+                    "location": function (column, row) {
+                        return '<a href=/devices/location=' + row.id + '>' + row.location + '</a>';
+                    },
+                    "coordinates": function (column, row) {
+                        if (row.lat && row.lng) {
+                            return row.lat + ', ' + row.lng;
+                        }
+                        return '@lang('N/A')';
+                    },
+                    "down": function (column, row) {
+                        console.log(row);
+                        if (row.down > 0) {
+                            return '<span class="label label-danger">' + row.down + '</span>';
+                        }
+
+                        return '<span class="label label-default">' + row.down + '</span>';
+                    },
+                    "primaryLabel": function (column, row) {
+                        return '<span class="label label-primary">' + row[column.id] + '</span>';
+                    },
+                    "defaultLabel": function (column, row) {
+                        return '<span class="label label-default">' + row[column.id] + '</span>';
+                    },
+                    "actions": function (column, row) {
+                        var buttons = '<div style="white-space:nowrap">' +
+                            '<button type="button" class="btn btn-sm btn-primary" onclick="toggle_location_graphs(' + row.id + ', this)">' +
+                            '<i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> @lang('Traffic')</span></button>';
+
+                        @admin
+                        buttons += ' <button type="button" class="btn btn-sm btn-default" data-id="' + row.id +
+                            '" data-location=' + row.location + '" data-lat="' + row.lat + '" data-lng="' + row.lng +
+                            '" onclick="$(\'#edit-location\').modal(\'show\', this)"><i class="fa fa-pencil" aria-hidden="true"></i>' +
+                            '<span class="hidden-sm"> @lang('Edit')</span></button>';
+
+                        buttons += ' <button type="button" class="btn btn-sm btn-danger" onclick="delete_location(' + row.id + ')"';
+                        if (row.devices > 0) {
+                            buttons += ' disabled title="Cannot delete locations used by devices"';
+                        }
+                        buttons += '><i class="fa fa-trash" aria-hidden="true"></i><span class="hidden-sm">  @lang('Delete')</span></button>';
+                        @endadmin
+
+                        buttons += '</div>';
+
+                        return buttons;
+                    }
+                }
             });
 
             var modal = $('#edit-location');

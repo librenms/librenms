@@ -58,35 +58,16 @@ class LocationController extends TableController
      */
     public function formatItem($location)
     {
-        $total_devices = $location->devices()->count();
-
-        $buttons = ['<button type="button" class="btn btn-primary" onclick="toggle_location_graphs(' . $location->id . ', this)">' .
-            '<i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> ' . __('Traffic') . '</span></button>'];
-
-        if (\Request::user()->isAdmin()) {
-            $buttons[] = '<button type="button" class="btn btn-default" data-id="' . $location->id .
-                '" data-location="' . $location->location . '" data-lat="' . $location->lat . '" data-lng="' .
-                $location->lng . '" onclick="$(\'#edit-location\').modal(\'show\', this)"><i class="fa fa-pencil" aria-hidden="true"></i>' .
-                '<span class="hidden-sm"> ' . __('Edit') . '</span></button>';
-
-            $delete = '<button type="button" class="btn btn-danger" onclick="delete_location(' . $location->id . ')"';
-            if ($total_devices > 0) {
-                $delete .= 'disabled title="Cannot delete locations used by devices"';
-            }
-
-            $delete .= '><i class="fa fa-trash" aria-hidden="true"></i><span class="hidden-sm"> ' . __('Delete') . '</span></button>';
-            $buttons[] = $delete;
-        }
-
         return [
+            'id' => $location->id,
             'location' => $location->location,
-            'coordinates' => $location->hasCoordinates() ? $location->lat . ', ' . $location->lng : 'N/A',
-            'alert' => $location->devices()->isDown()->count() ? '<i class="fa fa-flag" style="color:red" aria-hidden="true"></i>' : '',
-            'devices' => '<span class="label label-primary">' . $total_devices . '</span>',
-            'network' => '<span class="label label-default">' . $location->devices()->where('type', 'network')->count() . '</span>',
-            'servers' => '<span class="label label-default">' . $location->devices()->where('type', 'server')->count() . '</span>',
-            'firewalls' => '<span class="label label-default">' . $location->devices()->where('type', 'firewall')->count() . '</span>',
-            'actions' => '<span style="white-space:nowrap">' . implode(' ', $buttons). '</span>',
+            'lat' => $location->lat,
+            'lng' => $location->lng,
+            'down' => $location->devices()->isDown()->count(),
+            'devices' => $location->devices()->count(),
+            'network' => $location->devices()->where('type', 'network')->count(),
+            'servers' => $location->devices()->where('type', 'server')->count(),
+            'firewalls' => $location->devices()->where('type', 'firewall')->count(),
         ];
     }
 }
