@@ -118,6 +118,7 @@ $table_base_oids = array(
     'ifHighSpeed',
     'ifOperStatus',
     'ifAdminStatus',
+    'ifType',
 );
 
 $hc_mappings = array(
