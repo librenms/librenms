@@ -1,0 +1,16 @@
+os: comtrol
+text: 'Comtrol Rocketlinx'
+ifname: true
+type: network
+icon: Comtrol
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir:
+    - comtrol
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.2882.2.1.1
+    - sysDescr:
+        - ES8510 Industrial Managed Ethernet Switch
