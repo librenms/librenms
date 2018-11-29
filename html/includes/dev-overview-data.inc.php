@@ -7,7 +7,7 @@ use LibreNMS\Util\IP;
 
 echo "<div class='row'>
       <div class='col-md-12'>
-          <div class='panel panel-default panel-condensed overview'>
+          <div class='panel panel-default panel-condensed device-overview'>
             <div class='panel-heading'>";
 
 if ($config['overview_show_sysDescr']) {
@@ -118,25 +118,23 @@ if ($device['location_id']) {
     $location = Location::find($device['location_id']);
     $location_coords = $location->coordinatesValid() ? $location->lat . ', ' . $location->lng : 'N/A';
 
-    echo '<div class="row">
+    echo '
+    <div class="row">
         <div class="col-sm-4">Location</div>
         <div class="col-sm-8">' . $location->location . '</div>
-      </div>
-      <div class="row">
+    </div>
+    <div class="row" id="coordinates-row" data-toggle="collapse" data-target="#toggle-map">
         <div class="col-sm-4">Lat / Lng</div>
-        <div class="col-sm-8"><span id="toggle-map-text" data-toggle="collapse" data-target="#toggle-map" class="collapsed"><i class="fa fa-lg fa-angle-right"></i> <span id="location-text">';
-    echo $location_coords . '</span></span><div class="pull-right">';
+        <div class="col-sm-8"><span id="coordinates-text">' . $location_coords . '</span><div class="pull-right">';
 
-    echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> View</button>';
+    echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> <span>View</span></button>';
     if ($location->coordinatesValid()) {
         echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . '+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
     }
     echo '</div>
         </div>
     </div>
-    </div>
-    <div class="row"></div>
-    <div id="toggle-map" class="row collapse"><div class="col-sm-12"><div id="location-map"></div></div></div>
+    <div id="toggle-map" class="row collapse"><div id="location-map"></div></div>
     <script>
         var device_marker, device_location, device_map;
         $("#toggle-map").on("shown.bs.collapse", function () {
@@ -151,37 +149,24 @@ if ($device['location_id']) {
                     if (confirm("Update location to " + new_location + "? This will update this location for all devices!")) {
                         update_location(' . $location->id . ', new_location, function(success) {
                             if (success) {
-                                $("#location-text").text(new_location.lat.toFixed(5) + ", " + new_location.lng.toFixed(5));
+                                $("#coordinates-text").text(new_location.lat.toFixed(5) + ", " + new_location.lng.toFixed(5));
                                 $("#map-it-button").attr("href", "https://maps.google.com/?q=" + new_location.lat + "+" + new_location.lng );
                             }
                         });
                     }
                 });
             }
+            $("#toggle-map-button").find(".fa").removeClass("fa-map").addClass("fa-map-o");
+            $("#toggle-map-button span").text("Hide")
+        }).on("hidden.bs.collapse", function () {
+            $("#toggle-map-button").find(".fa").removeClass("fa-map-o").addClass("fa-map");
+            $("#toggle-map-button span").text("View")
         });
     </script>
     ';
 }
 ?>
-
+      </div>
     </div>
   </div>
 </div>
-
-<style>
-    #location-map {
-        padding: 15px;
-        height: 400px;
-        font-family: "DejaVu Sans";
-    }
-
-    #toggle-map-text { cursor: pointer; }
-    #toggle-map-text i { transition: .3s transform ease-in-out; }
-    #toggle-map-text:not(.collapsed) i { transform: rotate(90deg); }
-
-    .overview>.panel-body { padding-top: 0; padding-bottom: 0; }
-    .overview>.panel-body>.row:nth-child(odd) { background-color: #f9f9f9; }
-    .overview>.panel-body>.row:hover { background-color: #f5f5f5; }
-    .overview>.panel-body>.row>div { padding: 3px 5px; }
-    .overview>.panel-body>.row>div:first-child { font-weight: 500; }
-</style>
