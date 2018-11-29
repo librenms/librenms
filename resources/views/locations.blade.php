@@ -94,7 +94,7 @@
                             return '<span class="label label-danger">' + row.down + '</span>';
                         }
 
-                        return '<span class="label label-default">' + row.down + '</span>';
+                        return '<span class="label label-success">' + row.down + '</span>';
                     },
                     "primaryLabel": function (column, row) {
                         return '<span class="label label-primary">' + row[column.id] + '</span>';
