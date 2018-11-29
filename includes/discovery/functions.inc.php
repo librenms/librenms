@@ -939,14 +939,14 @@ function ignore_storage($os, $descr)
  * @param array $pre_cache
  * @return bool
  */
-function can_skip_sensor($value, $data, $group, $pre_cache = array())
+function can_skip_sensor($value, $index, $data, $group, $pre_cache = array())
 {
     $skip_values = array_replace((array)$group['skip_values'], (array)$data['skip_values']);
     foreach ($skip_values as $skip_value) {
         if (is_array($skip_value) && $pre_cache) {
             // Dynamic skipping of data
             $op = isset($skip_value['op']) ? $skip_value['op'] : '!=';
-            $tmp_value = $pre_cache[$skip_value['oid']];
+            $tmp_value = dynamic_discovery_get_value($skip_value['oid'], $index, $data, $pre_cache);
             if (compare_var($tmp_value, $skip_value['value'], $op) == true) {
                 return true;
             }
@@ -1033,7 +1033,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                 d_echo("Final sensor value: $value\n");
 
-                if (can_skip_sensor($value, $data, $sensor_options, $raw_data[$index]) === false && is_numeric($value)) {
+                if (can_skip_sensor($value, $index, $data, $sensor_options, $pre_cache) === false && is_numeric($value)) {
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
 
                     // process the description
