@@ -38,7 +38,7 @@ class LocationController extends TableController
      */
     public function searchFields($request)
     {
-        return ['location'];
+        return ['location', 'devices', 'down', 'network', 'servers', 'firewalls'];
     }
 
     /**
@@ -49,6 +49,18 @@ class LocationController extends TableController
      */
     public function baseQuery($request)
     {
+        // joins are needed for device count sorts
+        $sort = $request->get('sort');
+        $key = key($sort);
+        $join = $this->getJoinQuery($key);
+
+        if ($join) {
+            return Location::hasAccess($request->user())
+                ->select(['id', 'location', 'lat', 'lng', \DB::raw("COUNT(device_id) AS $key")])
+                ->leftJoin('devices', $this->getJoinQuery($key))
+                ->groupBy(['id', 'location', 'lat', 'lng']);
+        }
+
         return Location::hasAccess($request->user());
     }
 
@@ -69,5 +81,37 @@ class LocationController extends TableController
             'servers' => $location->devices()->where('type', 'server')->count(),
             'firewalls' => $location->devices()->where('type', 'firewall')->count(),
         ];
+    }
+
+    private function getJoinQuery($field)
+    {
+        switch ($field) {
+            case 'devices':
+                return function ($query) {
+                    $query->on('devices.location_id', 'locations.id');
+                };
+            case 'down':
+                return function ($query) {
+                    $query->on('devices.location_id', 'locations.id')
+                        ->where('devices.status', 0);
+                };
+            case 'network':
+                return function ($query) {
+                    $query->on('devices.location_id', 'locations.id')
+                        ->where('devices.type', 'network');
+                };
+            case 'servers':
+                return function ($query) {
+                    $query->on('devices.location_id', 'locations.id')
+                        ->where('devices.type', 'server');
+                };
+            case 'firewalls':
+                return function ($query) {
+                    $query->on('devices.location_id', 'locations.id')
+                        ->where('devices.type', 'firewall');
+                };
+            default:
+                return null;
+        }
     }
 }

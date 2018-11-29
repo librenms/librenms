@@ -22,11 +22,11 @@
                     <tr>
                         <th data-column-id="location" data-formatter="location" data-order="desc">@lang('Location')</th>
                         <th data-column-id="coordinates" data-formatter="coordinates" data-sortable="false">@lang('Coordinates')</th>
-                        <th data-column-id="devices" data-formatter="primaryLabel" data-sortable="false">@lang('Devices')</th>
-                        <th data-column-id="network" data-formatter="defaultLabel" data-sortable="false">@lang('Network')</th>
-                        <th data-column-id="servers" data-formatter="defaultLabel" data-sortable="false">@lang('Servers')</th>
-                        <th data-column-id="firewalls" data-formatter="defaultLabel" data-sortable="false">@lang('Firewalls')</th>
-                        <th data-column-id="down" data-formatter="down" data-sortable="false">@lang('Down')</th>
+                        <th data-column-id="devices" data-formatter="primaryLabel">@lang('Devices')</th>
+                        <th data-column-id="network" data-formatter="defaultLabel">@lang('Network')</th>
+                        <th data-column-id="servers" data-formatter="defaultLabel">@lang('Servers')</th>
+                        <th data-column-id="firewalls" data-formatter="defaultLabel">@lang('Firewalls')</th>
+                        <th data-column-id="down" data-formatter="down">@lang('Down')</th>
                         <th data-column-id="actions" data-formatter="actions" data-sortable="false">@lang('Actions')</th>
                     </tr>
                     </thead>
