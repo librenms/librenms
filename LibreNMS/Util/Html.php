@@ -2,7 +2,7 @@
 /**
  * Html.php
  *
- * -Description-
+ * Helper functions to generate html snippets
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
  */
 
 namespace LibreNMS\Util;
-
 
 use LibreNMS\Config;
 
