@@ -6,13 +6,7 @@ $maps_api = \LibreNMS\Config::get('geoloc.api_key');
 $maps_engine = $maps_api ? \LibreNMS\Config::get('geoloc.engine') : '';
 
 echo '<script src="js/leaflet.js"></script>';
-echo '<link rel="stylesheet" href="js/L.Control.Locate.min.css"/>';
 echo '<script src="js/L.Control.Locate.min.js"></script>';
-
-if ($maps_engine == 'google') {
-    echo "<script src='https://maps.googleapis.com/maps/api/js?key=$maps_api' async defer></script>";
-    echo "<script src='js/Leaflet.GoogleMutant.js'></script>";
-}
 
 ?>
 
@@ -109,7 +103,7 @@ if ($maps_engine == 'google') {
             locationMarker = init_map_marker(locationMap, location);
         }
 
-        var zoom = 15;
+        var zoom = 17;
         if (location.lat === 0 && location.lng === 0) {
             zoom = 1;
         }
