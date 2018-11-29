@@ -111,7 +111,7 @@
 
                         @admin
                         buttons += ' <button type="button" class="btn btn-sm btn-default" data-id="' + row.id +
-                            '" data-location=' + row.location + '" data-lat="' + row.lat + '" data-lng="' + row.lng +
+                            '" data-location="' + row.location + '" data-lat="' + row.lat + '" data-lng="' + row.lng +
                             '" onclick="$(\'#edit-location\').modal(\'show\', this)"><i class="fa fa-pencil" aria-hidden="true"></i>' +
                             '<span class="hidden-sm"> @lang('Edit')</span></button>';
 
