@@ -11,6 +11,6 @@ mib_dir:
     - comtrol
 discovery:
     - sysObjectID:
-        - .1.3.6.1.4.1.2882.2.1.1
+        - .1.3.6.1.4.1.2882
     - sysDescr:
-        - ES8510 Industrial Managed Ethernet Switch
+        - Industrial Managed Ethernet Switch
