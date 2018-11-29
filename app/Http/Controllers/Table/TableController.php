@@ -58,7 +58,7 @@ abstract class TableController extends PaginatedAjaxController
 
         $limit = $request->get('rowCount', 25);
         $page = $request->get('current', 1);
-        $paginator = $query->paginate($limit, ['*'], 'page', $page);
+        $paginator = $query->paginate($limit < 0 ? null : $limit, ['*'], 'page', $page);
 
         return $this->formatResponse($paginator);
     }
