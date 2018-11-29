@@ -26,10 +26,16 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Location;
-use LibreNMS\Util\Html;
 
 class LocationController extends TableController
 {
+    /**
+     * Defines search fields will be searched in order
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function searchFields($request)
     {
         return ['location'];
@@ -52,15 +58,12 @@ class LocationController extends TableController
      */
     public function formatItem($location)
     {
-        $admin = \Request::user()->isAdmin();
         $total_devices = $location->devices()->count();
 
-        $buttons = [];
+        $buttons = ['<button type="button" class="btn btn-primary" onclick="toggle_location_graphs(' . $location->id . ', this)">' .
+            '<i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> Traffic</span></button>'];
 
-        $buttons[] = '<button type="button" class="btn btn-primary" onclick="toggle_location_graphs(' . $location->id . ', this)">' .
-            '<i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> Traffic</span></button>';
-
-        if ($admin) {
+        if (\Request::user()->isAdmin()) {
             $buttons[] = '<button type="button" class="btn btn-default" data-id="' . $location->id .
                 '" data-location="' . $location->location . '" data-lat="' . $location->lat . '" data-lng="' .
                 $location->lng . '" onclick="$(\'#edit-location\').modal(\'show\', this)"><i class="fa fa-pencil" aria-hidden="true"></i>' .
