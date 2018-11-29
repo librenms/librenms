@@ -143,8 +143,10 @@ if ($device['location_id']) {
                 device_map = init_map("location-map", "' . $maps_engine . '", "' . $maps_api . '");
                 device_marker = init_map_marker(device_map, device_location);
                 device_map.setZoom(18);
-                
-                device_map.on("dragend", function () {
+                ';
+
+    if (Auth::user()->isAdmin()) {
+        echo '  device_map.on("dragend", function () {
                     var new_location = device_marker.getLatLng();
                     if (confirm("Update location to " + new_location + "? This will update this location for all devices!")) {
                         update_location(' . $location->id . ', new_location, function(success) {
@@ -154,8 +156,12 @@ if ($device['location_id']) {
                             }
                         });
                     }
-                });
-            }
+                });';
+    } else {
+        echo 'device_map.dragging.disable();';
+    }
+    echo '
+        }
             $("#toggle-map-button").find(".fa").removeClass("fa-map").addClass("fa-map-o");
             $("#toggle-map-button span").text("Hide")
         }).on("hidden.bs.collapse", function () {

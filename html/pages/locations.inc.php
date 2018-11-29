@@ -48,7 +48,7 @@ echo '<script src="js/L.Control.Locate.min.js"></script>';
                     <th data-column-id="network" data-sortable="false">Network</th>
                     <th data-column-id="servers" data-sortable="false">Servers</th>
                     <th data-column-id="firewalls" data-sortable="false">Firewalls</th>
-                    <?php echo Auth::user()->isAdmin() ? '<th data-column-id="actions">Actions</th>' : ''?>
+                    <th data-column-id="actions">Actions</th>
                 </tr>
                 </thead>
             </table>
