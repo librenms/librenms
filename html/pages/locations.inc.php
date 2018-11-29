@@ -109,9 +109,14 @@ if ($maps_engine == 'google') {
             locationMarker = init_map_marker(locationMap, location);
         }
 
+        var zoom = 15;
+        if (location.lat === 0 && location.lng === 0) {
+            zoom = 1;
+        }
+
         // move the map (which will trigger a move event and update the marker
         locationMarker.setLatLng(location);
-        locationMap.setView(location, 15);
+        locationMap.setView(location, zoom);
     });
 
     $('#save-location').click(function () {
