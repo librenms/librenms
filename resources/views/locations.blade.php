@@ -20,7 +20,7 @@
                 <table id="locations" class="table table-hover table-condensed table-striped">
                     <thead>
                     <tr>
-                        <th data-column-id="location" data-formatter="location" data-order="desc">@lang('Location')</th>
+                        <th data-column-id="location" data-formatter="location" data-order="asc">@lang('Location')</th>
                         <th data-column-id="coordinates" data-formatter="coordinates" data-sortable="false">@lang('Coordinates')</th>
                         <th data-column-id="devices" data-formatter="primaryLabel">@lang('Devices')</th>
                         <th data-column-id="network" data-formatter="defaultLabel">@lang('Network')</th>
