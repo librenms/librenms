@@ -45,7 +45,7 @@ class Gitlab extends Transport
         } else {
             $device = device_by_id_cache($obj['device_id']); // for event logging
 
-            $project_id  = $opts['project_id'];
+            $project_id  = $opts['project-id'];
             $project_key = $opts['key'];
             $details     = "Librenms alert for: " . $obj['hostname'];
             $description = $obj['msg'];
