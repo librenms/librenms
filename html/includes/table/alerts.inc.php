@@ -117,7 +117,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`hardware`, `devices`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
+$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`hardware`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
 
 $rulei = 0;
 $format = $vars['format'];

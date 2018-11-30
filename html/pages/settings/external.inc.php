@@ -4,6 +4,26 @@ $no_refresh = true;
 
 $config_groups = get_config_by_group('external');
 
+$location_conf = [
+    [
+        'name'    => 'geoloc.engine',
+        'descr'   => 'Geocoding Engine',
+        'type'    => 'select',
+        'options' => [
+            ['value' => 'google', 'description' => 'Google Maps'],
+            ['value' => 'openstreetmap', 'description' => 'OpenStreetMap'],
+            ['value' => 'mapquest', 'description' => 'MapQuest'],
+            ['value' => 'bing', 'description' => 'Bing Maps'],
+        ]
+    ],
+    [
+        'name'     => 'geoloc.api_key',
+        'descr'    => 'Geocoding API Key',
+        'type'     => 'text',
+        'class'    => 'geoloc_api_key'
+    ],
+];
+
 $oxidized_conf = array(
     array('name'               => 'oxidized.enabled',
           'descr'              => 'Enable Oxidized support',
@@ -84,12 +104,23 @@ echo '
     <form class="form-horizontal" role="form" action="" method="post">
 ';
 
+echo generate_dynamic_config_panel('Location Geocoding', $config_groups, $location_conf);
 echo generate_dynamic_config_panel('Oxidized integration', $config_groups, $oxidized_conf);
 echo generate_dynamic_config_panel('Unix-agent integration', $config_groups, $unixagent_conf);
 echo generate_dynamic_config_panel('RRDTool Setup', $config_groups, $rrdtool_conf);
 echo generate_dynamic_config_panel('PeeringDB Integration', $config_groups, $peeringdb_conf);
 
-echo '
+?>
+
     </form>
 </div>
-';
+<script>
+    $('#geoloc\\.engine').change(function () {
+        var engine = this.value;
+        if (engine === 'openstreetmap') {
+            $('.geoloc_api_key').hide();
+        } else {
+            $('.geoloc_api_key').show();
+        }
+    }).change(); // trigger initially
+</script>

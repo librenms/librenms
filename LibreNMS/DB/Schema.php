@@ -161,6 +161,12 @@ class Schema
         }
 
         foreach ($tables as $table) {
+            // check for direct relationships
+            if (in_array($table, $relationships[$target])) {
+                d_echo("Direct relationship found $target -> $table\n");
+                return [$table, $target];
+            }
+
             $table_relations = $relationships[$table];
             d_echo("Searching $table: " . json_encode($table_relations) . PHP_EOL);
 

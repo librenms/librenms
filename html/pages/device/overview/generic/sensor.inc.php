@@ -1,8 +1,8 @@
 <?php
 if ($sensor_class == 'state') {
-    $sensors = dbFetchRows('SELECT `sensors`.*, `state_indexes`.`state_index_id` FROM `sensors` LEFT JOIN `sensors_to_state_indexes` ON sensors_to_state_indexes.sensor_id = sensors.sensor_id LEFT JOIN state_indexes ON state_indexes.state_index_id = sensors_to_state_indexes.state_index_id WHERE `sensor_class` = ? AND device_id = ? ORDER BY `sensor_type`, `sensor_index`+0, `sensor_oid`', array($sensor_class, $device['device_id']));
+    $sensors = dbFetchRows('SELECT `sensors`.*, `state_indexes`.`state_index_id` FROM `sensors` LEFT JOIN `sensors_to_state_indexes` ON sensors_to_state_indexes.sensor_id = sensors.sensor_id LEFT JOIN state_indexes ON state_indexes.state_index_id = sensors_to_state_indexes.state_index_id WHERE `sensor_class` = ? AND device_id = ? ORDER BY `sensor_type`, `sensor_descr`, `sensor_index`+0, `sensor_oid`', array($sensor_class, $device['device_id']));
 } else {
-    $sensors = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND device_id = ? ORDER BY `poller_type`, `sensor_oid`, `sensor_index`', array($sensor_class, $device['device_id']));
+    $sensors = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND device_id = ? ORDER BY `poller_type`, `sensor_descr`, `sensor_oid`, `sensor_index`', array($sensor_class, $device['device_id']));
 }
 
 if (count($sensors)) {
@@ -54,7 +54,7 @@ if (count($sensors)) {
             break;
     }//end switch
 
-    echo '<div class="container-fluid ">
+    echo '
         <div class="row">
         <div class="col-md-12">
         <div class="panel panel-default panel-condensed">
@@ -149,7 +149,6 @@ if (count($sensors)) {
     }//end foreach
 
     echo '</table>';
-    echo '</div>';
     echo '</div>';
     echo '</div>';
     echo '</div>';

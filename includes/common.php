@@ -366,7 +366,7 @@ function device_by_id_cache($device_id, $refresh = false)
     if (!$refresh && isset($cache['devices']['id'][$device_id]) && is_array($cache['devices']['id'][$device_id])) {
         $device = $cache['devices']['id'][$device_id];
     } else {
-        $device = dbFetchRow("SELECT `devices`.*, `lat`, `lng` FROM `devices` LEFT JOIN locations ON `devices`.`location`=`locations`.`location` WHERE `device_id` = ?", array($device_id));
+        $device = dbFetchRow("SELECT `devices`.*, `location`, `lat`, `lng` FROM `devices` LEFT JOIN locations ON `devices`.location_id=`locations`.`id` WHERE `device_id` = ?", [$device_id]);
         $device['attribs'] = get_dev_attribs($device['device_id']);
         load_os($device);
 
@@ -1122,14 +1122,16 @@ function ceph_rrd($gtype)
 /**
  * Parse location field for coordinates
  * @param string location The location field to look for coords in.
- * @return array Containing the lat and lng coords
+ * @return array|bool Containing the lat and lng coords
  **/
 function parse_location($location)
 {
-    preg_match('/(\[)(-?[0-9\. ]+),[ ]*(-?[0-9\. ]+)(\])/', $location, $tmp_loc);
-    if (is_numeric($tmp_loc[2]) && is_numeric($tmp_loc[3])) {
-        return array('lat' => $tmp_loc[2], 'lng' => $tmp_loc[3]);
+    preg_match('/\[(-?[0-9. ]+), *(-?[0-9. ]+)\]/', $location, $tmp_loc);
+    if (is_numeric($tmp_loc[1]) && is_numeric($tmp_loc[2])) {
+        return ['lat' => $tmp_loc[1], 'lng' => $tmp_loc[2]];
     }
+
+    return false;
 }//end parse_location()
 
 /**
@@ -1354,11 +1356,16 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
                     'sensors_to_state_indexes.sensor_id',
                     "sensors.$target",
                 ));
-            } elseif ($table == 'application_metrics' && $target = 'device_id') {
+            } elseif ($table == 'application_metrics' && $target == 'device_id') {
                 return array_merge($last, array(
                     'application_metrics.app_id',
                     "applications.$target",
                 ));
+            } elseif ($table == 'locations' && $target == 'device_id') {
+                return array_merge($last, [
+                    'locations.id',
+                    'devices.device_id.location_id'
+                ]);
             }
 
             $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"', array($table));

@@ -11,6 +11,8 @@
  * See COPYING for more details.
  */
 
+use App\Models\Location;
+use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
 $snmpdata = snmp_get_multi_oid($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysObjectID.0 sysDescr.0', '-OQnUt', 'SNMPv2-MIB');
@@ -79,14 +81,23 @@ foreach (array('sysContact', 'sysObjectID', 'sysName', 'sysDescr') as $elem) {
     }
 }
 
-if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocation'] && $device['override_sysLocation'] == 0) {
-    $update_array['location'] = $poll_device['sysLocation'];
-    $device['location']       = $poll_device['sysLocation'];
-    log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system', 3);
+if ($device['override_sysLocation'] == 0 && $poll_device['sysLocation']) {
+    /** @var Location $location */
+    $location = Location::firstOrCreate(['location' => $poll_device['sysLocation']]);
+
+    if ($device['location_id'] != $location->id) {
+        $device['location_id'] = $location->id;
+        $update_array['location_id'] = $location->id;
+        log_event('Location -> ' . $location->location, $device, 'system', 3);
+    }
 }
 
-if ($config['geoloc']['latlng'] === true) {
-    location_to_latlng($device);
+// make sure the location has coordinates
+if (Config::get('geoloc.latlng', true) && ($location || $location = Location::find($device['location_id']))) {
+    if (!$location->hasCoordinates()) {
+        $location->lookupCoordinates();
+        $location->save();
+    }
 }
 
 unset($snmpdata, $uptime_data, $uptime, $tags, $poll_device);

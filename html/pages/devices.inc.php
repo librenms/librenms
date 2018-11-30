@@ -188,7 +188,7 @@ if ($format == "graph") {
         $where .= " )";
     }
 
-    $query = "SELECT * FROM `devices` WHERE 1 ";
+    $query = "SELECT * FROM `devices`,locations WHERE devices.location_id = locations.id ";
 
     if (isset($where)) {
         $query .= $where;
@@ -325,18 +325,17 @@ if ($format == "graph") {
 
     $locations_options = "<select name='location' id='location' class='form-control input-sm'>";
     $locations_options .= "<option value=''>All Locations</option>";
-    foreach (getlocations() as $location) {
-        if ($location) {
-            $location = clean_bootgrid($location);
-            if ($location == $vars['location']) {
-                $location_selected = 'selected';
-            } else {
-                $location_selected = '';
-            }
-
-            $ui_location = strlen($location) > 15 ? substr($location, 0, 15) . "..." : $location;
-            $locations_options .= "<option value='" . $location . "' " . $location_selected . ">" . $ui_location . "</option>";
+    foreach (getlocations() as $location_row) {
+        $location = clean_bootgrid($location_row['location']);
+        $location_id = $location_row['id'];
+        if (isset($vars['location']) && ($location_id == $vars['location'] || $location == $vars['location'])) {
+            $location_selected = 'selected';
+        } else {
+            $location_selected = '';
         }
+
+        $ui_location = strlen($location) > 15 ? substr($location, 0, 15) . "..." : $location;
+        $locations_options .= "<option value='" . $location_id . "' " . $location_selected . ">" . $ui_location . "</option>";
     }
     $locations_options .= "</select>";
 

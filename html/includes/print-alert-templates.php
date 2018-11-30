@@ -14,7 +14,7 @@ require_once 'includes/modal/delete_alert_template.inc.php';
             <th data-column-id="id" data-searchable="false" data-identifier="true" data-type="numeric">#</th>
             <th data-column-id="templatename">Name</th>
             <th data-column-id="actions" data-searchable="false" data-formatter="commands">Action</th>
-            <th data-column-id="template" data-searchable="false" data-visible="false">Template</th>
+            <th data-column-id="old_template" data-searchable="false" data-visible="false">Old template</th>
           </tr>
       </thead>
       <tbody>
@@ -30,11 +30,12 @@ foreach ($full_query as $template) {
 $template_ids = array_column($templates, 'id');
 array_multisort($templates, SORT_ASC, $template_ids);
 foreach ($templates as $template) {
+    $old_template = strpos($template['template'], "{/if}") !== false ? "1" : "";
     echo '<tr data-row-id="'.$template['id'].'">
             <td>'.$template['id'].'</td>
             <td>'.$template['name'].'</td>
             <td></td>
-            <td>'.$template['template'].'</td>
+            <td>'.$old_template.'</td>
           </tr>';
 }
 
@@ -64,9 +65,8 @@ $(document).ready(function() {
         formatters: {
             "commands": function(column, row) {
                 var response = '';
-                template = row.template;
                 //FIXME remove Deprecated template
-                if (template.indexOf("{/if}") >= 0) {
+                if (row.old_template == "1") {
                     response = "<button type='button' class='btn btn-xs btn-warning' data-content=' class='btn btn-xs btn-warning' data-content='><i class='fa fa-exclamation-triangle' title='This is a legacy template and needs converting, please edit this template and click convert then save'><i class='fa fa-exclamation-triangle'></i></button> ";
                 }
                 if(row.id == 0) {

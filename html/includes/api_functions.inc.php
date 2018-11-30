@@ -313,14 +313,14 @@ function list_devices()
     }
 
     $select = " d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname, `lat`, `lng` ";
-    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` LEFT JOIN `locations` ON `locations`.`location` = `d`.`location`";
+    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` LEFT JOIN `locations` ON `locations`.`id` = `d`.`location_id`";
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
     } elseif ($type == 'active') {
         $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
-        $sql = "`d`.`location` LIKE '%".$query."%'";
+        $sql = "`locations`.`location` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
         $sql = "`d`.`ignore`='1' AND `d`.`disabled`='0'";
     } elseif ($type == 'up') {
@@ -1296,7 +1296,7 @@ function list_oxidized()
         $params = array($hostname);
     }
 
-    foreach (dbFetchRows("SELECT hostname,sysname,sysDescr,hardware,os,location,ip AS ip FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
+    foreach (dbFetchRows("SELECT hostname,sysname,sysDescr,hardware,os,locations.location,ip AS ip FROM `devices` LEFT JOIN locations ON devices.location_id = locations.id LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
         // Convert from packed value to human value
         $device['ip'] = inet6_ntop($device['ip']);
 
@@ -1967,6 +1967,63 @@ function list_vlans()
     }
 
     api_success($vlans, 'vlans');
+}
+
+
+function list_links()
+{
+    $app        = \Slim\Slim::getInstance();
+    $router     = $app->router()->getCurrentRoute()->getParams();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $router['hostname'];
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `links`.`local_device_id`=?";
+        $sql_params = array($device_id);
+    }
+    if (!LegacyAuth::user()->hasGlobalRead()) {
+        $sql .= " AND `links`.`local_device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = LegacyAuth::id();
+    }
+
+    $links       = array();
+    foreach (dbFetchRows("SELECT `links`.* FROM `links` LEFT JOIN `devices` ON `links`.`local_device_id` = `devices`.`device_id` WHERE `links`.`id` IS NOT NULL $sql", $sql_params) as $link) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $links[] = $link;
+    }
+    $total_links = count($links);
+    if ($total_links == 0) {
+        api_error(404, 'Links do not exist');
+    }
+
+    api_success($links, 'links');
+}
+
+
+function get_link()
+{
+    check_is_read();
+
+    $app    = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $linkId  = $router['id'];
+    if (!is_numeric($linkId)) {
+        api_error(400, 'Invalid id has been provided');
+    }
+
+    $link       = dbFetchRows("SELECT * FROM `links` WHERE `id` IS NOT NULL AND `id` = ?", array($linkId));
+    $link_count = count($link);
+    if ($link_count == 0) {
+        api_error(404, "Link $linkId does not exist");
+    }
+
+    api_success($link, 'link');
 }
 
 
