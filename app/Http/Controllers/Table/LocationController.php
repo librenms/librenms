@@ -58,7 +58,7 @@ class LocationController extends TableController
         if ($join) {
             return Location::hasAccess($request->user())
                 ->select(['id', 'location', 'lat', 'lng', \DB::raw("COUNT(device_id) AS `$key`")])
-                ->leftJoin('devices', $this->getJoinQuery($key))
+                ->leftJoin('devices', $join)
                 ->groupBy(['id', 'location', 'lat', 'lng']);
         }
 
