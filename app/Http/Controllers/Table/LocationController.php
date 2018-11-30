@@ -25,6 +25,7 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Models\Device;
 use App\Models\Location;
 
 class LocationController extends TableController
@@ -56,7 +57,7 @@ class LocationController extends TableController
 
         if ($join) {
             return Location::hasAccess($request->user())
-                ->select(['id', 'location', 'lat', 'lng', \DB::raw("COUNT(device_id) AS $key")])
+                ->select(['id', 'location', 'lat', 'lng', \DB::raw("COUNT(device_id) AS `$key`")])
                 ->leftJoin('devices', $this->getJoinQuery($key))
                 ->groupBy(['id', 'location', 'lat', 'lng']);
         }
@@ -92,12 +93,8 @@ class LocationController extends TableController
                 };
             case 'down':
                 return function ($query) {
-                    $query->on('devices.location_id', 'locations.id')
-                        ->where([
-                            ['status', '=', 0],
-                            ['ignore', '=', 0],
-                            ['disabled', '=', 0]
-                        ]);
+                    $query->on('devices.location_id', 'locations.id');
+                    (new Device)->scopeIsDown($query);
                 };
             case 'network':
                 return function ($query) {
