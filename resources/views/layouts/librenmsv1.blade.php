@@ -47,6 +47,7 @@
     @endforeach
     @yield('css')
 
+    <script src="js/polyfill.min.js"></script>
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/bootstrap-hover-dropdown.min.js"></script>
@@ -68,7 +69,7 @@
         <script src="js/lazyload.js"></script>
     @endif
     <script src="{{ asset('js/select2.min.js') }}"></script>
-    <script src="{{ asset('js/librenms.js?ver=20181128') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=20181130') }}"></script>
     <script type="text/javascript">
 
         <!-- Begin
