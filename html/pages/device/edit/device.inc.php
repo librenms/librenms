@@ -236,6 +236,12 @@ if ($_POST['editing']) {
             document.getElementById('edit-hostname-input').disabled = true;
         }
     });
+    $('#sysLocation').keypress(function (e) {
+        if(e.keyCode === 13) {
+            e.preventDefault();
+            $('#edit').submit();
+        }
+    });
     $('#parent_id').select2({
         width: 'resolve'
     });
