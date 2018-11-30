@@ -132,7 +132,7 @@ if ($_POST['editing']) {
     <div class="form-group">
         <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
         <div class="col-sm-6">
-          <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"
+          <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked; edit.sysLocation.select()" type="checkbox" name="override_sysLocation"
                 <?php
                 if ($device_model->override_sysLocation) {
                     echo(' checked="1"');
