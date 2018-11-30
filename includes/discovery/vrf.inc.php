@@ -180,5 +180,15 @@ if (Config::get('enable_vrfs')) {
         );
 
         echo "\n";
+    } else if ($device['os_group'] == 'nokia') {
+        unset($vrf_count);
+
+        $vrtr = snmpwalk_cache_oid($device, 'vRtrConfTable', array(), 'TIMETRA-VRTR-MIB', null);
+        d_echo($vrtr);
+	// Nokia, The VPRN route distinguisher is a 8-octet object. 
+        // It contains a 2-octet type field followed by a 6-octet value field. The type field specify how to interpret the value field.
+        // Type 0 specifies two subfields as a 2-octet administrative field and a 4-octet assigned number subfield.
+        // Type 1 specifies two subfields as a 4-octet administrative field which must contain an IP address and a 2-octet assigned number subfield.
+        // Type 2 specifies two subfields as a 4-octet administrative field which contains a 4-octet AS number and a 2-octet assigned number subfield.
     } //end if
 } //end if
