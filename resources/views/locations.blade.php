@@ -103,19 +103,19 @@
                         return '<span class="label label-default">' + row[column.id] + '</span>';
                     },
                     "actions": function (column, row) {
-                        var buttons = '<div style="white-space:nowrap"><button type="button" class="btn btn-sm btn-primary" onclick="toggle_location_graphs(' + row.id + ', this)"';
+                        var buttons = '<div style="white-space:nowrap"><button type="button" class="btn btn-xs btn-primary" onclick="toggle_location_graphs(' + row.id + ', this)"';
                         if (row.devices < 1) {
                             buttons += ' disabled title="@lang('Location must have devices to show graphs')"';
                         }
                         buttons += '><i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> @lang('Traffic')</span></button>';
 
                         @admin
-                        buttons += ' <button type="button" class="btn btn-sm btn-default" data-id="' + row.id +
+                        buttons += ' <button type="button" class="btn btn-xs btn-default" data-id="' + row.id +
                             '" data-location="' + row.location + '" data-lat="' + row.lat + '" data-lng="' + row.lng +
                             '" onclick="$(\'#edit-location\').modal(\'show\', this)"><i class="fa fa-pencil" aria-hidden="true"></i>' +
                             '<span class="hidden-sm"> @lang('Edit')</span></button>';
 
-                        buttons += ' <button type="button" class="btn btn-sm btn-danger" onclick="delete_location(' + row.id + ')"';
+                        buttons += ' <button type="button" class="btn btn-xs btn-danger" onclick="delete_location(' + row.id + ')"';
                         if (row.devices > 0) {
                             buttons += ' disabled title="@lang('Cannot delete locations used by devices')"';
                         }
