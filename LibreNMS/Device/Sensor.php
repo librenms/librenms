@@ -363,8 +363,8 @@ class Sensor implements DiscoveryModule, PollerModule
             $oid = preg_replace('/[^-0-9.e]/i', '', $oid);
             if (stripos($oid, 'e') !== false) {
                 $oid = sprintf('%.16f', floatval($oid));
+                $oid = rtrim($oid, '0');
             }
-            $oid = rtrim($oid, '0');
         });
 
         return $snmp_data;
