@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "saf-cfm",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "saf.png"
+                    "icon": "saf.png",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": "<private>",
                     "os": "saf-cfm",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "saf.png"
+                    "icon": "saf.png",
+                    "location": "<private>"
                 }
             ]
         }
