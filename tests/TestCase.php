@@ -29,6 +29,8 @@ use LibreNMS\Util\Snmpsim;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
+    use SnmpsimHelpers;
+
     /** @var Snmpsim snmpsim instance */
     protected $snmpsim = null;
 
@@ -55,13 +57,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     {
         if (getenv('DBTEST')) {
             \LibreNMS\DB\Eloquent::DB()->rollBack();
-        }
-    }
-
-    public function requreSnmpsim()
-    {
-        if (!getenv('SNMPSIM')) {
-            $this->markTestSkipped('Snmpsim required for this test.  Set SNMPSIM=1 to enable.');
         }
     }
 }

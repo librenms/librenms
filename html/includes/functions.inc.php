@@ -203,21 +203,10 @@ function generate_link($text, $vars, $new_vars = array())
 }//end generate_link()
 
 
-function generate_url($vars, $new_vars = array())
+function generate_url($vars, $new_vars = [])
 {
-    $vars = array_merge($vars, $new_vars);
-
-    $url = $vars['page'] . '/';
-    unset($vars['page']);
-
-    foreach ($vars as $var => $value) {
-        if ($value == '0' || $value != '' && strstr($var, 'opt') === false && is_numeric($var) === false) {
-            $url .= $var . '=' . urlencode($value) . '/';
-        }
-    }
-
-    return ($url);
-}//end generate_url()
+    return \LibreNMS\Util\Url::generate($vars, $new_vars);
+}
 
 
 function escape_quotes($text)
@@ -369,26 +358,8 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
 
 function overlib_link($url, $text, $contents, $class = null)
 {
-    global $config;
-
-    $contents = "<div style=\'background-color: #FFFFFF;\'>" . $contents . '</div>';
-    $contents = str_replace('"', "\'", $contents);
-    if ($class === null) {
-        $output = '<a href="' . $url . '"';
-    } else {
-        $output = '<a class="' . $class . '" href="' . $url . '"';
-    }
-
-    if ($config['web_mouseover'] === false) {
-        $output .= '>';
-    } else {
-        $output .= " onmouseover=\"return overlib('" . $contents . "'" . $config['overlib_defaults'] . ",WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
-    }
-
-    $output .= $text . '</a>';
-
-    return $output;
-}//end overlib_link()
+    return \LibreNMS\Util\Url::overlibLink($url, $text, $contents, $class);
+}
 
 
 function generate_graph_popup($graph_array)
@@ -536,45 +507,13 @@ function print_graph_tag($args)
 
 function generate_graph_tag($args)
 {
-    $urlargs = array();
-    foreach ($args as $key => $arg) {
-        $urlargs[] = $key . '=' . urlencode($arg);
-    }
-
-    return '<img src="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
-}//end generate_graph_tag()
+    return \LibreNMS\Util\Url::graphTag($args);
+}
 
 function generate_lazy_graph_tag($args)
 {
-    global $config;
-    $urlargs = array();
-    $w = 0;
-    $h = 0;
-    foreach ($args as $key => $arg) {
-        switch (strtolower($key)) {
-            case 'width':
-                $w = $arg;
-                break;
-            case 'height':
-                $h = $arg;
-                break;
-            case 'lazy_w':
-                $lazy_w = $arg;
-                break;
-        }
-        $urlargs[] = $key . "=" . urlencode($arg);
-    }
-
-    if (isset($lazy_w)) {
-        $w = $lazy_w;
-    }
-
-    if ($config['enable_lazy_load'] === true) {
-        return '<img class="lazy img-responsive" data-original="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
-    } else {
-        return '<img class="img-responsive" src="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
-    }
-}//end generate_lazy_graph_tag()
+    return \LibreNMS\Util\Url::lazyGraphTag($args);
+}
 
 function generate_dynamic_graph_tag($args)
 {
@@ -880,27 +819,12 @@ function devclass($device)
 
 function getlocations()
 {
-    $locations = array();
-
-    // Fetch regular locations
     if (LegacyAuth::user()->hasGlobalRead()) {
-        $rows = dbFetchRows('SELECT location FROM devices AS D GROUP BY location ORDER BY location');
-    } else {
-        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array(LegacyAuth::id()));
+        return dbFetchRows('SELECT id, location FROM locations ORDER BY location');
     }
 
-    foreach ($rows as $row) {
-        // Only add it as a location if it wasn't overridden (and not already there)
-        if ($row['location'] != '') {
-            if (!in_array($row['location'], $locations)) {
-                $locations[] = $row['location'];
-            }
-        }
-    }
-
-    sort($locations);
-    return $locations;
-}//end getlocations()
+    return dbFetchRows('SELECT id, L.location FROM devices AS D, locations AS L, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND D.location_id = L.id ORDER BY location', [LegacyAuth::id()]);
+}
 
 
 /**
@@ -1271,7 +1195,7 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
     if (!empty($items)) {
         foreach ($items as $item) {
             $output .= '
-            <div class="form-group has-feedback">
+            <div class="form-group has-feedback ' . (isset($item['class']) ? $item['class'] : '') . '">
                 <label for="' . $item['name'] . '"" class="col-sm-4 control-label">' . $item['descr'] . ' </label>
                 <div data-toggle="tooltip" title="' . $config_groups[$item['name']]['config_descr'] . '" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
                 <div class="col-sm-4">
@@ -1297,7 +1221,7 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
                 ';
             } elseif ($item['type'] == 'select') {
                 $output .= '
-                <select id="' . $config_groups[$item['name']]['name'] . '" class="form-control" name="global-config-select" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
+                <select id="' . ($config_groups[$item['name']]['name'] ?: $item['name']) . '" class="form-control" name="global-config-select" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
                 ';
                 if (!empty($item['options'])) {
                     foreach ($item['options'] as $option) {
@@ -1705,6 +1629,31 @@ function get_zfs_pools($device_id)
     if (isset($zfsc[$device_id])) {
         $id = $component->getFirstComponentID($zfsc, $device_id);
         return json_decode($zfsc[$device_id][$id]['pools']);
+    }
+
+    return array();
+}
+
+/**
+ * Get the ports for a device... just requires the device ID
+ * an empty return means portsactivity is not in use or there are currently no ports
+ * @param $device_id
+ * @return array
+ */
+function get_portactivity_ports($device_id)
+{
+    $options=array(
+        'filter' => array(
+             'type' => array('=', 'portsactivity'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $portsc=$component->getComponents($device_id, $options);
+
+    if (isset($portsc[$device_id])) {
+        $id = $component->getFirstComponentID($portsc, $device_id);
+        return json_decode($portsc[$device_id][$id]['ports']);
     }
 
     return array();

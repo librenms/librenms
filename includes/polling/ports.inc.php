@@ -417,7 +417,7 @@ foreach ($port_stats as $ifIndex => $port) {
         d_echo(' valid');
 
         // Port newly discovered?
-        if (! $ports[$port_id]) {
+        if (!$port_id || empty($ports[$port_id])) {
             /**
               * When using the ifName or ifDescr as means to map discovered ports to
               * known ports in the DB (think of port association mode) it's possible

@@ -18,16 +18,12 @@ use LibreNMS\Authentication\LegacyAuth;
 $where = 1;
 $param = array();
 
-$sql = ' FROM `devices`';
+$sql = ' FROM `devices` LEFT JOIN locations ON devices.location_id = locations.id';
 
 if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
     $where .= ' AND `DP`.`user_id`=?';
     $param[] = LegacyAuth::id();
-}
-
-if (!empty($vars['location'])) {
-    $sql .= " LEFT JOIN `devices_attribs` AS `DB` ON `DB`.`device_id`=`devices`.`device_id` AND `DB`.`attrib_type`='override_sysLocation_bool' AND `DB`.`attrib_value`='1' LEFT JOIN `devices_attribs` AS `DA` ON `devices`.`device_id`=`DA`.`device_id`";
 }
 
 if (!empty($vars['group']) && is_numeric($vars['group'])) {
@@ -97,7 +93,8 @@ if (!empty($vars['location']) && $vars['location'] == 'Unset') {
 }
 
 if (!empty($vars['location'])) {
-    $sql .= " AND `location` = ?";
+    $sql .= " AND (`location` = ? OR `location_id` = ?)";
+    $param[] = $vars['location'];
     $param[] = $vars['location'];
 }
 
@@ -120,7 +117,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT DISTINCT(`devices`.`device_id`),`devices`.* $sql";
+$sql = "SELECT DISTINCT(`devices`.`device_id`),`devices`.*,locations.location $sql";
 
 if (!isset($vars['format'])) {
     $vars['format'] = 'list_detail';

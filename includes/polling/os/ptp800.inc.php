@@ -24,5 +24,5 @@
  */
 use LibreNMS\RRD\RrdDefinition;
 
-$version = $poll_device['sysDescr'];
+$version = $device['sysDescr'];
 $hardware = 'PTP 800';

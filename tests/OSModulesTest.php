@@ -58,7 +58,7 @@ class OSModulesTest extends DBTestCase
      */
     public function testOS($os, $variant, $modules)
     {
-        $this->requreSnmpsim();  // require snmpsim for tests
+        $this->requireSnmpsim();  // require snmpsim for tests
         global $snmpsim;
 
         try {

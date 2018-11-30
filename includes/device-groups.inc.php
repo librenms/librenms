@@ -127,7 +127,12 @@ function GenGroupSQL($pattern, $search = '', $extra = 0)
                     list($tmp,$last) = explode('.', $glue);
                     $qry .= $glue.' = ';
                 } else {
-                    list($tmp,$new) = explode('.', $glue);
+                    $parts = explode('.', $glue);
+                    if (count($parts) == 3) {
+                        list($tmp, $new, $last) = $parts;
+                    } else {
+                        list($tmp,$new) = $parts;
+                    }
                     $qry .= $tmp.'.'.$last.' && '.$tmp.'.'.$new.' = ';
                     $last = $new;
                 }
