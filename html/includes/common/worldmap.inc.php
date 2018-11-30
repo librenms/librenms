@@ -109,7 +109,7 @@ if ($config['map']['engine'] == 'leaflet') {
     } else {
         $temp_output = '
 <script src="js/leaflet.js"></script>
-<script src="js/leaflet.markercluster-src.js"></script>
+<script src="js/leaflet.markercluster.js"></script>
 <script src="js/leaflet.awesome-markers.min.js"></script>
 <div id="leaflet-map"></div>
 <script>
