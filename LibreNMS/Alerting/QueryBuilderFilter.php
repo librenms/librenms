@@ -144,7 +144,7 @@ class QueryBuilderFilter implements \JsonSerializable
         if (starts_with($type, ['varchar', 'text', 'double', 'float'])) {
             return 'string';
         } elseif (starts_with($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'])) {
-            return 'integer';
+            return 'string';
         } elseif (starts_with($type, ['timestamp', 'datetime'])) {
             return 'datetime';
         } elseif (starts_with($type, 'enum')) {
