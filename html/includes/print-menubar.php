@@ -179,27 +179,29 @@ if (count($devices_groups) > 0) {
     unset($group);
     echo '</ul></li>';
 }
-if (Auth::user()->hasGlobalAdmin()) {
-    if ($config['show_locations']) {
-        if ($config['show_locations_dropdown']) {
-            $locations = getlocations();
-            if (count($locations) > 0) {
-                echo('
+if ($config['show_locations']) {
+    if ($config['show_locations_dropdown']) {
+        $locations = getlocations();
+        if (count($locations) > 0) {
+            echo('
                     <li role="presentation" class="divider"></li>
                     <li class="dropdown-submenu">
                     <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> Geo Locations</a>
                     <ul class="dropdown-menu scrollable-menu">
+                    <li><a href="locations"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> All Locations</a></li>
                 ');
-                foreach ($locations as $location) {
-                    echo('            <li><a href="devices/location=' . urlencode($location) . '/"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> ' . $location . ' </a></li>');
-                }
-                echo('
+            foreach ($locations as $location) {
+                echo('            <li><a href="devices/location=' . $location['id'] . '/"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> ' . htmlentities($location['location']) . ' </a></li>');
+            }
+            echo('
                     </ul>
                     </li>
                 ');
-            }
         }
     }
+}
+
+if (Auth::user()->hasGlobalAdmin()) {
     echo '
             <li role="presentation" class="divider"></li>';
     if (is_module_enabled('poller', 'mib')) {

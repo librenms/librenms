@@ -2466,13 +2466,17 @@ function get_schema_list()
 function get_db_schema()
 {
     try {
-        return \LibreNMS\DB\Eloquent::DB()
-            ->table('dbSchema')
-            ->orderBy('version', 'DESC')
-            ->value('version');
+        $db = \LibreNMS\DB\Eloquent::DB();
+        if ($db) {
+            return $db->table('dbSchema')
+                ->orderBy('version', 'DESC')
+                ->value('version');
+        }
     } catch (PDOException $e) {
-        return 0;
+        // return default
     }
+
+    return 0;
 }
 
 /**

@@ -73,7 +73,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->registerGeocoder();
     }
 
     private function configureMorphAliases()
@@ -82,5 +82,29 @@ class AppServiceProvider extends ServiceProvider
             'interface' => \App\Models\Port::class,
             'sensor' => \App\Models\Sensor::class,
         ]);
+    }
+
+    private function registerGeocoder()
+    {
+        $this->app->alias(\LibreNMS\Interfaces\Geocoder::class, 'geocoder');
+        $this->app->bind(\LibreNMS\Interfaces\Geocoder::class, function ($app) {
+            $engine = Config::get('geoloc.engine');
+
+            switch ($engine) {
+                case 'mapquest':
+                    Log::debug('MapQuest geocode engine');
+                    return $app->make(\App\ApiClients\MapquestApi::class);
+                case 'bing':
+                    Log::debug('Bing geocode engine');
+                    return $app->make(\App\ApiClients\BingApi::class);
+                case 'openstreetmap':
+                    Log::debug('OpenStreetMap geocode engine');
+                    return $app->make(\App\ApiClients\NominatimApi::class);
+                default:
+                case 'google':
+                    Log::debug('Google Maps geocode engine');
+                    return $app->make(\App\ApiClients\GoogleMapsApi::class);
+            }
+        });
     }
 }

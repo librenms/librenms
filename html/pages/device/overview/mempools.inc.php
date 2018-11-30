@@ -5,7 +5,7 @@ $graph_type = 'mempool_usage';
 $mempools = dbFetchRows('SELECT * FROM `mempools` WHERE device_id = ?', array($device['device_id']));
 
 if (count($mempools)) {
-    echo '<div class="container-fluid">
+    echo '
         <div class="row">
         <div class="col-md-12">
         <div class="panel panel-default panel-condensed">
@@ -57,7 +57,6 @@ if (count($mempools)) {
     }//end foreach
 
     echo '</table>
-        </div>
         </div>
         </div>
         </div>';
