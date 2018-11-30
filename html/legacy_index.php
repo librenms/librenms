@@ -97,11 +97,12 @@ if (empty($config['favicon'])) {
   <link href="css/leaflet.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
+  <link href="css/L.Control.Locate.min.css" rel="stylesheet" type="text/css" />
   <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
   <link href="css/select2.min.css" rel="stylesheet" type="text/css" />
   <link href="css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="css/query-builder.default.min.css" rel="stylesheet" type="text/css" />
-  <link href="<?php echo($config['stylesheet']);  ?>?ver=291727421" rel="stylesheet" type="text/css" />
+  <link href="<?php echo($config['stylesheet']);  ?>?ver=20181128" rel="stylesheet" type="text/css" />
   <link href="css/<?php echo $config['site_style']; ?>.css?ver=632417642" rel="stylesheet" type="text/css" />
 <?php
 
@@ -135,7 +136,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
     }
     ?>
   <script src="js/select2.min.js"></script>
-  <script src="js/librenms.js?ver=20181028"></script>
+  <script src="js/librenms.js?ver=20181128"></script>
   <script type="text/javascript">
 
     <!-- Begin

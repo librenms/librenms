@@ -92,6 +92,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
      * @param \Psr\Http\Message\ResponseInterface $response
      * @param array $data decoded response data
      * @return bool
+     * @throws Exception you may throw an Exception if validation fails
      */
     protected function checkResponse($response, $data)
     {

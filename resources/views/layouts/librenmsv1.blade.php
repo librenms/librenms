@@ -35,11 +35,12 @@
     <link href="css/leaflet.css" rel="stylesheet" type="text/css" />
     <link href="css/MarkerCluster.css" rel="stylesheet" type="text/css" />
     <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
+    <link href="css/L.Control.Locate.min.css" rel="stylesheet" type="text/css" />
     <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
     <link href="css/select2.min.css" rel="stylesheet" type="text/css" />
     <link href="css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="css/query-builder.default.min.css" rel="stylesheet" type="text/css" />
-    <link href="{{ LibreNMS\Config::get('stylesheet', 'css/styles.css') }}?ver=20180512" rel="stylesheet" type="text/css" />
+    <link href="{{ LibreNMS\Config::get('stylesheet', 'css/styles.css') }}?ver=20181128" rel="stylesheet" type="text/css" />
     <link href="css/{{ LibreNMS\Config::get('site_style', 'light') }}.css?ver=632417642" rel="stylesheet" type="text/css" />
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet" type="text/css" />
@@ -67,7 +68,7 @@
         <script src="js/lazyload.js"></script>
     @endif
     <script src="{{ asset('js/select2.min.js') }}"></script>
-    <script src="{{ asset('js/librenms.js?ver=20181028') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=20181128') }}"></script>
     <script type="text/javascript">
 
         <!-- Begin
