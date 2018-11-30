@@ -313,13 +313,12 @@ function init_map(id, engine, api_key) {
     leaflet.setView([0, 0], 15);
 
     if (engine === 'google') {
-        var roads, satellite;
         loadScript('https://maps.googleapis.com/maps/api/js?key=' + api_key, function () {
             loadScript('js/Leaflet.GoogleMutant.js', function () {
-                roads = L.gridLayer.googleMutant({
+                var roads = L.gridLayer.googleMutant({
                     type: 'roadmap'	// valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
                 });
-                satellite = L.gridLayer.googleMutant({
+                var satellite = L.gridLayer.googleMutant({
                     type: 'satellite'
                 });
 
@@ -330,6 +329,24 @@ function init_map(id, engine, api_key) {
                 L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
                 roads.addTo(leaflet);
             });
+        });
+    } else if (engine === 'bing') {
+        loadScript('js/leaflet-bing-layer.min.js', function () {
+            var roads = L.tileLayer.bing({
+                bingMapsKey: api_key,
+                imagerySet: 'RoadOnDemand'
+            });
+            var satellite = L.tileLayer.bing({
+                bingMapsKey: api_key,
+                imagerySet: 'AerialWithLabelsOnDemand'
+            });
+
+            baseMaps = {
+                "Streets": roads,
+                "Satellite": satellite
+            };
+            L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+            roads.addTo(leaflet);
         });
     } else {
         var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
