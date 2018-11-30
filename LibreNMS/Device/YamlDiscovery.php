@@ -227,7 +227,7 @@ class YamlDiscovery
      * @param array $item_snmp_data The pre-cache data array
      * @return bool
      */
-    static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = array())
+    public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = array())
     {
         $skip_values = array_replace((array)$group_options['skip_values'], (array)$yaml_item_data['skip_values']);
 
@@ -235,7 +235,7 @@ class YamlDiscovery
             if (is_array($skip_value) && $pre_cache) {
                 // Dynamic skipping of data
                 $op = isset($skip_value['op']) ? $skip_value['op'] : '!=';
-                $tmp_value = static::getValueFromData($skip_value['oid'],$index, $yaml_item_data, $pre_cache);
+                $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
                 if (compare_var($tmp_value, $skip_value['value'], $op)) {
                     return true;
                 }
