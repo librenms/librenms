@@ -39,7 +39,7 @@ class LocationController extends TableController
      */
     public function searchFields($request)
     {
-        return ['location', 'devices', 'down', 'network', 'servers', 'firewalls'];
+        return ['location'];
     }
 
     /**
