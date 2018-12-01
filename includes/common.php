@@ -1719,7 +1719,8 @@ function set_numeric($value, $default = 0)
 
 function is_git_install()
 {
-    return file_exists(Config::get('install_dir') . '/.git');
+    $install_dir = Config::get('install_dir', realpath(__DIR__ . '/..'));
+    return file_exists("$install_dir/.git");
 }
 
 function check_git_exists()
