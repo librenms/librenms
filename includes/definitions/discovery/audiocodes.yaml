@@ -122,16 +122,6 @@ modules:
                         - { descr: BRI-IUA, graph: 0, value: 57 , generic: 0 }
                 -
                     oid: dsx1ConfigTable
-                    value: dsx1LineStatus
-                    num_oid: .1.3.6.1.2.1.10.18.6.1.10.{{ $index }}
-                    descr: 'DS1 Status ({{ $dsx1CircuitIdentifier }}){{ $index }}'
-                    index: 'DS1status{{ $index }}'
-                    high_limit: 1
-                    state_name: dsx1LineStatus
-                    states:
-                        - { descr: No Alarm , graph: 0, value: 0 , generic: 0 }
-                -
-                    oid: dsx1ConfigTable
                     value: dsx1LoopbackConfig
                     num_oid: .1.3.6.1.2.1.10.18.6.1.9.{{ $index }}
                     descr: 'DS1 LoopbackConfig ({{ $dsx1CircuitIdentifier }}){{ $index }}'
