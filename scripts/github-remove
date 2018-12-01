@@ -31,8 +31,8 @@ args = parser.parse_args()
 
 if args.discard:
     if confirm("Are you sure you want to delete all modified and untracked files?"):
-        dirs = ["app/", "contrib/", "doc/", "html/", "includes/", "lib/", "LibreNMS/",
-        "licenses/", "mibs/", "misc/", "scripts/", "sql-schema/", "tests/"]
+        dirs = ["app/", "bootstrap/", "contrib/", "databases/", "doc/", "html/", "includes/", "LibreNMS/",
+        "licenses/", "mibs/", "misc/", "resources/", "routes", "scripts/", "sql-schema/", "tests/"]
 
         call(["git", "reset", "-q"], cwd=librenms_dir)
         call(["git", "checkout", "."], cwd=librenms_dir)
