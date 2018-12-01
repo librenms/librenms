@@ -38,7 +38,7 @@ class CreateDevicesTable extends Migration
             $table->text('version')->nullable();
             $table->text('hardware')->nullable();
             $table->text('features')->nullable();
-            $table->text('location')->nullable();
+            $table->integer('location_id')->nullable();
             $table->string('os', 32)->nullable()->index('os');
             $table->boolean('status')->default(0)->index('status');
             $table->string('status_reason', 50);

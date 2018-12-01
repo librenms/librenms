@@ -23,6 +23,7 @@ class CreateDevicePerfTable extends Migration
             $table->float('min');
             $table->float('max');
             $table->float('avg');
+            $table->text('debug')->nullable();
         });
     }
 
