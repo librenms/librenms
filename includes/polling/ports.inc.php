@@ -118,7 +118,6 @@ $table_base_oids = array(
     'ifHighSpeed',
     'ifOperStatus',
     'ifAdminStatus',
-    'ifType',
 );
 
 $hc_mappings = array(
@@ -221,6 +220,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 
         foreach ($polled_ports as $port_id => $port) {
             $ifIndex = $port['ifIndex'];
+            $port_stats[$ifIndex]['ifType'] = $port['ifType']; // we keep it as it is not included in $base_oids
 
             if (is_port_valid($port, $device)) {
                 if (!$walk_base) {
