@@ -40,6 +40,8 @@ if ($alert_state != '') {
         $text     = 'Better';
     }//end if
     echo "<td><b><i class='fa fa-fw fa-".$fa_icon." text-".$fa_color."'></i> $text</b></td>";
-}//end if
+} else {
+    echo "<td></td>";
+} //end else
 
 echo '</tr>';
