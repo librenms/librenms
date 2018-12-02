@@ -299,12 +299,14 @@ $(document).ready(function () {
     }, 300000);
 });
 
-function loadScript(src, callback) {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    if(callback)script.onload=callback;
-    document.getElementsByTagName("head")[0].appendChild(script);
-    script.src = src;
+var jsfilesadded = [];
+function loadjs(filename, func){
+    if (jsfilesadded.indexOf(filename) < 0) {
+        $.getScript(filename, func);
+        jsfilesadded.push(filename);
+    } else {
+        func();
+    }
 }
 
 function init_map(id, engine, api_key) {
@@ -313,8 +315,8 @@ function init_map(id, engine, api_key) {
     leaflet.setView([0, 0], 15);
 
     if (engine === 'google') {
-        loadScript('https://maps.googleapis.com/maps/api/js?key=' + api_key, function () {
-            loadScript('js/Leaflet.GoogleMutant.js', function () {
+        loadjs('https://maps.googleapis.com/maps/api/js?key=' + api_key, function () {
+            loadjs('js/Leaflet.GoogleMutant.js', function () {
                 var roads = L.gridLayer.googleMutant({
                     type: 'roadmap'	// valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
                 });
@@ -331,7 +333,7 @@ function init_map(id, engine, api_key) {
             });
         });
     } else if (engine === 'bing') {
-        loadScript('js/leaflet-bing-layer.min.js', function () {
+        loadjs('js/leaflet-bing-layer.min.js', function () {
             var roads = L.tileLayer.bing({
                 bingMapsKey: api_key,
                 imagerySet: 'RoadOnDemand'
@@ -470,15 +472,5 @@ function init_select2(selector, type, data, selected) {
     if (selected) {
         $select.val(selected);
         $select.trigger('change');
-    }
-}
-
-var jsfilesadded = [];
-function loadjs(filename, func){
-    if (jsfilesadded.indexOf(filename) < 0) {
-        $.getScript(filename, func);
-        jsfilesadded.push(filename);
-    } else {
-        func();
     }
 }

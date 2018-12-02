@@ -59,10 +59,7 @@ class GlobeController extends WidgetController
         $data = $this->getSettings();
         $locations = collect();
 
-        $eager_load = ['devices'];
-        if ($data['markers'] == 'ports') {
-            $eager_load[] = 'devices.ports';
-        }
+        $eager_load = $data['markers'] == 'ports' ? ['devices.ports'] : ['devices'];
 
         foreach (Location::hasAccess($request->user())->with($eager_load)->get() as $location) {
             $count = 0;

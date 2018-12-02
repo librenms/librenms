@@ -1,9 +1,8 @@
-<div id="leaflet-map"></div>
-
+<div id="leaflet-map" style="width: {{ $dimensions['x'] }}px; height: {{ $dimensions['y'] }}px;"></div>
 
 <script type="application/javascript">
     loadjs('js/leaflet.js', function() {
-    loadjs('js/leaflet.markercluster-src.js', function () {
+    loadjs('js/leaflet.markercluster.js', function () {
     loadjs('js/leaflet.awesome-markers.min.js', function () {
         var map = L.map('leaflet-map', { zoomSnap: 0.1 } ).setView(['{{ $init_lat }}', '{{ $init_lng }}'], '{{ sprintf('%01.1f', $init_zoom) }}');
         L.tileLayer('//{{ $title_url }}/{z}/{x}/{y}.png', {
@@ -14,8 +13,7 @@
             maxClusterRadius: '{{ $group_radius }}',
             iconCreateFunction: function (cluster) {
                 var markers = cluster.getAllChildMarkers();
-                var n = 0;
-                var color = "green"
+                var color = "green";
                 var newClass = "Cluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
                 for (var i = 0; i < markers.length; i++) {
                     if (markers[i].options.icon.options.markerColor == "blue" && color != "red") {
@@ -44,7 +42,7 @@
         @foreach($devices as $device)
             var title = '<a href="{{ \LibreNMS\Util\Url::deviceUrl($device) }}"><img src="{{ $device->icon }}" width="32" height="32" alt=""> {{ $device->displayName() }}</a>';
             var tooltip = '{{ $device->displayName() }}';
-            var marker = L.marker(new L.LatLng('{{ $device->location()['lat'] }}', '{{ $device->location()['lng'] }}'), {title: tooltip, icon: $icon, zIndexOffset: $z_offset});
+            var marker = L.marker(new L.LatLng('{{ $device->location->lat }}', '{{ $device->location->lng }}'), {title: tooltip, icon: {{ $device->markerIcon }}, zIndexOffset: {{ $device->zOffset }}});
             marker.bindPopup(title);
             markers.addLayer(marker);
         @endforeach
@@ -54,8 +52,7 @@
         $(document).ready(function() {
             $("#leaflet-map").on("click", function (event) {
                 map.scrollWheelZoom.enable();
-            });
-            $("#leaflet-map").mouseleave(function (event) {
+            }).mouseleave(function (event) {
                 map.scrollWheelZoom.disable();
             });
         });

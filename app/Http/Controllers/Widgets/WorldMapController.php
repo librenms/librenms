@@ -25,7 +25,10 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Models\Device;
+use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use LibreNMS\Config;
 
 class WorldMapController extends WidgetController
@@ -40,7 +43,7 @@ class WorldMapController extends WidgetController
             'init_lat' => Config::get('leaflet.default_lat', 51.4800),
             'init_lng' => Config::get('leaflet.default_lng', 0),
             'init_zoom' => Config::get('leaflet.default_zoom', 2),
-            'group_radius' => 80,
+            'group_radius' => Config::get('leaflet.group_radius', 80),
             'status' => '0,1',
         ];
     }
@@ -51,7 +54,40 @@ class WorldMapController extends WidgetController
         $settings = $this->getSettings();
         $status = explode(',', $settings['status']);
 
-        $settings['devices'] = [];
+        $settings['dimensions'] = $request->get('dimensions');
+
+        $devices = Device::hasAccess($request->user())
+            ->with('location')
+            ->where('disabled', 0)
+            ->whereIn('status', $status)
+            ->get()
+            ->filter(function ($device) use ($status) {
+                if (!$device->location->coordinatesValid()) {
+                    return false;
+                }
+
+                // add extra data
+                $device->markerIcon = 'greenMarker';
+                $device->zOffset = 0;
+
+                if ($device->status == 0) {
+                    $device->markerIcon = 'redMarker';
+                    $device->zOffset = 10000;
+
+// TODO                   if ($device->isUnderMaintenance())
+                    if (false) {
+                        if ($status == 0) {
+                            return false;
+                        }
+                        $device->markerIcon = 'blueMarker';
+                        $device->zOffset = 5000;
+                    }
+                }
+
+                return true;
+            });
+
+        $settings['devices'] = $devices;
 
         return view('widgets.worldmap', $settings);
     }
