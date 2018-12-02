@@ -25,9 +25,7 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use App\Models\Device;
 use App\Models\Location;
-use App\Models\Port;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use LibreNMS\Config;
@@ -61,30 +59,27 @@ class GlobeController extends WidgetController
         $data = $this->getSettings();
         $locations = collect();
 
-        $dbl = Device::hasAccess($request->user())
-            ->select('location')->whereNotNull('location')
-            ->orderBy('location')->groupBy('location')
-            ->pluck('location');
+        $eager_load = ['devices'];
+        if ($data['markers'] == 'ports') {
+            $eager_load[] = 'devices.ports';
+        }
 
-        foreach (Location::whereIn('location', $dbl)->get() as $location) {
+        foreach (Location::hasAccess($request->user())->with($eager_load)->get() as $location) {
             $count = 0;
             $up = 0;
             $down_items = collect();
 
             if ($data['markers'] == 'devices') {
-                $devices = $location->devices();
-                $count = $devices->count();
-                list($devices_down, $devices_up) = $devices->partition(function ($device) {
-                    return $device->status = 0;
+                $count = $location->devices->count();
+                list($devices_down, $devices_up) = $location->devices->partition(function ($device) {
+                    return $device->disable = 0 && $device->ignore = 0 && $device->status = 0;
                 });
                 $up = $devices_up->count();
                 $down_items = $devices_down->map(function ($device) {
                     return $device->displayName() . ' DOWN';
                 });
             } elseif ($data['markers'] == 'ports') {
-                $devices = $location->devicesQuery()->with('ports')->get();
-
-                foreach ($devices as $device) {
+                foreach ($location->devices as $device) {
                     list($ports_down, $ports_up) = $device->ports->partition(function ($port) {
                         return $port->ifOperStatus == 'down' && $port->ifAdminStatus == 'up';
                     });
