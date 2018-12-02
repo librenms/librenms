@@ -434,6 +434,11 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\Alert', 'device_id');
     }
 
+    public function alertSchedules()
+    {
+        return $this->morphToMany('App\Models\AlertSchedule', 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+    }
+
     public function applications()
     {
         return $this->hasMany('App\Models\Application', 'device_id');
