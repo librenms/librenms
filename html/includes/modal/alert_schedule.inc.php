@@ -110,17 +110,9 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                         </div>
                     </div>
                     <div class="form-group">
-                         <label for='map-stub' class='col-sm-4 control-label'>Map To <exp>*</exp>: </label>
-                        <div class="col-sm-5">
-                            <input type='text' id='map-stub' name='map-stub' class='form-control'/>
-                        </div>
-                        <div class="col-sm-3">
-                            <button class="btn btn-primary" type="button" name="add-map" id="add-map" value="Add">Add</button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-12">
-                            <span id="map-tags"></span>
+                         <label for='maps' class='col-sm-4 control-label'>Map To <exp>*</exp>: </label>
+                        <div class="col-sm-8">
+                            <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                         </div>
                     </div>
                     <div class="form-group">
@@ -135,7 +127,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
 </div>
 <script>
 $('#schedule-maintenance').on('hide.bs.modal', function (event) {
-    $('#map-tags').data('tagmanager').empty();
+    $('#maps').val(null).trigger('change');
     $('#schedule_id').val('');
     $('#title').val('');
     $('#notes').val('');
@@ -154,13 +146,7 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
 });
 
 $('#schedule-maintenance').on('show.bs.modal', function (event) {
-    $('#tagmanager').tagmanager();
     var schedule_id = $('#schedule_id').val();
-    $('#map-tags').tagmanager({
-           strategy: 'array',
-           tagFieldName: 'maps[]',
-           initialCap: false
-    });
     if (schedule_id > 0) {
         $.ajax({
             type: "POST",
@@ -168,11 +154,18 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
             data: { type: "schedule-maintenance", sub_type: "parse-maintenance", schedule_id: schedule_id },
             dataType: "json",
             success: function(output) {
-                var arr = [];
-                $.each ( output['targets'], function( key, value ) {
-                    arr.push(value);
+                var maps = $('#maps');
+                var selected = [];
+                $.each ( output['targets'], function( key, item ) {
+                    // create options if they don't exist
+                    if (maps.find("option[value='" + item.id + "']").length === 0) {
+                        var newOption = new Option(item.text, item.id, true, true);
+                        maps.append(newOption);
+                    }
+                    selected.push(item.id);
                 });
-                $('#map-tags').data('tagmanager').populate(arr);
+                maps.val(selected).trigger('change');
+
                 $('#title').val(output['title']);
                 $('#notes').val(output['notes']);
                 if (output['recurring'] == 0){
@@ -254,67 +247,18 @@ $('#sched-submit').click('', function(e) {
     });
 });
 
-$('#add-map').click('',function (event) {
-        $('#map-tags').data('tagmanager').populate([ $('#map-stub').val() ]);
-        $('#map-stub').val('');
-});
-
-var map_devices = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  remote: {
-      url: "ajax_search.php?search=%QUERY&type=device&map=1",
-        filter: function (output) {
-            return $.map(output, function (item) {
-                return {
-                    name: item.name,
-                };
-            });
-        },
-      wildcard: "%QUERY"
-  }
-});
-var map_groups = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  remote: {
-      url: "ajax_search.php?search=%QUERY&type=group&map=1",
-        filter: function (output) {
-            return $.map(output, function (item) {
-                return {
-                    name: item.name,
-                };
-            });
-        },
-      wildcard: "%QUERY"
-  }
-});
-map_devices.initialize();
-map_groups.initialize();
-$('#map-stub').typeahead({
-    hint: true,
-    highlight: true,
-    minLength: 1,
-    classNames: {
-        menu: 'typeahead-left'
-    }
-},
-{
-  source: map_devices.ttAdapter(),
-  async: true,
-  displayKey: 'name',
-  valueKey: name,
-    templates: {
-        suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
-    }
-},
-{
-  source: map_groups.ttAdapter(),
-  async: true,
-  displayKey: 'name',
-  valueKey: name,
-    templates: {
-        suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
+$("#maps").select2({
+    width: '100%',
+    placeholder: "Devices or Groups",
+    ajax: {
+        url: 'ajax_list.php',
+        delay: 250,
+        data: function (params) {
+            return {
+                type: 'devices_groups',
+                search: params.term
+            };
+        }
     }
 });
 

@@ -156,13 +156,13 @@ function GetRules($device_id)
 function IsMaintenance($device)
 {
     $groups = GetGroupsFromDevice($device);
-    $params = array($device);
-    $where = "";
+    $params = [$device];
+    $where = "(alert_schedulables.alert_schedulable_type = 'device' && alert_schedulables.alert_schedulable_id = ?)";
     foreach ($groups as $group) {
-        $where .= " || alert_schedule_items.target = ?";
-        $params[] = 'g'.$group;
+        $where .= " || (alert_schedulables.alert_schedulable_type = 'device_group; && alert_schedulables.alert_schedulable_id = ?";
+        $params[] = $group;
     }
-    return dbFetchCell('SELECT alert_schedule.schedule_id FROM alert_schedule LEFT JOIN alert_schedule_items ON alert_schedule.schedule_id=alert_schedule_items.schedule_id WHERE ( alert_schedule_items.target = ?'.$where.' ) && ((alert_schedule.recurring = 0 AND (NOW() BETWEEN alert_schedule.start AND alert_schedule.end)) OR (alert_schedule.recurring = 1 AND (alert_schedule.start_recurring_dt <= date_format(NOW(), \'%Y-%m-%d\') AND (end_recurring_dt >= date_format(NOW(), \'%Y-%m-%d\') OR end_recurring_dt is NULL OR end_recurring_dt = \'0000-00-00\' OR end_recurring_dt = \'\')) AND (date_format(now(), \'%H:%i:%s\') BETWEEN `start_recurring_hr` AND end_recurring_hr) AND (recurring_day LIKE CONCAT(\'%\',date_format(now(), \'%w\'),\'%\') OR recurring_day is null or recurring_day = \'\'))) LIMIT 1', $params);
+    return dbFetchCell("SELECT alert_schedule.schedule_id FROM alert_schedule LEFT JOIN alert_schedulables ON alert_schedule.schedule_id=alert_schedulables.schedule_id WHERE ( ".$where." ) && ((alert_schedule.recurring = 0 AND (NOW() BETWEEN alert_schedule.start AND alert_schedule.end)) OR (alert_schedule.recurring = 1 AND (alert_schedule.start_recurring_dt <= date_format(NOW(), '%Y-%m-%d') AND (end_recurring_dt >= date_format(NOW(), '%Y-%m-%d') OR end_recurring_dt is NULL OR end_recurring_dt = '0000-00-00' OR end_recurring_dt = '')) AND (date_format(now(), '%H:%i:%s') BETWEEN `start_recurring_hr` AND end_recurring_hr) AND (recurring_day LIKE CONCAT('%',date_format(now(), '%w'),'%') OR recurring_day is null or recurring_day = ''))) LIMIT 1", $params);
 }
 /**
  * Run all rules for a device
