@@ -303,6 +303,10 @@ if ($device['os'] == 'cmm') {
     require_once 'ports/cmm.inc.php';
 }
 
+if ($device['os'] == 'timos') {
+    require_once 'ports/timos.inc.php';
+}
+
 if ($config['enable_ports_adsl']) {
     $device['xdsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` in ('adsl','vdsl')", [$device['device_id']]);
 }
