@@ -185,46 +185,46 @@ if (Config::get('enable_vrfs')) {
 
         $vrtr = snmpwalk_cache_oid($device, 'vRtrConfTable', array(), 'TIMETRA-VRTR-MIB', null);
         $port_table = snmpwalk_cache_twopart_oid($device, 'vRtrIfName', array(), 'TIMETRA-VRTR-MIB', null);
-	
-	foreach($vrtr as $vrf_oid => $vr) {
+
+        foreach ($vrtr as $vrf_oid => $vr) {
             $vrf_name = $vr['vRtrName'];
             $vrf_desc = $vr['vRtrName'];
-	    $vrf_rd = $vr['vRtrRouteDistinguisher'];
-	    // Nokia, The VPRN route distinguisher is a 8-octet object. 
+            $vrf_rd = $vr['vRtrRouteDistinguisher'];
+            // Nokia, The VPRN route distinguisher is a 8-octet object.
             // It contains a 2-octet type field followed by a 6-octet value field. The type field specify how to interpret the value field.
             // Type 0 specifies two subfields as a 2-octet administrative field and a 4-octet assigned number subfield.
             // Type 1 specifies two subfields as a 4-octet administrative field which must contain an IP address and a 2-octet assigned number subfield.
             // Type 2 specifies two subfields as a 4-octet administrative field which contains a 4-octet AS number and a 2-octet assigned number subfield.
-	    // FIXME Hardcoded to Type 0
+            // FIXME Hardcoded to Type 0
             $vrf_rd   = str_replace(' ', '', $vrf_rd);
-	    if ($vrf_rd <> "000000000000") {
-	        $vrf_rd_1   = substr($vrf_rd, 4, 4);
-	        $vrf_rd_2   = substr($vrf_rd, 8);
+            if ($vrf_rd <> "000000000000") {
+                $vrf_rd_1   = substr($vrf_rd, 4, 4);
+                $vrf_rd_2   = substr($vrf_rd, 8);
                 $vrf_rd   = hexdec($vrf_rd_1) . ":" . hexdec($vrf_rd_2);
-	    } else $vrf_rd = null;
-
-
+            } else {
+                $vrf_rd = null;
+            }
+            
             echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
             echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
             echo "\n  [VRF $vrf_name] DESC  - $vrf_desc";
-            
-	    if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', array($device['device_id'], $vrf_oid))) {
+
+            if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', array($device['device_id'], $vrf_oid))) {
                 dbUpdate(array('mplsVpnVrfDescription' => $vrf_desc, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd), 'vrfs', 'device_id=? AND vrf_oid=?', array($device['device_id'], $vrf_oid));
             } else {
                 dbInsert(array('vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $$vrf_desc, 'device_id' => $device['device_id']), 'vrfs');
             }
-	    
-            $vrf_id             = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', array($device['device_id'], $vrf_oid));
+
+            $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', array($device['device_id'], $vrf_oid));
             $valid_vrf[$vrf_id] = 1;
 
             echo "\n  [VRF $vrf_name] PORTS - ";
             foreach ($port_table[$vrf_oid] as $if_id => $if) {
-		$if_name = $if['vRtrIfName'];
+                $if_name = $if['vRtrIfName'];
                 echo makeshortif($if_name).' ';
                 dbUpdate(array('ifVrf' => $vrf_id), 'ports', 'ifIndex=?', array($if_id));
                 $valid_vrf_if[$vrf_id][$if_id] = 1;
             }
-	} //end foreach
-        echo "\n";
+        } //end foreach
     } //end if
 } //end if

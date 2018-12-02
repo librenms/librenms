@@ -24,16 +24,16 @@
 */
 
 // get all virtual router ports and statistics
-$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfName',        array(),'TIMETRA-VRTR-MIB');
-$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfAlias',       $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
+$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfName', array(), 'TIMETRA-VRTR-MIB');
+$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfAlias', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
 $timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfDescription', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
-$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfSpeed',       $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
-$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfType',        $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
-$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfMtu',         $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
-$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfRxBytes',     $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
-$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfTxBytes',     $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
-$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfRxPkts',      $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
-$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfTxPkts',      $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
+$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfSpeed', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
+$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfType', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
+$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfMtu', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
+$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfRxBytes', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
+$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfTxBytes', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
+$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfRxPkts', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
+$timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfTxPkts', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
 
 // Merge all virtual routing ports into one
 $timos_stats = [];
@@ -41,7 +41,6 @@ foreach ($timos_vrf_stats as $vrf) {
     foreach ($vrf as $index => $stats) {
         $timos_stats[$index] = $stats;
     }
-    
 }
 unset($timos_vrf_stats);
 
@@ -63,7 +62,9 @@ foreach ($timos_stats as $index => $value) {
     foreach ($translate as $ifEntry => $ifVrtrEntry) {
         $timos_ports[$index][$ifEntry] = $timos_stats[$index][$ifVrtrEntry];
     }
-    if (empty($timos_ports[$index]['ifDescr'])) $timos_ports[$index]['ifDescr'] = $timos_ports[$index]['ifName']; 
+    if (empty($timos_ports[$index]['ifDescr'])) {
+        $timos_ports[$index]['ifDescr'] = $timos_ports[$index]['ifName'];
+    }
 }
 $port_stats = array_replace_recursive($timos_ports, $port_stats);
 unset($timos_ports);
