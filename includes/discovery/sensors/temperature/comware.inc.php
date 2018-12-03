@@ -31,9 +31,6 @@ if (!empty($entphydata)) {
                     }
                 }
                 $cur_oid = '.1.3.6.1.4.1.25506.2.6.1.1.1.1.12.';
-echo 'test';
-echo $hightemp;
-echo 'test einde';
                 discover_sensor(
                     $valid['sensor'],
                     'temperature',
