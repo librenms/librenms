@@ -9,7 +9,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\OS;
 
-class HarmonyEnhancedMC extends OS implements WirelessRssiDiscovery, WirelessSnrDiscovery, WirelessPowerDiscovery, WirelessErrorsDiscovery
+class HarmonyEnhanced extends OS implements WirelessRssiDiscovery, WirelessSnrDiscovery, WirelessPowerDiscovery, WirelessErrorsDiscovery
 {
     public function discoverWirelessRssi()
     {
@@ -20,7 +20,7 @@ class HarmonyEnhancedMC extends OS implements WirelessRssiDiscovery, WirelessSnr
                 'rssi',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7262.4.5.12.203.1.1.5.' . $index,
-                'harmony_enhanced_mc',
+                'harmony_enhanced',
                 $index,
                 'RSL Radio ' .$index,
                  null,
@@ -40,7 +40,7 @@ class HarmonyEnhancedMC extends OS implements WirelessRssiDiscovery, WirelessSnr
                 'snr',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7262.4.5.12.203.1.1.7.' . $index,
-                'harmony_enhanced_mc',
+                'harmony_enhanced',
                 $index,
                 'SNR Radio ' . $index,
                  null,
@@ -60,7 +60,7 @@ class HarmonyEnhancedMC extends OS implements WirelessRssiDiscovery, WirelessSnr
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7262.4.5.12.203.1.1.9.' . $index,
-                'harmony_enhanced_mc',
+                'harmony_enhanced',
                 $index,
                 'TX Power Radio ' . $index,
                  null,
@@ -80,7 +80,7 @@ class HarmonyEnhancedMC extends OS implements WirelessRssiDiscovery, WirelessSnr
                 'errors',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7262.4.5.12.203.1.1.4.' . $index,
-                'harmony_enhanced_mc',
+                'harmony_enhanced',
                 $index,
                 'RX Errors Radio ' . $index
             );
