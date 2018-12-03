@@ -16,11 +16,24 @@ $entphydata = dbFetchRows("SELECT `entPhysicalIndex`, `entPhysicalClass`, `entPh
     
 if (!empty($entphydata)) {
     $tempdata = snmpwalk_cache_multi_oid($device, 'hh3cEntityExtTemperature', array(), 'HH3C-ENTITY-EXT-MIB');
-        
+    $hightempdata = snmpwalk_cache_multi_oid($device, 'hh3cEntityExtTemperatureThreshold', array(), 'HH3C-ENTITY-EXT-MIB');
+    
     foreach ($entphydata as $index) {
         foreach ($tempdata as $tempindex => $value) {
             if ($index['entPhysicalIndex'] == $tempindex && $value['hh3cEntityExtTemperature'] != 65535) {
+                foreach ($hightempdata as $hightempindex => $highvalue) {
+                    if ($index['entPhysicalIndex'] == $hightempindex) {
+                        if ($highvalue['hh3cEntityExtTemperatureThreshold'] != 65535) {
+                            $hightemp = $highvalue['hh3cEntityExtTemperatureThreshold'];
+                        } else {
+                            $hightemp = null;
+                        }
+                    }
+                }
                 $cur_oid = '.1.3.6.1.4.1.25506.2.6.1.1.1.1.12.';
+echo 'test';
+echo $hightemp;
+echo 'test einde';
                 discover_sensor(
                     $valid['sensor'],
                     'temperature',
@@ -34,7 +47,7 @@ if (!empty($entphydata)) {
                     null,
                     null,
                     null,
-                    null,
+                    $hightemp,
                     $value['hh3cEntityExtTemperature'],
                     'snmp',
                     $index['entPhysicalIndex']
