@@ -319,7 +319,7 @@ Get your Access Token from your Pushbullet's settings page and set it in your tr
 ## Pushover
 If you want to change the [notification sounds](https://pushover.net/api#sounds) then add it in Pushover Options:
 
-`sound_critical=falling`
+`sound=falling`
 
 Enabling Pushover support is fairly easy, there are only two required parameters.
 
@@ -335,7 +335,7 @@ Now copy your API Key and obtain your User Key from the newly created Applicatio
 | ------ | ------- |
 | Api Key | APPLICATIONAPIKEYGOESHERE |
 | User Key | USERKEYGOESHERE |
-| Pushover Options | sound_critical=falling |
+| Pushover Options | sound=falling |
 
 ## Rocket.chat
 The Rocket.chat transport will POST the alert message to your Rocket.chat Incoming WebHook using the
