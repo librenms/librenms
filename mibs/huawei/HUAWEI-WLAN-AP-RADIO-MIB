@@ -1,0 +1,1612 @@
+-- ============================================================================
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: The mib is used for defining the management of huawei AC at the side of the quality of wireless signal for AP MIB objects.
+-- Reference: 
+-- Version: V1.18
+-- ============================================================================
+-- Module definition
+
+	HUAWEI-WLAN-AP-RADIO-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+			hwWlan
+				FROM HUAWEI-WLAN-MIB
+		        hwWlanApName
+		                FROM HUAWEI-WLAN-AP-MIB
+		        hwWlanApMac
+		                FROM HUAWEI-WLAN-AP-MIB
+			hwWlanApId
+				FROM HUAWEI-WLAN-AP-MIB
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+				FROM SNMPv2-CONF
+			IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE,
+			MODULE-IDENTITY, NOTIFICATION-TYPE
+				FROM SNMPv2-SMI
+			MacAddress, RowStatus, DateAndTime
+				FROM SNMPv2-TC;
+		--1.3.6.1.4.1.2011.6.139.16
+		hwWlanRadio MODULE-IDENTITY
+			LAST-UPDATED "201612241640Z"		-- Dec 24, 2016 at 16:40 GMT
+			ORGANIZATION 
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO 
+                                  "Huawei Industrial Base
+				   Bantian, Longgang
+				   Shenzhen 518129
+				   People's Republic of China
+				   Website: http://www.huawei.com
+				   Email: support@huawei.com
+				  "
+		        DESCRIPTION 
+				"V1.18, modify  the  hwWlanRadioLegitimateAntennaGain type."
+				REVISION "201612241640Z"		-- Dec 24, 2016 at 16:40 GMT 
+		        DESCRIPTION 
+				"V1.17, add and modify  the  hwWlanRadioTrapObjects."
+				REVISION "201612141640Z"		-- Dec 14, 2016 at 16:40 GMT 
+			DESCRIPTION 
+				"V1.16, Modify the description of node hwWlanRadioWorkMode."
+				REVISION "201608191640Z"		-- August 19, 2016 at 16:40 GMT 
+		        DESCRIPTION 
+				"V1.15, Modify node status."
+				REVISION "201607211130Z"		-- July 21, 2016 at 11:30 GMT 
+			DESCRIPTION 
+				"V1.14, Modify the trap nodes about interference detection."
+				REVISION "201605311030Z"		-- May 31, 2016 at 10:30 GMT 
+			DESCRIPTION 
+				"V1.13, Add the node of hwWlanRadioMngSecondChannel."
+				REVISION "201605131030Z"		-- May 13, 2016 at 10:30 GMT  
+			DESCRIPTION 
+				"V1.12, Add the node of hwWlanRadioRetryFrames, hwWlanRadioRcvErrFrames, hwWlanRadioRcvDropFrames, and add the table of hwWlanRadioUncontrolAPInfTable."
+			REVISION "201510101030Z"		-- Jan 21, 2016 at 10:30 GMT
+			DESCRIPTION 
+				"V1.11, Add the node of hwWlanRadioRetryFrames, hwWlanRadioRcvErrFrames, hwWlanRadioRcvDropFrames, and add the table of hwWlanRadioUncontrolAPInfTable."
+			REVISION "201510101030Z"		-- Jan 21, 2016 at 10:30 GMT
+			DESCRIPTION 
+				"V1.10, Modify the node of hwWlanRadioWorkingChannelBandwidth."
+			REVISION "201510101030Z"		-- Nov 30, 2015 at 10:30 GMT  
+			DESCRIPTION 
+				"V1.09, Modify the trap nodes and add the node of hwWlanWIDSTrapInfoAPId."
+			REVISION "201510101030Z"		-- Oct 10, 2015 at 10:30 GMT  
+			DESCRIPTION 
+				"V1.08, Add AP ID in the trap node."
+			REVISION "201509151030Z"		-- Sept 15, 2015 at 10:30 GMT  
+			DESCRIPTION 
+				"V1.07, Add the node of hwWlanRadioInfoApId in the hwWlanRadioInfoTable."
+			REVISION "201508261030Z"		-- Aug 26, 2015 at 10:30 GMT  
+			DESCRIPTION 
+				"Change the trap of hwRadioPowerChangedTrap."
+			REVISION "201508190930Z"		-- Aug 19, 2015 at 9:30 GMT
+			DESCRIPTION 
+				"Modify the node value of hwWlanRadioActualEIRP and hwWlanRadioMaximumEIRP."
+			REVISION "201507230940Z"		-- July 23, 2015 at 9:40 GMT
+			DESCRIPTION 
+				"Add the node for spectrum switch flag."
+			REVISION "201507170956Z"		-- July 17, 2015 at 9:56 GMT
+			DESCRIPTION 
+				"Add the node for channel change notificaction."
+			REVISION "201507060956Z"		-- July 16, 2015 at 9:56 GMT
+			DESCRIPTION 
+				"Add the description of mib nodes."
+			REVISION "201506160956Z"		-- Jun 16, 2015 at 9:56 GMT
+			DESCRIPTION 
+				"V1.02, Add nodes for eirp."
+			REVISION "201505111452Z"		-- May 11, 2015 at 14:52 GMT
+			DESCRIPTION 
+				"The MIB module defines the WIDS operation."
+			REVISION "201502021452Z"		-- February 2, 2015 at 14:52 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+			::= { hwWlan 16 }
+
+--
+--Node definitions
+--
+
+		--1.3.6.1.4.1.2011.6.139.16.1
+		hwWlanRadioObjects OBJECT IDENTIFIER ::= { hwWlanRadio 1 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1
+		hwWlanRadioTraps OBJECT IDENTIFIER ::= { hwWlanRadioObjects 1 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1
+		hwWlanRadioTrap OBJECT IDENTIFIER ::= { hwWlanRadioTraps 1 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.1
+		hwRadioChannelChangedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanApName, hwWlanRadioActualChannel, hwWlanRadioSecondActualChannel,
+			          hwWlanRadioChannelChangedReason, hwWlanRadioChannelChangedReasonStr, hwWlanRadioPreActualChannel, hwWlanRadioPreSecondActualChannel, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when a channel changes."
+			::= { hwWlanRadioTrap 1 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.2
+		hwRadioSignalEnvDeteriorationTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioPER, hwWlanRadioConflictRate, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when radio environment deteriorates."
+			::= { hwWlanRadioTrap 2 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.3
+		hwRadioSignalEnvResumeTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"This alarm is generated when radio environment is recovered."
+			::= { hwWlanRadioTrap 3 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.4
+		hwApMonitorModeChangedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanApMonitorMode,hwWlanApMonitorModeDesc, hwWlanApPreMonitorMode, hwWlanApPreMonitorModeDesc,hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"The wireless monitoring mode of an AP was changed."
+			::= { hwWlanRadioTrap 4 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.5
+		hwAPCoInterfDetectedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanApChannel, hwWlanRadioInfoApId, hwWlanApInterfBssid, hwWlanInterfRSSI }
+			STATUS current
+			DESCRIPTION 
+				"The co-channel interference between APs was detected."
+			::= { hwWlanRadioTrap 5 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.6
+		hwAPCoInterfClearTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanApChannel, hwWlanRadioInfoApId, hwWlanApInterfBssid }
+			STATUS current
+			DESCRIPTION 
+				"The co-channel interference between APs was removed."
+			::= { hwWlanRadioTrap 6 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.7
+		hwNerborInterfDetectedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac,hwWlanRadioID, hwWlanRadioInfoApName, hwWlanApChannel, hwWlanRadioInfoApId, hwWlanApInterfBssid, 
+			hwWlanInterfApChannel, hwWlanInterfRSSI }
+			STATUS current
+			DESCRIPTION 
+				"The adjacent-channel interference between APs was detected."
+			::= { hwWlanRadioTrap 7 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.8
+		hwNeiborInterfClearTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanApChannel, hwWlanRadioInfoApId, hwWlanApInterfBssid,
+			 hwWlanInterfApChannel }
+			STATUS current
+			DESCRIPTION 
+				"The adjacent-channel interference between APs was removed."
+			::= { hwWlanRadioTrap 8 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.9
+		hwStaInterfDetectedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"Interference on STA was detected."
+			::= { hwWlanRadioTrap 9 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.10
+		hwStaInterfClearTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"Interference on STA was cleared."
+			::= { hwWlanRadioTrap 10 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.11
+		hwOtherDeviceInterfDetectedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"Interference on other devices was detected."
+			::= { hwWlanRadioTrap 11 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.12
+		hwOtherDeviceInterfClearTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"Interference on other devices was removed."
+			::= { hwWlanRadioTrap 12 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.13
+		hwRadioDownTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanApName, hwWlanRadioDownCause, hwWlanRadioDownCauseStr, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"A wireless link is Down."
+			::= { hwWlanRadioTrap 13 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.14
+		hwRadioDownRecovTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName,  hwWlanRadioDownCause, hwWlanRadioDownCauseStr, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"The radio link Down alarm was cleared."
+			::= { hwWlanRadioTrap 14 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.15
+		hwWIDSDetectRogueTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWIDSTrapInfoAPName, hwWlanWIDSTrapInfoRadioId, hwWlanWIDSTrapInfoAPMAC, hwWlanWIDSTrapInfoRogueMAC, 
+			hwWlanWIDSTrapInfoRogueSSId, hwWlanWIDSTrapInfoRogueType, hwWlanWIDSTrapInfoRogueRSSI, hwWlanWIDSTrapInfoRogueChanID, hwWlanWIDSTrapInfoAPId }
+			STATUS current
+			DESCRIPTION 
+				"A suspicious device is detected."
+			::= { hwWlanRadioTrap 15 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.16
+		hwRadioNotSupportChannelTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioMngChannelBandwidth, 
+			hwWlanRadioMngChannel, hwWlanRadioMngSecondChannel, hwWlanRadioActualChannelBandwidth, hwWlanRadioActualChannel, hwWlanRadioSecondActualChannel,
+			hwWlanRadioChannelChangedReasonStr, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"A channel is not supported."
+			::= { hwWlanRadioTrap 16 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.17
+		hwRadioNotSupportPowerLevelTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioMngPowerLevel, hwWlanRadioActualPowerLevel, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"Power is not supported."
+			::= { hwWlanRadioTrap 17 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.18
+		hwRadioAntennaGainIsUnlawfulTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioActualAntennaGain, hwWlanRadioLegitimateAntennaGain, hwWlanRadioInfoApId, hwWlanRadioLegitimateEirp}
+			STATUS current
+			DESCRIPTION 
+				"The antenna gain of the radio does not conform to local law."
+			::= { hwWlanRadioTrap 18 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.19
+		hwRadioPowerChangedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioActualEIRP, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"The radio power is changed."
+			::= { hwWlanRadioTrap 19 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.20
+		hwApAccessUserNumExceedThresholdTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioUacUserNum, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"The number of users associated with the AP exceeds the alarm threshold."
+			::= { hwWlanRadioTrap 20 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.21
+		hwApAccessUserNumExceedThresholdRecovTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioUacUserNum, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"The number of users associated with the AP falls below the clear alarm threshold."
+			::= { hwWlanRadioTrap 21 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.22
+		hwApRoamUserNumExceedThresholdTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioUacUserNum, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"The number of roaming users connected to the AP exceeds the alarm threshold."
+			::= { hwWlanRadioTrap 22 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.23
+		hwApRoamUserNumExceedThresholdRecovTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioUacUserNum, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"The number of roaming users The number of roaming users connected to the AP falls below the clear alarm threshold."
+			::= { hwWlanRadioTrap 23 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.24
+		hwApAccessChannelUtilExceedThresholdTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac,  hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioUacUserNum, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"The channel usage exceeds the alarm threshold."
+			::= { hwWlanRadioTrap 24 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.25
+		hwApAccessChannelUtilExceedThresholdRecovTrap NOTIFICATION-TYPE
+			OBJECTS {hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioUacUserNum, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"The channel usage falls below the clear alarm threshold."
+			::= { hwWlanRadioTrap 25 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.26
+		hwApRoamChannelUtilExceedThresholdTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioUacUserNum, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"The channel usage by the roaming STAs exceeds the alarm threshold."
+			::= { hwWlanRadioTrap 26 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.27
+		hwApRoamChannelUtilExceedThresholdRecovTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioUacUserNum, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"The channel usage by the roaming STAs falls below the clear alarm threshold."
+			::= { hwWlanRadioTrap 27 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.28
+		hwRadioDownTrapFat NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanRadioInfoApName, hwWlanApRadioNotifyPara, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrap 28 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.1.29
+		hwRadioDownRecovTrapFat NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanApName, hwWlanApRadioNotifyPara, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrap 29 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.2
+		hwWlanRadioTrapObjects OBJECT IDENTIFIER ::= { hwWlanRadioTraps 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.1
+		hwWlanRadioActualChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.2
+		hwWlanRadioActualChannelBandwidth OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			    ht20(1),
+				ht40Plus(2),
+				ht40Minus(3),
+				ht80(4),
+				ht160(5),
+				invalid(255)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.3
+		hwWlanRadioActualPowerLevel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.4
+		hwWlanRadioActualAntennaGain OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.5
+		hwWlanRadioLegitimateAntennaGain OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.6
+		hwWlanRadioChannelChangedReason OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			    unknown(1), 
+                            dfs(2), 
+                            wds(3),
+                            config(4), 
+                            calibrate(5)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.7
+		hwWlanRadioChannelChangedReasonStr OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.8
+		hwWlanRadioConflictRate OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.9
+		hwWlanApMonitorMode OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.10
+		hwWlanApPreMonitorMode OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 10 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.11
+		hwWlanApChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 11 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.12
+		hwWlanApInterfBssid OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 12 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.13
+		hwWlanInterfStaMac OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 13 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.14
+		hwWlanRadioDownCause OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 14 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.15
+		hwWlanInterfApChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 15 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.16
+		hwWlanInterfRSSI OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 16 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.17
+		hwWlanWIDSTrapInfoAPName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 17 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.18
+		hwWlanWIDSTrapInfoRadioId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 18 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.19
+		hwWlanWIDSTrapInfoAPMAC OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 19 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.20
+		hwWlanWIDSTrapInfoRogueMAC OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 20 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.21
+		hwWlanWIDSTrapInfoRogueSSId OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 21 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.22
+		hwWlanWIDSTrapInfoRogueType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 22 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.23
+		hwWlanWIDSTrapInfoRogueRSSI OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 23 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.24
+		hwWlanWIDSTrapInfoRogueChanID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 24 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.25
+		hwWlanRadioDownCauseStr OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 25 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.26
+		hwWlanRadioUacUserNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 26 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.27
+		hwWlanRadioPreActualChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 27 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.28
+		hwWlanApRadioNotifyPara OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 28 }
+                
+                --1.3.6.1.4.1.2011.6.139.16.1.1.2.29
+		hwWlanRadioMngChannelBandwidth OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			    ht20(1),
+				ht40Plus(2),
+				ht40Minus(3),
+				ht80(4),
+				ht160(5),
+				invalid(255)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 29 }
+			
+		--1.3.6.1.4.1.2011.6.139.16.1.1.2.30
+                hwWlanRadioMngChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 30 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.1.2.31
+                hwWlanRadioMngPowerLevel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 31 }
+		
+		--1.3.6.1.4.1.2011.6.139.16.1.1.2.32
+                hwWlanWIDSTrapInfoAPId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 32 }
+			
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.33
+		hwWlanRadioSecondActualChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 33 }
+			
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.34
+		hwWlanRadioPreSecondActualChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 34 }
+			
+		--1.3.6.1.4.1.2011.6.139.16.1.1.2.35
+        hwWlanRadioMngSecondChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 35 }
+               
+                --1.3.6.1.4.1.2011.6.139.16.1.1.2.36
+		hwWlanApMonitorModeDesc OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 36 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.37
+		hwWlanApPreMonitorModeDesc OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 37 }
+			
+			
+		 --1.3.6.1.4.1.2011.6.139.16.1.1.2.38
+		hwWlanRadioLegitimateEirp OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioTrapObjects 38 }	
+	
+		--1.3.6.1.4.1.2011.6.139.16.1.2
+		hwWlanRadioInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanRadioInfoEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query RF information, including channel, power, number of sent and received packets, and number of users."
+			::= { hwWlanRadioObjects 2 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.2.1
+		hwWlanRadioInfoEntry OBJECT-TYPE
+			SYNTAX HwWlanRadioInfoEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanRadioInfoApMac and hwWlanRadioID."
+			INDEX { hwWlanRadioInfoApMac, hwWlanRadioID }
+			::= { hwWlanRadioInfoTable 1 }
+
+
+		HwWlanRadioInfoEntry ::=
+			SEQUENCE {				
+				hwWlanRadioInfoApMac
+					MacAddress,
+				hwWlanRadioID
+					Unsigned32,
+				hwWlanRadioInfoApName
+					OCTET STRING,
+				hwWlanRadioType
+					Unsigned32,
+				hwWlanRadioFreqType
+					INTEGER,
+				hwWlanRadioRunState
+					INTEGER,
+				hwWlanRadioWorkingChannel
+					Unsigned32,
+				hwWlanRadioWorkingPowerLevel
+					Unsigned32,
+				hwWlanRadioWorkingPower
+					Unsigned32,
+				hwWlanRadioWorkingChannelBandwidth
+					INTEGER,
+				hwWlanRadioWorkMode
+					INTEGER,
+				hwWlanRadioMaxTxPwrLvl
+					Integer32,
+				hwWlanRadioPwrAttRange
+					Integer32,
+				hwWlanRadioPwrAttValue
+					Integer32,
+				hwWlanRadioAntennaGain
+					Integer32,
+				hwWlanRadioDecsption
+					OCTET STRING,
+				hwWlanRadioPortType
+					OCTET STRING,
+				hwWlanRadioMaxMtu
+					Integer32,
+				hwWlanRadioBandwidth
+					Integer32,
+				hwWlanRadioMac
+					MacAddress,
+				hwWlanRadioLastChange
+					Integer32,
+				hwWlanRadioInfoUpDownTimes
+					Integer32,
+				hwWlanRadioPER
+					Unsigned32,
+				hwWlanRadioNoise
+					Integer32,
+				hwWlanRadioChUtilizationRate
+					Unsigned32,
+				hwWlanRadioChannelFreeRate
+					Unsigned32,
+				hwWlanRadioTxRatio
+					Unsigned32,
+				hwWlanRadioRxRatio
+					Unsigned32,
+				hwWlanRadioChInterferenceRate
+					Unsigned32,
+				hwWlanRadioRcvFrames
+					Counter64,
+				hwWlanRadioRcvBytes
+					Counter64,
+				hwWlanRadioRecvRate
+					Unsigned32,
+				hwWlanRadioPeriodRcvDropFrames
+					Counter64,
+				hwWlanRadioPeriodRcvErrFrames
+					Counter64,
+				hwWlanRadioSendFrames
+					Counter64,
+				hwWlanRadioSendBytes
+					Counter64,
+				hwWlanRadioSendRate
+					Unsigned32,
+				hwWlanRadioPeriodRetryFrames
+					Counter64,
+				hwWlanRadioPeriodSendDropFrames
+					Counter64,
+				hwWlanRadioOnlineStaCnt
+					Unsigned32,
+				hwWlanRadioStaAveSignalStrength
+					Integer32,
+				hwWlanRadioPerformanceStatOperMode
+					INTEGER,
+				hwWlanRadioPeriodRcvFrames
+					Counter64,
+				hwWlanRadioPeriodSendFrames
+					Counter64,
+				hwWlanRadioActualEIRP
+					Unsigned32,
+				hwWlanRadioMaximumEIRP
+					Unsigned32,
+				hwWlanRadioSpectrumSwitchFlag
+					INTEGER,
+				hwWlanRadioInfoApId
+					Unsigned32,
+				hwWlanRadioRetryFrames
+					Counter64,
+				hwWlanRadioRcvErrFrames
+					Counter64,
+				hwWlanRadioRcvDropFrames
+					Counter64,
+				hwWlanRadioWorkingSecondChannel
+					Unsigned32
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.1
+		hwWlanRadioInfoApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the AP."
+			::= { hwWlanRadioInfoEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.2
+		hwWlanRadioID OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio ID."
+			::= { hwWlanRadioInfoEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.3
+		hwWlanRadioInfoApName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP name."
+			::= { hwWlanRadioInfoEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.4
+		hwWlanRadioType OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio type (b\g\n\ac)."
+			::= { hwWlanRadioInfoEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.5
+		hwWlanRadioFreqType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				frequency2G(1),
+				frequency5G(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio frequency band."
+			::= { hwWlanRadioInfoEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.6
+		hwWlanRadioRunState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				up(1),
+				down(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the running status of the radio."
+			::= { hwWlanRadioInfoEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.7
+		hwWlanRadioWorkingChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the actual channel of a radio."
+			::= { hwWlanRadioInfoEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.8
+		hwWlanRadioWorkingPowerLevel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the actual power level of a radio."
+			::= { hwWlanRadioInfoEntry 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.9
+		hwWlanRadioWorkingPower OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the power determined by the actual power level."
+			::= { hwWlanRadioInfoEntry 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.10
+		hwWlanRadioWorkingChannelBandwidth OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ht20(1) ,
+				ht40Plus(2) ,
+				ht40Minus(3) ,
+				ht80(4) ,
+				unknown(255)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the actual channel bandwidth."
+			::= { hwWlanRadioInfoEntry 10 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.11
+		hwWlanRadioWorkMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				normal(1),
+				monitor(2),
+				dualBand(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio working mode.normal(1): The radio works in normal mode.monitor(2): The radio works in monitor mode and uses current band scanning.dualBand(4): The radio works in monitor mode and uses dual band scanning."
+			::= { hwWlanRadioInfoEntry 11 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.12
+		hwWlanRadioMaxTxPwrLvl OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the maximum transmit power."
+			::= { hwWlanRadioInfoEntry 12 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.13
+		hwWlanRadioPwrAttRange OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the power attenuation range."
+			::= { hwWlanRadioInfoEntry 13 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.14
+		hwWlanRadioPwrAttValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the power adjustment step."
+			::= { hwWlanRadioInfoEntry 14 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.15
+		hwWlanRadioAntennaGain OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the antenna gain."
+			::= { hwWlanRadioInfoEntry 15 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.16
+		hwWlanRadioDecsption OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the interface description."
+			::= { hwWlanRadioInfoEntry 16 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.17
+		hwWlanRadioPortType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the interface type."
+			::= { hwWlanRadioInfoEntry 17 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.18
+		hwWlanRadioMaxMtu OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the maximum transmit unit (MTU) of the interface."
+			::= { hwWlanRadioInfoEntry 18 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.19
+		hwWlanRadioBandwidth OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the interface bandwidth."
+			::= { hwWlanRadioInfoEntry 19 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.20
+		hwWlanRadioMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the interface."
+			::= { hwWlanRadioInfoEntry 20 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.21
+		hwWlanRadioLastChange OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates how long the interface has stayed in the current state."
+			::= { hwWlanRadioInfoEntry 21 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.22
+		hwWlanRadioInfoUpDownTimes OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates how many times the interface goes online and offline."
+			::= { hwWlanRadioInfoEntry 22 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.23
+		hwWlanRadioPER OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the packet error rate at the wireless side."
+			::= { hwWlanRadioInfoEntry 23 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.24
+		hwWlanRadioNoise OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the interference noise of the radio."
+			::= { hwWlanRadioInfoEntry 24 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.25
+		hwWlanRadioChUtilizationRate OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel usage on the radio."
+			::= { hwWlanRadioInfoEntry 25 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.26
+		hwWlanRadioChannelFreeRate OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the idle period."
+			::= { hwWlanRadioInfoEntry 26 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.27
+		hwWlanRadioTxRatio OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the packet transmitting ratio."
+			::= { hwWlanRadioInfoEntry 27 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.28
+		hwWlanRadioRxRatio OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the packet receiving ratio."
+			::= { hwWlanRadioInfoEntry 28 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.29
+		hwWlanRadioChInterferenceRate OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the interference rate."
+			::= { hwWlanRadioInfoEntry 29 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.30
+		hwWlanRadioRcvFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of user packets received at the wireless side."
+			::= { hwWlanRadioInfoEntry 30 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.31
+		hwWlanRadioRcvBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of bytes in user packets received at the wireless side."
+			::= { hwWlanRadioInfoEntry 31 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.32
+		hwWlanRadioRecvRate OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the downstream rate at the wireless side."
+			::= { hwWlanRadioInfoEntry 32 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.33
+		hwWlanRadioPeriodRcvDropFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of packets failed to be received by the radio within the echo interval."
+			::= { hwWlanRadioInfoEntry 33 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.34
+		hwWlanRadioPeriodRcvErrFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of error packets of the radio received within the echo interval."
+			::= { hwWlanRadioInfoEntry 34 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.35
+		hwWlanRadioSendFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of user packets sent at the wireless side."
+			::= { hwWlanRadioInfoEntry 35 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.36
+		hwWlanRadioSendBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of bytes in user packets sent at the wireless side."
+			::= { hwWlanRadioInfoEntry 36 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.37
+		hwWlanRadioSendRate OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the upstream rate at the wireless side."
+			::= { hwWlanRadioInfoEntry 37 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.38
+		hwWlanRadioPeriodRetryFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of packets retransmitted at the wireless side within the echo interval."
+			::= { hwWlanRadioInfoEntry 38 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.39
+		hwWlanRadioPeriodSendDropFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of packets failed to be sent by the radio within the echo interval."
+			::= { hwWlanRadioInfoEntry 39 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.40
+		hwWlanRadioOnlineStaCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of online users of the radio."
+			::= { hwWlanRadioInfoEntry 40 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.41
+		hwWlanRadioStaAveSignalStrength OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of online users of the radio."
+			::= { hwWlanRadioInfoEntry 41 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.2.1.42
+		hwWlanRadioPerformanceStatOperMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				invalid(1),
+				clearstatistic(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the operating mode."
+			::= { hwWlanRadioInfoEntry 42 }
+
+		-- 1.3.6.1.4.1.2011.6.139.16.1.2.1.43
+		hwWlanRadioPeriodRcvFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of packets of the radio received within the echo interval."
+			::= { hwWlanRadioInfoEntry 43 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.2.1.44
+		hwWlanRadioPeriodSendFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of packets of the radio sent within the echo interval."
+			::= { hwWlanRadioInfoEntry 44 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.16.1.2.1.45
+		hwWlanRadioActualEIRP OBJECT-TYPE
+			SYNTAX Unsigned32 (1..127 | 255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the actual power of a radio, invalid value is 255."
+			::= { hwWlanRadioInfoEntry 45 }
+
+		-- 1.3.6.1.4.1.2011.6.139.16.1.2.1.46
+		hwWlanRadioMaximumEIRP OBJECT-TYPE
+			SYNTAX Unsigned32 (1..127 | 255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the maximum power of a radio, invalid value is 255."
+			::= { hwWlanRadioInfoEntry 46 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.2.1.47
+		hwWlanRadioSpectrumSwitchFlag OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the spectrum switch flag of a radio."
+			::= { hwWlanRadioInfoEntry 47 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.2.1.48
+		hwWlanRadioInfoApId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"AP ID."
+			::= { hwWlanRadioInfoEntry 48 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.2.1.49
+		hwWlanRadioRetryFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of user packets retransmitted at the wireless side."
+			::= { hwWlanRadioInfoEntry 49 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.2.1.50
+		hwWlanRadioRcvErrFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of wrong user packets received at the wireless side."
+			::= { hwWlanRadioInfoEntry 50 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.2.1.51
+		hwWlanRadioRcvDropFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of user packets failed to received at the wireless side."
+			::= { hwWlanRadioInfoEntry 51 }
+        
+		-- 1.3.6.1.4.1.2011.6.139.16.1.2.1.52
+		hwWlanRadioWorkingSecondChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the second working channel of a radio."
+			::= { hwWlanRadioInfoEntry 52 }
+		
+--  1.3.6.1.4.1.2011.6.139.16.1.3
+		-- 1.3.6.1.4.1.2011.6.139.16.1.3
+		hwWlanRadioQueryPowerlevelTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanRadioQueryPowerlevelEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query the maximum power level for specified channel and bandwidth."
+			::= { hwWlanRadioObjects 3 }
+
+		--1.3.6.1.4.1.2011.6.139.16.1.3.1
+		hwWlanRadioQueryPowerlevelEntry OBJECT-TYPE
+			SYNTAX HwWlanRadioQueryPowerlevelEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanRadioQueryPowerlevelApMac, hwWlanRadioQueryPowerlevelRadioId, hwWlanRadioQueryPowerlevelChannel, and hwWlanRadioQueryPowerlevelBandwidth."
+			INDEX { hwWlanRadioQueryPowerlevelApMac, hwWlanRadioQueryPowerlevelRadioId, hwWlanRadioQueryPowerlevelChannel, hwWlanRadioQueryPowerlevelBandwidth }
+			::= { hwWlanRadioQueryPowerlevelTable 1 }
+
+
+		HwWlanRadioQueryPowerlevelEntry ::=
+			SEQUENCE {				
+				hwWlanRadioQueryPowerlevelApMac
+					MacAddress,
+				hwWlanRadioQueryPowerlevelRadioId
+					Unsigned32,
+				hwWlanRadioQueryPowerlevelChannel
+					Unsigned32,
+				hwWlanRadioQueryPowerlevelBandwidth
+					INTEGER,
+				hwWlanRadioQueryPowerlevelMax
+					Integer32 
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.3.1.1
+		hwWlanRadioQueryPowerlevelApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the AP."
+			::= { hwWlanRadioQueryPowerlevelEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.3.1.2
+		hwWlanRadioQueryPowerlevelRadioId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio ID."
+			::= { hwWlanRadioQueryPowerlevelEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.3.1.3
+		hwWlanRadioQueryPowerlevelChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the channel."
+			::= { hwWlanRadioQueryPowerlevelEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.3.1.4
+		hwWlanRadioQueryPowerlevelBandwidth OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ht20(1) ,
+				ht40Plus(2) ,
+				ht40Minus(3) ,
+				ht80(4)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the bandwidth."
+			::= { hwWlanRadioQueryPowerlevelEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.16.1.3.1.5
+		hwWlanRadioQueryPowerlevelMax OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the maximum power level."
+			::= { hwWlanRadioQueryPowerlevelEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.4
+		hwWlanRadioUncontrolAPInfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanRadioUncontrolAPInfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRadioObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.4.1
+		hwWlanRadioUncontrolAPInfEntry OBJECT-TYPE
+			SYNTAX HwWlanRadioUncontrolAPInfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwWlanUncontrolApId }
+			::= { hwWlanRadioUncontrolAPInfTable 1 }
+
+		
+		HwWlanRadioUncontrolAPInfEntry ::=
+			SEQUENCE { 
+				hwWlanUncontrolApId
+					Integer32,
+				hwWlanUncontrolApBSSID
+					MacAddress,
+				hwWlanAuthAPId
+					Integer32,
+				hwWlanUncontrolApChannel
+					Unsigned32,
+				hwWlanUncontrolApRSSI
+					Integer32,
+				hwWlanUncontrolApSSID
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.16.1.4.1.1
+		hwWlanUncontrolApId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRadioUncontrolAPInfEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.4.1.2
+		hwWlanUncontrolApBSSID OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRadioUncontrolAPInfEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.4.1.3
+		hwWlanAuthAPId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRadioUncontrolAPInfEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.4.1.4
+		hwWlanUncontrolApChannel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRadioUncontrolAPInfEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.4.1.5
+		hwWlanUncontrolApRSSI OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRadioUncontrolAPInfEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.16.1.4.1.6
+		hwWlanUncontrolApSSID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRadioUncontrolAPInfEntry 6 }
+
+		
+-- 1.3.6.1.4.1.2011.6.139.16.2
+		-- 1.3.6.1.4.1.2011.6.139.16.3
+		hwWlanRadioConformance OBJECT IDENTIFIER ::= { hwWlanRadio 3 }
+
+		--1.3.6.1.4.1.2011.6.139.16.2.1
+		hwWlanRadioCompliances OBJECT IDENTIFIER ::= { hwWlanRadioConformance 1 }
+
+		--1.3.6.1.4.1.2011.6.139.16.2.1.1
+		hwWlanRadioCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE
+					MANDATORY-GROUPS { hwWlanRadioTrapObjectGroup, hwWlanRadioInfoGroup, hwWlanRadioQueryPowerlevelGroup }
+			::= { hwWlanRadioCompliances 1 }
+
+		--1.3.6.1.4.1.2011.6.139.16.2.2
+		hwWlanRadioObjectGroups OBJECT IDENTIFIER ::= { hwWlanRadioConformance 2 }
+
+		--1.3.6.1.4.1.2011.6.139.16.2.2.1
+		hwWlanRadioTrapGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwRadioChannelChangedTrap, hwRadioSignalEnvDeteriorationTrap, hwRadioSignalEnvResumeTrap, hwApMonitorModeChangedTrap, hwAPCoInterfDetectedTrap, 
+			hwAPCoInterfClearTrap, hwNerborInterfDetectedTrap, hwNeiborInterfClearTrap, hwStaInterfDetectedTrap, hwStaInterfClearTrap, 
+			hwOtherDeviceInterfDetectedTrap, hwOtherDeviceInterfClearTrap, hwRadioDownTrap, hwRadioDownRecovTrap, hwWIDSDetectRogueTrap, 
+			hwRadioNotSupportChannelTrap, hwRadioNotSupportPowerLevelTrap, hwRadioAntennaGainIsUnlawfulTrap, hwRadioPowerChangedTrap, hwApAccessUserNumExceedThresholdTrap, 
+			hwApAccessUserNumExceedThresholdRecovTrap, hwApRoamUserNumExceedThresholdTrap, hwApRoamUserNumExceedThresholdRecovTrap, hwApAccessChannelUtilExceedThresholdTrap, hwApAccessChannelUtilExceedThresholdRecovTrap, 
+			hwApRoamChannelUtilExceedThresholdTrap, hwApRoamChannelUtilExceedThresholdRecovTrap, hwRadioDownTrapFat, hwRadioDownRecovTrapFat }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioObjectGroups 1 }
+
+		--1.3.6.1.4.1.2011.6.139.16.2.2.2
+		hwWlanRadioTrapObjectGroup OBJECT-GROUP
+			OBJECTS { hwWlanRadioActualChannel, hwWlanRadioActualChannelBandwidth, hwWlanRadioActualPowerLevel, hwWlanRadioActualAntennaGain, hwWlanRadioLegitimateAntennaGain, 
+			hwWlanRadioChannelChangedReason, hwWlanRadioChannelChangedReasonStr, hwWlanRadioConflictRate, hwWlanApMonitorMode, hwWlanApPreMonitorMode, 
+			hwWlanApChannel, hwWlanApInterfBssid, hwWlanInterfStaMac, hwWlanRadioDownCause, hwWlanInterfApChannel, 
+			hwWlanInterfRSSI, hwWlanWIDSTrapInfoAPName, hwWlanWIDSTrapInfoRadioId, hwWlanWIDSTrapInfoAPMAC, hwWlanWIDSTrapInfoRogueMAC, 
+			hwWlanWIDSTrapInfoRogueSSId, hwWlanWIDSTrapInfoRogueType, hwWlanWIDSTrapInfoRogueRSSI, hwWlanWIDSTrapInfoRogueChanID, hwWlanRadioDownCauseStr, 
+			hwWlanRadioUacUserNum, hwWlanRadioPreActualChannel, hwWlanApRadioNotifyPara,hwWlanRadioMngChannelBandwidth,hwWlanRadioMngPowerLevel,hwWlanRadioMngChannel,hwWlanWIDSTrapInfoAPId,
+			hwWlanRadioSecondActualChannel, hwWlanRadioPreSecondActualChannel, hwWlanRadioMngSecondChannel, hwWlanApMonitorModeDesc, hwWlanApPreMonitorModeDesc, hwWlanRadioLegitimateEirp}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioObjectGroups 2 }
+
+		--1.3.6.1.4.1.2011.6.139.16.2.2.3
+		hwWlanRadioInfoGroup OBJECT-GROUP
+			OBJECTS { hwWlanRadioInfoApMac, hwWlanRadioID, hwWlanRadioInfoApName, hwWlanRadioType, hwWlanRadioFreqType, 
+			hwWlanRadioRunState, hwWlanRadioWorkingChannel, hwWlanRadioWorkingPowerLevel, hwWlanRadioWorkingPower, hwWlanRadioWorkingChannelBandwidth, 
+			hwWlanRadioWorkMode, hwWlanRadioMaxTxPwrLvl, hwWlanRadioPwrAttRange, hwWlanRadioPwrAttValue, hwWlanRadioAntennaGain, 
+			hwWlanRadioDecsption, hwWlanRadioPortType, hwWlanRadioMaxMtu, hwWlanRadioBandwidth, hwWlanRadioMac, 
+			hwWlanRadioLastChange, hwWlanRadioInfoUpDownTimes, hwWlanRadioPER, hwWlanRadioNoise, hwWlanRadioChUtilizationRate, 
+			hwWlanRadioChannelFreeRate, hwWlanRadioTxRatio, hwWlanRadioRxRatio, hwWlanRadioChInterferenceRate, hwWlanRadioRcvFrames, 
+			hwWlanRadioRcvBytes, hwWlanRadioRecvRate, hwWlanRadioPeriodRcvDropFrames, hwWlanRadioPeriodRcvErrFrames, hwWlanRadioSendFrames, 
+			hwWlanRadioSendBytes, hwWlanRadioSendRate, hwWlanRadioPeriodRetryFrames, hwWlanRadioPeriodSendDropFrames, hwWlanRadioOnlineStaCnt, 
+			hwWlanRadioStaAveSignalStrength, hwWlanRadioPerformanceStatOperMode, hwWlanRadioPeriodRcvFrames, hwWlanRadioPeriodSendFrames, 
+			hwWlanRadioActualEIRP, hwWlanRadioMaximumEIRP, hwWlanRadioSpectrumSwitchFlag, hwWlanRadioInfoApId }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioObjectGroups 3 }
+
+		--1.3.6.1.4.1.2011.6.139.16.2.2.4
+		hwWlanRadioQueryPowerlevelGroup OBJECT-GROUP
+			OBJECTS { hwWlanRadioQueryPowerlevelMax }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanRadioObjectGroups 4 }
+
+
+	END
+--
+-- HUAWEI-WLAN-RADIO-MIB.mib
+--
