@@ -140,46 +140,6 @@ if (Config::get('enable_vrfs')) {
                 }
             }//end if
         }//end foreach
-
-        unset(
-            $descr_table,
-            $port_table
-        );
-        echo "\n";
-
-        $sql = "SELECT * FROM ports WHERE device_id = '".$device['device_id']."'";
-        foreach (dbFetchRows($sql) as $row) {
-            $if     = $row['port_id'];
-            $vrf_id = $row['ifVrf'];
-            if ($row['ifVrf']) {
-                if (!$valid_vrf_if[$vrf_id][$if]) {
-                    echo '-';
-                    dbUpdate(array('ifVrf' => 'NULL'), 'ports', 'port_id=?', array($if));
-                } else {
-                    echo '.';
-                }
-            }
-        }
-
-        $sql = "SELECT * FROM vrfs WHERE device_id = '".$device['device_id']."'";
-        foreach (dbFetchRows($sql) as $row) {
-            $vrf_id = $row['vrf_id'];
-            if (!$valid_vrf[$vrf_id]) {
-                echo '-';
-                dbDelete('vrfs', '`vrf_id` = ?', array($vrf_id));
-            } else {
-                echo '.';
-            }
-        }
-
-        unset(
-            $valid_vrf_if,
-            $valid_vrf,
-            $row,
-            $sql
-        );
-
-        echo "\n";
     } else if ($device['os_group'] == 'nokia') {
         unset($vrf_count);
 
@@ -204,7 +164,7 @@ if (Config::get('enable_vrfs')) {
             } else {
                 $vrf_rd = null;
             }
-            
+
             echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
             echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
             echo "\n  [VRF $vrf_name] DESC  - $vrf_desc";
@@ -217,14 +177,53 @@ if (Config::get('enable_vrfs')) {
 
             $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', array($device['device_id'], $vrf_oid));
             $valid_vrf[$vrf_id] = 1;
-
             echo "\n  [VRF $vrf_name] PORTS - ";
-            foreach ($port_table[$vrf_oid] as $if_id => $if) {
-                $if_name = $if['vRtrIfName'];
-                echo makeshortif($if_name).' ';
-                dbUpdate(array('ifVrf' => $vrf_id), 'ports', 'ifIndex=?', array($if_id));
-                $valid_vrf_if[$vrf_id][$if_id] = 1;
+            foreach ($port_table[$vrf_oid] as $if_index => $if_name) {
+                $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $if_index));
+                echo makeshortif($interface['ifDescr']).' ';
+                dbUpdate(array('ifVrf' => $vrf_id), 'ports', 'port_id=?', array($interface['port_id']));
+                $if = $interface['port_id'];
+                $valid_vrf_if[$vrf_id][$if] = 1;
             }
         } //end foreach
     } //end if
+    unset(
+        $descr_table,
+        $port_table
+    );
+    echo "\n";
+
+    $sql = "SELECT * FROM ports WHERE device_id = '".$device['device_id']."'";
+    foreach (dbFetchRows($sql) as $row) {
+        $if     = $row['port_id'];
+        $vrf_id = $row['ifVrf'];
+        if ($row['ifVrf']) {
+            if (!$valid_vrf_if[$vrf_id][$if]) {
+                echo '-';
+                dbUpdate(array('ifVrf' => 'NULL'), 'ports', 'port_id=?', array($if));
+            } else {
+                echo '.';
+            }
+        }
+    }
+
+    $sql = "SELECT * FROM vrfs WHERE device_id = '".$device['device_id']."'";
+    foreach (dbFetchRows($sql) as $row) {
+        $vrf_id = $row['vrf_id'];
+        if (!$valid_vrf[$vrf_id]) {
+            echo '-';
+            dbDelete('vrfs', '`vrf_id` = ?', array($vrf_id));
+        } else {
+            echo '.';
+        }
+    }
+
+    unset(
+        $valid_vrf_if,
+        $valid_vrf,
+        $row,
+        $sql
+    );
+
+    echo "\n";
 } //end if
