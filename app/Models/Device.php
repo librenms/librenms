@@ -151,7 +151,7 @@ class Device extends BaseModel
         // properties that block relationships
         unset($device['location']);
 
-        foreach($device as $key => $value) {
+        foreach ($device as $key => $value) {
             $device_model->$key = $value;
         }
 
