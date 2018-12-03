@@ -144,6 +144,7 @@ class QueryBuilderFilter implements \JsonSerializable
         if (starts_with($type, ['varchar', 'text', 'double', 'float'])) {
             return 'string';
         } elseif (starts_with($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'])) {
+            //TODO implement field selection and change back to integer
             return 'string';
         } elseif (starts_with($type, ['timestamp', 'datetime'])) {
             return 'datetime';
