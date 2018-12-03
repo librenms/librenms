@@ -30,8 +30,21 @@ use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
 use App\Models\PortsNac;
+use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 
-class Vrp extends OS implements ProcessorDiscovery, NacPolling
+//use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
+//use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
+//use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
+//use LibreNMS\Interfaces\Polling\Sensors\WirelessCcqPolling;
+//use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
+
+class Vrp extends OS implements 
+    ProcessorDiscovery,
+    NacPolling,
+    WirelessApCountDiscovery,
+    WirelessClientsDiscovery
 {
     /**
      * Discover processors.
@@ -122,5 +135,56 @@ class Vrp extends OS implements ProcessorDiscovery, NacPolling
             }
         }
         return $nac;
+    }
+
+    public function discoverWirelessApCount()
+    {
+        $sensors = array();
+        $ap_number = snmpwalk_cache_oid($this->getDevice(), 'hwWlanCurJointApNum.0', array(), 'HUAWEI-WLAN-GLOBAL-MIB');
+
+        $sensors[] = new WirelessSensor(
+                'ap-count',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.2011.6.139.12.1.2.1.0',
+                'vrp-ap-count',
+                'ap-count',
+                'AP Count',
+                $ap_number[0]['hwWlanCurJointApNum']
+                );
+
+        return $sensors;
+    }
+
+    public function discoverWirelessClients()
+    {
+        $sensors = array();
+        $total_oids = array();
+        $total = 0;
+
+        $vapInfoTable = snmpwalk_group($this->getDevice(), 'hwWlanVapInfoTable', 'HUAWEI-WLAN-VAP-MIB',3,array());
+        $ssidsPerRadios = array();
+        foreach ($vapInfoTable as $a_index => $ap) {
+            $a_index_oid = implode(".", array_map("hexdec", explode(":", $a_index)));
+            foreach ($ap as $r_index => $radio) {
+                foreach ($radio as $s_index => $ssid) {
+                    $clientPerSsid[$ssid['hwWlanVapProfileName']] += $ssid['hwWlanVapStaOnlineCnt'];
+                    $clientPerSsidPerRadio[$ssid['hwWlanVapProfileName']][$r_index] += $ssid['hwWlanVapStaOnlineCnt'];
+
+                    $oid = '.1.3.6.1.4.1.2011.6.139.17.1.1.1.9.' . $a_index_oid . '.' . $r_index . '.' . $s_index ;
+                    $total_oids[] = $oid;
+                    $sensors[] = new WirelessSensor(
+                            'clients',
+                            $this->getDeviceId(),
+                            $oid,
+                            'vrp',
+                            $a_index_oid . '.' . $r_index . '.' . $s_index,
+                            'Radio:' . $r_index . ' SSID:' . $ssid['hwWlanVapProfileName'],
+                            $ssid['hwWlanVapStaOnlineCnt']
+                            );
+                }    
+            }
+        }
+
+        return $sensors;
     }
 }

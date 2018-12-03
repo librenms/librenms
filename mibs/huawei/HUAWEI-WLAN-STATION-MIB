@@ -502,7 +502,7 @@
 					Integer32,
 				hwWlanStationPowerSavePercent
 					Integer32,
-                                                                                     hwWlanStaAssocStartTime
+                hwWlanStaAssocStartTime
 					Unsigned32,
 				hwWlanStaAssocSuccessTime
 					Unsigned32,
@@ -521,7 +521,7 @@
 				hwWlanStaMUMIMOCapable
 					INTEGER,
 				hwWlanStaWpaStartTime 
-				    	Unsigned32,   
+		        	Unsigned32,   
 				hwWlanStaWpaSuccessTime 
 					Unsigned32
 			 }
