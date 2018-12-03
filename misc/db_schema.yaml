@@ -1561,6 +1561,7 @@ syslog:
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
     program: { Name: program, Columns: [program], Unique: false, Type: BTREE }
     priority_level: { Name: priority_level, Columns: [priority, level], Unique: false, Type: BTREE }
+    device_id-timestamp: { Name: device_id-timestamp, Columns: [device_id, timestamp], Unique: false, Type: BTREE }
 tnmsneinfo:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
