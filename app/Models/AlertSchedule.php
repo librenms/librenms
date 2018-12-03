@@ -25,6 +25,8 @@
 
 namespace App\Models;
 
+use DB;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class AlertSchedule extends Model
@@ -32,6 +34,43 @@ class AlertSchedule extends Model
     public $timestamps = false;
     protected $table = 'alert_schedule';
     protected $primaryKey = 'schedule_id';
+
+    // ---- Query scopes ----
+
+    public function scopeIsActive($query)
+    {
+        // TODO use Carbon?
+        return $query->where(function ($query) {
+            $query->where(function ($query) {
+                // Non recurring simply between start and end
+                $query->where('recurring', 0)
+                    ->where('start', '<=', DB::raw('NOW()'))
+                    ->where('end', '>=', DB::raw('NOW()'));
+            })->orWhere(function ($query) {
+                $query->where('recurring', 1)
+                    // Check the time is after the start date and before the end date, or end date is not set
+                    ->where(function ($query) {
+                        $query->where('start_recurring_dt', '<=', DB::raw("date_format(NOW(), '%Y-%m-%d')"))
+                            ->where(function ($query) {
+                                $query->where('end_recurring_dt', '>=', DB::raw("date_format(NOW(), '%Y-%m-%d')"))
+                                    ->orWhereNull('end_recurring_dt')
+                                    ->orWhere('end_recurring_dt', '0000-00-00')
+                                    ->orWhere('end_recurring_dt', '');
+                            });
+                    })
+                    // Check the time is between the start and end hour/minutes/seconds
+                    ->where('start_recurring_hr', '<=', DB::raw("date_format(NOW(), '%H:%i:%s')"))
+                    ->where('end_recurring_hr', '>=', DB::raw("date_format(NOW(), '%H:%i:%s')"))
+                    // Check we are on the correct day of the week
+                    ->where(function ($query) {
+                            /** @var Builder $query */
+                            $query->where('recurring_day', 'like', DB::raw("CONCAT('%', date_format(NOW(), '%w'), '%')"))
+                                ->orWhereNull('recurring_day')
+                                ->orWhere('recurring_day', '');
+                    });
+            });
+        });
+    }
 
     // ---- Define Relationships ----
 

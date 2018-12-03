@@ -142,7 +142,7 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
     $('#recurring_day').prop('checked', false);
     $('#norecurringgroup').show();
     $('#recurringgroup').hide();
-    $('#schedulemodal-alert').remove('');
+    $('#schedulemodal-alert').remove();
 });
 
 $('#schedule-maintenance').on('show.bs.modal', function (event) {
@@ -190,7 +190,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                     $("#recurring1").prop("checked", true);
 
                     var recdayupd = output['recurring_day'];
-                    if (recdayupd != ''){
+                    if (recdayupd){
                         var arrayrecdayupd = recdayupd.split(',');
                         $.each(arrayrecdayupd, function(indexcheckedday, checkedday){
                             $("input[name='recurring_day[]'][value="+checkedday+"]").prop('checked', true);
@@ -294,7 +294,9 @@ $(function () {
         $("#end").data("DateTimePicker").minDate(e.date);
     });
     $("#end").on("dp.change", function (e) {
-        $("#start").data("DateTimePicker").maxDate(e.date);
+        if (e.date && e.date.isAfter(moment())) {
+            $("#start").data("DateTimePicker").maxDate(e.date);
+        }
     });
     $("#start_recurring_dt").datetimepicker({
         minDate: '<?php echo date($config['dateformat']['byminute']); ?>',
@@ -327,7 +329,9 @@ $(function () {
         $("#end_recurring_dt").data("DateTimePicker").minDate(e.date);
     });
     $("#end_recurring_dt").on("dp.change", function (e) {
-        $("#start_recurring_dt").data("DateTimePicker").maxDate(e.date);
+        if (e.date && e.date.isAfter(moment())) {
+            $("#start_recurring_dt").data("DateTimePicker").maxDate(e.date);
+        }
     });
     $("#start_recurring_hr").datetimepicker({
         icons: {

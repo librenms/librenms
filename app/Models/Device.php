@@ -151,6 +151,27 @@ class Device extends BaseModel
         return $this->hostname;
     }
 
+    public function isUnderMaintenance()
+    {
+        $query = AlertSchedule::isActive()
+            ->join('alert_schedulables', 'alert_schedule.schedule_id', 'alert_schedulables.schedule_id')
+            ->where(function ($query) {
+                $query->where(function ($query) {
+                    $query->where('alert_schedulable_type', 'device')
+                        ->where('alert_schedulable_id', $this->device_id);
+                });
+
+                if ($this->groups) {
+                    $query->orWhere(function ($query) {
+                        $query->where('alert_schedulable_type', 'device_group')
+                            ->whereIn('alert_schedulable_id', $this->groups->pluck('id'));
+                    });
+                }
+            });
+
+        return $query->exists();
+    }
+
     /**
      * Get the shortened display name of this device.
      * Length is always overridden by shorthost_target_length.
