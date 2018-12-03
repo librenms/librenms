@@ -70,5 +70,4 @@ class TopInterfacesController extends WidgetController
     {
         return view('widgets.settings.top-interfaces', $this->getSettings());
     }
-
 }
