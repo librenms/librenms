@@ -137,6 +137,28 @@ class Device extends BaseModel
     }
 
     /**
+     * Create a Device instance from an array.
+     * This is likely an array fetched from the DB in legacy code.
+     * Avoids fill()
+     *
+     * @param array $device
+     * @return Device
+     */
+    public static function fromArray($device)
+    {
+        $device_model = new static($device);
+
+        // properties that block relationships
+        unset($device['location']);
+
+        foreach($device as $key => $value) {
+            $device_model->$key = $value;
+        }
+
+        return $device_model;
+    }
+
+    /**
      * Get the display name of this device (hostname) unless force_ip_to_sysname is set
      * and hostname is an IP and sysName is set
      *

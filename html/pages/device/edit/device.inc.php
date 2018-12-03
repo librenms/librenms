@@ -4,7 +4,7 @@ use App\Models\Device;
 use App\Models\Location;
 use LibreNMS\Authentication\LegacyAuth;
 
-$device_model = Device::find($device['device_id']);
+$device_model = Device::fromArray($device);
 
 if ($_POST['editing']) {
     if (LegacyAuth::user()->hasGlobalAdmin()) {

@@ -8,7 +8,7 @@ use App\Models\OspfNbr;
 use App\Models\OspfPort;
 use LibreNMS\RRD\RrdDefinition;
 
-$device_model = Device::find($device['device_id']);
+$device_model = Device::fromArray($device);
 
 if (key_exists('vrf_lite_cisco', $device) && ($device['vrf_lite_cisco'] != '')) {
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
