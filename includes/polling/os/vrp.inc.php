@@ -71,11 +71,20 @@ if (!empty($apTable)) {
         $radioTable = snmpwalk_group($device, $apRadioTableOid, 'HUAWEI-WLAN-AP-RADIO-MIB', 2, $radioTable);
     }
 
-    var_dump($apTable);
-    var_dump($radioTable);
+    $numClients = 0;
+    $vapInfoTable = snmpwalk_group($device, 'hwWlanVapStaOnlineCnt', 'HUAWEI-WLAN-VAP-MIB', 3, array());
+    foreach ($vapInfoTable as $ap_id => $ap) {
+        //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
+        //$a_index_oid = implode(".", array_map("hexdec", explode(":", $ap_id)));
+        foreach ($ap as $r_id => $radio) {
+            foreach ($radio as $s_index => $ssid) {
+                $clientPerRadio[$ap_id][$r_id] += $ssid['hwWlanVapStaOnlineCnt'];
+                $numClients +=  $ssid['hwWlanVapStaOnlineCnt'];
+            }
+        }
+    }
 
     $numRadios = count($radioTable);
-    $numClients = 0;
 
     $rrd_def = RrdDefinition::make()
         ->addDataset('NUMAPS', 'GAUGE', 0, 12500000000)
@@ -100,6 +109,7 @@ if (!empty($apTable)) {
             $txpow         = $radio['hwWlanRadioActualEIRP'];
             $interference  = $radio['hwWlanRadioChInterferenceRate'];
             $radioutil     = $radio['hwWlanRadioChUtilizationRate'];
+            $numasoclients  = $clientPerRadio[$ap_id][$r_id];
 
             switch ($radio['hwWlanRadioFreqType']) {
                 case 1:
@@ -112,12 +122,10 @@ if (!empty($apTable)) {
                     $type = "unknown (huawei " . $radio['hwWlanRadioFreqType'] . ")";
             }
 
-
             // TODO
             $numactbssid   = 0;
             $nummonbssid   = 0;
             $nummonclients = 0;
-            $numasoclients  = 0;
 
             d_echo("  name: $name\n");
             d_echo("  radionum: $radionum\n");
@@ -127,11 +135,6 @@ if (!empty($apTable)) {
             d_echo("  radioutil: $radioutil\n");
             d_echo("  numasoclients: $numasoclients\n");
             d_echo("  interference: $interference\n");
-
-            // if there is a numeric channel, assume the rest of the data is valid, I guess
-            //if (!is_numeric($channel)) {
-            //    continue;
-            //}
 
             $rrd_name = array('arubaap', $name.$radionum);
             $rrd_def = RrdDefinition::make()

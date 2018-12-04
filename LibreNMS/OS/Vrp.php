@@ -31,14 +31,11 @@ use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
 use App\Models\PortsNac;
 use LibreNMS\Device\WirelessSensor;
+//use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-
-//use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 //use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 //use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
-//use LibreNMS\Interfaces\Polling\Sensors\WirelessCcqPolling;
-//use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 
 class Vrp extends OS implements 
     ProcessorDiscovery,
@@ -161,12 +158,12 @@ class Vrp extends OS implements
 
         $vapInfoTable = snmpwalk_group($this->getDevice(), 'hwWlanVapInfoTable', 'HUAWEI-WLAN-VAP-MIB', 3, array());
         foreach ($vapInfoTable as $a_index => $ap) {
+            //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
             $a_index_oid = implode(".", array_map("hexdec", explode(":", $a_index)));
             foreach ($ap as $r_index => $radio) {
                 foreach ($radio as $s_index => $ssid) {
                     //$clientPerSsid[$ssid['hwWlanVapProfileName']] += $ssid['hwWlanVapStaOnlineCnt'];
                     //$clientPerSsidPerRadio[$ssid['hwWlanVapProfileName']][$r_index] += $ssid['hwWlanVapStaOnlineCnt'];
-                    //$clientPerRadio
 
                     $oid = '.1.3.6.1.4.1.2011.6.139.17.1.1.1.9.' . $a_index_oid . '.' . $r_index . '.' . $s_index ;
                     $total_oids[] = $oid;
