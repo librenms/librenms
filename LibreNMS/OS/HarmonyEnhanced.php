@@ -87,4 +87,4 @@ class HarmonyEnhanced extends OS implements WirelessRssiDiscovery, WirelessSnrDi
         }
         return $sensors;
     }
- }
+}
