@@ -143,15 +143,14 @@ class Vrp extends OS implements
         $ap_number = snmpwalk_cache_oid($this->getDevice(), 'hwWlanCurJointApNum.0', array(), 'HUAWEI-WLAN-GLOBAL-MIB');
 
         $sensors[] = new WirelessSensor(
-                'ap-count',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.2011.6.139.12.1.2.1.0',
-                'vrp-ap-count',
-                'ap-count',
-                'AP Count',
-                $ap_number[0]['hwWlanCurJointApNum']
-                );
-
+            'ap-count',
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.2011.6.139.12.1.2.1.0',
+            'vrp-ap-count',
+            'ap-count',
+            'AP Count',
+            $ap_number[0]['hwWlanCurJointApNum']
+        );
         return $sensors;
     }
 
@@ -159,32 +158,30 @@ class Vrp extends OS implements
     {
         $sensors = array();
         $total_oids = array();
-        $total = 0;
 
-        $vapInfoTable = snmpwalk_group($this->getDevice(), 'hwWlanVapInfoTable', 'HUAWEI-WLAN-VAP-MIB',3,array());
-        $ssidsPerRadios = array();
+        $vapInfoTable = snmpwalk_group($this->getDevice(), 'hwWlanVapInfoTable', 'HUAWEI-WLAN-VAP-MIB', 3, array());
         foreach ($vapInfoTable as $a_index => $ap) {
             $a_index_oid = implode(".", array_map("hexdec", explode(":", $a_index)));
             foreach ($ap as $r_index => $radio) {
                 foreach ($radio as $s_index => $ssid) {
-                    $clientPerSsid[$ssid['hwWlanVapProfileName']] += $ssid['hwWlanVapStaOnlineCnt'];
-                    $clientPerSsidPerRadio[$ssid['hwWlanVapProfileName']][$r_index] += $ssid['hwWlanVapStaOnlineCnt'];
+                    //$clientPerSsid[$ssid['hwWlanVapProfileName']] += $ssid['hwWlanVapStaOnlineCnt'];
+                    //$clientPerSsidPerRadio[$ssid['hwWlanVapProfileName']][$r_index] += $ssid['hwWlanVapStaOnlineCnt'];
+                    //$clientPerRadio
 
                     $oid = '.1.3.6.1.4.1.2011.6.139.17.1.1.1.9.' . $a_index_oid . '.' . $r_index . '.' . $s_index ;
                     $total_oids[] = $oid;
                     $sensors[] = new WirelessSensor(
-                            'clients',
-                            $this->getDeviceId(),
-                            $oid,
-                            'vrp',
-                            $a_index_oid . '.' . $r_index . '.' . $s_index,
-                            'Radio:' . $r_index . ' SSID:' . $ssid['hwWlanVapProfileName'],
-                            $ssid['hwWlanVapStaOnlineCnt']
-                            );
-                }    
+                        'clients',
+                        $this->getDeviceId(),
+                        $oid,
+                        'vrp',
+                        $a_index_oid . '.' . $r_index . '.' . $s_index,
+                        'Radio:' . $r_index . ' SSID:' . $ssid['hwWlanVapProfileName'],
+                        $ssid['hwWlanVapStaOnlineCnt']
+                    );
+                }
             }
         }
-
         return $sensors;
     }
 }
