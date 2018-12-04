@@ -360,10 +360,11 @@ class Sensor implements DiscoveryModule, PollerModule
 
         // deal with string values that may be surrounded by quotes, scientific number format and remove non numerical characters
         array_walk($snmp_data, function (&$oid) {
-            $oid = preg_replace('/[^-0-9.e]/i', '', $oid);
-            if (stripos($oid, 'e') !== false) {
-                $oid = sprintf('%.16f', floatval($oid));
-                $oid = rtrim($oid, '0');
+            preg_match('/-?\d+(\.\d+)?(e-?\d+)?/i', $oid, $matches);
+            if (isset($matches[0])) {
+                $oid = $matches[0] + 0;
+            } else {
+                $oid = trim('"', $oid); // allow string only values
             }
         });
 
