@@ -46,51 +46,14 @@ class CustomersController extends TableController
     public function baseQuery($request)
     {
         $cust_descrs = (array)Config::get('customers_descr', ['cust']);
-        $fields = [
-            'port_descr_descr',
-            'port_id',
-            'ports.device_id',
-            'port_descr_circuit',
-            'port_descr_speed',
-            'port_descr_notes',
-            'ifDescr',
-            'ifName',
-            'ifIndex',
-            'ifOperStatus',
-            'ifAdminStatus',
-            'ifAlias',
-            'ifVlan',
-            'ifTrunk',
-            // devices for search
-            'hostname',
-            'sysDescr'
-        ];
 
-//        return Port::hasAccess($request->user())
-        return Port::query()
+        // selecting just the customer name, will fetch port data later
+        return Port::hasAccess($request->user())
             ->with('device')
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
-            ->select($fields)
+            ->select('port_descr_descr')
             ->whereIn('port_descr_type', $cust_descrs)
-            ->groupBy($fields);
-    }
-
-    /**
-     * @param Port $port
-     * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection
-     */
-    public function formatItem($port)
-    {
-//        $item = $port->all(['port_descr_descr', 'port_descr_speed', 'port_descr_circuit', 'port_descr_notes']);
-
-        return [
-            'port_descr_descr' => $port->port_descr_descr,
-            'device_id' => Url::deviceLink($port->device),
-            'ifDescr' => Url::portLink($port),
-            'port_descr_speed' => $port->port_descr_speed,
-            'port_descr_circuit' => $port->port_descr_circuit,
-            'port_descr_notes' => $port->port_descr_notes,
-        ];
+            ->groupBy('port_descr_descr');
     }
 
     /**
@@ -99,27 +62,57 @@ class CustomersController extends TableController
      */
     protected function formatResponse($paginator)
     {
-        $items = collect();
-        foreach ($paginator->items() as $item) {
-            $items->push($this->formatItem($item));
-            $items->push($this->getGraphRow($item));
-        }
+        $customers = collect($paginator->items())->pluck('port_descr_descr');
+        // fetch all ports
+        $ports = Port::whereIn('port_descr_descr', $customers)
+            ->with('device')
+            ->get()
+            ->groupBy('port_descr_descr');
+
+        $rows = $customers->reduce(function ($rows, $customer) use ($ports) {
+            $graph_row = $this->getGraphRow($customer);
+            foreach ($ports->get($customer) as $port) {
+                $port->port_descr_descr = $customer;
+                $rows->push($this->formatItem($port));
+                $customer = ''; // only display customer in the first row
+            }
+
+            // add graphs row
+            $rows->push($graph_row);
+            return $rows;
+        }, collect());
 
         return response()->json([
             'current' => $paginator->currentPage(),
             'rowCount' => $paginator->count(),
-            'rows' => $items,
+            'rows' => $rows,
             'total' => $paginator->total(),
         ]);
     }
 
-    private function getGraphRow($port)
+    /**
+     * @param Port $port
+     * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection
+     */
+    public function formatItem($port)
+    {
+        return [
+            'port_descr_descr'   => $port->port_descr_descr,
+            'device_id'          => Url::deviceLink($port->device),
+            'ifDescr'            => Url::portLink($port),
+            'port_descr_speed'   => $port->port_descr_speed,
+            'port_descr_circuit' => $port->port_descr_circuit,
+            'port_descr_notes'   => $port->port_descr_notes,
+        ];
+    }
+
+    private function getGraphRow($customer)
     {
         $graph_array = [
             'type' => 'customer_bits',
             'height' => 100,
             'width' => 220,
-            'id' => $port->port_descr_descr,
+            'id' => $customer,
         ];
 
         $graph_data = Html::graphRow($graph_array);

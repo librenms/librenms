@@ -83,7 +83,7 @@ class Url
             $contents .= ' (' . htmlentities($device->features) . ')';
         }
 
-        if ($device->location) {
+        if ($device->location_id) {
             $contents .= ' - ' . htmlentities($device->location);
         }
 
