@@ -1,0 +1,5415 @@
+
+AC-PM-Media-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+
+        OBJECT-TYPE, 
+        MODULE-IDENTITY                             FROM SNMPv2-SMI
+        TAddress, 
+        DisplayString, 
+        DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+        IpAddress                                   FROM RFC1155-SMI
+        Unsigned32,
+		Integer32,
+        enterprises                                 FROM SNMPv2-SMI
+		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
+		audioCodes,       
+		acRegistrations,
+		acGeneric, 
+		acProducts,acBoardMibs,acPerformance		FROM AUDIOCODES-TYPES-MIB;
+
+       
+acPMMedia  MODULE-IDENTITY       
+    LAST-UPDATED "201207260522Z"          --Thursday, July 26 2012
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+			 AudioCodes LTD
+             1 Hayarden Street
+             Airport City 
+			 Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"		
+		
+
+    DESCRIPTION       
+    "The AC-PM-Media MIB offers performance monitoring
+For the Media related elements in Audiocodes' devices.
+The Configuration sub-tree is for configuring the interval
+Period length for the entire AC-PM-Media MIB, and the 
+different tables' thresholds.
+The Data sub-tree presents the tables of monitored
+elements.
+
+Note  - for the entire MIB the value (-1) means the value
+Asked for is either not supported or currently not relevant
+(this is for when values asked for are for intervals not yet
+recorded."
+
+
+
+    ::= {acPerformance 7}  
+
+
+
+
+
+
+
+
+     acPMMediaConfiguration OBJECT IDENTIFIER ::= {acPMMedia 1}
+
+
+     acPMMediaConfigurationPeriodLength OBJECT-TYPE
+       SYNTAX Unsigned32 (0..894780)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Length of monitoring intervals for entire MIB.
+Time is in minutes.
+Access: Instant."
+       ::= {acPMMediaConfiguration 1}
+
+
+
+     acPMMediaConfigurationResetTotalCounters OBJECT-TYPE
+       SYNTAX INTEGER {
+                  resetCountersDone(1)
+,
+                  resetTotalCounters(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Total-Counters Reset.  To reset the total counters, set the
+value of this object to resetTotalCounters(2).
+Access: Instant."
+       ::= {acPMMediaConfiguration 2}
+
+
+
+     acPMDSPAttributes OBJECT IDENTIFIER ::= {acPMMediaConfiguration 31}
+
+
+     acPMDSPAttributesDSPUtilHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMDSPAttributes 1}
+
+
+
+     acPMDSPAttributesDSPUtilLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMDSPAttributes 2}
+
+
+
+     acPMCodersAttributes OBJECT IDENTIFIER ::= {acPMMediaConfiguration 32}
+
+
+     acPMCodersAttributesChannelsPerCoderHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMCodersAttributes 1}
+
+
+
+     acPMCodersAttributesChannelsPerCoderLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMCodersAttributes 2}
+
+
+
+     acPMNetworkingAttributes OBJECT IDENTIFIER ::= {acPMMediaConfiguration 33}
+
+
+     acPMNetworkingAttributesPacketDelayHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 1}
+
+
+
+     acPMNetworkingAttributesPacketDelayLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 2}
+
+
+
+     acPMNetworkingAttributesPacketJitterHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 3}
+
+
+
+     acPMNetworkingAttributesPacketJitterLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 4}
+
+
+
+     acPMNetworkingAttributesRTPBytesTxHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 5}
+
+
+
+     acPMNetworkingAttributesRTPBytesTxLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 6}
+
+
+
+     acPMNetworkingAttributesRTPBytesRxHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 7}
+
+
+
+     acPMNetworkingAttributesRTPBytesRxLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 8}
+
+
+
+     acPMNetworkingAttributesRTPPacketsTxHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 9}
+
+
+
+     acPMNetworkingAttributesRTPPacketsTxLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 10}
+
+
+
+     acPMNetworkingAttributesRTPPacketsRxHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 11}
+
+
+
+     acPMNetworkingAttributesRTPPacketsRxLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 12}
+
+
+
+     acPMNetworkingAttributesRTPPacketLossRxHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 13}
+
+
+
+     acPMNetworkingAttributesRTPPacketLossRxLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 14}
+
+
+
+     acPMNetworkingAttributesRTPPacketLossTxHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 15}
+
+
+
+     acPMNetworkingAttributesRTPPacketLossTxLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 16}
+
+
+
+     acPMNetworkingAttributesModuleRTPPacketLossRxHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 17}
+
+
+
+     acPMNetworkingAttributesModuleRTPPacketLossRxLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 18}
+
+
+
+     acPMNetworkingAttributesModuleRTPPacketLossTxHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 19}
+
+
+
+     acPMNetworkingAttributesModuleRTPPacketLossTxLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMNetworkingAttributes 20}
+
+
+
+     acPMMediaNetworkingAggregatedAttributes OBJECT IDENTIFIER ::= {acPMNetworkingAttributes 21}
+
+
+     acPMMediaNetworkingAggregatedAttributesPacketDelayHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaNetworkingAggregatedAttributes 1}
+
+
+
+     acPMMediaNetworkingAggregatedAttributesPacketDelayLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaNetworkingAggregatedAttributes 2}
+
+
+
+     acPMMediaNetworkingAggregatedAttributesPacketJitterHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaNetworkingAggregatedAttributes 3}
+
+
+
+     acPMMediaNetworkingAggregatedAttributesPacketJitterLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaNetworkingAggregatedAttributes 4}
+
+
+
+     acPMMediaNetworkingAggregatedAttributesRTPBytesTxHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaNetworkingAggregatedAttributes 5}
+
+
+
+     acPMMediaNetworkingAggregatedAttributesRTPBytesTxLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaNetworkingAggregatedAttributes 6}
+
+
+
+     acPMMediaNetworkingAggregatedAttributesRTPBytesRxHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaNetworkingAggregatedAttributes 7}
+
+
+
+     acPMMediaNetworkingAggregatedAttributesRTPBytesRxLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaNetworkingAggregatedAttributes 8}
+
+
+
+     acPMMediaNetworkingAggregatedAttributesRTPPacketsTxHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaNetworkingAggregatedAttributes 9}
+
+
+
+     acPMMediaNetworkingAggregatedAttributesRTPPacketsTxLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaNetworkingAggregatedAttributes 10}
+
+
+
+     acPMMediaNetworkingAggregatedAttributesRTPPacketsRxHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaNetworkingAggregatedAttributes 11}
+
+
+
+     acPMMediaNetworkingAggregatedAttributesRTPPacketsRxLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaNetworkingAggregatedAttributes 12}
+
+
+
+     acPMMediaChannelUtilizationAttr OBJECT IDENTIFIER ::= {acPMMediaConfiguration 34}
+
+
+     acPMMediaChannelUtilizationAttrFaxChannelsHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 1}
+
+
+
+     acPMMediaChannelUtilizationAttrFaxChannelsLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 2}
+
+
+
+     acPMMediaChannelUtilizationAttrModemChannelsHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 3}
+
+
+
+     acPMMediaChannelUtilizationAttrModemChannelsLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 4}
+
+
+
+     acPMMediaChannelUtilizationAttrTDM2IPChannelsHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 5}
+
+
+
+     acPMMediaChannelUtilizationAttrTDM2IPChannelsLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 6}
+
+
+
+     acPMMediaChannelUtilizationAttrRTPStreamsHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 7}
+
+
+
+     acPMMediaChannelUtilizationAttrRTPStreamsLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 8}
+
+
+
+     acPMMediaChannelUtilizationAttrSRTPStreamsHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 9}
+
+
+
+     acPMMediaChannelUtilizationAttrSRTPStreamsLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 10}
+
+
+
+     acPMMediaChannelUtilizationAttrMulticastRegisChanHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 11}
+
+
+
+     acPMMediaChannelUtilizationAttrMulticastRegisChanLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 12}
+
+
+
+     acPMMediaChannelUtilizationAttrModemRelayHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 13}
+
+
+
+     acPMMediaChannelUtilizationAttrModemRelayLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold.
+Access: Instant."
+       ::= {acPMMediaChannelUtilizationAttr 14}
+
+
+
+     acPMMediaData OBJECT IDENTIFIER ::= {acPMMedia 2}
+
+
+     acPMMediaDataAcPMMediaTimeFromStartOfInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The time in seconds since the start of the current interval.
+MIB specific."
+       ::= {acPMMediaData 1}
+
+
+
+     -- ****************************************
+     -- acPMDSPUtil table declaration
+     -- ****************************************
+     acPMDSPUtilTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMDSPUtilEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of active DSP channels."
+       ::= {acPMMediaData 21}
+
+
+
+     -- ****************************************
+     -- acPMDSPUtil table entry
+     -- ****************************************
+     acPMDSPUtilEntry OBJECT-TYPE
+       SYNTAX AcPMDSPUtilEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMDSPUtilInterval}
+       ::= {acPMDSPUtilTable 1}
+
+
+
+     -- ****************************************
+     -- acPMDSPUtil TABLE
+     -- ****************************************
+     AcPMDSPUtilEntry ::= SEQUENCE {
+       acPMDSPUtilInterval                             Unsigned32,
+       acPMDSPUtilVal                                  Gauge32,
+       acPMDSPUtilAverage                              Integer32,
+       acPMDSPUtilMax                                  Integer32,
+       acPMDSPUtilMin                                  Integer32,
+       acPMDSPUtilVolume                               Counter32,
+       acPMDSPUtilTimeBelowLowThreshold                Integer32,
+       acPMDSPUtilTimeBetweenThresholds                Integer32,
+       acPMDSPUtilTimeAboveHighThreshold               Integer32,
+       acPMDSPUtilFullDayAverage                       Integer32
+     }
+
+
+
+     acPMDSPUtilInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMDSPUtilEntry 1}
+
+
+
+     acPMDSPUtilVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMDSPUtilEntry 2}
+
+
+
+     acPMDSPUtilAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMDSPUtilEntry 3}
+
+
+
+     acPMDSPUtilMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMDSPUtilEntry 4}
+
+
+
+     acPMDSPUtilMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMDSPUtilEntry 5}
+
+
+
+     acPMDSPUtilVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMDSPUtilEntry 6}
+
+
+
+     acPMDSPUtilTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMDSPUtilEntry 7}
+
+
+
+     acPMDSPUtilTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMDSPUtilEntry 8}
+
+
+
+     acPMDSPUtilTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMDSPUtilEntry 9}
+
+
+
+     acPMDSPUtilFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMDSPUtilEntry 10}
+
+
+
+     -- ****************************************
+     -- acPMChannelsPerCoder table declaration
+     -- ****************************************
+     acPMChannelsPerCoderTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMChannelsPerCoderEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of active channels per coder. Index: 0=G711, 1=G723, 2=G728, 3=G729a, 4=G729e, 5=AMR"
+       ::= {acPMMediaData 22}
+
+
+
+     -- ****************************************
+     -- acPMChannelsPerCoder table entry
+     -- ****************************************
+     acPMChannelsPerCoderEntry OBJECT-TYPE
+       SYNTAX AcPMChannelsPerCoderEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMChannelsPerCoderCoders,acPMChannelsPerCoderInterval}
+       ::= {acPMChannelsPerCoderTable 1}
+
+
+
+     -- ****************************************
+     -- acPMChannelsPerCoder TABLE
+     -- ****************************************
+     AcPMChannelsPerCoderEntry ::= SEQUENCE {
+       acPMChannelsPerCoderCoders                      INTEGER,
+       acPMChannelsPerCoderInterval                    Unsigned32,
+       acPMChannelsPerCoderVal                         Gauge32,
+       acPMChannelsPerCoderAverage                     Integer32,
+       acPMChannelsPerCoderMax                         Integer32,
+       acPMChannelsPerCoderMin                         Integer32,
+       acPMChannelsPerCoderVolume                      Counter32,
+       acPMChannelsPerCoderTimeBelowLowThreshold       Integer32,
+       acPMChannelsPerCoderTimeBetweenThresholds       Integer32,
+       acPMChannelsPerCoderTimeAboveHighThreshold      Integer32,
+       acPMChannelsPerCoderFullDayAverage              Integer32
+     }
+
+
+
+     acPMChannelsPerCoderCoders OBJECT-TYPE
+       SYNTAX INTEGER {
+                  g711(0)
+,
+                  g723(1)
+,
+                  g728(2)
+,
+                  g729a(3)
+,
+                   g729e(4)
+,
+                  aMR(5)
+,
+                  g729EV(6)
+,
+                  eg711(7)
+,
+                  eVRC(8)
+,
+                  unknownCoder(9)
+,
+                  g726(10)
+,
+                  rTA(11)
+,
+                  sILK(12)
+,
+                  amrWB(13)
+,
+                  g722(14)
+
+                  }
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Coder.
+ 0=G711, 1=G723, 2=G728, 3=G729a, 4=G729e, 5=AMR, 6=G729EV,
+7=EG711, 8=EVRC, 9=Unknown Coder, 10=G726, 11=RTA, 12=SILK,
+13=AMR WB, 14=G722."
+       ::= {acPMChannelsPerCoderEntry 1}
+
+
+
+     acPMChannelsPerCoderInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMChannelsPerCoderEntry 2}
+
+
+
+     acPMChannelsPerCoderVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMChannelsPerCoderEntry 3}
+
+
+
+     acPMChannelsPerCoderAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMChannelsPerCoderEntry 4}
+
+
+
+     acPMChannelsPerCoderMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMChannelsPerCoderEntry 5}
+
+
+
+     acPMChannelsPerCoderMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMChannelsPerCoderEntry 6}
+
+
+
+     acPMChannelsPerCoderVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMChannelsPerCoderEntry 7}
+
+
+
+     acPMChannelsPerCoderTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMChannelsPerCoderEntry 8}
+
+
+
+     acPMChannelsPerCoderTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMChannelsPerCoderEntry 9}
+
+
+
+     acPMChannelsPerCoderTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMChannelsPerCoderEntry 10}
+
+
+
+     acPMChannelsPerCoderFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMChannelsPerCoderEntry 11}
+
+
+
+     -- ****************************************
+     -- acPMRobustDiscard table declaration
+     -- ****************************************
+     acPMRobustDiscardTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMRobustDiscardEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of packets discarded by the robust RTP filter."
+       ::= {acPMMediaData 23}
+
+
+
+     -- ****************************************
+     -- acPMRobustDiscard table entry
+     -- ****************************************
+     acPMRobustDiscardEntry OBJECT-TYPE
+       SYNTAX AcPMRobustDiscardEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMRobustDiscardInterval}
+       ::= {acPMRobustDiscardTable 1}
+
+
+
+     -- ****************************************
+     -- acPMRobustDiscard TABLE
+     -- ****************************************
+     AcPMRobustDiscardEntry ::= SEQUENCE {
+       acPMRobustDiscardInterval                       Unsigned32,
+       acPMRobustDiscardVal                            Counter32
+     }
+
+
+
+     acPMRobustDiscardInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMRobustDiscardEntry 1}
+
+
+
+     acPMRobustDiscardVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMRobustDiscardEntry 2}
+
+
+
+     -- ****************************************
+     -- acPMRtcpXr table declaration
+     -- ****************************************
+     acPMRtcpXrTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMRtcpXrEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTCP XR R-Factor"
+       ::= {acPMMediaData 24}
+
+
+
+     -- ****************************************
+     -- acPMRtcpXr table entry
+     -- ****************************************
+     acPMRtcpXrEntry OBJECT-TYPE
+       SYNTAX AcPMRtcpXrEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMRtcpXrInterval}
+       ::= {acPMRtcpXrTable 1}
+
+
+
+     -- ****************************************
+     -- acPMRtcpXr TABLE
+     -- ****************************************
+     AcPMRtcpXrEntry ::= SEQUENCE {
+       acPMRtcpXrInterval                              Unsigned32,
+       acPMRtcpXrAverage                               Integer32,
+       acPMRtcpXrVal                                   Integer32,
+       acPMRtcpXrMax                                   Integer32,
+       acPMRtcpXrMin                                   Integer32
+     }
+
+
+
+     acPMRtcpXrInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMRtcpXrEntry 1}
+
+
+
+     acPMRtcpXrAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMRtcpXrEntry 2}
+
+
+
+     acPMRtcpXrVal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMRtcpXrEntry 3}
+
+
+
+     acPMRtcpXrMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMRtcpXrEntry 4}
+
+
+
+     acPMRtcpXrMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMRtcpXrEntry 5}
+
+
+
+     acPMMediaNetworking OBJECT IDENTIFIER ::= {acPMMediaData 31}
+
+
+     -- ****************************************
+     -- acPMPacketDelay table declaration
+     -- ****************************************
+     acPMPacketDelayTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMPacketDelayEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Packet delay in RTCP data, per trunk."
+       ::= {acPMMediaNetworking 1}
+
+
+
+     -- ****************************************
+     -- acPMPacketDelay table entry
+     -- ****************************************
+     acPMPacketDelayEntry OBJECT-TYPE
+       SYNTAX AcPMPacketDelayEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMPacketDelayTrunkNum,acPMPacketDelayInterval}
+       ::= {acPMPacketDelayTable 1}
+
+
+
+     -- ****************************************
+     -- acPMPacketDelay TABLE
+     -- ****************************************
+     AcPMPacketDelayEntry ::= SEQUENCE {
+       acPMPacketDelayTrunkNum                         Unsigned32,
+       acPMPacketDelayInterval                         Unsigned32,
+       acPMPacketDelayVal                              Gauge32,
+       acPMPacketDelayAverage                          Integer32,
+       acPMPacketDelayMax                              Integer32,
+       acPMPacketDelayMin                              Integer32,
+       acPMPacketDelayVolume                           Counter32,
+       acPMPacketDelayTimeBelowLowThreshold            Integer32,
+       acPMPacketDelayTimeBetweenThresholds            Integer32,
+       acPMPacketDelayTimeAboveHighThreshold           Integer32,
+       acPMPacketDelayFullDayAverage                   Integer32
+     }
+
+
+
+     acPMPacketDelayTrunkNum OBJECT-TYPE
+       SYNTAX Unsigned32 (0..83)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Trunk number.
+0 is the first trunk."
+       ::= {acPMPacketDelayEntry 1}
+
+
+
+     acPMPacketDelayInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMPacketDelayEntry 2}
+
+
+
+     acPMPacketDelayVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMPacketDelayEntry 3}
+
+
+
+     acPMPacketDelayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMPacketDelayEntry 4}
+
+
+
+     acPMPacketDelayMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMPacketDelayEntry 5}
+
+
+
+     acPMPacketDelayMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMPacketDelayEntry 6}
+
+
+
+     acPMPacketDelayVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMPacketDelayEntry 7}
+
+
+
+     acPMPacketDelayTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMPacketDelayEntry 8}
+
+
+
+     acPMPacketDelayTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMPacketDelayEntry 9}
+
+
+
+     acPMPacketDelayTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMPacketDelayEntry 10}
+
+
+
+     acPMPacketDelayFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMPacketDelayEntry 11}
+
+
+
+     -- ****************************************
+     -- acPMPacketJitter table declaration
+     -- ****************************************
+     acPMPacketJitterTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMPacketJitterEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Packet jitter in RTCP data, per trunk."
+       ::= {acPMMediaNetworking 2}
+
+
+
+     -- ****************************************
+     -- acPMPacketJitter table entry
+     -- ****************************************
+     acPMPacketJitterEntry OBJECT-TYPE
+       SYNTAX AcPMPacketJitterEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMPacketJitterTrunkNum,acPMPacketJitterInterval}
+       ::= {acPMPacketJitterTable 1}
+
+
+
+     -- ****************************************
+     -- acPMPacketJitter TABLE
+     -- ****************************************
+     AcPMPacketJitterEntry ::= SEQUENCE {
+       acPMPacketJitterTrunkNum                        Unsigned32,
+       acPMPacketJitterInterval                        Unsigned32,
+       acPMPacketJitterVal                             Gauge32,
+       acPMPacketJitterAverage                         Integer32,
+       acPMPacketJitterMax                             Integer32,
+       acPMPacketJitterMin                             Integer32,
+       acPMPacketJitterVolume                          Counter32,
+       acPMPacketJitterTimeBelowLowThreshold           Integer32,
+       acPMPacketJitterTimeBetweenThresholds           Integer32,
+       acPMPacketJitterTimeAboveHighThreshold          Integer32,
+       acPMPacketJitterFullDayAverage                  Integer32
+     }
+
+
+
+     acPMPacketJitterTrunkNum OBJECT-TYPE
+       SYNTAX Unsigned32 (0..83)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Trunk number.
+0 is the first trunk."
+       ::= {acPMPacketJitterEntry 1}
+
+
+
+     acPMPacketJitterInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMPacketJitterEntry 2}
+
+
+
+     acPMPacketJitterVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMPacketJitterEntry 3}
+
+
+
+     acPMPacketJitterAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMPacketJitterEntry 4}
+
+
+
+     acPMPacketJitterMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMPacketJitterEntry 5}
+
+
+
+     acPMPacketJitterMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMPacketJitterEntry 6}
+
+
+
+     acPMPacketJitterVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMPacketJitterEntry 7}
+
+
+
+     acPMPacketJitterTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMPacketJitterEntry 8}
+
+
+
+     acPMPacketJitterTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMPacketJitterEntry 9}
+
+
+
+     acPMPacketJitterTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMPacketJitterEntry 10}
+
+
+
+     acPMPacketJitterFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMPacketJitterEntry 11}
+
+
+
+     -- ****************************************
+     -- acPMRTPBytesTx table declaration
+     -- ****************************************
+     acPMRTPBytesTxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMRTPBytesTxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTP bytes sent in RTCP data, per trunk."
+       ::= {acPMMediaNetworking 3}
+
+
+
+     -- ****************************************
+     -- acPMRTPBytesTx table entry
+     -- ****************************************
+     acPMRTPBytesTxEntry OBJECT-TYPE
+       SYNTAX AcPMRTPBytesTxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMRTPBytesTxTrunkNum,acPMRTPBytesTxInterval}
+       ::= {acPMRTPBytesTxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMRTPBytesTx TABLE
+     -- ****************************************
+     AcPMRTPBytesTxEntry ::= SEQUENCE {
+       acPMRTPBytesTxTrunkNum                          Unsigned32,
+       acPMRTPBytesTxInterval                          Unsigned32,
+       acPMRTPBytesTxVal                               Gauge32,
+       acPMRTPBytesTxAverage                           Integer32,
+       acPMRTPBytesTxMax                               Integer32,
+       acPMRTPBytesTxMin                               Integer32,
+       acPMRTPBytesTxVolume                            Counter32,
+       acPMRTPBytesTxTimeBelowLowThreshold             Integer32,
+       acPMRTPBytesTxTimeBetweenThresholds             Integer32,
+       acPMRTPBytesTxTimeAboveHighThreshold            Integer32,
+       acPMRTPBytesTxFullDayAverage                    Integer32
+     }
+
+
+
+     acPMRTPBytesTxTrunkNum OBJECT-TYPE
+       SYNTAX Unsigned32 (0..83)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Trunk number.
+0 is the first trunk."
+       ::= {acPMRTPBytesTxEntry 1}
+
+
+
+     acPMRTPBytesTxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMRTPBytesTxEntry 2}
+
+
+
+     acPMRTPBytesTxVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMRTPBytesTxEntry 3}
+
+
+
+     acPMRTPBytesTxAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMRTPBytesTxEntry 4}
+
+
+
+     acPMRTPBytesTxMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMRTPBytesTxEntry 5}
+
+
+
+     acPMRTPBytesTxMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMRTPBytesTxEntry 6}
+
+
+
+     acPMRTPBytesTxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMRTPBytesTxEntry 7}
+
+
+
+     acPMRTPBytesTxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which counter is below what was
+determined as the low threshold."
+       ::= {acPMRTPBytesTxEntry 8}
+
+
+
+     acPMRTPBytesTxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which counter is above what was
+determined as the high threshold."
+       ::= {acPMRTPBytesTxEntry 9}
+
+
+
+     acPMRTPBytesTxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which counter is between what were
+determined as the low and high thresholds."
+       ::= {acPMRTPBytesTxEntry 10}
+
+
+
+     acPMRTPBytesTxFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMRTPBytesTxEntry 11}
+
+
+
+     -- ****************************************
+     -- acPMRTPBytesRx table declaration
+     -- ****************************************
+     acPMRTPBytesRxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMRTPBytesRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTP bytes received in RTCP data, per trunk."
+       ::= {acPMMediaNetworking 4}
+
+
+
+     -- ****************************************
+     -- acPMRTPBytesRx table entry
+     -- ****************************************
+     acPMRTPBytesRxEntry OBJECT-TYPE
+       SYNTAX AcPMRTPBytesRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMRTPBytesRxTrunkNum,acPMRTPBytesRxInterval}
+       ::= {acPMRTPBytesRxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMRTPBytesRx TABLE
+     -- ****************************************
+     AcPMRTPBytesRxEntry ::= SEQUENCE {
+       acPMRTPBytesRxTrunkNum                          Unsigned32,
+       acPMRTPBytesRxInterval                          Unsigned32,
+       acPMRTPBytesRxVal                               Gauge32,
+       acPMRTPBytesRxAverage                           Integer32,
+       acPMRTPBytesRxMax                               Integer32,
+       acPMRTPBytesRxMin                               Integer32,
+       acPMRTPBytesRxVolume                            Counter32,
+       acPMRTPBytesRxTimeBelowLowThreshold             Integer32,
+       acPMRTPBytesRxTimeBetweenThresholds             Integer32,
+       acPMRTPBytesRxTimeAboveHighThreshold            Integer32,
+       acPMRTPBytesRxFullDayAverage                    Integer32
+     }
+
+
+
+     acPMRTPBytesRxTrunkNum OBJECT-TYPE
+       SYNTAX Unsigned32 (0..83)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Trunk number.
+0 is the first trunk."
+       ::= {acPMRTPBytesRxEntry 1}
+
+
+
+     acPMRTPBytesRxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMRTPBytesRxEntry 2}
+
+
+
+     acPMRTPBytesRxVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMRTPBytesRxEntry 3}
+
+
+
+     acPMRTPBytesRxAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMRTPBytesRxEntry 4}
+
+
+
+     acPMRTPBytesRxMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMRTPBytesRxEntry 5}
+
+
+
+     acPMRTPBytesRxMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMRTPBytesRxEntry 6}
+
+
+
+     acPMRTPBytesRxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMRTPBytesRxEntry 7}
+
+
+
+     acPMRTPBytesRxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which counter is below what was
+determined as the low threshold."
+       ::= {acPMRTPBytesRxEntry 8}
+
+
+
+     acPMRTPBytesRxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which counter is above what was
+determined as the high threshold."
+       ::= {acPMRTPBytesRxEntry 9}
+
+
+
+     acPMRTPBytesRxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which counter is between what were
+determined as the low and high thresholds."
+       ::= {acPMRTPBytesRxEntry 10}
+
+
+
+     acPMRTPBytesRxFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMRTPBytesRxEntry 11}
+
+
+
+     -- ****************************************
+     -- acPMRTPPacketsTx table declaration
+     -- ****************************************
+     acPMRTPPacketsTxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMRTPPacketsTxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTP packets sent in RTCP data, per trunk."
+       ::= {acPMMediaNetworking 5}
+
+
+
+     -- ****************************************
+     -- acPMRTPPacketsTx table entry
+     -- ****************************************
+     acPMRTPPacketsTxEntry OBJECT-TYPE
+       SYNTAX AcPMRTPPacketsTxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMRTPPacketsTxTrunkNum,acPMRTPPacketsTxInterval}
+       ::= {acPMRTPPacketsTxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMRTPPacketsTx TABLE
+     -- ****************************************
+     AcPMRTPPacketsTxEntry ::= SEQUENCE {
+       acPMRTPPacketsTxTrunkNum                        Unsigned32,
+       acPMRTPPacketsTxInterval                        Unsigned32,
+       acPMRTPPacketsTxVal                             Gauge32,
+       acPMRTPPacketsTxAverage                         Integer32,
+       acPMRTPPacketsTxMax                             Integer32,
+       acPMRTPPacketsTxMin                             Integer32,
+       acPMRTPPacketsTxVolume                          Counter32,
+       acPMRTPPacketsTxTimeBelowLowThreshold           Integer32,
+       acPMRTPPacketsTxTimeBetweenThresholds           Integer32,
+       acPMRTPPacketsTxTimeAboveHighThreshold          Integer32,
+       acPMRTPPacketsTxFullDayAverage                  Integer32,
+       acPMRTPPacketsTxTotal                           Integer32
+     }
+
+
+
+     acPMRTPPacketsTxTrunkNum OBJECT-TYPE
+       SYNTAX Unsigned32 (0..83)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Trunk number.
+0 is the first trunk."
+       ::= {acPMRTPPacketsTxEntry 1}
+
+
+
+     acPMRTPPacketsTxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMRTPPacketsTxEntry 2}
+
+
+
+     acPMRTPPacketsTxVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMRTPPacketsTxEntry 3}
+
+
+
+     acPMRTPPacketsTxAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMRTPPacketsTxEntry 4}
+
+
+
+     acPMRTPPacketsTxMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMRTPPacketsTxEntry 5}
+
+
+
+     acPMRTPPacketsTxMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMRTPPacketsTxEntry 6}
+
+
+
+     acPMRTPPacketsTxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMRTPPacketsTxEntry 7}
+
+
+
+     acPMRTPPacketsTxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which counter is below what was
+determined as the low threshold."
+       ::= {acPMRTPPacketsTxEntry 8}
+
+
+
+     acPMRTPPacketsTxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which counter is above what was
+determined as the high threshold."
+       ::= {acPMRTPPacketsTxEntry 9}
+
+
+
+     acPMRTPPacketsTxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which counter is between what were
+determined as the low and high thresholds."
+       ::= {acPMRTPPacketsTxEntry 10}
+
+
+
+     acPMRTPPacketsTxFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMRTPPacketsTxEntry 11}
+
+
+
+     acPMRTPPacketsTxTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMRTPPacketsTxEntry 12}
+
+
+
+     -- ****************************************
+     -- acPMRTPPacketsRx table declaration
+     -- ****************************************
+     acPMRTPPacketsRxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMRTPPacketsRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTP packets received in RTCP data, per trunk."
+       ::= {acPMMediaNetworking 6}
+
+
+
+     -- ****************************************
+     -- acPMRTPPacketsRx table entry
+     -- ****************************************
+     acPMRTPPacketsRxEntry OBJECT-TYPE
+       SYNTAX AcPMRTPPacketsRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMRTPPacketsRxTrunkNum,acPMRTPPacketsRxInterval}
+       ::= {acPMRTPPacketsRxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMRTPPacketsRx TABLE
+     -- ****************************************
+     AcPMRTPPacketsRxEntry ::= SEQUENCE {
+       acPMRTPPacketsRxTrunkNum                        Unsigned32,
+       acPMRTPPacketsRxInterval                        Unsigned32,
+       acPMRTPPacketsRxVal                             Gauge32,
+       acPMRTPPacketsRxAverage                         Integer32,
+       acPMRTPPacketsRxMax                             Integer32,
+       acPMRTPPacketsRxMin                             Integer32,
+       acPMRTPPacketsRxVolume                          Counter32,
+       acPMRTPPacketsRxTimeBelowLowThreshold           Integer32,
+       acPMRTPPacketsRxTimeBetweenThresholds           Integer32,
+       acPMRTPPacketsRxTimeAboveHighThreshold          Integer32,
+       acPMRTPPacketsRxFullDayAverage                  Integer32,
+       acPMRTPPacketsRxTotal                           Integer32
+     }
+
+
+
+     acPMRTPPacketsRxTrunkNum OBJECT-TYPE
+       SYNTAX Unsigned32 (0..83)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Trunk number.
+0 is the first trunk."
+       ::= {acPMRTPPacketsRxEntry 1}
+
+
+
+     acPMRTPPacketsRxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMRTPPacketsRxEntry 2}
+
+
+
+     acPMRTPPacketsRxVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMRTPPacketsRxEntry 3}
+
+
+
+     acPMRTPPacketsRxAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMRTPPacketsRxEntry 4}
+
+
+
+     acPMRTPPacketsRxMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMRTPPacketsRxEntry 5}
+
+
+
+     acPMRTPPacketsRxMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMRTPPacketsRxEntry 6}
+
+
+
+     acPMRTPPacketsRxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMRTPPacketsRxEntry 7}
+
+
+
+     acPMRTPPacketsRxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which counter is below what was
+determined as the low threshold."
+       ::= {acPMRTPPacketsRxEntry 8}
+
+
+
+     acPMRTPPacketsRxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which counter is above what was
+determined as the high threshold."
+       ::= {acPMRTPPacketsRxEntry 9}
+
+
+
+     acPMRTPPacketsRxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which counter is between what were
+determined as the low and high thresholds."
+       ::= {acPMRTPPacketsRxEntry 10}
+
+
+
+     acPMRTPPacketsRxFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMRTPPacketsRxEntry 11}
+
+
+
+     acPMRTPPacketsRxTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMRTPPacketsRxEntry 12}
+
+
+
+     -- ****************************************
+     -- acPMRTPPacketLossRx table declaration
+     -- ****************************************
+     acPMRTPPacketLossRxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMRTPPacketLossRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTP packet loss reported in outgoing RTCP data, per trunk."
+       ::= {acPMMediaNetworking 7}
+
+
+
+     -- ****************************************
+     -- acPMRTPPacketLossRx table entry
+     -- ****************************************
+     acPMRTPPacketLossRxEntry OBJECT-TYPE
+       SYNTAX AcPMRTPPacketLossRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMRTPPacketLossRxTrunkNum,acPMRTPPacketLossRxInterval}
+       ::= {acPMRTPPacketLossRxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMRTPPacketLossRx TABLE
+     -- ****************************************
+     AcPMRTPPacketLossRxEntry ::= SEQUENCE {
+       acPMRTPPacketLossRxTrunkNum                     Unsigned32,
+       acPMRTPPacketLossRxInterval                     Unsigned32,
+       acPMRTPPacketLossRxVal                          Gauge32,
+       acPMRTPPacketLossRxAverage                      Integer32,
+       acPMRTPPacketLossRxMax                          Integer32,
+       acPMRTPPacketLossRxMin                          Integer32,
+       acPMRTPPacketLossRxVolume                       Counter32,
+       acPMRTPPacketLossRxTimeBelowLowThreshold        Integer32,
+       acPMRTPPacketLossRxTimeBetweenThresholds        Integer32,
+       acPMRTPPacketLossRxTimeAboveHighThreshold       Integer32,
+       acPMRTPPacketLossRxFullDayAverage               Integer32
+     }
+
+
+
+     acPMRTPPacketLossRxTrunkNum OBJECT-TYPE
+       SYNTAX Unsigned32 (0..83)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Trunk number.
+0 is the first trunk."
+       ::= {acPMRTPPacketLossRxEntry 1}
+
+
+
+     acPMRTPPacketLossRxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMRTPPacketLossRxEntry 2}
+
+
+
+     acPMRTPPacketLossRxVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMRTPPacketLossRxEntry 3}
+
+
+
+     acPMRTPPacketLossRxAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMRTPPacketLossRxEntry 4}
+
+
+
+     acPMRTPPacketLossRxMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMRTPPacketLossRxEntry 5}
+
+
+
+     acPMRTPPacketLossRxMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMRTPPacketLossRxEntry 6}
+
+
+
+     acPMRTPPacketLossRxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMRTPPacketLossRxEntry 7}
+
+
+
+     acPMRTPPacketLossRxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMRTPPacketLossRxEntry 8}
+
+
+
+     acPMRTPPacketLossRxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMRTPPacketLossRxEntry 9}
+
+
+
+     acPMRTPPacketLossRxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMRTPPacketLossRxEntry 10}
+
+
+
+     acPMRTPPacketLossRxFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMRTPPacketLossRxEntry 11}
+
+
+
+     -- ****************************************
+     -- acPMRTPPacketLossTx table declaration
+     -- ****************************************
+     acPMRTPPacketLossTxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMRTPPacketLossTxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTP packet loss reported in incoming RTCP data, per trunk."
+       ::= {acPMMediaNetworking 8}
+
+
+
+     -- ****************************************
+     -- acPMRTPPacketLossTx table entry
+     -- ****************************************
+     acPMRTPPacketLossTxEntry OBJECT-TYPE
+       SYNTAX AcPMRTPPacketLossTxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMRTPPacketLossTxTrunkNum,acPMRTPPacketLossTxInterval}
+       ::= {acPMRTPPacketLossTxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMRTPPacketLossTx TABLE
+     -- ****************************************
+     AcPMRTPPacketLossTxEntry ::= SEQUENCE {
+       acPMRTPPacketLossTxTrunkNum                     Unsigned32,
+       acPMRTPPacketLossTxInterval                     Unsigned32,
+       acPMRTPPacketLossTxVal                          Gauge32,
+       acPMRTPPacketLossTxAverage                      Integer32,
+       acPMRTPPacketLossTxMax                          Integer32,
+       acPMRTPPacketLossTxMin                          Integer32,
+       acPMRTPPacketLossTxVolume                       Counter32,
+       acPMRTPPacketLossTxTimeBelowLowThreshold        Integer32,
+       acPMRTPPacketLossTxTimeBetweenThresholds        Integer32,
+       acPMRTPPacketLossTxTimeAboveHighThreshold       Integer32,
+       acPMRTPPacketLossTxFullDayAverage               Integer32
+     }
+
+
+
+     acPMRTPPacketLossTxTrunkNum OBJECT-TYPE
+       SYNTAX Unsigned32 (0..83)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Trunk number.
+0 is the first trunk."
+       ::= {acPMRTPPacketLossTxEntry 1}
+
+
+
+     acPMRTPPacketLossTxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMRTPPacketLossTxEntry 2}
+
+
+
+     acPMRTPPacketLossTxVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMRTPPacketLossTxEntry 3}
+
+
+
+     acPMRTPPacketLossTxAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMRTPPacketLossTxEntry 4}
+
+
+
+     acPMRTPPacketLossTxMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMRTPPacketLossTxEntry 5}
+
+
+
+     acPMRTPPacketLossTxMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMRTPPacketLossTxEntry 6}
+
+
+
+     acPMRTPPacketLossTxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMRTPPacketLossTxEntry 7}
+
+
+
+     acPMRTPPacketLossTxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMRTPPacketLossTxEntry 8}
+
+
+
+     acPMRTPPacketLossTxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMRTPPacketLossTxEntry 9}
+
+
+
+     acPMRTPPacketLossTxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMRTPPacketLossTxEntry 10}
+
+
+
+     acPMRTPPacketLossTxFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMRTPPacketLossTxEntry 11}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPPacketLossRx table declaration
+     -- ****************************************
+     acPMModuleRTPPacketLossRxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMModuleRTPPacketLossRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTP packet loss reported in incoming RTCP data, per entire module."
+       ::= {acPMMediaNetworking 9}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPPacketLossRx table entry
+     -- ****************************************
+     acPMModuleRTPPacketLossRxEntry OBJECT-TYPE
+       SYNTAX AcPMModuleRTPPacketLossRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMModuleRTPPacketLossRxInterval}
+       ::= {acPMModuleRTPPacketLossRxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPPacketLossRx TABLE
+     -- ****************************************
+     AcPMModuleRTPPacketLossRxEntry ::= SEQUENCE {
+       acPMModuleRTPPacketLossRxInterval               Unsigned32,
+       acPMModuleRTPPacketLossRxAverage                Integer32,
+       acPMModuleRTPPacketLossRxMax                    Integer32,
+       acPMModuleRTPPacketLossRxMin                    Integer32,
+       acPMModuleRTPPacketLossRxVolume                 Counter32,
+       acPMModuleRTPPacketLossRxTimeBelowLowThreshold  Integer32,
+       acPMModuleRTPPacketLossRxTimeBetweenThresholds  Integer32,
+       acPMModuleRTPPacketLossRxTimeAboveHighThreshold Integer32,
+       acPMModuleRTPPacketLossRxFullDayAverage         Integer32,
+       acPMModuleRTPPacketLossRxTotal                  Integer32
+     }
+
+
+
+     acPMModuleRTPPacketLossRxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMModuleRTPPacketLossRxEntry 1}
+
+
+
+     acPMModuleRTPPacketLossRxAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMModuleRTPPacketLossRxEntry 2}
+
+
+
+     acPMModuleRTPPacketLossRxMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMModuleRTPPacketLossRxEntry 3}
+
+
+
+     acPMModuleRTPPacketLossRxMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMModuleRTPPacketLossRxEntry 4}
+
+
+
+     acPMModuleRTPPacketLossRxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMModuleRTPPacketLossRxEntry 5}
+
+
+
+     acPMModuleRTPPacketLossRxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMModuleRTPPacketLossRxEntry 6}
+
+
+
+     acPMModuleRTPPacketLossRxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMModuleRTPPacketLossRxEntry 7}
+
+
+
+     acPMModuleRTPPacketLossRxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMModuleRTPPacketLossRxEntry 8}
+
+
+
+     acPMModuleRTPPacketLossRxFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMModuleRTPPacketLossRxEntry 9}
+
+
+
+     acPMModuleRTPPacketLossRxTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMModuleRTPPacketLossRxEntry 10}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPPacketLossTx table declaration
+     -- ****************************************
+     acPMModuleRTPPacketLossTxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMModuleRTPPacketLossTxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTP packet loss reported in outging RTCP data, per entire module."
+       ::= {acPMMediaNetworking 10}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPPacketLossTx table entry
+     -- ****************************************
+     acPMModuleRTPPacketLossTxEntry OBJECT-TYPE
+       SYNTAX AcPMModuleRTPPacketLossTxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMModuleRTPPacketLossTxInterval}
+       ::= {acPMModuleRTPPacketLossTxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPPacketLossTx TABLE
+     -- ****************************************
+     AcPMModuleRTPPacketLossTxEntry ::= SEQUENCE {
+       acPMModuleRTPPacketLossTxInterval               Unsigned32,
+       acPMModuleRTPPacketLossTxAverage                Integer32,
+       acPMModuleRTPPacketLossTxMax                    Integer32,
+       acPMModuleRTPPacketLossTxMin                    Integer32,
+       acPMModuleRTPPacketLossTxVolume                 Counter32,
+       acPMModuleRTPPacketLossTxTimeBelowLowThreshold  Integer32,
+       acPMModuleRTPPacketLossTxTimeBetweenThresholds  Integer32,
+       acPMModuleRTPPacketLossTxTimeAboveHighThreshold Integer32,
+       acPMModuleRTPPacketLossTxFullDayAverage         Integer32,
+       acPMModuleRTPPacketLossTxTotal                  Integer32
+     }
+
+
+
+     acPMModuleRTPPacketLossTxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMModuleRTPPacketLossTxEntry 1}
+
+
+
+     acPMModuleRTPPacketLossTxAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMModuleRTPPacketLossTxEntry 2}
+
+
+
+     acPMModuleRTPPacketLossTxMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMModuleRTPPacketLossTxEntry 3}
+
+
+
+     acPMModuleRTPPacketLossTxMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMModuleRTPPacketLossTxEntry 4}
+
+
+
+     acPMModuleRTPPacketLossTxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMModuleRTPPacketLossTxEntry 5}
+
+
+
+     acPMModuleRTPPacketLossTxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMModuleRTPPacketLossTxEntry 6}
+
+
+
+     acPMModuleRTPPacketLossTxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMModuleRTPPacketLossTxEntry 7}
+
+
+
+     acPMModuleRTPPacketLossTxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMModuleRTPPacketLossTxEntry 8}
+
+
+
+     acPMModuleRTPPacketLossTxFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMModuleRTPPacketLossTxEntry 9}
+
+
+
+     acPMModuleRTPPacketLossTxTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMModuleRTPPacketLossTxEntry 10}
+
+
+
+     acPMMediaNetworkingAggregated OBJECT IDENTIFIER ::= {acPMMediaNetworking 21}
+
+
+     -- ****************************************
+     -- acPMModulePacketDelay table declaration
+     -- ****************************************
+     acPMModulePacketDelayTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMModulePacketDelayEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Packet delay in RTCP data. This counter is collected for the entire TPM module, and includes TDM-IP and IP-IP calls."
+       ::= {acPMMediaNetworkingAggregated 1}
+
+
+
+     -- ****************************************
+     -- acPMModulePacketDelay table entry
+     -- ****************************************
+     acPMModulePacketDelayEntry OBJECT-TYPE
+       SYNTAX AcPMModulePacketDelayEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMModulePacketDelayInterval}
+       ::= {acPMModulePacketDelayTable 1}
+
+
+
+     -- ****************************************
+     -- acPMModulePacketDelay TABLE
+     -- ****************************************
+     AcPMModulePacketDelayEntry ::= SEQUENCE {
+       acPMModulePacketDelayInterval                   Unsigned32,
+       acPMModulePacketDelayVal                        Gauge32,
+       acPMModulePacketDelayAverage                    Integer32,
+       acPMModulePacketDelayMax                        Integer32,
+       acPMModulePacketDelayMin                        Integer32,
+       acPMModulePacketDelayTimeBelowLowThreshold      Integer32,
+       acPMModulePacketDelayTimeBetweenThresholds      Integer32,
+       acPMModulePacketDelayTimeAboveHighThreshold     Integer32,
+       acPMModulePacketDelayFullDayAverage             Integer32,
+       acPMModulePacketDelayVolume                     Counter32
+     }
+
+
+
+     acPMModulePacketDelayInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMModulePacketDelayEntry 1}
+
+
+
+     acPMModulePacketDelayVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMModulePacketDelayEntry 2}
+
+
+
+     acPMModulePacketDelayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMModulePacketDelayEntry 3}
+
+
+
+     acPMModulePacketDelayMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMModulePacketDelayEntry 4}
+
+
+
+     acPMModulePacketDelayMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMModulePacketDelayEntry 5}
+
+
+
+     acPMModulePacketDelayTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMModulePacketDelayEntry 6}
+
+
+
+     acPMModulePacketDelayTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMModulePacketDelayEntry 7}
+
+
+
+     acPMModulePacketDelayTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMModulePacketDelayEntry 8}
+
+
+
+     acPMModulePacketDelayFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMModulePacketDelayEntry 9}
+
+
+
+     acPMModulePacketDelayVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMModulePacketDelayEntry 10}
+
+
+
+     -- ****************************************
+     -- acPMModulePacketJitter table declaration
+     -- ****************************************
+     acPMModulePacketJitterTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMModulePacketJitterEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Packet jitter in RTCP data. This counter is collected for the entire TPM module, and includes TDM-IP and IP-IP calls."
+       ::= {acPMMediaNetworkingAggregated 2}
+
+
+
+     -- ****************************************
+     -- acPMModulePacketJitter table entry
+     -- ****************************************
+     acPMModulePacketJitterEntry OBJECT-TYPE
+       SYNTAX AcPMModulePacketJitterEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMModulePacketJitterInterval}
+       ::= {acPMModulePacketJitterTable 1}
+
+
+
+     -- ****************************************
+     -- acPMModulePacketJitter TABLE
+     -- ****************************************
+     AcPMModulePacketJitterEntry ::= SEQUENCE {
+       acPMModulePacketJitterInterval                  Unsigned32,
+       acPMModulePacketJitterVal                       Gauge32,
+       acPMModulePacketJitterAverage                   Integer32,
+       acPMModulePacketJitterMax                       Integer32,
+       acPMModulePacketJitterMin                       Integer32,
+       acPMModulePacketJitterTimeBelowLowThreshold     Integer32,
+       acPMModulePacketJitterTimeBetweenThresholds     Integer32,
+       acPMModulePacketJitterTimeAboveHighThreshold    Integer32,
+       acPMModulePacketJitterFullDayAverage            Integer32,
+       acPMModulePacketJitterVolume                    Counter32
+     }
+
+
+
+     acPMModulePacketJitterInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMModulePacketJitterEntry 1}
+
+
+
+     acPMModulePacketJitterVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMModulePacketJitterEntry 2}
+
+
+
+     acPMModulePacketJitterAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMModulePacketJitterEntry 3}
+
+
+
+     acPMModulePacketJitterMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMModulePacketJitterEntry 4}
+
+
+
+     acPMModulePacketJitterMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMModulePacketJitterEntry 5}
+
+
+
+     acPMModulePacketJitterTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMModulePacketJitterEntry 6}
+
+
+
+     acPMModulePacketJitterTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMModulePacketJitterEntry 7}
+
+
+
+     acPMModulePacketJitterTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMModulePacketJitterEntry 8}
+
+
+
+     acPMModulePacketJitterFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMModulePacketJitterEntry 9}
+
+
+
+     acPMModulePacketJitterVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMModulePacketJitterEntry 10}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPBytesTx table declaration
+     -- ****************************************
+     acPMModuleRTPBytesTxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMModuleRTPBytesTxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTP bytes sent in RTCP data, per entire module."
+       ::= {acPMMediaNetworkingAggregated 3}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPBytesTx table entry
+     -- ****************************************
+     acPMModuleRTPBytesTxEntry OBJECT-TYPE
+       SYNTAX AcPMModuleRTPBytesTxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMModuleRTPBytesTxInterval}
+       ::= {acPMModuleRTPBytesTxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPBytesTx TABLE
+     -- ****************************************
+     AcPMModuleRTPBytesTxEntry ::= SEQUENCE {
+       acPMModuleRTPBytesTxInterval                    Unsigned32,
+       acPMModuleRTPBytesTxAverage                     Integer32,
+       acPMModuleRTPBytesTxMax                         Integer32,
+       acPMModuleRTPBytesTxMin                         Integer32,
+       acPMModuleRTPBytesTxTimeBelowLowThreshold       Integer32,
+       acPMModuleRTPBytesTxTimeBetweenThresholds       Integer32,
+       acPMModuleRTPBytesTxTimeAboveHighThreshold      Integer32,
+       acPMModuleRTPBytesTxFullDayAverage              Integer32,
+       acPMModuleRTPBytesTxVolume                      Counter32
+     }
+
+
+
+     acPMModuleRTPBytesTxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMModuleRTPBytesTxEntry 1}
+
+
+
+     acPMModuleRTPBytesTxAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMModuleRTPBytesTxEntry 2}
+
+
+
+     acPMModuleRTPBytesTxMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMModuleRTPBytesTxEntry 3}
+
+
+
+     acPMModuleRTPBytesTxMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMModuleRTPBytesTxEntry 4}
+
+
+
+     acPMModuleRTPBytesTxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMModuleRTPBytesTxEntry 5}
+
+
+
+     acPMModuleRTPBytesTxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMModuleRTPBytesTxEntry 6}
+
+
+
+     acPMModuleRTPBytesTxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMModuleRTPBytesTxEntry 7}
+
+
+
+     acPMModuleRTPBytesTxFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMModuleRTPBytesTxEntry 8}
+
+
+
+     acPMModuleRTPBytesTxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMModuleRTPBytesTxEntry 9}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPBytesRx table declaration
+     -- ****************************************
+     acPMModuleRTPBytesRxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMModuleRTPBytesRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTP bytes received in RTCP data, per entire module."
+       ::= {acPMMediaNetworkingAggregated 4}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPBytesRx table entry
+     -- ****************************************
+     acPMModuleRTPBytesRxEntry OBJECT-TYPE
+       SYNTAX AcPMModuleRTPBytesRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMModuleRTPBytesRxInterval}
+       ::= {acPMModuleRTPBytesRxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPBytesRx TABLE
+     -- ****************************************
+     AcPMModuleRTPBytesRxEntry ::= SEQUENCE {
+       acPMModuleRTPBytesRxInterval                    Unsigned32,
+       acPMModuleRTPBytesRxAverage                     Integer32,
+       acPMModuleRTPBytesRxMax                         Integer32,
+       acPMModuleRTPBytesRxMin                         Integer32,
+       acPMModuleRTPBytesRxTimeBelowLowThreshold       Integer32,
+       acPMModuleRTPBytesRxTimeBetweenThresholds       Integer32,
+       acPMModuleRTPBytesRxTimeAboveHighThreshold      Integer32,
+       acPMModuleRTPBytesRxFullDayAverage              Integer32,
+       acPMModuleRTPBytesRxVolume                      Counter32
+     }
+
+
+
+     acPMModuleRTPBytesRxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMModuleRTPBytesRxEntry 1}
+
+
+
+     acPMModuleRTPBytesRxAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMModuleRTPBytesRxEntry 2}
+
+
+
+     acPMModuleRTPBytesRxMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMModuleRTPBytesRxEntry 3}
+
+
+
+     acPMModuleRTPBytesRxMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMModuleRTPBytesRxEntry 4}
+
+
+
+     acPMModuleRTPBytesRxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMModuleRTPBytesRxEntry 5}
+
+
+
+     acPMModuleRTPBytesRxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMModuleRTPBytesRxEntry 6}
+
+
+
+     acPMModuleRTPBytesRxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMModuleRTPBytesRxEntry 7}
+
+
+
+     acPMModuleRTPBytesRxFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMModuleRTPBytesRxEntry 8}
+
+
+
+     acPMModuleRTPBytesRxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMModuleRTPBytesRxEntry 9}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPPacketsTx table declaration
+     -- ****************************************
+     acPMModuleRTPPacketsTxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMModuleRTPPacketsTxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTP packets sent in RTCP data, per entire module."
+       ::= {acPMMediaNetworkingAggregated 5}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPPacketsTx table entry
+     -- ****************************************
+     acPMModuleRTPPacketsTxEntry OBJECT-TYPE
+       SYNTAX AcPMModuleRTPPacketsTxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMModuleRTPPacketsTxInterval}
+       ::= {acPMModuleRTPPacketsTxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPPacketsTx TABLE
+     -- ****************************************
+     AcPMModuleRTPPacketsTxEntry ::= SEQUENCE {
+       acPMModuleRTPPacketsTxInterval                  Unsigned32,
+       acPMModuleRTPPacketsTxAverage                   Integer32,
+       acPMModuleRTPPacketsTxMax                       Integer32,
+       acPMModuleRTPPacketsTxMin                       Integer32,
+       acPMModuleRTPPacketsTxTimeBelowLowThreshold     Integer32,
+       acPMModuleRTPPacketsTxTimeBetweenThresholds     Integer32,
+       acPMModuleRTPPacketsTxTimeAboveHighThreshold    Integer32,
+       acPMModuleRTPPacketsTxFullDayAverage            Integer32,
+       acPMModuleRTPPacketsTxTotal                     Integer32,
+       acPMModuleRTPPacketsTxVolume                    Counter32
+     }
+
+
+
+     acPMModuleRTPPacketsTxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMModuleRTPPacketsTxEntry 1}
+
+
+
+     acPMModuleRTPPacketsTxAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMModuleRTPPacketsTxEntry 2}
+
+
+
+     acPMModuleRTPPacketsTxMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMModuleRTPPacketsTxEntry 3}
+
+
+
+     acPMModuleRTPPacketsTxMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMModuleRTPPacketsTxEntry 4}
+
+
+
+     acPMModuleRTPPacketsTxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMModuleRTPPacketsTxEntry 5}
+
+
+
+     acPMModuleRTPPacketsTxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMModuleRTPPacketsTxEntry 6}
+
+
+
+     acPMModuleRTPPacketsTxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMModuleRTPPacketsTxEntry 7}
+
+
+
+     acPMModuleRTPPacketsTxFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMModuleRTPPacketsTxEntry 8}
+
+
+
+     acPMModuleRTPPacketsTxTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMModuleRTPPacketsTxEntry 9}
+
+
+
+     acPMModuleRTPPacketsTxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMModuleRTPPacketsTxEntry 10}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPPacketsRx table declaration
+     -- ****************************************
+     acPMModuleRTPPacketsRxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMModuleRTPPacketsRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "RTP packets received in RTCP data, per entire module."
+       ::= {acPMMediaNetworkingAggregated 6}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPPacketsRx table entry
+     -- ****************************************
+     acPMModuleRTPPacketsRxEntry OBJECT-TYPE
+       SYNTAX AcPMModuleRTPPacketsRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMModuleRTPPacketsRxInterval}
+       ::= {acPMModuleRTPPacketsRxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMModuleRTPPacketsRx TABLE
+     -- ****************************************
+     AcPMModuleRTPPacketsRxEntry ::= SEQUENCE {
+       acPMModuleRTPPacketsRxInterval                  Unsigned32,
+       acPMModuleRTPPacketsRxAverage                   Integer32,
+       acPMModuleRTPPacketsRxMax                       Integer32,
+       acPMModuleRTPPacketsRxMin                       Integer32,
+       acPMModuleRTPPacketsRxTimeBelowLowThreshold     Integer32,
+       acPMModuleRTPPacketsRxTimeBetweenThresholds     Integer32,
+       acPMModuleRTPPacketsRxTimeAboveHighThreshold    Integer32,
+       acPMModuleRTPPacketsRxFullDayAverage            Integer32,
+       acPMModuleRTPPacketsRxTotal                     Integer32,
+       acPMModuleRTPPacketsRxVolume                    Counter32
+     }
+
+
+
+     acPMModuleRTPPacketsRxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMModuleRTPPacketsRxEntry 1}
+
+
+
+     acPMModuleRTPPacketsRxAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMModuleRTPPacketsRxEntry 2}
+
+
+
+     acPMModuleRTPPacketsRxMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMModuleRTPPacketsRxEntry 3}
+
+
+
+     acPMModuleRTPPacketsRxMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMModuleRTPPacketsRxEntry 4}
+
+
+
+     acPMModuleRTPPacketsRxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMModuleRTPPacketsRxEntry 5}
+
+
+
+     acPMModuleRTPPacketsRxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMModuleRTPPacketsRxEntry 6}
+
+
+
+     acPMModuleRTPPacketsRxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMModuleRTPPacketsRxEntry 7}
+
+
+
+     acPMModuleRTPPacketsRxFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMModuleRTPPacketsRxEntry 8}
+
+
+
+     acPMModuleRTPPacketsRxTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMModuleRTPPacketsRxEntry 9}
+
+
+
+     acPMModuleRTPPacketsRxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMModuleRTPPacketsRxEntry 10}
+
+
+
+     acPMChannelUtilization OBJECT IDENTIFIER ::= {acPMMediaData 41}
+
+
+     -- ****************************************
+     -- acPMFaxChannels table declaration
+     -- ****************************************
+     acPMFaxChannelsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMFaxChannelsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Total number of active fax channels."
+       ::= {acPMChannelUtilization 1}
+
+
+
+     -- ****************************************
+     -- acPMFaxChannels table entry
+     -- ****************************************
+     acPMFaxChannelsEntry OBJECT-TYPE
+       SYNTAX AcPMFaxChannelsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMFaxChannelsInterval}
+       ::= {acPMFaxChannelsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMFaxChannels TABLE
+     -- ****************************************
+     AcPMFaxChannelsEntry ::= SEQUENCE {
+       acPMFaxChannelsInterval                         Unsigned32,
+       acPMFaxChannelsVal                              Gauge32,
+       acPMFaxChannelsAverage                          Integer32,
+       acPMFaxChannelsMax                              Integer32,
+       acPMFaxChannelsMin                              Integer32,
+       acPMFaxChannelsTimeBelowLowThreshold            Integer32,
+       acPMFaxChannelsTimeBetweenThresholds            Integer32,
+       acPMFaxChannelsTimeAboveHighThreshold           Integer32,
+       acPMFaxChannelsFullDayAverage                   Integer32,
+       acPMFaxChannelsVolume                           Counter32
+     }
+
+
+
+     acPMFaxChannelsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMFaxChannelsEntry 1}
+
+
+
+     acPMFaxChannelsVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMFaxChannelsEntry 2}
+
+
+
+     acPMFaxChannelsAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMFaxChannelsEntry 3}
+
+
+
+     acPMFaxChannelsMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMFaxChannelsEntry 4}
+
+
+
+     acPMFaxChannelsMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMFaxChannelsEntry 5}
+
+
+
+     acPMFaxChannelsTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMFaxChannelsEntry 6}
+
+
+
+     acPMFaxChannelsTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMFaxChannelsEntry 7}
+
+
+
+     acPMFaxChannelsTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMFaxChannelsEntry 8}
+
+
+
+     acPMFaxChannelsFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMFaxChannelsEntry 9}
+
+
+
+     acPMFaxChannelsVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMFaxChannelsEntry 10}
+
+
+
+     -- ****************************************
+     -- acPMModemChannels table declaration
+     -- ****************************************
+     acPMModemChannelsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMModemChannelsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Total number of active modem channels."
+       ::= {acPMChannelUtilization 2}
+
+
+
+     -- ****************************************
+     -- acPMModemChannels table entry
+     -- ****************************************
+     acPMModemChannelsEntry OBJECT-TYPE
+       SYNTAX AcPMModemChannelsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMModemChannelsInterval}
+       ::= {acPMModemChannelsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMModemChannels TABLE
+     -- ****************************************
+     AcPMModemChannelsEntry ::= SEQUENCE {
+       acPMModemChannelsInterval                       Unsigned32,
+       acPMModemChannelsVal                            Gauge32,
+       acPMModemChannelsAverage                        Integer32,
+       acPMModemChannelsMax                            Integer32,
+       acPMModemChannelsMin                            Integer32,
+       acPMModemChannelsTimeBelowLowThreshold          Integer32,
+       acPMModemChannelsTimeBetweenThresholds          Integer32,
+       acPMModemChannelsTimeAboveHighThreshold         Integer32,
+       acPMModemChannelsFullDayAverage                 Integer32
+     }
+
+
+
+     acPMModemChannelsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMModemChannelsEntry 1}
+
+
+
+     acPMModemChannelsVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMModemChannelsEntry 2}
+
+
+
+     acPMModemChannelsAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMModemChannelsEntry 3}
+
+
+
+     acPMModemChannelsMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMModemChannelsEntry 4}
+
+
+
+     acPMModemChannelsMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMModemChannelsEntry 5}
+
+
+
+     acPMModemChannelsTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMModemChannelsEntry 6}
+
+
+
+     acPMModemChannelsTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMModemChannelsEntry 7}
+
+
+
+     acPMModemChannelsTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMModemChannelsEntry 8}
+
+
+
+     acPMModemChannelsFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMModemChannelsEntry 9}
+
+
+
+     -- ****************************************
+     -- acPMTdm2IpChannels table declaration
+     -- ****************************************
+     acPMTdm2IpChannelsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMTdm2IpChannelsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Total number of active TDM-to-IP channels."
+       ::= {acPMChannelUtilization 3}
+
+
+
+     -- ****************************************
+     -- acPMTdm2IpChannels table entry
+     -- ****************************************
+     acPMTdm2IpChannelsEntry OBJECT-TYPE
+       SYNTAX AcPMTdm2IpChannelsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMTdm2IpChannelsInterval}
+       ::= {acPMTdm2IpChannelsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMTdm2IpChannels TABLE
+     -- ****************************************
+     AcPMTdm2IpChannelsEntry ::= SEQUENCE {
+       acPMTdm2IpChannelsInterval                      Unsigned32,
+       acPMTdm2IpChannelsVal                           Gauge32,
+       acPMTdm2IpChannelsAverage                       Integer32,
+       acPMTdm2IpChannelsMax                           Integer32,
+       acPMTdm2IpChannelsMin                           Integer32,
+       acPMTdm2IpChannelsVolume                        Counter32,
+       acPMTdm2IpChannelsTimeBelowLowThreshold         Integer32,
+       acPMTdm2IpChannelsTimeBetweenThresholds         Integer32,
+       acPMTdm2IpChannelsTimeAboveHighThreshold        Integer32,
+       acPMTdm2IpChannelsFullDayAverage                Integer32
+     }
+
+
+
+     acPMTdm2IpChannelsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMTdm2IpChannelsEntry 1}
+
+
+
+     acPMTdm2IpChannelsVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMTdm2IpChannelsEntry 2}
+
+
+
+     acPMTdm2IpChannelsAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMTdm2IpChannelsEntry 3}
+
+
+
+     acPMTdm2IpChannelsMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMTdm2IpChannelsEntry 4}
+
+
+
+     acPMTdm2IpChannelsMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMTdm2IpChannelsEntry 5}
+
+
+
+     acPMTdm2IpChannelsVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMTdm2IpChannelsEntry 6}
+
+
+
+     acPMTdm2IpChannelsTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMTdm2IpChannelsEntry 7}
+
+
+
+     acPMTdm2IpChannelsTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMTdm2IpChannelsEntry 8}
+
+
+
+     acPMTdm2IpChannelsTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMTdm2IpChannelsEntry 9}
+
+
+
+     acPMTdm2IpChannelsFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMTdm2IpChannelsEntry 10}
+
+
+
+     -- ****************************************
+     -- acPMRTPStreams table declaration
+     -- ****************************************
+     acPMRTPStreamsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMRTPStreamsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Total number of active RTP streams."
+       ::= {acPMChannelUtilization 4}
+
+
+
+     -- ****************************************
+     -- acPMRTPStreams table entry
+     -- ****************************************
+     acPMRTPStreamsEntry OBJECT-TYPE
+       SYNTAX AcPMRTPStreamsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMRTPStreamsInterval}
+       ::= {acPMRTPStreamsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMRTPStreams TABLE
+     -- ****************************************
+     AcPMRTPStreamsEntry ::= SEQUENCE {
+       acPMRTPStreamsInterval                          Unsigned32,
+       acPMRTPStreamsVal                               Gauge32,
+       acPMRTPStreamsAverage                           Integer32,
+       acPMRTPStreamsMax                               Integer32,
+       acPMRTPStreamsMin                               Integer32,
+       acPMRTPStreamsVolume                            Counter32,
+       acPMRTPStreamsTimeBelowLowThreshold             Integer32,
+       acPMRTPStreamsTimeBetweenThresholds             Integer32,
+       acPMRTPStreamsTimeAboveHighThreshold            Integer32,
+       acPMRTPStreamsFullDayAverage                    Integer32
+     }
+
+
+
+     acPMRTPStreamsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMRTPStreamsEntry 1}
+
+
+
+     acPMRTPStreamsVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMRTPStreamsEntry 2}
+
+
+
+     acPMRTPStreamsAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMRTPStreamsEntry 3}
+
+
+
+     acPMRTPStreamsMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMRTPStreamsEntry 4}
+
+
+
+     acPMRTPStreamsMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMRTPStreamsEntry 5}
+
+
+
+     acPMRTPStreamsVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMRTPStreamsEntry 6}
+
+
+
+     acPMRTPStreamsTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMRTPStreamsEntry 7}
+
+
+
+     acPMRTPStreamsTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMRTPStreamsEntry 8}
+
+
+
+     acPMRTPStreamsTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMRTPStreamsEntry 9}
+
+
+
+     acPMRTPStreamsFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMRTPStreamsEntry 10}
+
+
+
+     -- ****************************************
+     -- acPMSRTPStreams table declaration
+     -- ****************************************
+     acPMSRTPStreamsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSRTPStreamsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Total number of active SRTP streams."
+       ::= {acPMChannelUtilization 5}
+
+
+
+     -- ****************************************
+     -- acPMSRTPStreams table entry
+     -- ****************************************
+     acPMSRTPStreamsEntry OBJECT-TYPE
+       SYNTAX AcPMSRTPStreamsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSRTPStreamsInterval}
+       ::= {acPMSRTPStreamsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSRTPStreams TABLE
+     -- ****************************************
+     AcPMSRTPStreamsEntry ::= SEQUENCE {
+       acPMSRTPStreamsInterval                         Unsigned32,
+       acPMSRTPStreamsVal                              Gauge32,
+       acPMSRTPStreamsAverage                          Integer32,
+       acPMSRTPStreamsMax                              Integer32,
+       acPMSRTPStreamsMin                              Integer32,
+       acPMSRTPStreamsVolume                           Counter32,
+       acPMSRTPStreamsTimeBelowLowThreshold            Integer32,
+       acPMSRTPStreamsTimeBetweenThresholds            Integer32,
+       acPMSRTPStreamsTimeAboveHighThreshold           Integer32,
+       acPMSRTPStreamsFullDayAverage                   Integer32
+     }
+
+
+
+     acPMSRTPStreamsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSRTPStreamsEntry 1}
+
+
+
+     acPMSRTPStreamsVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSRTPStreamsEntry 2}
+
+
+
+     acPMSRTPStreamsAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMSRTPStreamsEntry 3}
+
+
+
+     acPMSRTPStreamsMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMSRTPStreamsEntry 4}
+
+
+
+     acPMSRTPStreamsMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMSRTPStreamsEntry 5}
+
+
+
+     acPMSRTPStreamsVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMSRTPStreamsEntry 6}
+
+
+
+     acPMSRTPStreamsTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMSRTPStreamsEntry 7}
+
+
+
+     acPMSRTPStreamsTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMSRTPStreamsEntry 8}
+
+
+
+     acPMSRTPStreamsTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMSRTPStreamsEntry 9}
+
+
+
+     acPMSRTPStreamsFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMSRTPStreamsEntry 10}
+
+
+
+     -- ****************************************
+     -- acPMMulticastRegisteredChannels table declaration
+     -- ****************************************
+     acPMMulticastRegisteredChannelsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMMulticastRegisteredChannelsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Total number of active channels connected to a multicast source."
+       ::= {acPMChannelUtilization 6}
+
+
+
+     -- ****************************************
+     -- acPMMulticastRegisteredChannels table entry
+     -- ****************************************
+     acPMMulticastRegisteredChannelsEntry OBJECT-TYPE
+       SYNTAX AcPMMulticastRegisteredChannelsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMMulticastRegisteredChannelsInterval}
+       ::= {acPMMulticastRegisteredChannelsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMMulticastRegisteredChannels TABLE
+     -- ****************************************
+     AcPMMulticastRegisteredChannelsEntry ::= SEQUENCE {
+       acPMMulticastRegisteredChannelsInterval         Unsigned32,
+       acPMMulticastRegisteredChannelsVal              Gauge32,
+       acPMMulticastRegisteredChannelsAverage          Integer32,
+       acPMMulticastRegisteredChannelsMax              Integer32,
+       acPMMulticastRegisteredChannelsMin              Integer32,
+       acPMMulticastRegisteredChannelsVolume           Counter32,
+       acPMMulticastRegisteredChannelsTimeBelowLowThreshold 
+                                                       Integer32,
+       acPMMulticastRegisteredChannelsTimeBetweenThresholds 
+                                                       Integer32,
+       acPMMulticastRegisteredChannelsTimeAboveHighThreshold 
+                                                       Integer32,
+       acPMMulticastRegisteredChannelsFullDayAverage   Integer32
+     }
+
+
+
+     acPMMulticastRegisteredChannelsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMMulticastRegisteredChannelsEntry 1}
+
+
+
+     acPMMulticastRegisteredChannelsVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMMulticastRegisteredChannelsEntry 2}
+
+
+
+     acPMMulticastRegisteredChannelsAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMMulticastRegisteredChannelsEntry 3}
+
+
+
+     acPMMulticastRegisteredChannelsMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMMulticastRegisteredChannelsEntry 4}
+
+
+
+     acPMMulticastRegisteredChannelsMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMMulticastRegisteredChannelsEntry 5}
+
+
+
+     acPMMulticastRegisteredChannelsVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMMulticastRegisteredChannelsEntry 6}
+
+
+
+     acPMMulticastRegisteredChannelsTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMMulticastRegisteredChannelsEntry 7}
+
+
+
+     acPMMulticastRegisteredChannelsTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMMulticastRegisteredChannelsEntry 8}
+
+
+
+     acPMMulticastRegisteredChannelsTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMMulticastRegisteredChannelsEntry 9}
+
+
+
+     acPMMulticastRegisteredChannelsFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMMulticastRegisteredChannelsEntry 10}
+
+
+
+     -- ****************************************
+     -- acPMModemRelayActiveChannels table declaration
+     -- ****************************************
+     acPMModemRelayActiveChannelsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMModemRelayActiveChannelsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of active modem relay (V150.1) channels."
+       ::= {acPMChannelUtilization 7}
+
+
+
+     -- ****************************************
+     -- acPMModemRelayActiveChannels table entry
+     -- ****************************************
+     acPMModemRelayActiveChannelsEntry OBJECT-TYPE
+       SYNTAX AcPMModemRelayActiveChannelsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMModemRelayActiveChannelsInterval}
+       ::= {acPMModemRelayActiveChannelsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMModemRelayActiveChannels TABLE
+     -- ****************************************
+     AcPMModemRelayActiveChannelsEntry ::= SEQUENCE {
+       acPMModemRelayActiveChannelsInterval            Unsigned32,
+       acPMModemRelayActiveChannelsVal                 Gauge32,
+       acPMModemRelayActiveChannelsAverage             Integer32,
+       acPMModemRelayActiveChannelsMax                 Integer32,
+       acPMModemRelayActiveChannelsMin                 Integer32,
+       acPMModemRelayActiveChannelsVolume              Counter32,
+       acPMModemRelayActiveChannelsTimeBelowLowThreshold 
+                                                       Integer32,
+       acPMModemRelayActiveChannelsTimeBetweenThresholds 
+                                                       Integer32,
+       acPMModemRelayActiveChannelsTimeAboveHighThreshold 
+                                                       Integer32,
+       acPMModemRelayActiveChannelsFullDayAverage      Integer32
+     }
+
+
+
+     acPMModemRelayActiveChannelsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMModemRelayActiveChannelsEntry 1}
+
+
+
+     acPMModemRelayActiveChannelsVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMModemRelayActiveChannelsEntry 2}
+
+
+
+     acPMModemRelayActiveChannelsAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMModemRelayActiveChannelsEntry 3}
+
+
+
+     acPMModemRelayActiveChannelsMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMModemRelayActiveChannelsEntry 4}
+
+
+
+     acPMModemRelayActiveChannelsMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMModemRelayActiveChannelsEntry 5}
+
+
+
+     acPMModemRelayActiveChannelsVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMModemRelayActiveChannelsEntry 6}
+
+
+
+     acPMModemRelayActiveChannelsTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMModemRelayActiveChannelsEntry 7}
+
+
+
+     acPMModemRelayActiveChannelsTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMModemRelayActiveChannelsEntry 8}
+
+
+
+     acPMModemRelayActiveChannelsTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMModemRelayActiveChannelsEntry 9}
+
+
+
+     acPMModemRelayActiveChannelsFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMModemRelayActiveChannelsEntry 10}
+
+
+
+     acPMStreamingCache OBJECT IDENTIFIER ::= {acPMMediaData 42}
+
+
+     -- ****************************************
+     -- acPMStreamingCacheHitRate table declaration
+     -- ****************************************
+     acPMStreamingCacheHitRateTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMStreamingCacheHitRateEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Hit count rate of streaming cache"
+       ::= {acPMStreamingCache 1}
+
+
+
+     -- ****************************************
+     -- acPMStreamingCacheHitRate table entry
+     -- ****************************************
+     acPMStreamingCacheHitRateEntry OBJECT-TYPE
+       SYNTAX AcPMStreamingCacheHitRateEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMStreamingCacheHitRateInterval}
+       ::= {acPMStreamingCacheHitRateTable 1}
+
+
+
+     -- ****************************************
+     -- acPMStreamingCacheHitRate TABLE
+     -- ****************************************
+     AcPMStreamingCacheHitRateEntry ::= SEQUENCE {
+       acPMStreamingCacheHitRateInterval               Unsigned32,
+       acPMStreamingCacheHitRateAverage                Integer32,
+       acPMStreamingCacheHitRateMax                    Integer32,
+       acPMStreamingCacheHitRateMin                    Integer32,
+       acPMStreamingCacheHitRateVolume                 Counter32,
+       acPMStreamingCacheHitRateTimeBelowLowThreshold  Integer32,
+       acPMStreamingCacheHitRateTimeBetweenThresholds  Integer32,
+       acPMStreamingCacheHitRateTimeAboveHighThreshold Integer32,
+       acPMStreamingCacheHitRateFullDayAverage         Integer32
+     }
+
+
+
+     acPMStreamingCacheHitRateInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMStreamingCacheHitRateEntry 1}
+
+
+
+     acPMStreamingCacheHitRateAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMStreamingCacheHitRateEntry 2}
+
+
+
+     acPMStreamingCacheHitRateMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMStreamingCacheHitRateEntry 3}
+
+
+
+     acPMStreamingCacheHitRateMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMStreamingCacheHitRateEntry 4}
+
+
+
+     acPMStreamingCacheHitRateVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMStreamingCacheHitRateEntry 5}
+
+
+
+     acPMStreamingCacheHitRateTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMStreamingCacheHitRateEntry 6}
+
+
+
+     acPMStreamingCacheHitRateTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMStreamingCacheHitRateEntry 7}
+
+
+
+     acPMStreamingCacheHitRateTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMStreamingCacheHitRateEntry 8}
+
+
+
+     acPMStreamingCacheHitRateFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMStreamingCacheHitRateEntry 9}
+
+
+
+     -- ****************************************
+     -- acPMStreamingCacheMissRate table declaration
+     -- ****************************************
+     acPMStreamingCacheMissRateTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMStreamingCacheMissRateEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Miss count rate of streaming cache"
+       ::= {acPMStreamingCache 2}
+
+
+
+     -- ****************************************
+     -- acPMStreamingCacheMissRate table entry
+     -- ****************************************
+     acPMStreamingCacheMissRateEntry OBJECT-TYPE
+       SYNTAX AcPMStreamingCacheMissRateEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMStreamingCacheMissRateInterval}
+       ::= {acPMStreamingCacheMissRateTable 1}
+
+
+
+     -- ****************************************
+     -- acPMStreamingCacheMissRate TABLE
+     -- ****************************************
+     AcPMStreamingCacheMissRateEntry ::= SEQUENCE {
+       acPMStreamingCacheMissRateInterval              Unsigned32,
+       acPMStreamingCacheMissRateAverage               Integer32,
+       acPMStreamingCacheMissRateMax                   Integer32,
+       acPMStreamingCacheMissRateMin                   Integer32,
+       acPMStreamingCacheMissRateVolume                Counter32,
+       acPMStreamingCacheMissRateTimeBelowLowThreshold Integer32,
+       acPMStreamingCacheMissRateTimeBetweenThresholds Integer32,
+       acPMStreamingCacheMissRateTimeAboveHighThreshold 
+                                                       Integer32,
+       acPMStreamingCacheMissRateFullDayAverage        Integer32
+     }
+
+
+
+     acPMStreamingCacheMissRateInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMStreamingCacheMissRateEntry 1}
+
+
+
+     acPMStreamingCacheMissRateAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMStreamingCacheMissRateEntry 2}
+
+
+
+     acPMStreamingCacheMissRateMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMStreamingCacheMissRateEntry 3}
+
+
+
+     acPMStreamingCacheMissRateMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMStreamingCacheMissRateEntry 4}
+
+
+
+     acPMStreamingCacheMissRateVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMStreamingCacheMissRateEntry 5}
+
+
+
+     acPMStreamingCacheMissRateTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMStreamingCacheMissRateEntry 6}
+
+
+
+     acPMStreamingCacheMissRateTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMStreamingCacheMissRateEntry 7}
+
+
+
+     acPMStreamingCacheMissRateTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMStreamingCacheMissRateEntry 8}
+
+
+
+     acPMStreamingCacheMissRateFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMStreamingCacheMissRateEntry 9}
+
+
+
+     -- ****************************************
+     -- acPMStreamingCacheServerRequestsRate table declaration
+     -- ****************************************
+     acPMStreamingCacheServerRequestsRateTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMStreamingCacheServerRequestsRateEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Server requests count rate of streaming cache"
+       ::= {acPMStreamingCache 3}
+
+
+
+     -- ****************************************
+     -- acPMStreamingCacheServerRequestsRate table entry
+     -- ****************************************
+     acPMStreamingCacheServerRequestsRateEntry OBJECT-TYPE
+       SYNTAX AcPMStreamingCacheServerRequestsRateEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMStreamingCacheServerRequestsRateInterval}
+       ::= {acPMStreamingCacheServerRequestsRateTable 1}
+
+
+
+     -- ****************************************
+     -- acPMStreamingCacheServerRequestsRate TABLE
+     -- ****************************************
+     AcPMStreamingCacheServerRequestsRateEntry ::= SEQUENCE {
+       acPMStreamingCacheServerRequestsRateInterval    Unsigned32,
+       acPMStreamingCacheServerRequestsRateAverage     Integer32,
+       acPMStreamingCacheServerRequestsRateMax         Integer32,
+       acPMStreamingCacheServerRequestsRateMin         Integer32,
+       acPMStreamingCacheServerRequestsRateVolume      Counter32,
+       acPMStreamingCacheServerRequestsRateTimeBelowLowThreshold 
+                                                       Integer32,
+       acPMStreamingCacheServerRequestsRateTimeBetweenThresholds 
+                                                       Integer32,
+       acPMStreamingCacheServerRequestsRateTimeAboveHighThreshold 
+                                                       Integer32,
+       acPMStreamingCacheServerRequestsRateFullDayAverage 
+                                                       Integer32
+     }
+
+
+
+     acPMStreamingCacheServerRequestsRateInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMStreamingCacheServerRequestsRateEntry 1}
+
+
+
+     acPMStreamingCacheServerRequestsRateAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMStreamingCacheServerRequestsRateEntry 2}
+
+
+
+     acPMStreamingCacheServerRequestsRateMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMStreamingCacheServerRequestsRateEntry 3}
+
+
+
+     acPMStreamingCacheServerRequestsRateMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMStreamingCacheServerRequestsRateEntry 4}
+
+
+
+     acPMStreamingCacheServerRequestsRateVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMStreamingCacheServerRequestsRateEntry 5}
+
+
+
+     acPMStreamingCacheServerRequestsRateTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMStreamingCacheServerRequestsRateEntry 6}
+
+
+
+     acPMStreamingCacheServerRequestsRateTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMStreamingCacheServerRequestsRateEntry 7}
+
+
+
+     acPMStreamingCacheServerRequestsRateTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMStreamingCacheServerRequestsRateEntry 8}
+
+
+
+     acPMStreamingCacheServerRequestsRateFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMStreamingCacheServerRequestsRateEntry 9}
+
+
+
+     acPMModemRelay OBJECT IDENTIFIER ::= {acPMMediaData 43}
+
+
+     -- ****************************************
+     -- acPMModemRelaySessionRequests table declaration
+     -- ****************************************
+     acPMModemRelaySessionRequestsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMModemRelaySessionRequestsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of modem relay (V150.1) session requests."
+       ::= {acPMModemRelay 1}
+
+
+
+     -- ****************************************
+     -- acPMModemRelaySessionRequests table entry
+     -- ****************************************
+     acPMModemRelaySessionRequestsEntry OBJECT-TYPE
+       SYNTAX AcPMModemRelaySessionRequestsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMModemRelaySessionRequestsInterval}
+       ::= {acPMModemRelaySessionRequestsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMModemRelaySessionRequests TABLE
+     -- ****************************************
+     AcPMModemRelaySessionRequestsEntry ::= SEQUENCE {
+       acPMModemRelaySessionRequestsInterval           Unsigned32,
+       acPMModemRelaySessionRequestsAverage            Integer32,
+       acPMModemRelaySessionRequestsMax                Integer32,
+       acPMModemRelaySessionRequestsMin                Integer32,
+       acPMModemRelaySessionRequestsVal                Gauge32,
+       acPMModemRelaySessionRequestsFullDayAverage     Integer32
+     }
+
+
+
+     acPMModemRelaySessionRequestsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMModemRelaySessionRequestsEntry 1}
+
+
+
+     acPMModemRelaySessionRequestsAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMModemRelaySessionRequestsEntry 2}
+
+
+
+     acPMModemRelaySessionRequestsMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMModemRelaySessionRequestsEntry 3}
+
+
+
+     acPMModemRelaySessionRequestsMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMModemRelaySessionRequestsEntry 4}
+
+
+
+     acPMModemRelaySessionRequestsVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMModemRelaySessionRequestsEntry 5}
+
+
+
+     acPMModemRelaySessionRequestsFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMModemRelaySessionRequestsEntry 6}
+
+
+
+     -- ****************************************
+     -- acPMModemRelaySessionRejections table declaration
+     -- ****************************************
+     acPMModemRelaySessionRejectionsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMModemRelaySessionRejectionsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of modem relay (V150.1) session rejections due to lack of resources."
+       ::= {acPMModemRelay 2}
+
+
+
+     -- ****************************************
+     -- acPMModemRelaySessionRejections table entry
+     -- ****************************************
+     acPMModemRelaySessionRejectionsEntry OBJECT-TYPE
+       SYNTAX AcPMModemRelaySessionRejectionsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMModemRelaySessionRejectionsInterval}
+       ::= {acPMModemRelaySessionRejectionsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMModemRelaySessionRejections TABLE
+     -- ****************************************
+     AcPMModemRelaySessionRejectionsEntry ::= SEQUENCE {
+       acPMModemRelaySessionRejectionsInterval         Unsigned32,
+       acPMModemRelaySessionRejectionsAverage          Integer32,
+       acPMModemRelaySessionRejectionsMax              Integer32,
+       acPMModemRelaySessionRejectionsMin              Integer32,
+       acPMModemRelaySessionRejectionsVal              Gauge32,
+       acPMModemRelaySessionRejectionsTimeBetweenThresholds 
+                                                       Integer32,
+       acPMModemRelaySessionRejectionsTimeAboveHighThreshold 
+                                                       Integer32,
+       acPMModemRelaySessionRejectionsFullDayAverage   Integer32
+     }
+
+
+
+     acPMModemRelaySessionRejectionsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMModemRelaySessionRejectionsEntry 1}
+
+
+
+     acPMModemRelaySessionRejectionsAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMModemRelaySessionRejectionsEntry 2}
+
+
+
+     acPMModemRelaySessionRejectionsMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMModemRelaySessionRejectionsEntry 3}
+
+
+
+     acPMModemRelaySessionRejectionsMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMModemRelaySessionRejectionsEntry 4}
+
+
+
+     acPMModemRelaySessionRejectionsVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMModemRelaySessionRejectionsEntry 5}
+
+
+
+     acPMModemRelaySessionRejectionsTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMModemRelaySessionRejectionsEntry 6}
+
+
+
+     acPMModemRelaySessionRejectionsTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMModemRelaySessionRejectionsEntry 7}
+
+
+
+     acPMModemRelaySessionRejectionsFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMModemRelaySessionRejectionsEntry 8}
+
+
+
+
+
+END
