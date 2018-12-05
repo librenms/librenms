@@ -17,6 +17,7 @@ if (!isset($alert_entry['device'])) {
 
 echo '<td>'.htmlspecialchars($alert_entry['name']).'</td>';
 
+echo "<td>";
 if ($alert_state != '') {
     if ($alert_state == '0') {
         $fa_icon  = 'check';
@@ -39,7 +40,8 @@ if ($alert_state != '') {
         $fa_color = 'info';
         $text     = 'Better';
     }//end if
-    echo "<td><b><i class='fa fa-fw fa-".$fa_icon." text-".$fa_color."'></i> $text</b></td>";
-}//end if
+    echo "<b><i class='fa fa-fw fa-".$fa_icon." text-".$fa_color."'></i> $text</b>";
+}
+echo "</td>";
 
 echo '</tr>';
