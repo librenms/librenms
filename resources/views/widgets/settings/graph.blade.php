@@ -96,7 +96,7 @@
 @endsection
 
 @section('javascript')
-    <script type="text/javascript">
+    <script>
         init_select2('#graph_type-{{ $id }}', 'graph', {}, '{{ $graph_type ?: '' }}');
         init_select2('#graph_device-{{ $id }}', 'device', {limit: 100}, '{{ $graph_device ?: '' }}');
         init_select2('#graph_port-{{ $id }}', 'port', {limit: 100}, '{{ $graph_port ?: '' }}');
@@ -113,7 +113,7 @@
         init_select2('#graph_munin-{{ $id }}', 'munin', {limit: 100}, '{{ $graph_munin ?: '' }}');
         init_select2('#graph_bill-{{ $id }}', 'bill', {limit: 100}, '{{ $graph_bill ?: '' }}');
         init_select2('#graph_custom-{{ $id }}', 'graph-aggregate', {}, false);
-        init_select2('#graph_ports-{{ $id }}', 'port', {limit: 100}, '{{ $graph_port_ids }}');
+        init_select2('#graph_ports-{{ $id }}', 'port', {limit: 100}, {{ $graph_port_ids }});
 
         function switch_graph_type{{ $id }}(data) {
             $('.graph_select_extra-{{ $id }}').hide();

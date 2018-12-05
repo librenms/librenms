@@ -158,7 +158,7 @@ class GraphController extends WidgetController
         $type = $this->getGraphType();
 
         // force settings if not initialized
-        if (is_null($type) || empty($settings["graph_$type"])) {
+        if (is_null($type) || empty($settings['graph_' . $this->getGraphType(false)])) {
             return $this->getSettingsView($request);
         }
 
