@@ -303,7 +303,13 @@ class Url
         return $device->status ? 'list-device' : 'list-device-down';
     }
 
-    private static function portLinkDisplayClass($port)
+    /**
+     * Get html class for a port using ifAdminStatus and ifOperStatus
+     *
+     * @param Port $port
+     * @return string
+     */
+    public static function portLinkDisplayClass($port)
     {
         if ($port->ifAdminStatus == "down") {
             return "interface-admindown";

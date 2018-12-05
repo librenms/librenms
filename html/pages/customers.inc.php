@@ -1,6 +1,7 @@
 <?php
 
 $pagetitle[] = 'Customers';
+$no_refresh = true;
 
 ?>
 
@@ -24,12 +25,6 @@ $pagetitle[] = 'Customers';
     var grid = $("#customers").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
-        post: function ()
-        {
-            return {
-                id: "customers",
-            };
-        },
-        url: "ajax_table.php"
+        url: "ajax/table/customers"
     });
 </script>
