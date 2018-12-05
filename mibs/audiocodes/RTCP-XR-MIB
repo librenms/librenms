@@ -1,0 +1,1903 @@
+RTCPXR-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+       mib-2, MODULE-IDENTITY, NOTIFICATION-TYPE, 
+       OBJECT-TYPE, Unsigned32, Integer32,
+       Gauge32, Counter32                     FROM SNMPv2-SMI
+       OBJECT-GROUP, MODULE-COMPLIANCE,
+       NOTIFICATION-GROUP                     FROM SNMPv2-CONF
+       TEXTUAL-CONVENTION, RowPointer, TimeStamp
+                                              FROM SNMPv2-TC
+       SnmpAdminString                        FROM SNMP-FRAMEWORK-MIB
+       InetAddressType, InetAddress,
+       InetPortNumber                         FROM INET-ADDRESS-MIB;
+       --ItuPerceivedSeverity                   FROM IANA-ITU-ALARM-TC-MIB;
+
+
+rtcpXrMIB MODULE-IDENTITY
+    LAST-UPDATED "200502200000Z" 
+    ORGANIZATION
+        "IETF AVT Working Group"
+    CONTACT-INFO
+        "IETF AVT Working Group
+         Chairs: Colin Perkins, Magnus Westerlund
+         Working Group Email:  avt@ietf.org
+
+         Editors: Alan Clark
+                  Telchemy
+                  Email: alan@telchemy.com
+
+                  Amy Pendleton
+                  Nortel Networks
+                  Email: aspen@nortelnetworks.com"
+   DESCRIPTION  
+                 "RTCP Extended Reports MIB
+                 Copyright (c) The Internet Society (2005)
+                 This version of the MIB module is part of
+                 RFC nnnn and is based on RFC3611."
+
+   REVISION      "200502200000Z"
+   DESCRIPTION
+                 "Initial version, published as RFC nnnn"
+
+-- RFC Ed: replace nnnn (2 occurrences) with the actual RFC number and
+-- remove this notice
+
+::= { mib-2 255 }
+
+-- IANA: need assignment of a mib-2 OID for this MIB
+-- RFC Ed: replace mmm with IANA assigned number and remove this note 
+
+
+
+
+
+-- RTCP Extended Reports - Voice over IP Metrics
+--
+-- Description
+--    This MIB module provides basic voice quality monitoring
+--    capabilities for Voice-over-packet systems. The MIB contains 
+--    4 tables of information:-
+--         a table of call records with session identifying information
+--         a table of basic parameters for each session
+--         a table of call quality metrics for each session
+--         a table of aggregate statistics for groups of calls
+
+-- TEXTUAL CONVENTIONS
+--
+
+LeveldB ::= TEXTUAL-CONVENTION
+STATUS      current
+DESCRIPTION
+      "Represents a signal level in decibels (dB)."
+SYNTAX      Integer32 (-120..120|127)
+
+Rfactor ::= TEXTUAL-CONVENTION
+STATUS      current
+DESCRIPTION
+      "Call or transmission quality expressed as an 
+       R factor in the range 0 to 120. A value of
+       127 shall be interpreted as NULL or unsupported."
+REFERENCE
+       "ITU-T G.107"
+SYNTAX      Unsigned32 (0..120|127)
+
+ScaledMOSscore ::= TEXTUAL-CONVENTION
+STATUS      current
+DESCRIPTION
+       "Call or transmission quality expressed as a 
+       MOS score scaled by 10.  MOS is typically represented
+       as a 1.0 to 5.0 score with a single decimal place and
+       hence in this representation as 10 to 50. A value of
+       127 shall be interpreted as NULL or unsupported."
+REFERENCE
+       "ITU-T P.800"
+SYNTAX      Integer32 (10..50|127)
+
+Percentage ::= TEXTUAL-CONVENTION
+STATUS       current
+DESCRIPTION
+       "Percentage expressed as a rounded integer."
+SYNTAX      Unsigned32 (0..100)
+
+-- OBJECTS
+--
+
+rtcpXrMIBObjects  OBJECT IDENTIFIER ::= { rtcpXrMIB 1 }
+rtcpXrConformance OBJECT IDENTIFIER ::= { rtcpXrMIB 2 }
+rtcpXrEvents      OBJECT IDENTIFIER ::= { rtcpXrMIB 3 }
+
+--
+-- Table of Session Identifying information
+--
+
+rtcpXrSessionIDTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RtcpXrSessionIDEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+     "Table of information about RTP Sessions for which RTCP XR
+     parameters and metrics are available. "
+    ::= { rtcpXrMIBObjects 1 }
+
+rtcpXrSessionIDEntry OBJECT-TYPE
+    SYNTAX RtcpXrSessionIDEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the table of call records.  A row in this table 
+         is created for each RTP session endpoint participating."
+    INDEX { rtcpXrSessionIDIndex }
+    ::= { rtcpXrSessionIDTable 1 }
+
+RtcpXrSessionIDEntry ::= SEQUENCE {
+    rtcpXrSessionIDIndex                          Unsigned32,
+    rtcpXrSessionIDSessionIdentifier              OCTET STRING,
+    rtcpXrSessionIDCallStartTime                  TimeStamp,
+    rtcpXrSessionIDCallStopTime                   TimeStamp,
+    rtcpXrSessionIDSourceIPtype                   InetAddressType,
+    rtcpXrSessionIDSourceIPaddress                InetAddress,
+    rtcpXrSessionIDSourceRTPport                  InetPortNumber,
+    rtcpXrSessionIDSourceRTCPport                 InetPortNumber,
+    rtcpXrSessionIDDestIPtype                     InetAddressType,
+    rtcpXrSessionIDDestIPaddress                  InetAddress,
+    rtcpXrSessionIDDestRTPport                    InetPortNumber,
+    rtcpXrSessionIDDestRTCPport                   InetPortNumber,
+    rtcpXrSessionIDSrceIdenType                   INTEGER,
+    rtcpXrSessionIDSrceIdentifier                 OCTET STRING,
+    rtcpXrSessionIDDestIdenType                   INTEGER,
+    rtcpXrSessionIDDestIdentifier                 OCTET STRING,
+    rtcpXrSessionIDMeasurePt                      INTEGER,
+    rtcpXrSessionIDMeasurePtID                    OCTET STRING,
+    rtcpXrSessionIDReverseSession                 RowPointer,
+    rtcpXrSessionIDAltMeasurePt                   RowPointer
+}
+
+rtcpXrSessionIDIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4294967295)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index for this session within the Session ID table."
+    ::= { rtcpXrSessionIDEntry 1 }
+    
+
+rtcpXrSessionIDSessionIdentifier OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Unique identifier for this session.  Where a billing record
+         correlation identifer is not available for a particular call, 
+         another identifier such as SSRC can be used." 
+    ::= { rtcpXrSessionIDEntry 2 }    
+    
+rtcpXrSessionIDCallStartTime OBJECT-TYPE
+    SYNTAX TimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Call start time for this call. If the start time is not
+         known then this represents the earliest known time associated
+         with the call." 
+    ::= { rtcpXrSessionIDEntry 3 }
+
+rtcpXrSessionIDCallStopTime OBJECT-TYPE
+    SYNTAX TimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Call stop time for this call. If the call is still active 
+         then this shall have the value 0.  If the call is complete
+         but the time is unknown then this shall have the value of the 
+         latest time associated with the call." 
+    ::= { rtcpXrSessionIDEntry 4 }
+
+rtcpXrSessionIDSourceIPtype OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Source IP address type for this session."
+    ::= { rtcpXrSessionIDEntry 5 }
+
+rtcpXrSessionIDSourceIPaddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Source IP address for this session."
+    ::= { rtcpXrSessionIDEntry 6 }
+
+rtcpXrSessionIDSourceRTPport OBJECT-TYPE
+    SYNTAX InetPortNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Source UDP port for RTP. A value of 0 indicates
+         an unknown port number."
+    ::= { rtcpXrSessionIDEntry 7 }
+
+
+rtcpXrSessionIDSourceRTCPport OBJECT-TYPE
+    SYNTAX InetPortNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Source UDP port for RTCP.A value of 0 indicates
+         an unknown port number."
+    ::= { rtcpXrSessionIDEntry 8 }
+
+rtcpXrSessionIDDestIPtype OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Destination IP address type for this session."
+    ::= { rtcpXrSessionIDEntry 9 }
+
+rtcpXrSessionIDDestIPaddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Destination IP address for this session."
+    ::= { rtcpXrSessionIDEntry 10 }
+
+rtcpXrSessionIDDestRTPport OBJECT-TYPE
+    SYNTAX InetPortNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Destination UDP port for RTP. A value of 0 indicates
+         an unknown port number."
+    ::= { rtcpXrSessionIDEntry 11 }
+
+rtcpXrSessionIDDestRTCPport OBJECT-TYPE
+    SYNTAX InetPortNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Destination UDP port for RTCP.A value of 0 indicates
+         an unknown port number."
+    ::= { rtcpXrSessionIDEntry 12 }
+
+rtcpXrSessionIDSrceIdenType  OBJECT-TYPE
+    SYNTAX INTEGER {dialedNumber (1),
+                    urlID (2),
+                    other (3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Defines the type of address in parameter
+        rtcpXrSessionIDSourceIdentifier"
+    ::= { rtcpXrSessionIDEntry 13 }
+
+
+rtcpXrSessionIDSrceIdentifier OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Alternate identifier to the IP address.  This can be E.164, 
+         DN, or URL."
+    ::= { rtcpXrSessionIDEntry 14 }
+
+rtcpXrSessionIDDestIdenType  OBJECT-TYPE
+    SYNTAX INTEGER {dialedNumber (1),
+                    urlID (2),
+                    other (3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Defines the type of address in parameter
+         rtcpXrSessionIDDestIdentifier."
+    ::= { rtcpXrSessionIDEntry 15 }
+
+rtcpXrSessionIDDestIdentifier OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Alternate identifier to the IP address.  This can be E.164, 
+         DN, or URL."
+    ::= { rtcpXrSessionIDEntry 16 }
+
+rtcpXrSessionIDMeasurePt OBJECT-TYPE
+    SYNTAX INTEGER {    localEndpoint (1),
+                        remoteEndpoint (2),
+                        midStream (3)
+                    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Place that these metrics were measured - this endpoint,
+         remote endpoint (i.e. reported through XR), or midstream.
+         If this MIB is supported in a midstream device (e.g. probe)
+         then data from the IP endpoint reported to this device 
+         using RFC3611 would be described as 'remoteEndpoint' and
+         data measured locally would be described as 'midStream'.
+         If this MIB is supported in an IP endpoint then the metrics
+         obtained from measurement of the incoming stream would be
+         'localEndpoint' and those reported via RFC3611 from the
+         remote end would be 'remoteEndpoint'. 
+         This MIB could therefor report both remote and local
+         data if located in an IP endpoint or both remote and 
+         midstream data if located in a probe, router or other
+         mid-network device."
+    ::= { rtcpXrSessionIDEntry 17 }
+
+
+
+
+rtcpXrSessionIDMeasurePtID OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Information describing the identity of the endpoint that
+         measured the data in this row. If the data was measured
+         locally then this would be the identity of this system,
+         if measured remotely and reported via RFC3611 then this
+         would be the identity of the remote measurement point,
+         if known."
+    ::= { rtcpXrSessionIDEntry 18 }
+
+rtcpXrSessionIDReverseSession OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A pointer to the corresponding entry in this table for
+        the reverse direction of transmission. For example, if
+        this row contained locally measured metrics for the A->B
+        direction of transmission then the reverse session would
+        be the row containing locally measured metrics for the
+        B->A direction of transmission."
+    ::= { rtcpXrSessionIDEntry 19 }
+
+rtcpXrSessionIDAltMeasurePt OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A pointer to the corresponding entry in this table for
+        alternate measurement point data. For example, if this
+        MIB was located in a midstream devices and this row 
+        contained metrics measured midstream then the alternate
+        measurement point would refer to the metrics reported
+        by the remote endpoint, and vice versa."
+    ::= { rtcpXrSessionIDEntry 20 }
+
+
+--
+-- Table of basic call parameters
+--
+
+rtcpXrBaseParamTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RtcpXrBaseParamEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+     "Table of basic parameters related to RTP sessions in
+      the Session table. "
+    ::= { rtcpXrMIBObjects 2 }
+
+
+
+
+rtcpXrBaseParamEntry OBJECT-TYPE
+    SYNTAX RtcpXrBaseParamEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the table of basic parameters. A row in this table 
+         is created for each RTP session endpoint participating."
+    INDEX { rtcpXrSessionIDIndex }
+    ::= { rtcpXrBaseParamTable 1 }
+
+RtcpXrBaseParamEntry ::= SEQUENCE {
+    rtcpXrBaseParamVocoderType                    OCTET STRING,
+    rtcpXrBaseParamVocoderRate                    Unsigned32,
+    rtcpXrBaseParamFrameDuration                  Unsigned32,
+    rtcpXrBaseParamSampleRate                     Unsigned32,
+    rtcpXrBaseParamDurationMs                     Counter32,
+    rtcpXrBaseParamNetworkLossRate                Percentage,
+    rtcpXrBaseParamAvgDiscardRate                 Percentage,
+    rtcpXrBaseParamBurstLossDensity               Percentage,
+    rtcpXrBaseParamBurstLenMs                     Gauge32,
+    rtcpXrBaseParamGapLossDensity                 Percentage,
+    rtcpXrBaseParamGapLenMs                       Gauge32,
+    rtcpXrBaseParamAvgOWDelay                     Gauge32,
+    rtcpXrBaseParamAvgEndSysDelay                 Gauge32,
+    rtcpXrBaseParamPlcType                        INTEGER,
+    rtcpXrBaseParamJBuffAdaptMode                 INTEGER,                   
+    rtcpXrBaseParamJBuffAdaptRate                 Unsigned32,
+    rtcpXrBaseParamJBuffAverageDelay              Gauge32,
+    rtcpXrBaseParamJBuffMaximumDelay              Gauge32,
+    rtcpXrBaseParamJBuffAbsMaxDelay               Gauge32,
+    rtcpXrBaseParamJitterLevel                    Gauge32
+}
+
+rtcpXrBaseParamVocoderType OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Vocoder type used on this call. The format used shall be
+         ITU-T G.7xx, GSM FR, GSM EFR, GSM HR, AMR, AMR WB, iLBC 
+         or similar.  For example 'ITU G.729A'. "
+    ::= { rtcpXrBaseParamEntry 1 }
+    
+rtcpXrBaseParamVocoderRate OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Vocoder rate in use at the time this data was captured 
+         expressed in bits per second.  For example G.711 would
+         have the rate 64000 and G.729 would have the rate 8000."
+    ::= { rtcpXrBaseParamEntry 2 }
+    
+
+
+rtcpXrBaseParamFrameDuration OBJECT-TYPE
+    SYNTAX Unsigned32 (0..16384)
+    UNITS "sample clock ticks"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Companion information to vocoder type.  This represents the
+         duration of the time interval represented by a frame, which
+         is generally equivalent to the nominal spacing of frames.
+         This is expressed in sample clock ticks as defined under
+         rtxpXrSampleRate.
+         This parameter may be equated to the SDP ptime parameter
+         which is expressed in milliseconds (however which cannot
+         represent certain vocoder types, e.g. those with 2.5mS
+         frames)."
+    ::= { rtcpXrBaseParamEntry 3 }
+    
+rtcpXrBaseParamSampleRate OBJECT-TYPE
+    SYNTAX Unsigned32 (0..16777215)
+    UNITS "samples per second"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Companion information to vocoder type.  This represents the
+         rate at which media was sampled (e.g. 8000 for narrowband
+         voice, 16000 for wideband voice)."
+    ::= { rtcpXrBaseParamEntry 4 }    
+
+rtcpXrBaseParamDurationMs OBJECT-TYPE
+    SYNTAX Counter32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current duration of call in milliseconds if still active,
+         duration of call in milliseconds if complete."
+    ::= { rtcpXrBaseParamEntry 5 }
+    
+rtcpXrBaseParamNetworkLossRate OBJECT-TYPE
+    SYNTAX Percentage
+    UNITS "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average rate of network packet loss."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry 6 }
+
+
+
+
+
+
+
+
+rtcpXrBaseParamAvgDiscardRate OBJECT-TYPE
+    SYNTAX Percentage
+    UNITS "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average rate of discards due to jitter."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry 7 }
+
+rtcpXrBaseParamBurstLossDensity OBJECT-TYPE
+    SYNTAX Percentage
+    UNITS "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Density of loss and discarded packets during burst periods."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry 8 }
+
+rtcpXrBaseParamBurstLenMs OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average length of bursts in milliseconds."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry 9 }
+
+rtcpXrBaseParamGapLossDensity OBJECT-TYPE
+    SYNTAX Percentage
+    UNITS "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Density of loss and discarded packets during gap periods."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry 10 }
+
+rtcpXrBaseParamGapLenMs OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average length of gaps in milliseconds."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry 11 }
+
+
+rtcpXrBaseParamAvgOWDelay OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average (symmetric) one way RTCP delay on call. A value of 
+         zero may indicate that this value has not yet been determined."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry 12 }
+
+rtcpXrBaseParamAvgEndSysDelay OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average end system delay on call. A value of zero may 
+         indicate that this value has not yet been determined."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry 13 }
+
+rtcpXrBaseParamPlcType OBJECT-TYPE
+    SYNTAX INTEGER { disabled(1),
+                     enhanced(2), 
+                     standard(3),
+                     unspecified (4)}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Defines type of packet loss concealment used on this call."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry  14 }
+
+rtcpXrBaseParamJBuffAdaptMode OBJECT-TYPE
+    SYNTAX INTEGER { reserved (1),
+                     nonAdaptive (2),
+                     adaptive (3),
+                     unknown (4) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Defines if jitter buffer is in fixed or adaptive mode."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry  15 }
+
+
+
+
+
+
+rtcpXrBaseParamJBuffAdaptRate OBJECT-TYPE
+    SYNTAX Unsigned32 (0..15)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Estimated adaptation rate of jitter buffer."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= {  rtcpXrBaseParamEntry 16 }
+
+rtcpXrBaseParamJBuffAverageDelay OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average size of jitter buffer in mS."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry 17 }
+
+rtcpXrBaseParamJBuffMaximumDelay OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Maximum delay through jitter buffer at current size in mS."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry  18 }
+
+rtcpXrBaseParamJBuffAbsMaxDelay OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Absolute maximum size jitter buffer can reach in mS."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrBaseParamEntry  19 }
+
+rtcpXrBaseParamJitterLevel OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average jitter level measured according to RFC3550 and
+         represented in terms of milliseconds."
+    REFERENCE
+         "See RFC3550 Section 6.4."
+    ::= { rtcpXrBaseParamEntry  20 }
+
+
+-- Table of Call Quality Metrics
+--
+
+rtcpXrCallQualityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RtcpXrCallQualityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+     "Table of voice quality metrics. A row is created
+      in this table for each row in the Session table."
+    ::= { rtcpXrMIBObjects 3 }
+
+rtcpXrCallQualityEntry OBJECT-TYPE
+    SYNTAX RtcpXrCallQualityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the table of voice quality metrics.  A row in 
+         this table is created for each row in the Session
+         table."
+    INDEX { rtcpXrSessionIDIndex }
+    ::= { rtcpXrCallQualityTable 1 }
+
+RtcpXrCallQualityEntry ::= SEQUENCE {
+    rtcpXrCallQualityNoiseLeveldBm                  LeveldB,
+    rtcpXrCallQualitySignalLeveldBm                 LeveldB,
+    rtcpXrCallQualityLocalRERLdB                    LeveldB,
+    rtcpXrCallQualityRemoteRERLdB                   LeveldB,
+    rtcpXrCallQualityRCQ                            Rfactor,
+    rtcpXrCallQualityRLQ                            Rfactor,
+    rtcpXrCallQualityExternalRCQ                    Rfactor,    
+    rtcpXrCallQualityMOSCQ                          ScaledMOSscore,
+    rtcpXrCallQualityMOSLQ                          ScaledMOSscore,
+    rtcpXrCallQualityAlgorithm                      OCTET STRING
+}
+        
+rtcpXrCallQualityNoiseLeveldBm OBJECT-TYPE
+    SYNTAX LeveldB
+    UNITS "dBm0"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Measured received silent period noise level in dBm.
+         A value of 127 indicates that this parameter is not
+         available.
+         In midpoint applications this parameter may not be
+         available.  If this is a midstream device and call
+         quality metrics were calculated using the value of
+         this parameter reported from the endpoint in an
+         RTCP XR payload then the value used in this
+         calculation MAY be reported."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrCallQualityEntry 1 }
+
+
+rtcpXrCallQualitySignalLeveldBm OBJECT-TYPE
+    SYNTAX LeveldB 
+    UNITS "dBm0"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Measured received signal level during talkspurts in dBm.
+         A value of 127 indicates that this parameter is not
+         available.
+         In midpoint applications this parameter may not be
+         available. If this is a midstream device and call
+         quality metrics were calculated using the value of
+         this parameter reported from the endpoint in an
+         RTCP XR payload then the value used in this
+         calculation MAY be reported."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrCallQualityEntry 2 }
+
+rtcpXrCallQualityLocalRERLdB OBJECT-TYPE
+    SYNTAX LeveldB
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Residual Echo Return Loss measured at this endpoint,
+         or at the terminating endpoint of this RTP session.
+         This relates to the echo level from the network beyond
+         the terminating endpoint and may be interpreted as either
+         line echo in the case of a gateway or acoustic echo in the
+         case of a handset.  
+         Note that this echo affects conversational quality as
+         perceived by the user at the originating end of this
+         RTP session.
+         A value of 127 indicates that this parameter is not
+         available.
+         In midpoint applications this parameter may not be
+         available.  If this is a midstream device and call
+         quality metrics were calculated using the value of
+         this parameter reported from the endpoint in an
+         RTCP XR payload then the value used in this
+         calculation MAY be reported."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrCallQualityEntry 3 }
+
+rtcpXrCallQualityRemoteRERLdB OBJECT-TYPE
+    SYNTAX LeveldB
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Residual Echo Return Loss measured at originating endpoint
+         of this RTP session (i.e. the remote endpoint if this MIB
+         is implemented in an endpoint).
+
+
+         Note that this affects the conversational quality 
+         metrics reported by the terminating (this) endpoint, hence
+         is useful in understanding what has affected the reported
+         call quality mertrics
+         A value of 127 indicates that this parameter is not
+         available.
+         In midpoint applications this parameter may not be
+         available.  If this is a midstream device and call
+         quality metrics were calculated using the value of
+         this parameter reported from the endpoint in an
+         RTCP XR payload then the value used in this
+         calculation MAY be reported."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrCallQualityEntry 4 }
+
+rtcpXrCallQualityRCQ OBJECT-TYPE
+    SYNTAX Rfactor
+    UNITS "R factor"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Conversational quality R factor for this call. This value
+         SHOULD be calculated using ITU G.107 (The E Model) or 
+         extended versions thereof."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrCallQualityEntry 5 }
+
+rtcpXrCallQualityRLQ OBJECT-TYPE
+    SYNTAX Rfactor
+    UNITS "R factor"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Listening quality R factor for this call. This value
+         SHOULD be calculated using ITU G.107 (The E Model) or 
+         extended versions thereof."
+    ::= { rtcpXrCallQualityEntry 6 }
+
+rtcpXrCallQualityExternalRCQ OBJECT-TYPE
+    SYNTAX Rfactor
+    UNITS "R factor"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "External R factor for this call. This value
+         SHOULD be calculated using ITU G.107 (The E Model) or 
+         extended versions thereof.
+         The External R factor relates to the quality of an
+         incoming voice from another network segment.  For example
+         if a conference bridge terminates and re-creates voice
+         streams then an R factor would be calculated at the bridge
+         for the endpoint A to bridge segment and relayed to the
+
+
+         subsequent bridge to endpoint B as an External R factor. 
+         This allows endpoint B to estimate the end-to-end call
+         quality."
+    ::= { rtcpXrCallQualityEntry 7 }
+
+rtcpXrCallQualityMOSCQ OBJECT-TYPE
+    SYNTAX ScaledMOSscore
+    UNITS "MOS x 10"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Estimated conversational quality MOS for this call
+        expressed in MOS x 10 (e.g. 41 = MOS of 4.1). This value
+        MAY be calculated by converting the R-CQ value to a MOS."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrCallQualityEntry 8 }
+
+rtcpXrCallQualityMOSLQ OBJECT-TYPE
+    SYNTAX ScaledMOSscore
+    UNITS "MOS x 10"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Estimated listening quality MOS for this call
+       expressed in MOS x 10 (e.g. 41 = MOS of 4.1). This value
+        MAY be calculated by converting the R-CQ value to a MOS."
+    REFERENCE
+         "See RFC3611 Section 4.7."
+    ::= { rtcpXrCallQualityEntry 9 }
+
+rtcpXrCallQualityAlgorithm OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Call quality algorithm used to determine R factors
+        and MOS scores. For example, 'ITU-T G.107' for the 
+        E model. If any localized parameter scaling is used
+        (for example Japan's TTC MOS scaling) then this 
+        MUST also be reported."
+    ::= { rtcpXrCallQualityEntry 10 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+--
+-- History Table
+--
+--
+
+rtcpXrHistoryTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RtcpXrHistoryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+     "Table of aggregate measurement data for groups
+      of RTP sessions.  A group may be a flow or any
+      other logical association of streams."
+    ::= { rtcpXrMIBObjects 4 }
+
+rtcpXrHistoryEntry OBJECT-TYPE
+    SYNTAX RtcpXrHistoryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the table of call history records."
+    INDEX { rtcpXrHistoryIndex }
+    ::= { rtcpXrHistoryTable 1 }
+
+RtcpXrHistoryEntry ::= SEQUENCE {
+    rtcpXrHistoryIndex                             Unsigned32,
+    rtcpXrHistoryGroupName                         OCTET STRING,
+    rtcpXrHistoryStartTime                         TimeStamp,
+    rtcpXrHistoryStopTime                          TimeStamp,
+    rtcpXrHistoryNumOfSessions                     Counter32,
+    rtcpXrHistoryMinDurationMs                     Gauge32,
+    rtcpXrHistoryMaxDurationMs                     Gauge32,
+    rtcpXrHistoryAvgDurationMs                     Gauge32,
+    rtcpXrHistoryMaxNetworkLossRate                Percentage,
+    rtcpXrHistoryAvgNetworkLossRate                Percentage,
+    rtcpXrHistoryMaxDiscardRate                    Percentage,
+    rtcpXrHistoryAvgDiscardRate                    Percentage,
+    rtcpXrHistoryMaxBurstLossDensity               Percentage,
+    rtcpXrHistoryAvgBurstLossDensity               Percentage,
+    rtcpXrHistoryMinBurstLenMs                     Gauge32,
+    rtcpXrHistoryMaxBurstLenMs                     Gauge32,
+    rtcpXrHistoryAvgBurstLenMs                     Gauge32,
+    rtcpXrHistoryMaxGapLossDensity                 Percentage,
+    rtcpXrHistoryAvgGapLossDensity                 Percentage,
+    rtcpXrHistoryMinGapLenMs                       Gauge32,
+    rtcpXrHistoryMaxGapLenMs                       Gauge32,
+    rtcpXrHistoryAvgGapLenMs                       Gauge32,
+    rtcpXrHistoryMinOneWayDelay                    Gauge32,
+    rtcpXrHistoryMaxOneWayDelay                    Gauge32,
+    rtcpXrHistoryAvgOneWayDelay                    Gauge32,
+    rtcpXrHistoryMinEndSystemDelay                 Gauge32,
+    rtcpXrHistoryMaxEndSystemDelay                 Gauge32,
+    rtcpXrHistoryAvgEndSystemDelay                 Gauge32,
+    rtcpXrHistoryMinJitterLevel                    Gauge32,
+    rtcpXrHistoryMaxJitterLevel                    Gauge32,
+    rtcpXrHistoryAvgJitterLevel                    Gauge32,
+    rtcpXrHistoryMinNoiseLeveldBm                  LeveldB,
+    rtcpXrHistoryMaxNoiseLeveldBm                  LeveldB,
+    rtcpXrHistoryAvgNoiseLeveldBm                  LeveldB,
+    rtcpXrHistoryNoiseLevelCount                   Counter32,
+    rtcpXrHistoryMinSignalLeveldBm                 LeveldB,
+    rtcpXrHistoryMaxSignalLeveldBm                 LeveldB,
+    rtcpXrHistoryAvgSignalLeveldBm                 LeveldB,
+    rtcpXrHistorySignalLevelCount                  Counter32,
+    rtcpXrHistoryMinLocalRERLdB                    LeveldB,
+    rtcpXrHistoryMaxLocalRERLdB                    LeveldB,
+    rtcpXrHistoryAvgLocalRERLdB                    LeveldB,
+    rtcpXrHistoryLocalRERLCount                    Counter32,
+    rtcpXrHistoryMinRemoteRERLdB                   LeveldB,
+    rtcpXrHistoryMaxRemoteRERLdB                   LeveldB,
+    rtcpXrHistoryAvgRemoteRERLdB                   LeveldB,
+    rtcpXrHistoryRemoteRERLCount                   Counter32,
+    rtcpXrHistoryMinRCQ                            Rfactor,
+    rtcpXrHistoryMaxRCQ                            Rfactor,
+    rtcpXrHistoryAvgRCQ                            Rfactor,
+    rtcpXrHistoryRCQCount                          Counter32,
+    rtcpXrHistoryMinRLQ                            Rfactor,    
+    rtcpXrHistoryMaxRLQ                            Rfactor,    
+    rtcpXrHistoryAvgRLQ                            Rfactor,    
+    rtcpXrHistoryRLQCount                          Counter32,
+    rtcpXrHistoryMinMOSCQ                          ScaledMOSscore,
+    rtcpXrHistoryMaxMOSCQ                          ScaledMOSscore,
+    rtcpXrHistoryAvgMOSCQ                          ScaledMOSscore,
+    rtcpXrHistoryMOSCQCount                        Counter32,
+    rtcpXrHistoryMinMOSLQ                          ScaledMOSscore,
+    rtcpXrHistoryMaxMOSLQ                          ScaledMOSscore,
+    rtcpXrHistoryAvgMOSLQ                          ScaledMOSscore,
+    rtcpXrHistoryMOSLQCount                        Counter32,
+    rtcpXrHistoryCQAlgorithm                       OCTET STRING,
+    rtcpXrHistoryReset                             INTEGER
+}
+
+
+rtcpXrHistoryIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4294967295)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index for this set of aggregate data."
+    ::= { rtcpXrHistoryEntry 1 }
+
+
+
+
+
+
+
+
+rtcpXrHistoryGroupName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of this set of aggregate data. Examples may include
+         a flow, an interface or some other logical grouping of
+         RTP sessions."
+    ::= { rtcpXrHistoryEntry 2 }
+   
+rtcpXrHistoryStartTime OBJECT-TYPE
+    SYNTAX TimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Time at which this history was reset or started."
+    ::= {rtcpXrHistoryEntry 3 }
+
+rtcpXrHistoryStopTime OBJECT-TYPE
+    SYNTAX TimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Time at which this history was stopped."
+    ::= {rtcpXrHistoryEntry 4 }
+
+rtcpXrHistoryNumOfSessions OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Number of calls included in this history."
+    ::= {rtcpXrHistoryEntry 5 }
+
+rtcpXrHistoryMinDurationMs OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum duration of calls."
+    ::= {rtcpXrHistoryEntry 6 }
+
+rtcpXrHistoryMaxDurationMs OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum duration of calls."
+    ::= {rtcpXrHistoryEntry 7 }
+
+
+
+
+rtcpXrHistoryAvgDurationMs OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average duration of calls."
+    ::= {rtcpXrHistoryEntry 8 }
+
+rtcpXrHistoryMaxNetworkLossRate OBJECT-TYPE
+    SYNTAX Percentage
+    UNITS "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum loss rate per call."
+    ::= {rtcpXrHistoryEntry 9 }
+
+rtcpXrHistoryAvgNetworkLossRate OBJECT-TYPE
+    SYNTAX Percentage
+    UNITS "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average loss rate across calls."
+    ::= {rtcpXrHistoryEntry 10 }
+
+rtcpXrHistoryMaxDiscardRate OBJECT-TYPE
+    SYNTAX Percentage
+    UNITS "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum discard rate per call."
+    ::= {rtcpXrHistoryEntry 11 }
+
+rtcpXrHistoryAvgDiscardRate OBJECT-TYPE
+    SYNTAX Percentage
+    UNITS "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average discard rate across calls."
+    ::= {rtcpXrHistoryEntry 12 }
+
+rtcpXrHistoryMaxBurstLossDensity OBJECT-TYPE
+    SYNTAX Percentage
+    UNITS "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum density of bursts if loss/discard."
+    ::= {rtcpXrHistoryEntry 13 }
+
+
+rtcpXrHistoryAvgBurstLossDensity OBJECT-TYPE
+    SYNTAX Percentage
+    UNITS "percent"  
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average density of bursts of loss/discard."
+    ::= {rtcpXrHistoryEntry 14 }
+
+rtcpXrHistoryMinBurstLenMs OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum length of bursts."
+    ::= {rtcpXrHistoryEntry 15 }
+
+rtcpXrHistoryMaxBurstLenMs OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum length of bursts."
+    ::= {rtcpXrHistoryEntry 16 }
+
+rtcpXrHistoryAvgBurstLenMs OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average length of bursts."
+    ::= {rtcpXrHistoryEntry 17 }
+
+rtcpXrHistoryMaxGapLossDensity OBJECT-TYPE
+    SYNTAX Percentage
+    UNITS "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum loss/discard density in gaps."
+    ::= {rtcpXrHistoryEntry 18 }
+
+rtcpXrHistoryAvgGapLossDensity OBJECT-TYPE
+    SYNTAX Percentage
+    UNITS "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average loss/discard density in gaps."
+    ::= {rtcpXrHistoryEntry 19 }
+
+
+rtcpXrHistoryMinGapLenMs OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum average per-call gap length."
+    ::= {rtcpXrHistoryEntry 20 }
+
+rtcpXrHistoryMaxGapLenMs OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum average per-call gap length."
+    ::= {rtcpXrHistoryEntry 21 }
+
+rtcpXrHistoryAvgGapLenMs OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average per-call gap length."
+    ::= {rtcpXrHistoryEntry 22 }
+
+rtcpXrHistoryMinOneWayDelay OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum one way delay."
+    ::= {rtcpXrHistoryEntry 23 }
+
+rtcpXrHistoryMaxOneWayDelay OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum one way delay."
+    ::= {rtcpXrHistoryEntry 24 }
+
+rtcpXrHistoryAvgOneWayDelay OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average one way delay."
+    ::= {rtcpXrHistoryEntry 25 }
+
+
+rtcpXrHistoryMinEndSystemDelay OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum end system delay."
+    ::= {rtcpXrHistoryEntry 26 }
+
+rtcpXrHistoryMaxEndSystemDelay OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum end system delay."
+    ::= {rtcpXrHistoryEntry 27 }
+
+rtcpXrHistoryAvgEndSystemDelay OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average end system delay."
+    ::= {rtcpXrHistoryEntry 28 }
+
+rtcpXrHistoryMinJitterLevel OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum jitter level."
+    ::= {rtcpXrHistoryEntry 29 }
+
+rtcpXrHistoryMaxJitterLevel OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum jitter level."
+    ::= {rtcpXrHistoryEntry 30 }
+
+rtcpXrHistoryAvgJitterLevel OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "milliseconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average jitter level."
+    ::= {rtcpXrHistoryEntry 31 }
+
+
+rtcpXrHistoryMinNoiseLeveldBm OBJECT-TYPE
+    SYNTAX LeveldB 
+    UNITS "dBm0"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum noise level."
+    ::= {rtcpXrHistoryEntry 32 }
+
+rtcpXrHistoryMaxNoiseLeveldBm OBJECT-TYPE
+    SYNTAX LeveldB 
+    UNITS "dBm0"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum noise level."
+    ::= {rtcpXrHistoryEntry 33 }
+
+rtcpXrHistoryAvgNoiseLeveldBm OBJECT-TYPE
+    SYNTAX LeveldB 
+    UNITS "dBm0"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average noise level."
+    ::= {rtcpXrHistoryEntry 34 }
+
+rtcpXrHistoryNoiseLevelCount OBJECT-TYPE
+    SYNTAX Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Number of sessions included in the Noise Level
+       history values (as Noise Level is an optional
+       parameter and may not be present on all calls."
+    ::= {rtcpXrHistoryEntry 35 }
+
+rtcpXrHistoryMinSignalLeveldBm OBJECT-TYPE
+    SYNTAX LeveldB  
+    UNITS "dBm0"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum signal level."
+    ::= {rtcpXrHistoryEntry 36 }
+
+rtcpXrHistoryMaxSignalLeveldBm OBJECT-TYPE
+    SYNTAX LeveldB  
+    UNITS "dBm0"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum signal level."
+    ::= {rtcpXrHistoryEntry 37 }
+
+
+rtcpXrHistoryAvgSignalLeveldBm OBJECT-TYPE
+    SYNTAX LeveldB  
+    UNITS "dBm0"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average signal level."
+    ::= {rtcpXrHistoryEntry 38 }
+
+rtcpXrHistorySignalLevelCount OBJECT-TYPE
+    SYNTAX Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Number of sessions included in the Signal Level
+       history values (as Signal Level is an optional
+       parameter and may not be present on all calls."
+    ::= {rtcpXrHistoryEntry 39 }
+
+rtcpXrHistoryMinLocalRERLdB OBJECT-TYPE
+    SYNTAX LeveldB 
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum local Residual Echo Return Loss."
+    ::= {rtcpXrHistoryEntry 40 }
+
+rtcpXrHistoryMaxLocalRERLdB OBJECT-TYPE
+    SYNTAX LeveldB
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum local Residual Echo Return Loss."
+    ::= {rtcpXrHistoryEntry 41 }
+
+rtcpXrHistoryAvgLocalRERLdB OBJECT-TYPE
+    SYNTAX LeveldB
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average local Residual Echo Return Loss."
+    ::= {rtcpXrHistoryEntry 42 }
+
+rtcpXrHistoryLocalRERLCount OBJECT-TYPE
+    SYNTAX Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Number of sessions included in the Local RERL
+       history values (as Local RERL is an optional
+       parameter and may not be present on all calls."
+    ::= {rtcpXrHistoryEntry 43 }
+
+
+rtcpXrHistoryMinRemoteRERLdB OBJECT-TYPE
+    SYNTAX LeveldB
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum remote Residual Echo Return Loss."
+    ::= {rtcpXrHistoryEntry 44 }
+
+rtcpXrHistoryMaxRemoteRERLdB OBJECT-TYPE
+    SYNTAX LeveldB
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum remote Residual Echo Return Loss."
+    ::= {rtcpXrHistoryEntry 45 }
+
+rtcpXrHistoryAvgRemoteRERLdB OBJECT-TYPE
+    SYNTAX LeveldB
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum remote Residual Echo Return Loss."
+    ::= {rtcpXrHistoryEntry 46 }
+
+rtcpXrHistoryRemoteRERLCount OBJECT-TYPE
+    SYNTAX Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Number of sessions included in the Remote RERL
+       history values (as Remote RERL is an optional
+       parameter and may not be present on all calls."
+    ::= {rtcpXrHistoryEntry 47 }
+
+rtcpXrHistoryMinRCQ OBJECT-TYPE
+    SYNTAX Rfactor 
+    UNITS "R factor"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum conversational R factor."
+    ::= {rtcpXrHistoryEntry 48 }
+
+rtcpXrHistoryMaxRCQ OBJECT-TYPE
+    SYNTAX Rfactor 
+    UNITS "R factor"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum conversational R factor"
+    ::= {rtcpXrHistoryEntry 49 }
+
+
+rtcpXrHistoryAvgRCQ OBJECT-TYPE
+    SYNTAX Rfactor 
+    UNITS "R factor"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average conversational R factor"
+    ::= {rtcpXrHistoryEntry 50 }
+
+rtcpXrHistoryRCQCount OBJECT-TYPE
+    SYNTAX Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Number of sessions included in the R CQ
+       history values (as R CQ is an optional
+       parameter and may not be present on all calls."
+    ::= {rtcpXrHistoryEntry 51 }
+
+rtcpXrHistoryMinRLQ OBJECT-TYPE
+    SYNTAX Rfactor 
+    UNITS "R factor"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum listening quality R factor."
+    ::= {rtcpXrHistoryEntry 52 }
+   
+rtcpXrHistoryMaxRLQ OBJECT-TYPE
+    SYNTAX Rfactor 
+    UNITS "R factor"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum listening quality R factor."
+    ::= {rtcpXrHistoryEntry 53 }
+
+rtcpXrHistoryAvgRLQ OBJECT-TYPE
+    SYNTAX Rfactor 
+    UNITS "R factor"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average listening quality R factor."
+    ::= {rtcpXrHistoryEntry 54 }
+
+rtcpXrHistoryRLQCount OBJECT-TYPE
+    SYNTAX Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Number of sessions included in the R LQ
+       history values (as R LQ is an optional
+       parameter and may not be present on all calls."
+    ::= {rtcpXrHistoryEntry 55 }
+   
+rtcpXrHistoryMinMOSCQ OBJECT-TYPE
+    SYNTAX ScaledMOSscore
+    UNITS "MOS x 10"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum conversational quality MOS."
+    ::= {rtcpXrHistoryEntry 56 }
+
+rtcpXrHistoryMaxMOSCQ OBJECT-TYPE
+    SYNTAX ScaledMOSscore
+    UNITS "MOS x 10"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum conversational quality MOS."
+    ::= {rtcpXrHistoryEntry 57 }
+
+rtcpXrHistoryAvgMOSCQ OBJECT-TYPE
+    SYNTAX ScaledMOSscore
+    UNITS "MOS x 10"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average conversational quality MOS."
+    ::= {rtcpXrHistoryEntry 58 }
+
+rtcpXrHistoryMOSCQCount OBJECT-TYPE
+    SYNTAX Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Number of sessions included in the MOS CQ
+       history values (as MOS CQ is an optional
+       parameter and may not be present on all calls."
+    ::= {rtcpXrHistoryEntry 59 }
+
+rtcpXrHistoryMinMOSLQ OBJECT-TYPE
+    SYNTAX ScaledMOSscore
+    UNITS "MOS x 10"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Minimum listening quality MOS."
+    ::= {rtcpXrHistoryEntry 60 }
+
+rtcpXrHistoryMaxMOSLQ OBJECT-TYPE
+    SYNTAX ScaledMOSscore
+    UNITS "MOS x 10"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Maximum listening quality MOS."
+    ::= {rtcpXrHistoryEntry 61 }
+
+rtcpXrHistoryAvgMOSLQ OBJECT-TYPE
+    SYNTAX ScaledMOSscore
+    UNITS "MOS x 10"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Average listening quality MOS."
+    ::= {rtcpXrHistoryEntry 62 }
+
+rtcpXrHistoryMOSLQCount OBJECT-TYPE
+    SYNTAX Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Number of sessions included in the MOS LQ
+       history values (as MOS LQ is an optional
+       parameter and may not be present on all calls."
+    ::= {rtcpXrHistoryEntry 63 }
+
+rtcpXrHistoryCQAlgorithm OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Call quality algorithm used - must be consistent
+       for all calls in this history."
+    ::= {rtcpXrHistoryEntry 64 }
+
+rtcpXrHistoryReset OBJECT-TYPE
+    SYNTAX INTEGER { running (1),
+                     stop (2),
+                     reset (3)
+                    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "Status of this row in the history table.
+       Writing a value of 2 to this object MUST cause 
+       history updates to be stopped for this row. Writing 
+       a value of 3 to this object MUST cause the history 
+       row to be reset. 
+       Reads MUST return a value of 1 if the row is still
+       being updated or 2 if the row update has stopped."
+    ::= {rtcpXrHistoryEntry 65 }
+
+--
+-- Notifications
+--      
+rtcpXrVoipThresholdViolation NOTIFICATION-TYPE
+    OBJECTS { rtcpXrVoipAlertSeverity, rtcpXrVoipAlertType, 
+              rtcpXrVoipAlertInfoType, rtcpXrVoipAlertPointer }
+    STATUS current
+    DESCRIPTION
+        "Notification that voice quality has changed
+         Sent immediately when the condition is detected."
+    ::= { rtcpXrEvents 1}
+
+rtcpXrEventParam OBJECT IDENTIFIER ::= { rtcpXrEvents 2 }
+
+rtcpXrVoipAlertType OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Text description of the type of alert.  Where possible,
+        this parameter should be populated with the correct
+        rtcpXrVoipEntry or rtcpXrVoipHistory description."
+    ::= { rtcpXrEventParam 1 }
+
+rtcpXrVoipAlertInfoType OBJECT-TYPE
+    SYNTAX INTEGER {  adminStringOnly (1),
+                      sessionPointer (2),
+                      historyPointer (3)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "Indicates the type of information returned in the
+          rtcpXrVoipAlertInfo parameter."
+    ::= { rtcpXrEventParam 2 }
+
+rtcpXrVoipAlertPointer OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "Pointer to the table of call session information to 
+         identify the specific call that triggered the alert."
+    ::= { rtcpXrEventParam 3 }
+
+rtcpXrVoipAlertSeverity OBJECT-TYPE
+    SYNTAX INTEGER (1..6)  --ItuPerceivedSeverity
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The severity of the alert as defined in ITU-T X.733 and
+        RFC3877."
+    REFERENCE
+        "See Alarm MIB - RFC3877."
+    ::= { rtcpXrEventParam 4 }
+     
+
+--
+--  MODULE GROUPS
+--
+-- There are four types of RTCP XR VoIP Metrics System.
+-- RTCP XR VOIP Metrics Systems MUST implement one of the four
+-- identified types of system and SHOULD NOT implement the
+-- rtcpXrMinimalCompliance system, which is included only
+-- for reasons of compatibility with RFC3611's minimal
+-- requirements.
+--
+
+       rtcpXrCompliances OBJECT IDENTIFIER ::= { rtcpXrConformance 1 }
+       rtcpXrGroups OBJECT IDENTIFIER ::= { rtcpXrConformance 2 }
+
+ 
+       rtcpXrFullMetricsCompliance MODULE-COMPLIANCE
+           STATUS  current
+           DESCRIPTION
+               "Describes the requirements for conformance to the
+                rtcpXr MIB for VoIP devices that support basic
+                reporting."
+           MODULE  -- this module
+           MANDATORY-GROUPS { rtcpXrSessionIDGroup, 
+                              rtcpXrBaseParamGroup,
+                              rtcpXrCallQualityGroup
+                            }
+           ::= { rtcpXrCompliances 1 }
+
+       rtcpXrMetricsAlertsCompliance MODULE-COMPLIANCE
+           STATUS  current
+           DESCRIPTION
+               "Describes the requirements for conformance to the
+                rtcpXr MIB for VoIP devices that support reporting
+                and alerts."
+           MODULE  -- this module
+           MANDATORY-GROUPS { rtcpXrSessionIDGroup, 
+                              rtcpXrBaseParamGroup,
+                              rtcpXrCallQualityGroup,
+                              rtcpXrNotificationParmsGroup,
+                              rtcpXrNotificationsGroup 
+                            }
+           ::= { rtcpXrCompliances 2 }
+
+       rtcpXrMetricsHistoryCompliance MODULE-COMPLIANCE
+           STATUS  current
+           DESCRIPTION
+               "Describes the requirements for conformance to the
+                rtcpXr MIB for VoIP devices that support reporting,
+                call history and alerts."
+           MODULE  -- this module
+           MANDATORY-GROUPS { rtcpXrSessionIDGroup, 
+                              rtcpXrBaseParamGroup,
+                              rtcpXrCallQualityGroup,
+                              rtcpXrMIBHistoryGroup,
+                              rtcpXrNotificationParmsGroup,
+                              rtcpXrNotificationsGroup }
+           ::= { rtcpXrCompliances 3 }
+
+
+
+
+
+
+
+
+
+
+      rtcpXrMinimalCompliance MODULE-COMPLIANCE
+           STATUS  current
+           DESCRIPTION
+               "Describes the minimal requirements for conformance to 
+                the rtcpXr MIB - NOT RECOMMENDED."
+           MODULE  -- this module
+           MANDATORY-GROUPS { rtcpXrSessionIDGroup, 
+                              rtcpXrBaseParamGroup
+                            }
+           ::= { rtcpXrCompliances 4 }
+
+      rtcpXrSessionIDGroup OBJECT-GROUP
+           OBJECTS {
+                   rtcpXrSessionIDSessionIdentifier,
+                   rtcpXrSessionIDCallStartTime,
+                   rtcpXrSessionIDCallStopTime,
+                   rtcpXrSessionIDSourceIPtype,
+                   rtcpXrSessionIDSourceIPaddress,
+                   rtcpXrSessionIDSourceRTPport,
+                   rtcpXrSessionIDSourceRTCPport,
+                   rtcpXrSessionIDDestIPtype,
+                   rtcpXrSessionIDDestIPaddress,
+                   rtcpXrSessionIDDestRTPport,
+                   rtcpXrSessionIDDestRTCPport,
+                   rtcpXrSessionIDDestIdentifier,
+                   rtcpXrSessionIDDestIdenType,
+                   rtcpXrSessionIDSrceIdentifier,
+                   rtcpXrSessionIDSrceIdenType,
+                   rtcpXrSessionIDMeasurePt,
+                   rtcpXrSessionIDMeasurePtID,
+                   rtcpXrSessionIDReverseSession,
+                   rtcpXrSessionIDAltMeasurePt
+                   }
+           STATUS current
+           DESCRIPTION
+               "Session ID objects used in rtcpXr VoIP Metrics MIB"
+           ::= { rtcpXrGroups 1 }
+
+      rtcpXrBaseParamGroup OBJECT-GROUP
+           OBJECTS {
+                   rtcpXrBaseParamVocoderType,
+                   rtcpXrBaseParamVocoderRate,
+                   rtcpXrBaseParamFrameDuration,
+                   rtcpXrBaseParamSampleRate,
+                   rtcpXrBaseParamDurationMs,
+                   rtcpXrBaseParamNetworkLossRate,
+                   rtcpXrBaseParamAvgDiscardRate,
+                   rtcpXrBaseParamBurstLossDensity,
+                   rtcpXrBaseParamBurstLenMs,
+                   rtcpXrBaseParamGapLossDensity,
+                   rtcpXrBaseParamGapLenMs,
+                   rtcpXrBaseParamAvgOWDelay,
+                   rtcpXrBaseParamAvgEndSysDelay,
+                   rtcpXrBaseParamPlcType,
+                   rtcpXrBaseParamJBuffAdaptMode,
+                   rtcpXrBaseParamJBuffAdaptRate,
+                   rtcpXrBaseParamJBuffAverageDelay,
+                   rtcpXrBaseParamJBuffMaximumDelay,
+                   rtcpXrBaseParamJBuffAbsMaxDelay,
+                   rtcpXrBaseParamJitterLevel
+                   }
+           STATUS current
+           DESCRIPTION
+               "Objects used in rtcpXr VoIP Metrics MIB"
+           ::= { rtcpXrGroups 2 }
+
+
+      rtcpXrCallQualityGroup OBJECT-GROUP
+           OBJECTS {
+                   rtcpXrCallQualityNoiseLeveldBm,
+                   rtcpXrCallQualitySignalLeveldBm,
+                   rtcpXrCallQualityLocalRERLdB,
+                   rtcpXrCallQualityRemoteRERLdB,
+                   rtcpXrCallQualityRCQ,
+                   rtcpXrCallQualityRLQ,
+                   rtcpXrCallQualityExternalRCQ,
+                   rtcpXrCallQualityMOSCQ,
+                   rtcpXrCallQualityMOSLQ,
+                   rtcpXrCallQualityAlgorithm
+                   }
+           STATUS current
+           DESCRIPTION
+               "Call quality objects used in rtcpXr VoIP Metrics MIB"
+           ::= { rtcpXrGroups 3 }
+
+       rtcpXrMIBHistoryGroup OBJECT-GROUP
+           OBJECTS {
+                   rtcpXrHistoryGroupName,
+                   rtcpXrHistoryStartTime,
+                   rtcpXrHistoryStopTime,
+                   rtcpXrHistoryNumOfSessions,
+                   rtcpXrHistoryMinDurationMs,
+                   rtcpXrHistoryMaxDurationMs,
+                   rtcpXrHistoryAvgDurationMs,
+                   rtcpXrHistoryMaxNetworkLossRate,
+                   rtcpXrHistoryAvgNetworkLossRate,
+                   rtcpXrHistoryMaxDiscardRate,
+                   rtcpXrHistoryAvgDiscardRate,
+                   rtcpXrHistoryMaxBurstLossDensity,
+                   rtcpXrHistoryAvgBurstLossDensity,
+                   rtcpXrHistoryMinBurstLenMs,
+                   rtcpXrHistoryMaxBurstLenMs,
+                   rtcpXrHistoryAvgBurstLenMs,
+                   rtcpXrHistoryMaxGapLossDensity,
+                   rtcpXrHistoryAvgGapLossDensity,
+                   rtcpXrHistoryMinGapLenMs,
+                   rtcpXrHistoryMaxGapLenMs,
+                   rtcpXrHistoryAvgGapLenMs,
+                   rtcpXrHistoryMinOneWayDelay,
+                   rtcpXrHistoryMaxOneWayDelay,
+                   rtcpXrHistoryAvgOneWayDelay,
+                   rtcpXrHistoryMinEndSystemDelay,
+                   rtcpXrHistoryMaxEndSystemDelay,
+                   rtcpXrHistoryAvgEndSystemDelay,
+                   rtcpXrHistoryAvgJitterLevel,
+                   rtcpXrHistoryMinJitterLevel,
+                   rtcpXrHistoryMaxJitterLevel,
+                   rtcpXrHistoryMinNoiseLeveldBm,
+                   rtcpXrHistoryMaxNoiseLeveldBm,
+                   rtcpXrHistoryAvgNoiseLeveldBm,
+                   rtcpXrHistoryNoiseLevelCount,
+                   rtcpXrHistoryMinSignalLeveldBm,
+                   rtcpXrHistoryMaxSignalLeveldBm,
+                   rtcpXrHistoryAvgSignalLeveldBm,
+                   rtcpXrHistorySignalLevelCount,
+                   rtcpXrHistoryMinLocalRERLdB,
+                   rtcpXrHistoryMaxLocalRERLdB,
+                   rtcpXrHistoryAvgLocalRERLdB,
+                   rtcpXrHistoryLocalRERLCount,
+                   rtcpXrHistoryMinRemoteRERLdB,
+                   rtcpXrHistoryMaxRemoteRERLdB,
+                   rtcpXrHistoryAvgRemoteRERLdB,
+                   rtcpXrHistoryRemoteRERLCount,
+                   rtcpXrHistoryMinRCQ,
+                   rtcpXrHistoryMaxRCQ,
+                   rtcpXrHistoryAvgRCQ,
+                   rtcpXrHistoryRCQCount,
+                   rtcpXrHistoryMinRLQ,
+                   rtcpXrHistoryMaxRLQ,
+                   rtcpXrHistoryAvgRLQ,
+                   rtcpXrHistoryRLQCount,
+                   rtcpXrHistoryMinMOSCQ,
+                   rtcpXrHistoryMaxMOSCQ,
+                   rtcpXrHistoryAvgMOSCQ,
+                   rtcpXrHistoryMOSCQCount,
+                   rtcpXrHistoryMinMOSLQ,
+                   rtcpXrHistoryMaxMOSLQ,
+                   rtcpXrHistoryAvgMOSLQ,
+                   rtcpXrHistoryMOSLQCount,
+                   rtcpXrHistoryCQAlgorithm,
+                   rtcpXrHistoryReset
+                 }
+           STATUS current
+           DESCRIPTION
+               "Objects used in rtcpXr VoIP History MIB"
+           ::= { rtcpXrGroups 4 }
+
+
+
+       rtcpXrNotificationParmsGroup OBJECT-GROUP
+           OBJECTS {
+                   rtcpXrVoipAlertSeverity,
+                   rtcpXrVoipAlertType,
+                   rtcpXrVoipAlertInfoType,
+                   rtcpXrVoipAlertPointer
+                   }
+           STATUS current
+           DESCRIPTION
+               "Notification parameters emitted by a rtcpXr endpoint."
+           ::= { rtcpXrGroups 5 }
+
+       rtcpXrNotificationsGroup NOTIFICATION-GROUP
+           NOTIFICATIONS { 
+                   rtcpXrVoipThresholdViolation 
+                   }
+           STATUS current
+           DESCRIPTION
+               "Notifications emitted by a rtcpXr endpoint."
+           ::= { rtcpXrGroups 6 }
+
+
+   END
