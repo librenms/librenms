@@ -191,7 +191,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $actions .= '<div class="col-xs-1"><a href="ssh://' . $device['hostname'] . '"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>
         ';
     }
-        $actions .= '<div class="col-xs-1"><a href="https://' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" title="Launch browser https://' . $device['hostname'] . '"></i></a></div>
+        $actions .= '<div class="col-xs-1"><a href="https://' . $device['hostname'] . '" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" title="Launch browser https://' . $device['hostname'] . '"></i></a></div>
                 </div>
             </div>
         ';
