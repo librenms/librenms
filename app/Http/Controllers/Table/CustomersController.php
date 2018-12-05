@@ -98,7 +98,7 @@ class CustomersController extends TableController
     {
         return [
             'port_descr_descr'   => $port->port_descr_descr,
-            'device_id'          => Url::deviceLink($port->device),
+            'hostname'          => Url::deviceLink($port->device),
             'ifDescr'            => Url::portLink($port),
             'port_descr_speed'   => $port->port_descr_speed,
             'port_descr_circuit' => $port->port_descr_circuit,
@@ -119,7 +119,7 @@ class CustomersController extends TableController
 
         return [
             'port_descr_descr'   => $graph_data[0],
-            'device_id'          => $graph_data[1],
+            'hostname'          => $graph_data[1],
             'ifDescr'            => '',
             'port_descr_speed'   => '',
             'port_descr_circuit' => $graph_data[2],
