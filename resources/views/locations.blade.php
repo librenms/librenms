@@ -201,6 +201,7 @@
                     update_location(id, latlng, function (success) {
                         if (success) {
                             $text_el.text(latlng.lat + ', ' + latlng.lng);
+                            locations_grid.bootgrid('reload');
                         } else {
                             $text_el.text(text);
                         }
