@@ -45,7 +45,6 @@ release with a view to running that specific version, you will need to disable u
     - username: librenms
     - password: `CDne3fwdfds`
 
-> Please note the second character of the SSH password is a CAPITAL EYE
 
   - MySQL/MariaDB
     - username: librenms
