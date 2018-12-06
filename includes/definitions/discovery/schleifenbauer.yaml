@@ -20,7 +20,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.31034.12.1.1.1.1.4.{{ $index }}'
                     high_limit: '1'
                     entPhysicalIndex: '3'
-                    descr: 'Amount of Duplicate Device Addresses'
+                    descr: 'Duplicate Device Addresses'
                     index: 'sdbMgmtStsDuplicateDevices.{{ $index }}'
                 -
                     oid: sdbMgmtStsNewDevices
@@ -28,5 +28,5 @@ modules:
                     warn_limit: '1'
                     high_limit: '2'
                     entPhysicalIndex: '4'
-                    descr: 'Amount of New Devices Detected'
+                    descr: 'New Devices'
                     index: 'sdbMgmtStsNewDevices.{{ $index }}'
