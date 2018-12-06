@@ -392,6 +392,7 @@ function sensor_low_limit($class, $current)
         case 'humidity':
             $limit = 30;
             break;
+        case 'count':
         case 'current':
             $limit = null;
             break;
@@ -447,6 +448,7 @@ function sensor_limit($class, $current)
         case 'humidity':
             $limit = 70;
             break;
+        case 'count':
         case 'current':
         case 'power':
             $limit = $current * 1.50;

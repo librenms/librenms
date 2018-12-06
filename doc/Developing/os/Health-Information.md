@@ -14,6 +14,7 @@ Currently we have support for the following health metrics along with the values
 | charge                          | %                           |
 | chromatic_disperision           | ps/nm                       |
 | cooling                         | W                           |
+| count                           | #                           |
 | current                         | A                           |
 | dbm                             | dBm                         |
 | delay                           | s                           |

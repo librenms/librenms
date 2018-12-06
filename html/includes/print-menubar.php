@@ -396,6 +396,7 @@ $icons = array(
     'power_factor' => 'calculator',
     'voltage' => 'bolt',
     'charge' => 'battery-half',
+    'count' => 'hashtag',
     'dbm' => 'sun-o',
     'load' => 'percent',
     'runtime' => 'hourglass-half',

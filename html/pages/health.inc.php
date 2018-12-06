@@ -24,6 +24,9 @@ if ($used_sensors['temperature']) {
 if ($used_sensors['charge']) {
     $datas[] = 'charge';
 }
+if ($used_sensors['count']) {
+    $datas[] = 'count';
+}
 if ($used_sensors['humidity']) {
     $datas[] = 'humidity';
 }
@@ -97,6 +100,7 @@ if ($used_sensors['waterflow']) {
 $type_text['overview'] = "Overview";
 $type_text['temperature'] = "Temperature";
 $type_text['charge'] = "Battery Charge";
+$type_text['count'] = "Count";
 $type_text['humidity'] = "Humidity";
 $type_text['mempool'] = "Memory";
 $type_text['storage'] = "Storage";

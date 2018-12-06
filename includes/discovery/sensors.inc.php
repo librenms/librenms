@@ -42,6 +42,7 @@ $run_sensors = array(
     'airflow',
     'current',
     'charge',
+    'count',
     'dbm',
     'fanspeed',
     'frequency',

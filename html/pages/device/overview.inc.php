@@ -57,6 +57,7 @@ if (is_array($entity_state['group']['c6kxbar'])) {
 
 require 'overview/toner.inc.php';
 require 'overview/sensors/charge.inc.php';
+require 'overview/sensors/count.inc.php';
 require 'overview/sensors/temperature.inc.php';
 require 'overview/sensors/humidity.inc.php';
 require 'overview/sensors/fanspeed.inc.php';

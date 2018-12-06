@@ -6,6 +6,7 @@ $mempools  = dbFetchCell('select count(*) from mempools WHERE device_id = ?', ar
 $processor = dbFetchCell('select count(*) from processors WHERE device_id = ?', array($device['device_id'])) + count_mib_processors($device);
 
 $charge                = dbFetchCell("select count(*) from sensors WHERE sensor_class='charge' AND device_id = ?", array($device['device_id']));
+$count                 = dbFetchCell("select count(*) from sensors WHERE sensor_class='count' AND device_id = ?", array($device['device_id']));
 $temperatures          = dbFetchCell("select count(*) from sensors WHERE sensor_class='temperature' AND device_id = ?", array($device['device_id']));
 $humidity              = dbFetchCell("select count(*) from sensors WHERE sensor_class='humidity' AND device_id = ?", array($device['device_id']));
 $fans                  = dbFetchCell("select count(*) from sensors WHERE sensor_class='fanspeed' AND device_id = ?", array($device['device_id']));
@@ -51,6 +52,10 @@ if ($diskio) {
 
 if ($charge) {
     $datas[] = 'charge';
+}
+
+if ($count) {
+    $datas[] = 'count';
 }
 
 if ($temperatures) {
@@ -151,6 +156,7 @@ if ($waterflow) {
 
 $type_text['overview']             = 'Overview';
 $type_text['charge']               = 'Battery Charge';
+$type_text['count']                = 'Count';
 $type_text['temperature']          = 'Temperature';
 $type_text['humidity']             = 'Humidity';
 $type_text['mempool']              = 'Memory';
