@@ -9,5 +9,6 @@
  * the source code distribution for details.
  */
 
-$version = trim(snmp_get($device, ".1.3.6.1.4.1.7262.4.5.2.4.2.1.1.3.1", "-Ovq"), '" ');
-$serial = trim(snmp_get($device, ".1.3.6.1.4.1.7262.4.5.2.4.1.3.0", "-Ovq"), '" ');
+$harmony_data = snmp_get_multi_oid($device, ['.1.3.6.1.4.1.7262.4.5.2.4.2.1.1.3.1', '.1.3.6.1.4.1.7262.4.5.2.4.1.3.0']);
+$version      = $harmony_data['.1.3.6.1.4.1.7262.4.5.2.4.2.1.1.3.1'];
+$serial       = $harmony_data['.1.3.6.1.4.1.7262.4.5.2.4.1.3.0'];
