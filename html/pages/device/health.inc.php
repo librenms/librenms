@@ -5,7 +5,6 @@ $diskio    = get_disks($device['device_id']);
 $mempools  = dbFetchCell('select count(*) from mempools WHERE device_id = ?', array($device['device_id'])) + count_mib_mempools($device);
 $processor = dbFetchCell('select count(*) from processors WHERE device_id = ?', array($device['device_id'])) + count_mib_processors($device);
 
-$charge                = dbFetchCell("select count(*) from sensors WHERE sensor_class='charge' AND device_id = ?", array($device['device_id']));
 $count                 = dbFetchCell("select count(*) from sensors WHERE sensor_class='count' AND device_id = ?", array($device['device_id']));
 $temperatures          = dbFetchCell("select count(*) from sensors WHERE sensor_class='temperature' AND device_id = ?", array($device['device_id']));
 $humidity              = dbFetchCell("select count(*) from sensors WHERE sensor_class='humidity' AND device_id = ?", array($device['device_id']));
@@ -19,6 +18,7 @@ $power_consumed        = dbFetchCell("select count(*) from sensors WHERE sensor_
 $power_factor          = dbFetchCell("select count(*) from sensors WHERE sensor_class='power_factor' AND device_id = ?", array($device['device_id']));
 $dBm                   = dbFetchCell("select count(*) from sensors WHERE sensor_class='dBm' AND device_id = ?", array($device['device_id']));
 $states                = dbFetchCell("select count(*) from sensors WHERE sensor_class='state' AND device_id = ?", array($device['device_id']));
+$charge                = dbFetchCell("select count(*) from sensors WHERE sensor_class='charge' AND device_id = ?", array($device['device_id']));
 $load                  = dbFetchCell("select count(*) from sensors WHERE sensor_class='load' AND device_id = ?", array($device['device_id']));
 $signal                = dbFetchCell("select count(*) from sensors WHERE sensor_class='signal' AND device_id = ?", array($device['device_id']));
 $airflow               = dbFetchCell("select count(*) from sensors WHERE sensor_class='airflow' AND device_id = ?", array($device['device_id']));
@@ -52,10 +52,6 @@ if ($diskio) {
 
 if ($charge) {
     $datas[] = 'charge';
-}
-
-if ($count) {
-    $datas[] = 'count';
 }
 
 if ($temperatures) {
@@ -104,6 +100,10 @@ if ($dBm) {
 
 if ($states) {
     $datas[] = 'state';
+}
+
+if ($count) {
+    $datas[] = 'count';
 }
 
 if ($load) {
@@ -156,7 +156,6 @@ if ($waterflow) {
 
 $type_text['overview']             = 'Overview';
 $type_text['charge']               = 'Battery Charge';
-$type_text['count']                = 'Count';
 $type_text['temperature']          = 'Temperature';
 $type_text['humidity']             = 'Humidity';
 $type_text['mempool']              = 'Memory';
@@ -173,6 +172,7 @@ $type_text['power_consumed']       = 'Power Consumed';
 $type_text['power_factor']         = 'Power Factor';
 $type_text['dbm']                  = 'dBm';
 $type_text['state']                = 'State';
+$type_text['count']                = 'Count';
 $type_text['load']                 = 'Load';
 $type_text['signal']               = 'Signal';
 $type_text['airflow']              = 'Airflow';

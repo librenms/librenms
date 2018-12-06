@@ -10,9 +10,6 @@ if (count($sensors)) {
         case "charge":
             $sensor_fa_icon = "fa-battery-half";
             break;
-        case "count":
-            $sensor_fa_icon = "fa-hashtag";
-            break;
         case "temperature":
             $sensor_fa_icon = "fa-thermometer-three-quarters";
             break;
@@ -48,6 +45,9 @@ if (count($sensors)) {
             break;
         case "state":
             $sensor_fa_icon = "fa-bullseye";
+            break;
+        case "count":
+            $sensor_fa_icon = "fa-hashtag";
             break;
         case "load":
             $sensor_fa_icon = "fa-percent";

@@ -24,9 +24,6 @@ if ($used_sensors['temperature']) {
 if ($used_sensors['charge']) {
     $datas[] = 'charge';
 }
-if ($used_sensors['count']) {
-    $datas[] = 'count';
-}
 if ($used_sensors['humidity']) {
     $datas[] = 'humidity';
 }
@@ -62,6 +59,9 @@ if ($used_sensors['load']) {
 }
 if ($used_sensors['state']) {
     $datas[] = 'state';
+}
+if ($used_sensors['count']) {
+    $datas[] = 'count';
 }
 if ($used_sensors['signal']) {
     $datas[] = 'signal';
@@ -100,7 +100,6 @@ if ($used_sensors['waterflow']) {
 $type_text['overview'] = "Overview";
 $type_text['temperature'] = "Temperature";
 $type_text['charge'] = "Battery Charge";
-$type_text['count'] = "Count";
 $type_text['humidity'] = "Humidity";
 $type_text['mempool'] = "Memory";
 $type_text['storage'] = "Storage";
@@ -118,6 +117,7 @@ $type_text['toner'] = "Toner";
 $type_text['dbm'] = "dBm";
 $type_text['load'] = "Load";
 $type_text['state'] = "State";
+$type_text['count'] = "Count";
 $type_text['signal'] = "Signal";
 $type_text['snr'] = "SNR";
 $type_text['pressure'] = "Pressure";
