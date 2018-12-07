@@ -36,6 +36,11 @@ class Updates extends BaseValidation
 {
     public function validate(Validator $validator)
     {
+        if (!is_git_install()) {
+            $validator->warn('Non-git install, updates are manual or from package');
+            return;
+        }
+
         // if git is not available, we cannot do the other tests
         if (!check_git_exists()) {
             $validator->warn('Unable to locate git. This should probably be installed.');
