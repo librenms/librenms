@@ -1,111 +1,38 @@
 {
-    "arp-table": {
+    "os": {
         "discovery": {
-            "ipv4_mac": [
+            "devices": [
                 {
-                    "mac_address": "00900b2a11ad",
-                    "ipv4_address": "10.37.105.100",
-                    "context_name": null
-                },
-                {
-                    "mac_address": "00900b2a11ad",
-                    "ipv4_address": "10.37.105.100",
-                    "context_name": null
-                },
-                {
-                    "mac_address": "001577320ea0",
-                    "ipv4_address": "10.37.105.91",
-                    "context_name": null
-                },
-                {
-                    "mac_address": "001577c5abbd",
-                    "ipv4_address": "10.37.105.92",
-                    "context_name": null
-                },
-                {
-                    "mac_address": "00131929dd40",
-                    "ipv4_address": "10.37.105.94",
-                    "context_name": null
-                },
-                {
-                    "mac_address": "00131929dd40",
-                    "ipv4_address": "10.37.105.94",
-                    "context_name": null
-                }
-            ]
-        },
-        "poller": null
-    },
-    "mempools": {
-        "discovery": {
-            "mempools": [
-                {
-                    "mempool_index": "1",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": "2080",
-                    "mempool_descr": "Buffer Pool",
-                    "mempool_perc": "0",
-                    "mempool_used": "0",
-                    "mempool_free": "0",
-                    "mempool_total": "0",
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
-                },
-                {
-                    "mempool_index": "4",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": "2080",
-                    "mempool_descr": "Fast Buffers",
-                    "mempool_perc": "0",
-                    "mempool_used": "0",
-                    "mempool_free": "0",
-                    "mempool_total": "0",
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.207.1.14.57",
+                    "sysDescr": "CentreCOM 9924Ts, version 3.2.1-04, built 08-Sep-2009",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "allied",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "alliedtelesis.svg",
+                    "location": null
                 }
             ]
         },
         "poller": {
-            "mempools": [
+            "devices": [
                 {
-                    "mempool_index": "1",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": "2080",
-                    "mempool_descr": "Buffer Pool",
-                    "mempool_perc": "8",
-                    "mempool_used": "20587840",
-                    "mempool_free": "245749920",
-                    "mempool_total": "266337760",
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
-                },
-                {
-                    "mempool_index": "4",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": "2080",
-                    "mempool_descr": "Fast Buffers",
-                    "mempool_perc": "0",
-                    "mempool_used": "0",
-                    "mempool_free": "0",
-                    "mempool_total": "0",
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.207.1.14.57",
+                    "sysDescr": "CentreCOM 9924Ts, version 3.2.1-04, built 08-Sep-2009",
+                    "sysContact": "<private>",
+                    "version": "3.2.1-04",
+                    "hardware": "CentreCOM 9924Ts",
+                    "features": "08-Sep-2009",
+                    "os": "allied",
+                    "type": "network",
+                    "serial": "30BZ32000",
+                    "icon": "alliedtelesis.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -5580,61 +5507,97 @@
             ]
         }
     },
-    "os": {
-        "discovery": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.207.1.14.57",
-                    "sysDescr": "CentreCOM 9924Ts, version 3.2.1-04, built 08-Sep-2009",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "",
-                    "features": null,
-                    "location": null,
-                    "os": "allied",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "alliedtelesis.svg"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.207.1.14.57",
-                    "sysDescr": "CentreCOM 9924Ts, version 3.2.1-04, built 08-Sep-2009",
-                    "sysContact": "<private>",
-                    "version": "3.2.1-04",
-                    "hardware": "CentreCOM 9924Ts",
-                    "features": "08-Sep-2009",
-                    "location": "<private>",
-                    "os": "allied",
-                    "type": "network",
-                    "serial": "30BZ32000",
-                    "icon": "alliedtelesis.svg"
-                }
-            ]
-        }
-    },
     "processors": {
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": "0",
-                    "hrDeviceIndex": "2",
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 2,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.2",
                     "processor_index": "2",
                     "processor_type": "hr",
-                    "processor_usage": "0",
+                    "processor_usage": 0,
                     "processor_descr": "Motorola MPC8541 CPU",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
                 }
             ]
         },
         "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": 2080,
+                    "mempool_descr": "Buffer Pool",
+                    "mempool_perc": 0,
+                    "mempool_used": 0,
+                    "mempool_free": 0,
+                    "mempool_total": 0,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                },
+                {
+                    "mempool_index": "4",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": 2080,
+                    "mempool_descr": "Fast Buffers",
+                    "mempool_perc": 0,
+                    "mempool_used": 0,
+                    "mempool_free": 0,
+                    "mempool_total": 0,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                }
+            ]
+        },
+        "poller": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": 2080,
+                    "mempool_descr": "Buffer Pool",
+                    "mempool_perc": 8,
+                    "mempool_used": 20587840,
+                    "mempool_free": 245749920,
+                    "mempool_total": 266337760,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                },
+                {
+                    "mempool_index": "4",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "hrstorage",
+                    "mempool_precision": 2080,
+                    "mempool_descr": "Fast Buffers",
+                    "mempool_perc": 0,
+                    "mempool_used": 0,
+                    "mempool_free": 0,
+                    "mempool_total": 0,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                }
+            ]
+        }
     },
     "storage": {
         "discovery": {
@@ -5644,13 +5607,13 @@
                     "storage_index": "3",
                     "storage_type": "hrStorageRamDisk",
                     "storage_descr": "32768kb Flash",
-                    "storage_size": "31651840",
-                    "storage_units": "1",
-                    "storage_used": "4628480",
-                    "storage_free": "0",
-                    "storage_perc": "0",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
+                    "storage_size": 31651840,
+                    "storage_units": 1,
+                    "storage_used": 4628480,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
                 }
             ]
         },
@@ -5661,15 +5624,29 @@
                     "storage_index": "3",
                     "storage_type": "hrStorageRamDisk",
                     "storage_descr": "32768kb Flash",
-                    "storage_size": "31651840",
-                    "storage_units": "1",
-                    "storage_used": "4628480",
-                    "storage_free": "27023360",
-                    "storage_perc": "15",
-                    "storage_perc_warn": "60",
-                    "storage_deleted": "0"
+                    "storage_size": 31651840,
+                    "storage_units": 1,
+                    "storage_used": 4628480,
+                    "storage_free": 27023360,
+                    "storage_perc": 15,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
                 }
             ]
+        }
+    },
+    "vlans": {
+        "discovery": {
+            "vlans": [
+                {
+                    "vlan_vlan": 1,
+                    "vlan_domain": 1,
+                    "vlan_name": "default",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                }
+            ],
+            "ports_vlans": []
         }
     }
 }
