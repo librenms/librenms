@@ -38,6 +38,12 @@ class Dependencies extends BaseValidation
      */
     public function validate(Validator $validator)
     {
+        # if git is not installed, do not assume composer is either
+        if (!is_git_install()) {
+            $validator->ok("Installed from package; no Composer required");
+            return;
+        }
+
         $composer_output = trim(shell_exec($validator->getBaseDir() . '/scripts/composer_wrapper.php --version'));
         $found = preg_match(
             '/Composer.*(\d+\.\d+\.\d+(-RC\d*|-beta\d?|-alpha\d+)?)/',
