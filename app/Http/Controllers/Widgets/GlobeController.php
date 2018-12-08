@@ -61,6 +61,7 @@ class GlobeController extends WidgetController
 
         $eager_load = $data['markers'] == 'ports' ? ['devices.ports'] : ['devices'];
 
+        /** @var Location $location */
         foreach (Location::hasAccess($request->user())->with($eager_load)->get() as $location) {
             $count = 0;
             $up = 0;
@@ -91,12 +92,16 @@ class GlobeController extends WidgetController
             // indicate the number of up items before the itemized down
             $down_items->prepend($up .  '&nbsp;' . ucfirst($data['markers']) . '&nbsp;OK');
 
-            $locations->push([
-                $location->location,
-                $count ? (1 - $up / $count) * 100 : 0, // percent down
-                $count,
-                $down_items->implode(',<br/> '),
-            ]);
+            if ($count > 0) {
+                $locations->push([
+                    $location->lat,
+                    $location->lng,
+                    $location->location,
+                    $count ? (1 - $up / $count) * 100 : 0, // percent down
+                    $count,
+                    $down_items->implode(',<br/> '),
+                ]);
+            }
         }
 
         $data['locations'] = $locations->toJson();

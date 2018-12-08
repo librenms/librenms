@@ -1,10 +1,12 @@
 <div id='chart_div'></div>
 
 <script type='text/javascript'>
-    loadjs('https://www.google.com/jsapi', function() {
-        google.load('visualization', '1', {'packages': ['geochart'], callback: function() {
+    loadjs('https://www.gstatic.com/charts/loader.js', function() {
+        google.charts.load('current', {'packages': ['geochart'], callback: function() {
                 var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Site');
+                data.addColumn('number', 'Latitude');
+                data.addColumn('number', 'Longitude');
+                data.addColumn('string', 'Label');
                 data.addColumn('number', 'Status');
                 data.addColumn('number', 'Size');
                 data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}});
