@@ -420,3 +420,24 @@ function update_location(id, latlng, callback) {
 
     });
 }
+
+function http_fallback(link) {
+    var url = link.getAttribute('href');
+    console.log(url);
+    try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, false);
+        xhr.timeout = 2000;
+        xhr.send(null);
+
+        if (xhr.status !== 200) {
+            url = url.replace(/^https:\/\//, 'http://');
+        }
+    } catch (e) {
+        // console.log(e);
+        url = url.replace(/^https:\/\//, 'http://');
+    }
+
+    window.open(url, '_blank');
+    return false;
+}
