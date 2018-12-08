@@ -72,7 +72,10 @@
             "LibreNMS\\": "LibreNMS",
             "LibreNMS\\Plugins\\" : "html/plugins",
             "LibreNMS\\Tests\\": "tests"
-        }
+        },
+        "files": [
+            "includes/helpers.php"
+        ]
     },
     "scripts": {
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
