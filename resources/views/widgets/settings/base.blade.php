@@ -2,11 +2,8 @@
     @yield('form')
 
     @hassection('form')
-        <br style="clear:both;"/>
-        <div class="form-group">
-            <div class="col-sm-2 col-sm-offset-8">
-                <button type="submit" class="btn btn-default">@lang('Apply')</button>
-            </div>
+        <div style="margin-top: 8px;">
+                <button type="submit" class="btn btn-primary pull-right">@lang('Save')</button>
         </div>
     @else
         No settings for this widget

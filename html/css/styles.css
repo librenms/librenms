@@ -1731,10 +1731,6 @@ tr.search:nth-child(odd) {
           border-top-right-radius: 4px;
 }
 
-.widget_body {
-    padding: 0.8em;
-}
-
 .mapTooltip {
     position : fixed;
     background-color : #B2B3B1;
@@ -1917,6 +1913,7 @@ label {
 
 .edit-widget, .close-widget { cursor: pointer; }
 .widget_body {
+    padding: 0.8em;
     overflow-y: auto;
     width: 100%;
     height: calc(100% - 38px);
