@@ -27,6 +27,7 @@
 namespace LibreNMS;
 
 use App\Models\Plugin;
+use Log;
 
 /**
  * Handles loading of plugins
@@ -179,10 +180,14 @@ class Plugins
         }
 
         foreach (self::$plugins[$hook] as $name) {
-            if (!is_array($params)) {
-                @call_user_func(array($name, $hook));
-            } else {
-                @call_user_func_array(array($name, $hook), $params);
+            try {
+                if (!is_array($params)) {
+                    @call_user_func([$name, $hook]);
+                } else {
+                    @call_user_func_array([$name, $hook], $params);
+                }
+            } catch (\Exception $e) {
+                Log::error($e);
             }
         }
     }
