@@ -3,7 +3,7 @@
         <img class="minigraph-image"
              width="{{ $dimensions['x'] }}"
              height="{{ $dimensions['y'] }}"
-             src="graph.php?{{ $param }}&from={{ $from }}&to={{ $to }}&width={{ $dimensions['x'] }}&height={{ $dimensions['y'] }}&type={{ $graph_type }}&legend={{ $graph_legend ? 'yes' : 'no' }}&absolute=1"
+             src="graph.php?{{ $param }}&from={{ $from }}&to={{ $to }}&width={{ $dimensions['x'] }}&height={{ $dimensions['y'] }}&type={{ $graph_type }}&legend={{ $graph_legend }}&absolute=1"
         />
     </a>
 </div>

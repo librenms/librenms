@@ -62,7 +62,7 @@ class WorldMapController extends WidgetController
             ->whereIn('status', $status)
             ->get()
             ->filter(function ($device) use ($status) {
-                if (!$device->location->coordinatesValid()) {
+                if (!($device->location_id && $device->location->coordinatesValid())) {
                     return false;
                 }
 
