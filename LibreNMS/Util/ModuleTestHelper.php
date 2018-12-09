@@ -56,6 +56,7 @@ class ModuleTestHelper
         'fdb-table' => ['ports', 'vlans', 'fdb-table'],
         'vlans' => ['ports', 'vlans'],
         'vrf' => ['ports', 'vrf'],
+        'nac' => ['ports', 'nac'],
     ];
 
 
