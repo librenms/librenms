@@ -4,7 +4,7 @@ header('Content-type: application/json');
 
 // reload dashboard referencing old endpoint
 exit(json_encode([
-    'html' => '<javascript>window.location.reload(false);</javascript>',
+    'html' => '<script>window.location.reload(false);</script>',
     'status' => 'ok',
     'title' => 'Reload Dasbhoard'
 ]));
