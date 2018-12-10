@@ -30,7 +30,7 @@ foreach ($portAuthSessionEntry as $index => $PortAuthSessionEntryParameters) {
         'auth_id' => $auth_id,
         'device_id' => $device['device_id'],
     ], [
-        'port_id' => $ports_map->get($ifIndex),
+        'port_id' => $ports_map->get($ifIndex, 0),
         'PortAuthSessionMacAddress' => strtoupper(implode(':', array_map('zeropad', explode(':', $PortAuthSessionEntryParameters['cafSessionClientMacAddress'])))),
         'PortAuthSessionIPAddress' => (string)IP::fromHexString($PortAuthSessionEntryParameters['cafSessionClientAddress'], true),
         'PortAuthSessionAuthzStatus' => $PortAuthSessionEntryParameters['cafSessionStatus'],
