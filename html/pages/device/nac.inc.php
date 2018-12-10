@@ -13,7 +13,7 @@ echo"<br>";
 echo "<table id='grid' data-toggle='bootgrid' class='table table-condensed table-responsive table-striped'>
     <thead>
         <tr>
-            <th data-column-id='nac_port'>Port</th>
+            <th data-column-id='nac_port' data-formatter='port'>Port</th>
             <th data-column-id='nac_mac'>MAC Address</th>
             <th data-column-id='nac_ip'>IP Address</th>
             <th data-column-id='nac_authz' data-searchable='false' data-formatter='nac_authz'>AuthZ</th>
@@ -27,8 +27,13 @@ echo "<table id='grid' data-toggle='bootgrid' class='table table-condensed table
         </tr>
     </thead>";
 
-foreach (\App\Models\PortsNac::where('device_id', $device['device_id'])->with('port')->get() as $nac) {
-    echo '<td>' . generate_port_link($nac->port->toArray(), $nac->port->getLabel()) . '</td>';
+$port_nac = \App\Models\PortsNac::where('device_id', $device['device_id'])->with('port')->get();
+$ports = $port_nac->reduce(function ($out, $nac) {
+    return $out->put($nac->port->port_id, $nac->port);
+}, collect());
+
+foreach ($port_nac as $nac) {
+    echo '<td>' . $nac->port->port_id . '</td>';
     echo '<td>' . strtoupper($nac['PortAuthSessionMacAddress']) . '</td>';
     echo '<td>' . $nac['PortAuthSessionIPAddress'] . '</td>';
     echo '<td>' . $nac['PortAuthSessionAuthzStatus'] . '</td>';
@@ -48,6 +53,18 @@ echo '</table>';
         caseSensitive: false,
         rowCount: [50, 100, 250, -1],
         formatters:{
+            "port": function (column, row) {
+                switch(row[column.id]) {
+                    <?php
+                        foreach ($ports as $port) {
+                            echo 'case "' . $nac->port->port_id . "\":\n";
+                            echo "  return '" . addslashes(\LibreNMS\Util\Url::portLink($nac->port, $nac->port->getShortLabel())) . "';\n";
+                        }
+                    ?>
+                    default:
+                        return row[column.id];
+                }
+            },
             "nac_authz": function (column, row){
                 if (row.nac_authz == 'authorizationSuccess'){
                     return "<i class=\"fa fa-check-circle fa-lg icon-theme\"  aria-hidden=\"true\" style=\"color:green;\"></i>";
