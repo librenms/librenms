@@ -720,23 +720,6 @@ function generate_sensor_link($args, $text = null, $type = null)
         $args['graph_type'] = "sensor_" . $type;
     }
 
-    $details = "Current Value: " . $args['sensor_current'] . " (" . $args['sensor_class'] . ")<br>  ";
-
-    if ($args['sensor_limit_low']) {
-        $details_a[] = "low: " . $args['sensor_limit_low'];
-    }
-    if ($args['sensor_limit_low_warn']) {
-        $details_a[]= "low_warn: " . $args['sensor_limit_low_warn'];
-    }
-    if ($args['sensor_limit_warn']) {
-        $details_a[]= "high_warn: " . $args['sensor_limit_warn'];
-    }
-    if ($args['sensor_limit']) {
-        $details_a[]= "high: " . $args['sensor_limit'];
-    }
-
-    $details .= implode(', ', $details_a);
-
     if (!isset($args['hostname'])) {
         $args = array_merge($args, device_by_id_cache($args['device_id']));
     }
@@ -764,9 +747,9 @@ function generate_sensor_link($args, $text = null, $type = null)
 
     $url = generate_sensor_url($args);
     if (port_permitted($args['interface_id'], $args['device_id'])) {
-        return overlib_link($url, $text, $content, null) . "<br>" . $details;
+        return overlib_link($url, $text, $content, null);
     } else {
-        return fixifName($text) . "<br>" . $details;
+        return fixifName($text);
     }
 }//end generate_sensor_link()
 
@@ -1206,7 +1189,22 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['sensor_id']) {
-            $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp;';
+            $details = "Current Value: " . $tmp_alerts['sensor_current'] . " (" . $tmp_alerts['sensor_class'] . ")<br>  ";
+            if ($tmp_alerts['sensor_limit_low']) {
+                $details_a[] = "low: " . $tmp_alerts['sensor_limit_low'];
+            }
+            if ($tmp_alerts['sensor_limit_low_warn']) {
+                $details_a[]= "low_warn: " . $tmp_alerts['sensor_limit_low_warn'];
+            }
+            if ($tmp_alerts['sensor_limit_warn']) {
+                $details_a[]= "high_warn: " . $tmp_alerts['sensor_limit_warn'];
+            }
+            if ($tmp_alerts['sensor_limit']) {
+                $details_a[]= "high: " . $tmp_alerts['sensor_limit'];
+            }
+            $details .= implode(', ', $details_a);
+
+            $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
             $fallback = false;
         }
         if ($tmp_alerts['bgpPeer_id']) {
