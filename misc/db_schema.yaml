@@ -1240,6 +1240,27 @@ ports_fdb:
     ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
     ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ports_fdb_vlan_id_index: { Name: ports_fdb_vlan_id_index, Columns: [vlan_id], Unique: false, Type: BTREE }
+ports_nac:
+  Columns:
+    - { Field: ports_nac_id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: auth_id, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: device_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: port_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: PortAuthSessionMacAddress, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: PortAuthSessionIPAddress, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: PortAuthSessionAuthzStatus, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: PortAuthSessionDomain, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: PortAuthSessionHostMode, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: PortAuthSessionUserName, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: PortAuthSessionAuthzBy, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: PortAuthSessionTimeOut, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: PortAuthSessionTimeLeft, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: PortAuthSessionAuthcStatus, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: PortSessionMethod, Type: varchar(50), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [ports_nac_id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+    port_id: { Name: port_id, Columns: [port_id], Unique: false, Type: BTREE }
 ports_perms:
   Columns:
     - { Field: user_id, Type: int(11), 'Null': false, Extra: '' }
