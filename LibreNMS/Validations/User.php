@@ -59,6 +59,10 @@ class User extends BaseValidation
             }
         }
 
+        # if no git, then we probably have different permissions by design
+        if (!is_git_install()) {
+            return;
+        }
 
         // Let's test the user configured if we have it
         if (Config::has('user')) {
