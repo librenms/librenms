@@ -1219,7 +1219,7 @@ function alert_details($details)
                 "'>" . $tmp_alerts['bgpPeerIdentifier'] . "</a>";
             $fault_detail .= ", AS" . $tmp_alerts['bgpPeerRemoteAs'];
             $fault_detail .= ", State " . $tmp_alerts['bgpPeerState'];
-            $fallback = false; 
+            $fallback = false;
         }
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
             if ($tmp_alerts['error'] == "") {
