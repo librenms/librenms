@@ -339,6 +339,9 @@
         "nobulk": {
             "type": "boolean"
         },
+        "snmp_max_oid": {
+            "type": "string"
+        },
         "ifXmcbc": {
             "type": "boolean"
         },

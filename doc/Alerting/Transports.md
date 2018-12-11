@@ -1,4 +1,5 @@
 source: Alerting/Transports.md
+path: blob/master/doc/
 
 # Transports
 
@@ -254,9 +255,18 @@ LibreNMS can send alerts to osTicket API which are then converted to osTicket ti
 | API Token | 123456789 |
 
 ## PagerDuty
-PagerDuty setup is currently done by a two way integration. Start this process from Settings -> Alerting Settings from within LibreNMS.
+LibreNMS can make use of PagerDuty, this is done by utilizing an API key and Integraton Key.
 
-[PagerDuty Docs](https://www.pagerduty.com/docs/guides/librenms-integration-guide/)
+API Keys can be found under 'API Access' in the PagerDuty portal.
+
+Integration Keys can be found under 'Integration' for the particular Service you have created in the PagerDuty portal.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| API Key | randomsample |
+| Integration Key | somerandomstring |
 
 ## Philips Hue
 Want to spice up your noc life? LibreNMS will flash all lights connected to your philips hue bridge whenever an alert is triggered. 
@@ -404,16 +414,18 @@ Each fault will be sent as a separate syslog.
 
 2. Generate a new bot with the command "/newbot" BotFather is then asking for a username and a normal name. After that your bot is created and you get a HTTP token. (for more options for your bot type "/help")
 
-3. Add your bot to telegram with the following url: `http://telegram.me/<botname>` and send some text to the bot.
+3. Add your bot to telegram with the following url: `http://telegram.me/<botname>` to use app or `https://web.telegram.org/<botname>` to use in web, and send some text to the bot.
 
 4. The BotFather should have responded with a token, copy your token code and go to the following page in chrome: `https://api.telegram.org/bot<tokencode>/getUpdates`
 (this could take a while so continue to refresh until you see something similar to below)
 
-5. You see a json code with the message you sent to the bot. Copy the Chat id. In this example that is “-9787468”
-   `"message":{"message_id":7,"from":"id":656556,"first_name":"Joo","last_name":"Doo","username":"JohnDoo"},"chat":{"id":-9787468,"title":"Telegram Group"},"date":1435216924,"text":"Hi"}}]}`
+5. You see a json code with the message you sent to the bot. Copy the Chat id. In this example that is “-9787468” within this example:
+   `"message":{"message_id":7,"from":"id":656556,"first_name":"Joo","last_name":"Doo","username":"JohnDoo"},"chat":{"id":-9787468,"title":"Telegram Group"},"date":1435216924,"text":"Hi"}}]}`.
    
 6. Now create a new "Telegram transport" in LibreNMS (Global Settings -> Alerting Settings -> Telegram transport).
 Click on 'Add Telegram config' and put your chat id and token into the relevant box.
+
+7. If want to use a group to receive alerts, you need to pick the Chat ID of the group chat, and not of the Bot itself.
 
 [Telegram Docs](https://core.telegram.org/api)
 
@@ -423,6 +435,19 @@ Click on 'Add Telegram config' and put your chat id and token into the relevant 
 | ------ | ------- |
 | Chat ID | 34243432 |
 | Token | 3ed32wwf235234 |
+| Format | HTML or MARKDOWN |
+
+## Twilio SMS
+
+Twilio will send your alert via SMS.  From your Twilio account you will need your account SID, account token and your Twilio SMS phone number that you would like to send the alerts from.  Twilio's APIs are located at: https://www.twilio.com/docs/api?filter-product=sms
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| SID | ACxxxxxxxxxxxxxxxxxxxxxxxxxxxx |
+| Token | 7xxxx573acxxxbc2xxx308d6xxx652d32 |
+| Twilio SMS Number | 8888778660 |
 
 ## VictorOps
 VictorOps provide a webHook url to make integration extremely simple. To get the URL required login to your VictorOps 

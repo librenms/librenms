@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $device_id = $widget_settings['device'];
 $column = $widget_settings['columnsize'];
@@ -25,12 +25,12 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
             </div>
             <div class="col-sm-6">
                 <select id="device" name="device" class="form-control">';
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $sql = "SELECT `devices`.`device_id`, `hostname` FROM `devices` WHERE disabled = 0 AND `type` = 'server' ORDER BY `hostname` ASC";
         $param = array();
     } else {
         $sql = "SELECT `devices`.`device_id`, `hostname` FROM `devices` LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id` WHERE disabled = 0 AND `type` = 'server' AND `DP`.`user_id`=? ORDER BY `hostname` ASC";
-        $param = array(Auth::id());
+        $param = array(LegacyAuth::id());
     }
     foreach (dbFetchRows($sql, $param) as $dev) {
         if ($dev['device_id'] == $cur_dev) {
@@ -53,6 +53,8 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
                     <option value="2"'.($cur_col_size == 2 ? ' selected' : ' ').'>2</option>
                     <option value="3"'.($cur_col_size == 3 ? ' selected' : ' ').'>3</option>
                     <option value="4"'.($cur_col_size == 4 ? ' selected' : ' ').'>4</option>
+                    <option value="6"'.($cur_col_size == 6 ? ' selected' : ' ').'>6</option>
+                    <option value="12"'.($cur_col_size == 12 ? ' selected' : ' ').'>12</option>
                 </select>
             </div>
         </div>
@@ -65,13 +67,13 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
 } else {
     if (device_permitted($device_id)) {
         $cpu = dbFetchCell("SELECT AVG(processor_usage) from processors WHERE device_id = ?", array($device_id));
-        $mem = dbFetchRows("SELECT mempool_descr, 
-                                ROUND(mempool_used / (1024*1024), 0) as used, 
-                                ROUND(mempool_total /(1024*1024), 0) as total 
+        $mem = dbFetchRows("SELECT mempool_descr,
+                                ROUND(mempool_used / (1024*1024), 0) as used,
+                                ROUND(mempool_total /(1024*1024), 0) as total
                                 FROM mempools WHERE device_id = ?", array($device_id));
-        $disk = dbFetchRows("SELECT storage_descr, 
-                                ROUND(storage_used / (1024*1024), 0) as used, 
-                                ROUND(storage_size / (1024*1024), 0) as total 
+        $disk = dbFetchRows("SELECT storage_descr,
+                                ROUND(storage_used / (1024*1024), 0) as used,
+                                ROUND(storage_size / (1024*1024), 0) as total
                                 FROM storage WHERE device_id = ?", array($device_id));
         $colno = 12 / $column;
         if (!$cpu) {
@@ -122,7 +124,7 @@ if (defined('SHOW_SETTINGS') || empty($widget_settings)) {
         $common_output[] = "<script>
     var cpugauge = new JustGage({
         id: 'cpu-" . $unique_id . "',
-        value: " . $cpu . ", 
+        value: " . $cpu . ",
         min: 0,
         max: 100,
         title: 'CPU Usage',

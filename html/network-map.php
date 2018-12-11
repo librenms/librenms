@@ -11,7 +11,7 @@
  *
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $links = 1;
 
@@ -36,12 +36,12 @@ if (isset($config['branding']) && is_array($config['branding'])) {
     }
 }
 
-if (is_numeric($_GET['device']) && isset($_GET['device'])) {
-    $where = 'WHERE device_id = '.mres($_GET['device']);
-} else {
-    $where = '';
+$where = '';
+$param = [];
+if (isset($_GET['device']) && is_numeric($_GET['device'])) {
+    $where = '&& device_id = ?';
+    $param[] = $_GET['device'];
 }
-
 // FIXME this shit probably needs tidied up.
 
 if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
@@ -52,12 +52,11 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
             graph [bgcolor=transparent];
 ';
 
-    if (!Auth::check()) {
+    if (!LegacyAuth::check()) {
         $map .= "\"Not authenticated\" [fontsize=20 fillcolor=\"lightblue\", URL=\"/\" shape=box3d]\n";
     } else {
         $loc_count = 1;
-
-        foreach (dbFetch("SELECT * from devices ".$where) as $device) {
+        foreach (dbFetch("SELECT *, locations.location FROM devices LEFT JOIN locations ON devices.location_id = locations.id WHERE 1 ".$where, $param) as $device) {
             if ($device) {
                 $links = dbFetch("SELECT * from ports AS I, links AS L WHERE I.device_id = ? AND L.local_port_id = I.port_id ORDER BY L.remote_hostname", array($device['device_id']));
                 if (count($links)) {
@@ -70,7 +69,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
                     }
                     $loc_id = $locations[$device['location']];
 
-                    $map .= "\"".$device['hostname']."\" [fontsize=20, fillcolor=\"lightblue\", group=".$loc_id." URL=\"{$config['base_url']}/device/device=".$device['device_id']."/tab=map/\" shape=box3d]\n";
+                    $map .= "\"".$device['hostname']."\" [fontsize=20, fillcolor=\"lightblue\", group=".$loc_id." URL=\"{$config['base_url']}/device/device=".$device['device_id']."/tab=neighbours/selection=map/\" shape=box3d]\n";
                 }
 
                 foreach ($links as $link) {
@@ -138,7 +137,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
                             }
 
                             if ($dst_host) {
-                                $map .= "\"$dst\" [URL=\"{$config['base_url']}/device/device=$dst_host/tab=map/\", fontsize=20, shape=box3d]\n";
+                                $map .= "\"$dst\" [URL=\"{$config['base_url']}/device/device=$dst_host/tab=neighbours/selection=map/\", fontsize=20, shape=box3d]\n";
                             } else {
                                 $map .= "\"$dst\" [ fontsize=20 shape=box3d]\n";
                             }
@@ -222,10 +221,10 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
     }
     echo $img;
 } else {
-    if (Auth::check()) {
+    if (LegacyAuth::check()) {
         // FIXME level 10 only?
         echo '<center>
-                  <object width=1200 height=1000 data="'. $config['base_url'] . '/map.php?format=svg" type="image/svg+xml"></object>
+                  <object width=1200 height=1000 data="'. $config['base_url'] . '/network-map.php?format=svg" type="image/svg+xml"></object>
               </center>
         ';
     }

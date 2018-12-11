@@ -9,19 +9,19 @@ modules:
             data:
                 -
                     oid: powerConsumption
-                    num_oid: .1.3.6.1.4.1.8691.7.116.1.10.8.
+                    num_oid: '.1.3.6.1.4.1.8691.7.116.1.10.8.{{ $index }}'
                     descr: 'Power Consumption'
                     index: 'powerConsumption.{{ $index }}'
                     value: powerConsumption
                 -
                     oid: powerConsumption
-                    num_oid: .1.3.6.1.4.1.8691.7.69.1.10.8.
+                    num_oid: '.1.3.6.1.4.1.8691.7.69.1.10.8.{{ $index }}'
                     descr: 'Power Consumption'
                     index: 'powerConsumption.{{ $index }}'
                     value: powerConsumption
                 -
                     oid: poePortConsumption
-                    num_oid: .1.3.6.1.4.1.8691.7.86.1.40.6.1.2.
+                    num_oid: '.1.3.6.1.4.1.8691.7.86.1.40.6.1.2.{{ $index }}'
                     descr: '{{ $ifDescr }} PoE Consumption'
                     index: 'poePortConsumption.{{ $index }}'
                     value: poePortConsumption
@@ -29,7 +29,7 @@ modules:
             data:
                 -
                     oid: sfpTemperature
-                    num_oid: .1.3.6.1.4.1.8691.7.86.1.10.7.1.3.
+                    num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.7.1.3.{{ $index }}'
                     descr: '{{ $ifDescr }} SFP module temperature'
                     index: 'sfpTemperature.{{ $index }}'
                     value: sfpTemperature
@@ -37,7 +37,7 @@ modules:
             data:
                 -
                     oid: sfpVoltage
-                    num_oid: .1.3.6.1.4.1.8691.7.86.1.10.7.1.4.
+                    num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.7.1.4.{{ $index }}'
                     descr: '{{ $ifDescr }} SFP module Supply Voltage'
                     index: 'sfpVoltage.{{ $index }}'
                     value: sfpVoltage
@@ -45,13 +45,13 @@ modules:
             data:
                 -
                     oid: sfpTxPower
-                    num_oid: .1.3.6.1.4.1.8691.7.86.1.10.7.1.5.
+                    num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.7.1.5.{{ $index }}'
                     descr: '{{ $ifDescr }} SFP module Transmit Power'
                     index: 'sfpTxPower.{{ $index }}'
                     value: sfpTxPower
                 -
                     oid: sfpRXPower
-                    num_oid: .1.3.6.1.4.1.8691.7.86.1.10.7.1.6.
+                    num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.7.1.6.{{ $index }}'
                     descr: '{{ $ifDescr }} SFP module Receive Power'
                     index: 'sfpRxPower.{{ $index }}'
                     value: sfpRXPower
@@ -59,7 +59,7 @@ modules:
             data:
                 -
                     oid: power1InputStatus
-                    num_oid: .1.3.6.1.4.1.8691.7.86.1.10.1.
+                    num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.1.{{ $index }}'
                     descr: 'Power Input 1 Status'
                     index: 'powerInputStatus.1'
                     value: power1InputStatus
@@ -69,7 +69,7 @@ modules:
                         - { value:  1, generic: 0, graph: 0, descr: present }
                 -
                     oid: power2InputStatus
-                    num_oid: .1.3.6.1.4.1.8691.7.86.1.10.2.
+                    num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.2.{{ $index }}'
                     descr: 'Power Input 2 Status'
                     index: 'powerInputStatus.2'
                     value: power2InputStatus

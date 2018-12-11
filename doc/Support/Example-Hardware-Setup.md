@@ -1,4 +1,5 @@
 source: Support/Example-Hardware-Setup.md
+path: blob/master/doc/
 ### Example hardware setups
 
 The information in this document is direct from users, it's a place for people to share their 

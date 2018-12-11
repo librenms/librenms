@@ -114,7 +114,7 @@ class ObjectCache implements ArrayAccess
      */
     public function offsetSet($obj, $value)
     {
-        if (!is_array($this->data[$obj])) {
+        if (!isset($this->data[$obj])) {
             $this->data[$obj] = array();
         }
 

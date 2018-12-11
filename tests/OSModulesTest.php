@@ -36,13 +36,29 @@ class OSModulesTest extends DBTestCase
      *
      * @group os
      * @dataProvider dumpedDataProvider
+     */
+    public function testDataIsValid($os, $variant, $modules)
+    {
+        // special case if data provider throws exception
+        if ($os === false) {
+            $this->fail($modules);
+        }
+
+        $this->assertNotEmpty($modules, "No modules to test for $os $variant");
+    }
+
+    /**
+     * Test all modules for a particular OS
+     *
+     * @group os
+     * @dataProvider dumpedDataProvider
      * @param string $os base os
      * @param string $variant optional variant
      * @param array $modules modules to test for this os
      */
     public function testOS($os, $variant, $modules)
     {
-        $this->requreSnmpsim();  // require snmpsim for tests
+        $this->requireSnmpsim();  // require snmpsim for tests
         global $snmpsim;
 
         try {
@@ -105,6 +121,11 @@ class OSModulesTest extends DBTestCase
             $modules = explode(',', getenv('TEST_MODULES'));
         }
 
-        return ModuleTestHelper::findOsWithData($modules);
+        try {
+            return ModuleTestHelper::findOsWithData($modules);
+        } catch (InvalidModuleException $e) {
+            // special case for exception
+            return [[false, false, $e->getMessage()]];
+        }
     }
 }

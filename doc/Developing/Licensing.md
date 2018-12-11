@@ -1,4 +1,5 @@
 ## Contributor Agreement
+path: blob/master/doc/
 
 By contributing code to LibreNMS (whether by a GitHub pull request, or by
 any other means), you assert that:

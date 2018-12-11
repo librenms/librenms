@@ -387,8 +387,8 @@ if ($config['enable_bgp']) {
                     );
 
                     foreach ($oids as $oid) {
-                        $tmp_delta = set_numeric($peer['c_update'][$oid] - $peer_afi[$oid]);
                         $tmp_prev  = set_numeric($peer_afi[$oid]);
+                        $tmp_delta = $cbgpPeers_cbgp_fields[$oid] - $tmp_prev;
                         if ($peer_afi[$oid . '_delta'] != $tmp_delta) {
                             $peer['c_update'][$oid . '_delta'] = $tmp_delta;
                         }

@@ -2534,7 +2534,7 @@
             "ports_nac": [
                 {
                     "auth_id": "000000000000000105EF0AFE",
-                    "PortAuthSessionMacAddress": "78:8a:20:7f:0e:96",
+                    "PortAuthSessionMacAddress": "78:8A:20:7F:0E:96",
                     "PortAuthSessionIPAddress": "120.50.253.35",
                     "PortAuthSessionAuthzStatus": "authorizationSuccess",
                     "PortAuthSessionDomain": "data",
@@ -2549,7 +2549,7 @@
                 },
                 {
                     "auth_id": "000000000000000205EF7F41",
-                    "PortAuthSessionMacAddress": "f0:9f:c2:1d:6e:1c",
+                    "PortAuthSessionMacAddress": "F0:9F:C2:1D:6E:1C",
                     "PortAuthSessionIPAddress": "19.67.146.146",
                     "PortAuthSessionAuthzStatus": "authorizationSuccess",
                     "PortAuthSessionDomain": "data",
@@ -2564,7 +2564,7 @@
                 },
                 {
                     "auth_id": "000000000000000305F03DAB",
-                    "PortAuthSessionMacAddress": "fc:ec:da:b0:b1:87",
+                    "PortAuthSessionMacAddress": "FC:EC:DA:B0:B1:87",
                     "PortAuthSessionIPAddress": "18.52.163.60",
                     "PortAuthSessionAuthzStatus": "authorizationSuccess",
                     "PortAuthSessionDomain": "data",
@@ -2579,7 +2579,7 @@
                 },
                 {
                     "auth_id": "000000000000000405F13EAB",
-                    "PortAuthSessionMacAddress": "78:8a:20:7f:0e:95",
+                    "PortAuthSessionMacAddress": "78:8A:20:7F:0E:95",
                     "PortAuthSessionIPAddress": "0.0.0.0",
                     "PortAuthSessionAuthzStatus": "authorizationSuccess",
                     "PortAuthSessionDomain": "data",
@@ -2594,7 +2594,7 @@
                 },
                 {
                     "auth_id": "000000000000000505F17F8C",
-                    "PortAuthSessionMacAddress": "00:90:9e:9f:9e:78",
+                    "PortAuthSessionMacAddress": "00:90:9E:9F:9E:78",
                     "PortAuthSessionIPAddress": "0.0.0.0",
                     "PortAuthSessionAuthzStatus": "authorizationSuccess",
                     "PortAuthSessionDomain": "data",

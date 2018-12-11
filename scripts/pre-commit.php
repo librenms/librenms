@@ -7,6 +7,47 @@ chdir($install_dir);
 
 require $install_dir . '/vendor/autoload.php';
 
+if (getenv('FILES')) {
+    $changed_files = rtrim(getenv('FILES'));
+} else {
+    $changed_files = exec("git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
+}
+
+$changed_files = explode(' ', $changed_files);
+
+$map = [
+    'docs'   => 0,
+    'python' => 0,
+    'bash'   => 0,
+    'php'    => 0,
+    'os'     => [],
+];
+
+foreach ($changed_files as $file) {
+    if (starts_with($file, 'doc/')) {
+        $map['docs']++;
+    }
+    if (ends_with($file, '.py')) {
+        $map['python']++;
+    }
+    if (ends_with($file, '.sh')) {
+        $map['bash']++;
+    }
+
+    if ($file == 'composer.lock') {
+        $map['php']++; // cause full tests to run
+    }
+
+    // check if os owned file or generic php file
+    if (!empty($os_name = os_from_file($file))) {
+        $map['os'][] = $os_name;
+    } elseif (ends_with($file, '.php')) {
+        $map['php']++;
+    }
+}
+
+$map['os'] = array_unique($map['os']);
+
 $short_opts = 'lsufqcho:m:';
 $long_opts = array(
     'lint',
@@ -80,7 +121,25 @@ if (check_opt($options, 'db')) {
     putenv('DBTEST=1');
 }
 
+// No php files, skip the php checks.
+if ($map['php'] === 0) {
+    putenv('SKIP_LINT_CHECK=1');
+    putenv('SKIP_STYLE_CHECK=1');
+}
+
+// If we have no php files and no OS' found then also skip unit checks.
+if ($map['php'] === 0 && empty($map['os']) && !$os) {
+    putenv('SKIP_UNIT_CHECK=1');
+}
+
+// If we have more than 4 (arbitrary number) of OS' then blank them out
+// Unit tests may take longer to run in a loop so fall back to all.
+if (count($map['os']) > 4) {
+    unset($map['os']);
+}
+
 // run tests in the order they were specified
+
 foreach (array_keys($options) as $opt) {
     $ret = 0;
     if ($opt == 'l' || $opt == 'lint') {
@@ -88,6 +147,14 @@ foreach (array_keys($options) as $opt) {
     } elseif ($opt == 's' || $opt == 'style') {
         $ret = run_check('style', $passthru, $command_only);
     } elseif ($opt == 'u' || $opt == 'unit') {
+        if (!empty($map['os']) && $map['php'] === 0) {
+            $os = $map['os'];
+        }
+
+        if (!empty($os)) {
+            echo 'Only checking os: ' . implode(', ', (array)$os) . PHP_EOL;
+        }
+
         $ret = run_check('unit', $passthru, $command_only, compact('fail_fast', 'os', 'module'));
     }
 
@@ -104,6 +171,48 @@ if ($all && $return === 0) {
 }
 exit($return); //return the combined/single return value of tests
 
+function os_from_file($file)
+{
+    if (starts_with($file, 'includes/definitions/')) {
+        return basename($file, '.yaml');
+    } elseif (starts_with($file, ['includes/polling', 'includes/discovery'])) {
+        return os_from_php($file);
+    } elseif (starts_with($file, 'LibreNMS/OS/')) {
+        if (preg_match('#LibreNMS/OS/[^/]+.php#', $file)) {
+            // convert class name to os name
+            preg_match_all("/[A-Z][a-z]*/", basename($file, '.php'), $segments);
+            $osname = implode('-', array_map('strtolower', $segments[0]));
+            $os = os_from_php($osname);
+            if ($os) {
+                return $os;
+            }
+            return os_from_php(str_replace('-', '_', $osname));
+        }
+    } elseif (starts_with($file, ['tests/snmpsim/', 'tests/data/'])) {
+        list($os,) = explode('_', basename(basename($file, '.json'), '.snmprec'), 2);
+        return $os;
+    }
+
+    return null;
+}
+
+/**
+ * Extract os name from path and validate it exists.
+ *
+ * @param $php_file
+ * @return null|string
+ */
+function os_from_php($php_file)
+{
+    $os = basename($php_file, '.inc.php');
+
+    if (file_exists("includes/definitions/$os.yaml")) {
+        return $os;
+    }
+
+    return null;
+}
+
 
 /**
  * Run the specified check and return the return value.
@@ -119,7 +228,7 @@ function run_check($type, $passthru, $command_only, $options = array())
 {
     global $completed_tests;
     if (getenv('SKIP_' . strtoupper($type) . '_CHECK') || $completed_tests[$type]) {
-        echo ucfirst($type) . ' check skipped.';
+        echo ucfirst($type) . " check skipped.\n";
         return 0;
     }
 
@@ -220,6 +329,8 @@ function check_style($passthru = false, $command_only = false)
  */
 function check_unit($passthru = false, $command_only = false, $options = array())
 {
+    echo 'Running unit tests... ';
+
     $phpunit_bin = check_exec('phpunit');
 
     $phpunit_cmd = "$phpunit_bin --colors=always";
@@ -229,7 +340,9 @@ function check_unit($passthru = false, $command_only = false, $options = array()
     }
 
     if ($options['os']) {
-        $phpunit_cmd .= " --group os --filter \"@{$options['os']}.*\"";
+        $filter = implode('.*|', (array)$options['os']);
+        // include tests that don't have data providers and only data sets that match
+        $phpunit_cmd .= " --group os --filter '/::test[A-Za-z]+$|::test[A-Za-z]+ with data set \"$filter.*\"$/'";
     }
 
     if ($options['module']) {
@@ -241,7 +354,6 @@ function check_unit($passthru = false, $command_only = false, $options = array()
         return 250;
     }
 
-    echo 'Running unit tests... ';
     if ($passthru) {
         echo PHP_EOL;
         passthru($phpunit_cmd, $phpunit_ret);
@@ -264,15 +376,12 @@ function check_unit($passthru = false, $command_only = false, $options = array()
  *  Check if the given options array contains any of the $opts specified
  *
  * @param array $options the array from getopt()
- * @param string $opts,... options to check for
+ * @param string ...$opts options to check for
  * @return bool If one of the specified options is set
  */
-function check_opt($options)
+function check_opt($options, ...$opts)
 {
-    $args = func_get_args();
-    array_shift($args);
-
-    foreach ($args as $option) {
+    foreach ($opts as $option) {
         if (isset($options[$option])) {
             if ($options[$option] === false) {
                 // no data, return that option is enabled

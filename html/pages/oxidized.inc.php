@@ -34,6 +34,7 @@ $pagetitle[] = 'Oxidized';
                                 <th data-column-id="last_update">Last Update</th>
                                 <th data-column-id="model">Model</th>
                                 <th data-column-id="group">Group</th>
+                                <th data-column-id="actions"></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -62,6 +63,7 @@ $pagetitle[] = 'Oxidized';
     </div>
 </div>
 <script>
+
     $("[name='btn-search']").on('click', function (event) {
         event.preventDefault();
         var $this = $(this);

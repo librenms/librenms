@@ -32,6 +32,7 @@ class PortsNac extends BaseModel
     public $timestamps = false;
     protected $fillable = [
         'auth_id',
+        'port_id',
         'device_id',
         'PortAuthSessionMacAddress',
         'PortAuthSessionIPAddress',

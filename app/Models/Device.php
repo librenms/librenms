@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use DB;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -136,6 +137,99 @@ class Device extends BaseModel
     }
 
     /**
+     * Get the display name of this device (hostname) unless force_ip_to_sysname is set
+     * and hostname is an IP and sysName is set
+     *
+     * @return string
+     */
+    public function displayName()
+    {
+        if (\LibreNMS\Config::get('force_ip_to_sysname') && $this->sysName && IP::isValid($this->hostname)) {
+            return $this->sysName;
+        }
+
+        return $this->hostname;
+    }
+
+    /**
+     * Get the shortened display name of this device.
+     * Length is always overridden by shorthost_target_length.
+     *
+     * @param int $length length to shorten to, will not break up words so may be longer
+     * @return string
+     */
+    public function shortDisplayName($length = 12)
+    {
+        $name = $this->displayName();
+
+        // IP addresses should not be shortened
+        if (IP::isValid($name)) {
+            return $name;
+        }
+
+        $length = \LibreNMS\Config::get('shorthost_target_length', $length);
+        if ($length < strlen($name)) {
+            $take = substr_count($name, '.', 0, $length) + 1;
+            return implode('.', array_slice(explode('.', $name), 0, $take));
+        }
+
+        return $name;
+    }
+
+    /**
+     * Check if user can access this device.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canAccess($user)
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->hasGlobalRead()) {
+            return true;
+        }
+
+        return DB::table('devices_perms')
+            ->where('user_id', $user->user_id)
+            ->where('device_id', $this->device_id)->exists();
+    }
+
+    public function formatUptime($short = false)
+    {
+        $result = '';
+        $interval = $this->uptime;
+        $data = [
+            'years' => 31536000,
+            'days' => 86400,
+            'hours' => 3600,
+            'minutes' => 60,
+            'seconds' => 1,
+        ];
+
+        foreach ($data as $k => $v) {
+            if ($interval >= $v) {
+                $diff = floor($interval / $v);
+
+                $result .= " $diff";
+                if ($short) {
+                    $result .= substr($k, 0, 1);
+                } elseif ($diff > 1) {
+                    $result .= $k;
+                } else {
+                    $result .= substr($k, 0, -1);
+                }
+
+                $interval -= $v * $diff;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * @return string
      */
     public function logo()
@@ -224,6 +318,7 @@ class Device extends BaseModel
     }
 
     // ---- Accessors/Mutators ----
+
     public function getIconAttribute($icon)
     {
         if (isset($icon)) {
@@ -358,6 +453,11 @@ class Device extends BaseModel
     public function groups()
     {
         return $this->belongsToMany('App\Models\DeviceGroup', 'device_group_device', 'device_id', 'device_group_id');
+    }
+
+    public function location()
+    {
+        return $this->belongsTo('App\Models\Location', 'location_id', 'id');
     }
 
     public function ospfInstances()

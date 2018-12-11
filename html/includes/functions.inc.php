@@ -12,7 +12,7 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
@@ -203,21 +203,10 @@ function generate_link($text, $vars, $new_vars = array())
 }//end generate_link()
 
 
-function generate_url($vars, $new_vars = array())
+function generate_url($vars, $new_vars = [])
 {
-    $vars = array_merge($vars, $new_vars);
-
-    $url = $vars['page'] . '/';
-    unset($vars['page']);
-
-    foreach ($vars as $var => $value) {
-        if ($value == '0' || $value != '' && strstr($var, 'opt') === false && is_numeric($var) === false) {
-            $url .= $var . '=' . urlencode($value) . '/';
-        }
-    }
-
-    return ($url);
-}//end generate_url()
+    return \LibreNMS\Util\Url::generate($vars, $new_vars);
+}
 
 
 function escape_quotes($text)
@@ -369,26 +358,8 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
 
 function overlib_link($url, $text, $contents, $class = null)
 {
-    global $config;
-
-    $contents = "<div style=\'background-color: #FFFFFF;\'>" . $contents . '</div>';
-    $contents = str_replace('"', "\'", $contents);
-    if ($class === null) {
-        $output = '<a href="' . $url . '"';
-    } else {
-        $output = '<a class="' . $class . '" href="' . $url . '"';
-    }
-
-    if ($config['web_mouseover'] === false) {
-        $output .= '>';
-    } else {
-        $output .= " onmouseover=\"return overlib('" . $contents . "'" . $config['overlib_defaults'] . ",WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
-    }
-
-    $output .= $text . '</a>';
-
-    return $output;
-}//end overlib_link()
+    return \LibreNMS\Util\Url::overlibLink($url, $text, $contents, $class);
+}
 
 
 function generate_graph_popup($graph_array)
@@ -452,7 +423,7 @@ function bill_permitted($bill_id)
 {
     global $permissions;
 
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif ($permissions['bill'][$bill_id]) {
         $allowed = true;
@@ -472,7 +443,7 @@ function port_permitted($port_id, $device_id = null)
         $device_id = get_device_id_by_port_id($port_id);
     }
 
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif (device_permitted($device_id)) {
         $allowed = true;
@@ -495,7 +466,7 @@ function application_permitted($app_id, $device_id = null)
             $device_id = get_device_id_by_app_id($app_id);
         }
 
-        if (Auth::user()->hasGlobalRead()) {
+        if (LegacyAuth::user()->hasGlobalRead()) {
             $allowed = true;
         } elseif (device_permitted($device_id)) {
             $allowed = true;
@@ -516,7 +487,7 @@ function device_permitted($device_id)
 {
     global $permissions;
 
-    if (Auth::user()->hasGlobalRead()) {
+    if (LegacyAuth::user()->hasGlobalRead()) {
         $allowed = true;
     } elseif ($permissions['device'][$device_id]) {
         $allowed = true;
@@ -536,46 +507,66 @@ function print_graph_tag($args)
 
 function generate_graph_tag($args)
 {
-    $urlargs = array();
-    foreach ($args as $key => $arg) {
-        $urlargs[] = $key . '=' . urlencode($arg);
-    }
-
-    return '<img src="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
-}//end generate_graph_tag()
+    return \LibreNMS\Util\Url::graphTag($args);
+}
 
 function generate_lazy_graph_tag($args)
 {
-    global $config;
+    return \LibreNMS\Util\Url::lazyGraphTag($args);
+}
+
+function generate_dynamic_graph_tag($args)
+{
     $urlargs = array();
-    $w = 0;
-    $h = 0;
+    $width = 0;
     foreach ($args as $key => $arg) {
         switch (strtolower($key)) {
             case 'width':
-                $w = $arg;
+                $width = $arg;
+                $value = "{{width}}";
                 break;
-            case 'height':
-                $h = $arg;
+            case 'from':
+                $value = "{{start}}";
                 break;
-            case 'lazy_w':
-                $lazy_w = $arg;
+            case 'to':
+                $value = "{{end}}";
+                break;
+            default:
+                $value = $arg;
                 break;
         }
-        $urlargs[] = $key . "=" . urlencode($arg);
+        $urlargs[] = $key . "=" . $value;
     }
 
-    if (isset($lazy_w)) {
-        $w = $lazy_w;
-    }
+    return '<img style="width:'.$width.'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+}//end generate_dynamic_graph_tag()
 
-    if ($config['enable_lazy_load'] === true) {
-        return '<img class="lazy img-responsive" data-original="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
-    } else {
-        return '<img class="img-responsive" src="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
-    }
-}//end generate_lazy_graph_tag()
+function generate_dynamic_graph_js($args)
+{
+    $from = (is_numeric($args['from']) ? $args['from'] : '(new Date()).getTime() / 1000 - 24*3600');
+    $range = (is_numeric($args['to']) ? $args['to'] - $args['from'] : '24*3600');
 
+    $output = '<script src="js/RrdGraphJS/q-5.0.2.min.js"></script>
+        <script src="js/RrdGraphJS/moment-timezone-with-data.js"></script>
+        <script src="js/RrdGraphJS/rrdGraphPng.js"></script>
+          <script type="text/javascript">
+              q.ready(function(){
+                  var graphs = [];
+                  q(\'.graph\').forEach(function(item){
+                      graphs.push(
+                          q(item).rrdGraphPng({
+                              canvasPadding: 120,
+                                initialStart: ' . $from . ',
+                                initialRange: ' . $range . '
+                          })
+                      );
+                  });
+              });
+              // needed for dynamic height
+              window.onload = function(){ window.dispatchEvent(new Event(\'resize\')); }
+          </script>';
+    return $output;
+}//end generate_dynamic_graph_js()
 
 function generate_graph_js_state($args)
 {
@@ -828,27 +819,12 @@ function devclass($device)
 
 function getlocations()
 {
-    $locations = array();
-
-    // Fetch regular locations
-    if (Auth::user()->hasGlobalRead()) {
-        $rows = dbFetchRows('SELECT location FROM devices AS D GROUP BY location ORDER BY location');
-    } else {
-        $rows = dbFetchRows('SELECT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? GROUP BY location ORDER BY location', array(Auth::id()));
+    if (LegacyAuth::user()->hasGlobalRead()) {
+        return dbFetchRows('SELECT id, location FROM locations ORDER BY location');
     }
 
-    foreach ($rows as $row) {
-        // Only add it as a location if it wasn't overridden (and not already there)
-        if ($row['location'] != '') {
-            if (!in_array($row['location'], $locations)) {
-                $locations[] = $row['location'];
-            }
-        }
-    }
-
-    sort($locations);
-    return $locations;
-}//end getlocations()
+    return dbFetchRows('SELECT id, L.location FROM devices AS D, locations AS L, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = ? AND D.location_id = L.id ORDER BY location', [LegacyAuth::id()]);
+}
 
 
 /**
@@ -1219,7 +1195,7 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
     if (!empty($items)) {
         foreach ($items as $item) {
             $output .= '
-            <div class="form-group has-feedback">
+            <div class="form-group has-feedback ' . (isset($item['class']) ? $item['class'] : '') . '">
                 <label for="' . $item['name'] . '"" class="col-sm-4 control-label">' . $item['descr'] . ' </label>
                 <div data-toggle="tooltip" title="' . $config_groups[$item['name']]['config_descr'] . '" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
                 <div class="col-sm-4">
@@ -1245,7 +1221,7 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
                 ';
             } elseif ($item['type'] == 'select') {
                 $output .= '
-                <select id="' . $config_groups[$item['name']]['name'] . '" class="form-control" name="global-config-select" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
+                <select id="' . ($config_groups[$item['name']]['name'] ?: $item['name']) . '" class="form-control" name="global-config-select" data-config_id="' . $config_groups[$item['name']]['config_id'] . '">
                 ';
                 if (!empty($item['options'])) {
                     foreach ($item['options'] as $option) {
@@ -1460,11 +1436,19 @@ function get_oxidized_nodes_list()
 
     foreach ($data as $object) {
         $device = device_by_name($object['name']);
+        if (! device_permitted($device['device_id'])) {
+            //user cannot see this device, so let's skip it.
+            continue;
+        }
         $fa_color = $object['status'] == 'success' ? 'success' : 'danger';
         echo "
         <tr>
         <td>
-        " . generate_device_link($device) . "
+        " . generate_device_link($device);
+        if ($device['device_id'] == 0) {
+            echo "(device '" . $object['name'] . "' not in LibreNMS)";
+        }
+        echo "
         </td>
         <td>
         <i class='fa fa-square text-" . $fa_color . "'></i>
@@ -1477,6 +1461,25 @@ function get_oxidized_nodes_list()
         </td>
         <td>
         " . $object['group'] . "
+        </td>
+        <td>
+        ";
+        if (! $device['device_id'] == 0) {
+            echo "
+          <button class='btn btn-default btn-sm' name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "' onclick='refresh_oxidized_node(\"" . $device['hostname'] . "\")'>
+            <i class='fa fa-refresh'></i>
+          </button>
+          <a href='" . generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig')) . "'>
+            <i class='fa fa-align-justify fa-lg icon-theme'></i>
+          </a>
+            ";
+        } else {
+            echo "
+          <button class='btn btn-default btn-sm' disabled name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "'>
+            <i class='fa fa-refresh'></i>
+          </button>";
+        }
+        echo "
         </td>
         </tr>";
     }
@@ -1576,31 +1579,16 @@ function get_disks_with_smart($device, $app_id)
  */
 function get_dashboards($user_id = null)
 {
+    $user = is_null($user_id) ? Auth::user() : \App\Models\User::find($user_id);
     $default = get_user_pref('dashboard');
-    $dashboards = dbFetchRows(
-        "SELECT * FROM `dashboards` WHERE dashboards.access > 0 || dashboards.user_id = ?",
-        array(is_null($user_id) ? Auth::id() : $user_id)
-    );
 
-    $usernames = array(
-        Auth::id() => Auth::user()->username
-    );
+    return \App\Models\Dashboard::allAvailable($user)->with('user')->get()->map(function ($dashboard) use ($default) {
+        $dash = $dashboard->toArray();
+        $dash['username'] = $dashboard->user ? $dashboard->user->username : '';
+        $dash['default'] = $default == $dashboard->dashboard_id;
 
-    $result = array();
-    foreach ($dashboards as $dashboard) {
-        $duid = $dashboard['user_id'];
-        if (!isset($usernames[$duid])) {
-            $user = Auth::get()->getUser($duid);
-            $usernames[$duid] = $user['username'];
-        }
-
-        $dashboard['username'] = $usernames[$duid];
-        $dashboard['default'] = $dashboard['dashboard_id'] == $default;
-
-        $result[$dashboard['dashboard_id']] = $dashboard;
-    }
-
-    return $result;
+        return $dash;
+    })->keyBy('dashboard_id')->all();
 }
 
 /**
@@ -1641,6 +1629,31 @@ function get_zfs_pools($device_id)
     if (isset($zfsc[$device_id])) {
         $id = $component->getFirstComponentID($zfsc, $device_id);
         return json_decode($zfsc[$device_id][$id]['pools']);
+    }
+
+    return array();
+}
+
+/**
+ * Get the ports for a device... just requires the device ID
+ * an empty return means portsactivity is not in use or there are currently no ports
+ * @param $device_id
+ * @return array
+ */
+function get_portactivity_ports($device_id)
+{
+    $options=array(
+        'filter' => array(
+             'type' => array('=', 'portsactivity'),
+        ),
+    );
+
+    $component=new LibreNMS\Component();
+    $portsc=$component->getComponents($device_id, $options);
+
+    if (isset($portsc[$device_id])) {
+        $id = $component->getFirstComponentID($portsc, $device_id);
+        return json_decode($portsc[$device_id][$id]['ports']);
     }
 
     return array();

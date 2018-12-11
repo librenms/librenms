@@ -1,4 +1,5 @@
 source: Extensions/Network-Map.md
+path: blob/master/doc/
 
 # Network Map
 

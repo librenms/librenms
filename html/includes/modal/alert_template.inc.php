@@ -11,9 +11,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -35,7 +35,11 @@ if (!Auth::user()->hasGlobalAdmin()) {
                         </div>
                         <div class="form-group">
                             <label for="template">Template: </label>
-                            <textarea class="form-control" id="template" name="template" rows="15"></textarea>
+                            <textarea class="form-control" id="template" name="template" style="font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;" rows="15"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="rules_list">Attach template to rules: </label>
+                            <select id="rules_list" name="rules_list[]" class="form-control" multiple="multiple"></select>
                         </div>
                         <div class="form-group">
                             <label for="title">Alert title: </label>
@@ -46,6 +50,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
                             <input type="text" class="form-control input-sm" id="title_rec" name="title_rec" placeholder="Recovery Title">
                         </div>
                         <button type="button" class="btn btn-primary btn-sm" name="create-template" id="create-template">Create template</button>
+                        <!--//FIXME remove Deprecated template-->
                         <button type="button" class="btn btn-default btn-sm" name="convert-template" id="convert-template" title="Convert template to new syntax" style="display: none">Convert template</button>
                     </div>
                 </div>
@@ -53,8 +58,8 @@ if (!Auth::user()->hasGlobalAdmin()) {
         </div>
     </div>
 </div>
-<script>
 
+<script type="text/javascript">
 $('#alert-template').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var template_id = $('#template_id').val();
@@ -66,23 +71,56 @@ $('#alert-template').on('show.bs.modal', function (event) {
             $('#name').prop("disabled",true);
         }
         $('#create-template').text('Update template');
-        $.ajax({
-            type: "POST",
-            url: "ajax_form.php",
-            data: { type: "parse-alert-template", template_id: template_id },
-            dataType: "json",
-            success: function(output) {
-                $('#template').val(output['template']);
-                $('#name').val(output['name']);
-                $('#title').val(output['title']);
-                $('#title_rec').val(output['title_rec']);
-                if(output['template'].indexOf("{/if}")>=0){
-                    toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old_Templates/');
-                    $('#convert-template').show();
-                }
-            }
-        });
     }
+    $.ajax({
+        type: "POST",
+        url: "ajax_form.php",
+        data: { type: "parse-alert-template", template_id: template_id },
+        dataType: "json",
+        success: function(output) {
+            $('#template').val(output['template']);
+            $('#name').val(output['name']);
+            $('#title').val(output['title']);
+            $('#title_rec').val(output['title_rec']);
+            var selected_rules = [];
+            $.each(output.rules, function(i, rule) {
+                var ruleElem = $('<option>', {
+                    value: rule.id,
+                    text : rule.name
+                }).attr('data-usedby', '');
+                if (rule.selected) {
+                    selected_rules.push(parseInt(rule.id));
+                } else if (rule.used !== '') {
+                    ruleElem.attr('data-usedby', rule.used).prop("disabled", true);
+                }
+                $('#rules_list').append(ruleElem);
+            });
+            $('#rules_list').select2({
+                theme: "bootstrap",
+                dropdownAutoWidth : true,
+                width: "auto",
+                allowClear: true,
+                placeholder: "Nothing selected",
+                templateResult: function(data) {
+                    if (data.id && data.element.dataset.usedby !== '') {
+                        return $(
+                            '<span>' + data.text + ' <span class="label label-default">Used in template "' + data.element.dataset.usedby + '"</span></span>'
+                        );
+                    } else if (data.id && data.selected) {
+                        return $(
+                            '<span><i class="fa fa-check"></i> ' + data.text + '</span>'
+                        );
+                    }
+                    return data.text;
+                }
+            }).val(selected_rules).trigger("change");
+            //FIXME remove Deprecated template
+            if(output['template'].indexOf("{/if}")>=0){
+                toastr.info('The old template syntax is no longer supported. Please see https://docs.librenms.org/Alerting/Old_Templates/');
+                $('#convert-template').show();
+            }
+        }
+    });
 });
 
 $('#alert-template').on('hide.bs.modal', function(event) {
@@ -91,24 +129,34 @@ $('#alert-template').on('hide.bs.modal', function(event) {
     $('#line').val('');
     $('#value').val('');
     $('#name').val('');
+    $('#rules_list').find('option').remove().end().select2('destroy');
     $('#create-template').text('Create template');
     $('#default-template').val('0');
     $('#reset-default').remove();
     $('#name').prop("disabled",false);
     $('#error').val('');
+    //FIXME remove Deprecated template
     $('#convert-template').hide();
 });
 
 $('#create-template').click('', function(e) {
     e.preventDefault();
+
+    var rules_items = [];
+    $('#rules_list :selected').each(function(i, selectedElement) {
+        rules_items.push($(selectedElement).val());
+    });
+
     var template = $("#template").val();
     var template_id = $("#template_id").val();
     var name = $("#name").val();
     var title = $("#title").val();
     var title_rec = $("#title_rec").val();
-    alertTemplateAjaxOps(template, name, template_id, title, title_rec);
+
+    alertTemplateAjaxOps(template, name, template_id, title, title_rec, rules_items.join(','));
 });
 
+//FIXME remove Deprecated template
 $('#convert-template').click('', function(e) {
     e.preventDefault();
     var template = $("#template").val();
@@ -134,24 +182,20 @@ $('#convert-template').click('', function(e) {
     });
 });
 
-function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
-{
+function alertTemplateAjaxOps(template, name, template_id, title, title_rec, rules) {
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec},
+        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec, rules: rules},
         dataType: "json",
         success: function(output) {
-            console.log(output);
             if(output.status == 'ok') {
                 toastr.success(output.message);
                 $("#alert-template").modal('hide');
-
                 if(template_id != null && template_id != '') {
                     $('#templatetable tbody tr').each(function (i, row) {
                         if ($(row).children().eq(0).text() == template_id) {
                             $(row).children().eq(1).text(name);
-                            // We found our match so stop looping through the table
                             return false;
                         }
                     });
@@ -167,7 +211,5 @@ function alertTemplateAjaxOps(template, name, template_id, title, title_rec)
             toastr.error('An error occurred updating this alert template.');
         }
     });
-
 }
-
 </script>

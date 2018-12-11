@@ -1,12 +1,11 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh = true;
 
 require_once 'includes/modal/alert_template.inc.php';
 require_once 'includes/modal/delete_alert_template.inc.php';
-require_once 'includes/modal/attach_alert_template.inc.php';
 ?>
 <div class="table-responsive">
     <table id="templatetable" class="table table-hover table-condensed" width="100%">
@@ -15,25 +14,28 @@ require_once 'includes/modal/attach_alert_template.inc.php';
             <th data-column-id="id" data-searchable="false" data-identifier="true" data-type="numeric">#</th>
             <th data-column-id="templatename">Name</th>
             <th data-column-id="actions" data-searchable="false" data-formatter="commands">Action</th>
+            <th data-column-id="old_template" data-searchable="false" data-visible="false">Old template</th>
           </tr>
       </thead>
       <tbody>
-          <tr data-row-id="0">
-            <td>0</td>
-            <td>Default Alert Template</td>
-            <td></td>
-          </tr>
 <?php
-$full_query = "SELECT id, name from alert_templates";
-foreach (dbFetchRows($full_query, $param) as $template) {
+$full_query = dbFetchRows("SELECT id, name, template from alert_templates", $param);
+foreach ($full_query as $template) {
     if ($template['name'] == 'Default Alert Template') {
         $default_tplid = $template['id'];
-        continue;
+        $template['id'] = 0;
     }
+    $templates[] = $template;
+}
+$template_ids = array_column($templates, 'id');
+array_multisort($templates, SORT_ASC, $template_ids);
+foreach ($templates as $template) {
+    $old_template = strpos($template['template'], "{/if}") !== false ? "1" : "";
     echo '<tr data-row-id="'.$template['id'].'">
             <td>'.$template['id'].'</td>
             <td>'.$template['name'].'</td>
             <td></td>
+            <td>'.$old_template.'</td>
           </tr>';
 }
 
@@ -48,7 +50,7 @@ $(document).ready(function() {
         templates: {
         header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
                     <div class="row"> \
-<?php if (Auth::user()->hasGlobalAdmin()) { ?>
+<?php if (LegacyAuth::user()->hasGlobalAdmin()) { ?>
                         <div class="col-sm-8 actionBar"> \
                             <span class="pull-left"> \
                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template" data-template_id="">Create new alert template</button> \
@@ -63,10 +65,14 @@ $(document).ready(function() {
         formatters: {
             "commands": function(column, row) {
                 var response = '';
+                //FIXME remove Deprecated template
+                if (row.old_template == "1") {
+                    response = "<button type='button' class='btn btn-xs btn-warning' data-content=' class='btn btn-xs btn-warning' data-content='><i class='fa fa-exclamation-triangle' title='This is a legacy template and needs converting, please edit this template and click convert then save'><i class='fa fa-exclamation-triangle'></i></button> ";
+                }
                 if(row.id == 0) {
-                    response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" disabled=\"disabled\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button> " + "<button type='button' class='btn btn-warning btn-xs command-attach' disabled=\"disabled\"><i class='fa fa-th-list' aria-hidden='true'></i></button>";
+                    response = response + "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" disabled=\"disabled\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
                 } else {
-                    response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-toggle=\"modal\" data-target='#confirm-delete-alert-template' data-template_id=\"" + row.id + "\" name='delete-alert-template'><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button> " + "<button type='button' class='btn btn-warning btn-xs command-attach' data-toggle='modal' data-target='#attach-alert-template' data-template_id='" + row.id + "' name='attach-alert-template'><i class='fa fa-th-list' aria-hidden='true'></i></button>";
+                    response = response + "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-toggle=\"modal\" data-target='#confirm-delete-alert-template' data-template_id=\"" + row.id + "\" name='delete-alert-template'><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
                 }
                 return response;
             }
@@ -86,9 +92,6 @@ $(document).ready(function() {
         }).end().find(".command-delete").on("click", function(e) {
             $('#template_id').val($(this).data("template_id"));
             $('#confirm-delete-alert-template').modal('show');
-        }).end().find(".command-attach").on("click", function(e) {
-            $('#template_id').val($(this).data("template_id"));
-            $('#attach-alert-template').modal('show');
         });
     });
 });

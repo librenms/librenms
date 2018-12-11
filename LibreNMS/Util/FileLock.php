@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Util;
 
+use LibreNMS\Config;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Interfaces\Lock;
 
@@ -42,10 +43,10 @@ class FileLock implements Lock
 
     private function __construct($lock_name)
     {
-        global $config;
+        $install_dir = Config::get('install_dir');
 
         $this->name = $lock_name;
-        $this->file = "$config[install_dir]/.$lock_name.lock";
+        $this->file = "$install_dir/.$lock_name.lock";
         $this->handle = fopen($this->file, "w+");
     }
 

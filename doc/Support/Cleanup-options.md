@@ -1,4 +1,5 @@
 source: Support/Cleanup-options.md
+path: blob/master/doc/
 
 #  Cleanup Options
 As the number of devices starts to grow in your LibreNMS install, so will things such as the RRD files, MySQL database containing eventlogs, Syslogs and performance data etc. Your LibreNMS install could become quite large so it becomes necessary to clean up those entries. With Cleanup Options, you can keep in crontrol. 

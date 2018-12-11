@@ -10,7 +10,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 ini_set('allow_url_fopen', 0);
 
@@ -19,7 +19,7 @@ require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 set_debug($_GET['debug']);
 
-if (!Auth::check()) {
+if (!LegacyAuth::check()) {
     echo 'unauthenticated';
     exit;
 }
@@ -42,7 +42,7 @@ if ($_GET['query'] && $_GET['cmd']) {
                 break;
 
             case 'nmap':
-                if (!Auth::user()->isAdmin()) {
+                if (!LegacyAuth::user()->isAdmin()) {
                     echo 'insufficient privileges';
                 } else {
                     $cmd = $config['nmap']." $host";

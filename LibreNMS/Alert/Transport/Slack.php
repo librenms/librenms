@@ -33,7 +33,7 @@ class Slack extends Transport
             return $this->deliverAlertOld($obj, $opts);
         }
         $slack_opts['url'] = $this->config['slack-url'];
-        foreach (explode(PHP_EOL, $this->config['options']) as $option) {
+        foreach (explode(PHP_EOL, $this->config['slack-options']) as $option) {
             list($k,$v) = explode('=', $option);
             $slack_opts[$k] = $v;
         }
@@ -98,7 +98,7 @@ class Slack extends Transport
                 ],
                 [
                     'title' => 'Slack Options',
-                    'name' => 'options',
+                    'name' => 'slack-options',
                     'descr' => 'Slack Options',
                     'type' => 'textarea',
                 ]

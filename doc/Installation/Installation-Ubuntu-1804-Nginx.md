@@ -1,10 +1,11 @@
 source: Installation/Installation-Ubuntu-1804-Nginx.md
+path: blob/master/doc/
 > NOTE: These instructions assume you are the **root** user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
 **Please note the minimum supported PHP version is 5.6.4**
 
 ## Install Required Packages ##
-
+    add-apt-repository universe
     apt update
     apt install curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-snmp php7.2-xml php7.2-zip python-memcache python-mysqldb rrdtool snmp snmpd whois
     
@@ -89,7 +90,7 @@ server {
     rm /etc/nginx/sites-enabled/default
     systemctl restart nginx
 
-#### Configure snmpd
+### Configure snmpd
 
     cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
     vi /etc/snmp/snmpd.conf

@@ -30,6 +30,11 @@ use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
 
+/**
+ * Class SVGTest
+ * @package LibreNMS\Tests
+ * @group os
+ */
 class SVGTest extends TestCase
 {
     public function testSVGContainsPNG()

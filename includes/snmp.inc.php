@@ -84,28 +84,24 @@ function get_mib_dir($device)
  * If $mibdir is empty '', return an empty string
  *
  * @param string $mibdir should be the name of the directory within $config['mib_dir']
- * @param string $device
+ * @param array $device
  * @return string The option string starting with -M
  */
-function mibdir($mibdir = null, $device = array())
+function mibdir($mibdir = null, $device = [])
 {
-    global $config;
+    $base = Config::get('mib_dir');
+    $dirs = get_mib_dir($device);
+    $dirs[] = "$base/$mibdir";
 
-    $extra_dir = implode(':', get_mib_dir($device));
-    if (!empty($extra_dir)) {
-        $extra_dir = ":".$extra_dir;
-    }
+    // make sure base directory is included first
+    array_unshift($dirs, $base);
 
-    if (is_null($mibdir)) {
-        return " -M ${config['mib_dir']}$extra_dir";
-    }
+    // remove trailing /, remove empty dirs, and remove duplicates
+    $dirs = array_unique(array_filter(array_map(function ($dir) {
+        return rtrim($dir, '/');
+    }, $dirs)));
 
-    if (empty($mibdir)) {
-        // use system mibs
-        return '';
-    }
-
-    return " -M ${config['mib_dir']}$extra_dir:${config['mib_dir']}/$mibdir";
+    return " -M " . implode(':', $dirs);
 }//end mibdir()
 
 /**
@@ -225,17 +221,25 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
 function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
 {
     $time_start = microtime(true);
+    $oid_limit = get_device_oid_limit($device);
 
-    if (is_array($oids)) {
-        $oids = implode(' ', $oids);
+    if (!is_array($oids)) {
+        $oids = explode(" ", $oids);
     }
 
-    $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd));
+    $data = [];
+    foreach (array_chunk($oids, $oid_limit) as $chunk) {
+        $partial_oids = implode(' ', $chunk);
+        $cmd = gen_snmpget_cmd($device, $partial_oids, $options, $mib, $mibdir);
+        $result = trim(external_exec($cmd));
+        if ($result) {
+            $data = array_merge($data, explode("\n", $result));
+        }
+    }
 
     $array = array();
     $oid = '';
-    foreach (explode("\n", $data) as $entry) {
+    foreach ($data as $entry) {
         if (str_contains($entry, '=')) {
             list($oid,$value)  = explode('=', $entry, 2);
             $oid               = trim($oid);
@@ -775,15 +779,15 @@ function snmp_gen_auth(&$device)
             $cmd = " -v3 -n '".$device['context_name']."' -l '".$device['authlevel']."'";
         }
 
-        if ($device['authlevel'] === 'noAuthNoPriv') {
+        if (strtolower($device['authlevel']) === 'noauthnopriv') {
             // We have to provide a username anyway (see Net-SNMP doc)
             $username = !empty($device['authname']) ? $device['authname'] : 'root';
             $cmd .= " -u '".$username."'";
-        } elseif ($device['authlevel'] === 'authNoPriv') {
+        } elseif (strtolower($device['authlevel']) === 'authnopriv') {
             $cmd .= " -a '".$device['authalgo']."'";
             $cmd .= " -A '".$device['authpass']."'";
             $cmd .= " -u '".$device['authname']."'";
-        } elseif ($device['authlevel'] === 'authPriv') {
+        } elseif (strtolower($device['authlevel']) === 'authpriv') {
             $cmd .= " -a '".$device['authalgo']."'";
             $cmd .= " -A '".$device['authpass']."'";
             $cmd .= " -u '".$device['authname']."'";

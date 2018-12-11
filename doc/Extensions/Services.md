@@ -1,10 +1,21 @@
 source: Extensions/Services.md
-# Setting up Services
+path: blob/master/doc/
+[TOC]
+
+# Setting up services
 
 Services within LibreNMS provides the ability to use Nagios plugins to perform additional monitoring outside of SNMP.
 
 **These services are tied into an existing device so you need at least one device to be able to add it
 to LibreNMS - localhost is a good one. This is needed in order for alerting to work properly.**
+
+## Pre installed plugins
+
+Note: Plugins will only load if they are prefixed with "check_" and they have that prefix stripped out when displaying in the "Add Serice" GUI "Type" dropdown list.
+
+Plugins come from two main places [pkg-nagios-plugins-contrib](https://github.com/bzed/pkg-nagios-plugins-contrib) and [monitoring-plugins](https://www.monitoring-plugins.org). This is where you can find the documentation for most, if not all of the plugins.
+
+The plugins are bundled with the pre build VM images via the packge `monitoring-plugins` in Ubuntu and `nagios-plugins-all` in CentOS.
 
 ## Setup
 

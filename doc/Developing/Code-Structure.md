@@ -1,4 +1,5 @@
 source: Developing/Code-Structure.md
+path: blob/master/doc/
 # Code structure.
 
 This document will try and provide a good overview of how the code is structured within LibreNMS. We will go through the main directories and provide information on how and when they are used.
@@ -20,7 +21,7 @@ All used css files are located here. Apart from legacy files, anything in here i
 ### html/css/custom
 This is a folder you can put custom css files into that won't interfere with auto updates
 ### html/forms
-This folder contains all of the files that are dynamically included from an ajax call to html/ajax_form.php.
+This folder contains all of the files that are dynamically included from an ajax call to ajax/form.
 ### html/includes
 This is where the majority of the website core files are located. These tend to be files that contain functions or often used code segments that can be included where needed rather than duplicating code.
 ### html/includes/api_functions.inc.php

@@ -295,6 +295,10 @@ if ($device['os'] == 'procera') {
     require_once 'ports/procera.inc.php';
 }
 
+if ($device['os'] == 'cxr-ts') {
+    require_once 'ports/cxr-ts.inc.php';
+}
+
 if ($device['os'] == 'cmm') {
     require_once 'ports/cmm.inc.php';
 }
@@ -413,7 +417,7 @@ foreach ($port_stats as $ifIndex => $port) {
         d_echo(' valid');
 
         // Port newly discovered?
-        if (! $ports[$port_id]) {
+        if (!$port_id || empty($ports[$port_id])) {
             /**
               * When using the ifName or ifDescr as means to map discovered ports to
               * known ports in the DB (think of port association mode) it's possible
@@ -679,7 +683,7 @@ foreach ($ports as $port) {
                 }
             } else {
                 if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
-                    if ($port[$oid . '_prev'] != $this_port[$oid]) {
+                    if ($port[$oid.'_prev'] == null) {
                         $port['update'][$oid . '_prev'] = $this_port[$oid];
                     }
                 }

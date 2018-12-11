@@ -32,6 +32,7 @@ echo('
     <div class="col-md-6">
 ');
 require 'includes/dev-overview-data.inc.php';
+require 'overview/tracepath.inc.php';
 
 LibreNMS\Plugins::call('device_overview_container', array($device));
 
