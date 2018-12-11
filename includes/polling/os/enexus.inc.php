@@ -23,5 +23,6 @@
  * @author     BArry O'Donovan <barry@lightnet.ie>
  */
 
-$hardware = snmp_get($device, 'powerSystem.powerSystemModel.0', '-Ovqa', 'SP2-MIB');
-$version = snmp_get($device, 'controlSystem.controlSystemInventory.controlUnitTable.controlUnitEntry.controlUnitSwVersion.1', '-Ovqa', 'SP2-MIB');
+$hardware = snmp_get($device, 'powerSystemModel.0', '-Ovqa', 'SP2-MIB');
+$version = snmp_get($device, 'controlUnitSwVersion.1', '-Ovqa', 'SP2-MIB');
+$serial = snmp_get($device, 'powerSystemSerialNumber.0', '-Ovqa', 'SP2-MIB');
