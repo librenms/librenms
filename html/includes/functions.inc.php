@@ -1193,7 +1193,7 @@ function alert_details($details)
 
         if ($tmp_alerts['sensor_id']) {
             $details = "Current Value: " . $tmp_alerts['sensor_current'] . " (" . $tmp_alerts['sensor_class'] . ")<br>  ";
-            $details_a[] = array();
+            $details_a = array();
 
             if ($tmp_alerts['sensor_limit_low']) {
                 $details_a[] = "low: " . $tmp_alerts['sensor_limit_low'];
