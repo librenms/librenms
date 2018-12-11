@@ -13,6 +13,7 @@
  */
 
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
@@ -706,8 +707,6 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
 
 function generate_sensor_link($args, $text = null, $type = null)
 {
-    global $config;
-
     $args = cleanPort($args);
 
     if (!$text) {
@@ -732,15 +731,15 @@ function generate_sensor_link($args, $text = null, $type = null)
     $graph_array['legend'] = 'yes';
     $graph_array['height'] = '100';
     $graph_array['width'] = '340';
-    $graph_array['to'] = $config['time']['now'];
-    $graph_array['from'] = $config['time']['day'];
+    $graph_array['to'] = Config::get('time.now');
+    $graph_array['from'] = Config::get('time.day');
     $graph_array['id'] = $args['sensor_id'];
     $content .= generate_graph_tag($graph_array);
-    $graph_array['from'] = $config['time']['week'];
+    $graph_array['from'] = Config::get('time.week');
     $content .= generate_graph_tag($graph_array);
-    $graph_array['from'] = $config['time']['month'];
+    $graph_array['from'] = Config::get('time.month');
     $content .= generate_graph_tag($graph_array);
-    $graph_array['from'] = $config['time']['year'];
+    $graph_array['from'] = Config::get('time.year');
     $content .= generate_graph_tag($graph_array);
     $content .= '</div>';
 
@@ -756,7 +755,7 @@ function generate_sensor_link($args, $text = null, $type = null)
 
 function generate_sensor_url($sensor, $vars = array())
 {
-    return generate_url(array('page' => 'graphs', 'id' => $sensor['sensor_id'], 'type' => $sensor['graph_type'], 'from' => $config['time']['day']), $vars);
+    return generate_url(array('page' => 'graphs', 'id' => $sensor['sensor_id'], 'type' => $sensor['graph_type'], 'from' => Config::get('time.day')), $vars);
 }//end generate_sensor_url()
 
  
@@ -1683,8 +1682,6 @@ function get_dashboards($user_id = null)
  * @param string $transparency value of desired transparency applied to rrdtool options (values 01 - 99)
  * @return array containing transparency and stacked setup
  */
-
-use LibreNMS\Config;
 
 function generate_stacked_graphs($transparency = '88')
 {
