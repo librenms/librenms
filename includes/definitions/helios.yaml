@@ -10,11 +10,9 @@ discovery:
 discovery_modules:
     bgp-peers: false
     stp: false
-    storage: false
 poller_modules:
     bgp-peers: false
     services: false
     storage: false
 over:
     - { graph: device_bits, text: Traffic }
-    - { graph: device_wireless_rssi, text: 'Received Signal Strength Indicator (dBm)'}

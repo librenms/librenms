@@ -96,7 +96,6 @@ class Ceraos extends OS implements WirelessXpiDiscovery, WirelessFrequencyDiscov
                 null,
                 1,
                 1000
-
             );
         }
         return $sensors;
