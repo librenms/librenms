@@ -235,15 +235,18 @@ foreach (scandir($transport_dir) as $transport) {
         });
 
         function loadTransport(transport) {
+            var form_id = transport.type+"-form";
+            var transport_form = $("#" + form_id);
+
             $("#name").val(transport.name);
-            $("#transport-choice").val(transport.type+"-form");
-            $("#is_default").bootstrapSwitch('state', transport.is_default); 
+            $("#transport-choice").val(form_id);
+            $("#is_default").bootstrapSwitch('state', transport.is_default);
             $(".transport").hide();
-            $("#" + $("#transport-choice").val()).show().find("input:text").val("");
+            transport_form.show().find("input:text").val("");
              
             // Populate the field values
             transport.details.forEach(function(config) {
-                var $field = $("#" + config.name);
+                var $field = transport_form.find("#" + config.name);
                 if ($field.prop('type') == 'checkbox') {
                     $field.bootstrapSwitch('state', config.value);
                 } else {
