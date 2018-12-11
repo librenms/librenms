@@ -12,25 +12,24 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 function authToken(\Slim\Route $route)
 {
     global $permissions;
 
-    $app   = \Slim\Slim::getInstance();
-    $token = $app->request->headers->get('X-Auth-Token');
-    if (!empty($token)
-        && ($user_id = dbFetchCell('SELECT `AT`.`user_id` FROM `api_tokens` AS AT WHERE `AT`.`token_hash`=? && `AT`.`disabled`=0', array($token)))
-        && ($user = Auth::get()->getUser($user_id))
-    ) {
+    if (Auth::check()) {
+        $user = Auth::user();
+
         // Fake session so the standard auth/permissions checks work
-        $_SESSION = array(
-            'username' => $user['username'],
-            'user_id' => $user['user_id'],
-            'userlevel' => $user['level']
-        );
-        $permissions = permissions_cache(Auth::id());
+        $_SESSION = [
+            'username' => $user->username,
+            'user_id' => $user->user_id,
+            'userlevel' => $user->level
+        ];
+        $permissions = permissions_cache($user->user_id);
 
         return;
     }
@@ -109,14 +108,14 @@ function check_port_permission($port_id, $device_id)
 
 function check_is_admin()
 {
-    if (!Auth::user()->hasGlobalAdmin()) {
+    if (!LegacyAuth::user()->hasGlobalAdmin()) {
         api_error(403, 'Insufficient privileges');
     }
 }
 
 function check_is_read()
 {
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         api_error(403, 'Insufficient privileges');
     }
 }
@@ -314,14 +313,14 @@ function list_devices()
     }
 
     $select = " d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname, `lat`, `lng` ";
-    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` LEFT JOIN `locations` ON `locations`.`location` = `d`.`location`";
+    $join = " LEFT JOIN `device_relationships` AS dr ON dr.`child_device_id` = d.`device_id` LEFT JOIN `devices` AS dd ON dr.`parent_device_id` = dd.`device_id` LEFT JOIN `locations` ON `locations`.`id` = `d`.`location_id`";
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
     } elseif ($type == 'active') {
         $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
-        $sql = "`d`.`location` LIKE '%".$query."%'";
+        $sql = "`locations`.`location` LIKE '%".$query."%'";
     } elseif ($type == 'ignored') {
         $sql = "`d`.`ignore`='1' AND `d`.`disabled`='0'";
     } elseif ($type == 'up') {
@@ -353,9 +352,9 @@ function list_devices()
     }
 
 
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         $sql .= " AND `d`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $param[] = Auth::id();
+        $param[] = LegacyAuth::id();
     }
     $devices = array();
     $dev_query = "SELECT $select FROM `devices` AS d $join WHERE $sql GROUP BY d.`hostname` ORDER BY $order";
@@ -419,7 +418,7 @@ function add_device()
             'cryptoalgo' => mres($data['cryptoalgo']),
         );
 
-        array_push($config['snmp']['v3'], $v3);
+        array_unshift($config['snmp']['v3'], $v3);
         $snmpver = 'v3';
     } else {
         api_error(400, 'You haven\'t specified an SNMP version to use');
@@ -583,9 +582,9 @@ function list_cbgp()
         $sql        = " AND `devices`.`device_id` = ?";
         $sql_params[] = $device_id;
     }
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         $sql .= " AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = Auth::id();
+        $sql_params[] = LegacyAuth::id();
     }
 
     $bgp_counters = array();
@@ -910,7 +909,7 @@ function get_port_graphs()
     $params = array($device_id);
     if (!device_permitted($device_id)) {
         $sql = 'AND `port_id` IN (select `port_id` from `ports_perms` where `user_id` = ?)';
-        array_push($params, Auth::id());
+        array_push($params, LegacyAuth::id());
     }
 
     $ports       = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex` ASC", $params);
@@ -980,10 +979,10 @@ function get_all_ports()
     validate_column_list($columns, 'ports');
     $params = array();
     $sql = '';
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         $sql = ' AND (device_id IN (SELECT device_id FROM devices_perms WHERE user_id = ?) OR port_id IN (SELECT port_id FROM ports_perms WHERE user_id = ?))';
-        array_push($params, Auth::id());
-        array_push($params, Auth::id());
+        array_push($params, LegacyAuth::id());
+        array_push($params, LegacyAuth::id());
     }
     $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0 $sql", $params);
 
@@ -1066,20 +1065,28 @@ function add_edit_rule()
     check_is_admin();
     $app  = \Slim\Slim::getInstance();
     $data = json_decode(file_get_contents('php://input'), true);
+    if (json_last_error()) {
+        api_error(500, "We couldn't parse the provided json");
+    }
 
     $rule_id = mres($data['rule_id']);
-    $device_id = mres($data['device_id']);
-    if (empty($device_id) && !isset($rule_id)) {
-        api_error(400, 'Missing the device id or global device id (-1)');
+    $tmp_devices = (array)mres($data['devices']);
+    $groups  = (array)$data['groups'];
+    if (empty($tmp_devices) && !isset($rule_id)) {
+        api_error(400, 'Missing the devices or global device (-1)');
     }
 
-    if ($device_id == 0) {
-        $device_id = '-1';
+    $devices = [];
+    foreach ($tmp_devices as $device) {
+        if ($device == "-1") {
+            continue;
+        }
+        $devices[] = ctype_digit($device) ? $device : getidbyname($device);
     }
 
-    $rule = $data['rule'];
-    if (empty($rule)) {
-        api_error(400, 'Missing the alert rule');
+    $builder = $data['builder'] ?: $data['rule'];
+    if (empty($builder)) {
+        api_error(400, 'Missing the alert builder rule');
     }
 
     $name = mres($data['name']);
@@ -1105,6 +1112,8 @@ function add_edit_rule()
     $count     = mres($data['count']);
     $mute      = mres($data['mute']);
     $delay     = mres($data['delay']);
+    $override_query = $data['override_query'];
+    $adv_query = $data['adv_query'];
     $delay_sec = convert_delay($delay);
     if ($mute == 1) {
         $mute = true;
@@ -1112,12 +1121,25 @@ function add_edit_rule()
         $mute = false;
     }
 
-    $extra      = array(
+    $extra      = [
         'mute'  => $mute,
         'count' => $count,
         'delay' => $delay_sec,
-    );
+        'options' =>
+            [
+                'override_query' => $override_query
+            ],
+    ];
     $extra_json = json_encode($extra);
+
+    if ($override_query === 'on') {
+        $query = $adv_query;
+    } else {
+        $query = QueryBuilderParser::fromJson($builder)->toSql();
+        if (empty($query)) {
+            api_error(500, "We couldn't parse your rule");
+        }
+    }
 
     if (!isset($rule_id)) {
         if (dbFetchCell('SELECT `name` FROM `alert_rules` WHERE `name`=?', array($name)) == $name) {
@@ -1125,18 +1147,20 @@ function add_edit_rule()
         }
     } else {
         if (dbFetchCell("SELECT name FROM alert_rules WHERE name=? AND id !=? ", array($name, $rule_id)) == $name) {
-            api_error(500, 'Addition failed : Name has already been used');
+            api_error(500, 'Update failed : Invalid rule id');
         }
     }
 
     if (is_numeric($rule_id)) {
-        if (!(dbUpdate(array('name' => $name, 'rule' => $rule, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules', 'id=?', array($rule_id)) >= 0)) {
+        if (!(dbUpdate(array('name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules', 'id=?', array($rule_id)) >= 0)) {
             api_error(500, 'Failed to update existing alert rule');
         }
-    } elseif (!dbInsert(array('name' => $name, 'device_id' => $device_id, 'rule' => $rule, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules')) {
+    } elseif (!$rule_id = dbInsert(array('name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules')) {
         api_error(500, 'Failed to create new alert rule');
     }
 
+    dbSyncRelationship('alert_device_map', 'rule_id', $rule_id, 'device_id', $devices);
+    dbSyncRelationship('alert_group_map', 'rule_id', $rule_id, 'group_id', $groups);
     api_success_noresult(200);
 }
 
@@ -1162,15 +1186,27 @@ function delete_rule()
 function ack_alert()
 {
     check_is_admin();
-    global $config;
+
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $alert_id = mres($router['id']);
+    $data = json_decode(file_get_contents('php://input'), true);
 
     if (!is_numeric($alert_id)) {
         api_error(400, 'Invalid alert has been provided');
     }
-    if (dbUpdate(array('state' => 2), 'alerts', '`id` = ? LIMIT 1', array($alert_id))) {
+
+    $alert = dbFetchRow('SELECT note, info FROM alerts WHERE id=?', [$alert_id]);
+    $note  = $alert['note'];
+    $info  = json_decode($alert['info'], true);
+    if (!empty($note)) {
+        $note .= PHP_EOL;
+    }
+    $note .= date(Config::get('dateformat.long')) . " - Ack (" . Auth::user()->username . ") {$data['note']}";
+    $info['until_clear'] = $data['until_clear'];
+    $info = json_encode($info);
+
+    if (dbUpdate(['state' => 2, 'note' => $note, 'info' => $info], 'alerts', '`id` = ? LIMIT 1', [$alert_id])) {
         api_success_noresult(200, 'Alert has been acknowledged');
     } else {
         api_success_noresult(200, 'No Alert by that ID');
@@ -1180,16 +1216,25 @@ function ack_alert()
 function unmute_alert()
 {
     check_is_admin();
-    global $config;
+
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $alert_id = mres($router['id']);
+    $data = json_decode(file_get_contents('php://input'), true);
 
     if (!is_numeric($alert_id)) {
-        api_success_noresult(200, 'Alert has been acknowledged');
+        api_error(400, 'Invalid alert has been provided');
     }
 
-    if (dbUpdate(array('state' => 1), 'alerts', '`id` = ? LIMIT 1', array($alert_id))) {
+    $alert = dbFetchRow('SELECT note, info FROM alerts WHERE id=?', [$alert_id]);
+    $note  = $alert['note'];
+    $info  = json_decode($alert['info'], true);
+    if (!empty($note)) {
+        $note .= PHP_EOL;
+    }
+    $note .= date(Config::get('dateformat.long')) . " - Ack (" . Auth::user()->username . ") {$data['note']}";
+
+    if (dbUpdate(['state' => 1, 'note' => $note], 'alerts', '`id` = ? LIMIT 1', [$alert_id])) {
         api_success_noresult(200, 'Alert has been unmuted');
     } else {
         api_success_noresult(200, 'No alert by that ID');
@@ -1251,7 +1296,7 @@ function list_oxidized()
         $params = array($hostname);
     }
 
-    foreach (dbFetchRows("SELECT hostname,sysname,sysDescr,hardware,os,location,ip AS ip FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
+    foreach (dbFetchRows("SELECT hostname,sysname,sysDescr,hardware,os,locations.location,ip AS ip FROM `devices` LEFT JOIN locations ON devices.location_id = locations.id LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
         // Convert from packed value to human value
         $device['ip'] = inet6_ntop($device['ip']);
 
@@ -1322,9 +1367,9 @@ function list_bills()
     } else {
         $sql = '1';
     }
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         $sql    .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';
-        $param[] = Auth::id();
+        $param[] = LegacyAuth::id();
     }
 
     if ($period === 'previous') {
@@ -1380,7 +1425,7 @@ function get_bill_graph()
     $bill_id = mres($router['bill_id']);
     $graph_type = $router['graph_type'];
 
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1406,7 +1451,7 @@ function get_bill_graphdata()
     $bill_id = mres($router['bill_id']);
     $graph_type = $router['graph_type'];
 
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1434,7 +1479,7 @@ function get_bill_history()
     $router = $app->router()->getCurrentRoute()->getParams();
     $bill_id = mres($router['bill_id']);
 
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1456,7 +1501,7 @@ function get_bill_history_graph()
     $bill_hist_id = mres($router['bill_hist_id']);
     $graph_type = $router['graph_type'];
 
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1500,7 +1545,7 @@ function get_bill_history_graphdata()
     $bill_hist_id = mres($router['bill_hist_id']);
     $graph_type = $router['graph_type'];
 
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         check_bill_permission($bill_id);
     }
 
@@ -1829,9 +1874,9 @@ function list_vrf()
         $sql        = "  AND `vrfs`.`vrf_name`=?";
         $sql_params = array($vrfname);
     }
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         $sql .= " AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = Auth::id();
+        $sql_params[] = LegacyAuth::id();
     }
 
     $vrfs       = array();
@@ -1902,9 +1947,9 @@ function list_vlans()
         $sql        = " AND `devices`.`device_id` = ?";
         $sql_params[] = $device_id;
     }
-    if (!Auth::user()->hasGlobalRead()) {
+    if (!LegacyAuth::user()->hasGlobalRead()) {
         $sql .= " AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
-        $sql_params[] = Auth::id();
+        $sql_params[] = LegacyAuth::id();
     }
 
     $vlans       = array();
@@ -1922,6 +1967,63 @@ function list_vlans()
     }
 
     api_success($vlans, 'vlans');
+}
+
+
+function list_links()
+{
+    $app        = \Slim\Slim::getInstance();
+    $router     = $app->router()->getCurrentRoute()->getParams();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $router['hostname'];
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `links`.`local_device_id`=?";
+        $sql_params = array($device_id);
+    }
+    if (!LegacyAuth::user()->hasGlobalRead()) {
+        $sql .= " AND `links`.`local_device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = LegacyAuth::id();
+    }
+
+    $links       = array();
+    foreach (dbFetchRows("SELECT `links`.* FROM `links` LEFT JOIN `devices` ON `links`.`local_device_id` = `devices`.`device_id` WHERE `links`.`id` IS NOT NULL $sql", $sql_params) as $link) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $links[] = $link;
+    }
+    $total_links = count($links);
+    if ($total_links == 0) {
+        api_error(404, 'Links do not exist');
+    }
+
+    api_success($links, 'links');
+}
+
+
+function get_link()
+{
+    check_is_read();
+
+    $app    = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $linkId  = $router['id'];
+    if (!is_numeric($linkId)) {
+        api_error(400, 'Invalid id has been provided');
+    }
+
+    $link       = dbFetchRows("SELECT * FROM `links` WHERE `id` IS NOT NULL AND `id` = ?", array($linkId));
+    $link_count = count($link);
+    if ($link_count == 0) {
+        api_error(404, "Link $linkId does not exist");
+    }
+
+    api_success($link, 'link');
 }
 
 

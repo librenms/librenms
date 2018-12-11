@@ -1,4 +1,5 @@
 source: Developing/os/Custom-Graphs.md
+path: blob/master/doc/
 
 If you are adding custom graphs, please add the following to `includes/definitions.inc.php`:
 ```php

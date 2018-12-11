@@ -363,6 +363,41 @@
    {
     "rule": "devices.os = \"Netscaler\" && sensors.sensor_type = \"haCurState\" && sensors.sensor_current ~ \"[2|4|5|7|10|11]\" && macros.device_up = \"1\"",
     "name": "Netscaler HA node state Critical"
+   },
+   {
+    "rule": "%applications.app_type='portactivity' && %applications_metrics.ssh_total_to>'5'",
+    "name": "SSH Connections To"
+   },
+   {
+    "rule": "%applications.app_type='portactivity' && %applications_metrics.http_total_to>'100'",
+    "name": "HTTP Connections To"
+   },
+   {
+    "rule": "%applications.app_type='portactivity' && %applications_metrics.https_total_to>'100'",
+    "name": "HTTPS Connections To"
+   },
+   {
+    "rule": "%applications.app_type='portactivity' && %applications_metrics.smtp_total_from>'10'",
+    "name": "SMTP Connections From"
+   },
+   {
+    "rule": "%applications.app_type='portactivity' && %applications_metrics.smtp_total_to>'30'",
+    "name": "SMTP Connections To"
+   },
+   {
+    "rule": "%applications.app_type='portactivity' && %applications_metrics.ftp_total_to>'5'",
+    "name": "FTP Connections To"
+   },
+   {
+    "rule": "%applications.app_type='portactivity' && %applications_metrics.imap_total_to>'20'",
+    "name": "IMAP Connections To"
+   },
+   {
+    "rule": "%applications.app_type='portactivity' && %applications_metrics.imaps_total_to>'20'",
+    "name": "IMAPS Connections To"
+   },
+   {
+    "rule": "%applications.app_type='portactivity' && %applications_metrics.imaps_total_from>'0'",
+    "name": "IRCD Connections From"
    }
-
   ]

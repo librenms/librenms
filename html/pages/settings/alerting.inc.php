@@ -12,7 +12,8 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 $no_refresh = true;
 
@@ -270,7 +271,7 @@ if (isset($_GET['account']) && isset($_GET['service_key']) && isset($_GET['servi
     set_config_name('alert.pagerduty.service', $_GET['service_name']);
 }
 
-if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && Auth::user()->hasGlobalAdmin()) {
+if (isset($vars['del_pagerduty']) && $vars['del_pagerduty'] == true && LegacyAuth::user()->hasGlobalAdmin()) {
     set_config_name('alert.transports.pagerduty', '');
     set_config_name('alert.pagerduty.account', '');
     set_config_name('alert.pagerduty.service', '');
@@ -329,82 +330,112 @@ $general_conf = array(
           'descr'              => 'Updates to contact email addresses not honored',
           'type'               => 'checkbox',
     ),
+    [
+        'name'                 => 'alert.ack_until_clear',
+        'descr'                => 'Default acknowledge until alert clears option',
+        'type'                 => 'checkbox',
+    ]
 );
 
-$mail_conf = array(
-    array('name'               => 'alert.transports.mail',
-          'descr'              => 'Enable email alerting',
-          'type'               => 'checkbox',
-    ),
-    array('name'               => 'email_backend',
-          'descr'              => 'How to deliver mail',
-          'options'            => $config['email_backend_options'],
-          'type'               => 'select',
-    ),
-    array('name'               => 'email_user',
-          'descr'              => 'From name',
-          'type'               => 'text',
-    ),
-    array('name'               => 'email_from',
-          'descr'              => 'From email address',
-          'type'               => 'text',
-          'pattern'            => '[a-zA-Z0-9_\-\.\+]+@[a-zA-Z0-9_\-\.]+\.[a-zA-Z]{2,18}',
-    ),
-    array('name'               => 'email_html',
-          'descr'              => 'Use HTML emails',
-          'type'               => 'checkbox',
-    ),
-    array('name'               => 'email_sendmail_path',
-          'descr'              => 'Sendmail path',
-          'type'               => 'text',
-    ),
-    array('name'               => 'email_smtp_host',
-          'descr'              => 'SMTP Host',
-          'type'               => 'text',
-          'pattern'            => '[a-zA-Z0-9_\-\.]+',
-    ),
-    array('name'               => 'email_smtp_port',
-          'descr'              => 'SMTP Port',
-          'type'               => 'numeric',
-          'required'           => true,
-    ),
-    array('name'               => 'email_smtp_timeout',
-          'descr'              => 'SMTP Timeout',
-          'type'               => 'numeric',
-          'required'           => true,
-    ),
-    array('name'               => 'email_smtp_secure',
-          'descr'              => 'SMTP Secure',
-          'type'               => 'select',
-          'options'            => $config['email_smtp_secure_options'],
-    ),
-    array('name'               => 'email_auto_tls',
-          'descr'              => 'SMTP Auto TLS Support',
-          'type'               => 'select',
-          'options'            => array('true', 'false'),
-    ),
-    array('name'               => 'email_smtp_auth',
-          'descr'              => 'SMTP Authentication',
-          'type'               => 'checkbox',
-    ),
-    array('name'               => 'email_smtp_username',
-          'descr'              => 'SMTP Authentication Username',
-          'type'               => 'text',
-    ),
-    array('name'               => 'email_smtp_password',
-          'descr'              => 'SMTP Authentication Password',
-          'type'               => 'password',
-    ),
-);
+$mail_conf = [
+    [
+        'name'     => 'alert.transports.mail',
+        'descr'    => 'Enable email alerting',
+        'type'     => 'checkbox',
+    ],
+    [
+        'name'     => 'email_backend',
+        'descr'    => 'How to deliver mail',
+        'options'  => Config::get('email_backend_options', ['mail', 'sendmail', 'smtp']),
+        'type'     => 'select',
+    ],
+    [
+        'name'     => 'email_user',
+        'descr'    => 'From name',
+        'type'     => 'text',
+    ],
+    [
+        'name'     => 'email_from',
+        'descr'    => 'From email address',
+        'type'     => 'text',
+        'pattern'  => '[a-zA-Z0-9_\-\.\+]+@[a-zA-Z0-9_\-\.]+\.[a-zA-Z]{2,18}',
+    ],
+    [
+        'name'     => 'email_html',
+        'descr'    => 'Use HTML emails',
+        'type'     => 'checkbox',
+    ],
+    [
+        'name'     => 'email_sendmail_path',
+        'descr'    => 'Sendmail path',
+        'type'     => 'text',
+        'class'    => 'sendmail-form',
+    ],
+    [
+        'name'     => 'email_smtp_host',
+        'descr'    => 'SMTP Host',
+        'type'     => 'text',
+        'pattern'  => '[a-zA-Z0-9_\-\.]+',
+        'class'    => 'smtp-form',
+    ],
+    [
+        'name'     => 'email_smtp_port',
+        'descr'    => 'SMTP Port',
+        'type'     => 'numeric',
+        'class'    => 'smtp-form',
+        'required' => true,
+    ],
+    [
+        'name'     => 'email_smtp_timeout',
+        'descr'    => 'SMTP Timeout',
+        'type'     => 'numeric',
+        'class'    => 'smtp-form',
+        'required' => true,
+    ],
+    [
+        'name'     => 'email_smtp_secure',
+        'descr'    => 'SMTP Secure',
+        'type'     => 'select',
+        'class'    => 'smtp-form',
+        'options'  => Config::get('email_smtp_secure_options', ['', 'tls', 'ssl']),
+    ],
+    [
+        'name'     => 'email_auto_tls',
+        'descr'    => 'SMTP Auto TLS Support',
+        'type'     => 'select',
+        'class'    => 'smtp-form',
+        'options'  => ['true', 'false'],
+    ],
+    [
+        'name'     => 'email_smtp_auth',
+        'descr'    => 'SMTP Authentication',
+        'type'     => 'checkbox',
+        'class'    => 'smtp-form',
+    ],
+    [
+        'name'     => 'email_smtp_username',
+        'descr'    => 'SMTP Authentication Username',
+        'type'     => 'text',
+        'class'    => 'smtp-form',
+    ],
+    [
+        'name'     => 'email_smtp_password',
+        'descr'    => 'SMTP Authentication Password',
+        'type'     => 'password',
+        'class'    => 'smtp-form',
+    ],
+];
 
 echo '
-<div class="well"><strong>DEPRECATED</strong>: Please use the new Alert Transports section under Alerts to configure transports - <a href="https://docs.librenms.org/Alerting/Transports/" target="_blank">docs</a>.</div>
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
 ';
 
 echo generate_dynamic_config_panel('General alert settings', $config_groups, $general_conf);
-echo generate_dynamic_config_panel('Email transport', $config_groups, $mail_conf, 'mail');
+
+echo generate_dynamic_config_panel('Email options', $config_groups, $mail_conf, 'mail');
+
+echo '<br /><div class="well"><strong class="text-danger">DEPRECATED</strong>: All options below are deprecated, please use the new Alert Transports section under Alerts to configure transports :: <a href="https://docs.librenms.org/Alerting/Transports/" target="_blank">Docs <i class="fa fa-book fa-1x"></i></a></div>';
 
 echo '
         <div class="panel panel-default">
@@ -1737,6 +1768,20 @@ echo '
             }
         });
     });
+
+    $('#email_backend').change(function () {
+        var type = this.value;
+        if (type === 'sendmail') {
+            $('.smtp-form').hide();
+            $('.sendmail-form').show();
+        } else if (type === 'smtp') {
+            $('.sendmail-form').hide();
+            $('.smtp-form').show();
+        } else {
+            $('.smtp-form').hide();
+            $('.sendmail-form').hide();
+        }
+    }).change(); // trigger initially
 
     apiIndex = 0;
 

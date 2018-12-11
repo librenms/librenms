@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://docs.librenms.org/sitemap.xml

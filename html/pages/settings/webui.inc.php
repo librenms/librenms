@@ -12,25 +12,33 @@ $search_conf = array(
     ),
 );
 
-$graph_conf = array(
-    array('name'               => 'webui.min_graph_height',
-          'descr'              => 'Set the minimum graph height',
-          'type'               => 'numeric',
-          'required'           => true,
-    ),
-    array('name'               => 'webui.graph_type',
-          'descr'              => 'Set the graph type',
-          'type'               => 'select',
-          'options'            => array(
-              'png' => 'png',
-              'svg' => 'svg',
-        ),
-    ),
-    array('name' => 'webui.graph_stacked',
-          'descr' => 'Use stacked graphs',
-          'type' => 'checkbox',
-    ),
-);
+$graph_conf = [
+    [
+        'name'               => 'webui.min_graph_height',
+        'descr'              => 'Set the minimum graph height',
+        'type'               => 'numeric',
+        'required'           => true,
+    ],
+    [
+        'name'               => 'webui.graph_type',
+        'descr'              => 'Set the graph type',
+        'type'               => 'select',
+        'options'            => [
+            'png' => 'png',
+            'svg' => 'svg',
+        ],
+    ],
+    [
+        'name'  => 'webui.graph_stacked',
+        'descr' => 'Use stacked graphs',
+        'type'  => 'checkbox',
+    ],
+    [
+        'name'  => 'webui.dynamic_graphs',
+        'descr' => 'Enable dynamic graphs',
+        'type'  => 'checkbox',
+    ]
+];
 
 $availability_map_conf = array(
     array('name'               => 'webui.availability_map_compact',

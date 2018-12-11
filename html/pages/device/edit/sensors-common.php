@@ -5,6 +5,7 @@
  *
  * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk>
  * Copyright (c) 2017 Tony Murray <https://github.com/murrant>
+ * Copyright (c) 2018 TheGreatDoc <https://github.com/TheGreatDoc>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -25,6 +26,8 @@ echo "<h3>$title</h3>";
     <th>Desc</th>
     <th>Current</th>
     <th class="col-sm-1">High</th>
+    <th class="col-sm-1">High warn</th>
+    <th class="col-sm-1">Low warn</th>
     <th class="col-sm-1">Low</th>
     <th class="col-sm-2">Alerts</th>
     <th></th>
@@ -35,6 +38,8 @@ foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_d
     $rollback[] = array(
         'sensor_id'        => $sensor['sensor_id'],
         'sensor_limit'     => $sensor['sensor_limit'],
+        'sensor_limit_warn'     => $sensor['sensor_limit_warn'],
+        'sensor_limit_low_warn' => $sensor['sensor_limit_low_warn'],
         'sensor_limit_low' => $sensor['sensor_limit_low'],
         'sensor_alert'     => $sensor['sensor_alert'],
     );
@@ -59,21 +64,25 @@ foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_d
         <td>
         <div class="form-group has-feedback">
         <input type="text" class="form-control input-sm sensor" id="high-'.$sensor['device_id'].'" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit'].'">
-        <span class="form-control-feedback">
-            <i class="fa" aria-hidden="true"></i>
-        </span>
+        </div>
+        </td>
+        <td>
+        <div class="form-group has-feedback">
+        <input type="text" class="form-control input-sm sensor" id="high-'.$sensor['device_id'].'-warn" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit_warn" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit_warn'].'">
+        </div>
+        </td>
+        <td>
+        <div class="form-group has-feedback">
+        <input type="text" class="form-control input-sm sensor" id="low-'.$sensor['device_id'].'-warn" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit_low_warn" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit_low_warn'].'">
         </div>
         </td>
         <td>
         <div class="form-group has-feedback">
         <input type="text" class="form-control input-sm sensor" id="low-'.$sensor['device_id'].'" data-device_id="'.$sensor['device_id'].'" data-value_type="sensor_limit_low" data-sensor_id="'.$sensor['sensor_id'].'" value="'.$sensor['sensor_limit_low'].'">
-        <span class="form-control-feedback">
-            <i class="fa" aria-hidden="true"></i>
-        </span>
         </div>
         </td>
         <td>
-        <input type="checkbox" name="alert-status" data-device_id="'.$sensor['device_id'].'" data-sensor_id="'.$sensor['sensor_id'].'" '.$alert_status.'>
+        <input type="checkbox" name="alert-status" data-device_id="'.$sensor['device_id'].'" data-sensor_id="'.$sensor['sensor_id'].'" data-sensor_desc="'.$sensor['sensor_descr'].'" '.$alert_status.'>
         </td>
         <td>
         <a type="button" class="btn btn-danger btn-sm '.$custom.' remove-custom" id="remove-custom" name="remove-custom" data-sensor_id="'.$sensor['sensor_id'].'">Clear custom</a>
@@ -90,6 +99,8 @@ foreach ($rollback as $reset_data) {
     echo '
         <input type="hidden" name="sensor_id[]" value="'.$reset_data['sensor_id'].'">
         <input type="hidden" name="sensor_limit[]" value="'.$reset_data['sensor_limit'].'">
+        <input type="hidden" name="sensor_limit_warn[]" value="'.$reset_data['sensor_limit_warn'].'">
+        <input type="hidden" name="sensor_limit_low_warn[]" value="'.$reset_data['sensor_limit_low_warn'].'">
         <input type="hidden" name="sensor_limit_low[]" value="'.$reset_data['sensor_limit_low'].'">
         <input type="hidden" name="sensor_alert[]" value="'.$reset_data['sensor_alert'].'">
         ';
@@ -101,18 +112,27 @@ foreach ($rollback as $reset_data) {
 <script>
 $('#newThread').on('click', function(e){
     e.preventDefault(); // preventing default click action
+
     var form = $('#alert-reset');
+
     $.ajax({
         type: 'POST',
             url: 'ajax_form.php',
             data: form.serialize(),
-      dataType: "html",
+      dataType: "json",
       success: function(data){
-          //alert(data);
-          location.reload(true);
+          if (data.status == 'ok') {
+              toastr.success(data.message);
+              setTimeout(function() {
+                  location.reload(true);
+              }, 2000);
+          } else {
+              toastr.error(data.message);
+          }
+
       },
           error:function(){
-              //alert('bad');
+              toastr.error(data.message);
           }
     });
 });
@@ -139,25 +159,19 @@ $( ".sensor" ).bind('blur keyup',function(e) {
         type: 'POST',
             url: 'ajax_form.php',
             data: { type: "<?php echo $ajax_prefix; ?>-update", device_id: device_id, data: data, sensor_id: sensor_id , value_type: value_type},
-            dataType: "html",
+            dataType: "json",
             success: function(data){
-                $this.closest('.form-group').addClass('has-success');
-                $this.next().find('.fa').addClass('fa-check');
-                $this.data('val', $this.val());
+            if (data.status == 'ok') {
                 $('.remove-custom[data-sensor_id='+sensor_id+']').removeClass('disabled');
-                setTimeout(function(){
-                    $this.closest('.form-group').removeClass('has-success');
-                    $this.next().find('.fa').removeClass('fa-check');
-                }, 2000);
+                toastr.success(data.message);
+            } else {
+                toastr.error(data.message);
+            }
+
             },
-                error:function(){
-                    $this.closest('.form-group').addClass('has-error');
-                    $this.next().find('.fa').addClass('fa-times');
-                    setTimeout(function(){
-                        $this.closest('.form-group').removeClass('has-error');
-                        $this.next().find('.fa').removeClass('fa-times');
-                    }, 2000);
-                }
+            error:function(){
+                toastr.error(data.message);
+            }
     });
 });
 
@@ -167,16 +181,25 @@ $('input[name="alert-status"]').on('switchChange.bootstrapSwitch',  function(eve
     var $this = $(this);
     var device_id = $(this).data("device_id");
     var sensor_id = $(this).data("sensor_id");
+    var sensor_desc = $(this).data("sensor_desc");
     $.ajax({
         type: 'POST',
             url: 'ajax_form.php',
-            data: { type: "<?php echo $ajax_prefix; ?>-alert-update", device_id: device_id, sensor_id: sensor_id, state: state},
-            dataType: "html",
+            data: { type: "<?php echo $ajax_prefix; ?>-alert-update", device_id: device_id, sensor_id: sensor_id, sensor_desc: sensor_desc, state: state},
+            dataType: "json",
             success: function(data){
-                //alert('good');
+                if (data.status != 'error') {
+                    if (data.status == 'ok') {
+                        toastr.success(data.message);
+                    } else {
+                        toastr.info(data.message);
+                    }
+                } else {
+                    toastr.error(data.message);
+                }
             },
                 error:function(){
-                    //alert('bad');
+                    toastr.error(data.message);
                 }
     });
 });
@@ -188,12 +211,13 @@ $("[name='remove-custom']").on('click', function(event) {
         type: 'POST',
             url: 'ajax_form.php',
             data: { type: "<?php echo $ajax_prefix; ?>-alert-update", sensor_id: sensor_id, sub_type: "remove-custom" },
-            dataType: "html",
+            dataType: "json",
             success: function(data){
+                toastr.success(data.message);
                 $this.addClass('disabled');
             },
                 error:function(){
-                    //alert('bad');
+                    toastr.error(data.message);
                 }
     });
 });

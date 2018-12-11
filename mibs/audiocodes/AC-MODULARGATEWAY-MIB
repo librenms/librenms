@@ -1,0 +1,319 @@
+
+AC-ModularGW-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+
+        OBJECT-TYPE, 
+        MODULE-IDENTITY                             FROM SNMPv2-SMI
+        TAddress, 
+        DisplayString, 
+        DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+        IpAddress                                   FROM RFC1155-SMI
+        enterprises                                 FROM SNMPv2-SMI;
+	
+
+	audioCodes       OBJECT IDENTIFIER ::= {enterprises 5003}
+	acRegistrations  OBJECT IDENTIFIER ::= {audioCodes 7}
+	acGeneric        OBJECT IDENTIFIER ::= {audioCodes 8}
+	acProducts       OBJECT IDENTIFIER ::= {audioCodes 9}	
+        acBoardMibs     OBJECT IDENTIFIER ::= {acProducts 10}	
+
+       
+acModularGateway  MODULE-IDENTITY       
+    LAST-UPDATED "200608150553Z"          --Tuesday, August 15, 2006
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: AudioCodes LTD
+             4 Horesh Road
+             Yehud 56470, ISRAEL
+     Tel:    972-3-5394000
+     Email:  support@audiocodes.com"               
+		
+
+    DESCRIPTION       
+    "This MIB is solely for AudioCodes’ modular Gateways. 
+Use this MIB’s status section for cross reference tables connecting
+analog/digital ports to the modules on which they are.
+The MIB has become deprecated as of version 5.2. It will be 
+obsolete as of version 5.4"
+
+
+
+    ::= {acBoardMibs 11}  
+
+
+
+
+
+
+
+
+     acModularGatewayConfiguration OBJECT IDENTIFIER ::= {acModularGateway 1}
+
+
+     acModularGatewayStatus        OBJECT IDENTIFIER ::= {acModularGateway 2}
+
+
+     acModularGWModules            OBJECT IDENTIFIER ::= {acModularGatewayStatus 1}
+
+
+     -- ****************************************
+     -- acModularGWModule table decleration
+     -- ****************************************
+     acModularGWModuleTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcModularGWModuleEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "This table holds the information about each module in Audiocodes' modular gateways. If an index (Module number) is shown - then the module is in and working. You can also see the modules type, number of ports and it's first port's logical number allowing you to calculate which port is which logical trunk or analog channel. (This information is also obtainable in the acModularGWTrunkTable and acModularGWChannelTable)."
+       ::= {acModularGWModules 20}
+
+
+
+     -- ****************************************
+     -- acModularGWModule table entry
+     -- ****************************************
+     acModularGWModuleEntry OBJECT-TYPE
+       SYNTAX AcModularGWModuleEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acModularGWModuleIndex}
+       ::= {acModularGWModuleTable 1}
+
+
+
+     -- ****************************************
+     -- acModularGWModule TABLE
+     -- ****************************************
+     AcModularGWModuleEntry ::= SEQUENCE {
+       acModularGWModuleIndex                          INTEGER,
+       acModularGWModuleType                           INTEGER,
+       acModularGWModuleNumOfPorts                     INTEGER,
+       acModularGWModuleFirstPortNum                   INTEGER
+     }
+
+
+
+     acModularGWModuleIndex OBJECT-TYPE
+       SYNTAX INTEGER (1..6)
+       MAX-ACCESS not-accessible
+       STATUS deprecated
+       DESCRIPTION
+           "Module index.
+1 is the first Module - top left corner.
+2 is the next Module to the right and so on.
+4 is under 1."
+       ::= {acModularGWModuleEntry 1}
+
+
+
+     acModularGWModuleType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  e1-t1-QUAD(0)
+,
+                  fxs(1)
+,
+                  fxo(2)
+,
+                  e1-t1-FALC56(4)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Module Type.
+The Modules are characterized according to their ports.
+0
+= Digital - Quad.
+1 = Analog - FXS.
+2 = Analog - FXO.
+4 = Digital -
+FALC."
+       ::= {acModularGWModuleEntry 2}
+
+
+
+     acModularGWModuleNumOfPorts OBJECT-TYPE
+       SYNTAX INTEGER (1..4)
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of  physical interfaces in a module, analog or digital."
+       ::= {acModularGWModuleEntry 3}
+
+
+
+     acModularGWModuleFirstPortNum OBJECT-TYPE
+       SYNTAX INTEGER (0..19)
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The logical number as seen in the general trunk/analog-channel
+table of the first port in the module in question.
+Since analog and digital ports can be operational at once,
+analog and digital ports may have same logical number."
+       ::= {acModularGWModuleEntry 4}
+
+
+
+     acModularGWCrossReference     OBJECT IDENTIFIER ::= {acModularGatewayStatus 2}
+
+
+     -- ****************************************
+     -- acModularGWTrunk table decleration
+     -- ****************************************
+     acModularGWTrunkTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcModularGWTrunkEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "This table shows the trunk location and type."
+       ::= {acModularGWCrossReference 20}
+
+
+
+     -- ****************************************
+     -- acModularGWTrunk table entry
+     -- ****************************************
+     acModularGWTrunkEntry OBJECT-TYPE
+       SYNTAX AcModularGWTrunkEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acModularGWTrunkIndex}
+       ::= {acModularGWTrunkTable 1}
+
+
+
+     -- ****************************************
+     -- acModularGWTrunk TABLE
+     -- ****************************************
+     AcModularGWTrunkEntry ::= SEQUENCE {
+       acModularGWTrunkIndex                           INTEGER,
+       acModularGWTrunkOnModuleNum                     INTEGER,
+       acModularGWTrunkOnPortNum                       INTEGER
+     }
+
+
+
+     acModularGWTrunkIndex OBJECT-TYPE
+       SYNTAX INTEGER (0..23)
+       MAX-ACCESS not-accessible
+       STATUS deprecated
+       DESCRIPTION
+           "Trunk index.
+The trunk in question's logical number."
+       ::= {acModularGWTrunkEntry 1}
+
+
+
+     acModularGWTrunkOnModuleNum OBJECT-TYPE
+       SYNTAX INTEGER (1..6)
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Module number on which the trunk in question is placed.
+1 is the first Module - top left corner.
+2 is the next Module
+to the right and so on.
+4 is under 1."
+       ::= {acModularGWTrunkEntry 2}
+
+
+
+     acModularGWTrunkOnPortNum OBJECT-TYPE
+       SYNTAX INTEGER (1..4)
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Physical Port on module.
+1 - left most port."
+       ::= {acModularGWTrunkEntry 3}
+
+
+
+     -- ****************************************
+     -- acModularGWAnalogPort table decleration
+     -- ****************************************
+     acModularGWAnalogPortTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcModularGWAnalogPortEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "This table shows the analog port location and type."
+       ::= {acModularGWCrossReference 21}
+
+
+
+     -- ****************************************
+     -- acModularGWAnalogPort table entry
+     -- ****************************************
+     acModularGWAnalogPortEntry OBJECT-TYPE
+       SYNTAX AcModularGWAnalogPortEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acModularGWAnalogPortIndex}
+       ::= {acModularGWAnalogPortTable 1}
+
+
+
+     -- ****************************************
+     -- acModularGWAnalogPort TABLE
+     -- ****************************************
+     AcModularGWAnalogPortEntry ::= SEQUENCE {
+       acModularGWAnalogPortIndex                      INTEGER,
+       acModularGWAnalogPortOnModuleNum                INTEGER,
+       acModularGWAnalogPortOnPortNum                  INTEGER
+     }
+
+
+
+     acModularGWAnalogPortIndex OBJECT-TYPE
+       SYNTAX INTEGER (0..23)
+       MAX-ACCESS not-accessible
+       STATUS deprecated
+       DESCRIPTION
+           "Channel index.
+The channel in question's logical number."
+       ::= {acModularGWAnalogPortEntry 1}
+
+
+
+     acModularGWAnalogPortOnModuleNum OBJECT-TYPE
+       SYNTAX INTEGER (1..6)
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Module number on which the analog port in question is placed.
+1 is the first Module - top left corner.
+2 is the next Module
+to the right and so on.
+4 is under 1."
+       ::= {acModularGWAnalogPortEntry 2}
+
+
+
+     acModularGWAnalogPortOnPortNum OBJECT-TYPE
+       SYNTAX INTEGER (1..4)
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Physical port on module.
+1 - left most port."
+       ::= {acModularGWAnalogPortEntry 3}
+
+
+
+     acModularGatewayAction        OBJECT IDENTIFIER ::= {acModularGateway 3}
+
+
+
+
+END

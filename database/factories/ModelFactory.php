@@ -13,6 +13,7 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
+use Carbon\Carbon;
 use LibreNMS\Util\IPv4;
 
 $factory->define(App\User::class, function (Faker\Generator $faker) {
@@ -80,5 +81,20 @@ $factory->define(\App\Models\Ipv4Address::class, function (Faker\Generator $fake
 $factory->define(\App\Models\Ipv4Network::class, function (Faker\Generator $faker) {
     return [
         'ipv4_network'   => $faker->ipv4 . '/' . $faker->numberBetween(0, 32),
+    ];
+});
+
+$factory->define(\App\Models\Syslog::class, function (Faker\Generator $faker) {
+    $facilities = ['kern', 'user', 'mail', 'daemon', 'auth', 'syslog', 'lpr', 'news', 'uucp', 'cron', 'authpriv', 'ftp', 'ntp', 'security', 'console', 'solaris-cron', 'local0', 'local1', 'local2', 'local3', 'local4', 'local5', 'local6', 'local7'];
+    $levels = ['emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug'];
+
+    return [
+        'facility' => $faker->randomElement($facilities),
+        'priority' => $faker->randomElement($levels),
+        'level' => $faker->randomElement($levels),
+        'tag' => $faker->asciify(str_repeat('*', $faker->numberBetween(0, 10))),
+        'timestamp' => Carbon::now(),
+        'program' => $faker->asciify(str_repeat('*', $faker->numberBetween(0, 32))),
+        'msg' => $faker->text(),
     ];
 });

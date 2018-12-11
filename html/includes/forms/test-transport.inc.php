@@ -12,10 +12,10 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
@@ -24,7 +24,7 @@ $transport = $vars['transport'] ?: null;
 $transport_id = $vars['transport_id'] ?: null;
 
 require_once $config['install_dir'].'/includes/alerts.inc.php';
-$tmp = array(dbFetchRow('select device_id,hostname,sysDescr,version,hardware,location from devices order by device_id asc limit 1'));
+$tmp = array(dbFetchRow('select device_id,hostname,sysDescr,version,hardware,location_id from devices order by device_id asc limit 1'));
 $tmp['contacts'] = GetContacts($tmp);
 $obj = array(
     "hostname"  => $tmp[0]['hostname'],

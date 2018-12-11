@@ -39,6 +39,6 @@ class Dashboard extends Model
      */
     public function widgets()
     {
-        return $this->hasMany('App\Models\UsersWidgets', 'dashboard_id');
+        return $this->hasMany('App\Models\UserWidget', 'dashboard_id');
     }
 }

@@ -1,4 +1,5 @@
 source: os/Settings.md
+path: blob/master/doc/
 # Optional OS Settings
 
 This page documents settings that can be set in the os yaml files or in config.php.
@@ -46,14 +47,6 @@ ifalias: true
 ifindex: true
 ```
 
-### Disable snmpbulkwalk
-Some devices have buggy snmp implementations and don't respond well to the more efficient snmpbulkwalk.
-To disable snmpbulkwalk and only use snmpwalk for an os set the following.
-
-```yaml
-nobulk: true
-```
-
 ### Poller and Discovery Modules
 The various discovery and poller modules can be enabled or disabled per OS.  The defaults are usually reasonable, so likely you won't want to change more than a few.
 These modules can be enabled or disabled per-device in the webui and per os or globally in config.php.
@@ -66,11 +59,26 @@ discovery_modules:
     arp-table: false
 ```
 
+### SNMP Settings
+
+#### Disable snmpbulkwalk
+Some devices have buggy snmp implementations and don't respond well to the more efficient snmpbulkwalk.
+To disable snmpbulkwalk and only use snmpwalk for an os set the following.
+
+```yaml
+nobulk: true
+```
+
+#### Limit the oids per snmpget
+```yaml
+snmp_max_oid: 8
+```
+
 ### Storage Settings
 See also: [Global Storage Config](../../Support/Configuration.md#storage-configuration)
 
 ```yaml
-ignore_mount array: # exact match
+ignore_mount_array: # exact match
     - /var/run
 ignore_mount_string: # substring
     - run

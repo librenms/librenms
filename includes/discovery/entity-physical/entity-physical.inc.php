@@ -1,4 +1,5 @@
 <?php
+
 echo "\nCaching OIDs:";
 
 if ($device['os'] == 'junos') {
@@ -17,6 +18,71 @@ if ($device['os'] == 'junos') {
     if (!empty($entity_array)) {
         echo ' entAliasMappingIdentifier';
         $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
+    }
+}
+if ($device['os'] == 'vrp') {
+    echo ' hwEntityBoardType';
+    $entity_array = snmpwalk_cache_oid($device, 'hwEntityBoardType', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
+    echo ' hwEntityBomEnDesc';
+    $entity_array = snmpwalk_cache_oid($device, 'hwEntityBomEnDesc', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
+}
+if ($device['os'] == 'saf-cfm') {
+    $entity_array = [];
+    echo ' saf-cfmAnatomy';
+    $oid = '.1.3.6.1.4.1.7571.100.1.1.2.22';
+    $device_array = snmpwalk_cache_oid($device, $oid, [], 'SAF-MPMUX-MIB')[0];
+
+    $entity_array[1] = [
+        'entPhysicalDescr' => $device_array['termProduct'],
+        'entPhysicalVendorType' => $device_array['termProduct'],
+        'entPhysicalContainedIn' => '0',
+        'entPhysicalClass' => 'chassis',
+        'entPhysicalParentRelPos' => '-1',
+        'entPhysicalName' => 'Chassis',
+        'entPhysicalSerialNum' => $device_array['serialNumber'],
+        'entPhysicalMfgName' => 'SAF',
+        'entPhysicalModelName' => $device_array['serialNumber'],
+        'entPhysicalIsFRU' => 'true',
+    ];
+
+    foreach ([1 => 'rf1Version', 2 => 'rf2Version'] as $index => $item) {
+        $entity_array[] = [
+            'entPhysicalDescr' => $device_array[$item],
+            'entPhysicalVendorType' => 'radio',
+            'entPhysicalContainedIn' => 1,
+            'entPhysicalClass' => 'module',
+            'entPhysicalParentRelPos' => $index,
+            'entPhysicalName' => "Radio $index",
+            'entPhysicalIsFRU' => 'true',
+        ];
+    }
+
+    if ($device_array['termProduct'] == 'SAF CFM-M4P-MUX') {
+        foreach (range(1, 4) as $index) {
+            $entity_array[] = [
+                'entPhysicalDescr' => 'Module Container',
+                'entPhysicalVendorType' => 'containerSlot',
+                'entPhysicalContainedIn' => 1,
+                'entPhysicalClass' => 'container',
+                'entPhysicalParentRelPos' => $index + 2,
+                'entPhysicalName' => "Slot $index",
+                'entPhysicalIsFRU' => 'false',
+            ];
+        }
+
+        foreach ([1 => 'm1Description', 2 => 'm2Description', 3 => 'm3Description', 4 => 'm4Description'] as $index => $item) {
+            if (!str_contains($device_array[$item], 'N/A')) {
+                $entity_array[] = [
+                    'entPhysicalDescr' => $device_array[$item],
+                    'entPhysicalVendorType' => 'module',
+                    'entPhysicalContainedIn' => $index + 3,
+                    'entPhysicalClass' => 'module',
+                    'entPhysicalParentRelPos' => 1,
+                    'entPhysicalName' => "Module $index",
+                    'entPhysicalIsFRU' => 'true',
+                ];
+            }
+        }
     }
 }
 
@@ -59,13 +125,14 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalAlias        = $entry['tmnxHwAlias'];
         $entPhysicalAssetID      = $entry['tmnxHwAssetID'];
         $entPhysicalIndex = str_replace('.', '', $entPhysicalIndex);
-    } else {
-        $entPhysicalDescr        = $entry['entPhysicalDescr'];
+    } elseif ($device['os'] == 'vrp') {
+        //Add some details collected in the VRP Entity Mib
+        $entPhysicalDescr        = $entry['hwEntityBomEnDesc'];
         $entPhysicalContainedIn  = $entry['entPhysicalContainedIn'];
         $entPhysicalClass        = $entry['entPhysicalClass'];
         $entPhysicalName         = $entry['entPhysicalName'];
         $entPhysicalSerialNum    = $entry['entPhysicalSerialNum'];
-        $entPhysicalModelName    = $entry['entPhysicalModelName'];
+        $entPhysicalModelName    = $entry['hwEntityBoardType'];
         $entPhysicalMfgName      = $entry['entPhysicalMfgName'];
         $entPhysicalVendorType   = $entry['entPhysicalVendorType'];
         $entPhysicalParentRelPos = $entry['entPhysicalParentRelPos'];
@@ -75,6 +142,22 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalIsFRU        = $entry['entPhysicalIsFRU'];
         $entPhysicalAlias        = $entry['entPhysicalAlias'];
         $entPhysicalAssetID      = $entry['entPhysicalAssetID'];
+    } else {
+        $entPhysicalDescr        = array_key_exists('entPhysicalDescr', $entry)        ? $entry['entPhysicalDescr']        : '';
+        $entPhysicalContainedIn  = array_key_exists('entPhysicalContainedIn', $entry)  ? $entry['entPhysicalContainedIn']  : '';
+        $entPhysicalClass        = array_key_exists('entPhysicalClass', $entry)        ? $entry['entPhysicalClass']        : '';
+        $entPhysicalName         = array_key_exists('entPhysicalName', $entry)         ? $entry['entPhysicalName']         : '';
+        $entPhysicalSerialNum    = array_key_exists('entPhysicalSerialNum', $entry)    ? $entry['entPhysicalSerialNum']    : '';
+        $entPhysicalModelName    = array_key_exists('entPhysicalModelName', $entry)    ? $entry['entPhysicalModelName']    : '';
+        $entPhysicalMfgName      = array_key_exists('entPhysicalMfgName', $entry)      ? $entry['entPhysicalMfgName']      : '';
+        $entPhysicalVendorType   = array_key_exists('entPhysicalVendorType', $entry)   ? $entry['entPhysicalVendorType']   : '';
+        $entPhysicalParentRelPos = array_key_exists('entPhysicalParentRelPos', $entry) ? $entry['entPhysicalParentRelPos'] : '';
+        $entPhysicalHardwareRev  = array_key_exists('entPhysicalHardwareRev', $entry)  ? $entry['entPhysicalHardwareRev']  : '';
+        $entPhysicalFirmwareRev  = array_key_exists('entPhysicalFirmwareRev', $entry)  ? $entry['entPhysicalFirmwareRev']  : '';
+        $entPhysicalSoftwareRev  = array_key_exists('entPhysicalSoftwareRev', $entry)  ? $entry['entPhysicalSoftwareRev']  : '';
+        $entPhysicalIsFRU        = array_key_exists('entPhysicalIsFRU', $entry)        ? $entry['entPhysicalIsFRU']        : '';
+        $entPhysicalAlias        = array_key_exists('entPhysicalAlias', $entry)        ? $entry['entPhysicalAlias']        : '';
+        $entPhysicalAssetID      = array_key_exists('entPhysicalAssetID', $entry)      ? $entry['entPhysicalAssetID']      : '';
     }//end if
 
     if (isset($entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'])) {

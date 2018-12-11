@@ -1,4 +1,5 @@
 source: General/index.md
+path: blob/master/doc/
 
 # Copyright and Licensing
 All contributors to LibreNMS retain copyright to their own code and are not

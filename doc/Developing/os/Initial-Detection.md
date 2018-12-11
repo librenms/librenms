@@ -1,4 +1,5 @@
 source: Developing/os/Initial-Detection.md
+path: blob/master/doc/
 
 This document will provide the information you should need to add basic detection for a new OS.
 

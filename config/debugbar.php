@@ -13,6 +13,9 @@ return [
      */
 
     'enabled' => env('DEBUGBAR_ENABLED', null),
+    'except' => [
+        'api*' // won't work until DebugBar 3.*
+    ],
 
     /*
      |--------------------------------------------------------------------------
@@ -74,7 +77,7 @@ return [
      |
      */
     'error_handler' => false,
-    
+
     /*
      |--------------------------------------------------------------------------
      | Clockwork integration

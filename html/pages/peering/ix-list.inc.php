@@ -22,7 +22,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$asn = $vars['asn'];
+$asn = $vars['bgpLocalAs'];
 
 ?>
 <div class="row">

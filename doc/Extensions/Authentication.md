@@ -1,4 +1,5 @@
 source: Extensions/Authentication.md
+path: blob/master/doc/
 # Authentication modules
 
 LibreNMS supports multiple authentication modules along with [Two Factor Auth](http://docs.librenms.org/Extensions/Two-Factor-Auth/).
@@ -274,7 +275,7 @@ $config['auth_ldap_cache_ttl'] = 300;
 
 ## View/embedded graphs without being logged into LibreNMS
 ```php
-$config['allow_unauth_graphs_cidr'] = array(127.0.0.1/32');
+$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
 $config['allow_unauth_graphs'] = true;
 ```
 

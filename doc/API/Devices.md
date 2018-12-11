@@ -1,4 +1,5 @@
 source: API/Devices.md
+path: blob/master/doc/
 
 ### `del_device`
 
@@ -846,7 +847,7 @@ For SNMP v1 or v2c
 
 For SNMP v3
 
-  - authlevel: SNMP authlevel (NoAuthNoPriv, AuthNoPriv, AuthPriv).
+  - authlevel: SNMP authlevel (noAuthNoPriv, authNoPriv, authPriv).
   - authname: SNMP Auth username
   - authpass: SNMP Auth password
   - authalgo: SNMP Auth algorithm (MD5, SHA)

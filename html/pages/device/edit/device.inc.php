@@ -1,70 +1,57 @@
 <?php
 
 use App\Models\Device;
-use LibreNMS\Authentication\Auth;
+use App\Models\Location;
+use LibreNMS\Authentication\LegacyAuth;
+
+$device_model = Device::find($device['device_id']);
 
 if ($_POST['editing']) {
-    if (Auth::user()->hasGlobalAdmin()) {
-        $updated = 0;
-
+    if (LegacyAuth::user()->hasGlobalAdmin()) {
         if (isset($_POST['parent_id'])) {
             $parents = array_diff((array)$_POST['parent_id'], ['0']);
             // TODO avoid loops!
-            Device::find($device['device_id'])->parents()->sync($parents);
+            $device_model->parents()->sync($parents);
         }
 
-        $override_sysLocation_bool = mres($_POST['override_sysLocation']);
-        if (isset($_POST['sysLocation'])) {
-            $override_sysLocation_string = $_POST['sysLocation'];
-        }
+        $override_sysLocation = (int)isset($_POST['override_sysLocation']);
+        $override_sysLocation_string = isset($_POST['sysLocation']) ? $_POST['sysLocation'] : null;
 
-        if ($device['override_sysLocation'] != $override_sysLocation_bool || $device['location'] != $override_sysLocation_string) {
-            $updated = 1;
-        }
-
-        if ($override_sysLocation_bool) {
-            $override_sysLocation = 1;
-        } else {
-            $override_sysLocation = 0;
-        }
-
-        dbUpdate(array('override_sysLocation'=>$override_sysLocation), 'devices', '`device_id`=?', array($device['device_id']));
-
-        if (isset($override_sysLocation_string)) {
-            dbUpdate(array('location'=>$override_sysLocation_string), 'devices', '`device_id`=?', array($device['device_id']));
-        }
-
-        if ($device['type'] != $vars['type']) {
-            $param['type'] = $vars['type'];
-            $update_type = true;
-        }
-
-        #FIXME needs more sanity checking! and better feedback
-
-        $param['purpose']  = $vars['descr'];
-        $param['ignore']   = set_numeric($vars['ignore']);
-        $param['disabled'] = set_numeric($vars['disabled']);
-
-        $rows_updated = dbUpdate($param, 'devices', '`device_id` = ?', array($device['device_id']));
-
-        if ($rows_updated > 0 || $updated) {
-            if ($update_type === true) {
-                set_dev_attrib($device, 'override_device_type', true);
+        if ($override_sysLocation) {
+            if ($override_sysLocation_string) {
+                $location = Location::firstOrCreate(['location' => $override_sysLocation_string]);
+                $device_model->location()->associate($location);
+            } else {
+                $device_model->location()->dissociate();
             }
-            $update_message = "Device record updated.";
-            $updated = 1;
-            $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device['device_id']));
-        } elseif ($rows_updated == 0) {
-            $update_message = "Device record unchanged. No update necessary.";
-            $updated = -1;
-        } else {
-            $update_message = "Device record update error.";
+        } elseif ($device_model->override_sysLocation) {
+            // no longer overridden, clear location
+            $device_model->location()->dissociate();
         }
+
+        $device_model->override_sysLocation = $override_sysLocation;
+        $device_model->purpose = $_POST['descr'];
+        $device_model->ignore = (int)isset($_POST['ignore']);
+        $device_model->disabled = (int)isset($_POST['disabled']);
+        $device_model->type = $_POST['type'];
+
+        if ($device_model->isDirty('type')) {
+            set_dev_attrib($device, 'override_device_type', true);
+        }
+
+        if ($device_model->isDirty()) {
+            if ($device_model->save()) {
+                Toastr::success(__('Device record updated'));
+            } else {
+                Toastr::error(__('Device record update error'));
+            }
+        }
+
         if (isset($_POST['hostname']) && $_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
-            if (Auth::user()->hasGlobalAdmin()) {
+            if (LegacyAuth::user()->hasGlobalAdmin()) {
                 $result = renamehost($device['device_id'], $_POST['hostname'], 'webui');
                 if ($result == "") {
-                    print_message("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
+                    Toastr::success("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
                     echo '
                         <script>
                             var loc = window.location;
@@ -72,25 +59,15 @@ if ($_POST['editing']) {
                         </script>
                     ';
                 } else {
-                    print_error($result . ".  Does your web server have permission to modify the rrd files?");
+                    Toastr::error($result . ".  Does your web server have permission to modify the rrd files?");
                 }
             } else {
-                print_error('Only administrative users may update the device hostname');
+                Toastr::error('Only administrative users may update the device hostname');
             }
         }
     } else {
         include 'includes/error-no-perm.inc.php';
     }
-}
-
-$descr  = $device['purpose'];
-$override_sysLocation = $device['override_sysLocation'];
-$override_sysLocation_string = $device['location'];
-
-if ($updated && $update_message) {
-    print_message($update_message);
-} elseif ($update_message) {
-    print_error($update_message);
 }
 
 ?>
@@ -127,7 +104,7 @@ if ($updated && $update_message) {
      <div class="form-group">
         <label for="descr" class="col-sm-2 control-label">Description:</label>
         <div class="col-sm-6">
-            <textarea id="descr" name="descr" class="form-control"><?php echo(display($device['purpose'])); ?></textarea>
+            <textarea id="descr" name="descr" class="form-control"><?php echo(display($device_model->purpose)); ?></textarea>
         </div>
     </div>
     <div class="form-group">
@@ -139,7 +116,7 @@ if ($updated && $update_message) {
 
                 foreach ($config['device_types'] as $type) {
                     echo('          <option value="'.$type['type'].'"');
-                    if ($device['type'] == $type['type']) {
+                    if ($device_model->type == $type['type']) {
                         echo(' selected="1"');
                         $unknown = 0;
                     }
@@ -155,23 +132,23 @@ if ($updated && $update_message) {
     <div class="form-group">
         <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
         <div class="col-sm-6">
-          <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"
+          <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked; edit.sysLocation.select()" type="checkbox" name="override_sysLocation"
                 <?php
-                if ($override_sysLocation) {
+                if ($device_model->override_sysLocation) {
                     echo(' checked="1"');
                 }
                 ?> />
         </div>
     </div>
-    <div class="form-group">
+    <div class="form-group" title="To set coordinates, include [latitude,longitude]">
         <div class="col-sm-2"></div>
         <div class="col-sm-6">
           <input id="sysLocation" name="sysLocation" class="form-control"
                 <?php
-                if (!$override_sysLocation) {
+                if (!$device_model->override_sysLocation) {
                     echo(' disabled="1"');
                 }
-                ?> value="<?php echo($override_sysLocation_string); ?>" />
+                ?> value="<?php echo display($device_model->location->location); ?>" />
         </div>
     </div>
     <div class="form-group">
@@ -206,7 +183,7 @@ if ($updated && $update_message) {
         <div class="col-sm-6">
           <input name="disabled" type="checkbox" id="disabled" value="1"
                 <?php
-                if ($device["disabled"]) {
+                if ($device_model->disabled) {
                     echo("checked=checked");
                 }
                 ?> />
@@ -217,7 +194,7 @@ if ($updated && $update_message) {
         <div class="col-sm-6">
            <input name="ignore" type="checkbox" id="ignore" value="1"
                 <?php
-                if ($device['ignore']) {
+                if ($device_model->ignore) {
                     echo("checked=checked");
                 }
                 ?> />
@@ -257,6 +234,12 @@ if ($updated && $update_message) {
             document.getElementById('edit-hostname-input').disabled = false;
         } else {
             document.getElementById('edit-hostname-input').disabled = true;
+        }
+    });
+    $('#sysLocation').keypress(function (e) {
+        if(e.keyCode === 13) {
+            e.preventDefault();
+            $('#edit').submit();
         }
     });
     $('#parent_id').select2({

@@ -38,7 +38,7 @@ foreach (dbFetchRows($sql) as $asn) {
     $response[] = array(
         'bgpLocalAs'    => $asn['bgpLocalAs'],
         'asname' => $astext,
-        'action' => "<a class='btn btn-sm btn-primary' href='" . generate_url(array('page' => 'peering', 'section' => 'ix-list', 'bgpLocalAs' => $asn['bgpLocalAs'])) . "' role='button'>Show connectd IXes</a>",
+        'action' => "<a class='btn btn-sm btn-primary' href='" . generate_url(array('page' => 'peering', 'section' => 'ix-list', 'bgpLocalAs' => $asn['bgpLocalAs'])) . "' role='button'>Show connected IXes</a>",
     );
 }
 

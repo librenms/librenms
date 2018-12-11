@@ -180,7 +180,6 @@ class OS implements ProcessorDiscovery
 
         $rf = new \ReflectionClass($this);
         $name = $rf->getShortName();
-        var_dump($name);
         preg_match_all("/[A-Z][a-z]*/", $name, $segments);
 
         return implode('-', array_map('strtolower', $segments[0]));

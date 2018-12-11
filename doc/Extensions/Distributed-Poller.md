@@ -1,4 +1,5 @@
 source: Extensions/Distributed-Poller.md
+path: blob/master/doc/
 # Distributed Poller
 LibreNMS has the ability to distribute polling of devices to other machines.
 

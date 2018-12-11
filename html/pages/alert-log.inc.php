@@ -36,6 +36,12 @@ if (isset($_POST['device_id'])) {
 } else {
     $default_option = '';
 }
+if (isset($_POST['state'])) {
+    $state = htmlspecialchars($_POST['state']);
+} else {
+    $state = '-1';
+}
+
 
 ?>
 
@@ -90,7 +96,7 @@ if (isset($_POST['device_id'])) {
             return {
                 id: "alertlog",
                 device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-                state: '<?php echo htmlspecialchars($_POST['state']); ?>'
+                state: '<?php echo $state; ?>'
             };
         },
         url: "ajax_table.php"

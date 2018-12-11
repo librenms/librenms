@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+$pagetitle[] = 'Poller Groups';
+
 require_once 'includes/modal/poller_groups.inc.php';
 
 ?>
