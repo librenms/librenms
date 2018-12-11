@@ -31,7 +31,7 @@ class Msteams extends Transport
         $data  = array(
             'title' => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
             'themeColor' => $color,
-            'text' => strip_tags($obj['msg'])
+            'text' => strip_tags($obj['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>')
         );
         $curl  = curl_init();
         set_curl_proxy($curl);
