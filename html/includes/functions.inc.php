@@ -726,23 +726,27 @@ function generate_sensor_link($args, $text = null, $type = null)
     $content = '<div class=list-large>' . $text . '</div>';
 
     $content .= "<div style=\'width: 850px\'>";
-    $graph_array = array();
-    $graph_array['type'] = $args['graph_type'];
-    $graph_array['legend'] = 'yes';
-    $graph_array['height'] = '100';
-    $graph_array['width'] = '340';
-    $graph_array['to'] = Config::get('time.now');
-    $graph_array['from'] = Config::get('time.day');
-    $graph_array['id'] = $args['sensor_id'];
+    $graph_array = [
+        'type' => $args['graph_type'],
+        'legend' => 'yes',
+        'height' => '100',
+        'width' => '340',
+        'to' => Config::get('time.now'),
+        'from' => Config::get('time.day'),
+        'id' => $args['sensor_id'],
+        ];
     $content .= generate_graph_tag($graph_array);
+
     $graph_array['from'] = Config::get('time.week');
     $content .= generate_graph_tag($graph_array);
+
     $graph_array['from'] = Config::get('time.month');
     $content .= generate_graph_tag($graph_array);
+
     $graph_array['from'] = Config::get('time.year');
     $content .= generate_graph_tag($graph_array);
-    $content .= '</div>';
 
+    $content .= '</div>';
 
     $url = generate_sensor_url($args);
     if (port_permitted($args['interface_id'], $args['device_id'])) {
@@ -1189,6 +1193,8 @@ function alert_details($details)
 
         if ($tmp_alerts['sensor_id']) {
             $details = "Current Value: " . $tmp_alerts['sensor_current'] . " (" . $tmp_alerts['sensor_class'] . ")<br>  ";
+            $details_a[] = array();
+
             if ($tmp_alerts['sensor_limit_low']) {
                 $details_a[] = "low: " . $tmp_alerts['sensor_limit_low'];
             }
