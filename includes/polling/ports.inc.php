@@ -571,7 +571,12 @@ foreach ($ports as $port) {
             }
         }
 
-        if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed']) && $this_port['ifHighSpeed'] < 4294901759) {
+        // work around invalid values for ifHighSpeed (fortigate)
+        if ($this_port['ifHighSpeed'] == 4294901759) {
+            $this_port['ifHighSpeed'] = null;
+        }
+
+        if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
             d_echo('ifHighSpeed ');
             $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
         } elseif (isset($this_port['ifSpeed']) && is_numeric($this_port['ifSpeed'])) {
