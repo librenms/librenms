@@ -186,8 +186,8 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
 {
     $time_start = microtime(true);
 
-    if (is_array($oids)) {
-        $oids = implode(' ', $oids);
+    if (!is_array($oids)) {
+        $oids = explode(' ', $oids);
     }
 
     $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
@@ -226,8 +226,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
 
     $data = [];
     foreach (array_chunk($oids, $oid_limit) as $chunk) {
-        $partial_oids = implode(' ', $chunk);
-        $cmd = gen_snmpget_cmd($device, $partial_oids, $options, $mib, $mibdir);
+        $cmd = gen_snmpget_cmd($device, $chunk, $options, $mib, $mibdir);
         $result = trim(external_exec($cmd));
         if ($result) {
             $data = array_merge($data, explode("\n", $result));
@@ -333,8 +332,8 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
 function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = array())
 {
     $time_start = microtime(true);
-    if (is_array($oids)) {
-        $oids = implode(' ', $oids);
+    if (!is_array($oids)) {
+        $oids = explode(' ', $oids);
     }
     $snmpcmd  = [Config::get('snmpgetnext', 'snmpgetnext')];
     $cmd = gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
