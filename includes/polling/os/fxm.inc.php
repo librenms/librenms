@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$fxm_tmp  = snmp_get_multi_oid($device, 'upsIdentProductCode.0 upsIdentUPSSoftwareVersion.0', '-OUQs', 'Argus-Power-System-MIB');
+$fxm_tmp  = snmp_get_multi_oid($device, ['upsIdentProductCode.0', 'upsIdentUPSSoftwareVersion.0'], '-OUQs', 'Argus-Power-System-MIB');
 $hardware = $fxm_tmp['upsIdentProductCode.0'];
 $version  = $fxm_tmp['upsIdentUPSSoftwareVersion.0'];
 unset($fxm_tmp);

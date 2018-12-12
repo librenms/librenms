@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$onefs_oids = snmp_get_multi_oid($device, 'ifsTotalBytes.0 ifsUsedBytes.0 ifsAvailableBytes.0', '-OUQn', 'ISILON-MIB');
+$onefs_oids = snmp_get_multi_oid($device, ['ifsTotalBytes.0', 'ifsUsedBytes.0', 'ifsAvailableBytes.0'], '-OUQn', 'ISILON-MIB');
 $storage['free']   = $onefs_oids['.1.3.6.1.4.1.12124.1.3.3.0'];
 $storage['size']  = $onefs_oids['.1.3.6.1.4.1.12124.1.3.1.0'];
 $storage['used']   = $onefs_oids['.1.3.6.1.4.1.12124.1.3.2.0'];

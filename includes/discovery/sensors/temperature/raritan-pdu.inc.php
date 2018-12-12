@@ -27,7 +27,7 @@ $index = 'unitCpuTemp.0';
 $oid = '.1.3.6.1.4.1.13742.4.1.3.1.5.0';
 $descr = 'Processor Temp';
 $divisor = 10;
-$raritan_data = snmp_get_multi_oid($device, 'unitCpuTemp.0 unitTempLowerWarning.0 unitTempLowerCritical.0 unitTempUpperWarning.0 unitTempUpperCritical.0', '-OUQs', 'PDU-MIB');
+$raritan_data = snmp_get_multi_oid($device, ['unitCpuTemp.0', 'unitTempLowerWarning.0', 'unitTempLowerCritical.0', 'unitTempUpperWarning.0', 'unitTempUpperCritical.0'], '-OUQs', 'PDU-MIB');
 if (is_array($raritan_data) && !empty($raritan_data)) {
     $low_limit = $raritan_data['unitTempLowerCritical.0'];
     $low_warn_limit = $raritan_data['unitTempLowerWarning.0'];
