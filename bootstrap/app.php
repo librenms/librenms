@@ -42,7 +42,7 @@ $app->singleton(
 );
 
 $app->configureMonologUsing(function (Monolog\Logger $logger) use ($app) {
-    $path = $app->basePath(config('app.log'));
+    $path = config('app.log') ?: $app->basePath('logs/librenms.log');
     $logger->pushHandler(new \Monolog\Handler\StreamHandler($path));
 });
 
