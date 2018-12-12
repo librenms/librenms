@@ -27,11 +27,9 @@ class AppServiceProvider extends ServiceProvider
         // load config
         Config::load();
 
-        // redirect log to config location, unless APP_LOG is set
-        if (!config('app.log')) {
-            Log::getMonolog()->popHandler(); // remove existing errorlog logger
-            Log::useFiles(Config::get('log_file', base_path('logs/librenms.log')), 'error');
-        }
+        // replace early boot logging redirect log to config location, unless APP_LOG is set
+        Log::getMonolog()->popHandler(); // remove existing errorlog logger
+        Log::useFiles(config('app.log') ?: Config::get('log_file', base_path('logs/librenms.log')), 'error');
 
         // Blade directives (Yucky because of < L5.5)
         Blade::directive('config', function ($key) {
