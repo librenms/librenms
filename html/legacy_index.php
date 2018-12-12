@@ -111,6 +111,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
 }
 
 ?>
+  <script src="js/polyfill.min.js"></script>
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
@@ -136,7 +137,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
     }
     ?>
   <script src="js/select2.min.js"></script>
-  <script src="js/librenms.js?ver=20181128"></script>
+  <script src="js/librenms.js?ver=20181205"></script>
   <script type="text/javascript">
 
     <!-- Begin

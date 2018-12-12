@@ -192,6 +192,12 @@ class WirelessSensor extends Sensor
                 'unit' => 'dB',
                 'icon' => 'signal',
             ),
+            'xpi' => array(
+                'short' => 'XPI',
+                'long' => 'Cross Polar Interference',
+                'unit' => 'dB',
+                'icon' => 'signal',
+            ),
             'rssi' => array(
                 'short' => 'RSSI',
                 'long' => 'Received Signal Strength Indicator',

@@ -1,0 +1,1114 @@
+
+AcAtm DEFINITIONS ::= BEGIN
+
+    IMPORTS
+       OBJECT-TYPE, 
+       MODULE-IDENTITY                             FROM SNMPv2-SMI
+       TAddress, 
+       DisplayString,     
+       RowStatus ,
+       DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+       IpAddress                                   FROM RFC1155-SMI
+       enterprises                                 FROM SNMPv2-SMI
+       AtmAddr                                     FROM ATM-TC-MIB;
+
+
+
+
+	audioCodes       OBJECT IDENTIFIER ::= {enterprises 5003}
+	acRegistrations  OBJECT IDENTIFIER ::= {audioCodes 7}
+	acGeneric        OBJECT IDENTIFIER ::= {audioCodes 8}
+	acProducts       OBJECT IDENTIFIER ::= {audioCodes 9}	
+        acBoardMibs      OBJECT IDENTIFIER ::= {acProducts 10}
+       
+	acAtm MODULE-IDENTITY
+	LAST-UPDATED "200603211048Z"          --Tuesday, March 21, 2006
+	ORGANIZATION "AudioCodes Ltd"
+	CONTACT-INFO
+    	"Postal: Support
+	     	AudioCodes LTD
+             	1 Hayarden Street
+                Airport City 
+	        Lod, ISRAEL 70151
+     	Tel:    972-3-9764000
+     	Fax:    972-3-9764040
+     	Email:  support@audiocodes.com
+	Web:    www.audiocodes.com"	
+	DESCRIPTION 
+		"The Audiocodes ATMMIB."
+
+        REVISION     "200310160000Z"  -- Midnight 16 October 2003.   
+        DESCRIPTION  "Initial version for acAtm mib "
+       
+
+        REVISION     "200603211048Z"          --Tuesday, March 21, 2006  
+
+        DESCRIPTION  "Addition new table  - remote gateway into the mib "
+
+        REVISION     "201006041528Z"          --Tuesday, April 06, 2010 
+
+        DESCRIPTION  "obsoleted AcAtm"
+
+
+	::= {acBoardMibs 6}  
+
+
+
+
+
+
+     acAtmConfiguration            OBJECT IDENTIFIER ::= {acAtm 1}
+
+
+     atmGeneralParams              OBJECT IDENTIFIER ::= {acAtmConfiguration 1}
+
+
+     atmGeneralParamsAtmDefaultApplicationType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  aal1(1)
+,
+                   aal2-i-366-2(2)
+,
+                   aal2-umts(3) 
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the default application type used when the board cannot determine from the H248 add message which AAL type to use."
+       ::= {atmGeneralParams 1}
+
+
+
+     atmGeneralParamsAtmTransmissionMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  sdh (0)
+,
+                  sonet(1)
+,
+                  none(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the ATM Port Optical Carrier type which indicates whether the European standard (SDH) is to be employed or the North American Standard (SONET)"
+       ::= {atmGeneralParams 2}
+
+
+
+     atmPort                       OBJECT IDENTIFIER ::= {acAtmConfiguration 2}
+
+
+     -- ****************************************
+     -- atmPort table decleration
+     -- ****************************************
+     atmPortTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AtmPortEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "This table indicates general information about and alarm status of the ATM optical fiber ports.  It is also used to configure the ATM address associated with the optical port and read that address."
+       ::= {atmPort 1}
+
+
+
+     -- ****************************************
+     -- atmPort table entry
+     -- ****************************************
+     atmPortEntry OBJECT-TYPE
+       SYNTAX AtmPortEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           ""
+       INDEX {atmPortNumber}
+       ::= {atmPortTable 1}
+
+
+
+     -- ****************************************
+     -- atmPort TABLE
+     -- ****************************************
+     AtmPortEntry ::= SEQUENCE {
+       atmPortAdministrativeState                      INTEGER,
+       atmPortOperationalState                         INTEGER,
+       atmPortNumber                                   INTEGER,
+       atmPortAdminAddress                             AtmAddr,
+       atmPortOperationalAddress                       AtmAddr,
+       atmPortAlarmStatus                              INTEGER,
+       atmPortAddressMode                              INTEGER
+     }
+
+
+
+     atmPortAdministrativeState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  locked (0)
+,
+                   shuttingDown(1)
+,
+                   unlocked(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the ATM Port Administrative State"
+       ::= {atmPortEntry 1}
+
+
+
+     atmPortOperationalState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disabled(0)
+,
+                   enabled(1)
+
+
+                  }
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the Port Operational State"
+       ::= {atmPortEntry 2}
+
+
+
+     atmPortNumber OBJECT-TYPE
+       SYNTAX INTEGER {
+                  port0(0)
+,
+                   port1(1)
+,
+                   port2(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the ATM Port Number"
+       ::= {atmPortEntry 3}
+
+
+
+     atmPortAdminAddress OBJECT-TYPE
+       SYNTAX AtmAddr (SIZE (0..40))
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the Administrative ATM Port Address (20 octets in length - 40 hexadecimal characters). This address is manually configured. This address is used when ILMI is not available."
+       ::= {atmPortEntry 4}
+
+
+
+     atmPortOperationalAddress OBJECT-TYPE
+       SYNTAX AtmAddr (SIZE (0..40))
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the port ATM address currently in operation (i.e.:assigned to this port). This address is set to atmPortAdminAddress if no ILMI address is registered. If an ILMI address is successfully registered, then atmPortOperationalAddress will be set to the ILMI one, though an administrative address may have already been configured. Thus ILMI address always takes precedence over the administrative one. If both the administrative and ILMI addresses are unavailable then the operational address is left empty. Refer to atmPortAddressMode for which address is operational."
+       ::= {atmPortEntry 5}
+
+
+
+     atmPortAlarmStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cleared(0)
+,
+                   los(1)
+,
+                   ais(2)
+,
+                   rdi(4)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the ATM Port Alarm Status. The possible values are:
+  cleared(0) - LOS, AIS and RDI conditions are not present
+  los(1)       - the LOS condition is present
+  ais(2)       - AIS condition is present (LOS condition is not present)
+  rdi(4)        - RDI condition is present (LOS and AIS conditions are not present)
+Note: Alarm conditions (from the SONET/SDH standard documents) are:
+   LOS - Loss Of Signal
+   AIS - Alarm Indication Signal
+   RDI - Remote Defect Indication"
+       ::= {atmPortEntry 6}
+
+
+
+     atmPortAddressMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  addrModeNone(0) 
+,
+                   addrModeManual(1)
+,
+                   addrModeILMI(2) 
+
+                  }
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "The mode reflects the type of address in operation. addrModeNone(0) : No administrative address has been configured and no ILMI address has been registered. Thus no address is available to assign to the port. addrModeManual(1): An Administrative address has been configured and no ILMI address has been registered. Thus the port is assigned the manually configured address.addrModeILMI (2): An ILMI address has been registered. The port is assigned this address. The administrative address is ignored if it has been configured."
+       ::= {atmPortEntry 7}
+
+
+
+     atmRemoteGateway              OBJECT IDENTIFIER ::= {acAtmConfiguration 3}
+
+
+     -- ****************************************
+     -- atmRemoteGateway table decleration
+     -- ****************************************
+     atmRemoteGatewayTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AtmRemoteGatewayEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "This includes the destination remote Gateways (and RNC) that the Media Gateway would have signaling contact with."
+       ::= {atmRemoteGateway 1}
+
+
+
+     -- ****************************************
+     -- atmRemoteGateway table entry
+     -- ****************************************
+     atmRemoteGatewayEntry OBJECT-TYPE
+       SYNTAX AtmRemoteGatewayEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           ""
+       INDEX {atmRemoteGatewayIndex}
+       ::= {atmRemoteGatewayTable 1}
+
+
+
+     -- ****************************************
+     -- atmRemoteGateway TABLE
+     -- ****************************************
+     AtmRemoteGatewayEntry ::= SEQUENCE {
+       atmRemoteGatewayRowStatus                       RowStatus,
+       atmRemoteGatewayAction                          INTEGER,
+       atmRemoteGatewayActionResult                    INTEGER,
+       atmRemoteGatewayIndex                           INTEGER,
+       atmRemoteGatewayName                            OCTET STRING,
+       atmRemoteGatewayNSAPAddress                     AtmAddr,
+       atmRemoteGatewayALCAPInstanceNum                INTEGER
+     }
+
+
+
+     atmRemoteGatewayRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS obsolete
+       DESCRIPTION
+           "The RowStatus textual convention is used to manage the
+ creation and deletion and active of conceptual rows."
+       ::= {atmRemoteGatewayEntry 1}
+
+
+
+     atmRemoteGatewayAction OBJECT-TYPE
+       SYNTAX INTEGER (0..100)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Development Pending -for future use"
+       ::= {atmRemoteGatewayEntry 2}
+
+
+
+     atmRemoteGatewayActionResult OBJECT-TYPE
+       SYNTAX INTEGER (0..100)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Development Pending -future use"
+       ::= {atmRemoteGatewayEntry 3}
+
+
+
+     atmRemoteGatewayIndex OBJECT-TYPE
+       SYNTAX INTEGER (0..99)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "."
+       ::= {atmRemoteGatewayEntry 4}
+
+
+
+     atmRemoteGatewayName OBJECT-TYPE
+       SYNTAX OCTET STRING (SIZE (0..20))
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Remote Gateway name "
+       ::= {atmRemoteGatewayEntry 5}
+
+
+
+     atmRemoteGatewayNSAPAddress OBJECT-TYPE
+       SYNTAX AtmAddr (SIZE (0..40))
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the ATM Address associated with the remote Gateway to which this PVC connects (20 octets in length - 40 hexadecimal characters)"
+       ::= {atmRemoteGatewayEntry 6}
+
+
+
+     atmRemoteGatewayALCAPInstanceNum OBJECT-TYPE
+       SYNTAX INTEGER (0..7)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "ALCAP  Instance number  associated with the remote Gateway ( 3G only)"
+       ::= {atmRemoteGatewayEntry 7}
+
+
+
+     aal2PVC                       OBJECT IDENTIFIER ::= {acAtmConfiguration 4}
+
+
+     -- ****************************************
+     -- aal2PVC table decleration
+     -- ****************************************
+     aal2PVCTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF Aal2PVCEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "This table contains information referring to Permanent Virtual Channels connecting the AMS to the ATM Edge Switch."
+       ::= {aal2PVC 1}
+
+
+
+     -- ****************************************
+     -- aal2PVC table entry
+     -- ****************************************
+     aal2PVCEntry OBJECT-TYPE
+       SYNTAX Aal2PVCEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           ""
+       INDEX {aal2PVCRemoteGatewayIndex, aal2PVCVCCIPATHID}
+       ::= {aal2PVCTable 1}
+
+
+
+     -- ****************************************
+     -- aal2PVC TABLE
+     -- ****************************************
+     Aal2PVCEntry ::= SEQUENCE {
+       aal2PVCRowStatus                                RowStatus,
+       aal2PVCAction                                   INTEGER,
+       aal2PVCActionResult                             INTEGER,
+       aal2PVCRemoteGatewayIndex                       INTEGER,
+       aal2PVCVCCIPATHID                               INTEGER,
+       aal2PVCPortNumber                               INTEGER,
+       aal2PVCVpi                                      INTEGER,
+       aal2PVCVci                                      INTEGER,
+       aal2PVCMaxNumOfCid                              INTEGER,
+       aal2PVCNumOfCidInUse                            INTEGER,
+       aal2PVCServiceCategory                          INTEGER,
+       aal2PVCPCR                                      INTEGER,
+       aal2PVCSCR                                      INTEGER,
+       aal2PVCMBS                                      INTEGER
+     }
+
+
+
+     aal2PVCRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS obsolete
+       DESCRIPTION
+           "The RowStatus textual convention is used to manage the
+ creation and deletion and active of conceptual rows."
+       ::= {aal2PVCEntry 1}
+
+
+
+     aal2PVCAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Development Pending - for future use"
+       ::= {aal2PVCEntry 2}
+
+
+
+     aal2PVCActionResult OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Development Pending - for future use"
+       ::= {aal2PVCEntry 3}
+
+
+
+     aal2PVCRemoteGatewayIndex OBJECT-TYPE
+       SYNTAX INTEGER (0..99)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the gw  index  that associated with the remote Gateway table to which this PVC connects (20 octets in length - 40 hexadecimal characters)"
+       ::= {aal2PVCEntry 4}
+
+
+
+     aal2PVCVCCIPATHID OBJECT-TYPE
+       SYNTAX INTEGER (1..8191)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the range of Virtual Connection Channel Identifiers which is an end to end identifier for an AAL2 VC."
+       ::= {aal2PVCEntry 5}
+
+
+
+     aal2PVCPortNumber OBJECT-TYPE
+       SYNTAX INTEGER {
+                  port0(0)
+,
+                   port1(1)
+,
+                   port2(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the port number associated with the PVC"
+       ::= {aal2PVCEntry 6}
+
+
+
+     aal2PVCVpi OBJECT-TYPE
+       SYNTAX INTEGER (0..255)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the VPI assigned to the PVC"
+       ::= {aal2PVCEntry 7}
+
+
+
+     aal2PVCVci OBJECT-TYPE
+       SYNTAX INTEGER (0..65535)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the VCI assigned to the PVC"
+       ::= {aal2PVCEntry 8}
+
+
+
+     aal2PVCMaxNumOfCid OBJECT-TYPE
+       SYNTAX INTEGER (1..248)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the maximum number of CIDs for the AAL2 PVC."
+       ::= {aal2PVCEntry 9}
+
+
+
+     aal2PVCNumOfCidInUse OBJECT-TYPE
+       SYNTAX INTEGER (1..248)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the number of CIDs for AAL2 PVC currently in use."
+       ::= {aal2PVCEntry 10}
+
+
+
+     aal2PVCServiceCategory OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cbr(1)
+,
+                   rtVbr(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the Service Category which is either CBR (Constant Bit Rate) or rtVBR (realtime Variable Bit Rate)"
+       ::= {aal2PVCEntry 11}
+
+
+
+     aal2PVCPCR OBJECT-TYPE
+       SYNTAX INTEGER (0..49600)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the peak cell rate (PCR) associated with the provisioned virtual channel (PVC).  Includes bandwidth for all CIDs within the PVC"
+       ::= {aal2PVCEntry 12}
+
+
+
+     aal2PVCSCR OBJECT-TYPE
+       SYNTAX INTEGER (0..49600)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the sustained cell rate (SCR) associated with the provisioned virtual channel (PVC). Includes bandwidth for all CIDs within the PVC."
+       ::= {aal2PVCEntry 13}
+
+
+
+     aal2PVCMBS OBJECT-TYPE
+       SYNTAX INTEGER (0..100)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the Maximum Burst Size (MBS) for the provisioned virtual channel (PVC)."
+       ::= {aal2PVCEntry 14}
+
+
+
+     atmPortLoopbackConfig         OBJECT IDENTIFIER ::= {acAtmConfiguration 5}
+
+
+     -- ****************************************
+     -- atmPortLoopbackConfig table decleration
+     -- ****************************************
+     atmPortLoopbackConfigTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AtmPortLoopbackConfigEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "This table gives the Loopback Configuration associated with a given Optical Fiber Port number."
+       ::= {atmPortLoopbackConfig 1}
+
+
+
+     -- ****************************************
+     -- atmPortLoopbackConfig table entry
+     -- ****************************************
+     atmPortLoopbackConfigEntry OBJECT-TYPE
+       SYNTAX AtmPortLoopbackConfigEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           ""
+       INDEX {atmPortLoopbackConfigPortNumber}
+       ::= {atmPortLoopbackConfigTable 1}
+
+
+
+     -- ****************************************
+     -- atmPortLoopbackConfig TABLE
+     -- ****************************************
+     AtmPortLoopbackConfigEntry ::= SEQUENCE {
+       atmPortLoopbackConfigIsUsed                     INTEGER,
+       atmPortLoopbackConfigAction                     INTEGER,
+       atmPortLoopbackConfigActionResult               INTEGER,
+       atmPortLoopbackConfigPortNumber                 INTEGER,
+       atmPortLoopbackConfigMode                       INTEGER,
+       atmPortLoopbackConfigOutBoundVirtualPath        INTEGER,
+       atmPortLoopbackConfigInBoundVirtualPath         INTEGER,
+       atmPortLoopbackConfigVciRangeFirst              INTEGER,
+       atmPortLoopbackConfigVciRangeLast               INTEGER,
+       atmPortLoopbackConfigServiceCategory            INTEGER,
+       atmPortLoopbackConfigPCR                        INTEGER,
+       atmPortLoopbackConfigSCR                        INTEGER,
+       atmPortLoopbackConfigMBS                        INTEGER
+     }
+
+
+
+     atmPortLoopbackConfigIsUsed OBJECT-TYPE
+       SYNTAX INTEGER {
+                  no(0)
+,
+                   yes(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This tells whether or not the port loopback is used.  If the port is available on the board, this is yes."
+       ::= {atmPortLoopbackConfigEntry 1}
+
+
+
+     atmPortLoopbackConfigAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Development Pending - for future use"
+       ::= {atmPortLoopbackConfigEntry 2}
+
+
+
+     atmPortLoopbackConfigActionResult OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Development Pending - for future use"
+       ::= {atmPortLoopbackConfigEntry 3}
+
+
+
+     atmPortLoopbackConfigPortNumber OBJECT-TYPE
+       SYNTAX INTEGER {
+                  port0(0)
+,
+                   port1(1)
+,
+                   port2(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "The port number associated with the optical port which is being described.  "
+       ::= {atmPortLoopbackConfigEntry 4}
+
+
+
+     atmPortLoopbackConfigMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+,
+                   uni(1)
+,
+                   vp(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the mode in which the loopback will work: no loopback, UNI loopback, or Virtual Path loopback"
+       ::= {atmPortLoopbackConfigEntry 5}
+
+
+
+     atmPortLoopbackConfigOutBoundVirtualPath OBJECT-TYPE
+       SYNTAX INTEGER (1..255)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "If the atmLoopback mode is VP, this specifies the VP identity for the cells going toward the ATM edge switch"
+       ::= {atmPortLoopbackConfigEntry 6}
+
+
+
+     atmPortLoopbackConfigInBoundVirtualPath OBJECT-TYPE
+       SYNTAX INTEGER (1..255)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "If the atmLoopback mode is VP, this specifies the VP identity for the cells coming from the ATM edge switch"
+       ::= {atmPortLoopbackConfigEntry 7}
+
+
+
+     atmPortLoopbackConfigVciRangeFirst OBJECT-TYPE
+       SYNTAX INTEGER (33..2047)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "If the atmLoopback mode is VP, this specifies the minimum VCI within the inbound and outbound VP which may be used."
+       ::= {atmPortLoopbackConfigEntry 8}
+
+
+
+     atmPortLoopbackConfigVciRangeLast OBJECT-TYPE
+       SYNTAX INTEGER (33..2047)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "If the atmLoopback mode is VP, this specifies the maximum VCI within the inbound and outbound VP which may be used."
+       ::= {atmPortLoopbackConfigEntry 9}
+
+
+
+     atmPortLoopbackConfigServiceCategory OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cbr(1)
+,
+                   rtVbr(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This category is limited to Constant Bit Rate (CBR) traffic or realtime Variable Bit Rate (rtVBR) for this release."
+       ::= {atmPortLoopbackConfigEntry 10}
+
+
+
+     atmPortLoopbackConfigPCR OBJECT-TYPE
+       SYNTAX INTEGER (171..59600)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the peak cell rate (PCR) associated with the switched virtual channel (SVC).  This is used for Constant Bit Rate (CBR) traffic. For AAL2, this includes bandwidth for all CIDs within the SVC. For AAL1, there is only one channel per SVC (and no concept of a CID)."
+       ::= {atmPortLoopbackConfigEntry 11}
+
+
+
+     atmPortLoopbackConfigSCR OBJECT-TYPE
+       SYNTAX INTEGER (171..59600)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the sustained cell rate (SCR) associated with the switched virtual channel (SVC). This is used for realtime Variable Bit Rate (rtVBR) traffice. For AAL2, this includes bandwidth for all CIDs within the SVC. For AAL1, there is only one channel per SVC (and no concept of a CID)."
+       ::= {atmPortLoopbackConfigEntry 12}
+
+
+
+     atmPortLoopbackConfigMBS OBJECT-TYPE
+       SYNTAX INTEGER (1..100)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the Maximum Burst Size (MBS) associated with the switched virtual channel (SVC).  This is used in realtime Variable Bit Rate (rtVBR) traffice. The unit for this parameter is ATM cells."
+       ::= {atmPortLoopbackConfigEntry 13}
+
+
+
+     atmSvcProfile                 OBJECT IDENTIFIER ::= {acAtmConfiguration 6}
+
+
+     -- ****************************************
+     -- atmSvcProfile table decleration
+     -- ****************************************
+     atmSvcProfileTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AtmSvcProfileEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "This table indicates information about profiles associated with the creation of each new AAL2 SVC."
+       ::= {atmSvcProfile 1}
+
+
+
+     -- ****************************************
+     -- atmSvcProfile table entry
+     -- ****************************************
+     atmSvcProfileEntry OBJECT-TYPE
+       SYNTAX AtmSvcProfileEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           ""
+       INDEX {atmSvcProfileIndex}
+       ::= {atmSvcProfileTable 1}
+
+
+
+     -- ****************************************
+     -- atmSvcProfile TABLE
+     -- ****************************************
+     AtmSvcProfileEntry ::= SEQUENCE {
+       atmSvcProfileIsUsed                             INTEGER,
+       atmSvcProfileIndex                              INTEGER,
+       atmSvcProfileMaxNumOfCids                       INTEGER,
+       atmSvcProfilePCR                                INTEGER,
+       atmSvcProfileSCR                                INTEGER,
+       atmSvcProfileMBS                                INTEGER,
+       atmSvcProfilePersistence                        INTEGER,
+       atmSvcProfileServiceCategory                    INTEGER
+     }
+
+
+
+     atmSvcProfileIsUsed OBJECT-TYPE
+       SYNTAX INTEGER {
+                  no(0)
+,
+                   yes(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This tells whether or not this SVC profile is used.  If it is used, the value is yes."
+       ::= {atmSvcProfileEntry 1}
+
+
+
+     atmSvcProfileIndex OBJECT-TYPE
+       SYNTAX INTEGER (1..550)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Initially only one SVC Profile is supported.  This parameter may be updated later as the table supports more profiles"
+       ::= {atmSvcProfileEntry 2}
+
+
+
+     atmSvcProfileMaxNumOfCids OBJECT-TYPE
+       SYNTAX INTEGER (1..248)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "The CIDs fall in the range of 8 to 255, so there are a maximum of 248 CIDs possible. The assignment of CID #8 may be received but not initiated.  Assignments from the low end of the CID range should start with 9 as there are some vendors who use 8 for a special OAM purpose."
+       ::= {atmSvcProfileEntry 3}
+
+
+
+     atmSvcProfilePCR OBJECT-TYPE
+       SYNTAX INTEGER (171..59600)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the peak cell rate (PCR) associated with the switched virtual channel (SVC).  This is used for Constant Bit Rate (CBR) traffic. For AAL2, this includes bandwidth for all CIDs within the SVC. For AAL1, there is only one channel per SVC (and no concept of a CID)."
+       ::= {atmSvcProfileEntry 4}
+
+
+
+     atmSvcProfileSCR OBJECT-TYPE
+       SYNTAX INTEGER (171..59600)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the sustained cell rate (SCR) associated with the switched virtual channel (SVC). This is used for realtime Variable Bit Rate (rtVBR) traffice. For AAL2, this includes bandwidth for all CIDs within the SVC. For AAL1, there is only one channel per SVC (and no concept of a CID)."
+       ::= {atmSvcProfileEntry 5}
+
+
+
+     atmSvcProfileMBS OBJECT-TYPE
+       SYNTAX INTEGER (1..100)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the Maximum Burst Size (MBS) associated with the switched virtual channel (SVC).  This is used in realtime Variable Bit Rate (rtVBR) traffice. The unit for this parameter is ATM cells."
+       ::= {atmSvcProfileEntry 6}
+
+
+
+     atmSvcProfilePersistence OBJECT-TYPE
+       SYNTAX INTEGER (0..10000)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This is the parameter which descirbes how long an AAL2 SVC will persist even when no CIDs are in use.  Generally, this is on the order of 180 to 600 seconds.  Non-persistent SVCs should have a value of 0."
+       ::= {atmSvcProfileEntry 7}
+
+
+
+     atmSvcProfileServiceCategory OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cbr(1)
+,
+                   rtVbr(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "This category is limited to Constant Bit Rate (CBR) traffic or realtime Variable Bit Rate (rtVBR) for this release."
+       ::= {atmSvcProfileEntry 8}
+
+
+
+     acAtmStatus                   OBJECT IDENTIFIER ::= {acAtm 2}
+
+
+     atmSvcConnection              OBJECT IDENTIFIER ::= {acAtmStatus 1}
+
+
+     -- ****************************************
+     -- atmSvcConnection table decleration
+     -- ****************************************
+     atmSvcConnectionTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AtmSvcConnectionEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "This is the table which describes the read only characteristics of a given AAL1 or AAL2 SVC."
+       ::= {atmSvcConnection 1}
+
+
+
+     -- ****************************************
+     -- atmSvcConnection table entry
+     -- ****************************************
+     atmSvcConnectionEntry OBJECT-TYPE
+       SYNTAX AtmSvcConnectionEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           ""
+       INDEX {atmSvcConnectionIndex}
+       ::= {atmSvcConnectionTable 1}
+
+
+
+     -- ****************************************
+     -- atmSvcConnection TABLE
+     -- ****************************************
+     AtmSvcConnectionEntry ::= SEQUENCE {
+       atmSvcConnectionIndex                           INTEGER,
+       atmSvcConnectionRemoteGatewayAddress            AtmAddr,
+       atmSvcConnectionPort                            INTEGER,
+       atmSvcConnectionVpi                             INTEGER,
+       atmSvcConnectionVci                             INTEGER,
+       atmSvcConnectionAALType                         INTEGER,
+       atmSvcConnectionDirection                       INTEGER,
+       atmSvcConnectionEecid                           Unsigned32,
+       atmSvcConnectionVcci                            INTEGER,
+       atmSvcConnectionMaxNumOfCid                     INTEGER,
+       atmSvcConnectionNumOfCidInUse                   INTEGER
+     }
+
+
+
+     atmSvcConnectionIndex OBJECT-TYPE
+       SYNTAX INTEGER (0..500)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "A unique index, that identifies the SVC on the system."
+       ::= {atmSvcConnectionEntry 1}
+
+
+
+     atmSvcConnectionRemoteGatewayAddress OBJECT-TYPE
+       SYNTAX AtmAddr (SIZE (0..40))
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the ATM Address associated with the remote Gateway to which this SVC connects (20 octets in length - 40 hexadecimal characters)"
+       ::= {atmSvcConnectionEntry 2}
+
+
+
+     atmSvcConnectionPort OBJECT-TYPE
+       SYNTAX INTEGER {
+                  port0(0)
+,
+                   port1(1)
+,
+                   port2(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the port on which the SVC is connected"
+       ::= {atmSvcConnectionEntry 3}
+
+
+
+     atmSvcConnectionVpi OBJECT-TYPE
+       SYNTAX INTEGER (0..255)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the VPI associated with the SVC"
+       ::= {atmSvcConnectionEntry 4}
+
+
+
+     atmSvcConnectionVci OBJECT-TYPE
+       SYNTAX INTEGER (0..65535)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the VCI associated with the SVC"
+       ::= {atmSvcConnectionEntry 5}
+
+
+
+     atmSvcConnectionAALType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  aal1(1)
+,
+                   aal2(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the Adaptation Layer type.  It is either AAL1 or AAL2."
+       ::= {atmSvcConnectionEntry 6}
+
+
+
+     atmSvcConnectionDirection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  incoming(0)
+,
+                   outgoing(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the direction in which the SVC was setup.  Incoming means the this end received the SETUP.  Outgoing means this end sent the SETUP."
+       ::= {atmSvcConnectionEntry 7}
+
+
+
+     atmSvcConnectionEecid OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the unique end to end identifier associated with the setup of AAL1 SVCs"
+       ::= {atmSvcConnectionEntry 8}
+
+
+
+     atmSvcConnectionVcci OBJECT-TYPE
+       SYNTAX INTEGER (0..65535)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the unique identity of an SVC associated with an AAL2 connection"
+       ::= {atmSvcConnectionEntry 9}
+
+
+
+     atmSvcConnectionMaxNumOfCid OBJECT-TYPE
+       SYNTAX INTEGER (1..248)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the maximum number of CIDs for an AAL2 SVC."
+       ::= {atmSvcConnectionEntry 10}
+
+
+
+     atmSvcConnectionNumOfCidInUse OBJECT-TYPE
+       SYNTAX INTEGER (1..248)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "This is the number of channel Ids currently in use in a given SVC."
+       ::= {atmSvcConnectionEntry 11}
+
+
+
+
+
+END

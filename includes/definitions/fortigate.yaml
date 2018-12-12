@@ -5,6 +5,7 @@ icon: fortinet
 mib_dir:
     - fortinet
 empty_ifdescr: true
+ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_fortigate_cpu, text: 'CPU Usage' }

@@ -116,7 +116,8 @@ if ($device['location_id']) {
     $maps_engine = $maps_api ? Config::get('geoloc.engine') : '';
 
     $location = Location::find($device['location_id']);
-    $location_coords = $location->coordinatesValid() ? $location->lat . ', ' . $location->lng : 'N/A';
+    $location_valid = $location && $location->coordinatesValid();
+    $location_coords = $location_valid ? $location->lat . ', ' . $location->lng : 'N/A';
 
     echo '
     <div class="row">
@@ -128,7 +129,7 @@ if ($device['location_id']) {
         <div class="col-sm-8"><span id="coordinates-text">' . $location_coords . '</span><div class="pull-right">';
 
     echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> <span>View</span></button>';
-    if ($location->coordinatesValid()) {
+    if ($location_valid) {
         echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . '+' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
     }
     echo '</div>
