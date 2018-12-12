@@ -60,7 +60,7 @@
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
                     "ifMtu": null,
-                    "ifType": null,
+                    "ifType": "ethernetCsmacd",
                     "ifAlias": "Ethernet Port 1/1",
                     "ifPhysAddress": null,
                     "ifHardType": null,
