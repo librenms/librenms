@@ -225,7 +225,7 @@ class Checks
         if (!is_file($log_file) || !is_writable($log_file)) {
             // override for proper error output
             $dirs = [$log_file];
-            $install_dir = starts_with($log_file, '/') ? dirname($log_file) : $log_file;
+            $install_dir = $log_file;
             $commands = [
                 '<h3>Cannot write to log file: &quot;' . $log_file . '&quot;</h3>',
                 'Make sure it exists and is writable, or change your LOG_DIR setting.'
