@@ -199,11 +199,11 @@ class YamlDiscovery
                         foreach ((array)$data['oid'] as $oid) {
                             if (!array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
-                                    $snmp_flag = $data['snmp_flags'];
+                                    $snmp_flag = [$data['snmp_flags']];
                                 } else {
-                                    $snmp_flag = '-OteQUs';
+                                    $snmp_flag = ['-OteQUs'];
                                 }
-                                $snmp_flag .= ' -Ih';
+                                $snmp_flag[] = '-Ih';
 
                                 $mib = $device['dynamic_discovery']['mib'];
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid], $mib, null, $snmp_flag);

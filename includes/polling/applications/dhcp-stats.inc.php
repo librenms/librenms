@@ -4,7 +4,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'dhcp-stats';
 $app_id = $app['app_id'];
-$options      = '-O qv';
+$options      = '-Oqv';
 $mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.100.104.99.112.115.116.97.116.115';
 

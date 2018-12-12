@@ -144,7 +144,7 @@ class ModuleTestHelper
         foreach ($snmp_oids as $oid_data) {
             $this->qPrint(" " . $oid_data['oid']);
 
-            $snmp_options = '-OUneb -Ih';
+            $snmp_options = ['-OUneb', '-Ih'];
             if ($oid_data['method'] == 'walk') {
                 $data = snmp_walk($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
             } elseif ($oid_data['method'] == 'get') {

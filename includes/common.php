@@ -108,7 +108,7 @@ function external_exec($command)
         $debug_command = preg_replace($patterns, $replacements, implode(' ', $command));
         c_echo('SNMP[%c' . $debug_command . "%n]\n");
     } elseif ($vdebug) {
-        c_echo('SNMP[%c'.$command."%n]\n");
+        c_echo('SNMP[%c'.implode(' ', $command)."%n]\n");
     }
 
     $proc = new \Symfony\Component\Process\Process($command);
