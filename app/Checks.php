@@ -220,6 +220,16 @@ class Checks
             $commands[] = "usermod -a -G $group $current_user";
         }
 
+        // check for invalid log setting
+        $log_file = config('app.log');
+        if (!is_file($log_file) || !is_writable($log_file)) {
+            $dirs = [$log_file];
+            $commands = [
+                '<h3>Cannot write to log file: &quot;' . $log_file . '&quot;</h3>',
+                'Make sure it exists and is writable, or change your LOG_DIR setting.'
+            ];
+        }
+
         // selinux:
         $commands[] = '<h4>If using SELinux you may also need:</h4>';
         foreach ($dirs as $dir) {
