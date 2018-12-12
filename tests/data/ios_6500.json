@@ -8,13 +8,13 @@
                     "sysDescr": "Cisco IOS Software, s72033_rp Software (s72033_rp-IPSERVICESK9-M), Version 15.1(2)SY10, RELEASE SOFTWARE (fc4)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\r\nCompiled Tue 21-Feb-17 02:00 by prod_rel_+",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "ios",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg"
+                    "icon": "cisco.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "15.1(2)SY10",
                     "hardware": "cat6509",
                     "features": "IPSERVICESK9",
-                    "location": "<private>",
                     "os": "ios",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg"
+                    "icon": "cisco.svg",
+                    "location": "<private>"
                 }
             ]
         }
