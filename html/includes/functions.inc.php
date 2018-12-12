@@ -13,6 +13,7 @@
  */
 
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
@@ -704,7 +705,64 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     }
 }//end generate_port_link()
 
+function generate_sensor_link($args, $text = null, $type = null)
+{
+    $args = cleanPort($args);
 
+    if (!$text) {
+        $text = fixIfName($args['sensor_descr']);
+    }
+
+    if (!$type) {
+        $args['graph_type'] = "sensor_" . $args['sensor_class'];
+    } else {
+        $args['graph_type'] = "sensor_" . $type;
+    }
+
+    if (!isset($args['hostname'])) {
+        $args = array_merge($args, device_by_id_cache($args['device_id']));
+    }
+
+    $content = '<div class=list-large>' . $text . '</div>';
+
+    $content .= "<div style=\'width: 850px\'>";
+    $graph_array = [
+        'type' => $args['graph_type'],
+        'legend' => 'yes',
+        'height' => '100',
+        'width' => '340',
+        'to' => Config::get('time.now'),
+        'from' => Config::get('time.day'),
+        'id' => $args['sensor_id'],
+        ];
+    $content .= generate_graph_tag($graph_array);
+
+    $graph_array['from'] = Config::get('time.week');
+    $content .= generate_graph_tag($graph_array);
+
+    $graph_array['from'] = Config::get('time.month');
+    $content .= generate_graph_tag($graph_array);
+
+    $graph_array['from'] = Config::get('time.year');
+    $content .= generate_graph_tag($graph_array);
+
+    $content .= '</div>';
+
+    $url = generate_sensor_url($args);
+    if (port_permitted($args['interface_id'], $args['device_id'])) {
+        return overlib_link($url, $text, $content, null);
+    } else {
+        return fixifName($text);
+    }
+}//end generate_sensor_link()
+
+
+function generate_sensor_url($sensor, $vars = array())
+{
+    return generate_url(array('page' => 'graphs', 'id' => $sensor['sensor_id'], 'type' => $sensor['graph_type'], 'from' => Config::get('time.day')), $vars);
+}//end generate_sensor_url()
+
+ 
 function generate_port_url($port, $vars = array())
 {
     return generate_url(array('page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']), $vars);
@@ -1133,6 +1191,39 @@ function alert_details($details)
             $fallback = false;
         }
 
+        if ($tmp_alerts['sensor_id']) {
+            $details = "Current Value: " . $tmp_alerts['sensor_current'] . " (" . $tmp_alerts['sensor_class'] . ")<br>  ";
+            $details_a = [];
+
+            if ($tmp_alerts['sensor_limit_low']) {
+                $details_a[] = "low: " . $tmp_alerts['sensor_limit_low'];
+            }
+            if ($tmp_alerts['sensor_limit_low_warn']) {
+                $details_a[]= "low_warn: " . $tmp_alerts['sensor_limit_low_warn'];
+            }
+            if ($tmp_alerts['sensor_limit_warn']) {
+                $details_a[]= "high_warn: " . $tmp_alerts['sensor_limit_warn'];
+            }
+            if ($tmp_alerts['sensor_limit']) {
+                $details_a[]= "high: " . $tmp_alerts['sensor_limit'];
+            }
+            $details .= implode(', ', $details_a);
+
+            $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
+            $fallback = false;
+        }
+        if ($tmp_alerts['bgpPeer_id']) {
+            // If we have a bgpPeer_id, we format the data accordingly
+            $fault_detail .= "BGP peer <a href='" .
+                generate_url(array('page' => 'device',
+                            'device' => $tmp_alerts['device_id'],
+                            'tab' => 'routing',
+                            'proto' => 'bgp')) .
+                "'>" . $tmp_alerts['bgpPeerIdentifier'] . "</a>";
+            $fault_detail .= ", AS" . $tmp_alerts['bgpPeerRemoteAs'];
+            $fault_detail .= ", State " . $tmp_alerts['bgpPeerState'];
+            $fallback = false;
+        }
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
             if ($tmp_alerts['error'] == "") {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
@@ -1597,8 +1688,6 @@ function get_dashboards($user_id = null)
  * @param string $transparency value of desired transparency applied to rrdtool options (values 01 - 99)
  * @return array containing transparency and stacked setup
  */
-
-use LibreNMS\Config;
 
 function generate_stacked_graphs($transparency = '88')
 {
