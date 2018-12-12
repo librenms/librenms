@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "apex-plus",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "trango.png"
+                    "icon": "trango.png",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": "Trango ApexPlus-3.2.0",
                     "features": null,
-                    "location": "<private>",
                     "os": "apex-plus",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "trango.png"
+                    "icon": "trango.png",
+                    "location": "<private>"
                 }
             ]
         }
@@ -60,7 +60,7 @@
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
                     "ifMtu": null,
-                    "ifType": null,
+                    "ifType": "softwareLoopback",
                     "ifAlias": "",
                     "ifPhysAddress": null,
                     "ifHardType": null,
@@ -165,7 +165,7 @@
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
                     "ifMtu": null,
-                    "ifType": null,
+                    "ifType": "ethernetCsmacd",
                     "ifAlias": "",
                     "ifPhysAddress": null,
                     "ifHardType": null,
@@ -270,7 +270,7 @@
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
                     "ifMtu": null,
-                    "ifType": null,
+                    "ifType": "ethernetCsmacd",
                     "ifAlias": "",
                     "ifPhysAddress": null,
                     "ifHardType": null,
@@ -375,7 +375,7 @@
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
                     "ifMtu": null,
-                    "ifType": null,
+                    "ifType": "ethernetCsmacd",
                     "ifAlias": "",
                     "ifPhysAddress": null,
                     "ifHardType": null,
