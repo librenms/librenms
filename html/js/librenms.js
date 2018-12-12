@@ -348,6 +348,18 @@ function init_map(id, engine, api_key) {
             L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
             roads.addTo(leaflet);
         });
+    } else if (engine === 'mapquest') {
+        loadScript('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key=' + api_key, function () {
+            var roads = MQ.mapLayer();
+            var satellite = MQ.hybridLayer();
+
+            baseMaps = {
+                "Streets": roads,
+                "Satellite": satellite
+            };
+            L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+            roads.addTo(leaflet);
+        });
     } else {
         var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -419,4 +431,25 @@ function update_location(id, latlng, callback) {
         typeof callback === 'function' && callback(false);
 
     });
+}
+
+function http_fallback(link) {
+    var url = link.getAttribute('href');
+    console.log(url);
+    try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, false);
+        xhr.timeout = 2000;
+        xhr.send(null);
+
+        if (xhr.status !== 200) {
+            url = url.replace(/^https:\/\//, 'http://');
+        }
+    } catch (e) {
+        // console.log(e);
+        url = url.replace(/^https:\/\//, 'http://');
+    }
+
+    window.open(url, '_blank');
+    return false;
 }

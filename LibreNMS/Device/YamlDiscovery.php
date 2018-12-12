@@ -252,7 +252,7 @@ class YamlDiscovery
             }
         }
 
-        $skip_value_gt = array_reduce((array)$group_options['skip_value_gt'], (array)$yaml_item_data['skip_value_gt']);
+        $skip_value_gt = array_replace((array)$group_options['skip_value_gt'], (array)$yaml_item_data['skip_value_gt']);
         foreach ($skip_value_gt as $skip_value) {
             if ($value > $skip_value) {
                 return true;

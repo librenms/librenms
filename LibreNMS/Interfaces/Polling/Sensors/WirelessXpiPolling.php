@@ -1,6 +1,6 @@
 <?php
 /**
- * enexus.inc.php
+ * WirelessXpiPolling.php
  *
  * -Description-
  *
@@ -19,10 +19,20 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Barry O'Donovan
- * @author     BArry O'Donovan <barry@lightnet.ie>
+ * @copyright  2018 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$hardware = snmp_get($device, 'powerSystemModel.0', '-Ovqa', 'SP2-MIB');
-$version = snmp_get($device, 'controlUnitSwVersion.1', '-Ovqa', 'SP2-MIB');
-$serial = snmp_get($device, 'powerSystemSerialNumber.0', '-Ovqa', 'SP2-MIB');
+namespace LibreNMS\Interfaces\Polling\Sensors;
+
+interface WirelessXpiPolling
+{
+    /**
+     * Poll wireless Cross Polar Interference.
+     * The returned array should be sensor_id => value pairs
+     *
+     * @param array $sensors Array of sensors needed to be polled
+     * @return array of polled data
+     */
+    public function pollWirelessApCount(array $sensors);
+}

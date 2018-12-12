@@ -50,7 +50,7 @@ class Pushover extends Transport
         unset($pushover_opts['options']);
         foreach (explode(PHP_EOL, $this->config['options']) as $option) {
             list($k,$v) = explode('=', $option);
-            $pushover_opts['options'][$k] = $v;
+            $pushover_opts['options'][$k] = trim($v);
         }
         return $this->contactPushover($obj, $pushover_opts);
     }
@@ -74,22 +74,22 @@ class Pushover extends Transport
         switch ($obj['severity']) {
             case "critical":
                 $data['priority'] = 1;
-                if (!empty($api['sound_critical'])) {
-                    $data['sound'] = $api['sound_critical'];
+                if (!empty($api['options']['sound_critical'])) {
+                    $data['sound'] = $api['options']['sound_critical'];
                 }
                 break;
             case "warning":
                 $data['priority'] = 1;
-                if (!empty($api['sound_warning'])) {
-                    $data['sound'] = $api['sound_warning'];
+                if (!empty($api['options']['sound_warning'])) {
+                    $data['sound'] = $api['options']['sound_warning'];
                 }
                 break;
         }
         switch ($obj['state']) {
             case 0:
                 $data['priority'] = 0;
-                if (!empty($api['sound_ok'])) {
-                    $data['sound'] = $api['sound_ok'];
+                if (!empty($api['options']['sound_ok'])) {
+                    $data['sound'] = $api['options']['sound_ok'];
                 }
                 break;
         }
