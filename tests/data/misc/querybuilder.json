@@ -109,7 +109,7 @@
     ],
     [
         "%ports.ifOutErrors_rate >= \"100\" || %ports.ifInErrors_rate >= \"100\"",
-        {"condition":"OR","rules":[{"id":"ports.ifOutErrors_rate","field":"ports.ifOutErrors_rate","type":"integer","input":"text","operator":"greater_or_equal","value":"100"},{"id":"ports.ifInErrors_rate","field":"ports.ifInErrors_rate","type":"integer","input":"text","operator":"greater_or_equal","value":"100"}],"valid":true},
+        {"condition":"OR","rules":[{"id":"ports.ifOutErrors_rate","field":"ports.ifOutErrors_rate","type":"string","input":"text","operator":"greater_or_equal","value":"100"},{"id":"ports.ifInErrors_rate","field":"ports.ifInErrors_rate","type":"string","input":"text","operator":"greater_or_equal","value":"100"}],"valid":true},
         "ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100",
         "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100)"
     ]

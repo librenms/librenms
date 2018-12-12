@@ -21,6 +21,8 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         return view('laravel');
     });
 
+    Route::get('locations', 'LocationController@index');
+
     // old route redirects
     Route::get('poll-log', function () {
         return redirect('pollers/tab=log/');
@@ -36,6 +38,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     // Ajax routes
     Route::group(['prefix' => 'ajax'], function () {
         Route::post('set_resolution', 'ResolutionController@set');
+        Route::resource('location', 'LocationController', ['only' => ['update', 'destroy']]);
 
         Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
             Route::get('device', 'DeviceController');
@@ -44,7 +47,9 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         });
 
         Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
+            Route::post('customers', 'CustomersController');
             Route::post('eventlog', 'EventlogController');
+            Route::post('location', 'LocationController');
             Route::post('syslog', 'SyslogController');
         });
     });

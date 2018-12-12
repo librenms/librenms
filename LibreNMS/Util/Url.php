@@ -83,7 +83,7 @@ class Url
             $contents .= ' (' . htmlentities($device->features) . ')';
         }
 
-        if ($device->location) {
+        if ($device->location_id) {
             $contents .= ' - ' . htmlentities($device->location);
         }
 
@@ -204,7 +204,23 @@ class Url
             $urlargs[] = $key . '=' . urlencode($arg);
         }
 
-        return '<img src="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+        return '<img src="graph.php?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+    }
+
+    public static function lazyGraphTag($args)
+    {
+        $urlargs = [];
+
+        foreach ($args as $key => $arg) {
+            $urlargs[] = $key . "=" . urlencode($arg);
+        }
+
+
+        if (Config::get('enable_lazy_load', true)) {
+            return '<img class="lazy img-responsive" data-original="graph.php?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+        }
+
+        return '<img class="img-responsive" src="graph.php?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
     }
 
     public static function overlibLink($url, $text, $contents, $class = null)
@@ -287,7 +303,13 @@ class Url
         return $device->status ? 'list-device' : 'list-device-down';
     }
 
-    private static function portLinkDisplayClass($port)
+    /**
+     * Get html class for a port using ifAdminStatus and ifOperStatus
+     *
+     * @param Port $port
+     * @return string
+     */
+    public static function portLinkDisplayClass($port)
     {
         if ($port->ifAdminStatus == "down") {
             return "interface-admindown";

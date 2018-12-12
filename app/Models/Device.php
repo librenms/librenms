@@ -455,6 +455,11 @@ class Device extends BaseModel
         return $this->belongsToMany('App\Models\DeviceGroup', 'device_group_device', 'device_id', 'device_group_id');
     }
 
+    public function location()
+    {
+        return $this->belongsTo('App\Models\Location', 'location_id', 'id');
+    }
+
     public function ospfInstances()
     {
         return $this->hasMany('App\Models\OspfInstance', 'device_id');
