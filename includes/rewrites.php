@@ -1051,6 +1051,7 @@ function rewrite_junos_hardware($hardware)
         'jnxProductNameDELLJSRX5600'        => 'DELLJSRX5600',
         'jnxProductNameDELLJSRX5800'        => 'DELLJSRX5800',
         'jnxProductNameDellJFX3500'         => 'DellJFX3500',
+        'jnxProductNameESR1000V'            => 'ESR1000V',
         'jnxProductNameEX2200'              => 'EX2200',
         'jnxProductNameEX2300'              => 'EX2300',
         'jnxProductNameEX3200'              => 'EX3200',
