@@ -58,7 +58,7 @@ class Database extends BaseValidation
             );
             return;
         } elseif ($current > $latest) {
-            $validator->warn("Your schema ($current) is newer than expected ($latest).  If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
+            $validator->warn("Your database schema ($current) is newer than expected ($latest). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
         }
 
         $this->checkCollation($validator);
