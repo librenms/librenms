@@ -83,6 +83,8 @@ function external_exec($command)
 {
     global $debug, $vdebug;
 
+    $proc = new \Symfony\Component\Process\Process($command);
+
     if ($debug && !$vdebug) {
         $patterns = [
             '/-c [\S]+/',
@@ -105,13 +107,12 @@ function external_exec($command)
             '\1:HOSTNAME:\3',
         ];
 
-        $debug_command = preg_replace($patterns, $replacements, implode(' ', $command));
+        $debug_command = preg_replace($patterns, $replacements, $proc->getCommandLine());
         c_echo('SNMP[%c' . $debug_command . "%n]\n");
     } elseif ($vdebug) {
-        c_echo('SNMP[%c'.implode(' ', $command)."%n]\n");
+        c_echo('SNMP[%c'.$proc->getCommandLine()."%n]\n");
     }
 
-    $proc = new \Symfony\Component\Process\Process($command);
     $proc->run();
     $output = $proc->getOutput();
 
