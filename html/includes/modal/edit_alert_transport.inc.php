@@ -39,37 +39,18 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                             <label for='transport-choice' class='col-sm-3 col-md-2 control-label'>Transport type: </label>
                             <div class="col-sm-3">
                                 <select name='transport-choice' id='transport-choice' class='form-control'>
-                                    <option value="api-form">API</option>
-                                    <option value="boxcar-form">Boxcar</option>
-                                    <option value="canopsis-form">Canopsis</option>
-                                    <option value="ciscospark-form">Cisco Spark</option>
-                                    <option value="clickatell-form">Clickatell</option>
-                                    <option value="discord-form">Discord</option>
-                                    <option value="elasticsearch-form">Elasticsearch</option>
-                                    <option value="gitlab-form">Gitlab</option>
-                                    <option value="hipchat-form">Hipchat</option>
-                                    <option value="irc-form">IRC</option>
-                                    <option value="jira-form">Jira</option>
-                                    <option value="kayako-form">Kayako Classic</option>
-                                    <option value="mail-form" selected>Mail</option>
-                                    <option value="msteams-form">Microsoft Teams</option>
-                                    <option value="nagios-form">Nagios</option>
-                                    <option value="opsgenie-form">OpsGenie</option>
-                                    <option value="osticket-form">osTicket</option>
-                                    <option value="pagerduty-form">PagerDuty</option>
-                                    <option value="hue-form">Phillips Hue</option>
-                                    <option value="playsms-form">PlaySMS</option>
-                                    <option value="pushbullet-form">Pushbullet</option>
-                                    <option value="pushover-form">Pushover</option>
-                                    <option value="rocket-form">Rocket.chat</option>
-                                    <option value="slack-form">Slack</option>
-                                    <option value="smseagle-form">SMSEagle</option>
-                                    <option value="smsfeedback-form">SMSFeedback</option>
-                                    <option value="syslog-form">Syslog</option>
-                                    <option value="telegram-form">Telegram</option>
-                                    <option value="twilio-form">Twilio</option>
-                                    <option value="victorops-form">Victorops</option>
-                                    <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
+<?php
+
+// Create list of transport
+$transport_dir = Config::get('install_dir').'/LibreNMS/Alert/Transport';
+foreach (scandir($transport_dir) as $transport) {
+    $transport = strstr($transport, '.', true);
+    if (empty($transport)) {
+        continue;
+    }
+    echo '<option value="'.strtolower($transport).'-form">'.$transport.'</option>';
+}
+?>
                                 </select>
                             </div>
                         </div>
