@@ -37,8 +37,7 @@ if (strpos($device['sysDescr'], 'olive')) {
     $boxDescr = snmp_get($device, 'jnxBoxDescr.0', '-Oqv', 'JUNIPER-MIB');
     if (!empty($boxDesc)) {
         $hardware = $boxDescr;
-    }
-    else {
+    } else {
         $hardware = snmp_translate($device['sysObjectID'], 'Juniper-Products-MIB:JUNIPER-CHASSIS-DEFINES-MIB', 'junos');
         $hardware = 'Juniper '.rewrite_junos_hardware($hardware);
     }
