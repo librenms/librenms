@@ -405,7 +405,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 
 function snmpwalk_cache_cip($device, $oid, $array = array(), $mib = 0)
 {
-    $cmd = gen_snmpwalk_cmd($device, $oid, ' -OsnQ', $mib);
+    $cmd = gen_snmpwalk_cmd($device, $oid, '-OsnQ', $mib);
     $data      = trim(external_exec($cmd));
 
     // echo("Caching: $oid\n");
@@ -441,7 +441,7 @@ function snmpwalk_cache_cip($device, $oid, $array = array(), $mib = 0)
 function snmp_cache_ifIndex($device)
 {
     // FIXME: this is not yet using our own snmp_*
-    $cmd = gen_snmpwalk_cmd($device, 'ifIndex', ' -OQs', 'IF-MIB');
+    $cmd = gen_snmpwalk_cmd($device, 'ifIndex', '-OQs', 'IF-MIB');
     $data      = trim(external_exec($cmd));
 
     $array = array();
@@ -675,7 +675,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array(), 
 
 function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
 {
-    $cmd = gen_snmpwalk_cmd($device, $oid, ' -OQUs', $mib);
+    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUs', $mib);
     $data = trim(external_exec($cmd));
 
     foreach (explode("\n", $data) as $entry) {
@@ -697,7 +697,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
 {
     global $debug;
 
-    $cmd = gen_snmpwalk_cmd($device, $oid, ' -OQUs', $mib);
+    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUs', $mib);
     $data = trim(external_exec($cmd));
 
     foreach (explode("\n", $data) as $entry) {
@@ -722,7 +722,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
 
 function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0)
 {
-    $cmd = gen_snmpwalk_cmd($device, $oid, ' -OQUs', $mib);
+    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUs', $mib);
     $data      = trim(external_exec($cmd));
 
     foreach (explode("\n", $data) as $entry) {
@@ -754,7 +754,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib = 0)
         $string .= " $oid.$port";
     }
 
-    $cmd = gen_snmpget_cmd($device, $string, ' -Ovq', $mib);
+    $cmd = gen_snmpget_cmd($device, $string, '-Ovq', $mib);
     $data   = trim(external_exec($cmd));
 
     $x      = 0;
