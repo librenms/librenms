@@ -435,7 +435,6 @@ function update_location(id, latlng, callback) {
 
 function http_fallback(link) {
     var url = link.getAttribute('href');
-    console.log(url);
     try {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, false);
@@ -446,7 +445,6 @@ function http_fallback(link) {
             url = url.replace(/^https:\/\//, 'http://');
         }
     } catch (e) {
-        // console.log(e);
         url = url.replace(/^https:\/\//, 'http://');
     }
 
