@@ -164,7 +164,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     }
 
     $cmd = snmp_gen_auth($device, $cmd);
-    $cmd = array_merge($cmd, (array)$options);
+    $cmd = $options ? array_merge($cmd, (array)$options) : $cmd;
     if ($mib) {
         array_push($cmd, '-m', $mib);
     }
