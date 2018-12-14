@@ -84,7 +84,7 @@
                                         "type": [
                                             "string",
                                             "array"
-                                        ],
+                                        ]
                                     }
                                 },
                                 "additionalProperties": false,
@@ -193,7 +193,7 @@
                                                 "type": [
                                                     "string",
                                                     "array"
-                                                ],
+                                                ]
                                             }
                                         },
                                         "required": [
@@ -333,7 +333,7 @@
                         "type": [
                             "string",
                             "array"
-                        ],
+                        ]
                     },
                     "entPhysicalIndex": {
                         "type": "string"
