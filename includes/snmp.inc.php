@@ -781,13 +781,8 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib = 0)
 function snmp_gen_auth(&$device, $cmd = [])
 {
     if ($device['snmpver'] === 'v3') {
-        array_push($cmd, '-v3', '-n', '', '-l', $device['authlevel']);
-
-        //add context if exist context
-        if (key_exists('context_name', $device)) {
-            array_push($cmd, '-v3', '-n', $device['context_name'], '-l', $device['authlevel']);
-            $cmd = [];
-        }
+        array_push($cmd, '-v3', '-l', $device['authlevel']);
+        array_push($cmd, '-n', isset($device['context_name']) ? $device['context_name'] : '');
 
         $authlevel = strtolower($device['authlevel']);
         if ($authlevel === 'noauthnopriv') {
@@ -806,7 +801,7 @@ function snmp_gen_auth(&$device, $cmd = [])
         } else {
             d_echo('DEBUG: '.$device['snmpver']." : Unsupported SNMPv3 AuthLevel (wtf have you done ?)\n");
         }
-    } elseif ($device['snmpver'] === 'v2c' or $device['snmpver'] === 'v1') {
+    } elseif ($device['snmpver'] === 'v2c' || $device['snmpver'] === 'v1') {
         array_push($cmd, '-' . $device['snmpver'], '-c', $device['community']);
     } else {
         d_echo('DEBUG: '.$device['snmpver']." : Unsupported SNMP Version (shouldn't be possible to get here)\n");
