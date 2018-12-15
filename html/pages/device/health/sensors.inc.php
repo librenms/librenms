@@ -22,7 +22,7 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
     $sensor_current = format_si($sensor['sensor_current']).$unit;
 
     if (($graph_type == 'sensor_state') && !empty($state_translation['0']['state_descr'])) {
-        $sensor_current = get_state_label($sensor['state_generic_value'], $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")") ; 
+        $sensor_current = get_state_label($sensor['state_generic_value'], $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")");
     }
 
     $sensor_limit = format_si($sensor['sensor_limit']).$unit;
@@ -34,10 +34,10 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
 
     //Display low and high limit if they are not null (format_si() is changing null to '0')
     if (!is_null($sensor['sensor_limit_low'])) {
-        echo "<span style='color: red;'> low: $sensor_limit_low</span>";
+        echo " <span class='label label-default'>low: $sensor_limit_low</span>";
     }
     if (!is_null($sensor['sensor_limit'])) {
-        echo "<span style='color: red;'> high: $sensor_limit</span>";
+        echo " <span class='label label-default'>high: $sensor_limit</span>";
     }
 
     echo "</div></h3>
