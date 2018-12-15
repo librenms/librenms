@@ -132,12 +132,12 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
     $('#title').val('');
     $('#notes').val('');
     $('#recurring').val('');
-    $('#start').val('');
-    $('#end').val('');
-    $('#start_recurring_dt').val('');
-    $('#end_recurring_dt').val('');
-    $('#start_recurring_hr').val('');
-    $('#end_recurring_hr').val('');
+    $('#start').val('').data("DateTimePicker").maxDate(false).minDate(moment());
+    $('#end').val('').data("DateTimePicker").maxDate(false).minDate(moment());
+    $('#start_recurring_dt').val('').data("DateTimePicker").maxDate(false).minDate(moment());
+    $('#end_recurring_dt').val('').data("DateTimePicker").maxDate(false).minDate(moment());
+    $('#start_recurring_hr').val('').data("DateTimePicker").minDate(false).maxDate(false);
+    $('#end_recurring_hr').val('').data("DateTimePicker").minDate(false).maxDate(false);
     $("#recurring0").prop("checked", true);
     $('#recurring_day').prop('checked', false);
     $('#norecurringgroup').show();
@@ -169,8 +169,12 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                 $('#title').val(output['title']);
                 $('#notes').val(output['notes']);
                 if (output['recurring'] == 0){
-                    $('#start').val(output['start']);
-                    $('#end').val(output['end']);
+                    var start = $('#start').data("DateTimePicker");
+                    if (output['start']) {
+                        start.minDate(output['start']);
+                    }
+                    start.date(output['start']);
+                    $('#end').data("DateTimePicker").date(output['end']);
 
                     $('#norecurringgroup').show();
                     $('#recurringgroup').hide();
@@ -182,11 +186,20 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                     $("#recurring0").prop("checked", true);
                     $('#recurring_day').prop('checked', false);
                 }else{
+                    var start_recurring_dt = $('#start_recurring_dt').data("DateTimePicker");
+                    if (output['start_recurring_dt']) {
+                        start_recurring_dt.minDate(output['start_recurring_dt']);
+                    }
+                    start_recurring_dt.date(output['start_recurring_dt']);
+                    $('#end_recurring_dt').data("DateTimePicker").date(output['end_recurring_dt']);
 
-                    $('#start_recurring_dt').val(output['start_recurring_dt']);
-                    $('#end_recurring_dt').val(output['end_recurring_dt']);
-                    $('#start_recurring_hr').val(output['start_recurring_hr']);
-                    $('#end_recurring_hr').val(output['end_recurring_hr']);
+                    var start_recurring_hr = $('#start_recurring_hr').data("DateTimePicker");
+                    if (output['start_recurring_dt']) {
+                        start_recurring_dt.minDate(output['start_recurring_dt']);
+                    }
+                    start_recurring_hr.date(output['start_recurring_hr']);
+                    $('#end_recurring_hr').data("DateTimePicker").date(output['end_recurring_hr']);
+
                     $("#recurring1").prop("checked", true);
 
                     var recdayupd = output['recurring_day'];
@@ -264,7 +277,7 @@ $("#maps").select2({
 
 $(function () {
     $("#start").datetimepicker({
-        minDate: '<?php echo date($config['dateformat']['byminute']); ?>',
+        minDate: moment(),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -278,6 +291,7 @@ $(function () {
         }
     });
     $("#end").datetimepicker({
+        minDate: moment(),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -294,12 +308,10 @@ $(function () {
         $("#end").data("DateTimePicker").minDate(e.date);
     });
     $("#end").on("dp.change", function (e) {
-        if (e.date && e.date.isAfter(moment())) {
-            $("#start").data("DateTimePicker").maxDate(e.date);
-        }
+        $("#start").data("DateTimePicker").maxDate(e.date);
     });
     $("#start_recurring_dt").datetimepicker({
-        minDate: '<?php echo date($config['dateformat']['byminute']); ?>',
+        minDate: moment(),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -313,6 +325,7 @@ $(function () {
         }
     });
     $("#end_recurring_dt").datetimepicker({
+        minDate: moment(),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -329,9 +342,7 @@ $(function () {
         $("#end_recurring_dt").data("DateTimePicker").minDate(e.date);
     });
     $("#end_recurring_dt").on("dp.change", function (e) {
-        if (e.date && e.date.isAfter(moment())) {
-            $("#start_recurring_dt").data("DateTimePicker").maxDate(e.date);
-        }
+        $("#start_recurring_dt").data("DateTimePicker").maxDate(e.date);
     });
     $("#start_recurring_hr").datetimepicker({
         icons: {
