@@ -27,14 +27,14 @@ foreach ($portAuthSessionEntry as $index => $PortAuthSessionEntryParameters) {
     $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
 
     $port_nac = PortsNac::updateOrCreate([
-        'auth_id' => $auth_id,
-        'device_id' => $device['device_id'],
-    ], [
         'port_id' => $ports_map->get($ifIndex, 0),
+        'PortAuthSessionDomain' => $PortAuthSessionEntryParameters['cafSessionDomain'],
+    ], [
+        'device_id' => $device['device_id'],
+        'auth_id' => $auth_id,
         'PortAuthSessionMacAddress' => strtoupper(implode(':', array_map('zeropad', explode(':', $PortAuthSessionEntryParameters['cafSessionClientMacAddress'])))),
         'PortAuthSessionIPAddress' => (string)IP::fromHexString($PortAuthSessionEntryParameters['cafSessionClientAddress'], true),
         'PortAuthSessionAuthzStatus' => $PortAuthSessionEntryParameters['cafSessionStatus'],
-        'PortAuthSessionDomain' => $PortAuthSessionEntryParameters['cafSessionDomain'],
         'PortAuthSessionHostMode' => $PortAuthSessionEntryParameters['cafSessionAuthHostMode'],
         'PortAuthSessionUserName' => $PortAuthSessionEntryParameters['cafSessionAuthUserName'],
         'PortAuthSessionAuthzBy' => $PortAuthSessionEntryParameters['cafSessionAuthorizedBy'],
