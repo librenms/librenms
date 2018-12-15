@@ -1774,32 +1774,24 @@ function get_device_name($device)
 
 function get_state_label($state_value, $state_text_param = null)
 {
-    $state_text = $state_text_param;
     switch ($state_value) {
         case 0:  // OK
-            if ($state_text == null) {
-                $state_text = "OK";
-            }
-            $state = "<span class='label label-success'>$state_text</span>";
+            $state_text = (is_null($state_text_param) ? "OK": $state_text_param);
+            $state_label = "label-success";
             break;
         case 1:  // Warning
-            if ($state_text == null) {
-                $state_text = "Warning";
-            }
-            $state = "<span class='label label-warning'>$state_text</span>";
+            $state_text = (is_null($state_text_param) ? "Warning": $state_text_param);
+            $state_label = "label-warning";
             break;
         case 2:  // Critical
-            if ($state_text == null) {
-                $state_text = "Critical";
-            }
-            $state = "<span class='label label-danger'>$state_text</span>";
+            $state_text = (is_null($state_text_param) ? "Critical": $state_text_param);
+            $state_label = "label-danger";
             break;
         case 3:// Unknown
         default:
-            if ($state_text == null) {
-                $state_text = "Unknown";
-            }
-            $state = "<span class='label label-default'>$state_text</span>";
+            $state_text = (is_null($state_text_param) ? "Unknown": $state_text_param);
+            $state_label = "label-default";
     }
+    $state = "<span class='label $state_label'>$state_text</span>"; 
     return $state;
 }
