@@ -87,23 +87,23 @@ function external_exec($command)
 
     if ($debug && !$vdebug) {
         $patterns = [
-            '/-c [\S]+/',
-            '/-u [\S]+/',
-            '/-U [\S]+/',
-            '/-A [\S]+/',
-            '/-X [\S]+/',
-            '/-P [\S]+/',
-            '/-H [\S]+/',
+            '/-c\' \'[\S]+/',
+            '/-u\' \'[\S]+/',
+            '/-U\' \'[\S]+/',
+            '/-A\' \'[\S]+/',
+            '/-X\' \'[\S]+/',
+            '/-P\' \'[\S]+/',
+            '/-H\' \'[\S]+/',
             '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
         ];
         $replacements = [
-            '-c COMMUNITY',
-            '-u USER',
-            '-u USER',
-            '-A PASSWORD',
-            '-X PASSWORD',
-            '-P PASSWORD',
-            '-H HOSTNAME',
+            '-c\' \'COMMUNITY',
+            '-u\' \'USER',
+            '-u\' \'USER',
+            '-A\' \'PASSWORD',
+            '-X\' \'PASSWORD',
+            '-P\' \'PASSWORD',
+            '-H\' \'HOSTNAME',
             '\1:HOSTNAME:\3',
         ];
 
