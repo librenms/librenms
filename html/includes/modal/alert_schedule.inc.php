@@ -61,13 +61,13 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                         <div class="form-group">
                             <label for="start" class="col-sm-4 control-label">Start <exp>*</exp>: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="start" name="start" value="<?php echo date($config['dateformat']['byminute']); ?>" data-date-format="YYYY-MM-DD HH:mm">
+                                <input type="text" class="form-control date" id="start" name="start" value="" data-date-format="YYYY-MM-DD HH:mm">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="end" class="col-sm-4 control-label">End <exp>*</exp>: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="end" name="end" value="<?php echo date($config['dateformat']['byminute'], strtotime('+1 hour')); ?>" data-date-format="YYYY-MM-DD HH:mm">
+                                <input type="text" class="form-control date" id="end" name="end" value="" data-date-format="YYYY-MM-DD HH:mm">
                             </div>
                         </div>
                     </div>
@@ -75,25 +75,25 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                         <div class="form-group">
                             <label for="start_recurring_dt" class="col-sm-4 control-label">Start date <exp>*</exp>: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="start_recurring_dt" name="start_recurring_dt" value="<?php echo date($config['dateformat']['start_recurring_dt']); ?>" data-date-format="YYYY-MM-DD">
+                                <input type="text" class="form-control date" id="start_recurring_dt" name="start_recurring_dt" value="" data-date-format="YYYY-MM-DD">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="end_recurring_dt" class="col-sm-4 control-label">End date: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="end_recurring_dt" name="end_recurring_dt" value="<?php echo date($config['dateformat']['end_recurring_dt'], strtotime('+1 hour')); ?>" data-date-format="YYYY-MM-DD">
+                                <input type="text" class="form-control date" id="end_recurring_dt" name="end_recurring_dt" value="" data-date-format="YYYY-MM-DD">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="start_recurring_hr" class="col-sm-4 control-label">Start hour <exp>*</exp>: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="start_recurring_hr" name="start_recurring_hr" value="<?php echo date($config['dateformat']['start_recurring_hr']); ?>" data-date-format="HH:mm">
+                                <input type="text" class="form-control date" id="start_recurring_hr" name="start_recurring_hr" value="" data-date-format="HH:mm">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="end_recurring_hr" class="col-sm-4 control-label">End hour <exp>*</exp>: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="end_recurring_hr" name="end_recurring_hr" value="<?php echo date($config['dateformat']['end_recurring_hr'], strtotime('+1 hour')); ?>" data-date-format="HH:mm">
+                                <input type="text" class="form-control date" id="end_recurring_hr" name="end_recurring_hr" value="" data-date-format="HH:mm">
                             </div>
                         </div>
                         <div class="form-group">
@@ -132,10 +132,15 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
     $('#title').val('');
     $('#notes').val('');
     $('#recurring').val('');
-    $('#start').val('').data("DateTimePicker").maxDate(false).minDate(moment());
-    $('#end').val('').data("DateTimePicker").maxDate(false).minDate(moment());
-    $('#start_recurring_dt').val('').data("DateTimePicker").maxDate(false).minDate(moment());
-    $('#end_recurring_dt').val('').data("DateTimePicker").maxDate(false).minDate(moment());
+    $('#start').val(moment().format('YYYY-MM-DD HH:mm')).data("DateTimePicker").maxDate(false).minDate(moment());
+    $('#end').val(moment().add(1, 'hour').format('YYYY-MM-DD HH:mm')).data("DateTimePicker").maxDate(false).minDate(moment());
+    var $startRecurringDt = $('#start_recurring_dt');
+    $startRecurringDt.val('').data("DateTimePicker").maxDate(false).minDate(moment());
+    var $endRecurringDt = $('#end_recurring_dt');
+    $endRecurringDt.data("DateTimePicker").date(moment()).maxDate(false).minDate(moment());
+    $endRecurringDt.val('');
+    $startRecurringDt.data("DateTimePicker").maxDate(false);
+
     $('#start_recurring_hr').val('').data("DateTimePicker").minDate(false).maxDate(false);
     $('#end_recurring_hr').val('').data("DateTimePicker").minDate(false).maxDate(false);
     $("#recurring0").prop("checked", true);
@@ -277,7 +282,8 @@ $("#maps").select2({
 
 $(function () {
     $("#start").datetimepicker({
-        minDate: moment(),
+        defaultDate: moment(),
+        minDate: moment().format('YYYY-MM-DD'),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -291,7 +297,8 @@ $(function () {
         }
     });
     $("#end").datetimepicker({
-        minDate: moment(),
+        defaultDate: moment().add(1, 'hour'),
+        minDate: moment().format('YYYY-MM-DD'),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -311,7 +318,8 @@ $(function () {
         $("#start").data("DateTimePicker").maxDate(e.date);
     });
     $("#start_recurring_dt").datetimepicker({
-        minDate: moment(),
+        defaultDate: moment(),
+        minDate: moment().format('YYYY-MM-DD'),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -325,7 +333,7 @@ $(function () {
         }
     });
     $("#end_recurring_dt").datetimepicker({
-        minDate: moment(),
+        minDate: moment().format('YYYY-MM-DD'),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -339,7 +347,14 @@ $(function () {
         }
     });
     $("#start_recurring_dt").on("dp.change", function (e) {
-        $("#end_recurring_dt").data("DateTimePicker").minDate(e.date);
+        var $endRecurringDt = $("#end_recurring_dt");
+        var val = $endRecurringDt.val();
+        $endRecurringDt.data("DateTimePicker").minDate(e.date);
+        // work around annoying event interaction
+        if (!val) {
+            $endRecurringDt.val('');
+            $("#start_recurring_dt").data("DateTimePicker").maxDate(false);
+        }
     });
     $("#end_recurring_dt").on("dp.change", function (e) {
         $("#start_recurring_dt").data("DateTimePicker").maxDate(e.date);
