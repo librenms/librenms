@@ -220,6 +220,18 @@ class Checks
             $commands[] = "usermod -a -G $group $current_user";
         }
 
+        // check for invalid log setting
+        $log_file = config('app.log') ?: Config::get('log_file', base_path('logs/librenms.log'));
+        if (!is_file($log_file) || !is_writable($log_file)) {
+            // override for proper error output
+            $dirs = [$log_file];
+            $install_dir = $log_file;
+            $commands = [
+                '<h3>Cannot write to log file: &quot;' . $log_file . '&quot;</h3>',
+                'Make sure it exists and is writable, or change your LOG_DIR setting.'
+            ];
+        }
+
         // selinux:
         $commands[] = '<h4>If using SELinux you may also need:</h4>';
         foreach ($dirs as $dir) {
@@ -230,6 +242,7 @@ class Checks
         // use pre-compiled template because we probably can't compile it.
         $template = file_get_contents(base_path('resources/views/errors/static/file_permissions.html'));
         $content = str_replace('!!!!CONTENT!!!!', '<p>' . implode('</p><p>', $commands) . '</p>', $template);
+        $content = str_replace('!!!!LOG_FILE!!!!', $log_file, $content);
 
         return SymfonyResponse::create($content);
     }

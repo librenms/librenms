@@ -18,7 +18,6 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      *
      * @return void
-     * @throws DatabaseConnectException caught by App\Exceptions\Handler and displayed to the user
      */
     public function boot()
     {
@@ -28,9 +27,9 @@ class AppServiceProvider extends ServiceProvider
         // load config
         Config::load();
 
-        // direct log output to librenms.log
+        // replace early boot logging redirect log to config location, unless APP_LOG is set
         Log::getMonolog()->popHandler(); // remove existing errorlog logger
-        Log::useFiles(Config::get('log_file', base_path('logs/librenms.log')), 'error');
+        Log::useFiles(config('app.log') ?: Config::get('log_file', base_path('logs/librenms.log')), 'error');
 
         // Blade directives (Yucky because of < L5.5)
         Blade::directive('config', function ($key) {
