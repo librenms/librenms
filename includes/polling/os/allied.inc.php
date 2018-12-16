@@ -2,7 +2,7 @@
 
 //OS: AT-S39
 //Legacy products: at8024, at8024GB, at8024M, at8016F, at8026FC
-$data = snmp_get_multi_oid($device, 'atiswitchProductType.0 atiswitchSwVersion.0 atiswitchSw.0', '-OsvQU', 'AtiSwitch-MIB');
+$data = snmp_get_multi_oid($device, ['atiswitchProductType.0', 'atiswitchSwVersion.0', 'atiswitchSw.0'], '-OsvQU', 'AtiSwitch-MIB');
 
 $hardware = $data['atiswitchProductType.0'];
 $version = $data['atiswitchSwVersion.0'];
@@ -25,7 +25,7 @@ if (!$hardware && !$version && !$software) {
 //SNMPv2-MIB::sysDescr.0 = STRING: AlliedWare Plus (TM) 2.2.3.0
 
 if (!$hardware && !$version) {
-    $data = snmp_get_multi_oid($device, '.1.3.6.1.4.1.207.8.17.1.3.1.6.1 .1.3.6.1.4.1.207.8.17.1.3.1.5.1 .1.3.6.1.4.1.207.8.17.1.3.1.8.1');
+    $data = snmp_get_multi_oid($device, ['.1.3.6.1.4.1.207.8.17.1.3.1.6.1', '.1.3.6.1.4.1.207.8.17.1.3.1.5.1', '.1.3.6.1.4.1.207.8.17.1.3.1.8.1']);
 
     $hardware = $data['.1.3.6.1.4.1.207.8.17.1.3.1.6.1'];
     $version = $data['.1.3.6.1.4.1.207.8.17.1.3.1.5.1'];

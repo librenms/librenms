@@ -5,7 +5,7 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'nvidia';
 $app_id = $app['app_id'];
 
-$options      = '-O qv';
+$options      = '-Oqv';
 $oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.6.110.118.105.100.105.97';
 $gpus = snmp_walk($device, $oid, $options);
 

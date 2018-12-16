@@ -1,6 +1,6 @@
 <?php
 
-$oids = 'cmcIIIUnitFWRev.0 cmcIIIDevName.1 cmcIIIUnitSerial.0';
+$oids = ['cmcIIIUnitFWRev.0', 'cmcIIIDevName.1', 'cmcIIIUnitSerial.0'];
 
 $data = snmp_get_multi($device, $oids, '-OQUs', 'RITTAL-CMC-III-MIB');
 d_echo($data);
