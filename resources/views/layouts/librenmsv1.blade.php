@@ -21,27 +21,27 @@
         <link rel="shortcut icon" href="{{ LibreNMS\Config::get('favicon') }}" />
     @endif
 
-    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/toastr.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/jquery.bootgrid.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/tagmanager.css" rel="stylesheet" type="text/css" />
-    <link href="css/mktree.css" rel="stylesheet" type="text/css" />
-    <link href="css/vis.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/jquery.gridster.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/leaflet.css" rel="stylesheet" type="text/css" />
-    <link href="css/MarkerCluster.css" rel="stylesheet" type="text/css" />
-    <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
-    <link href="css/L.Control.Locate.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
-    <link href="css/select2.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/query-builder.default.min.css" rel="stylesheet" type="text/css" />
-    <link href="{{ LibreNMS\Config::get('stylesheet', 'css/styles.css') }}?ver=20181128" rel="stylesheet" type="text/css" />
-    <link href="css/{{ LibreNMS\Config::get('site_style', 'light') }}.css?ver=632417642" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/bootstrap-switch.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/jquery-ui.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/jquery.bootgrid.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/tagmanager.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/mktree.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/vis.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/jquery.gridster.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/leaflet.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/MarkerCluster.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/MarkerCluster.Default.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/L.Control.Locate.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/leaflet.awesome-markers.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20181201" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/' . LibreNMS\Config::get('site_style', 'light') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet" type="text/css" />
     @endforeach

@@ -311,4 +311,9 @@ class DeviceGroup extends BaseModel
     {
         return $this->belongsToMany('App\Models\Device', 'device_group_device', 'device_group_id', 'device_id');
     }
+
+    public function services()
+    {
+        return $this->belongsToMany('App\Models\Service', 'device_group_device', 'device_group_id', 'device_id');
+    }
 }
