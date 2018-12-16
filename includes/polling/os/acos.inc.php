@@ -23,6 +23,6 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$acos_temp = snmp_get_multi($device, 'axSysSerialNumber.0 axSysFirmwareVersion.0', '-OQUs', 'A10-AX-MIB');
+$acos_temp = snmp_get_multi($device, ['axSysSerialNumber.0', 'axSysFirmwareVersion.0'], '-OQUs', 'A10-AX-MIB');
 $serial    = $acos_temp[0]['axSysSerialNumber'];
 $version   = $acos_temp[0]['axSysFirmwareVersion'];
