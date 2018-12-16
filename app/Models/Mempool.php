@@ -9,6 +9,13 @@ class Mempool extends BaseModel
 
     protected $primaryKey = 'mempool_id';
 
+    // ---- Query Scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
+    }
+
     // ---- Define Relationships ----
     
     public function device()

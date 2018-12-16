@@ -56,7 +56,7 @@ class Port extends BaseModel
      */
     public function getShortLabel()
     {
-        return Rewrite::shortenIfName(Rewrite::normalizeIfName($this->getLabel()));
+        return Rewrite::shortenIfName(Rewrite::normalizeIfName($this->ifName ?: $this->ifDescr));
     }
 
     /**
@@ -145,6 +145,15 @@ class Port extends BaseModel
             ['ifOperStatus', '=', 'down'],
             ['ifAdminStatus', '=', 'up'],
         ]);
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsShutdown($query)
+    {
+        return $query->where('ifAdminStatus', 'down');
     }
 
     /**
