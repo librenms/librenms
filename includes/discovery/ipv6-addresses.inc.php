@@ -8,7 +8,7 @@ if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=
 foreach ($vrfs_lite_cisco as $vrf) {
     $device['context_name']=$vrf['context_name'];
 
-    $oids = snmp_walk($device, 'ipAddressIfIndex.ipv6', '-Ln -Osq', 'IP-MIB');
+    $oids = snmp_walk($device, 'ipAddressIfIndex.ipv6', ['-Osq', '-Ln'], 'IP-MIB');
     $oids = str_replace('ipAddressIfIndex.ipv6.', '', $oids);
     $oids = str_replace('"', '', $oids);
     $oids = str_replace('IP-MIB::', '', $oids);
@@ -48,7 +48,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
     } //end foreach
 
     if (!$oids) {
-        $oids = snmp_walk($device, 'ipv6AddrPfxLength', '-Ln -Osq -OnU', 'IPV6-MIB');
+        $oids = snmp_walk($device, 'ipv6AddrPfxLength', ['-OsqnU', '-Ln'], 'IPV6-MIB');
         $oids = str_replace('.1.3.6.1.2.1.55.1.8.1.2.', '', $oids);
         $oids = str_replace('"', '', $oids);
         $oids = trim($oids);

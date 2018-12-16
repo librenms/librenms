@@ -21,7 +21,7 @@ if ($device['os'] == 'moxa-etherdevice') {
         $mibmod = 'MOXA-EDSG508E-MIB';
     }
 
-    $mem_res = snmp_get_multi_oid($device, 'totalMemory.0 freeMemory.0', '-OQUs', $mibmod);
+    $mem_res = snmp_get_multi_oid($device, ['totalMemory.0', 'freeMemory.0'], '-OQUs', $mibmod);
     $total = $mem_res['totalMemory.0'];
     $avail = $mem_res['freeMemory.0'];
 

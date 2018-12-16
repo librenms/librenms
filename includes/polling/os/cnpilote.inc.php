@@ -11,7 +11,7 @@
 
 
 $version = $device['sysDescr'];
-$cnpilot_data = snmp_get_multi_oid($device, 'cambiumAPSerialNum.0 cambiumAPHWType.0', '-OUQs', 'CAMBIUM-MIB');
+$cnpilot_data = snmp_get_multi_oid($device, ['cambiumAPSerialNum.0', 'cambiumAPHWType.0'], '-OUQs', 'CAMBIUM-MIB');
 
 $hardware = $cnpilot_data['cambiumAPHWType.0'];
 $serial = $cnpilot_data['cambiumAPSerialNum.0'];

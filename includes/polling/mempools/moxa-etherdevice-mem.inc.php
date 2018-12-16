@@ -27,7 +27,7 @@ if ($device['sysDescr'] == 'IKS-6726A-2GTXSFP-T') {
     $mibmod = 'MOXA-EDSG508E-MIB';
 }
 
-$mem_res = snmp_get_multi_oid($device, 'totalMemory.0 usedMemory.0 freeMemory.0', '-OQUs', $mibmod);
+$mem_res = snmp_get_multi_oid($device, ['totalMemory.0', 'usedMemory.0', 'freeMemory.0'], '-OQUs', $mibmod);
 
 d_echo(serialize($mem_res));
 
