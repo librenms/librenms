@@ -14,8 +14,8 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 
-if (isset($widget_settings['mode_select']) && $widget_settings['mode_select'] !== '') {
-    $mode = $widget_settings['mode_select'];
+if (isset($settings['mode_select']) && $settings['mode_select'] !== '') {
+    $mode = $settings['mode_select'];
 } elseif (isset($_SESSION["map_view"]) && is_numeric($_SESSION["map_view"])) {
     $mode = $_SESSION["map_view"];
 } else {
@@ -29,10 +29,10 @@ $select_modes = array(
 );
 
 if ($config['webui']['availability_map_compact'] == 1) {
-    $compact_tile = $widget_settings['tile_size'];
+    $compact_tile = $settings['tile_size'];
 }
 
-$show_disabled_ignored = $widget_settings['show_disabled_and_ignored'];
+$show_disabled_ignored = $settings['show_disabled_and_ignored'];
 
 if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
@@ -42,7 +42,7 @@ if (defined('SHOW_SETTINGS')) {
                 <label for="title" class="control-label availability-map-widget-header">Widget title</label>
             </div>
             <div class="col-sm-6">
-                <input type="text" class="form-control" name="title" placeholder="Custom title for widget" value="'.htmlspecialchars($widget_settings['title']).'">
+                <input type="text" class="form-control" name="title" placeholder="Custom title for widget" value="'.htmlspecialchars($settings['title']).'">
             </div>
         </div>';
 
@@ -54,8 +54,8 @@ if (defined('SHOW_SETTINGS')) {
         </div>
         <div class="col-sm-6">
             <select class="form-control" name="color_only_select">
-                <option value="1"' . ($widget_settings['color_only_select'] == 1 ? ' selected' : '')  . ' >yes</option>
-                <option value="0"' . ($widget_settings['color_only_select'] == 1 ? '' : ' selected')  . ' >no</option>
+                <option value="1"' . ($settings['color_only_select'] == 1 ? ' selected' : '')  . ' >yes</option>
+                <option value="0"' . ($settings['color_only_select'] == 1 ? '' : ' selected')  . ' >no</option>
             </select>
         </div>
     </div>
@@ -107,7 +107,7 @@ if (defined('SHOW_SETTINGS')) {
         $common_output[] = '<option value="0" selected>only devices</option>';
     } else {
         foreach ($select_modes as $mode_select => $option) {
-            if ($mode_select == $widget_settings["mode_select"]) {
+            if ($mode_select == $settings["mode_select"]) {
                 $selected = 'selected';
             } else {
                 $selected = '';
@@ -237,7 +237,7 @@ if (defined('SHOW_SETTINGS')) {
                     </div>
                     </a>';
                 } else {
-                    if ($widget_settings['color_only_select'] == 1) {
+                    if ($settings['color_only_select'] == 1) {
                         $deviceState = ' ';
                         $deviceLabel .= ' widget-availability-fixed';
                     }
@@ -295,7 +295,7 @@ if (defined('SHOW_SETTINGS')) {
                         </a>';
                     } else {
                         $serviceText = $service['service_type'] . ' - ' . $serviceState;
-                        if ($widget_settings['color_only_select'] == 1) {
+                        if ($settings['color_only_select'] == 1) {
                             $serviceText = ' ';
                             $serviceLabel .= ' widget-availability-fixed';
                         }

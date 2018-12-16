@@ -55,99 +55,15 @@ function data_uri($file, $mime)
 }//end data_uri()
 
 
+/**
+ * Convert string to nice case, mostly used for applications
+ *
+ * @param $item
+ * @return mixed|string
+ */
 function nicecase($item)
 {
-    switch ($item) {
-        case 'dbm':
-            return 'dBm';
-
-        case 'entropy':
-            return 'Random entropy';
-
-        case 'mysql':
-            return ' MySQL';
-
-        case 'powerdns':
-            return 'PowerDNS';
-
-        case 'bind':
-            return 'BIND';
-
-        case 'nfs-stats':
-            return 'NFS Stats';
-
-        case 'nfs-v3-stats':
-            return 'NFS v3 Stats';
-
-        case 'nfs-server':
-            return 'NFS Server';
-
-        case 'ntp':
-            return 'NTP';
-
-        case 'ntp-client':
-            return 'NTP Client';
-
-        case 'ntp-server':
-            return 'NTP Server';
-
-        case 'os-updates':
-            return 'OS Updates';
-
-        case 'smart':
-            return 'SMART';
-
-        case 'powerdns-recursor':
-            return 'PowerDNS Recursor';
-
-        case 'powerdns-dnsdist':
-            return 'PowerDNS dnsdist';
-
-        case 'dhcp-stats':
-            return 'DHCP Stats';
-
-        case 'ups-nut':
-            return 'UPS nut';
-
-        case 'ups-apcups':
-            return 'UPS apcups';
-
-        case 'gpsd':
-            return 'GPSD';
-
-        case 'exim-stats':
-            return 'EXIM Stats';
-
-        case 'fbsd-nfs-client':
-            return 'FreeBSD NFS Client';
-
-        case 'fbsd-nfs-server':
-            return 'FreeBSD NFS Server';
-
-        case 'php-fpm':
-            return 'PHP-FPM';
-
-        case 'opengridscheduler':
-            return 'Open Grid Scheduler';
-
-        case 'sdfsinfo':
-            return 'SDFS info';
-
-        case 'pi-hole':
-            return 'Pi-hole';
-
-        case 'freeradius':
-            return 'FreeRADIUS';
-
-        case 'zfs':
-            return 'ZFS';
-
-        case 'asterisk':
-            return 'Asterisk';
-
-        default:
-            return ucfirst($item);
-    }
+    return \LibreNMS\Util\StringHelpers::niceCase($item);
 }//end nicecase()
 
 
@@ -234,31 +150,7 @@ function generate_overlib_content($graph_array, $text)
 
 function get_percentage_colours($percentage, $component_perc_warn = null)
 {
-    $perc_warn = '75';
-
-    if (isset($component_perc_warn)) {
-        $perc_warn = round($component_perc_warn, 0);
-    }
-
-    $background = array();
-    if ($percentage > $perc_warn) {
-        $background['left'] = 'c4323f';
-        $background['right'] = 'C96A73';
-    } elseif ($percentage > '75') {
-        $background['left'] = 'bf5d5b';
-        $background['right'] = 'd39392';
-    } elseif ($percentage > '50') {
-        $background['left'] = 'bf875b';
-        $background['right'] = 'd3ae92';
-    } elseif ($percentage > '25') {
-        $background['left'] = '5b93bf';
-        $background['right'] = '92b7d3';
-    } else {
-        $background['left'] = '9abf5b';
-        $background['right'] = 'bbd392';
-    }
-
-    return ($background);
+    return \LibreNMS\Util\Colors::percentage($percentage, $component_perc_warn);
 }//end get_percentage_colours()
 
 
@@ -595,25 +487,8 @@ STATE;
 
 function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
 {
-    if ($percent > '100') {
-        $size_percent = '100';
-    } else {
-        $size_percent = $percent;
-    }
-
-    $output = '
-        <div style="width:'.$width.'px; height:'.$height.'px; position: relative;">
-        <div class="progress" style="min-width: 2em; background-color:#'.$right_background.'; height:'.$height.'px;margin-bottom:-'.$height.'px;">
-        <div class="progress-bar" role="progressbar" aria-valuenow="'.$size_percent.'" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width:'.$size_percent.'%; background-color: #'.$left_background.';">
-        </div>
-        </div>
-        <b style="padding-left: 2%; position: absolute; top: 0px; left: 0px;color:#'.$left_colour.';">'.$left_text.'</b>
-        <b style="padding-right: 2%; position: absolute; top: 0px; right: 0px;color:#'.$right_colour.';">'.$right_text.'</b>
-        </div>
-        ';
-
-    return $output;
-}//end print_percentage_bar()
+    return \LibreNMS\Util\Html::percentageBar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background);
+}
 
 
 function generate_entity_link($type, $entity, $text = null, $graph_type = null)
@@ -1065,11 +940,7 @@ function get_client_ip()
  */
 function shorten_text($string, $max = 30)
 {
-    if (strlen($string) > 50) {
-        return substr($string, 0, $max) . "...";
-    } else {
-        return $string;
-    }
+    return \LibreNMS\Util\StringHelpers::shortenText($string, $max);
 }
 
 function shorten_interface_type($string)
