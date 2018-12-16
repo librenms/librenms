@@ -178,7 +178,8 @@ class TopDevicesController extends WidgetController
         }])
             ->select('device_id')
             ->groupBy('device_id')
-            ->where('poll_time', '>', Carbon::now()->subMinutes($settings['time_interval']))
+            ->where('poll_time', '>', Carbon::now()->subMinutes($settings['time_interval'])->timestamp)
+            ->has('device')
             ->orderByRaw('SUM(ifInOctets_rate + ifOutOctets_rate) ' . $sort)
             ->limit($settings['device_count']);
 

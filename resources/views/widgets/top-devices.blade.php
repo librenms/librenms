@@ -1,3 +1,4 @@
+@if($rows->isNotEmpty())
 <div class="table-responsive">
     <table class="table table-hover table-condensed table-striped bootgrid-table">
         <thead>
@@ -19,3 +20,6 @@
         </tbody>
     </table>
 </div>
+@else
+    <h4>@lang('No devices found within interval.')</h4>
+@endif
