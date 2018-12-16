@@ -1792,6 +1792,6 @@ function get_state_label($state_value, $state_text_param = null)
             $state_text = (is_null($state_text_param) ? "Unknown": $state_text_param);
             $state_label = "label-default";
     }
-    $state = "<span class='label $state_label'>$state_text</span>"; 
+    $state = "<span class='label $state_label'>$state_text</span>";
     return $state;
 }
