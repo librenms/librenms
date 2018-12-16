@@ -22,7 +22,6 @@ $pagetitle[] = 'NAC';
                     <th data-column-id="port_id">Port</th>
                     <th data-column-id="PortAuthSessionMacAddress">MAC Address</th>
                     <th data-column-id="PortAuthSessionIPAddress">IP Address</th>
-                    <th data-column-id="PortAuthSessionAuthzStatus" data-formatter="nac_authz">AuthZ</th>
                     <th data-column-id="PortAuthSessionDomain" data-formatter="nac_domain">Domain</th>
                     <th data-column-id="PortAuthSessionHostMode" data-formatter="nac_mode">Mode</th>
                     <th data-column-id="PortAuthSessionUserName">Username</th>
@@ -30,6 +29,7 @@ $pagetitle[] = 'NAC';
                     <th data-column-id="PortAuthSessionTimeOut">Time Out</th>
                     <th data-column-id="PortAuthSessionTimeLeft">Time Left</th>
                     <th data-column-id="PortAuthSessionAuthcStatus" data-formatter="nac_authc">AuthC</th>
+                    <th data-column-id="PortAuthSessionAuthzStatus" data-formatter="nac_authz">AuthZ</th>
                     <th data-column-id="PortSessionMethod" data-formatter="nac_method">Method</th>
                 </tr>
                 </thead>
