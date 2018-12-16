@@ -21,25 +21,25 @@ if (!empty($portAuthSessionEntry)) {
 }
 
 // update the DB
-foreach ($portAuthSessionEntry as $index => $PortAuthSessionEntryParameters) {
+foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
     $auth_id = trim(strstr($index, "'"), "'");
     $ifIndex = substr($index, 0, strpos($index, "."));
     $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
 
     $port_nac = PortsNac::updateOrCreate([
         'port_id' => $ports_map->get($ifIndex, 0),
-        'domain' => $PortAuthSessionEntryParameters['cafSessionDomain'],
+        'domain' => $portAuthSessionEntryParameters['cafSessionDomain'],
     ], [
         'device_id' => $device['device_id'],
         'auth_id' => $auth_id,
-        'mac_address' => strtoupper(implode(':', array_map('zeropad', explode(':', $PortAuthSessionEntryParameters['cafSessionClientMacAddress'])))),
-        'ip_address' => (string)IP::fromHexString($PortAuthSessionEntryParameters['cafSessionClientAddress'], true),
-        'authz_status' => $PortAuthSessionEntryParameters['cafSessionStatus'],
-        'host_mode' => $PortAuthSessionEntryParameters['cafSessionAuthHostMode'],
-        'username' => $PortAuthSessionEntryParameters['cafSessionAuthUserName'],
-        'authz_by' => $PortAuthSessionEntryParameters['cafSessionAuthorizedBy'],
-        'timeout' => $PortAuthSessionEntryParameters['cafSessionTimeout'],
-        'time_left' => $PortAuthSessionEntryParameters['cafSessionTimeLeft'],
+        'mac_address' => strtoupper(implode(':', array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress'])))),
+        'ip_address' => (string)IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'], true),
+        'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'],
+        'host_mode' => $portAuthSessionEntryParameters['cafSessionAuthHostMode'],
+        'username' => $portAuthSessionEntryParameters['cafSessionAuthUserName'],
+        'authz_by' => $portAuthSessionEntryParameters['cafSessionAuthorizedBy'],
+        'timeout' => $portAuthSessionEntryParameters['cafSessionTimeout'],
+        'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'],
         'authc_status' => $session_info['authc_status'],
         'method' => $session_info['method'],
     ]);
