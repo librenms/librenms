@@ -307,7 +307,7 @@ function loadScript(src, callback) {
     script.src = src;
 }
 
-function init_map(id, engine, api_key) {
+function init_map(id, engine, api_key, config) {
     var leaflet = L.map(id);
     var baseMaps = {};
     leaflet.setView([0, 0], 15);
@@ -361,7 +361,7 @@ function init_map(id, engine, api_key) {
             roads.addTo(leaflet);
         });
     } else {
-        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        var osm = L.tileLayer('//' + config.tile_url + '/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         });
@@ -435,7 +435,6 @@ function update_location(id, latlng, callback) {
 
 function http_fallback(link) {
     var url = link.getAttribute('href');
-    console.log(url);
     try {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, false);
@@ -446,7 +445,6 @@ function http_fallback(link) {
             url = url.replace(/^https:\/\//, 'http://');
         }
     } catch (e) {
-        // console.log(e);
         url = url.replace(/^https:\/\//, 'http://');
     }
 

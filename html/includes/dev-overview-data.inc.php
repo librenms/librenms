@@ -141,7 +141,8 @@ if ($device['location_id']) {
         $("#toggle-map").on("shown.bs.collapse", function () {
             if (device_marker == null) {
                 device_location = new L.LatLng(' . (float)$location->lat . ', ' . (float)$location->lng . ');
-                device_map = init_map("location-map", "' . $maps_engine . '", "' . $maps_api . '");
+                config = {"tile_url": "'.Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org').'"};
+                device_map = init_map("location-map", "' . $maps_engine . '", "' . $maps_api . '", config);
                 device_marker = init_map_marker(device_map, device_location);
                 device_map.setZoom(18);
                 ';
