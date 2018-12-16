@@ -81,7 +81,10 @@
                                         "type": "string"
                                     },
                                     "snmp_flags": {
-                                        "type": "string"
+                                        "type": [
+                                            "string",
+                                            "array"
+                                        ]
                                     }
                                 },
                                 "additionalProperties": false,
@@ -187,7 +190,10 @@
                                                 ]
                                             },
                                             "snmp_flags": {
-                                                "type": "string"
+                                                "type": [
+                                                    "string",
+                                                    "array"
+                                                ]
                                             }
                                         },
                                         "required": [
@@ -324,7 +330,10 @@
                         }
                     },
                     "snmp_flags": {
-                        "type": "string"
+                        "type": [
+                            "string",
+                            "array"
+                        ]
                     },
                     "entPhysicalIndex": {
                         "type": "string"

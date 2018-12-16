@@ -58,9 +58,12 @@
 
 @section('css')
     <style>
-        #locations-panel>.panel-body {
-            padding: 0;
-        }
+        #locations-panel>.panel-body { padding: 0;  }
+
+        .coordinates-text { white-space: normal; }
+        .coordinates-field { white-space: nowrap; }
+        .coordinates-field>.fa { visibility: hidden; }
+        .coordinates-field:hover>.fa { visibility: visible; }
     </style>
 @endsection
 
@@ -84,10 +87,14 @@
                         return '<a href=/devices/location=' + row.id + '>' + row.location + '</a>';
                     },
                     "coordinates": function (column, row) {
+                        var text;
                         if (row.lat && row.lng) {
-                            return row.lat + ', ' + row.lng;
+                            text = row.lat + ', ' + row.lng;
+                        } else {
+                            text = '@lang('N/A')';
                         }
-                        return '@lang('N/A')';
+                        return '<div class="coordinates-field" onclick="edit_coordinates(this);" data-id="' + row.id +
+                            '"><span class="coordinates-text">' + text + '</span> <i class="fa fa-pencil"></i></div>';
                     },
                     "down": function (column, row) {
                         if (row.down > 0) {
@@ -141,7 +148,8 @@
                 locationId = $btn.data('id');
 
                 if (locationMap === null) {
-                    locationMap = init_map('location-edit-map', '{{ $maps_engine }}', '{{ $maps_api }}');
+                    config = {"tile_url": "{{ Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org') }}"};
+                    locationMap = init_map('location-edit-map', '{{ $maps_engine }}', '{{ $maps_api }}', config);
                     locationMarker = init_map_marker(locationMap, location);
                 }
 
@@ -165,6 +173,47 @@
             });
             locationsGraphTemplate = Handlebars.compile(document.getElementById("location-graph-template").innerHTML);
         });
+
+        function edit_coordinates(field) {
+            var $field = $(field);
+            var $text_el = $field.find('.coordinates-text');
+            var text = $text_el.text();
+            var id = $field.data('id');
+            var $edit = $('<input type="text" value="' + text + '">');
+            $edit.on('blur keyup',function(e) {
+                if (e.keyCode === 27) {
+                    $text_el.text(text);
+                }
+
+                if (e.type === 'blur' || e.keyCode === 13) {
+                    var input = $(this).val();
+                    var loc = input.split(',', 2);
+
+                    console.log(loc);
+                    if (loc.length === 1 || input === text) {
+                        $text_el.text(text);
+                        return;
+                    }
+                    console.log(loc[1]);
+                    var latlng = {
+                        lat: loc[0].trim(),
+                        lng: loc[1].trim()
+                    };
+                    update_location(id, latlng, function (success) {
+                        if (success) {
+                            $text_el.text(latlng.lat + ', ' + latlng.lng);
+                            locations_grid.bootgrid('reload');
+                        } else {
+                            $text_el.text(text);
+                        }
+                    });
+
+                }
+            });
+
+            $text_el.html($edit);
+            $edit.select();
+        }
 
         function delete_location(locationId) {
             $.ajax({

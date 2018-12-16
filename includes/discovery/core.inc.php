@@ -1,6 +1,6 @@
 <?php
 
-$snmpdata = snmp_get_multi_oid($device, 'sysName.0 sysObjectID.0 sysDescr.0', '-OUQn', 'SNMPv2-MIB');
+$snmpdata = snmp_get_multi_oid($device, ['sysName.0', 'sysObjectID.0', 'sysDescr.0'], '-OUQn', 'SNMPv2-MIB');
 
 $core_update = array(
     'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'],

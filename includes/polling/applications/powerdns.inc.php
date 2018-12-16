@@ -4,7 +4,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$options      = '-O qv';
+$options      = '-Oqv';
 $oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.119.101.114.100.110.115';
 
 $name = 'powerdns';

@@ -2,7 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$oid_list = 'sgProxyVersion.0 sgProxySoftware.0 sgProxyHttpClientRequestRate.0 sgProxyHttpClientConnections.0 sgProxyHttpClientConnectionsActive.0 sgProxyHttpClientConnectionsIdle.0 sgProxyHttpServerConnections.0 sgProxyHttpServerConnectionsActive.0 sgProxyHttpServerConnectionsIdle.0';
+$oid_list = ['sgProxyVersion.0', 'sgProxySoftware.0', 'sgProxyHttpClientRequestRate.0', 'sgProxyHttpClientConnections.0', 'sgProxyHttpClientConnectionsActive.0', 'sgProxyHttpClientConnectionsIdle.0', 'sgProxyHttpServerConnections.0', 'sgProxyHttpServerConnectionsActive.0', 'sgProxyHttpServerConnectionsIdle.0'];
 
 $sgos = snmp_get_multi($device, $oid_list, '-OUQs', 'BLUECOAT-SG-PROXY-MIB');
 

@@ -33,7 +33,7 @@
 $output = preg_split("/[\s,]+/", $device['sysDescr']);
 $version = $output[1];
 
-$oid = snmp_get_multi($device, 'systemSiteInfoControllerType.0 rectifierStatusType.1 batteryName.0 systemSiteInfoSystemSeriaNum.0', '-OQUs', 'ELTEK-DISTRIBUTED-MIB');
+$oid = snmp_get_multi($device, ['systemSiteInfoControllerType.0', 'rectifierStatusType.1', 'batteryName.0', 'systemSiteInfoSystemSeriaNum.0'], '-OQUs', 'ELTEK-DISTRIBUTED-MIB');
 $features = 'Rectifier type: '.$oid[1]['rectifierStatusType'];
 $features .= ', Battery name: '.$oid[0]['batteryName'];
 $hardware = $oid[0]['systemSiteInfoControllerType'];
