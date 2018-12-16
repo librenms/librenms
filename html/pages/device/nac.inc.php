@@ -20,17 +20,17 @@ $pagetitle[] = 'NAC';
                 <thead>
                 <tr>
                     <th data-column-id="port_id">Port</th>
-                    <th data-column-id="PortAuthSessionMacAddress">MAC Address</th>
-                    <th data-column-id="PortAuthSessionIPAddress">IP Address</th>
-                    <th data-column-id="PortAuthSessionDomain" data-formatter="nac_domain">Domain</th>
-                    <th data-column-id="PortAuthSessionHostMode" data-formatter="nac_mode">Mode</th>
-                    <th data-column-id="PortAuthSessionUserName">Username</th>
-                    <th data-column-id="PortAuthSessionAuthzBy" data-visible="false">Auth By</th>
-                    <th data-column-id="PortAuthSessionTimeOut">Time Out</th>
-                    <th data-column-id="PortAuthSessionTimeLeft">Time Left</th>
-                    <th data-column-id="PortAuthSessionAuthcStatus" data-formatter="nac_authc">AuthC</th>
-                    <th data-column-id="PortAuthSessionAuthzStatus" data-formatter="nac_authz">AuthZ</th>
-                    <th data-column-id="PortSessionMethod" data-formatter="nac_method">Method</th>
+                    <th data-column-id="mac_address">MAC Address</th>
+                    <th data-column-id="ip_address">IP Address</th>
+                    <th data-column-id="domain" data-formatter="nac_domain">Domain</th>
+                    <th data-column-id="host_mode" data-formatter="nac_mode">Mode</th>
+                    <th data-column-id="username">Username</th>
+                    <th data-column-id="authz_by" data-visible="false">Auth By</th>
+                    <th data-column-id="timeout">Timeout</th>
+                    <th data-column-id="time_left">Time Left</th>
+                    <th data-column-id="authc_status" data-formatter="nac_authc">AuthC</th>
+                    <th data-column-id="authz_status" data-formatter="nac_authz">AuthZ</th>
+                    <th data-column-id="method" data-formatter="nac_method">Method</th>
                 </tr>
                 </thead>
             </table>

@@ -38,7 +38,7 @@ class PortNacController extends TableController
 
     public function searchFields($request)
     {
-        return ['PortAuthSessionUserName', 'PortAuthSessionIPAddress', 'PortAuthSessionMacAddress'];
+        return ['username', 'ip_address', 'mac_address'];
     }
 
     /**

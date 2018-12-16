@@ -16,7 +16,7 @@ if (!empty($portAuthSessionEntry)) {
     $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($device, 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB'))->mapWithKeys(function ($item, $key) {
         $key_parts = explode('.', $key);
         $key = implode('.', array_slice($key_parts, 0, 2)); // remove the auth method
-        return [$key => ['PortSessionMethod' => $key_parts[2], 'PortAuthSessionAuthcStatus' => $item['cafSessionMethodState']]];
+        return [$key => ['method' => $key_parts[2], 'authc_status' => $item['cafSessionMethodState']]];
     });
 }
 
@@ -28,20 +28,20 @@ foreach ($portAuthSessionEntry as $index => $PortAuthSessionEntryParameters) {
 
     $port_nac = PortsNac::updateOrCreate([
         'port_id' => $ports_map->get($ifIndex, 0),
-        'PortAuthSessionDomain' => $PortAuthSessionEntryParameters['cafSessionDomain'],
+        'domain' => $PortAuthSessionEntryParameters['cafSessionDomain'],
     ], [
         'device_id' => $device['device_id'],
         'auth_id' => $auth_id,
-        'PortAuthSessionMacAddress' => strtoupper(implode(':', array_map('zeropad', explode(':', $PortAuthSessionEntryParameters['cafSessionClientMacAddress'])))),
-        'PortAuthSessionIPAddress' => (string)IP::fromHexString($PortAuthSessionEntryParameters['cafSessionClientAddress'], true),
-        'PortAuthSessionAuthzStatus' => $PortAuthSessionEntryParameters['cafSessionStatus'],
-        'PortAuthSessionHostMode' => $PortAuthSessionEntryParameters['cafSessionAuthHostMode'],
-        'PortAuthSessionUserName' => $PortAuthSessionEntryParameters['cafSessionAuthUserName'],
-        'PortAuthSessionAuthzBy' => $PortAuthSessionEntryParameters['cafSessionAuthorizedBy'],
-        'PortAuthSessionTimeOut' => $PortAuthSessionEntryParameters['cafSessionTimeout'],
-        'PortAuthSessionTimeLeft' => $PortAuthSessionEntryParameters['cafSessionTimeLeft'],
-        'PortAuthSessionAuthcStatus' => $session_info['PortAuthSessionAuthcStatus'],
-        'PortSessionMethod' => $session_info['PortSessionMethod'],
+        'mac_address' => strtoupper(implode(':', array_map('zeropad', explode(':', $PortAuthSessionEntryParameters['cafSessionClientMacAddress'])))),
+        'ip_address' => (string)IP::fromHexString($PortAuthSessionEntryParameters['cafSessionClientAddress'], true),
+        'authz_status' => $PortAuthSessionEntryParameters['cafSessionStatus'],
+        'host_mode' => $PortAuthSessionEntryParameters['cafSessionAuthHostMode'],
+        'username' => $PortAuthSessionEntryParameters['cafSessionAuthUserName'],
+        'authz_by' => $PortAuthSessionEntryParameters['cafSessionAuthorizedBy'],
+        'timeout' => $PortAuthSessionEntryParameters['cafSessionTimeout'],
+        'time_left' => $PortAuthSessionEntryParameters['cafSessionTimeLeft'],
+        'authc_status' => $session_info['authc_status'],
+        'method' => $session_info['method'],
     ]);
     if (!$port_nac->port_id || $port_nac->port->ifIndex != $ifIndex) {
         $port_nac->port()->associate(Port::where(['device_id' => $device['device_id'], 'ifIndex' => $ifIndex])->first());
