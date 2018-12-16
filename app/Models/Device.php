@@ -18,7 +18,53 @@ class Device extends BaseModel
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
-    protected $fillable = ['hostname', 'ip', 'status', 'status_reason'];
+    protected $fillable = [
+        'hostname',
+        'sysName',
+        'ip',
+        'community',
+        'authlevel',
+        'authname',
+        'authalgo',
+        'cyrptopass',
+        'cryptoalgo',
+        'snmpver',
+        'port',
+        'transport',
+        'timeout',
+        'retries',
+        'snmp_disable',
+        'bgpLocalAs',
+        'sysObjectID',
+        'sysDescr',
+        'sysContact',
+        'version',
+        'hardware',
+        'features',
+        'location_id',
+        'os',
+        'status',
+        'status_reason',
+        'ignore',
+        'disabled',
+        'uptime',
+        'agent_uptime',
+        'last_polled',
+        'last_poll_attempted',
+        'last_polled_timetaken',
+        'last_discovered_timetakem',
+        'last_discovered',
+        'last_ping',
+        'purpose',
+        'type',
+        'serial',
+        'icon',
+        'poller_group',
+        'override_sysLocation',
+        'notes',
+        'port_association_mode',
+        'max_depth',
+    ];
     protected $casts = ['status' => 'boolean'];
 
     /**
@@ -147,13 +193,8 @@ class Device extends BaseModel
     public static function fromArray($device)
     {
         $device_model = new static($device);
-
-        // properties that block relationships
-        unset($device['location']);
-
-        foreach ($device as $key => $value) {
-            $device_model->$key = $value;
-        }
+        $device_model->device_id = $device['device_id'];
+        $device_model->original = $device_model->attributes; // clear dirty status (just assuming)
 
         return $device_model;
     }
