@@ -20,14 +20,6 @@ if (strpos($vars['id'], ',') !== false) {
         $sensor['sensor_descr_fixed'] = rrdtool_escape($sensor['sensor_descr'], 15);
         $rrd_file = get_sensor_rrd($device, $sensor);
 
-        if (is_numeric($sensor['sensor_limit'])) {
-            $rrd_options .= ' HRULE:'.$sensor['sensor_limit'].'#999999::dashes';
-        }
-
-        if (is_numeric($sensor['sensor_limit_low'])) {
-            $rrd_options .= ' HRULE:'.$sensor['sensor_limit_low'].'#999999::dashes';
-        }
-
         if (rrdtool_check_rrd_exists($rrd_file)) {
             $rrd_list[$i] = array(
                 'ds' => 'sensor',
