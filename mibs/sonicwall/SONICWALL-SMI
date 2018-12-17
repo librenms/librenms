@@ -17,8 +17,10 @@
 --                SONICWALL-SMI.MIB, Mike Uy
 -- 07-23-12       Updated company copyright and 
 --                organization, Mike Uy
+-- 01-06-17       Updated company copyright and
+--                organization, Thomas Tang
 --
--- Copyright (c) 2012 DELL Inc.
+-- Copyright (c) 2017 SonicWall Inc.
 -- All rights reserved.
 -- *****************************************************************
 
@@ -33,73 +35,75 @@ SONICWALL-SMI
 DEFINITIONS ::= BEGIN
 
 IMPORTS
-        MODULE-IDENTITY,
-        OBJECT-IDENTITY,
-        enterprises
-                FROM SNMPv2-SMI;
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
 
 sonicwall MODULE-IDENTITY
-        LAST-UPDATED "201207230000Z"
-        ORGANIZATION "DELL SonicWALL"
-        CONTACT-INFO
-                "       DELL SonicWall
+	LAST-UPDATED "201701060000Z"
+	ORGANIZATION "SonicWall"
+	CONTACT-INFO
+		"	SonicWall Inc.
 
-                Postal: 2001 Logic Drive
-                        San Jose, CA 95124-3452
-                        USA
+		Postal: 5455 Great America Parkway
+			Santa Clara, CA 95054
+			USA
 
-                   Tel: +1 408 745 9600
-                   Fax: +1 408 745 9300
+		   Tel: +1 408 745 9600
+		   Fax: +1 408 745 9300
 
-                E-mail: products@sonicwall.com"
-        DESCRIPTION
-                "The MIB Module for SonicWALL enterprise."
-        REVISION      "200304220000Z"
-        DESCRIPTION
-                "Initial version."
-        ::= { enterprises 8741 }
+		E-mail: support@sonicwall.com"
+	DESCRIPTION
+		"The MIB Module for SonicWall enterprise."
+	REVISION      "201701060000Z"
+	DESCRIPTION   "Updated company copyright and organization."    
 
+	REVISION      "200701060000Z"
+	DESCRIPTION   "Initial version."
+	::= { enterprises 8741 }
+	
 
 sonicwallFw OBJECT-IDENTITY
-        STATUS  current
-        DESCRIPTION
-                "sonicwallFw is the subtree for the SonicWALL firewall products."
-        ::= { sonicwall 1 }
+	STATUS	current
+	DESCRIPTION
+		"sonicwallFw is the subtree for the SonicWall firewall products."
+	::= { sonicwall 1 }
 
 sonicwallCommon OBJECT-IDENTITY
-        STATUS  current
-        DESCRIPTION
-                "Subtree for MIBs common for all SonicWALL products"
-        ::= { sonicwall 2 }
+	STATUS	current
+	DESCRIPTION
+		"Subtree for MIBs common for all SonicWall products"
+	::= { sonicwall 2 }
 
 sonicwallGMS OBJECT-IDENTITY
-        STATUS  current
-        DESCRIPTION
-                "sonicwallGMS is the subtree for the SonicWALL Global Management System products."
-        ::= { sonicwall 3 }
+	STATUS	current
+	DESCRIPTION
+		"sonicwallGMS is the subtree for the SonicWall Global Management System products."
+	::= { sonicwall 3 }
 
 sonicwallEmailSec OBJECT-IDENTITY
-        STATUS  current
-        DESCRIPTION
-                "sonicwallEmailSec is the subtree for SonicWALL email security products."
-        ::= { sonicwall 4 }
+	STATUS	current
+	DESCRIPTION
+		"sonicwallEmailSec is the subtree for SonicWall email security products."
+	::= { sonicwall 4 }
 
 sonicwallDataCenter OBJECT-IDENTITY
-        STATUS  current
-        DESCRIPTION
-                "sonicwallDataCenter is the subtree for SonicWALL datacenter operations."
-        ::= { sonicwall 5 }
+	STATUS	current
+	DESCRIPTION
+		"sonicwallDataCenter is the subtree for SonicWall datacenter operations."
+	::= { sonicwall 5 }
 
 sonicwallSSLVPN OBJECT-IDENTITY
-        STATUS  current
-        DESCRIPTION
-                "sonicwallSSLVPN is the subtree for SonicWALL SSL VPN products."
-        ::= { sonicwall 6 }
+	STATUS	current
+	DESCRIPTION
+		"sonicwallSSLVPN is the subtree for SonicWall SSL VPN products."
+	::= { sonicwall 6 }
 
 sonicwallCDP OBJECT-IDENTITY
-        STATUS  current
-        DESCRIPTION
-                "sonicwallCDP is the subtree for SonicWALL CDP products."
-        ::= { sonicwall 7 }
+	STATUS	current
+	DESCRIPTION
+		"sonicwallCDP is the subtree for SonicWall CDP products."
+	::= { sonicwall 7 }
 
 END

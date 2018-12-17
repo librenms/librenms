@@ -423,6 +423,7 @@ function sensor_low_limit($class, $current)
         case 'ber':
         case 'eer':
         case 'waterflow':
+        case 'clients':
     }//end switch
 
     if (is_numeric($limit)) {

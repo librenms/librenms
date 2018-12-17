@@ -96,6 +96,9 @@ if ($used_sensors['eer']) {
 if ($used_sensors['waterflow']) {
     $datas[] = 'waterflow';
 }
+if ($used_sensors['clients']) {
+    $datas[] = 'clients';
+}
 
 $type_text['overview'] = "Overview";
 $type_text['temperature'] = "Temperature";
@@ -129,6 +132,7 @@ $type_text['chromatic_dispersion'] = 'Chromatic Dispersion';
 $type_text['ber'] = 'Bit Error Rate';
 $type_text['eer'] = 'Energy Efficiency Ratio';
 $type_text['waterflow'] = 'Water Flow Rate';
+$type_text['clients'] = 'Clients';
 
 if (!$vars['metric']) {
     $vars['metric'] = "processor";

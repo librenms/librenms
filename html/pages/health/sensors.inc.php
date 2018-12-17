@@ -67,6 +67,9 @@ switch ($class) {
     case 'voltage':
         $pagetitle[] = "Health :: Voltage";
         break;
+    case 'clients':
+        $pagetitle[] = "Health :: Clients";
+        break;
 }
 
 ?>
