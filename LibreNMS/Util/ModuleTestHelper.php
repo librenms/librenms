@@ -189,7 +189,7 @@ class ModuleTestHelper
         $collection_output = preg_replace('/\033\[[\d;]+m/', '', $collection_output);
 
         // extract snmp queries
-        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+) .+:HOSTNAME:[0-9]+(.+)\]/';
+        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+)\' .+:HOSTNAME:[0-9]+\' \'(.+)\'\]/';
         preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
 
         // extract mibs and group with oids
@@ -198,10 +198,11 @@ class ModuleTestHelper
             'sysObjectID.0_get' => ['oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
         ];
         foreach ($snmp_matches[0] as $index => $line) {
-            preg_match('/-m \+?([a-zA-Z0-9:\-]+)/', $line, $mib_matches);
+            preg_match("/'-m' '\+?([a-zA-Z0-9:\-]+)'/", $line, $mib_matches);
             $mib = $mib_matches[1];
             $method = $snmp_matches[1][$index];
-            $oids = explode(' ', trim($snmp_matches[2][$index]));
+            $oids = explode("' '", trim($snmp_matches[2][$index]));
+
             foreach ($oids as $oid) {
                 $snmp_oids["{$oid}_$method"] = [
                     'oid' => $oid,
