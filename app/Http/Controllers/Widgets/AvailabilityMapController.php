@@ -104,7 +104,7 @@ class AvailabilityMapController extends WidgetController
         if (!$settings['show_disabled_and_ignored']) {
             $device_query->isActive();
         }
-        $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime')->get();
+        $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime', 'disabled', 'ignore')->get();
 
         // process status
         $uptime_warn = Config::get('uptime_warning', 84600);
