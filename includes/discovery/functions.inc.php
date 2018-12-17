@@ -956,7 +956,10 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             d_echo("Data $tmp_name: ");
             d_echo($raw_data);
 
+            $count = 0;
             foreach ($raw_data as $index => $snmp_data) {
+                $count++;
+
                 $user_function = null;
                 if (isset($data['user_func'])) {
                     $user_function = $data['user_func'];
@@ -994,17 +997,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
 
                     // process the description
-                    $descr = dynamic_discovery_get_value('descr', $index, $data, $pre_cache);
-                    if (is_null($descr)) {
-                        $descr = str_replace('{{ $index }}', $index, $data['descr']);
-                        preg_match_all('/{{ \$([a-zA-Z0-9.]+) }}/', $descr, $matches);
-                        foreach ($matches[1] as $tmp_var) {
-                            $replace = dynamic_discovery_get_value($tmp_var, $index, $data, $pre_cache, null);
-                            if (!is_null($replace)) {
-                                $descr = str_replace("{{ \$$tmp_var }}", $replace, $descr);
-                            }
-                        }
-                    }
+                    $descr = YamlDiscovery::replaceValues('descr', $index, $count, $data, $pre_cache);
 
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
