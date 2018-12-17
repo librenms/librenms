@@ -53,6 +53,6 @@ class Sonicwall extends OS implements ProcessorDiscovery
                     1
                 )
             );
-         }
+        }
     }
 }
