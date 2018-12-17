@@ -1917,6 +1917,7 @@ label {
     overflow-y: auto;
     width: 100%;
     height: calc(100% - 38px);
+    cursor: auto;
 }
 
 .device-availability, .service-availability {
@@ -2007,7 +2008,6 @@ label {
 .widget-availability {
   float:left;
   margin:2px;
-  curosr: pointer;
 }
 
 .widget-availability-fixed {
@@ -2019,6 +2019,10 @@ label {
 .widget-availability-host {
   float:left;
   margin-bottom: 10px;
+}
+
+.widget-availability-host a:hover {
+  text-decoration: none;
 }
 
 .widget-availability-service {
