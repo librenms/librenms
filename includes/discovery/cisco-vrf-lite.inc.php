@@ -28,7 +28,7 @@ if (Config::get('enable_vrf_lite_cisco')) {
         $mib = "SNMP-COMMUNITY-MIB";
         $mib = "CISCO-CONTEXT-MAPPING-MIB";
         //-Osq because if i put the n the oid from the first command is not the same of this one
-        $listVrf = snmp_walk($device, "cContextMappingVrfName", "-Osq -Ln", $mib, null);
+        $listVrf = snmp_walk($device, "cContextMappingVrfName", ['-Osq', '-Ln'], $mib, null);
         $listVrf = str_replace("cContextMappingVrfName.", "", $listVrf);
         $listVrf = str_replace('"', "", $listVrf);
         $listVrf = trim($listVrf);
@@ -45,7 +45,7 @@ if (Config::get('enable_vrf_lite_cisco')) {
         }
         unset($listVrf);
 
-        $listIntance = snmp_walk($device, "cContextMappingProtoInstName", "-Osq -Ln", $mib, null);
+        $listIntance = snmp_walk($device, "cContextMappingProtoInstName", ['-Osq', '-Ln'], $mib, null);
         $listIntance = str_replace("cContextMappingProtoInstName.", "", $listIntance);
         $listIntance = str_replace('"', "", $listIntance);
         $listIntance = trim($listIntance);

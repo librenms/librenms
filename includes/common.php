@@ -19,6 +19,7 @@
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\IP;
 
 function generate_priority_label($priority)
@@ -73,25 +74,48 @@ function graylog_severity_label($severity)
     return '<span class="alert-status '.$barColor .'" style="margin-right:8px;float:left;"></span>';
 }
 
+/**
+ * Execute and snmp command, filter debug output unless -v is specified
+ *
+ * @param array $command
+ * @return null|string
+ */
 function external_exec($command)
 {
-    global $debug,$vdebug;
+    global $debug, $vdebug;
+
+    $proc = new \Symfony\Component\Process\Process($command);
 
     if ($debug && !$vdebug) {
-        $debug_command = preg_replace('/-c [\S]+/', '-c COMMUNITY', $command);
-        $debug_command = preg_replace('/-u [\S]+/', '-u USER', $debug_command);
-        $debug_command = preg_replace('/-U [\S]+/', '-u USER', $debug_command);
-        $debug_command = preg_replace('/-A [\S]+/', '-A PASSWORD', $debug_command);
-        $debug_command = preg_replace('/-X [\S]+/', '-X PASSWORD', $debug_command);
-        $debug_command = preg_replace('/-P [\S]+/', '-P PASSWORD', $debug_command);
-        $debug_command = preg_replace('/-H [\S]+/', '-H HOSTNAME', $debug_command);
-        $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/', '\1:HOSTNAME:\3', $debug_command);
+        $patterns = [
+            '/-c\' \'[\S]+/',
+            '/-u\' \'[\S]+/',
+            '/-U\' \'[\S]+/',
+            '/-A\' \'[\S]+/',
+            '/-X\' \'[\S]+/',
+            '/-P\' \'[\S]+/',
+            '/-H\' \'[\S]+/',
+            '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
+        ];
+        $replacements = [
+            '-c\' \'COMMUNITY',
+            '-u\' \'USER',
+            '-u\' \'USER',
+            '-A\' \'PASSWORD',
+            '-X\' \'PASSWORD',
+            '-P\' \'PASSWORD',
+            '-H\' \'HOSTNAME',
+            '\1:HOSTNAME:\3',
+        ];
+
+        $debug_command = preg_replace($patterns, $replacements, $proc->getCommandLine());
         c_echo('SNMP[%c' . $debug_command . "%n]\n");
     } elseif ($vdebug) {
-        c_echo('SNMP[%c'.$command."%n]\n");
+        c_echo('SNMP[%c'.$proc->getCommandLine()."%n]\n");
     }
 
-    $output = shell_exec($command);
+    $proc->run();
+    $output = $proc->getOutput();
 
     if ($debug && !$vdebug) {
         $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
@@ -100,6 +124,7 @@ function external_exec($command)
     } elseif ($vdebug) {
         d_echo($output . PHP_EOL);
     }
+    d_echo($proc->getErrorOutput());
 
     return $output;
 }
@@ -723,9 +748,7 @@ function c_echo($string, $enabled = true)
  */
 function is_mib_graph($type, $subtype)
 {
-    global $config;
-    return isset($config['graph_types'][$type][$subtype]['section']) &&
-        $config['graph_types'][$type][$subtype]['section'] == 'mib';
+    return \LibreNMS\Util\Graph::isMibGraph($type, $subtype);
 } // is_mib_graph
 
 
@@ -1519,28 +1542,9 @@ function clean($value, $strip_tags = true)
  * @param array $purifier_config (key, value pair)
  * @return string
  */
-function display($value, $purifier_config = array())
+function display($value, $purifier_config = [])
 {
-    /** @var HTMLPurifier $purifier */
-    global $config, $purifier;
-
-    // If $purifier_config is non-empty then we don't want
-    // to convert html tags and allow these to be controlled
-    // by purifier instead.
-    if (empty($purifier_config)) {
-        $value = htmlentities($value);
-    }
-    if (!isset($purifier)) {
-        // initialize HTML Purifier here since this is the only user
-        $p_config = HTMLPurifier_Config::createDefault();
-        $p_config->set('Cache.SerializerPath', $config['temp_dir']);
-        foreach ($purifier_config as $k => $v) {
-            $p_config->set($k, $v);
-        }
-        $purifier = new HTMLPurifier($p_config);
-    }
-
-    return $purifier->purify(stripslashes($value));
+    return Html::display($value, $purifier_config);
 }
 
 /**

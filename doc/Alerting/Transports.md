@@ -317,9 +317,14 @@ Get your Access Token from your Pushbullet's settings page and set it in your tr
 | Access Token | MYFANCYACCESSTOKEN |
 
 ## Pushover
-If you want to change the [notification sounds](https://pushover.net/api#sounds) then add it in Pushover Options:
+If you want to change the default [notification sound](https://pushover.net/api#sounds) for all notifications then you can add the following in Pushover Options:
 
+`sound=falling`
+
+You also have the possibility to change sound per severity:
 `sound_critical=falling`
+`sound_warning=siren`
+`sound_ok=magic`
 
 Enabling Pushover support is fairly easy, there are only two required parameters.
 
@@ -336,6 +341,8 @@ Now copy your API Key and obtain your User Key from the newly created Applicatio
 | Api Key | APPLICATIONAPIKEYGOESHERE |
 | User Key | USERKEYGOESHERE |
 | Pushover Options | sound_critical=falling |
+|  | sound_warning=siren |
+|  | sound_ok=magic |
 
 ## Rocket.chat
 The Rocket.chat transport will POST the alert message to your Rocket.chat Incoming WebHook using the

@@ -3,7 +3,7 @@
 if ($device['os'] == 'hpe-ilo') {
     echo 'HPE ILO4 ';
 
-    $memory_pool = snmp_get_multi_oid($device, 'cpqHoPhysicalMemoryFree.0 cpqHoPhysicalMemorySize.0 cpqHoPagingMemoryFree.0 cpqHoPagingMemorySize.0', '-OQUs', 'CPQHOST-MIB');
+    $memory_pool = snmp_get_multi_oid($device, ['cpqHoPhysicalMemoryFree.0', 'cpqHoPhysicalMemorySize.0', 'cpqHoPagingMemoryFree.0', 'cpqHoPagingMemorySize.0'], '-OQUs', 'CPQHOST-MIB');
 
     $mem_free = $memory_pool['cpqHoPhysicalMemoryFree.0'];
     $mem_capacity = $memory_pool['cpqHoPhysicalMemorySize.0'];

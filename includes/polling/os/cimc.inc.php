@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-$oids = 'cucsComputeBoardModel.1 cucsComputeBoardSerial.1';
+$oids = ['cucsComputeBoardModel.1', 'cucsComputeBoardSerial.1'];
 $data = snmp_get_multi($device, $oids, '-OQUs', 'CISCO-UNIFIED-COMPUTING-COMPUTE-MIB');
 if (!empty($data[1]['cucsComputeBoardModel'])) {
     $hardware = $data[1]['cucsComputeBoardModel'];

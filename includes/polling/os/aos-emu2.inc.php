@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$aos_emu2_data = snmp_get_multi_oid($device, 'emsIdentSerialNumber.0 emsIdentProductNumber.0 emsIdentHardwareRev.0 emsIdentFirmwareRev.0', '-OQUs', 'PowerNet-MIB');
+$aos_emu2_data = snmp_get_multi_oid($device, ['emsIdentSerialNumber.0', 'emsIdentProductNumber.0', 'emsIdentHardwareRev.0', 'emsIdentFirmwareRev.0'], '-OQUs', 'PowerNet-MIB');
 
 $serial   = trim($aos_emu2_data['emsIdentSerialNumber.0'], '"');
 $hardware = trim($aos_emu2_data['emsIdentProductNumber.0'], '"') . ' ' . trim($aos_emu2_data['emsIdentHardwareRev.0'], '"');

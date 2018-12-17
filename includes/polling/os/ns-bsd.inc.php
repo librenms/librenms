@@ -23,7 +23,7 @@
  * @author     Thomas GAGNIERE <tgagniere@reseau-concept.com>
  */
 
-$data = snmp_get_multi_oid($device, 'snsModel.0 snsVersion.0 snsSerialNumber.0 snsSystemName.0', '-OUQs', 'STORMSHIELD-PROPERTY-MIB');
+$data = snmp_get_multi_oid($device, ['snsModel.0', 'snsVersion.0', 'snsSerialNumber.0', 'snsSystemName.0'], '-OUQs', 'STORMSHIELD-PROPERTY-MIB');
 
 $hardware = $data['snsModel.0'];
 $version = $data['snsVersion.0'];

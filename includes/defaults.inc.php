@@ -696,7 +696,7 @@ $config['ignore_mount_regexp'][] = '/on: \/junos\/dev/';
 $config['ignore_mount_regexp'][] = '/on: \/jail\/dev/';
 $config['ignore_mount_regexp'][] = '/^(dev|proc)fs/';
 $config['ignore_mount_regexp'][] = '/^\/dev\/md0/';
-$config['ignore_mount_regexp'][] = '/^\/var\/dhcpd\/dev,/';
+$config['ignore_mount_regexp'][] = '/^\/var\/dhcpd\/dev/';
 $config['ignore_mount_regexp'][] = '/UMA/';
 
 $config['ignore_mount_removable'] = 1;

@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$netguardian_tmp = snmp_get_multi_oid($device, 'dpsRTUModel.0 dpsRTUFirmwareVersion.0', '-OQs', 'DPS-MIB-V38');
+$netguardian_tmp = snmp_get_multi_oid($device, ['dpsRTUModel.0', 'dpsRTUFirmwareVersion.0'], '-OQs', 'DPS-MIB-V38');
 $version         = $netguardian_tmp['dpsRTUFirmwareVersion.0'];
 $hardware        = $netguardian_tmp['dpsRTUModel.0'];
 unset($netguardian_tmp);

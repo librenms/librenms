@@ -168,6 +168,22 @@ Description: Ports that were previously up and have now gone down.
 
 Example: `macros.port_now_down = 1`
 
+### Port has xDP neighbour (Boolean)
+
+Entity: `%macros.port AND %links.local_port_id = %ports.port_id`
+
+Description: Ports that have an xDP (lldp, cdp, etc) neighbour.
+
+Example: `macros.port_has_xdp_neighbours = 1`
+
+### Port has xDP neighbour already known in LibreNMS (Boolean)
+
+Entity: `%macros.port_has_neighbours AND (%links.remote_port_id IS NOT NULL)`
+
+Description: Ports that have an xDP (lldp, cdp, etc) neighbour that is already known in libreNMS.
+
+Example: `macros.port_has_xdp_neighbours_device = 1`
+
 ### Device component down [JunOS]
 
 Entity: `sensors.sensor_class = "state" AND sensors.sensor_current != "6" AND sensors.sensor_type = "jnxFruState" AND sensors.sensor_current != "2"`
