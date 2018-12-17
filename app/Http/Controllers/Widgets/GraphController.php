@@ -154,14 +154,12 @@ class GraphController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        // get type
-        $type = $this->getGraphType();
-
         // force settings if not initialized
-        if (is_null($type) || empty($settings['graph_' . $this->getGraphType(false)])) {
+        if ($this->hasInvalidSettings()) {
             return $this->getSettingsView($request);
         }
 
+        $type = $this->getGraphType();
         $param = '';
 
         if ($type == 'device') {
@@ -222,6 +220,16 @@ class GraphController extends WidgetController
         }
 
         return $type;
+    }
+
+    private function hasInvalidSettings()
+    {
+        $raw_type = $this->getGraphType(false);
+        if ($raw_type == 'custom' || $this->getGraphType() != 'aggregate') {
+            return empty($this->getSettings()['graph_' . $raw_type]);
+        }
+
+        return false; // non-custom aggregate types require no additional settings
     }
 
     public function getSettings()
