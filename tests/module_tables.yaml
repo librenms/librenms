@@ -39,6 +39,7 @@ nac:
         excluded_fields: [ports_nac_id, device_id, port_id]
         joins:
             - { left: ports_nac.port_id, right: ports.port_id, select: [ifIndex] }
+        order_by: ports.ifIndex, domain
 os:
     devices:
         included_fields: [sysName, sysObjectID, sysDescr, sysContact, version, hardware, features, location, os, type, serial, icon]
