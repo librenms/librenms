@@ -12,7 +12,7 @@ if (is_numeric($vars['id'])) {
         $title .= ' :: Sensor :: '.htmlentities($sensor['sensor_descr']);
         $auth   = true;
     }
-} elseif ($vars['type'] == 'sensor_clients' && strpos($vars['id'], ',') !== false){
+} elseif ($vars['type'] == 'sensor_clients' && strpos($vars['id'], ',') !== false) {
     foreach (explode(',', $vars['id']) as $id) {
         $id = str_replace('!', '', $id);
         $sensor = dbFetchRow('SELECT * FROM sensors WHERE sensor_id = ?', array($id));
@@ -22,7 +22,7 @@ if (is_numeric($vars['id'])) {
     }
     
     $is_all_good=true;
-    foreach($sens_auth as $check) {
+    foreach ($sens_auth as $check) {
         if (!$check) {
             $is_all_good=false;
         }
