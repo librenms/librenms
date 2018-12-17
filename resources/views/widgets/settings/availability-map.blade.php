@@ -30,8 +30,8 @@
     <div class="form-group">
         <label for="show_disabled_and_ignored-{{ $id }}" class="control-label">@lang('Disabled/ignored')</label>
         <select class="form-control" name="show_disabled_and_ignored" id="show_disabled_and_ignored-{{ $id }}">
-            <option value="1" @if($show_disabled_and_ignored) selected @endif>@lang('yes')</option>
-            <option value="0" @unless($show_disabled_and_ignored) selected @endunless>@lang('no')</option>
+            <option value="1" @if($show_disabled_and_ignored) selected @endif>@lang('Show')</option>
+            <option value="0" @unless($show_disabled_and_ignored) selected @endunless>@lang('Hide')</option>
         </select>
     </div>
 
