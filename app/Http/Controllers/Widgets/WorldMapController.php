@@ -58,7 +58,7 @@ class WorldMapController extends WidgetController
 
         $devices = Device::hasAccess($request->user())
             ->with('location')
-            ->where('disabled', 0)
+            ->isActive()
             ->whereIn('status', $status)
             ->get()
             ->filter(function ($device) use ($status) {
