@@ -2,6 +2,7 @@
 
 use App\Models\Port;
 use App\Models\PortsNac;
+use LibreNMS\Util\DiscoveryModelObserver;
 use LibreNMS\Util\IP;
 
 echo "\nCisco-NAC\n";
@@ -9,6 +10,11 @@ echo "\nCisco-NAC\n";
 // cache port ifIndex -> port_id map
 $ports_map = Port::where('device_id', $device['device_id'])->pluck('port_id', 'ifIndex');
 $port_nac_ids = [];
+
+// discovery output (but don't install it twice (testing can can do this)
+if (!PortsNac::getEventDispatcher()->hasListeners('eloquent.created: App\Models\PortsNac')) {
+    PortsNac::observe(new DiscoveryModelObserver());
+}
 
 // collect data via snmp and reorganize the session method entry a bit
 $portAuthSessionEntry = snmpwalk_cache_oid($device, 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
@@ -54,7 +60,8 @@ foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
 
 
 // delete old entries
-\LibreNMS\DB\Eloquent::DB()->table('ports_nac')->whereNotIn('ports_nac_id', $port_nac_ids)->delete();
+$count = \LibreNMS\DB\Eloquent::DB()->table('ports_nac')->whereNotIn('ports_nac_id', $port_nac_ids)->delete();
+d_echo('Deleted ' . $count, str_repeat('-', $count));
 //    \App\Models\PortsNac::whereNotIn('ports_nac_id', $port_nac_ids)->get()->each->delete(); // alternate delete to trigger model events
 
 
