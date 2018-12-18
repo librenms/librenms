@@ -1795,3 +1795,28 @@ function get_state_label($state_value, $state_text_param = null)
     $state = "<span class='label $state_label'>$state_text</span>";
     return $state;
 }
+
+/** 
+ * Get state label color
+ */
+function get_state_label_color($sensor)
+{
+        $current_label_color = "label-success";
+        if (is_null($sensor)) {
+            return "label-unknown";
+        }
+        if (!is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] > $sensor['sensor_limit_warn']) {
+            $current_label_color = "label-warning";
+        }
+        if (!is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] < $sensor['sensor_limit_low_warn']) {
+            $current_label_color = "label-warning";
+        }
+        if (!is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']) {
+            $current_label_color = "label-danger";
+        }
+        if (!is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
+            $current_label_color = "label-danger";
+        }
+
+    return $current_label_color;
+}

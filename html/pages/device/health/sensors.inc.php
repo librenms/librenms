@@ -19,24 +19,11 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
         $sensor_descr = $sensor['sensor_descr'];
     }
 
-    $current_label = "label-success";
-    if (!is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] > $sensor['sensor_limit_warn']) {
-        $current_label = "label-warning";
-    }
-    if (!is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] < $sensor['sensor_limit_low_warn']) {
-        $current_label = "label-warning";
-    }
-    if (!is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']) {
-        $current_label = "label-danger";
-    }
-    if (!is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
-        $current_label = "label-danger";
-    }
-
-    $sensor_current = "<span class='label $current_label'>".format_si($sensor['sensor_current']).$unit."</span>";
-
     if (($graph_type == 'sensor_state') && !empty($state_translation['0']['state_descr'])) {
         $sensor_current = get_state_label($sensor['state_generic_value'], $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")");
+    } else {
+        $current_label = get_state_label_color($sensor);
+        $sensor_current = "<span class='label $current_label'>".format_si($sensor['sensor_current']).$unit."</span>";
     }
 
     $sensor_limit = format_si($sensor['sensor_limit']).$unit;
