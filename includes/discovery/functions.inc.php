@@ -1039,7 +1039,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $value = ($value / $divisor) * $multiplier;
                     }
 
-                    $uindex = str_replace('{{ $index }}', $index, $data['index'] ?: $index);
+                    $uindex = str_replace('{{ $index }}', $index,  isset($data['index']) ? $data['index'] : $index);
                     discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function);
 
                     if ($sensor_type === 'state') {
