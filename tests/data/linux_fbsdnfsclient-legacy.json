@@ -1,4 +1,5 @@
 {
+"applications": {
     "discovery": {
         "applications": {
             "app_type": "fbsdnfsclient",
@@ -274,4 +275,5 @@
             }
         ]
     }
+}
 }
