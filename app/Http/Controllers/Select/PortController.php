@@ -62,6 +62,8 @@ class PortController extends SelectController
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = Port::hasAccess($request->user())
+            ->isNotDeleted()
+            ->has('device')
             ->with(['device' => function ($query) {
                 $query->select('device_id', 'hostname', 'sysName');
             }])
