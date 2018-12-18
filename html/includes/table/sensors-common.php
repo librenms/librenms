@@ -120,7 +120,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
         $sensor_current = get_state_label($sensor['state_generic_value'], (!empty($state_translation['0']['state_descr'])) ? $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")" : $sensor['sensor_current']);
     } else {
         // we have another sensor
-        $current_label = get_state_label_color($sensor);
+        $current_label = get_sensor_label_color($sensor);
         $sensor_current = "<span class='label $current_label'>".format_si($sensor['sensor_current']).$unit."</span>";
     }
 

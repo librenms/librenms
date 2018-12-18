@@ -1799,7 +1799,7 @@ function get_state_label($state_value, $state_text_param = null)
 /** 
  * Get state label color
  */
-function get_state_label_color($sensor)
+function get_sensor_label_color($sensor)
 {
         $current_label_color = "label-success";
         if (is_null($sensor)) {
