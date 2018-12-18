@@ -635,7 +635,6 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
         $("#widget_body_"+id+" .bootgrid-table").bootgrid("destroy");
         $("#widget_body_"+id+" *").off();
         var $widget_body = $("#widget_body_"+id);
-        $widget_body.empty();
         if ($widget_body.parent().data('settings') == 1 ) {
             settings = 1;
         } else {
@@ -652,6 +651,7 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
             dataType: "json",
             success: function (data) {
                 var $widget_body = $("#widget_body_"+id);
+                $widget_body.empty();
                 if (data.status === 'ok') {
                     $("#widget_title_"+id).html(data.title);
                     $widget_body.html(data.html).parent().data('settings', data.show_settings);
@@ -661,6 +661,7 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
             },
             error: function (data) {
                 var $widget_body = $("#widget_body_"+id);
+                $widget_body.empty();
                 if (data.responseJSON.error) {
                     $widget_body.html('<div class="alert alert-info">' + data.responseJSON.error + '</div>');
                 } else {
