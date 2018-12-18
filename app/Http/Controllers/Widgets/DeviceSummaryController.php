@@ -65,12 +65,12 @@ abstract class DeviceSummaryController extends WidgetController
         ];
 
         $data['ports'] = [
-            'count' => Port::hasAccess($user)->count(),
-            'up' => Port::hasAccess($user)->isUp()->count(),
-            'down' => Port::hasAccess($user)->isDown()->count(),
-            'ignored' => Port::hasAccess($user)->isIgnored()->count(),
-            'shutdown' => Port::hasAccess($user)->isShutdown()->count(),
-            'errored' => $data['summary_errors'] ? Port::hasAccess($user)->hasErrors()->count() : -1,
+            'count' => Port::hasAccess($user)->isNotDeleted()->count(),
+            'up' => Port::hasAccess($user)->isNotDeleted()->isUp()->count(),
+            'down' => Port::hasAccess($user)->isNotDeleted()->isDown()->count(),
+            'ignored' => Port::hasAccess($user)->isNotDeleted()->isIgnored()->count(),
+            'shutdown' => Port::hasAccess($user)->isNotDeleted()->isShutdown()->count(),
+            'errored' => $data['summary_errors'] ? Port::hasAccess($user)->isNotDeleted()->hasErrors()->count() : -1,
         ];
 
         if ($data['show_services']) {

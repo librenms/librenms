@@ -634,8 +634,8 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
     function widget_reload(id,data_type) {
         $("#widget_body_"+id+" .bootgrid-table").bootgrid("destroy");
         $("#widget_body_"+id+" *").off();
-        $("#widget_body_"+id).empty();
-        if( $("#widget_body_"+id).parent().data('settings') == 1 ) {
+        var $widget_body = $("#widget_body_"+id);
+        if ($widget_body.parent().data('settings') == 1 ) {
             settings = 1;
         } else {
             settings = 0;
@@ -645,24 +645,27 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
             url: 'ajax/dash/' + data_type,
             data: {
                 id: id,
-                dimensions: {x:$("#widget_body_"+id).width(), y:$("#widget_body_"+id).height()},
+                dimensions: {x:$widget_body.width(), y:$widget_body.height()},
                 settings:settings
             },
             dataType: "json",
             success: function (data) {
-                if (data.status == 'ok') {
+                var $widget_body = $("#widget_body_"+id);
+                $widget_body.empty();
+                if (data.status === 'ok') {
                     $("#widget_title_"+id).html(data.title);
-                    $("#widget_body_"+id).html(data.html);
-                }
-                else {
-                    $("#widget_body_"+id).html('<div class="alert alert-info">' + data.message + '</div>');
+                    $widget_body.html(data.html).parent().data('settings', data.show_settings);
+                } else {
+                    $widget_body.html('<div class="alert alert-info">' + data.message + '</div>');
                 }
             },
             error: function (data) {
+                var $widget_body = $("#widget_body_"+id);
+                $widget_body.empty();
                 if (data.responseJSON.error) {
-                    $("#widget_body_"+id).html('<div class="alert alert-info">' + data.responseJSON.error + '</div>');
+                    $widget_body.html('<div class="alert alert-info">' + data.responseJSON.error + '</div>');
                 } else {
-                    $("#widget_body_"+id).html('<div class="alert alert-info"><?php echo __('Problem with backend'); ?></div>');
+                    $widget_body.html('<div class="alert alert-info"><?php echo __('Problem with backend'); ?></div>');
                 }
             }
         });

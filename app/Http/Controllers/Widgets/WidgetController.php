@@ -93,12 +93,28 @@ abstract class WidgetController extends Controller
         return $this->settings;
     }
 
+    /**
+     * @param View|string $view
+     * @param string $title
+     * @param array $settings
+     * @param string $status
+     * @return \Illuminate\Http\JsonResponse
+     */
     private function formatResponse($view, $title, $settings, $status = 'ok')
     {
+        if ($view instanceof View) {
+            $html = $view->__toString();
+            $show_settings = (int)starts_with($view->getName(), 'widgets.settings.');
+        } else {
+            $html = (string)$view;
+            $show_settings = (int)$this->show_settings;
+        }
+
         return response()->json([
             'status' => $status,
             'title' => __($title),
-            'html' => is_string($view) ? $view : $view->__toString(),
+            'html' => $html,
+            'show_settings' => $show_settings,
             'settings' => $settings,
         ]);
     }
