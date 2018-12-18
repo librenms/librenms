@@ -15,7 +15,7 @@ Note: Plugins will only load if they are prefixed with "check_" and they have th
 
 Plugins come from two main places [pkg-nagios-plugins-contrib](https://github.com/bzed/pkg-nagios-plugins-contrib) and [monitoring-plugins](https://www.monitoring-plugins.org). This is where you can find the documentation for most, if not all of the plugins.
 
-The plugins are bundled with the pre build VM images via the packge `monitoring-plugins` in Ubuntu and `nagios-plugins-all` in CentOS.
+The plugins are bundled with the pre build VM images via the package `monitoring-plugins` in Ubuntu and `nagios-plugins-all` in CentOS.
 
 ## Setup
 
@@ -54,7 +54,8 @@ Note that some services (procs, inodes, load and similar) will always poll the l
 
 ## Performance data
 
-By default, the check-services script will collect all performance data that the Nagios script returns and display each datasource on a separate graph.
+By default, the check-services script will collect all performance data that the Nagios script returns and display each datasource on a separate graph. LibreNMS expects scripts to return using Nagios convention for the response message structure: [AEN200](https://nagios-plugins.org/doc/guidelines.html#AEN200)
+
 However for some modules it would be better if some of this information was consolidated on a single graph.
 An example is the ICMP check. This check returns: Round Trip Average (rta), Round Trip Min (rtmin) and Round Trip Max (rtmax).
 These have been combined onto a single graph.
