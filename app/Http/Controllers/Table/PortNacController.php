@@ -26,6 +26,8 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\PortsNac;
+use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 class PortNacController extends TableController
 {
@@ -55,7 +57,8 @@ class PortNacController extends TableController
     public function formatItem($nac)
     {
         $item = $nac->toArray();
-        $item['port_id'] = \LibreNMS\Util\Url::portLink($nac->port, $nac->port->getShortLabel());
+        $item['port_id'] = Url::portLink($nac->port, $nac->port->getShortLabel());
+        $item['mac_address'] = Rewrite::readableMac($item['mac_address']);
 
         return $item;
     }

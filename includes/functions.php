@@ -96,7 +96,7 @@ function array_sort_by_column($array, $on, $order = SORT_ASC)
 
 function mac_clean_to_readable($mac)
 {
-    return rtrim(chunk_split($mac, 2, ':'), ':');
+    return \LibreNMS\Util\Rewrite::readableMac($mac);
 }
 
 function only_alphanumeric($string)

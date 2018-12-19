@@ -56,20 +56,14 @@ foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
     $ifIndex = substr($index, 0, strpos($index, "."));
     $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
 
-    // check the mode to see how we should determine unique entries. multiAuth, multiDomain allow multiple por port
-    $unique = ['port_id' => $ports_map->get($ifIndex, 0)];
-    if ($portAuthSessionEntryParameters['cafSessionAuthHostMode'] == 'multiAuth') {
-        $unique['auth_id'] = $auth_id;
-    } elseif ($portAuthSessionEntryParameters['cafSessionAuthHostMode'] == 'multiDomain') {
-        $unique['domain'] = $portAuthSessionEntryParameters['cafSessionDomain'];
-    }
-
-    $port_nac = PortsNac::updateOrCreate($unique, [
+    $port_nac = PortsNac::updateOrCreate([
+        'port_id' => $ports_map->get($ifIndex, 0),
+        'mac_address' => strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress'])))),
+    ], [
         'auth_id' => $auth_id,
         'device_id' => $device['device_id'],
         'domain' => $portAuthSessionEntryParameters['cafSessionDomain'],
         'username' => $portAuthSessionEntryParameters['cafSessionAuthUserName'],
-        'mac_address' => strtoupper(implode(':', array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress'])))),
         'ip_address' => (string)IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'], true),
         'host_mode' => $portAuthSessionEntryParameters['cafSessionAuthHostMode'],
         'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'],
@@ -79,10 +73,6 @@ foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
         'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'],
         'method' => $session_info['method'],
     ]);
-    if (!$port_nac->port_id || $port_nac->port->ifIndex != $ifIndex) {
-        $port_nac->port()->associate(Port::where(['device_id' => $device['device_id'], 'ifIndex' => $ifIndex])->first());
-        $port_nac->save();
-    }
 
     // save valid ids
     $port_nac_ids[] = $port_nac->ports_nac_id;
