@@ -56,21 +56,27 @@ foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
     $ifIndex = substr($index, 0, strpos($index, "."));
     $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
 
-    $port_nac = PortsNac::updateOrCreate([
-        'port_id' => $ports_map->get($ifIndex, 0),
-        'domain' => $portAuthSessionEntryParameters['cafSessionDomain'],
-    ], [
-        'device_id' => $device['device_id'],
+    // check the mode to see how we should determine unique entries. multiAuth, multiDomain allow multiple por port
+    $unique = ['port_id' => $ports_map->get($ifIndex, 0)];
+    if ($portAuthSessionEntryParameters['cafSessionAuthHostMode'] == 'multiAuth') {
+        $unique['auth_id'] = $auth_id;
+    } elseif ($portAuthSessionEntryParameters['cafSessionAuthHostMode'] == 'multiDomain') {
+        $unique['domain'] = $portAuthSessionEntryParameters['cafSessionDomain'];
+    }
+
+    $port_nac = PortsNac::updateOrCreate($unique, [
         'auth_id' => $auth_id,
+        'device_id' => $device['device_id'],
+        'domain' => $portAuthSessionEntryParameters['cafSessionDomain'],
+        'username' => $portAuthSessionEntryParameters['cafSessionAuthUserName'],
         'mac_address' => strtoupper(implode(':', array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress'])))),
         'ip_address' => (string)IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'], true),
-        'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'],
         'host_mode' => $portAuthSessionEntryParameters['cafSessionAuthHostMode'],
-        'username' => $portAuthSessionEntryParameters['cafSessionAuthUserName'],
+        'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'],
         'authz_by' => $portAuthSessionEntryParameters['cafSessionAuthorizedBy'],
+        'authc_status' => $session_info['authc_status'],
         'timeout' => $portAuthSessionEntryParameters['cafSessionTimeout'],
         'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'],
-        'authc_status' => $session_info['authc_status'],
         'method' => $session_info['method'],
     ]);
     if (!$port_nac->port_id || $port_nac->port->ifIndex != $ifIndex) {
