@@ -1,10 +1,10 @@
-<div id="leaflet-map" style="width: {{ $dimensions['x'] }}px; height: {{ $dimensions['y'] }}px;"></div>
+<div id="leaflet-map-{{ $id }}" style="width: {{ $dimensions['x'] }}px; height: {{ $dimensions['y'] }}px;"></div>
 
 <script type="application/javascript">
     loadjs('js/leaflet.js', function() {
     loadjs('js/leaflet.markercluster.js', function () {
     loadjs('js/leaflet.awesome-markers.min.js', function () {
-        var map = L.map('leaflet-map', { zoomSnap: 0.1 } ).setView(['{{ $init_lat }}', '{{ $init_lng }}'], '{{ sprintf('%01.1f', $init_zoom) }}');
+        var map = L.map('leaflet-map-{{ $id }}', { zoomSnap: 0.1 } ).setView(['{{ $init_lat }}', '{{ $init_lng }}'], '{{ sprintf('%01.1f', $init_zoom) }}');
         L.tileLayer('//{{ $title_url }}/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
@@ -50,7 +50,7 @@
         map.addLayer(markers);
         map.scrollWheelZoom.disable();
         $(document).ready(function() {
-            $("#leaflet-map").on("click", function (event) {
+            $("#leaflet-map-{{ $id }}").on("click", function (event) {
                 map.scrollWheelZoom.enable();
             }).mouseleave(function (event) {
                 map.scrollWheelZoom.disable();
