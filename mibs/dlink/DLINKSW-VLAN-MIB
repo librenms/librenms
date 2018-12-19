@@ -1,0 +1,594 @@
+--  *****************************************************************
+--  DLINKSW-VLAN-MIB.mib : VLAN MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+DLINKSW-VLAN-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,        
+        Unsigned32
+            FROM SNMPv2-SMI
+        RowStatus,TruthValue,MacAddress   
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        InetAddress, InetAddressType, InetAddressPrefixLength    
+            FROM INET-ADDRESS-MIB
+        dot1dBasePort
+            FROM BRIDGE-MIB
+        VlanId,dot1vProtocolPortGroupId                         
+            FROM Q-BRIDGE-MIB  
+        Dlink2kVlanList                 
+            FROM DLINKSW-TC-MIB  
+        dlinkIndustrialCommon                     
+            FROM DLINK-ID-REC-MIB;              
+
+                                       
+    dlinkSwVlanMIB MODULE-IDENTITY
+        LAST-UPDATED "201304180000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for extending the configuration of 
+            VLAN (Virtual Local Area Network). "
+            
+        REVISION "201304180000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file."
+
+        ::= { dlinkIndustrialCommon 21 } 
+            
+-- -----------------------------------------------------------------------------
+    dVlanMIBNotifications   OBJECT IDENTIFIER ::= { dlinkSwVlanMIB 0 }
+    dVlanMIBObjects         OBJECT IDENTIFIER ::= { dlinkSwVlanMIB 1 }
+    dVlanMIBConformance     OBJECT IDENTIFIER ::= { dlinkSwVlanMIB 2 }
+
+-- -----------------------------------------------------------------------------    
+    dVlanStaticMacVlanTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DVlanStaticMacVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of MAC-based VLANs."
+        ::= { dVlanMIBObjects 1 }
+
+    dVlanStaticMacVlanEntry OBJECT-TYPE
+        SYNTAX          DVlanStaticMacVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table entry represents the configuration of a MAC-based VLAN."
+        INDEX    { dVlanStaticMacVlanAddress }
+        ::= { dVlanStaticMacVlanTable 1 }
+
+    DVlanStaticMacVlanEntry ::= SEQUENCE {
+        dVlanStaticMacVlanAddress     MacAddress,
+        dVlanStaticMacVlanId          VlanId,
+        dVlanStaticMacVlanPriority    Unsigned32,
+        dVlanStaticMacVlanRowStatus   RowStatus    
+    }
+                 
+    dVlanStaticMacVlanAddress OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the MAC address of the entry."
+        ::= { dVlanStaticMacVlanEntry 1 }
+        
+    dVlanStaticMacVlanId OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the Vlan ID for the MAC based VLAN entry."
+        ::= { dVlanStaticMacVlanEntry 2 }
+        
+    dVlanStaticMacVlanPriority OBJECT-TYPE
+        SYNTAX          Unsigned32 ( 0 .. 7 )
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the CoS for the MAC based VLAN entry."
+        DEFVAL { 0 }
+        ::= { dVlanStaticMacVlanEntry 3 }
+
+    dVlanStaticMacVlanRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dVlanStaticMacVlanEntry 4 } 
+ 
+-- -----------------------------------------------------------------------------
+dVlanCurrentMacVlanTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DVlanCurrentMacVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of MAC-based VLANs."
+        ::= { dVlanMIBObjects 2 }
+
+    dVlanCurrentMacVlanEntry OBJECT-TYPE
+        SYNTAX          DVlanCurrentMacVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table entry represents the information of a MAC-based VLAN."
+        INDEX    { 
+            dVlanCurrentMacVlanAddress,
+            dVlanCurrentMacVlanStatus
+        }
+        ::= { dVlanCurrentMacVlanTable 1 }
+
+    DVlanCurrentMacVlanEntry ::= SEQUENCE {
+        dVlanCurrentMacVlanAddress     MacAddress,
+        dVlanCurrentMacVlanStatus      INTEGER,
+        dVlanCurrentMacVlanId          VlanId,
+        dVlanCurrentMacVlanPriority    Unsigned32
+    }
+                 
+    dVlanCurrentMacVlanAddress OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the MAC address of the entry."
+        ::= { dVlanCurrentMacVlanEntry 1 }
+ 
+    dVlanCurrentMacVlanStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+            active(1),
+            inactive(2)         
+        }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of the entry."
+        ::= { dVlanCurrentMacVlanEntry 2 }
+        
+    dVlanCurrentMacVlanId OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the Vlan ID for the MAC based VLAN entry."
+        ::= { dVlanCurrentMacVlanEntry 3 }
+        
+    dVlanCurrentMacVlanPriority OBJECT-TYPE
+        SYNTAX          Unsigned32 ( 0 .. 7 )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the CoS for the MAC based VLAN entry."
+        ::= { dVlanCurrentMacVlanEntry 4 }
+-- -----------------------------------------------------------------------------    
+    dVlanSubnetVlanTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DVlanSubnetVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of subnet-based VLANs."
+        ::= { dVlanMIBObjects 3 }
+
+    dVlanSubnetVlanEntry OBJECT-TYPE
+        SYNTAX          DVlanSubnetVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table entry represents the configuration of a subnet-based VLAN."
+        INDEX   { 
+            dVlanSubnetVlanType,
+            dVlanSubnetVlanNetPrefix,
+            dVlanSubnetVlanNetPrefixLen
+        }
+        ::= { dVlanSubnetVlanTable 1 }
+
+    DVlanSubnetVlanEntry ::= SEQUENCE {
+        dVlanSubnetVlanType             InetAddressType,
+        dVlanSubnetVlanNetPrefix        InetAddress,
+        dVlanSubnetVlanNetPrefixLen     InetAddressPrefixLength,            
+        dVlanSubnetVlanId               VlanId,
+        dVlanSubnetVlanPriority         Unsigned32,     
+        dVlanSubnetVlanRowStatus        RowStatus     
+    }
+    
+    dVlanSubnetVlanType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the address type of the subnet."
+        ::= { dVlanSubnetVlanEntry 1 }
+         
+    dVlanSubnetVlanNetPrefix OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the network prefix of the entry."
+        ::= { dVlanSubnetVlanEntry 2 }
+
+    dVlanSubnetVlanNetPrefixLen OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the length of the sub-network
+            address prefix."
+        ::= { dVlanSubnetVlanEntry 3 }
+            
+    dVlanSubnetVlanId OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the VLAN-ID of the subnet-based VLAN."
+        ::= { dVlanSubnetVlanEntry 4 }
+     
+     dVlanSubnetVlanPriority OBJECT-TYPE
+        SYNTAX          Unsigned32 ( 0..7 )
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the CoS of the subnet-based VLAN."
+        ::= { dVlanSubnetVlanEntry 5 }
+              
+     dVlanSubnetVlanRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dVlanSubnetVlanEntry 6 }  
+
+-- -----------------------------------------------------------------------------
+    dVlanPortIfCtrlTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DVlanPortIfCtrlEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table provides mechanism to configure port-specific VLAN
+            function."
+        ::= { dVlanMIBObjects 4 }
+     
+    dVlanPortIfCtrlEntry OBJECT-TYPE
+        SYNTAX          DVlanPortIfCtrlEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table entry represents the VLAN configuration on a port.
+            This table is an extension to dot1qPortVlanTable which is defined at 
+            Q-BRIDGE-MIB."            
+        INDEX { 
+            dot1dBasePort 
+        }
+        ::= { dVlanPortIfCtrlTable 1 }
+                     
+    DVlanPortIfCtrlEntry ::= SEQUENCE {                                    
+        dVlanPortIfMode                         INTEGER,
+        dVlanPortIfTrunkNativeVlanTagged        TruthValue,
+        dVlanPortIfAcceptableFrameTypes         INTEGER,
+        dVlanPortIfVlanPrecedence               INTEGER,
+        dVlanPortIfTagAllowVlanLstFirst2K       Dlink2kVlanList,
+        dVlanPortIfTagAllowVlanLstSecond2K      Dlink2kVlanList,
+        dVlanPortIfUntagAllowVlanLstFirst2K     Dlink2kVlanList,
+        dVlanPortIfUntagAllowVlanLstSecond2K    Dlink2kVlanList
+    }
+              
+    dVlanPortIfMode OBJECT-TYPE
+        SYNTAX          INTEGER {
+            access(1),
+            hybrid(2),
+            trunk(3),
+            dot1qTunnel(4),
+            privateVlanHost(5),
+            privateVlanPromiscuous(6)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates VLAN mode for the port. 
+            access - this port will be untagged member of the access VLAN
+                     configured for the port.
+            hybrid - the port can be untagged or tagged member of all VLANs
+                     configured by the user. The purpose of this VLAN mode is
+                     to support protocol VLAN, MAC-based VLAN, voice VLAN and
+                     dot1q VLAN tunnel application in access side.
+            trunk -  this port is either tagged or untagged member port of its
+                     native VLAN and can be tagged member of other VLANs
+                     configured by the user. The purpose of a trunk port is to
+                     support the switch-to-switch connection. 
+            dot1qTunnel - the port behaves as an UNI port of a service VLAN.
+            privateVlanHost - the port behaves as private VLAN host port.
+            privateVlanPromiscuous - the port behaves as private VLAN promiscuous
+                     port.
+
+            When VLAN mode is changed, the VLAN related setting associated
+            with previous mode will be lost."
+        ::= { dVlanPortIfCtrlEntry 1 } 
+       
+    dVlanPortIfTrunkNativeVlanTagged OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current  
+        DESCRIPTION
+            "This object indicates whether enable the tagging mode of the native
+            VLAN on the interface.
+            
+            Note: This value is meaningful only when the VLAN mode of the port
+                  is 'trunk'."
+        ::= { dVlanPortIfCtrlEntry 2 }
+      
+    dVlanPortIfAcceptableFrameTypes OBJECT-TYPE
+        SYNTAX          INTEGER {
+            admitAll(1),
+            admitUntaggedAndPriority(2),
+            admitTagged(3)            
+        }
+        MAX-ACCESS      read-write
+        STATUS          current  
+        DESCRIPTION
+            "This object indicates the acceptable frame types on the interface.     
+            
+            'admitAll' - Permits both tagged and untagged packet.
+            'admitUntaggedAndPriority' - Only untagged or Priority-Tagged packets 
+                        received on this interface will be accepted and tagged packets are 
+                        dropped. 
+            'admitTagged' - Only tagged incoming packets are permitted and untagged packets
+                        are dropped."
+        ::= { dVlanPortIfCtrlEntry 3 }  
+
+    dVlanPortIfVlanPrecedence OBJECT-TYPE
+        SYNTAX          INTEGER {
+            macVlan(1),
+            subnetVlan(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the VLAN classification precedence for the port.
+            
+            macVlan - MAC-based VLAN classification has higher precedence than 
+                      subnet-based VLAN.                              
+                      
+            subnetVlan - subnet-based VLAN classification has higher precedence
+                      than MAC-based VLAN.
+                      
+            Note: This value is meaningful only when the VLAN mode of the port
+                  is 'hybrid' or 'dot1qTunnel'."
+        ::= { dVlanPortIfCtrlEntry 4 } 
+
+    dVlanPortIfTagAllowVlanLstFirst2K  OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the VLANs in a string of octets containing
+            one bit per VLAN for VLANs 1 to 2048.
+             
+            If the bit is set to '1', then the interface is allowed to be the
+            VLAN's tagged member.
+            
+            Note: This value is meaningful only when the VLAN mode of the port
+                  is 'hybrid' or 'trunk'."         
+        ::= { dVlanPortIfCtrlEntry 5 }
+    
+    dVlanPortIfTagAllowVlanLstSecond2K OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the VLANs in a string of octets containing
+            one bit per VLAN for VLANs 2049 to 4094.
+            
+            If the bit is set to '1', then the interface is allowed to be the
+            VLAN's tagged member.
+            
+            Note: This value is meaningful only when the VLAN mode of the port
+                  is 'hybrid' or 'trunk'."     
+        ::= { dVlanPortIfCtrlEntry 6 }         
+        
+    dVlanPortIfUntagAllowVlanLstFirst2K  OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the VLANs in a string of octets containing
+            one bit per VLAN for VLANs 1 to 2048. 
+                                   
+            If the bit is set to '1', then the interface is allowed to be the
+            VLAN's untagged member.  
+            
+            Note: This value is meaningful only when the VLAN mode of the port
+                  is 'hybrid' or 'trunk'."         
+        ::= { dVlanPortIfCtrlEntry 7 }
+    
+    dVlanPortIfUntagAllowVlanLstSecond2K OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the VLANs in a string of octets containing
+            one bit per VLAN for VLANs 2049 to 4094.                       
+             
+            If the bit is set to '1', then the interface is allowed to be the
+            VLAN's untagged member.                         
+            
+            Note: This value is meaningful only when the VLAN mode of the port
+                  is 'hybrid' or 'trunk'."      
+        ::= { dVlanPortIfCtrlEntry 8 } 
+        
+-- -----------------------------------------------------------------------------
+    dVlanProtocolVlanIfCtrlTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DVlanProtocolVlanIfCtrlEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table provides mechanism to configure port-specific protocol 
+            VLAN function.
+            This table is an extension to dot1vProtocolPortTable which is defined 
+            at Q-BRIDGE-MIB.
+            An entry appears in this table for each row created at 
+            dot1vProtocolPortTable.
+            "
+        ::= { dVlanMIBObjects 5 }
+     
+    dVlanProtocolVlanIfCtrlEntry OBJECT-TYPE
+        SYNTAX          DVlanProtocolVlanIfCtrlEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table entry represents the extension configuration of protocol
+            VLAN profile on a port.
+            "
+        INDEX   { 
+            dot1dBasePort,
+            dot1vProtocolPortGroupId 
+        }
+        ::= { dVlanProtocolVlanIfCtrlTable 1 }
+                     
+    DVlanProtocolVlanIfCtrlEntry ::= SEQUENCE {       
+        dVlanProtocolVlanPriority           Unsigned32                
+    }
+              
+    dVlanProtocolVlanPriority OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..7)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the CoS of the protocol VLAN entry on the 
+            interface."
+        ::= { dVlanProtocolVlanIfCtrlEntry 1}   
+             
+-- -----------------------------------------------------------------------------
+ dVlanAsymVlanStateEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables or disables asymmetric VLAN feature."
+        ::= { dVlanMIBObjects 6 }
+
+--  *************************************************************************** 
+--  Conformance
+--  ***************************************************************************                 
+    dVlanCompliances OBJECT IDENTIFIER ::= { dVlanMIBConformance 1 }
+        
+    dVlanCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for entities which implement the 
+            DLINKSW-VLAN-MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS { 
+            dVlanIfCfgGroup
+        }
+        GROUP           dVlanStaticMacVlanCfgGroup
+        DESCRIPTION
+            "Implementation of this group is optional."
+        
+        GROUP           dVlanCurrentMacVlanCfgGroup
+        DESCRIPTION
+            "Implementation of this group is optional."
+
+        GROUP           dVlanSubnetVlanCfgGroup
+        DESCRIPTION
+            "Implementation of this group is optional."   
+            
+        GROUP           dVlanProtocolVlanCfgGroup
+        DESCRIPTION
+            "Implementation of this group is optional."    
+                   
+        GROUP           dVlanAsymmetricVlanCfgGroup
+        DESCRIPTION
+            "Implementation of this group is optional."  
+        ::= { dVlanCompliances 1 }
+        
+    dVlanGroups OBJECT IDENTIFIER ::= { dVlanMIBConformance 2 }
+        
+    dVlanIfCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            dVlanPortIfMode,
+            dVlanPortIfTrunkNativeVlanTagged,
+            dVlanPortIfVlanPrecedence,
+            dVlanPortIfAcceptableFrameTypes,
+            dVlanPortIfTagAllowVlanLstFirst2K,
+            dVlanPortIfTagAllowVlanLstSecond2K,
+            dVlanPortIfUntagAllowVlanLstFirst2K,
+            dVlanPortIfUntagAllowVlanLstSecond2K
+        }           
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing the information 
+            and control for configuring port-specific VLAN feature."
+        ::= { dVlanGroups 1 }
+        
+    dVlanStaticMacVlanCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            dVlanStaticMacVlanId,
+            dVlanStaticMacVlanPriority,
+            dVlanStaticMacVlanRowStatus            
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects provides the configuration
+            of MAC-based VLANs."
+            ::= { dVlanGroups 2 } 
+    
+    dVlanCurrentMacVlanCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            dVlanCurrentMacVlanId,
+            dVlanCurrentMacVlanPriority         
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects provides the running MAC-based 
+            VLANs."
+            ::= { dVlanGroups 3 }
+        
+    dVlanSubnetVlanCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            dVlanSubnetVlanId,
+            dVlanSubnetVlanPriority,
+            dVlanSubnetVlanRowStatus    
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects provides the configuration
+            of subnet-based VLANs."
+            ::= { dVlanGroups 4 }    
+            
+    dVlanProtocolVlanCfgGroup OBJECT-GROUP
+        OBJECTS {            
+            dVlanProtocolVlanPriority            
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects provides the configuration
+            of protocol VLAN entrys on interfaces."
+            ::= { dVlanGroups 5 }
+     
+    dVlanAsymmetricVlanCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            dVlanAsymVlanStateEnabled
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects provides the management of
+            asymmetric VLAN feature."
+            ::= { dVlanGroups 6 }
+END
+

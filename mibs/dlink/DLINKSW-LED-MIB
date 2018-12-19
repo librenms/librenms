@@ -1,0 +1,260 @@
+-- *****************************************************************
+-- DLINKSW-LED-MIB.mib : LED Mib
+--
+-- Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+DLINKSW-LED-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+        OBJECT-GROUP, MODULE-COMPLIANCE			
+            FROM SNMPv2-CONF
+        MODULE-IDENTITY, OBJECT-TYPE
+            FROM SNMPv2-SMI
+        dlinkIndustrialCommon
+	          FROM DLINK-ID-REC-MIB;
+
+    dlinkSwLedMIB MODULE-IDENTITY
+        LAST-UPDATED "201309130000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+                "        D-Link Corporation
+                 Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                         Taipei City 114, Taiwan, R.O.C
+                 Tel:     +886-2-66000123
+                 E-mail: tsd@dlink.com.tw
+                "
+        DESCRIPTION
+                "A MIB module for LED status.
+                "
+        REVISION "201309130000Z"
+        DESCRIPTION
+                 "Add 'LED off' state for stackingID(12) LED."
+                               
+        REVISION "201309060000Z"
+        DESCRIPTION
+                 "Initial version of this MIB module."
+        ::= { dlinkIndustrialCommon 163 }
+
+-- -----------------------------------------------------------------------------
+    dLedMIBNotifications OBJECT IDENTIFIER ::= { dlinkSwLedMIB 0 }		
+    dLedMIBObjects       OBJECT IDENTIFIER ::= { dlinkSwLedMIB 1 }
+    dLedMIBConformance   OBJECT IDENTIFIER ::= { dlinkSwLedMIB 2 }
+
+--------------------------------------------------------------------------------
+
+    dLedInfoTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DLedInfoEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of information of LEDs."
+        ::= { dLedMIBObjects 1 }
+ 
+    dLedInfoEntry OBJECT-TYPE
+        SYNTAX          DLedInfoEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains information of one box."
+        INDEX {dLedBoxId}
+        ::= { dLedInfoTable 1 }
+       
+    DLedInfoEntry ::=
+        SEQUENCE {
+		    dLedBoxId
+				INTEGER,
+		    dLedSysLedStatus					
+				OCTET STRING,
+		    dLedIfLedStatus					
+				OCTET STRING
+		 }
+
+    dLedBoxId OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+           "This variable uniquely identifies the box in the stack, module in a
+            rack and the value 1 MUST be used for non-modular devices."
+        ::= { dLedInfoEntry 1 }
+       
+    dLedSysLedStatus OBJECT-TYPE
+        SYNTAX  OCTET STRING 
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+		"This object is a set of system LED indicators. 
+		 Every type LED's format is as follow: 
+         +-------------------------------------+
+         | LED  |  LED   |  Data  |...|  Data  |
+         | Type | Length |        |   |        |
+         +-------------------------------------+
+         1octet   1octet   3octet
+		
+		LED Type(1 octet): 
+	  		 rps(1) - indicates RPS LED,
+	  		 console(2) - indicates console LED,
+	  		 master(3) - indicates device role LED,
+	  		 sdCard(4) - indicates SD card LED,
+	  		 linkMode(5) - indicates link mode LED,
+	  		 poeMode(6) - indicates PoE mode LED,
+	  		 alarm(7) - indicates alarm LED,
+	  		 sysPower(8) - indicates system power LED,
+	  		 mgmtPort(9) - indicates management port LED,
+	   		 fan(10) - indicates device's fan LED,
+	   		 sioPort(11) - indicates SIO port LED,
+	   		 stackingID(12) - indicates stacking ID LED
+
+		LED Length(1 octet): indicates Data's length of a specified LED type in number of octets.
+
+		Data(3 octets): indicates LED status of specified LED type. Three consecutive octets are used
+				            to represent the information of one LED. If given LED type has more than one LEDs,
+				            there are multiple such triads in the data field.
+				
+     		If LED Type is stackingID(12), below predefined values represent stacking ID LED's
+				status, with the most significant byte in the first octet.
+       				index         box id LED display
+        			 0x0     --     '0'
+        			 0x1     --     '1'
+        			 0x2     --     '2'
+        			 0x3     --     '3'
+        			 0x4     --     '4'
+        			 0x5     --     '5'
+        			 0x6     --     '6'
+        			 0x7     --     '7'
+        			 0x8     --     '8'
+        			 0x9     --     '9'
+        			 0xA     --     '10'
+        			 0xB     --     '11'
+        			 0xC     --     '12'
+        			 0xD     --     '13'
+        			 0xE     --     '14'
+					 0xF     --     '15'
+        			 0x10    --     '16'
+        			 0x11    --     '17'
+        			 0x12    --     '18'
+        			 0x13    --     '19'
+        			 0x100   --     'H'
+        			 0x101   --     'h'
+        			 0x102   --     'E'
+        			 0x103   --     'G'    
+        			 
+               0xfff   --     LED off state
+               
+				Else these 3 octets shows LED's status value,format is as below:
+					+-------------------------+
+					| LED Instance  |  LED    |
+					| Index         |  Status |
+					+-------------------------+				
+				  1 octet           2 octet
+				
+				LED instance index(high octet) indicates the instance ID of specified LED type.
+				For example, if the LED type is fan(10), it is the fan ID.
+				
+				LED status(low 2 octets) is the status of one LED. Its data format is as below: 
+					+-----------------------+
+					| Color  | LED Lighting |
+					| Bits   | Mode         |
+					+-----------------------+
+				  15      4 3             0
+				      
+				Bit0 to bit3 indicates the mode of LED lighting.
+      				0x0 means this LED is not supported.
+            		0x1 means LED is off.
+           			0x2 means LED is fixed lighting. 
+	   			    0x3 indicates LED is blinking.
+	    			0x4 indicates LED is alternating lighting between more than one color. 
+				        Colors are determined by color bits.
+					0x5-0xF are reserved.
+
+				Bit4 to bit15 are color bits, they indicate the LED's specific color. If a 
+				color bit is set, it stands for corresponding color. Only when LED lighting mode 
+				is alternating lighting(low nibble is 0x4), multi-bit can be set.
+           			bit4 - green bit
+          			bit5 - amber bit
+            		bit6 - red bit
+					      bit7-bit15 are reserved.
+
+				If a LED instance consists of more LEDs, for example, if power source has separate input, state
+ 				LEDs, there will be two LED data and their instance index is the same power ID. One LED data for the input LED,
+ 				another for the state LED. The meaning of each LED data is device based.
+		      +---------------------------------------------------------------------------------------------+
+		      | sysPower(8) | 12 | power1 | LED    | power1 | LED    | power2 | LED    | power2 | LED    |...
+		      |             |    |        | Status |        | Status |        | Status |        | Status |      
+		      +---------------------------------------------------------------------------------------------+
+				"
+
+        ::= { dLedInfoEntry 2 }
+
+    dLedIfLedStatus OBJECT-TYPE
+        SYNTAX  OCTET STRING 
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+		"This object is a set of ethernet port LED indicators. Format is as follow: 
+		     +--------------------------------------------+
+		     | Total Port | Port1       |....| PortN      |
+		     | Number     | LED Status  |    | LED Status |
+		     +--------------------------------------------+
+         1octets        2octets
+
+         Total Port Number(1 octet): indicates the number of following port LED status.
+
+		     Port LED Status(2 octets): indicates one ethernet port LED's status, format is as below:
+         +-----------------------+
+         | Color  | LED lighting |
+         | bits   | mode         |
+         +-----------------------+					
+         15      4 3             0
+				      
+			Bit0 to bit3 indicates the mode of LED lighting.
+      			 0x0 means this LED is not supported.
+            	 0x1 means LED is off.
+           		 0x2 means LED is fixed lighting. 
+	   	         0x3 indicates LED is blinking.
+	    	     0x4 indicates LED is alternating lighting between more than one color. 
+			         Colors are determined by color bits.
+            	 0x5-0xF are reserved.
+
+      Bit4 to bit15 are color bits,they indicate the LED's specific color. If a 
+      color bit is set, it stands for corresponding color. Only when LED lighting mode 
+      is alternating lighting(low nibble is 0x4), multi-bit can be set.
+               bit4 - green bit
+               bit5 - amber bit
+               bit6 - red bit
+           	   bit7-bit15 are reserved.
+
+      Each LED Status corresponds to one port, all ethernet port LEDs' status are arranged 
+      from lowest number port to high.
+      "
+        ::= { dLedInfoEntry 3 }
+
+-- *****************************************************************************
+-- MIB Conformance statements
+-- *****************************************************************************
+    dLedMIBCompliances  OBJECT IDENTIFIER  ::= { dLedMIBConformance 1 }
+
+    dLedMIBGroups  OBJECT IDENTIFIER  ::= { dLedMIBConformance 2 }   
+    dLedMIBCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement the
+             DLINKSW-LED-MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS { 
+            dLedInfoGroup
+        } 
+        ::= { dLedMIBCompliances 1 }    
+
+    dLedInfoGroup OBJECT-GROUP
+        OBJECTS {
+             dLedSysLedStatus,
+             dLedIfLedStatus
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects to display the LED status."
+        ::= { dLedMIBGroups 1 }   
+        
+END

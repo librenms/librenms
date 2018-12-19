@@ -1,0 +1,41 @@
+-- *****************************************************************************
+-- proprietary management MIB
+-- *****************************************************************************
+
+
+
+SWDGS1510PRIMGMT-MIB    DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY             FROM SNMPv2-SMI
+        dlink-mgmt,dlink-products   FROM DLINK-ID-REC-MIB;
+
+    
+    
+    -- 
+--   DGS1510 series Product 
+-- 
+
+    dlink-Dgs1510Prod			OBJECT IDENTIFIER ::= { dlink-products 137 }
+    dlink-Dgs1510Prod-Dgs1510-20			OBJECT IDENTIFIER ::= { dlink-Dgs1510Prod 1 }
+    dlink-Dgs1510Prod-Dgs1510-28			OBJECT IDENTIFIER ::= { dlink-Dgs1510Prod 2 }
+    dlink-Dgs1510Prod-Dgs1510-28P			OBJECT IDENTIFIER ::= { dlink-Dgs1510Prod 3 }
+    dlink-Dgs1510Prod-Dgs1510-52			OBJECT IDENTIFIER ::= { dlink-Dgs1510Prod 4 }
+    dlink-Dgs1510Prod-Dgs1510-28X			OBJECT IDENTIFIER ::= { dlink-Dgs1510Prod 6 }
+    dlink-Dgs1510Prod-Dgs1510-52X			OBJECT IDENTIFIER ::= { dlink-Dgs1510Prod 8 }    
+    dlink-Dgs1510Prod-Dgs1510-28XMP			OBJECT IDENTIFIER ::= { dlink-Dgs1510Prod 9 }
+	dlink-Dgs1510Prod-Dgs1510-52XMP			OBJECT IDENTIFIER ::= { dlink-Dgs1510Prod 10 }
+
+    dlink-Dgs1510Proj			OBJECT IDENTIFIER ::= { dlink-mgmt 118 }
+    dlink-Dgs1510ProjModel			OBJECT IDENTIFIER ::= { dlink-Dgs1510Proj 1 }
+    dlink-Dgs1510Proj-Dgs1510-20			OBJECT IDENTIFIER ::= { dlink-Dgs1510ProjModel 1 }
+    dlink-Dgs1510Proj-Dgs1510-28			OBJECT IDENTIFIER ::= { dlink-Dgs1510ProjModel 2 }
+    dlink-Dgs1510Proj-Dgs1510-28P			OBJECT IDENTIFIER ::= { dlink-Dgs1510ProjModel 3 }
+    dlink-Dgs1510Proj-Dgs1510-52			OBJECT IDENTIFIER ::= { dlink-Dgs1510ProjModel 4 }
+    dlink-Dgs1510Proj-Dgs1510-28X			OBJECT IDENTIFIER ::= { dlink-Dgs1510ProjModel 6 }
+    dlink-Dgs1510Proj-Dgs1510-52X			OBJECT IDENTIFIER ::= { dlink-Dgs1510ProjModel 8 }
+    dlink-Dgs1510Proj-Dgs1510-28XMP			OBJECT IDENTIFIER ::= { dlink-Dgs1510ProjModel 9 }	
+    dlink-Dgs1510Proj-Dgs1510-52XMP			OBJECT IDENTIFIER ::= { dlink-Dgs1510ProjModel 10 }
+
+
+END

@@ -1,0 +1,912 @@
+--  *****************************************************************
+--  DLINKSW-DHCP-RELAY-MIB.mib : DHCP Relay MIB
+-- 
+--  Copyright (c) 2012 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+DLINKSW-DHCP-RELAY-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        IpAddress
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+            FROM SNMPv2-CONF
+        DisplayString,
+        TruthValue,
+        RowStatus        
+            FROM SNMPv2-TC
+        InterfaceIndex
+            FROM IF-MIB
+        dlinkIndustrialCommon                     
+            FROM DLINK-ID-REC-MIB
+        Dlink2kVlanList                 
+            FROM DLINKSW-TC-MIB;
+
+
+    dlinkSwDhcpRelayMIB MODULE-IDENTITY
+        LAST-UPDATED "201309260000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for BOOTP/DHCP relay."
+            
+        REVISION "201307190000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file for 'BOOTP/DHCP Relay'
+             functionality."    
+
+        REVISION "201309090000Z"
+        DESCRIPTION
+            "1.Update dDhcpROption82RemoteIdUserDef and dDhcpROption82CircuitIdUserDef value length(Note:follow UIS).
+            2.Remove dDhcpRIfIgnoreBootpRowStatus and add dDhcpRIfIgnoreBootpEnabled(Note:follow IP interface).
+            3.Remove dDhcpRIfAgentInfoChkRowStatus and modify dDhcpRIfAgentInfoChkState SYNTAX(Note:follow IP interface).
+            4.Remove dDhcpRIfAgentInfoInsertRowStatus and modify dDhcpRIfAgentInfoInsertState SYNTAX(Note:follow IP interface).
+            5.Remove dDhcpRIfAgentInfoPolicyRowStatus(Note:follow IP interface).
+            6.Remove dDhcpRIfAgentInfoTrustRowStatus and add dDhcpRIfAgentInfoTrustEnabled(Note:follow IP interface)."
+
+        REVISION "201309260000Z"
+        DESCRIPTION
+            "1.Modify dDhcpROption82RemoteIdUserDef and dDhcpROption82CircuitIdUserDef value length for IWL test.
+             2.Update dDhcpRVlanLocalRelayCrlSecond2K description "
+
+        ::= { dlinkIndustrialCommon 23 }
+
+-- -----------------------------------------------------------------------------
+    dDhcpRelayMIBNotifications    OBJECT IDENTIFIER ::= { dlinkSwDhcpRelayMIB 0 }
+    dDhcpRelayMIBObjects          OBJECT IDENTIFIER ::= { dlinkSwDhcpRelayMIB 1 }
+    dDhcpRelayMIBConformance      OBJECT IDENTIFIER ::= { dlinkSwDhcpRelayMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dDhcpRelayGeneral          OBJECT IDENTIFIER ::= { dDhcpRelayMIBObjects 1 }
+       
+    dDhcpRelayAgentInfoCheckEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the DHCP relay agent validates the
+             relay agent information option in the received DHCP reply packet."
+        DEFVAL          { false }     
+        ::= { dDhcpRelayGeneral 1 }
+
+    dDhcpRelayAgentInfoInsertEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the DHCP relay agent inserts relay
+            agent information option (option 82)."            
+        DEFVAL          { false } 
+        ::= { dDhcpRelayGeneral 2 }
+
+    dDhcpRelayAgentInfoPolicy OBJECT-TYPE
+        SYNTAX          INTEGER {  drop(1), keep(2), replace(3)}
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the re-forwarding policy of DHCP relay agent
+             information option 82.              
+             drop (1)    - discards the packet that already has the relay 
+                           option.  
+             keep (2)    - the DHCP requests packet that already has the relay 
+                           option is left unchanged and directly relayed to the 
+                           DHCP server.
+             replace (3) - the DHCP requests packet that already has the relay
+                           option will be replaced by a new option."
+        DEFVAL          { keep }
+        ::= { dDhcpRelayGeneral 3 }
+        
+    dDhcpRelayInfoTrustAll OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the DHCP relay agent trusts the DHCP
+            relay information for all interfaces."             
+        DEFVAL          { false } 
+        ::= { dDhcpRelayGeneral 4 }
+     
+    dDhcpRelaySmartRelay OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of smart relay function.
+            By default, the relay agent sets the gateway address field of the
+            packet to the primary address of the interface. When the received
+            interface of the packet has secondary addresses and smart relay is
+            enabled, relay agent will count the number that a client retries
+            sending of the DISCOVER message. The relay agent will switch the
+            gateway address to secondary address of the received interface
+            after three retries. "             
+        DEFVAL          { false } 
+        ::= { dDhcpRelayGeneral 5 }   
+    
+    dDhcpROption82RemoteIdType OBJECT-TYPE
+        SYNTAX  INTEGER {
+            default(1),
+            userDefined(2),
+            vendor2(4),
+            vendor3(5)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of remote ID sub-option. 
+            default(1)     - MAC address of VLAN 1.
+            userDefined(2) - The value of dDhcpROption82RemoteID is used.
+            vendor2(4)     - System Name. 
+            vendor3(5)     - The value of dDhcpRPortIfOp82RemIdVendor3Cfg  
+                             of the corresponding entry is used."
+        ::= { dDhcpRelayGeneral 6 }
+
+	dDhcpROption82RemoteIdUserDef OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE  (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the global user defined string as the remote
+            ID of the device.
+            This object can be modified when dDhcpROption82RemoteIdType is set
+            to 'userDefined'.
+            When read, a zero length string is returned when dDhcpROption82RemoteIdType
+            is not 'userDefined'."   
+        ::= { dDhcpRelayGeneral 7 }   
+        
+	dDhcpROption82CircuitIdType OBJECT-TYPE
+        SYNTAX  INTEGER {
+            default(1),
+            userDefined(2),
+            vendor1(3),
+            vendor2(4),
+            vendor3(5),
+            vendor4(6),
+            vendor5(7),
+            vendor6(8)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the type of circuit ID sub-option.
+            default(1)     - VLAN ID, Module ID and Port Number.
+            userDefined(2) - The value of dDhcpROption82CircuitID is used.
+            vendor1(3)     - VLAN ID, Slot ID, Port Number and MAC address of VLAN 1.
+            vendor2(4)     - Port Number. 
+            vendor3(5)     - The value of dDhcpRPortIfOp82CirIdVendor3Cfg
+                             of the corresponding entry is used.
+            vendor4(6)     - System Name, Module ID, Port Number and Client's VLAN ID.
+            vendor5(7)     - System Name, 'eth', Chassis ID, Slot ID, Port
+                             Number and Client's VLAN ID.         
+            vendor6(8)     - 'Ethernet', Chassis ID, Slot ID, Port
+                             Number, Client's VLAN ID and System Name.  
+            "
+        ::= { dDhcpRelayGeneral 8 }
+
+	dDhcpROption82CircuitIdUserDef OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE  (0..32))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the global user defined string as the circuit ID.
+            This object can be modified when dDhcpROption82CircuitIdType is set
+            to 'userDefined'. 
+            When read, a zero length string is returned when dDhcpROption82CircuitIdType
+            is not 'userDefined'."                     
+        ::= { dDhcpRelayGeneral 9 }   
+                    
+-- -----------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
+    dDhcpRPoolObjects          OBJECT IDENTIFIER ::= { dDhcpRelayMIBObjects 2 }
+    
+    dDhcpRPoolClassRelayTargetTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DDhcpRPoolClassRelayTargetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table that contains relay target class configuration for DHCP pools."
+        ::= { dDhcpRPoolObjects 1 }
+
+    dDhcpRPoolClassRelayTargetEntry OBJECT-TYPE
+        SYNTAX      DDhcpRPoolClassRelayTargetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "By using DHCP class, DHCP relay uses option configuration to further 
+            determine which DHCP relay target for relaying the packet that
+            matches the value pattern of option defined in the class."
+        INDEX { 
+            dDhcpRPoClRelayTargetPoolName, 
+            dDhcpRPoClRelayTargetClassName,
+            dDhcpRPoClRelayTargetVrfName,
+            dDhcpRPoClRelayTargetAddr }
+       ::= { dDhcpRPoolClassRelayTargetTable 1 }
+
+    DDhcpRPoolClassRelayTargetEntry ::=     SEQUENCE {
+        dDhcpRPoClRelayTargetPoolName       DisplayString,   
+        dDhcpRPoClRelayTargetClassName      DisplayString,
+        dDhcpRPoClRelayTargetVrfName        DisplayString,
+        dDhcpRPoClRelayTargetAddr           IpAddress,       
+        dDhcpRPoClRelayTargetRowStatus      RowStatus
+    }
+       
+    dDhcpRPoClRelayTargetPoolName OBJECT-TYPE
+        SYNTAX          DisplayString	(SIZE  (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object specifies a DHCP pool.
+            The value must be same as an entry in dDhcpSPoolTable identified by
+            dDhcpSPoolName."
+        REFERENCE
+            "dDhcpSPoolName is defined in DLINKSW-DHCP-SERVER-MIB." 
+        ::= { dDhcpRPoolClassRelayTargetEntry 1 }
+    
+    dDhcpRPoClRelayTargetClassName OBJECT-TYPE
+        SYNTAX          DisplayString	(SIZE  (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS  current        
+        DESCRIPTION
+            "This object specifies a DHCP class.
+            The value must be same as an entry in dDhcpSClassTable identified by
+            dDhcpSClassName."
+        REFERENCE
+            "dDhcpSClassName is defined in DLINKSW-DHCP-SERVER-MIB."     
+        ::= { dDhcpRPoolClassRelayTargetEntry 2 }
+  
+    dDhcpRPoClRelayTargetVrfName OBJECT-TYPE
+        SYNTAX          DisplayString	(SIZE(0..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of virtual routing and forwarding (VRF).  
+            If this object is a zero length string, the relay target is in
+            global routing and forwarding space."
+        ::= { dDhcpRPoolClassRelayTargetEntry 3 }
+        
+    dDhcpRPoClRelayTargetAddr OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP address of the target server for 
+            the class."
+        ::= { dDhcpRPoolClassRelayTargetEntry 4 }
+
+    dDhcpRPoClRelayTargetRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object manages this entry."
+    ::= { dDhcpRPoolClassRelayTargetEntry 99 }
+
+-- -----------------------------------------------------------------------------      
+    dDhcpRPoolRelayDestTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DDhcpRPoolRelayDestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table that contains DHCP relay destination IP address of DHCP
+            pools."
+        ::= { dDhcpRPoolObjects 2 }
+
+    dDhcpRPoolRelayDestEntry OBJECT-TYPE
+        SYNTAX      DDhcpRPoolRelayDestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "By using DHCP class, DHCP relay uses option configuration to further 
+            determine which IP addresses to allocate to clients."
+        INDEX { 
+            dDhcpRPoolRelayDestPoolName,     
+            dDhcpRPoolRelayDestVrfName,        
+            dDhcpRPoolRelayDestAddr }
+       ::= { dDhcpRPoolRelayDestTable 1 }
+
+    DDhcpRPoolRelayDestEntry ::=     SEQUENCE {
+        dDhcpRPoolRelayDestPoolName     DisplayString,   
+        dDhcpRPoolRelayDestVrfName      DisplayString,
+        dDhcpRPoolRelayDestAddr         IpAddress,       
+        dDhcpRPoolRelayDestRowStatus    RowStatus
+    }
+    
+    dDhcpRPoolRelayDestPoolName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE  (1..32))	
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This object specifies a DHCP pool.
+            The value must be same as an entry in dDhcpSPoolTable identified by
+            dDhcpSPoolName."
+        REFERENCE
+            "dDhcpSPoolName is defined in DLINKSW-DHCP-SERVER-MIB." 
+        ::= { dDhcpRPoolRelayDestEntry 1 }
+    
+    dDhcpRPoolRelayDestVrfName OBJECT-TYPE
+        SYNTAX          DisplayString	(SIZE(0..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of virtual routing and forwarding(VRF).  
+            If this object is a zero length string, the destination DHCP server
+            IP address is in global routing and forwarding space."
+        ::= { dDhcpRPoolRelayDestEntry 2 }
+             
+    dDhcpRPoolRelayDestAddr OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP address of the relay destination for 
+            the pool."
+        ::= { dDhcpRPoolRelayDestEntry 3 }
+
+    dDhcpRPoolRelayDestRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object manages this entry."
+    ::= { dDhcpRPoolRelayDestEntry 99 }            
+    
+-- -----------------------------------------------------------------------------
+    dDhcpRPoolRelaySourceTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpRPoolRelaySourceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table that contains the configuration of the source subnet that
+            the client packets come from."
+        ::= { dDhcpRPoolObjects 3 }
+
+    dDhcpRPoolRelaySourceEntry OBJECT-TYPE
+        SYNTAX          DDhcpRPoolRelaySourceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry identifying a surce subnet that the client packets come
+            from."             
+        INDEX { 
+            dDhcpRPoolRelaySourcePoolName, 
+            dDhcpRPoolRelaySourceSubnet,
+            dDhcpRPoolRelaySourceSubnetMask
+        }
+        ::= { dDhcpRPoolRelaySourceTable 1 }
+
+    DDhcpRPoolRelaySourceEntry ::=     SEQUENCE {
+        dDhcpRPoolRelaySourcePoolName       DisplayString,   
+        dDhcpRPoolRelaySourceSubnet         IpAddress,   
+        dDhcpRPoolRelaySourceSubnetMask     IpAddress, 
+        dDhcpRPoolRelaySourceRowStatus      RowStatus
+    }
+    
+    dDhcpRPoolRelaySourcePoolName OBJECT-TYPE
+        SYNTAX          DisplayString	
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object specifies a DHCP pool.
+            The value must be same as an entry in dDhcpSPoolTable identified by
+            dDhcpSPoolName."
+        REFERENCE
+            "dDhcpSPoolName is defined in DLINKSW-DHCP-SERVER-MIB." 
+        ::= { dDhcpRPoolRelaySourceEntry 1 }
+         
+    dDhcpRPoolRelaySourceSubnet OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the source subnet of the client packets 
+            come from of the corresponding entry."
+        ::= { dDhcpRPoolRelaySourceEntry 2 }
+
+    dDhcpRPoolRelaySourceSubnetMask OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the network mask of the source subnet
+            for the corresponding entry."
+        ::= { dDhcpRPoolRelaySourceEntry 3 }
+        
+    dDhcpRPoolRelaySourceRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object manages this entry."
+        ::= { dDhcpRPoolRelaySourceEntry 99}
+                        
+-- -----------------------------------------------------------------------------        
+    dDhcpRelayIfObjects          OBJECT IDENTIFIER ::= { dDhcpRelayMIBObjects 3 }
+       
+    dDhcpRIfIgnoreBootpTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpRIfIgnoreBootpEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A list of configurations about the BOOTP/DHCP relay will ignore
+             BOOTP packet on an interface. 
+             An entry is created/removed when ignoring the BOOTP request
+             packets is enabled or disabled on an interface via CLI or by 
+             issuing appropriate sets to this table using snmp. "
+        ::= { dDhcpRelayIfObjects 1 }
+
+    dDhcpRIfIgnoreBootpEntry OBJECT-TYPE
+        SYNTAX          DDhcpRIfIgnoreBootpEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcpRelayAddrTable."
+        INDEX  { dDhcpRIfIgnoreBootpIfIndex }
+        ::= { dDhcpRIfIgnoreBootpTable 1 }
+
+    DDhcpRIfIgnoreBootpEntry ::= SEQUENCE {
+        dDhcpRIfIgnoreBootpIfIndex        InterfaceIndex,
+        dDhcpRIfIgnoreBootpEnabled        TruthValue
+    }
+
+    dDhcpRIfIgnoreBootpIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the interface.
+            Only VLAN interfaces are valid interfaces for this object."
+        ::= { dDhcpRIfIgnoreBootpEntry 1 }   
+
+    dDhcpRIfIgnoreBootpEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the interface ignore the bootp packet or not." 
+        ::= { dDhcpRIfIgnoreBootpEntry 2 }
+
+-- -----------------------------------------------------------------------------   
+    dDhcpRIfAgentInfoChkTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpRIfAgentInfoChkEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of configurations about the DHCP relay validates the
+            relay agent information (option 82) in the received DHCP reply packet
+            on an interface. 
+            An entry is created/removed when checking option 82 is or not configured 
+            on an interface via CLI or by issuing appropriate sets to this table
+            using snmp. 
+            If checking option 82 is not configured for an interface, the global
+            setting, dDhcpRelayAgentInfoCheckEnabled takes effect. If checking 
+            option 82 is configured for an interface, the interface setting takes
+            effect."
+        ::= { dDhcpRelayIfObjects 2 }
+
+    dDhcpRIfAgentInfoChkEntry OBJECT-TYPE
+        SYNTAX          DDhcpRIfAgentInfoChkEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcpRIfInfoChkTable."
+        INDEX  { dDhcpRIfAgentInfoChkIfIndex }
+        ::= { dDhcpRIfAgentInfoChkTable 1 }
+
+    DDhcpRIfAgentInfoChkEntry ::= SEQUENCE {
+        dDhcpRIfAgentInfoChkIfIndex         InterfaceIndex,
+        dDhcpRIfAgentInfoChkState           INTEGER
+    }
+
+    dDhcpRIfAgentInfoChkIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the interface.
+             Only VLAN interfaces are valid interfaces for this object."
+        ::= { dDhcpRIfAgentInfoChkEntry 1 }
+    
+    dDhcpRIfAgentInfoChkState OBJECT-TYPE
+        SYNTAX          INTEGER{enabled(1), disabled(2), none(3)}
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the DHCP relay agent validates the
+             relay agent information option in the received DHCP reply packet 
+             on the corresponding interface."   
+        ::= { dDhcpRIfAgentInfoChkEntry 2 }       
+        
+-- -----------------------------------------------------------------------------            
+    dDhcpRIfAgentInfoInsertTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpRIfAgentInfoInsertEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of configurations about whether insert option 82 for
+            an interface during relay of DHCP request packets.            
+            An entry is created/removed when the insertion of
+            option 82 is or not configured on an interface via CLI
+            or by issuing appropriate sets to this table using snmp. 
+            If the insertion of option 82 is not configured for an interface, 
+            the global setting, dDhcpRelayAgentInfoInsertEnabled takes effect. If checking 
+            option 82 is configured for an interface, the interface setting takes
+            effect."
+        ::= { dDhcpRelayIfObjects 3 }
+
+    dDhcpRIfAgentInfoInsertEntry OBJECT-TYPE
+        SYNTAX          DDhcpRIfAgentInfoInsertEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcpRIfAgentInfoInsertTable."
+        INDEX  { dDhcpRIfAgentInfoInsertIfIndex }
+        ::= { dDhcpRIfAgentInfoInsertTable 1 }
+
+    DDhcpRIfAgentInfoInsertEntry ::= SEQUENCE {
+        dDhcpRIfAgentInfoInsertIfIndex         InterfaceIndex,
+        dDhcpRIfAgentInfoInsertState           INTEGER
+    }
+
+    dDhcpRIfAgentInfoInsertIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the interface.
+             Only VLAN interfaces are valid interfaces for this object."
+        ::= { dDhcpRIfAgentInfoInsertEntry 1 }
+    
+    dDhcpRIfAgentInfoInsertState OBJECT-TYPE
+        SYNTAX          INTEGER{enabled(1), disabled(2), none(3)}
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether insert option 82 for an interface
+            during relay of DHCP request packets."
+        ::= { dDhcpRIfAgentInfoInsertEntry 2 }
+              
+-- -----------------------------------------------------------------------------                       
+    dDhcpRIfAgentInfoPolicyTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpRIfAgentInfoPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of configurations about relay agent information
+            re-forwarding policy for the DHCP relay agent on an interface.             
+            An entry is created/removed when the re-forwarding policy
+            is or not configured on an interface via CLI
+            or by issuing appropriate sets to this table using snmp. 
+            If the re-forwarding policy is not configured for an interface, 
+            the global setting, dDhcpRelayAgentInfoPolicy takes effect. If 
+            re-forwarding policy is configured for an interface, the interface
+            setting takes effect."
+        ::= { dDhcpRelayIfObjects 4 }
+
+    dDhcpRIfAgentInfoPolicyEntry OBJECT-TYPE
+        SYNTAX          DDhcpRIfAgentInfoPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcpRIfAgentInfoPolicyTable."
+        INDEX  { dDhcpRIfAgentInfoPolicyIfIndex }
+        ::= { dDhcpRIfAgentInfoPolicyTable 1 }
+
+    DDhcpRIfAgentInfoPolicyEntry ::= SEQUENCE {
+        dDhcpRIfAgentInfoPolicyIfIndex         InterfaceIndex,
+        dDhcpRIfAgentInfoPolicyAction          INTEGER
+    }
+
+    dDhcpRIfAgentInfoPolicyIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the interface.
+             Only VLAN interfaces are valid interfaces for this object."
+        ::= { dDhcpRIfAgentInfoPolicyEntry 1 }
+   
+    dDhcpRIfAgentInfoPolicyAction OBJECT-TYPE
+        SYNTAX          INTEGER { drop(1), keep(2), replace(3), none(4)}
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the re-forwarding policy of DHCP relay agent
+             information option 82 for the corresponding interface.    
+             drop (1)    - discards the packet that already has the relay 
+                           option.  
+             keep (2)    - the DHCP requests packet that already has the relay 
+                           option is left unchanged and directly relayed to the 
+                           DHCP server.
+             replace (3) - the DHCP requests packet that already has the relay
+                           option will be replaced by a new option.  
+             none (4)    -  not configure the policy action on the interface. "    
+        ::= { dDhcpRIfAgentInfoPolicyEntry 2 }
+                   
+-- -----------------------------------------------------------------------------               
+    dDhcpRIfAgentInfoTrustTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpRIfAgentInfoTrustEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of configurations about the relay agent trusts the relay
+            information on an interface.             
+            An entry is created/removed when the trusting relay information
+            is enabled/disabled on an interface via CLI or by issuing
+            appropriate sets to this table using snmp. 
+            
+            If dDhcpRelayInfoTrustAll is 'true', the dhcp relay information is
+            trusted for all interfaces.  If dDhcpRelayInfoTrustAll is 'false',
+            the trust state on an interface is determined whether
+            the corresponding interface exists in this table. If exists, the 
+            corresponding interface is trusted, otherwise, the interface is not
+            trusted.
+            
+            When relay information is trusted on an interface, the
+            arriving packets with giaddr==0 (this relay agent is the first
+            relay of this DHCP request packet) but with relay agent information
+            option present will be accepted. If it is un-trusted, these packets
+            will be dropped."
+        ::= { dDhcpRelayIfObjects 5 }
+
+    dDhcpRIfAgentInfoTrustEntry OBJECT-TYPE
+        SYNTAX          DDhcpRIfAgentInfoTrustEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcpRIfAgentInfoTrustTable."
+        INDEX  { dDhcpRIfAgentInfoTrustIfIndex }
+        ::= { dDhcpRIfAgentInfoTrustTable 1 }
+
+    DDhcpRIfAgentInfoTrustEntry ::= SEQUENCE {
+        dDhcpRIfAgentInfoTrustIfIndex        InterfaceIndex,        
+        dDhcpRIfAgentInfoTrustEnabled        TruthValue
+    }
+
+    dDhcpRIfAgentInfoTrustIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the interface.
+             Only VLAN interfaces are valid interfaces for this object."
+        ::= { dDhcpRIfAgentInfoTrustEntry 1 }
+
+    dDhcpRIfAgentInfoTrustEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the interface is trusted on
+            the not." 
+        ::= { dDhcpRIfAgentInfoTrustEntry 2 }
+
+-- -----------------------------------------------------------------------------               
+    dDhcpRelayPortIfOption82Objects         OBJECT IDENTIFIER ::= { dDhcpRelayMIBObjects 4 }
+    
+    dDhcpRPortIfOp82RemIdTable OBJECT-TYPE
+     	SYNTAX SEQUENCE OF DDhcpRPortIfOp82RemIdEntry
+	    MAX-ACCESS not-accessible
+	    STATUS current
+	    DESCRIPTION
+	 		"This table is used to manage the remote ID sub-option of Option 82
+	 		for physical port or port channel interface."
+	    ::={ dDhcpRelayPortIfOption82Objects 1}    
+	   
+    dDhcpRPortIfOp82RemIdEntry OBJECT-TYPE
+	    SYNTAX          DDhcpRPortIfOp82RemIdEntry
+	    MAX-ACCESS      not-accessible
+	    STATUS current
+	    DESCRIPTION
+	    	"An entry in dDhcpRPortIfOption82RemIdTable containing the
+	    	configuration about the remote ID sub-option of Option 82 for the 
+	    	corresponding interface."
+		INDEX { dDhcpRPortIfOp82RemIdIfIndex }
+	    ::={ dDhcpRPortIfOp82RemIdTable 1 }
+  
+    DDhcpRPortIfOp82RemIdEntry ::=      SEQUENCE{
+		dDhcpRPortIfOp82RemIdIfIndex       InterfaceIndex, 
+		dDhcpRPortIfOp82RemIdVendor3Cfg    DisplayString         	
+    }
+     
+    dDhcpRPortIfOp82RemIdIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex value of the port or port channel.
+            Only physical port and port channel interface will appear in this
+            table."
+        ::= { dDhcpRPortIfOp82RemIdEntry 1 }     
+              
+	dDhcpRPortIfOp82RemIdVendor3Cfg OBJECT-TYPE
+        SYNTAX          DisplayString  (SIZE  (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the per port/port channel user defined
+            string as remote ID.  
+            This object is used when dDhcpROption82RemoteIdType is set to
+            'vendor3'."
+        ::= { dDhcpRPortIfOp82RemIdEntry 2 } 
+    
+    dDhcpRPortIfOp82CirIdTable  OBJECT-TYPE  
+     	SYNTAX          SEQUENCE OF DDhcpRPortIfOp82CirIdEntry
+	    MAX-ACCESS      not-accessible
+	    STATUS          current
+	    DESCRIPTION
+	 		"This table is used to manage the circuit ID sub-option of Option 82 
+	 		for physical port or port channel interface."
+	    ::={ dDhcpRelayPortIfOption82Objects 2}    
+	   
+    dDhcpRPortIfOp82CirIdEntry OBJECT-TYPE
+	    SYNTAX          DDhcpRPortIfOp82CirIdEntry
+	    MAX-ACCESS      not-accessible
+	    STATUS          current
+	    DESCRIPTION	    	
+	    	"An entry in dDhcpRPortIfOp82CirIdTable containing the
+	    	configuration about the circuit ID sub-option of Option 82 for the 
+	    	corresponding interface."
+		INDEX { dDhcpRPortIfOp82CirIdIfIndex}
+	    ::={ dDhcpRPortIfOp82CirIdTable 1 }
+  
+    DDhcpRPortIfOp82CirIdEntry ::=     	SEQUENCE{
+		dDhcpRPortIfOp82CirIdIfIndex         InterfaceIndex,
+		dDhcpRPortIfOp82CirIdVendor3Cfg	     DisplayString
+     }
+     
+    dDhcpRPortIfOp82CirIdIfIndex OBJECT-TYPE
+      	SYNTAX          InterfaceIndex
+      	MAX-ACCESS      not-accessible
+      	STATUS          current
+      	DESCRIPTION
+            "This object indicates the ifIndex value of the port or port channel.
+            Only physical port and port channel interface will appear in this
+            table."
+      	::= { dDhcpRPortIfOp82CirIdEntry 1 }
+	
+	dDhcpRPortIfOp82CirIdVendor3Cfg OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE  (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION            
+            "This object indicates the per port/port channel user defined
+            string as circuit ID.  
+            This object is used when dDhcpROption82CircuitIdType is set to
+            'vendor3'."
+        ::= { dDhcpRPortIfOp82CirIdEntry 2 }     
+
+-- -----------------------------------------------------------------------------
+    dDhcpRelayVlanObjects          OBJECT IDENTIFIER ::= { dDhcpRelayMIBObjects 5 }
+ 
+    dDhcpRVlanLocalRelayCrlFirst2K  OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the DHCP Local Relay enabled VLAN in a 
+            string of octets containing one bit per VLAN for VLANs 1 to 2048. 
+            If the bit is set to '1', then the VLAN is enabled for DHCP Local Relay.
+            "         
+        ::= { dDhcpRelayVlanObjects 1 }
+    
+    dDhcpRVlanLocalRelayCrlSecond2K OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the DHCP Local Relay enabled VLAN in a 
+            string of octets containing one bit per VLAN for VLANs 2049 to 4094. 
+            If the bit is set to '1', then the VLAN is enabled for DHCP Local Relay.
+            "     
+        ::= { dDhcpRelayVlanObjects 2 }
+      
+-- -----------------------------------------------------------------------------		
+        
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************
+    dDhcpRelayCompliances OBJECT IDENTIFIER ::= { dDhcpRelayMIBConformance 1 }
+		
+	dDhcpRelayCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINK-DHCP-RELAY-IPV4-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+		    dDhcpRGblCfgGroup,
+		    dDhcpRPoolCfgGroup,
+		    dDhcpRInterfaceGroup
+		}	
+					
+		GROUP       dDhcpROp82SuboptionGroup
+        DESCRIPTION
+            "This group is required only for implementations that support 
+            sub-options configuration of option 82."
+		
+		GROUP       dDhcpRVlanCfgGroup
+		DESCRIPTION
+            "This group is required only for implementations that support 
+            DHCP Local Relay for per VLAN."
+	    ::= { dDhcpRelayCompliances 1 }
+		
+	dDhcpRelayGroups OBJECT IDENTIFIER ::= { dDhcpRelayMIBConformance 2 }
+		
+	dDhcpRGblCfgGroup OBJECT-GROUP
+		OBJECTS { 
+			dDhcpRelayAgentInfoCheckEnabled,
+			dDhcpRelayAgentInfoInsertEnabled,
+			dDhcpRelayAgentInfoPolicy,
+			dDhcpRelayInfoTrustAll,
+			dDhcpRelaySmartRelay
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing global configuration about DHCP
+			relay."
+		::= { dDhcpRelayGroups 1 }
+								
+				
+	dDhcpRPoolCfgGroup OBJECT-GROUP
+		OBJECTS { 
+		    dDhcpRPoClRelayTargetRowStatus,
+		    dDhcpRPoolRelayDestRowStatus,
+		    dDhcpRPoolRelaySourceRowStatus		    
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing DHCP pool configuration."
+		::= { dDhcpRelayGroups 2 }
+										
+	dDhcpRInterfaceGroup OBJECT-GROUP
+		OBJECTS { 
+		    dDhcpRIfIgnoreBootpEnabled,
+		    dDhcpRIfAgentInfoChkState,
+		    dDhcpRIfAgentInfoInsertState,
+		    dDhcpRIfAgentInfoPolicyAction,
+		    dDhcpRIfAgentInfoTrustEnabled
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing per interface configuration of
+			DHCP Relay."
+		::= { dDhcpRelayGroups 3 }
+	
+	dDhcpROp82SuboptionGroup OBJECT-GROUP
+		OBJECTS { 
+		   dDhcpROption82RemoteIdType,
+		   dDhcpROption82RemoteIdUserDef,
+		   dDhcpROption82CircuitIdType, 
+		   dDhcpROption82CircuitIdUserDef, 
+		   dDhcpRPortIfOp82RemIdVendor3Cfg,
+		   dDhcpRPortIfOp82CirIdVendor3Cfg		   		  		   
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing sub-options configuration of option 82."
+		::= { dDhcpRelayGroups 4 }
+
+	dDhcpRVlanCfgGroup OBJECT-GROUP
+		OBJECTS { 
+		   dDhcpRVlanLocalRelayCrlFirst2K,
+		   dDhcpRVlanLocalRelayCrlSecond2K		   		  		   
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects which are used to configure as
+			well as show information regarding the feature enabling
+			on each VLAN."
+		::= { dDhcpRelayGroups 5 }		
+
+END
+
+
