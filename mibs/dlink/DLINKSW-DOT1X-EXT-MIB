@@ -1,0 +1,939 @@
+--  *****************************************************************
+--  DLINKSW-DOT1X-EXT-MIB.mib : 802.1X Extensions MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-DOT1X-EXT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32, Counter64,
+        Unsigned32, TimeTicks
+               FROM SNMPv2-SMI               
+        TruthValue, MacAddress, DisplayString       
+               FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+               FROM SNMPv2-CONF           
+        InterfaceIndex,    InterfaceIndexOrZero
+            FROM IF-MIB  
+        VlanId 
+            FROM Q-BRIDGE-MIB
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB  
+        ifIndex 
+            FROM IF-MIB
+        dnaSessionClientMacAddress, dnaSessionAuthVlan, dnaSessionAuthUserName
+            FROM DLINKSW-NETWORK-ACCESS-MIB
+        dlinkIndustrialCommon            
+            FROM DLINK-ID-REC-MIB;    
+   
+   dlinkSwDot1xExtMIB    MODULE-IDENTITY
+           LAST-UPDATED "201307190000Z"
+           ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for managing IEEE 802.1X
+            extensions which cannot be covered by standard MIB 
+            (IEEE8021-PAE-MIB)."
+            
+        REVISION "201307190000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file for IEEE 802.1X
+            extensions."
+        ::= { dlinkIndustrialCommon 30 }
+      
+ -- -----------------------------------------------------------------------------      
+    dDot1xExtMIBNotifications     OBJECT IDENTIFIER ::= { dlinkSwDot1xExtMIB 0 }
+    dDot1xExtMIBObjects         OBJECT IDENTIFIER ::= { dlinkSwDot1xExtMIB 1 }
+    dDot1xExtMIBConformance        OBJECT IDENTIFIER ::= { dlinkSwDot1xExtMIB 2 }
+     
+ -- -----------------------------------------------------------------------------    
+    dDot1xExtGenCtrl        OBJECT IDENTIFIER ::= { dDot1xExtMIBObjects 1 }
+                   
+    dDot1xExtClearCounterByIf     OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the interface on which
+            802.1X authentication and session statistics will be cleared.
+            When read, a value of 0 is returned."                     
+        ::= { dDot1xExtGenCtrl 1 }
+    
+    dDot1xExtInitByMacAddr     OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies a MAC address which will be initialized.
+            When read, a value of '000000000000'H is returned."  
+        ::= { dDot1xExtGenCtrl 2 }
+
+    dDot1xExtReAuthByMacAddr     OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION            
+            "This object specifies a MAC address which will be re-authenticated.
+            When read, a value of '000000000000'H is returned."              
+        ::= { dDot1xExtGenCtrl 3 }
+
+    dDot1xExtNotifEnabled    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Setting to 'true' to enable global SNMP notification for 802.1X
+            authentication feature.
+            Setting the object to 'false' will disable SNMP notifications.
+            "
+        DEFVAL { false }
+        ::= { dDot1xExtGenCtrl 4 }
+ -- -----------------------------------------------------------------------------
+    dDot1xExtPortMgmt            OBJECT IDENTIFIER ::= { dDot1xExtMIBObjects 2 }
+    
+    dDot1xExtPaePortTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDot1xExtPaePortEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table contains a list of port-specific information for the 802.1X
+             extensions."
+        ::= { dDot1xExtPortMgmt 1 }
+
+    dDot1xExtPaePortEntry OBJECT-TYPE
+        SYNTAX          DDot1xExtPaePortEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in dDot1xExtPaePortTable indicates per port
+            802.1X extensions information which is not covered by
+            IEEE8021-PAE-MIB."
+        INDEX    { dDot1xExtPaePortNumber }
+        ::= { dDot1xExtPaePortTable 1}
+
+    DDot1xExtPaePortEntry ::= SEQUENCE {
+        dDot1xExtPaePortNumber            InterfaceIndex,
+        dDot1xExtPaePortEnabled         TruthValue,
+        dDot1xExtPaePortForwardPdu        TruthValue             
+    }
+                 
+    dDot1xExtPaePortNumber    OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the port."
+        ::= { dDot1xExtPaePortEntry 1 }
+           
+    dDot1xExtPaePortEnabled    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is used to enable/disable IEEE 802.1X port access entity (PAE)
+            authenticator.
+            "
+        DEFVAL { false }
+        ::= { dDot1xExtPaePortEntry 2 }
+    dDot1xExtPaePortForwardPdu    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is used to enable/disable forwarding of IEEE 802.1X PDU.
+            'true' indicates the forwarding of 802.1X PDU is enabled.
+            'false' indicates the forwarding of 802.1X PDU is disabled.
+            "
+        DEFVAL { false }
+        ::= { dDot1xExtPaePortEntry 3 }
+                                       
+ -- -----------------------------------------------------------------------------    
+    dDot1xExtAuthStatsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDot1xExtAuthStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table that contains the statistics objects for the
+             Authenticator PAE associated with each Port/MAC/VLAN (for multi-auth
+             mode).       
+             "
+        ::= { dDot1xExtMIBObjects 3 }
+
+    dDot1xExtAuthStatsEntry OBJECT-TYPE
+        SYNTAX          DDot1xExtAuthStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The statistics information for an Authenticator PAE, including
+            multi-auth mode."
+        INDEX    { dDot1xExtPaePortNumber,
+                    dDot1xExtAuthStatsMacAddr,
+                    dDot1xExtAuthStatsVlanId
+                 }
+        ::= { dDot1xExtAuthStatsTable 1}
+
+    DDot1xExtAuthStatsEntry ::= SEQUENCE {
+        dDot1xExtAuthStatsMacAddr           MacAddress,
+        dDot1xExtAuthStatsVlanId            VlanId,   
+        dDot1xExtAuthEapolFramesRx            Counter32,
+        dDot1xExtAuthEapolFramesTx          Counter32,
+        dDot1xExtAuthEapolStartFramesRx     Counter32,
+        dDot1xExtAuthEapolLogoffFramesRx    Counter32,
+        dDot1xExtAuthEapolRespIdFramesRx    Counter32,
+        dDot1xExtAuthEapolRespFramesRx      Counter32,
+        dDot1xExtAuthEapolReqIdFramesTx     Counter32,
+        dDot1xExtAuthEapolReqFramesTx       Counter32,
+        dDot1xExtAuthInvalidEapolFramesRx   Counter32,
+        dDot1xExtAuthEapLengthErrorFramesRx Counter32,
+        dDot1xExtAuthLastEapolFrameVersion  Unsigned32,
+        dDot1xExtAuthLastEapolFrameSource   MacAddress
+    }
+                 
+    dDot1xExtAuthStatsMacAddr    OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the MAC address of the entry."
+        ::= { dDot1xExtAuthStatsEntry 1 }
+
+    dDot1xExtAuthStatsVlanId    OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the VLAN ID of the entry."
+        ::= { dDot1xExtAuthStatsEntry 2 }
+
+    dDot1xExtAuthEapolFramesRx    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of valid EAPOL frames of any type
+            that have been received by this Authenticator."
+        ::= { dDot1xExtAuthStatsEntry 3 }        
+
+    dDot1xExtAuthEapolFramesTx    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of EAPOL frames of any type
+            that have been transmitted by this Authenticator."
+        ::= { dDot1xExtAuthStatsEntry 4 }    
+
+    dDot1xExtAuthEapolStartFramesRx    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of EAPOL Start frames that have
+            been received by this Authenticator."
+        ::= { dDot1xExtAuthStatsEntry 5 }        
+
+    dDot1xExtAuthEapolLogoffFramesRx    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of EAPOL Logoff frames that have
+            been received by this Authenticator."
+        ::= { dDot1xExtAuthStatsEntry 6 }    
+        
+    dDot1xExtAuthEapolRespIdFramesRx    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of EAP Resp/Id frames that have
+            been received by this Authenticator."
+        ::= { dDot1xExtAuthStatsEntry 7 }    
+
+    dDot1xExtAuthEapolRespFramesRx    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of valid EAP Response frames
+            (other than Resp/Id frames) that have been
+            received by this Authenticator."
+        ::= { dDot1xExtAuthStatsEntry 8 }    
+
+    dDot1xExtAuthEapolReqIdFramesTx    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of EAP Req/Id frames that have been
+            transmitted by this Authenticator."
+        ::= { dDot1xExtAuthStatsEntry 9 }    
+
+    dDot1xExtAuthEapolReqFramesTx    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of EAP Request frames
+            (other than Rq/Id frames) that have been
+            transmitted by this Authenticator."
+        ::= { dDot1xExtAuthStatsEntry 10 }    
+
+    dDot1xExtAuthInvalidEapolFramesRx    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of EAPOL frames that have been
+            received by this Authenticator in which the
+            frame type is not recognized."
+        ::= { dDot1xExtAuthStatsEntry 11 }    
+
+    dDot1xExtAuthEapLengthErrorFramesRx    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of EAPOL frames that have been received
+            by this Authenticator in which the Packet Body
+            Length field is invalid."
+        ::= { dDot1xExtAuthStatsEntry 12 }        
+        
+    dDot1xExtAuthLastEapolFrameVersion    OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The protocol version number carried in the
+            most recently received EAPOL frame."
+        ::= { dDot1xExtAuthStatsEntry 13 }    
+
+    dDot1xExtAuthLastEapolFrameSource    OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The source MAC address carried in the
+            most recently received EAPOL frame."
+        ::= { dDot1xExtAuthStatsEntry 14 }        
+                                       
+ -- -----------------------------------------------------------------------------    
+    dDot1xExtAuthDiagTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDot1xExtAuthDiagEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table that contains the diagnostics objects for the
+         Authenticator PAE associated with each Port/MAC/VLAN (for multi-auth
+         mode).
+         "
+        ::= { dDot1xExtMIBObjects 4 }
+
+    dDot1xExtAuthDiagEntry OBJECT-TYPE
+        SYNTAX          DDot1xExtAuthDiagEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The statistics information for an Authenticator PAE, including
+            multi-auth mode."
+        INDEX    { dDot1xExtPaePortNumber,
+                    dDot1xExtAuthDiagMacAddr,
+                    dDot1xExtAuthDiagVlanId
+                 }
+        ::= { dDot1xExtAuthDiagTable 1}
+
+    DDot1xExtAuthDiagEntry ::= SEQUENCE {
+        dDot1xExtAuthDiagMacAddr                          MacAddress,
+        dDot1xExtAuthDiagVlanId                              VlanId,
+        dDot1xExtAuthEntersConnecting                       Counter32,
+        dDot1xExtAuthEapLogoffsWhileConnecting               Counter32,
+        dDot1xExtAuthEntersAuthenticating                   Counter32,
+        dDot1xExtAuthAuthSuccessWhileAuthenticating       Counter32,
+        dDot1xExtAuthAuthTimeoutsWhileAuthenticating       Counter32,
+        dDot1xExtAuthAuthFailWhileAuthenticating           Counter32,
+        dDot1xExtAuthAuthReauthsWhileAuthenticating       Counter32,
+        dDot1xExtAuthAuthEapStartsWhileAuthenticating       Counter32,
+        dDot1xExtAuthAuthEapLogoffWhileAuthenticating       Counter32,
+        dDot1xExtAuthAuthReauthsWhileAuthenticated           Counter32,
+        dDot1xExtAuthAuthEapStartsWhileAuthenticated       Counter32,
+        dDot1xExtAuthAuthEapLogoffWhileAuthenticated       Counter32,
+        dDot1xExtAuthBackendResponses                       Counter32,
+        dDot1xExtAuthBackendAccessChallenges               Counter32,
+        dDot1xExtAuthBackendOtherRequestsToSupplicant       Counter32,
+        dDot1xExtAuthBackendNonNakResponsesFromSupplicant Counter32,
+        dDot1xExtAuthBackendAuthSuccesses                   Counter32,
+        dDot1xExtAuthBackendAuthFails                       Counter32
+    }
+                 
+    dDot1xExtAuthDiagMacAddr    OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the MAC address of the entry."
+        ::= { dDot1xExtAuthDiagEntry 1 }
+
+    dDot1xExtAuthDiagVlanId    OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the VLAN ID of the entry."
+        ::= { dDot1xExtAuthDiagEntry 2 }
+
+    dDot1xExtAuthEntersConnecting    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            transitions to the CONNECTING state from any other
+            state."
+        ::= { dDot1xExtAuthDiagEntry 3 }
+
+    dDot1xExtAuthEapLogoffsWhileConnecting    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            transitions from CONNECTING to DISCONNECTED as a result
+            of receiving an EAPOL-Logoff message."
+        ::= { dDot1xExtAuthDiagEntry 4 }    
+
+    dDot1xExtAuthEntersAuthenticating    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            transitions from CONNECTING to AUTHENTICATING, as a
+            result of an EAP-Response/Identity message being
+            received from the Supplicant."
+        ::= { dDot1xExtAuthDiagEntry 5 }        
+
+    dDot1xExtAuthAuthSuccessWhileAuthenticating    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            transitions from AUTHENTICATING to AUTHENTICATED, as a
+            result of the Backend Authentication state machine
+            indicating successful authentication of the Supplicant
+            (authSuccess = TRUE)."
+        ::= { dDot1xExtAuthDiagEntry 6 }
+
+    dDot1xExtAuthAuthTimeoutsWhileAuthenticating    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            transitions from AUTHENTICATING to ABORTING, as a result
+            of the Backend Authentication state machine indicating
+            authentication timeout (authTimeout = TRUE)."
+        ::= { dDot1xExtAuthDiagEntry 7 }    
+
+    dDot1xExtAuthAuthFailWhileAuthenticating    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            transitions from AUTHENTICATING to HELD, as a result
+            of the Backend Authentication state machine indicating
+            authentication failure (authFail = TRUE)."
+        ::= { dDot1xExtAuthDiagEntry 8 }    
+
+    dDot1xExtAuthAuthReauthsWhileAuthenticating    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            transitions from AUTHENTICATING to ABORTING, as a result
+            of a reauthentication request (reAuthenticate = TRUE)."
+        ::= { dDot1xExtAuthDiagEntry 9 }    
+
+    dDot1xExtAuthAuthEapStartsWhileAuthenticating    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            transitions from AUTHENTICATING to ABORTING, as a result
+            of an EAPOL-Start message being received
+            from the Supplicant."
+        ::= { dDot1xExtAuthDiagEntry 10 }        
+
+    dDot1xExtAuthAuthEapLogoffWhileAuthenticating    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            transitions from AUTHENTICATING to ABORTING, as a result
+            of an EAPOL-Logoff message being received
+            from the Supplicant."
+        ::= { dDot1xExtAuthDiagEntry 11 }
+
+    dDot1xExtAuthAuthReauthsWhileAuthenticated    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            transitions from AUTHENTICATED to CONNECTING, as a
+            result of a reauthentication request
+            (reAuthenticate = TRUE)."
+        ::= { dDot1xExtAuthDiagEntry 12 }    
+
+    dDot1xExtAuthAuthEapStartsWhileAuthenticated    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            transitions from AUTHENTICATED to CONNECTING, as a
+            result of an EAPOL-Start message being received from the
+            Supplicant."
+        ::= { dDot1xExtAuthDiagEntry 13 }
+
+    dDot1xExtAuthAuthEapLogoffWhileAuthenticated    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            transitions from AUTHENTICATED to DISCONNECTED, as a
+            result of an EAPOL-Logoff message being received from
+            the Supplicant."
+        ::= { dDot1xExtAuthDiagEntry 14 }        
+        
+    dDot1xExtAuthBackendResponses    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine sends
+            an initial Access-Request packet to the Authentication
+            server (i.e., executes sendRespToServer on entry to the
+            RESPONSE state). Indicates that the Authenticator
+            attempted communication with the Authentication Server."
+        ::= { dDot1xExtAuthDiagEntry 15 }
+
+    dDot1xExtAuthBackendAccessChallenges    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            receives an initial Access-Challenge packet from the
+            Authentication server (i.e., aReq becomes TRUE,
+            causing exit from the RESPONSE state). Indicates that
+            the Authentication Server has communication with
+            the Authenticator."
+        ::= { dDot1xExtAuthDiagEntry 16 }
+        
+    dDot1xExtAuthBackendOtherRequestsToSupplicant    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            sends an EAP-Request packet (other than an Identity,
+            Notification, Failure or Success message) to the
+            Supplicant (i.e., executes txReq on entry to the
+            REQUEST state). Indicates that the Authenticator chose
+            an EAP-method."
+        ::= { dDot1xExtAuthDiagEntry 17 }        
+        
+    dDot1xExtAuthBackendNonNakResponsesFromSupplicant    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            receives a response from the Supplicant to an initial
+            EAP-Request, and the response is something other than
+            EAP-NAK (i.e., rxResp becomes TRUE, causing the state
+            machine to transition from REQUEST to RESPONSE,
+            and the response is not an EAP-NAK). Indicates that
+            the Supplicant can respond to the Authenticator's
+            chosen EAP-method."
+        ::= { dDot1xExtAuthDiagEntry 18 }    
+
+    dDot1xExtAuthBackendAuthSuccesses    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            receives an EAP-Success message from the Authentication
+            Server (i.e., aSuccess becomes TRUE, causing a
+            transition from RESPONSE to SUCCESS). Indicates that
+            the Supplicant has successfully authenticated to
+            the Authentication Server."
+        ::= { dDot1xExtAuthDiagEntry 19 }    
+
+    dDot1xExtAuthBackendAuthFails    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Counts the number of times that the state machine
+            receives an EAP-Failure message from the Authentication
+            Server (i.e., aFail becomes TRUE, causing a transition
+            from RESPONSE to FAIL). Indicates that the Supplicant
+            has not authenticated to the Authentication Server."
+        ::= { dDot1xExtAuthDiagEntry 20 }        
+
+ -- -----------------------------------------------------------------------------    
+    dDot1xExtAuthSessionStatsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDot1xExtAuthSessionStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table that contains the diagnostics objects for the
+             Authenticator PAE associated with each Port/MAC/VLAN (for multi-auth
+             mode)."
+        ::= { dDot1xExtMIBObjects 5 }
+
+    dDot1xExtAuthSessionStatsEntry OBJECT-TYPE
+        SYNTAX          DDot1xExtAuthSessionStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The statistics information for an Authenticator PAE, including
+            multi-auth mode."
+        INDEX    { dDot1xExtPaePortNumber,
+                    dDot1xExtAuthSessionMacAddr,
+                    dDot1xExtAuthSessionVlanId
+                 }
+        ::= { dDot1xExtAuthSessionStatsTable 1}
+
+    DDot1xExtAuthSessionStatsEntry ::= SEQUENCE {
+        dDot1xExtAuthSessionMacAddr         MacAddress,
+        dDot1xExtAuthSessionVlanId            VlanId,
+        dDot1xExtAuthSessionOctetsRx        Counter64,    
+        dDot1xExtAuthSessionOctetsTx        Counter64,
+        dDot1xExtAuthSessionFramesRx        Counter32,
+        dDot1xExtAuthSessionFramesTx        Counter32,
+        dDot1xExtAuthSessionId                SnmpAdminString,
+        dDot1xExtAuthSessionAuthenticMethod    INTEGER,
+        dDot1xExtAuthSessionTime            TimeTicks,
+        dDot1xExtAuthSessionTerminateCause    INTEGER,
+        dDot1xExtAuthSessionUserName        SnmpAdminString
+    }
+                 
+    dDot1xExtAuthSessionMacAddr    OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the MAC address of the entry."
+        ::= { dDot1xExtAuthSessionStatsEntry 1 }
+
+    dDot1xExtAuthSessionVlanId    OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the VLAN ID of the entry."
+        ::= { dDot1xExtAuthSessionStatsEntry 2 }
+
+    dDot1xExtAuthSessionOctetsRx    OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of octets received in user data
+            frames on this Port during the session."
+        ::= { dDot1xExtAuthSessionStatsEntry 3 }
+
+    dDot1xExtAuthSessionOctetsTx    OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of octets transmitted in user data
+            frames on this Port during the session."
+        ::= { dDot1xExtAuthSessionStatsEntry 4 }        
+        
+    dDot1xExtAuthSessionFramesRx    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of user data frames received
+            on this Port during the session."
+        ::= { dDot1xExtAuthSessionStatsEntry 5 }    
+
+    dDot1xExtAuthSessionFramesTx    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of user data frames transmitted
+            on this Port during the session."
+        ::= { dDot1xExtAuthSessionStatsEntry 6 }
+
+    dDot1xExtAuthSessionId    OBJECT-TYPE
+        SYNTAX          SnmpAdminString(SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "A unique identifier for the session, in the
+            form of a printable ASCII string of at least
+            three characters."
+        ::= { dDot1xExtAuthSessionStatsEntry 7 }        
+
+    dDot1xExtAuthSessionAuthenticMethod    OBJECT-TYPE
+        SYNTAX      INTEGER {
+            remoteAuthServer(1),
+            localAuthServer(2)
+        }
+        
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The authentication method used to establish the
+            session."
+        ::= { dDot1xExtAuthSessionStatsEntry 8 }
+
+    dDot1xExtAuthSessionTime    OBJECT-TYPE
+        SYNTAX      TimeTicks        
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The duration of the session in seconds."
+        ::= { dDot1xExtAuthSessionStatsEntry 9 }        
+        
+    dDot1xExtAuthSessionTerminateCause    OBJECT-TYPE
+        SYNTAX      INTEGER {
+            supplicantLogoff(1),
+            portFailure(2),
+            supplicantRestart(3),
+            reauthFailed(4),
+            authControlForceUnauth(5),
+            portReInit(6),
+            portAdminDisabled(7),
+            notTerminatedYet(999)
+        }
+        
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The reason for the session termination."
+        ::= { dDot1xExtAuthSessionStatsEntry 10 }
+
+    dDot1xExtAuthSessionUserName    OBJECT-TYPE
+        SYNTAX          SnmpAdminString(SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The User-Name representing the identity of the
+            Supplicant PAE."
+        ::= { dDot1xExtAuthSessionStatsEntry 11 }
+
+-- --------------------------------------------------------------------------
+    dDot1xExtNotifyInfo  OBJECT IDENTIFIER ::= {  dDot1xExtMIBObjects 6 }   
+ 
+     dDot1xExtNotifyFailReason OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(1..255))
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+               "The reason for failed authentication."
+              ::= { dDot1xExtNotifyInfo 1 }
+              
+--  ***************************************************************************
+--  Notifications
+--  ***************************************************************************
+    dDot1xExtLoggedSuccess NOTIFICATION-TYPE
+        OBJECTS  { 
+            ifIndex, 
+            dnaSessionClientMacAddress, 
+            dnaSessionAuthVlan,
+            dnaSessionAuthUserName
+        }
+        STATUS  current
+        DESCRIPTION
+            "The trap is sent when a host has successfully logged in (passed 
+            802.1X authentication)."
+        ::= { dDot1xExtMIBNotifications 1 }
+
+    dDot1xExtLoggedFail NOTIFICATION-TYPE
+        OBJECTS  { 
+            ifIndex, 
+            dnaSessionClientMacAddress, 
+            dnaSessionAuthVlan,
+            dnaSessionAuthUserName,
+            dDot1xExtNotifyFailReason
+        }
+        STATUS  current
+        DESCRIPTION
+            "The trap is sent when a host failed to pass 802.1X authenitcation
+            (login failed)."
+        ::= { dDot1xExtMIBNotifications 2 }
+        
+--  ***************************************************************************    
+--  Conformance
+--  ***************************************************************************
+    
+    dDot1xExtCompliances OBJECT IDENTIFIER ::= { dDot1xExtMIBConformance 1 }
+        
+    dDot1xExtCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for entities which implement the 
+            DLINKSW-DOT1X-EXT-MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS { 
+            dDot1xExtGeneralGroup,
+            dDot1xExtPortIfGroup
+        }
+        
+        GROUP   ddot1xExtPaeAuthStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   ddot1xExtPaeAuthDiagGroup
+        DESCRIPTION
+            "This group is optional for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   ddot1xExtPaeAuthSessionStatsGroup
+        DESCRIPTION
+            "This group is optional for systems that support
+            the Authenticator functions of the PAE."        
+        ::= { dDot1xExtCompliances 1 }
+
+-- units of conformance
+        
+    dDot1xExtGroups OBJECT IDENTIFIER ::= { dDot1xExtMIBConformance 2 }
+        
+    dDot1xExtGeneralGroup OBJECT-GROUP
+        OBJECTS { 
+            dDot1xExtClearCounterByIf,
+            dDot1xExtInitByMacAddr,
+            dDot1xExtReAuthByMacAddr,
+            dDot1xExtNotifyFailReason
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing the global configuration for
+            802.1X extensions."
+        ::= { dDot1xExtGroups 1 }
+
+    dDot1xExtPortIfGroup OBJECT-GROUP
+        OBJECTS { 
+        dDot1xExtPaePortEnabled,
+            dDot1xExtPaePortForwardPdu
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing the interface-specific
+            information for 802.1X extensions."
+        ::= { dDot1xExtGroups 2 }
+
+    ddot1xExtPaeAuthStatsGroup OBJECT-GROUP
+        OBJECTS {   
+                dDot1xExtAuthEapolFramesRx,
+                dDot1xExtAuthEapolFramesTx,
+                dDot1xExtAuthEapolStartFramesRx,
+                dDot1xExtAuthEapolLogoffFramesRx,
+                dDot1xExtAuthEapolRespIdFramesRx,
+                dDot1xExtAuthEapolRespFramesRx,
+                dDot1xExtAuthEapolReqIdFramesTx,
+                dDot1xExtAuthEapolReqFramesTx,
+                dDot1xExtAuthInvalidEapolFramesRx,
+                dDot1xExtAuthEapLengthErrorFramesRx,
+                dDot1xExtAuthLastEapolFrameVersion,
+                dDot1xExtAuthLastEapolFrameSource            
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing statistics about an
+            Authenticator PAE, including the multi-auth mode."
+        ::= { dDot1xExtGroups 3 }        
+
+    ddot1xExtPaeAuthDiagGroup OBJECT-GROUP
+        OBJECTS { 
+            dDot1xExtAuthEntersConnecting,
+            dDot1xExtAuthEapLogoffsWhileConnecting,
+            dDot1xExtAuthEntersAuthenticating,
+            dDot1xExtAuthAuthSuccessWhileAuthenticating,
+            dDot1xExtAuthAuthTimeoutsWhileAuthenticating,
+            dDot1xExtAuthAuthFailWhileAuthenticating,
+            dDot1xExtAuthAuthReauthsWhileAuthenticating,
+            dDot1xExtAuthAuthEapStartsWhileAuthenticating,
+            dDot1xExtAuthAuthEapLogoffWhileAuthenticating,
+            dDot1xExtAuthAuthReauthsWhileAuthenticated,
+            dDot1xExtAuthAuthEapStartsWhileAuthenticated,
+            dDot1xExtAuthAuthEapLogoffWhileAuthenticated,
+            dDot1xExtAuthBackendResponses,
+            dDot1xExtAuthBackendAccessChallenges,
+            dDot1xExtAuthBackendOtherRequestsToSupplicant,
+            dDot1xExtAuthBackendNonNakResponsesFromSupplicant,
+            dDot1xExtAuthBackendAuthSuccesses,
+            dDot1xExtAuthBackendAuthFails        
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing diagnostic statistics
+            about an Authenticator PAE, including the multi-auth mode."
+        ::= { dDot1xExtGroups 4 }    
+
+    ddot1xExtPaeAuthSessionStatsGroup OBJECT-GROUP
+        OBJECTS { 
+            dDot1xExtAuthSessionOctetsRx,    
+            dDot1xExtAuthSessionOctetsTx,
+            dDot1xExtAuthSessionFramesRx,
+            dDot1xExtAuthSessionFramesTx,
+            dDot1xExtAuthSessionId,
+            dDot1xExtAuthSessionAuthenticMethod,
+            dDot1xExtAuthSessionTime,
+            dDot1xExtAuthSessionTerminateCause,
+            dDot1xExtAuthSessionUserName    
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing statistics about the
+            current, or last session for an Authenticator PAE, 
+            including the multi-auth mode."
+        ::= { dDot1xExtGroups 5 }   
+
+    ddot1xExtNotifyCfgGroup OBJECT-GROUP
+        OBJECTS {   
+            dDot1xExtNotifEnabled
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects provides the configuration for notification 
+            of 802.1X authentication."
+        ::= { dDot1xExtGroups 6 }
+
+    dDot1xExtNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+            dDot1xExtLoggedSuccess,
+            dDot1xExtLoggedFail
+         }
+        STATUS current
+        DESCRIPTION
+           "The collection of notifications used for monitoring the hosts under the 
+           control of 802.1X authentication."
+        ::= { dDot1xExtGroups 7    }        
+END
+
+
