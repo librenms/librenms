@@ -1,0 +1,110 @@
+--  *****************************************************************
+--  DLINKSW-TRAFFIC-SEGMENT-MIB.mib : Traffic Segmentation MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+    DLINKSW-TRAFFIC-SEGMENT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE     FROM SNMPv2-SMI
+        ifIndex,
+        InterfaceIndex                  FROM IF-MIB
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP                    FROM SNMPv2-CONF
+        PortList                        FROM Q-BRIDGE-MIB
+        dlinkIndustrialCommon           FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwTrafficSegMIB MODULE-IDENTITY
+        LAST-UPDATED "201303010000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for Traffic Segmentation."            
+            
+        REVISION     "201303010000Z"
+        DESCRIPTION 
+            "This is the first version of the MIB file."    
+        ::= { dlinkIndustrialCommon 26 }
+  
+
+-- ---------------------------------------------------------------------------------------------
+    dTrafficSegNotifications    OBJECT IDENTIFIER ::= { dlinkSwTrafficSegMIB 0 }
+    dTrafficSegObjects          OBJECT IDENTIFIER ::= { dlinkSwTrafficSegMIB 1 }
+    dTrafficSegConformance      OBJECT IDENTIFIER ::= { dlinkSwTrafficSegMIB 2 }
+
+-- ---------------------------------------------------------------------------------------------
+    dTrafficSegForwardDomainTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DTrafficSegForwardDomainEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current   
+        DESCRIPTION            
+            "A list of specification of forwarding domains for Traffic Segmentation."            
+    ::= { dTrafficSegObjects 1 }
+
+    dTrafficSegForwardDomainEntry    OBJECT-TYPE
+        SYNTAX          DTrafficSegForwardDomainEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current   
+        DESCRIPTION            
+            "An entry indicates the setting of forwarding domain on an interface."
+        INDEX  { ifIndex }
+        ::= { dTrafficSegForwardDomainTable 1 }
+
+    DTrafficSegForwardDomainEntry ::= SEQUENCE
+    {
+        dTrafficSegForwardPorts    PortList
+    }
+
+    dTrafficSegForwardPorts    OBJECT-TYPE
+        SYNTAX                 PortList
+        MAX-ACCESS             read-write
+        STATUS                 current
+        DESCRIPTION
+            "This object indicates the forward domain (a set of ports) on the
+            interface."
+        ::= { dTrafficSegForwardDomainEntry 1 }
+
+-- -----------------------------------------------------------------------------
+-- MIB Conformance statements
+-- -----------------------------------------------------------------------------
+    dTrafficSegMIBCompliances    OBJECT IDENTIFIER
+        ::= { dTrafficSegConformance 1 }
+
+    dTrafficSegMIBGroups    OBJECT IDENTIFIER
+        ::= { dTrafficSegConformance 2 } 
+    
+    dTrafficSegMIBCompliance    MODULE-COMPLIANCE
+        STATUS                  current
+        DESCRIPTION
+            "The compliance statement for entities which implement the 
+            DLINKSW-TRAFFIC-SEGMENT-MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS
+        {   
+            dTrafficSegIfCfgGroup           
+        }                 
+        ::= { dTrafficSegMIBCompliances 1 }
+
+-- -----------------------------------------------------------------------------        
+    dTrafficSegIfCfgGroup    OBJECT-GROUP
+        OBJECTS
+        { 
+            dTrafficSegForwardPorts
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing management of the Traffic
+            Segmentation feature."
+        ::= { dTrafficSegMIBGroups 1 }
+  
+END

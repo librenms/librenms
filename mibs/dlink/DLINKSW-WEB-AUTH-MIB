@@ -1,0 +1,359 @@
+--  *****************************************************************
+--  DLINKSW-WEB-AUTH-MIB.mib : Web-Authentication MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+    DLINKSW-WEB-AUTH-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE              FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP       FROM SNMPv2-CONF
+        TruthValue               FROM SNMPv2-TC
+        ifIndex                  FROM IF-MIB        
+        InetAddressIPv4,
+        InetAddressIPv6          FROM INET-ADDRESS-MIB
+        SnmpAdminString          FROM SNMP-FRAMEWORK-MIB
+        dnaSessionAuthVlan,
+        dnaSessionClientMacAddress,
+        dnaSessionClientAddrType,
+        dnaSessionClientAddress,
+        dnaSessionAuthUserName   FROM DLINKSW-NETWORK-ACCESS-MIB
+        dlinkIndustrialCommon    FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwWebAuthMIB MODULE-IDENTITY
+        LAST-UPDATED "201302210000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+             "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for Web-Authentication."            
+            
+        REVISION "201302210000Z"
+        DESCRIPTION 
+            "This is the first version of the MIB file."    
+        ::= { dlinkIndustrialCommon 154 }
+
+-- -----------------------------------------------------------------------------
+    dWebAuthNotifications    OBJECT IDENTIFIER ::= { dlinkSwWebAuthMIB 0 }
+    dWebAuthObjects          OBJECT IDENTIFIER ::= { dlinkSwWebAuthMIB 1 }
+    dWebAuthConformance      OBJECT IDENTIFIER ::= { dlinkSwWebAuthMIB 2 }
+
+    dWebAuthSysEnabled    OBJECT-TYPE
+        SYNTAX          TruthValue         
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the global state of Web-Authentication on
+            the device."
+        ::= { dWebAuthObjects 1 }
+
+    dWebAuthRedirectPath    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the URL that the client will be redirected to
+            after successful authentication.
+            Initially, the redirected path is an empty string.
+            If no default redirect URL is specified, the Web-Authentication 
+            logout page will be displayed. 
+            "
+        ::= { dWebAuthObjects 2 }
+
+    dWebAuthVirtualIp    OBJECT-TYPE
+        SYNTAX           InetAddressIPv4
+        MAX-ACCESS       read-write
+        STATUS           current
+        DESCRIPTION
+            "This object indicates the virtual IP address which is used to accept 
+            authentication requests from an unauthenticated host.
+    
+            This virtual IP address is used to accept authentication
+            requests from an unauthenticated host. Only requests sent to this IP will 
+            get a correct response.
+ 
+            NOTE: This IP does not respond to ARP requests or ICMP packets."
+        ::= { dWebAuthObjects 3 }
+
+    dWebAuthVirtualIpv6    OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the virtual IPv6 address which is used to accept 
+            authentication requests from an unauthenticated host.
+    
+            This virtual IPv6 address is used to accept authentication requests 
+            from an unauthenticated host. Only requests sent to this IP will 
+            get a correct response.
+
+            NOTE: This IPv6 does not respond to ICMPv6 packets."
+        ::= { dWebAuthObjects 4 }
+
+    dWebAuthVirtualUrl    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the FQDN URL for the virtual IP address.
+    
+            The defined URL only takes effect when the virtual IP address is 
+            configured. The user gets the FQDN URL stored on the DNS server 
+            to get the virtual IP address. The obtained IP address must match 
+            the virtual IP address."
+        ::= { dWebAuthObjects 5 }
+
+    dWebAuthNotifyEnabled    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION   
+            "Set to 'true' to enable global SNMP notification for MAC 
+            authentication feature.  
+            Setting the object to 'false' will disable SNMP notifications."            
+        ::= { dWebAuthObjects 6}
+
+-- -----------------------------------------------------------------------------
+    dWebAuthPageElement OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION
+            "This object identifier represents the objects customizing the 
+            Web-Authentication page elements."
+        ::= { dWebAuthObjects 7 }
+
+    dWebAuthPageTitle    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the title of the WEB authentication page."
+        ::= { dWebAuthPageElement 1 }
+
+    dWebAuthPageLoginWindowTitle    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the title of the WEB authentication login
+            window."
+        ::= { dWebAuthPageElement 2 }
+
+    dWebAuthPageUserName    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the user name title of WEB authentication
+            login window."
+        ::= { dWebAuthPageElement 3 }
+
+    dWebAuthPagePassWord    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the password title of WEB authentication
+            login window."
+        ::= { dWebAuthPageElement 4 }
+
+    dWebAuthPageLogoutWindowTitle    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the title of the WEB authentication logout
+            window."
+        ::= { dWebAuthPageElement 5 }
+
+    dWebAuthPageCopyrightLine1    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the first line of the copyright information  
+            in WEB authentication pages."
+        ::= { dWebAuthPageElement 6 }
+
+    dWebAuthPageCopyrightLine2    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the second line of the copyright information  
+            in WEB authentication pages."
+        ::= { dWebAuthPageElement 7 }
+
+    dWebAuthPageCopyrightLine3    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the third line of the copyright information  
+            in WEB authentication pages."
+        ::= { dWebAuthPageElement 8 }
+
+    dWebAuthPageCopyrightLine4    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the fourth line of copyright information  
+            in WEB authentication pages."
+        ::= { dWebAuthPageElement 9 }
+
+    dWebAuthPageCopyrightLine5    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the fifth line of copyright information  
+            in WEB authentication pages."
+        ::= { dWebAuthPageElement 10 }
+
+-- -----------------------------------------------------------------------------
+    dWebAuthIfCfgTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DWebAuthIfCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "This table consists of a list of interface-specific 
+            Web-Authentication information entries."
+        ::= { dWebAuthObjects 8 }
+
+    dWebAuthIfCfgEntry    OBJECT-TYPE
+        SYNTAX          DWebAuthIfCfgEntry
+        MAX-ACCESS      not-accessible       
+        STATUS          current
+        DESCRIPTION            
+            "An entry indicates the setting of Web-Authentication on an
+            interface."
+        INDEX  { ifIndex }
+        ::= { dWebAuthIfCfgTable 1 }
+
+    DWebAuthIfCfgEntry ::= SEQUENCE     {
+        dWebAuthIfEnabled    TruthValue
+    }
+
+    dWebAuthIfEnabled    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the Web-Authentication state on the interface.               
+            'truth'  - The Web-Authentication is enabled.                   
+            'false'  - The Web-Authentication is disabled."             
+        ::= { dWebAuthIfCfgEntry 1 }
+
+-- -----------------------------------------------------------------------------
+-- MIB Notifications statements
+-- -----------------------------------------------------------------------------
+    dWebAuthLoggedSuccess    NOTIFICATION-TYPE
+        OBJECTS   {
+            ifIndex,
+            dnaSessionAuthVlan,
+            dnaSessionClientMacAddress,
+            dnaSessionClientAddrType,
+            dnaSessionClientAddress,
+            dnaSessionAuthUserName
+        }
+        STATUS    current
+        DESCRIPTION
+            "The trap is sent when a host has successfully logged in(passed
+            Web-Authentication)."
+        ::= { dWebAuthNotifications 1 }
+
+    dWebAuthLoggedFail    NOTIFICATION-TYPE
+        OBJECTS   {
+            ifIndex,
+            dnaSessionAuthVlan,
+            dnaSessionClientMacAddress,
+            dnaSessionClientAddrType,
+            dnaSessionClientAddress,
+            dnaSessionAuthUserName
+        }
+        STATUS    current
+        DESCRIPTION
+            "The trap is sent when a host has  failed to pass Web-Authentication
+            (login failed)."
+        ::= { dWebAuthNotifications 2 }
+
+-- -----------------------------------------------------------------------------
+-- MIB Conformance statements
+-- -----------------------------------------------------------------------------
+    dWebAuthMIBCompliances  OBJECT IDENTIFIER
+        ::= { dWebAuthConformance 1 }
+
+    dWebAuthMIBGroups  OBJECT IDENTIFIER
+        ::= { dWebAuthConformance 2 } 
+    
+    dWebAuthMIBCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement the 
+            DLINKSW-WEB-AUTH-MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS    {   
+            dWebAuthCfgGroup,
+            dWebAuthIfCfgGroup
+        }                              
+        ::= { dWebAuthMIBCompliances 1 }
+-- -----------------------------------------------------------------------------        
+    dWebAuthCfgGroup OBJECT-GROUP
+        OBJECTS         { 
+            dWebAuthSysEnabled,
+            dWebAuthRedirectPath,
+            dWebAuthVirtualIp,
+            dWebAuthVirtualIpv6,
+            dWebAuthVirtualUrl,
+            dWebAuthNotifyEnabled,
+            dWebAuthPageTitle,
+            dWebAuthPageLoginWindowTitle,
+            dWebAuthPageUserName,
+            dWebAuthPagePassWord,
+            dWebAuthPageLogoutWindowTitle,
+            dWebAuthPageCopyrightLine1,
+            dWebAuthPageCopyrightLine2,
+            dWebAuthPageCopyrightLine3,
+            dWebAuthPageCopyrightLine4,
+            dWebAuthPageCopyrightLine5
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing management of the
+            Web-Authentication feature."
+        ::= { dWebAuthMIBGroups 1 }
+
+    dWebAuthIfCfgGroup OBJECT-GROUP
+        OBJECTS 
+        { 
+            dWebAuthIfEnabled
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing the management of Web-Authentication
+            on a per-interface basis."
+        ::= { dWebAuthMIBGroups 2 }
+
+    dWebAuthNotificationGroup    NOTIFICATION-GROUP
+        NOTIFICATIONS   { 
+            dWebAuthLoggedSuccess,
+            dWebAuthLoggedFail
+        }
+        STATUS    current
+        DESCRIPTION
+           "The collection of notifications used for monitoring the hosts under the 
+           control of Web-Authentication."
+        ::= { dWebAuthMIBGroups 3}
+END
