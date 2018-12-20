@@ -41,10 +41,8 @@ $rrd_options .= " GPRINT:perc:LAST:%5.2lf%%";
 $rrd_options .= " GPRINT:diff:%6.2lf%sB\\n";
 
 if ($_GET['previous']) {
-    $descr = rrdtool_escape('Prev '.$storage['storage_descr'], 12);
-
-    $colour      = '99999999';
-    $colour_area = '66666666';
+    $colour      = '77777777';
+    $colour_area = '33333333';
 
     $rrd_options .= " DEF:usedX=$rrd_filename:used:AVERAGE:start=".$prev_from.':end='.$from;
     $rrd_options .= " DEF:freeX=$rrd_filename:free:AVERAGE:start=".$prev_from.':end='.$from;
