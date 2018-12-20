@@ -60,21 +60,21 @@ class Nac implements Module
             }
 
             $nac_entries = $os->pollNac()->keyBy('mac_address');
-            $existing_entries = $os->getDeviceModel()->ports_nac->keyBy('mac_address');
+            $existing_entries = $os->getDeviceModel()->portsNac->keyBy('mac_address');
 
             // update existing models
-            foreach($nac_entries as $nac_entry) {
+            foreach ($nac_entries as $nac_entry) {
                 if ($existing = $existing_entries->get($nac_entry->mac_address)) {
                     $nac_entries->put($nac_entry->mac_address, $existing->fill($nac_entry->attributesToArray()));
                 }
             }
 
             // persist to DB
-            $os->getDeviceModel()->ports_nac()->saveMany($nac_entries);
+            $os->getDeviceModel()->portsNac()->saveMany($nac_entries);
 
             $delete = $existing_entries->diffKeys($nac_entries)->pluck('ports_nac_id');
             if ($delete->isNotEmpty()) {
-                $count = \LibreNMS\DB\Eloquent::DB()->table('ports_nac')->whereIn('ports_nac_id', $delete)->delete();
+                $count = PortsNac::query()->whereIn('ports_nac_id', $delete)->delete();
                 d_echo('Deleted ' . $count, str_repeat('-', $count));
             }
         }
@@ -88,6 +88,6 @@ class Nac implements Module
      */
     public function cleanup(OS $os)
     {
-        $os->getDeviceModel()->ports_nac()->delete();
+        $os->getDeviceModel()->portsNac()->delete();
     }
 }

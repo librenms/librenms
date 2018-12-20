@@ -499,7 +499,7 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\Port', 'device_id', 'device_id');
     }
 
-    public function ports_nac()
+    public function portsNac()
     {
         return $this->hasMany('App\Models\PortsNac', 'device_id', 'device_id');
     }

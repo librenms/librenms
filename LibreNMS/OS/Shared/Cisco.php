@@ -119,7 +119,7 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
 
     public function pollNac()
     {
-       $nac = collect();
+        $nac = collect();
 
         $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
         if (!empty($portAuthSessionEntry)) {
