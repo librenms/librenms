@@ -2,7 +2,7 @@
 /**
  * NacPolling.php
  *
- * -Description-
+ * Nac Polling interface
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ use Illuminate\Support\Collection;
 interface NacPolling
 {
     /**
-     * @return Collection PortNac models
+     * @return Collection PortNac objects
      */
     public function pollNac();
 }

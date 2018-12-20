@@ -21,6 +21,7 @@
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2018 Jose Augusto Cardoso
  */
 
 namespace LibreNMS\OS\Shared;
