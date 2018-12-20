@@ -85,6 +85,7 @@ function external_exec($command)
     global $debug, $vdebug;
 
     $proc = new \Symfony\Component\Process\Process($command);
+    $proc->setTimeout(600);
 
     if ($debug && !$vdebug) {
         $patterns = [
