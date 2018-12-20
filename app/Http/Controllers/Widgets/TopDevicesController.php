@@ -192,8 +192,10 @@ class TopDevicesController extends WidgetController
 
     private function getUptimeData($sort)
     {
+        $settings = $this->getSettings();
+
         /** @var Builder $query */
-        $query = $this->deviceQuery()->orderBy('uptime', $sort);
+        $query = $this->deviceQuery()->orderBy('uptime', $sort)->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($device) {
             return $this->standardRow($device, 'device_uptime', ['tab' => 'graphs', 'group' => 'system']);
@@ -204,8 +206,10 @@ class TopDevicesController extends WidgetController
 
     private function getPingData($sort)
     {
+        $settings = $this->getSettings();
+
         /** @var Builder $query */
-        $query = $this->deviceQuery()->orderBy('last_ping_timetaken', $sort);
+        $query = $this->deviceQuery()->orderBy('last_ping_timetaken', $sort)->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($device) {
             return $this->standardRow($device, 'device_ping_perf', ['tab' => 'graphs', 'group' => 'poller']);
@@ -216,9 +220,12 @@ class TopDevicesController extends WidgetController
 
     private function getProcessorData($sort)
     {
+        $settings = $this->getSettings();
+
         /** @var Builder $query */
         $query = $this->withDeviceQuery(Processor::hasAccess(Auth::user()), (new Processor)->getTable())
-            ->orderByRaw('AVG(`processor_usage`) ' . $sort);
+            ->orderByRaw('AVG(`processor_usage`) ' . $sort)
+            ->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($port) {
             return $this->standardRow($port->device, 'device_processor', ['tab' => 'health', 'metric' => 'processor']);
@@ -229,9 +236,12 @@ class TopDevicesController extends WidgetController
 
     private function getMemoryData($sort)
     {
+        $settings = $this->getSettings();
+
         /** @var Builder $query */
         $query = $this->withDeviceQuery(Mempool::hasAccess(Auth::user()), (new Mempool)->getTable())
-            ->orderBy('mempool_perc', $sort);
+            ->orderBy('mempool_perc', $sort)
+            ->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($port) {
             return $this->standardRow($port->device, 'device_mempool', ['tab' => 'health', 'metric' => 'mempool']);
@@ -242,8 +252,10 @@ class TopDevicesController extends WidgetController
 
     private function getPollerData($sort)
     {
+        $settings = $this->getSettings();
+
         /** @var Builder $query */
-        $query = $this->deviceQuery()->orderBy('last_polled_timetaken', $sort);
+        $query = $this->deviceQuery()->orderBy('last_polled_timetaken', $sort)->limit($settings['device_count']);
 
         $results = $query->get()->map(function ($device) {
             return $this->standardRow($device, 'device_poller_perf', ['tab' => 'graphs', 'group' => 'poller']);
