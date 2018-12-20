@@ -108,4 +108,15 @@ class Rewrite
 
         return str_ireplace(array_keys($rewrite_shortif), array_values($rewrite_shortif), $name);
     }
+
+    /**
+     * Reformat a mac stored in the DB (only hex) to a nice readable format
+     *
+     * @param $mac
+     * @return string
+     */
+    public static function readableMac($mac)
+    {
+        return rtrim(chunk_split($mac, 2, ':'), ':');
+    }
 }

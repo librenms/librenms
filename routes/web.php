@@ -63,6 +63,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('customers', 'CustomersController');
             Route::post('eventlog', 'EventlogController');
             Route::post('location', 'LocationController');
+            Route::post('port-nac', 'PortNacController');
             Route::post('graylog', 'GraylogController');
             Route::post('syslog', 'SyslogController');
         });

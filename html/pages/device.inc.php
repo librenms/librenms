@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\PortsNac;
 use LibreNMS\Authentication\LegacyAuth;
 
 if (!is_numeric($vars['device'])) {
@@ -432,6 +433,14 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             echo '<li role="presentation" '.$select['performance'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'performance')).'">
                 <i class="fa fa-line-chart fa-lg icon-theme"  aria-hidden="true"></i> Performance
+                </a>
+                </li>';
+        }
+
+        if (PortsNac::where('device_id', $device['device_id'])->exists()) {
+            echo '<li role="presentation" '.$select['nac'].'>
+                <a href="'.generate_device_url($device, array('tab' => 'nac')).'">
+                <i class="fa fa-lock fa-lg icon-theme"  aria-hidden="true"></i> NAC
                 </a>
                 </li>';
         }
