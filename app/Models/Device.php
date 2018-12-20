@@ -499,6 +499,11 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\Port', 'device_id', 'device_id');
     }
 
+    public function ports_nac()
+    {
+        return $this->hasMany('App\Models\PortsNac', 'device_id', 'device_id');
+    }
+
     public function processors()
     {
         return $this->hasMany('App\Models\Processor', 'device_id');

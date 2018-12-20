@@ -31,14 +31,9 @@ use LibreNMS\Util\IP;
 
 echo "\nCisco-NAC\n";
 
-// cache port ifIndex -> port_id map
-$ports_map = Port::where('device_id', $device['device_id'])->pluck('port_id', 'ifIndex');
-$port_nac_ids = [];
-
-// discovery output (but don't install it twice (testing can can do this)
-if (!PortsNac::getEventDispatcher()->hasListeners('eloquent.created: App\Models\PortsNac')) {
-    PortsNac::observe(new DiscoveryModelObserver());
-}
+$device_model = \App\Models\Device::find($device['device_id']);
+$new_nac = collect();
+$existing_nac = $device_model->ports_nac->keyBy('mac_address');
 
 // collect data via snmp and reorganize the session method entry a bit
 $portAuthSessionEntry = snmpwalk_cache_oid($device, 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
@@ -48,41 +43,54 @@ if (!empty($portAuthSessionEntry)) {
         $key = implode('.', array_slice($key_parts, 0, 2)); // remove the auth method
         return [$key => ['method' => $key_parts[2], 'authc_status' => $item['cafSessionMethodState']]];
     });
+
+    // cache port ifIndex -> port_id map
+    $ifIndex_map = $device_model->ports()->pluck('port_id', 'ifIndex');
+
+    // discovery output (but don't install it twice (testing can can do this)
+    if (!PortsNac::getEventDispatcher()->hasListeners('eloquent.created: App\Models\PortsNac')) {
+        PortsNac::observe(new DiscoveryModelObserver());
+    }
+
+    // update the DB
+    foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
+        list($ifIndex, $auth_id) = explode('.', str_replace("'", '', $index));
+        $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
+        $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress']))));
+
+        $data = [
+            'port_id' => $ifIndex_map->get($ifIndex, 0),
+            'mac_address' => $mac_address,
+            'auth_id' => $auth_id,
+            'domain' => $portAuthSessionEntryParameters['cafSessionDomain'],
+            'username' => $portAuthSessionEntryParameters['cafSessionAuthUserName'],
+            'ip_address' => (string)IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'], true),
+            'host_mode' => $portAuthSessionEntryParameters['cafSessionAuthHostMode'],
+            'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'],
+            'authz_by' => $portAuthSessionEntryParameters['cafSessionAuthorizedBy'],
+            'timeout' => $portAuthSessionEntryParameters['cafSessionTimeout'],
+            'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'],
+            'authc_status' => $session_info['authc_status'],
+            'method' => $session_info['method'],
+        ];
+
+        if ($model = $existing_nac->get($mac_address)) {
+            $model->fill($data);
+        } else {
+            $model = new PortsNac($data);
+        }
+
+        $new_nac->put($mac_address, $model);
+    }
+
+    $device_model->ports_nac()->saveMany($new_nac);
 }
 
-// update the DB
-foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
-    $auth_id = trim(strstr($index, "'"), "'");
-    $ifIndex = substr($index, 0, strpos($index, "."));
-    $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
 
-    $port_nac = PortsNac::updateOrCreate([
-        'port_id' => $ports_map->get($ifIndex, 0),
-        'mac_address' => strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress'])))),
-    ], [
-        'auth_id' => $auth_id,
-        'device_id' => $device['device_id'],
-        'domain' => $portAuthSessionEntryParameters['cafSessionDomain'],
-        'username' => $portAuthSessionEntryParameters['cafSessionAuthUserName'],
-        'ip_address' => (string)IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'], true),
-        'host_mode' => $portAuthSessionEntryParameters['cafSessionAuthHostMode'],
-        'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'],
-        'authz_by' => $portAuthSessionEntryParameters['cafSessionAuthorizedBy'],
-        'authc_status' => $session_info['authc_status'],
-        'timeout' => $portAuthSessionEntryParameters['cafSessionTimeout'],
-        'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'],
-        'method' => $session_info['method'],
-    ]);
-
-    // save valid ids
-    $port_nac_ids[] = $port_nac->ports_nac_id;
+$delete = $existing_nac->diffKeys($new_nac)->pluck('ports_nac_id');
+if ($delete->isNotEmpty()) {
+    $count = \LibreNMS\DB\Eloquent::DB()->table('ports_nac')->whereIn('ports_nac_id', $delete)->delete();
+    d_echo('Deleted ' . $count, str_repeat('-', $count));
 }
 
-
-// delete old entries
-$count = \LibreNMS\DB\Eloquent::DB()->table('ports_nac')->whereNotIn('ports_nac_id', $port_nac_ids)->delete();
-d_echo('Deleted ' . $count, str_repeat('-', $count));
-//    \App\Models\PortsNac::whereNotIn('ports_nac_id', $port_nac_ids)->get()->each->delete(); // alternate delete to trigger model events
-
-
-unset($port_nac_ids, $ports_map, $portAuthSessionEntry, $cafSessionMethodsInfoEntry, $port_nac);
+unset($port_nac_ids, $ifIndex_map, $portAuthSessionEntry, $cafSessionMethodsInfoEntry, $existing_nac, $new_nac);

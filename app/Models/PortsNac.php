@@ -32,19 +32,19 @@ class PortsNac extends BaseModel
     public $timestamps = false;
     protected $fillable = [
         'auth_id',
-        'port_id',
         'device_id',
+        'port_id',
+        'domain',
+        'username',
         'mac_address',
         'ip_address',
-        'authz_status',
-        'domain',
         'host_mode',
-        'username',
+        'authz_status',
         'authz_by',
-        'timeout',
-        'time_left',
         'authc_status',
         'method',
+        'timeout',
+        'time_left',
     ];
 
 
