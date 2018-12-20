@@ -121,7 +121,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     } else {
         // we have another sensor
         $current_label = get_sensor_label_color($sensor);
-        $sensor_current = "<span class='label $current_label'>".format_si($sensor['sensor_current']).$unit."</span>";
+        $sensor_current = "<span class='label $current_label'>".(format_si($sensor['sensor_current'])+0)." $unit</span>";
     }
 
     $response[] = array(
