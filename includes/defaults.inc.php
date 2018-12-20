@@ -782,6 +782,7 @@ $config['poller_modules']['cisco-voice']                 = false;
 $config['poller_modules']['cisco-cbqos']                 = false;
 $config['poller_modules']['cisco-otv']                   = false;
 $config['poller_modules']['cisco-vpdn']                  = false;
+$config['poller_modules']['nac']                         = false;
 $config['poller_modules']['netscaler-vsvr']              = false;
 $config['poller_modules']['aruba-controller']            = false;
 $config['poller_modules']['entity-physical']             = true;
