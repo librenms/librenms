@@ -8,13 +8,13 @@
                     "sysDescr": "Cisco IOS Software, s72033_rp Software (s72033_rp-IPSERVICESK9-M), Version 15.1(2)SY10, RELEASE SOFTWARE (fc4)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\r\nCompiled Tue 21-Feb-17 02:00 by prod_rel_+",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "ios",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg"
+                    "icon": "cisco.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "15.1(2)SY10",
                     "hardware": "cat6509",
                     "features": "IPSERVICESK9",
-                    "location": "<private>",
                     "os": "ios",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg"
+                    "icon": "cisco.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -63683,161 +63683,161 @@
                 {
                     "vrf_oid": "1",
                     "vrf_name": "20",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "399"
                 },
                 {
                     "vrf_oid": "2",
                     "vrf_name": "30",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "398"
                 },
                 {
                     "vrf_oid": "3",
                     "vrf_name": "40",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "417"
                 },
                 {
                     "vrf_oid": "4",
                     "vrf_name": "50",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "418"
                 },
                 {
                     "vrf_oid": "5",
                     "vrf_name": "CGN",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "578,834,835,836"
                 },
                 {
                     "vrf_oid": "6",
                     "vrf_name": "CFI",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "848,849,850"
                 },
                 {
                     "vrf_oid": "7",
                     "vrf_name": "Cne",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "506,509,577,615"
                 },
                 {
                     "vrf_oid": "8",
                     "vrf_name": "CED",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "774,775,776"
                 },
                 {
                     "vrf_oid": "9",
                     "vrf_name": "CID",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "874,875,876,877"
                 },
                 {
                     "vrf_oid": "10",
                     "vrf_name": "Crt",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "535,536,538,750"
                 },
                 {
                     "vrf_oid": "11",
                     "vrf_name": "CVA",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "871,872,883,885"
                 },
                 {
                     "vrf_oid": "12",
                     "vrf_name": "CDL",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "542,543,544"
                 },
                 {
                     "vrf_oid": "13",
                     "vrf_name": "Cte",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "814,815"
                 },
                 {
                     "vrf_oid": "14",
                     "vrf_name": "CHC",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "804,805,806,807"
                 },
                 {
                     "vrf_oid": "15",
                     "vrf_name": "CYV",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "810,811"
                 },
                 {
                     "vrf_oid": "16",
                     "vrf_name": "CTM",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "792,793,794,818"
                 },
                 {
                     "vrf_oid": "17",
                     "vrf_name": "CBE",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "801,802,803,838,854"
                 },
                 {
                     "vrf_oid": "18",
                     "vrf_name": "PIC",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "769,770,785"
                 },
                 {
                     "vrf_oid": "19",
                     "vrf_name": "O_Tit",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "907,908,909"
                 },
                 {
                     "vrf_oid": "20",
                     "vrf_name": "CCO",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "919,920,921"
                 },
                 {
                     "vrf_oid": "21",
                     "vrf_name": "CLF",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "925,926,927"
                 },
                 {
                     "vrf_oid": "22",
                     "vrf_name": "O_EXT",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "938,940"
                 },
                 {
                     "vrf_oid": "23",
                     "vrf_name": "O_INT",
-                    "mplsVpnVrfRouteDistinguisher": "",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "939,941,947,948"
                 }
