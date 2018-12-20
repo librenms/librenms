@@ -1,8 +1,8 @@
 <?php
 /**
- * nac.inc.php
+ * NacPolling.php
  *
- * Cisco network access controls poller module
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,18 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 Jose Augusto Cardoso
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\OS;
+namespace LibreNMS\Interfaces\Polling;
 
-if (!$os instanceof OS) {
-    $os = OS::make($device);
+use Illuminate\Support\Collection;
+
+interface NacPolling
+{
+    /**
+     * @return Collection PortNac models
+     */
+    public function pollNac();
 }
-(new \LibreNMS\Modules\Nac())->poll($os);

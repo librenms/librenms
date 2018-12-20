@@ -1,8 +1,8 @@
 <?php
 /**
- * DiscoveryModelObserver.php
+ * Module.php
  *
- * Displays +,-,U,. while running discovery and adding,deleting,updating, and doing nothing.
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,32 +23,34 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Util;
+namespace LibreNMS\Interfaces;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
+use LibreNMS\OS;
 
-class DiscoveryModelObserver
+interface Module
 {
-    public function saving(Eloquent $model)
-    {
-        if (!$model->isDirty()) {
-            echo '.';
-        }
-    }
+    /**
+     * Discover this module. Heavier processes can be run here
+     * Run infrequently (default 4 times a day)
+     *
+     * @param OS $os
+     */
+    public function discover(OS $os);
 
-    public function updated(Eloquent $model)
-    {
-        d_echo("Updated data:", 'U');
-        d_echo($model->getDirty());
-    }
+    /**
+     * Poll data for this module and update the DB / RRD.
+     * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
+     * Run frequently (default every 5 minutes)
+     *
+     * @param OS $os
+     */
+    public function poll(OS $os);
 
-    public function created(Eloquent $model)
-    {
-        echo '+';
-    }
-
-    public function deleted(Eloquent $model)
-    {
-        echo '-';
-    }
+    /**
+     * Remove all DB data for this module.
+     * This will be run when the module is disabled.
+     *
+     * @param OS $os
+     */
+    public function cleanup(OS $os);
 }
