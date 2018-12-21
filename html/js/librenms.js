@@ -299,11 +299,25 @@ $(document).ready(function () {
     }, 300000);
 });
 
-var jsfilesadded = [];
+var jsFilesAdded = [];
+var jsLoadingFiles = {};
 function loadjs(filename, func){
-    if (jsfilesadded.indexOf(filename) < 0) {
-        $.getScript(filename, func);
-        jsfilesadded.push(filename);
+    if (jsFilesAdded.indexOf(filename) < 0) {
+        if (filename in jsLoadingFiles) {
+            // store all waiting callbacks
+            jsLoadingFiles[filename].push(func);
+        } else {
+            // first request, load the script store the callback for this request
+            jsLoadingFiles[filename] = [func];
+            $.getScript(filename, function () {
+                // finish loading the script, call all waiting callbacks
+                jsFilesAdded.push(filename);
+                for (var i = 0; i < jsLoadingFiles[filename].length; i++) {
+                    jsLoadingFiles[filename][i]();
+                }
+                delete jsLoadingFiles[filename];
+            });
+        }
     } else {
         func();
     }
