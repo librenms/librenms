@@ -84,8 +84,8 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry) {
                 <td><span style='font-weight: bold;' class=".$fabric['mode_class'].'>'.$fabric['cc6kxbarModuleChannelFabStatus'].'</span></td>
                 <td>'.formatRates(($fabric['cc6kxbarModuleChannelSpeed'] * 1000000)).'</td>
                 <td>'.overlib_link($link, $minigraph, $overlib_content).'</td>
-                <td>'.print_percentage_bar(125, 20, $percent_in, 'Ingress', 'ffffff', $background['left'], $percent_in.'%', 'ffffff', $background['right']).'</td>
-                <td>'.print_percentage_bar(125, 20, $percent_out, 'Egress', 'ffffff', $background['left'], $percent_out.'%', 'ffffff', $background['right']).'</td>
+                <td>'.print_percentage_bar(125, 20, $percent_in, 'Ingress', 'ffffff', $background_in['left'], $percent_in.'%', 'ffffff', $background_in['right']).'</td>
+                <td>'.print_percentage_bar(125, 20, $percent_out, 'Egress', 'ffffff', $background_out['left'], $percent_out.'%', 'ffffff', $background_out['right']).'</td>
                 </tr>');
         }//end if
     }//end foreach
