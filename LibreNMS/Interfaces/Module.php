@@ -1,8 +1,8 @@
 <?php
 /**
- * nac.inc.php
+ * Module.php
  *
- * Cisco network access controls poller module
+ * LibreNMS Discovery/Poller Module
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,38 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 Jose Augusto Cardoso
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+namespace LibreNMS\Interfaces;
+
 use LibreNMS\OS;
 
-if (!$os instanceof OS) {
-    $os = OS::make($device);
+interface Module
+{
+    /**
+     * Discover this module. Heavier processes can be run here
+     * Run infrequently (default 4 times a day)
+     *
+     * @param OS $os
+     */
+    public function discover(OS $os);
+
+    /**
+     * Poll data for this module and update the DB / RRD.
+     * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
+     * Run frequently (default every 5 minutes)
+     *
+     * @param OS $os
+     */
+    public function poll(OS $os);
+
+    /**
+     * Remove all DB data for this module.
+     * This will be run when the module is disabled.
+     *
+     * @param OS $os
+     */
+    public function cleanup(OS $os);
 }
-(new \LibreNMS\Modules\Nac())->poll($os);

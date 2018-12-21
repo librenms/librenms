@@ -21,15 +21,19 @@
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2018 Jose Augusto Cardoso
  */
 
 namespace LibreNMS\OS\Shared;
 
+use App\Models\PortsNac;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\IP;
 
-class Cisco extends OS implements ProcessorDiscovery
+class Cisco extends OS implements ProcessorDiscovery, NacPolling
 {
     /**
      * Discover processors.
@@ -111,5 +115,47 @@ class Cisco extends OS implements ProcessorDiscovery
         }
 
         return $processors;
+    }
+
+    public function pollNac()
+    {
+        $nac = collect();
+
+        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
+        if (!empty($portAuthSessionEntry)) {
+            $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($this->getDevice(), 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB'))->mapWithKeys(function ($item, $key) {
+                $key_parts = explode('.', $key);
+                $key = implode('.', array_slice($key_parts, 0, 2)); // remove the auth method
+                return [$key => ['method' => $key_parts[2], 'authc_status' => $item['cafSessionMethodState']]];
+            });
+
+            // cache port ifIndex -> port_id map
+            $ifIndex_map = $this->getDeviceModel()->ports()->pluck('port_id', 'ifIndex');
+
+            // update the DB
+            foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
+                list($ifIndex, $auth_id) = explode('.', str_replace("'", '', $index));
+                $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
+                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress']))));
+
+                $nac->put($mac_address, new PortsNac([
+                    'port_id' => $ifIndex_map->get($ifIndex, 0),
+                    'mac_address' => $mac_address,
+                    'auth_id' => $auth_id,
+                    'domain' => $portAuthSessionEntryParameters['cafSessionDomain'],
+                    'username' => $portAuthSessionEntryParameters['cafSessionAuthUserName'],
+                    'ip_address' => (string)IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'], true),
+                    'host_mode' => $portAuthSessionEntryParameters['cafSessionAuthHostMode'],
+                    'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'],
+                    'authz_by' => $portAuthSessionEntryParameters['cafSessionAuthorizedBy'],
+                    'timeout' => $portAuthSessionEntryParameters['cafSessionTimeout'],
+                    'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'],
+                    'authc_status' => $session_info['authc_status'],
+                    'method' => $session_info['method'],
+                ]));
+            }
+        }
+
+        return $nac;
     }
 }

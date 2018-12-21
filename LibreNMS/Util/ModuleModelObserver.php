@@ -1,8 +1,8 @@
 <?php
 /**
- * nac.inc.php
+ * DiscoveryModelObserver.php
  *
- * Cisco network access controls poller module
+ * Displays +,-,U,. while running discovery and adding,deleting,updating, and doing nothing.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,36 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 Jose Augusto Cardoso
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\OS;
+namespace LibreNMS\Util;
 
-if (!$os instanceof OS) {
-    $os = OS::make($device);
+use Illuminate\Database\Eloquent\Model as Eloquent;
+
+class ModuleModelObserver
+{
+    public function saving(Eloquent $model)
+    {
+        if (!$model->isDirty()) {
+            echo '.';
+        }
+    }
+
+    public function updated(Eloquent $model)
+    {
+        d_echo("Updated data:", 'U');
+        d_echo($model->getDirty());
+    }
+
+    public function created(Eloquent $model)
+    {
+        echo '+';
+    }
+
+    public function deleted(Eloquent $model)
+    {
+        echo '-';
+    }
 }
-(new \LibreNMS\Modules\Nac())->poll($os);
