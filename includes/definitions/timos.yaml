@@ -10,4 +10,5 @@ icon: nokia
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.6527.
-
+discovery_modules:
+    vrf: true
