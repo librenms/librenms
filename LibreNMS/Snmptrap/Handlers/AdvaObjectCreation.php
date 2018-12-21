@@ -47,7 +47,6 @@ class AdvaObjectCreation implements SnmptrapHandler
     {
 
         $device_array = $device->toArray();
-
         if ($trap_oid = $trap->findOid('CM-SECURITY-MIB::cmSecurityUserName')) {
             $UserName = $trap->getOidData($trap_oid);
             log_event("User object $UserName created.", $device_array, 'trap', 2);

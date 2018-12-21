@@ -49,7 +49,6 @@ class AdvaStateChangeTrap implements SnmptrapHandler
     {
 
         $device_array = $device->toArray();
-
         if ($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortAdminState')) {
             $adminState = $trap->getOidData($trap_oid);
             $opState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortOperationalState'));
