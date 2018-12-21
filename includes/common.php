@@ -627,7 +627,7 @@ function format_si($value, $round = '2', $sf = '3')
         $value = $value * -1;
     }
 
-    return number_format(round($value, $round), $sf, '.', '').$ext;
+    return (number_format(round($value, $round), $sf, '.', '')+0)." ".$ext;
 }
 
 function format_bi($value, $round = '2', $sf = '3')
@@ -646,8 +646,7 @@ function format_bi($value, $round = '2', $sf = '3')
     if ($neg) {
         $value = $value * -1;
     }
-
-    return number_format(round($value, $round), $sf, '.', '').$ext;
+    return (number_format(round($value, $round), $sf, '.', '')+0)." ".$ext;
 }
 
 function format_number($value, $base = '1000', $round = 2, $sf = 3)
