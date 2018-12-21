@@ -3,7 +3,6 @@
 // Set Entity state
 foreach (dbFetch('SELECT * FROM `entPhysical_state` WHERE `device_id` = ?', array($device['device_id'])) as $entity) {
     if (!isset($entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']])) {
-//	echo 'dbDelete' . ' ' . $entity['entPhysicalIndex'] . ' ' . $entity['subindex'] . ' ' . $entity['key'] . ': ' . $entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']] . "\n";
         dbDelete(
             'entPhysical_state',
             '`device_id` = ? AND `entPhysicalIndex` = ? AND `subindex` = ? AND `group` = ? AND `key` = ?',
@@ -43,7 +42,6 @@ foreach ((array)$entPhysical_state as $epi => $entity) {
     foreach ($entity as $subindex => $si) {
         foreach ($si as $group => $ti) {
             foreach ($ti as $key => $value) {
-//		echo  'dbInsert: ' . $device['device_id']  . ' ' .  $epi . ' ' .  $subindex . ' ' . $group . ' ' . $key . ' ' . $value . "\n";
                 dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $epi, 'subindex' => $subindex, 'group' => $group, 'key' => $key, 'value' => $value), 'entPhysical_state');
             }
         }
