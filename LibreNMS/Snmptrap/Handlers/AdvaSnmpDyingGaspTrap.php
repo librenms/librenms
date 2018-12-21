@@ -46,6 +46,5 @@ class AdvaSnmpDyingGaspTrap implements SnmptrapHandler
     {
         $device_array = $device->toArray();
         log_event("Dying Gasp received", $device_array, 'trap', 5);
-
     }
 }

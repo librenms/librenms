@@ -58,15 +58,14 @@ Options:
 }
 $hostname = $options['h'];
 
-echo("\nThis test script will sequentually send pre-created trap data to the trap handling system using the hostname given with a 2 second
+echo ("\nThis test script will sequentually send pre-created trap data to the trap handling system using the hostname given with a 2 second
 delay between each trap. The expected log text will display below, compare with the eventlog in the UI for the device given. \n\n");
 
-
 /*
- * Object Creation 
-*/
+ * Object Creation
+ */
 
-echo("The following traps will test AdvaObjectCreation.php: \n\n");
+echo ("The following traps will test AdvaObjectCreation.php: \n\n");
 
 // User creation trap
 
@@ -82,7 +81,7 @@ CM-SECURITY-MIB::cmSecurityUserComment.\"test-trap-user\".false Remote User";
 $trap = new \LibreNMS\Snmptrap\Trap($userCreate);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("User object trap-test-user created.\n");
+echo ("User object trap-test-user created.\n");
 sleep($time);
 
 // LAG creation trap
@@ -106,14 +105,14 @@ F3-LAG-MIB::f3LagEntry.14.1.1 \"B0 00 \"";
 $trap = new \LibreNMS\Snmptrap\Trap($lagCreate);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("LAG 1 created.\n");
+echo ("LAG 1 created.\n");
 sleep($time);
 
 /*
  * Object Deletion Traps
-*/
+ */
 
-echo("\nThe following traps will test AdvaObjectDeletion.php:\n\n");
+echo ("\nThe following traps will test AdvaObjectDeletion.php:\n\n");
 
 // User deletion trap
 
@@ -126,7 +125,7 @@ CM-SECURITY-MIB::cmSecurityUserName.\"test-trap-user\".false test-trap-user";
 $trap = new \LibreNMS\Snmptrap\Trap($text);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("User object test-trap-user deleted.\n");
+echo ("User object test-trap-user deleted.\n");
 sleep(time);
 
 // LAG deletion trap
@@ -140,7 +139,7 @@ F3-LAG-MIB::f3LagIndex.1.1 1";
 $trap = new \LibreNMS\Snmptrap\Trap($lagDelete);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("LAG 1 deleted.\n");
+echo ("LAG 1 deleted.\n");
 sleep($time);
 
 // LAG member port deletion trap
@@ -154,7 +153,7 @@ F3-LAG-MIB::f3LagPortIndex.1.1.1 1";
 $trap = new \LibreNMS\Snmptrap\Trap($lagPortDelete);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("LAG member port 1 removed from LAG 1-1. \n");
+echo ("LAG member port 1 removed from LAG 1-1. \n");
 sleep($time);
 
 // Flow deletion trap
@@ -168,14 +167,14 @@ CM-FACILITY-MIB::cmFlowIndex.1.1.1.4.1 1";
 $trap = new \LibreNMS\Snmptrap\Trap($flowDelete);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Flow 1-1-1-4-1 deleted. \n");
+echo ("Flow 1-1-1-4-1 deleted. \n");
 sleep($time);
 
 /*
  * Configuration attribute change traps
-*/
+ */
 
-echo("\nThe following traps will test AdvaAttributeChange.php:\n\n");
+echo ("\nThe following traps will test AdvaAttributeChange.php:\n\n");
 
 // Syslog modified traps
 
@@ -190,9 +189,9 @@ CM-SYSTEM-MIB::sysLogPort.1 514";
 $trap = new \LibreNMS\Snmptrap\Trap($syslogIpv4);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Syslog server 1 IP version set to ipv4. \n");
-echo("Syslog server 1 IP address changed to 10.255.255.2. \n");
-echo("Syslog server 1 IP address changed to 514. \n");
+echo ("Syslog server 1 IP version set to ipv4. \n");
+echo ("Syslog server 1 IP address changed to 10.255.255.2. \n");
+echo ("Syslog server 1 IP address changed to 514. \n");
 sleep($time);
 
 $syslogIpv6 = "$hostname
@@ -205,8 +204,8 @@ CM-SYSTEM-MIB::sysLogIpVersion.1 ipv6";
 $trap = new \LibreNMS\Snmptrap\Trap($syslogIpv6);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Syslog server 1 IP version set to ipv6. \n");
-echo("Syslog server 1 IP address changed to 2001:0:0:0:0:0:0:2. \n");
+echo ("Syslog server 1 IP version set to ipv6. \n");
+echo ("Syslog server 1 IP address changed to 2001:0:0:0:0:0:0:2. \n");
 sleep($time);
 
 // ACL modified trap
@@ -220,7 +219,7 @@ CM-SYSTEM-MIB::aclEntryEnabled.5 false";
 $trap = new \LibreNMS\Snmptrap\Trap($aclEntry);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("ACL 5 modified \n");
+echo ("ACL 5 modified \n");
 sleep($time);
 
 // Banner modified trap
@@ -234,7 +233,7 @@ CM-SYSTEM-MIB::securityBanner.0 Banner Text";
 $trap = new \LibreNMS\Snmptrap\Trap($banner);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("MOTD/Banner modified \n");
+echo ("MOTD/Banner modified \n");
 sleep($time);
 
 // Time and NTP modified traps
@@ -257,8 +256,8 @@ F3-TIMEZONE-MIB::f3TimeZoneDstControlEnabled.0 true";
 $trap = new \LibreNMS\Snmptrap\Trap($dstEnabled);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Daylight Savings Time disabled.\n");
-echo("Daylight Savings Time enabled.\n");
+echo ("Daylight Savings Time disabled.\n");
+echo ("Daylight Savings Time enabled.\n");
 sleep($time);
 
 $utcOffset = "$hostname
@@ -270,7 +269,7 @@ F3-TIMEZONE-MIB::f3TimeZoneUtcOffset.0 -05:00";
 $trap = new \LibreNMS\Snmptrap\Trap($utcOffset);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("UTC offset (timezone) change to -05:00\n");
+echo ("UTC offset (timezone) change to -05:00\n");
 sleep($time);
 
 $timeSrc = "$hostname
@@ -282,7 +281,7 @@ CM-SYSTEM-MIB::sysTimeOfDayType.0 ntp";
 $trap = new \LibreNMS\Snmptrap\Trap($timeSrc);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Time source set to ntp \n");
+echo ("Time source set to ntp \n");
 sleep($time);
 
 $ntpPrimary = "$hostname
@@ -305,8 +304,8 @@ CM-SYSTEM-MIB::ntpBackupServerIpVersion.0 ipv4";
 $trap = new \LibreNMS\Snmptrap\Trap($ntpSecondary);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Primary NTP server IP 10.255.255.3\n");
-echo("Backup NTP server IP 10.255.255.4\n");
+echo ("Primary NTP server IP 10.255.255.3\n");
+echo ("Backup NTP server IP 10.255.255.4\n");
 sleep($time);
 
 // Authentication server modified traps
@@ -324,9 +323,9 @@ CM-SECURITY-MIB::cmRemoteAuthServerEnabled.3 true";
 $trap = new \LibreNMS\Snmptrap\Trap($authServer);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Authentication server enabled.\n");
-echo("Authentication server 3 secret changed\n");
-echo("Authentication server 3 IP changed to 10.255.255.5.\n");
+echo ("Authentication server enabled.\n");
+echo ("Authentication server 3 secret changed\n");
+echo ("Authentication server 3 IP changed to 10.255.255.5.\n");
 sleep($time);
 
 // Network Element card name and CLI prefix modified traps
@@ -341,8 +340,8 @@ CM-ENTITY-MIB::neCmdPromptPrefix.1 adva-test-1";
 $trap = new \LibreNMS\Snmptrap\Trap($neName);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Network Element name changed to adva-test-1.\n");
-echo("Network Element prompt changed to adva-test-1.\n");
+echo ("Network Element name changed to adva-test-1.\n");
+echo ("Network Element prompt changed to adva-test-1.\n");
 sleep($time);
 
 // SNMP Dying Gasp Enable/Disable traps
@@ -356,7 +355,7 @@ CM-ENTITY-MIB::ethernetNTEGE114ProCardSnmpDyingGaspEnabled.1.1.1 true";
 $trap = new \LibreNMS\Snmptrap\Trap($gaspEnable);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("SNMP Dying Gasp is enabled.\n");
+echo ("SNMP Dying Gasp is enabled.\n");
 
 $gaspDisable = "$hostname
 UDP: [192.168.1.1]:36570->[10.0.0.1]:162
@@ -367,7 +366,7 @@ CM-ENTITY-MIB::ethernetNTEGE114ProCardSnmpDyingGaspEnabled.1.1.1 false";
 $trap = new \LibreNMS\Snmptrap\Trap($gaspDisable);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("SNMP Dying Gasp is disabled.\n");
+echo ("SNMP Dying Gasp is disabled.\n");
 sleep($time);
 
 // Network port modified traps
@@ -387,12 +386,12 @@ CM-FACILITY-MIB::cmEthernetNetPortConfigSpeed.1.1.1.2 speed-auto-100MB-full";
 $trap = new \LibreNMS\Snmptrap\Trap($netPort);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Network Port 1-1-1-2 changed speed to speed-auto-100MB-full.\n");
-echo("Network Port 1-1-1-2 changed media to copper.\n");
-echo("Network Port 1-1-1-2 changed MDIX to crossed.\n");
-echo("Network Port 1-1-1-2 AutoDiagnostic disabled.\n");
-echo("Network Port 1-1-1-2 administrative state changed to in-service.\n");
-echo("Network Port 1-1-1-2 MTU changed to 9000 bytes.\n");
+echo ("Network Port 1-1-1-2 changed speed to speed-auto-100MB-full.\n");
+echo ("Network Port 1-1-1-2 changed media to copper.\n");
+echo ("Network Port 1-1-1-2 changed MDIX to crossed.\n");
+echo ("Network Port 1-1-1-2 AutoDiagnostic disabled.\n");
+echo ("Network Port 1-1-1-2 administrative state changed to in-service.\n");
+echo ("Network Port 1-1-1-2 MTU changed to 9000 bytes.\n");
 sleep($time);
 
 // Access Port modified traps
@@ -415,11 +414,11 @@ IF-MIB::ifAlias.4 Shado's Desk";
 $trap = new \LibreNMS\Snmptrap\Trap($accPort);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Access Port 1-1-1-4 changed speed to speed-auto-1000MB-full.\n");
-echo("Access Port 1-1-1-4 changed media to fiber.\n");
-echo("Access Port 1-1-1-4 changed MDIX to not-applicable.\n");
-echo("Access Port 1-1-1-4 MTU changed to 9000 bytes.\n");
-echo("Access Port 1-1-1-4 administrative state changed to maintenance.\n");
+echo ("Access Port 1-1-1-4 changed speed to speed-auto-1000MB-full.\n");
+echo ("Access Port 1-1-1-4 changed media to fiber.\n");
+echo ("Access Port 1-1-1-4 changed MDIX to not-applicable.\n");
+echo ("Access Port 1-1-1-4 MTU changed to 9000 bytes.\n");
+echo ("Access Port 1-1-1-4 administrative state changed to maintenance.\n");
 sleep($time);
 
 // Flow modified traps
@@ -434,7 +433,7 @@ CM-FACILITY-MIB::cmFlowN2ACIRHi.1.1.1.4.1 0";
 $trap = new \LibreNMS\Snmptrap\Trap($flow);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Access Flow 1-1-1-4-1 modified.\n");
+echo ("Access Flow 1-1-1-4-1 modified.\n");
 sleep($time);
 
 // QoS modified traps
@@ -448,7 +447,7 @@ CM-FACILITY-MIB::cmQosFlowPolicerCIRLo.1.1.1.3.1.1.1 9856000";
 $trap = new \LibreNMS\Snmptrap\Trap($flowPolicer);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("QoS on flow 1-1-1-3-1 modified.\n");
+echo ("QoS on flow 1-1-1-3-1 modified.\n");
 sleep($time);
 
 $accShaper = "$hostname
@@ -460,14 +459,14 @@ CM-FACILITY-MIB::cmAccPortQosShaperCIRLo.1.1.1.3.1 120000000";
 $trap = new \LibreNMS\Snmptrap\Trap($accShaper);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Shaper modified on access port 1-1-1-3-1 modified.\n");
+echo ("Shaper modified on access port 1-1-1-3-1 modified.\n");
 sleep($time);
 
 /*
-* This section test AdvaSnmpDyingGasp.php
-*/
+ * This section test AdvaSnmpDyingGasp.php
+ */
 
-echo("\nThe following trpas with test AdvaSnmpDyingGaspTrap.php:\n\n");
+echo ("\nThe following trpas with test AdvaSnmpDyingGaspTrap.php:\n\n");
 
 $dyingGasp = "$hostname
 UDP: [192.168.1.1]:53407->[10.0.0.1]:162
@@ -477,16 +476,16 @@ SNMPv2-MIB::snmpTrapOID.0 CM-SYSTEM-MIB::cmSnmpDyingGaspTrap";
 $trap = new \LibreNMS\Snmptrap\Trap($dyingGasp);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Dying Gasp received\n");
+echo ("Dying Gasp received\n");
 sleep($time);
 
 /*
-* The following section tests AdvaStateChange.php
-*/
+ * The following section tests AdvaStateChange.php
+ */
 
 // Network interface state changes
 
-echo("\nThe following traps will test AdvaStateChangeTrap.php:\n\n");
+echo ("\nThe following traps will test AdvaStateChangeTrap.php:\n\n");
 
 $neState = "$hostname
 UDP: [192.168.1.1]:24402->[10.0.0.1]:162
@@ -500,14 +499,14 @@ IF-MIB::ifName.2 NETWORK PORT-1-1-1-2";
 $trap = new \LibreNMS\Snmptrap\Trap($neState);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Port state change: NETWORK PORT-1-1-1-2 Admin State: maintenance Operational State: outage\n");
+echo ("Port state change: NETWORK PORT-1-1-1-2 Admin State: maintenance Operational State: outage\n");
 sleep($time);
 
 $accState = "$hostname
 UDP: [192.168.1.1]:24402->[10.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:07:42.66
 SNMPv2-MIB::snmpTrapOID.0 CM-SYSTEM-MIB::cmStateChangeTrap
-CM-FACILITY-MIB::cmEthernetAccPortAdminState.1.1.1.3 maintenance 
+CM-FACILITY-MIB::cmEthernetAccPortAdminState.1.1.1.3 maintenance
 CM-FACILITY-MIB::cmEthernetAccPortOperationalState.1.1.1.3 normal
 CM-FACILITY-MIB::cmEthernetAccPortSecondaryState.1.1.1.3 \"42 00 00 \"
 IF-MIB::ifName.3 ACCESS PORT-1-1-1-3";
@@ -515,7 +514,7 @@ IF-MIB::ifName.3 ACCESS PORT-1-1-1-3";
 $trap = new \LibreNMS\Snmptrap\Trap($accState);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Port state change: ACCESS PORT-1-1-1-3 Admin State: maintenance Operational State: normal\n");
+echo ("Port state change: ACCESS PORT-1-1-1-3 Admin State: maintenance Operational State: normal\n");
 sleep($time);
 
 $flowState = "$hostname
@@ -529,14 +528,14 @@ CM-FACILITY-MIB::cmFlowSecondaryState.1.1.1.3.1 \"40 00 00 \"";
 $trap = new \LibreNMS\Snmptrap\Trap($flowState);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("Flow state change: 1-1-1-3-1 Admin State: management Operational State: normal\n");
+echo ("Flow state change: 1-1-1-3-1 Admin State: management Operational State: normal\n");
 sleep($time);
 
 /*
-* This section tests AdvaSysAlmtrap.php
-*/
+ * This section tests AdvaSysAlmtrap.php
+ */
 
-echo("\nThe following traps will test AdvaSysAlmTrap.php:\n\n");
+echo ("\nThe following traps will test AdvaSysAlmTrap.php:\n\n");
 
 $sysAlarm = "$hostname
 UDP: [192.168.1.1]:24402->[10.0.0.1]:162
@@ -550,20 +549,20 @@ CM-ALARM-MIB::cmSysAlmTime.5 2018-12-10,11:28:20.0,-6:0
 CM-ALARM-MIB::cmSysAlmLocation.5 nearEnd
 CM-ALARM-MIB::cmSysAlmDirection.5 receiveDirectionOnly
 CM-ALARM-MIB::cmSysAlmDescr.5 \"Primary NTP Server Failed\"
-CM-ALARM-MIB::cmSysAlmObject.5 SNMPv2-MIB::system 
+CM-ALARM-MIB::cmSysAlmObject.5 SNMPv2-MIB::system
 CM-ALARM-MIB::cmSysAlmObjectName.5 SYSTEM";
 
 $trap = new \LibreNMS\Snmptrap\Trap($sysAlarm);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("System Alarm: Primary NTP Server Failed Status: minor\n");
+echo ("System Alarm: Primary NTP Server Failed Status: minor\n");
 sleep($time);
 
 /*
-* This section tests AdvaNetThresholdCrossingAlert.php
-*/
+ * This section tests AdvaNetThresholdCrossingAlert.php
+ */
 
-echo("\nThe following traps will test AdvaNetThresholdCrossingAlert.php:\n");
+echo ("\nThe following traps will test AdvaNetThresholdCrossingAlert.php:\n");
 
 $netAlarm = "$hostname
 UDP: [192.168.1.1]:24402->[10.0.0.1]:162
@@ -580,5 +579,4 @@ IF-MIB::ifName.2 NETWORK PORT-1-1-1-2";
 $trap = new \LibreNMS\Snmptrap\Trap($netAlarm);
 \LibreNMS\Snmptrap\Dispatcher::handle($trap);
 
-echo("NETWORK PORT-1-1-1-2 threshold exceeded for interval-15min. Threshold OID is CM-PERFORMANCE-MIB::cmEthernetNetPortStatsUAS.1.1.1.2.1.\n\n");
-
+echo ("NETWORK PORT-1-1-1-2 threshold exceeded for interval-15min. Threshold OID is CM-PERFORMANCE-MIB::cmEthernetNetPortStatsUAS.1.1.1.2.1.\n\n");
