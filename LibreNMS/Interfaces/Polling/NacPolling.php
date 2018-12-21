@@ -1,8 +1,8 @@
 <?php
 /**
- * DiscoveryModelObserver.php
+ * NacPolling.php
  *
- * Displays +,-,U,. while running discovery and adding,deleting,updating, and doing nothing.
+ * Nac Polling interface
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,32 +23,14 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Util;
+namespace LibreNMS\Interfaces\Polling;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Support\Collection;
 
-class DiscoveryModelObserver
+interface NacPolling
 {
-    public function saving(Eloquent $model)
-    {
-        if (!$model->isDirty()) {
-            echo '.';
-        }
-    }
-
-    public function updated(Eloquent $model)
-    {
-        d_echo("Updated data:", 'U');
-        d_echo($model->getDirty());
-    }
-
-    public function created(Eloquent $model)
-    {
-        echo '+';
-    }
-
-    public function deleted(Eloquent $model)
-    {
-        echo '-';
-    }
+    /**
+     * @return Collection PortNac objects
+     */
+    public function pollNac();
 }
