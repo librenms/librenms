@@ -23,13 +23,13 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
         $sensor_current = get_state_label($sensor['state_generic_value'], $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")");
     } else {
         $current_label = get_sensor_label_color($sensor);
-        $sensor_current = "<span class='label $current_label'>".(format_si($sensor['sensor_current'])+0)." $unit</span>";
+        $sensor_current = "<span class='label $current_label'>".format_si($sensor['sensor_current']).$unit."</span>";
     }
 
-    $sensor_limit = (format_si($sensor['sensor_limit'])+0)." $unit";
-    $sensor_limit_low = (format_si($sensor['sensor_limit_low'])+0)." $unit";
-    $sensor_limit_warn = (format_si($sensor['sensor_limit_warn'])+0)." $unit";
-    $sensor_limit_low_warn = (format_si($sensor['sensor_limit_low_warn'])+0)." $unit";
+    $sensor_limit = format_si($sensor['sensor_limit']).$unit;
+    $sensor_limit_low = format_si($sensor['sensor_limit_low']).$unit;
+    $sensor_limit_warn = format_si($sensor['sensor_limit_warn']).$unit;
+    $sensor_limit_low_warn = format_si($sensor['sensor_limit_low_warn']).$unit;
 
     echo "<div class='panel panel-default'>
         <div class='panel-heading'>
