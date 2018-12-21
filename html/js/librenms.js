@@ -365,7 +365,7 @@ function init_map(id, engine, api_key, config) {
             roads.addTo(leaflet);
         });
     } else if (engine === 'mapquest') {
-        loadScript('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key=' + api_key, function () {
+        loadjs('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key=' + api_key, function () {
             var roads = MQ.mapLayer();
             var satellite = MQ.hybridLayer();
 
