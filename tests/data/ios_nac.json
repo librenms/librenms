@@ -2578,21 +2578,6 @@
                     "ifIndex": 10002
                 },
                 {
-                    "auth_id": "000000000000000405F13EAB",
-                    "domain": "data",
-                    "username": "username4",
-                    "mac_address": "788a207f0e95",
-                    "ip_address": "0.0.0.0",
-                    "host_mode": "multiAuth",
-                    "authz_status": "authorizationSuccess",
-                    "authz_by": "Authentication Server",
-                    "authc_status": "authcSuccess",
-                    "method": "other",
-                    "timeout": "5",
-                    "time_left": "12",
-                    "ifIndex": 10003
-                },
-                {
                     "auth_id": "000000000000000505F17F8C",
                     "domain": "data",
                     "username": "username5",
@@ -2605,6 +2590,21 @@
                     "method": "other",
                     "timeout": "6",
                     "time_left": "0",
+                    "ifIndex": 10003
+                },
+                {
+                    "auth_id": "000000000000000405F13EAB",
+                    "domain": "data",
+                    "username": "username4",
+                    "mac_address": "788a207f0e95",
+                    "ip_address": "0.0.0.0",
+                    "host_mode": "multiAuth",
+                    "authz_status": "authorizationSuccess",
+                    "authz_by": "Authentication Server",
+                    "authc_status": "authcSuccess",
+                    "method": "other",
+                    "timeout": "5",
+                    "time_left": "12",
                     "ifIndex": 10003
                 }
             ]
