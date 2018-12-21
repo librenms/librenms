@@ -45,7 +45,6 @@ class AdvaNetworkElementAlmTrap implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $device_array = $device->toArray();
-
         $alSeverity = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmNotifCode'));
         switch ($alSeverity) {
             case "critical":

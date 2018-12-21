@@ -1,6 +1,6 @@
 <?php
 /**
- * AdvaObjectDeletion.php
+ * AdvaThresholdCrossingAlert.php
  *
  * -Description-
  *
@@ -17,8 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Traps when Adva objects are deleted. This includes Remote User Login object,
- * Flow Deletion object, LAG Member Port Removed object, and Lag Deletion object.
+ * Adva Threshold Exceeded Alarms.
  *
  * @package    LibreNMS
  * @link       http://librenms.org
@@ -31,9 +30,8 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
-class AdvaObjectDeletion implements SnmptrapHandler
+class AdvaThresholdCrossingAlert implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
@@ -46,19 +44,13 @@ class AdvaObjectDeletion implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $device_array = $device->toArray();
-        if ($trap_oid = $trap->findOid('CM-SECURITY-MIB::cmSecurityUserName')) {
-            $UserName = $trap->getOidData($trap_oid);
-            log_event("User object $UserName deleted.", $device_array, 'trap', 2);
-        } elseif ($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmFlowIndex')) {
-            $flowID = str_replace(".", "-", substr($trap_oid, 29));
-            log_event("Flow $flowID deleted.", $device_array, 'trap', 2);
-        } elseif ($trap_oid = $trap->findOid('F3-LAG-MIB::f3LagPortIndex')) {
-            $lagPortID = $trap->getOidData($trap_oid);
-            $lagID = str_replace(".", "-", substr($trap_oid, -5, 3));
-            log_event("LAG member port $lagPortID removed from LAG $lagID.", $device_array, 'trap', 2);
-        } elseif ($trap_oid = $trap->findOid('F3-LAG-MIB::f3LagIndex')) {
-            $lagID = $trap->getOidData($trap_oid);
-            log_event("LAG $lagID deleted.", $device_array, 'trap', 2);
+        $raw = $trap->getRaw();
+        log_event($raw, $device_array, 'trap', 2);
+        if ($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThreshold")) {
+            $interval = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdInterval"));
+            $ifName = $trap->getOidData($trap->findOid("IF-MIB::ifName"));
+            $threshOid = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdVariable"));
+            log_event("$ifName threshold exceeded for $interval. Threshold OID is $threshOid.", $device_array, 'trap', 2);
         }
     }
 }
