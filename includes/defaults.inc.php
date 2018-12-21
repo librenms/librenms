@@ -696,7 +696,7 @@ $config['ignore_mount_regexp'][] = '/on: \/junos\/dev/';
 $config['ignore_mount_regexp'][] = '/on: \/jail\/dev/';
 $config['ignore_mount_regexp'][] = '/^(dev|proc)fs/';
 $config['ignore_mount_regexp'][] = '/^\/dev\/md0/';
-$config['ignore_mount_regexp'][] = '/^\/var\/dhcpd\/dev,/';
+$config['ignore_mount_regexp'][] = '/^\/var\/dhcpd\/dev/';
 $config['ignore_mount_regexp'][] = '/UMA/';
 
 $config['ignore_mount_removable'] = 1;
@@ -782,6 +782,7 @@ $config['poller_modules']['cisco-voice']                 = false;
 $config['poller_modules']['cisco-cbqos']                 = false;
 $config['poller_modules']['cisco-otv']                   = false;
 $config['poller_modules']['cisco-vpdn']                  = false;
+$config['poller_modules']['nac']                         = false;
 $config['poller_modules']['netscaler-vsvr']              = false;
 $config['poller_modules']['aruba-controller']            = false;
 $config['poller_modules']['entity-physical']             = true;
@@ -916,8 +917,8 @@ $config['unix-agent-read-time-out'] = 10;
 // seconds
 
 // Lat / Lon support for maps
-$config['geoloc']['latlng']                             = true; // True to enable translation of location to latlng co-ordinates
-$config['geoloc']['engine']                             = 'google';
+#$config['geoloc']['latlng']                             = true; // True to enable translation of location to latlng co-ordinates
+#$config['geoloc']['engine']                             = 'google';
 $config['map']['engine']                                = 'leaflet';
 $config['mapael']['default_map']                        = 'maps/world_countries.js';
 $config['leaflet']['default_lat']                       = '51.4800';

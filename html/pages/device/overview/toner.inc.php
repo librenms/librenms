@@ -5,7 +5,7 @@ $graph_type = 'toner_usage';
 $toners = dbFetchRows('SELECT * FROM `toner` WHERE device_id = ?', array($device['device_id']));
 
 if (count($toners)) {
-    echo '<div class="container-fluid">
+    echo '
           <div class="row">
           <div class="col-md-12">
             <div class="panel panel-default panel-condensed">
@@ -54,7 +54,6 @@ if (count($toners)) {
     }//end foreach
 
     echo '</table>';
-    echo '</div>';
     echo '</div>';
     echo '</div>';
     echo '</div>';

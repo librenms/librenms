@@ -22,6 +22,7 @@
  * @subpackage Alerts
  */
 
+use App\Models\DevicePerf;
 use LibreNMS\Alert\Template;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alerting\QueryBuilderParser;
@@ -414,36 +415,37 @@ function DescribeAlert($alert)
 {
     $obj         = array();
     $i           = 0;
-    $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, sysContact, os, type, ip, hardware, version, location, purpose, notes, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
+    $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, sysContact, os, type, ip, hardware, version, purpose, notes, uptime, status, status_reason, locations.location FROM devices LEFT JOIN locations ON locations.id = devices.location_id WHERE device_id = ?', array($alert['device_id']));
     $attribs     = get_dev_attribs($alert['device_id']);
-    if (can_ping_device($attribs)) {
-        $ping_stats = dbFetchRow('SELECT `timestamp`, `loss`, `min`, `max`, `avg` FROM `device_perf` WHERE `device_id` = ? ORDER BY `timestamp` LIMIT 1', [$alert['device_id']]);
-    }
 
-    $obj['hostname']     = $device['hostname'];
-    $obj['sysName']      = $device['sysName'];
-    $obj['sysDescr']     = $device['sysDescr'];
-    $obj['sysContact']   = $device['sysContact'];
-    $obj['os']           = $device['os'];
-    $obj['type']         = $device['type'];
-    $obj['ip']           = inet6_ntop($device['ip']);
-    $obj['hardware']     = $device['hardware'];
-    $obj['version']      = $device['version'];
-    $obj['location']     = $device['location'];
-    $obj['uptime']       = $device['uptime'];
-    $obj['uptime_short'] = formatUptime($device['uptime'], 'short');
-    $obj['uptime_long']  = formatUptime($device['uptime']);
-    $obj['description']  = $device['purpose'];
-    $obj['notes']        = $device['notes'];
-    $obj['alert_notes']  = $alert['note'];
-    $obj['device_id']    = $alert['device_id'];
-    $obj['rule_id']      = $alert['rule_id'];
+    $obj['hostname']      = $device['hostname'];
+    $obj['sysName']       = $device['sysName'];
+    $obj['sysDescr']      = $device['sysDescr'];
+    $obj['sysContact']    = $device['sysContact'];
+    $obj['os']            = $device['os'];
+    $obj['type']          = $device['type'];
+    $obj['ip']            = inet6_ntop($device['ip']);
+    $obj['hardware']      = $device['hardware'];
+    $obj['version']       = $device['version'];
+    $obj['location']      = $device['location'];
+    $obj['uptime']        = $device['uptime'];
+    $obj['uptime_short']  = formatUptime($device['uptime'], 'short');
+    $obj['uptime_long']   = formatUptime($device['uptime']);
+    $obj['description']   = $device['purpose'];
+    $obj['notes']         = $device['notes'];
+    $obj['alert_notes']   = $alert['note'];
+    $obj['device_id']     = $alert['device_id'];
+    $obj['rule_id']       = $alert['rule_id'];
+    $obj['status']        = $device['status'];
+    $obj['status_reason'] = $device['status_reason'];
     if (can_ping_device($attribs)) {
-        $obj['ping_timestamp'] = $ping_stats['template'];
-        $obj['ping_loss']      = $ping_stats['loss'];
-        $obj['ping_min']       = $ping_stats['min'];
-        $obj['ping_max']       = $ping_stats['max'];
-        $obj['ping_avg']       = $ping_stats['avg'];
+        $ping_stats = DevicePerf::where('device_id', $alert['device_id'])->latest('timestamp')->first();
+        $obj['ping_timestamp'] = $ping_stats->template;
+        $obj['ping_loss']      = $ping_stats->loss;
+        $obj['ping_min']       = $ping_stats->min;
+        $obj['ping_max']       = $ping_stats->max;
+        $obj['ping_avg']       = $ping_stats->avg;
+        $obj['debug']          = json_decode($ping_stats->debug, true);
     }
     $extra               = $alert['details'];
 

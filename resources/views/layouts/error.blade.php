@@ -68,6 +68,7 @@
     @yield('content')
 
     <hr class="separator"/>
+    <p>@lang("Check your log for more details.") ({{ isset($log_file) ? $log_file : 'librenms.log' }})</p>
 
     <p>@lang("If you need additional help, you can find how to get help at") <a href="https://docs.librenms.org/Support">https://docs.librenms.org/Support</a>.</p>
 </div>

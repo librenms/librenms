@@ -16,8 +16,6 @@
  * Code for Gridster.sort_by_row_and_col_asc(serialization) call is from http://gridster.net/demos/grid-from-serialize.html
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $no_refresh   = true;
 $default_dash = get_user_pref('dashboard', 0);
 
@@ -27,7 +25,7 @@ require_once 'includes/modal/alert_ack.inc.php';
 // get all dashboards this user can access and put them into two lists user_dashboards and shared_dashboards
 $dashboards = get_dashboards();
 list($user_dashboards, $shared_dashboards) = array_reduce($dashboards, function ($ret, $dash) {
-    if ($dash['user_id'] == LegacyAuth::id()) {
+    if ($dash['user_id'] == Auth::id()) {
         $ret[0][] = $dash;
     } else {
         $ret[1][] = $dash;
@@ -45,16 +43,16 @@ if (!isset($dashboards[$default_dash])) {
 if ($default_dash == 0 && empty($user_dashboards)) {
     $new_dash = array(
         'dashboard_name'=>'Default',
-        'user_id'=>LegacyAuth::id(),
+        'user_id'=>Auth::id(),
     );
 
     $dashboard_id = dbInsert($new_dash, 'dashboards');
     $new_dash['dashboard_id'] = $dashboard_id;
-    $new_dash['username'] = LegacyAuth::user()->username;
+    $new_dash['username'] = Auth::user()->username;
     $vars['dashboard'] = $new_dash;
 
-    if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?', array(LegacyAuth::id(),0)) == 1) {
-        dbUpdate(array('dashboard_id'=>$dashboard_id), 'users_widgets', 'user_id = ? && dashboard_id = ?', array(LegacyAuth::id(), 0));
+    if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?', array(Auth::id(),0)) == 1) {
+        dbUpdate(array('dashboard_id'=>$dashboard_id), 'users_widgets', 'user_id = ? && dashboard_id = ?', array(Auth::id(), 0));
     }
 } else {
     // load a dashboard
@@ -94,7 +92,7 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
     <div class="btn-group btn-lg">
       <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">Dashboards</span></button>
       <div class="btn-group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left"><?php echo ($vars['dashboard']['user_id'] != LegacyAuth::id() ? $vars['dashboard']['username'].':' : ''); ?><?php echo $vars['dashboard']['dashboard_name']; ?></span>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left"><?php echo ($vars['dashboard']['user_id'] != Auth::id() ? $vars['dashboard']['username'].':' : ''); ?><?php echo $vars['dashboard']['dashboard_name']; ?></span>
           <span class="pull-right">
             <span class="caret"></span>
             <span class="sr-only">Toggle Dropdown</span>
@@ -228,9 +226,6 @@ if (empty($vars['bare']) || $vars['bare'] == "no") {
   <hr>
 </div>
 <?php } //End Vars['bare'] If
-if (strpos($dash_config, 'globe') !== false) {
-    echo "<script src='https://www.google.com/jsapi'></script>";
-}
 ?>
 <script src="js/jquery.gridster.min.js"></script>
 
@@ -566,7 +561,7 @@ if (strpos($dash_config, 'globe') !== false) {
               '</span>'+
               '<span class="fade-edit pull-right">'+
                 <?php
-                if (($vars['dashboard']['access'] == 1 && LegacyAuth::id() === $vars['dashboard']['user_id']) ||
+                if (($vars['dashboard']['access'] == 1 && Auth::id() === $vars['dashboard']['user_id']) ||
                         ($vars['dashboard']['access'] == 0 || $vars['dashboard']['access'] == 2)) {
                         echo "'<i class=\"fa fa-pencil-square-o edit-widget\" data-widget-id=\"'+data.user_widget_id+'\" aria-label=\"Settings\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Settings\">&nbsp;</i>&nbsp;'+";
                 }
@@ -591,10 +586,21 @@ if (strpos($dash_config, 'globe') !== false) {
     function widget_settings(data) {
         var widget_settings = {};
         var widget_id = 0;
-        datas = $(data).serializeArray();
+        var datas = $(data).serializeArray();
         for( var field in datas ) {
-            widget_settings[datas[field].name] = datas[field].value;
+            var name = datas[field].name;
+            if (name.endsWith('[]')) {
+                name = name.slice(0, -2);
+                if (widget_settings[name]) {
+                    widget_settings[name].push(datas[field].value);
+                } else {
+                    widget_settings[name] = [datas[field].value];
+                }
+            } else {
+                widget_settings[name] = datas[field].value;
+            }
         }
+
         $('.gridster').find('div[id^=widget_body_]').each(function() {
             if(this.contains(data)) {
                 widget_id = $(this).parent().attr('id');
@@ -604,9 +610,9 @@ if (strpos($dash_config, 'globe') !== false) {
         });
         if( widget_id > 0 && widget_settings != {} ) {
             $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: {type: 'widget-settings', id: widget_id, settings: widget_settings},
+                type: 'PUT',
+                url: 'ajax/form/widget-settings/' + widget_id,
+                data: {settings: widget_settings},
                 dataType: "json",
                 success: function (data) {
                     if( data.status == "ok" ) {
@@ -628,36 +634,38 @@ if (strpos($dash_config, 'globe') !== false) {
     function widget_reload(id,data_type) {
         $("#widget_body_"+id+" .bootgrid-table").bootgrid("destroy");
         $("#widget_body_"+id+" *").off();
-        $("#widget_body_"+id).empty();
-        if( $("#widget_body_"+id).parent().data('settings') == 1 ) {
+        var $widget_body = $("#widget_body_"+id);
+        if ($widget_body.parent().data('settings') == 1 ) {
             settings = 1;
         } else {
             settings = 0;
         }
         $.ajax({
             type: 'POST',
-            url: 'ajax_dash.php',
+            url: 'ajax/dash/' + data_type,
             data: {
-                type: data_type,
                 id: id,
-                dimensions: {x:$("#widget_body_"+id).innerWidth()-50, y:$("#widget_body_"+id).innerHeight()-50},
+                dimensions: {x:$widget_body.width(), y:$widget_body.height()},
                 settings:settings
             },
             dataType: "json",
             success: function (data) {
-                if (data.status == 'ok') {
+                var $widget_body = $("#widget_body_"+id);
+                $widget_body.empty();
+                if (data.status === 'ok') {
                     $("#widget_title_"+id).html(data.title);
-                    $("#widget_body_"+id).html(data.html);
-                }
-                else {
-                    $("#widget_body_"+id).html('<div class="alert alert-info">' + data.message + '</div>');
+                    $widget_body.html(data.html).parent().data('settings', data.show_settings);
+                } else {
+                    $widget_body.html('<div class="alert alert-info">' + data.message + '</div>');
                 }
             },
             error: function (data) {
+                var $widget_body = $("#widget_body_"+id);
+                $widget_body.empty();
                 if (data.responseJSON.error) {
-                    $("#widget_body_"+id).html('<div class="alert alert-info">' + data.responseJSON.error + '</div>');
+                    $widget_body.html('<div class="alert alert-info">' + data.responseJSON.error + '</div>');
                 } else {
-                    $("#widget_body_"+id).html('<div class="alert alert-info">Problem with backend</div>');
+                    $widget_body.html('<div class="alert alert-info"><?php echo __('Problem with backend'); ?></div>');
                 }
             }
         });

@@ -197,6 +197,7 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
     chown -R librenms:librenms /opt/librenms
     setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
     setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    chgrp apache /var/lib/php/session/
 
 ## Web installer ##
 

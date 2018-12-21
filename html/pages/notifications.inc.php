@@ -161,7 +161,7 @@ foreach ($notifications['unread'] as $notif) {
     </div>
   </div>
 <?php
-foreach (array_reverse($notifications['read']) as $notif) {
+foreach ($notifications['read'] as $notif) {
     echo '<div class="well"><div class="row"> <div class="col-md-12"><h4';
     if ($notif['severity'] == 1) {
         echo ' class="text-warning"';

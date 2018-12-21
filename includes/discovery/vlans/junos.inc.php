@@ -10,13 +10,13 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     $vlans        = snmpwalk_cache_oid($device, 'jnxExVlanName', array(), 'JUNIPER-VLAN-MIB');
     if (empty($vlans)) {
         $vlans      = snmpwalk_cache_oid($device, 'jnxL2aldVlanName', array(), 'JUNIPER-L2ALD-MIB');
-        $tagoruntag = snmpwalk_cache_oid($device, 'jnxL2aldVlanTag', array(), 'JUNIPER-L2ALD-MIB', null, '-OQUs --hexOutputLength=0');
-        $untag      = snmpwalk_cache_oid($device, 'jnxExVlanPortTagness', array(), 'JUNIPER-VLAN-MIB', null, '-OQeUs --hexOutputLength=0');
+        $tagoruntag = snmpwalk_cache_oid($device, 'jnxL2aldVlanTag', array(), 'JUNIPER-L2ALD-MIB', null, ['-OQUs', '--hexOutputLength=0']);
+        $untag      = snmpwalk_cache_oid($device, 'jnxExVlanPortTagness', array(), 'JUNIPER-VLAN-MIB', null, ['-OQeUs', '--hexOutputLength=0']);
         $tmp_tag    = 'jnxL2aldVlanTag';
         $tmp_name   = 'jnxL2aldVlanName';
     } else {
-        $tagoruntag = snmpwalk_cache_oid($device, 'jnxExVlanTag', array(), 'JUNIPER-VLAN-MIB', null, '-OQUs --hexOutputLength=0');
-        $untag      = snmpwalk_cache_oid($device, 'jnxExVlanPortTagness', array(), 'JUNIPER-VLAN-MIB', null, '-OQeUs --hexOutputLength=0');
+        $tagoruntag = snmpwalk_cache_oid($device, 'jnxExVlanTag', array(), 'JUNIPER-VLAN-MIB', null, ['-OQUs', '--hexOutputLength=0']);
+        $untag      = snmpwalk_cache_oid($device, 'jnxExVlanPortTagness', array(), 'JUNIPER-VLAN-MIB', null, ['-OQeUs', '--hexOutputLength=0']);
         $tmp_tag    = 'jnxExVlanTag';
         $tmp_name   = 'jnxExVlanName';
     }

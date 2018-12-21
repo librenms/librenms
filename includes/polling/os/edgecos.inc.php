@@ -16,7 +16,7 @@ if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.6.')) {
     $tmp_mib = 'ES3510MA-MIB';
 }
 
-$tmp_edgecos = snmp_get_multi($device, 'swOpCodeVer.1 swProdName.0 swSerialNumber.1 swHardwareVer.1', '-OQUs', $tmp_mib);
+$tmp_edgecos = snmp_get_multi($device, ['swOpCodeVer.1', 'swProdName.0', 'swSerialNumber.1', 'swHardwareVer.1'], '-OQUs', $tmp_mib);
 
 $version  = trim($tmp_edgecos[1]['swHardwareVer'], '"') . ' ' . trim($tmp_edgecos[1]['swOpCodeVer'], '"');
 $hardware = trim($tmp_edgecos[0]['swProdName'], '"');

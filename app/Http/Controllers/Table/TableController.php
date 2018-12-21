@@ -34,14 +34,13 @@ abstract class TableController extends PaginatedAjaxController
 {
     final protected function baseRules()
     {
-        return [
-            'current' => 'int',
-            'rowCount' => 'int',
-            'searchPhrase' => 'nullable|string',
-            'sort.*' => 'in:asc,desc',
-        ];
+        return SimpleTableController::$base_rules;
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function __invoke(Request $request)
     {
         $this->validate($request, $this->rules());
@@ -58,6 +57,10 @@ abstract class TableController extends PaginatedAjaxController
 
         $limit = $request->get('rowCount', 25);
         $page = $request->get('current', 1);
+        if ($limit < 0) {
+            $limit = $query->count();
+            $page = null;
+        }
         $paginator = $query->paginate($limit, ['*'], 'page', $page);
 
         return $this->formatResponse($paginator);

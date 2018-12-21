@@ -202,13 +202,14 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     if (!empty($insert)) {
         $res = dbBulkInsert($insert, 'alert_transport_map');
     }
-
     // Remove old mappings
     if (!empty($t_del)) {
-        dbDelete('alert_transport_map', 'target_type="single" AND transport_or_group_id IN ' . dbGenPlaceholders(count($t_del)), $t_del);
+        $db_t_values = array_merge([$rule_id], $t_del);
+        dbDelete('alert_transport_map', 'target_type="single" AND rule_id=? AND transport_or_group_id IN ' . dbGenPlaceholders(count($t_del)), $db_t_values);
     }
     if (!empty($g_del)) {
-        dbDelete('alert_transport_map', 'target_type="group" AND transport_or_group_id IN ' . dbGenPlaceholders(count($g_del)), $g_del);
+        $db_g_values = array_merge([$rule_id], $g_del);
+        dbDelete('alert_transport_map', 'target_type="group" AND rule_id=? AND transport_or_group_id IN ' . dbGenPlaceholders(count($g_del)), $db_g_values);
     }
 }
 

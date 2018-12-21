@@ -46,7 +46,7 @@ abstract class PaginatedAjaxController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    abstract public function baseQuery($request);
+    abstract protected function baseQuery($request);
 
     /**
      * @param Paginator $paginator
@@ -59,7 +59,7 @@ abstract class PaginatedAjaxController extends Controller
      *
      * @return array
      */
-    public function rules()
+    protected function rules()
     {
         return [];
     }
@@ -69,8 +69,9 @@ abstract class PaginatedAjaxController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function searchFields($request)
+    protected function searchFields($request)
     {
         return [];
     }
@@ -81,7 +82,7 @@ abstract class PaginatedAjaxController extends Controller
      * @param Model $model
      * @return array|Collection|Model
      */
-    public function formatItem($model)
+    protected function formatItem($model)
     {
         return $model;
     }

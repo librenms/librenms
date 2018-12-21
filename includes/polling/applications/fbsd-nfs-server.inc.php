@@ -4,7 +4,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'fbsd-nfs-server';
 $app_id = $app['app_id'];
-$options      = '-O qv';
+$options      = '-Oqv';
 $oid          = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.13.102.98.115.100.110.102.115.115.101.114.118.101.114';
 $nfsserver = snmp_walk($device, $oid, $options);
 

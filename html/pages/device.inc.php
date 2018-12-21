@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\PortsNac;
 use LibreNMS\Authentication\LegacyAuth;
 
 if (!is_numeric($vars['device'])) {
@@ -436,6 +437,14 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                 </li>';
         }
 
+        if (PortsNac::where('device_id', $device['device_id'])->exists()) {
+            echo '<li role="presentation" '.$select['nac'].'>
+                <a href="'.generate_device_url($device, array('tab' => 'nac')).'">
+                <i class="fa fa-lock fa-lg icon-theme"  aria-hidden="true"></i> NAC
+                </a>
+                </li>';
+        }
+
         echo '<li role="presentation" '.$select['notes'].'>
             <a href="'.generate_device_url($device, array('tab' => 'notes')).'">
             <i class="fa fa-file-text-o fa-lg icon-theme"  aria-hidden="true"></i> Notes
@@ -454,7 +463,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                   <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-cog fa-lg icon-theme"  aria-hidden="true"></i>
                   <span class="caret"></span></button>
                   <ul class="dropdown-menu">
-                    <li><a href="https://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme"  aria-hidden="true"></i> Web</a></li>';
+                    <li><a href="https://'.$device['hostname'].'" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme"  aria-hidden="true"></i> Web</a></li>';
         if (isset($config['gateone']['server'])) {
             if ($config['gateone']['use_librenms_user'] == true) {
                     echo '<li><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . LegacyAuth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';

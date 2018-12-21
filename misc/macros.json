@@ -25,6 +25,8 @@
     "port_in_usage_perc": "((%ports.ifInOctets_rate*8) \/ %ports.ifSpeed)*100",
     "port_out_usage_perc": "((%ports.ifOutOctets_rate*8) \/ %ports.ifSpeed)*100",
     "port_now_down": "%ports.ifOperStatus != %ports.ifOperStatus_prev && %ports.ifOperStatus_prev = \"up\" && %ports.ifAdminStatus = \"up\" && %macros.port",
+    "port_has_xdp_neighbours": "(%macros.port && %links.local_port_id = %ports.port_id)",
+    "port_has_xdp_neighbours_device": "(%macros.port_has_xdp_neighbours && %links.remote_port_id IS NOT NULL)",
     "pdu_over_amperage_apc": "%sensors.sensor_class = \"current\" && %sensors.sensor_descr = \"Bank Total\" && %sensors.sensor_current > %sensors.sensor_limit && %devices.os = \"apc\"",
     "sensor": "(%sensors.sensor_alert = 1)",
     "sensor_port_link": "(%sensors.entPhysicalIndex_measured = 'ports' && %sensors.entPhysicalIndex = %ports.ifIndex && %macros.port_up)",

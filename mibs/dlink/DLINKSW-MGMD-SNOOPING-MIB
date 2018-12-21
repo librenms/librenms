@@ -1,0 +1,1617 @@
+--  *****************************************************************
+--  DLINKSW-MGMD-SNOOPING-MIB.mib : MGMD (IGMP/MLD) Snooping MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+DLINKSW-MGMD-SNOOPING-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        NOTIFICATION-TYPE, IpAddress,
+        TimeTicks, Counter64, Unsigned32      FROM SNMPv2-SMI
+        RowStatus, DisplayString, TruthValue  FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP       FROM SNMPv2-CONF
+        InterfaceIndex, InterfaceIndexOrZero  FROM IF-MIB
+        InetAddress, InetAddressType          FROM INET-ADDRESS-MIB
+        VlanId, VlanIdOrNone                  FROM Q-BRIDGE-MIB
+        dlinkIndustrialCommon                 FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwMgmdSnoopingMIB MODULE-IDENTITY
+        LAST-UPDATED "201309050000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for MGMD (Multicast Group
+            Membership Discovery) snooping."
+            
+        REVISION "201309050000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file for 'MGMD snooping'
+            functionality."
+    ::= { dlinkIndustrialCommon 6 }
+
+-- 
+-- Textual Conventions
+--
+SnoopingType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The snooping type.
+
+        'igmpSnooping' -- IGMP (IPv4 MGMD) snooping. 
+
+        'mldSnooping' -- MLD (IPv6 MGMD) snooping.
+        "    
+            
+    SYNTAX     INTEGER {
+        igmpSnooping(1),
+        mldSnooping(2)
+    }
+-- -----------------------------------------------------------------------------
+    dMgmdSnpMIBNotifications   OBJECT IDENTIFIER ::= { dlinkSwMgmdSnoopingMIB 0 }
+    dMgmdSnpMIBObjects         OBJECT IDENTIFIER ::= { dlinkSwMgmdSnoopingMIB 1 }
+    dMgmdSnpMIBConformance     OBJECT IDENTIFIER ::= { dlinkSwMgmdSnoopingMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dMgmdSnpGlobalCtrl         OBJECT IDENTIFIER ::= { dMgmdSnpMIBObjects 1 }
+    
+    dMgmdSnpStateGblEnabled OBJECT-TYPE
+        SYNTAX BITS {
+            ipv4(0),
+            ipv6(1)  }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "An object indicates which type of MGMD is globally enabled.
+            Setting a type's bit to 1 means the type of MGMD is globally 
+            enabled.
+            ipv4 (0)    - IGMP snooping
+            ipv6 (1)    - MLD snooping." 
+        ::= { dMgmdSnpGlobalCtrl 1 }
+        
+    dMgmdSnpClearAllState OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notClear(0),
+            igmpClear(1),
+            mldClear(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the global state of MGMD snooping statistics 
+            function. Configuring this object to igmpClear or mldClear will clear
+            all respective MGMD snooping counters."
+        ::= { dMgmdSnpGlobalCtrl 2 }
+        
+    dMgmdSnpClearIgmpSnoopByPortIf OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the ifIndex of the port/port-channel on which 
+           the IGMP snooping counters will be cleared.
+           When read, the special value 0 is returned."
+        ::= { dMgmdSnpGlobalCtrl 3 }
+    
+    dMgmdSnpClearMldSnoopByPortIf OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the ifIndex of the port/port-channel on which 
+           the MLD snooping counters will be cleared.
+           When read, the special value 0 is returned."
+        ::= { dMgmdSnpGlobalCtrl 4 }
+    
+    dMgmdSnpClearIgmpSnoopByVlanId OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the VLAN ID on which the IGMP snooping 
+           counters will be cleared.
+           When read, the special value 0 is returned."
+        ::= { dMgmdSnpGlobalCtrl 5 }
+    
+    dMgmdSnpClearMldSnoopByVlanId OBJECT-TYPE
+        SYNTAX          VlanIdOrNone           
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the VLAN ID on which the MLD snooping counters
+           will be cleared.
+           When read, the special value 0 is returned."    
+        ::= { dMgmdSnpGlobalCtrl 6 }
+        
+-- -----------------------------------------------------------------------------
+    dMgmdSnpVlanIfCtrl           OBJECT IDENTIFIER ::= { dMgmdSnpMIBObjects 2 }
+    
+    dMgmdSnpIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DMgmdSnpIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table lists the MGMD snooping settings per interface. 
+            An entry is created to configure the MGMD snooping related settings
+            to different value than the default per interface.
+            When an entry is deleted, all the MGMD snooping settings will be
+            reverted to default settings."
+        ::= { dMgmdSnpVlanIfCtrl 1 }
+
+    dMgmdSnpIfEntry OBJECT-TYPE
+        SYNTAX          DMgmdSnpIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table entry represents the MGMD snooping state on a VLAN
+             basis."
+        INDEX    { 
+            dMgmdSnpIfVlanIfIndex , 
+            dMgmdSnpIfSnoopingType
+        }
+        ::= { dMgmdSnpIfTable 1 }
+
+    DMgmdSnpIfEntry ::= SEQUENCE {
+        dMgmdSnpIfVlanIfIndex               InterfaceIndex,
+        dMgmdSnpIfSnoopingType              SnoopingType,
+        dMgmdSnpIfRowStatus                 RowStatus,
+        dMgmdSnpIfStateEnabled              TruthValue,
+        dMgmdSnpIfQuerierStateEnabled       TruthValue,
+        dMgmdSnpIfQuerierRouter             INTEGER,
+        dMgmdSnpIfFastLeaveEnabled          TruthValue,
+        dMgmdSnpIfFastLeaveHostBased        TruthValue,
+        dMgmdSnpIfMinimumVersion            INTEGER,
+        dMgmdSnpIfExplicitTrackEnabled      TruthValue,
+        dMgmdSnpIfReportSuppresEnabled      TruthValue,
+        dMgmdSnpIfProxyReportingEnabled     TruthValue,
+        dMgmdSnpIfAutoLearnMrouter          TruthValue,   
+        dMgmdSnpIfProxyReportSrcAddrType    InetAddressType,
+        dMgmdSnpIfProxyReportSrcAddr        InetAddress,
+        dMgmdSnpIfQueryInterval             Unsigned32,
+        dMgmdSnpIfQueryMaxResponseTime      Unsigned32,
+        dMgmdSnpIfQueryVersion              Unsigned32,
+        dMgmdSnpIfRobustness                Unsigned32,
+        dMgmdSnpIfLastMemberQueryInterval   Unsigned32,
+        dMgmdSnpIfSuppressionTime           Unsigned32
+    }
+         
+    dMgmdSnpIfVlanIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the specific VLAN interface."
+        ::= { dMgmdSnpIfEntry 1 }
+
+    dMgmdSnpIfSnoopingType OBJECT-TYPE
+        SYNTAX          SnoopingType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The snooping type of this entry."
+        ::= { dMgmdSnpIfEntry 2 }
+
+    dMgmdSnpIfRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+           "The status of this conceptual row." 
+        ::= { dMgmdSnpIfEntry 3 }
+
+    dMgmdSnpIfStateEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the state of MGMD snooping of the entry."
+        DEFVAL      { false }
+        ::= { dMgmdSnpIfEntry 4 }
+
+    dMgmdSnpIfQuerierStateEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the MGMD query function in Layer 2 networks."
+        DEFVAL      { false }
+        ::= { dMgmdSnpIfEntry 5 }
+
+    dMgmdSnpIfQuerierRouter OBJECT-TYPE
+        SYNTAX          INTEGER { 
+            absence(1), 
+            active(2), 
+            nonActive(3)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the VLAN interface at the switch system works as a
+            MGMD querier or not. A value of absence(1) indicates the absence of
+            this attribute."
+        ::= { dMgmdSnpIfEntry 6 }
+
+    dMgmdSnpIfFastLeaveEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object enables the MGMD snooping fast-leave feature on the
+            interface."
+        DEFVAL      { false }
+        ::= { dMgmdSnpIfEntry 7 }
+
+    dMgmdSnpIfFastLeaveHostBased OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object configures the MGMD Snooping Host Based Fast Leave 
+            function."
+        DEFVAL      { false }
+        ::= { dMgmdSnpIfEntry 8 }
+        
+    dMgmdSnpIfMinimumVersion OBJECT-TYPE
+        SYNTAX      INTEGER { 
+            disabled(0), 
+            version2(2), 
+            version3(3) }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "To restrict the minimum version allows user to control the minimum
+             version of MGMD hosts can be joined on a layer 2 port. The value 
+             '0' means that this interface does not restrict the minimum version.
+             Value 2 applies to IGMP routers only.  Value 3 applies to IGMP and
+             MLD routers."
+        DEFVAL      { 0 }
+        ::= { dMgmdSnpIfEntry 9 }
+
+    dMgmdSnpIfExplicitTrackEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object enables explicit tracking of group membership for IGMP
+            Version 3 hosts on the interface."
+        DEFVAL      { false }
+        ::= { dMgmdSnpIfEntry 10 }
+ 
+    dMgmdSnpIfReportSuppresEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object enables the report suppression on the interface."
+        DEFVAL      { false }
+        ::= { dMgmdSnpIfEntry 11 }
+    
+    dMgmdSnpIfProxyReportingEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object enables the proxy-reporting function on the interface."
+        DEFVAL      { false }
+        ::= { dMgmdSnpIfEntry 12 }    
+
+    dMgmdSnpIfAutoLearnMrouter  OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object enables dynamically learning of multicast router port
+            on the interface."
+        DEFVAL      { false }
+        ::= { dMgmdSnpIfEntry 13 }  
+        
+    dMgmdSnpIfProxyReportSrcAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType 
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of Internet address 
+             of the source IP of proxy reporting."
+        DEFVAL { ipv4 }
+        ::= { dMgmdSnpIfEntry 14 }      
+        
+     dMgmdSnpIfProxyReportSrcAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the source Internet address 
+             of proxy reporting. This object is valid when 
+             dMgmdSnpIfProxyReportingEnabled is 'true'."
+        DEFVAL { '00000000'h }
+        ::= { dMgmdSnpIfEntry 15 }
+        
+    dMgmdSnpIfQueryInterval OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..31744)
+        UNITS           "seconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The frequency at which IGMP or MLD Query packets are
+            transmitted on this interface."
+        DEFVAL      { 125 }
+        ::= { dMgmdSnpIfEntry 16 }
+        
+    dMgmdSnpIfQueryMaxResponseTime OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "seconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The maximum query response interval advertised in IGMP 
+            or MLD queries on this interface."
+        ::= { dMgmdSnpIfEntry 17 }
+        
+    dMgmdSnpIfQueryVersion OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..3)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The version of MGMD querier version on this interface.
+            Value 1 applies to IGMPv1 routers only.  Value 2 applies
+            to IGMPv2 and MLDv1 routers, and value 3 applies to IGMPv3
+            and MLDv2 routers."
+        DEFVAL      { 3 }
+        ::= { dMgmdSnpIfEntry 18 }
+        
+    dMgmdSnpIfRobustness OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..7)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The Robustness Variable allows tuning for the expected
+            packet loss on a subnet."
+        DEFVAL      { 2 }
+        ::= { dMgmdSnpIfEntry 19 }
+        
+    dMgmdSnpIfLastMemberQueryInterval OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "seconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The amount of time between group-specific query messages.
+            This value can be tuned to modify the leave latency of the 
+            network."
+        DEFVAL      { 1 }
+        ::= { dMgmdSnpIfEntry 20 }
+        
+    dMgmdSnpIfSuppressionTime OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "seconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The interval of report suppression on this interface."
+        ::= { dMgmdSnpIfEntry 21 }
+
+-- -----------------------------------------------------------------------------
+    dMgmdSnpPortIfCtrl           OBJECT IDENTIFIER ::= { dMgmdSnpMIBObjects 3 }
+
+    dMgmdSnpMrouterTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DMgmdSnpMrouterEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table to display and configure the MGMD snooping multicast
+            router information. An entry is created if a multicast router is
+            is learned dynamically on that port/port-channel interface 
+            (dMgmdSnpIfAutoLearnMrouter is 'true' on the VLAN interface). In 
+            this situation, an entry cannot be destroyed.
+            An entry can also be created to statically configured a multicast 
+            router port or forbid a port/port-channel become multicast router
+            port."
+        ::= { dMgmdSnpPortIfCtrl 1 }
+
+    dMgmdSnpMrouterEntry OBJECT-TYPE
+        SYNTAX          DMgmdSnpMrouterEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in the dMgmdSnpMrouterTable."
+        INDEX  { 
+            dMgmdSnpMrouterIfIndex,
+            dMgmdSnpMrouterVlanIfIndex,
+            dMgmdSnpMrouterQuerierType
+        }
+        ::= { dMgmdSnpMrouterTable 1 }
+
+    DMgmdSnpMrouterEntry ::= SEQUENCE {
+        dMgmdSnpMrouterIfIndex              InterfaceIndex,
+        dMgmdSnpMrouterVlanIfIndex          InterfaceIndex,
+        dMgmdSnpMrouterQuerierType          SnoopingType,
+        dMgmdSnpMrouterStatus               RowStatus,
+        dMgmdSnpMrouterAdminState           INTEGER,
+        dMgmdSnpMrouterDynamicMrouter       TruthValue
+    }
+    
+    dMgmdSnpMrouterIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the specific physical port/port-channel interface"
+        ::= { dMgmdSnpMrouterEntry 1 }
+        
+    dMgmdSnpMrouterVlanIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the specific VLAN interface."
+        ::= { dMgmdSnpMrouterEntry 2 }
+
+    dMgmdSnpMrouterQuerierType OBJECT-TYPE
+        SYNTAX          SnoopingType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The snooping type of this interface."
+        ::= { dMgmdSnpMrouterEntry 3 }
+    
+    dMgmdSnpMrouterStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dMgmdSnpMrouterEntry 4 }
+     
+    dMgmdSnpMrouterAdminState OBJECT-TYPE
+        SYNTAX      INTEGER { 
+            none(1), 
+            designated(2), 
+            forbidden(3) }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the static configuration about multicast
+            router state of a port/port-channel on a per-VLAN basis. 
+            none(1) - no static configuration
+            designated(2) - the port/port-channel is a static multicast router 
+                           port.
+            forbidden(3) - the port/port-channel cannot be multicast router
+                           port."
+        DEFVAL      { 1 }
+        ::= { dMgmdSnpMrouterEntry 5 }
+               
+     dMgmdSnpMrouterDynamicMrouter OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object is valid when dMgmdSnpMrouterAdminState is 'none'.
+            This object indicates the port/port-channel is dynamically learned
+            as a multicast router port on the corresponding VLAN interface."
+        ::= { dMgmdSnpMrouterEntry 6 }
+               
+-- -----------------------------------------------------------------------------
+    dMgmdSnpIfLimitTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DMgmdSnpIfLimitEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The table to set the limitation on the number of MGMD cache entries.
+            For a Layer 2 VLAN on a trunk port, the limitation can be set per
+            port/port-channel and on per VLAN basis."
+        ::= { dMgmdSnpPortIfCtrl 2 }
+
+    dMgmdSnpIfLimitEntry OBJECT-TYPE
+        SYNTAX          DMgmdSnpIfLimitEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry in the dMgmdSnpFilterTable."
+        INDEX  { 
+            dMgmdSnpIfLimitIfIndex,
+            dMgmdSnpIfLimitVlanId,
+            dMgmdSnpIfLimitSnoopingType 
+        }
+        ::= { dMgmdSnpIfLimitTable 1 }
+
+    DMgmdSnpIfLimitEntry ::= SEQUENCE {
+        dMgmdSnpIfLimitIfIndex              InterfaceIndex,
+        dMgmdSnpIfLimitVlanId               VlanIdOrNone,
+        dMgmdSnpIfLimitSnoopingType         SnoopingType,
+        dMgmdSnpIfLimitRowStatus            RowStatus,
+        dMgmdSnpIfLimitExceptAccLstName     DisplayString,
+        dMgmdSnpIfLimitValue                Unsigned32
+    }
+
+    dMgmdSnpIfLimitIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the specific physical interface/port-channel interface."
+        ::= { dMgmdSnpIfLimitEntry 1 }
+
+    dMgmdSnpIfLimitVlanId OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the specific VLAN ID.
+            A value of zero indicates that no VLAN ID is not applicable or 
+            not configured."
+        ::= { dMgmdSnpIfLimitEntry 2 }
+
+    dMgmdSnpIfLimitSnoopingType OBJECT-TYPE
+        SYNTAX          SnoopingType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "Indicates the snooping type."    
+        ::= { dMgmdSnpIfLimitEntry 3 }
+    
+    dMgmdSnpIfLimitRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dMgmdSnpIfLimitEntry 4 }
+            
+    dMgmdSnpIfLimitExceptAccLstName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The name of the IP/IPv6 basic access list. The group (*,G), or 
+            channel (S,G) permitted by the access list will be excluded from the
+            limit.
+            The zero length of this object means except ACL is not specified.
+            "
+        ::= { dMgmdSnpIfLimitEntry 5 }
+            
+    dMgmdSnpIfLimitValue OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..2048)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "To restric the number of MGMD groups or channels allows user 
+            to control how many MGMD groups or channels can be joined on a 
+            layer-2 port."
+        ::= { dMgmdSnpIfLimitEntry 6}
+
+-- -----------------------------------------------------------------------------
+    dMgmdSnpAccGrpTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DMgmdSnpAccGrpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The table to display and configure the IP/IPv6 basic access list 
+            information of MGMD snooping.
+            For a Layer 2 VLAN on a trunk port, the access group can be set per
+            port/port-channel and on per VLAN basis."
+        ::= { dMgmdSnpPortIfCtrl 3 }
+
+    dMgmdSnpAccGrpEntry OBJECT-TYPE
+        SYNTAX      DMgmdSnpAccGrpEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry in the dMgmdSnpAccGrpTable. "
+        INDEX  { 
+            dMgmdSnpAccGrpIfIndex,
+            dMgmdSnpAccGrpVlanId,
+            dMgmdSnpAccGrpSnoopingType
+        }
+        ::= { dMgmdSnpAccGrpTable 1 }
+
+    DMgmdSnpAccGrpEntry ::= SEQUENCE {
+            dMgmdSnpAccGrpIfIndex           InterfaceIndex,
+            dMgmdSnpAccGrpVlanId            VlanIdOrNone,
+            dMgmdSnpAccGrpSnoopingType      SnoopingType,
+            dMgmdSnpAccGrpStatus            RowStatus,
+            dMgmdSnpAccessGroupName         DisplayString
+        }
+
+    dMgmdSnpAccGrpIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Indicates the specific physical interface/port-channel interface."
+        ::= { dMgmdSnpAccGrpEntry 1 }
+
+    dMgmdSnpAccGrpVlanId OBJECT-TYPE
+        SYNTAX      VlanIdOrNone
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Indicates the specific VLAN interface."
+        ::= { dMgmdSnpAccGrpEntry 2 }
+
+    dMgmdSnpAccGrpSnoopingType OBJECT-TYPE
+        SYNTAX          SnoopingType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "Indicates the snooping type." 
+        ::= { dMgmdSnpAccGrpEntry 3 }
+    
+    dMgmdSnpAccGrpStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dMgmdSnpAccGrpEntry 4 }
+        
+    dMgmdSnpAccessGroupName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..32))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The name of the IP/IPv6 basic access list to be configured on MGMD 
+            snooping."
+        ::= { dMgmdSnpAccGrpEntry 5 }
+
+-- -----------------------------------------------------------------------------
+    dMgmdSnpGroupCtrl           OBJECT IDENTIFIER ::= { dMgmdSnpMIBObjects 4 }
+    
+    dMgmdSnpGroupTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DMgmdSnpGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table listing the MGMD snooping dynamic groups."
+        ::= { dMgmdSnpGroupCtrl 1 }
+
+    dMgmdSnpGroupEntry OBJECT-TYPE
+        SYNTAX          DMgmdSnpGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in the dMgmdSnpGroupTable."
+        INDEX  { 
+            dMgmdSnpGroupVlanIfIndex,
+            dMgmdSnpGroupAddressType, 
+            dMgmdSnpGroupAddress,
+            dMgmdSnpGroupIfIndex
+        }
+        ::= { dMgmdSnpGroupTable 1 }
+
+    DMgmdSnpGroupEntry ::=   SEQUENCE {
+        dMgmdSnpGroupVlanIfIndex            InterfaceIndex,
+        dMgmdSnpGroupAddressType            InetAddressType,
+        dMgmdSnpGroupAddress                InetAddress,
+        dMgmdSnpGroupIfIndex                InterfaceIndex, 
+        dMgmdSnpGroupVersion                INTEGER,
+        dMgmdSnpGroupUpTime                 TimeTicks,
+        dMgmdSnpGroupExpire                 TimeTicks,
+        dMgmdSnpGroupMode                   INTEGER,
+        dMgmdSnpGroupLastReportAddrType     InetAddressType,
+        dMgmdSnpGroupLastReportAddr         InetAddress
+    }
+     dMgmdSnpGroupVlanIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the specific VLAN interface."
+        ::= { dMgmdSnpGroupEntry 1 }
+        
+    dMgmdSnpGroupAddressType OBJECT-TYPE
+        SYNTAX          InetAddressType 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The type of this group address."
+        ::= { dMgmdSnpGroupEntry 2 }
+
+    dMgmdSnpGroupAddress OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object identifies the group address of the entry."
+        ::= { dMgmdSnpGroupEntry 3}
+            
+    dMgmdSnpGroupIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the specific physical port/port-channel interface"
+        ::= { dMgmdSnpGroupEntry 4 }
+
+    dMgmdSnpGroupVersion OBJECT-TYPE
+        SYNTAX     INTEGER { 
+            version1(1), 
+            version2(2), 
+            version3(3) 
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The version of MGMD that the multicast group is reported."
+        ::= { dMgmdSnpGroupEntry 5 }
+
+    dMgmdSnpGroupUpTime OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The time elapsed since the entry has been created."
+        ::= { dMgmdSnpGroupEntry 6 }
+
+    dMgmdSnpGroupExpire  OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The time that the entry will be removed if there is no refresh on
+            the entry "
+        ::= { dMgmdSnpGroupEntry 7 }
+
+    dMgmdSnpGroupMode OBJECT-TYPE
+        SYNTAX          INTEGER { 
+            include(1), 
+            exclude(2) 
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The group mode is based on the type of membership reports that are
+            received on the interface for the group."
+        ::= { dMgmdSnpGroupEntry 8 }
+
+     dMgmdSnpGroupLastReportAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of the last host to report being a
+            member of the multicast group."
+        DEFVAL { ipv4 }
+        ::= { dMgmdSnpGroupEntry 9 }
+        
+     dMgmdSnpGroupLastReportAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the address of the last host to report being
+            a member of the multicast group."
+        ::= { dMgmdSnpGroupEntry 10 }
+            
+-- -----------------------------------------------------------------------------
+    dMgmdSnpGroupSrcTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DMgmdSnpGroupSrcEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table listing the MGMD snooping dynamic group source
+            entries."
+        ::= { dMgmdSnpGroupCtrl 2 }
+
+    dMgmdSnpGroupSrcEntry OBJECT-TYPE
+        SYNTAX          DMgmdSnpGroupSrcEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in the dMgmdSnpGroupSrcTable."
+        INDEX      { 
+            dMgmdSnpGroupVlanIfIndex,
+            dMgmdSnpGroupAddressType,
+            dMgmdSnpGroupAddress,
+            dMgmdSnpGroupSrcAddrType,
+            dMgmdSnpGroupSrcAddress,
+            dMgmdSnpGroupSrcIfIndex 
+        }
+        ::= { dMgmdSnpGroupSrcTable 1 }
+
+    DMgmdSnpGroupSrcEntry ::= SEQUENCE {
+        dMgmdSnpGroupSrcAddrType     InetAddressType,
+        dMgmdSnpGroupSrcAddress      InetAddress,
+        dMgmdSnpGroupSrcIfIndex      InterfaceIndex,
+        dMgmdSnpGroupSrcUpTime       TimeTicks,
+        dMgmdSnpGroupSrcExpire       TimeTicks,
+        dMgmdSnpGroupSrcForward      INTEGER
+    }
+    
+    dMgmdSnpGroupSrcAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of the source address where the 
+            (S,G) channel traffic originate."
+        ::= { dMgmdSnpGroupSrcEntry 1 }  
+    
+    dMgmdSnpGroupSrcAddress OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the source address where the 
+            (S,G) channel traffic originate." 
+        ::= { dMgmdSnpGroupSrcEntry 2 }
+            
+    dMgmdSnpGroupSrcIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the specific physical port/port-channel interface"
+        ::= { dMgmdSnpGroupSrcEntry 3 }
+
+    dMgmdSnpGroupSrcUpTime OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The time elapsed since the entry has been created."
+        ::= { dMgmdSnpGroupSrcEntry 4 }
+
+    dMgmdSnpGroupSrcExpire OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The expire timer."
+        ::= { dMgmdSnpGroupSrcEntry 5 }
+
+    dMgmdSnpGroupSrcForward OBJECT-TYPE
+        SYNTAX      INTEGER { yes(1), no(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of whether the router is forwarding multicast traffic
+            due to this entry."
+        ::= { dMgmdSnpGroupSrcEntry 6 }
+
+-- -----------------------------------------------------------------------------
+    dMgmdSnpStaticGrpTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DMgmdSnpStaticGrpEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table is used to manage MGMD snooping static groups."
+        ::= { dMgmdSnpGroupCtrl 3 }
+    
+    dMgmdSnpStaticGrpEntry OBJECT-TYPE
+        SYNTAX          DMgmdSnpStaticGrpEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in the dMgmdSnpStaticGrpTable."
+        INDEX  { 
+            dMgmdSnpStaticGrpVlanIfIndex,
+            dMgmdSnpStaticGrpAddressType, 
+            dMgmdSnpStaticGrpAddress,
+            dMgmdSnpStaticGrpIfIndex
+        }
+        ::= { dMgmdSnpStaticGrpTable 1 }
+        
+    DMgmdSnpStaticGrpEntry ::=   SEQUENCE {
+        dMgmdSnpStaticGrpVlanIfIndex          InterfaceIndex,
+        dMgmdSnpStaticGrpAddressType          InetAddressType,
+        dMgmdSnpStaticGrpAddress              InetAddress,
+        dMgmdSnpStaticGrpIfIndex              InterfaceIndex,
+        dMgmdSnpStaticGrpStatus               RowStatus
+    }
+    
+    dMgmdSnpStaticGrpVlanIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the specific VLAN interface."
+        ::= { dMgmdSnpStaticGrpEntry 1 }
+        
+    dMgmdSnpStaticGrpAddressType OBJECT-TYPE
+        SYNTAX          InetAddressType 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The type of this group address."
+        ::= { dMgmdSnpStaticGrpEntry 2 }
+        
+    dMgmdSnpStaticGrpAddress OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object identifies the group address of the entry."
+        ::= { dMgmdSnpStaticGrpEntry 3}
+            
+    dMgmdSnpStaticGrpIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the specific physical port/port-channel interface"
+        ::= { dMgmdSnpStaticGrpEntry 4 }
+           
+    dMgmdSnpStaticGrpStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dMgmdSnpStaticGrpEntry 5 }
+         
+-- -----------------------------------------------------------------------------
+    dMgmdSnpStaticGrpSrcTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DMgmdSnpStaticGrpSrcEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table is used to manage MGMD snooping static group 
+            source entries."
+        ::= { dMgmdSnpGroupCtrl 4 }
+    
+    dMgmdSnpStaticGrpSrcEntry OBJECT-TYPE
+        SYNTAX          DMgmdSnpStaticGrpSrcEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in the dMgmdSnpStaticGrpSrcTable."
+        INDEX      { 
+            dMgmdSnpStaticGrpVlanIfIndex,
+            dMgmdSnpStaticGrpAddressType,
+            dMgmdSnpStaticGrpAddress,
+            dMgmdSnpStaticGrpSrcAddrType,
+            dMgmdSnpStaticGrpSrcAddress,
+            dMgmdSnpStaticGrpSrcIfIndex 
+        }
+        ::= { dMgmdSnpStaticGrpSrcTable 1 }
+    
+    DMgmdSnpStaticGrpSrcEntry ::= SEQUENCE {
+        dMgmdSnpStaticGrpSrcAddrType     InetAddressType,
+        dMgmdSnpStaticGrpSrcAddress      InetAddress,
+        dMgmdSnpStaticGrpSrcIfIndex      InterfaceIndex,
+        dMgmdSnpStaticGrpSrcStatus       RowStatus
+    }
+    
+    dMgmdSnpStaticGrpSrcAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of the source address where the 
+            (S,G) channel traffic originate."
+        ::= { dMgmdSnpStaticGrpSrcEntry 1 }  
+    
+    dMgmdSnpStaticGrpSrcAddress OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the source address where the 
+            (S,G) channel traffic originate." 
+        ::= { dMgmdSnpStaticGrpSrcEntry 2 }
+        
+    dMgmdSnpStaticGrpSrcIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the specific physical port/port-channel interface"
+        ::= { dMgmdSnpStaticGrpSrcEntry 3 }
+        
+    dMgmdSnpStaticGrpSrcStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dMgmdSnpStaticGrpSrcEntry 4 }
+        
+-- ----------------------------------------------------------------------------- 
+    dMgmdSnpHostTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DMgmdSnpHostEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table is a list of host information of MGMD snooping."
+        ::= { dMgmdSnpMIBObjects 5 }
+
+    dMgmdSnpHostEntry OBJECT-TYPE
+        SYNTAX          DMgmdSnpHostEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in the dMgmdSnpHostTable."
+        INDEX  { 
+            dMgmdSnpHostVlanIfIndex, 
+            dMgmdSnpHostGrpAddressType,
+            dMgmdSnpHostGrpAddress, 
+            dMgmdSnpHostIfIndex,
+            dMgmdSnpHostAddrType,
+            dMgmdSnpHostAddress
+        }
+        ::= { dMgmdSnpHostTable 1 }
+
+    DMgmdSnpHostEntry ::= SEQUENCE {
+        dMgmdSnpHostVlanIfIndex        InterfaceIndex,
+        dMgmdSnpHostGrpAddressType     InetAddressType,
+        dMgmdSnpHostGrpAddress         InetAddress,
+        dMgmdSnpHostIfIndex            InterfaceIndex,
+        dMgmdSnpHostAddrType           InetAddressType,
+        dMgmdSnpHostAddress            InetAddress
+    }
+
+    dMgmdSnpHostVlanIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Indicates the specific VLAN interface."
+        ::= { dMgmdSnpHostEntry 1 }
+
+    dMgmdSnpHostGrpAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType 
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The address type of this group address."
+        ::= { dMgmdSnpHostEntry 2 }
+
+    dMgmdSnpHostGrpAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object identifies IP multicast group addresses of a group which
+             the user would like to see."
+        ::= { dMgmdSnpHostEntry 3 }
+
+    dMgmdSnpHostIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Indicates the specific physical port/port-channel interface"
+        ::= { dMgmdSnpHostEntry 4 }
+
+    dMgmdSnpHostAddrType OBJECT-TYPE
+        SYNTAX     InetAddressType 
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The address type of the host."
+        ::= { dMgmdSnpHostEntry 5 }
+        
+    dMgmdSnpHostAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the address of the host."
+        ::= { dMgmdSnpHostEntry 6 }
+
+-- -----------------------------------------------------------------------------
+    dMgmdSnpStatistics   OBJECT IDENTIFIER ::= { dMgmdSnpMIBObjects 6 }
+                
+    dMgmdSnpStatPortIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DMgmdSnpStatPortIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table to display per port/port-channel statistics of MGMD snooping."
+        ::= { dMgmdSnpStatistics 1 }
+
+    dMgmdSnpStatPortIfEntry OBJECT-TYPE
+        SYNTAX          DMgmdSnpStatPortIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in the dMgmdSnpStatisticTable."
+        INDEX  { 
+            dMgmdSnpStatPortIfIndex,
+            dMgmdSnpStatPortIfType 
+        }
+        ::= { dMgmdSnpStatPortIfTable 1 }
+
+    DMgmdSnpStatPortIfEntry ::= SEQUENCE {
+        dMgmdSnpStatPortIfIndex             InterfaceIndex,
+        dMgmdSnpStatPortIfType              SnoopingType,
+        dMgmdSnpStatPortIfV1RxReport        Counter64,
+        dMgmdSnpStatPortIfV1RxQuery         Counter64,
+        dMgmdSnpStatPortIfV1TxReport        Counter64,
+        dMgmdSnpStatPortIfV1TxQuery         Counter64,
+        dMgmdSnpStatPortIfV2RxReport        Counter64,
+        dMgmdSnpStatPortIfV2RxQuery         Counter64,
+        dMgmdSnpStatPortIfV2RxLeave         Counter64,
+        dMgmdSnpStatPortIfV2TxReport        Counter64,
+        dMgmdSnpStatPortIfV2TxQuery         Counter64,
+        dMgmdSnpStatPortIfV2TxLeave         Counter64,
+        dMgmdSnpStatPortIfV3RxReport        Counter64,
+        dMgmdSnpStatPortIfV3RxQuery         Counter64,
+        dMgmdSnpStatPortIfV3TxReport        Counter64,
+        dMgmdSnpStatPortIfV3TxQuery         Counter64,
+        dMgmdSnpStatPortIfDropByAccGroup    Counter64,
+        dMgmdSnpStatPortIfDropByGrpLimit    Counter64
+    }
+
+    dMgmdSnpStatPortIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Indicates the specific physical port/port-channel interface"
+        ::= { dMgmdSnpStatPortIfEntry 1 }
+  
+    dMgmdSnpStatPortIfType OBJECT-TYPE
+        SYNTAX          SnoopingType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The snooping type of this entry."
+        ::= { dMgmdSnpStatPortIfEntry 2 }
+
+    dMgmdSnpStatPortIfV1RxReport OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v1 Report packets received in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 3 }
+
+    dMgmdSnpStatPortIfV1RxQuery OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v1 Query packets received in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 4 }
+    
+    dMgmdSnpStatPortIfV1TxReport OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD v1 Report packets transmitted in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 5 }
+        
+    dMgmdSnpStatPortIfV1TxQuery OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD v1 Query packets transmitted in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 6 }
+    
+    dMgmdSnpStatPortIfV2RxReport OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v2 Report packets received in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 7 }
+
+    dMgmdSnpStatPortIfV2RxQuery OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v2 Query packets received in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 8 }
+    
+    dMgmdSnpStatPortIfV2RxLeave OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v2 Leave packets received in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 9 }
+        
+    dMgmdSnpStatPortIfV2TxReport OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "This indicates the number of MGMD v2 Report packets transmitted in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 10 }
+        
+    dMgmdSnpStatPortIfV2TxQuery OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD v2 Query packets transmitted in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 11 }
+    
+    dMgmdSnpStatPortIfV2TxLeave OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD v2 Leave packets transmitted in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 12 }
+        
+    dMgmdSnpStatPortIfV3RxReport OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v3 Report packets received in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 13 }
+
+    dMgmdSnpStatPortIfV3RxQuery OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v3 Query packets received in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 14 }
+    
+    dMgmdSnpStatPortIfV3TxReport OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+             "This indicates the number of MGMD v3 Report packets transmitted in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 15 }
+        
+    dMgmdSnpStatPortIfV3TxQuery OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD v3 Query packets transmitted in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 16 }        
+    
+     dMgmdSnpStatPortIfDropByAccGroup OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD packets dropped by access group
+             in this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 17 }       
+      
+     dMgmdSnpStatPortIfDropByGrpLimit OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD packets dropped by the limit   
+            of the number of MGMD groups in this port/port-channel."
+        ::= { dMgmdSnpStatPortIfEntry 18 }
+               
+-- -----------------------------------------------------------------------------
+    dMgmdSnpStatVlanIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DMgmdSnpStatVlanIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table to display per port/port-channel statistics of MGMD snooping."
+        ::= { dMgmdSnpStatistics 2 }
+
+    dMgmdSnpStatVlanIfEntry OBJECT-TYPE
+        SYNTAX          DMgmdSnpStatVlanIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in the dMgmdSnpStatisticTable."
+        INDEX  { 
+            dMgmdSnpStatVlanIfIndex,
+            dMgmdSnpStatVlanIfType 
+        }
+        ::= { dMgmdSnpStatVlanIfTable 1 }
+
+    DMgmdSnpStatVlanIfEntry ::= SEQUENCE {
+        dMgmdSnpStatVlanIfIndex             VlanId,
+        dMgmdSnpStatVlanIfType              SnoopingType,
+        dMgmdSnpStatVlanIfV1RxReport        Counter64,
+        dMgmdSnpStatVlanIfV1RxQuery         Counter64,
+        dMgmdSnpStatVlanIfV1TxReport        Counter64,
+        dMgmdSnpStatVlanIfV1TxQuery         Counter64,
+        dMgmdSnpStatVlanIfV2RxReport        Counter64,
+        dMgmdSnpStatVlanIfV2RxQuery         Counter64,
+        dMgmdSnpStatVlanIfV2RxLeave         Counter64,
+        dMgmdSnpStatVlanIfV2TxReport        Counter64,
+        dMgmdSnpStatVlanIfV2TxQuery         Counter64,
+        dMgmdSnpStatVlanIfV2TxLeave         Counter64,
+        dMgmdSnpStatVlanIfV3RxReport        Counter64,
+        dMgmdSnpStatVlanIfV3RxQuery         Counter64,
+        dMgmdSnpStatVlanIfV3TxReport        Counter64,
+        dMgmdSnpStatVlanIfV3TxQuery         Counter64,
+        dMgmdSnpStatVlanIfDropByAccGroup    Counter64,
+        dMgmdSnpStatVlanIfDropByGrpLimit    Counter64
+    }
+
+    dMgmdSnpStatVlanIfIndex OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the specific VLAN ID."
+        ::= { dMgmdSnpStatVlanIfEntry 1 }
+  
+    dMgmdSnpStatVlanIfType OBJECT-TYPE
+        SYNTAX          SnoopingType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The snooping type of this entry."
+        ::= { dMgmdSnpStatVlanIfEntry 2 }
+
+    dMgmdSnpStatVlanIfV1RxReport OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v1 Report packets received in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 3 }
+
+    dMgmdSnpStatVlanIfV1RxQuery OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v1 Query packets received in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 4 }
+    
+    dMgmdSnpStatVlanIfV1TxReport OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD v1 Report packets transmitted in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 5 }
+        
+    dMgmdSnpStatVlanIfV1TxQuery OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD v1 Query packets transmitted in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 6 }
+    
+    dMgmdSnpStatVlanIfV2RxReport OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v2 Report packets received in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 7 }
+
+    dMgmdSnpStatVlanIfV2RxQuery OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v2 Query packets received in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 8 }
+    
+    dMgmdSnpStatVlanIfV2RxLeave OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v2 Leave packets received in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 9 }
+        
+    dMgmdSnpStatVlanIfV2TxReport OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "This indicates the number of MGMD v2 Report packets transmitted in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 10 }
+        
+    dMgmdSnpStatVlanIfV2TxQuery OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD v2 Query packets transmitted in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 11 }
+    
+    dMgmdSnpStatVlanIfV2TxLeave OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD v2 Leave packets transmitted in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 12 }
+        
+    dMgmdSnpStatVlanIfV3RxReport OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v3 Report packets received in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 13 }
+
+    dMgmdSnpStatVlanIfV3RxQuery OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of MGMD v3 Query packets received in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 14 }
+    
+    dMgmdSnpStatVlanIfV3TxReport OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+             "This indicates the number of MGMD v3 Report packets transmitted in 
+            this port/port-channel."
+        ::= { dMgmdSnpStatVlanIfEntry 15 }
+        
+    dMgmdSnpStatVlanIfV3TxQuery OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD v3 Query packets transmitted in 
+            this VLAN."
+        ::= { dMgmdSnpStatVlanIfEntry 16 }   
+
+    dMgmdSnpStatVlanIfDropByAccGroup OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD packets dropped by access  
+            group."
+        ::= { dMgmdSnpStatVlanIfEntry 17 }   
+    
+    dMgmdSnpStatVlanIfDropByGrpLimit OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of MGMD packets dropped by the limit   
+            of the number of MGMD groups."
+        ::= { dMgmdSnpStatVlanIfEntry 18 }    
+        
+--  ***************************************************************************
+--  Conformance
+--  ***************************************************************************
+    dMgmdSnpCompliances OBJECT IDENTIFIER ::= { dMgmdSnpMIBConformance 1 }
+        
+    dMgmdSnpCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for entities which implement the 
+            DLINKSW-MGMD-SNOOPING-MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS { 
+            dMgmdSnpGblCfgGroup,
+            dMgmdSnpVlanIfCfgGoup, 
+            dMgmdSnpPortIfCfgGoup,
+            dMgmdSnpDynamicInfoGroup,
+            dMgmdSnpStatisticsInfoGoup
+        }
+        
+        OBJECT          dMgmdSnpIfProxyReportingEnabled
+        MIN-ACCESS      read-only
+        DESCRIPTION
+         "It is compliant to implement this object as read-only if 
+         proxy-reporting function is not supported at the agent."
+        ::= { dMgmdSnpCompliances 1 }
+        
+    dMgmdSnpGroups OBJECT IDENTIFIER ::= { dMgmdSnpMIBConformance 2 }
+        
+    dMgmdSnpGblCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            dMgmdSnpStateGblEnabled, dMgmdSnpClearAllState, 
+            dMgmdSnpClearIgmpSnoopByPortIf, dMgmdSnpClearMldSnoopByPortIf, 
+            dMgmdSnpClearIgmpSnoopByVlanId, dMgmdSnpClearMldSnoopByVlanId 
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing global configuration about MGMD
+            snooping."
+        ::= { dMgmdSnpGroups 1 }
+        
+    dMgmdSnpVlanIfCfgGoup OBJECT-GROUP
+        OBJECTS { 
+            dMgmdSnpIfRowStatus, dMgmdSnpIfStateEnabled, 
+            dMgmdSnpIfQuerierStateEnabled, dMgmdSnpIfQuerierRouter, 
+            dMgmdSnpIfFastLeaveEnabled, dMgmdSnpIfFastLeaveHostBased, 
+            dMgmdSnpIfExplicitTrackEnabled, dMgmdSnpIfReportSuppresEnabled, 
+            dMgmdSnpIfMinimumVersion, dMgmdSnpIfProxyReportingEnabled, 
+            dMgmdSnpIfAutoLearnMrouter, dMgmdSnpIfProxyReportSrcAddrType, 
+            dMgmdSnpIfProxyReportSrcAddr 
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing MGMD snooping per VLAN interface 
+            configuration."
+            ::= { dMgmdSnpGroups 2 }
+        
+    dMgmdSnpPortIfCfgGoup OBJECT-GROUP
+        OBJECTS { 
+            dMgmdSnpMrouterStatus, 
+            dMgmdSnpMrouterAdminState, dMgmdSnpIfLimitRowStatus, 
+            dMgmdSnpIfLimitExceptAccLstName, dMgmdSnpIfLimitValue, 
+            dMgmdSnpAccGrpStatus, dMgmdSnpAccessGroupName, 
+            dMgmdSnpStaticGrpStatus, dMgmdSnpStaticGrpSrcStatus
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing MGMD snooping per port/port-channel
+            interface configuration."
+        ::= { dMgmdSnpGroups 3 }
+    
+    dMgmdSnpDynamicInfoGroup OBJECT-GROUP
+        OBJECTS { 
+            dMgmdSnpMrouterDynamicMrouter,
+            dMgmdSnpHostAddress, 
+            dMgmdSnpGroupVersion, dMgmdSnpGroupUpTime, 
+            dMgmdSnpGroupExpire, dMgmdSnpGroupMode, 
+            dMgmdSnpGroupLastReportAddrType, 
+            dMgmdSnpGroupLastReportAddr, dMgmdSnpGroupSrcUpTime, 
+            dMgmdSnpGroupSrcExpire, dMgmdSnpGroupSrcForward 
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing dynamic information for learned
+            multicast router, host, and group."
+        ::= { dMgmdSnpGroups 4 }
+            
+    dMgmdSnpStatisticsInfoGoup OBJECT-GROUP
+        OBJECTS { 
+            dMgmdSnpStatPortIfV1RxReport, dMgmdSnpStatPortIfV1RxQuery, 
+            dMgmdSnpStatPortIfV1TxReport, dMgmdSnpStatPortIfV1TxQuery, 
+            dMgmdSnpStatPortIfV2RxReport, dMgmdSnpStatPortIfV2RxQuery, 
+            dMgmdSnpStatPortIfV2RxLeave,  dMgmdSnpStatPortIfV2TxReport, 
+            dMgmdSnpStatPortIfV2TxQuery,  dMgmdSnpStatPortIfV2TxLeave, 
+            dMgmdSnpStatPortIfV3RxReport, dMgmdSnpStatPortIfV3RxQuery, 
+            dMgmdSnpStatPortIfV3TxReport, dMgmdSnpStatPortIfV3TxQuery, 
+            dMgmdSnpStatPortIfDropByAccGroup, dMgmdSnpStatPortIfDropByGrpLimit,
+            dMgmdSnpStatVlanIfV1RxReport, dMgmdSnpStatVlanIfV1RxQuery, 
+            dMgmdSnpStatVlanIfV1TxReport, dMgmdSnpStatVlanIfV1TxQuery, 
+            dMgmdSnpStatVlanIfV2RxReport, dMgmdSnpStatVlanIfV2RxQuery, 
+            dMgmdSnpStatVlanIfV2RxLeave, dMgmdSnpStatVlanIfV2TxReport, 
+            dMgmdSnpStatVlanIfV2TxQuery, dMgmdSnpStatVlanIfV2TxLeave, 
+            dMgmdSnpStatVlanIfV3RxReport, dMgmdSnpStatVlanIfV3RxQuery, 
+            dMgmdSnpStatVlanIfV3TxReport, dMgmdSnpStatVlanIfV3TxQuery,
+            dMgmdSnpStatVlanIfDropByAccGroup, dMgmdSnpStatVlanIfDropByGrpLimit
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing information for MGMD statistics."
+            ::= { dMgmdSnpGroups 5 }
+END
+

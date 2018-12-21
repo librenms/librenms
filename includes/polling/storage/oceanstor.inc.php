@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$oceanstor_tmp = snmp_get_multi_oid($device, 'usedCapacity.0 totalCapacity.0', '-OUQs', 'ISM-STORAGE-SVC-MIB');
+$oceanstor_tmp = snmp_get_multi_oid($device, ['usedCapacity.0', 'totalCapacity.0'], '-OUQs', 'ISM-STORAGE-SVC-MIB');
 
 $storage['size']  = $oceanstor_tmp['totalCapacity.0'];
 $storage['used']  = $oceanstor_tmp['usedCapacity.0'];

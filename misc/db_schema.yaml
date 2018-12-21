@@ -451,7 +451,7 @@ devices:
     - { Field: version, Type: text, 'Null': true, Extra: '' }
     - { Field: hardware, Type: text, 'Null': true, Extra: '' }
     - { Field: features, Type: text, 'Null': true, Extra: '' }
-    - { Field: location, Type: text, 'Null': true, Extra: '' }
+    - { Field: location_id, Type: int(11), 'Null': true, Extra: '' }
     - { Field: os, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: status, Type: tinyint(1), 'Null': false, Extra: '', Default: '0' }
     - { Field: status_reason, Type: varchar(50), 'Null': false, Extra: '' }
@@ -555,6 +555,7 @@ device_perf:
     - { Field: min, Type: 'double(8,2)', 'Null': false, Extra: '' }
     - { Field: max, Type: 'double(8,2)', 'Null': false, Extra: '' }
     - { Field: avg, Type: 'double(8,2)', 'Null': false, Extra: '' }
+    - { Field: debug, Type: text, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
@@ -771,12 +772,13 @@ loadbalancer_vservers:
 locations:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }
-    - { Field: location, Type: text, 'Null': false, Extra: '' }
-    - { Field: lat, Type: 'double(10,6)', 'Null': false, Extra: '' }
-    - { Field: lng, Type: 'double(10,6)', 'Null': false, Extra: '' }
+    - { Field: location, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: lat, Type: 'double(10,6)', 'Null': true, Extra: '' }
+    - { Field: lng, Type: 'double(10,6)', 'Null': true, Extra: '' }
     - { Field: timestamp, Type: datetime, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    locations_location_uindex: { Name: locations_location_uindex, Columns: [location], Unique: true, Type: BTREE }
 mac_accounting:
   Columns:
     - { Field: ma_id, Type: int(11), 'Null': false, Extra: auto_increment }
@@ -1238,6 +1240,27 @@ ports_fdb:
     ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
     ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ports_fdb_vlan_id_index: { Name: ports_fdb_vlan_id_index, Columns: [vlan_id], Unique: false, Type: BTREE }
+ports_nac:
+  Columns:
+    - { Field: ports_nac_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: auth_id, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+    - { Field: port_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: domain, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: username, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: mac_address, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: ip_address, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: host_mode, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: authz_status, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: authz_by, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: authc_status, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: method, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: timeout, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: time_left, Type: varchar(50), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [ports_nac_id], Unique: true, Type: BTREE }
+    ports_nac_device_id_index: { Name: ports_nac_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    ports_nac_port_id_mac_address_index: { Name: ports_nac_port_id_mac_address_index, Columns: [port_id, mac_address], Unique: false, Type: BTREE }
 ports_perms:
   Columns:
     - { Field: user_id, Type: int(11), 'Null': false, Extra: '' }
@@ -1559,6 +1582,7 @@ syslog:
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
     program: { Name: program, Columns: [program], Unique: false, Type: BTREE }
     priority_level: { Name: priority_level, Columns: [priority, level], Unique: false, Type: BTREE }
+    device_id-timestamp: { Name: device_id-timestamp, Columns: [device_id, timestamp], Unique: false, Type: BTREE }
 tnmsneinfo:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }

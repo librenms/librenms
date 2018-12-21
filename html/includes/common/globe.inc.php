@@ -38,14 +38,15 @@ $temp_output .= "
 ";
 
 $locations = array();
-foreach (getlocations() as $location) {
-    $location = mres($location);
+foreach (getlocations() as $location_row) {
+    $location = $location_row['location'];
+    $location_id = $location_row['id'];
     $devices = array();
     $devices_down = array();
     $devices_up = array();
     $count = 0;
     $down  = 0;
-    foreach (dbFetchRows("SELECT devices.device_id,devices.hostname,devices.status FROM devices LEFT JOIN devices_attribs ON devices.device_id = devices_attribs.device_id WHERE ( devices.location = ? || ( devices_attribs.attrib_type = 'override_sysLocation_string' && devices_attribs.attrib_value = ? ) ) && devices.disabled = 0 && devices.ignore = 0 GROUP BY devices.hostname", array($location,$location)) as $device) {
+    foreach (dbFetchRows("SELECT `device_id`, `hostname`, `status` FROM `devices` WHERE `location_id` = ? && `disabled` = 0 && `ignore` = 0 GROUP BY `hostname`", [$location_id]) as $device) {
         if ($config['frontpage_globe']['markers'] == 'devices' || empty($config['frontpage_globe']['markers'])) {
             $devices[] = $device['hostname'];
             $count++;
@@ -67,7 +68,7 @@ foreach (getlocations() as $location) {
             }
         }
     }
-    $pdown = ($down / $count)*100;
+    $pdown = $count ? ($down / $count)*100 : 0;
     if ($config['frontpage_globe']['markers'] == 'devices' || empty($config['frontpage_globe']['markers'])) {
         $devices_down = array_merge(array(count($devices_up). " Devices OK"), $devices_down);
     } elseif ($config['frontpage_globe']['markers'] == 'ports') {

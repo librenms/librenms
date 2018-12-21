@@ -18,6 +18,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Device\YamlDiscovery;
 
 function discover_new_device($hostname, $device = '', $method = '', $interface = '')
 {
@@ -932,50 +933,6 @@ function ignore_storage($os, $descr)
 }
 
 /**
- * @param $value
- * @param $data
- * @param $group
- * @param null $index
- * @param array $pre_cache
- * @return bool
- */
-function can_skip_sensor($value, $data, $group, $pre_cache = array())
-{
-    $skip_values = array_replace((array)$group['skip_values'], (array)$data['skip_values']);
-    foreach ($skip_values as $skip_value) {
-        if (is_array($skip_value) && $pre_cache) {
-            // Dynamic skipping of data
-            $op = isset($skip_value['op']) ? $skip_value['op'] : '!=';
-            $tmp_value = $pre_cache[$skip_value['oid']];
-            if (compare_var($tmp_value, $skip_value['value'], $op) == true) {
-                return true;
-            }
-        }
-        if ($value == $skip_value) {
-            return true;
-        }
-    }
-
-    $skip_value_lt = array_replace((array)$group['skip_value_lt'], (array)$data['skip_value_lt']);
-    foreach ($skip_value_lt as $skip_value) {
-        if ($value < $skip_value) {
-            return true;
-        }
-    }
-
-    $skip_value_gt = array_replace((array)$group['skip_value_gt'], (array)$data['skip_value_gt']);
-    foreach ($skip_value_gt as $skip_value) {
-        if ($value > $skip_value) {
-            return true;
-        }
-    }
-
-
-
-    return false;
-}
-
-/**
  * @param $valid
  * @param $device
  * @param $sensor_type
@@ -1033,7 +990,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                 d_echo("Final sensor value: $value\n");
 
-                if (can_skip_sensor($value, $data, $sensor_options, $raw_data[$index]) === false && is_numeric($value)) {
+                if (YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache) === false && is_numeric($value)) {
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
 
                     // process the description

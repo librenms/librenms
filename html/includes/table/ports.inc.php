@@ -46,7 +46,7 @@ if (!empty($vars['hostname'])) {
 }
 
 if (!empty($vars['location'])) {
-    $where .= " AND `D`.`location` = ?";
+    $where .= " AND `D`.`location_id` = ?";
     $param[] = $vars['location'];
 }
 

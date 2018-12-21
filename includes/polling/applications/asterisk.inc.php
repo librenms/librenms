@@ -7,7 +7,7 @@ $app_id = $app['app_id'];
 if (!empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
 } else {
-    $options = '-O qv';
+    $options = '-Oqv';
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.8.97.115.116.101.114.105.115.107';
     $rawdata = snmp_walk($device, $oid, $options);
     $rawdata  = str_replace("<<<asterisk>>>\n", '', $rawdata);

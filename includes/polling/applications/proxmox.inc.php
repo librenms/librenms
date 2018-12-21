@@ -45,7 +45,7 @@ $app_id = $app['app_id'];
 if (isset($config['enable_proxmox']) && $config['enable_proxmox'] && !empty($agent_data['app'][$name])) {
     $proxmox = $agent_data['app'][$name];
 } elseif (isset($config['enable_proxmox']) && $config['enable_proxmox']) {
-    $options = '-O qv';
+    $options = '-Oqv';
     $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.7.112.114.111.120.109.111.120';
     $proxmox = snmp_get($device, $oid, $options);
     $proxmox = preg_replace('/^.+\n/', '', $proxmox);

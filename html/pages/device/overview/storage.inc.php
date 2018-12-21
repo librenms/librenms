@@ -5,7 +5,7 @@ $graph_type = 'storage_usage';
 $drives = dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY `storage_descr` ASC', array($device['device_id']));
 
 if (count($drives)) {
-    echo '<div class="container-fluid">
+    echo '
           <div class="row">
             <div class="col-md-12">
               <div class="panel panel-default panel-condensed">
@@ -79,7 +79,6 @@ if (count($drives)) {
     }//end foreach
 
     echo '</table>
-        </div>
         </div>
         </div>
         </div>';
