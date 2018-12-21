@@ -170,7 +170,6 @@ class AdvaAttributeChange implements SnmptrapHandler
                 /* Catch all other Access Port changes and give a generic message */
                 log_event("Network Port $netPort modified", $device_array, 'trap', 2);
             }
-
         } elseif ($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPort')) {
             $accPort = substr($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPort'), -7);
             $accPort = str_replace(".", "-", $accPort);
@@ -233,7 +232,6 @@ class AdvaAttributeChange implements SnmptrapHandler
             $shaperID = substr($trap->findOid('CM-FACILITY-MIB::cmAccPort'), -9);
             $shaperID = str_replace(".", "-", $shaperID);
             log_event("Shaper modified on access port $shaperID modified.", $device_array, 'trap', 2);
-
         }
     }
 }
