@@ -1244,7 +1244,7 @@ ports_nac:
   Columns:
     - { Field: ports_nac_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
     - { Field: auth_id, Type: varchar(50), 'Null': false, Extra: '' }
-    - { Field: device_id, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: int(11), 'Null': false, Extra: '' }
     - { Field: domain, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: username, Type: varchar(50), 'Null': false, Extra: '' }
