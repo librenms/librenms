@@ -43,11 +43,15 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
 
 // Create list of transport
 $transport_dir = Config::get('install_dir').'/LibreNMS/Alert/Transport';
+$transports_list = array();
 foreach (scandir($transport_dir) as $transport) {
     $transport = strstr($transport, '.', true);
     if (empty($transport)) {
         continue;
     }
+    $transports_list[] = $transport;
+}
+foreach ($transports_list as $transport) {
     echo '<option value="'.strtolower($transport).'-form">'.$transport.'</option>';
 }
 ?>
@@ -63,15 +67,8 @@ foreach (scandir($transport_dir) as $transport) {
                     </form>
 <?php
 
-// Fetch list of transport classes
-$transport_dir = Config::get('install_dir').'/LibreNMS/Alert/Transport';
 $switches = []; // store names of bootstrap switches
-
-foreach (scandir($transport_dir) as $transport) {
-    $transport = strstr($transport, '.', true);
-    if (empty($transport)) {
-        continue;
-    }
+foreach ($transports_list as $transport) {
     $class = 'LibreNMS\\Alert\\Transport\\'.$transport;
 
     if (!method_exists($class, 'configTemplate')) {
