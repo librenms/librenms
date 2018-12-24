@@ -11,18 +11,6 @@
             },
             "application_metrics": []
         },
-        "poller": {
-            "applications": {
-                "app_type": "ups-apcups",
-                "app_state": "OK",
-                "discovered": "1",
-                "app_state_prev": "UNKNOWN",
-                "app_status": "",
-                "app_instance": ""
-            },
-            "application_metrics": []
-        }
-    },
     "poller": {
         "application_metrics": [
             {
@@ -69,4 +57,5 @@
             }
         ]
     }
+}
 }
