@@ -44,8 +44,9 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
 foreach ($port_stats as $ifIndex => $port) {
     // Store ifIndex in port entry and prefetch ifName as we'll need it multiple times
     $port['ifIndex'] = $ifIndex;
-    $ifName = $port['ifName'];
-    $ifAlias = $port['ifAlias'];
+    // handle ifName and ifAlias the same way we do in the poller
+    $ifName = empty($port['ifName']) ? $port['ifDescr'] : $port['ifName'];
+    $ifAlias = empty($port['ifAlias']) ? $port['ifDescr'] : $port['ifAlias'];
     $ifDescr = $port['ifDescr'];
     $ifType = $port['ifType'];
 
