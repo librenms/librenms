@@ -2791,7 +2791,7 @@
                     "ifDuplex": null,
                     "ifMtu": null,
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "",
+                    "ifAlias": "tengigabitethernet3",
                     "ifPhysAddress": null,
                     "ifHardType": null,
                     "ifLastChange": 0,
