@@ -44,12 +44,7 @@ innodb_file_per_table=1
 lower_case_table_names=0
 ```
 
-Save the configuration file and exit the text editor by typing
-
-```
-<Esc>!w
-<Esc>q
-```
+Save the configuration file and exit the text editor
 
 Restart mysql
 
