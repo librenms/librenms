@@ -27,9 +27,11 @@ namespace LibreNMS\OS;
 
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
+use App\Models\PortsNac;
 
-class Vrp extends OS implements ProcessorDiscovery
+class Vrp extends OS implements ProcessorDiscovery, NacPolling
 {
     /**
      * Discover processors.
@@ -76,5 +78,44 @@ class Vrp extends OS implements ProcessorDiscovery
         }
 
         return $processors;
+    }
+
+    /**
+    * Discover the Network Access Control informations (dot1X etc etc) 
+    *
+    */
+    public function pollNac()
+    {
+        $nac = collect();
+        // We collect the first table
+        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'hwAccessTable', [], 'HUAWEI-AAA-MIB');
+
+        if (!empty($portAuthSessionEntry)) {
+            // If it is not empty, lets add the Extended table
+            $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'hwAccessExtTable', $portAuthSessionEntry, 'HUAWEI-AAA-MIB');
+            // We cache a port_ifName -> port_id map
+            $ifName_map = $this->getDeviceModel()->ports()->pluck('port_id', 'ifName');
+
+            // update the DB
+            foreach ($portAuthSessionEntry as $authId => $portAuthSessionEntryParameters) {
+                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
+                $nac->put($mac_address, new PortsNac([
+                    'port_id' => $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0),
+                    'mac_address' => $mac_address,
+                    'auth_id' => $authId,
+                    'domain' => $portAuthSessionEntryParameters['hwAccessDomain'],
+                    'username' => $portAuthSessionEntryParameters['hwAccessUserName'],
+                    'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'],
+                    'host_mode' => "",
+                    'authz_status' => $portAuthSessionEntryParameters['hwAccessAuthorizetype'],
+                    'authz_by' => $portAuthSessionEntryParameters['hwAccessAuthType'],
+                    'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'],
+                    'time_left' => "",
+                    'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'],
+                    'method' => $portAuthSessionEntryParameters['hwAccessAuthtype'],
+                ]));
+            }
+        }
+        return $nac;
     }
 }
