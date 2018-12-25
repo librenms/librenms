@@ -100,7 +100,11 @@ if (!isset($json['error'], $json['data'], $json['errorString'], $json['version']
 }
 
 //successfully loaded and tested the file, just exit now if asked to
-if (isset($options['l'])) {
+if ((isset($options['l']))||(
+    (!isset($options['t']))&&
+    (!isset($options['s']))&&
+    (!isset($options['m']))
+    )) {
     exit(0);
 }
 
@@ -151,7 +155,7 @@ if (isset($options['s'])) {
 }
 
 // prints the json test data file if asked to
-if (isset($options['j'])) {
+if (isset($options['t'])) {
     $test_data=array(
         'applications' => array (
             "discovery" => array(
