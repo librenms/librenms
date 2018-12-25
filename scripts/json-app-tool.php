@@ -177,7 +177,7 @@ if (isset($options['j'])) {
         ),
     );
     foreach ($metrics_keys as $key) {
-        $test_data[poller][application_metrics][]=array(
+        $test_data[applications][poller][application_metrics][]=array(
             "metric" => $key,
             "value" => $metrics[$key],
             "value_prev" => null,
