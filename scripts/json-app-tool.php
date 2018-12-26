@@ -156,37 +156,39 @@ if (isset($options['s'])) {
 
 // prints the json test data file if asked to
 if (isset($options['t'])) {
-    $test_data=array(
-        'applications' => array (
-            "discovery" => array(
-                "applications" => array(
+    $test_data = [
+        'applications' => [
+            "discovery" => [
+                "applications" => [
                     "app_type" => $options['a'],
                     "app_state" => "UNKNOWN",
                     "discovered" => "1",
                     "app_state_prev" => null,
                     "app_status" => "",
-                    "app_instance" => "",),
-                "application_metrics" => array(),
-            ),
-            "poller" => array(
-                "applications" => array(
+                    "app_instance" => "",
+                ],
+                "application_metrics" => [],
+            ],
+            "poller" => [
+                "applications" => [
                     "app_type" => $options['a'],
                     "app_state" => "OK",
                     "discovered" => "1",
                     "app_state_prev" => "UNKNOWN",
                     "app_status" => "",
-                    "app_instance" => "",),
-                "application_metrics" => array(),
-            ),
-        ),
-    );
+                    "app_instance" => "",
+                ],
+                "application_metrics" => [],
+            ],
+        ],
+    ];
     foreach ($metrics_keys as $key) {
-        $test_data[applications][poller][application_metrics][]=array(
+        $test_data['applications']['poller']['application_metrics'][] = [
             "metric" => $key,
             "value" => $metrics[$key],
             "value_prev" => null,
             "app_type" => $options['a'],
-        );
+        ];
     }
     echo json_encode($test_data, JSON_PRETTY_PRINT)."\n";
     exit(0);
