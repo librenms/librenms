@@ -190,7 +190,7 @@
                 "app_type": "fbsd-nfs-client"
             },
             {
-                "metric": "Rdirplus",
+                "metric": "RdirPlus",
                 "value": "0.0",
                 "value_prev": null,
                 "app_type": "fbsd-nfs-client"
