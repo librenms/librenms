@@ -64,7 +64,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('nominal_voltage', 'GAUGE', 0)
     ->addDataset('load', 'GAUGE', 0, 100);
 
-$fields = $json_return{data};
+$fields = $json_return{'data'};
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
