@@ -16,7 +16,7 @@ try {
     $legacy = $e->getOutput();
 
     $nfs=array(
-        data => array(),
+        'data' => array(),
     );
     list($nfs['data']['Getattr'], $nfs['data']['Setattr'], $nfs['data']['Lookup'], $nfs['data']['Readlink'],
          $nfs['data']['Read'], $nfs['data']['Write'], $nfs['data']['Create'], $nfs['data']['Remove'],
