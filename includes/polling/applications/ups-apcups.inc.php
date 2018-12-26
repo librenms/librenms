@@ -30,14 +30,14 @@ $app_id = $app['app_id'];
 echo ' '.$name;
 
 try {
-    $json_returned=json_app_get($device, $name);
+    $json_return=json_app_get($device, $name);
 } catch (JsonAppParsingFailedException $e) {
     // Legacy script, build compatible array
     $legacy = trim($e->getOutput());
 
     // pull apart the legacy info and create the basic required hash with it
     list ($line_volt, $load, $charge, $remaining, $bat_volt, $line_nominal, $bat_nominal) = explode("\n", $legacy);
-    $json_retrun=array(
+    $json_return=array(
         'data' => array(
             'charge' => $charge,
             'time_remaining' => $remaining,
