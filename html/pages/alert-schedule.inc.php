@@ -12,11 +12,11 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $pagetitle[] = 'Alert Schedule';
 $no_refresh  = true;
-if (Auth::user()->hasGlobalAdmin()) {
+if (LegacyAuth::user()->hasGlobalAdmin()) {
     include_once 'includes/modal/alert_schedule.inc.php';
     include_once 'includes/modal/remove_alert_schedule.inc.php';
 
@@ -43,7 +43,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <th data-column-id="end_recurring_hr">End recurring hr</th>
                     <th data-column-id="recurring_day" data-sortable="false" data-searchable="false">Recurring on days</th>
                     <th data-column-id="actions" data-sortable="false" data-searchable="false" data-formatter="commands">Actions</th>
-                    <th data-column-id="status" data-sortable="false" data-searchable="false" data-formatter="schedstatus">Status</th>
+                    <th data-column-id="status" data-searchable="false" data-formatter="schedstatus">Status</th>
                 </tr>
             </thead>
         </table>

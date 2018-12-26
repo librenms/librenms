@@ -12,7 +12,7 @@ modules:
                 -
                     oid: upsBasicOutputStatus
                     value: upsBasicOutputStatus
-                    num_oid: .1.3.6.1.4.1.318.1.1.1.4.1.1.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.4.1.1.{{ $index }}'
                     descr: Output Status
                     index: '{{ $index }}'
                     state_name: upsBasicOutputStatus
@@ -41,7 +41,7 @@ modules:
                         - { descr: inverterSpotmode, graph: 0, value: 22, generic: 0 }
                 -
                     oid: airIRRP100UnitStatusOperateMode
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.1.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.1.{{ $index }}'
                     descr: Unit Status
                     states:
                         - { descr: standby, graph: 1, value: 1, generic: 1 }
@@ -53,21 +53,21 @@ modules:
                         - { descr: assist, graph: 1, value: 7, generic: 1 }
                 -
                     oid: airIRRP100UnitStatusInputState
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.21.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.21.{{ $index }}'
                     descr: Input State
                     states:
                         - { descr: open, graph: 1, value: 1, generic: 0 }
                         - { descr: closed, graph: 1, value: 2, generic: 2 }
                 -
                     oid: airIRRP100UnitStatusOutputState
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.22.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.22.{{ $index }}'
                     descr: Output State
                     states:
                         - { descr: open, graph: 1, value: 1, generic: 0 }
                         - { descr: closed, graph: 1, value: 2, generic: 2 }
                 -
                     oid: airIRRP500UnitStatusOperateMode
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.1.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.1.{{ $index }}'
                     descr: Unit Status
                     states:
                         - { descr: standby, graph: 1, value: 1, generic: 1 }
@@ -78,14 +78,14 @@ modules:
                         - { descr: assist, graph: 1, value: 6, generic: 1 }
                 -
                     oid: airIRRP500UnitStatusInputState
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.21.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.21.{{ $index }}'
                     descr: Input State
                     states:
                         - { descr: open, graph: 1, value: 1, generic: 0 }
                         - { descr: closed, graph: 1, value: 2, generic: 2 }
                 -
                     oid: airIRRP500UnitStatusOutputState
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.22.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.22.{{ $index }}'
                     descr: Output State
                     states:
                         - { descr: open, graph: 1, value: 1, generic: 0 }
@@ -94,7 +94,7 @@ modules:
                     oid: rPDU2PhaseStatusTable
                     state_name: rPDU2PhaseStatusLoadState
                     value: rPDU2PhaseStatusLoadState
-                    num_oid: .1.3.6.1.4.1.318.1.1.26.6.3.1.4.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.26.6.3.1.4.{{ $index }}'
                     index: 'rPDU2PhaseStatusLoadState.{{ $index }}'
                     descr: 'Load State, Phase #{{ $index }}'
                     states:
@@ -106,7 +106,7 @@ modules:
                     oid: rPDU2DeviceStatusTable
                     state_name: rPDU2DeviceStatusLoadState
                     value: rPDU2DeviceStatusLoadState
-                    num_oid: .1.3.6.1.4.1.318.1.1.26.4.3.1.4.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.26.4.3.1.4.{{ $index }}'
                     index: 'rPDU2DeviceStatusLoadState.{{ $index }}'
                     descr: 'Device State'
                     states:
@@ -119,7 +119,7 @@ modules:
                     oid: rPDU2DeviceStatusTable
                     state_name: rPDU2DeviceStatusPowerSupplyAlarm
                     value: rPDU2DeviceStatusPowerSupplyAlarm
-                    num_oid: .1.3.6.1.4.1.318.1.1.26.4.3.1.12.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.26.4.3.1.12.{{ $index }}'
                     index: 'rPDU2DeviceStatusPowerSupplyAlarm.{{ $index }}'
                     descr: 'Power Supply State'
                     states:
@@ -129,7 +129,7 @@ modules:
                     oid: rPDU2SensorTempHumidityStatusTable
                     state_name: rPDU2SensorTempHumidityStatusTempStatus
                     value: rPDU2SensorTempHumidityStatusTempStatus
-                    num_oid: .1.3.6.1.4.1.318.1.1.26.10.2.2.1.9.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.26.10.2.2.1.9.{{ $index }}'
                     index: 'rPDU2SensorTempHumidityStatusTempStatus.{{ $index }}'
                     descr: 'Temperature Probe Status'
                     states:
@@ -149,7 +149,7 @@ modules:
                     oid: rPDU2SensorTempHumidityStatusTable
                     state_name: rPDU2SensorTempHumidityStatusHumidityStatus
                     value: rPDU2SensorTempHumidityStatusHumidityStatus
-                    num_oid: .1.3.6.1.4.1.318.1.1.26.10.2.2.1.11.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.26.10.2.2.1.11.{{ $index }}'
                     index: 'rPDU2SensorTempHumidityStatusHumidityStatus.{{ $index }}'
                     descr: 'Humidity Probe Status'
                     states:
@@ -164,118 +164,178 @@ modules:
                         oid: rPDU2SensorTempHumidityStatusHumidityStatus
                         op: '='
                         value: 1
+                -
+                    oid: atsStatusSourceAStatus
+                    value: atsStatusSourceAStatus
+                    state_name: atsStatusSourceAStatus
+                    num_oid: '.1.3.6.1.4.1.318.1.1.8.5.1.12.{{ $index }}'
+                    index: 'atsStatusSourceAStatus.{{ $index }}'
+                    descr: Source A Status
+                    states:
+                        - { descr: Fail, graph: 0, value: 1, generic: 2 }
+                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                -
+                    oid: atsStatusSourceBStatus
+                    value: atsStatusSourceBStatus
+                    state_name: atsStatusSourceBStatus
+                    num_oid: '.1.3.6.1.4.1.318.1.1.8.5.1.13.{{ $index }}'
+                    index: 'atsStatusSourceBStatus.{{ $index }}'
+                    descr: Source B Status
+                    states:
+                        - { descr: Fail, graph: 0, value: 1, generic: 2 }
+                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                -
+                    oid: atsStatusSwitchStatus
+                    value: atsStatusSwitchStatus
+                    state_name: atsStatusSwitchStatus
+                    num_oid: '.1.3.6.1.4.1.318.1.1.8.5.1.10.{{ $index }}'
+                    index: 'atsStatusSwitchStatus.{{ $index }}'
+                    descr: Global Switch Status
+                    states:
+                        - { descr: Fail, graph: 0, value: 1, generic: 2 }
+                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                -
+                    oid: atsStatusSelectedSource
+                    value: atsStatusSelectedSource
+                    state_name: atsStatusSelectedSource
+                    num_oid: '.1.3.6.1.4.1.318.1.1.8.5.1.2.{{ $index }}'
+                    index: 'atsStatusSelectedSource.{{ $index }}'
+                    descr: Selected Source
+                    states:
+                        - { descr: Source A, graph: 0, value: 1, generic: 3 }
+                        - { descr: Source B, graph: 0, value: 2, generic: 3 }
+                -
+                    oid: atsStatusRedundancyState
+                    value: atsStatusRedundancyState
+                    state_name: atsStatusRedundancyState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.8.5.1.3.{{ $index }}'
+                    index: 'atsStatusRedundancyState.{{ $index }}'
+                    descr: Redundancy State
+                    states:
+                        - { descr: Redundancy Lost, graph: 0, value: 1, generic: 2 }
+                        - { descr: Fully Redundant, graph: 0, value: 2, generic: 0 }
+                -
+                    oid: atsStatusPhaseSyncStatus
+                    value: atsStatusPhaseSyncStatus
+                    state_name: atsStatusPhaseSyncStatus
+                    num_oid: '.1.3.6.1.4.1.318.1.1.8.5.1.14.{{ $index }}'
+                    index: 'atsStatusPhaseSyncStatus.{{ $index }}'
+                    descr: Phase Sync Status
+                    states:
+                        - { descr: In Sync, graph: 0, value: 1, generic: 0 }
+                        - { descr: Out Of Sync, graph: 0, value: 2, generic: 2 }
 
         temperature:
             data:
                 -
                     oid: airIRRP100UnitStatusRackInletTempMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.3.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.3.{{ $index }}'
                     index: 'airIRRP100UnitStatusRackInletTempMetric.{{ $index }}'
                     descr: Rack Inlet
                     divisor: 10
                 -
                     oid: airIRRP100UnitStatusSupplyAirTempMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.5.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.5.{{ $index }}'
                     index: 'airIRRP100UnitStatusSupplyAirTempMetric.{{ $index }}'
                     descr: Supply Air
                     divisor: 10
                 -
                     oid: airIRRP100UnitStatusReturnAirTempMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.7.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.7.{{ $index }}'
                     index: 'airIRRP100UnitStatusReturnAirTempMetric.{{ $index }}'
                     descr: Return Air
                     divisor: 10
                 -
                     oid: airIRRP100UnitStatusRackInletTemperature1Metric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.24.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.24.{{ $index }}'
                     index: 'airIRRP100UnitStatusRackInletTemperature1Metric.{{ $index }}'
                     descr: 'Inlet #1'
                     divisor: 10
                 -
                     oid: airIRRP100UnitStatusRackInletTemperature2Metric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.26.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.26.{{ $index }}'
                     index: 'airIRRP100UnitStatusRackInletTemperature2Metric.{{ $index }}'
                     descr: 'Inlet #2'
                     divisor: 10
                 -
                     oid: airIRRP100UnitStatusRackInletTemperature3Metric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.28.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.28.{{ $index }}'
                     index: 'airIRRP100UnitStatusRackInletTemperature3Metric.{{ $index }}'
                     descr: 'Inlet #3'
                     divisor: 10
                 -
                     oid: airIRRP100UnitStatusCompressorDriveHeatSinkTempMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.41.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.41.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDriveHeatSinkTempMetric.{{ $index }}'
                     descr: 'Compressor Drive Heatsink'
                     divisor: 10
                 -
                     oid: airIRRP100UnitStatusCompressorDriveControlCardTempMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.43.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.43.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDriveControlCardTempMetric.{{ $index }}'
                     descr: 'Compressor Drive Control Card'
                     divisor: 10
                 -
                     oid: airIRRP500UnitStatusSupplyAirTempMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.5.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.5.{{ $index }}'
                     index: 'airIRRP500UnitStatusSupplyAirTempMetric.{{ $index }}'
                     descr: Supply Air
                     divisor: 10
                 -
                     oid: airIRRP500UnitStatusReturnAirTempMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.7.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.7.{{ $index }}'
                     index: 'airIRRP500UnitStatusReturnAirTempMetric.{{ $index }}'
                     descr: Return Air
                     divisor: 10
                 -
                     oid: airIRRP500UnitStatusRackInletTemperature1Metric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.24.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.24.{{ $index }}'
                     index: 'airIRRP500UnitStatusRackInletTemperature1Metric.{{ $index }}'
                     descr: 'Inlet #1'
                     divisor: 10
                 -
                     oid: airIRRP500UnitStatusRackInletTemperature2Metric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.26.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.26.{{ $index }}'
                     index: 'airIRRP500UnitStatusRackInletTemperature2Metric.{{ $index }}'
                     descr: 'Inlet #2'
                     divisor: 10
                 -
                     oid: airIRRP500UnitStatusRackInletTemperature3Metric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.28.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.28.{{ $index }}'
                     index: 'airIRRP500UnitStatusRackInletTemperature3Metric.{{ $index }}'
                     descr: 'Inlet #3'
                     divisor: 10
                 -
                     oid: airIRG2RDT2StatusRackInletTempMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.7.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.7.{{ $index }}'
                     index: 'airIRG2RDT2StatusRackInletTempMetric.{{ $index }}'
                     descr: 'Rack Inlet'
                     divisor: 10
                     high_limit: airIRG2RDT2ThresholdsRackInletHighTempMetric
                 -
                     oid: airIRG2RDT2StatusSupplyAirTempMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.9.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.9.{{ $index }}'
                     index: 'airIRG2RDT2StatusSupplyAirTempMetric.{{ $index }}'
                     descr: 'Supply Air'
                     divisor: 10
                     high_limit: airIRG2RDT2ThresholdsSupplyAirHighTempMetric
                 -
                     oid: airIRG2RDT2StatusReturnAirTempMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.11.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.11.{{ $index }}'
                     index: 'airIRG2RDT2StatusReturnAirTempMetric.{{ $index }}'
                     descr: 'Return Air'
                     divisor: 10
                     high_limit: airIRG2RDT2ThresholdsReturnAirHighTempMetric
                 -
                     oid: airIRG2RDT2StatusSuctionTempMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.13.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.13.{{ $index }}'
                     index: 'airIRG2RDT2StatusSuctionTempMetric.{{ $index }}'
                     descr: 'Suction'
                     divisor: 10
                 -
                     oid: rPDU2SensorTempHumidityStatusTable
                     value: rPDU2SensorTempHumidityStatusTempC
-                    num_oid: .1.3.6.1.4.1.318.1.1.26.10.2.2.1.8.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.26.10.2.2.1.8.{{ $index }}'
                     index: 'rPDU2SensorTempHumidityStatusTempC.{{ $index }}'
                     descr: 'Temperature Probe'
                     divisor: 10
@@ -288,32 +348,32 @@ modules:
             data:
                 -
                     oid: airIRRP100UnitStatusSupplyHumidity
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.8.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.8.{{ $index }}'
                     index: 'airIRRP100UnitStatusSupplyHumidity.{{ $index }}'
                     descr: Supply
                     divisor: 10
                 -
                     oid: airIRRP100UnitStatusReturnHumidity
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.8.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.8.{{ $index }}'
                     index: 'airIRRP100UnitStatusReturnHumidity.{{ $index }}'
                     descr: Return
                     divisor: 10
                 -
                     oid: airIRRP500UnitStatusSupplyHumidity
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.8.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.8.{{ $index }}'
                     index: 'airIRRP500UnitStatusSupplyHumidity.{{ $index }}'
                     descr: Supply
                     divisor: 10
                 -
                     oid: airIRRP500UnitStatusReturnHumidity
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.8.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.8.{{ $index }}'
                     index: 'airIRRP500UnitStatusSupplyHumidity.{{ $index }}'
                     descr: Return
                     divisor: 10
                 -
                     oid: rPDU2SensorTempHumidityStatusTable
                     value: rPDU2SensorTempHumidityStatusRelativeHumidity
-                    num_oid: .1.3.6.1.4.1.318.1.1.26.10.2.2.1.10.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.26.10.2.2.1.10.{{ $index }}'
                     index: 'rPDU2SensorTempHumidityStatusRelativeHumidity.{{ $index }}'
                     descr: 'Humidity Probe'
                     skip_values:
@@ -329,32 +389,32 @@ modules:
             data:
                 -
                     oid: airIRRP100UnitStatusAirFlowMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.11.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.11.{{ $index }}'
                     index: 'airIRRP100UnitStatusAirFlowMetric.{{ $index }}'
                     descr: Air Flow
                     divisor: 10
                 -
                     oid: airIRRP500UnitStatusAirFlowMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.11.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.11.{{ $index }}'
                     index: 'airIRRP500UnitStatusAirFlowMetric.{{ $index }}'
                     descr: Air Flow
                     divisor: 10
                 -
                     oid: airIRG2RDT2StatusAirFlowMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.5.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.5.{{ $index }}'
                     index: 'airIRG2RDT2StatusAirFlowMetric.{{ $index }}'
                     descr: Air Flow
         voltage:
             data:
                 -
                     oid: airIRRP100UnitStatusCompressorDriveVoltage
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.37.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.37.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDriveVoltage.{{ $index }}'
                     descr: Compressor Drive
                     divisor: 10
                 -
                     oid: airIRRP100UnitStatusCompressorDriveDCLinkVoltage
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.39.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.39.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDriveDCLinkVoltage.{{ $index }}'
                     descr: Compressor Drive DC Link
                     divisor: 10
@@ -362,19 +422,19 @@ modules:
             data:
                 -
                     oid: airIRRP100UnitStatusHumidifierCurrent
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.33.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.33.{{ $index }}'
                     index: 'airIRRP100UnitStatusHumidifierCurrent.{{ $index }}'
                     descr: Humidifier
                     divisor: 10
                 -
                     oid: airIRRP100UnitStatusCompressorDriveCurrent
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.38.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.38.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDriveCurrent.{{ $index }}'
                     descr: Compressor Drive
                     divisor: 10
                 -
                     oid: airIRRP500UnitStatusHumidifierCurrent
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.33.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.33.{{ $index }}'
                     index: 'airIRRP100UnitStatusHumidifierCurrent.{{ $index }}'
                     descr: Humidifier
                     divisor: 10
@@ -382,13 +442,13 @@ modules:
             data:
                 -
                     oid: airIRRP100UnitStatusFanSpeed
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.12.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.12.{{ $index }}'
                     index: 'airIRRP100UnitStatusFanSpeed.{{ $index }}'
                     descr: 'Fan Speed (%)'
                     divisor: 10
                 -
                     oid: airIRRP500UnitStatusFanSpeed
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.12.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.12.{{ $index }}'
                     index: 'airIRRP500UnitStatusFanSpeed.{{ $index }}'
                     descr: 'Fan Speed (%)'
                     divisor: 10
@@ -396,7 +456,7 @@ modules:
             data:
                 -
                     oid: airIRRP100UnitStatusCompressorDriveSpeed
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.35.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.35.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDriveSpeed.{{ $index }}'
                     descr: 'Drive Speed'
                     divisor: 10
@@ -404,38 +464,38 @@ modules:
             data:
                 -
                     oid: airIRRP100UnitStatusCompressorDrivePower
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.35.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.35.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDrivePower.{{ $index }}'
                     descr: 'Drive Power'
                     multiplier: 10
                 -
                     oid: airIRRP100UnitStatusCoolDemand
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.13.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.13.{{ $index }}'
                     index: 'airIRRP100UnitStatusCoolDemand.{{ $index }}'
                     descr: 'Cooling Demand'
                     multiplier: 100
                 -
                     oid: airIRRP100UnitStatusCoolOutput
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.14.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.14.{{ $index }}'
                     index: 'airIRRP100UnitStatusCoolOutput.{{ $index }}'
                     descr: 'Cooling Output'
                     multiplier: 100
                 -
                     oid: airIRRP500UnitStatusCoolDemand
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.13.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.13.{{ $index }}'
                     index: 'airIRRP500UnitStatusCoolDemand.{{ $index }}'
                     descr: 'Cooling Demand'
                     multiplier: 100
                 -
                     oid: airIRRP500UnitStatusCoolOutput
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.14.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.14.{{ $index }}'
                     index: 'airIRRP500UnitStatusCoolOutput.{{ $index }}'
                     descr: 'Cooling Output'
                     multiplier: 100
                 -
                     oid: rPDU2DeviceStatusTable
                     value: rPDU2DeviceStatusPower
-                    num_oid: .1.3.6.1.4.1.318.1.1.26.4.3.1.5.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.26.4.3.1.5.{{ $index }}'
                     multiplier: 10
                     index: 'rPDU2DeviceStatusPower.{{ $index }}'
                     descr: 'Power, Total'
@@ -443,25 +503,25 @@ modules:
             data:
                 -
                     oid: airIRG2RDT2StatusSuctionPressureMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.19.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.19.{{ $index }}'
                     index: 'airIRG2RDT2StatusSuctionPressureMetric.{{ $index }}'
                     descr: Suction Pressure
                 -
                     oid: airIRG2RDT2StatusDischargePressureMetric
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.21.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.21.{{ $index }}'
                     index: 'airIRG2RDT2StatusDischargePressureMetric.{{ $index }}'
                     descr: Discharge Pressure
         cooling:
             data:
                 -
                     oid: airIRG2RDT2StatusCoolOutput
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.2.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.2.{{ $index }}'
                     index: 'airIRG2RDT2StatusCoolOutput.{{ $index }}'
                     descr: Output
                     multiplier: 100
                 -
                     oid: airIRG2RDT2StatusCoolDemand
-                    num_oid: .1.3.6.1.4.1.318.1.1.13.4.5.2.1.3.
+                    num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.3.{{ $index }}'
                     index: 'airIRG2RDT2StatusCoolDemand.{{ $index }}'
                     descr: Demand
                     multiplier: 100

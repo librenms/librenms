@@ -34,9 +34,17 @@ ports:
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName
+nac:
+    ports_nac:
+        excluded_fields: [ports_nac_id, device_id, port_id]
+        joins:
+            - { left: ports_nac.port_id, right: ports.port_id, select: [ifIndex] }
+        order_by: ports.ifIndex, mac_address
 os:
     devices:
         included_fields: [sysName, sysObjectID, sysDescr, sysContact, version, hardware, features, location, os, type, serial, icon]
+        joins:
+            - { left: devices.location_id, right: locations.id, select: [location] }
 processors:
     processors:
         excluded_fields: [device_id, processor_id]
@@ -72,7 +80,7 @@ vrf:
     vrfs:
         excluded_fields: [vrf_id, device_id]
         joins:
-            - { custom: "JOIN (SELECT ifVrf, GROUP_CONCAT(ifIndex ORDER BY ifIndex ASC SEPARATOR ',') as ifIndices FROM ports GROUP BY ifVrf) p ON p.ifVrf = vrfs.vrf_id", select: ["p.ifIndices"] }
+            - { custom: "LEFT JOIN (SELECT ifVrf, GROUP_CONCAT(ifIndex ORDER BY ifIndex ASC SEPARATOR ',') as ifIndices FROM ports GROUP BY ifVrf) p ON p.ifVrf = vrfs.vrf_id", select: ["p.ifIndices"] }
 wireless:
     wireless_sensors:
         excluded_fields: [device_id, sensor_id, access_point_id, lastupdate]

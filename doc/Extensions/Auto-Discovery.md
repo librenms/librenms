@@ -1,4 +1,5 @@
 source: Extensions/Auto-Discovery.md
+path: blob/master/doc/
 # Auto Discovery Support
 
 ### Getting Started
@@ -124,7 +125,7 @@ Enabled by default.
 
 This module is invoked from bgp-peers discovery module.
 
-### SNMP Scan
+## SNMP Scan
 Apart from the aforementioned Auto-Discovery options, LibreNMS is also able to proactively scan a network for SNMP-enabled devices using the configured version/credentials.
 
 SNMP Scan will scan `$config['nets']` by default and respects `$config['autodiscovery']['nets-exclude']`.

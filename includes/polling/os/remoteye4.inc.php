@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$remoteye4_tmp = snmp_get_multi($device, 'upsIdentName.0 upsIdentAgentSoftwareVersion.0', '-OQUs', 'UPS-MIB');
+$remoteye4_tmp = snmp_get_multi($device, ['upsIdentName.0', 'upsIdentAgentSoftwareVersion.0'], '-OQUs', 'UPS-MIB');
 
 $hardware = $remoteye4_tmp[0]['upsIdentName'];
 $version  = str_replace('RemotEye4 ', '', $remoteye4_tmp[0]['upsIdentAgentSoftwareVersion']);

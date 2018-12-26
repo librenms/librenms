@@ -1,4 +1,5 @@
 source: Support/Discovery Support.md
+path: blob/master/doc/
 ### discovery.php
 
 This document will explain how to use discovery.php to debug issues or manually running to process data.

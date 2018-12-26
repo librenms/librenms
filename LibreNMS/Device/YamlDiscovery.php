@@ -90,7 +90,7 @@ class YamlDiscovery
                         }
                     }
 
-                    if (static::canSkipItem($current_data['value'], $current_data, $group_options, $snmp_data)) {
+                    if (static::canSkipItem($current_data['value'], $index, $current_data, $group_options, $snmp_data)) {
                         continue;
                     }
 
@@ -197,13 +197,13 @@ class YamlDiscovery
 
                     foreach ($data_array as $data) {
                         foreach ((array)$data['oid'] as $oid) {
-                            if (!isset($pre_cache[$oid])) {
+                            if (!array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
-                                    $snmp_flag = $data['snmp_flags'];
+                                    $snmp_flag = array_wrap($data['snmp_flags']);
                                 } else {
-                                    $snmp_flag = '-OteQUs';
+                                    $snmp_flag = ['-OteQUs'];
                                 }
-                                $snmp_flag .= ' -Ih';
+                                $snmp_flag[] = '-Ih';
 
                                 $mib = $device['dynamic_discovery']['mib'];
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid], $mib, null, $snmp_flag);
@@ -227,15 +227,15 @@ class YamlDiscovery
      * @param array $item_snmp_data The pre-cache data array
      * @return bool
      */
-    private static function canSkipItem($value, $yaml_item_data, $group_options, $item_snmp_data = array())
+    public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = array())
     {
         $skip_values = array_replace((array)$group_options['skip_values'], (array)$yaml_item_data['skip_values']);
 
         foreach ($skip_values as $skip_value) {
-            if (is_array($skip_value) && $item_snmp_data) {
+            if (is_array($skip_value) && $pre_cache) {
                 // Dynamic skipping of data
                 $op = isset($skip_value['op']) ? $skip_value['op'] : '!=';
-                $tmp_value = $item_snmp_data[$skip_value['oid']];
+                $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
                 if (compare_var($tmp_value, $skip_value['value'], $op)) {
                     return true;
                 }
@@ -252,7 +252,7 @@ class YamlDiscovery
             }
         }
 
-        $skip_value_gt = array_reduce((array)$group_options['skip_value_gt'], (array)$yaml_item_data['skip_value_gt']);
+        $skip_value_gt = array_replace((array)$group_options['skip_value_gt'], (array)$yaml_item_data['skip_value_gt']);
         foreach ($skip_value_gt as $skip_value) {
             if ($value > $skip_value) {
                 return true;

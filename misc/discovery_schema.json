@@ -81,7 +81,10 @@
                                         "type": "string"
                                     },
                                     "snmp_flags": {
-                                        "type": "string"
+                                        "type": [
+                                            "string",
+                                            "array"
+                                        ]
                                     }
                                 },
                                 "additionalProperties": false,
@@ -116,7 +119,7 @@
                                             },
                                             "num_oid": {
                                                 "type": "string",
-                                                "pattern": "^(\\.\\d+)+\\.?$"
+                                                "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
                                             },
                                             "descr": {
                                                 "type": "string"
@@ -187,7 +190,10 @@
                                                 ]
                                             },
                                             "snmp_flags": {
-                                                "type": "string"
+                                                "type": [
+                                                    "string",
+                                                    "array"
+                                                ]
                                             }
                                         },
                                         "required": [
@@ -286,7 +292,7 @@
                     },
                     "num_oid": {
                         "type": "string",
-                        "pattern": "^(\\.\\d+)+\\.?$"
+                        "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
                     },
                     "index": {
                         "type": ["integer", "string"]
@@ -324,7 +330,10 @@
                         }
                     },
                     "snmp_flags": {
-                        "type": "string"
+                        "type": [
+                            "string",
+                            "array"
+                        ]
                     },
                     "entPhysicalIndex": {
                         "type": "string"

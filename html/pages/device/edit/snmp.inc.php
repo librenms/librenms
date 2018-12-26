@@ -1,9 +1,9 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 if ($_POST['editing']) {
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (LegacyAuth::user()->hasGlobalAdmin()) {
         $poller_group = isset($_POST['poller_group']) ? clean($_POST['poller_group']) : 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');
         if ($snmp_enabled) {

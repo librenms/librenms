@@ -212,6 +212,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         $walk_base = $total_port_count - $polled_port_count < 5 || $polled_port_count / $total_port_count > 0.9 ;
 
         if ($walk_base) {
+            echo "Not enough ports for selected port polling, walking base OIDs instead\n";
             foreach ($table_base_oids as $oid) {
                 $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
             }
@@ -219,6 +220,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 
         foreach ($polled_ports as $port_id => $port) {
             $ifIndex = $port['ifIndex'];
+            $port_stats[$ifIndex]['ifType'] = $port['ifType']; // we keep it as it is not included in $base_oids
 
             if (is_port_valid($port, $device)) {
                 if (!$walk_base) {
@@ -251,6 +253,10 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 
                     $port_stats = snmp_get_multi($device, $oids, '-OQUst', 'IF-MIB', null, $port_stats);
                     $port_stats = snmp_get_multi($device, $extra_oids, '-OQUst', 'EtherLike-MIB', null, $port_stats);
+
+                    if ($device['os'] != 'asa') {
+                        $port_stats = snmp_get_multi($device, "dot1qPvid.$ifIndex", '-OQUst', 'Q-BRIDGE-MIB', null, $port_stats);
+                    }
                 }
             }
         }
@@ -281,6 +287,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                 $port_stats = snmpwalk_cache_oid($device, 'dot3StatsIndex', $port_stats, 'EtherLike-MIB');
             }
             $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB');
+            $port_stats = snmpwalk_cache_oid($device, 'dot1qPvid', $port_stats, 'Q-BRIDGE-MIB');
         }
     }
 }
@@ -289,8 +296,16 @@ if ($device['os'] == 'procera') {
     require_once 'ports/procera.inc.php';
 }
 
+if ($device['os'] == 'cxr-ts') {
+    require_once 'ports/cxr-ts.inc.php';
+}
+
 if ($device['os'] == 'cmm') {
     require_once 'ports/cmm.inc.php';
+}
+
+if ($device['os'] == 'timos') {
+    require_once 'ports/timos.inc.php';
 }
 
 if ($config['enable_ports_adsl']) {
@@ -375,8 +390,6 @@ if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     $port_stats = snmpwalk_cache_oid($device, 'vmVlan', $port_stats, 'CISCO-VLAN-MEMBERSHIP-MIB');
     $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortEncapsulationOperType', $port_stats, 'CISCO-VTP-MIB');
     $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortNativeVlan', $port_stats, 'CISCO-VTP-MIB');
-} elseif ($device['os'] != 'asa') {
-    $port_stats = snmpwalk_cache_oid($device, 'dot1qPvid', $port_stats, 'Q-BRIDGE-MIB');
 }//end if
 
 $polled = time();
@@ -409,7 +422,7 @@ foreach ($port_stats as $ifIndex => $port) {
         d_echo(' valid');
 
         // Port newly discovered?
-        if (! $ports[$port_id]) {
+        if (!$port_id || empty($ports[$port_id])) {
             /**
               * When using the ifName or ifDescr as means to map discovered ports to
               * known ports in the DB (think of port association mode) it's possible
@@ -563,6 +576,11 @@ foreach ($ports as $port) {
             }
         }
 
+        // work around invalid values for ifHighSpeed (fortigate)
+        if ($this_port['ifHighSpeed'] == 4294901759) {
+            $this_port['ifHighSpeed'] = null;
+        }
+
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
             d_echo('ifHighSpeed ');
             $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
@@ -675,7 +693,7 @@ foreach ($ports as $port) {
                 }
             } else {
                 if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
-                    if ($port[$oid . '_prev'] != $this_port[$oid]) {
+                    if ($port[$oid.'_prev'] == null) {
                         $port['update'][$oid . '_prev'] = $this_port[$oid];
                     }
                 }

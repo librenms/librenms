@@ -72,7 +72,7 @@ if ($config['map']['engine'] == 'leaflet') {
 <script src='js/jquery.mousewheel.min.js'></script>
 <?php
 $x=0;
-foreach (dbFetchRows("SELECT `hostname`,`devices`.`location`,`status`, COUNT(`status`) AS `total`,`lat`,`lng` FROM `devices` LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location` WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != '' GROUP BY `status`,`lat`,`lng` ORDER BY `status` ASC, `hostname`") as $map_devices) {
+foreach (dbFetchRows("SELECT `hostname`,`location`,`status`, COUNT(`status`) AS `total`,`lat`,`lng` FROM `devices` LEFT JOIN `locations` ON `devices`.`location_id`=`locations`.`id` WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != '' GROUP BY `status`,`lat`,`lng` ORDER BY `status` ASC, `hostname`") as $map_devices) {
     $color = "#29FF3B";
     $size = 15;
     $status = 'Up';

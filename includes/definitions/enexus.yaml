@@ -6,9 +6,12 @@ nobulk: true
 mib_dir:
     - eltek
 discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.12148.10
     - snmpget:
           oid: .1.3.6.1.4.1.12148.10.2.6.0
-          value: 'Micropack System'
+          op: regex
+          value: '/Micropack System|Smartpack S/'
 poller_modules:
     entity-physical: false
     hr-mib: false

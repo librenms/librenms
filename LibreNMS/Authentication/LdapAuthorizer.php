@@ -53,21 +53,6 @@ class LdapAuthorizer extends AuthorizerBase
         throw new AuthenticationException();
     }
 
-
-    public function reauthenticate($sess_id, $token)
-    {
-        $sess_id = clean($sess_id);
-        $token = clean($token);
-
-        list($username, $hash) = explode('|', $token);
-
-        if (!$this->userExists($username, true)) {
-            throw new AuthenticationException();
-        }
-
-        return $this->checkRememberMe($sess_id, $token);
-    }
-
     public function userExists($username, $throw_exception = false)
     {
         try {
@@ -209,7 +194,7 @@ class LdapAuthorizer extends AuthorizerBase
     public function getUser($user_id)
     {
         foreach ($this->getUserlist() as $user) {
-            if ($user['user_id'] === $user_id) {
+            if ((int)$user['user_id'] === (int)$user_id) {
                 return $user;
             }
         }
@@ -282,6 +267,37 @@ class LdapAuthorizer extends AuthorizerBase
             return $this->ldap_connection; // bind already attempted
         }
 
+        if ($skip_bind) {
+            $this->connect();
+        } else {
+            $this->bind();
+        }
+
+        return $this->ldap_connection;
+    }
+
+    /**
+     * @param array $entry ldap entry array
+     * @return array
+     */
+    private function ldapToUser($entry)
+    {
+        $uid_attr = strtolower(Config::get('auth_ldap_uid_attribute', 'uidnumber'));
+        return [
+            'username' => $entry['uid'][0],
+            'realname' => $entry['cn'][0],
+            'user_id' => (int)$entry[$uid_attr][0],
+            'email' => $entry[Config::get('auth_ldap_emailattr', 'mail')][0],
+            'level' => $this->getUserlevel($entry['uid'][0]),
+        ];
+    }
+
+    private function connect()
+    {
+        if ($this->ldap_connection) {
+            return;
+        }
+
         if (!function_exists('ldap_connect')) {
             throw new AuthenticationException("PHP does not support LDAP, please install or enable the PHP LDAP extension.");
         }
@@ -302,65 +318,43 @@ class LdapAuthorizer extends AuthorizerBase
                 throw new AuthenticationException("Fatal error: LDAP TLS required but not successfully negotiated: $error");
             }
         }
+    }
 
-        if ($skip_bind) {
-            return $this->ldap_connection;
-        }
-
+    public function bind($username = null, $password = null)
+    {
         if (Config::get('auth_ldap_debug')) {
             ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
         }
 
-        // set timeout
-        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ldap_timeout', 5));
+        $this->connect();
+
+        if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
+            $username = Config::get('auth_ldap_binddn', $this->getFullDn(Config::get('auth_ldap_binduser')));
+            $password = Config::get('auth_ldap_bindpassword');
+        } elseif ($username) {
+            $username = $this->getFullDn($username);
+        }
 
         // With specified bind user
-        if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn'))
-            && Config::has('auth_ldap_bindpassword')
-        ) {
-            if (Config::has('auth_ldap_binddn')) {
-                $bind_dn = Config::get('auth_ldap_binddn');
-            } else {
-                $bind_dn = $this->getFullDn(Config::get('auth_ldap_binduser'));
-            }
+        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ldap_timeout', 5));
+        $bind_result = ldap_bind($this->ldap_connection, $username, $password);
+        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
 
+        if (Config::get('auth_ldap_debug')) {
+            echo "Bind result: " . ldap_error($this->ldap_connection) . PHP_EOL;
+        }
 
-            $bind_result = ldap_bind($this->ldap_connection, $bind_dn, Config::get('auth_ldap_bindpassword'));
-
-            if (Config::get('auth_ldap_debug')) {
-                echo "Bind result: " . ldap_error($this->ldap_connection) . PHP_EOL;
-            }
-
-            if ($bind_result) {
-                ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
-                return $this->ldap_connection;
-            }
+        if ($bind_result) {
+            return;
         }
 
         // Anonymous
+        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ldap_timeout', 5));
         ldap_bind($this->ldap_connection);
+        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
 
         if (Config::get('auth_ldap_debug')) {
             echo "Anonymous bind result: " . ldap_error($this->ldap_connection) . PHP_EOL;
         }
-
-        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
-        return $this->ldap_connection;
-    }
-
-    /**
-     * @param array $entry ldap entry array
-     * @return array
-     */
-    private function ldapToUser($entry)
-    {
-        $uid_attr = strtolower(Config::get('auth_ldap_uid_attribute', 'uidnumber'));
-        return [
-            'username' => $entry['uid'][0],
-            'realname' => $entry['cn'][0],
-            'user_id' => (int)$entry[$uid_attr][0],
-            'email' => $entry[Config::get('auth_ldap_emailattr', 'mail')][0],
-            'level' => $this->getUserlevel($entry['uid'][0]),
-        ];
     }
 }

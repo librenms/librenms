@@ -1,0 +1,437 @@
+
+AcPerfMediaGateway DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+       OBJECT-TYPE, 
+       MODULE-IDENTITY                             FROM SNMPv2-SMI
+       enterprises                                 FROM SNMPv2-SMI;
+
+	audioCodes       OBJECT IDENTIFIER ::= {enterprises 5003}
+	acRegistrations  OBJECT IDENTIFIER ::= {audioCodes 7}
+	acGeneric        OBJECT IDENTIFIER ::= {audioCodes 8}
+	acProducts       OBJECT IDENTIFIER ::= {audioCodes 9}	
+	acPerformance    OBJECT IDENTIFIER ::= {audioCodes 10}	
+
+       
+acPerfMediaGateway  MODULE-IDENTITY       
+    LAST-UPDATED "200407121502Z"          --Monday, July 12, 2004
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+	     AudioCodes LTD
+             1 Hayarden Street
+             Airport City 
+	     Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"		
+
+    DESCRIPTION       
+    "This MIB defines the enterprise-specific objects needed
+     to support performance management of the AudioCodes product.
+     Performance measurements are grouped into the following MIB trees:
+
+            acPerfCp     - performance measurements related to the control protocol
+            acPerfRtp    - performance measurements related to RTP streams
+            acPerfSystem - performance measurements related to network element as a whole"
+
+
+    REVISION "200311200000Z"
+       DESCRIPTION
+         "Version 4.4. November 20, 2003. Made these changes:
+             o  Initial revision"
+
+    ::= {acPerformance 1}  
+
+--
+-- Abbreviations used:
+--   Annc       announcement(s)
+--   IVR        Interactive Voice Response
+--   CallAgent  CallAgentConnection
+--   Conf       Conferencing
+--   CP         Control Protocol
+--   NE         network element
+--   TT         Test Trunks
+--
+
+-- The following conventions are used in this MIB:
+
+--   The "Product" attribute lists the products in which the
+--   performance measurement is maintained. Current products
+--   are:
+--
+--     Media Servers
+--       IPmedia 2000
+--     Media Gateways
+--       Mediant 2000/5000/8000 (wireline)
+--       Stretto 2000/5000/8000 (wireless)
+--
+
+--   The "Capabilities" attribute lists the capabilities that must be
+--   configured on the system for the performance measurement to be
+--   maintained.  The possible values are IVR, Conferencing, BCT, TT
+--   and Trunking Gateway. Some performance measurements are not
+--   related to any particular capabilities. In those cases, the value
+--   of Capabilities attribute is "All".
+
+
+ 
+ 
+
+
+
+
+
+
+     -- ****************************************
+     -- acPerfCp Configuration
+     -- ****************************************
+     acPerfCp                      OBJECT IDENTIFIER ::= {acPerfMediaGateway 1}
+
+
+     acPerfCpNumDupsForCompletedTransactions OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of times a duplicate transaction request was received
+     after the initial transaction had already been completed. In this
+     case, the gateway resends the response for this transaction.
+     Products:     All
+     Capabilities: All"
+       ::= {acPerfCp 1}
+
+
+
+     acPerfCpNumDupsForOutstandingTransactions OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of times a duplicate transaction request was received
+     while the initial transaction was outstanding, that is, still in
+     progress. In this case, the gateway ignores the duplicate request.
+     Products:     All
+     Capabilities: All"
+       ::= {acPerfCp 2}
+
+
+
+     acPerfCpMessageSendSuccesses OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of times there was a success in sending
+     a call control (H.248) message. Call control messages
+     are sent using the system's socket library.
+     This counter tracks successes in using the local
+     socket services. It does not track successes in end-to-end
+     message transfer between the gateway and the call agent.
+     Products:     All
+     Capabilities: All"
+       ::= {acPerfCp 3}
+
+
+
+     acPerfCpMessageSendErrors OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of times there was a failure in sending a call control
+     (H.248) message. The message is sent via a datagram
+     using the system's socket library. Normally a failure on a
+     socket send operation would be attributed to an internal
+     system problem.
+     Products:     All
+     Capabilities: All"
+       ::= {acPerfCp 4}
+
+
+
+     acPerfCpMessageReceiveSuccesses OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of times there was a success in receiving
+     a call control (H.248) message. Call control messages
+     are received using the system's socket library.
+     This counter tracks successes in using the local
+     socket services. It does not track successes in end-to-end
+     message transfer between the gateway and the call agent.
+     Products:     All
+     Capabilities: All"
+       ::= {acPerfCp 5}
+
+
+
+     acPerfCpMessageReceiveErrors OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of times there was a failure in receiving a call control
+     ( H.248) message. Call control messages are received
+     using the system's socket library. A failure on the socket
+     receive operation can be attributed to an internal system
+     problem or with the call agent sending a message larger than
+     what is supported by the gateway.
+     Products:     All
+     Capabilities: All"
+       ::= {acPerfCp 6}
+
+
+
+     acPerfCpProtocolSyntaxErrors OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of syntax errors detected in incoming call control 
+    (H.248) messages.
+     Products:     All
+     Capabilities: All"
+       ::= {acPerfCp 7}
+
+
+
+     acPerfCpMessageRetransmissions OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Each time the call engine times out waiting for an acknowledgement
+     it retransmits the control protocol message, unless the number of
+     max retransmissions is exceeded. This counter is incremented each time
+     a message is retransmitted due to a timeout.
+     Products:     All
+     Capabilities: All"
+       ::= {acPerfCp 8}
+
+
+
+     acPerfCpMessageMaxRetransmissionsExceeded OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of times the call control message maximum retransmission count was
+     exceeded. The gateway attempted several times to send a message to the call
+     agent, but each time, an ack was not received. A failure of this type
+     results in a failed call and is usually an indication that subsequent
+     calls will fail. This problem is typically a result of the call agent
+     being down or a result of a network problem.
+     Products:     All
+     Capabilities: All"
+       ::= {acPerfCp 9}
+
+
+
+     acPerfCpMessagesFromUntrustedSources OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of messages received from untrusted sources, that is from network
+     nodes other than the node on which the call agent is running.
+     Products:     All
+     Capabilities: All"
+       ::= {acPerfCp 10}
+
+
+
+     -- ****************************************
+     -- acPerfRtp Configuration
+     -- ****************************************
+     acPerfRtp                     OBJECT IDENTIFIER ::= {acPerfMediaGateway 2}
+
+
+     acPerfRtpSenderPackets OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Total number of RTP packets sent by the system for this card.
+     Products:     All IP-based products
+     Capabilities: IVR, BCT, Conferencing, Test Trunks"
+       ::= {acPerfRtp 1}
+
+
+
+     acPerfRtpSenderOctets OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Total number of non-header RTP octets sent by this card.
+     Products:     All IP-based products
+     Capabilities: IVR, BCT, Conferencing, Test Trunks"
+       ::= {acPerfRtp 2}
+
+
+
+     acPerfRtpReceiverPackets OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Total number of RTP packets received by the system for this card.
+     Products:     All IP-based products
+     Capabilities: IVR, BCT, Conferencing, Test Trunks"
+       ::= {acPerfRtp 3}
+
+
+
+     acPerfRtpReceiverOctets OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Total number of non-header RTP octets received by this card.
+     Products:     All IP-based products
+     Capabilities: IVR, BCT, Conferencing, Test Trunks"
+       ::= {acPerfRtp 4}
+
+
+
+     acPerfRtpRcvrLostPackets OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Total number of RTP  packets lost as observed by this card.
+     Products:     All IP-based products
+     Capabilities: IVR, BCT, Conferencing, Test Trunks"
+       ::= {acPerfRtp 5}
+
+
+
+     acPerfRtpFailedDueToLackOfResources OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of times a rtp request was rejected due to lack of resources
+     since the last application restart.
+     Products:     IPmedia 2000"
+       ::= {acPerfRtp 6}
+
+
+
+     acPerfRtpSimplexInSessionsTotal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Total number of simplex input RTP sessions.
+     A simplex (one-way) session would be used to play an announcement.
+
+     Products:     All IP-based products
+     Capabilities: IVR, BCT, Conferencing, Test Trunks"
+       ::= {acPerfRtp 7}
+
+
+
+     acPerfRtpSimplexInSessionsCurrent OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Current number of simplex input RTP sessions.
+     Products:     All IP-based products
+     Capabilities: IVR, BCT, Conferencing, Test Trunks"
+       ::= {acPerfRtp 8}
+
+
+
+     acPerfRtpSimplexOutSessionsTotal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Total number of simplex output RTP sessions.
+     Products:     All IP-based products
+     Capabilities: IVR, BCT, Conferencing, Test Trunks"
+       ::= {acPerfRtp 9}
+
+
+
+     acPerfRtpSimplexOutSessionsCurrent OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Current number of simplex output RTP sessions.
+     Products:     All IP-based products
+     Capabilities: IVR, BCT, Conferencing, Test Trunks"
+       ::= {acPerfRtp 10}
+
+
+
+     acPerfRtpDuplexSessionsTotal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Total number of duplex RTP sessions.
+
+     A duplex (two-way) session would be used for conferencing.
+
+     Products:     All IP-based products
+     Capabilities: IVR, BCT, Conferencing, Test Trunks"
+       ::= {acPerfRtp 11}
+
+
+
+     acPerfRtpDuplexSessionsCurrent OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Current number of duplex RTP sessions.
+     Products:     All IP-based products
+     Capabilities: IVR, BCT, Conferencing, Test Trunks"
+       ::= {acPerfRtp 12}
+
+
+
+     -- ****************************************
+     -- acPerfSystem Configuration
+     -- ****************************************
+     acPerfSystem                  OBJECT IDENTIFIER ::= {acPerfMediaGateway 3}
+
+
+     acPerfSystemPacketEndpoints OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of endpoints reserved for all packet network-related functions (conferencing, plays, etc.). This is an attribute that is derived from the type of hardware and the values of certain config parameters. Currently, its value is fixed after init-time. In the future, it's value might be impacted by configuration of online parameters. That is, its value might increase or decrease over time. For example, in a multi-card system, addition of a board would cause it to increase.
+     Products:     All
+     Capabilities: All
+"
+       ::= {acPerfSystem 1}
+
+
+
+     acPerfSystemPacketEndpointsInUse OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of endpoints that the call engine is currently using for
+     all packet network-related functions (conferencing, plays, etc.).
+     Products:     All
+     Capabilities: All"
+       ::= {acPerfSystem 2}
+
+
+
+
+
+END

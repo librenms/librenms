@@ -8,8 +8,8 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
     $vtpdomain_id = '1';
     $vlans        = snmpwalk_cache_oid($device, 'dot1qVlanStaticName', array(), 'Q-BRIDGE-MIB');
-    $tagoruntag   = snmpwalk_cache_oid($device, 'dot1qVlanCurrentEgressPorts', array(), 'Q-BRIDGE-MIB', null, '-OQUs --hexOutputLength=0');
-    $untag        = snmpwalk_cache_oid($device, 'dot1qVlanCurrentUntaggedPorts', array(), 'Q-BRIDGE-MIB', null, '-OQUs --hexOutputLength=0');
+    $tagoruntag   = snmpwalk_cache_oid($device, 'dot1qVlanCurrentEgressPorts', array(), 'Q-BRIDGE-MIB', null, ['-OQUs', '--hexOutputLength=0']);
+    $untag        = snmpwalk_cache_oid($device, 'dot1qVlanCurrentUntaggedPorts', array(), 'Q-BRIDGE-MIB', null, ['-OQUs', '--hexOutputLength=0']);
 
     // drop dot1qVlanTimeMark, we don't care about it
     $tagoruntag = array_reduce(array_keys($tagoruntag), function ($result, $key) use ($tagoruntag) {

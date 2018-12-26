@@ -41,9 +41,10 @@ class DatabaseConnectException extends \Exception
                 'message' => 'Error connecting to database: ' . $this->getMessage(),
             ]);
         } else {
-            $message = "<h2 style='color:darkred'>Error connecting to database.</h2>";
-            $message .= $this->getMessage();
-            return response($message);
+            return response()->view('errors.generic', [
+                'title' => 'Error connecting to database.',
+                'content' => $this->getMessage(),
+            ]);
         }
     }
 }

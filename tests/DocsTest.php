@@ -29,6 +29,37 @@ use Symfony\Component\Yaml\Yaml;
 
 class DocTest extends TestCase
 {
+    private $hidden_pages = [
+        'API/API-Docs.md',
+        'Alerting/Old_Templates.md',
+        'Extensions/Alerting.md',
+        'Extensions/Email-Alerting.md',
+        'Extensions/Graphite.md',
+        'Extensions/InfluxDB.md',
+        'Extensions/OpenTSDB.md',
+        'Extensions/Port-Description-Parser.md',
+        'Extensions/Prometheus.md',
+        'Extensions/RRDCached-Security.md',
+        'General/Changelogs/2013.md',
+        'General/Changelogs/2014.md',
+        'General/Changelogs/2015.md',
+        'General/Changelogs/2016.md',
+        'General/Contributing.md',
+        'General/Credits.md',
+        'Installation/Installation-(Debian-Ubuntu).md',
+        'Installation/Installation-(RHEL-CentOS).md',
+        'Installation/Installation-CentOS-6-Apache-Nginx.md',
+        'Installation/Installation-Ubuntu-1404-Apache.md',
+        'Installation/Installation-Ubuntu-1404-Lighttpd.md',
+        'Installation/Installation-Ubuntu-1404-Nginx.md',
+        'Installation/Installation-Ubuntu-1604-Apache.md',
+        'Installation/Installation-Ubuntu-1604-Nginx.md',
+        'Installation/Installing-LibreNMS.md',
+        'Support/Support-New-OS.md',
+        'Installation/Ubuntu-image.md',
+        'Installation/CentOS-image.md',
+    ];
+    
     public function testDocExist()
     {
         $mkdocs = Yaml::parse(file_get_contents(__DIR__ . '/../mkdocs.yml'));
@@ -37,7 +68,7 @@ class DocTest extends TestCase
 
         // check for missing pages
         collect(explode(PHP_EOL, $files))
-            ->diff(collect($mkdocs['pages'])->flatten()) // grab defined pages and diff
+            ->diff(collect($mkdocs['nav'])->flatten()->merge($this->hidden_pages)) // grab defined pages and diff
             ->each(function ($missing_doc) {
                 $this->fail("The doc $missing_doc doesn't exist in mkdocs.yml, please add it to the relevant section");
             });

@@ -15,7 +15,7 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $graph_type = mres($vars['graph_type']);
 $unit       = mres($vars['unit']);
@@ -23,16 +23,16 @@ $class      = mres($vars['class']);
 
 $sql = " FROM `$table` AS S, `devices` AS D";
 
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql .= ', devices_perms as P';
 }
 
 $sql .= " WHERE S.sensor_class=? AND S.device_id = D.device_id ";
 $param[] = mres($vars['class']);
 
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql .= " AND D.device_id = P.device_id AND P.user_id = ?";
-    $param[] = Auth::id();
+    $param[] = LegacyAuth::id();
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
@@ -111,12 +111,25 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
 
     $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
 
+    if ($graph_type == 'sensor_state') {
+        // If we have a state, let's display a label with textual state translation
+        $state_translation = array();
+        $state_translation = dbFetchRows('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', array($sensor['sensor_id'], $sensor['sensor_current']));
+
+        //$current_label = get_state_label_color($sensor);
+        $sensor_current = get_state_label($sensor['state_generic_value'], (!empty($state_translation['0']['state_descr'])) ? $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")" : $sensor['sensor_current']);
+    } else {
+        // we have another sensor
+        $current_label = get_sensor_label_color($sensor);
+        $sensor_current = "<span class='label $current_label'>".format_si($sensor['sensor_current']).$unit."</span>";
+    }
+
     $response[] = array(
         'hostname'         => generate_device_link($sensor),
         'sensor_descr'     => overlib_link($link, $sensor['sensor_descr'], $overlib_content, null),
         'graph'            => overlib_link($link_graph, $sensor_minigraph, $overlib_content, null),
         'alert'            => $alert,
-        'sensor_current'   => $sensor['sensor_current'].$unit,
+        'sensor_current'   => $sensor_current,
         'sensor_limit_low' => is_null($sensor['sensor_limit_low']) ? '-' : round($sensor['sensor_limit_low'], 2).$unit,
         'sensor_limit'     => is_null($sensor['sensor_limit']) ? '-' : round($sensor['sensor_limit'], 2).$unit,
     );

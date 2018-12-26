@@ -12,11 +12,11 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 header('Content-type: text/plain');
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -28,6 +28,7 @@ if (!is_numeric($vars['alert_id'])) {
         dbDelete('alert_device_map', 'rule_id=?', [$vars['alert_id']]);
         dbDelete('alert_group_map', 'rule_id=?', [$vars['alert_id']]);
         dbDelete('alert_transport_map', 'rule_id=?', [$vars['alert_id']]);
+        dbDelete('alert_template_map', 'alert_rule_id=?', [$vars['alert_id']]);
         echo 'Alert rule has been deleted.';
         exit;
     } else {

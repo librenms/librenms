@@ -124,7 +124,7 @@ if ($device['os_group'] == "cisco") {
 
         ///////////ipRouteMask//////////////////////
         $oid = '.1.3.6.1.2.1.4.21.1.11';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn -Ln", $mib, null);
+        $resultHelp = snmp_walk($device, $oid, ['-Osq', '-Ln'], $mib, null);
         $resultHelp = trim($resultHelp);
         $resultHelp = str_replace("$oid.", "", $resultHelp);
 

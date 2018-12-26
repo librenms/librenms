@@ -11,11 +11,31 @@ class Dashboard extends Model
     protected $primaryKey = 'dashboard_id';
     protected $fillable = ['user_id', 'dashboard_name', 'access'];
 
+    // ---- Helper Functions ---
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function canRead($user)
+    {
+        return $this->user_id == $user->user_id || $this->access > 0;
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function canWrite($user)
+    {
+        return $this->user_id == $user->user_id || $this->access > 1;
+    }
+
     // ---- Query scopes ----
 
     /**
      * @param Builder $query
-     * @param $user
+     * @param User $user
      * @return Builder|static
      */
     public function scopeAllAvailable(Builder $query, $user)
@@ -24,21 +44,15 @@ class Dashboard extends Model
             ->orWhere('access', '>', 0);
     }
 
-    // ---- Define Reletionships ----
+    // ---- Define Relationships ----
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function widgets()
     {
-        return $this->hasMany('App\Models\UsersWidgets', 'dashboard_id');
+        return $this->hasMany('App\Models\UserWidget', 'dashboard_id');
     }
 }

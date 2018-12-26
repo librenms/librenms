@@ -1,4 +1,5 @@
 source: Alerting/Creating-Transport.md
+path: blob/master/doc/
 
 # Creating a new Transport.
 
@@ -19,14 +20,6 @@ of the transport config to get it ready for use.
 data should be validated and how. Validation is done using [Laravel validation](https://laravel.com/docs/5.4/validation)
 
 The following function is __not__ required for new Transports and is for legacy reasons only. `deliverAlertOld()`.
-
-### WebUI
-At present you will also need to add the new transport to the select part of the form in
-`html/includes/modal/edit_alert_transport.inc.php`. I.e:
-
-`<option value="discord-form">Discord</option>`
-
-Please ensure you add the new entry in the correct location sorted alphabetically.
 
 ### Documentation
 Please don't forget to update the [Transport](Transports.md) file to include details of your new transport.

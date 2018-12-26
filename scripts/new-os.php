@@ -97,6 +97,9 @@ discovery:
             mkdir($config['install_dir'] . "/mibs/$vendor/");
         }
         rename($config['temp_dir'] . "/{$options['o']}.mib", $config['install_dir'] . "/mibs/$vendor/$mib_name");
+    } elseif ($mib_name) {
+        $tmp_mib = explode('/', $mib_name);
+        $mib_name = array_pop($tmp_mib);
     }
 
     $tables = `{$config['snmptranslate']} -M {$config['mib_dir']}:{$config['mib_dir']}/$vendor -m $mib_name -TB '.*Table$' -Os`;
@@ -121,7 +124,7 @@ discovery:
                 -
                     oid: $table_name
                     value: $value
-                    num_oid: {$tmp_table[$value]}.
+                    num_oid: '{$tmp_table[$value]}.{{ \$index }}'
                     descr: $descr";
                     if ($multiplier) {
                         $discovery[$type] .= "\n                    multiplier: $multiplier";

@@ -1,0 +1,883 @@
+-- ============================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: This mib is used for defining huawei's energy management MIB objects
+-- Reference: None
+-- Version:   V2.05
+-- ============================================================================
+HUAWEI-ENERGYMNGT-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+
+            IpAddress, Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY,
+            NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+                    FROM SNMPv2-CONF 
+            InetAddressType, InetAddress            
+                FROM INET-ADDRESS-MIB           
+            DisplayString, DateAndTime, TruthValue, RowStatus
+                FROM SNMPv2-TC
+            huaweiUtility
+                FROM HUAWEI-MIB ;
+
+hwEnergyMngt MODULE-IDENTITY
+       LAST-UPDATED "201706210000Z"
+       ORGANIZATION "Huawei Technologies Co.,Ltd."
+       CONTACT-INFO
+"Huawei Industrial Base
+  Bantian, Longgang
+   Shenzhen 518129
+   People's Republic of China
+   Website: http://www.huawei.com
+   Email: support@huawei.com
+ "
+            DESCRIPTION "huawei energy management MIB."
+            REVISION    "201706210000Z"
+            DESCRIPTION "V2.05. Modify the description of hwBoardName and hwBoardType ."
+
+            REVISION    "201511110000Z"
+            DESCRIPTION "V2.04. Add enum of hwEnergySavingMode:optimal."
+            REVISION    "201505300000Z"
+            DESCRIPTION "V2.03. Add enum of hwEnergySavingMode:optimal.
+                                This is a draft version." 
+
+            REVISION    "201401230000Z"
+            DESCRIPTION "V2.02. Add hwEnergyDevId, hwEnergyDevChangeToSleep.
+                                This is a draft version."    
+        
+
+            REVISION    "201107010000Z"
+            DESCRIPTION "V0.114. Add hwPoEType, hwPSEPower.
+                                 Modify FTPC table.
+                                 This is a draft version."           
+
+            REVISION    "201103141530Z"
+            DESCRIPTION "V0.113, add hwEnergyFtpcIpv4TransMode and hwEnergyFtpcTransMode.
+                                This is a draft version."           
+            
+            REVISION    "201103140000Z"
+            DESCRIPTION "V0.112, modify hwEnergyFtpcTransFileIpv4Table and hwEnergyFtpcTransFileTable.
+                                This is a draft version."           
+            
+            REVISION    "201103100000Z"
+            DESCRIPTION "V0.111, add hwEnergyFtpcObjects, 
+                                including hwEnergyFtpcTransFileIpv4Table and hwEnergyFtpcTransFileTable.
+                                This is a draft version."
+
+            REVISION    "201102100000Z"
+            DESCRIPTION "V0.11, add hwEnergySavingDescReqMode."
+
+            REVISION    "201008060000Z"
+            DESCRIPTION "V0.10, modify hwBoardIndex."
+
+            REVISION    "201008050000Z"
+            DESCRIPTION "V0.09, modify hwBoardType."
+
+            REVISION    "201008030000Z"
+            DESCRIPTION "V0.08, modify watt to milliwatt.
+                         Modify enumeration of hwEnergySavingMode.
+                         Add boardType and boardDescription."
+
+        REVISION    "201007120000Z"
+            DESCRIPTION "V0.08, modify hwPowerStatPeriod."
+
+            REVISION    "201007070000Z"
+            DESCRIPTION "V0.06, modify hwPowerStatPeriod."
+
+            REVISION    "201006290000Z"
+            DESCRIPTION "V0.05, modify hwEnergySavingMethodEnable value list.
+                         Delete hwEnergySavingParameterTable first index 'hwEnergySavingMethodIndex'"
+
+            REVISION    "201006230000Z"
+            DESCRIPTION "V0.05, modify hwEnergySavingCapabilityMngtEntry, modify hwEnergySavingMethodTable"
+
+            REVISION    "201006180000Z"
+            DESCRIPTION "V0.04, modify hwEnergySavingCapabilityMngtEntry"
+
+            REVISION    "201006170000Z"
+            DESCRIPTION "V0.03, modify description for all MIB table"
+
+            REVISION    "201006080000Z"
+            DESCRIPTION "V0.02, add hwEnergySavingMethodEntry, add hwEnergySavingCapabilityMngt"
+
+            REVISION    "201005240000Z"
+            DESCRIPTION "V0.01 mib initial"
+
+        ::= { huaweiUtility 157 }
+
+
+    
+--
+-- Node definitions
+--
+    
+        -- 1.1
+        hwSysPowerMgnt OBJECT IDENTIFIER ::= { hwEnergyMngt 1 }
+
+        
+        -- 1.1.1
+        hwPowerConsumption OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "NE total power consumption, counted from equipment first used.
+                 Joule(Watt * second).
+                 Note: If the device is a power supplier(PSE), the power consumption includes the outputs."
+            ::= { hwSysPowerMgnt 1 }
+
+        
+        -- 1.1.2
+        hwPowerStatPeriod OBJECT-TYPE
+            SYNTAX INTEGER
+                          {
+                fifteenMinutes(1),
+                thirtyMinutes(2),
+                oneHour(3),
+                oneDay(4),
+                oneWeek(5),
+                oneMonth(6)
+               }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "NE power statistics period: 
+                fifteenMinutes(1):  The power statistics generated every 15 minutes.
+                thirtyMinutes(2):   The power statistics generated every 30 minutes.
+                oneHour(3):         The power statistics generated every hour. 
+                oneDay(4):          The power statistics generated every day.
+                oneWeek(5):         The power statistics generated every week.
+                oneMonth(6):        The power statistics generated every month.
+                The defaut statistics intervalue is one hour."
+            DEFVAL {oneHour}
+            ::= { hwSysPowerMgnt 2 }
+
+        
+        -- 1.1.3
+        hwAveragePower OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "NE average power consumtion during a period: milliwatt"
+            ::= { hwSysPowerMgnt 3 }
+
+        
+        -- 1.1.4
+        hwRatedPower OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "NE rated power: milliwatt"
+            ::= { hwSysPowerMgnt 4 }
+
+        
+        -- 1.1.5
+        hwThresholdOfPower OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "NE threshold power: milliwatt"
+            ::= { hwSysPowerMgnt 5 }
+
+        
+        -- 1.1.6
+        hwCurrentPower OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "NE current power: milliwatt"
+            ::= { hwSysPowerMgnt 6 }
+
+
+        -- 1.1.7
+        hwPoEType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                pse(1),
+                pd(2),
+                noPoe(255)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "powered type:
+                PSE(1): power supplier.
+                PD(2): powered deivce.
+                noPoe(255): not PSE or PD"
+            ::= { hwSysPowerMgnt 7 }
+
+
+        -- 1.1.8
+        hwPSEPower OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The output power(milliwatt) by a PSE. For a non-PSE device, the value is zero."
+            ::= { hwSysPowerMgnt 8 }
+
+
+        -- 1.2
+        hwBoardPowerMngt OBJECT IDENTIFIER ::= { hwEnergyMngt 2 }
+
+        
+        -- 1.2.1
+        hwBoardPowerMngtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBoardPowerMngtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table describes current power and rated power of boards. The index is hwBoardIndex."
+            ::= { hwBoardPowerMngt 1 }
+
+        
+        -- 1.2.1.1
+        hwBoardPowerMngtEntry OBJECT-TYPE
+            SYNTAX HwBoardPowerMngtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwBoardPowerMngtTable."
+            INDEX { hwBoardIndex }
+            ::= { hwBoardPowerMngtTable 1 }
+
+        
+        HwBoardPowerMngtEntry ::=
+            SEQUENCE { 
+                hwBoardIndex
+                    Integer32,
+                hwBoardType
+                    DisplayString,
+                hwBoardName
+                    DisplayString,
+                hwBoardCurrentPower
+                    Integer32,
+                hwBoardRatedPower
+                    Integer32,
+                hwBoardThresholdOfPower
+                    Integer32
+                    }
+
+        -- 1.2.1.1.1
+        hwBoardIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Index: reserved/shelf/frame/slot.
+                The index is format by 4 bytes(8bit for 1 byte): reservedByte(0xFF), shelfID, frameID, slotID.
+                e.g. shlef=1, frame=2, slot=17, the index is 0xFF010211(66065).
+                If no shelfID or frameID, the corresponding byte is set to be 0xFF.
+                e.g. no shlefID, no frameID, slot=17, the index is 0xFFFFFF11(4294967057).
+                "
+            ::= { hwBoardPowerMngtEntry 1 }
+
+
+        -- 1.2.1.1.2
+        hwBoardType OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "hwBoardType describes main type of board.
+                "
+            ::= { hwBoardPowerMngtEntry 2 }
+
+
+        -- 1.2.1.1.3
+        hwBoardName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "hwBoardName describes full name of board.
+                "
+            ::= { hwBoardPowerMngtEntry 3 }
+
+
+        -- 1.2.1.1.4
+        hwBoardCurrentPower OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "current power of board(slot): milliwatt"
+            ::= { hwBoardPowerMngtEntry 4 }
+
+        
+        -- 1.2.1.1.5
+        hwBoardRatedPower OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "rated power of board(slot): milliwatt"
+            ::= { hwBoardPowerMngtEntry 5 }
+
+
+        -- 1.2.1.1.6
+        hwBoardThresholdOfPower OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Threshold power of board(slot): milliwatt"
+            ::= { hwBoardPowerMngtEntry 6 }
+
+
+
+        
+        -- 1.3
+        hwEnergySavingMngt OBJECT IDENTIFIER ::= { hwEnergyMngt 3 }
+
+        
+        -- 1.3.1
+        hwEnergySavingMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                userDefined(1),
+                standard(2),
+                basic(3),
+                deep(4),
+                optimal(5)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Power saving mode:
+                 UserDefined(1): UserDined energy-saving mode, user can define energy-saving strategy.
+                 Standard(2): standard energy-saving mode
+                 Basic(3): basic energy-saving mode, many basic energy-saving strategy included.
+                 Deep(4): Deep energy-saving mode, many complex energy-saving strategy included, which may effect service.
+                 Optimal(5): Optimal energy-saving mode, many complex energy-saving strategy included, which may effect service.
+                "
+            ::= { hwEnergySavingMngt 1 }
+
+        
+        -- 1.3.2
+        hwEnergySavingMethodTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEnergySavingMethodEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "hwEnergySavingMethodTable defines energy-saving Method for all mode.
+                User can set a method with its parameter.
+                The index of this table is hwEnergySavingMethodIndex.
+                "
+            ::= { hwEnergySavingMngt 2 }
+
+        
+        -- 1.3.2.1
+        hwEnergySavingMethodEntry OBJECT-TYPE
+            SYNTAX HwEnergySavingMethodEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of energy-saveing method table."
+            INDEX { hwEnergySavingMethodIndex }
+            ::= { hwEnergySavingMethodTable 1 }
+
+        
+        HwEnergySavingMethodEntry ::=
+            SEQUENCE { 
+                hwEnergySavingMethodIndex
+                    Integer32,
+                hwEnergySavingMethodEnable
+                    INTEGER
+                }
+
+        -- 1.3.2.1.1
+        hwEnergySavingMethodIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of method in use.
+                "
+            ::= { hwEnergySavingMethodEntry 1 }
+
+        -- 1.3.2.1.2
+        hwEnergySavingMethodEnable OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                enable(1),
+                disable(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "hwEnergySaveingMethodEnable describes the status of energy-saving method: enableed or disabled.
+                "
+            ::= { hwEnergySavingMethodEntry 2 }
+
+
+        
+        -- 1.3.3
+        hwEnergySavingParameterTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEnergySavingParameterEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "hwEnergySavingParameterTable defines parameters for all energy-saving methods.
+                User can set parameter for a method.
+                The index of this table: hwEnergySavingMethodIndex, hwEnergySavingParameterIndex."
+            ::= { hwEnergySavingMngt 3 }
+
+        
+        -- 1.3.3.1
+        hwEnergySavingParameterEntry OBJECT-TYPE
+            SYNTAX HwEnergySavingParameterEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of energy-saveing parameter table."
+            INDEX { hwEnergySavingMethodIndex, hwEnergySavingParameterIndex }
+            ::= { hwEnergySavingParameterTable 1 }
+
+        
+        HwEnergySavingParameterEntry ::=
+            SEQUENCE { 
+                hwEnergySavingParameterIndex
+                    Integer32,
+                hwEnergySavingParameterValue
+                    DisplayString (SIZE (0..64))
+             }
+
+        -- 1.3.3.1.1
+        hwEnergySavingParameterIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The second index of hwEnergySavingParameterTable.
+                An energy-saving method might have more than one parameter.
+                This index is used to identify the parameter for a method."
+            ::= { hwEnergySavingParameterEntry 1 }
+
+        -- 1.3.3.1.2
+        hwEnergySavingParameterValue OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of an energy-saveing method's parameter.
+                 The parameter is a format string. 
+                 When NMS sets integer 12 as a parameter for a energy-saving method, the value is a string '12'.
+                "
+            ::= { hwEnergySavingParameterEntry 2 }
+
+            
+
+        -- 1.3.4
+        hwEnergySavingCapabilityMngtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEnergySavingCapabilityMngtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table describes the energy-saving capability, including energy-saving methods and parameters.
+                The index is hwEnergySavingCapabilityDescIndex.
+                "
+            ::= { hwEnergySavingMngt 4 }
+
+        
+        -- 1.3.4.1
+        hwEnergySavingCapabilityMngtEntry OBJECT-TYPE
+            SYNTAX HwEnergySavingCapabilityMngtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwBoardPowerMngtTable."
+            INDEX { hwEnergySavingCapabilityDescIndex }
+            ::= { hwEnergySavingCapabilityMngtTable 1 }
+
+        
+        HwEnergySavingCapabilityMngtEntry ::=
+            SEQUENCE { 
+                hwEnergySavingCapabilityDescIndex
+                    Integer32,
+                hwEnergySavingCapabilityDescLanguage
+                    DisplayString (SIZE (0..64)),
+                hwEnergySavingCapabilityDesc
+                    OCTET STRING
+                    }
+        
+        -- 1.3.4.1.1
+        hwEnergySavingCapabilityDescIndex OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of hwEnergySavingCapabilityMngtTable.
+                "
+            ::= { hwEnergySavingCapabilityMngtEntry 1 }
+
+        -- 1.3.4.1.2
+        hwEnergySavingCapabilityDescLanguage OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The language of EnergySavingCapabilityDescription file.
+                'en-gb'(English-GreatBraitain)
+                'zh-cn'(Chinese)
+                "
+            ::= { hwEnergySavingCapabilityMngtEntry 2 }
+
+        -- 1.3.4.1.3
+        hwEnergySavingCapabilityDesc OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..10240)) 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "User can get the description string from hwEnergySavingCapabilityDesc.
+                An XML file which is compressed by ZIP to less than 10240 bytes,
+                describes the energy-saving capability, including all energy-saving methods and parameters.
+                "
+            ::= { hwEnergySavingCapabilityMngtEntry 3 }
+
+        
+        -- 1.3.5
+        hwEnergySavingDescReqMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                snmp(1),
+                ftp(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The mode describes how to get energy saving capability description file :
+                 snmp(1): Get the file using hwEnergySavingCapabilityDesc.
+                 ftp(2): Get the file using FTP, which described by hwEnergyFtpclientReqTable.
+                "
+            ::= { hwEnergySavingMngt 5 }
+
+
+
+    -- 1.4
+        hwEnergyFtpcObjects OBJECT IDENTIFIER ::= { hwEnergyMngt 4 }
+
+-- == Ftpc Table ==
+        hwEnergyFtpcTransFileTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEnergyFtpcTransFileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure transfer file feature related parameters."
+            ::= { hwEnergyFtpcObjects 1 }
+
+        
+        hwEnergyFtpcTransFileEntry OBJECT-TYPE
+            SYNTAX HwEnergyFtpcTransFileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Name identifying Transfer configuration"
+            INDEX { hwEnergyFtpcSetName }
+            ::= { hwEnergyFtpcTransFileTable 1 }
+
+        
+        HwEnergyFtpcTransFileEntry ::=
+            SEQUENCE { 
+                hwEnergyFtpcSetName
+                    OCTET STRING,
+                hwEnergyFtpcSrcAddrType
+                    InetAddressType,
+                hwEnergyFtpcSrcAddr
+                    InetAddress,
+                hwEnergyFtpcVpnName
+                    OCTET STRING,
+                hwEnergyFtpcHostAddrType
+                    InetAddressType,
+                hwEnergyFtpcHostAddr
+                    InetAddress,
+                hwEnergyFtpcServerPort
+                    Integer32,
+                hwEnergyFtpcUserName
+                    OCTET STRING,
+                hwEnergyFtpcPassword
+                    OCTET STRING,
+                hwEnergyFtpcDirectory
+                    OCTET STRING,
+                hwEnergyFtpcSrcIfName
+                    OCTET STRING,
+                hwEnergyFtpcTransCfgRowStatus
+                    RowStatus,
+                    hwEnergyFtpcAction
+                    INTEGER,
+                hwEnergyFtpcTransMode
+                        INTEGER,
+                hwEnergyFtpOperStatus
+                        INTEGER
+             }
+
+        hwEnergyFtpcSetName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Name identifying FTPC Transfer configuration"
+            ::= { hwEnergyFtpcTransFileEntry 1 }
+
+        
+        hwEnergyFtpcSrcAddrType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Source IP address Type:
+                ipv4(1)
+                ipv6(2)"
+            ::= { hwEnergyFtpcTransFileEntry 2 }
+
+        
+        hwEnergyFtpcSrcAddr OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Source IP address"
+            ::= { hwEnergyFtpcTransFileEntry 3 }
+
+        
+        hwEnergyFtpcVpnName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "VPN name used for the corresponding connection"
+            ::= { hwEnergyFtpcTransFileEntry 4 }
+
+        
+        hwEnergyFtpcHostAddrType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Server address type:
+                ipv4(1)
+                ipv6(2)"
+            ::= { hwEnergyFtpcTransFileEntry 5 }
+
+        
+        hwEnergyFtpcHostAddr OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Server IP address"
+            ::= { hwEnergyFtpcTransFileEntry 6 }
+
+        
+        hwEnergyFtpcServerPort OBJECT-TYPE
+            SYNTAX Integer32 (21 | 1025..55535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Server port used for connection"
+            ::= { hwEnergyFtpcTransFileEntry 7 }
+
+        
+        hwEnergyFtpcUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..85))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "User Name used for user validation"
+            ::= { hwEnergyFtpcTransFileEntry 8 }
+
+        
+        hwEnergyFtpcPassword OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..25))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Password used for user validation. Password Length while setting should not be more than
+                16 characters, while querying password will be cipher text"
+            ::= { hwEnergyFtpcTransFileEntry 9 }
+
+        
+        hwEnergyFtpcDirectory OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..256))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Local working directory"
+            ::= { hwEnergyFtpcTransFileEntry 10 }
+
+        
+        hwEnergyFtpcSrcIfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..48))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Interface Name"
+            ::= { hwEnergyFtpcTransFileEntry 11 }
+
+        
+        hwEnergyFtpcTransCfgRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object specifies the status of this table
+                entry. When the status is createAndGo, it
+                allows to create  and when value is destroy
+                it allows to delete the record in the table"
+            ::= { hwEnergyFtpcTransFileEntry 12 }
+
+    
+        hwEnergyFtpcAction OBJECT-TYPE
+            SYNTAX INTEGER {
+                                    get(1),
+                                    put(2)
+                                   }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The type of request.
+                              get(1): To request a file from the FTP server.
+                              put(2): To send a file to the FTP server."
+            ::= { hwEnergyFtpcTransFileEntry 13 }
+
+
+        hwEnergyFtpcTransMode OBJECT-TYPE
+            SYNTAX INTEGER {
+                                    ftp(1),
+                                    sftp(2),
+                                    tftp(3)
+                                   }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The file transfer protocol. Default: FTP."
+            ::= { hwEnergyFtpcTransFileEntry 14 }
+
+
+        hwEnergyFtpOperStatus OBJECT-TYPE
+            SYNTAX INTEGER {
+                                    opInProgress(1),
+                                    opSuccess(2),
+                                    opInvalid(3),
+                                    opInvalidProtocol(4),
+                                    opInvalidSourceName(5),
+                                    opInvalidDestName(6),
+                                    opInvalidServerAddress(7),
+                                    opDeviceBusy(8),
+                                    opDeviceError(9),
+                                    opFileOpenError(10),
+                                    opFileTransferError(11),
+                                    opFileChecksumError(12),
+                                    opAuthFail(13),
+                                    opUnknownFailure(14),
+                                    opAbort(15),
+                                    opInvalidSourceAddress(16),
+                                    opInvalidSourceInterface(17)
+                                   }            
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The OperStatus:
+                 opInProgress(1): the operation is in process.
+                                 opSuccess(2): the operation has been completed successfully.
+                                 opInvalid(3): the command is invalid or command-protocol-device combination is unsupported by the system.
+                                 opInvalidProtocol(4): invalid protocol is specified
+                                 opInvalidSourceName(5) :invalid source file name is specified.    
+                                 opInvalidDestName(6): invalid target name is specified.    
+                                 opInvalidServerAddress(7): invalid server address is specified
+                                 opDeviceBusy(8): the device is in use and locked by another process
+                                 opDeviceError(9): device read, write or erase error
+                                 opFileOpenError(10) :invalid file name; file not found in partition
+                                 opFileTransferError(11) :file transfer was unsuccessfull
+                                 opFileChecksumError(12) :file checksum in Flash is invalid
+                                 opAuthFail(13) :authentication failure
+                                 opUnknownFailure(14) :failure which is unknown
+                                 opAbort(15) : transfer operation has been aborted
+                                 opInvalidSourceAddress(16): invalid source IP is specified.
+                                 opInvalidSourceInterface(17): invalid source interface is specified.
+"
+            ::= { hwEnergyFtpcTransFileEntry 15 }
+
+                                  hwEnergyTrapObjects OBJECT IDENTIFIER ::= { hwEnergyMngt 10 }
+    
+                                  hwEnergyDevId OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object identifies the device ID."
+            ::= { hwEnergyTrapObjects 1 }       
+    
+    
+                                  hwEnergyNotification OBJECT IDENTIFIER ::= { hwEnergyMngt 11 }
+    
+                                  hwEnergyDevChangeToSleep NOTIFICATION-TYPE
+            OBJECTS { hwEnergyDevId }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates device entering in the sleeping status."
+            ::= { hwEnergyNotification 1 }     
+
+
+
+        
+        hwEnergyConformance OBJECT IDENTIFIER ::= { hwEnergyMngt 6 }
+
+        
+        hwEnergyCompliances OBJECT IDENTIFIER ::= { hwEnergyConformance 1 }
+
+        
+        hwEnergyCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwEnergyFtpcGroup }
+            ::= { hwEnergyCompliances 1 }
+
+        
+        hwEnergyGroups OBJECT IDENTIFIER ::= { hwEnergyConformance 2 }
+
+        
+        hwEnergyFtpcGroup OBJECT-GROUP
+            OBJECTS { hwEnergyFtpcSrcAddrType, hwEnergyFtpcSrcAddr, hwEnergyFtpcVpnName, hwEnergyFtpcHostAddrType, hwEnergyFtpcHostAddr, 
+                hwEnergyFtpcServerPort, hwEnergyFtpcUserName, hwEnergyFtpcPassword, hwEnergyFtpcDirectory, hwEnergyFtpcSrcIfName, 
+                hwEnergyFtpcTransCfgRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwEnergyGroups 1 }
+
+--      hwSysPowerMgntGroups OBJECT IDENTIFIER ::= { hwEnergyConformance 3 }
+        hwSysPowerMgntGroup OBJECT-GROUP
+            OBJECTS { hwThresholdOfPower,hwPowerConsumption,hwPowerStatPeriod,hwAveragePower,hwRatedPower,hwCurrentPower,hwPSEPower,hwPoEType }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwEnergyGroups 2 }
+
+--      hwEnergySavingMngtGroups OBJECT IDENTIFIER ::= { hwEnergyConformance 4 }
+        
+        hwEnergySavingMngtGroup OBJECT-GROUP
+            OBJECTS { hwEnergySavingMode,hwEnergySavingMethodIndex,hwEnergySavingParameterIndex,hwEnergySavingCapabilityDescIndex,hwEnergySavingDescReqMode }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwEnergyGroups 3 }
+
+                                    hwEnergyNotificationGroup NOTIFICATION-GROUP
+                                                   NOTIFICATIONS { hwEnergyDevChangeToSleep }
+                                                   STATUS        current
+                                                   DESCRIPTION
+                                                   "Description."
+                                                   ::= { hwEnergyGroups 4 }
+
+    END
+
+--
+-- HUAWEI-ENERGYMNGT-MIB
+--

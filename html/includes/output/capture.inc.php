@@ -23,9 +23,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     echo("Insufficient Privileges");
     exit();
 }
@@ -35,48 +35,39 @@ $type = $_REQUEST['type'];
 
 switch ($type) {
     case 'poller':
-        $cmd = "php ${config['install_dir']}/poller.php -h $hostname -r -f -d";
+        $cmd = ['php', $config['install_dir'] . '/poller.php', '-h', $hostname, '-r', '-f', '-d'];
         $filename = "poller-$hostname.txt";
         break;
     case 'snmpwalk':
-        $device = device_by_name(mres($hostname));
+        $device = device_by_name($hostname);
 
-        $cmd = gen_snmpwalk_cmd($device, '.', ' -OUneb');
-
-        if ($debug) {
-            $cmd .= ' 2>&1';
-        }
+        $cmd = gen_snmpwalk_cmd($device, '.', '-OUneb');
 
         $filename = $device['os'] . '-' . $device['hostname'] . '.snmpwalk';
         break;
     case 'discovery':
-        $cmd = "php ${config['install_dir']}/discovery.php -h $hostname -d";
+        $cmd = ['php', $config['install_dir'] . '/discovery.php', '-h', $hostname, '-d'];
         $filename = "discovery-$hostname.txt";
         break;
     default:
         echo 'You must specify a valid type';
-        exit();
+        exit;
 }
 
 // ---- Output ----
-
+$proc = new \Symfony\Component\Process\Process($cmd);
 if ($_GET['format'] == 'text') {
     header("Content-type: text/plain");
     header('X-Accel-Buffering: no');
 
-    if (($fp = popen($cmd, "r"))) {
-        while (!feof($fp)) {
-            $line = stream_get_line($fp, 1024, PHP_EOL);
-            echo preg_replace('/\033\[[\d;]+m/', '', $line) . PHP_EOL;
-            ob_flush();
-            flush(); // you have to flush buffer
-        }
-        fclose($fp);
-    }
+    $proc->run(function ($type, $buffer) {
+        echo preg_replace('/\033\[[\d;]+m/', '', $buffer) . PHP_EOL;
+        ob_flush();
+        flush(); // you have to flush buffer
+    });
 } elseif ($_GET['format'] == 'download') {
-    ob_start();
-    $output = shell_exec($cmd);
-    ob_end_clean();
+    $proc->run();
+    $output = $proc->getOutput();
 
     $output = preg_replace('/\033\[[\d;]+m/', '', $output);
 

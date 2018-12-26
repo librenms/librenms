@@ -25,7 +25,10 @@
 
 namespace LibreNMS\Validations;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 use Symfony\Component\Yaml\Yaml;
@@ -39,6 +42,7 @@ class Database extends BaseValidation
         }
 
         $this->checkMode($validator);
+        $this->checkTime($validator);
 
         // check database schema version
         $current = get_db_schema();
@@ -54,11 +58,28 @@ class Database extends BaseValidation
             );
             return;
         } elseif ($current > $latest) {
-            $validator->warn("Your schema ($current) is newer than than expected ($latest).  If you just switch to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
+            $validator->warn("Your database schema ($current) is newer than expected ($latest). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
         }
 
         $this->checkCollation($validator);
         $this->checkSchema($validator);
+    }
+
+    private function checkTime(Validator $validator)
+    {
+        $raw_time = Eloquent::DB()->selectOne(Eloquent::DB()->raw('SELECT NOW() as time'))->time;
+        $db_time = new Carbon($raw_time);
+        $php_time = Carbon::now();
+
+        $diff = $db_time->diffAsCarbonInterval($php_time);
+
+        if ($diff->compare(CarbonInterval::minute(1)) > 0) {
+            $message = "Time between this server and the mysql database is off\n";
+            $message .= " Mysql time " . $db_time->toDateTimeString() . PHP_EOL;
+            $message .= " PHP time " . $php_time->toDateTimeString() . PHP_EOL;
+
+            $validator->fail($message);
+        }
     }
 
     private function checkMode(Validator $validator)
@@ -194,7 +215,7 @@ class Database extends BaseValidation
         if (empty($schema_update)) {
             $validator->ok('Database schema correct');
         } else {
-            $result = ValidationResult::fail("We have detected that your database schema may be wrong, please report the following to us on IRC or the community site (https://t.libren.ms/5gscd):")
+            $result = ValidationResult::fail("We have detected that your database schema may be wrong, please report the following to us on Discord (https://t.libren.ms/discord) or the community site (https://t.libren.ms/5gscd):")
                 ->setFix('Run the following SQL statements to fix.')
                 ->setList('SQL Statements', $schema_update);
             $validator->result($result);

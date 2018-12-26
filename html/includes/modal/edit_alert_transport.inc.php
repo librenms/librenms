@@ -11,10 +11,10 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (LegacyAuth::user()->hasGlobalAdmin()) {
 ?>
 <!--Modal for adding or updating an alert transport -->
     <div class="modal fade" id="edit-alert-transport" tabindex="-1" role="dialog"
@@ -39,35 +39,22 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <label for='transport-choice' class='col-sm-3 col-md-2 control-label'>Transport type: </label>
                             <div class="col-sm-3">
                                 <select name='transport-choice' id='transport-choice' class='form-control'>
-                                    <option value="api-form">API</option>
-                                    <option value="boxcar-form">Boxcar</option>
-                                    <option value="canopsis-form">Canopsis</option>
-                                    <option value="ciscospark-form">Cisco Spark</option>
-                                    <option value="clickatell-form">Clickatell</option>
-                                    <option value="discord-form">Discord</option>
-                                    <option value="elasticsearch-form">Elasticsearch</option>
-                                    <option value="gitlab-form">Gitlab</option>
-                                    <option value="hipchat-form">Hipchat</option>
-                                    <option value="irc-form">IRC</option>
-                                    <option value="jira-form">Jira</option>
-                                    <option value="kayako-form">Kayako Classic</option>
-                                    <option value="mail-form" selected>Mail</option>
-                                    <option value="msteams-form">Microsoft Teams</option>
-                                    <option value="nagios-form">Nagios</option>
-                                    <option value="opsgenie-form">OpsGenie</option>
-                                    <option value="osticket-form">osTicket</option>
-                                    <option value="hue-form">Phillips Hue</option>
-                                    <option value="playsms-form">PlaySMS</option>
-                                    <option value="pushbullet-form">Pushbullet</option>
-                                    <option value="pushover-form">Pushover</option>
-                                    <option value="rocket-form">Rocket.chat</option>
-                                    <option value="slack-form">Slack</option>
-                                    <option value="smseagle-form">SMSEagle</option>
-                                    <option value="smsfeedback-form">SMSFeedback</option>
-                                    <option value="syslog-form">Syslog</option>
-                                    <option value="telegram-form">Telegram</option>
-                                    <option value="victorops-form">Victorops</option>
-                                    <!--Insert more transport type options here has support is added. Value should be: [transport_name]-form -->
+<?php
+
+// Create list of transport
+$transport_dir = Config::get('install_dir').'/LibreNMS/Alert/Transport';
+$transports_list = array();
+foreach (scandir($transport_dir) as $transport) {
+    $transport = strstr($transport, '.', true);
+    if (empty($transport)) {
+        continue;
+    }
+    $transports_list[] = $transport;
+}
+foreach ($transports_list as $transport) {
+    echo '<option value="'.strtolower($transport).'-form">'.$transport.'</option>';
+}
+?>
                                 </select>
                             </div>
                         </div>
@@ -80,15 +67,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                     </form>
 <?php
 
-// Fetch list of transport classes
-$transport_dir = Config::get('install_dir').'/LibreNMS/Alert/Transport';
 $switches = []; // store names of bootstrap switches
-
-foreach (scandir($transport_dir) as $transport) {
-    $transport = strstr($transport, '.', true);
-    if (empty($transport)) {
-        continue;
-    }
+foreach ($transports_list as $transport) {
     $class = 'LibreNMS\\Alert\\Transport\\'.$transport;
 
     if (!method_exists($class, 'configTemplate')) {
@@ -102,37 +82,51 @@ foreach (scandir($transport_dir) as $transport) {
     $tmp = call_user_func($class.'::configTemplate');
     
     foreach ($tmp['config'] as $item) {
-        echo '<div class="form-group" title="'.$item['descr'].'">';
-        echo '<label for="'.$item['name'].'" class="col-sm-3 col-md-2 control-label">'.$item['title'].': </label>';
-        if ($item['type'] == 'text') {
-            echo '<div class="col-sm-9 col-md-10">';
-            echo '<input type="'.$item['type'].'" id="'.$item['name'].'" name="'.$item['name'].'" class="form-control" ';
-            if ($item['required']) {
-                echo 'required>';
-            } else {
-                echo '>';
+        if ($item['type'] !== 'hidden') {
+            echo '<div class="form-group" title="' . $item['descr'] . '">';
+            echo '<label for="' . $item['name'] . '" class="col-sm-3 col-md-2 control-label">' . $item['title'] . ': </label>';
+            if ($item['type'] == 'text') {
+                echo '<div class="col-sm-9 col-md-10">';
+                echo '<input type="' . $item['type'] . '" id="' . $item['name'] . '" name="' . $item['name'] . '" class="form-control" ';
+                if ($item['required']) {
+                    echo 'required>';
+                } else {
+                    echo '>';
+                }
+                echo '</div>';
+            } elseif ($item['type'] == 'checkbox') {
+                echo '<div class="col-sm-2">';
+                echo '<input type="checkbox" name="' . $item['name'] . '" id="' . $item['name'] . '">';
+                echo '</div>';
+                $switches[$item['name']] = $item['default'];
+            } elseif ($item['type'] == 'select') {
+                echo '<div class="col-sm-3">';
+                echo '<select name="' . $item['name'] . '" id="' . $item['name'] . '" class="form-control">';
+                foreach ($item['options'] as $descr => $opt) {
+                    echo '<option value="' . $opt . '">' . $descr . '</option>';
+                }
+                echo '</select>';
+                echo '</div>';
+            } elseif ($item['type'] === 'textarea') {
+                echo '<div class="col-sm-9 col-md-10">';
+                echo '<textarea name="' . $item['name'] . '" id="' . $item['name'] . '" class="form-control" placeholder="' . $item['descr'] . '">';
+                echo '</textarea>';
+                echo '</div>';
+            } elseif ($item['type'] === 'oauth') {
+                $class = isset($item['class']) ? $item['class'] : 'btn-success';
+                $callback = urlencode(url()->current() . '/?oauthtransport=' . $transport);
+                $url = $item['url'] . $callback;
+
+                echo '<a class="btn btn-oauth ' . $class . '"';
+                echo '" href="' . $url . '" data-base-url="' . $url . '">';
+                if (isset($item['icon'])) {
+                    echo '<img src="' . asset('images/transports/' . $item['icon']) . '"  width="24" height="24"> ';
+                }
+                echo $item['descr'];
+                echo '</a>';
             }
-            echo '</div>';
-        } elseif ($item['type'] == 'checkbox') {
-            echo '<div class="col-sm-2">';
-            echo '<input type="checkbox" name="'.$item['name'].'" id="'.$item['name'].'">';
-            echo '</div>';
-            $switches[$item['name']] = $item['default'];
-        } elseif ($item['type'] == 'select') {
-            echo '<div class="col-sm-3">';
-            echo '<select name="'.$item['name'].'" id="'.$item['name'].'" class="form-control">';
-            foreach ($item['options'] as $descr => $opt) {
-                echo '<option value="'.$opt.'">'.$descr.'</option>';
-            }
-            echo '</select>';
-            echo '</div>';
-        } elseif ($item['type'] === 'textarea') {
-            echo '<div class="col-sm-9 col-md-10">';
-            echo '<textarea name="' . $item['name'] . '" id="' . $item['name'] . '" class="form-control" placeholder="'.$item['descr'].'">';
-            echo '</textarea>';
             echo '</div>';
         }
-        echo '</div>';
     }
     echo '<div class="form-group">';
     echo '<div class="col-sm-12 text-center">';
@@ -219,15 +213,18 @@ foreach (scandir($transport_dir) as $transport) {
         });
 
         function loadTransport(transport) {
+            var form_id = transport.type+"-form";
+            var transport_form = $("#" + form_id);
+
             $("#name").val(transport.name);
-            $("#transport-choice").val(transport.type+"-form");
-            $("#is_default").bootstrapSwitch('state', transport.is_default); 
+            $("#transport-choice").val(form_id);
+            $("#is_default").bootstrapSwitch('state', transport.is_default);
             $(".transport").hide();
-            $("#" + $("#transport-choice").val()).show().find("input:text").val("");
+            transport_form.show().find("input:text").val("");
              
             // Populate the field values
             transport.details.forEach(function(config) {
-                var $field = $("#" + config.name);
+                var $field = transport_form.find("#" + config.name);
                 if ($field.prop('type') == 'checkbox') {
                     $field.bootstrapSwitch('state', config.value);
                 } else {
@@ -235,6 +232,10 @@ foreach (scandir($transport_dir) as $transport) {
                 }
             });
         }
+
+        $(".btn-oauth").click(function (e) {
+            this.href = $(this).data('base-url') + '%26id=' + $("#transport_id").val();
+        });
 
         // Save alert transport
         $(".btn-save").on("click", function (e) {

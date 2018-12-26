@@ -5,7 +5,7 @@ modules:
             data:
                 -
                     oid: transmitModulationMode
-                    num_oid: .1.3.6.1.4.1.17713.6.12.9.
+                    num_oid: '.1.3.6.1.4.1.17713.6.12.9.{{ $index }}'
                     index: 'transmitModulationMode.{{ $index }}'
                     descr: Transmit Modulation Mode
                     states:
@@ -36,7 +36,7 @@ modules:
                         - { value: 24, generic: 0, graph: 1, descr: mod256qam81percentDual }
                 -
                     oid: receiveModulationMode
-                    num_oid: .1.3.6.1.4.1.17713.6.12.8
+                    num_oid: '.1.3.6.1.4.1.17713.6.12.8.{{ $index }}'
                     index: 'receiveModulationMode.{{ $index }}'
                     descr: Receive Modulation Mode
                     states:
@@ -65,4 +65,3 @@ modules:
                         - { value: 22, generic: 0, graph: 1, descr: mod64qam92percentDual }
                         - { value: 23, generic: 0, graph: 1, descr: modTransient10 }
                         - { value: 24, generic: 0, graph: 1, descr: mod256qam81percentDual }
-                        

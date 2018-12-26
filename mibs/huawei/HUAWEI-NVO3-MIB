@@ -1,0 +1,586 @@
+-- ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI NVO3 MIB
+-- Reference:
+-- Version: V1.05
+-- History: V1.0 gaoyuan, 2014-07-02,publish
+-- created 2014-7-2
+-- ==================================================================
+
+    HUAWEI-NVO3-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS                    
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, IpAddress, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE, Counter64
+                FROM SNMPv2-SMI           
+            InterfaceIndex
+                FROM  IF-MIB         
+            RowStatus, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC
+			Ipv6Address   
+				FROM IPV6-TC;
+
+        hwNvo3Mgmt MODULE-IDENTITY 
+            LAST-UPDATED "201706201408Z"      -- June 20, 2017 at 14:08GMT 
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+                    Bantian, Longgang
+                     Shenzhen 518129
+                     People's Republic of China
+                     Website: http://www.huawei.com
+                     Email: support@huawei.com
+                   "
+            DESCRIPTION 
+                "The MIB module for nvo3 management." 				  
+            REVISION "201706201408Z"        -- June 20, 2017 at 14:08GMT 
+            DESCRIPTION 
+                "V1.05, The modify revision of this MIB module."  
+                
+            REVISION "201701091408Z"        -- Jan 09, 2017 at 14:08GMT 
+            DESCRIPTION 
+                "V1.04, The modify revision of this MIB module."  
+            
+            REVISION "201612141408Z"        -- Dec 14, 2016 at 14:08GMT 
+            DESCRIPTION 
+                "V1.03, The modify revision of this MIB module." 
+				
+            REVISION "201606011408Z"        -- Jun 1, 2016 at 14:08GMT 
+            DESCRIPTION 
+                "V1.02, The modify revision of this MIB module." 
+
+            REVISION "201512011408Z"        -- Dec 1, 2015 at 14:08GMT 
+            DESCRIPTION 
+                "V1.01, The modify revision of this MIB module." 
+		  
+            REVISION "201407021655Z"        -- July 2, 2014 at 16:55GMT
+            DESCRIPTION 
+                "V1.00, The initial revision of this MIB module."   
+          
+            ::= { hwDatacomm 335 }
+ 
+--
+-- Node definitions
+--
+        hwNvo3MIBInstances OBJECT IDENTIFIER ::= { hwNvo3Mgmt 1 }
+        
+        hwNvo3NveTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwNvo3NveEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Nvo3 nve table providing read/modify operations.
+                The Nve entry is created and deleted associate with the nve type interface,  
+                you need to create the nve type interface first, then you can get the nve entry and modify it's attribute.
+                "
+            ::= { hwNvo3MIBInstances 1 }
+        
+        hwNvo3NveEntry OBJECT-TYPE
+            SYNTAX HwNvo3NveEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwNvo3NveTable."
+            INDEX { hwNvo3NveIfIndex }
+            ::= { hwNvo3NveTable 1 }
+        
+        HwNvo3NveEntry ::=
+            SEQUENCE { 
+                hwNvo3NveIfIndex
+                    InterfaceIndex,
+                hwNvo3NveSourceAddress
+                    IpAddress
+             }
+
+        hwNvo3NveIfIndex  OBJECT-TYPE
+             SYNTAX InterfaceIndex
+             MAX-ACCESS not-accessible
+             STATUS current
+             DESCRIPTION
+                 "IfIndex of the nve type interface, the key  of the nve entry."
+             ::= { hwNvo3NveEntry 1 }    
+       
+        hwNvo3NveSourceAddress  OBJECT-TYPE
+             SYNTAX IpAddress
+             MAX-ACCESS read-write
+             STATUS current
+             DESCRIPTION
+                 "The nve source address which is used as vxlan tunnel end point address"
+             ::= { hwNvo3NveEntry 2 } 
+            
+        hwNvo3NveVniPeerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwNvo3NveVniPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Nvo3 vni peer table providing create/modify/delete operations. Vxlan use this table to send broadcast, multicast, and unknown unicast flood frames."
+            ::= { hwNvo3MIBInstances 2 }
+        
+      hwNvo3NveVniPeerEntry OBJECT-TYPE
+            SYNTAX HwNvo3NveVniPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwNvo3NveVniPeerTable."
+            INDEX { hwNvo3NveIfIndex,  hwNvo3NveVni, hwNvo3NveVniPeerAddress}
+            ::= { hwNvo3NveVniPeerTable 1 }
+  
+        HwNvo3NveVniPeerEntry ::=
+            SEQUENCE { 
+                hwNvo3NveVni
+                    Unsigned32,
+                hwNvo3NveVniPeerAddress
+                    IpAddress,
+                hwNvo3NveVniPeerRowStatus
+                    RowStatus
+             }     
+             
+        hwNvo3NveVni OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The vni that to be specified a remote nve peer address."
+            ::= { hwNvo3NveVniPeerEntry 1 }
+        
+        hwNvo3NveVniPeerAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The vni remote nve peer address."
+            ::= { hwNvo3NveVniPeerEntry 2 }
+             
+        hwNvo3NveVniPeerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row status."
+            ::= { hwNvo3NveVniPeerEntry 3 }
+ 
+        hwNvo3VxlanTnlTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwNvo3VxlanTnlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Nvo3 vxlan tunnel table, providing read operations."
+            ::= { hwNvo3MIBInstances 3 }
+        
+        hwNvo3VxlanTnlEntry OBJECT-TYPE
+            SYNTAX HwNvo3VxlanTnlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwNvo3VxlanTnlTable."
+            INDEX { hwNvo3VxlanTnlSrcAddress,  hwNvo3VxlanDestAdress}
+            ::= { hwNvo3VxlanTnlTable 1 }
+        
+        HwNvo3VxlanTnlEntry ::=
+            SEQUENCE { 
+                hwNvo3VxlanTnlSrcAddress
+                    IpAddress,
+                hwNvo3VxlanDestAdress
+                    IpAddress,
+                hwNvo3VxlanTnlStatus
+                    INTEGER
+             }
+
+       hwNvo3VxlanTnlSrcAddress  OBJECT-TYPE
+		     SYNTAX IpAddress
+		     MAX-ACCESS not-accessible
+		     STATUS current
+		     DESCRIPTION
+                "The vxlan tunnel source address."
+                ::= { hwNvo3VxlanTnlEntry 1 } 
+                        
+       
+       hwNvo3VxlanDestAdress  OBJECT-TYPE
+              SYNTAX IpAddress
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                  "The vxlan tunnel destionation address."
+              ::= { hwNvo3VxlanTnlEntry 2 } 
+                        
+       hwNvo3VxlanTnlStatus  OBJECT-TYPE
+              SYNTAX INTEGER
+	          {
+	             down(2),
+	             up(1)
+	          }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The vxlan tunnel status."
+              ::= { hwNvo3VxlanTnlEntry 3 } 
+	      
+	hwNvo3VxlanIPv6TnlTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwNvo3VxlanIPv6TnlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Nvo3 vxlan IPv6 tunnel table, providing read operations."
+            ::= { hwNvo3MIBInstances 4 }
+        
+        hwNvo3VxlanIPv6TnlEntry OBJECT-TYPE
+            SYNTAX HwNvo3VxlanIPv6TnlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwNvo3VxlanTnlTable."
+            INDEX { hwNvo3VxlanTnlSrcIPv6Addr,  hwNvo3VxlanDestIPv6Addr}
+            ::= { hwNvo3VxlanIPv6TnlTable 1 }
+        
+        HwNvo3VxlanIPv6TnlEntry ::=
+            SEQUENCE { 
+                hwNvo3VxlanTnlSrcIPv6Addr
+                    Ipv6Address,
+                hwNvo3VxlanDestIPv6Addr
+                    Ipv6Address,
+                hwNvo3VxlanIPv6TnlStatus
+                    INTEGER
+             }
+
+       hwNvo3VxlanTnlSrcIPv6Addr  OBJECT-TYPE
+		     SYNTAX Ipv6Address
+		     MAX-ACCESS not-accessible
+		     STATUS current
+		     DESCRIPTION
+                "The vxlan tunnel source address"
+                ::= { hwNvo3VxlanIPv6TnlEntry 1 } 
+                        
+       
+       hwNvo3VxlanDestIPv6Addr  OBJECT-TYPE
+              SYNTAX Ipv6Address
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                  "The vxlan tunnel destionation address"
+              ::= { hwNvo3VxlanIPv6TnlEntry 2 } 
+                        
+       hwNvo3VxlanIPv6TnlStatus  OBJECT-TYPE
+              SYNTAX INTEGER
+	          {
+	             down(2),
+	             up(1)
+	          }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The vxlan tunnel status"
+              ::= { hwNvo3VxlanIPv6TnlEntry 3 } 
+
+       hwNvo3VniStatsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwNvo3VniStatsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Nvo3 vni stats table providing traffic statistics about the VNI."
+            ::= { hwNvo3MIBInstances 5 }  
+        hwNvo3VniStatsEntry OBJECT-TYPE
+            SYNTAX HwNvo3VniStatsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwNvo3VniStatsTable."
+            INDEX { hwNvo3Vni}
+            ::= { hwNvo3VniStatsTable 1 }
+  
+        HwNvo3VniStatsEntry ::=
+            SEQUENCE { 
+                hwNvo3Vni    
+				Unsigned32,
+				hwVniRxBitsPerSec 
+				Counter64,
+				hwVniTxBitsPerSec 
+				Counter64
+             } 
+			 
+        hwNvo3Vni OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The vni that to be specified a remote nve peer address."
+            ::= { hwNvo3VniStatsEntry 1 }   
+
+        hwVniRxBitsPerSec OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of recieved bits per second about vni."
+            ::= { hwNvo3VniStatsEntry 2 }   
+			
+		hwVniTxBitsPerSec OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of sent bits per second about vni."
+            ::= { hwNvo3VniStatsEntry 3 }  
+          				
+
+     hwNvo3TnlStatusEvent OBJECT IDENTIFIER ::= { hwNvo3Mgmt 2 }
+        
+     hwNvo3VxlanTnlDown NOTIFICATION-TYPE
+            OBJECTS { hwNvo3VxlanTnlStatus}
+            STATUS current
+            DESCRIPTION
+                "The SNMP trap that is generated when an vxlan tunnle status change.
+                When alarm is down trigger, hwNvo3VxlanTnlStatus is 1, when alarm is up trigger, hwNvo3VxlanTnlStatus is 2.
+                "
+            ::= { hwNvo3TnlStatusEvent 1 }
+
+        
+     hwNvo3VxlanTnlUp NOTIFICATION-TYPE
+            OBJECTS { hwNvo3VxlanTnlStatus}
+            STATUS current
+            DESCRIPTION
+                "The SNMP trap that is generated when an vxlan tunnle status change.
+                When alarm is down trigger, hwNvo3VxlanTnlStatus is 0, when alarm is up trigger, hwNvo3VxlanTnlStatus is 1.
+                "
+            ::= { hwNvo3TnlStatusEvent 2 }  
+             							  		  
+	hwNvo3Conformance OBJECT IDENTIFIER ::= { hwNvo3Mgmt 3 }
+        
+        hwNvo3Compliances OBJECT IDENTIFIER ::= { hwNvo3Conformance 1 }
+        
+        hwNvo3Compliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+                "The nvo3 management compliance."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwNvo3NveMIBGroup, hwNvo3NveVniPeerGroup, hwNvo3VxlanTnlGroup, hwNvo3NotificationGroup, hwNvo3VxlanIPv6TnlGroup, hwNvo3IPv6NotificationGroup}
+            ::= { hwNvo3Compliances 1 }
+        
+        hwNvo3Group OBJECT IDENTIFIER ::= { hwNvo3Conformance 2 }
+        
+        hwNvo3NveMIBGroup OBJECT-GROUP
+            OBJECTS { hwNvo3NveSourceAddress }
+            STATUS current
+            DESCRIPTION
+                "The nve management group."
+            ::= { hwNvo3Group 1 }   
+            
+        hwNvo3NveVniPeerGroup OBJECT-GROUP
+            OBJECTS { hwNvo3NveVniPeerRowStatus }
+            STATUS current
+            DESCRIPTION
+                "The nve management group."
+            ::= { hwNvo3Group 2 } 
+                             
+        hwNvo3VxlanTnlGroup OBJECT-GROUP
+            OBJECTS { hwNvo3VxlanTnlStatus }
+            STATUS current
+            DESCRIPTION
+                "The  vxlan tunnel status group."
+            ::= { hwNvo3Group 3 }
+     
+         hwNvo3NotificationGroup NOTIFICATION-GROUP    
+            NOTIFICATIONS { hwNvo3VxlanTnlDown, hwNvo3VxlanTnlUp}
+            STATUS current
+            DESCRIPTION
+                "The  vxlan tunnel alarm group."
+            ::= { hwNvo3Group 4 }
+			
+		hwNvo3VxlanIPv6TnlGroup OBJECT-GROUP
+            OBJECTS { hwNvo3VxlanIPv6TnlStatus }
+            STATUS current
+            DESCRIPTION
+                "The  vxlan IPv6 tunnel status group."
+            ::= { hwNvo3Group 5 }
+			
+	 hwNvo3IPv6NotificationGroup NOTIFICATION-GROUP    
+            NOTIFICATIONS { hwNvo3VxlanIPv6TnlDown, hwNvo3VxlanIPv6TnlUp}
+            STATUS current
+            DESCRIPTION
+                "The  vxlan IPv6 tunnel alarm group."
+            ::= { hwNvo3Group 6 }
+            
+    --vxlan tunnel statistic
+      hwVxlanTunnelStatEnableObjects  OBJECT IDENTIFIER ::= { hwNvo3Mgmt 4 }     
+    
+   --vxlan tunnel statistic get
+      hwVxlanTunnelStatisticTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwVxlanTunnelStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of vxlan statistic display information."
+        ::= { hwVxlanTunnelStatEnableObjects 1 } 
+                                                       
+      hwVxlanTunnelStatisticEntry OBJECT-TYPE
+        SYNTAX HwVxlanTunnelStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "vxlan statistic display Entry."
+        INDEX { hwVxlanTunnelStatisticPeerIp, 
+                hwVxlanTunnelStatisticsourceIp,
+				hwVxlanTunnelStatisticVni}
+        ::= { hwVxlanTunnelStatisticTable 1 }  
+      
+      HwVxlanTunnelStatisticEntry ::=
+         SEQUENCE {
+            hwVxlanTunnelStatisticPeerIp
+                IpAddress,
+            hwVxlanTunnelStatisticsourceIp
+                IpAddress,
+            hwVxlanTunnelStatisticVni
+                Integer32,
+            hwVxlanTunnelStatisticLastRcvPkt
+                Counter64, 
+            hwVxlanTunnelStatisticLastRcvByte
+                Counter64,
+            hwVxlanTunnelStatisticLastTransPkt
+                Counter64, 
+            hwVxlanTunnelStatisticLastTransByte
+                Counter64       
+         }
+              
+      hwVxlanTunnelStatisticPeerIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Peer Ip."
+        ::= { hwVxlanTunnelStatisticEntry 1 }  
+      
+      hwVxlanTunnelStatisticsourceIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Source Ip of vxlan tunnel."
+        ::= { hwVxlanTunnelStatisticEntry 2 }      
+      
+      hwVxlanTunnelStatisticVni OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "VRF index."
+        ::= { hwVxlanTunnelStatisticEntry 3 }      
+ 
+      hwVxlanTunnelStatisticLastRcvPkt OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Received packets of vxlan tunnel."
+        ::= { hwVxlanTunnelStatisticEntry 4 }            
+ 
+      hwVxlanTunnelStatisticLastRcvByte OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Received bytes of vxlan tunnel."
+        ::= { hwVxlanTunnelStatisticEntry 5 }  
+        
+      hwVxlanTunnelStatisticLastTransPkt OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transmitted packets of vxlan tunnel."
+        ::= { hwVxlanTunnelStatisticEntry 6 }            
+ 
+      hwVxlanTunnelStatisticLastTransByte OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transmitted bytes of vxlan tunnel."
+        ::= { hwVxlanTunnelStatisticEntry 7 }  
+   
+     hwNvo3TnlTrapObject OBJECT IDENTIFIER ::= { hwNvo3Mgmt 5 }
+
+        hwNvo3TnlTnlId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The tunnelid of vxlan tunnel."
+            ::= { hwNvo3TnlTrapObject 1 }
+        
+
+        hwNvo3TnlVniId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The vni value."
+            ::= { hwNvo3TnlTrapObject 2 }
+
+        hwNvo3TnlVrfId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The vrf value."
+            ::= { hwNvo3TnlTrapObject 3 }
+            
+        hwNvo3TnlVrId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The vr index."
+            ::= { hwNvo3TnlTrapObject 4 }
+            
+     hwNvo3TnlTrap OBJECT IDENTIFIER ::= { hwNvo3Mgmt 6 }
+     hwNvo3VxlanVni2Vrf NOTIFICATION-TYPE
+            OBJECTS { hwNvo3TnlTnlId, hwNvo3TnlVniId, hwNvo3TnlVrId, hwNvo3TnlVrfId}
+            STATUS current
+            DESCRIPTION
+                "The VXLAN tunnel and VNI have been mapped to a VRF instance, and cannot be mapped to other VRF instances."
+            ::= { hwNvo3TnlTrap 1 }
+     hwNvo3VxlanVni2VrfClear NOTIFICATION-TYPE
+            OBJECTS { hwNvo3TnlTnlId, hwNvo3TnlVniId, hwNvo3TnlVrId, hwNvo3TnlVrfId}
+            STATUS current
+            DESCRIPTION
+                "The VXLAN tunnel and VNI are no longer mapped to more than one VRF instance."
+            ::= { hwNvo3TnlTrap 2 }
+     hwNvo3VxlanVrf2Vni NOTIFICATION-TYPE
+            OBJECTS { hwNvo3TnlTnlId, hwNvo3TnlVrfId, hwNvo3TnlVniId}
+            STATUS current
+            DESCRIPTION
+                "The VXLAN tunnel and VRF instance have been mapped to a VNI, and cannot be mapped to other VNIs."
+            ::= { hwNvo3TnlTrap 3 }
+     hwNvo3VxlanVrf2VniClear NOTIFICATION-TYPE
+            OBJECTS { hwNvo3TnlTnlId, hwNvo3TnlVrfId, hwNvo3TnlVniId}
+            STATUS current
+            DESCRIPTION
+                "The VXLAN tunnel and VRF instance are no longer mapped to more than one VNI."
+            ::= { hwNvo3TnlTrap 4 }
+			
+	hwNvo3IPv6TnlStatusEvent OBJECT IDENTIFIER ::= { hwNvo3Mgmt 7 }
+        
+        hwNvo3VxlanIPv6TnlDown NOTIFICATION-TYPE
+            OBJECTS { hwNvo3VxlanIPv6TnlStatus}
+            STATUS current
+            DESCRIPTION
+                "The SNMP trap that is generated when an vxlan tunnle status change.
+                When alarm is down trigger, hwNvo3VxlanIPv6TnlStatus is 1, when alarm is up trigger, hwNvo3VxlanIPv6TnlStatus is 2.
+                "
+            ::= { hwNvo3IPv6TnlStatusEvent 1 }
+
+        
+        hwNvo3VxlanIPv6TnlUp NOTIFICATION-TYPE
+            OBJECTS { hwNvo3VxlanIPv6TnlStatus}
+            STATUS current
+            DESCRIPTION
+                "The SNMP trap that is generated when an vxlan tunnle status change.
+                When alarm is down trigger, hwNvo3VxlanIPv6TnlStatus is 0, when alarm is up trigger, hwNvo3VxlanIPv6TnlStatus is 1.
+                "
+            ::= { hwNvo3IPv6TnlStatusEvent 2 } 
+          
+    END

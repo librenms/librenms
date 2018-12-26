@@ -41,7 +41,7 @@ $graphs = array(
     'postgres_cr' => 'Commits & Rollbacks',
     'postgres_rows' => 'Rows',
     'postgres_hr' => 'Buffer Hits & Disk Blocks Read',
-    'postgres_index' => 'Indexs',
+    'postgres_index' => 'Indexes',
     'postgres_sequential' => 'Sequential',
 );
 

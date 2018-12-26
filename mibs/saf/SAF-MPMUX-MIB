@@ -1,0 +1,2929 @@
+SAF-MPMUX-MIB DEFINITIONS ::= BEGIN
+
+-- Title:       SAF SAF_MPMUX MIB version 2.15 in concise format
+-- Date:        2006.07.14
+-- By:          Technical Support <techsupport@saftehnika.com>
+-- changes:
+-- 2010.02.09. - outputABCD R/W
+
+IMPORTS
+        enterprises,  NetworkAddress, IpAddress,
+        Counter, Gauge, TimeTicks       FROM RFC1155-SMI
+	OBJECT-TYPE                     FROM RFC-1212	
+	DisplayString			FROM RFC1213-MIB
+	TRAP-TYPE			FROM RFC-1215;
+
+	
+saf   	                OBJECT IDENTIFIER ::=   { enterprises 7571 }
+--old saf_ft 	        OBJECT IDENTIFIER ::=   { enterprises 4858 }
+tehnika			OBJECT IDENTIFIER ::=   { saf 100 }
+microwaveRadio		OBJECT IDENTIFIER ::=   { tehnika  1}
+pointToPoint		OBJECT IDENTIFIER ::=   { microwaveRadio 1 }
+
+cfm22			OBJECT IDENTIFIER ::=   { pointToPoint 2 }
+mpmux			OBJECT IDENTIFIER ::=   { cfm22 22 }
+
+--mpmux ====================================================================
+terminal			OBJECT IDENTIFIER ::=   { mpmux 1 }
+--termProduct	Text  
+--termDescription   Text
+--termLocation      Text    promt>
+--termVersion       Text
+--termOperation	integer ok, error,
+--termIduTemperature integer
+--termRfCablePowerStatus	 integer off, ok, short 
+--termRestart ???   integer write restart ??? 
+
+baseband		OBJECT IDENTIFIER ::=   { mpmux 2 }
+--bbVersion 	Text
+--bbOperation     integer
+--bbLinkCapacity  integer Kbits
+--bbLinkCapacityDescr Text MUX 2M+2M+2M+2M
+--bbLoopback      integer off, on
+--bbSyncLostAlarm integer off, on
+
+radio1			OBJECT IDENTIFIER ::=   { mpmux 3 }
+--rf1Allarm   integer off,on
+--rf1Version  Text
+--rf1Side     integer low,high
+--rf1Channel integer 
+--rf1TxFrequency Text
+--rf1RxFrequency Text
+--rf1TxPower  integer dBm
+--rf1RxState  integer error, low, ok
+--rf1RxLevel  integer dBm
+--rf1CableAtt integer dB
+--rf1TxOut	   integer error, ok
+--rf1TxPLL	   integer error, ok
+--rf1RxPLL	   integer error, ok
+--rf1OduTemperature integer
+--rf1Humidity integer low, high		 
+--rf1Loopback integer off, on
+--rf1RxAlarmLevel integer dBm
+radio2			OBJECT IDENTIFIER ::=   { mpmux 4 }
+--look radio1
+switchCtrl		OBJECT IDENTIFIER ::=   { mpmux 5 }
+-- activeLink
+
+modules			OBJECT IDENTIFIER ::=   { mpmux 6 }
+m1   			OBJECT IDENTIFIER ::=   { modules 1 }
+m2   			OBJECT IDENTIFIER ::=   { modules 2 }
+m3   			OBJECT IDENTIFIER ::=   { modules 3 }
+m4   			OBJECT IDENTIFIER ::=   { modules 4 }
+
+--type     integer  e1(33),v35(37),bridge(43), f2bridge(242)
+--description  Text
+--version      Text
+--speed    integer 2048 Kbits
+--oper     integer none(0),booting(1),ok(2),testing(3),
+--		   loopback(4),illegalSpeed(5),error(6)
+--rx       integer none(0),ok(1),noSignal(2),noLink(3),rxAIS(4),error(5)
+--tx       integer none(0),ok(1),txAIS(4),error(5)
+--loopback integer off(0),on(1)
+--rxInput  integer other(0),coax(1),rj45(2),v35(3)
+--txMode   integer other(0),halfDuplex(1),fullDuplex(2)
+--txClockSource integer  other(0),master(1),slave(2)
+--txClockPhase  integer  other(0),normal(1),inverse(2)
+--dataPolarity  integer  other(0),normal(1),inverse(2)
+
+termProduct OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual name of the model."
+        ::= { terminal 1 }
+
+termDescription OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual description of the model."
+        ::= { terminal 2 }
+
+
+termLocation OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual description of location (same as PROMT>)."
+        ::= { terminal 3 }
+
+termVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual version."
+        ::= { terminal 4 }
+
+termOperation OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                booting(1),            
+		ok(2),
+		testing(3),
+		error(4)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "System operation."
+        ::= { terminal 5 }
+
+termIduTemperature OBJECT-TYPE
+        SYNTAX  INTEGER(-128..127) 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { terminal 6 }
+
+-- termRfCablePowerStatus OBJECT-TYPE
+--      SYNTAX  INTEGER {
+--              off(0),               
+--              ok(1),
+--		short(2),                 
+--		error(3)
+--              }
+--      ACCESS  read-only
+--      STATUS  obsolete
+--      DESCRIPTION
+--              "Look at termRf1CablePowerStatus and termRf2CablePowerStatus"
+--      ::= { terminal 7 }
+
+-- termUpTime OBJECT-TYPE
+--         SYNTAX  INTEGER
+--         ACCESS  read-only
+--         STATUS  obsolete
+--         DESCRIPTION
+--                 "Integer variable."
+--         ::= { terminal 8 }
+
+
+-- termDownTime OBJECT-TYPE
+--         SYNTAX  INTEGER
+--         ACCESS  read-only
+--         STATUS  obsolete
+--         DESCRIPTION
+--                 "Integer variable."
+--         ::= { terminal 9 }
+
+termFrameErrors OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable. "
+        ::= { terminal 10 }
+
+writeConfig OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  write-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Write Config"
+        ::= { terminal 11 }
+
+restartCPU OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  write-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Restart CPU"
+        ::= { terminal 12 }
+
+serialNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Serial number"
+        ::= { terminal 13 }
+
+termRf1CablePowerStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),               
+                ok(1),
+		short(2),                 
+		error(3),
+		power-off(4)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Cable status from ODU1"
+        ::= { terminal 14 }
+termRf2CablePowerStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),               
+                ok(1),
+		short(2),                 
+		error(3),
+		power-off(4)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Cable status from ODU2"
+        ::= { terminal 15 }
+
+-- PW 1
+power3V3PS1 OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IDU power voltage +3.3V"
+        ::= { terminal 16 }
+
+power5VPS1 OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IDU power voltage +5V"
+        ::= { terminal 17 }
+
+powerM5VPS1 OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IDU power voltage -5V"
+        ::= { terminal 18 }
+
+powerODU1V OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "ODU power voltage (V)"
+        ::= { terminal 19 }
+
+powerODU1I OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "ODU power current (A)"
+        ::= { terminal 20 }
+
+powerODU1W OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "ODU power (W)"
+        ::= { terminal 21 }
+-- PW 2
+power3V3PS2 OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IDU power voltage +3.3V"
+        ::= { terminal 22 }
+
+power5VPS2 OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IDU power voltage +5V"
+        ::= { terminal 23 }
+
+powerM5VPS2 OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IDU power voltage -5V"
+        ::= { terminal 24 }
+
+powerODU2V OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "ODU power voltage (V)"
+        ::= { terminal 25 }
+
+powerODU2I OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "ODU power current (A)"
+        ::= { terminal 26 }
+
+powerODU2W OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "ODU power (W)"
+        ::= { terminal 27 }
+
+-- end PW 1 2
+
+cpuUsage OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "CPU usage [%]"
+        ::= { terminal 28 }
+
+termBFrameErr OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Background block errors"
+        ::= { terminal 29 }
+
+termStatCountTime OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Stat. count. time"
+        ::= { terminal 30 }
+
+termErroredSecond OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Err. seconds"
+        ::= { terminal 31 }
+
+termSeverelyErroredSecond OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Severe err. seconds"
+        ::= { terminal 32 }
+
+termSyncLostTime OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Sync lost time"
+        ::= { terminal 33 }
+
+termAvailableTime OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Available time"
+        ::= { terminal 34 }
+termUnAvailableTime OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Unavailable time"
+        ::= { terminal 35 }
+
+termBer OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual representation of BER"
+        ::= { terminal 36 }
+berAlarm OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The BER alarm"
+        ::= { terminal 37 }
+remoteAlarm OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Remote alarm"
+        ::= { terminal 38 }
+systemAlarm OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The SYSTEM alarm"
+        ::= { terminal 39 }
+
+inputABCD OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Input sensor"
+        ::= { terminal 40 }
+
+outputABCD OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The Output relays"
+        ::= { terminal 41 }
+
+termBerInPwOf10 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "The Power of 10 part of termBer"
+        ::= { terminal 42 }
+
+outputMaskABCD OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The Output relay bit mask.
+                If the correspondig bit is
+                0 - the output bit can be changed manualy
+                1 - the output bit changes automaticaly (according to sync lost, radio allarm etc.)"
+        ::= { terminal 43 }
+
+-- ****** Basebend ***************************************************
+--bbVersion 	Text
+--bbOperation     integer
+--bbLinkCapacity  integer Kbits
+--bbLinkCapacityDescr Text MUX 2M+2M+2M+2M
+--bbLoopback      integer off, on
+--bbSyncLostAlarm integer off, on
+
+bbVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual version."
+        ::= { baseband 1 }
+
+bbOperation OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                booting(1),            
+		ok(2),
+		testing(3),
+		loopback(4),
+		illegalSpeed(5),
+		error(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "System operation."
+        ::= { baseband 2 }
+
+bbLinkCapacity OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { baseband 3 }
+
+bbLinkCapacityDescription OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual version."
+        ::= { baseband 4 }
+
+bbLoopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),               
+                digital(1),
+		analog(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Loopback Integer variable."
+        ::= { baseband 5 }
+
+bbSyncLostAlarm OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),               -- none of the following
+                on(1)                 -- Alarm ON
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The SYncLostAlarm."
+        ::= { baseband 6 }
+
+-- ****** Radio1 *****************************************************
+
+rf1Operation OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                booting(1),            
+		ok(2),
+		testing(3),
+		error(4),
+		noDataFromODU(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Radio operation."
+        ::= { radio1 1 }
+
+rf1Alarm OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),               -- none of the following
+                on(1)                 -- Alarm ON
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The RadioAlarm."
+        ::= { radio1 2 }
+
+rf1Version OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual version."
+        ::= { radio1 3 }
+
+rf1Side OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),               
+                high(1)               
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Side."
+        ::= { radio1 4 }
+
+rf1Channel OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 5 }
+
+rf1TxFrequency OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual version."
+        ::= { radio1 6 }
+
+rf1RxFrequency OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual version."
+        ::= { radio1 7 }
+
+rf1TxPower OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 8 }
+
+rf1RxState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),               
+                ok(1),
+		error(2),
+		loopback(3)               
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The rx State."
+        ::= { radio1 9 }
+
+rf1RxLevel OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 10 }
+
+rf1CableAttenuation OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 11 }
+
+rf1TxOut OBJECT-TYPE
+        SYNTAX  INTEGER {
+                error(0),               
+                ok(1),
+		off(2)               
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Tx out."
+        ::= { radio1 12 }
+
+
+rf1TxPLL OBJECT-TYPE
+        SYNTAX  INTEGER {
+                error(0),               
+                ok(1)               
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The txPLL."
+        ::= { radio1 13 }
+
+rf1RxPLL OBJECT-TYPE
+        SYNTAX  INTEGER {
+                error(0),               
+                ok(1)               
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The rxPLL."
+        ::= { radio1 14 }
+
+rf1OduTemperature OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 15 }
+
+rf1OduHumidity OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),               
+                high(1)               
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The ODU Humidity."
+        ::= { radio1 16 }
+
+rf1Loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),               
+                on(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Loopback Integer variable."
+        ::= { radio1 17 }
+
+rf1RxAlarmLevel OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 18 }
+-- new 2005.05.17
+rf1txfstart OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 19 }
+rf1duplexshift OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 20 }
+rf1chstep OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 21 }
+rf1chstart OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 22 }
+rf1chend OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 23 }
+rf1txpwmin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 24 }
+rf1txpwmax OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 25 }
+rf1txpwstep OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio1 26 }
+--rf1subbands OBJECT-TYPE
+--        SYNTAX  INTEGER 
+--        ACCESS  read-only
+--        STATUS  optional
+--      DESCRIPTION
+--              "Integer variable."
+--      ::= { radio1 27 }
+
+
+-- ****** Radio2 *****************************************************
+
+rf2Operation OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                booting(1),            
+		ok(2),
+		testing(3),
+		error(4),
+		noDataFromODU(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Radio operation."
+        ::= { radio2 1 }
+
+rf2Alarm OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),               -- none of the following
+                on(1)                 -- Alarm ON
+                }
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "The RadioAlarm. -> rf1Alarm"
+        ::= { radio2 2 }
+
+rf2Version OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual version."
+        ::= { radio2 3 }
+
+rf2Side OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),               
+                high(1)               
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Side."
+        ::= { radio2 4 }
+
+rf2Channel OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 5 }
+
+rf2TxFrequency OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual version."
+        ::= { radio2 6 }
+
+rf2RxFrequency OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual version."
+        ::= { radio2 7 }
+
+rf2TxPower OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 8 }
+
+rf2RxState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),               
+                ok(1),
+		error(2),
+		loopback(3)               
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The rx State."
+        ::= { radio2 9 }
+
+rf2RxLevel OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 10 }
+
+rf2CableAttenuation OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 11 }
+
+rf2TxOut OBJECT-TYPE
+        SYNTAX  INTEGER {
+                error(0),               
+                ok(1),
+		off(2)               
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The Tx out."
+        ::= { radio2 12 }
+
+
+rf2TxPLL OBJECT-TYPE
+        SYNTAX  INTEGER {
+                error(0),               
+                ok(1)               
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The txPLL."
+        ::= { radio2 13 }
+
+rf2RxPLL OBJECT-TYPE
+        SYNTAX  INTEGER {
+                error(0),               
+                ok(1)               
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The rxPLL."
+        ::= { radio2 14 }
+
+rf2OduTemperature OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 15 }
+
+rf2OduHumidity OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),               
+                high(1)               
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The ODU Humidity."
+        ::= { radio2 16 }
+
+rf2Loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),               
+                on(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Loopback Integer variable."
+        ::= { radio2 17 }
+
+rf2RxAlarmLevel OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 18 }
+
+-- new 2005.05.17
+rf2txfstart OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 19 }
+rf2duplexshift OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 20 }
+rf2chstep OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 21 }
+rf2chstart OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 22 }
+rf2chend OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 23 }
+rf2txpwmin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 24 }
+rf2txpwmax OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 25 }
+rf2txpwstep OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { radio2 26 }
+--rf2subbands OBJECT-TYPE
+--        SYNTAX  INTEGER 
+--        ACCESS  read-only
+--        STATUS  optional
+--      DESCRIPTION
+--              "Integer variable."
+--      ::= { radio2 27 }
+
+
+-- switchCtrl ====================
+activeLink OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unknown(0),              -- none of the following
+                link1(1),            
+		link2(2),
+		error(255)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { switchCtrl 1 }
+
+activeTx OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                link1(1),            
+		link2(2),
+		both(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { switchCtrl 2 }
+
+preferedLink OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unknown(0),              -- none of the following
+                link1(1),            
+		link2(2),
+		error(255)
+                }
+        ACCESS  read-write
+        STATUS  optional
+        DESCRIPTION
+                "Integer variable."
+        ::= { switchCtrl 3 }
+
+forcedLink OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),              -- none of the following
+                link1(1),            
+		link2(2),
+		error(255)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { switchCtrl 4 }
+
+switchMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unknown(0),              -- none of the following
+                freqDiv(1),            
+                hotStandby(2),
+		independent(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { switchCtrl 5 }
+
+odu1RxMax OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { switchCtrl 6 }
+
+odu2RxMax OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { switchCtrl 7 }
+
+odu1RxMin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { switchCtrl 8 }
+
+odu2RxMin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { switchCtrl 9 }
+
+rxDelta OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer variable."
+        ::= { switchCtrl 10 }
+
+rxBER OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Maximum value of allowed BER"
+        ::= { switchCtrl 11 }
+
+switchDelay OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Delay (s)"
+        ::= { switchCtrl 12 }
+
+
+switchEnabledForRxBer OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Enable/disable swithing for Rx and BER"
+        ::= { switchCtrl 13 }
+
+switchReason OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+"		100 - command SWITCH FORCE OFF
+		101 - command SWITCH FORCE 1
+		102 - command SWITCH FORCE 2
+		103 - command SWITCH ACTIVE 1
+		104 - command SWITCH ACTIVE 2
+		105 - active ODU changed from 1
+		to 2 because of power problems in ODU1
+		106 - active ODU changed from 2
+		to 2 because of power problems in ODU2
+		107 - active ODU changed from 1
+		to 2 because of cable problems in ODU1
+		108 - active ODU changed from 2
+		to 1 because of cable problems in ODU2
+		109 - active ODU changed from 1
+		to 2 because of SyncLoss problems when active ODU1
+		110 - active ODU changed from 2
+		to 1 because of SyncLoss problems when active ODU2
+		111 - active ODU changed from 1
+		to 2 because of RAI problems when active ODU1
+		112 - active ODU changed from 2
+		to 1 because of RAI problems when active ODU2
+		113 - active ODU changed from 1
+		to 2 because of RXLEV problems in ODU1
+		114 - active ODU changed from 2
+		to 1 because of RXLEV problems in ODU2
+		115 - active ODU changed from 1
+		to 2 because of BER problems when active ODU1
+		116 - active ODU changed from 2
+		to 1 because of BER problems when active ODU2"
+        ::= { switchCtrl 14 }
+
+
+-- ***** modules *********************************************************
+
+-- ****** m1 **************************
+m1Type OBJECT-TYPE
+        SYNTAX  INTEGER {
+                error(0),
+		e1x1(30),               
+		e1(33),               
+		v35(37),
+		bridge(43),
+		eow64(100),
+		e3(227),
+		t1x4(74),               
+		e1x4(78),               
+		f1bridge(241),
+		f2bridge(242),
+                none(255)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The module type."
+        ::= { m1 1 }
+
+m1Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual description of the module."
+        ::= { m1 2 }
+
+
+m1Version OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Textual version."
+        ::= { m1 3 }
+
+m1Speed OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module data speed Integer variable Kbit."
+        ::= { m1 4 }
+
+m1Operation OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                booting(1),            
+		ok(2),
+		testing(3),
+		loopback(4),
+		illegalSpeed(5),
+		error(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module operation statuss."
+        ::= { m1 5 }
+
+m1Rx OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+		ok(1),
+		noSignal(2),
+		noLink(3),
+		rxAIS(4),
+		error(5),
+		noData(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Rx statuss."
+        ::= { m1 6 }
+
+m1Tx OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+		ok(1),
+		noSignal(2),
+		noLink(3),
+		txAIS(4),
+		error(5),
+		noData(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx statuss."
+        ::= { m1 7 }
+
+m1Loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),               
+                on(1),
+		analog(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Loopback Integer variable."
+        ::= { m1 8 }
+
+m1RxInput OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                coax(1),
+		rj45(2),
+		v35(3),
+                e3(4),
+		db25unbalanced(5),
+		db25balanced(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Rx Input."
+        ::= { m1 9 }
+
+m1TxMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                halfDuplex(1),
+		fullDuplex(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx duplex mode."
+        ::= { m1 10 }
+
+
+m1TxClockSource OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                master(1),
+		slave(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx clock source."
+        ::= { m1 11 }
+
+
+m1TxClockPhase OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                normal(1),
+		inverse(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx clock Phase."
+        ::= { m1 12 }
+
+m1DataPolarity OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                normal(1),
+		inverse(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module data."
+        ::= { m1 13 }
+
+m1ChanCount OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of data channels"
+        ::= { m1 14 }
+
+-- ****** m2 **************************
+m2Type OBJECT-TYPE
+        SYNTAX  INTEGER {
+                error(0),
+		e1x1(30),               
+		e1(33),               
+		v35(37),
+		bridge(43),
+		eow64(100),
+		e3(227),
+		t1x4(74),               
+		e1x4(78),               
+		f1bridge(241),
+		f2bridge(242),
+                none(255)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The module type."
+        ::= { m2 1 }
+
+m2Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual description of the module."
+        ::= { m2 2 }
+
+
+m2Version OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Textual version."
+        ::= { m2 3 }
+
+m2Speed OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module data speed Integer variable Kbit."
+        ::= { m2 4 }
+
+m2Operation OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                booting(1),            
+		ok(2),
+		testing(3),
+		loopback(4),
+		illegalSpeed(5),
+		error(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module operation statuss."
+        ::= { m2 5 }
+
+m2Rx OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+		ok(1),
+		noSignal(2),
+		noLink(3),
+		rxAIS(4),
+		error(5),
+		noData(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Rx statuss."
+        ::= { m2 6 }
+
+m2Tx OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+		ok(1),
+		noSignal(2),
+		noLink(3),
+		txAIS(4),
+		error(5),
+		noData(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx statuss."
+        ::= { m2 7 }
+
+m2Loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),               
+                on(1),
+		analog(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Loopback Integer variable."
+        ::= { m2 8 }
+
+m2RxInput OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                coax(1),
+		rj45(2),
+		v35(3),
+                e3(4),
+		db25unbalanced(5),
+		db25balanced(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Rx Input."
+        ::= { m2 9 }
+
+m2TxMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                halfDuplex(1),
+		fullDuplex(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx duplex mode."
+        ::= { m2 10 }
+
+
+m2TxClockSource OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                master(1),
+		slave(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx clock source."
+        ::= { m2 11 }
+
+
+m2TxClockPhase OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                normal(1),
+		inverse(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx clock Phase."
+        ::= { m2 12 }
+
+m2DataPolarity OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                normal(1),
+		inverse(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module data."
+        ::= { m2 13 }
+
+m2ChanCount OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of data channels"
+        ::= { m2 14 }
+
+-- ****** m3 **************************
+m3Type OBJECT-TYPE
+        SYNTAX  INTEGER {
+                error(0),
+		e1x1(30),               
+		e1(33),               
+		v35(37),
+		bridge(43),
+		eow64(100),
+		e3(227),
+		t1x4(74),               
+		e1x4(78),               
+		f1bridge(241),
+		f2bridge(242),
+                none(255)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The module type."
+        ::= { m3 1 }
+
+m3Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual description of the module."
+        ::= { m3 2 }
+
+
+m3Version OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Textual version."
+        ::= { m3 3 }
+
+m3Speed OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module data speed Integer variable Kbit."
+        ::= { m3 4 }
+
+m3Operation OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                booting(1),            
+		ok(2),
+		testing(3),
+		loopback(4),
+		illegalSpeed(5),
+		error(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module operation statuss."
+        ::= { m3 5 }
+
+m3Rx OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+		ok(1),
+		noSignal(2),
+		noLink(3),
+		rxAIS(4),
+		error(5),
+		noData(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Rx statuss."
+        ::= { m3 6 }
+
+m3Tx OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+		ok(1),
+		noSignal(2),
+		noLink(3),
+		txAIS(4),
+		error(5),
+		noData(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx statuss."
+        ::= { m3 7 }
+
+m3Loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),               
+                on(1),
+		analog(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Loopback Integer variable."
+        ::= { m3 8 }
+
+
+m3RxInput OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                coax(1),
+		rj45(2),
+		v35(3),
+                e3(4),
+		db25unbalanced(5),
+		db25balanced(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Rx Input."
+        ::= { m3 9 }
+
+m3TxMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                halfDuplex(1),
+		fullDuplex(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx duplex mode."
+        ::= { m3 10 }
+
+
+m3TxClockSource OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                master(1),
+		slave(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx clock source."
+        ::= { m3 11 }
+
+
+m3TxClockPhase OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                normal(1),
+		inverse(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx clock Phase."
+        ::= { m3 12 }
+
+m3DataPolarity OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                normal(1),
+		inverse(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module data."
+        ::= { m3 13 }
+
+m3ChanCount OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of data channels"
+        ::= { m3 14 }
+
+-- ****** m4 **************************
+m4Type OBJECT-TYPE
+        SYNTAX  INTEGER {
+                error(0),
+		e1x1(30),               
+		e1(33),               
+		v35(37),
+		bridge(43),
+		eow64(100),
+		e3(227),
+		t1x4(74),               
+		e1x4(78),               
+		f1bridge(241),
+		f2bridge(242),
+                none(255)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The module type."
+        ::= { m4 1 }
+
+m4Description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Textual description of the module."
+        ::= { m4 2 }
+
+
+m4Version OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Textual version."
+        ::= { m4 3 }
+
+m4Speed OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module data speed Integer variable Kbit."
+        ::= { m4 4 }
+
+m4Operation OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                booting(1),            
+		ok(2),
+		testing(3),
+		loopback(4),
+		illegalSpeed(5),
+		error(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module operation statuss."
+        ::= { m4 5 }
+
+m4Rx OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+		ok(1),
+		noSignal(2),
+		noLink(3),
+		rxAIS(4),
+		error(5),
+		noData(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Rx statuss."
+        ::= { m4 6 }
+
+m4Tx OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+		ok(1),
+		noSignal(2),
+		noLink(3),
+		txAIS(4),
+		error(5),
+		noData(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx statuss."
+        ::= { m4 7 }
+
+m4Loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),               
+                on(1),
+		analog(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Loopback Integer variable."
+        ::= { m4 8 }
+
+
+m4RxInput OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                coax(1),
+		rj45(2),
+		v35(3),
+                e3(4),
+		db25unbalanced(5),
+		db25balanced(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Rx Input."
+        ::= { m4 9 }
+
+m4TxMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                halfDuplex(1),
+		fullDuplex(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx duplex mode."
+        ::= { m4 10 }
+
+
+m4TxClockSource OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                master(1),
+		slave(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx clock source."
+        ::= { m4 11 }
+
+
+m4TxClockPhase OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                normal(1),
+		inverse(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module Tx clock Phase."
+        ::= { m4 12 }
+
+m4DataPolarity OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(0),               
+                normal(1),
+		inverse(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Module data."
+        ::= { m4 13 }
+
+m4ChanCount OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of data channels"
+        ::= { m4 14 }
+
+m1port1   			OBJECT IDENTIFIER ::=   { m1 21 }
+m1port2   			OBJECT IDENTIFIER ::=   { m1 22 }
+m1port3   			OBJECT IDENTIFIER ::=   { m1 23 }
+m1port4   			OBJECT IDENTIFIER ::=   { m1 24 }
+m2port1   			OBJECT IDENTIFIER ::=   { m2 21 }
+m2port2   			OBJECT IDENTIFIER ::=   { m2 22 }
+m2port3   			OBJECT IDENTIFIER ::=   { m2 23 }
+m2port4   			OBJECT IDENTIFIER ::=   { m2 24 }
+m3port1   			OBJECT IDENTIFIER ::=   { m3 21 }
+m3port2   			OBJECT IDENTIFIER ::=   { m3 22 }
+m3port3   			OBJECT IDENTIFIER ::=   { m3 23 }
+m3port4   			OBJECT IDENTIFIER ::=   { m3 24 }
+m4port1   			OBJECT IDENTIFIER ::=   { m4 21 }
+m4port2   			OBJECT IDENTIFIER ::=   { m4 22 }
+m4port3   			OBJECT IDENTIFIER ::=   { m4 23 }
+m4port4   			OBJECT IDENTIFIER ::=   { m4 24 }
+
+m1p1statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m1port1 1 }
+
+m1p1connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m1port1 2 }
+
+m1p1flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m1port1 3 }
+
+m1p1priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m1port1 4 }
+
+m1p1loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m1port1 5 }
+
+m1p2statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m1port2 1 }
+
+m1p2connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m1port2 2 }
+
+m1p2flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m1port2 3 }
+
+
+m1p2priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m1port2 4 }
+
+m1p2loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m1port2 5 }
+
+m1p3statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m1port3 1 }
+
+m1p3connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m1port3 2 }
+
+m1p3flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m1port3 3 }
+
+m1p3priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m1port3 4 }
+
+
+m1p3loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m1port3 5 }
+
+m1p4statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m1port4 1 }
+
+m1p4connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m1port4 2 }
+
+m1p4flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m1port4 3 }
+
+m1p4priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m1port4 4 }
+
+m1p4loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m1port4 5 }
+
+m2p1statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m2port1 1 }
+
+m2p1connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m2port1 2 }
+
+m2p1flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m2port1 3 }
+
+m2p1priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m2port1 4 }
+
+m2p1loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m2port1 5 }
+
+m2p2statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m2port2 1 }
+
+m2p2connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m2port2 2 }
+
+m2p2flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m2port2 3 }
+
+m2p2priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m2port2 4 }
+
+m2p2loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m2port2 5 }
+
+m2p3statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m2port3 1 }
+
+m2p3connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m2port3 2 }
+
+m2p3flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m2port3 3 }
+
+m2p3priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m2port3 4 }
+
+m2p3loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m2port3 5 }
+
+m2p4statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m2port4 1 }
+
+m2p4connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m2port4 2 }
+
+m2p4flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m2port4 3 }
+
+m2p4priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m2port4 4 }
+
+m2p4loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m2port4 5 }
+
+m3p1statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m3port1 1 }
+
+m3p1connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m3port1 2 }
+
+m3p1flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m3port1 3 }
+
+m3p1priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m3port1 4 }
+
+m3p1loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m3port1 5 }
+
+m3p2statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m3port2 1 }
+
+m3p2connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m3port2 2 }
+
+m3p2flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m3port2 3 }
+
+m3p2priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m3port2 4 }
+
+m3p2loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m3port2 5 }
+
+m3p3statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m3port3 1 }
+
+m3p3connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m3port3 2 }
+
+m3p3flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m3port3 3 }
+
+m3p3priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m3port3 4 }
+
+m3p3loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m3port3 5 }
+
+m3p4statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m3port4 1 }
+
+m3p4connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m3port4 2 }
+
+m3p4flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m3port4 3 }
+
+m3p4priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m3port4 4 }
+
+m3p4loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m3port4 5 }
+
+m4p1statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m4port1 1 }
+
+m4p1connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m4port1 2 }
+
+m4p1flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m4port1 3 }
+
+m4p1priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m4port1 4 }
+
+m4p1loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m4port1 5 }
+
+m4p2statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m4port2 1 }
+
+m4p2connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m4port2 2 }
+
+m4p2flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m4port2 3 }
+
+m4p2priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m4port2 4 }
+
+m4p2loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m4port2 5 }
+
+m4p3statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m4port3 1 }
+
+m4p3connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m4port3 2 }
+
+m4p3flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m4port3 3 }
+
+m4p3priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m4port3 4 }
+
+m4p3loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m4port3 5 }
+
+m4p4statbin OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m4port4 1 }
+
+m4p4connection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(0),              -- none of the following
+                auto(1),            
+		eth10fdx(2),
+		eth10hdx(3),
+		eth100fdx(4),
+		eth100hdx(5),
+		ds1(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Note: ds1 means E1 or T1"
+        ::= { m4port4 2 }
+
+
+m4p4flowcntrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(0),
+                enabled(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m4port4 3 }
+
+m4p4priority OBJECT-TYPE
+        SYNTAX  INTEGER {
+                low(0),
+                high(1)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { m4port4 4 }
+
+m4p4loopback OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(0),
+                analog(1),
+                remote(2),
+                digital(4),
+                remoteANDdigital(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "loopback"
+        ::= { m4port4 5 }
+
+--mpmux ==================================================================
+        
+
+alarmTrap	TRAP-TYPE 
+		ENTERPRISE   mpmux 
+		VARIABLES
+		{            
+		 rfAlarm,
+		 bbSyncLostAlarm,
+		 berAlarm,
+		 remoteAlarm,
+		 systemAlarm
+		}
+		DESCRIPTION
+		"SAF management Alarm trap."                                
+		::= 0
+
+alinkTrap	TRAP-TYPE 
+		ENTERPRISE   mpmux
+		VARIABLES
+		{            
+		 activeLink
+		}
+		DESCRIPTION
+		"SAF Active Link trap."                                
+		::= 1
+                           
+END

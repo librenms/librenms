@@ -1,9 +1,9 @@
 <?php
 
-foreach (dbFetchRows('SELECT * FROM `devices` WHERE `location` = ?', array($vars['id'])) as $device) {
-    if ($auth || device_permitted($device_id)) {
+foreach (dbFetchRows('SELECT * FROM `devices`,`locations` WHERE location_id = ? && devices.location_id = locations.id', [$vars['id']]) as $device) {
+    if ($auth || device_permitted($device['device_id'])) {
         $devices[] = $device;
-        $title     = $vars['id'];
+        $title     = $device['location'];
         $auth      = true;
     }
 }

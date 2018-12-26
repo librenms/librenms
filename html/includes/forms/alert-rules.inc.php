@@ -24,11 +24,11 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 header('Content-type: application/json');
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die(json_encode([
         'status' => 'error',
         'message' => 'ERROR: You need to be admin',
@@ -38,8 +38,18 @@ if (!Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-$builder_json = $_POST['builder_json'];
-$query        = QueryBuilderParser::fromJson($builder_json)->toSql();
+$builder_json   = $vars['builder_json'];
+$override_query = $vars['override_query'];
+
+$options = [
+    'override_query' => $override_query,
+];
+
+if ($override_query === 'on') {
+    $query = $vars['adv_query'];
+} else {
+    $query = QueryBuilderParser::fromJson($builder_json)->toSql();
+}
 $rule_id      = $_POST['rule_id'];
 $count        = mres($_POST['count']);
 $delay        = mres($_POST['delay']);
@@ -79,6 +89,7 @@ $extra = array(
     'invert'   => $invert,
     'interval' => $interval_sec,
     'recovery' => $recovery,
+    'options'  => $options,
 );
 
 $extra_json = json_encode($extra);
@@ -191,13 +202,14 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     if (!empty($insert)) {
         $res = dbBulkInsert($insert, 'alert_transport_map');
     }
-
     // Remove old mappings
     if (!empty($t_del)) {
-        dbDelete('alert_transport_map', 'target_type="single" AND transport_or_group_id IN ' . dbGenPlaceholders(count($t_del)), $t_del);
+        $db_t_values = array_merge([$rule_id], $t_del);
+        dbDelete('alert_transport_map', 'target_type="single" AND rule_id=? AND transport_or_group_id IN ' . dbGenPlaceholders(count($t_del)), $db_t_values);
     }
     if (!empty($g_del)) {
-        dbDelete('alert_transport_map', 'target_type="group" AND transport_or_group_id IN ' . dbGenPlaceholders(count($g_del)), $g_del);
+        $db_g_values = array_merge([$rule_id], $g_del);
+        dbDelete('alert_transport_map', 'target_type="group" AND rule_id=? AND transport_or_group_id IN ' . dbGenPlaceholders(count($g_del)), $db_g_values);
     }
 }
 

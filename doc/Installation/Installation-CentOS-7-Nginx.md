@@ -1,4 +1,5 @@
 source: Installation/Installation-CentOS-7-Nginx.md
+path: blob/master/doc/
 > NOTE: These instructions assume you are the **root** user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
 **Please note the minimum supported PHP version is 5.6.4**
@@ -168,7 +169,7 @@ Then run these commands
     firewall-cmd --zone public --add-service https
     firewall-cmd --permanent --zone public --add-service https
 
-#### Configure snmpd
+### Configure snmpd
 
     cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
 
@@ -196,6 +197,7 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can become large an
     chown -R librenms:librenms /opt/librenms
     setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
     setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+    chgrp apache /var/lib/php/session/
 
 ## Web installer ##
 

@@ -13,7 +13,7 @@
  */
 
 
-$oids = 'entPhysicalSoftwareRev.22 entPhysicalName.149 entPhysicalSerialNum.10';
+$oids = ['entPhysicalSoftwareRev.22', 'entPhysicalName.149', 'entPhysicalSerialNum.10'];
 
 $data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB');
 

@@ -1,4 +1,5 @@
 source: Extensions/RRDCached.md
+path: blob/master/doc/
 # Setting up RRDCached
 
 This document will explain how to setup RRDCached for LibreNMS.

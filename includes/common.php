@@ -16,9 +16,10 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\IP;
 
 function generate_priority_label($priority)
@@ -73,25 +74,49 @@ function graylog_severity_label($severity)
     return '<span class="alert-status '.$barColor .'" style="margin-right:8px;float:left;"></span>';
 }
 
+/**
+ * Execute and snmp command, filter debug output unless -v is specified
+ *
+ * @param array $command
+ * @return null|string
+ */
 function external_exec($command)
 {
-    global $debug,$vdebug;
+    global $debug, $vdebug;
+
+    $proc = new \Symfony\Component\Process\Process($command);
+    $proc->setTimeout(600);
 
     if ($debug && !$vdebug) {
-        $debug_command = preg_replace('/-c [\S]+/', '-c COMMUNITY', $command);
-        $debug_command = preg_replace('/-u [\S]+/', '-u USER', $debug_command);
-        $debug_command = preg_replace('/-U [\S]+/', '-u USER', $debug_command);
-        $debug_command = preg_replace('/-A [\S]+/', '-A PASSWORD', $debug_command);
-        $debug_command = preg_replace('/-X [\S]+/', '-X PASSWORD', $debug_command);
-        $debug_command = preg_replace('/-P [\S]+/', '-P PASSWORD', $debug_command);
-        $debug_command = preg_replace('/-H [\S]+/', '-H HOSTNAME', $debug_command);
-        $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/', '\1:HOSTNAME:\3', $debug_command);
+        $patterns = [
+            '/-c\' \'[\S]+/',
+            '/-u\' \'[\S]+/',
+            '/-U\' \'[\S]+/',
+            '/-A\' \'[\S]+/',
+            '/-X\' \'[\S]+/',
+            '/-P\' \'[\S]+/',
+            '/-H\' \'[\S]+/',
+            '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
+        ];
+        $replacements = [
+            '-c\' \'COMMUNITY',
+            '-u\' \'USER',
+            '-u\' \'USER',
+            '-A\' \'PASSWORD',
+            '-X\' \'PASSWORD',
+            '-P\' \'PASSWORD',
+            '-H\' \'HOSTNAME',
+            '\1:HOSTNAME:\3',
+        ];
+
+        $debug_command = preg_replace($patterns, $replacements, $proc->getCommandLine());
         c_echo('SNMP[%c' . $debug_command . "%n]\n");
     } elseif ($vdebug) {
-        c_echo('SNMP[%c'.$command."%n]\n");
+        c_echo('SNMP[%c'.$proc->getCommandLine()."%n]\n");
     }
 
-    $output = shell_exec($command);
+    $proc->run();
+    $output = $proc->getOutput();
 
     if ($debug && !$vdebug) {
         $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
@@ -100,6 +125,7 @@ function external_exec($command)
     } elseif ($vdebug) {
         d_echo($output . PHP_EOL);
     }
+    d_echo($proc->getErrorOutput());
 
     return $output;
 }
@@ -330,17 +356,8 @@ function get_device_id_by_app_id($app_id)
 
 function ifclass($ifOperStatus, $ifAdminStatus)
 {
-    $ifclass = "interface-upup";
-    if ($ifAdminStatus == "down") {
-        $ifclass = "interface-admindown";
-    }
-    if ($ifAdminStatus == "up" && $ifOperStatus== "down") {
-        $ifclass = "interface-updown";
-    }
-    if ($ifAdminStatus == "up" && $ifOperStatus== "up") {
-        $ifclass = "interface-upup";
-    }
-    return $ifclass;
+    // fake a port model
+    return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
 }
 
 function device_by_name($name, $refresh = 0)
@@ -366,7 +383,7 @@ function device_by_id_cache($device_id, $refresh = false)
     if (!$refresh && isset($cache['devices']['id'][$device_id]) && is_array($cache['devices']['id'][$device_id])) {
         $device = $cache['devices']['id'][$device_id];
     } else {
-        $device = dbFetchRow("SELECT `devices`.*, `lat`, `lng` FROM `devices` LEFT JOIN locations ON `devices`.`location`=`locations`.`location` WHERE `device_id` = ?", array($device_id));
+        $device = dbFetchRow("SELECT `devices`.*, `location`, `lat`, `lng` FROM `devices` LEFT JOIN locations ON `devices`.location_id=`locations`.`id` WHERE `device_id` = ?", [$device_id]);
         $device['attribs'] = get_dev_attribs($device['device_id']);
         load_os($device);
 
@@ -611,7 +628,7 @@ function format_si($value, $round = '2', $sf = '3')
         $value = $value * -1;
     }
 
-    return number_format(round($value, $round), $sf, '.', '').$ext;
+    return (number_format(round($value, $round), $sf, '.', '')+0)." ".$ext;
 }
 
 function format_bi($value, $round = '2', $sf = '3')
@@ -630,8 +647,7 @@ function format_bi($value, $round = '2', $sf = '3')
     if ($neg) {
         $value = $value * -1;
     }
-
-    return number_format(round($value, $round), $sf, '.', '').$ext;
+    return (number_format(round($value, $round), $sf, '.', '')+0)." ".$ext;
 }
 
 function format_number($value, $base = '1000', $round = 2, $sf = 3)
@@ -666,20 +682,23 @@ function is_valid_hostname($hostname)
 /*
  * convenience function - please use this instead of 'if ($debug) { echo ...; }'
  */
-function d_echo($text, $no_debug_text = null)
-{
-    global $debug;
+if (!function_exists('d_echo')) {
+    //TODO remove this after installs have updated, leaving it for for transition
+    function d_echo($text, $no_debug_text = null)
+    {
+        global $debug;
 
-    if (class_exists('\Log')) {
-        \Log::debug(is_string($text) ? rtrim($text) : $text);
-    } elseif ($debug) {
-        print_r($text);
-    }
+        if (class_exists('\Log')) {
+            \Log::debug(is_string($text) ? rtrim($text) : $text);
+        } elseif ($debug) {
+            print_r($text);
+        }
 
-    if (!$debug && $no_debug_text) {
-        echo "$no_debug_text";
+        if (!$debug && $no_debug_text) {
+            echo "$no_debug_text";
+        }
     }
-} // d_echo
+}
 
 /**
  * Output using console color if possible
@@ -729,9 +748,7 @@ function c_echo($string, $enabled = true)
  */
 function is_mib_graph($type, $subtype)
 {
-    global $config;
-    return isset($config['graph_types'][$type][$subtype]['section']) &&
-        $config['graph_types'][$type][$subtype]['section'] == 'mib';
+    return \LibreNMS\Util\Graph::isMibGraph($type, $subtype);
 } // is_mib_graph
 
 
@@ -1122,14 +1139,16 @@ function ceph_rrd($gtype)
 /**
  * Parse location field for coordinates
  * @param string location The location field to look for coords in.
- * @return array Containing the lat and lng coords
+ * @return array|bool Containing the lat and lng coords
  **/
 function parse_location($location)
 {
-    preg_match('/(\[)(-?[0-9\. ]+),[ ]*(-?[0-9\. ]+)(\])/', $location, $tmp_loc);
-    if (is_numeric($tmp_loc[2]) && is_numeric($tmp_loc[3])) {
-        return array('lat' => $tmp_loc[2], 'lng' => $tmp_loc[3]);
+    preg_match('/\[(-?[0-9. ]+), *(-?[0-9. ]+)\]/', $location, $tmp_loc);
+    if (is_numeric($tmp_loc[1]) && is_numeric($tmp_loc[2])) {
+        return ['lat' => $tmp_loc[1], 'lng' => $tmp_loc[2]];
     }
+
+    return false;
 }//end parse_location()
 
 /**
@@ -1141,7 +1160,7 @@ function version_info($remote = false)
 {
     global $config;
     $output = array();
-    if (check_git_exists() === true) {
+    if (is_git_install() && check_git_exists()) {
         if ($remote === true && $config['update_channel'] == 'master') {
             $api = curl_init();
             set_curl_proxy($api);
@@ -1354,11 +1373,16 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
                     'sensors_to_state_indexes.sensor_id',
                     "sensors.$target",
                 ));
-            } elseif ($table == 'application_metrics' && $target = 'device_id') {
+            } elseif ($table == 'application_metrics' && $target == 'device_id') {
                 return array_merge($last, array(
                     'application_metrics.app_id',
                     "applications.$target",
                 ));
+            } elseif ($table == 'locations' && $target == 'device_id') {
+                return array_merge($last, [
+                    'locations.id',
+                    'devices.device_id.location_id'
+                ]);
             }
 
             $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"', array($table));
@@ -1518,28 +1542,9 @@ function clean($value, $strip_tags = true)
  * @param array $purifier_config (key, value pair)
  * @return string
  */
-function display($value, $purifier_config = array())
+function display($value, $purifier_config = [])
 {
-    /** @var HTMLPurifier $purifier */
-    global $config, $purifier;
-
-    // If $purifier_config is non-empty then we don't want
-    // to convert html tags and allow these to be controlled
-    // by purifier instead.
-    if (empty($purifier_config)) {
-        $value = htmlentities($value);
-    }
-    if (!isset($purifier)) {
-        // initialize HTML Purifier here since this is the only user
-        $p_config = HTMLPurifier_Config::createDefault();
-        $p_config->set('Cache.SerializerPath', $config['temp_dir']);
-        foreach ($purifier_config as $k => $v) {
-            $p_config->set($k, $v);
-        }
-        $purifier = new HTMLPurifier($p_config);
-    }
-
-    return $purifier->purify(stripslashes($value));
+    return Html::display($value, $purifier_config);
 }
 
 /**
@@ -1672,10 +1677,16 @@ function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
     return sprintf('%.02f', $value);
 }
 
+/**
+ * Converts uW to dBm
+ * $value must be positive
+ *
+ */
 function uw_to_dbm($value)
 {
     return 10 * log10($value / 1000);
 }
+
 /**
  * @param $value
  * @param null $default
@@ -1709,6 +1720,12 @@ function set_numeric($value, $default = 0)
         $value = $default;
     }
     return $value;
+}
+
+function is_git_install()
+{
+    $install_dir = Config::get('install_dir', realpath(__DIR__ . '/..'));
+    return file_exists("$install_dir/.git");
 }
 
 function check_git_exists()
@@ -1750,7 +1767,7 @@ function get_user_pref($name, $default = null, $user_id = null)
     }
 
     if (is_null($user_id)) {
-        $user_id = Auth::id();
+        $user_id = LegacyAuth::id();
     }
 
     $pref = dbFetchCell(
@@ -1779,7 +1796,7 @@ function set_user_pref($name, $value, $user_id = null)
 {
     global $user_prefs;
     if (is_null($user_id)) {
-        $user_id = Auth::id();
+        $user_id = LegacyAuth::id();
     }
 
     $pref = array(

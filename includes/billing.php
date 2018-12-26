@@ -79,7 +79,7 @@ function getValue($host, $port, $id, $inout)
 
     $oid    = 'IF-MIB::ifHC'.$inout.'Octets.'.$id;
     $device = dbFetchRow("SELECT * from `devices` WHERE `hostname` = '".mres($host)."' LIMIT 1");
-    $value  = snmp_get($device, $oid, '-O qv');
+    $value  = snmp_get($device, $oid, '-Oqv');
 
     if (!is_numeric($value)) {
         $oid   = 'IF-MIB::if'.$inout.'Octets.'.$id;

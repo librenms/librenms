@@ -1,24 +1,32 @@
 site_name: LibreNMS Docs
 docs_dir: doc
-theme_dir: 'theme_v2'
-theme: null
+theme:
+  name: material
+  logo: img/librenms.svg
+  language: en
+  palette: null
+  font:
+    text: 'Roboto'
+    code: 'Roboto Mono'
+  feature: null
 site_dir: out
 site_url: http://docs.librenms.org
 markdown_extensions:
     - pymdownx.tasklist
     - pymdownx.tilde
 extra_css:
+    - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     - librenms.css
 extra:
-    logo: img/librenms.svg
     article_nav_top: false
     article_nav_bottom: true
 site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
-repo_url: https://github.com/librenms/librenms
+repo_url: https://github.com/librenms/librenms/
+edit_uri: edit/master/doc
 repo_name: GitHub
 google_analytics: ['UA-79149977-2', 'docs.librenms.org']
-pages:
+nav:
   - Home: index.md
   - 1. General:
       - Acknowledgements: General/Acknowledgement.md
@@ -28,10 +36,9 @@ pages:
       - General/Welcome-to-Observium-users.md
   - 2. Installing:
       - Installing LibreNMS: Installation/index.md
-      - Ubuntu VM Image: Installation/Ubuntu-image.md
-      - CentOS VM Image: Installation/CentOS-image.md
-      - Ubuntu 16.04 (Nginx): Installation/Installation-Ubuntu-1604-Nginx.md
-      - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
+      - LibreNMS VMs: Installation/Images.md
+      - Ubuntu 18.04 (Nginx): Installation/Installation-Ubuntu-1804-Nginx.md
+      - Ubuntu 18.04 (Apache): Installation/Installation-Ubuntu-1804-Apache.md
       - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
       - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
       - Migrating from Observium: Installation/Migrating-from-Observium.md
@@ -54,6 +61,7 @@ pages:
   - 5. Advanced Setup:
       - Support/1-Minute-Polling.md
       - Fast Ping Checking: Extensions/Fast-Ping-Check.md
+      - Support/Environment-Variables.md
       - Configuration docs: Support/Configuration.md
       - Authentication Options: Extensions/Authentication.md
       - Two-Factor Auth: Extensions/Two-Factor-Auth.md
@@ -103,6 +111,7 @@ pages:
       - API/Logs.md
   - 8. Alerting:
       - Intro: Alerting/index.md
+      - Alerting/Introduction.md
       - Alerting/Rules.md
       - Alerting/Templates.md
       - Alerting/Transports.md
@@ -156,24 +165,3 @@ pages:
       - Device Notes:
           - Intro: Support/Device-Notes/index.md
           - Carel pCOweb: Support/Device-Notes/Carel-pCOweb-Devices.md
-  - hidden:
-      - Alerting/Old_Templates.md
-      - API/API-Docs.md
-      - Installation/Installing-LibreNMS.md
-      - Extensions/Alerting.md
-      - Extensions/Email-Alerting.md
-      - Parsing Port Descriptions: Extensions/Port-Description-Parser.md
-      - Extensions/InfluxDB.md
-      - Extensions/Graphite.md
-      - Extensions/OpenTSDB.md
-      - Extensions/Prometheus.md
-      - Extensions/RRDCached-Security.md
-      - General/Contributing.md
-      - General/Credits.md
-      - Installation/Installation-Ubuntu-1404-Nginx.md
-      - Installation/Installation-Ubuntu-1404-Apache.md
-      - Installation/Installation-Ubuntu-1404-Lighttpd.md
-      - Installation/Installation-CentOS-6-Apache-Nginx.md
-      - Installation/Installation-(Debian-Ubuntu).md
-      - Installation/Installation-(RHEL-CentOS).md
-      - Support/Support-New-OS.md

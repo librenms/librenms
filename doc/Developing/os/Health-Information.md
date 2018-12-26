@@ -1,4 +1,5 @@
 source: Developing/os/Health-Information.md
+path: blob/master/doc/
 
 #### Sensors
 
@@ -57,7 +58,7 @@ modules:
                     oid: airFlowSensorTable
                     value: airFlowSensorValue
                     divisor: 10
-                    num_oid: .1.3.6.1.4.1.5528.100.4.1.5.1.2.
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.1.5.1.2.{{ $index }}'
                     descr: airFlowSensorLabel
                     index: 'airFlowSensorValue.{{ $index }}'
 ```
@@ -72,7 +73,7 @@ The only sensor we have defined here is airflow. The available options are as fo
 
   - `oid` (required): This is the name of the table you want to do the snmp walk on.
   - `value` (optional): This is the key within the table that contains the value. If not provided will use `oid`
-  - `num_oid` (required): This is the numerical OID that contains `value`. This should always be without the appended `index`.
+  - `num_oid` (required): This is the numerical OID that contains `value`. This should always include `{{ $index }}`.  snmptranslate -On can help figure out the number
   - `divisor` (optional): This is the divisor to use against the returned `value`.
   - `multiplier` (optional): This is the multiplier to use against the returned `value`.
   - `low_limit` (optional): This is the critical low threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.

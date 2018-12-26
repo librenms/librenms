@@ -13,21 +13,17 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $where = 1;
 $param = array();
 
-$sql = ' FROM `devices`';
+$sql = ' FROM `devices` LEFT JOIN locations ON devices.location_id = locations.id';
 
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
     $where .= ' AND `DP`.`user_id`=?';
-    $param[] = Auth::id();
-}
-
-if (!empty($vars['location'])) {
-    $sql .= " LEFT JOIN `devices_attribs` AS `DB` ON `DB`.`device_id`=`devices`.`device_id` AND `DB`.`attrib_type`='override_sysLocation_bool' AND `DB`.`attrib_value`='1' LEFT JOIN `devices_attribs` AS `DA` ON `devices`.`device_id`=`DA`.`device_id`";
+    $param[] = LegacyAuth::id();
 }
 
 if (!empty($vars['group']) && is_numeric($vars['group'])) {
@@ -73,7 +69,7 @@ if (!empty($vars['type'])) {
     }
 }
 
-if (!empty($vars['state'])) {
+if (isset($vars['state']) && $vars['state'] !== "") {
     $sql .= ' AND status= ?';
     if (is_numeric($vars['state'])) {
         $param[] = $vars['state'];
@@ -97,7 +93,8 @@ if (!empty($vars['location']) && $vars['location'] == 'Unset') {
 }
 
 if (!empty($vars['location'])) {
-    $sql .= " AND `location` = ?";
+    $sql .= " AND (`location` = ? OR `location_id` = ?)";
+    $param[] = $vars['location'];
     $param[] = $vars['location'];
 }
 
@@ -120,7 +117,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT DISTINCT(`devices`.`device_id`),`devices`.* $sql";
+$sql = "SELECT DISTINCT(`devices`.`device_id`),`devices`.*,locations.location $sql";
 
 if (!isset($vars['format'])) {
     $vars['format'] = 'list_detail';
@@ -172,7 +169,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
                 <div class="col-xs-1"><a href="' . generate_device_url($device, array('tab' => 'alerts')) . '"> <i class="fa fa-exclamation-circle fa-lg icon-theme" title="View alerts"></i></a></div>
     ';
 
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (LegacyAuth::user()->hasGlobalAdmin()) {
         $actions .= '<div class="col-xs-1"><a href="' . generate_device_url($device, array('tab' => 'edit')) . '"> <i class="fa fa-pencil fa-lg icon-theme" title="Edit device"></i></a></div>';
     }
 
@@ -186,7 +183,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
                     ';
     if (isset($config['gateone']['server'])) {
         if ($config['gateone']['use_librenms_user'] == true) {
-                    $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . Auth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
+                    $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . LegacyAuth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
         } else {
                     $actions .= '<div class="col-xs-1"><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>';
         }
@@ -194,7 +191,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $actions .= '<div class="col-xs-1"><a href="ssh://' . $device['hostname'] . '"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device['hostname'] . '"></i></a></div>
         ';
     }
-        $actions .= '<div class="col-xs-1"><a href="https://' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" title="Launch browser https://' . $device['hostname'] . '"></i></a></div>
+        $actions .= '<div class="col-xs-1"><a href="https://' . $device['hostname'] . '" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" title="Launch browser https://' . $device['hostname'] . '"></i></a></div>
                 </div>
             </div>
         ';
@@ -208,8 +205,8 @@ foreach (dbFetchRows($sql, $param) as $device) {
     }
 
     if ($subformat == 'detail') {
-        $platform = $device['hardware'] . '<br>' . $device['features'];
-        $os = $device['os_text'] . '<br>' . $device['version'];
+        $platform = $device['hardware'];
+        $os = $device['os_text'] . '<br>' . $device['version'] . (empty($device['features'])? "" : " ({$device['features']})");
         $device['ip'] = inet6_ntop($device['ip']);
         $uptime = formatUptime($device['uptime'], 'short');
         $hostname .= '<br />' . get_device_name($device);

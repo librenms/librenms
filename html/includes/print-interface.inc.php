@@ -5,7 +5,7 @@ $(function () {
 </script>
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Util\IP;
 
 // This file prints a table row for each interface
@@ -43,7 +43,7 @@ if (dbFetchCell('SELECT COUNT(*) FROM `mac_accounting` WHERE `port_id` = ?', arr
 echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='{$config['list_colour']['highlight']}';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" style='cursor: pointer;'>
     <td valign=top width=350>";
 
-if (Auth::user()->hasGlobalRead()) {
+if (LegacyAuth::user()->hasGlobalRead()) {
     $port_data = array_to_htmljson($port);
     echo '<i class="fa fa-tag" data-toggle="popover" data-content="'.$port_data.'" data-html="true"></i>';
 }

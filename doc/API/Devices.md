@@ -1,4 +1,5 @@
 source: API/Devices.md
+path: blob/master/doc/
 
 ### `del_device`
 
@@ -768,6 +769,7 @@ Input:
   - order: How to order the output, default is by hostname. Can be prepended by DESC or ASC to change the order.
   - type: can be one of the following to filter or search by:
     - all: All devices
+    - active: Only not ignored and not disabled devices
     - ignored: Only ignored devices
     - up: Only devices that are up
     - down: Only devices that are down
@@ -845,7 +847,7 @@ For SNMP v1 or v2c
 
 For SNMP v3
 
-  - authlevel: SNMP authlevel (NoAuthNoPriv, AuthNoPriv, AuthPriv).
+  - authlevel: SNMP authlevel (noAuthNoPriv, authNoPriv, authPriv).
   - authname: SNMP Auth username
   - authpass: SNMP Auth password
   - authalgo: SNMP Auth algorithm (MD5, SHA)

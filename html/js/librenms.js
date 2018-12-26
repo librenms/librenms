@@ -269,3 +269,232 @@ $(document).ready(function() {
         }
     });
 });
+
+function refresh_oxidized_node(device_hostname){
+    $.ajax({
+        type: 'POST',
+        url: 'ajax_form.php',
+        data: {
+            type: "refresh-oxidized-node",
+            device_hostname: device_hostname
+        },
+        success: function (data) {
+            if(data['status'] == 'ok') {
+                toastr.success(data['message']);
+            } else {
+                toastr.error(data['message']);
+            }
+        },
+        error:function(){
+            toastr.error('An error occured while queuing refresh for an oxidized node (hostname: ' + device_hostname + ')');
+        }
+    });
+}
+
+$(document).ready(function () {
+    setInterval(function () {
+        $('.bootgrid-table').each(function() {
+            $(this).bootgrid('reload');
+        });
+    }, 300000);
+});
+
+var jsFilesAdded = [];
+var jsLoadingFiles = {};
+function loadjs(filename, func){
+    if (jsFilesAdded.indexOf(filename) < 0) {
+        if (filename in jsLoadingFiles) {
+            // store all waiting callbacks
+            jsLoadingFiles[filename].push(func);
+        } else {
+            // first request, load the script store the callback for this request
+            jsLoadingFiles[filename] = [func];
+            $.getScript(filename, function () {
+                // finish loading the script, call all waiting callbacks
+                jsFilesAdded.push(filename);
+                for (var i = 0; i < jsLoadingFiles[filename].length; i++) {
+                    jsLoadingFiles[filename][i]();
+                }
+                delete jsLoadingFiles[filename];
+            });
+        }
+    } else {
+        func();
+    }
+}
+
+function init_map(id, engine, api_key, config) {
+    var leaflet = L.map(id);
+    var baseMaps = {};
+    leaflet.setView([0, 0], 15);
+
+    if (engine === 'google') {
+        loadjs('https://maps.googleapis.com/maps/api/js?key=' + api_key, function () {
+            loadjs('js/Leaflet.GoogleMutant.js', function () {
+                var roads = L.gridLayer.googleMutant({
+                    type: 'roadmap'	// valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
+                });
+                var satellite = L.gridLayer.googleMutant({
+                    type: 'satellite'
+                });
+
+                baseMaps = {
+                    "Streets": roads,
+                    "Satellite": satellite
+                };
+                L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+                roads.addTo(leaflet);
+            });
+        });
+    } else if (engine === 'bing') {
+        loadjs('js/leaflet-bing-layer.min.js', function () {
+            var roads = L.tileLayer.bing({
+                bingMapsKey: api_key,
+                imagerySet: 'RoadOnDemand'
+            });
+            var satellite = L.tileLayer.bing({
+                bingMapsKey: api_key,
+                imagerySet: 'AerialWithLabelsOnDemand'
+            });
+
+            baseMaps = {
+                "Streets": roads,
+                "Satellite": satellite
+            };
+            L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+            roads.addTo(leaflet);
+        });
+    } else if (engine === 'mapquest') {
+        loadjs('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key=' + api_key, function () {
+            var roads = MQ.mapLayer();
+            var satellite = MQ.hybridLayer();
+
+            baseMaps = {
+                "Streets": roads,
+                "Satellite": satellite
+            };
+            L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+            roads.addTo(leaflet);
+        });
+    } else {
+        var osm = L.tileLayer('//' + config.tile_url + '/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        });
+
+        // var esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        //     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        // });
+        //
+        // baseMaps = {
+        //     "OpenStreetMap": osm,
+        //     "Satellite": esri
+        // };
+        // L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+        osm.addTo(leaflet);
+    }
+
+    if (location.protocol === 'https:') {
+        // can't request location permission without https
+        L.control.locate().addTo(leaflet);
+    }
+
+    return leaflet;
+}
+
+function init_map_marker(leaflet, latlng) {
+    var marker = L.marker(latlng);
+    marker.addTo(leaflet);
+    leaflet.setView(latlng);
+
+    // move marker on drag
+    leaflet.on('drag', function () {
+        marker.setLatLng(leaflet.getCenter());
+    });
+    // center map on zoom
+    leaflet.on('zoom', function () {
+        leaflet.setView(marker.getLatLng());
+    });
+
+    return marker;
+}
+
+function update_location(id, latlng, callback) {
+    $.ajax({
+        method: 'PATCH',
+        url: "ajax/location/" + id,
+        data: {lat: latlng.lat, lng: latlng.lng}
+    }).success(function () {
+        toastr.success('Location updated');
+        typeof callback === 'function' && callback(true);
+    }).error(function (e) {
+        var msg = 'Failed to update location: ' + e.statusText;
+        var data = e.responseJSON;
+        if (data) {
+            if (data.hasOwnProperty('lat')) {
+                msg = data.lat.join(' ') + '<br />';
+            }
+            if (data.hasOwnProperty('lng')) {
+                if (!data.hasOwnProperty('lat')) {
+                    msg = '';
+                }
+
+                msg += data.lng.join(' ')
+            }
+        }
+
+        toastr.error(msg);
+        typeof callback === 'function' && callback(false);
+
+    });
+}
+
+function http_fallback(link) {
+    var url = link.getAttribute('href');
+    try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, false);
+        xhr.timeout = 2000;
+        xhr.send(null);
+
+        if (xhr.status !== 200) {
+            url = url.replace(/^https:\/\//, 'http://');
+        }
+    } catch (e) {
+        url = url.replace(/^https:\/\//, 'http://');
+    }
+
+    window.open(url, '_blank');
+    return false;
+}
+
+function init_select2(selector, type, data, selected) {
+    var $select = $(selector);
+
+    // allow function to be assigned to pass data
+    var data_function = function(params) {
+        data.term = params.term;
+        data.page = params.page || 1;
+        return data;
+    };
+    if ($.isFunction(data)) {
+        data_function = data;
+    }
+
+    $select.select2({
+        theme: "bootstrap",
+        dropdownAutoWidth : true,
+        width: "auto",
+        allowClear: true,
+        ajax: {
+            url: 'ajax/select/' + type,
+            delay: 150,
+            data: data_function
+        }
+    });
+
+    if (selected) {
+        $select.val(selected);
+        $select.trigger('change');
+    }
+}

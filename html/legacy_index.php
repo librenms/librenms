@@ -11,7 +11,6 @@
  *
  */
 
-use LibreNMS\Authentication\Auth;
 use LibreNMS\Config;
 
 if (empty($_SERVER['PATH_INFO'])) {
@@ -25,12 +24,6 @@ if (empty($_SERVER['PATH_INFO'])) {
 
 // Set variables
 $msg_box = array();
-// Check for install.inc.php
-if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
-    // no config.php does so let's redirect to the install
-    header("Location: " . rtrim(Config::get('base_url'), '/') . "/install.php");
-    exit;
-}
 
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
@@ -104,10 +97,12 @@ if (empty($config['favicon'])) {
   <link href="css/leaflet.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
+  <link href="css/L.Control.Locate.min.css" rel="stylesheet" type="text/css" />
   <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
   <link href="css/select2.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="css/query-builder.default.min.css" rel="stylesheet" type="text/css" />
-  <link href="<?php echo($config['stylesheet']);  ?>?ver=291727421" rel="stylesheet" type="text/css" />
+  <link href="<?php echo($config['stylesheet']);  ?>?ver=20181201" rel="stylesheet" type="text/css" />
   <link href="css/<?php echo $config['site_style']; ?>.css?ver=632417642" rel="stylesheet" type="text/css" />
 <?php
 
@@ -116,6 +111,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
 }
 
 ?>
+  <script src="js/polyfill.min.js"></script>
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
@@ -141,7 +137,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
     }
     ?>
   <script src="js/select2.min.js"></script>
-  <script src="js/librenms.js?ver=20180511"></script>
+  <script src="js/librenms.js?ver=20181221"></script>
   <script type="text/javascript">
 
     <!-- Begin
@@ -188,33 +184,13 @@ if (isset($devel) || isset($vars['devel'])) {
     echo("</pre>");
 }
 
-if (Auth::check()) {
-    // Authenticated. Print a page.
-    if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php")) {
-        require "pages/" . $vars['page'] . ".inc.php";
-    } else {
-        if (isset($config['front_page']) && is_file($config['front_page'])) {
-            require $config['front_page'];
-        } else {
-            require 'pages/front/default.php';
-        }
-    }
+if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php")) {
+    require "pages/" . $vars['page'] . ".inc.php";
 } else {
-    // Not Authenticated. Show status page if enabled
-    if ($config['public_status'] === true) {
-        if (isset($vars['page']) && strstr("login", $vars['page'])) {
-            require 'pages/logon.inc.php';
-        } else {
-            echo '<div id="public-status">';
-            require 'pages/public.inc.php';
-            echo '</div>';
-            echo '<div id="public-logon" style="display:none;">';
-            echo '<div class="well"><h3>Logon<button class="btn btn-default" type="submit" style="float:right;" id="ToggleStatus">Status</button></h3></div>';
-            require 'pages/logon.inc.php';
-            echo '</div>';
-        }
+    if (isset($config['front_page']) && is_file($config['front_page'])) {
+        require $config['front_page'];
     } else {
-        require 'pages/logon.inc.php';
+        require 'pages/front/default.php';
     }
 }
 ?>
@@ -277,31 +253,6 @@ echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" r
 <?php
 }
 
-// Pre-flight checks
-$rrd_dir = Config::get('rrd_dir');
-if (!is_dir($rrd_dir)) {
-    $msg_box[] = ['type' => 'error', 'message' => "RRD Log Directory is missing ($rrd_dir).  Graphing may fail."];
-}
-
-$temp_dir = Config::get('temp_dir');
-if (!is_dir($temp_dir)) {
-    $msg_box[] = ['type' => 'error', 'message' => "Temp Directory is missing ($temp_dir).  Graphing may fail."];
-} elseif (!is_writable($temp_dir)) {
-    $msg_box[] = ['type' => 'error', 'message' => "Temp Directory is not writable ($temp_dir).  Graphing may fail."];
-}
-
-if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute) AND `ignore` = 0 AND `disabled` = 0 AND status = 1", array()) > 0) {
-    $msg_box[] = ['type' => 'warning', 'message' => "<a href=\"poll-log/filter=unpolled/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled'];
-}
-
-foreach (dbFetchRows('SELECT `notifications`.* FROM `notifications` WHERE NOT exists( SELECT 1 FROM `notifications_attribs` WHERE `notifications`.`notifications_id` = `notifications_attribs`.`notifications_id` AND `notifications_attribs`.`user_id` = ?) AND `severity` > 1', array(Auth::id())) as $notification) {
-    $msg_box[] = [
-        'type' => 'error',
-        'message' => "<a href='notifications/'>${notification['body']}</a>",
-        'title' => $notification['title']
-    ];
-}
-
 if (is_array($msg_box)) {
     echo "<script>
         toastr.options.timeout = 10;
@@ -312,8 +263,6 @@ if (is_array($msg_box)) {
     foreach ($msg_box as $message) {
         Toastr::add($message['type'], $message['message'], $message['title']);
     }
-
-    echo Toastr::render();
 }
 
 if ($no_refresh !== true && $config['page_refresh'] != 0) {
@@ -380,6 +329,8 @@ if ($no_refresh !== true && $config['page_refresh'] != 0) {
      });
 </script>');
 }
+
+echo Toastr::render();
 
 ?>
 </body>

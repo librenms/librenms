@@ -28,13 +28,15 @@ $config['project_id']   = strtolower($config['project_name']);
 $config['temp_dir']    = '/tmp';
 $config['log_dir']     = $config['install_dir'].'/logs';
 
-// MySQL extension to use
-$config['db']['extension']       = 'mysqli';
 // MySQL Debug level
 $config['mysql_log_level']       = 'ERROR';
 
-//MySQL port
+//MySQL Settings
 $config['db_port']               = 3306;
+$config['db_socket']             = null;
+$config['db_name']               = 'librenms';
+$config['db_user']               = 'librenms';
+$config['db_pass']               = null;
 $config['db_socket']             = null;
 
 // What is my own hostname (used to identify this host in its own database)
@@ -516,6 +518,7 @@ $config['billing']['base'] = 1000;
 // Set the base to divider bytes to kB, MB, GB ,... (1000|1024)
 // External Integration
 // $config['rancid_configs'][]             = '/var/lib/rancid/network/configs/';
+$config['rancid_repo_type'] = 'svn';
 $config['rancid_ignorecomments'] = 0;
 // Ignore lines starting with #
 // $config['collectd_dir']                 = '/var/lib/collectd/rrd';
@@ -693,7 +696,7 @@ $config['ignore_mount_regexp'][] = '/on: \/junos\/dev/';
 $config['ignore_mount_regexp'][] = '/on: \/jail\/dev/';
 $config['ignore_mount_regexp'][] = '/^(dev|proc)fs/';
 $config['ignore_mount_regexp'][] = '/^\/dev\/md0/';
-$config['ignore_mount_regexp'][] = '/^\/var\/dhcpd\/dev,/';
+$config['ignore_mount_regexp'][] = '/^\/var\/dhcpd\/dev/';
 $config['ignore_mount_regexp'][] = '/UMA/';
 
 $config['ignore_mount_removable'] = 1;
@@ -779,6 +782,7 @@ $config['poller_modules']['cisco-voice']                 = false;
 $config['poller_modules']['cisco-cbqos']                 = false;
 $config['poller_modules']['cisco-otv']                   = false;
 $config['poller_modules']['cisco-vpdn']                  = false;
+$config['poller_modules']['nac']                         = false;
 $config['poller_modules']['netscaler-vsvr']              = false;
 $config['poller_modules']['aruba-controller']            = false;
 $config['poller_modules']['entity-physical']             = true;
@@ -913,8 +917,8 @@ $config['unix-agent-read-time-out'] = 10;
 // seconds
 
 // Lat / Lon support for maps
-$config['geoloc']['latlng']                             = true; // True to enable translation of location to latlng co-ordinates
-$config['geoloc']['engine']                             = 'google';
+#$config['geoloc']['latlng']                             = true; // True to enable translation of location to latlng co-ordinates
+#$config['geoloc']['engine']                             = 'google';
 $config['map']['engine']                                = 'leaflet';
 $config['mapael']['default_map']                        = 'maps/world_countries.js';
 $config['leaflet']['default_lat']                       = '51.4800';

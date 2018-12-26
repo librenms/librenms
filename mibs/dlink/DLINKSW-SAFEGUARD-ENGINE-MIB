@@ -1,0 +1,178 @@
+
+
+--  *****************************************************************
+--  DLINKSW-SAFEGUARD-ENGINE-MIB.mib : Safeguard Engine Configuration MIB
+-- 
+--  Copyright (c) 2012 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+	DLINKSW-SAFEGUARD-ENGINE-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS						
+			OBJECT-GROUP, MODULE-COMPLIANCE			
+				FROM SNMPv2-CONF			
+			Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI			
+			TruthValue,
+			RowStatus, 
+			TEXTUAL-CONVENTION			
+				FROM SNMPv2-TC
+			dCpuProtectMIBObjects			
+				FROM DLINKSW-CPU-PROTECT-MIB;
+		
+		dlinkSwSafeguardEngineMIB MODULE-IDENTITY 
+			LAST-UPDATED "201206270000Z"		
+            ORGANIZATION "D-Link Corp."
+            CONTACT-INFO
+                "        D-Link Corporation
+
+                 Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                         Taipei City 114, Taiwan, R.O.C
+                 Tel:     +886-2-66000123
+                 E-mail: tsd@dlink.com.tw
+                "
+			DESCRIPTION 
+				"The MIB module for managing Safeguard engine."
+			REVISION        "201206270000Z"
+            DESCRIPTION
+                "Initial version of this MIB module."	
+			::= { dCpuProtectMIBObjects 1 }
+       
+--
+-- Node definitions
+--
+	
+		dSafeguardEngineMIBNotif        OBJECT IDENTIFIER ::= { dlinkSwSafeguardEngineMIB 0 }		
+		dSafeguardEngineMIBObjects      OBJECT IDENTIFIER ::= { dlinkSwSafeguardEngineMIB 1 }
+		dSafeguardEngineMIBConformance  OBJECT IDENTIFIER ::= { dlinkSwSafeguardEngineMIB 2 }
+		
+--  ***************************************************************************
+--  Safeguard-Engine
+--  ***************************************************************************				
+		
+		dSafeguardEngineState OBJECT-TYPE
+			SYNTAX      INTEGER
+				{ 	enable(1),
+				    disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object is used to configure and show the state of Safeguard Engine."
+			DEFVAL      { disable }
+			::= { dSafeguardEngineMIBObjects 1 }
+		
+		dSafeguardEngineRiseThresh OBJECT-TYPE
+			SYNTAX      INTEGER (20..100)
+			UNITS       "%"
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+				"This object is used to configure and show the rising threshold 
+				of Safeguard Engine."
+			DEFVAL      { 50 }	
+			::= { dSafeguardEngineMIBObjects 2 }
+		
+		dSafeguardEngineFallThresh OBJECT-TYPE
+			SYNTAX      INTEGER (20..100)
+			UNITS       "%"
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+				"This object is used to configure and show the falling 
+				 threshold of Safeguard Engine."
+			DEFVAL      { 20 }	 
+			::= { dSafeguardEngineMIBObjects 3 }
+		
+		dSafeguardEngineCurrentMode OBJECT-TYPE
+			SYNTAX      INTEGER
+				{   normal(1),
+				    exhausted(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object show the current mode of Safeguard Engine."
+			::= { dSafeguardEngineMIBObjects 4 }
+       
+	    dSafeguardEngineNotifEnable OBJECT-TYPE
+		    SYNTAX      TruthValue
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION           
+                "This object specifies whether the system sends notifications to the NMS."                         
+            DEFVAL      { false }    
+            ::= { dSafeguardEngineMIBObjects 5 }	
+			
+--  ***************************************************************************	
+--  Notification
+--  ***************************************************************************		
+        dSafeguardChgToExhausted NOTIFICATION-TYPE
+            OBJECTS {   dSafeguardEngineCurrentMode   }
+            STATUS      current
+            DESCRIPTION 
+                "This trap indicates System change operation mode from normal to exhausted."
+            ::= { dSafeguardEngineMIBNotif 1 }
+
+        dSafeguardChgToNormal NOTIFICATION-TYPE
+            OBJECTS {   dSafeguardEngineCurrentMode   }
+            STATUS      current
+            DESCRIPTION 
+                "This trap indicates System change operation mode from exhausted to normal."
+            ::= { dSafeguardEngineMIBNotif 2 }
+        	
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************			   		
+	    dSafeguardEngineCompliances OBJECT IDENTIFIER ::= { dSafeguardEngineMIBConformance 1 }
+	
+	    dSafeguardEngineCompliance MODULE-COMPLIANCE
+	        STATUS      current
+	        DESCRIPTION 
+		        "The compliance statement for entities which implement the 
+		        DLINKSW-SAFEGUARD-ENGINE-MIB."
+	        MODULE -- this module
+	        MANDATORY-GROUPS    
+	            {   dSafeguardEngineGroup,
+	                dSafeguardEngNotifEnableGroup,
+		            dSafeguardEngineNotifGroup
+		        }		    			
+		    ::= { dSafeguardEngineCompliances 1 }
+
+		
+        dSafeguardEngineGroups OBJECT IDENTIFIER ::= { dSafeguardEngineMIBConformance 2 }
+		
+        dSafeguardEngineGroup OBJECT-GROUP
+	        OBJECTS 
+	        {   dSafeguardEngineState, 
+	            dSafeguardEngineRiseThresh, 
+	            dSafeguardEngineFallThresh, 
+	            dSafeguardEngineCurrentMode 
+	        }
+	        STATUS      current
+	        DESCRIPTION 
+		        "A collection of objects providing the configuration or inforamtion about Safeguard Engine."
+	        ::= { dSafeguardEngineGroups 1 }
+		
+        dSafeguardEngNotifEnableGroup OBJECT-GROUP        
+            OBJECTS {   dSafeguardEngineNotifEnable }
+            STATUS      current
+            DESCRIPTION
+                "A collection of object(s) that provides control over
+                Safeguard Engine related notification(s)."
+            ::= { dSafeguardEngineGroups 2 }
+    
+        dSafeguardEngineNotifGroup NOTIFICATION-GROUP
+            NOTIFICATIONS    
+                {   dSafeguardChgToExhausted,
+                    dSafeguardChgToNormal 
+                }
+            STATUS      current
+            DESCRIPTION
+                "A collection of notifications providing information 
+                about the System mode change of Safeguard Engine."
+            ::= { dSafeguardEngineGroups 3}
+	   	
+	END
+
