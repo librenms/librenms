@@ -47,7 +47,7 @@
             },
             {
                 "metric": "AttrMisses",
-                "value": "2766941",
+                "value": "3466788.0",
                 "value_prev": null,
                 "app_type": "fbsd-nfs-client"
             },
