@@ -1,0 +1,58 @@
+mib: HUAWEI-DEVICE-MIB
+modules:
+  sensors:
+    pre-cache:
+      data:
+          - oid:
+              - hwFrameTypeName
+              - hwFrameIndex
+              - hwSlotIndex
+              - hwSlotTypeName
+
+    state:
+      data:
+        -
+          oid: hwFrameOperStatus
+          num_oid: '.1.3.6.1.4.1.2011.6.3.3.1.1.5.{{ $index }}'
+          index: hwFrameIndex
+          descr: "Frame {{ $hwFrameIndex }} ({{ $hwFrameTypeName }}) Status"
+          state_name: hwFrameOperStatus
+          states:
+            - { value: 1, generic: 0, graph: 1, descr: 'normal' }
+            - { value: 2, generic: 3, graph: 1, descr: 'fault' }
+            - { value: 3, generic: 2, graph: 1, descr: 'other' }
+            - { value: 4, generic: 2, graph: 1, descr: 'discovery' }
+            - { value: 5, generic: 2, graph: 1, descr: 'mismatch' }
+            - { value: 6, generic: 3, graph: 1, descr: 'offline' }
+        -
+          oid: hwSlotOperStatus
+          num_oid: '.1.3.6.1.4.1.2011.6.3.3.2.1.8.{{ $index }}'
+          descr: "Slot {{ $hwSlotIndex }} ({{ $hwSlotTypeName }}) Status"
+          state_name: hwSlotOperStatus
+          states:
+            - { value: 1, generic: 0, graph: 1, descr: 'online' }
+            - { value: 2, generic: 0, graph: 1, descr: 'normal' }
+            - { value: 3, generic: 3, graph: 1, descr: 'fault' }
+            - { value: 4, generic: 2, graph: 1, descr: 'forbidden' }
+            - { value: 5, generic: 2, graph: 1, descr: 'autofind' }
+            - { value: 6, generic: 2, graph: 1, descr: 'config' }
+            - { value: 7, generic: 3, graph: 1, descr: 'offline' }
+            - { value: 8, generic: 3, graph: 1, descr: 'abnormal' }
+            - { value: 9, generic: 2, graph: 1, descr: 'versionerr' }
+            - { value: 10, generic: 2, graph: 1, descr: 'autoload' }
+            - { value: 11, generic: 2, graph: 1, descr: 'outofservice' }
+            - { value: 12, generic: 2, graph: 1, descr: 'graceful' }
+            - { value: 13, generic: 3, graph: 1, descr: 'shutdown' }
+            - { value: 14, generic: 2, graph: 1, descr: 'energysavingshutdown' }
+            - { value: 15, generic: 2, graph: 1, descr: 'hightemperatureshutdown' }
+            - { value: 16, generic: 2, graph: 1, descr: 'manualshutdown' }
+            - { value: 17, generic: 2, graph: 1, descr: 'mismatch' }
+            - { value: 18, generic: 2, graph: 1, descr: 'acoffshutdown' }
+
+    temperature:
+      data:
+        -
+          oid: hwSlotTemprature
+          num_oid: '.1.3.6.1.4.1.2011.6.3.3.2.1.13.{{ $index }}'
+          descr: "Slot {{ $hwSlotIndex }} ({{ $hwSlotTypeName }})"
+          skip_value_gt: 999
