@@ -10,3 +10,5 @@ over:
 discovery:
     - sysDescr:
         - 'Huawei Integrated Access Software'
+mib_dir:
+   - huawei
