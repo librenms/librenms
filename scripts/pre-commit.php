@@ -122,13 +122,13 @@ if (check_opt($options, 'db')) {
 }
 
 // No php files, skip the php checks.
-if ($map['php'] === 0) {
+if (!empty($changed_files) && $map['php'] === 0) {
     putenv('SKIP_LINT_CHECK=1');
     putenv('SKIP_STYLE_CHECK=1');
 }
 
 // If we have no php files and no OS' found then also skip unit checks.
-if ($map['php'] === 0 && empty($map['os']) && !$os) {
+if (!empty($changed_files) && $map['php'] === 0 && empty($map['os']) && !$os) {
     putenv('SKIP_UNIT_CHECK=1');
 }
 
