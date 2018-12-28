@@ -13,7 +13,7 @@ if (getenv('FILES')) {
     $changed_files = exec("git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
 }
 
-$changed_files = explode(' ', $changed_files);
+$changed_files = $changed_files ? explode(' ', $changed_files) : [];
 
 $map = [
     'docs'   => 0,
