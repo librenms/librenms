@@ -181,7 +181,7 @@ if ($polled_devices) {
     ), 'perf_times');
 }
 
-$string = $argv[0]." $doing ".date($config['dateformat']['compact'])." - $polled_devices devices polled in $poller_time secs";
+$string = $argv[0]." $doing ".date($config['dateformat']['compact'])." - $polled_devices devices polled in $poller_time secs (ID: ".$device['device_id'].")";
 d_echo("$string\n");
 
 if (!isset($options['q'])) {
