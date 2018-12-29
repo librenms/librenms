@@ -1,0 +1,886 @@
+--  ============================================================================
+-- Copyright (C)2011  by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description:  The MIB module defines MIB objects which provide 
+--               device management NMS interfaces.     
+-- Reference:  
+-- Version: V1.18
+-- ============================================================================
+
+	HWMUSA-DEV-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			hwFrameIndex, hwSlotIndex
+				FROM HUAWEI-DEVICE-MIB			
+			hwProducts			
+				FROM HUAWEI-MIB			
+			HWPCBType,HWFrameType			
+				FROM HUAWEI-TC-MIB			
+			Integer32, OBJECT-TYPE,Unsigned32,MODULE-IDENTITY		
+				FROM SNMPv2-SMI
+			RowStatus, DateAndTime
+				FROM SNMPv2-TC;	
+				
+		musa MODULE-IDENTITY
+			LAST-UPDATED "201201180000Z"
+			ORGANIZATION
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO                                        
+			        "Huawei Industrial Base                
+			         Bantian, Longgang                     
+			         Shenzhen 518129                       
+			         People's Republic of China            
+			         Website: http://www.huawei.com        
+			         Email: support@huawei.com             
+			        "                                      
+			DESCRIPTION
+				"
+				The MIB module defines MIB objects which provide device management NMS interfaces.
+				"
+		--  Revision history 
+		  	REVISION    "201203310000Z"
+		  	DESCRIPTION "V1.18, Added enumerated value 0x02000173 to hwMusaBoardLatestResetCause's value list."
+		  
+		  	REVISION    "201201170000Z"
+			DESCRIPTION "V1.17, Added hwMusaFramePowerSupplyTable node."
+
+			REVISION    "201111180000Z"
+			DESCRIPTION "V1.16, Added enumerated value dcAndRemote(8) and acAndDc(9) to hwMusaFramePowerMode's value list."
+		
+		  	REVISION    "201107080000Z"
+			DESCRIPTION "V1.15, Time and type of last Board reset on OLT devices."
+			
+			REVISION    "201101120000Z"
+			DESCRIPTION "V1.14, Added enumerated value acRemote(7) to hwMusaFramePowerMode's value list.."
+
+			REVISION    "201011100000Z"
+			DESCRIPTION "V1.13, Modified the description of hwMusaSlotConfExtTable, hwMusaSlotConfExtEntry, hwMusaBoardTemperature,
+									hwMusaSlotAverageConfTable, hwMusaSlotAverageConfEntry, hwMusaBoardStatisticTime, hwXPONBoardParaTable, hwXPONBoardParaEntry,
+									hwBroadBandFrameOperTable, hwBroadBandFrameOperEntry and hwIasConfigChangeEntry."
+					
+			REVISION    "201008190000Z"
+			DESCRIPTION "V1.12, Modified the description of the objects in this MIB file for MIB standardization."
+		
+			REVISION    "201003240000Z"
+			DESCRIPTION "V1.11, Modified this MIB for clearing simple tester errors and warnings."
+			
+			REVISION    "201002220000Z"
+			DESCRIPTION "V1.10, Added enumerated value pd(6) to hwMusaFramePowerMode's value list."
+			
+			REVISION    "201002100000Z"
+			DESCRIPTION "V1.09, Modified MIB descriptions."
+			
+			REVISION    "201002030000Z"
+			DESCRIPTION "V1.08, Cleared compile warnings."
+			
+			REVISION    "200907220000Z"
+			DESCRIPTION "V1.07, Added enumerated value linePowered(5) to hwMusaFramePowerMode's value list."
+			
+			REVISION    "200907200000Z"
+			DESCRIPTION "V1.06, Added hwMusaFramePower, hwMusaBoardPower, and hwMusaBoardActivedPortNum."
+			
+			REVISION    "200611270000Z"
+			DESCRIPTION "V1.00, Initial version."
+
+		::= { hwProducts 6 }
+				
+		ias OBJECT IDENTIFIER ::= { musa 7 }
+		
+		hwIasDev OBJECT IDENTIFIER ::= { ias 1 }
+		
+		hwMusaSlotConf OBJECT IDENTIFIER ::= { hwIasDev 1 }
+		
+		hwMusaFrameExtTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwMusaFrameExtEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			Frame description extended table.The table describes the bandwidth of the frame,
+			and also contains the EMU and slot information of the frame.
+			The index of this table is hwFrameIndex. It is the frame ID.
+			"
+		::= { hwMusaSlotConf 1 }
+		
+		hwMusaFrameExtEntry OBJECT-TYPE
+		SYNTAX HwMusaFrameExtEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			Frame description extended table.The table describes the bandwidth of the frame,
+			and also contains the EMU and slot information of the frame.
+			The index of this entry is hwFrameIndex. It is the frame ID.
+			"
+
+		INDEX { hwFrameIndex }
+		::= { hwMusaFrameExtTable 1 }
+		
+		HwMusaFrameExtEntry ::=
+			SEQUENCE { 
+				hwMusaFrameLimtBandWidth
+					Integer32,
+				hwMusaFrameDistBandWidth
+					Integer32,
+				hwMusaFrameTestGroupID
+					Integer32,
+				hwMusaFrameEmuId1
+					Integer32,
+				hwMusaFrameEmuId2
+					Integer32,
+				hwMusaFrameEmuId3
+					Integer32,
+				hwMusaFrameEmuId4
+					Integer32,
+				hwMusaFrameEmuId5
+					Integer32,
+				hwMusaFrameSlotConnection
+					OCTET STRING,
+				hwMusaFramePowerMode
+					INTEGER,
+				hwMusaFramePower
+					Integer32        
+			 }
+
+		hwMusaFrameLimtBandWidth OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Frame limit bandwidth,the maximum bandwidth of the frame. 
+			Unit: K. It is used in debug mode. 1G = 1000M.
+			"
+		::= { hwMusaFrameExtEntry 1 }
+		
+		hwMusaFrameDistBandWidth OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Frame distributed bandwidth.
+			Unit: K. It is used in debug mode. 1G = 1000M.
+			"
+		::= { hwMusaFrameExtEntry 2 }
+		
+		hwMusaFrameTestGroupID OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwMusaFrameExtEntry 3 }
+		
+		hwMusaFrameEmuId1 OBJECT-TYPE
+		SYNTAX Integer32 (0..63)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwMusaFrameExtEntry 4 }
+		
+		hwMusaFrameEmuId2 OBJECT-TYPE
+		SYNTAX Integer32 (0..63)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwMusaFrameExtEntry 5 }
+		
+		hwMusaFrameEmuId3 OBJECT-TYPE
+		SYNTAX Integer32 (0..63)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwMusaFrameExtEntry 6 }
+		
+		hwMusaFrameEmuId4 OBJECT-TYPE
+		SYNTAX Integer32 (0..63)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwMusaFrameExtEntry 7 }
+		
+		hwMusaFrameEmuId5 OBJECT-TYPE
+		SYNTAX Integer32 (0..63)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwMusaFrameExtEntry 8 }
+
+		hwMusaFrameSlotConnection OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwMusaFrameExtEntry 9 }
+			
+		hwMusaFramePowerMode OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			localac(1),
+			localdc(2),
+			localacBackuppower(3),  
+			backuppower(4),
+			remotedc(5),
+			pd(6),
+			remoteac(7),
+			localdcAndRemotedc(8),
+			localacAndlocaldc(9)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Frame power supply mode.
+			Options:
+			1.localac(1)            -local 220V AC power supply   
+			2.localdc(2)            -local DC power supply     
+			3.localacBackuppower(3) -AC power and backuppower supply
+			4.backuppower(4)        -accumulator supply
+			5.remotedc(5)           -remote line +/-190V high voltage power supply of DC
+			6.pd(6)                 -powered device supply
+			7.remoteac(7)           -remote 60V AC power supply
+			8.localdcAndRemotedc(8) -DC power and Remote power are provided at the same time
+			9.localacAndlocaldc(9)  -DC power and AC power are provided at the same time
+			"
+		::= { hwMusaFrameExtEntry 10 }
+			
+		hwMusaFramePower OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The total power of the frame. 
+			It includes the power of service boards, active control board, standby control board,
+			interface boards, and environment monitoring boards.
+			Unit: watt.
+			"
+		::= { hwMusaFrameExtEntry 11 }
+
+		hwMusaSlotConfExtTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwMusaSlotConfExtEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			Board description extended table. 
+			The tabel is used for describing the extended information 
+			about all boards in each slot of the shelf.			
+			The indexes of this table are hwFrameIndex and hwSlotIndex.
+			"
+		::= { hwMusaSlotConf 2 }
+		
+		hwMusaSlotConfExtEntry OBJECT-TYPE
+		SYNTAX HwMusaSlotConfExtEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			Board description extended table. 
+			The tabel is used for describing the extended information 
+			about all boards in each slot of the shelf.			
+			The indexes of this entry are hwFrameIndex and hwSlotIndex.
+			"
+		INDEX { hwFrameIndex, hwSlotIndex }
+		::= { hwMusaSlotConfExtTable 1 }
+		
+		HwMusaSlotConfExtEntry ::=
+			SEQUENCE { 
+				hwMusaBoardLimitBandWidthUp
+					Integer32,
+				hwMusaBoardLimitBandWidthDown
+					Integer32,
+				hwMusaBoardHasBandWidthUp
+					Integer32,
+				hwMusaBoardHasBandWidthDown
+					Integer32,
+				hwMusaBoardCpuRate
+					Integer32,
+				hwMusaBoardRamUseRate
+					Integer32,
+				hwMusaBoardSlotDesc
+					OCTET STRING,
+				hwMusaBoardOnlineState
+				    INTEGER,
+				hwMusaServiceChannelBufferRate
+				    Integer32,
+				hwMusaBoardTemperature				        
+				    Integer32,
+				hwMusaBoardPower
+				    Integer32,
+				hwMusaBoardActivedPortNum
+				    Integer32,
+				hwMusaBoardLatestResetTime
+				    DateAndTime,
+				hwMusaBoardLatestResetCause
+				    Integer32
+			 }
+
+		hwMusaBoardLimitBandWidthUp OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwMusaSlotConfExtEntry 1 }
+		
+		hwMusaBoardLimitBandWidthDown OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwMusaSlotConfExtEntry 2 }
+		
+		hwMusaBoardHasBandWidthUp OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwMusaSlotConfExtEntry 3 }
+		
+		hwMusaBoardHasBandWidthDown OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwMusaSlotConfExtEntry 4 }
+		
+		hwMusaBoardCpuRate OBJECT-TYPE
+		SYNTAX Integer32 (-1 | 0..100)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Active and standby control board CPU usage. 
+			It does not support RSP, PV8, BAS, or other boards.
+			-1 indicates that the device cannot get the value, e.g. the board does not support this operation, or the board state is abnormal.
+			"
+		::= { hwMusaSlotConfExtEntry 5 }
+		
+		hwMusaBoardRamUseRate OBJECT-TYPE
+		SYNTAX Integer32 ( -1 | 0..100)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Active and standby control board RAM usage.
+			It does not support RSP, PV8, BAS, AIC, or other boards.
+			-1 indicates that the device cannot get the value, e.g. the board does not support this operation, or the board state is abnormal.
+			"
+		::= { hwMusaSlotConfExtEntry 6 }
+			
+		hwMusaBoardSlotDesc OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (0..64))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"				
+			Slot information description.
+			It describes the name of the slot.
+			"
+		::= { hwMusaSlotConfExtEntry 7 }
+			
+			
+		hwMusaBoardOnlineState OBJECT-TYPE
+		SYNTAX INTEGER 
+			{
+			online(1),
+			offline(2),
+			unmanageable(3)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Board online state.
+			Options:
+			1.online(1)       -board is online
+			2.offline(2)      -board is offline
+			3.unmanageable(3) -board is faulty
+			"
+		::= { hwMusaSlotConfExtEntry 8 }  
+			
+		hwMusaServiceChannelBufferRate OBJECT-TYPE
+		SYNTAX Integer32 (-1 | 0..100)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Service channel buffer usage.
+			It only supports the xDSL service board on the MA5600 and the MA5600T product.
+			-1 indicates that the device cannot get the value, e.g. the board does not support this operation, or the board state is abnormal.
+			"
+		::= { hwMusaSlotConfExtEntry 9 }
+			
+		hwMusaBoardTemperature OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Board temperature.The value 0X7FFFFFF indicates invalid temperature.
+			It only supports the H801SCUB and H801SCUL boards.
+			"
+		::= { hwMusaSlotConfExtEntry 10 }
+			
+		hwMusaBoardPower OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The power of the board.
+			Unit: watt.
+			"
+		::= { hwMusaSlotConfExtEntry 11 }
+			
+		hwMusaBoardActivedPortNum OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The number of activated ports on one board.
+			"
+		::= { hwMusaSlotConfExtEntry 12 }
+		
+		hwMusaBoardLatestResetTime OBJECT-TYPE
+		SYNTAX DateAndTime
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The latest reset time of the board.
+			"
+		::= { hwMusaSlotConfExtEntry 13 }
+		
+		hwMusaBoardLatestResetCause OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The latest reset cause of the board.
+			0x00000000 - There is no reset record of the board. 
+			0x02000000 - The communication with the control board is abnormal. 
+			0x02000165 - COM user delivers board reset command. 
+			0x02000167 - NMS user delivers board reset command.
+			0x02000169 - Telnet user delivers board reset command. 
+			0x0200016b - User add board manually.  
+			0x020000a1 - The board temperature is too high, which causes the shutdown of the board. 
+			0x02000173 - The board resets because the working mode is changed.
+			0x02000181 - The service board is automatically shut down when it is not configured with any service. 
+			0x02000182 - The service board is automatically shut down when the mains supply is interrupted. 
+			0x020001b5 - The board is loosened or is removed forcibly.
+			0x0700000a - The active/standby switchover command is manually delivered.
+			"
+		::= { hwMusaSlotConfExtEntry 14 }
+			
+		hwMusaSlotAverageConfTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwMusaSlotAverageConfEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			The indexes of this table are hwFrameIndex and hwSlotIndex.
+			This table is not supported.
+			"
+		::= { hwMusaSlotConf 3 }
+			
+		hwMusaSlotAverageConfEntry OBJECT-TYPE
+		SYNTAX HwMusaSlotAverageConfEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			The indexes of this entry are hwFrameIndex and hwSlotIndex.
+			This table is not supported.
+			"
+		INDEX { hwFrameIndex, hwSlotIndex, hwMusaBoardStatisticTime }
+		::= { hwMusaSlotAverageConfTable 1 }
+		
+		HwMusaSlotAverageConfEntry ::=
+			SEQUENCE { 
+				hwMusaBoardStatisticTime
+					INTEGER,
+				hwMusaBoardCpuAverageRate
+					Integer32
+			 }
+
+		hwMusaBoardStatisticTime OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			five-seconds(1),
+			one-minute(2),
+			ten-minutes(3)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.   
+			Options:
+			1. five-seconds(1) -five seconds
+			2. one-minute(2)   -one minute
+			3. ten-minutes(3)  -ten minutes 
+			"
+		::= { hwMusaSlotAverageConfEntry 1 }
+			
+		hwMusaBoardCpuAverageRate OBJECT-TYPE
+		SYNTAX Integer32 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwMusaSlotAverageConfEntry 2 }
+
+		hwXPONBoardParaTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwXPONBoardParaEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			" 
+			The indexes of this table are hwFrameIndex and hwSlotIndex.
+			This table is not supported. 
+			"
+		::= { hwMusaSlotConf 4 }
+                       
+		hwXPONBoardParaEntry OBJECT-TYPE
+		SYNTAX HwXPONBoardParaEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			" 
+			The indexes of this entry are hwFrameIndex and hwSlotIndex.
+			This table is not supported.
+			 "
+		INDEX { hwXPONBoardParaFrameIndex, hwXPONBoardParaSlotIndex }
+		::= { hwXPONBoardParaTable 1 }
+		
+		HwXPONBoardParaEntry ::=
+			SEQUENCE { 
+				hwXPONBoardParaFrameIndex
+					Integer32,
+				hwXPONBoardParaSlotIndex
+					Integer32,
+				hwXPONBoardSN
+					OCTET STRING,
+				hwXPONBoardPassWord
+					OCTET STRING,                
+				hwXPONBoardMacAddr
+					OCTET STRING
+			}
+		hwXPONBoardParaFrameIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwXPONBoardParaEntry 1 }
+		
+		hwXPONBoardParaSlotIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwXPONBoardParaEntry 2 }   
+		
+		hwXPONBoardSN OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (0..96))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwXPONBoardParaEntry 3 }
+		
+		hwXPONBoardPassWord OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (0..96))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			" 
+			This node is not supported.
+			"
+		::= { hwXPONBoardParaEntry 4 }  
+		
+		hwXPONBoardMacAddr OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(17..17))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.             
+			"
+		::= { hwXPONBoardParaEntry 5 }  
+	
+		hwBroadBandFrameOperTable   OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwBroadBandFrameOperEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			The indexes of this table are hwFrameIndex and hwSlotIndex.
+			This table is not supported.
+			"
+		::= { hwIasDev 2 }
+	        
+		hwBroadBandFrameOperEntry OBJECT-TYPE
+		SYNTAX HwBroadBandFrameOperEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			The indexes of this entry are hwFrameIndex and hwSlotIndex.
+			This table is not supported.
+			"
+		INDEX { hwFrameIfIndex }
+		::= { hwBroadBandFrameOperTable 1 }
+		
+		HwBroadBandFrameOperEntry ::=
+			SEQUENCE { 
+				hwFrameIfIndex
+					Integer32,
+				hwBroadBandFrameType
+					HWFrameType,	
+				hwMainBoardSlots
+					Integer32,
+				hwMainBoardType
+					HWPCBType,
+				hwBroadBandFrameID
+					Integer32,
+				hwBroadBandFrameRowStatus
+					RowStatus
+			 }
+		
+		hwFrameIfIndex OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwBroadBandFrameOperEntry 1 }
+			
+		hwBroadBandFrameType  OBJECT-TYPE
+		SYNTAX  HWFrameType
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwBroadBandFrameOperEntry 2 }
+		
+		hwMainBoardSlots OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwBroadBandFrameOperEntry 3 }
+		
+		hwMainBoardType OBJECT-TYPE
+		SYNTAX HWPCBType
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwBroadBandFrameOperEntry 4 }
+		
+		hwBroadBandFrameID OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwBroadBandFrameOperEntry 5 }
+			
+		hwBroadBandFrameRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			This node is not supported.
+			"
+		::= { hwBroadBandFrameOperEntry 6 }
+
+		hwIasConfigChange OBJECT IDENTIFIER ::= { ias 5 }			
+		hwIasConfigChangeTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwIasConfigChangeEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			Configuration change type trap table. 
+			The index of this table is hwIasConfigChangeTrapID. It is the trap ID.
+			"
+		::= { hwIasConfigChange 1 }
+		
+		hwIasConfigChangeEntry OBJECT-TYPE
+		SYNTAX HwIasConfigChangeEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			Configuration change type trap table.
+			The index of this entry is hwIasConfigChangeTrapID. It is the trap ID.
+			"
+		INDEX { hwIasConfigChangeTrapID }
+		::= { hwIasConfigChangeTable 1 }
+		
+		HwIasConfigChangeEntry ::=
+			SEQUENCE { 
+				hwIasConfigChangeTrapID
+					Integer32,
+				hwIasConfigChangeSerialSN
+					Integer32
+			}
+
+		hwIasConfigChangeTrapID OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"
+			Configuration change type trap ID.
+			"
+		::= { hwIasConfigChangeEntry 1 }
+			
+		hwIasConfigChangeSerialSN OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Configuration change type trap serial number.
+			"
+		::= { hwIasConfigChangeEntry 2 }
+			
+		hwMusaFramePowerSupplyTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwMusaFramePowerSupplyEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The power supply query table.
+			 The table is used to get supply state of all the power supply input. 
+			 The index of this table is hwFrameIndex,hwMusaPowerSupplyInputMode and hwMusaPowerSupplyID.
+			"
+		::= { hwMusaSlotConf 5 }
+		
+		hwMusaFramePowerSupplyEntry OBJECT-TYPE
+		SYNTAX HwMusaFramePowerSupplyEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The power supply query table.
+			 The table is used to get supply state of all the power supply input. 
+			 The index of this entry is hwFrameIndex,hwMusaPowerSupplyInputMode and hwMusaPowerSupplyID.
+			"
+		INDEX { hwFrameIndex, hwMusaPowerSupplyInputMode, hwMusaPowerSupplyID }
+		::= { hwMusaFramePowerSupplyTable 1 }
+		
+		HwMusaFramePowerSupplyEntry ::=
+			SEQUENCE { 
+				hwMusaPowerSupplyInputMode
+					INTEGER,
+				hwMusaPowerSupplyID
+					Integer32,
+				hwMusaPowerSupplyState
+					INTEGER        
+			 }
+		
+		hwMusaPowerSupplyInputMode OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			localac(1),
+			localdc(2),
+			remoteac(3),
+			remotedc(4),
+			pd(5)
+			}		
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Power supply input mode.
+			 Options: 
+			  1. localac(1)  -local 220V AC power supply
+			  2. localdc(2)  -local DC power supply
+			  3. remoteac(3) -remote 60V AC power supply
+			  4. remotedc(4) -remote line +/-190V high voltage power supply of DC
+			  5. pd(5)       -powered device supply 
+			"
+		::= { hwMusaFramePowerSupplyEntry 1 }
+		
+		hwMusaPowerSupplyID OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The input index of power supply."
+		::= { hwMusaFramePowerSupplyEntry 2 }
+	
+		hwMusaPowerSupplyState OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			valid(1),
+			invalid(2)
+			} 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The state of power supply.
+			 Options: 
+			  1. valid(1)   -this power input is working
+			  2. invalid(2) -this power input is not working			
+		"
+		::= { hwMusaFramePowerSupplyEntry 3 }
+
+	END
