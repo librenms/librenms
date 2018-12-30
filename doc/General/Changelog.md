@@ -1,3 +1,120 @@
+##1.47
+*(2018-12-30)*
+
+A big thank you to the following 28 contributors this last month:
+
+  - murrant (33)
+  - PipoCanaja (8)
+  - laf (4)
+  - VVelox (3)
+  - TheGreatDoc (2)
+  - RobbFromIT (2)
+  - vitalisator (2)
+  - evheros (2)
+  - djamp42 (2)
+  - peelman (1)
+  - hexdump0x0200 (1)
+  - h-barnhart (1)
+  - joseaugustocardoso (1)
+  - TakeMeNL (1)
+  - 2E0PGS (1)
+  - msmithbbc (1)
+  - crazy-max (1)
+  - sorano (1)
+  - Rosiak (1)
+  - thanegill (1)
+  - markoh76 (1)
+  - gillmore-ac (1)
+  - pcw11211 (1)
+  - kkrumm1 (1)
+  - Schouwenburg (1)
+  - arjitc (1)
+  - voipmeister (1)
+  - TylerSweet (1)
+
+#### Bug
+* Fixed customers page to only show customer type ports ([#9598](https://github.com/librenms/librenms/pull/9598)) - [murrant](https://github.com/murrant)
+* Fixed ifName and ifAlias being blanked by discovery ([#9589](https://github.com/librenms/librenms/pull/9589)) - [murrant](https://github.com/murrant)
+* Widget fixes 4 ([#9583](https://github.com/librenms/librenms/pull/9583)) - [murrant](https://github.com/murrant)
+* Fixed for snmp query timeout after 60s ([#9574](https://github.com/librenms/librenms/pull/9574)) - [murrant](https://github.com/murrant)
+* TopDevices widget respect limit ([#9572](https://github.com/librenms/librenms/pull/9572)) - [murrant](https://github.com/murrant)
+* Allow multiple worldmap widgets ([#9565](https://github.com/librenms/librenms/pull/9565)) - [murrant](https://github.com/murrant)
+* Fixed error in error page ([#9560](https://github.com/librenms/librenms/pull/9560)) - [murrant](https://github.com/murrant)
+* Fixed snmp-collect-data.php ([#9553](https://github.com/librenms/librenms/pull/9553)) - [murrant](https://github.com/murrant)
+* Better handling of log file failures ([#9539](https://github.com/librenms/librenms/pull/9539)) - [murrant](https://github.com/murrant)
+* Fixed openstreetmap support in device not using custom tiles ([#9536](https://github.com/librenms/librenms/pull/9536)) - [laf](https://github.com/laf)
+* Fixed ifType being removed when a port is down ([#9493](https://github.com/librenms/librenms/pull/9493)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Pushover fix sounds ([#9519](https://github.com/librenms/librenms/pull/9519)) - [murrant](https://github.com/murrant)
+* Fixed plugins using d_echo ([#9498](https://github.com/librenms/librenms/pull/9498)) - [murrant](https://github.com/murrant)
+* Typo in YamlDiscovery.php ([#9530](https://github.com/librenms/librenms/pull/9530)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fixed customers page ([#9521](https://github.com/librenms/librenms/pull/9521)) - [murrant](https://github.com/murrant)
+* Fixed alert log showing only green instead of all by default ([#9529](https://github.com/librenms/librenms/pull/9529)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Fixed error when location is missing from the DB ([#9523](https://github.com/librenms/librenms/pull/9523)) - [murrant](https://github.com/murrant)
+* Fixed integers fields in alert rules to be string ([#9496](https://github.com/librenms/librenms/pull/9496)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+
+#### Device
+* Updated AirFiber to add modulation rates, fix gpsSync ([#9563](https://github.com/librenms/librenms/pull/9563)) - [murrant](https://github.com/murrant)
+* Added support for Eaton Matrix Telecom Inverters ([#9547](https://github.com/librenms/librenms/pull/9547)) - [peelman](https://github.com/peelman)
+* Added detection for Cisco SG550x-24 ([#9569](https://github.com/librenms/librenms/pull/9569)) - [laf](https://github.com/laf)
+* Added Nokia vrf ([#9509](https://github.com/librenms/librenms/pull/9509)) - [vitalisator](https://github.com/vitalisator)
+* Updated dlink support with additional health,mempools and processors ([#9464](https://github.com/librenms/librenms/pull/9464)) - [laf](https://github.com/laf)
+* Updated hardware/platform naming for Juniper devices ([#9546](https://github.com/librenms/librenms/pull/9546)) - [msmithbbc](https://github.com/msmithbbc)
+* Added Device Trango Apex-Plus ([#9483](https://github.com/librenms/librenms/pull/9483)) - [djamp42](https://github.com/djamp42)
+* Added Fortigate state sensors ([#9520](https://github.com/librenms/librenms/pull/9520)) - [evheros](https://github.com/evheros)
+* Updated Ligowave detection ([#9474](https://github.com/librenms/librenms/pull/9474)) - [Rosiak](https://github.com/Rosiak)
+* Added support for Eltek Smartpack S ([#9469](https://github.com/librenms/librenms/pull/9469)) - [murrant](https://github.com/murrant)
+* Updated Ceraos to add more sensors ([#9392](https://github.com/librenms/librenms/pull/9392)) - [markoh76](https://github.com/markoh76)
+* Added Marathon UPS support ([#9489](https://github.com/librenms/librenms/pull/9489)) - [RobbFromIT](https://github.com/RobbFromIT)
+* Added HPE Comware temp limit ([#9518](https://github.com/librenms/librenms/pull/9518)) - [evheros](https://github.com/evheros)
+* Added Audiocodes initial support ([#9508](https://github.com/librenms/librenms/pull/9508)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added SAF CFM wireless device support ([#9450](https://github.com/librenms/librenms/pull/9450)) - [Schouwenburg](https://github.com/Schouwenburg)
+* Added Device Dragonwave Harmony Enhanced ([#9499](https://github.com/librenms/librenms/pull/9499)) - [djamp42](https://github.com/djamp42)
+* Added Comtrol support ([#9491](https://github.com/librenms/librenms/pull/9491)) - [RobbFromIT](https://github.com/RobbFromIT)
+
+#### Documentation
+* Correction in sensor yaml docs ([#9591](https://github.com/librenms/librenms/pull/9591)) - [murrant](https://github.com/murrant)
+* Added reference to check_service scripts response format. ([#9562](https://github.com/librenms/librenms/pull/9562)) - [2E0PGS](https://github.com/2E0PGS)
+* Updated Pushover.net docs on how to set the general sound ([#9511](https://github.com/librenms/librenms/pull/9511)) - [sorano](https://github.com/sorano)
+
+#### Alerting
+* Added automatic generation of the list of available transports (alerting) ([#9544](https://github.com/librenms/librenms/pull/9544)) - [hexdump0x0200](https://github.com/hexdump0x0200)
+* Macros for xDP neighbours alert rules ([#9531](https://github.com/librenms/librenms/pull/9531)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added HTML tag support for msteams transport ([#9533](https://github.com/librenms/librenms/pull/9533)) - [gillmore-ac](https://github.com/gillmore-ac)
+* Fixed integers fields in alert rules to be string ([#9496](https://github.com/librenms/librenms/pull/9496)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+
+#### Webui
+* Added automatic generation of the list of available transports (alerting) ([#9544](https://github.com/librenms/librenms/pull/9544)) - [hexdump0x0200](https://github.com/hexdump0x0200)
+* Translate state in health/state display ([#9550](https://github.com/librenms/librenms/pull/9550)) - [PipoCanaja](https://github.com/PipoCanaja)
+* TopDevices widget respect limit ([#9572](https://github.com/librenms/librenms/pull/9572)) - [murrant](https://github.com/murrant)
+* Order archived notifications in date DESC order ([#9567](https://github.com/librenms/librenms/pull/9567)) - [TakeMeNL](https://github.com/TakeMeNL)
+* Allow multiple worldmap widgets ([#9565](https://github.com/librenms/librenms/pull/9565)) - [murrant](https://github.com/murrant)
+* Dashboard widget update ([#9515](https://github.com/librenms/librenms/pull/9515)) - [murrant](https://github.com/murrant)
+* Fixed openstreetmap support in device not using custom tiles ([#9536](https://github.com/librenms/librenms/pull/9536)) - [laf](https://github.com/laf)
+* Improve alert details display for bgp and sensors ([#9534](https://github.com/librenms/librenms/pull/9534)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Manual location coordinate editing ([#9526](https://github.com/librenms/librenms/pull/9526)) - [murrant](https://github.com/murrant)
+* Mapquest layers for location editors ([#9505](https://github.com/librenms/librenms/pull/9505)) - [murrant](https://github.com/murrant)
+* Device management link fallback to http if https isn't available. ([#9524](https://github.com/librenms/librenms/pull/9524)) - [murrant](https://github.com/murrant)
+* Fixed customers page ([#9521](https://github.com/librenms/librenms/pull/9521)) - [murrant](https://github.com/murrant)
+* Fixed alert log showing only green instead of all by default ([#9529](https://github.com/librenms/librenms/pull/9529)) - [TheGreatDoc](https://github.com/TheGreatDoc)
+* Fixed error when location is missing from the DB ([#9523](https://github.com/librenms/librenms/pull/9523)) - [murrant](https://github.com/murrant)
+* Fixed last column of alerts table visual ([#9506](https://github.com/librenms/librenms/pull/9506)) - [arjitc](https://github.com/arjitc)
+* Focus and select location on override ([#9503](https://github.com/librenms/librenms/pull/9503)) - [murrant](https://github.com/murrant)
+
+#### Enhancement
+* Added SNMP Trap Handlers for Adva Ethernet devices ([#9436](https://github.com/librenms/librenms/pull/9436)) - [h-barnhart](https://github.com/h-barnhart)
+* Better handling of log file failures ([#9539](https://github.com/librenms/librenms/pull/9539)) - [murrant](https://github.com/murrant)
+
+#### Feature
+* Added NAC Polling (Network Access Control) ([#9227](https://github.com/librenms/librenms/pull/9227)) - [joseaugustocardoso](https://github.com/joseaugustocardoso)
+* Dashboard widget update ([#9515](https://github.com/librenms/librenms/pull/9515)) - [murrant](https://github.com/murrant)
+* Manual location coordinate editing ([#9526](https://github.com/librenms/librenms/pull/9526)) - [murrant](https://github.com/murrant)
+* Device management link fallback to http if https isn't available. ([#9524](https://github.com/librenms/librenms/pull/9524)) - [murrant](https://github.com/murrant)
+* Detect if this is a git based install or not. ([#9379](https://github.com/librenms/librenms/pull/9379)) - [murrant](https://github.com/murrant)
+
+#### Security
+* Escape SNMP & IPMI shell commands ([#9537](https://github.com/librenms/librenms/pull/9537)) - [murrant](https://github.com/murrant)
+
+
 ##1.46
 *(2018-12-02)*
 
