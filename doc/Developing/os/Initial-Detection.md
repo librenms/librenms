@@ -193,7 +193,7 @@ By optimizing the SVG you can shrink the file size in some cases to less than 20
 
 Discovery
 ```bash
-./discovery.php -h HOSTNAME
+./discovery.php -d -h HOSTNAME
 ```
 
 Polling
