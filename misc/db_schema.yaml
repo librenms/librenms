@@ -78,6 +78,16 @@ alert_rules:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     name: { Name: name, Columns: [name], Unique: true, Type: BTREE }
+alert_schedulables:
+  Columns:
+    - { Field: item_id, Type: int(11), 'Null': false, Extra: auto_increment }
+    - { Field: schedule_id, Type: int(11), 'Null': false, Extra: '' }
+    - { Field: alert_schedulable_id, Type: 'int(11) unsigned', 'Null': false, Extra: '' }
+    - { Field: alert_schedulable_type, Type: varchar(255), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [item_id], Unique: true, Type: BTREE }
+    schedule_id: { Name: schedule_id, Columns: [schedule_id], Unique: false, Type: BTREE }
+    schedulable_morph_index: { Name: schedulable_morph_index, Columns: [alert_schedulable_type, alert_schedulable_id], Unique: false, Type: BTREE }
 alert_schedule:
   Columns:
     - { Field: schedule_id, Type: int(11), 'Null': false, Extra: auto_increment }
@@ -93,14 +103,6 @@ alert_schedule:
     - { Field: notes, Type: text, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [schedule_id], Unique: true, Type: BTREE }
-alert_schedule_items:
-  Columns:
-    - { Field: item_id, Type: int(11), 'Null': false, Extra: auto_increment }
-    - { Field: schedule_id, Type: int(11), 'Null': false, Extra: '' }
-    - { Field: target, Type: varchar(255), 'Null': false, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [item_id], Unique: true, Type: BTREE }
-    schedule_id: { Name: schedule_id, Columns: [schedule_id], Unique: false, Type: BTREE }
 alert_templates:
   Columns:
     - { Field: id, Type: int(11), 'Null': false, Extra: auto_increment }

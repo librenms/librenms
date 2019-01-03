@@ -62,6 +62,7 @@ class WorldMapController extends WidgetController
             ->whereIn('status', $status)
             ->get()
             ->filter(function ($device) use ($status) {
+                /** @var Device $device */
                 if (!($device->location_id && $device->location->coordinatesValid())) {
                     return false;
                 }
@@ -74,8 +75,7 @@ class WorldMapController extends WidgetController
                     $device->markerIcon = 'redMarker';
                     $device->zOffset = 10000;
 
-// TODO                   if ($device->isUnderMaintenance())
-                    if (false) {
+                    if ($device->isUnderMaintenance()) {
                         if ($status == 0) {
                             return false;
                         }

@@ -80,6 +80,8 @@ class AppServiceProvider extends ServiceProvider
         Relation::morphMap([
             'interface' => \App\Models\Port::class,
             'sensor' => \App\Models\Sensor::class,
+            'device' => \App\Models\Device::class,
+            'device_group' => \App\Models\DeviceGroup::class,
         ]);
     }
 
