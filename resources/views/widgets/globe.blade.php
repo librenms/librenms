@@ -1,4 +1,4 @@
-<div id='chart_div'></div>
+<div id='chart_div-{{ $id }}'></div>
 
 <script type='text/javascript'>
     loadjs('https://www.gstatic.com/charts/loader.js', function() {
@@ -21,7 +21,7 @@
                     markerOpacity: 0.90,
                     tooltip: {isHtml: true}
                 };
-                var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
+                var chart = new google.visualization.GeoChart(document.getElementById('chart_div-{{ $id }}'));
                 chart.draw(data, options);
             }
         });

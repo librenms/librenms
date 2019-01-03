@@ -53,7 +53,7 @@ if (Config::get('enable_vrfs')) {
         if ($descr_oid) {
             $descrs = snmp_walk($device, $descr_oid, '-Osqn', $vpnmib, null);
             $descrs = trim(str_replace("$descr_oid.", '', $descrs));
-            $descr_table = array();
+            $descr_table = [];
             foreach (explode("\n", $descrs) as $descr) {
                 $t = explode(' ', $descr, 2);
                 $descr_table[$t[0]] = $t[1];
@@ -62,7 +62,7 @@ if (Config::get('enable_vrfs')) {
 
         $ports  = snmp_walk($device, $ports_oid, '-Osqn', $vpnmib, null);
         $ports  = trim(str_replace("$ports_oid.", '', $ports));
-        $port_table  = array();
+        $port_table = [];
         foreach (explode("\n", $ports) as $port) {
             $t       = explode(' ', $port);
             $dotpos  = strrpos($t[0], '.');
@@ -121,64 +121,109 @@ if (Config::get('enable_vrfs')) {
                 echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
                 echo "\n  [VRF $vrf_name] DESC  - ".$descr_table[$vrf_oid];
 
-                if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', array($device['device_id'], $vrf_oid))) {
-                    dbUpdate(array('mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'mplsVpnVrfRouteDistinguisher' => $vrf_rd), 'vrfs', 'device_id=? AND vrf_oid=?', array($device['device_id'], $vrf_oid));
+                if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
+                    dbUpdate(['mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
                 } else {
-                    dbInsert(array('vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'device_id' => $device['device_id']), 'vrfs');
+                    dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'device_id' => $device['device_id']], 'vrfs');
                 }
 
-                $vrf_id             = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', array($device['device_id'], $vrf_oid));
+                $vrf_id             = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
                 $valid_vrf[$vrf_id] = 1;
 
                 echo "\n  [VRF $vrf_name] PORTS - ";
                 foreach ($port_table[$vrf_oid] as $if_id) {
-                    $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $if_id));
+                    $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_id]);
                     echo makeshortif($interface['ifDescr']).' ';
-                    dbUpdate(array('ifVrf' => $vrf_id), 'ports', 'port_id=?', array($interface['port_id']));
+                    dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                     $if = $interface['port_id'];
                     $valid_vrf_if[$vrf_id][$if] = 1;
                 }
             }//end if
         }//end foreach
+    } else if ($device['os_group'] == 'nokia') {
+        unset($vrf_count);
 
-        unset(
-            $descr_table,
-            $port_table
-        );
-        echo "\n";
+        $vrtr = snmpwalk_cache_oid($device, 'vRtrConfTable', [], 'TIMETRA-VRTR-MIB');
+        $port_table = snmpwalk_cache_twopart_oid($device, 'vRtrIfName', [], 'TIMETRA-VRTR-MIB');
 
-        $sql = "SELECT * FROM ports WHERE device_id = '".$device['device_id']."'";
-        foreach (dbFetchRows($sql) as $row) {
-            $if     = $row['port_id'];
-            $vrf_id = $row['ifVrf'];
-            if ($row['ifVrf']) {
-                if (!$valid_vrf_if[$vrf_id][$if]) {
-                    echo '-';
-                    dbUpdate(array('ifVrf' => 'NULL'), 'ports', 'port_id=?', array($if));
-                } else {
-                    echo '.';
-                }
+        foreach ($vrtr as $vrf_oid => $vr) {
+            $vrf_name = $vr['vRtrName'];
+            $vrf_desc = $vr['vRtrName'];
+            $vrf_rd = $vr['vRtrRouteDistinguisher'];
+            // Nokia, The VPRN route distinguisher is a 8-octet object.
+            // It contains a 2-octet type field followed by a 6-octet value field. The type field specify how to interpret the value field.
+            // Type 0 specifies two subfields as a 2-octet administrative field and a 4-octet assigned number subfield.
+            // Type 1 specifies two subfields as a 4-octet administrative field which must contain an IP address and a 2-octet assigned number subfield.
+            // Type 2 specifies two subfields as a 4-octet administrative field which contains a 4-octet AS number and a 2-octet assigned number subfield.
+            // FIXME Hardcoded to Type 0
+            $vrf_rd   = str_replace(' ', '', $vrf_rd);
+            if ($vrf_rd <> "000000000000") {
+                $vrf_rd_1   = substr($vrf_rd, 4, 4);
+                $vrf_rd_2   = substr($vrf_rd, 8);
+                $vrf_rd   = hexdec($vrf_rd_1) . ":" . hexdec($vrf_rd_2);
+            } else {
+                $vrf_rd = null;
             }
-        }
 
-        $sql = "SELECT * FROM vrfs WHERE device_id = '".$device['device_id']."'";
-        foreach (dbFetchRows($sql) as $row) {
-            $vrf_id = $row['vrf_id'];
-            if (!$valid_vrf[$vrf_id]) {
+            echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
+            echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
+            echo "\n  [VRF $vrf_name] DESC  - $vrf_desc";
+
+            if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
+                dbUpdate(['mplsVpnVrfDescription' => $vrf_desc, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
+            } else {
+                dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $$vrf_desc, 'device_id' => $device['device_id']], 'vrfs');
+            }
+
+            $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
+            $valid_vrf[$vrf_id] = 1;
+            echo "\n  [VRF $vrf_name] PORTS - ";
+            foreach ($port_table[$vrf_oid] as $if_index => $if_name) {
+                $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);
+                echo makeshortif($interface['ifDescr']).' ';
+                dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
+                $if = $interface['port_id'];
+                $valid_vrf_if[$vrf_id][$if] = 1;
+            }
+        } //end foreach
+    } //end if
+    unset(
+        $descr_table,
+        $port_table
+    );
+    echo "\n";
+
+    $sql = "SELECT * FROM ports WHERE device_id = '".$device['device_id']."'";
+    foreach (dbFetchRows($sql) as $row) {
+        $if     = $row['port_id'];
+        $vrf_id = $row['ifVrf'];
+        if ($row['ifVrf']) {
+            if (!$valid_vrf_if[$vrf_id][$if]) {
                 echo '-';
-                dbDelete('vrfs', '`vrf_id` = ?', array($vrf_id));
+                dbUpdate(['ifVrf' => 'NULL'], 'ports', 'port_id=?', [$if]);
             } else {
                 echo '.';
             }
         }
+    }
 
-        unset(
-            $valid_vrf_if,
-            $valid_vrf,
-            $row,
-            $sql
-        );
+    $sql = "SELECT * FROM vrfs WHERE device_id = '".$device['device_id']."'";
+    foreach (dbFetchRows($sql) as $row) {
+        $vrf_id = $row['vrf_id'];
+        if (!$valid_vrf[$vrf_id]) {
+            echo '-';
+            dbDelete('vrfs', '`vrf_id` = ?', [$vrf_id]);
+        } else {
+            echo '.';
+        }
+    }
 
-        echo "\n";
-    } //end if
+    unset(
+        $valid_vrf_if,
+        $valid_vrf,
+        $row,
+        $sql
+    );
+
+    echo "\n";
 } //end if

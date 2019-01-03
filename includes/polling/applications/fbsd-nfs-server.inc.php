@@ -1,16 +1,36 @@
 <?php
 
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'fbsd-nfs-server';
 $app_id = $app['app_id'];
-$options      = '-Oqv';
-$oid          = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.13.102.98.115.100.110.102.115.115.101.114.118.101.114';
-$nfsserver = snmp_walk($device, $oid, $options);
 
-list($getattr, $setattr, $lookup, $readlink, $read, $write, $create, $remove, $rename, $link, $symlink,
-    $mkdir, $rmdir, $readdir, $rdirplus, $access, $mknod, $fsstat, $fsinfo, $pathconf, $commit, $retfailed,
-    $faults, $inprog, $idem, $nonidem, $misses, $writeops, $writerpc, $opsaved) = explode("\n", $nfsserver);
+echo $name;
+
+try {
+    $nfs=json_app_get($device, 'fbsdnfsserver');
+} catch (JsonAppParsingFailedException $e) {
+    // Legacy script, build compatible array
+    $legacy = $e->getOutput();
+
+    $nfs=array(
+        'data' => array(),
+    );
+    list($nfs['data']['Getattr'], $nfs['data']['Setattr'], $nfs['data']['Lookup'], $nfs['data']['Readlink'],
+         $nfs['data']['Read'], $nfs['data']['Write'], $nfs['data']['Create'], $nfs['data']['Remove'],
+         $nfs['data']['Rename'], $nfs['data']['Link'], $nfs['data']['Symlink'], $nfs['data']['Mkdir'],
+         $nfs['data']['Rmdir'], $nfs['data']['Readdir'], $nfs['data']['RdirPlus'], $nfs['data']['Access'],
+         $nfs['data']['Mknod'], $nfs['data']['Fsstat'], $nfs['data']['Fsinfo'], $nfs['data']['PathConf'],
+         $nfs['data']['Commit'], $nfs['data']['RetFailed'], $nfs['data']['Faults'], $nfs['data']['Inprog'],
+         $nfs['data']['Idem'], $nfs['data']['Nonidem'], $nfs['data']['Misses'], $nfs['data']['WriteOps'],
+         $nfs['data']['WriteRPC'], $nfs['data']['Opsaved']) = explode("\n", $legacy);
+} catch (JsonAppException $e) {
+    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+    return;
+}
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -46,38 +66,38 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('opsaved', 'DERIVE', 0);
 
 $fields = array(
-    'getattr' => $getattr,
-    'setattr' => $setattr,
-    'lookup' => $lookup,
-    'readlink' => $readlink,
-    'read' => $read,
-    'write' => $write,
-    'create' => $create,
-    'remove' => $remove,
-    'rename' => $rename,
-    'link' => $link,
-    'symlink' => $symlink,
-    'mkdir' => $mkdir,
-    'rmdir' => $rmdir,
-    'readdir' => $readdir,
-    'rdirplus' => $rdirplus,
-    'access' => $access,
-    'mknod' => $mknod,
-    'fsstat' => $fsstat,
-    'fsinfo' => $fsinfo,
-    'pathconf' => $pathconf,
-    'commit' => $commit,
-    'retfailed' => $retfailed,
-    'faults' => $faults,
-    'inprog' => $inprog,
-    'idem' => $idem,
-    'nonidem' => $nonidem,
-    'misses' => $misses,
-    'writeops' => $writeops,
-    'writerpc' => $writerpc,
-    'opsaved' => $opsaved,
+    'getattr' => $nfs['data']['Getattr'],
+    'setattr' => $nfs['data']['Setattr'],
+    'lookup' => $nfs['data']['Lookup'],
+    'readlink' => $nfs['data']['Readlink'],
+    'read' => $nfs['data']['Read'],
+    'write' => $nfs['data']['Write'],
+    'create' => $nfs['data']['Create'],
+    'remove' => $nfs['data']['Remove'],
+    'rename' => $nfs['data']['Rename'],
+    'link' => $nfs['data']['Link'],
+    'symlink' => $nfs['data']['Symlink'],
+    'mkdir' => $nfs['data']['Mkdir'],
+    'rmdir' => $nfs['data']['Rmdir'],
+    'readdir' => $nfs['data']['Readdir'],
+    'rdirplus' => $nfs['data']['RdirPlus'],
+    'access' => $nfs['data']['Access'],
+    'mknod' => $nfs['data']['Mknod'],
+    'fsstat' => $nfs['data']['Fsstat'],
+    'fsinfo' => $nfs['data']['Fsinfo'],
+    'pathconf' => $nfs['data']['PathConf'],
+    'commit' => $nfs['data']['Commit'],
+    'retfailed' => $nfs['data']['RetFailed'],
+    'faults' => $nfs['data']['Faults'],
+    'inprog' => $nfs['data']['Inprog'],
+    'idem' => $nfs['data']['Idem'],
+    'nonidem' => $nfs['data']['Nonidem'],
+    'misses' => $nfs['data']['Misses'],
+    'writeops' => $nfs['data']['WriteOps'],
+    'writerpc' => $nfs['data']['WriteRPC'],
+    'opsaved' => $nfs['data']['Opsaved'],
 );
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
-update_application($app, $nfsserver, $fields);
+update_application($app, 'OK', $nfs['data']);

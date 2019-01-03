@@ -1638,3 +1638,56 @@ function get_device_name($device)
 
     return $ret_str;
 }
+
+/**
+ * Returns state generic label from value with optional text
+ */
+
+function get_state_label($state_value, $state_text_param = null)
+{
+    switch ($state_value) {
+        case 0:  // OK
+            $state_text = (is_null($state_text_param) ? "OK": $state_text_param);
+            $state_label = "label-success";
+            break;
+        case 1:  // Warning
+            $state_text = (is_null($state_text_param) ? "Warning": $state_text_param);
+            $state_label = "label-warning";
+            break;
+        case 2:  // Critical
+            $state_text = (is_null($state_text_param) ? "Critical": $state_text_param);
+            $state_label = "label-danger";
+            break;
+        case 3:// Unknown
+        default:
+            $state_text = (is_null($state_text_param) ? "Unknown": $state_text_param);
+            $state_label = "label-default";
+    }
+    $state = "<span class='label $state_label'>$state_text</span>";
+    return $state;
+}
+
+/**
+ * Get state label color
+ */
+function get_sensor_label_color($sensor)
+{
+    $current_label_color = "label-success";
+    if (is_null($sensor)) {
+        return "label-unknown";
+    }
+    if (!is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] > $sensor['sensor_limit_warn']) {
+        $current_label_color = "label-warning";
+    }
+    if (!is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] < $sensor['sensor_limit_low_warn']) {
+        $current_label_color = "label-warning";
+    }
+    if (!is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']) {
+        $current_label_color = "label-danger";
+    }
+    if (!is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
+        $current_label_color = "label-danger";
+    }
+
+    return $current_label_color;
+}
