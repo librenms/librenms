@@ -1,0 +1,12 @@
+os: eaton-matrix
+text: 'Eaton Matrix'
+type: power
+icon: eaton
+mib_dir:
+    - eaton
+discovery:
+   - sysObjectID:
+       - .1.3.6.1.4.1.935.10.2
+   - sysDescr_regex:
+       - '/^NMC for Matrix Inverter/'
+

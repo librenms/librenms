@@ -45,14 +45,12 @@ class CustomersController extends TableController
      */
     public function baseQuery($request)
     {
-        $cust_descrs = (array)Config::get('customers_descr', ['cust']);
-
         // selecting just the customer name, will fetch port data later
         return Port::hasAccess($request->user())
             ->with('device')
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
             ->select('port_descr_descr')
-            ->whereIn('port_descr_type', $cust_descrs)
+            ->whereIn('port_descr_type', $this->getTypeStrings())
             ->groupBy('port_descr_descr');
     }
 
@@ -65,6 +63,7 @@ class CustomersController extends TableController
         $customers = collect($paginator->items())->pluck('port_descr_descr');
         // fetch all ports
         $ports = Port::whereIn('port_descr_descr', $customers)
+            ->whereIn('port_descr_type', $this->getTypeStrings())
             ->with('device')
             ->get()
             ->groupBy('port_descr_descr');
@@ -125,5 +124,10 @@ class CustomersController extends TableController
             'port_descr_circuit' => $graph_data[2],
             'port_descr_notes'   => $graph_data[3],
         ];
+    }
+
+    private function getTypeStrings()
+    {
+        return array_wrap(Config::get('customers_descr', ['cust']));
     }
 }

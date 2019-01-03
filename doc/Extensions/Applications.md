@@ -1116,13 +1116,20 @@ The application should be auto-discovered as described at the top of the page. I
 A small shell script that exports apcacess ups status.
 
 ##### SNMP Extend
-1. Copy the [ups apcups](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-apcups.sh) to `/etc/snmp/` on your host.
+1. Copy the [ups apcups](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-apcups to `/etc/snmp/` on your host.
 
-2. Run `chmod +x /etc/snmp/ups-apcups.sh`
+2. Run `chmod +x /etc/snmp/ups-apcups`
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend ups-apcups /etc/snmp/ups-apcups.sh
+extend ups-apcups /etc/snmp/ups-apcups
+```
+
+If 'apcaccess' is not in the PATH enviromental variable snmpd is
+using, you may need to do something like below.
+
+```
+extend ups-apcups/usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /etc/snmp/ups-apcups
 ```
 
 4. Restart snmpd on your host
