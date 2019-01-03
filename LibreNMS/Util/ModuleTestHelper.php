@@ -28,6 +28,8 @@ namespace LibreNMS\Util;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use Symfony\Component\Process\PhpProcess;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
@@ -511,9 +513,9 @@ class ModuleTestHelper
         try {
             Config::set('snmp.community', [$this->file_name]);
             $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
-
+            dbCommitTransaction();
             // disable to block normal pollers
-            dbUpdate(['disabled' => 1], 'devices', 'device_id=?', [$device_id]);
+//            dbUpdate(['disabled' => 1], 'devices', 'device_id=?', [$device_id]);
 
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {
@@ -523,28 +525,28 @@ class ModuleTestHelper
 
         // Populate the device variable
         $device = device_by_id_cache($device_id, true);
-
         $data = [];  // array to hold dumped data
 
+        $install_dir = Config::get('install_dir');
+        $environment = ['DBTEST' => getenv('DBTEST'), 'SNMPSIM' => getenv('SNMPSIM')];
+
         // Run discovery
-        $save_debug = $debug;
-        $save_vedbug = $vdebug;
-        if ($this->quiet) {
-            $debug = true;
-            $vdebug = true;
+        $discovery_cmd = [$install_dir . '/discovery.php', '-h', $device_id];
+        if ($this->modules) {
+            $discovery_cmd[] = '-m';
+            $discovery_cmd[] = implode(',', $this->modules);
         }
-        ob_start();
-
-        discover_device($device, $this->parseArgs('discovery'));
-
-        $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
-            $debug = $save_debug;
-            $vdebug = $save_vedbug;
-        } else {
-            ob_flush();
+            $discovery_cmd[] = '-d';
+            $discovery_cmd[] = '-v';
         }
-        ob_end_clean();
+
+        $discovery_process = new Process($discovery_cmd, $install_dir, $environment);
+        $discovery_process->run($this->quiet ? null : function ($type, $buffer) {
+            echo $buffer;
+        });
+        $this->discovery_output = $discovery_process->getOutput();
+        d_echo($discovery_process->getErrorOutput());
 
         $this->qPrint(PHP_EOL);
 
@@ -557,22 +559,22 @@ class ModuleTestHelper
         $device = device_by_id_cache($device_id, true); // refresh the device array
 
         // Run the poller
-        if ($this->quiet) {
-            $debug = true;
-            $vdebug = true;
+        $poller_cmd = [$install_dir . '/poller.php', '-h', $device_id];
+        if ($this->modules) {
+            $poller_cmd[] = '-m';
+            $poller_cmd[] = implode(',', $this->modules);
         }
-        ob_start();
-
-        poll_device($device, $this->parseArgs('poller'));
-
-        $this->poller_output = ob_get_contents();
         if ($this->quiet) {
-            $debug = $save_debug;
-            $vdebug = $save_vedbug;
-        } else {
-            ob_flush();
+            $poller_cmd[] = '-d';
+            $poller_cmd[] = '-v';
         }
-        ob_end_clean();
+
+        $poller_process = new Process($poller_cmd, $install_dir, $environment);
+        $poller_process->run($this->quiet ? null : function ($type, $buffer) {
+            echo $buffer;
+        });
+        $this->poller_output = $poller_process->getOutput();
+        d_echo($poller_process->getErrorOutput());
 
         // Parse polled modules
         $this->poller_module_output = $this->extractModuleOutput($this->poller_output, 'poller');
