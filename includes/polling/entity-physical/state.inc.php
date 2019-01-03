@@ -18,19 +18,19 @@ foreach (dbFetch('SELECT * FROM `entPhysical_state` WHERE `device_id` = ?', arra
         if ($entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']] != $entity['value']) {
             echo 'no match!' . ' ' . $entity['entPhysicalIndex'] . ' ' . $entity['subindex'] . ' ' . $entity['key'] . ': ' . $entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']] . ' ' . $entity['value'] . "\n";
             dbUpdate(
-		array('value' => $entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']]),
+              array('value' => $entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']]),
 		'entPhysical_state',
 		'`device_id` = ? AND `entPhysicalIndex` = ? AND `subindex` = ? AND `group` = ? AND `key` = ?',
-		 array(
-                	$device['device_id'],
-                	$entity['entPhysicalIndex'],
-                	$entity['subindex'],
-                	$entity['group'],
-                	$entity['key']
-		)
-	    );
+                array(
+                  $device['device_id'],
+                  $entity['entPhysicalIndex'],
+                  $entity['subindex'],
+                  $entity['group'],
+                  $entity['key']
+                )
+              );
 
-	}
+       }
 
         unset($entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']]);
     }
