@@ -28,7 +28,7 @@ foreach (dbFetch('SELECT * FROM `entPhysical_state` WHERE `device_id` = ?', arra
                   $entity['group'],
                   $entity['key']
                 )
-              );
+            );
         }
 
         unset($entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']]);
