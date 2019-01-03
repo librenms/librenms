@@ -31,6 +31,12 @@ use LibreNMS\Util\ModuleTestHelper;
 
 class OSModulesTest extends DBTestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        set_debug(false); // prevent warnings from stopping execution
+    }
+
     /**
      * Test all modules for a particular OS
      *

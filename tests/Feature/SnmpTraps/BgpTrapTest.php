@@ -34,7 +34,6 @@ class BgpTrapTest extends TrapTestCase
 {
     public function testBgpUp()
     {
-
         $device = factory(Device::class)->create();
         $bgppeer = factory(BgpPeer::class)->make(['bgpPeerState' => 'idle']);
         $device->bgppeers()->save($bgppeer);

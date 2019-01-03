@@ -28,6 +28,7 @@ namespace LibreNMS\DB;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Events\Dispatcher;
+use LibreNMS\Util\Laravel;
 
 class Eloquent
 {
@@ -38,7 +39,7 @@ class Eloquent
     public static function boot($options = [])
     {
         // boot Eloquent outside of Laravel
-        if (!defined('LARAVEL_START') && class_exists(Capsule::class) && is_null(self::$capsule)) {
+        if (!Laravel::isBooted() && is_null(self::$capsule)) {
             $install_dir = realpath(__DIR__ . '/../../');
 
             $db_config = include($install_dir . '/config/database.php');
@@ -125,7 +126,7 @@ class Eloquent
     public static function DB()
     {
         // check if Laravel is booted
-        if (class_exists('\DB') && \DB::connection()) {
+        if (Laravel::isBooted()) {
             return \DB::connection();
         }
 
