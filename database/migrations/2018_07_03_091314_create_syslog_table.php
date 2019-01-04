@@ -24,6 +24,7 @@ class CreateSyslogTable extends Migration
             $table->text('msg', 65535)->nullable();
             $table->bigInteger('seq', true)->unsigned();
             $table->index(['priority','level'], 'priority_level');
+            $table->index(['device_id', 'timestamp'], 'device_id-timestamp');
         });
     }
 

@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateAlertScheduleItemsTable extends Migration
+class CreateAlertSchedulablesTable extends Migration
 {
 
     /**
@@ -13,10 +13,12 @@ class CreateAlertScheduleItemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('alert_schedule_items', function (Blueprint $table) {
+        Schema::create('alert_schedulables', function (Blueprint $table) {
             $table->integer('item_id', true);
             $table->integer('schedule_id')->index('schedule_id');
-            $table->string('target');
+            $table->unsignedInteger('alert_schedulable_id');
+            $table->string('alert_schedulable_type');
+            $table->index(['alert_schedulable_type', 'alert_schedulable_id'], 'schedulable_morph_index');
         });
     }
 
