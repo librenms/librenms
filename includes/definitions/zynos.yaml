@@ -11,3 +11,4 @@ discovery:
         - '/^GS/'
         - '/^MES/'
         - '/^XS/'
+        - '/^XGS/'
