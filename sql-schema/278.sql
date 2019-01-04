@@ -8,7 +8,7 @@ alter table alert_schedule modify schedule_id int unsigned auto_increment;
 alter table alert_template_map modify id int unsigned auto_increment, modify alert_templates_id int unsigned not null, modify alert_rule_id int unsigned not null;
 alter table alert_templates modify id int unsigned auto_increment;
 alter table alert_transport_groups modify transport_group_id int unsigned auto_increment;
-alter table alert_transport_map modify id int unsigned auto_increment, modify rule_id int unsigned not null, transport_or_group_id int unsigned not null;
+alter table alert_transport_map modify id int unsigned auto_increment, modify rule_id int unsigned not null, modify transport_or_group_id int unsigned not null;
 alter table alert_transports modify transport_id int unsigned auto_increment;
 alter table alerts modify id int unsigned auto_increment, modify device_id int unsigned not null, modify rule_id int unsigned not null;
 alter table api_tokens modify id int unsigned auto_increment, modify user_id int unsigned not null;
