@@ -14,8 +14,8 @@ class CreateApplicationsTable extends Migration
     public function up()
     {
         Schema::create('applications', function (Blueprint $table) {
-            $table->integer('app_id', true);
-            $table->integer('device_id');
+            $table->increments('app_id');
+            $table->unsignedInteger('device_id');
             $table->string('app_type', 64);
             $table->string('app_state', 32)->default('UNKNOWN');
             $table->tinyInteger('discovered')->default(0);

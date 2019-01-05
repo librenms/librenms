@@ -14,7 +14,7 @@ class CreateIpv4NetworksTable extends Migration
     public function up()
     {
         Schema::create('ipv4_networks', function (Blueprint $table) {
-            $table->integer('ipv4_network_id', true);
+            $table->increments('ipv4_network_id');
             $table->string('ipv4_network', 64);
             $table->string('context_name', 128)->nullable();
         });

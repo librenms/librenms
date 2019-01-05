@@ -14,7 +14,7 @@ class CreateStateIndexesTable extends Migration
     public function up()
     {
         Schema::create('state_indexes', function (Blueprint $table) {
-            $table->integer('state_index_id', true);
+            $table->increments('state_index_id');
             $table->string('state_name', 64)->unique('state_name');
         });
     }

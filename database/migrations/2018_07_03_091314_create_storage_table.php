@@ -14,8 +14,8 @@ class CreateStorageTable extends Migration
     public function up()
     {
         Schema::create('storage', function (Blueprint $table) {
-            $table->integer('storage_id', true);
-            $table->integer('device_id')->index('device_id');
+            $table->increments('storage_id');
+            $table->unsignedInteger('device_id')->index('device_id');
             $table->string('storage_mib', 16);
             $table->string('storage_index', 64)->nullable();
             $table->string('storage_type', 32)->nullable();

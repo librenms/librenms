@@ -14,7 +14,7 @@ class CreateAlertRulesTable extends Migration
     public function up()
     {
         Schema::create('alert_rules', function (Blueprint $table) {
-            $table->integer('id', true);
+            $table->increments('id');
             $table->text('rule', 65535);
             $table->enum('severity', array('ok','warning','critical'));
             $table->string('extra');

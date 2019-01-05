@@ -14,7 +14,7 @@ class CreateAuthlogTable extends Migration
     public function up()
     {
         Schema::create('authlog', function (Blueprint $table) {
-            $table->integer('id', true);
+            $table->increments('id');
             $table->timestamp('datetime')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->text('user', 65535);
             $table->text('address', 65535);

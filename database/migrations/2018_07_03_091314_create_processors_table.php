@@ -14,10 +14,10 @@ class CreateProcessorsTable extends Migration
     public function up()
     {
         Schema::create('processors', function (Blueprint $table) {
-            $table->integer('processor_id', true);
+            $table->increments('processor_id');
             $table->integer('entPhysicalIndex')->default(0);
             $table->integer('hrDeviceIndex')->nullable();
-            $table->integer('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index('device_id');
             $table->string('processor_oid', 128);
             $table->string('processor_index', 32);
             $table->string('processor_type', 16);

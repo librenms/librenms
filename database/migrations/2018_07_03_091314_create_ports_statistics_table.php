@@ -14,7 +14,7 @@ class CreatePortsStatisticsTable extends Migration
     public function up()
     {
         Schema::create('ports_statistics', function (Blueprint $table) {
-            $table->integer('port_id')->primary();
+            $table->unsignedInteger('port_id')->primary();
             $table->bigInteger('ifInNUcastPkts')->nullable();
             $table->bigInteger('ifInNUcastPkts_prev')->nullable();
             $table->bigInteger('ifInNUcastPkts_delta')->nullable();

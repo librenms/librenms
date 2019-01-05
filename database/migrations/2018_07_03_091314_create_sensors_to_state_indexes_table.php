@@ -14,9 +14,9 @@ class CreateSensorsToStateIndexesTable extends Migration
     public function up()
     {
         Schema::create('sensors_to_state_indexes', function (Blueprint $table) {
-            $table->integer('sensors_to_state_translations_id', true);
-            $table->integer('sensor_id');
-            $table->integer('state_index_id')->index('state_index_id');
+            $table->increments('sensors_to_state_translations_id');
+            $table->unsignedInteger('sensor_id');
+            $table->unsignedInteger('state_index_id')->index('state_index_id');
             $table->unique(['sensor_id','state_index_id'], 'sensor_id_state_index_id');
         });
     }

@@ -14,8 +14,8 @@ class CreateBillPermsTable extends Migration
     public function up()
     {
         Schema::create('bill_perms', function (Blueprint $table) {
-            $table->integer('user_id');
-            $table->integer('bill_id');
+            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('bill_id');
         });
     }
 

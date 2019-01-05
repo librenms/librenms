@@ -14,7 +14,7 @@ class CreateAlertTemplatesTable extends Migration
     public function up()
     {
         Schema::create('alert_templates', function (Blueprint $table) {
-            $table->integer('id', true);
+            $table->increments('id');
             $table->string('name');
             $table->longText('template');
             $table->string('title')->nullable();

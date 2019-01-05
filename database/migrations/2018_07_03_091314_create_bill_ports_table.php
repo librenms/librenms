@@ -14,8 +14,8 @@ class CreateBillPortsTable extends Migration
     public function up()
     {
         Schema::create('bill_ports', function (Blueprint $table) {
-            $table->integer('bill_id');
-            $table->integer('port_id');
+            $table->unsignedInteger('bill_id');
+            $table->unsignedInteger('port_id');
             $table->boolean('bill_port_autoadded')->default(0);
         });
     }

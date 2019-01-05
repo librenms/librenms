@@ -37,7 +37,7 @@ class CreateAlertTransportGroupsTable extends Migration
     public function up()
     {
         Schema::create('alert_transport_groups', function (Blueprint $table) {
-            $table->integer('transport_group_id', true);
+            $table->increments('transport_group_id');
             $table->string('transport_group_name', 30);
         });
     }

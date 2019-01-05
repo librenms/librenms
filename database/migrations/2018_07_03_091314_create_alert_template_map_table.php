@@ -14,9 +14,9 @@ class CreateAlertTemplateMapTable extends Migration
     public function up()
     {
         Schema::create('alert_template_map', function (Blueprint $table) {
-            $table->integer('id', true);
-            $table->integer('alert_templates_id');
-            $table->integer('alert_rule_id');
+            $table->increments('id');
+            $table->unsignedInteger('alert_templates_id');
+            $table->unsignedInteger('alert_rule_id');
             $table->index(['alert_templates_id','alert_rule_id'], 'alert_templates_id');
         });
     }

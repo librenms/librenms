@@ -14,7 +14,7 @@ class CreateDeviceOidsTable extends Migration
     public function up()
     {
         Schema::create('device_oids', function (Blueprint $table) {
-            $table->integer('device_id');
+            $table->unsignedInteger('device_id');
             $table->string('oid');
             $table->string('module');
             $table->string('mib');

@@ -37,7 +37,7 @@ class CreateAlertTransportsTable extends Migration
     public function up()
     {
         Schema::create('alert_transports', function (Blueprint $table) {
-            $table->integer('transport_id', true);
+            $table->increments('transport_id');
             $table->string('transport_name', 30);
             $table->string('transport_type', 20)->default('mail');
             $table->boolean('is_default')->default(0);

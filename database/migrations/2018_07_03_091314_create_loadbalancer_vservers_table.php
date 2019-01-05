@@ -14,10 +14,10 @@ class CreateLoadbalancerVserversTable extends Migration
     public function up()
     {
         Schema::create('loadbalancer_vservers', function (Blueprint $table) {
-            $table->integer('classmap_id');
+            $table->unsignedInteger('classmap_id');
             $table->string('classmap', 128);
             $table->string('serverstate', 64);
-            $table->integer('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index('device_id');
         });
     }
 

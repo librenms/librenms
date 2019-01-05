@@ -14,8 +14,8 @@ class CreateNetscalerVserversTable extends Migration
     public function up()
     {
         Schema::create('netscaler_vservers', function (Blueprint $table) {
-            $table->integer('vsvr_id', true);
-            $table->integer('device_id');
+            $table->increments('vsvr_id');
+            $table->unsignedInteger('device_id');
             $table->string('vsvr_name', 128);
             $table->string('vsvr_ip', 128);
             $table->integer('vsvr_port');

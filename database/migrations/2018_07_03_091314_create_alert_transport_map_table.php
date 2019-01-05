@@ -37,9 +37,9 @@ class CreateAlertTransportMapTable extends Migration
     public function up()
     {
         Schema::create('alert_transport_map', function (Blueprint $table) {
-            $table->integer('id', true);
-            $table->integer('rule_id');
-            $table->integer('transport_or_group_id');
+            $table->increments('id');
+            $table->unsignedInteger('rule_id');
+            $table->unsignedInteger('transport_or_group_id');
             $table->string('target_type', 16);
         });
     }

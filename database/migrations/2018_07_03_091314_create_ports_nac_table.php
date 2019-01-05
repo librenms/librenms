@@ -17,7 +17,7 @@ class CreatePortsNacTable extends Migration
             $table->increments('ports_nac_id');
             $table->string('auth_id', 50);
             $table->unsignedInteger('device_id')->index('ports_nac_device_id_index');
-            $table->integer('port_id');
+            $table->unsignedInteger('port_id');
             $table->string('domain', 50);
             $table->string('username', 50);
             $table->string('mac_address', 50);

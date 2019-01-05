@@ -14,8 +14,8 @@ class CreateDashboardsTable extends Migration
     public function up()
     {
         Schema::create('dashboards', function (Blueprint $table) {
-            $table->integer('dashboard_id', true);
-            $table->integer('user_id')->default(0);
+            $table->increments('dashboard_id');
+            $table->unsignedInteger('user_id')->default(0);
             $table->string('dashboard_name');
             $table->boolean('access')->default(0);
         });

@@ -14,8 +14,8 @@ class CreateVrfLiteCiscoTable extends Migration
     public function up()
     {
         Schema::create('vrf_lite_cisco', function (Blueprint $table) {
-            $table->integer('vrf_lite_cisco_id', true);
-            $table->integer('device_id')->index('device');
+            $table->increments('vrf_lite_cisco_id');
+            $table->unsignedInteger('device_id')->index('device');
             $table->string('context_name', 128)->index('context');
             $table->string('intance_name', 128)->nullable()->default('');
             $table->string('vrf_name', 128)->nullable()->default('Default')->index('vrf');

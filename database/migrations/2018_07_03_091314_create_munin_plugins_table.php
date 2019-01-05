@@ -14,8 +14,8 @@ class CreateMuninPluginsTable extends Migration
     public function up()
     {
         Schema::create('munin_plugins', function (Blueprint $table) {
-            $table->integer('mplug_id', true);
-            $table->integer('device_id')->index('device_id');
+            $table->increments('mplug_id');
+            $table->unsignedInteger('device_id')->index('device_id');
             $table->string('mplug_type');
             $table->string('mplug_instance', 128)->nullable();
             $table->string('mplug_category', 32)->nullable();

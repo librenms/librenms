@@ -14,8 +14,8 @@ class CreateOspfAreasTable extends Migration
     public function up()
     {
         Schema::create('ospf_areas', function (Blueprint $table) {
-            $table->integer('id', true);
-            $table->integer('device_id');
+            $table->increments('id');
+            $table->unsignedInteger('device_id');
             $table->string('ospfAreaId', 32);
             $table->string('ospfAuthType', 64);
             $table->string('ospfImportAsExtern', 128);

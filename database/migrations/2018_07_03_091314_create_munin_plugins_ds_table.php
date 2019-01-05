@@ -14,7 +14,7 @@ class CreateMuninPluginsDsTable extends Migration
     public function up()
     {
         Schema::create('munin_plugins_ds', function (Blueprint $table) {
-            $table->integer('mplug_id');
+            $table->unsignedInteger('mplug_id');
             $table->string('ds_name', 32);
             $table->enum('ds_type', array('COUNTER','ABSOLUTE','DERIVE','GAUGE'))->default('GAUGE');
             $table->string('ds_label', 64);

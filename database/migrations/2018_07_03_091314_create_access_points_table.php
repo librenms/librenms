@@ -14,8 +14,8 @@ class CreateAccessPointsTable extends Migration
     public function up()
     {
         Schema::create('access_points', function (Blueprint $table) {
-            $table->integer('accesspoint_id', true);
-            $table->integer('device_id');
+            $table->increments('accesspoint_id');
+            $table->unsignedInteger('device_id');
             $table->string('name');
             $table->tinyInteger('radio_number')->nullable();
             $table->string('type', 16);

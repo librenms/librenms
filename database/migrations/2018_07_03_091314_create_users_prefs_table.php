@@ -14,7 +14,7 @@ class CreateUsersPrefsTable extends Migration
     public function up()
     {
         Schema::create('users_prefs', function (Blueprint $table) {
-            $table->integer('user_id');
+            $table->unsignedInteger('user_id');
             $table->string('pref', 32);
             $table->string('value', 128);
             $table->unique(['user_id','pref']);

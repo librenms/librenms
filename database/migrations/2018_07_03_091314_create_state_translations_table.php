@@ -14,8 +14,8 @@ class CreateStateTranslationsTable extends Migration
     public function up()
     {
         Schema::create('state_translations', function (Blueprint $table) {
-            $table->integer('state_translation_id', true);
-            $table->integer('state_index_id');
+            $table->increments('state_translation_id');
+            $table->unsignedInteger('state_index_id');
             $table->string('state_descr');
             $table->boolean('state_draw_graph');
             $table->smallInteger('state_value')->default(0);

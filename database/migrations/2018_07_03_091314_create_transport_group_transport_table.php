@@ -37,8 +37,8 @@ class CreateTransportGroupTransportTable extends Migration
     public function up()
     {
         Schema::create('transport_group_transport', function (Blueprint $table) {
-            $table->integer('transport_group_id');
-            $table->integer('transport_id');
+            $table->unsignedInteger('transport_group_id');
+            $table->unsignedInteger('transport_id');
         });
     }
 

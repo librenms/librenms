@@ -14,9 +14,9 @@ class CreateOspfNbrsTable extends Migration
     public function up()
     {
         Schema::create('ospf_nbrs', function (Blueprint $table) {
-            $table->integer('id', true);
-            $table->integer('device_id');
-            $table->integer('port_id')->nullable();
+            $table->increments('id');
+            $table->unsignedInteger('device_id');
+            $table->unsignedInteger('port_id')->nullable();
             $table->string('ospf_nbr_id', 32);
             $table->string('ospfNbrIpAddr', 32);
             $table->integer('ospfNbrAddressLessIndex');

@@ -14,7 +14,7 @@ class CreateBgpPeersCbgpTable extends Migration
     public function up()
     {
         Schema::create('bgpPeers_cbgp', function (Blueprint $table) {
-            $table->integer('device_id');
+            $table->unsignedInteger('device_id');
             $table->string('bgpPeerIdentifier', 64);
             $table->string('afi', 16);
             $table->string('safi', 16);

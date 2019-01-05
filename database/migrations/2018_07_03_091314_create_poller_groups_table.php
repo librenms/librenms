@@ -14,7 +14,7 @@ class CreatePollerGroupsTable extends Migration
     public function up()
     {
         Schema::create('poller_groups', function (Blueprint $table) {
-            $table->integer('id', true);
+            $table->increments('id');
             $table->string('group_name');
             $table->string('descr');
         });

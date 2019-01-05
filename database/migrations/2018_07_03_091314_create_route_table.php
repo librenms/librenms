@@ -14,7 +14,7 @@ class CreateRouteTable extends Migration
     public function up()
     {
         Schema::create('route', function (Blueprint $table) {
-            $table->integer('device_id');
+            $table->unsignedInteger('device_id');
             $table->string('context_name', 128);
             $table->string('ipRouteDest', 39);
             $table->string('ipRouteIfIndex', 256)->nullable();
@@ -22,7 +22,7 @@ class CreateRouteTable extends Migration
             $table->string('ipRouteNextHop', 39);
             $table->string('ipRouteType', 256);
             $table->string('ipRouteProto', 256);
-            $table->integer('discoveredAt');
+            $table->unsignedInteger('discoveredAt');
             $table->string('ipRouteMask', 256);
             $table->index(['device_id','context_name','ipRouteDest','ipRouteNextHop'], 'device');
         });

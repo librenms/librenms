@@ -14,7 +14,7 @@ class CreateAlertScheduleTable extends Migration
     public function up()
     {
         Schema::create('alert_schedule', function (Blueprint $table) {
-            $table->integer('schedule_id', true);
+            $table->increments('schedule_id');
             $table->boolean('recurring')->default(0)->unsigned();
             $table->dateTime('start')->default('1970-01-02 00:00:01');
             $table->dateTime('end')->default('1970-01-02 00:00:01');

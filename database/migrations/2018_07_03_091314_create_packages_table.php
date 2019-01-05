@@ -14,8 +14,8 @@ class CreatePackagesTable extends Migration
     public function up()
     {
         Schema::create('packages', function (Blueprint $table) {
-            $table->integer('pkg_id', true);
-            $table->integer('device_id')->index('device_id');
+            $table->increments('pkg_id');
+            $table->unsignedInteger('device_id')->index('device_id');
             $table->string('name', 64);
             $table->string('manager', 16)->default('1');
             $table->boolean('status');

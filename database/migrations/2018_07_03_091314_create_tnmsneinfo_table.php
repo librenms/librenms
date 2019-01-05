@@ -14,8 +14,8 @@ class CreateTnmsneinfoTable extends Migration
     public function up()
     {
         Schema::create('tnmsneinfo', function (Blueprint $table) {
-            $table->integer('id', true);
-            $table->integer('device_id')->index('device_id');
+            $table->increments('id');
+            $table->unsignedInteger('device_id')->index('device_id');
             $table->integer('neID')->index('neID');
             $table->string('neType', 128);
             $table->string('neName', 128);

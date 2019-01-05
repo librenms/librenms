@@ -14,8 +14,8 @@ class CreateCefSwitchingTable extends Migration
     public function up()
     {
         Schema::create('cef_switching', function (Blueprint $table) {
-            $table->integer('cef_switching_id', true);
-            $table->integer('device_id');
+            $table->increments('cef_switching_id');
+            $table->unsignedInteger('device_id');
             $table->integer('entPhysicalIndex');
             $table->string('afi', 4);
             $table->integer('cef_index');
@@ -26,8 +26,8 @@ class CreateCefSwitchingTable extends Migration
             $table->integer('drop_prev');
             $table->integer('punt_prev');
             $table->integer('punt2host_prev');
-            $table->integer('updated');
-            $table->integer('updated_prev');
+            $table->unsignedInteger('updated');
+            $table->unsignedInteger('updated_prev');
             $table->unique(['device_id','entPhysicalIndex','afi','cef_index'], 'device_id');
         });
     }

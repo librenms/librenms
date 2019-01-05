@@ -14,10 +14,10 @@ class CreatePseudowiresTable extends Migration
     public function up()
     {
         Schema::create('pseudowires', function (Blueprint $table) {
-            $table->integer('pseudowire_id', true);
-            $table->integer('device_id');
-            $table->integer('port_id');
-            $table->integer('peer_device_id');
+            $table->increments('pseudowire_id');
+            $table->unsignedInteger('device_id');
+            $table->unsignedInteger('port_id');
+            $table->unsignedInteger('peer_device_id');
             $table->integer('peer_ldp_id');
             $table->integer('cpwVcID');
             $table->integer('cpwOid');

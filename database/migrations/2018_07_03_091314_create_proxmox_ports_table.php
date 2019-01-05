@@ -14,7 +14,7 @@ class CreateProxmoxPortsTable extends Migration
     public function up()
     {
         Schema::create('proxmox_ports', function (Blueprint $table) {
-            $table->integer('id', true);
+            $table->increments('id');
             $table->integer('vm_id');
             $table->string('port', 10);
             $table->timestamp('last_seen')->default(DB::raw('CURRENT_TIMESTAMP'));

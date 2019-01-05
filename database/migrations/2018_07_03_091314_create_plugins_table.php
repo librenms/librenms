@@ -14,7 +14,7 @@ class CreatePluginsTable extends Migration
     public function up()
     {
         Schema::create('plugins', function (Blueprint $table) {
-            $table->integer('plugin_id', true);
+            $table->increments('plugin_id');
             $table->string('plugin_name', 60);
             $table->integer('plugin_active');
         });

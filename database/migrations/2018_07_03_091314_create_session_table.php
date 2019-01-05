@@ -14,7 +14,7 @@ class CreateSessionTable extends Migration
     public function up()
     {
         Schema::create('session', function (Blueprint $table) {
-            $table->integer('session_id', true);
+            $table->increments('session_id');
             $table->string('session_username');
             $table->string('session_value', 60)->unique('session_value');
             $table->string('session_token', 60);

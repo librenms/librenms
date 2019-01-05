@@ -14,9 +14,9 @@ class CreateLoadbalancerRserversTable extends Migration
     public function up()
     {
         Schema::create('loadbalancer_rservers', function (Blueprint $table) {
-            $table->integer('rserver_id', true);
+            $table->increments('rserver_id');
             $table->string('farm_id', 128);
-            $table->integer('device_id');
+            $table->unsignedInteger('device_id');
             $table->string('StateDescr', 64);
         });
     }

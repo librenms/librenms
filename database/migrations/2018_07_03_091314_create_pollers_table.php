@@ -14,10 +14,10 @@ class CreatePollersTable extends Migration
     public function up()
     {
         Schema::create('pollers', function (Blueprint $table) {
-            $table->integer('id', true);
+            $table->increments('id');
             $table->string('poller_name')->unique('poller_name');
             $table->dateTime('last_polled');
-            $table->integer('devices');
+            $table->unsignedInteger('devices');
             $table->float('time_taken', 10, 0);
         });
     }

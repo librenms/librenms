@@ -14,12 +14,12 @@ class CreateIpsecTunnelsTable extends Migration
     public function up()
     {
         Schema::create('ipsec_tunnels', function (Blueprint $table) {
-            $table->integer('tunnel_id', true);
-            $table->integer('device_id');
-            $table->integer('peer_port');
+            $table->increments('tunnel_id');
+            $table->unsignedInteger('device_id');
+            $table->unsignedInteger('peer_port');
             $table->string('peer_addr', 64);
             $table->string('local_addr', 64);
-            $table->integer('local_port');
+            $table->unsignedInteger('local_port');
             $table->string('tunnel_name', 96);
             $table->string('tunnel_status', 11);
             $table->unique(['device_id','peer_addr'], 'unique_index');

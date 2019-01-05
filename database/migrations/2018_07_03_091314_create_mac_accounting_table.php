@@ -14,8 +14,8 @@ class CreateMacAccountingTable extends Migration
     public function up()
     {
         Schema::create('mac_accounting', function (Blueprint $table) {
-            $table->integer('ma_id', true);
-            $table->integer('port_id')->index('interface_id_2');
+            $table->increments('ma_id');
+            $table->unsignedInteger('port_id')->index('interface_id_2');
             $table->string('mac', 32);
             $table->string('in_oid', 128);
             $table->string('out_oid', 128);
@@ -37,9 +37,9 @@ class CreateMacAccountingTable extends Migration
             $table->bigInteger('cipMacHCSwitchedPkts_output_prev')->nullable();
             $table->bigInteger('cipMacHCSwitchedPkts_output_delta')->nullable();
             $table->integer('cipMacHCSwitchedPkts_output_rate')->nullable();
-            $table->integer('poll_time')->nullable();
-            $table->integer('poll_prev')->nullable();
-            $table->integer('poll_period')->nullable();
+            $table->unsignedInteger('poll_time')->nullable();
+            $table->unsignedInteger('poll_prev')->nullable();
+            $table->unsignedInteger('poll_period')->nullable();
             $table->index('port_id', 'interface_id');
         });
     }

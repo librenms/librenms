@@ -14,8 +14,8 @@ class CreatePortsTable extends Migration
     public function up()
     {
         Schema::create('ports', function (Blueprint $table) {
-            $table->integer('port_id', true);
-            $table->integer('device_id')->default(0);
+            $table->increments('port_id');
+            $table->unsignedInteger('device_id')->default(0);
             $table->string('port_descr_type')->nullable();
             $table->string('port_descr_descr')->nullable();
             $table->string('port_descr_circuit')->nullable();
@@ -83,9 +83,9 @@ class CreatePortsTable extends Migration
             $table->unsignedBigInteger('ifOutOctets_prev')->nullable();
             $table->unsignedBigInteger('ifOutOctets_delta')->nullable();
             $table->unsignedBigInteger('ifOutOctets_rate')->nullable();
-            $table->integer('poll_time')->nullable();
-            $table->integer('poll_prev')->nullable();
-            $table->integer('poll_period')->nullable();
+            $table->unsignedInteger('poll_time')->nullable();
+            $table->unsignedInteger('poll_prev')->nullable();
+            $table->unsignedInteger('poll_period')->nullable();
             $table->unique(['device_id','ifIndex'], 'device_ifIndex');
         });
     }

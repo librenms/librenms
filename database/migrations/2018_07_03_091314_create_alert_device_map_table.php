@@ -14,9 +14,9 @@ class CreateAlertDeviceMapTable extends Migration
     public function up()
     {
         Schema::create('alert_device_map', function (Blueprint $table) {
-            $table->integer('id', true);
-            $table->integer('rule_id');
-            $table->integer('device_id');
+            $table->increments('id');
+            $table->unsignedInteger('rule_id');
+            $table->unsignedInteger('device_id');
             $table->unique(['rule_id','device_id'], 'alert_device_map_rule_id_device_id_uindex');
         });
     }

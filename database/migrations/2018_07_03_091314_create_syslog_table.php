@@ -14,7 +14,7 @@ class CreateSyslogTable extends Migration
     public function up()
     {
         Schema::create('syslog', function (Blueprint $table) {
-            $table->integer('device_id')->nullable()->index('device_id');
+            $table->unsignedInteger('device_id')->nullable()->index('device_id');
             $table->string('facility', 10)->nullable();
             $table->string('priority', 10)->nullable();
             $table->string('level', 10)->nullable();

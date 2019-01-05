@@ -14,7 +14,7 @@ class CreateDeviceMibsTable extends Migration
     public function up()
     {
         Schema::create('device_mibs', function (Blueprint $table) {
-            $table->integer('device_id');
+            $table->unsignedInteger('device_id');
             $table->string('module');
             $table->string('mib');
             $table->string('included_by');

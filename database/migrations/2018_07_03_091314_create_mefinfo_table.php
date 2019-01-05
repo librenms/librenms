@@ -14,8 +14,8 @@ class CreateMefinfoTable extends Migration
     public function up()
     {
         Schema::create('mefinfo', function (Blueprint $table) {
-            $table->integer('id', true);
-            $table->integer('device_id')->index('device_id');
+            $table->increments('id');
+            $table->unsignedInteger('device_id')->index('device_id');
             $table->integer('mefID')->index('mefID');
             $table->string('mefType', 128);
             $table->string('mefIdent', 128);

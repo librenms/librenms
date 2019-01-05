@@ -14,7 +14,7 @@ class CreateEntPhysicalStateTable extends Migration
     public function up()
     {
         Schema::create('entPhysical_state', function (Blueprint $table) {
-            $table->integer('device_id');
+            $table->unsignedInteger('device_id');
             $table->string('entPhysicalIndex', 64);
             $table->string('subindex', 64)->nullable();
             $table->string('group', 64);

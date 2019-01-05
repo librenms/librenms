@@ -14,12 +14,12 @@ class CreatePerfTimesTable extends Migration
     public function up()
     {
         Schema::create('perf_times', function (Blueprint $table) {
-            $table->integer('id', true);
+            $table->increments('id');
             $table->string('type', 8)->index('type');
             $table->string('doing', 64);
-            $table->integer('start');
+            $table->unsignedInteger('start');
             $table->float('duration');
-            $table->integer('devices');
+            $table->unsignedInteger('devices');
             $table->string('poller');
         });
     }

@@ -14,8 +14,8 @@ class CreateAlertSchedulablesTable extends Migration
     public function up()
     {
         Schema::create('alert_schedulables', function (Blueprint $table) {
-            $table->integer('item_id', true);
-            $table->integer('schedule_id')->index('schedule_id');
+            $table->increments('item_id');
+            $table->unsignedInteger('schedule_id')->index('schedule_id');
             $table->unsignedInteger('alert_schedulable_id');
             $table->string('alert_schedulable_type');
             $table->index(['alert_schedulable_type', 'alert_schedulable_id'], 'schedulable_morph_index');

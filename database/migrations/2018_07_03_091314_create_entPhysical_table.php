@@ -14,8 +14,8 @@ class CreateEntPhysicalTable extends Migration
     public function up()
     {
         Schema::create('entPhysical', function (Blueprint $table) {
-            $table->integer('entPhysical_id', true);
-            $table->integer('device_id')->index('device_id');
+            $table->increments('entPhysical_id');
+            $table->unsignedInteger('device_id')->index('device_id');
             $table->integer('entPhysicalIndex');
             $table->text('entPhysicalDescr', 65535);
             $table->text('entPhysicalClass', 65535);

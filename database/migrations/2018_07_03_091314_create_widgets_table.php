@@ -14,7 +14,7 @@ class CreateWidgetsTable extends Migration
     public function up()
     {
         Schema::create('widgets', function (Blueprint $table) {
-            $table->integer('widget_id', true);
+            $table->increments('widget_id');
             $table->string('widget_title');
             $table->string('widget')->unique('widget');
             $table->string('base_dimensions', 10);

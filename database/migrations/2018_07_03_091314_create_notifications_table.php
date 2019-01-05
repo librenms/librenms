@@ -14,7 +14,7 @@ class CreateNotificationsTable extends Migration
     public function up()
     {
         Schema::create('notifications', function (Blueprint $table) {
-            $table->integer('notifications_id', true);
+            $table->increments('notifications_id');
             $table->string('title')->default('');
             $table->text('body', 65535);
             $table->integer('severity')->nullable()->default(0)->index()->comment('0=ok,1=warning,2=critical');

@@ -38,14 +38,14 @@ class CreateDevicesTable extends Migration
             $table->text('version')->nullable();
             $table->text('hardware')->nullable();
             $table->text('features')->nullable();
-            $table->integer('location_id')->nullable();
+            $table->unsignedInteger('location_id')->nullable();
             $table->string('os', 32)->nullable()->index('os');
             $table->boolean('status')->default(0)->index('status');
             $table->string('status_reason', 50);
             $table->boolean('ignore')->default(0);
             $table->boolean('disabled')->default(0);
             $table->bigInteger('uptime')->nullable();
-            $table->integer('agent_uptime')->default(0);
+            $table->unsignedInteger('agent_uptime')->default(0);
             $table->timestamp('last_polled')->nullable()->index('last_polled');
             $table->timestamp('last_poll_attempted')->nullable()->index('last_poll_attempted');
             $table->float('last_polled_timetaken', 5)->nullable();

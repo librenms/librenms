@@ -14,7 +14,7 @@ class CreateApplicationMetricsTable extends Migration
     public function up()
     {
         Schema::create('application_metrics', function (Blueprint $table) {
-            $table->integer('app_id');
+            $table->unsignedInteger('app_id');
             $table->string('metric', 32);
             $table->double('value')->nullable();
             $table->double('value_prev')->nullable();

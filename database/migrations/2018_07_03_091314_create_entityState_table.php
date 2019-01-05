@@ -14,9 +14,9 @@ class CreateEntityStateTable extends Migration
     public function up()
     {
         Schema::create('entityState', function (Blueprint $table) {
-            $table->integer('entity_state_id', true);
-            $table->integer('device_id')->nullable();
-            $table->integer('entPhysical_id')->nullable();
+            $table->increments('entity_state_id');
+            $table->unsignedInteger('device_id')->nullable();
+            $table->unsignedInteger('entPhysical_id')->nullable();
             $table->dateTime('entStateLastChanged')->nullable();
             $table->integer('entStateAdmin')->nullable();
             $table->integer('entStateOper')->nullable();

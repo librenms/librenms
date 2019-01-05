@@ -15,7 +15,7 @@ class CreatePdbIxTable extends Migration
     {
         Schema::create('pdb_ix', function (Blueprint $table) {
             $table->increments('pdb_ix_id');
-            $table->integer('ix_id')->unsigned();
+            $table->unsignedInteger('ix_id')->unsigned();
             $table->string('name');
             $table->integer('asn')->unsigned();
             $table->integer('timestamp')->unsigned();

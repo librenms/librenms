@@ -14,8 +14,8 @@ class CreatePortsPermsTable extends Migration
     public function up()
     {
         Schema::create('ports_perms', function (Blueprint $table) {
-            $table->integer('user_id');
-            $table->integer('port_id');
+            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('port_id');
         });
     }
 

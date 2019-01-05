@@ -14,7 +14,7 @@ class CreatePollerClusterTable extends Migration
     public function up()
     {
         Schema::create('poller_cluster', function (Blueprint $table) {
-            $table->integer('id', true);
+            $table->increments('id');
             $table->string('node_id')->unique();
             $table->string('poller_name');
             $table->string('poller_version')->default('');

@@ -14,8 +14,8 @@ class CreatePollerClusterStatsTable extends Migration
     public function up()
     {
         Schema::create('poller_cluster_stats', function (Blueprint $table) {
-            $table->integer('id', true);
-            $table->integer('parent_poller')->default(0);
+            $table->increments('id');
+            $table->unsignedInteger('parent_poller')->default(0);
             $table->string('poller_type', 64)->default('');
             $table->unsignedInteger('depth');
             $table->unsignedInteger('devices');

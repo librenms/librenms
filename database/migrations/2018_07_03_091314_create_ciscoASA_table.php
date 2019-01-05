@@ -14,8 +14,8 @@ class CreateCiscoASATable extends Migration
     public function up()
     {
         Schema::create('ciscoASA', function (Blueprint $table) {
-            $table->integer('ciscoASA_id', true);
-            $table->integer('device_id')->index('device_id');
+            $table->increments('ciscoASA_id');
+            $table->unsignedInteger('device_id')->index('device_id');
             $table->string('oid');
             $table->bigInteger('data');
             $table->bigInteger('high_alert');

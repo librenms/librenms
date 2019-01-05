@@ -15,8 +15,8 @@ class CreatePdbIxPeersTable extends Migration
     {
         Schema::create('pdb_ix_peers', function (Blueprint $table) {
             $table->increments('pdb_ix_peers_id');
-            $table->integer('ix_id')->unsigned();
-            $table->integer('peer_id')->unsigned();
+            $table->unsignedInteger('ix_id');
+            $table->unsignedInteger('peer_id');
             $table->unsignedInteger('remote_asn');
             $table->string('remote_ipaddr4', 15)->nullable();
             $table->string('remote_ipaddr6', 128)->nullable();

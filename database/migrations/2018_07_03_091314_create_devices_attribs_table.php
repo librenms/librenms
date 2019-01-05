@@ -14,8 +14,8 @@ class CreateDevicesAttribsTable extends Migration
     public function up()
     {
         Schema::create('devices_attribs', function (Blueprint $table) {
-            $table->integer('attrib_id', true);
-            $table->integer('device_id')->index('device_id');
+            $table->increments('attrib_id');
+            $table->unsignedInteger('device_id')->index('device_id');
             $table->string('attrib_type', 32);
             $table->text('attrib_value', 65535);
             $table->timestamp('updated')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));

@@ -14,7 +14,7 @@ class CreateSensorsTable extends Migration
     public function up()
     {
         Schema::create('sensors', function (Blueprint $table) {
-            $table->integer('sensor_id', true);
+            $table->increments('sensor_id');
             $table->boolean('sensor_deleted')->default(0);
             $table->string('sensor_class', 64)->index('sensor_class');
             $table->unsignedInteger('device_id')->default(0)->index('sensor_host');

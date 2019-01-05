@@ -14,8 +14,8 @@ class CreateSlasTable extends Migration
     public function up()
     {
         Schema::create('slas', function (Blueprint $table) {
-            $table->integer('sla_id', true);
-            $table->integer('device_id')->index('device_id');
+            $table->increments('sla_id');
+            $table->unsignedInteger('device_id')->index('device_id');
             $table->integer('sla_nr');
             $table->string('owner');
             $table->string('tag');

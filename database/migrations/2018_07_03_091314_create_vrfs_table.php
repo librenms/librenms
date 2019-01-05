@@ -14,12 +14,12 @@ class CreateVrfsTable extends Migration
     public function up()
     {
         Schema::create('vrfs', function (Blueprint $table) {
-            $table->integer('vrf_id', true);
+            $table->increments('vrf_id');
             $table->string('vrf_oid', 256);
             $table->string('vrf_name', 128)->nullable();
             $table->string('mplsVpnVrfRouteDistinguisher', 128)->nullable();
             $table->text('mplsVpnVrfDescription', 65535);
-            $table->integer('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index('device_id');
         });
     }
 

@@ -14,14 +14,14 @@ class CreateLinksTable extends Migration
     public function up()
     {
         Schema::create('links', function (Blueprint $table) {
-            $table->integer('id', true);
-            $table->integer('local_port_id')->nullable()->index('src_if');
-            $table->integer('local_device_id');
-            $table->integer('remote_port_id')->nullable()->index('dst_if');
+            $table->increments('id');
+            $table->unsignedInteger('local_port_id')->nullable()->index('src_if');
+            $table->unsignedInteger('local_device_id');
+            $table->unsignedInteger('remote_port_id')->nullable()->index('dst_if');
             $table->boolean('active')->default(1);
             $table->string('protocol', 11)->nullable();
             $table->string('remote_hostname', 128);
-            $table->integer('remote_device_id');
+            $table->unsignedInteger('remote_device_id');
             $table->string('remote_port', 128);
             $table->string('remote_platform', 256)->nullable();
             $table->string('remote_version', 256);

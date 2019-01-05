@@ -14,8 +14,8 @@ class CreateBillHistoryTable extends Migration
     public function up()
     {
         Schema::create('bill_history', function (Blueprint $table) {
-            $table->integer('bill_hist_id', true);
-            $table->integer('bill_id')->index('bill_id');
+            $table->increments('bill_hist_id');
+            $table->unsignedInteger('bill_id')->index('bill_id');
             $table->timestamp('updated')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->dateTime('bill_datefrom');
             $table->dateTime('bill_dateto');

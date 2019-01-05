@@ -14,8 +14,8 @@ class CreateVlansTable extends Migration
     public function up()
     {
         Schema::create('vlans', function (Blueprint $table) {
-            $table->integer('vlan_id', true);
-            $table->integer('device_id')->nullable();
+            $table->increments('vlan_id');
+            $table->unsignedInteger('device_id')->nullable();
             $table->integer('vlan_vlan')->nullable();
             $table->integer('vlan_domain')->nullable();
             $table->string('vlan_name', 64)->nullable();

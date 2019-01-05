@@ -14,7 +14,7 @@ class CreateWirelessSensorsTable extends Migration
     public function up()
     {
         Schema::create('wireless_sensors', function (Blueprint $table) {
-            $table->integer('sensor_id', true);
+            $table->increments('sensor_id');
             $table->boolean('sensor_deleted')->default(0);
             $table->string('sensor_class', 64)->index('sensor_class');
             $table->unsignedInteger('device_id')->default(0)->index('sensor_host');
@@ -36,7 +36,7 @@ class CreateWirelessSensorsTable extends Migration
             $table->string('entPhysicalIndex_measured', 16)->nullable();
             $table->timestamp('lastupdate')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->text('sensor_oids');
-            $table->integer('access_point_id')->nullable();
+            $table->unsignedInteger('access_point_id')->nullable();
         });
     }
 

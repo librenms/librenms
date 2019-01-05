@@ -14,9 +14,9 @@ class CreateNotificationsAttribsTable extends Migration
     public function up()
     {
         Schema::create('notifications_attribs', function (Blueprint $table) {
-            $table->integer('attrib_id', true);
-            $table->integer('notifications_id');
-            $table->integer('user_id');
+            $table->increments('attrib_id');
+            $table->unsignedInteger('notifications_id');
+            $table->unsignedInteger('user_id');
             $table->string('key')->default('');
             $table->string('value')->default('');
         });

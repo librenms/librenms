@@ -14,9 +14,9 @@ class CreatePortsVlansTable extends Migration
     public function up()
     {
         Schema::create('ports_vlans', function (Blueprint $table) {
-            $table->integer('port_vlan_id', true);
-            $table->integer('device_id');
-            $table->integer('port_id');
+            $table->increments('port_vlan_id');
+            $table->unsignedInteger('device_id');
+            $table->unsignedInteger('port_id');
             $table->integer('vlan');
             $table->integer('baseport');
             $table->bigInteger('priority');

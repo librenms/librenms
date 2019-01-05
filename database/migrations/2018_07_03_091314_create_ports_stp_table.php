@@ -14,9 +14,9 @@ class CreatePortsStpTable extends Migration
     public function up()
     {
         Schema::create('ports_stp', function (Blueprint $table) {
-            $table->integer('port_stp_id', true);
-            $table->integer('device_id');
-            $table->integer('port_id');
+            $table->increments('port_stp_id');
+            $table->unsignedInteger('device_id');
+            $table->unsignedInteger('port_id');
             $table->tinyInteger('priority')->unsigned();
             $table->string('state', 11);
             $table->string('enable', 8);

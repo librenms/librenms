@@ -14,14 +14,14 @@ class CreateMempoolsTable extends Migration
     public function up()
     {
         Schema::create('mempools', function (Blueprint $table) {
-            $table->integer('mempool_id', true);
+            $table->increments('mempool_id');
             $table->string('mempool_index', 16);
             $table->integer('entPhysicalIndex')->nullable();
             $table->integer('hrDeviceIndex')->nullable();
             $table->string('mempool_type', 32);
             $table->integer('mempool_precision')->default(1);
             $table->string('mempool_descr', 64);
-            $table->integer('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index('device_id');
             $table->integer('mempool_perc');
             $table->bigInteger('mempool_used');
             $table->bigInteger('mempool_free');

@@ -14,8 +14,8 @@ class CreateUcdDiskioTable extends Migration
     public function up()
     {
         Schema::create('ucd_diskio', function (Blueprint $table) {
-            $table->integer('diskio_id', true);
-            $table->integer('device_id')->index('device_id');
+            $table->increments('diskio_id');
+            $table->unsignedInteger('device_id')->index('device_id');
             $table->integer('diskio_index');
             $table->string('diskio_descr', 32);
         });
