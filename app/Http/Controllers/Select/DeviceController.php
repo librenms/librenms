@@ -47,7 +47,9 @@ class DeviceController extends SelectController
     {
         $this->id = $request->get('id', 'device_id');
 
-        return Device::hasAccess($request->user())->select('device_id', 'hostname', 'sysName');
+        return Device::hasAccess($request->user())
+            ->select('device_id', 'hostname', 'sysName')
+            ->orderBy('hostname');
     }
 
     public function formatItem($device)
