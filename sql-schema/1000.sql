@@ -4,7 +4,7 @@ INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_aler
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_alert_group_map_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_alert_log_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_alert_rules_table', 1);
-INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_alert_schedule_items_table', 1);
+INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_alert_schedulables_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_alert_schedule_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_alert_template_map_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_alert_templates_table', 1);
@@ -86,6 +86,7 @@ INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_poll
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_pollers_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_ports_adsl_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_ports_fdb_table', 1);
+INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_ports_nac_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_ports_perms_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_ports_stack_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_ports_statistics_table', 1);
