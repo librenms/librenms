@@ -22,7 +22,7 @@
                 <td><a href="{{ url('devices/ignore=1/format=list_detail') }}"><span class="grey"> {{ $devices['ignored'] }}</span></a></td>
                 <td><a href="{{ url('devices/disabled=1/format=list_detail') }}"><span class="black"> {{ $devices['disabled'] }}</span></a></td>
                 @if($summary_errors)
-                    <th>-</th>
+                    <td>-</td>
                 @endif
             </tr>
             <tr>
