@@ -81,7 +81,7 @@ class Vrp extends OS implements ProcessorDiscovery, NacPolling
     }
 
     /**
-    * Discover the Network Access Control informations (dot1X etc etc) 
+    * Discover the Network Access Control informations (dot1X etc etc)
     *
     */
     public function pollNac()
