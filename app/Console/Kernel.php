@@ -12,10 +12,7 @@ class Kernel extends ConsoleKernel
      *
      * @var array
      */
-    protected $commands = [
-        Commands\Release::class,
-        Commands\Ping::class,
-    ];
+    protected $commands = [];
 
     /**
      * Define the application's command schedule.
@@ -37,5 +34,9 @@ class Kernel extends ConsoleKernel
     protected function commands()
     {
         require base_path('routes/console.php');
+
+        if ($this->app->environment() !== 'production') {
+            require base_path('routes/dev-console.php');
+        }
     }
 }
