@@ -110,9 +110,10 @@ class Vrp extends OS implements ProcessorDiscovery, NacPolling
                     'authz_status' => $portAuthSessionEntryParameters['hwAccessAuthorizetype'],
                     'authz_by' => $portAuthSessionEntryParameters['hwAccessAuthType'],
                     'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'],
-                    'time_left' => "",
+                    'time_elapsed' => $portAuthSessionEntryParameters['hwAccessOnlineTime'],
                     'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'],
                     'method' => $portAuthSessionEntryParameters['hwAccessAuthtype'],
+                    'vlan' => $portAuthSessionEntryParameters['hwAccessVLANID'],
                 ]));
             }
         }

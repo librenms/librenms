@@ -38,6 +38,7 @@ class PortsNac extends BaseModel
         'username',
         'mac_address',
         'ip_address',
+        'vlan',
         'host_mode',
         'authz_status',
         'authz_by',
@@ -45,6 +46,7 @@ class PortsNac extends BaseModel
         'method',
         'timeout',
         'time_left',
+        'time_elapsed',
     ];
 
 
