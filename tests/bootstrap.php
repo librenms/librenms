@@ -101,8 +101,6 @@ if (getenv('DBTEST')) {
                 'alert_templates',
                 'config', // not sure about this one
                 'dbSchema',
-                'graph_types',
-                'port_association_mode',
                 'widgets',
             );
             $truncate = array_diff($tables, $excluded);

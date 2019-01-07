@@ -220,9 +220,7 @@ $config['graph_types']['device']['screenos_sessions']['order']     = '0';
 $config['graph_types']['device']['screenos_sessions']['descr']     = 'Active Sessions';
 
 //FortiOS Graphs
-$config['graph_types']['device']['fortios_lograte']['section']  = 'Analyzer';
-$config['graph_types']['device']['fortios_lograte']['order']    = '0';
-$config['graph_types']['device']['fortios_lograte']['descr']    = 'Log Rate';
+$config['graph_types']['device']['fortios_lograte'] = ['section' => 'analyzer', 'order' => 0, 'descr' => 'Log Rate'];
 
 //PAN OS Graphs
 $config['graph_types']['device']['panos_sessions']['section']           = 'firewall';
@@ -243,9 +241,7 @@ $config['graph_types']['device']['panos_sessions_ssl']['descr']         = 'Activ
 $config['graph_types']['device']['panos_sessions_sslutil']['section']   = 'firewall';
 $config['graph_types']['device']['panos_sessions_sslutil']['order']     = '0';
 $config['graph_types']['device']['panos_sessions_sslutil']['descr']     = 'Active SSL Proxy Utilization';
-$config['graph_types']['device']['panos_activetunnels']['section']      = 'firewall';
-$config['graph_types']['device']['panos_activetunnels']['order']        = '0';
-$config['graph_types']['device']['panos_activetunnels']['descr']        = 'Active GlobalProtect Tunnels';
+$config['graph_types']['device']['panos_activetunnels'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Active GlobalProtect Tunnels'];
 
 //PF Graphs
 $config['graph_types']['device']['pf_states']['section']           = 'firewall';
@@ -279,17 +275,9 @@ $config['graph_types']['device']['pf_memdropped']['section']         = 'firewall
 $config['graph_types']['device']['pf_memdropped']['order']           = '10';
 $config['graph_types']['device']['pf_memdropped']['descr']           = 'MemDropped';
 
-
-
-
-
 //Pulse Secure Graphs
-$config['graph_types']['device']['pulse_users']['section']         = 'firewall';
-$config['graph_types']['device']['pulse_users']['order']           = '0';
-$config['graph_types']['device']['pulse_users']['descr']           = 'Active Users';
-$config['graph_types']['device']['pulse_sessions']['section']      = 'firewall';
-$config['graph_types']['device']['pulse_sessions']['order']        = '0';
-$config['graph_types']['device']['pulse_sessions']['descr']        = 'Active Sessions';
+$config['graph_types']['device']['pulse_sessions'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Active Sessions'];
+$config['graph_types']['device']['pulse_users'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Active Users'];
 
 // Infoblox dns/dhcp Graphs
 $config['graph_types']['device']['ib_dns_dyn_updates']['section']             = 'dns';
@@ -306,14 +294,10 @@ $config['graph_types']['device']['ib_dhcp_messages']['order']                 = 
 $config['graph_types']['device']['ib_dhcp_messages']['descr']                 = 'DHCP messages';
 
 // Cisco WAAS Optimized TCP Connections
-$config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['section']      = 'graphs';
-$config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['order']        = '0';
-$config['graph_types']['device']['waas_cwotfostatsactiveoptconn']['descr']        = 'Optimized TCP Connections';
+$config['graph_types']['device']['waas_cwotfostatsactiveoptconn'] = ['section' => 'graphs', 'order' => 0, 'descr' => 'Optimized TCP Connections'];
 
 // SonicWALL Sessions
-$config['graph_types']['device']['sonicwall_sessions']['section']      = 'firewall';
-$config['graph_types']['device']['sonicwall_sessions']['order']        = '0';
-$config['graph_types']['device']['sonicwall_sessions']['descr']        = 'Active Sessions';
+$config['graph_types']['device']['sonicwall_sessions'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Active Sessions'];
 
 $config['graph_types']['device']['bits']['section']               = 'netstats';
 $config['graph_types']['device']['bits']['order']                 = '0';
@@ -438,9 +422,7 @@ $config['graph_types']['device']['netscaler_tcp_pkts']['section'] = 'load balanc
 $config['graph_types']['device']['netscaler_tcp_pkts']['order']   = '0';
 $config['graph_types']['device']['netscaler_tcp_pkts']['descr']   = 'TCP Packets';
 
-$config['graph_types']['device']['asa_conns']['section'] = 'firewall';
-$config['graph_types']['device']['asa_conns']['order']   = '0';
-$config['graph_types']['device']['asa_conns']['descr']   = 'Current connections';
+$config['graph_types']['device']['asa_conns'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Current connections'];
 
 $config['graph_types']['device']['cisco-iospri']['section']  = 'voice';
 $config['graph_types']['device']['cisco-iospri']['order']    = '0';
@@ -477,9 +459,8 @@ $config['graph_types']['device']['sgos_average_requests']['order']    = '0';
 $config['graph_types']['device']['sgos_average_requests']['descr']    = 'Average HTTP Requests';
 
 // SRX Flow Sessions
-$config['graph_types']['device']['junos_jsrx_spu_sessions']['section']  = 'network';
-$config['graph_types']['device']['junos_jsrx_spu_sessions']['order']    = '0';
-$config['graph_types']['device']['junos_jsrx_spu_sessions']['descr']    = 'Flow Sessions';
+$config['graph_types']['device']['junos_jsrx_spu_flows'] = ['section' => 'network', 'order' => 0, 'descr' => 'SPU Flows'];
+$config['graph_types']['device']['junos_jsrx_spu_sessions'] = ['section' => 'network', 'order' => 1, 'descr' => 'Flow Sessions'];
 
 // Blue Coat SGOS
 // Client Connections
@@ -512,18 +493,10 @@ $config['graph_types']['device']['bluecoat_http_server_connections_idle']['descr
 
 
 //riverbed specific graphs
-$config['graph_types']['device']['riverbed_connections']['section'] = 'network';
-$config['graph_types']['device']['riverbed_connections']['order'] = 0;
-$config['graph_types']['device']['riverbed_connections']['descr'] = 'Connections';
-$config['graph_types']['device']['riverbed_optimization']['section'] = 'network';
-$config['graph_types']['device']['riverbed_optimization']['order'] = 1;
-$config['graph_types']['device']['riverbed_optimization']['descr'] = 'Optimization';
-$config['graph_types']['device']['riverbed_datastore']['section'] = 'network';
-$config['graph_types']['device']['riverbed_datastore']['order'] = 2;
-$config['graph_types']['device']['riverbed_datastore']['descr'] = 'Data store productivity';
-$config['graph_types']['device']['riverbed_passthrough']['section'] = 'network';
-$config['graph_types']['device']['riverbed_passthrough']['order'] = 3;
-$config['graph_types']['device']['riverbed_passthrough']['descr'] = 'Bandwidth Passthrough';
+$config['graph_types']['device']['riverbed_connections'] = ['section' => 'network', 'order' => 0, 'descr' => 'Connections'];
+$config['graph_types']['device']['riverbed_optimization'] = ['section' => 'network', 'order' => 1, 'descr' => 'Optimization'];
+$config['graph_types']['device']['riverbed_datastore'] = ['section' => 'network', 'order' => 2, 'descr' => 'Datastore productivity'];
+$config['graph_types']['device']['riverbed_passthrough'] = ['section' => 'network', 'order' => 3, 'descr' => 'Bandwidth passthrough'];
 
 //mikrotik specific graphs
 $config['graph_types']['device']['routeros_leases']['section'] = 'network';
@@ -537,14 +510,25 @@ $config['graph_types']['device']['secureplatform_sessions']['order'] = 0;
 $config['graph_types']['device']['secureplatform_sessions']['descr'] = 'Active connections';
 
 //arbos specific graphs
-$config['graph_types']['device']['arbos_flows']['section']         = 'graphs';
-$config['graph_types']['device']['arbos_flows']['order']           = '0';
-$config['graph_types']['device']['arbos_flows']['descr']           = 'Accumulative flow count per SP device';
+$config['graph_types']['device']['arbos_flows'] = ['section' => 'graphs', 'order' => 0, 'descr' => 'Accumulative flow count per SP device'];
 
 //F5 specific graphs
-$config['graph_types']['device']['apm_sessions']['section']      = 'apm';
-$config['graph_types']['device']['apm_sessions']['order']        = '0';
-$config['graph_types']['device']['apm_sessions']['descr']        = 'Active Sessions';
+$config['graph_types']['device']['bigip_apm_sessions'] = ['section' => 'apm', 'order' => 0, 'descr' => 'Active Sessions'];
+
+// Bluecoat ProxySG Graphs
+$config['graph_types']['device']['sgos_average_requests'] = ['section' => 'network', 'order' => 0, 'descr' => 'Average HTTP Requests'];
+$config['graph_types']['device']['sgos_client_connections'] = ['section' => 'network', 'order' => 1, 'descr' => 'HTTP Client Connections'];
+$config['graph_types']['device']['sgos_client_connections_active'] = ['section' => 'network', 'order' => 2, 'descr' => 'HTTP Client Connections Active'];
+$config['graph_types']['device']['sgos_client_connections_idle'] = ['section' => 'network', 'order' => 3, 'descr' => 'HTTP Client Connections Idle'];
+$config['graph_types']['device']['sgos_server_connections'] = ['section' => 'network', 'order' => 4, 'descr' => 'HTTP Server Connections'];
+$config['graph_types']['device']['sgos_server_connections_active'] = ['section' => 'network', 'order' => 5, 'descr' => 'HTTP Server Connections Active'];
+$config['graph_types']['device']['sgos_server_connections_idle'] = ['section' => 'network', 'order' => 6, 'descr' => 'HTTP Server Connections Idle'];
+
+// Cisco AsyncOS Graphs
+$config['graph_types']['device']['asyncos_conns'] = ['section' => 'proxy', 'order' => 0, 'descr' => 'Current connections'];
+
+// Zywall Graphs
+$config['graph_types']['device']['zywall_sessions'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Sessions'];
 
 // Device Types
 $i = 0;
