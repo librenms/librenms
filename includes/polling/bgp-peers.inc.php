@@ -13,7 +13,7 @@ if ($config['enable_bgp']) {
         } elseif ($device['os_group'] === 'arista') {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', array(), 'ARISTA-BGP4V2-MIB');
         } elseif ($device['os'] === 'timos') {
-            $peer_data_check = snmpwalk_cache_multi_oid($device, 'tBgpInstanceRowStatus', [], 'TIMETRA-BGP-MIB', 'nokia');  
+            $peer_data_check = snmpwalk_cache_multi_oid($device, 'tBgpInstanceRowStatus', [], 'TIMETRA-BGP-MIB', 'nokia');
         } else {
             $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', array(), 'CISCO-BGP4-MIB');
         }
@@ -83,22 +83,22 @@ if ($config['enable_bgp']) {
                     } else if ($device['os'] == 'timos') {
                         if (!isset($bgpPeers)) {
                             echo "\nCaching Oids...";
-                            $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');  
-                            $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgOperEntry', $bgpPeersCache, 'TIMETRA-BGP-MIB', 'nokia');  
+                            $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
+                            $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgOperEntry', $bgpPeersCache, 'TIMETRA-BGP-MIB', 'nokia');
                             foreach ($bgpPeersCache as $key => $value) {
-                                $oid = explode (".", $key);
+                                $oid = explode(".", $key);
                                 $vrfInstance = $oid[0];
-                                $address = str_replace ($oid[0].".".$oid[1].".", '', $key);
+                                $address = str_replace($oid[0].".".$oid[1].".", '', $key);
                                 if (strlen($address) > 15) {
                                     $address = IP::fromHexString($address)->compressed();
                                 }
-                            $bgpPeers[$vrfInstance][$address] = $value;
+                                $bgpPeers[$vrfInstance][$address] = $value;
                             }
                         }
                         $address = (string)$peer_ip;
                         $tmpTime = $bgpPeers[$vrfOid][$address]['tBgpPeerNgLastChanged'];
-                        $tmpTime = explode (".", $tmpTime);
-                        $tmpTime = explode (":", $tmpTime[0]);
+                        $tmpTime = explode(".", $tmpTime);
+                        $tmpTime = explode(":", $tmpTime[0]);
                         $establishedTime = ($tmpTime[0] * 86400) + ($tmpTime[1] * 3600) + ($tmpTime[2] * 60) + $tmpTime[3];
 
                         $peer_data = [];
@@ -108,7 +108,6 @@ if ($config['enable_bgp']) {
                         $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsSent']; // not messages
                         $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                         // ToDo, It seems that bgpPeer(In|Out)Updates, bgpPeerInUpdateElapsedTime and  bgpLocalAddr are actually not available over SNMP
-
                     } else {
                         $bgp_peer_ident = $peer_ip->toSnmpIndex();
 

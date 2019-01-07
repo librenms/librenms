@@ -8,14 +8,14 @@ if (Config::get('enable_bgp')) {
     if ($device['os'] == 'timos') {
         $bgpPeersCache =snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
         foreach ($bgpPeersCache as $key => $value) {
-            $oid = explode (".", $key);
+            $oid = explode(".", $key);
             $vrfInstance = $oid[0];
-            $address = str_replace ($oid[0].".".$oid[1].".", '', $key);
+            $address = str_replace($oid[0].".".$oid[1].".", '', $key);
             if (strlen($address) > 15) {
                 $address = IP::fromHexString($address)->compressed();
             }
             $bgpPeers[$vrfInstance][$address] = $value;
-        } 
+        }
         unset($bgpPeersCache);
 
         foreach ($bgpPeers as $vrfOid => $vrf) {
@@ -41,12 +41,12 @@ if (Config::get('enable_bgp')) {
                         'bgpPeerInUpdateElapsedTime' => 0,
                         'astext' => $astext,
                     ];
-                dbInsert($peers, 'bgpPeers');
-                if (Config::get('autodiscovery.bgp')) {
-                    $name = gethostbyaddr($address);
-                    discover_new_device($name, $device, 'BGP');
-                }
-                echo '+';
+                    dbInsert($peers, 'bgpPeers');
+                    if (Config::get('autodiscovery.bgp')) {
+                        $name = gethostbyaddr($address);
+                        discover_new_device($name, $device, 'BGP');
+                    }
+                    echo '+';
                 } else {
                     dbUpdate(['bgpPeerRemoteAs' => $value['tBgpPeerNgPeerAS4Byte'], 'astext' => $astext], 'bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
                     echo '.';
