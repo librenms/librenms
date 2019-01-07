@@ -109,7 +109,7 @@
     "name": "Device discovered within the last 60 minutes"
   },
   {
-    "rule": "wireless_sensors.sensor_class = 'clients' && wireless_sensors.sensor_current >= `wireless_sensors.sensor_limit` && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
+    "rule": "wireless_sensors.sensor_class = \"clients\" && wireless_sensors.sensor_current >= `wireless_sensors.sensor_limit` && wireless_sensors.sensor_alert = \"1\" && macros.device_up = \"1\"",
     "name": "Too many wireless clients"
   },
   {
