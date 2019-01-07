@@ -15,7 +15,7 @@
     <div class="form-group">
         <label for="resolution-{{ $id }}-{{ $id }}" class="control-label">@lang('Resolution')</label>
         <select class="form-control" id="resolution-{{ $id }}" name="resolution">
-            <option value="countries" @if($resolution == 'countries') selected @endif>@lang('Contries')</option>
+            <option value="countries" @if($resolution == 'countries') selected @endif>@lang('Countries')</option>
             <option value="provinces" @if($resolution == 'provinces') selected @endif>@lang('Provinces')</option>
             <option value="metros" @if($resolution == 'metros') selected @endif>@lang('Metros')</option>
         </select>
