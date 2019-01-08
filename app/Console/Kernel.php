@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use LibreNMS\Util\Version;
 
 class Kernel extends ConsoleKernel
 {
@@ -38,5 +39,16 @@ class Kernel extends ConsoleKernel
         if ($this->app->environment() !== 'production') {
             require base_path('routes/dev-console.php');
         }
+    }
+
+    protected function getArtisan()
+    {
+        if (is_null($this->artisan)) {
+            parent::getArtisan();
+            $this->artisan->setName(\LibreNMS\Config::get('project_name', 'LibreNMS'));
+            $this->artisan->setVersion(Version::get()->local());
+        }
+
+        return $this->artisan;
     }
 }
