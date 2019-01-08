@@ -14,12 +14,14 @@ $vlan_visibility = ' data-visible="false"';
 $t_elapsed_visibility = ' data-visible="false"';
 $t_left_visibility = ' data-visible="false"';
 $timeout_visibility = ' data-visible="false"';
+$mode_visibility = ' data-visible="false"';
 if ($device['os'] === 'vrp') {
     $vlan_visibility = '';
     $t_elapsed_visibility = '';
 } else {
     $t_left_visibility = '';
     $timeout_visibility = '';
+    $mode_visibility = '';
 }
 
 ?>
@@ -38,12 +40,12 @@ if ($device['os'] === 'vrp') {
                     <th data-column-id="ip_address">IP Address</th>
                     <th data-column-id="vlan"<?php echo $vlan_visibility ?>>Vlan</th>
                     <th data-column-id="domain" data-formatter="nac_domain">Domain</th>
-                    <th data-column-id="host_mode" data-formatter="nac_mode">Mode</th>
+                    <th data-column-id="host_mode"<?php echo $mode_visibility ?>data-formatter="nac_mode">Mode</th>
                     <th data-column-id="username">Username</th>
                     <th data-column-id="authz_by" data-visible="false">Auth By</th>
                     <th data-column-id="timeout"<?php echo $timeout_visibility ?>>Timeout</th>
-                    <th data-column-id="time_elapsed"<?php echo $t_elapsed_visibility ?>>Time Elapsed</th>
-                    <th data-column-id="time_left"<?php echo $t_left_visibility ?>>Time Left</th>
+                    <th data-column-id="time_elapsed"<?php echo $t_elapsed_visibility ?> data-formatter="time_interval">Time Elapsed</th>
+                    <th data-column-id="time_left"<?php echo $t_left_visibility ?> data-formatter="time_interval">Time Left</th>
                     <th data-column-id="authc_status" data-formatter="nac_authc">AuthC</th>
                     <th data-column-id="authz_status" data-formatter="nac_authz">AuthZ</th>
                     <th data-column-id="method" data-formatter="nac_method">Method</th>
@@ -65,6 +67,21 @@ if ($device['os'] === 'vrp') {
             };
         },
         formatters: {
+            "time_interval": function (column, row) {
+                var value = row[column.id];
+                if (value > 59) {
+                    var date = new Date(null);
+                    var days = Math.floor(value / 86400);
+                    date.setSeconds(value % 86400);
+                    var result = date.toISOString().substr(11,8);
+                    if (days > 0) {
+                        result = days + ' days,' + result;
+                    }
+                    return result;
+                } else {
+                    return value;
+                }
+            },
             "nac_authz": function (column, row) {
                 var value = row[column.id];
 

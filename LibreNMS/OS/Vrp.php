@@ -99,20 +99,24 @@ class Vrp extends OS implements ProcessorDiscovery, NacPolling
             // update the DB
             foreach ($portAuthSessionEntry as $authId => $portAuthSessionEntryParameters) {
                 $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
+                $port_id = $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0);
+                if ($port_id <=0) {
+                    continue; //this would happen for an SSH session for instance
+                }
                 $nac->put($mac_address, new PortsNac([
                     'port_id' => $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0),
                     'mac_address' => $mac_address,
                     'auth_id' => $authId,
                     'domain' => $portAuthSessionEntryParameters['hwAccessDomain'],
-                    'username' => $portAuthSessionEntryParameters['hwAccessUserName'],
+                    'username' => ''.$portAuthSessionEntryParameters['hwAccessUserName'],
                     'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'],
-                    'host_mode' => $portAuthSessionEntryParameters['hwAccessType'],
-                    'authz_status' => $portAuthSessionEntryParameters['hwAccessAuthorizetype'],
-                    'authz_by' => $portAuthSessionEntryParameters['hwAccessAuthType'],
+                    'authz_by' => ''.$portAuthSessionEntryParameters['hwAccessType'],
+                    'authz_status' => ''.$portAuthSessionEntryParameters['hwAccessAuthorizetype'],
+                    'host_mode' => is_null($portAuthSessionEntryParameters['hwAccessAuthType'])?'default':$portAuthSessionEntryParameters['hwAccessAuthType'],
                     'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'],
                     'time_elapsed' => $portAuthSessionEntryParameters['hwAccessOnlineTime'],
                     'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'],
-                    'method' => $portAuthSessionEntryParameters['hwAccessAuthtype'],
+                    'method' => ''.$portAuthSessionEntryParameters['hwAccessAuthtype'],
                     'vlan' => $portAuthSessionEntryParameters['hwAccessVLANID'],
                 ]));
             }
