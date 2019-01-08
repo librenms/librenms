@@ -1,17 +1,12 @@
 source: Developing/os/Custom-Graphs.md
 path: blob/master/doc/
 
-If you are adding custom graphs, please add the following to `includes/definitions.inc.php`:
-```php
-//Don't forget to declare the specific graphs if needed. It will be located near the end of the file.
+First we define our graphs in `includes/definitions.inc.php` to share our work and contribute in the development of LibreNMS. :-) (or place in `config.php` if you don't plan to contribute)
 
-//Pulse Secure Graphs
-$config['graph_types']['device']['pulse_users']['section']         = 'firewall';
-$config['graph_types']['device']['pulse_users']['order']           = '0';
-$config['graph_types']['device']['pulse_users']['descr']           = 'Active Users';
-$config['graph_types']['device']['pulse_sessions']['section']      = 'firewall';
-$config['graph_types']['device']['pulse_sessions']['order']        = '0';
-$config['graph_types']['device']['pulse_sessions']['descr']        = 'Active Sessions';
+```php
+// Pulse Secure Graphs
+$config['graph_types']['device']['pulse_sessions'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Active Sessions'];
+$config['graph_types']['device']['pulse_users'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Active Users'];
 ```
 
 #### Polling OS
@@ -57,22 +52,6 @@ if (is_numeric($sessions)) {
     data_update($device, 'pulse_sessions', $tags, $fields);
     $graphs['pulse_sessions'] = true;
 }
-```
-We finish in the declaration of the two graph types in the database:
-
-We can do that within a file to share our work and contribute in the development of LibreNMS. :-)
-
-```bash
-sql-schema/xxx.sql
-php includes/sql-schema/update.php
-./scripts/build-schema.php
-```
-
-Or put the SQL commands directly in Mysql or PhpMyadmin for our tests:
-
-```php
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'pulse_users',  'firewall',  'Active Users',  0);
-INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph_descr`, `graph_order`) VALUES ('device',  'pulse_sessions',  'firewall',  'Active Sessions',  0);
 ```
 
 #### Displaying

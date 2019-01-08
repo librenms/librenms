@@ -644,17 +644,6 @@ graph_types:
     graph_type: { Name: graph_type, Columns: [graph_type], Unique: false, Type: BTREE }
     graph_subtype: { Name: graph_subtype, Columns: [graph_subtype], Unique: false, Type: BTREE }
     graph_section: { Name: graph_section, Columns: [graph_section], Unique: false, Type: BTREE }
-graph_types_dead:
-  Columns:
-    - { Field: graph_type, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: graph_subtype, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: graph_section, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: graph_descr, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: graph_order, Type: int(11), 'Null': false, Extra: '' }
-  Indexes:
-    graph_type: { Name: graph_type, Columns: [graph_type], Unique: false, Type: BTREE }
-    graph_subtype: { Name: graph_subtype, Columns: [graph_subtype], Unique: false, Type: BTREE }
-    graph_section: { Name: graph_section, Columns: [graph_section], Unique: false, Type: BTREE }
 hrDevice:
   Columns:
     - { Field: hrDevice_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
