@@ -21,26 +21,28 @@ echo $config['project_name_version']." Poller\n";
 
 $options = getopt('h:m:i:n:r::d::v::a::f::q');
 
-if ($options['h'] == 'odd') {
-    $options['n'] = '1';
-    $options['i'] = '2';
-} elseif ($options['h'] == 'even') {
-    $options['n'] = '0';
-    $options['i'] = '2';
-} elseif ($options['h'] == 'all') {
-    $where = ' ';
-    $doing = 'all';
-} elseif ($options['h']) {
-    if (is_numeric($options['h'])) {
-        $where = "AND `device_id` = ".$options['h'];
-        $doing = $options['h'];
-    } else {
-        if (preg_match('/\*/', $options['h'])) {
-            $where = "AND `hostname` LIKE '".str_replace('*', '%', mres($options['h']))."'";
+if (isset($options['h'])) {
+    if ($options['h'] == 'odd') {
+        $options['n'] = '1';
+        $options['i'] = '2';
+    } elseif ($options['h'] == 'even') {
+        $options['n'] = '0';
+        $options['i'] = '2';
+    } elseif ($options['h'] == 'all') {
+        $where = ' ';
+        $doing = 'all';
+    } elseif ($options['h']) {
+        if (is_numeric($options['h'])) {
+            $where = "AND `device_id` = " . $options['h'];
+            $doing = $options['h'];
         } else {
-            $where = "AND `hostname` = '".mres($options['h'])."'";
+            if (preg_match('/\*/', $options['h'])) {
+                $where = "AND `hostname` LIKE '" . str_replace('*', '%', mres($options['h'])) . "'";
+            } else {
+                $where = "AND `hostname` = '" . mres($options['h']) . "'";
+            }
+            $doing = $options['h'];
         }
-        $doing = $options['h'];
     }
 }
 
@@ -58,7 +60,7 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
     $doing = $options['n'].'/'.$options['i'];
 }
 
-if (!$where) {
+if (empty($where)) {
     echo "-h <device id> | <device hostname wildcard>  Poll single device\n";
     echo "-h odd             Poll odd numbered devices  (same as -i 2 -n 0)\n";
     echo "-h even            Poll even numbered devices (same as -i 2 -n 1)\n";

@@ -123,16 +123,21 @@ if ($sub_type == 'new-maintenance') {
             $fail  = 0;
 
             if ($update == 1) {
-                dbDelete('alert_schedule_items', '`schedule_id`=?', array($schedule_id));
+                dbDelete('alert_schedulables', '`schedule_id`=?', array($schedule_id));
             }
 
             foreach ($_POST['maps'] as $target) {
-                $target = target_to_id($target);
-                $item   = dbInsert(array('schedule_id' => $schedule_id, 'target' => $target), 'alert_schedule_items');
-                if ($notes && get_user_pref('add_schedule_note_to_device', false)) {
-                    $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', array($target));
+                $type = 'device';
+                if (starts_with($target, 'g')) {
+                    $type = 'device_group';
+                    $target = substr($target, 1);
+                }
+
+                $item = dbInsert(['schedule_id' => $schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');
+                if ($notes && $type = 'device' && get_user_pref('add_schedule_note_to_device', false)) {
+                    $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', [$target]);
                     $device_notes.= ((empty($device_notes)) ? '' : PHP_EOL) . date("Y-m-d H:i") . ' Alerts delayed: ' . $notes;
-                    dbUpdate(array('notes' => $device_notes), 'devices', '`device_id` = ?', array($target));
+                    dbUpdate(['notes' => $device_notes], 'devices', '`device_id` = ?', [$target]);
                 }
                 if ($item > 0) {
                     array_push($items, $item);
@@ -143,7 +148,7 @@ if ($sub_type == 'new-maintenance') {
 
             if ($fail == 1 && $update == 0) {
                 foreach ($items as $item) {
-                    dbDelete('alert_schedule_items', '`item_id`=?', array($item));
+                    dbDelete('alert_schedulables', '`item_id`=?', array($item));
                 }
 
                 dbDelete('alert_schedule', '`schedule_id`=?', array($schedule_id));
@@ -164,10 +169,19 @@ if ($sub_type == 'new-maintenance') {
 } elseif ($sub_type == 'parse-maintenance') {
     $schedule_id = mres($_POST['schedule_id']);
     $schedule    = dbFetchRow('SELECT * FROM `alert_schedule` WHERE `schedule_id`=?', array($schedule_id));
-    $items       = array();
-    foreach (dbFetchRows('SELECT `target` FROM `alert_schedule_items` WHERE `schedule_id`=?', array($schedule_id)) as $targets) {
-        $targets = id_to_target($targets['target']);
-        array_push($items, $targets);
+    $items       = [];
+    foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$schedule_id]) as $target) {
+        $id = $target['alert_schedulable_id'];
+        if ($target['alert_schedulable_type'] == 'device_group') {
+            $text = dbFetchCell('SELECT name FROM device_groups WHERE id = ?', [$id]);
+            $id = 'g' . $id;
+        } else {
+            $text = dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', [$id]);
+        }
+        $items[] = [
+            'id' => $id,
+            'text' => $text,
+        ];
     }
 
     $response = array(
