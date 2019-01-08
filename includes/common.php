@@ -1160,8 +1160,9 @@ function parse_location($location)
 function version_info($remote = false)
 {
     global $config;
-    $output = array();
-    $output['local_ver'] = \LibreNMS\Util\Version::get()->local();
+    $output = [
+        'local_ver' =>\LibreNMS\Util\Version::get()->local(),
+    ];
     if (Git::repoPresent() && Git::binaryExists()) {
         if ($remote === true && $config['update_channel'] == 'master') {
             $api = curl_init();
