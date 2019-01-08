@@ -34,7 +34,7 @@ class Version
 
     public function __construct()
     {
-        $this->is_git_install = Git::binaryExists() && Git::repoPresent();
+        $this->is_git_install = Git::repoPresent() && Git::binaryExists();
     }
 
     public static function get()
