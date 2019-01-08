@@ -105,7 +105,7 @@ $oids = [
     'ibDhcpTotalNoOfNacks.0',
     'ibDhcpTotalNoOfOffers.0',
     'ibDhcpTotalNoOfOthers.0',
-    'ibDhcpTotalNoOfReleases.0 ',
+    'ibDhcpTotalNoOfReleases.0',
     'ibDhcpTotalNoOfRequests.0',
 ];
 
