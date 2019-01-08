@@ -17,8 +17,7 @@ $timeout_visibility = ' data-visible="false"';
 if ($device['os'] === 'vrp') {
     $vlan_visibility = '';
     $t_elapsed_visibility = '';
-}
-if ($device['os'] === 'ios') {
+} else {
     $t_left_visibility = '';
     $timeout_visibility = '';
 }
