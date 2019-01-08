@@ -15,7 +15,7 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 
-header('Content-type: text/plain');
+header('Content-type: application/json');
 
 // FUA
 
