@@ -1252,7 +1252,9 @@ ports_nac:
     - { Field: authc_status, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: method, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: timeout, Type: varchar(50), 'Null': false, Extra: '' }
-    - { Field: time_left, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: time_left, Type: varchar(50), 'Null': true, Extra: '' }
+    - { Field: vlan, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: time_elapsed, Type: varchar(50), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ports_nac_id], Unique: true, Type: BTREE }
     ports_nac_device_id_index: { Name: ports_nac_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
