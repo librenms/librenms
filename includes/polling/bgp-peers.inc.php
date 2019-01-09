@@ -80,7 +80,7 @@ if ($config['enable_bgp']) {
                             $peer_data['bgpLocalAddr'] = '';
                         }
                         d_echo("State = {$peer_data['bgpPeerState']} - AdminStatus: {$peer_data['bgpPeerAdminStatus']}\n");
-                    } else if ($device['os'] == 'timos') {
+                    } elseif ($device['os'] == 'timos') {
                         if (!isset($bgpPeers)) {
                             echo "\nCaching Oids...";
                             $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
