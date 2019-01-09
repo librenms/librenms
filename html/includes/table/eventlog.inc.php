@@ -18,8 +18,8 @@ use LibreNMS\Authentication\LegacyAuth;
 $where = '1';
 
 if (is_numeric($vars['device'])) {
-    $where .= ' AND E.host = ?';
-    $param[] = $vars['device'];
+    $where .= ' AND E.device_id = ?';
+    $param[] = (int)$vars['device'];
 }
 
 if (!empty($vars['eventtype'])) {
@@ -33,9 +33,9 @@ if ($vars['string']) {
 }
 
 if (LegacyAuth::user()->hasGlobalRead()) {
-    $sql = " FROM `eventlog` AS E LEFT JOIN `devices` AS `D` ON `E`.`host`=`D`.`device_id` WHERE $where";
+    $sql = " FROM `eventlog` AS E LEFT JOIN `devices` AS `D` ON `E`.`device_id`=`D`.`device_id` WHERE $where";
 } else {
-    $sql = " FROM `eventlog` AS E, devices_perms AS P WHERE $where AND E.host = P.device_id AND P.user_id = ?";
+    $sql = " FROM `eventlog` AS E, devices_perms AS P WHERE $where AND E.device_id = P.device_id AND P.user_id = ?";
     $param[] = LegacyAuth::id();
 }
 
@@ -67,7 +67,7 @@ if ($rowCount != -1) {
 $sql = "SELECT `E`.*,DATE_FORMAT(datetime, '" . $config['dateformat']['mysql']['compact'] . "') as humandate,severity $sql";
 
 foreach (dbFetchRows($sql, $param) as $eventlog) {
-    $dev = device_by_id_cache($eventlog['host']);
+    $dev = device_by_id_cache($eventlog['device_id']);
     if ($eventlog['type'] == 'interface') {
         $this_if = cleanPort(getifbyid($eventlog['reference']));
         $type = '<b>' . generate_port_link($this_if, makeshortif(strtolower($this_if['label']))) . '</b>';

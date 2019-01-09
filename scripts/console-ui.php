@@ -41,7 +41,7 @@ while ($end == 0) {
 
         $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` AS E $sql ORDER BY `datetime` DESC LIMIT 20";
         foreach (dbFetchRows($query, $param) as $entry) {
-            $tbl->addRow(array($entry['datetime'], gethostbyid($entry['host']), $entry['message'], $entry['type'], $entry['reference']));
+            $tbl->addRow(array($entry['datetime'], gethostbyid($entry['device_id']), $entry['message'], $entry['type'], $entry['reference']));
         }
 
         echo $tbl->getTable();
