@@ -4,13 +4,18 @@ path: blob/master/doc/
 
 One of the goals of the LibreNMS project is to enable users to get all of the help they need from our documentation.
 
+Our documentation is generated with [mkdocs](https://www.mkdocs.org/). If you want to build a local copy, install `mkdocs` and `mkdocs-material`, then run `make docs`. This produces the HTML in `docs/out` directory.
+
+Alternatively you can start a webserver at http://localhost:8000 for live preview by executing `mkdocs serve`
+
 ### Writing docs
 When you are adding a new feature or extension, we need to have full documentation to go along with it. It's quite 
 simple to do this:
 
   - Find the relevant directory to store your new document in, General, Support and Extensions are the most likely choices.
   - Think of a descriptive name that's not too long, it should match what they may be looking for or describes the feature.
-  - Ensure the first line contains: `source: path/to/file.md` - don't include the intial `doc/`.
+  - Add the new document into the `nav` section of `mkdocs.yml` if it needs to appear in the table of contents
+  - Ensure the first line contains: `source: path/to/file.md` - don't include the initial `doc/`.
   - In the body of the document, be descriptive but keep things simple. Some tips:
     - If the document could cover different distros like CentOS and Ubuntu please try and include the information for them all.
       If that's not possible then at least put a placeholder in asking for contributions.
