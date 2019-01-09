@@ -55,3 +55,6 @@ Leaflet.markercluster:
 
 Leaflet.awesome-markers:
 	$(GIT_SUBTREE) --prefix=lib/Leaflet.awesome-markers https://github.com/lvoogdt/Leaflet.awesome-markers.git 2.0/develop
+
+etags:
+	ctags -e --language-force=php -R LibreNMS app includes
