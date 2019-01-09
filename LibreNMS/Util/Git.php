@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Util;
 
-
 use LibreNMS\Config;
 
 class Git
