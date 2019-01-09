@@ -13,6 +13,7 @@
 
 # Others #
 ##########
+TAGS
 __pycache__
 *.pyc
 *.swp
