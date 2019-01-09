@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
+use App\Jobs\PingCheck;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +13,7 @@ use Illuminate\Foundation\Inspiring;
 |
 */
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->describe('Display an inspiring quote');
+Artisan::command('ping {--d|debug} {groups?* : Optional List of distributed poller groups to poll}', function () {
+    $this->alert("Do not use this command yet, use ./ping.php");
+//    PingCheck::dispatch(new PingCheck($this->argument('groups')));
+})->describe('Check if devices are up or down via icmp');

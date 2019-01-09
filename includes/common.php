@@ -19,6 +19,7 @@
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Git;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\IP;
 
@@ -1159,8 +1160,10 @@ function parse_location($location)
 function version_info($remote = false)
 {
     global $config;
-    $output = array();
-    if (is_git_install() && check_git_exists()) {
+    $output = [
+        'local_ver' => \LibreNMS\Util\Version::get()->local(),
+    ];
+    if (Git::repoPresent() && Git::binaryExists()) {
         if ($remote === true && $config['update_channel'] == 'master') {
             $api = curl_init();
             set_curl_proxy($api);
@@ -1173,7 +1176,6 @@ function version_info($remote = false)
             $output['github'] = json_decode(curl_exec($api), true);
         }
         list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
-        $output['local_ver']    = rtrim(`git describe --tags`);
         $output['local_sha']    = $local_sha;
         $output['local_date']   = $local_date;
         $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
@@ -1720,22 +1722,6 @@ function set_numeric($value, $default = 0)
         $value = $default;
     }
     return $value;
-}
-
-function is_git_install()
-{
-    $install_dir = Config::get('install_dir', realpath(__DIR__ . '/..'));
-    return file_exists("$install_dir/.git");
-}
-
-function check_git_exists()
-{
-    exec('git > /dev/null 2>&1', $response, $exit_code);
-    if ($exit_code === 1) {
-        return true;
-    } else {
-        return false;
-    }
 }
 
 function get_vm_parent_id($device)
