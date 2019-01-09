@@ -59,7 +59,8 @@
 }
  */
 
-
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'gpsd';
@@ -84,9 +85,6 @@ if ($app_id > 0) {
             'mode',
             'hdop',
             'vdop',
-            //'latitude',
-            //'longitude',
-            //'altitude',
             'satellites',
             'satellites_used',
         );
@@ -125,9 +123,6 @@ if ($app_id > 0) {
             'mode' => $gpsd['data']['mode'],
             'hdop' => $gpsd['data']['hdop'],
             'vdop' => $gpsd['data']['vdop'],
-            //'latitude' => $gpsd['data']['latitude'],
-            //'longitude' => $gpsd['data']['longitude'],
-            //'altitude' => $gpsd['data']['altitude'],
             'satellites' => $gpsd['data']['satellites'],
             'satellites_used' => $gpsd['data']['satellites_used'],
         );
@@ -140,9 +135,6 @@ if ($app_id > 0) {
         ->addDataset('mode', 'GAUGE', 0, 4)
         ->addDataset('hdop', 'GAUGE', 0, 100)
         ->addDataset('vdop', 'GAUGE', 0, 100)
-        //->addDataset('latitude', 'GAUGE', -90, 90)
-        //->addDataset('longitude', 'GAUGE', -180, 180)
-        //->addDataset('altitude', 'GAUGE', 0)
         ->addDataset('satellites', 'GAUGE', 0, 40)
         ->addDataset('satellites_used', 'GAUGE', 0, 40);
         
