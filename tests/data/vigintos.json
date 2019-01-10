@@ -13,7 +13,7 @@
                     "os": "vigintos",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "vigintos.png",
                     "location": null
                 }
             ]
@@ -31,7 +31,7 @@
                     "os": "vigintos",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "vigintos.png",
                     "location": "<private>"
                 }
             ]
