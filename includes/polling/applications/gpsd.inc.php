@@ -19,45 +19,38 @@
  * GPSD Statistics
  * @author Karl Shea <karl@karlshea.com>
  * @copyright 2016 Karl Shea, LibreNMS
+* @author Mike Centola <mcentola@appliedengdesign.com>
+* @copyright 2019 Mike Centola, LibreNMS
  * @license GPL
  * @package LibreNMS
  * @subpackage Polling
  */
 
- /*
- * GPSD Statistics
- * @author Mike Centola <mcentola@appliedengdesign.com>
- * @copyright 2019 Mike Centola, LibreNMS
- * @license GPL
- * @package LibreNMS
- * @subpackage Polling
- */
+// TODO: Add Metrics for Lat/Long/Altitude (Additions commented out)
 
- // TODO: Add Metrics for Lat/Long/Altitude (Additions commented out)
+/* Example Agent Data
+   hdop:X.XX
+   vdop:X.XX
+   satellites:XX
+   satellites_used:XX
+*/
 
- /* Example Agent Data
-    hdop:X.XX
-    vdop:X.XX
-    satellites:XX
-    satellites_used:XX
- */
-
- /*
-  Example SNMP Extend Data
-  {
-    "data": {
-        "mode": "X",
-        "hdop": "X.XX",
-        "vdop": "X.XX",
-        "latitude": "XX.XXXXXXXX",
-        "longitude": "XX.XXXXXXXXX",
-        "altitude": "XXX.X",
-        "satellites": "XX",
-        "satellites_used": "XX"
-    },
-    "error:"0", "errorString":"", "version":"X.XX-X"
+/*
+ Example SNMP Extend Data
+ {
+   "data": {
+       "mode": "X",
+       "hdop": "X.XX",
+       "vdop": "X.XX",
+       "latitude": "XX.XXXXXXXX",
+       "longitude": "XX.XXXXXXXXX",
+       "altitude": "XXX.X",
+       "satellites": "XX",
+       "satellites_used": "XX"
+   },
+   "error:"0", "errorString":"", "version":"X.XX-X"
 }
- */
+*/
 
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\Exceptions\JsonAppException;
@@ -72,7 +65,7 @@ if ($app_id > 0) {
     if (!empty($agent_data['app'][$name])) {
         $gpsd = $agent_data['app'][$name];
 
-        $gpsd_parsed = array();
+        $gpsd_parsed = [];
 
         foreach (explode("\n", $gpsd) as $line) {
             list ($field, $data) = explode(':', $line);
@@ -81,15 +74,15 @@ if ($app_id > 0) {
 
         // Set Fields
 
-        $check_fields = array(
+        $check_fields = [
             'mode',
             'hdop',
             'vdop',
             'satellites',
             'satellites_used',
-        );
+        ];
 
-        $fields = array();
+        $fields = [];
 
         foreach ($check_fields as $field) {
             if (!empty($gpsd_parsed[$field])) {
@@ -103,9 +96,9 @@ if ($app_id > 0) {
         } catch (JsonAppParsingFailedException $e) {
             $legacy = $e->getOutput();
 
-            $gpsd = array(
-                data => array(),
-            );
+            $gpsd = [
+                'data' => [],
+            ];
 
             list ($gpsd['data']['mode'], $gpsd['data']['hdop'], $gpsd['data']['vdop'],
                 $gpsd['data']['latitude'], $gpsd['data']['longitude'], $gpsd['data']['altitude'],
@@ -119,25 +112,25 @@ if ($app_id > 0) {
         }
 
         // Set Fields
-        $fields = array(
+        $fields = [
             'mode' => $gpsd['data']['mode'],
             'hdop' => $gpsd['data']['hdop'],
             'vdop' => $gpsd['data']['vdop'],
             'satellites' => $gpsd['data']['satellites'],
             'satellites_used' => $gpsd['data']['satellites_used'],
-        );
+        ];
     }
 
     // Generate RRD Def
 
-    $rrd_name = array('app', $name, $app_id);
+    $rrd_name = ['app', $name, $app_id];
     $rrd_def = RrdDefinition::make()
         ->addDataset('mode', 'GAUGE', 0, 4)
         ->addDataset('hdop', 'GAUGE', 0, 100)
         ->addDataset('vdop', 'GAUGE', 0, 100)
         ->addDataset('satellites', 'GAUGE', 0, 40)
         ->addDataset('satellites_used', 'GAUGE', 0, 40);
-        
+
     // Update Application
     $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
     data_update($device, 'app', $tags, $fields);
