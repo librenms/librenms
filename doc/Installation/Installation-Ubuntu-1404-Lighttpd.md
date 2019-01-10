@@ -48,9 +48,13 @@ Within the [mysqld] section please add:
 
 Find the line: `bind-address = 127.0.0.1`
 
-Change `127.0.0.1` to the IP address that your MySQL server should listen on.  Restart MySQL:
+Change `127.0.0.1` to the IP address that your MySQL server should listen on.
 
 If you see a line that starts `sql-mode` then change this to `sql-mode=""`.
+
+Save the configuration file and exit the text editor
+
+Restart mysql
 
     service mysql restart
 
