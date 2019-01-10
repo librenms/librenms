@@ -422,7 +422,7 @@ function sensor_low_limit($class, $current)
     }//end switch
 
     if (is_numeric($limit)) {
-        return round($limit, 10);
+        return round($limit, 11);
     }
 
     return $limit;
@@ -472,7 +472,7 @@ function sensor_limit($class, $current)
     }//end switch
 
     if (is_numeric($limit)) {
-        return round($limit, 10);
+        return round($limit, 11);
     }
 
     return $limit;
