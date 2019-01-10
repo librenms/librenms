@@ -385,9 +385,9 @@ function sensor_low_limit($class, $current)
             break;
         case 'voltage':
             if ($current < 0) {
-                $limit = round($current * (1 + (sgn($current) * 0.15)), 12);
+                $limit = $current * (1 + (sgn($current) * 0.15));
             } else {
-                $limit = round($current * (1 - (sgn($current) * 0.15)), 12);
+                $limit = $current * (1 - (sgn($current) * 0.15));
             }
             break;
         case 'humidity':
@@ -397,7 +397,7 @@ function sensor_low_limit($class, $current)
             $limit = null;
             break;
         case 'fanspeed':
-            $limit = round($current * 0.80, 12);
+            $limit = $current * 0.80;
             break;
         case 'power':
             $limit = null;
@@ -411,7 +411,7 @@ function sensor_low_limit($class, $current)
         case 'frequency':
         case 'pressure':
         case 'cooling':
-            $limit = round($current * 0.95, 12);
+            $limit = $current * 0.95;
             break;
         case 'delay':
         case 'quality_factor':
@@ -420,6 +420,10 @@ function sensor_low_limit($class, $current)
         case 'eer':
         case 'waterflow':
     }//end switch
+
+    if (is_numeric($limit)) {
+        return round($limit, 10);
+    }
 
     return $limit;
 }
@@ -436,9 +440,9 @@ function sensor_limit($class, $current)
             break;
         case 'voltage':
             if ($current < 0) {
-                $limit = round($current * (1 - (sgn($current) * 0.15)), 12);
+                $limit = $current * (1 - (sgn($current) * 0.15));
             } else {
-                $limit = round($current * (1 + (sgn($current) * 0.15)), 12);
+                $limit = $current * (1 + (sgn($current) * 0.15));
             }
             break;
         case 'humidity':
@@ -446,10 +450,10 @@ function sensor_limit($class, $current)
             break;
         case 'current':
         case 'power':
-            $limit = round($current * 1.50, 12);
+            $limit = $current * 1.50;
             break;
         case 'fanspeed':
-            $limit = round($current * 1.80, 12);
+            $limit = $current * 1.80;
             break;
         case 'signal':
             $limit = -30;
@@ -463,9 +467,13 @@ function sensor_limit($class, $current)
         case 'frequency':
         case 'pressure':
         case 'cooling':
-            $limit = round($current * 1.05, 12);
+            $limit = $current * 1.05;
             break;
     }//end switch
+
+    if (is_numeric($limit)) {
+        return round($limit, 10);
+    }
 
     return $limit;
 }
