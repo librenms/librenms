@@ -45,7 +45,7 @@ class Eventlog extends BaseModel
      * @param int $severity 1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
      * @param int $reference the id of the referenced entity.  Supported types: interface
      */
-    function log($text, $device = null, $type = null, $severity = 2, $reference = null)
+    public static function log($text, $device = null, $type = null, $severity = 2, $reference = null)
     {
         $log = new static([
             'reference' => $reference,
