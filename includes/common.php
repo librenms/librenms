@@ -86,7 +86,7 @@ function external_exec($command)
     global $debug, $vdebug;
 
     $proc = new \Symfony\Component\Process\Process($command);
-    $proc->setTimeout(600);
+    $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
     if ($debug && !$vdebug) {
         $patterns = [
