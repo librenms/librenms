@@ -41,6 +41,5 @@ class CreatePortsNacTable extends Migration
     public function down()
     {
         Schema::drop('ports_nac');
-
     }
 }
