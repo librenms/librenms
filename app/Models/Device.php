@@ -151,6 +151,27 @@ class Device extends BaseModel
         return $this->hostname;
     }
 
+    public function isUnderMaintenance()
+    {
+        $query = AlertSchedule::isActive()
+            ->join('alert_schedulables', 'alert_schedule.schedule_id', 'alert_schedulables.schedule_id')
+            ->where(function ($query) {
+                $query->where(function ($query) {
+                    $query->where('alert_schedulable_type', 'device')
+                        ->where('alert_schedulable_id', $this->device_id);
+                });
+
+                if ($this->groups) {
+                    $query->orWhere(function ($query) {
+                        $query->where('alert_schedulable_type', 'device_group')
+                            ->whereIn('alert_schedulable_id', $this->groups->pluck('id'));
+                    });
+                }
+            });
+
+        return $query->exists();
+    }
+
     /**
      * Get the shortened display name of this device.
      * Length is always overridden by shorthost_target_length.
@@ -434,6 +455,11 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\Alert', 'device_id');
     }
 
+    public function alertSchedules()
+    {
+        return $this->morphToMany('App\Models\AlertSchedule', 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+    }
+
     public function applications()
     {
         return $this->hasMany('App\Models\Application', 'device_id');
@@ -461,7 +487,7 @@ class Device extends BaseModel
 
     public function eventlogs()
     {
-        return $this->hasMany('App\Models\General\Eventlog', 'host', 'device_id');
+        return $this->hasMany('App\Models\Eventlog', 'device_id', 'device_id');
     }
 
     public function groups()

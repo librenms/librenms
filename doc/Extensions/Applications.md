@@ -48,7 +48,7 @@ The unix-agent does not have a discovery module, only a poller module. That poll
 1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
 1. [FreeRADIUS](#freeradius) - SNMP extend, Agent
 1. [Freeswitch](#freeswitch) - SNMP extend, Agent
-1. [GPSD](#gpsd) - Agent
+1. [GPSD](#gpsd) - SNMP extend, Agent
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Memcached](#memcached) - SNMP extend
 1. [Munin](#munin) - Agent
@@ -464,7 +464,21 @@ extend freeswitch /etc/snmp/freeswitch
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
 ### GPSD
-A small shell script that reports GPSD status.
+
+##### SNMP Extend
+1. Download the script onto the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/gpsd -O /etc/snmp/gpsd
+```
+2. Run `chmod +x /etc/snmp/gpsd`
+
+3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+```
+extend gpsd /etc/snmp/gpsd
+```
+4. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading at the top of the page.
 
 ##### Agent
 [Install the agent](Agent-Setup.md) on this device if it isn't already and copy the `gpsd` script to `/usr/lib/check_mk_agent/local/`

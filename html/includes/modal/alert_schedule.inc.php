@@ -12,9 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (\Auth::user()->hasGlobalAdmin()) {
 ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -61,13 +59,13 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                         <div class="form-group">
                             <label for="start" class="col-sm-4 control-label">Start <exp>*</exp>: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="start" name="start" value="<?php echo date($config['dateformat']['byminute']); ?>" data-date-format="YYYY-MM-DD HH:mm">
+                                <input type="text" class="form-control date" id="start" name="start" value="" data-date-format="YYYY-MM-DD HH:mm">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="end" class="col-sm-4 control-label">End <exp>*</exp>: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="end" name="end" value="<?php echo date($config['dateformat']['byminute'], strtotime('+1 hour')); ?>" data-date-format="YYYY-MM-DD HH:mm">
+                                <input type="text" class="form-control date" id="end" name="end" value="" data-date-format="YYYY-MM-DD HH:mm">
                             </div>
                         </div>
                     </div>
@@ -75,25 +73,25 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                         <div class="form-group">
                             <label for="start_recurring_dt" class="col-sm-4 control-label">Start date <exp>*</exp>: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="start_recurring_dt" name="start_recurring_dt" value="<?php echo date($config['dateformat']['start_recurring_dt']); ?>" data-date-format="YYYY-MM-DD">
+                                <input type="text" class="form-control date" id="start_recurring_dt" name="start_recurring_dt" value="" data-date-format="YYYY-MM-DD">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="end_recurring_dt" class="col-sm-4 control-label">End date: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="end_recurring_dt" name="end_recurring_dt" value="<?php echo date($config['dateformat']['end_recurring_dt'], strtotime('+1 hour')); ?>" data-date-format="YYYY-MM-DD">
+                                <input type="text" class="form-control date" id="end_recurring_dt" name="end_recurring_dt" value="" data-date-format="YYYY-MM-DD">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="start_recurring_hr" class="col-sm-4 control-label">Start hour <exp>*</exp>: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="start_recurring_hr" name="start_recurring_hr" value="<?php echo date($config['dateformat']['start_recurring_hr']); ?>" data-date-format="HH:mm">
+                                <input type="text" class="form-control date" id="start_recurring_hr" name="start_recurring_hr" value="" data-date-format="HH:mm">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="end_recurring_hr" class="col-sm-4 control-label">End hour <exp>*</exp>: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="end_recurring_hr" name="end_recurring_hr" value="<?php echo date($config['dateformat']['end_recurring_hr'], strtotime('+1 hour')); ?>" data-date-format="HH:mm">
+                                <input type="text" class="form-control date" id="end_recurring_hr" name="end_recurring_hr" value="" data-date-format="HH:mm">
                             </div>
                         </div>
                         <div class="form-group">
@@ -110,17 +108,9 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                         </div>
                     </div>
                     <div class="form-group">
-                         <label for='map-stub' class='col-sm-4 control-label'>Map To <exp>*</exp>: </label>
-                        <div class="col-sm-5">
-                            <input type='text' id='map-stub' name='map-stub' class='form-control'/>
-                        </div>
-                        <div class="col-sm-3">
-                            <button class="btn btn-primary" type="button" name="add-map" id="add-map" value="Add">Add</button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-12">
-                            <span id="map-tags"></span>
+                         <label for='maps' class='col-sm-4 control-label'>Map To <exp>*</exp>: </label>
+                        <div class="col-sm-8">
+                            <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                         </div>
                     </div>
                     <div class="form-group">
@@ -135,32 +125,31 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
 </div>
 <script>
 $('#schedule-maintenance').on('hide.bs.modal', function (event) {
-    $('#map-tags').data('tagmanager').empty();
+    $('#maps').val(null).trigger('change');
     $('#schedule_id').val('');
     $('#title').val('');
     $('#notes').val('');
     $('#recurring').val('');
-    $('#start').val('');
-    $('#end').val('');
-    $('#start_recurring_dt').val('');
-    $('#end_recurring_dt').val('');
-    $('#start_recurring_hr').val('');
-    $('#end_recurring_hr').val('');
+    $('#start').val(moment().format('YYYY-MM-DD HH:mm')).data("DateTimePicker").maxDate(false).minDate(moment());
+    $('#end').val(moment().add(1, 'hour').format('YYYY-MM-DD HH:mm')).data("DateTimePicker").maxDate(false).minDate(moment());
+    var $startRecurringDt = $('#start_recurring_dt');
+    $startRecurringDt.val('').data("DateTimePicker").maxDate(false).minDate(moment());
+    var $endRecurringDt = $('#end_recurring_dt');
+    $endRecurringDt.data("DateTimePicker").date(moment()).maxDate(false).minDate(moment());
+    $endRecurringDt.val('');
+    $startRecurringDt.data("DateTimePicker").maxDate(false);
+
+    $('#start_recurring_hr').val('').data("DateTimePicker").minDate(false).maxDate(false);
+    $('#end_recurring_hr').val('').data("DateTimePicker").minDate(false).maxDate(false);
     $("#recurring0").prop("checked", true);
     $('#recurring_day').prop('checked', false);
     $('#norecurringgroup').show();
     $('#recurringgroup').hide();
-    $('#schedulemodal-alert').remove('');
+    $('#schedulemodal-alert').remove();
 });
 
 $('#schedule-maintenance').on('show.bs.modal', function (event) {
-    $('#tagmanager').tagmanager();
     var schedule_id = $('#schedule_id').val();
-    $('#map-tags').tagmanager({
-           strategy: 'array',
-           tagFieldName: 'maps[]',
-           initialCap: false
-    });
     if (schedule_id > 0) {
         $.ajax({
             type: "POST",
@@ -168,16 +157,27 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
             data: { type: "schedule-maintenance", sub_type: "parse-maintenance", schedule_id: schedule_id },
             dataType: "json",
             success: function(output) {
-                var arr = [];
-                $.each ( output['targets'], function( key, value ) {
-                    arr.push(value);
+                var maps = $('#maps');
+                var selected = [];
+                $.each ( output['targets'], function( key, item ) {
+                    // create options if they don't exist
+                    if (maps.find("option[value='" + item.id + "']").length === 0) {
+                        var newOption = new Option(item.text, item.id, true, true);
+                        maps.append(newOption);
+                    }
+                    selected.push(item.id);
                 });
-                $('#map-tags').data('tagmanager').populate(arr);
+                maps.val(selected).trigger('change');
+
                 $('#title').val(output['title']);
                 $('#notes').val(output['notes']);
                 if (output['recurring'] == 0){
-                    $('#start').val(output['start']);
-                    $('#end').val(output['end']);
+                    var start = $('#start').data("DateTimePicker");
+                    if (output['start']) {
+                        start.minDate(output['start']);
+                    }
+                    start.date(output['start']);
+                    $('#end').data("DateTimePicker").date(output['end']);
 
                     $('#norecurringgroup').show();
                     $('#recurringgroup').hide();
@@ -189,15 +189,24 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                     $("#recurring0").prop("checked", true);
                     $('#recurring_day').prop('checked', false);
                 }else{
+                    var start_recurring_dt = $('#start_recurring_dt').data("DateTimePicker");
+                    if (output['start_recurring_dt']) {
+                        start_recurring_dt.minDate(output['start_recurring_dt']);
+                    }
+                    start_recurring_dt.date(output['start_recurring_dt']);
+                    $('#end_recurring_dt').data("DateTimePicker").date(output['end_recurring_dt']);
 
-                    $('#start_recurring_dt').val(output['start_recurring_dt']);
-                    $('#end_recurring_dt').val(output['end_recurring_dt']);
-                    $('#start_recurring_hr').val(output['start_recurring_hr']);
-                    $('#end_recurring_hr').val(output['end_recurring_hr']);
+                    var start_recurring_hr = $('#start_recurring_hr').data("DateTimePicker");
+                    if (output['start_recurring_dt']) {
+                        start_recurring_dt.minDate(output['start_recurring_dt']);
+                    }
+                    start_recurring_hr.date(output['start_recurring_hr']);
+                    $('#end_recurring_hr').data("DateTimePicker").date(output['end_recurring_hr']);
+
                     $("#recurring1").prop("checked", true);
 
                     var recdayupd = output['recurring_day'];
-                    if (recdayupd != ''){
+                    if (recdayupd){
                         var arrayrecdayupd = recdayupd.split(',');
                         $.each(arrayrecdayupd, function(indexcheckedday, checkedday){
                             $("input[name='recurring_day[]'][value="+checkedday+"]").prop('checked', true);
@@ -254,73 +263,25 @@ $('#sched-submit').click('', function(e) {
     });
 });
 
-$('#add-map').click('',function (event) {
-        $('#map-tags').data('tagmanager').populate([ $('#map-stub').val() ]);
-        $('#map-stub').val('');
-});
-
-var map_devices = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  remote: {
-      url: "ajax_search.php?search=%QUERY&type=device&map=1",
-        filter: function (output) {
-            return $.map(output, function (item) {
-                return {
-                    name: item.name,
-                };
-            });
-        },
-      wildcard: "%QUERY"
-  }
-});
-var map_groups = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  remote: {
-      url: "ajax_search.php?search=%QUERY&type=group&map=1",
-        filter: function (output) {
-            return $.map(output, function (item) {
-                return {
-                    name: item.name,
-                };
-            });
-        },
-      wildcard: "%QUERY"
-  }
-});
-map_devices.initialize();
-map_groups.initialize();
-$('#map-stub').typeahead({
-    hint: true,
-    highlight: true,
-    minLength: 1,
-    classNames: {
-        menu: 'typeahead-left'
-    }
-},
-{
-  source: map_devices.ttAdapter(),
-  async: true,
-  displayKey: 'name',
-  valueKey: name,
-    templates: {
-        suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
-    }
-},
-{
-  source: map_groups.ttAdapter(),
-  async: true,
-  displayKey: 'name',
-  valueKey: name,
-    templates: {
-        suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
+$("#maps").select2({
+    width: '100%',
+    placeholder: "Devices or Groups",
+    ajax: {
+        url: 'ajax_list.php',
+        delay: 250,
+        data: function (params) {
+            return {
+                type: 'devices_groups',
+                search: params.term
+            };
+        }
     }
 });
 
 $(function () {
     $("#start").datetimepicker({
-        minDate: '<?php echo date($config['dateformat']['byminute']); ?>',
+        defaultDate: moment(),
+        minDate: moment().format('YYYY-MM-DD'),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -334,6 +295,8 @@ $(function () {
         }
     });
     $("#end").datetimepicker({
+        defaultDate: moment().add(1, 'hour'),
+        minDate: moment().format('YYYY-MM-DD'),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -353,7 +316,8 @@ $(function () {
         $("#start").data("DateTimePicker").maxDate(e.date);
     });
     $("#start_recurring_dt").datetimepicker({
-        minDate: '<?php echo date($config['dateformat']['byminute']); ?>',
+        defaultDate: moment(),
+        minDate: moment().format('YYYY-MM-DD'),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -367,6 +331,7 @@ $(function () {
         }
     });
     $("#end_recurring_dt").datetimepicker({
+        minDate: moment().format('YYYY-MM-DD'),
         icons: {
             time: 'fa fa-clock-o',
             date: 'fa fa-calendar',
@@ -380,7 +345,14 @@ $(function () {
         }
     });
     $("#start_recurring_dt").on("dp.change", function (e) {
-        $("#end_recurring_dt").data("DateTimePicker").minDate(e.date);
+        var $endRecurringDt = $("#end_recurring_dt");
+        var val = $endRecurringDt.val();
+        $endRecurringDt.data("DateTimePicker").minDate(e.date);
+        // work around annoying event interaction
+        if (!val) {
+            $endRecurringDt.val('');
+            $("#start_recurring_dt").data("DateTimePicker").maxDate(false);
+        }
     });
     $("#end_recurring_dt").on("dp.change", function (e) {
         $("#start_recurring_dt").data("DateTimePicker").maxDate(e.date);

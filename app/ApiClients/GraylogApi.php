@@ -125,7 +125,7 @@ class GraylogApi
             $ip = gethostbyname($device->hostname);
             $device_query = 'source:"' . $device->hostname . '" || source:"' . $ip . '"';
             if ($device->ip && $ip != $device->ip) {
-                $query .= ' || source:"' . $device->ip . '"';
+                $device_query .= ' || source:"' . $device->ip . '"';
             }
 
             $query[] = '(' . $device_query . ')';

@@ -83,7 +83,7 @@ class Laravel
 
     public static function enableCliDebugOutput()
     {
-        if (class_exists('Log')) {
+        if (class_exists('\Log')) {
             $logger = Log::getMonolog();
 
             // only install if not existing
