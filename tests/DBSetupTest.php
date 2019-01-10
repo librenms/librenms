@@ -75,7 +75,7 @@ class DBSetupTest extends DBTestCase
         $migrated = dbFetchColumn('SELECT migration FROM migrations');
         sort($files);
         sort($migrated);
-        $this->assertEquals($files, $migrated);
+        $this->assertEquals($files, $migrated, "List of run migrations did not match existing migration files.");
 
         $schema = get_db_schema();
         $this->assertEquals(0, $schema, "Legacy schema files were run, migrations should have been used instead");
