@@ -24,6 +24,24 @@ To include users that have `Global-Read`, `Administrator` or `Normal-User` permi
 ## Using a Proxy?
 [Proxy Configuration](../Support/Configuration.md#proxy-support)
 
+## Alertmanager
+Alertmanager is an alert handling software, initially developed for alert processing sent by Prometheus. 
+
+It has built-in functionality for deduplicating, grouping and routing alerts based on configurable criteria. 
+
+LibreNMS uses alert grouping by alert rule, which can produce an array of alerts of similar content for an array of hosts, whereas Alertmanager can group them by alert meta, ideally producing one single notice in case an issue occurs. 
+
+The one and only possible parameter to be passed is `source` - this is required to distinguish LibreNMS alerts from alerts coming from different sources. 
+
+[Alertmanager Docs](https://prometheus.io/docs/alerting/alertmanager/)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Alertmanager URL      | http://alertmanager.example.com |
+| Alertmanager Options: | source=librenms |
+
 ## API
 API transports definitions are a bit more complex than the E-Mail configuration.
 
