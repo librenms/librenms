@@ -69,15 +69,20 @@ class DBSetupTest extends DBTestCase
 
     public function testSchema()
     {
+        $files = array_map(function ($migration_file) {
+            return basename($migration_file, '.php');
+        }, array_diff(scandir(\LibreNMS\Config::get('install_dir') . '/database/migrations', SCANDIR_SORT_ASCENDING), ['.', '..']));
+        sort($files);
+
+        $migrated = dbFetchColumn('SELECT migration FROM migrations ORDER BY migration ASC');
+        $this->assertEquals($files, $migrated);
+
         $schema = get_db_schema();
-        $this->assertGreaterThan(0, $schema, "Database has no schema!");
-        $this->assertTrue(db_schema_is_current(), "Schema not fully up-to-date, at $schema");
+        $this->assertEquals(0, $schema, "Legacy schema files were run, migrations should have been used instead");
     }
 
     public function testCheckDBCollation()
     {
-        global $config;
-
         $collation = dbFetchRows("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '$this->db_name' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')");
         if (isset($collation[0])) {
             $error = implode(' ', $collation[0]);
@@ -89,8 +94,6 @@ class DBSetupTest extends DBTestCase
 
     public function testCheckTableCollation()
     {
-        global $config;
-
         $collation = dbFetchRows("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '$this->db_name' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );");
         $error = '';
         foreach ($collation as $id => $data) {
@@ -101,8 +104,6 @@ class DBSetupTest extends DBTestCase
 
     public function testCheckColumnCollation()
     {
-        global $config;
-
         $collation = dbFetchRows("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$this->db_name'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );");
         $error = '';
         foreach ($collation as $id => $data) {
