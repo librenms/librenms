@@ -51,7 +51,7 @@ modules:
             oid: host2DevParUnit
             op: '!='
             value: A
-   power:
+    power:
       data:
         -
           oid: host2DevParTable
