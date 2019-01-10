@@ -62,7 +62,7 @@
                                                                     "$ref": "#/definitions/comparison"
                                                                 },
                                                                 "value": {
-                                                                    "type": "integer"
+                                                                    "type": ["integer", "string"]
                                                                 }
                                                             },
                                                             "additionalProperties": false,
@@ -177,7 +177,7 @@
                                                                     "$ref": "#/definitions/comparison"
                                                                 },
                                                                 "value": {
-                                                                    "type": "integer"
+                                                                    "type": ["integer", "string"]
                                                                 }
                                                             },
                                                             "required": [
@@ -318,7 +318,7 @@
                                     "$ref": "#/definitions/comparison"
                                 },
                                 "value": {
-                                    "type": "integer"
+                                    "type": ["integer", "string"]
                                 }
                             },
                             "additionalProperties": false,
