@@ -53,7 +53,7 @@ class Eventlog extends BaseModel
             'datetime' => Carbon::now(),
             'severity' => $severity,
             'message' => $text,
-            'username'  => \Auth::check() ? \Auth::user()->username : '',
+            'username'  => (class_exists('\Auth') && \Auth::check()) ? \Auth::user()->username : '',
         ]);
 
         if ($device instanceof Device) {

@@ -946,7 +946,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         'datetime' => \Carbon\Carbon::now(),
         'severity' => $severity,
         'message' => $text,
-        'username'  => \Auth::check() ? \Auth::user()->username : '',
+        'username'  => isset(LegacyAuth::user()->username) ? LegacyAuth::user()->username : '',
     ], 'eventlog');
 }
 
