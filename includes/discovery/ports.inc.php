@@ -63,7 +63,8 @@ foreach ($port_stats as $ifIndex => $port) {
             dbUpdate(array('deleted' => '0', 'ifType' => $ifType, 'ifName' => $ifName, 'ifAlias' => $ifAlias, 'ifDescr' => $ifDescr, 'ifIndex' => $ifIndex), 'ports', '`port_id` = ?', array($port_id));
             $ports_db[$port_id]['deleted'] = '0';
             echo 'U';
-        } else {
+        } else { // port is existing, let's update it with some data we have collected here
+            dbUpdate(array('ifType' => $ifType, 'ifName' => $ifName, 'ifAlias' => $ifAlias, 'ifDescr' => $ifDescr), 'ports', '`port_id` = ?', array($port_id));
             echo '.';
         }
     } else {
