@@ -487,7 +487,7 @@ class Device extends BaseModel
 
     public function eventlogs()
     {
-        return $this->hasMany('App\Models\General\Eventlog', 'host', 'device_id');
+        return $this->hasMany('App\Models\Eventlog', 'device_id', 'device_id');
     }
 
     public function groups()

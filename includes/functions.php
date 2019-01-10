@@ -941,17 +941,15 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         $device = device_by_id_cache($device);
     }
 
-    $insert = array('host' => ($device['device_id'] ?: 0),
+    dbInsert([
         'device_id' => ($device['device_id'] ?: 0),
-        'reference' => ($reference ?: "NULL"),
-        'type' => ($type ?: "NULL"),
-        'datetime' => array("NOW()"),
+        'reference' => $reference,
+        'type' => $type,
+        'datetime' => \Carbon\Carbon::now(),
         'severity' => $severity,
         'message' => $text,
         'username'  => isset(LegacyAuth::user()->username) ? LegacyAuth::user()->username : '',
-     );
-
-    dbInsert($insert, 'eventlog');
+    ], 'eventlog');
 }
 
 // Parse string with emails. Return array with email (as key) and name (as value)
