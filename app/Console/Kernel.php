@@ -51,4 +51,18 @@ class Kernel extends ConsoleKernel
 
         return $this->artisan;
     }
+
+    public function handle($input, $output = null)
+    {
+        // intercept input and check for debug
+        if ($input->hasParameterOption(['-d', '--debug', '-vv', '-vvv'], true)) {
+            if ($input->hasParameterOption(['-vvv'], true)) {
+                global $vdebug;
+                $vdebug = true;
+            }
+            $this->app->booted('set_debug');
+        }
+
+        return parent::handle($input, $output);
+    }
 }
