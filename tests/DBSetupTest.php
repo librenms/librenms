@@ -71,10 +71,10 @@ class DBSetupTest extends DBTestCase
     {
         $files = array_map(function ($migration_file) {
             return basename($migration_file, '.php');
-        }, array_diff(scandir(\LibreNMS\Config::get('install_dir') . '/database/migrations', SCANDIR_SORT_ASCENDING), ['.', '..']));
+        }, array_diff(scandir(\LibreNMS\Config::get('install_dir') . '/database/migrations'), ['.', '..']));
+        $migrated = dbFetchColumn('SELECT migration FROM migrations');
         sort($files);
-
-        $migrated = dbFetchColumn('SELECT migration FROM migrations ORDER BY migration ASC');
+        sort($migrated);
         $this->assertEquals($files, $migrated);
 
         $schema = get_db_schema();
