@@ -229,9 +229,9 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current\n");
 
-    if (!is_null($warn_limit) && $low_warn_limit > $warn_limit) {
+    if (isset($warn_limit, $low_warn_limit) && $low_warn_limit > $warn_limit) {
         // Fix high/low thresholds (i.e. on negative numbers)
-        list($warn_limit, $low_warn_limit) = array($low_warn_limit, $warn_limit);
+        list($warn_limit, $low_warn_limit) = [$low_warn_limit, $warn_limit];
     }
 
     if (dbFetchCell('SELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ?', array($poller_type, $class, $device['device_id'], $type, (string)$index)) == '0') {
@@ -384,11 +384,7 @@ function sensor_low_limit($class, $current)
             $limit = $current - 10;
             break;
         case 'voltage':
-            if ($current < 0) {
-                $limit = $current * (1 + (sgn($current) * 0.15));
-            } else {
-                $limit = $current * (1 - (sgn($current) * 0.15));
-            }
+                $limit = $current * 0.85;
             break;
         case 'humidity':
             $limit = 30;
@@ -439,11 +435,7 @@ function sensor_limit($class, $current)
             $limit = $current + 20;
             break;
         case 'voltage':
-            if ($current < 0) {
-                $limit = $current * (1 - (sgn($current) * 0.15));
-            } else {
-                $limit = $current * (1 + (sgn($current) * 0.15));
-            }
+            $limit = $current * 1.15;
             break;
         case 'humidity':
             $limit = 70;
