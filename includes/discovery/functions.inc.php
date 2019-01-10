@@ -229,11 +229,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current\n");
 
-    if (is_null($low_warn_limit) && !is_null($warn_limit)) {
-        // Warn limits only make sense when we have both a high and a low limit
-        $low_warn_limit = null;
-        $warn_limit = null;
-    } elseif (!is_null($warn_limit) && $low_warn_limit > $warn_limit) {
+    if (!is_null($warn_limit) && $low_warn_limit > $warn_limit) {
         // Fix high/low thresholds (i.e. on negative numbers)
         list($warn_limit, $low_warn_limit) = array($low_warn_limit, $warn_limit);
     }

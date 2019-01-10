@@ -36,7 +36,7 @@ modules:
                     index: 'zyHwMonitorTemperatureCurrentValue.{{ $index }}'
                     high_limit: zyHwMonitorTemperatureMaxValue
                     low_limit: zyHwMonitorTemperatureMinValue
-                    high_warn_limit: zyHwMonitorTemperatureHighThreshold
+                    warn_limit: zyHwMonitorTemperatureHighThreshold
         voltage:
             options:
                 skip_values_lt: 0
