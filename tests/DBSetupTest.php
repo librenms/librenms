@@ -78,7 +78,7 @@ class DBSetupTest extends DBTestCase
         $this->assertEquals($files, $migrated, "List of run migrations did not match existing migration files.");
 
         $schema = get_db_schema();
-        $this->assertEquals(0, $schema, "Legacy schema files were run, migrations should have been used instead");
+        $this->assertEquals(1000, $schema, "Seed not run, after seed legacy dbSchema should be 1000");
     }
 
     public function testCheckDBCollation()
