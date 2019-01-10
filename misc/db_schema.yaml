@@ -1422,6 +1422,7 @@ sensors:
     - { Field: sensor_index, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: sensor_type, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: sensor_descr, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: group, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: sensor_divisor, Type: bigint(20), 'Null': false, Extra: '', Default: '1' }
     - { Field: sensor_multiplier, Type: int(11), 'Null': false, Extra: '', Default: '1' }
     - { Field: sensor_current, Type: double, 'Null': true, Extra: '' }
