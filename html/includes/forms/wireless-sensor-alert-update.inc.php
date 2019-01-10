@@ -15,20 +15,35 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 
-header('Content-type: text/plain');
+header('Content-type: application/json');
 
 // FUA
 
 if (!LegacyAuth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+    die(json_encode([
+        'status' => 'error',
+        'message' => 'You need to be admin'
+    ]));
 }
 
-if (isset($_POST['sub_type']) && !empty($_POST['sub_type'])) {
-    dbUpdate(array('sensor_custom' => 'No'), 'wireless_sensors', '`sensor_id` = ?', array($_POST['sensor_id']));
+if (isset($_POST['sub_type']) && $_POST['sub_type'] == 'remove-custom') {
+    if (dbUpdate(['sensor_custom' => 'No'], 'wireless_sensors', '`sensor_id` = ?', array($_POST['sensor_id']))) {
+        die(json_encode([
+            'status' => 'ok',
+            'message' => 'Custom limit removed'
+        ]));
+    }
+
+    die(json_encode([
+        'status' => 'error',
+        'message' => 'Could not remove custom. Check librenms.log'
+    ]));
 } else {
     if (!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id'])) {
-        echo 'error with data';
-        exit;
+        die(json_encode([
+            'status' => 'error',
+            'message' => 'Invalid values given'
+        ]));
     } else {
         if ($_POST['state'] == 'true') {
             $state = 1;
@@ -39,17 +54,21 @@ if (isset($_POST['sub_type']) && !empty($_POST['sub_type'])) {
         }
 
         $update = dbUpdate(
-            array('sensor_alert' => $state),
+            ['sensor_alert' => $state],
             'wireless_sensors',
             '`sensor_id` = ? AND `device_id` = ?',
-            array($_POST['sensor_id'], $_POST['device_id'])
+            [$_POST['sensor_id'], $_POST['device_id']]
         );
         if (!empty($update) || $update == '0') {
-            echo 'success';
-            exit;
+            die(json_encode([
+                'status' => 'ok',
+                'message' => 'Updated sensor value'
+            ]));
         } else {
-            echo 'error';
-            exit;
+            die(json_encode([
+                'status' => 'error',
+                'message' => 'Failed to update sensor value'
+            ]));
         }
     }
 }
