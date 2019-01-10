@@ -619,17 +619,15 @@ entPhysical_state:
 eventlog:
   Columns:
     - { Field: event_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: host, Type: int(11), 'Null': false, Extra: '', Default: '0' }
-    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
     - { Field: datetime, Type: datetime, 'Null': false, Extra: '', Default: '1970-01-02 00:00:01' }
     - { Field: message, Type: text, 'Null': true, Extra: '' }
     - { Field: type, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: reference, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: reference, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: username, Type: varchar(128), 'Null': true, Extra: '' }
-    - { Field: severity, Type: tinyint(4), 'Null': true, Extra: '', Default: '2' }
+    - { Field: severity, Type: tinyint(4), 'Null': false, Extra: '', Default: '2' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [event_id], Unique: true, Type: BTREE }
-    host: { Name: host, Columns: [host], Unique: false, Type: BTREE }
     datetime: { Name: datetime, Columns: [datetime], Unique: false, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 graph_types:
