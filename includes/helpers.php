@@ -46,3 +46,41 @@ if (!function_exists('d_echo')) {
         }
     }
 }
+
+if (!function_exists('set_debug')) {
+    /**
+     * Set debugging output
+     *
+     * @param bool $state If debug is enabled or not
+     * @param bool $silence When not debugging, silence every php error
+     * @return bool
+     */
+    function set_debug($state = true, $silence = false)
+    {
+        global $debug;
+
+        $debug = $state; // set to global
+
+        restore_error_handler(); // disable Laravel error handler
+
+        if ($debug) {
+            ini_set('display_errors', 1);
+            ini_set('display_startup_errors', 1);
+            ini_set('log_errors', 0);
+            error_reporting(E_ALL & ~E_NOTICE);
+
+            \LibreNMS\Util\Laravel::enableCliDebugOutput();
+            \LibreNMS\Util\Laravel::enableQueryDebug();
+        } else {
+            ini_set('display_errors', 0);
+            ini_set('display_startup_errors', 0);
+            ini_set('log_errors', 1);
+            error_reporting($silence ? 0 : E_ERROR);
+
+            \LibreNMS\Util\Laravel::disableCliDebugOutput();
+            \LibreNMS\Util\Laravel::disableQueryDebug();
+        }
+
+        return $debug;
+    }
+}
