@@ -13,6 +13,16 @@ Install snmptrapd via your package manager.
 
 Modify startup options to include `-M /opt/librenms/mibs -m ALL`
 
+If you are using Ubuntu, you can modify the ExecStart line in the snmptrapd.service file in /lib/systemd/system/snmptrapd.service to look like the following.
+
+ `ExecStart=/usr/sbin/snmptrapd -Lsd -M /opt/librenms/mibs -m ALL -f`
+ 
+Save the file, reload the systemd daemon,`sudo systemctl daemon-reload`, and start the snmptrapd service `sudo systemctl start snmptrapd`.
+
+You can also edit TRAPDOPTS in the init script in /etc/init.d/snmptrapd to retain changes on startup.
+
+`TRAPDOPTS="-Lsd  -M /opt/librenms/mibs -m ALL -f -p $TRAPD_PID"`
+
 In `/etc/snmp/snmptrapd.conf`, add something like the following:
 
 ```text
