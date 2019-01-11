@@ -117,6 +117,28 @@
                                             "value": {
                                                 "type": "string"
                                             },
+                                            "group": {
+                                                "type": "string",
+                                                "pattern": "^[A-Z]"
+                                            },
+                                            "low_limit": {
+                                                "type": ["number", "string"]
+                                            },
+                                            "low_warn_limit": {
+                                                "type": ["number", "string"]
+                                            },
+                                            "warn_limit": {
+                                                "type": ["number", "string"]
+                                            },
+                                            "high_limit": {
+                                                "type": ["number", "string"]
+                                            },
+                                            "skip_value_lt": {
+                                                "type": "number"
+                                            },
+                                            "skip_value_gt": {
+                                                "type": "number"
+                                            },
                                             "num_oid": {
                                                 "type": "string",
                                                 "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
@@ -196,6 +218,7 @@
                                                 ]
                                             }
                                         },
+                                        "additionalProperties": false,
                                         "required": [
                                             "descr",
                                             "num_oid",
@@ -303,8 +326,33 @@
                     "divisor": {
                         "type": "integer"
                     },
+                    "multiplier": {
+                        "type": "integer"
+                    },
                     "value": {
                         "type": "string"
+                    },
+                    "group": {
+                        "type": "string",
+                        "pattern": "^[A-Z]"
+                    },
+                    "low_limit": {
+                        "type": ["number", "string"]
+                    },
+                    "low_warn_limit": {
+                        "type": ["number", "string"]
+                    },
+                    "warn_limit": {
+                        "type": ["number", "string"]
+                    },
+                    "high_limit": {
+                        "type": ["number", "string"]
+                    },
+                    "skip_value_lt": {
+                        "type": "number"
+                    },
+                    "skip_value_gt": {
+                        "type": "number"
                     },
                     "skip_values": {
                         "type": ["number", "array"],
@@ -340,8 +388,12 @@
                     },
                     "entPhysicalIndex_measured": {
                         "type": "string"
+                    },
+                    "user_func": {
+                        "type": "string"
                     }
                 },
+                "additionalProperties": false,
                 "required": [
                     "descr",
                     "num_oid",
