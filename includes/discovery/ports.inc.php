@@ -44,9 +44,25 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
 foreach ($port_stats as $ifIndex => $port) {
     // Store ifIndex in port entry and prefetch ifName as we'll need it multiple times
     $port['ifIndex'] = $ifIndex;
-    // handle ifName and ifAlias the same way we do in the poller
-    $ifName = empty($port['ifName']) ? $port['ifDescr'] : $port['ifName'];
-    $ifAlias = empty($port['ifAlias']) ? $port['ifDescr'] : $port['ifAlias'];
+
+    // When devices do not provide ifDescr data, populate with ifName data if available
+    if ($port['ifDescr'] == '' || $port['ifDescr'] == null) {
+        $port['ifDescr'] = $port['ifName'];
+        d_echo('Using ifName as ifDescr');
+    }
+    // When devices do not provide ifAlias data, populate with ifDescr data if configured
+    if ($port['ifAlias'] == '' || $port['ifAlias'] == null) {
+        $port['ifAlias'] = $port['ifDescr'];
+        d_echo('Using ifDescr as ifAlias');
+    }
+    // When devices do not provide ifName data, populate with ifDescr data if configured
+    if ($port['ifName'] == '' || $port['ifName'] == null) {
+        $port['ifName'] = $port['ifDescr'];
+        d_echo('Using ifDescr as ifName');
+    }
+
+    $ifName = $port['ifName'];
+    $ifAlias = $port['ifAlias'];
     $ifDescr = $port['ifDescr'];
     $ifType = $port['ifType'];
 
@@ -63,7 +79,8 @@ foreach ($port_stats as $ifIndex => $port) {
             dbUpdate(array('deleted' => '0', 'ifType' => $ifType, 'ifName' => $ifName, 'ifAlias' => $ifAlias, 'ifDescr' => $ifDescr, 'ifIndex' => $ifIndex), 'ports', '`port_id` = ?', array($port_id));
             $ports_db[$port_id]['deleted'] = '0';
             echo 'U';
-        } else {
+        } else { // port is existing, let's update it with some data we have collected here
+            dbUpdate(array('ifType' => $ifType, 'ifName' => $ifName, 'ifAlias' => $ifAlias, 'ifDescr' => $ifDescr), 'ports', '`port_id` = ?', array($port_id));
             echo '.';
         }
     } else {
