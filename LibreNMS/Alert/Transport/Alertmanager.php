@@ -40,7 +40,6 @@ class Alertmanager extends Transport
 
     public static function contactAlertmanager($obj, $api)
     {
-        global $config;
         if ($obj['state'] == 0) {
             $alertmanager_status = 'resolved';
         } else { 
