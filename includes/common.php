@@ -192,17 +192,6 @@ function delete_port($int_id)
     unlink(get_port_rrdfile_path($interface['hostname'], $interface['port_id']));
 }
 
-function sgn($int)
-{
-    if ($int < 0) {
-        return -1;
-    } elseif ($int == 0) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
 function get_sensor_rrd($device, $sensor)
 {
     return rrd_name($device['hostname'], get_sensor_rrd_name($device, $sensor));
