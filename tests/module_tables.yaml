@@ -15,8 +15,8 @@ bgp-peers:
     bgpPeers:
         excluded_fields: [device_id, bgpPeer_id]
         joins:
-        - { left: bgpPeers.device_id, right: devices.device_id, select: [bgpLocalAs] }
-        - { left: bgpPeers.vrf_id, right: vrfs.vrf_id, select: [bgpLocalAs] }
+        - { left: bgpPeers.device_id, right: devices.device_id, select: [devices.bgpLocalAs] }
+        - { left: bgpPeers.vrf_id, right: vrfs.vrf_id, select: [vrfs.bgpLocalAs] }
     bgpPeers_cbgp:
         excluded_fields: [device_id]
 fdb-table:
