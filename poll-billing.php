@@ -55,6 +55,23 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         $host    = $port_data['hostname'];
         $port    = $port_data['port'];
 
+        // This conditional will check if "distributed_poller_group" is set in config.php.
+        // If it is, check to see if the port we're trying to bill on is for a device in our poller group,
+        // if the poller_groups don't match, don't do billing and continue to next port
+        if (isset($config['distributed_poller_group'])) {
+            // Fetch the associated device ID based on the port_id from the `ports` table
+            $device_id = dbFetchCell("SELECT device_id from ports where port_id='".mres($port_id)."' ");
+            // Get our poller group from the config
+            $our_poller_group = $config['distributed_poller_group'];
+            // Then finally fetch the poller_group for the port based on prior variables
+            $port_poller_group = dbFetchCell("SELECT poller_group from devices where device_id='".mres($device_id)."'");
+            // If our poller group doesn't match the port poller group, next item.
+            if ($our_poller_group != $port_poller_group) {
+                echo "Passing on billing port $port, not within our poller_group.\n";
+                continue;
+            }
+        }
+
         echo "  Polling ${port_data['ifName']} (${port_data['ifDescr']}) on ${port_data['hostname']}\n";
 
         $port_data['in_measurement']  = getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'In');
