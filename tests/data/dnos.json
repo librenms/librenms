@@ -13182,6 +13182,7 @@
                     "sensor_index": "1",
                     "sensor_type": "dnos",
                     "sensor_descr": "Unit 1",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 62,
