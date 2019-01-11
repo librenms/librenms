@@ -229,13 +229,9 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current\n");
 
-    if (is_null($low_warn_limit) && !is_null($warn_limit)) {
-        // Warn limits only make sense when we have both a high and a low limit
-        $low_warn_limit = null;
-        $warn_limit = null;
-    } elseif (!is_null($warn_limit) && $low_warn_limit > $warn_limit) {
+    if (isset($warn_limit, $low_warn_limit) && $low_warn_limit > $warn_limit) {
         // Fix high/low thresholds (i.e. on negative numbers)
-        list($warn_limit, $low_warn_limit) = array($low_warn_limit, $warn_limit);
+        list($warn_limit, $low_warn_limit) = [$low_warn_limit, $warn_limit];
     }
 
     if (dbFetchCell('SELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ?', array($poller_type, $class, $device['device_id'], $type, (string)$index)) == '0') {
@@ -388,20 +384,16 @@ function sensor_low_limit($class, $current)
             $limit = $current - 10;
             break;
         case 'voltage':
-            if ($current < 0) {
-                $limit = ($current * (1 + (sgn($current) * 0.15)));
-            } else {
-                $limit = ($current * (1 - (sgn($current) * 0.15)));
-            }
+                $limit = $current * 0.85;
             break;
         case 'humidity':
-            $limit = '30';
+            $limit = 30;
             break;
         case 'current':
             $limit = null;
             break;
         case 'fanspeed':
-            $limit = ($current * 0.80);
+            $limit = $current * 0.80;
             break;
         case 'power':
             $limit = null;
@@ -415,7 +407,7 @@ function sensor_low_limit($class, $current)
         case 'frequency':
         case 'pressure':
         case 'cooling':
-            $limit = ($current * 0.95);
+            $limit = $current * 0.95;
             break;
         case 'delay':
         case 'quality_factor':
@@ -424,6 +416,10 @@ function sensor_low_limit($class, $current)
         case 'eer':
         case 'waterflow':
     }//end switch
+
+    if (is_numeric($limit)) {
+        return round($limit, 11);
+    }
 
     return $limit;
 }
@@ -439,21 +435,17 @@ function sensor_limit($class, $current)
             $limit = $current + 20;
             break;
         case 'voltage':
-            if ($current < 0) {
-                $limit = ($current * (1 - (sgn($current) * 0.15)));
-            } else {
-                $limit = ($current * (1 + (sgn($current) * 0.15)));
-            }
+            $limit = $current * 1.15;
             break;
         case 'humidity':
-            $limit = '70';
+            $limit = 70;
             break;
         case 'current':
         case 'power':
-            $limit = ($current * 1.50);
+            $limit = $current * 1.50;
             break;
         case 'fanspeed':
-            $limit = ($current * 1.80);
+            $limit = $current * 1.80;
             break;
         case 'signal':
             $limit = -30;
@@ -467,9 +459,13 @@ function sensor_limit($class, $current)
         case 'frequency':
         case 'pressure':
         case 'cooling':
-            $limit = ($current * 1.05);
+            $limit = $current * 1.05;
             break;
     }//end switch
+
+    if (is_numeric($limit)) {
+        return round($limit, 11);
+    }
 
     return $limit;
 }
