@@ -81,6 +81,7 @@ The only sensor we have defined here is airflow. The available options are as fo
   - `warn_limit` (optional): This is the warning high threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
   - `high_limit` (optional): This is the critical high threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
   - `descr` (required): The visible label for this sensor. It can be a key with in the table or a static string, optionally using `{{ index }}`
+  - `group` (optional): Groups sensors together under in the webui, displaying this text. Not specifying this will put the sensors in the default group.
   - `index` (optional): This is the index value we use to uniquely identify this sensor. `{{ $index }}` will be replaced by the `index` from the snmp walk.
   - `skip_values` (optional): This is an array of values we should skip over (see note below).
   - `skip_value_lt` (optional): If sensor value is less than this, skip the discovery.
@@ -137,6 +138,8 @@ exception of state which requires additional code.
   - $poller_type = Defaults to snmp. Things like the unix-agent can set different values but for the most part this should be left as snmp.
   - $entPhysicalIndex = Defaults to null. Sets the entPhysicalIndex to be used to look up further hardware if available.
   - $entPhysicalIndex_measured = Defaults to null. Sets the type of entPhysicalIndex used, i.e ports.
+  - $user_func = Defaults to null. You can provide a function name for the sensors value to be processed through (i.e. Convert fahrenheit to celsius use `fahrenheit_to_celsius`)
+  - $group = Defaults to null. Groups sensors together under in the webui, displaying this text.
 
 For the majority of devices, this is all that's required to add support for a sensor. Polling is done based on the data gathered using `discover_sensor()`.
 If custom polling is needed then the file format is similar to discovery: `includes/polling/sensors/$class/$os.inc.php`. Whilst it's possible to perform additional 
