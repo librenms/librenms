@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
- * API Transport
+ * Alertmanager Transport
  * @copyright 2019 LibreNMS
  * @license GPL
  * @package LibreNMS
@@ -29,6 +29,7 @@ class Alertmanager extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
+        $alertmanager_opts = [];
         $alertmanager_opts['url'] = $this->config['alertmanager-url'];
         foreach (explode(PHP_EOL, $this->config['alertmanager-options']) as $option) {
             list($k,$v) = explode('=', $option);
@@ -45,7 +46,7 @@ class Alertmanager extends Transport
         } else { 
             $alertmanager_status = 'firing';
         }
-        $gen_url          = ($config['base_url'] . 'device/device=' . $obj['device_id']);
+        $gen_url          = (Config::get('base_url') . 'device/device=' . $obj['device_id']);
         $host             = ($api['url'] . '/api/v1/alerts');
         $curl             = curl_init();
         $alertmanager_msg = strip_tags($obj['msg']);
@@ -76,9 +77,6 @@ class Alertmanager extends Transport
         $ret  = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
-            var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump("Params: " . $alert_message); //FIXME: propper debuging
-            var_dump("Return: " . $ret); //FIXME: propper debuging
             return 'HTTP Status code ' . $code;
         }
         return true;
