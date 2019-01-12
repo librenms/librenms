@@ -23,6 +23,7 @@ class CreateSensorsTable extends Migration
             $table->string('sensor_index', 128)->nullable();
             $table->string('sensor_type')->index('sensor_type');
             $table->string('sensor_descr')->nullable();
+            $table->string('group')->nullable();
             $table->bigInteger('sensor_divisor')->default(1);
             $table->integer('sensor_multiplier')->default(1);
             $table->double('sensor_current')->nullable();

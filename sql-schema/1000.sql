@@ -48,7 +48,6 @@ INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_entP
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_entPhysical_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_entityState_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_eventlog_table', 1);
-INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_graph_types_dead_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_graph_types_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_hrDevice_table', 1);
 INSERT INTO migrations (migration, batch) VALUES ('2018_07_03_091314_create_ipsec_tunnels_table', 1);
