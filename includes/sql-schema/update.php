@@ -25,6 +25,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use Artisan;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Exceptions\LockException;
@@ -50,13 +51,15 @@ try {
 
     $db_rev = get_db_schema();
 
-    $migrate_opts = ['--force' => true];
+    $migrate_opts = ['--force' => true, '--ansi' => true];
 
     if ($db_rev === 0) {
         $migrate_opts['--seed'] = true;
-        $return = \Artisan::call('migrate', $migrate_opts);
+        $return = Artisan::call('migrate', $migrate_opts);
+        echo Artisan::output();
     } elseif ($db_rev == 1000) {
-        $return = \Artisan::call('migrate', $migrate_opts);
+        $return = Artisan::call('migrate', $migrate_opts);
+        echo Artisan::output();
     } else {
         // legacy update
         d_echo("DB Schema update started....\n");
