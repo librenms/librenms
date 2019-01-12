@@ -1,4 +1,4 @@
-mib: MG-SNMP-UPS-MIB
+mib: MG-SNMP-UPS-MIB:EATON-OIDS:EATON-EMP-MIB
 modules:
     sensors:
         power:
@@ -41,6 +41,20 @@ modules:
                     num_oid: '.1.3.6.1.4.1.705.1.5.7.{{ $index }}'
                     descr: 'Battery'
                     index: 'upsmgBatteryTemperature.{{ $index }}'
+                -
+                    oid: xupsEnvironment
+                    value: xupsEnvRemoteTemp
+                    num_oid: '.1.3.6.1.4.1.534.1.6.5.{{ $index }}'
+                    descr: 'Environment'
+                    index: 'xupsEnvRemoteTemp.{{ $index }}'
+        humidity:
+            data:
+                -
+                    oid: xupsEnvironment
+                    value: xupsEnvRemoteHumidity
+                    num_oid: '.1.3.6.1.4.1.534.1.6.6.{{ $index }}'
+                    descr: 'Environment'
+                    index: 'xupsEnvRemoteHumidity.{{ $index }}'
         frequency:
             data:
                 -
