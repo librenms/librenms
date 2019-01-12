@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "94e3c7aaedb369e0e4eb7fe80eb59082",
+    "content-hash": "cd88276da25e01b5040ea63480ed0f48",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -367,16 +367,16 @@
         },
         {
             "name": "fico7489/laravel-pivot",
-            "version": "3.0.0",
+            "version": "2.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fico7489/laravel-pivot.git",
-                "reference": "d5fecfbf15a5ba83d188f1ac28fddc262ee9bb6c"
+                "reference": "a7807b7f9a875f188553069484a23a547291a18c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fico7489/laravel-pivot/zipball/d5fecfbf15a5ba83d188f1ac28fddc262ee9bb6c",
-                "reference": "d5fecfbf15a5ba83d188f1ac28fddc262ee9bb6c",
+                "url": "https://api.github.com/repos/fico7489/laravel-pivot/zipball/a7807b7f9a875f188553069484a23a547291a18c",
+                "reference": "a7807b7f9a875f188553069484a23a547291a18c",
                 "shasum": ""
             },
             "require": {
@@ -413,7 +413,7 @@
                 "laravel pivot events",
                 "laravel sync events"
             ],
-            "time": "2018-11-03T11:07:53+00:00"
+            "time": "2018-08-26T09:23:13+00:00"
         },
         {
             "name": "fideloper/proxy",
