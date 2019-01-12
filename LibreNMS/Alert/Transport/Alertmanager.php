@@ -42,7 +42,7 @@ class Alertmanager extends Transport
     {
         if ($obj['state'] == 0) {
             $alertmanager_status = 'resolved';
-        } else { 
+        } else {
             $alertmanager_status = 'firing';
         }
         $gen_url          = (Config::get('base_url') . 'device/device=' . $obj['device_id']);
@@ -104,4 +104,3 @@ class Alertmanager extends Transport
         ];
     }
 }
-
