@@ -14,7 +14,7 @@ $entry = $storage_cache['hrstorage'][$mempool['mempool_index']];
 
 $mempool['units'] = $entry['hrStorageAllocationUnits'];
 $mempool['used']  = ($entry['hrStorageUsed'] * $mempool['units']);
-if ($device['os'] == 'opnsense' || $device['os'] == 'pfsense' {
+if ($device['sysObjectID'] == '.1.3.6.1.4.1.12325.1.1.2.1.1') { // bsnmpd based devices, like FreeBSD, opnsense, pfsense ...
     $mempool['total'] = $storage_cache['memorySize'];
 } else {
     $mempool['total'] = ($entry['hrStorageSize'] * $mempool['units']);
