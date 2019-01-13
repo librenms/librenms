@@ -8,7 +8,7 @@ IMPORTS
 	enterprises, IpAddress
 		FROM RFC1155-SMI
 	DisplayString
-		FROM RFC1213;
+		FROM RFC1213-MIB;
 
 
 synso			OBJECT IDENTIFIER ::= {enterprises 9557}

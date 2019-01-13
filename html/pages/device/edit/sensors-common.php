@@ -131,7 +131,7 @@ $('#newThread').on('click', function(e){
           }
 
       },
-          error:function(){
+          error:function(data){
               toastr.error(data.message);
           }
     });
@@ -169,7 +169,7 @@ $( ".sensor" ).bind('blur keyup',function(e) {
             }
 
             },
-            error:function(){
+            error:function(data){
                 toastr.error(data.message);
             }
     });
@@ -198,7 +198,7 @@ $('input[name="alert-status"]').on('switchChange.bootstrapSwitch',  function(eve
                     toastr.error(data.message);
                 }
             },
-                error:function(){
+                error:function(data){
                     toastr.error(data.message);
                 }
     });
@@ -216,7 +216,7 @@ $("[name='remove-custom']").on('click', function(event) {
                 toastr.success(data.message);
                 $this.addClass('disabled');
             },
-                error:function(){
+                error:function(data){
                     toastr.error(data.message);
                 }
     });

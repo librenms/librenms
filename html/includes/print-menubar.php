@@ -814,9 +814,6 @@ if ($(window).width() < 768) {
 devices.initialize();
 ports.initialize();
 bgp.initialize();
-$('#gsearch').bind('typeahead:select', function(ev, suggestion) {
-    window.location.href = suggestion.url;
-});
 $('#gsearch').typeahead({
     hint: true,
     highlight: true,
@@ -857,9 +854,13 @@ $('#gsearch').typeahead({
         header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
         suggestion: Handlebars.compile('<p><a href="{{url}}"><small>{{{bgp_image}}} {{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></a></p>')
     }
-});
-$('#gsearch').bind('typeahead:open', function(ev, suggestion) {
-    $('#gsearch').addClass('search-box');
+}).on('typeahead:select', function(ev, suggestion) {
+    window.location.href = suggestion.url;
+}).on('keyup', function(e) {
+    // on enter go to the first selection
+    if(e.which === 13) {
+        $('.tt-selectable').first().click();
+    }
 });
 </script>
 

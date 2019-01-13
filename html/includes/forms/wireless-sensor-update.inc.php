@@ -15,29 +15,38 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 
-header('Content-type: text/plain');
+header('Content-type: application/json');
 
 // FUA
 
 if (!LegacyAuth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+    die(json_encode([
+        'status' => 'error',
+        'message' => 'You need to be admin'
+    ]));
 }
 
 if (!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id']) || !isset($_POST['data'])) {
-    echo 'error with data';
-    exit;
+    die(json_encode([
+        'status' => 'error',
+        'message' => 'Invalid values given'
+    ]));
 } else {
     $update = dbUpdate(
-        array($_POST['value_type'] => set_null($_POST['data'], array('NULL')), 'sensor_custom' => 'Yes'),
+        [$_POST['value_type'] => set_null($_POST['data'], ['NULL']), 'sensor_custom' => 'Yes'],
         'wireless_sensors',
         '`sensor_id` = ? AND `device_id` = ?',
-        array($_POST['sensor_id'], $_POST['device_id'])
+        [$_POST['sensor_id'], $_POST['device_id']]
     );
     if (!empty($update) || $update == '0') {
-        echo 'success';
-        exit;
+        die(json_encode([
+            'status' => 'ok',
+            'message' => 'Updated sensor value'
+        ]));
     } else {
-        echo 'error';
-        exit;
+        die(json_encode([
+            'status' => 'error',
+            'message' => 'Failed to update sensor value'
+        ]));
     }
 }

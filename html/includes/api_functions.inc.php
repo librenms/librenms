@@ -2150,7 +2150,7 @@ function list_services()
 function list_logs()
 {
     check_is_read();
-    global $config;
+
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $type = $app->router()->getCurrentRoute()->getName();
@@ -2158,6 +2158,7 @@ function list_logs()
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if ($type === 'list_eventlog') {
         $table = 'eventlog';
+        $select = '`eventlog`.`device_id` as `host`, `eventlog`.*'; // inject host for backward compat
         $timestamp = 'datetime';
     } elseif ($type === 'list_syslog') {
         $table = 'syslog';
@@ -2173,13 +2174,14 @@ function list_logs()
         $timestamp = 'datetime';
     }
 
-    $start = mres($_GET['start']) ?: 0;
-    $limit = mres($_GET['limit']) ?: 50;
-    $from = mres($_GET['from']);
-    $to = mres($_GET['to']);
+    $start = (int)$_GET['start'] ?: 0;
+    $limit = (int)$_GET['limit'] ?: 50;
+    $from = (int)$_GET['from'];
+    $to = (int)$_GET['to'];
 
     $count_query = 'SELECT COUNT(*)';
-    $full_query = "SELECT `devices`.`hostname`, `devices`.`sysName`, `$table`.*";
+    $full_query = "SELECT `devices`.`hostname`, `devices`.`sysName`, ";
+    $full_query .= isset($select) ? $select : "`$table`.*";
 
     $param = array();
     $query = " FROM $table LEFT JOIN `devices` ON `$table`.`device_id`=`devices`.`device_id` WHERE 1";

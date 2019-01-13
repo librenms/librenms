@@ -15,7 +15,7 @@
  * @author     LibreNMS Contributors
 */
 
-$hostname = gethostbyid($entry['host']);
+$hostname = gethostbyid($entry['device_id']);
 
 unset($icon);
 
@@ -27,7 +27,7 @@ echo '<td>'.$icon .'</td>';
 echo '<td style="vertical-align: middle;">'.$entry['datetime'].'</td>';
 
 if (!isset($vars['device'])) {
-    $dev = device_by_id_cache($entry['host']);
+    $dev = device_by_id_cache($entry['device_id']);
     echo '<td style="vertical-align: middle;">'.generate_device_link($dev, shorthost($dev['hostname'])).'</td>';
 }
 

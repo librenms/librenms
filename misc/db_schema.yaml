@@ -620,17 +620,15 @@ entPhysical_state:
 eventlog:
   Columns:
     - { Field: event_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: host, Type: int(11), 'Null': false, Extra: '', Default: '0' }
-    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
     - { Field: datetime, Type: datetime, 'Null': false, Extra: '', Default: '1970-01-02 00:00:01' }
     - { Field: message, Type: text, 'Null': true, Extra: '' }
     - { Field: type, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: reference, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: reference, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: username, Type: varchar(128), 'Null': true, Extra: '' }
-    - { Field: severity, Type: tinyint(4), 'Null': true, Extra: '', Default: '2' }
+    - { Field: severity, Type: tinyint(4), 'Null': false, Extra: '', Default: '2' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [event_id], Unique: true, Type: BTREE }
-    host: { Name: host, Columns: [host], Unique: false, Type: BTREE }
     datetime: { Name: datetime, Columns: [datetime], Unique: false, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 graph_types:
@@ -642,17 +640,6 @@ graph_types:
     - { Field: graph_order, Type: int(11), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [graph_type, graph_subtype, graph_section], Unique: true, Type: BTREE }
-    graph_type: { Name: graph_type, Columns: [graph_type], Unique: false, Type: BTREE }
-    graph_subtype: { Name: graph_subtype, Columns: [graph_subtype], Unique: false, Type: BTREE }
-    graph_section: { Name: graph_section, Columns: [graph_section], Unique: false, Type: BTREE }
-graph_types_dead:
-  Columns:
-    - { Field: graph_type, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: graph_subtype, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: graph_section, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: graph_descr, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: graph_order, Type: int(11), 'Null': false, Extra: '' }
-  Indexes:
     graph_type: { Name: graph_type, Columns: [graph_type], Unique: false, Type: BTREE }
     graph_subtype: { Name: graph_subtype, Columns: [graph_subtype], Unique: false, Type: BTREE }
     graph_section: { Name: graph_section, Columns: [graph_section], Unique: false, Type: BTREE }
@@ -1436,6 +1423,7 @@ sensors:
     - { Field: sensor_index, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: sensor_type, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: sensor_descr, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: group, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: sensor_divisor, Type: bigint(20), 'Null': false, Extra: '', Default: '1' }
     - { Field: sensor_multiplier, Type: int(11), 'Null': false, Extra: '', Default: '1' }
     - { Field: sensor_current, Type: double, 'Null': true, Extra: '' }

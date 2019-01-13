@@ -698,6 +698,7 @@ $config['ignore_mount_regexp'][] = '/^(dev|proc)fs/';
 $config['ignore_mount_regexp'][] = '/^\/dev\/md0/';
 $config['ignore_mount_regexp'][] = '/^\/var\/dhcpd\/dev/';
 $config['ignore_mount_regexp'][] = '/UMA/';
+$config['ignore_mount_regexp'][] = "/^\/Volumes\/OS X Base System/";
 
 $config['ignore_mount_removable'] = 1;
 // Ignore removable disk storage
@@ -884,6 +885,20 @@ $config['distributed_poller_name']           = php_uname('n');
 $config['distributed_poller_group']          = 0;
 $config['distributed_poller_memcached_host'] = 'example.net';
 $config['distributed_poller_memcached_port'] = '11211';
+
+// BETA polller service config options.
+// See https://docs.librenms.org/Extensions/Poller-Service/ for more information
+//$config['service_poller_workers']              = 24;     # Processes spawned for polling
+//$config['service_services_workers']            = 8;      # Processes spawned for service polling
+//$config['service_discovery_workers']           = 16;     # Processes spawned for discovery
+// Optional BETA polller service Settings
+//$config['service_poller_frequency']            = 300;    # Seconds between polling attempts
+//$config['service_services_frequency']          = 300;    # Seconds between service polling attempts
+//$config['service_discovery_frequency']         = 21600;  # Seconds between discovery runs
+//$config['service_billing_frequency']           = 300;    # Seconds between billing calculations
+//$config['service_billing_calculate_frequency'] = 60;     # Billing interval
+//$config['service_poller_down_retry']           = 60;     # Seconds between failed polling attempts
+//$config['service_loglevel']                    = 'INFO'; # Must be one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
 
 // Stats callback system
 $config['callback_post']  = 'https://stats.librenms.org/log.php';
