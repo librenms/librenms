@@ -18,7 +18,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65501
+                    "bgpLocalAs": 65501,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -36,7 +37,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65501
+                    "bgpLocalAs": 65501,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -54,7 +56,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65501
+                    "bgpLocalAs": 65501,
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": []
@@ -77,7 +80,8 @@
                     "bgpPeerFsmEstablishedTime": 23675506,
                     "bgpPeerInUpdateElapsedTime": 21748,
                     "context_name": "",
-                    "bgpLocalAs": 65501
+                    "bgpLocalAs": 65501,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -95,7 +99,8 @@
                     "bgpPeerFsmEstablishedTime": 785386,
                     "bgpPeerInUpdateElapsedTime": 785386,
                     "context_name": "",
-                    "bgpLocalAs": 65501
+                    "bgpLocalAs": 65501,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -113,7 +118,8 @@
                     "bgpPeerFsmEstablishedTime": 774041,
                     "bgpPeerInUpdateElapsedTime": 774040,
                     "context_name": "",
-                    "bgpLocalAs": 65501
+                    "bgpLocalAs": 65501,
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": []
