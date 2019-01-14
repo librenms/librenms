@@ -8,6 +8,7 @@ path: blob/master/doc/
  - [Do you have a demo available?](#faq5)
 
 ### Support
+ - [How does LibreNMS use MIBs?](#how-does-librenms-use-mibs)
  - [Why do I get blank pages sometimes in the WebUI?](#faq6)
  - [Why do I not see any graphs?](#faq10)
  - [How do I debug pages not loading correctly?](#faq7)
@@ -79,6 +80,9 @@ However we will always aim to help wherever possible so if you are running a dis
 #### <a name="faq5"> Do you have a demo available?</a>
 
 We do indeed, you can find access to the demo [here](https://demo.librenms.org)
+
+### <a name='how-does-librenms-use-mibs'>How does LibreNMS use MIBs?</a>
+LibreNMS does not parse MIBs to discover sensors for devices.  LibreNMS uses static discovery definitions written in YAML or PHP.  Therefore, updating a MIB alone will not improve OS support, the definitions must be updated.  LibreNMS only uses MIBs to make OIDs easier to read.
 
 #### <a name="faq6"> Why do I get blank pages sometimes in the WebUI?</a>
 
