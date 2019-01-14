@@ -30,11 +30,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 class SyslogController extends TableController
 {
-    public function searchFields($request)
-    {
-        return ['msg'];
-    }
-
     public function rules()
     {
         return [
@@ -43,6 +38,20 @@ class SyslogController extends TableController
             'priority' => 'nullable|string',
             'to' => 'nullable|date',
             'from' => 'nullable|date',
+        ];
+    }
+
+    public function searchFields($request)
+    {
+        return ['msg'];
+    }
+
+    public function filterFields($request)
+    {
+        return [
+            'device_id' => 'device',
+            'program' => 'program',
+            'priority' => 'priority',
         ];
     }
 
@@ -56,18 +65,6 @@ class SyslogController extends TableController
     {
         /** @var Builder $query */
         $query = Syslog::hasAccess($request->user())->with('device');
-
-        if ($device_id = $request->get('device')) {
-            $query->where('device_id', $device_id);
-        }
-
-        if ($program = $request->get('program')) {
-            $query->where('program', $program);
-        }
-
-        if ($priority = $request->get('priority')) {
-            $query->where('priority', $priority);
-        }
 
         if ($from = $request->get('from')) {
             $query->where('timestamp', '>=', $from);
