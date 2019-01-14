@@ -46,12 +46,15 @@ class Database extends BaseValidation
 
         // check database schema version
         $current = get_db_schema();
+        $latest = 1000;
 
-        $schemas = get_schema_list();
-        end($schemas);
-        $latest = key($schemas);
-
-        if ($current < $latest) {
+        if ($current === 0 || $current === $latest) {
+            \Artisan::call('migrate', ['--pretend' => true, '--force' => true]);
+            if (\Artisan::output() !== "Nothing to migrate.\n") {
+                $validator->fail("Your database is out of date!", './librenms migrate');
+                return;
+            }
+        } elseif ($current < $latest) {
             $validator->fail(
                 "Your database schema ($current) is older than the latest ($latest).",
                 "Manually run ./daily.sh, and check for any errors."
