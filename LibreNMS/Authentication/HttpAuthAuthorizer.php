@@ -18,16 +18,16 @@ class HttpAuthAuthorizer extends MysqlAuthorizer
             return true;
         }
 
+        if (Config::has('http_auth_guest') && parent::userExists(Config::get('http_auth_guest'))) {
+            return true;
+        }
+
         throw new AuthenticationException('No matching user found and http_auth_guest is not set');
     }
 
     public function userExists($username, $throw_exception = false)
     {
         if (parent::userExists($username)) {
-            return true;
-        }
-
-        if (Config::has('http_auth_guest') && parent::userExists(Config::get('http_auth_guest'))) {
             return true;
         }
 
