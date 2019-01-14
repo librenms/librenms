@@ -835,6 +835,13 @@ mempools:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [mempool_id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+migrations:
+  Columns:
+    - { Field: id, Type: int(10) unsigned, 'Null': false, Extra: auto_increment }
+    - { Field: migration, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: batch, Type: int(11), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 mibdefs:
   Columns:
     - { Field: module, Type: varchar(255), 'Null': false, Extra: '' }
