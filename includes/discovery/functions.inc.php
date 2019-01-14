@@ -1005,10 +1005,10 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         }
                     }
 
-                    // process the group                    
+                    // process the group
                     $group = dynamic_discovery_get_value('group', $index, $data, $pre_cache);
                     if (is_null($group)) {
-                        $group = str_replace('{{ $index }}', $index, $data['group']); 
+                        $group = str_replace('{{ $index }}', $index, $data['group']);
                         preg_match_all('/{{ \$([a-zA-Z0-9.]+) }}/', $group, $matches);
                         foreach ($matches[1] as $tmp_var) {
                             $replace = dynamic_discovery_get_value($tmp_var, $index, $data, $pre_cache, null);
