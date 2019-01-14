@@ -32,6 +32,8 @@ use Illuminate\Http\Request;
 
 abstract class TableController extends PaginatedAjaxController
 {
+    protected $default_sort = [];
+
     final protected function baseRules()
     {
         return SimpleTableController::$base_rules;
@@ -49,8 +51,9 @@ abstract class TableController extends PaginatedAjaxController
         $query = $this->baseQuery($request);
 
         $this->search($request->get('searchPhrase'), $query, $this->searchFields($request));
+        $this->filter($request, $query, $this->filterFields($request));
 
-        $sort = $request->get('sort', []);
+        $sort = $request->get('sort', $this->default_sort);
         foreach ($sort as $column => $direction) {
             $query->orderBy($column, $direction);
         }
