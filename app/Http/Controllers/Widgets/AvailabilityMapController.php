@@ -28,7 +28,6 @@ namespace App\Http\Controllers\Widgets;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Service;
-use App\Models\UserWidget;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 
@@ -45,6 +44,7 @@ class AvailabilityMapController extends WidgetController
             'color_only_select' => 0,
             'show_disabled_and_ignored' => 0,
             'mode_select' => 0,
+            'order_by' => Config::get('webui.availability_map_sort_status') ? 'status' : 'hostname',
             'device_group' => 0,
         ];
     }
@@ -104,6 +104,7 @@ class AvailabilityMapController extends WidgetController
         if (!$settings['show_disabled_and_ignored']) {
             $device_query->isActive();
         }
+        $device_query->orderBy($settings['order_by']);
         $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime', 'disabled', 'ignore')->get();
 
         // process status
@@ -148,9 +149,14 @@ class AvailabilityMapController extends WidgetController
             $services_query = Service::hasAccess($request->user());
         }
 
+        if ($settings['order_by'] == 'status') {
+            $services_query->orderBy('service_status', 'DESC')->orderBy('service_type');
+        } elseif ($settings['order_by'] == 'hostname') {
+            $services_query->leftJoin('devices', 'services.device_id', 'devices.device_id')->orderBy('hostname')->orderBy('service_type');
+        }
         $services = $services_query->with(['device' => function ($query) {
             $query->select('devices.device_id', 'hostname', 'sysName');
-        }])->select('service_id', 'device_id', 'service_type', 'service_desc', 'service_status')->get();
+        }])->select('service_id', 'services.device_id', 'service_type', 'service_desc', 'service_status')->get();
 
         // process status
         $totals = ['warn' => 0, 'up' => 0, 'down' => 0];
