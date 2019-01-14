@@ -39,6 +39,7 @@ modules:
                     descr: 'Processor {{ $cpuFamily }} @{{ $cpuClockRate }} #{{ $cpuIndex }}'
                     index: 'cpuStatus.{{ $index }}'
                     state_name: cpuStatus
+                    group: 'CPU'
                     states:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                         - { descr: minor, graph: 0, value: 2, generic: 1 }
@@ -53,6 +54,7 @@ modules:
                     descr: 'Drive Bay {{ $index }} {{ $hardDiskDevicename }}'
                     index: 'hardDiskStatus.{{ $index }}'
                     state_name: hardDiskStatus
+                    group: 'Drive Bays'
                     states:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                         - { descr: minor, graph: 0, value: 2, generic: 1 }
@@ -67,6 +69,7 @@ modules:
                     descr: 'fanDevicename'
                     index: 'fanSpeed.{{ $index }}'
                     state_name: fanStatus
+                    group: 'Fans'
                     states:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                         - { descr: minor, graph: 0, value: 2, generic: 1 }
@@ -81,6 +84,7 @@ modules:
                     descr: 'Memory Status'
                     index: 'memoryEntireStatus.{{ $index }}'
                     state_name: memoryEntireStatus
+                    group: 'RAM'
                     states:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                         - { descr: minor, graph: 0, value: 2, generic: 1 }
@@ -95,6 +99,7 @@ modules:
                     descr: '{{ $memoryLogic }} {{ $memoryManufacturer }} {{ $memorySize }} {{ $memoryClockRate }}'
                     index: 'memoryStatus.{{ $index }}'
                     state_name: memoryStatus
+                    group: 'RAM'
                     states:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                         - { descr: minor, graph: 0, value: 2, generic: 1 }
