@@ -32,7 +32,7 @@ if ($enabled == 1) {
         'cef'             => 'SELECT COUNT(*) AS `total` FROM `cef_switching`',
         'cisco_asa'       => 'SELECT COUNT(*) AS `total`,`oid` FROM `ciscoASA` WHERE `disabled` = 0 GROUP BY `oid`',
         'mempool'         => 'SELECT COUNT(*) AS `total`,`mempool_descr` FROM `mempools` GROUP BY `mempool_descr`',
-        'dbschema'        => 'SELECT COUNT(*) AS `total`, `version` FROM `dbSchema`',
+        'dbschema'        => 'SELECT COUNT(*) AS `total`, COUNT(*) AS `version` FROM `migrations`',
         'snmp_version'    => 'SELECT COUNT(*) AS `total`,`snmpver` FROM `devices` GROUP BY `snmpver`',
         'os'              => 'SELECT COUNT(*) AS `total`,`os` FROM `devices` GROUP BY `os`',
         'type'            => 'SELECT COUNT(*) AS `total`,`type` FROM `devices` GROUP BY `type`',

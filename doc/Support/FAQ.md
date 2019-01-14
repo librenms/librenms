@@ -348,10 +348,10 @@ Configs can often contain sensitive data. Because of that only global admins can
 Demo users allow full access except adding/editing users and deleting devices and can't change passwords.
 
 ### <a name="faq31"> Why does modifying 'Default Alert Template' fail?</a>
-This template's entry could be missing in the database. Please run:
+This template's entry could be missing in the database. Please run this from the LibreNMS directory:
 
 ```bash
-mysql -u librenms -p < sql-schema/202.sql
+php artisan db:seed --class=DefaultAlertTemplateSeeder
 ```
 ### <a name="faq32"> Why would alert un-mute itself?</a> 
 If alert un-mutes itself then it most likely means that the alert cleared and is then triggered again.
