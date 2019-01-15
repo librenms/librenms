@@ -47,7 +47,7 @@
         "laravel/laravel": "5.4.*",
         "oriceon/toastr-5-laravel": "dev-master",
         "wpb/string-blade-compiler": "3.4.x-dev",
-        "fico7489/laravel-pivot": "*",
+        "fico7489/laravel-pivot": "2.*",
         "fideloper/proxy": "^4.0"
     },
     "require-dev": {
@@ -67,6 +67,9 @@
         "ext-mysqlnd": "*"
     },
     "autoload": {
+        "exclude-from-classmap": [
+            "/vendor/laravel/laravel/database/"
+        ],
         "classmap": [
             "database"
         ],
