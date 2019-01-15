@@ -378,6 +378,8 @@ component_prefs:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     component: { Name: component, Columns: [component], Unique: false, Type: BTREE }
+  Constraints:
+    component_prefs_ibfk_1: { name: component_prefs_ibfk_1, foreign_key: component, table: component, key: id, extra: 'ON DELETE CASCADE ON UPDATE CASCADE' }
 component_statuslog:
   Columns:
     - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
@@ -388,6 +390,8 @@ component_statuslog:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device: { Name: device, Columns: [component_id], Unique: false, Type: BTREE }
+  Constraints:
+    component_statuslog_ibfk_1: { name: component_statuslog_ibfk_1, foreign_key: component_id, table: component, key: id, extra: 'ON DELETE CASCADE ON UPDATE CASCADE' }
 config:
   Columns:
     - { Field: config_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
@@ -525,6 +529,9 @@ device_group_device:
     PRIMARY: { Name: PRIMARY, Columns: [device_group_id, device_id], Unique: true, Type: BTREE }
     device_group_device_device_group_id_index: { Name: device_group_device_device_group_id_index, Columns: [device_group_id], Unique: false, Type: BTREE }
     device_group_device_device_id_index: { Name: device_group_device_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints:
+    device_group_device_device_group_id_foreign: { name: device_group_device_device_group_id_foreign, foreign_key: device_group_id, table: device_groups, key: id, extra: 'ON DELETE CASCADE' }
+    device_group_device_device_id_foreign: { name: device_group_device_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
 device_mibs:
   Columns:
     - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
@@ -568,6 +575,9 @@ device_relationships:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [parent_device_id, child_device_id], Unique: true, Type: BTREE }
     device_relationship_child_device_id_fk: { Name: device_relationship_child_device_id_fk, Columns: [child_device_id], Unique: false, Type: BTREE }
+  Constraints:
+    device_relationship_child_device_id_fk: { name: device_relationship_child_device_id_fk, foreign_key: child_device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
+    device_relationship_parent_device_id_fk: { name: device_relationship_parent_device_id_fk, foreign_key: parent_device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
 entityState:
   Columns:
     - { Field: entity_state_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
@@ -1449,6 +1459,8 @@ sensors:
     sensor_host: { Name: sensor_host, Columns: [device_id], Unique: false, Type: BTREE }
     sensor_class: { Name: sensor_class, Columns: [sensor_class], Unique: false, Type: BTREE }
     sensor_type: { Name: sensor_type, Columns: [sensor_type], Unique: false, Type: BTREE }
+  Constraints:
+    sensors_device_id_foreign: { name: sensors_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
 sensors_to_state_indexes:
   Columns:
     - { Field: sensors_to_state_translations_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
@@ -1458,6 +1470,9 @@ sensors_to_state_indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sensors_to_state_translations_id], Unique: true, Type: BTREE }
     sensor_id_state_index_id: { Name: sensor_id_state_index_id, Columns: [sensor_id, state_index_id], Unique: true, Type: BTREE }
     state_index_id: { Name: state_index_id, Columns: [state_index_id], Unique: false, Type: BTREE }
+  Constraints:
+    sensors_to_state_indexes_ibfk_1: { name: sensors_to_state_indexes_ibfk_1, foreign_key: state_index_id, table: state_indexes, key: state_index_id, extra: '' }
+    sensors_to_state_indexes_sensor_id_foreign: { name: sensors_to_state_indexes_sensor_id_foreign, foreign_key: sensor_id, table: sensors, key: sensor_id, extra: 'ON DELETE CASCADE' }
 services:
   Columns:
     - { Field: service_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }

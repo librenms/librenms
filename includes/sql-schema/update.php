@@ -25,9 +25,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use Artisan;
 use LibreNMS\Config;
-use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\FileLock;
 use LibreNMS\Util\MemcacheLock;
