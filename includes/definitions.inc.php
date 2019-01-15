@@ -546,6 +546,11 @@ $config['graph_types']['device']['apm_sessions']['section']      = 'apm';
 $config['graph_types']['device']['apm_sessions']['order']        = '0';
 $config['graph_types']['device']['apm_sessions']['descr']        = 'Active Sessions';
 
+//TopVision specific graphs
+$config['graph_types']['device']['topvision_cmtotal'] = ['section' => 'cmts', 'order' => 0, 'descr' => 'Cable Modem Total'];
+$config['graph_types']['device']['topvision_cmreg'] = ['section' => 'cmts', 'order' => 1, 'descr' => 'Cable Modem Registered'];
+$config['graph_types']['device']['topvision_cmoffline'] = ['section' => 'cmts', 'order' => 2, 'descr' => 'Cable Modem Offline'];
+
 // Device Types
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';
