@@ -37,8 +37,8 @@ use LibreNMS\Util\Url;
 
 class FdbTablesController extends TableController
 {
-    protected $mac_count_cache = [];
-    protected $ip_cache = [];
+    protected $macCountCache = [];
+    protected $ipCache = [];
 
     protected function rules()
     {
@@ -85,6 +85,7 @@ class FdbTablesController extends TableController
                     return $query->whereIn('ports_fdb.vlan_id', $this->findVlans($search));
                 case 'dnsname':
                     $search = gethostbyname($search);
+                    // no break
                 case 'ip':
                     return $query->whereIn('ports_fdb.mac_address', $this->findMacs($search));
                 case 'description':
@@ -232,7 +233,7 @@ class FdbTablesController extends TableController
      */
     protected function findIps($mac_address)
     {
-        if (!isset($this->ip_cache[$mac_address])) {
+        if (!isset($this->ipCache[$mac_address])) {
             $ips = Ipv4Mac::where('ipv4_mac.mac_address', $mac_address)->pluck('ipv4_address');
 
             $dns = 'N/A';
@@ -245,13 +246,13 @@ class FdbTablesController extends TableController
                 }
             }
 
-            $this->ip_cache[$mac_address] = [
+            $this->ipCache[$mac_address] = [
                 'ips' => $ips,
                 'dns' => $dns,
             ];
         }
 
-        return $this->ip_cache[$mac_address];
+        return $this->ipCache[$mac_address];
     }
 
     /**
@@ -260,10 +261,10 @@ class FdbTablesController extends TableController
      */
     protected function getMacCount($port)
     {
-        if (!isset($this->mac_count_cache[$port->port_id])) {
-            $this->mac_count_cache[$port->port_id] = $port->fdbEntries()->count();
+        if (!isset($this->macCountCache[$port->port_id])) {
+            $this->macCountCache[$port->port_id] = $port->fdbEntries()->count();
         }
 
-        return $this->mac_count_cache[$port->port_id];
+        return $this->macCountCache[$port->port_id];
     }
 }
