@@ -234,7 +234,9 @@ class FdbTablesController extends TableController
     protected function findIps($mac_address)
     {
         if (!isset($this->ipCache[$mac_address])) {
-            $ips = Ipv4Mac::where('ipv4_mac.mac_address', $mac_address)->pluck('ipv4_address');
+            $ips = Ipv4Mac::where('mac_address', $mac_address)
+                ->groupBy('ipv4_address')
+                ->pluck('ipv4_address');
 
             $dns = 'N/A';
             // don't try too many dns queries, this is the slowest part
