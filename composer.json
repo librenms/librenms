@@ -67,6 +67,9 @@
         "ext-mysqlnd": "*"
     },
     "autoload": {
+        "exclude-from-classmap": [
+            "/vendor/laravel/laravel/database/"
+        ],
         "classmap": [
             "database"
         ],
