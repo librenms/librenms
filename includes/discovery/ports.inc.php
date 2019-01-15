@@ -45,20 +45,22 @@ foreach ($port_stats as $ifIndex => $port) {
     // Store ifIndex in port entry and prefetch ifName as we'll need it multiple times
     $port['ifIndex'] = $ifIndex;
 
-    // When devices do not provide ifDescr data, populate with ifName data if available
-    if ($port['ifDescr'] == '' || $port['ifDescr'] == null) {
-        $port['ifDescr'] = $port['ifName'];
-        d_echo('Using ifName as ifDescr');
-    }
-    // When devices do not provide ifAlias data, populate with ifDescr data if configured
-    if ($port['ifAlias'] == '' || $port['ifAlias'] == null) {
-        $port['ifAlias'] = $port['ifDescr'];
-        d_echo('Using ifDescr as ifAlias');
-    }
-    // When devices do not provide ifName data, populate with ifDescr data if configured
-    if ($port['ifName'] == '' || $port['ifName'] == null) {
-        $port['ifName'] = $port['ifDescr'];
-        d_echo('Using ifDescr as ifName');
+    if (is_port_valid($port, $device)) {
+        // When devices do not provide ifDescr data, populate with ifName data if available
+        if ($port['ifDescr'] == '' || $port['ifDescr'] == null) {
+            $port['ifDescr'] = $port['ifName'];
+            d_echo('Using ifName as ifDescr');
+        }
+        // When devices do not provide ifAlias data, populate with ifDescr data if configured
+        if ($port['ifAlias'] == '' || $port['ifAlias'] == null) {
+            $port['ifAlias'] = $port['ifDescr'];
+            d_echo('Using ifDescr as ifAlias');
+        }
+        // When devices do not provide ifName data, populate with ifDescr data if configured
+        if ($port['ifName'] == '' || $port['ifName'] == null) {
+            $port['ifName'] = $port['ifDescr'];
+            d_echo('Using ifDescr as ifName');
+        }
     }
 
     $ifName = $port['ifName'];
@@ -80,7 +82,7 @@ foreach ($port_stats as $ifIndex => $port) {
             $ports_db[$port_id]['deleted'] = '0';
             echo 'U';
         } else { // port is existing, let's update it with some data we have collected here
-            dbUpdate(array('ifType' => $ifType), 'ports', '`port_id` = ?', array($port_id));
+            dbUpdate(array('ifType' => $ifType, 'ifName' => $ifName, 'ifDescr' => $ifDescr), 'ports', '`port_id` = ?', array($port_id));
             echo '.';
         }
     } else {
