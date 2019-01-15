@@ -119,7 +119,7 @@
                                             },
                                             "group": {
                                                 "type": "string",
-                                                "pattern": "^[A-Z]"
+                                                "pattern": "^[A-Z]|(\\{\\{ )"
                                             },
                                             "low_limit": {
                                                 "type": ["number", "string"]
