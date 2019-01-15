@@ -7,11 +7,11 @@
             <tr>
                 <th data-column-id="device">Device</th>
                 <th data-column-id="mac_address">MAC Address</th>
-                <th data-column-id="ipv4_address">IPv4 Address</th>
+                <th data-column-id="ipv4_address" data-sortable="false">IPv4 Address</th>
                 <th data-column-id="interface">Port</th>
                 <th data-column-id="vlan">Vlan</th>
                 <th data-column-id="description">Description</th>
-                <th data-column-id="dnsname">DNS Name</th>
+                <th data-column-id="dnsname" data-sortable="false">DNS Name</th>
             </tr>
         </thead>
     </table>
@@ -114,13 +114,12 @@ echo '"'.$vars['searchPhrase'].'"+';
     post: function ()
     {
         return {
-            id: "fdb-search",
             device_id: '<?php echo $vars['device_id']; ?>',
             searchby: '<?php echo $vars['searchby']; ?>',
             searchPhrase: '<?php echo $vars['searchPhrase']; ?>'
         };
     },
-    url: "ajax_table.php"
+    url: "ajax/table/fdb-tables"
 });
 
 </script>

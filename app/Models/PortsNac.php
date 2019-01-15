@@ -49,7 +49,6 @@ class PortsNac extends BaseModel
         'time_elapsed',
     ];
 
-
     public function scopeHasAccess($query, User $user)
     {
         return $this->hasPortAccess($query, $user);
