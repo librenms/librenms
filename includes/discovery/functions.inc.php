@@ -266,6 +266,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             'entPhysicalIndex' => $entPhysicalIndex,
             'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
             'user_func' => $user_func,
+            'group' => $group,
         );
 
         foreach ($insert as $key => $val_check) {
@@ -992,17 +993,10 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
 
                     // process the description
-                    $descr = dynamic_discovery_get_value('descr', $index, $data, $pre_cache);
-                    if (is_null($descr)) {
-                        $descr = str_replace('{{ $index }}', $index, $data['descr']);
-                        preg_match_all('/{{ \$([a-zA-Z0-9.]+) }}/', $descr, $matches);
-                        foreach ($matches[1] as $tmp_var) {
-                            $replace = dynamic_discovery_get_value($tmp_var, $index, $data, $pre_cache, null);
-                            if (!is_null($replace)) {
-                                $descr = str_replace("{{ \$$tmp_var }}", $replace, $descr);
-                            }
-                        }
-                    }
+                    $descr = YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache);
+
+                    // process the group
+                    $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache);
 
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
@@ -1038,7 +1032,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     }
 
                     $uindex = str_replace('{{ $index }}', $index, isset($data['index']) ? $data['index'] : $index);
-                    discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, isset($data['group']) ? $data['group'] : null);
+                    discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group);
 
                     if ($sensor_type === 'state') {
                         create_sensor_to_state_index($device, $sensor_name, $uindex);
