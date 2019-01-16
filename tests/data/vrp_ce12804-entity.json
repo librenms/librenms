@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "vrp",
                     "type": "network",
                     "serial": null,
-                    "icon": "huawei.svg"
+                    "icon": "huawei.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "8.150 (V200R002C50SPC800)",
                     "hardware": "Huawei CE12800",
                     "features": null,
-                    "location": "<private>",
                     "os": "vrp",
                     "type": "network",
                     "serial": null,
-                    "icon": "huawei.svg"
+                    "icon": "huawei.svg",
+                    "location": "<private>"
                 }
             ]
         }
