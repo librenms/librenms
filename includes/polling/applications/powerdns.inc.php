@@ -13,7 +13,7 @@ echo " $name";
 
 // unused metrics:
 // deferred-packetcache-inserts, deferred-packetcache-lookup, dnsupdate-answers, dnsupdate-changes, dnsupdate-queries, dnsupdate-refused, incoming-notifications
-// overload-drops, rd-queries, recursion-unanswered, security-status, signatures, tcp-answers-bytes, tcp4-answers, tcp4-answers-bytes, tcp4-queries
+// query-cache-size, overload-drops, rd-queries, recursion-unanswered, security-status, signatures, tcp-answers-bytes, tcp4-answers, tcp4-answers-bytes, tcp4-queries
 // tcp6-answers, tcp6-answers-bytes, tcp6-queries, udp-answers-bytes, udp-do-queries, udp4-answers-bytes, udp6-answers-bytes, fd-usage, key-cache-size
 // meta-cache-size, real-memory-usage, signature-cache-size, sys-msec, udp-in-errors, udp-noport-errors, udp-recvbuf-errors, udp-sndbuf-errors, uptime, user-msec
 
@@ -25,7 +25,7 @@ $powerdns_metrics = [
     'pc_hit' => 'packetcache-hit',
     'pc_miss' => 'packetcache-miss',
     'pc_size' => 'packetcache-size',
-    'qsize' => 'query-cache-size', // is this supposed to be qsize-q? This value isn't used in graphs...
+    'qsize' => 'qsize-q',
     'qc_hit' => 'query-cache-hit',
     'qc_miss' => 'query-cache-miss',
     'rec_answers' => 'recursing-answers',
@@ -66,7 +66,7 @@ if (isset($legacy)) {
         $powerdns['packetcache-hit'],
         $powerdns['packetcache-miss'],
         $powerdns['packetcache-size'],
-        $powerdns['query-cache-size'],
+        $powerdns['qsize-q'],
         $powerdns['query-cache-hit'],
         $powerdns['query-cache-miss'],
         $powerdns['recursing-answers'],
