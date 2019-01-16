@@ -48,7 +48,8 @@
         "oriceon/toastr-5-laravel": "dev-master",
         "wpb/string-blade-compiler": "3.4.x-dev",
         "fico7489/laravel-pivot": "2.*",
-        "fideloper/proxy": "^4.0"
+        "fideloper/proxy": "^4.0",
+        "doctrine/dbal": "^2.5"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9.1",
