@@ -16,11 +16,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "vrp",
                     "type": "network",
                     "serial": null,
-                    "icon": "huawei.svg"
+                    "icon": "huawei.svg",
+                    "location": null
                 }
             ]
         },
@@ -34,11 +34,11 @@
                     "version": "5.120 (V200R003C01SPC900)",
                     "hardware": "Huawei AR1220",
                     "features": null,
-                    "location": null,
                     "os": "vrp",
                     "type": "network",
                     "serial": null,
-                    "icon": "huawei.svg"
+                    "icon": "huawei.svg",
+                    "location": null
                 }
             ]
         }

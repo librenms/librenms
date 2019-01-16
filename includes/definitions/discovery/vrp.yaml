@@ -48,6 +48,7 @@ modules:
                     entPhysicalIndex_measured: ports
                     index: 'rx-{{ $index }}'
                     user_func: 'uw_to_dbm'
+                    group: '{{ $entPhysicalName }}'
                     skip_values: 
                         -
                             oid: hwEntityOpticalRxPower
@@ -61,7 +62,8 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'tx-{{ $index }}'
-                    user_func: 'uw_to_dbm'  
+                    user_func: 'uw_to_dbm'
+                    group: '{{ $entPhysicalName }}'
                     skip_values:
                         -
                             oid: hwEntityOpticalTxPower
@@ -76,6 +78,7 @@ modules:
                     entPhysicalIndex_measured: ports
                     index: 'lane-rx-{{ $index }}'
                     divisor: 100
+                    group: '{{ $entPhysicalName }}'
                     skip_values:
                         -
                             oid: hwEntityOpticalRxPower
@@ -89,6 +92,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'lane-tx-{{ $index }}'
+                    group: '{{ $entPhysicalName }}'
                     skip_values:
                         -
                             oid: hwEntityOpticalTxPower
