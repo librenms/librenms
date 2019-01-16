@@ -275,7 +275,7 @@ $config['os']['iosxr']['syslog_hook'][] = Array('regex' => '/%GBL-CONFIG-6-DB_CO
 
 #### Juniper Junos
 ```ssh
-$config['os']['junos']['syslog_hook'][] = Array('regex' => '/%UI_COMMIT:/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+$config['os']['junos']['syslog_hook'][] = Array('regex' => '/UI_COMMIT:/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
 ```
 #### Juniper ScreenOS
 ```ssh
