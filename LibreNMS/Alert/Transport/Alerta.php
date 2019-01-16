@@ -14,7 +14,9 @@
  * @subpackage Alerts
  */
 namespace LibreNMS\Alert\Transport;
+
 use LibreNMS\Alert\Transport;
+
 class Alerta extends Transport
 {
     public function deliverAlert($obj, $opts)
