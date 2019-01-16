@@ -835,13 +835,6 @@ mempools:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [mempool_id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
-migrations:
-  Columns:
-    - { Field: id, Type: int(10) unsigned, 'Null': false, Extra: auto_increment }
-    - { Field: migration, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: batch, Type: int(11), 'Null': false, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 mibdefs:
   Columns:
     - { Field: module, Type: varchar(255), 'Null': false, Extra: '' }
@@ -856,6 +849,13 @@ mibdefs:
     - { Field: last_modified, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [module, mib, object_type], Unique: true, Type: BTREE }
+migrations:
+  Columns:
+    - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: migration, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: batch, Type: int(11), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 munin_plugins:
   Columns:
     - { Field: mplug_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
@@ -1252,7 +1252,9 @@ ports_nac:
     - { Field: authc_status, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: method, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: timeout, Type: varchar(50), 'Null': false, Extra: '' }
-    - { Field: time_left, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: time_left, Type: varchar(50), 'Null': true, Extra: '' }
+    - { Field: vlan, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: time_elapsed, Type: varchar(50), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ports_nac_id], Unique: true, Type: BTREE }
     ports_nac_device_id_index: { Name: ports_nac_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
