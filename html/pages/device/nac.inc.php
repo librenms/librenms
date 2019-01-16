@@ -69,18 +69,7 @@ if ($device['os'] === 'vrp') {
         formatters: {
             "time_interval": function (column, row) {
                 var value = row[column.id];
-                if (value > 59) {
-                    var date = new Date(null);
-                    var days = Math.floor(value / 86400);
-                    date.setSeconds(value % 86400);
-                    var result = date.toISOString().substr(11,8);
-                    if (days > 0) {
-                        result = days + ' days,' + result;
-                    }
-                    return result;
-                } else {
-                    return value;
-                }
+                return moment.duration(Number(value), 's').humanize();
             },
             "nac_authz": function (column, row) {
                 var value = row[column.id];
