@@ -118,8 +118,7 @@
                                                 "type": "string"
                                             },
                                             "group": {
-                                                "type": "string",
-                                                "pattern": "^[A-Z]"
+                                                "type": "string"
                                             },
                                             "low_limit": {
                                                 "type": ["number", "string"]
@@ -333,8 +332,7 @@
                         "type": "string"
                     },
                     "group": {
-                        "type": "string",
-                        "pattern": "^[A-Z]"
+                        "type": "string"
                     },
                     "low_limit": {
                         "type": ["number", "string"]
