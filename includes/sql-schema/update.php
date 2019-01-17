@@ -55,10 +55,7 @@ try {
         $migrate_opts['--seed'] = true;
         $return = Artisan::call('migrate', $migrate_opts);
         echo Artisan::output();
-    } elseif ($db_rev == 1000) {
-        $return = Artisan::call('migrate', $migrate_opts);
-        echo Artisan::output();
-    } else {
+    } elseif ($db_rev < 1000) {
         // legacy update
         d_echo("DB Schema update started....\n");
 
@@ -102,6 +99,12 @@ try {
 
         echo "-- Done\n";
         // end legacy update
+        $db_rev = get_db_schema();
+    }
+
+    if ($db_rev == 1000) {
+        $return = Artisan::call('migrate', $migrate_opts);
+        echo Artisan::output();
     }
 
     if (isset($schemaLock)) {
