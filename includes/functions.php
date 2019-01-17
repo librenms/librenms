@@ -2393,20 +2393,18 @@ function cache_peeringdb()
  */
 function dump_db_schema()
 {
-    global $config;
-
-    $output = array();
+    $output = [];
     $db_name = dbFetchCell('SELECT DATABASE()');
 
     foreach (dbFetchRows("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;") as $table) {
         $table = $table['TABLE_NAME'];
         foreach (dbFetchRows("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table'") as $data) {
-            $def = array(
+            $def = [
                 'Field'   => $data['COLUMN_NAME'],
                 'Type'    => $data['COLUMN_TYPE'],
                 'Null'    => $data['IS_NULLABLE'] === 'YES',
                 'Extra'   => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data['EXTRA']),
-            );
+            ];
 
             if (isset($data['COLUMN_DEFAULT']) && $data['COLUMN_DEFAULT'] != 'NULL') {
                 $default = trim($data['COLUMN_DEFAULT'], "'");
@@ -2421,15 +2419,30 @@ function dump_db_schema()
             if (isset($output[$table]['Indexes'][$key_name])) {
                 $output[$table]['Indexes'][$key_name]['Columns'][] = $key['Column_name'];
             } else {
-                $output[$table]['Indexes'][$key_name] = array(
+                $output[$table]['Indexes'][$key_name] = [
                     'Name'    => $key['Key_name'],
-                    'Columns' => array($key['Column_name']),
+                    'Columns' => [$key['Column_name']],
                     'Unique'  => !$key['Non_unique'],
                     'Type'    => $key['Index_type'],
-                );
+                ];
             }
         }
+
+        $create = dbFetchRow("SHOW CREATE TABLE `$table`")['Create Table'];
+        $constraint_regex = '/CONSTRAINT `(?<name>[A-Za-z_0-9]+)` FOREIGN KEY \(`(?<foreign_key>[A-Za-z_0-9]+)`\) REFERENCES `(?<table>[A-Za-z_0-9]+)` \(`(?<key>[A-Za-z_0-9]+)`\) ?(?<extra>[ A-Z]+)?/';
+        $constraint_count = preg_match_all($constraint_regex, $create, $constraints);
+        for ($i = 0; $i < $constraint_count; $i++) {
+            $constraint_name = $constraints['name'][$i];
+            $output[$table]['Constraints'][$constraint_name] = [
+                'name' => $constraint_name,
+                'foreign_key' => $constraints['foreign_key'][$i],
+                'table' => $constraints['table'][$i],
+                'key' => $constraints['key'][$i],
+                'extra' => $constraints['extra'][$i],
+            ];
+        }
     }
+
     return $output;
 }
 
