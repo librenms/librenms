@@ -59,3 +59,8 @@ Simple enough, this is where all of the rrd files are created. They are stored i
 
 ### database/migrations
 Contains all the database migrations.  See Laravel docs for additional info: https://laravel.com/docs/migrations
+
+In general to create a new table you should run:
+```bash
+php artisan make:model ModelName -m -c -r
+```
