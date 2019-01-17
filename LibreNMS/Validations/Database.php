@@ -171,7 +171,7 @@ class Database extends BaseValidation
                             unset($data['Indexes']['PRIMARY']);
                             $primary = true;
                         }
-                        $schema_update[] = $this->addColumnSql($table, $cdata, $data['Columns'][$index - 1]['Field'], $primary);
+                        $schema_update[] = $this->addColumnSql($table, $cdata, isset($data['Columns'][$index - 1]) ? $data['Columns'][$index - 1]['Field'] : null, $primary);
                     } elseif ($cdata !== $current_columns[$column]) {
                         $validator->fail("Database: incorrect column ($table/$column)");
                         $schema_update[] = $this->updateTableSql($table, $column, $cdata);
