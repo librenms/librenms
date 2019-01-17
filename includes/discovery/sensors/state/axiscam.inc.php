@@ -19,9 +19,9 @@ if (is_array($oids)) {
     //Create State Translation
     if ($state_index_id) {
         $states = array(
-             array($state_index_id,'Normal',0,1,0) ,
+             array($state_index_id,'Normal',0,3,0) ,
              array($state_index_id,'Failed',0,2,2) ,
-             array($state_index_id,'Out Of Boundary',0,3,2) ,
+             array($state_index_id,'Out Of Boundary',0,3,1) ,
          );
         foreach ($states as $value) {
             $insert = array(
@@ -56,8 +56,8 @@ if (is_array($oids)) {
     //Create State Translation
     if ($state_index_id) {
         $states = array(
-             array($state_index_id,'Normal',0,1,0) ,
-             array($state_index_id,'Failed',0,2,2) ,
+             array($state_index_id,'Normal',0,3,0) ,
+             array($state_index_id,'Failed',0,1,2) ,
          );
         foreach ($states as $value) {
             $insert = array(
