@@ -20,4 +20,12 @@ class CliServiceProvider extends ArtisanServiceProvider
             parent::register();
         }
     }
+
+    protected function registerModelMakeCommand()
+    {
+        // override with our own implementation to put models in the correct namespace
+        $this->app->singleton('command.model.make', function ($app) {
+            return new \App\Console\ModelMakeCommand($app['files']);
+        });
+    }
 }
