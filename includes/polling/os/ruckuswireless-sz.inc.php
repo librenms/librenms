@@ -14,29 +14,13 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
 $productmib = trim($device['sysObjectID'], '" ');
-$ruckusmodels    = array(
-    "$productmib.5.0",
-    '.1.3.6.1.4.1.25053.1.2.1.1.1.1.9.0',
-    '.1.3.6.1.4.1.25053.1.1.2.1.1.1.1.0',
-    '.1.3.6.1.2.1.1.1.0',
-);
-$ruckusversions  = array(
-    "$productmib.8.0",
-    '.1.3.6.1.4.1.25053.1.1.3.1.1.1.1.1.3.1',
-);
-$ruckusserials   = array(
-    "$productmib.7.0",
-    '.1.3.6.1.4.1.25053.1.1.2.1.1.1.2.0',
-);
-$ruckuscountries = array(
-    "$productmib.9.0",
-    '.1.3.6.1.4.1.25053.1.2.1.1.1.1.20',
-);
-$hardware      = first_oid_match($device, $ruckusmodels);
-$version       = first_oid_match($device, $ruckusversions);
-$serial        = first_oid_match($device, $ruckusserials);
-$ruckuscountry = first_oid_match($device, $ruckuscountries);
+
+$hardware      = snmp_getnext($device, '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.3', "-OQv");
+$version       = snmp_getnext($device, '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.9', "-OQv");
+$serial        = snmp_get($device, '.1.3.6.1.4.1.25053.1.4.1.1.1.15.13.0', "-OQv");
+$ruckuscountry = snmp_getnext($device, '.1.3.6.1.4.1.25053.1.8.1.1.1.1.3.1.4.139.32.129', "-OQv");
 if (isset($ruckuscountry) && $ruckuscountry != '') {
     $version .= " ($ruckuscountry)";
 }
