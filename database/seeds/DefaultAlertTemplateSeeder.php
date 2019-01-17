@@ -11,31 +11,37 @@ class DefaultAlertTemplateSeeder extends Seeder
      */
     public function run()
     {
-        \DB::table('alert_templates')->insert([
+        $templates = [
             [
                 'name' => 'BGP Sessions.',
-                'template' => '%title\\r\\n\nSeverity: %severity\\r\\n\n{if %state == 0}Time elapsed: %elapsed\\r\\n{/if}\nTimestamp: %timestamp\\r\\n\nUnique-ID: %uid\\r\\n\nRule: {if %name}%name{else}%rule{/if}\\r\\n\n{if %faults}Faults:\\r\\n\n{foreach %faults}\n#%key: %value.string\\r\\n\nPeer: %value.astext\\r\\n\nPeer IP: %value.bgpPeerIdentifier\\r\\n\nPeer AS: %value.bgpPeerRemoteAs\\r\\n\nPeer EstTime: %value.bgpPeerFsmEstablishedTime\\r\\n\nPeer State: %value.bgpPeerState\\r\\n\n{/foreach}\n{/if}',
+                'template' => '{{ $alert->title }}\r\n\\r\\n\nSeverity: {{ $alert->severity }}\r\n\\r\\n\n @if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }}\r\n @endif\\r\\n\nTimestamp: {{ $alert->timestamp }}\r\n\\r\\n\nUnique-ID: {{ $alert->uid }}\r\n\\r\\n\nRule:  @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif \r\n\\r\\n\n @if ($alert->faults) Faults:\r\n\\r\\n\n @foreach ($alert->faults as $key => $value)\\r\\n\n#{{ $key }}: {{ $value[\'string\'] }}\r\n\\r\\n\nPeer: {{ $value[\'astext\'] }}\r\n\\r\\n\nPeer IP: {{ $value[\'bgpPeerIdentifier\'] }}\r\n\\r\\n\nPeer AS: {{ $value[\'bgpPeerRemoteAs\'] }}\r\n\\r\\n\nPeer EstTime: {{ $value[\'bgpPeerFsmEstablishedTime\'] }}\r\n\\r\\n\nPeer State: {{ $value[\'bgpPeerState\'] }}\r\n\\r\\n\n @endforeach\\r\\n\n @endif',
                 'title' => '',
                 'title_rec' => ''
             ],
             [
                 'name' => 'Ports',
-                'template' => '%title\\r\\n\nSeverity: %severity\\r\\n\n{if %state == 0}Time elapsed: %elapsed{/if}\nTimestamp: %timestamp\nUnique-ID: %uid\nRule: {if %name}%name{else}%rule{/if}\\r\\n\n{if %faults}Faults:\\r\\n\n{foreach %faults}\\r\\n\n#%key: %value.string\\r\\n\nPort: %value.ifName\\r\\n\nPort Name: %value.ifAlias\\r\\n\nPort Status: %value.message\\r\\n\n{/foreach}\\r\\n\n{/if}\n',
+                'template' => '{{ $alert->title }}\r\n\\r\\n\nSeverity: {{ $alert->severity }}\r\n\\r\\n\n @if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif\\r\\n\nTimestamp: {{ $alert->timestamp }}\\r\\n\nUnique-ID: {{ $alert->uid }}\\r\\n\nRule:  @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif \r\n\\r\\n\n @if ($alert->faults) Faults:\r\n\\r\\n\n @foreach ($alert->faults as $key => $value)\r\n\\r\\n\n#{{ $key }}: {{ $value[\'string\'] }}\r\n\\r\\n\nPort: {{ $value[\'ifName\'] }}\r\n\\r\\n\nPort Name: {{ $value[\'ifAlias\'] }}\r\n\\r\\n\nPort Status: {{ $value[\'message\'] }}\r\n\\r\\n\n @endforeach \r\n\\r\\n\n @endif',
                 'title' => '',
                 'title_rec' => ''
             ],
             [
                 'name' => 'Temperature',
-                'template' => '%title\\r\\n\nSeverity: %severity\\r\\n\n{if %state == 0}Time elapsed: %elapsed{/if}\\r\\n\nTimestamp: %timestamp\\r\\n\nUnique-ID: %uid\\r\\n\nRule: {if %name}%name{else}%rule{/if}\\r\\n\n{if %faults}Faults:\\r\\n\n{foreach %faults}\\r\\n\n#%key: %value.string\\r\\n\nTemperature: %value.sensor_current\\r\\n\nPrevious Measurement: %value.sensor_prev\\r\\n\n{/foreach}\\r\\n\n{/if}',
+                'template' => '{{ $alert->title }}\r\n\\r\\n\nSeverity: {{ $alert->severity }}\r\n\\r\\n\n @if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif \r\n\\r\\n\nTimestamp: {{ $alert->timestamp }}\r\n\\r\\n\nUnique-ID: {{ $alert->uid }}\r\n\\r\\n\nRule:  @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif \r\n\\r\\n\n @if ($alert->faults) Faults:\r\n\\r\\n\n @foreach ($alert->faults as $key => $value)\r\n\\r\\n\n#{{ $key }}: {{ $value[\'string\'] }}\r\n\\r\\n\nTemperature: {{ $value[\'sensor_current\'] }}\r\n\\r\\n\nPrevious Measurement: {{ $value[\'sensor_prev\'] }}\r\n\\r\\n\n @endforeach \r\n\\r\\n\n @endif',
                 'title' => '',
                 'title_rec' => ''
             ],
             [
                 'name' => 'Default Alert Template',
-                'template' => '%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}',
+                'template' => '{{ $alert->title }}\\r\\n\nSeverity: {{ $alert->severity }}\\r\\n\n @if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }}\\r\\n\n @endif Timestamp: {{ $alert->timestamp }}\\r\\n\nUnique-ID: {{ $alert->uid }}\\r\\n\nRule:  @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif\\r\\n\n @if ($alert->faults) Faults:\\r\\n\n @foreach ($alert->faults as $key => $value)  #{{ $key }}: {{ $value[\'string\'] }}\\r\\n\n @endforeach  @endif Alert sent to:  @foreach ($alert->contacts as $key => $value){{ $value }} <{{ $key }}>  @endforeach',
                 'title' => null,
                 'title_rec' => null
             ]
-        ]);
+        ];
+
+        $existing = DB::table('alert_templates')->pluck('name');
+
+        \DB::table('alert_templates')->insert(array_filter($templates, function ($entry) use ($existing) {
+            return !$existing->contains($entry['name']);
+        }));
     }
 }

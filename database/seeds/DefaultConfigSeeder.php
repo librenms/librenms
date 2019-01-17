@@ -11,11 +11,8 @@ class DefaultConfigSeeder extends Seeder
      */
     public function run()
     {
-        \DB::table('dbSchema')->insert([
-            'version' => 253
-        ]);
-        
-        \DB::table('config')->insert([
+
+        $config_values = [
             [
                 "config_name" => "oxidized.enabled",
                 "config_value" => "false",
@@ -640,6 +637,12 @@ class DefaultConfigSeeder extends Seeder
                 "config_hidden" => "0",
                 "config_disabled" => "0",
             ]
-        ]);
+        ];
+
+        $existing = DB::table('config')->pluck('config_name');
+
+        \DB::table('config')->insert(array_filter($config_values, function ($entry) use ($existing) {
+            return !$existing->contains($entry['config_name']);
+        }));
     }
 }
