@@ -11,7 +11,7 @@ class DefaultWidgetSeeder extends Seeder
      */
     public function run()
     {
-        \DB::table('widgets')->insert([
+        $widgets = [
             [
                 "widget_title" => "Availability map",
                 "widget" => "availability-map",
@@ -92,6 +92,12 @@ class DefaultWidgetSeeder extends Seeder
                 "widget" => "server-stats",
                 "base_dimensions" => "6,3",
             ]
-        ]);
+        ];
+
+        $existing = DB::table('widgets')->pluck('widget');
+
+        \DB::table('widgets')->insert(array_filter($widgets, function ($entry) use ($existing) {
+            return !$existing->contains($entry['widget']);
+        }));
     }
 }
