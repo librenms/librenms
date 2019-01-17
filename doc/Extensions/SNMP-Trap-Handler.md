@@ -13,7 +13,7 @@ Install snmptrapd via your package manager.
 
 To enable snmptrapd to properly parse traps, we will need to add MIBs.
 
-Edit the file `/etc/systemd/system/snmptrapd.service.d/mibs.conf` and add the following content. You may want to tweak to add vendor directories for devices you care about (in addition to or instead of cisco).
+Make the folder `/etc/systemd/system/snmptrapd.service.d/` and edit the file `/etc/systemd/system/snmptrapd.service.d/mibs.conf` and add the following content. You may want to tweak to add vendor directories for devices you care about (in addition to or instead of cisco).
 
 ```ini
 [Service]
