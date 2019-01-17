@@ -11,15 +11,17 @@ Traps are handled via snmptrapd.
 
 Install snmptrapd via your package manager.
 
-Modify startup options to include `-M /opt/librenms/mibs -m ALL`
+To enable snmptrapd to properly parse traps, we will need to add MIBs.
 
-Copy the snmptrapd.service file located in /lib/systemd/system/snmptrapd.service to /etc/systemd/system/ and modify the ExecStart line to look like the following.
+Edit the file `/etc/systemd/system/snmptrapd.service.d/mibs.conf` and add the following content. You may want to tweak to add vendor directories for devices you care about (in addition to or instead of cisco).
 
- `ExecStart=/usr/sbin/snmptrapd -Lsd -M /opt/librenms/mibs -m ALL -f`
- 
-Save the file, reload the systemd daemon,`sudo systemctl daemon-reload`, and start the snmptrapd service `sudo systemctl start snmptrapd`.
+```ini
+[Service]
+Environment=MIBDIRS=+/opt/librenms/mibs:/opt/librenms/mibs/cisco
+Environment=MIBS=+ALL
+```
 
-You can also edit TRAPDOPTS in the init script in /etc/init.d/snmptrapd to retain changes on startup.
+For non-systemd systems, you can edit TRAPDOPTS in the init script in /etc/init.d/snmptrapd.
 
 `TRAPDOPTS="-Lsd  -M /opt/librenms/mibs -m ALL -f -p $TRAPD_PID"`
 
@@ -30,6 +32,8 @@ traphandle default /opt/librenms/snmptrap.php
 ```
 
 Along with any necessary configuration to receive the traps from your devices (community, etc.)
+
+Reload service files `sudo systemctl daemon-reload`, and start the snmptrapd service `sudo systemctl restart snmptrapd`.
 
 ### Event logging
 
