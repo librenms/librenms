@@ -2765,7 +2765,7 @@
                     "state_descr": "absent",
                     "state_draw_graph": 0,
                     "state_value": 5,
-                    "state_generic_value": 0
+                    "state_generic_value": 3
                 },
                 {
                     "state_name": "cpuStatus",
@@ -2807,7 +2807,7 @@
                     "state_descr": "absent",
                     "state_draw_graph": 0,
                     "state_value": 5,
-                    "state_generic_value": 0
+                    "state_generic_value": 3
                 },
                 {
                     "state_name": "fanStatus",
@@ -2849,7 +2849,7 @@
                     "state_descr": "absent",
                     "state_draw_graph": 0,
                     "state_value": 5,
-                    "state_generic_value": 0
+                    "state_generic_value": 3
                 },
                 {
                     "state_name": "hardDiskStatus",
@@ -2891,7 +2891,7 @@
                     "state_descr": "absent",
                     "state_draw_graph": 0,
                     "state_value": 5,
-                    "state_generic_value": 0
+                    "state_generic_value": 3
                 },
                 {
                     "state_name": "memoryEntireStatus",
@@ -2933,7 +2933,7 @@
                     "state_descr": "absent",
                     "state_draw_graph": 0,
                     "state_value": 5,
-                    "state_generic_value": 0
+                    "state_generic_value": 3
                 },
                 {
                     "state_name": "memoryStatus",
