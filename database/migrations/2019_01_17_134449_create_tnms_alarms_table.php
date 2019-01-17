@@ -18,6 +18,7 @@ class CreateTnmsAlarmsTable extends Migration
         });
         Schema::create('tnms_alarms', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('tnmsne_info_id');
             $table->unsignedInteger('alarm_num');
             $table->string('neAlarmtimestamp', 255);
             $table->string('alarm_sev', 128);
