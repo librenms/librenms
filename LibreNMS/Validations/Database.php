@@ -185,14 +185,15 @@ class Database extends BaseValidation
                     $schema_update[] = $this->dropColumnSql($table, $column);
                 }
 
+                $index_changes = [];
                 if (isset($data['Indexes'])) {
                     foreach ($data['Indexes'] as $name => $index) {
                         if (empty($current_schema[$table]['Indexes'][$name])) {
                             $validator->fail("Database: missing index ($table/$name)");
-                            $schema_update[] = $this->addIndexSql($table, $index);
+                            $index_changes[] = $this->addIndexSql($table, $index);
                         } elseif ($index != $current_schema[$table]['Indexes'][$name]) {
                             $validator->fail("Database: incorrect index ($table/$name)");
-                            $schema_update[] = $this->updateIndexSql($table, $name, $index);
+                            $index_changes[] = $this->updateIndexSql($table, $name, $index);
                         }
 
                         unset($current_schema[$table]['Indexes'][$name]);
@@ -205,6 +206,32 @@ class Database extends BaseValidation
                         $schema_update[] = $this->dropIndexSql($table, $name);
                     }
                 }
+                $schema_update = array_merge($schema_update, $index_changes); // drop before create/update
+
+
+                $constraint_changes = [];
+                if (isset($data['Constraints'])) {
+                    foreach ($data['Constraints'] as $name => $constraint) {
+                        if (empty($current_schema[$table]['Constraints'][$name])) {
+                            $validator->fail("Database: missing constraint ($table/$name)");
+                            $constraint_changes[] = $this->addConstraintSql($table, $constraint);
+                        } elseif ($constraint != $current_schema[$table]['Constraints'][$name]) {
+                            $validator->fail("Database: incorrect constraint ($table/$name)");
+                            $constraint_changes[] = $this->dropConstraintSql($table, $name);
+                            $constraint_changes[] = $this->addConstraintSql($table, $constraint);
+                        }
+
+                        unset($current_schema[$table]['Constraints'][$name]);
+                    }
+                }
+
+                if (isset($current_schema[$table]['Constraints'])) {
+                    foreach ($current_schema[$table]['Constraints'] as $name => $_unused) {
+                        $validator->fail("Database: extra constraint ($table/$name)");
+                        $schema_update[] = $this->dropConstraintSql($table, $name);
+                    }
+                }
+                $schema_update = array_merge($schema_update, $constraint_changes); // drop before create/update
             }
 
             unset($current_schema[$table]); // remove checked tables
@@ -331,5 +358,22 @@ class Database extends BaseValidation
         }, $index_data['Columns']));
 
         return sprintf($index, $columns);
+    }
+
+    private function addConstraintSql($table, $constraint)
+    {
+        $sql = "ALTER TABLE `$table` ADD CONSTRAINT `{$constraint['name']}` FOREIGN KEY (`{$constraint['foreign_key']}`) ";
+        $sql .= " REFERENCES `{$constraint['table']}` (`{$constraint['key']}`)";
+        if (!empty($constraint['extra'])) {
+            $sql .= ' ' . $constraint['extra'];
+        }
+        $sql .= ';';
+
+        return $sql;
+    }
+
+    private function dropConstraintSql($table, $name)
+    {
+        return "ALTER TABLE `$table` DROP FOREIGN KEY `$name`;";
     }
 }

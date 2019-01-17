@@ -14,7 +14,7 @@ class AddForeignKeysToSensorsToStateIndexesTable extends Migration
     public function up()
     {
         Schema::table('sensors_to_state_indexes', function (Blueprint $table) {
-            $table->foreign('state_index_id', 'sensors_to_state_indexes_ibfk_2')->references('state_index_id')->on('state_indexes')->onUpdate('RESTRICT')->onDelete('RESTRICT');
+            $table->foreign('state_index_id', 'sensors_to_state_indexes_ibfk_1')->references('state_index_id')->on('state_indexes')->onUpdate('RESTRICT')->onDelete('RESTRICT');
             $table->foreign('sensor_id')->references('sensor_id')->on('sensors')->onUpdate('RESTRICT')->onDelete('CASCADE');
         });
     }
