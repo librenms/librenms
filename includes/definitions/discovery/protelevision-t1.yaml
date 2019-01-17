@@ -90,22 +90,22 @@ modules:
                      descr: High Priority Code Rate
                      state_name: pt3080ModeCodeRateHighPrio
                      states:
-                         - { descr: 'code-rate-1-2', graph: 1, value: 0, generic: 0 }
-                         - { descr: 'code-rate-2-3', graph: 1, value: 1, generic: 0 }
-                         - { descr: 'code-rate-3-4', graph: 1, value: 2, generic: 0 }
-                         - { descr: 'code-rate-5-6', graph: 1, value: 3, generic: 0 }
-                         - { descr: 'code-rate-7-8', graph: 1, value: 4, generic: 0 }
+                         - { descr: 'code-rate-1/2', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'code-rate-2/3', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'code-rate-3/4', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'code-rate-5/6', graph: 1, value: 3, generic: 0 }
+                         - { descr: 'code-rate-7/8', graph: 1, value: 4, generic: 0 }
                 -
                      oid: pt3080ModeCodeRateLowPrio
                      num_oid: '.1.3.6.1.4.1.18086.3080.2.5.{{ $index }}'
                      descr: Low Priority Code Rate
                      state_name: pt3080ModeCodeRateLowPrio
                      states:
-                         - { descr: 'code-rate-1-2', graph: 1, value: 0, generic: 0 }
-                         - { descr: 'code-rate-2-3', graph: 1, value: 1, generic: 0 }
-                         - { descr: 'code-rate-3-4', graph: 1, value: 2, generic: 0 }
-                         - { descr: 'code-rate-5-6', graph: 1, value: 3, generic: 0 }
-                         - { descr: 'code-rate-7-8', graph: 1, value: 4, generic: 0 }
+                         - { descr: 'code-rate-1/2', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'code-rate-2/3', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'code-rate-3/4', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'code-rate-5/6', graph: 1, value: 3, generic: 0 }
+                         - { descr: 'code-rate-7/8', graph: 1, value: 4, generic: 0 }
                 -
                      oid: pt3080ModeConstellation
                      num_oid: '.1.3.6.1.4.1.18086.3080.2.6.{{ $index }}'
