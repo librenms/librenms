@@ -74,6 +74,48 @@ modules:
                      states:
                          - { descr: 'locked', graph: 1, value: 0, generic: 0 }
                          - { descr: 'unlocked', graph: 1, value: 1, generic: 2 }
+                -
+                     oid: pt3080SystemDateTimeSyncActual
+                     num_oid: '.1.3.6.1.4.1.18086.3080.1.31.{{ $index }}'
+                     descr: Time Sync
+                     state_name: pt3080SystemDateTimeSyncActual
+                     states:
+                         - { descr: 'manual', graph: 1, value: 0, generic: 1 }
+                         - { descr: 'auto', graph: 1, value: 1, generic: 1 }
+                         - { descr: 'gps', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'ntp', graph: 1, value: 3, generic: 1 }
+                -
+                     oid: pt3080ModeCodeRateHighPrio
+                     num_oid: '.1.3.6.1.4.1.18086.3080.2.4.{{ $index }}'
+                     descr: High Priority Code Rate
+                     state_name: pt3080ModeCodeRateHighPrio
+                     states:
+                         - { descr: 'code-rate-1-2', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'code-rate-2-3', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'code-rate-3-4', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'code-rate-5-6', graph: 1, value: 3, generic: 0 }
+                         - { descr: 'code-rate-7-8', graph: 1, value: 4, generic: 0 }
+                -
+                     oid: pt3080ModeCodeRateLowPrio
+                     num_oid: '.1.3.6.1.4.1.18086.3080.2.5.{{ $index }}'
+                     descr: Low Priority Code Rate
+                     state_name: pt3080ModeCodeRateHighPrio
+                     states:
+                         - { descr: 'code-rate-1-2', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'code-rate-2-3', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'code-rate-3-4', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'code-rate-5-6', graph: 1, value: 3, generic: 0 }
+                         - { descr: 'code-rate-7-8', graph: 1, value: 4, generic: 0 }
+                -
+                     oid: pt3080ModeConstellation
+                     num_oid: '.1.3.6.1.4.1.18086.3080.2.6.{{ $index }}'
+                     descr: Constellation Mode
+                     state_name: pt3080ModeCodeRateHighPrio
+                     states:
+                         - { descr: 'qpsk', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'qam16', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'qam64', graph: 1, value: 2, generic: 0 }
+
          dbm:
              data:
                 -
@@ -94,3 +136,9 @@ modules:
                      index: 2
                      descr: 'Detected RF Output Level'
                      divisor: 100
+         delay:
+             data:
+                -
+                     oid: pt3080ModeNetworkDelayHP
+                     num_oid: '.1.3.6.1.4.1.18086.3080.2.20.{{ $index }}'
+                     descr: 'Network delay of HP TS'
