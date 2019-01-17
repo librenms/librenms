@@ -33,7 +33,13 @@ traphandle default /opt/librenms/snmptrap.php
 
 Along with any necessary configuration to receive the traps from your devices (community, etc.)
 
-Reload service files `sudo systemctl daemon-reload`, and enable and start the snmptrapd service `sudo systemctl enable snmptrapd` `sudo systemctl restart snmptrapd`.
+Reload service files and enable and start the snmptrapd service:
+
+```
+sudo systemctl daemon-reload
+sudo systemctl enable snmptrapd
+sudo systemctl restart snmptrapd
+```
 
 ### Event logging
 
