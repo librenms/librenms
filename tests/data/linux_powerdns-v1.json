@@ -135,7 +135,7 @@
                 },
                 {
                     "metric": "qsize",
-                    "value": 570,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "powerdns"
                 },
