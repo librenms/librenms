@@ -530,6 +530,11 @@ $config['graph_types']['device']['asyncos_conns'] = ['section' => 'proxy', 'orde
 // Zywall Graphs
 $config['graph_types']['device']['zywall_sessions'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Sessions'];
 
+// TopVision Graphs
+$config['graph_types']['device']['topvision_cmtotal'] = ['section' => 'cmts', 'order' => 0, 'descr' => 'Cable Modem Total'];
+$config['graph_types']['device']['topvision_cmreg'] = ['section' => 'cmts', 'order' => 1, 'descr' => 'Cable Modem Registered'];
+$config['graph_types']['device']['topvision_cmoffline'] = ['section' => 'cmts', 'order' => 2, 'descr' => 'Cable Modem Offline'];
+
 // Device Types
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';
