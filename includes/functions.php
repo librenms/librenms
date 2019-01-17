@@ -2452,10 +2452,13 @@ function get_schema_list()
     $files = glob($config['install_dir'].'/sql-schema/*.sql');
 
     // set the keys to the db schema version
-    return array_reduce($files, function ($array, $file) {
-        $array[basename($file, '.sql')] = $file;
+    $files = array_reduce($files, function ($array, $file) {
+        $array[(int)basename($file, '.sql')] = $file;
         return $array;
-    }, array());
+    }, []);
+
+    ksort($files); // fix dbSchema 1000 order
+    return $files;
 }
 
 /**
