@@ -171,7 +171,7 @@ class Database extends BaseValidation
                             unset($data['Indexes']['PRIMARY']);
                             $primary = true;
                         }
-                        $schema_update[] = $this->addColumnSql($table, $cdata, $data['Columns'][$index - 1]['Field'], $primary);
+                        $schema_update[] = $this->addColumnSql($table, $cdata, isset($data['Columns'][$index - 1]) ? $data['Columns'][$index - 1]['Field'] : null, $primary);
                     } elseif ($cdata !== $current_columns[$column]) {
                         $validator->fail("Database: incorrect column ($table/$column)");
                         $schema_update[] = $this->updateTableSql($table, $column, $cdata);
@@ -228,10 +228,9 @@ class Database extends BaseValidation
     private function addTableSql($table, $table_schema)
     {
         $columns = array_map(array($this, 'columnToSql'), $table_schema['Columns']);
-        $indexes = array_map(array($this, 'indexToSql'), $table_schema['Indexes']);
+        $indexes = array_map(array($this, 'indexToSql'), isset($table_schema['Indexes']) ? $table_schema['Indexes'] : []);
 
         $def = implode(', ', array_merge(array_values((array)$columns), array_values((array)$indexes)));
-        var_dump($def);
 
         return "CREATE TABLE `$table` ($def);";
     }
