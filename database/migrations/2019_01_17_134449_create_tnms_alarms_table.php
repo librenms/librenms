@@ -13,11 +13,12 @@ class CreateTnmsAlarmsTable extends Migration
      */
     public function up()
     {
-        Schema::create('tnmsalarms', function (Blueprint $table) {
+        Schema::table('tnmsneinfo', function (Blueprint $table) {
+            $table->renameColumn('id', 'tnmsne_info_id');
+        });
+        Schema::create('tnms_alarms', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('alarm_num');
-            $table->unsignedInteger('device_id')->index('device_id');
-            $table->integer('neID')->index('neID');
             $table->string('neAlarmtimestamp', 255);
             $table->string('alarm_sev', 128);
             $table->string('alarm_cause', 128);
@@ -32,6 +33,6 @@ class CreateTnmsAlarmsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tnmsalarms');
+        Schema::dropIfExists('tnms_alarms');
     }
 }
