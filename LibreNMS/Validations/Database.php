@@ -228,10 +228,9 @@ class Database extends BaseValidation
     private function addTableSql($table, $table_schema)
     {
         $columns = array_map(array($this, 'columnToSql'), $table_schema['Columns']);
-        $indexes = array_map(array($this, 'indexToSql'), $table_schema['Indexes']);
+        $indexes = array_map(array($this, 'indexToSql'), isset($table_schema['Indexes']) ? $table_schema['Indexes'] : []);
 
         $def = implode(', ', array_merge(array_values((array)$columns), array_values((array)$indexes)));
-        var_dump($def);
 
         return "CREATE TABLE `$table` ($def);";
     }
