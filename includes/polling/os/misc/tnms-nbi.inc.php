@@ -59,7 +59,7 @@ function SqlNEAlarmCreate($table, $alarmmib, $device)
         foreach($ne_alarm_oids as $alarm_key => $alarm_value){
             $alarm_locations = $alarm_value['enmsAlAffectedLocation'];
             $alarm_num = $alarm_value['enmsAlAlarmNumber'];
-            $neID = $alarm_value['enmsAlNEId'];
+            $tnmsne_info_id = $alarm_value['enmsAlNEId'];
             $alarm_cause = $alarm_value['enmsAlProbableCauseString'];
             $timestamp = $alarm_value['enmsAlTimeStamp'];
             $alarm_sev = $alarm_value['enmsAlSeverity'];
