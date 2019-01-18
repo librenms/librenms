@@ -46,9 +46,9 @@ if (isset($_REQUEST['search'])) {
         } elseif ($_REQUEST['type'] == 'device') {
             // Device search
             if (LegacyAuth::user()->hasGlobalRead()) {
-                $results = dbFetchRows("SELECT * FROM `devices` WHERE `hostname` LIKE '%".$search."%' OR `location` LIKE '%".$search."%' OR `sysName` LIKE '%".$search."%' OR `purpose` LIKE '%".$search."%' OR `notes` LIKE '%".$search."%' ORDER BY hostname LIMIT ".$limit);
+                $results = dbFetchRows("SELECT * FROM `devices` LEFT JOIN `locations` ON `locations`.`id` = `devices`.`location_id` WHERE `devices`.`hostname` LIKE '%".$search."%' OR `locations`.`location` LIKE '%".$search."%' OR `devices`.`sysName` LIKE '%".$search."%' OR `devices`.`purpose` LIKE '%".$search."%' OR `devices`.`notes` LIKE '%".$search."%' ORDER BY `devices`.hostname LIMIT ".$limit);
             } else {
-                $results = dbFetchRows("SELECT * FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND (`hostname` LIKE '%".$search."%' OR `location` LIKE '%".$search."%') ORDER BY hostname LIMIT ".$limit, array(LegacyAuth::id()));
+                $results = dbFetchRows("SELECT * FROM `devices` AS `D` INNER JOIN `devices_perms` AS `P` ON `P`.`device_id` = `D`.`device_id` LEFT JOIN `locations` ON `locations`.`id` = `D`.`location_id` WHERE `P`.`user_id` = ? AND (D.`hostname` LIKE '%".$search."%' OR D.`sysName` LIKE '%".$search."%' OR `locations`.`location` LIKE '%".$search."%') ORDER BY hostname LIMIT ".$limit, array(LegacyAuth::id()));
             }
 
             if (count($results)) {
@@ -73,7 +73,7 @@ if (isset($_REQUEST['search'])) {
                     if (LegacyAuth::user()->hasGlobalRead()) {
                         $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ?', array($result['device_id']));
                     } else {
-                        $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `I`.`device_id` = `D`.`device_id` AND device_id = ?', array(LegacyAuth::id(), $result['device_id']));
+                        $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `I`.`device_id` = `D`.`device_id` AND D.device_id = ?', array(LegacyAuth::id(), $result['device_id']));
                     }
 
                     $device[] = array(

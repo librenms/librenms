@@ -33,6 +33,20 @@ use Log;
 
 class Laravel
 {
+    public static function bootCli()
+    {
+        // make sure Laravel isn't already booted
+        if (class_exists('App') && App::isBooted()) {
+            return;
+        }
+
+        define('LARAVEL_START', microtime(true));
+        $install_dir = realpath(__DIR__ . '/../..');
+        $app = require_once $install_dir . '/bootstrap/app.php';
+        $kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
+        $kernel->bootstrap();
+    }
+
     public static function enableQueryDebug()
     {
         $db = Eloquent::DB();
@@ -69,7 +83,7 @@ class Laravel
 
     public static function enableCliDebugOutput()
     {
-        if (class_exists('Log')) {
+        if (class_exists('\Log')) {
             $logger = Log::getMonolog();
 
             // only install if not existing

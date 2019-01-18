@@ -21,17 +21,24 @@ class LegacyExternalAuth
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if (!Auth::guard($guard)->check() && LegacyAuth::get()->authIsExternal()) {
-            $credentials = [
-                'username' => LegacyAuth::get()->getExternalUsername(),
-                'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : ''
-            ];
+        if (!Auth::guard($guard)->check()) {
+            // check for get variables
+            if ($request->isMethod('get') && $request->has(['username', 'password'])) {
+                Auth::attempt($request->only(['username', 'password']));
+            }
 
-            if (!Auth::guard($guard)->attempt($credentials)) {
-                $message = ''; // no debug info for now...
+            if (LegacyAuth::get()->authIsExternal()) {
+                $credentials = [
+                    'username' => LegacyAuth::get()->getExternalUsername(),
+                    'password' => isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : ''
+                ];
 
-                // force user to failure page
-                return response(view('auth.external-auth-failed')->with('message', $message));
+                if (!Auth::guard($guard)->attempt($credentials)) {
+                    $message = ''; // no debug info for now...
+
+                    // force user to failure page
+                    return response(view('auth.external-auth-failed')->with('message', $message));
+                }
             }
         }
 

@@ -6,7 +6,7 @@ modules:
                 -
                     oid: ats2OutputVoltage
                     value: ats2OutputVoltage
-                    num_oid: .1.3.6.1.4.1.534.10.2.2.3.1.
+                    num_oid: '.1.3.6.1.4.1.534.10.2.2.3.1.{{ $index }}'
                     divisor: 10
                     descr: 'Output'
                     index: 'ats2OutputVoltage.{{ $index }}'
@@ -15,7 +15,7 @@ modules:
                 -
                     oid: ats2OperationMode
                     value: ats2OperationMode
-                    num_oid: .1.3.6.1.4.1.534.10.2.2.4.
+                    num_oid: '.1.3.6.1.4.1.534.10.2.2.4.{{ $index }}'
                     descr: 'ats2OperationMode'
                     index: 'ats2OperationMode.{{ $index }}'
                     state_name: ats2OperationMode
@@ -30,7 +30,7 @@ modules:
                 -
                     oid: ats2InputStatusDephasing
                     value: ats2InputStatusDephasing
-                    num_oid: .1.3.6.1.4.1.534.10.2.3.1.1.
+                    num_oid: '.1.3.6.1.4.1.534.10.2.3.1.1.{{ $index }}'
                     descr: 'ats2InputStatusDephasing'
                     index: 'ats2InputStatusDephasing.{{ $index }}'
                     state_name: ats2InputStatusDephasing

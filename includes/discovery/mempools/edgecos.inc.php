@@ -39,7 +39,7 @@ if ($device['os'] == 'edgecos') {
         $temp_mibs = 'ES3510MA-MIB';
     };
 
-    $temp_data = snmp_get_multi_oid($device, 'memoryTotal.0 memoryFreed.0', '-OUQs', $temp_mibs);
+    $temp_data = snmp_get_multi_oid($device, ['memoryTotal.0', 'memoryFreed.0'], '-OUQs', $temp_mibs);
     $total = $temp_data['memoryTotal.0'];
     $avail = $temp_data['memoryFreed.0'];
     $used = $total - $avail;

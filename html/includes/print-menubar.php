@@ -179,27 +179,29 @@ if (count($devices_groups) > 0) {
     unset($group);
     echo '</ul></li>';
 }
-if (Auth::user()->hasGlobalAdmin()) {
-    if ($config['show_locations']) {
-        if ($config['show_locations_dropdown']) {
-            $locations = getlocations();
-            if (count($locations) > 0) {
-                echo('
+if ($config['show_locations']) {
+    if ($config['show_locations_dropdown']) {
+        $locations = getlocations();
+        if (count($locations) > 0) {
+            echo('
                     <li role="presentation" class="divider"></li>
                     <li class="dropdown-submenu">
                     <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> Geo Locations</a>
                     <ul class="dropdown-menu scrollable-menu">
+                    <li><a href="locations"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> All Locations</a></li>
                 ');
-                foreach ($locations as $location) {
-                    echo('            <li><a href="devices/location=' . urlencode($location) . '/"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> ' . $location . ' </a></li>');
-                }
-                echo('
+            foreach ($locations as $location) {
+                echo('            <li><a href="devices/location=' . $location['id'] . '/"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> ' . htmlentities($location['location']) . ' </a></li>');
+            }
+            echo('
                     </ul>
                     </li>
                 ');
-            }
         }
     }
+}
+
+if (Auth::user()->hasGlobalAdmin()) {
     echo '
             <li role="presentation" class="divider"></li>';
     if (is_module_enabled('poller', 'mib')) {
@@ -691,15 +693,16 @@ if (Auth::user()->hasGlobalAdmin()) {
            <li role="presentation" class="divider"></li> ');
     echo('
            <li class="dropdown-submenu">
-               <a href="#"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
+               <a href="pollers"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
                <ul class="dropdown-menu scrollable-menu">
-               <li><a href="poll-log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>
                <li><a href="pollers/tab=pollers/"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>');
 
     if ($config['distributed_poller'] === true) {
         echo ('
-                    <li><a href="pollers/tab=groups/"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Poller Groups</a></li>');
+                    <li><a href="pollers/tab=groups/"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Groups</a></li>');
     }
+    echo '    <li><a href="pollers/tab=performance/"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> Performance</a></li>';
+    echo '    <li><a href="pollers/tab=log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> History</a></li>';
     echo ('
                </ul>
            </li>
@@ -811,9 +814,6 @@ if ($(window).width() < 768) {
 devices.initialize();
 ports.initialize();
 bgp.initialize();
-$('#gsearch').bind('typeahead:select', function(ev, suggestion) {
-    window.location.href = suggestion.url;
-});
 $('#gsearch').typeahead({
     hint: true,
     highlight: true,
@@ -854,9 +854,13 @@ $('#gsearch').typeahead({
         header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
         suggestion: Handlebars.compile('<p><a href="{{url}}"><small>{{{bgp_image}}} {{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></a></p>')
     }
-});
-$('#gsearch').bind('typeahead:open', function(ev, suggestion) {
-    $('#gsearch').addClass('search-box');
+}).on('typeahead:select', function(ev, suggestion) {
+    window.location.href = suggestion.url;
+}).on('keyup', function(e) {
+    // on enter go to the first selection
+    if(e.which === 13) {
+        $('.tt-selectable').first().click();
+    }
 });
 </script>
 

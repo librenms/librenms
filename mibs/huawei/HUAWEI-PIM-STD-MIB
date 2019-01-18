@@ -1,10 +1,10 @@
 -- ============================================================================
--- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
--- Description: HUAWEI-PIM-STD-MIB.my , this Mib module for management of 
+-- Description: HUAWEI-PIM-STD-MIB.my , this MIB module for management of 
 --              the Protocol Independent Multicast (PIM) protocols for PIM routers.
 -- Reference:  
--- Version: V1.0
+-- Version: V2.06
 -- History:
 --    created by wangyanwei 63315 2007-04-24
 --    
@@ -19,7 +19,7 @@ IMPORTS
     TimeTicks                        FROM SNMPv2-SMI        -- [RFC2578] 
     TimeStamp                        FROM SNMPv2-TC         -- [Add by yuyunfu 54617]
     TEXTUAL-CONVENTION,
-    RowStatus, TruthValue,
+    RowStatus, TruthValue, DisplayString,
     StorageType                      FROM SNMPv2-TC         -- [RFC2579]
     MODULE-COMPLIANCE, OBJECT-GROUP,
     NOTIFICATION-GROUP               FROM SNMPv2-CONF       -- [RFC2580]
@@ -34,23 +34,55 @@ IMPORTS
 hwMcast      OBJECT IDENTIFIER      ::= { hwDatacomm 149 }
 
 hwPimStdMib MODULE-IDENTITY
-    LAST-UPDATED "200704240000Z" -- 24 April 2007
+    LAST-UPDATED  "201611090000Z" -- 9 Nov 2016
     ORGANIZATION
-            "Huawei Technologies co.,Ltd."
+            "Huawei Technologies Co.,Ltd."
     CONTACT-INFO
-            " R&D BeiJing, Huawei Technologies co.,Ltd.
-            Huawei Bld.,NO.3 Xinxi Rd., 
-            Shang-Di Information Industry Base,
-            Hai-Dian District Beijing P.R. China
-            Zip:100085 
-            Http://www.huawei.com                                       
-            E-mail:support@huawei.com "
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+             "
     DESCRIPTION
             "The MIB module for management of PIM routers.
 
             Huawei Technologies co.,Ltd . Supplementary information may
             be available at:
             http://www.huawei.com"
+
+    REVISION     "201611090000Z" -- 9 Nov 2016
+    DESCRIPTION  "Modify the description of hwPimNotificationLimitType."
+    
+    REVISION     "201605260000Z" -- 26 May 2016
+    DESCRIPTION  "1.Add hwPimGlobalTypeSGThresholdExceed.
+                                   2.Add hwPimGlobalTypeSGThresholdExceedClear.
+                                   3.Add hwPimGlobalTypeSGExceed.
+                                   4.Add hwPimGlobalTypeSGExceedClear.
+                                  "
+
+    REVISION     "201407010000Z" -- 1 July 2014
+    DESCRIPTION  "1.Modify the description of  hwPimStarGThresholdExceed.
+                                   2.Modify the description of  hwPimStarGThresholdExceedClear.
+                                   3.Modify the description of  hwPimStarGExceedClear.
+                                   4.Modify the description of  hwPimSGThresholdExceed.
+                                   5.Modify the description of  hwPimSGThresholdExceedClear.
+                                   6.Modify the description of  hwPimSGExceedClear.
+                                  "
+
+    REVISION     "201406200000Z" -- 20 Jun 2014
+    DESCRIPTION  "1.Add hwPimStarGThresholdExceed trap.
+                                   2.Add hwPimStarGThresholdExceedClear trap.
+                                   3.Add hwPimStarGExceed trap.
+                                   4.Add hwPimStarGExceedClear trap.
+                                   5.Add hwPimSGThresholdExceed trap.
+                                   6.Add hwPimSGThresholdExceedClear trap.
+                                   7.Add hwPimSGExceed trap.
+                                   8.Add hwPimSGExceedClear trap.
+                                  "
+    REVISION     "201305060000Z" -- 6 May 2013
+    DESCRIPTION  "Modify the description of hwPimNeighborLoss."
     REVISION     "200704240000Z" -- 24 April 2007
     DESCRIPTION  "The initial revision of this Mib module."
     ::= { hwMcast 4 }
@@ -98,7 +130,7 @@ HWPimGroupMappingOriginType ::= TEXTUAL-CONVENTION
 
             bsr(4)       The PIM Bootstrap Router (BSR) mechanism.
 
-            autoRp(5)    Cisco's Auto-RP mechanism.
+            autoRp(5)    Auto-RP mechanism.
 
             embedded(6)  The Embedded-RP mechanism where the RP address
                          is embedded in the multicast group address.
@@ -114,6 +146,26 @@ HWPimGroupMappingOriginType ::= TEXTUAL-CONVENTION
                   autoRp(5),
                   embedded(6),
                   other(7)
+               }
+
+HWPimCtlMsgState ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "The PIM control message state.
+
+            recv(1)      The PIM control message has been received.
+
+            sent(2)      The PIM control message has been sent.
+
+            invalid(3)   The invalid PIM control message has been received.
+
+            filter(4)    The PIM control message has been filtered."
+
+    SYNTAX     INTEGER {
+                  recv(1),
+                  sent(2),
+                  invalid(3),
+                  filter(4)
                }
 
 hwPimNotifications OBJECT IDENTIFIER ::= { hwPimStdMib 0 }
@@ -133,9 +185,9 @@ hwPimKeepalivePeriod OBJECT-TYPE
             is called the SourceLifetime in the PIM-DM specification.
 
             The storage type of this object is determined by
-            hwPimDeviceConfigStorageType."
+            hwPimDeviceConfigStorageType.
+            DEFVAL { 210 }"
     REFERENCE "RFC 4601 section 4.11"
-    DEFVAL { 210 }
     ::= { hwPim 14 }
 
 hwPimRegisterSuppressionTime OBJECT-TYPE
@@ -153,9 +205,9 @@ hwPimRegisterSuppressionTime OBJECT-TYPE
             PIM-SM specification.
 
             The storage type of this object is determined by
-            hwPimDeviceConfigStorageType."
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 60 }"
     REFERENCE "RFC 4601 section 4.11"
-    DEFVAL { 60 }
     ::= { hwPim 15 }
 
 hwPimStarGEntries OBJECT-TYPE
@@ -301,8 +353,8 @@ hwPimNeighborLossNotificationPeriod OBJECT-TYPE
             hwPimNeighborLoss notifications are ever sent.
 
             The storage type of this object is determined by
-            hwPimDeviceConfigStorageType."
-    DEFVAL { 0 }
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 0 }"
     ::= { hwPim 29 }
 
 hwPimNeighborLossCount OBJECT-TYPE
@@ -340,8 +392,8 @@ hwPimInvalidRegisterNotificationPeriod OBJECT-TYPE
             data and control planes to the network management plane.
 
             The storage type of this object is determined by
-            hwPimDeviceConfigStorageType."
-    DEFVAL { 65535 }
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 65535 }"
     ::= { hwPim 31 }
 
 hwPimInvalidRegisterMsgsRcvd OBJECT-TYPE
@@ -439,8 +491,8 @@ hwPimInvalidJoinPruneNotificationPeriod OBJECT-TYPE
             control plane to the network management plane.
 
             The storage type of this object is determined by
-            hwPimDeviceConfigStorageType."
-    DEFVAL { 65535 }
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 65535 }"
     ::= { hwPim 37 }
 
 hwPimInvalidJoinPruneMsgsRcvd OBJECT-TYPE
@@ -535,8 +587,8 @@ hwPimRpMappingNotificationPeriod OBJECT-TYPE
             sent.
 
             The storage type of this object is determined by
-            hwPimDeviceConfigStorageType."
-    DEFVAL { 65535 }
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 65535 }"
     ::= { hwPim 43 }
 
 hwPimRpMappingChangeCount OBJECT-TYPE
@@ -575,8 +627,8 @@ hwPimInterfaceElectionNotificationPeriod OBJECT-TYPE
             are ever sent.
 
             The storage type of this object is determined by
-            hwPimDeviceConfigStorageType."
-    DEFVAL { 65535 }
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 65535 }"
     ::= { hwPim 45 }
 
 hwPimInterfaceElectionWinCount OBJECT-TYPE
@@ -614,9 +666,9 @@ hwPimRefreshInterval OBJECT-TYPE
             used only by PIM-DM.
 
             The storage type of this object is determined by
-            hwPimDeviceConfigStorageType."
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 60 }"
     REFERENCE "RFC 3973 section 4.8"
-    DEFVAL { 60 }
     ::= { hwPim 47 }
 
 hwPimDeviceConfigStorageType OBJECT-TYPE
@@ -637,8 +689,8 @@ hwPimDeviceConfigStorageType OBJECT-TYPE
             hwPimRpMappingNotificationPeriod,
             hwPimInterfaceElectionNotificationPeriod,
             hwPimRefreshInterval,
-            hwPimNeighborAddNotificationPeriod."
-       DEFVAL { nonVolatile }
+            hwPimNeighborAddNotificationPeriod.
+        DEFVAL { nonVolatile }"
     ::= { hwPim 48 }
 
 hwPimNeighborAddCount OBJECT-TYPE
@@ -667,40 +719,278 @@ hwPimNeighborAddNotificationPeriod OBJECT-TYPE
     DESCRIPTION
             "The minimum time that must elapse between
             hwPimNeighborAdd notifications originated by this
-            router.  The default value of 65535 represents an 'infinite'
-            time, in which case no hwPimInterfaceElection notifications
+            router.  The maximum value 65535 represents an 'infinite'
+            time, in which case no hwPimNeighborAdd notifications
             are ever sent.
 
             The storage type of this object is determined by
-            hwPimDeviceConfigStorageType."
-    DEFVAL { 65535 }
+            hwPimDeviceConfigStorageType.
+        DEFVAL { 0 }"
     ::= { hwPim 50 }
          
 hwPimGRStartTime OBJECT-TYPE
     SYNTAX      TimeStamp
-    MAX-ACCESS  read-only
-    STATUS      current
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
     DESCRIPTION
-            "The time when PIM entered GR state"
+            "The time when PIM entered GR state."
     ::= { hwPim 51 }    
 
 hwPimGRInterval OBJECT-TYPE
     SYNTAX      Unsigned32 (90..3600)
-    MAX-ACCESS  read-only
-    STATUS      current
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
     DESCRIPTION
-            "The minimum PIM GR period"  
-       DEFVAL { 120 }
+            "The minimum PIM GR period.
+        DEFVAL { 120 }"  
     ::= { hwPim 52 }
 
 hwPimGREndTime OBJECT-TYPE
     SYNTAX      TimeStamp                   
-    MAX-ACCESS  read-only
-    STATUS      current
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
     DESCRIPTION
-            "The time when PIM left the GR state"
+            "The time when PIM left the GR state."
     ::= { hwPim 53 }
+hwPimMrtLimitAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The address type of the multicast group address."
+    ::= { hwPim 54 }  
+hwPimMrtLimitSource OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The source address of the entry."
+    ::= { hwPim 55 }
+hwPimMrtLimitGroup OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The group address of the entry."
+    ::= { hwPim 56 }
+hwPimInstanceID OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The Instance ID of the trap."
+    ::= { hwPim 57 }
+hwPimInstanceName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The instance name of the trap."
+    ::= { hwPim 60 }
+hwPimNeighborNotificationReason OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         holdTimeExpired(1),
+                         notReceiveHelloForALongTime(2),
+                         interfaceIsDown(3),
+                         receiveHelloAgain(4),
+                         neighbourIsDeleted(5),
+                         alarmTimeOut(6),
+                         receiveHelloHoldTimeZero(7),
+                         bfdSessionDown(8),
+                         userOperation(9),
+                         alarmClear(100)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The reason for trap sending:
+             1:holdTime expired;
+             2:Not receive hello for a long time;
+             3:Interface is down;
+             4:Receive Hello again;
+             5:neighbour is deleted;
+             6:Alarm time out;
+             7:Receive Hello HoldTime is Zero;
+             8:Bfd Session is Down;
+             9:User Operation;
+             100:Alarm Clear"
+    ::= { hwPim 61 }
 
+hwPimNotificationAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The address type of the multicast group address."
+    ::= { hwPim 62 }	
+	
+hwPimStarGCurrentCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The current number of PIM (*, G) entries of all instances." 
+    ::= { hwPim 63 }
+
+hwPimStarGTotalCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The total number of PIM (*, G) entries of all instances." 
+    ::= { hwPim 64 }
+
+hwPimStarGThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of PIM (*, G) uppper limit(%)." 
+    ::= { hwPim 65 }	
+
+hwPimSGCurrentCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The current number of PIM (S, G) entries of all instances." 
+    ::= { hwPim 66 }
+
+hwPimSGTotalCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The total number of PIM (S, G) entries of all instances." 
+    ::= { hwPim 67 }
+
+hwPimSGThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of PIM (S, G) uppper limit(%)." 
+    ::= { hwPim 68 }	
+	
+hwPimNotificationSrcAddr OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The source address of the entry."
+    ::= { hwPim 69 }
+    
+hwPimNotificationGrpAddr OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The group address of the entry."
+    ::= { hwPim 70 }	
+    
+hwPimNotificationTypeCurrentCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The current number of PIM specified type entries of all instances." 
+    ::= { hwPim 71 }
+
+hwPimNotificationTypeTotalCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The total number of PIM specified type entries of all instances." 
+    ::= { hwPim 72 }
+
+hwPimNotificationTypeLimit  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of PIM specified type uppper limit(%)." 
+    ::= { hwPim 73 }    
+     
+hwPimNotificationLimitType OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         sMStarG(1),
+                         sMSG(2),
+	   dMStarG(3),
+	   dMSG(4),
+	   bidirPimStarG(5)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The limit type:
+             1:SM star-group;
+             2:SM source-group;
+             3:DM star-group;
+             4:DM source-group;
+             5:bidirPim star-group"
+    ::= { hwPim 74 }   
+   
+ 
+hwPimNotificationLimitUpperThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)  
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The upper threshold value of PIM specified type alarm(%)." 
+    ::= { hwPim 75 }    
+      
+hwPimNotificationLimitLowerThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)  
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The lower threshold value of PIM specified type alarm(%)." 
+    ::= { hwPim 76 }  
+ 
+hwPimNotificationLimitReasonType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         entryDeleted(1),
+                         configurationChanged(2),
+                         alarmClear(100)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The reason for trap sending:
+             1:entry is deleted;
+             2:configuration is changed;
+             100:Alarm Clear"  
+    ::= { hwPim 77 }    
+    
+hwPimNotificationThresholdReasonType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         entryCreated(1),
+                         configurationChanged(100)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The reason for trap sending:
+             1:entry is created;
+             100:configuration is changed"  
+    ::= { hwPim 78 }
+
+hwPimNotificationThresholdClearReasonType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         entryDeleted(1),
+                         configurationChanged(2),
+                         alarmClear(100)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The reason for trap sending:
+             1:entry is deleted;
+             2:configuration is changed;
+             100:Alarm Clear"  
+    ::= { hwPim 79 }
+          
 hwPimInterfaceTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF HwPimInterfaceEntry
     MAX-ACCESS not-accessible
@@ -749,7 +1039,8 @@ HwPimInterfaceEntry ::= SEQUENCE {
     hwPimInterfaceGraftRetryInterval   Unsigned32,
     hwPimInterfaceSrPriorityEnabled    TruthValue,
     hwPimInterfaceStatus               RowStatus,
-    hwPimInterfaceStorageType          StorageType
+    hwPimInterfaceStorageType          StorageType,
+    hwPimInterfaceName                 DisplayString
 }
 
 hwPimInterfaceIfIndex OBJECT-TYPE
@@ -1123,6 +1414,13 @@ hwPimInterfaceStorageType OBJECT-TYPE
        DEFVAL { nonVolatile }
     ::= { hwPimInterfaceEntry 28 }
 
+hwPimInterfaceName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The name of this PIM interface."
+    ::= { hwPimInterfaceEntry 29 }
 hwPimNeighborTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF HwPimNeighborEntry
     MAX-ACCESS not-accessible
@@ -1157,7 +1455,8 @@ HwPimNeighborEntry ::= SEQUENCE {
     hwPimNeighborPropagationDelay     Unsigned32,
     hwPimNeighborOverrideInterval     Unsigned32,
     hwPimNeighborBidirCapable         TruthValue,
-    hwPimNeighborSrCapable            TruthValue
+    hwPimNeighborSrCapable            TruthValue,
+    hwPimNeighborIfName               DisplayString
 }
 
 hwPimNeighborIfIndex OBJECT-TYPE
@@ -1314,6 +1613,15 @@ hwPimNeighborSrCapable OBJECT-TYPE
     REFERENCE "RFC 3973 section 4.3.4"
     ::= { hwPimNeighborEntry 15 }
 
+hwPimNeighborIfName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The name for the interface used to reach this
+            PIM neighbor."
+    ::= { hwPimNeighborEntry 16 }
+    
 hwPimNbrSecAddressTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF HwPimNbrSecAddressEntry
     MAX-ACCESS not-accessible
@@ -2742,14 +3050,185 @@ hwPimGroupMappingPrecedence OBJECT-TYPE
             other routers."
     ::= { hwPimGroupMappingEntry 8 }
 
+hwPimInterfaceCtlMsgCountTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimInterfaceCtlMsgCountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the control message counter
+            of all PIM interfaces."
+    ::= { hwPim 58}
+
+hwPimInterfaceCtlMsgCountEntry OBJECT-TYPE
+    SYNTAX     HwPimInterfaceCtlMsgCountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimCtlMsgCountTable.
+            This entry is preserved on agent restart."
+    INDEX      { hwPimInterfaceCtlMsgCountIfIndex,
+                 hwPimInterfaceCtlMsgCountIpVersion,
+                 hwPimInterfaceCtlMsgCountMsgState }
+    ::= { hwPimInterfaceCtlMsgCountTable 1 }
+
+HwPimInterfaceCtlMsgCountEntry ::= SEQUENCE {
+    hwPimInterfaceCtlMsgCountIfIndex              InterfaceIndex,
+    hwPimInterfaceCtlMsgCountIpVersion            InetVersion,  
+    hwPimInterfaceCtlMsgCountMsgState             HWPimCtlMsgState,
+    hwPimInterfaceCtlMsgCountAssert               Unsigned32,    
+    hwPimInterfaceCtlMsgCountHello                Unsigned32,   
+    hwPimInterfaceCtlMsgCountJoinPrune            Unsigned32,    
+    hwPimInterfaceCtlMsgCountBsr                  Unsigned32    
+}
+
+hwPimInterfaceCtlMsgCountIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of this PIM interface."
+    ::= { hwPimInterfaceCtlMsgCountEntry 1 }
+
+hwPimInterfaceCtlMsgCountIpVersion OBJECT-TYPE
+    SYNTAX     InetVersion
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP version of this PIM interface.  A physical interface
+            may be configured in multiple modes concurrently, e.g. IPv4
+            and IPv6, however the traffic is considered to be logically
+            separate."
+    ::= { hwPimInterfaceCtlMsgCountEntry 2 }
+    
+hwPimInterfaceCtlMsgCountMsgState OBJECT-TYPE
+    SYNTAX     HWPimCtlMsgState
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The PIM control message state."
+    ::= { hwPimInterfaceCtlMsgCountEntry 3 }
+
+hwPimInterfaceCtlMsgCountAssert OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Assert messages on this interface."
+    ::= { hwPimInterfaceCtlMsgCountEntry 4 }    
+   
+hwPimInterfaceCtlMsgCountHello OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Hello messages on this interface."
+    ::= { hwPimInterfaceCtlMsgCountEntry 5 }    
+    
+hwPimInterfaceCtlMsgCountJoinPrune OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Join/Prune messages on this interface."
+    ::= { hwPimInterfaceCtlMsgCountEntry 6 }
+    
+hwPimInterfaceCtlMsgCountBsr OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM BSR messages on this interface."
+    ::= { hwPimInterfaceCtlMsgCountEntry 7 }  
+
+hwPimGlobalCtlMsgCountTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwPimGlobalCtlMsgCountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the control message counter on the router."
+    ::= { hwPim 59 }
+
+hwPimGlobalCtlMsgCountEntry OBJECT-TYPE
+    SYNTAX     HwPimGlobalCtlMsgCountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the hwPimGlobalCtlMsgCountTable.
+            This entry is preserved on agent restart."
+    INDEX      {  hwPimGlobalCtlMsgCountIpVersion,
+              hwPimGlobalCtlMsgCountMsgState }
+    ::= { hwPimGlobalCtlMsgCountTable 1 }
+
+HwPimGlobalCtlMsgCountEntry ::= SEQUENCE { 
+    hwPimGlobalCtlMsgCountIpVersion            InetVersion,   
+    hwPimGlobalCtlMsgCountMsgState             HWPimCtlMsgState,
+    hwPimGlobalCtlMsgCountRegister             Unsigned32,    
+    hwPimGlobalCtlMsgCountRegisterStop         Unsigned32,   
+    hwPimGlobalCtlMsgCountProbe                Unsigned32,    
+    hwPimGlobalCtlMsgCountCrp                  Unsigned32    
+}
+
+hwPimGlobalCtlMsgCountIpVersion OBJECT-TYPE
+    SYNTAX     InetVersion
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP version of this PIM instance, e.g. IPv4
+            and IPv6."
+    ::= { hwPimGlobalCtlMsgCountEntry 1 }
+        
+hwPimGlobalCtlMsgCountMsgState OBJECT-TYPE
+    SYNTAX     HWPimCtlMsgState
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The PIM control message state."
+    ::= { hwPimGlobalCtlMsgCountEntry 2 }
+
+hwPimGlobalCtlMsgCountRegister OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Register messages on the router."
+    ::= { hwPimGlobalCtlMsgCountEntry 3 }      
+    
+hwPimGlobalCtlMsgCountRegisterStop OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Register-stop messages on the router."
+    ::= { hwPimGlobalCtlMsgCountEntry 4 }      
+    
+hwPimGlobalCtlMsgCountProbe OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Probe messages on the router."
+    ::= { hwPimGlobalCtlMsgCountEntry 5 }    
+      
+hwPimGlobalCtlMsgCountCrp OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM CRP messages on the router."
+    ::= { hwPimGlobalCtlMsgCountEntry 6 }      
 
 hwPimNeighborLoss NOTIFICATION-TYPE
-    OBJECTS { hwPimNeighborUpTime }
+    OBJECTS { hwPimNeighborUpTime, 
+              hwPimNeighborIfName,
+              hwPimInstanceID,
+              hwPimInstanceName,
+              hwPimNeighborNotificationReason
+            }
     STATUS     current
     DESCRIPTION
             "A hwPimNeighborLoss notification signifies the loss of an
             adjacency with a neighbor.  This notification should be
-            generated when the neighbor timer expires.
+            generated when the neighbor is lost.
 
             This notification is generated whenever the counter
             hwPimNeighborLossCount is incremented, subject
@@ -2763,7 +3242,9 @@ hwPimInvalidRegister NOTIFICATION-TYPE
               hwPimInvalidRegisterAddressType,
               hwPimInvalidRegisterOrigin,
               hwPimInvalidRegisterGroup,
-              hwPimInvalidRegisterRp
+              hwPimInvalidRegisterRp,
+              hwPimInstanceID,
+              hwPimInstanceName
             }
     STATUS      current
     DESCRIPTION
@@ -2783,7 +3264,10 @@ hwPimInvalidJoinPrune NOTIFICATION-TYPE
               hwPimInvalidJoinPruneOrigin,
               hwPimInvalidJoinPruneGroup,
               hwPimInvalidJoinPruneRp,
-              hwPimNeighborUpTime
+              hwPimNeighborUpTime,
+              hwPimNeighborIfName,
+              hwPimInstanceID,
+              hwPimInstanceName
             }
     STATUS      current
     DESCRIPTION
@@ -2799,7 +3283,9 @@ hwPimInvalidJoinPrune NOTIFICATION-TYPE
 
 hwPimRpMappingChange NOTIFICATION-TYPE
     OBJECTS { hwPimGroupMappingPimMode,
-              hwPimGroupMappingPrecedence
+              hwPimGroupMappingPrecedence,
+              hwPimInstanceID,
+              hwPimInstanceName
             }
     STATUS      current
     DESCRIPTION
@@ -2813,7 +3299,11 @@ hwPimRpMappingChange NOTIFICATION-TYPE
 
 hwPimInterfaceElection NOTIFICATION-TYPE
     OBJECTS { hwPimInterfaceAddressType,
-              hwPimInterfaceAddress }
+              hwPimInterfaceAddress,
+              hwPimInterfaceName,
+              hwPimInstanceID,
+              hwPimInstanceName
+            }
     STATUS      current
     DESCRIPTION
             "A hwPimInterfaceElection notification signifies that a new DR
@@ -2828,7 +3318,10 @@ hwPimInterfaceElection NOTIFICATION-TYPE
     ::= { hwPimNotifications 5 }
 
 hwPimNeighborAdd NOTIFICATION-TYPE
-    OBJECTS { hwPimNeighborExpiryTime }
+    OBJECTS { hwPimNeighborExpiryTime,
+              hwPimInstanceID,
+              hwPimInstanceName 
+            }
     STATUS     current
     DESCRIPTION
             "A hwPimNeighborAdd notification signifies the new neighbor.  
@@ -2844,21 +3337,209 @@ hwPimNeighborAdd NOTIFICATION-TYPE
 
 hwPimGRStart NOTIFICATION-TYPE
     OBJECTS { hwPimGRStartTime,
-              hwPimGRInterval }
-    STATUS      current
+              hwPimGRInterval,
+              hwPimInstanceID
+            }
+    STATUS      obsolete
     DESCRIPTION
             "A hwPimGRStart notification signifies that the router enters 
             the PIM GR state."
     ::= { hwPimNotifications 7 }
 
 hwPimGREnd NOTIFICATION-TYPE
-    OBJECTS { hwPimGREndTime }
-    STATUS      current
+    OBJECTS { hwPimGREndTime,
+              hwPimInstanceID
+            }
+    STATUS      obsolete
     DESCRIPTION
             "A hwPimGREnd notification signifies that the router leaves 
             the PIM GR state."
       ::= { hwPimNotifications 8 }
-       
+hwPimMrtLimit NOTIFICATION-TYPE
+    OBJECTS { hwPimMrtLimitAddressType,
+              hwPimMrtLimitSource,
+              hwPimMrtLimitGroup,
+              hwPimInstanceID,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimMrtLimit notification signifies that PIM entries cannot be 
+             created because the upper limit is crossed."
+      ::= { hwPimNotifications 9 }
+     
+hwPimNeighborUnavailable NOTIFICATION-TYPE
+    OBJECTS { hwPimNeighborIfName,
+              hwPimInstanceID,
+              hwPimInstanceName,
+              hwPimNeighborNotificationReason
+            }
+    STATUS     current
+    DESCRIPTION
+            "A hwPimNeighborUnavailable notification signifies that the PIM neighbor is unavailable."
+    ::= { hwPimNotifications 10 }
+    
+hwPimNeighborUnavailableClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNeighborIfName,
+              hwPimInstanceID,
+              hwPimInstanceName,
+              hwPimNeighborNotificationReason
+            }
+    STATUS     current
+    DESCRIPTION
+            "A hwPimNeighborUnavailableClear notification signifies that the PIM neighbor is available."
+    ::= { hwPimNotifications 11 } 
+   
+hwPimMrtLimitClear NOTIFICATION-TYPE
+    OBJECTS { hwPimMrtLimitAddressType,
+              hwPimMrtLimitSource,
+              hwPimMrtLimitGroup,
+              hwPimInstanceID,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimMrtLimit notification signifies that PIM entries can created."
+      ::= { hwPimNotifications 12 }
+
+hwPimStarGThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimStarGCurrentCount,
+              hwPimStarGThreshold,
+              hwPimStarGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimStarGThresholdExceed notification signifies that PIM (*, G) entries count of all instances reached the upper threshold."
+      ::= { hwPimNotifications 13 }
+
+hwPimStarGThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimStarGCurrentCount,
+              hwPimStarGThreshold,
+              hwPimStarGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimStarGThresholdExceedClear notification signifies that PIM (*, G) entries count of all instances fell below the lower threshold."
+      ::= { hwPimNotifications 14 }
+
+hwPimStarGExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimNotificationSrcAddr,
+              hwPimNotificationGrpAddr,
+              hwPimStarGTotalCount,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimStarGExceed notification signifies that PIM (*, G) entries count of all instances reached the limit."
+      ::= { hwPimNotifications 15 }
+
+hwPimStarGExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType
+                       }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimStarGExceedClear notification signifies that PIM(*, G) entries count of all instances fell below the limit."
+      ::= { hwPimNotifications 16 }
+
+hwPimSGThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimSGCurrentCount,
+              hwPimSGThreshold,
+              hwPimSGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimSGThresholdExceed notification signifies that PIM (S, G) entries count of all instances reached the upper threshold."
+      ::= { hwPimNotifications 17 }
+
+hwPimSGThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimSGCurrentCount,
+              hwPimSGThreshold,
+              hwPimSGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimSGThresholdExceedClear notification signifies that PIM (S, G) entries count of all instances fell below the lower threshold."
+      ::= { hwPimNotifications 18 }
+
+hwPimSGExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimNotificationSrcAddr,
+              hwPimNotificationGrpAddr,
+              hwPimSGTotalCount,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimSGExceed notification signifies that PIM (S, G) entries count of all instances reached the limit."
+      ::= { hwPimNotifications 19 }
+
+hwPimSGExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType
+                       }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimSGExceedClear notification signifies that the number of PIM(S, G) entries count of all instances fell below the limit."
+      ::= { hwPimNotifications 20 }
+      
+hwPimGlobalTypeSGThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationLimitType,
+              hwPimNotificationAddressType,
+              hwPimNotificationTypeTotalCount,
+              hwPimNotificationLimitUpperThreshold,
+              hwPimNotificationThresholdReasonType
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimGlobalTypeSGThresholdExceed notification signifies that PIM specified type entries count of all instances reached the upper threshold."
+      ::= { hwPimNotifications 21 }
+
+hwPimGlobalTypeSGThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationLimitType,
+              hwPimNotificationAddressType,
+              hwPimNotificationTypeTotalCount,
+              hwPimNotificationLimitLowerThreshold,
+              hwPimNotificationThresholdClearReasonType
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimGlobalTypeSGThresholdExceedClear notification signifies that PIM specified type entries count of all instances fell below the lower threshold."
+      ::= { hwPimNotifications 22 }
+
+hwPimGlobalTypeSGExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationLimitType,
+              hwPimNotificationAddressType,
+              hwPimNotificationTypeTotalCount,
+              hwPimNotificationTypeLimit,
+              hwPimNotificationSrcAddr,
+              hwPimNotificationGrpAddr,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimGlobalTypeSGExceed notification signifies that PIM specified type entries count of all instances reached the limit."
+      ::= { hwPimNotifications 23 }
+
+hwPimGlobalTypeSGExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationLimitType,
+              hwPimNotificationAddressType,
+              hwPimNotificationTypeTotalCount,
+              hwPimNotificationTypeLimit,
+              hwPimNotificationSrcAddr,
+              hwPimNotificationGrpAddr,
+              hwPimInstanceName,
+              hwPimNotificationLimitReasonType
+                       }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimGlobalTypeSGExceedClear notification signifies that the number of PIM specified type entries count of all instances fell below the limit."
+      ::= { hwPimNotifications 24 }  
+     
+  
 hwPimMibConformance OBJECT IDENTIFIER ::= { hwPimStdMib 2 }
 hwPimMibCompliances OBJECT IDENTIFIER ::= { hwPimMibConformance 1 }
 hwPimMibGroups      OBJECT IDENTIFIER ::= { hwPimMibConformance 2 }
@@ -3047,7 +3728,9 @@ hwPimTopologyGroup OBJECT-GROUP
               hwPimNeighborPropagationDelay,
               hwPimNeighborOverrideInterval,
               hwPimNeighborBidirCapable,
-              hwPimNbrSecAddress
+              hwPimNbrSecAddress,
+              hwPimNeighborIfName,
+              hwPimInterfaceName
             }
     STATUS  current
     DESCRIPTION
@@ -3222,7 +3905,23 @@ hwPimNetMgmtNotificationObjects OBJECT-GROUP
               hwPimNeighborAddCount,
               hwPimGRStartTime,
               hwPimGRInterval,
-              hwPimGREndTime
+              hwPimGREndTime,
+              hwPimInstanceName,
+              hwPimMrtLimitAddressType,
+              hwPimMrtLimitSource,
+              hwPimMrtLimitGroup,
+              hwPimInstanceID,
+              hwPimInstanceName,
+              hwPimNeighborNotificationReason,
+              hwPimNotificationAddressType,
+              hwPimStarGCurrentCount,
+              hwPimStarGTotalCount,
+              hwPimStarGThreshold,
+              hwPimSGCurrentCount,
+              hwPimSGTotalCount,
+              hwPimSGThreshold,
+              hwPimNotificationSrcAddr,
+              hwPimNotificationGrpAddr
             }
     STATUS  current
     DESCRIPTION
@@ -3237,7 +3936,23 @@ hwPimNetMgmtNotificationGroup NOTIFICATION-GROUP
                     hwPimInterfaceElection, 
                     hwPimNeighborAdd,
                     hwPimGRStart,
-                    hwPimGREnd
+                    hwPimGREnd,
+                    hwPimMrtLimit,
+                    hwPimNeighborUnavailable,
+                    hwPimNeighborUnavailableClear,
+                    hwPimMrtLimitClear,
+                    hwPimStarGThresholdExceed,
+                    hwPimStarGThresholdExceedClear,
+                    hwPimStarGExceed,
+                    hwPimStarGExceedClear,
+                    hwPimSGThresholdExceed,
+                    hwPimSGThresholdExceedClear,
+                    hwPimSGExceed,
+                    hwPimSGExceedClear,
+                    hwPimGlobalTypeSGThresholdExceed,
+                    hwPimGlobalTypeSGThresholdExceedClear,
+                    hwPimGlobalTypeSGExceed,
+                    hwPimGlobalTypeSGExceedClear                    
                   }
     STATUS  current
     DESCRIPTION

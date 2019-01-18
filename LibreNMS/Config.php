@@ -454,7 +454,7 @@ class Config
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         // make sure we have full path to binaries in case PATH isn't set
-        foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool') as $bin) {
+        foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6') as $bin) {
             if (!is_executable(self::get($bin))) {
                 self::set($bin, self::locateBinary($bin), $persist, $bin, "Path to $bin", 'external', 'paths');
             }
@@ -522,12 +522,15 @@ class Config
         // Check for testing database
         if (getenv('DBTEST')) {
             if (isset($config['test_db_name'])) {
+                putenv('DB_DATABASE=' . $config['test_db_name']);
                 $config['db_name'] = $config['test_db_name'];
             }
             if (isset($config['test_db_user'])) {
+                putenv('DB_USERNAME=' . $config['test_db_user']);
                 $config['db_user'] = $config['test_db_user'];
             }
             if (isset($config['test_db_pass'])) {
+                putenv('DB_PASSWORD=' . $config['test_db_pass']);
                 $config['db_pass'] = $config['test_db_pass'];
             }
         }

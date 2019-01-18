@@ -1,0 +1,146 @@
+--  ==================================================================
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI-EVC-MIB provides information about EVC
+-- Reference:
+-- Version: V1.01
+-- History:
+-- <author>,   <date>,  <contents>
+--  HUAWEI   2014-09-011  EVC private MIB
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types are imported
+-- 
+-- ==================================================================
+
+	HUAWEI-EVC-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS		
+			hwDatacomm			
+				FROM HUAWEI-MIB			
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP			
+				FROM SNMPv2-CONF			
+			Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE			
+				FROM SNMPv2-SMI;
+
+-- September 11, 2014 at 16:55 GMT
+		hwEVC MODULE-IDENTITY 
+			LAST-UPDATED "201606170918Z"		-- September 11, 2014 at 16:55 GMT
+			ORGANIZATION 
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO 
+				"Huawei Industrial Base
+				Bantian, Longgang
+				 Shenzhen 518129
+				 People's Republic of China
+				 Website: http://www.huawei.com
+				 Email: support@huawei.com
+				"
+			DESCRIPTION 
+				"The EVC MIB module is defined to manage the EVC configuration under system or bride-domain view."
+			REVISION "201606170918Z"		-- September 11, 2014 at 16:55 GMT
+			DESCRIPTION
+				"modify the range of Bridge-domain  ."
+			REVISION "201409111655Z"		-- September 11, 2014 at 16:55 GMT
+			DESCRIPTION
+				"The initial revision of this MIB module."
+			::= { hwDatacomm 336 }
+		
+--  Node definitions
+
+		hwEVCMngObjects OBJECT IDENTIFIER ::= { hwEVC 1 }
+		
+		hwBDStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwBDStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"hwBDStatTable used to statistic total number of the inbound and outbound packets of bridge-domains."
+			::= { hwEVCMngObjects 1 }
+		
+		hwBDStatEntry OBJECT-TYPE
+			SYNTAX HwBDStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The entry of hwBDStatTable."
+			INDEX { hwBDStatBDID}
+			::= { hwBDStatTable 1 }
+		
+		HwBDStatEntry ::=
+			SEQUENCE { 
+				hwBDStatBDID
+					Unsigned32,
+				hwBDStatInboundPackets
+					Counter64,
+				hwBDStatOutboundPackets
+					Counter64,	
+				hwBDStatInboundBytes
+					Counter64,
+				hwBDStatOutboundBytes
+					Counter64	        
+			 }
+
+		hwBDStatBDID OBJECT-TYPE
+			SYNTAX Unsigned32 (1..16777215)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Bridge-domain id."
+			::= { hwBDStatEntry 1 }		
+		
+		hwBDStatInboundPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Inbound packets."
+			::= { hwBDStatEntry 2 }
+
+		hwBDStatOutboundPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Outbound packets."
+			::= { hwBDStatEntry 3 }
+
+		hwBDStatInboundBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Inbound bytes."
+			::= { hwBDStatEntry 4 }
+
+		hwBDStatOutboundBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Outbound bytes."
+			::= { hwBDStatEntry 5 }
+			
+		hwEVCConformance OBJECT IDENTIFIER ::= { hwEVC 2 }
+		
+		hwEVCCompliances OBJECT IDENTIFIER ::= { hwEVCConformance 1 }
+		
+		hwEVCCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "This is the EVC compliance."
+        MODULE -- this module
+            MANDATORY-GROUPS { hwBDStatGroup }
+        ::= { hwEVCCompliances 1 }
+		
+		hwEVCGroups OBJECT IDENTIFIER ::= { hwEVCConformance 2 }
+		
+		hwBDStatGroup OBJECT-GROUP
+			OBJECTS { hwBDStatInboundPackets, hwBDStatOutboundPackets, hwBDStatInboundBytes, hwBDStatOutboundBytes}
+			STATUS current
+			DESCRIPTION 
+				"This is the bridge-domain statistics group."
+			::= { hwEVCGroups 1 }	
+					
+	END

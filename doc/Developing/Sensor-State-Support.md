@@ -1,4 +1,5 @@
 source: Developing/Sensor-State-Support.md
+path: blob/master/doc/
 # Sensor State Support
 
 ### Introduction
@@ -57,8 +58,9 @@ modules:
                 -
                     oid: dryContactSensorTable
                     value: dryContactSensorValue
-                    num_oid: .1.3.6.1.4.1.5528.100.4.2.1.1.2.
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.2.1.1.2.{{ $index }}'
                     descr: dryContactSensorLabel
+                    group: Contact Sensors
                     index: 'dryContactSensor.{{ $index }}'
                     state_name: dryContactSensor
                     states:
@@ -68,8 +70,9 @@ modules:
                 -
                     oid: doorSwitchSensorTable
                     value: doorSwitchSensorValue
-                    num_oid: .1.3.6.1.4.1.5528.100.4.2.2.1.2.
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.2.2.1.2.{{ $index }}'
                     descr: doorSwitchSensorLabel
+                    group: Switch Sensors
                     index: 'doorSwitchSensor.{{ $index }}'
                     state_name: doorSwitchSensor
                     states:
@@ -79,8 +82,9 @@ modules:
                 -
                     oid: cameraMotionSensorTable
                     value: cameraMotionSensorValue
-                    num_oid: .1.3.6.1.4.1.5528.100.4.2.3.1.2.
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.2.3.1.2.{{ $index }}'
                     descr: cameraMotionSensorLabel
+                    group: Camera Motion Sensors
                     index: 'cameraMotionSensor.{{ $index }}'
                     state_name: cameraMotionSensor
                     states:
@@ -90,7 +94,7 @@ modules:
                 -
                     oid: otherStateSensorTable
                     value: otherStateSensorErrorStatus
-                    num_oid: .1.3.6.1.4.1.5528.100.4.2.10.1.3.
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.2.10.1.3.{{ $index }}'
                     descr: otherStateSensorLabel
                     index: '{{ $index }}'
                     state_name: otherStateSensorErrorStatus

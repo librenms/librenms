@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use DB;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -150,6 +151,73 @@ class Device extends BaseModel
         return $this->hostname;
     }
 
+    public function isUnderMaintenance()
+    {
+        $query = AlertSchedule::isActive()
+            ->join('alert_schedulables', 'alert_schedule.schedule_id', 'alert_schedulables.schedule_id')
+            ->where(function ($query) {
+                $query->where(function ($query) {
+                    $query->where('alert_schedulable_type', 'device')
+                        ->where('alert_schedulable_id', $this->device_id);
+                });
+
+                if ($this->groups) {
+                    $query->orWhere(function ($query) {
+                        $query->where('alert_schedulable_type', 'device_group')
+                            ->whereIn('alert_schedulable_id', $this->groups->pluck('id'));
+                    });
+                }
+            });
+
+        return $query->exists();
+    }
+
+    /**
+     * Get the shortened display name of this device.
+     * Length is always overridden by shorthost_target_length.
+     *
+     * @param int $length length to shorten to, will not break up words so may be longer
+     * @return string
+     */
+    public function shortDisplayName($length = 12)
+    {
+        $name = $this->displayName();
+
+        // IP addresses should not be shortened
+        if (IP::isValid($name)) {
+            return $name;
+        }
+
+        $length = \LibreNMS\Config::get('shorthost_target_length', $length);
+        if ($length < strlen($name)) {
+            $take = substr_count($name, '.', 0, $length) + 1;
+            return implode('.', array_slice(explode('.', $name), 0, $take));
+        }
+
+        return $name;
+    }
+
+    /**
+     * Check if user can access this device.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canAccess($user)
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->hasGlobalRead()) {
+            return true;
+        }
+
+        return DB::table('devices_perms')
+            ->where('user_id', $user->user_id)
+            ->where('device_id', $this->device_id)->exists();
+    }
+
     public function formatUptime($short = false)
     {
         $result = '';
@@ -205,6 +273,18 @@ class Device extends BaseModel
     }
 
     /**
+     * Get list of enabled graphs for this device.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function graphs()
+    {
+        return DB::table('device_graphs')
+            ->where('device_id', $this->device_id)
+            ->pluck('graph');
+    }
+
+    /**
      * Update the max_depth field based on parents
      * Performs SQL query, so make sure all parents are saved first
      *
@@ -254,19 +334,21 @@ class Device extends BaseModel
     /**
      * @return string
      */
-    public function statusColour()
+    public function statusName()
     {
-        $status = $this->status;
-        $ignore = $this->ignore;
-        $disabled = $this->disabled;
-        if ($disabled == 1) {
-            return 'teal';
-        } elseif ($ignore == 1) {
-            return 'yellow';
-        } elseif ($status == 0) {
-            return 'danger';
+        if ($this->disabled == 1) {
+            return 'disabled';
+        } elseif ($this->ignore == 1) {
+            return 'ignore';
+        } elseif ($this->status == 0) {
+            return 'down';
         } else {
-            return 'success';
+            $warning_time = \LibreNMS\Config::get('uptime_warning', 84600);
+            if ($this->uptime < $warning_time && $this->uptime != 0) {
+                return 'warn';
+            }
+
+            return 'up';
         }
     }
 
@@ -373,6 +455,11 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\Alert', 'device_id');
     }
 
+    public function alertSchedules()
+    {
+        return $this->morphToMany('App\Models\AlertSchedule', 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+    }
+
     public function applications()
     {
         return $this->hasMany('App\Models\Application', 'device_id');
@@ -400,12 +487,17 @@ class Device extends BaseModel
 
     public function eventlogs()
     {
-        return $this->hasMany('App\Models\General\Eventlog', 'host', 'device_id');
+        return $this->hasMany('App\Models\Eventlog', 'device_id', 'device_id');
     }
 
     public function groups()
     {
         return $this->belongsToMany('App\Models\DeviceGroup', 'device_group_device', 'device_id', 'device_group_id');
+    }
+
+    public function location()
+    {
+        return $this->belongsTo('App\Models\Location', 'location_id', 'id');
     }
 
     public function ospfInstances()
@@ -431,6 +523,11 @@ class Device extends BaseModel
     public function ports()
     {
         return $this->hasMany('App\Models\Port', 'device_id', 'device_id');
+    }
+
+    public function portsNac()
+    {
+        return $this->hasMany('App\Models\PortsNac', 'device_id', 'device_id');
     }
 
     public function processors()

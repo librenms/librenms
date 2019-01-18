@@ -30,7 +30,7 @@ BEGEMOT-HAST-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
-    Counter64, Integer32
+    Counter64, Integer32, Unsigned32
 	FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, RowStatus
 	FROM SNMPv2-TC
@@ -318,7 +318,7 @@ hastResourceWorkerPid OBJECT-TYPE
     ::= { hastResourceEntry 22 }
 
 hastResourceLocalQueue OBJECT-TYPE
-    SYNTAX	UNSIGNED32
+    SYNTAX	Unsigned32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -326,7 +326,7 @@ hastResourceLocalQueue OBJECT-TYPE
     ::= { hastResourceEntry 23 }
 
 hastResourceSendQueue OBJECT-TYPE
-    SYNTAX	UNSIGNED32
+    SYNTAX	Unsigned32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -335,7 +335,7 @@ hastResourceSendQueue OBJECT-TYPE
     ::= { hastResourceEntry 24 }
 
 hastResourceRecvQueue OBJECT-TYPE
-    SYNTAX	UNSIGNED32
+    SYNTAX	Unsigned32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -344,7 +344,7 @@ hastResourceRecvQueue OBJECT-TYPE
     ::= { hastResourceEntry 25 }
 
 hastResourceDoneQueue OBJECT-TYPE
-    SYNTAX	UNSIGNED32
+    SYNTAX	Unsigned32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -352,7 +352,7 @@ hastResourceDoneQueue OBJECT-TYPE
     ::= { hastResourceEntry 26 }
 
 hastResourceIdleQueue OBJECT-TYPE
-    SYNTAX	UNSIGNED32
+    SYNTAX	Unsigned32
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION

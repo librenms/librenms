@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: configuration mangement mib
 -- Reference:   huawei enterprise mib
--- Version:     V1.0
+-- Version:     V2.17
 -- History:
 --                initial version 2002-12-20
 -- =================================================================
@@ -17,7 +17,8 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
             FROM SNMPv2-CONF            
         TimeTicks, IpAddress, Integer32, Unsigned32, Counter32, 
         OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
-            FROM SNMPv2-SMI            
+            FROM SNMPv2-SMI    
+        InetAddressType,InetAddress         FROM INET-ADDRESS-MIB  -- [RFC4001]        
         DisplayString, TruthValue, RowStatus, TEXTUAL-CONVENTION, 
         DateAndTime            
             FROM SNMPv2-TC;
@@ -25,23 +26,84 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
 
     -- 1.3.6.1.4.1.2011.6.10
     hwConfig MODULE-IDENTITY 
-        LAST-UPDATED "200608222230Z"        -- August 22, 2006 at 22:30 GMT
-        ORGANIZATION 
-            "Huawei Technologies co.,Ltd."
-        CONTACT-INFO 
-            "VRP Team Huawei Technologies co.,Ltd.
-            Huawei Bld.,NO.3 Xinxi Rd., 
-            Shang-Di Information Industry Base,
-            Hai-Dian District Beijing P.R. China
-            http://www.huawei.com
-            Zip:100085
-            "
+        LAST-UPDATED"201708021727Z"         -- August 02, 2017 at 17:27GMT
+        ORGANIZATION
+              "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO
+              "Huawei Industrial Base
+                Bantian, Longgang
+                 Shenzhen 518129
+                 People's Republic of China
+                 Website: http://www.huawei.com
+                 Email: support@huawei.com
+               "
         DESCRIPTION 
             "The HUAWEI-CONFIG-MAN-MIB contains objects to manage the system configuration. 
             It defines the model used to represent configuration data that exists elsewhere 
             in the system and in peripheral devices. The MIB is proper for system configuration.
             NMS can query configuration change log information and operate configuration.
             There are no constraints on this MIB."
+
+         REVISION "201708021727Z"         -- August 02, 2017 at 17:27GMT
+           DESCRIPTION 
+            "modified trap node value hwCfgAppDataInconsistent and hwCfgAppDataInconsistentResume."
+
+         REVISION "201605261925Z"         -- May 26, 2016 at 19:56GMT
+           DESCRIPTION 
+            "modified trap node value hwCfgRestoreErrCode ."
+
+
+         REVISION "201603251010Z"         -- March 25, 2016 at 10:10GMT
+           DESCRIPTION 
+            "modified trap node name hwConfigInconsistentResume."
+
+         REVISION "201602221010Z"         -- February 22, 2016 at 10:10GMT
+           DESCRIPTION 
+            "modified trap node hwConfigInconsistent and hwConfigConsistent."
+
+
+        REVISION "201504271402Z"         -- April 27, 2015 at 14:02GMT
+           DESCRIPTION 
+            "add trap node hwConfigInconsistent and hwConfigConsistent."
+
+        REVISION "201504131119Z"        -- April 13, 2015 at 11:19 GMT
+           DESCRIPTION 
+            "modified  trap node hwCfgRestoreFail, and  MIB node hwCfgRestoreErrCode for hwCfgRestoreFail."
+
+
+        REVISION "201502022300Z"        -- February 09, 2015 at 23:00 GMT
+        DESCRIPTION 
+            "Add new trap node hwCfgRestoreFail, and new MIB node hwCfgRestoreErrCode for hwCfgRestoreFail."
+        REVISION "201409182200Z"        -- Septembet 18, 2014 at 22:00 GMT
+        DESCRIPTION 
+            "Modify the length and description of hwCfgBackupPassword."
+        REVISION "201409161020Z"        -- Septembet 16, 2014 at 10:20 GMT
+        DESCRIPTION 
+            "Modify the description of hwCfgOperateFileName."
+        REVISION "201408211602Z"        -- August 21, 2014 at 16:02 GMT
+        DESCRIPTION 
+            "Modify the length and description of hwCfgBackupPassword."
+        REVISION "201405292230Z"        -- May 29, 2014 at 10:20 GMT
+        DESCRIPTION 
+            "Modify the length range of hwCfgLogTerminalUser."
+        REVISION "201405262230Z"        -- May 26, 2014 at 10:20 GMT
+        DESCRIPTION 
+            "Modify the length range of hwCfgLogTerminalUser."
+        REVISION "201309032230Z"        -- September 03, 2013 at 22:30 GMT
+        DESCRIPTION 
+            "Add new mib node hwCfgOperateVpnInstance of hwCfgOperateEntry."
+        REVISION "201308302230Z"        -- August 30, 2013 at 22:30 GMT
+        DESCRIPTION 
+            "Add new mib node hwCfgOperateServerAddressType and hwCfgOperateServerAddressNet of hwCfgOperateEntry."
+        REVISION  "200608222230Z"
+        DESCRIPTION 
+            "Add new mib node hwCfgBackupVpnInstance of table HwCfgBackup2ServerEntry."
+        REVISION  "200608222230Z"
+        DESCRIPTION 
+            "Modify the description of hwCfgBackupProtocol."
+        REVISION  "200608222230Z"
+        DESCRIPTION 
+            "Modify the description of hwCfgBackupPassword And hwCfgOperateUserPassword."
         REVISION "200608222230Z"        -- August 22, 2006 at 22:30 GMT
         DESCRIPTION 
             "The initial revision of this MIB module ."
@@ -162,8 +224,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
             "Decides whether or not to backup the configuration log information.
             If the value is true, the data of configuration log on the master 
             will be sent to slave. Otherwise the data of log will be lost when 
-            master switches to slave."
-        DEFVAL { true }
+            master switches to slave. Default value is true."
         ::= { hwCfgLog 6 }
 
     
@@ -221,8 +282,8 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
                 DisplayString,
             hwCfgLogConfigChangeId  
                 Unsigned32,
-            hwCfgLogChgType   
-                INTEGER             
+            hwCfgLogCfgBaselineTime   
+                DisplayString             
          }
 
     -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.1
@@ -352,7 +413,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.7
     hwCfgLogTerminalUser OBJECT-TYPE
-        SYNTAX DisplayString (SIZE (0..64))
+        SYNTAX DisplayString (SIZE (0..256))
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
@@ -422,7 +483,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.12
     hwCfgLogUserName OBJECT-TYPE
-        SYNTAX DisplayString (SIZE (0..64))
+        SYNTAX DisplayString (SIZE (0..256))
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
@@ -462,28 +523,19 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
     hwCfgLogConfigChangeId OBJECT-TYPE
         SYNTAX Unsigned32 (0..4294967294)
         MAX-ACCESS read-only
-        STATUS current
+        STATUS obsolete
         DESCRIPTION
             "This is the sequence ID of configuration. When configuration is changed, ID is added.               
             "
         ::= { hwCfgLogEntry 15 }
 
     -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.16
-    hwCfgLogChgType OBJECT-TYPE
-        SYNTAX INTEGER
-            {
-            config(1),
-            rollback(2),
-            replace(3)
-            }
+    hwCfgLogCfgBaselineTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..20))
         MAX-ACCESS read-only
-        STATUS current
+        STATUS obsolete
         DESCRIPTION
-            "Specifies the change type of configuration. 
-            The value list:
-            config(1): common configuration.
-            rollback(2): configuration rollback.
-            replace(3):configuration replace.
+            "Specifies the time of system confiuration was baseline.             
             "
         ::= { hwCfgLogEntry 16 }
     
@@ -517,8 +569,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
             periodically. 
             If there is no space in the hwCfgOperateTable to save a new hwCfgOperateEntry,
             the expired hwCfgOperateEntry that is unactivated or the hwCfgOperateEntry 
-            that is processed may be deleted. "
-        DEFVAL { 5 }
+            that is processed may be deleted. Default value is 5."
         ::= { hwCfgOperate 2 }
 
     
@@ -530,9 +581,8 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The maximum number of copy entries that may be held
             in hwCfgOperateResultTable.  A particular setting does not guarantee 
-            that much data can be held.
+            that much data can be held. Default value is 5.
             "
-        DEFVAL { 5 }
         ::= { hwCfgOperate 3 }
 
     
@@ -583,9 +633,16 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
             hwCfgOperateSourceAddress
                 IpAddress,
             hwCfgOperateSourceInterface
-                OCTET STRING
-   
-         }
+                OCTET STRING,
+            hwCfgOperateOnError
+                INTEGER,
+            hwCfgOperateServerAddressType
+                InetAddressType,
+            hwCfgOperateServerAddressNet
+                InetAddress, 
+            hwCfgOperateVpnInstance
+                DisplayString
+            }
 
     -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.1
     hwCfgOperateIndex OBJECT-TYPE
@@ -626,7 +683,9 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
             used for file transfer . 
             The default protocol is ftp if no protocol is specified.  
             And for other value of hwCfgOperateType , this object may   
-            be ignored by the implementation.          "
+            be ignored by the implementation.
+            When hwCfgOperateProtocol is specified as SFTP, only password
+            authentication-type is valid. "
         ::= { hwCfgOperateEntry 3 }
 
     
@@ -636,13 +695,16 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "When the object of hwCfgOperateType has the value of net2Startup, net2running or 
-            running2Net,the value must be specified. The file name may include the path if
+            "When the object of hwCfgOperateType has the value of net2Startup, net2Running or 
+            running2Net, the value must be specified. The file name may include the path if
             applicable.
-            If the value of hwCfgOperateType is net2Startup or net2running, this node specifies the
-            source file name of transfers.If the value of hwCfgOperateType is running2Net , 
-            this node specify the destination file name of transfers.
-            When hwCfgOperateType has the value of startup2net,the object may not be
+            If the value of hwCfgOperateType is net2Startup or net2Running, this node specifies the
+            source file name of transfers. If the value of hwCfgOperateType is running2Net, this 
+            node specifies the destination file name of transfers. If the value of hwCfgOperateType 
+            is running2Startup, this node specifies the saved file name of current running 
+            configuration.
+
+            When hwCfgOperateType has the value of startup2Net or startup2Running, the object may not be
             created instead of using the file name of startup configuration file.
             "
         ::= { hwCfgOperateEntry 4 }
@@ -677,7 +739,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.7
     hwCfgOperateUserPassword OBJECT-TYPE
-        SYNTAX DisplayString (SIZE (1..40))
+        SYNTAX DisplayString (SIZE (0..40))
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -685,7 +747,9 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
              or startup2net , the user 
             password for the FTP/SFTP server from/to which to download/upload
             should be specified. The object must be created if hwCfgOperateProtocol
-            has the value of 'ftp'. "
+            has the value of 'ftp'. 
+           When get the value of the field, the device will return a zero-length string.
+           When set the field, its value cannot be a string that contains no character."
         ::= { hwCfgOperateEntry 7 }
 
     
@@ -719,14 +783,15 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         
     -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.10
     hwCfgOperateServerPort OBJECT-TYPE
-        SYNTAX Integer32(22|1025..55535)
+        SYNTAX Integer32(1..65535)
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "This object specifies the SFTP server port that is used for file transfer 
-             only if the value of hwCfgOperateProtocol is sftp.  
-             The default SFTP server port is 22 if no port is specified.  
-             If the value of hwCfgOperateProtocol is not sftp, this object is ignored by the 
+            "This object specifies the SFTP/FTP server port that is used for file transfer 
+             only if the value of hwCfgOperateProtocol is sftp/ftp.  
+             The default SFTP server port is 22 if no port is specified. 
+             The default FTP server port is 21 if no port is specified.  
+             If the value of hwCfgOperateProtocol is not sftp/ftp, this object is ignored by the 
              implementation. "
         ::= { hwCfgOperateEntry 10 } 
     
@@ -754,6 +819,50 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         the priority." 
         ::= { hwCfgOperateEntry 12 } 
     
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.13
+    hwCfgOperateOnError OBJECT-TYPE 
+    SYNTAX INTEGER
+            {
+            continueOnError(1),
+            stopOnError(2),
+            rollbackOnError(3)
+            }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the action when a configuration command fails to be executed.
+         continueOnError: skips the failed configuration command and continues to run other configuration commands.
+         stopOnError: stops running the failed configuration command and does not run other configuration commands.
+         rollbackOnError: rolls back the configuration to that before the configuration file is executed." 
+        ::= { hwCfgOperateEntry 13 } 
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.17
+    hwCfgOperateServerAddressType OBJECT-TYPE 
+    SYNTAX InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ip address type of the FTP/TFTP/SFTP server from/to which to download/upload must be specified. 1 is used for ipv4, 2 is used for ipv6." 
+        ::= { hwCfgOperateEntry 17 }  
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.18
+    hwCfgOperateServerAddressNet OBJECT-TYPE 
+    SYNTAX InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Address or host name of the FTP/TFTP/SFTP server from/to which to download/upload must be specified. " 
+        ::= { hwCfgOperateEntry 18 }
+
+      -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.19
+     hwCfgOperateVpnInstance OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The VPN instance name that through which to transfer the file."
+        ::= { hwCfgOperateEntry 19 } 
+
     -- 1.3.6.1.4.1.2011.6.10.1.2.5
     hwCfgOperateResultTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwCfgOperateResultEntry
@@ -788,7 +897,11 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
             hwCfgOperateTime
                 TimeTicks,
             hwCfgOperateEndTime
-                TimeTicks    
+                TimeTicks,   
+            hwCfgOperateTransferProgress
+                Integer32, 
+            hwCfgOperateErrorReason
+                DisplayString 
          }
 
     -- 1.3.6.1.4.1.2011.6.10.1.2.5.1.1
@@ -849,7 +962,8 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
             opUnknownFailure(19),
             opAbort(20),  
             opInvalidSourceAddress(21),
-            opInvalidSourceInterface(22)
+            opInvalidSourceInterface(22),
+            opCmdExecuteFail(23)
             }
         MAX-ACCESS read-only
         STATUS current
@@ -926,7 +1040,10 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
                 invalid source address specified.
 
             opInvalidSourceInterface :
-                invalid source interface specified.             
+                invalid source interface specified.   
+            
+            opCmdExecuteFail :
+                execute command return error.          
                 "
         ::= { hwCfgOperateResultEntry 4 }
 
@@ -950,11 +1067,31 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The value of sysUpTime when the configuration operation is finished."
         ::= { hwCfgOperateResultEntry 6 }
+   
+    -- 1.3.6.1.4.1.2011.6.10.1.2.5.1.7
+    hwCfgOperateTransferProgress OBJECT-TYPE
+        SYNTAX Integer32 (1..100 | 65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates progress of file transfer in the hwCfgOperateTable. 
+             When hwCfgOperateProtocol is specified as 2(tftp) or 3(sftp), and hwCfgOperateType is specified as net2Running or net2Startup, 
+             this object will be set as 65535, which indicates the progress can not be calculated. "
+        ::= { hwCfgOperateResultEntry 7}
 
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.5.1.8
+    hwCfgOperateErrorReason OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The failure reason of configuration operation."
+        ::= { hwCfgOperateResultEntry 8 }
 
     -- 1.3.6.1.4.1.2011.6.10.1.2.6
     hwCfgModuleChangeTimeTable OBJECT-TYPE
-        SYNTAX SEQUENCE OF HwCfgModuelChangeTimeEntry
+        SYNTAX SEQUENCE OF HwCfgModuleChangeTimeEntry
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
@@ -962,8 +1099,8 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         ::= { hwCfgOperate 6 }
  
      -- 1.3.6.1.4.1.2011.6.10.1.2.6.1
-    hwCfgModuelChangeTimeEntry OBJECT-TYPE
-        SYNTAX HwCfgModuelChangeTimeEntry
+    hwCfgModuleChangeTimeEntry OBJECT-TYPE
+        SYNTAX HwCfgModuleChangeTimeEntry
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
@@ -971,7 +1108,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         INDEX { hwCfgModuleId }
         ::= { hwCfgModuleChangeTimeTable 1 }
     
-    HwCfgModuelChangeTimeEntry ::=
+    HwCfgModuleChangeTimeEntry ::=
         SEQUENCE { 
             hwCfgModuleId
                 Integer32 (0..2147483647),
@@ -987,7 +1124,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "Module index. It is an integer without enumeration. This is because the enumeration may expose the classification methods of modules. In addition, this field is uncertain in the beginning stage and once the value is determined, it cannot be modified."
-        ::= { hwCfgModuelChangeTimeEntry 1 }
+        ::= { hwCfgModuleChangeTimeEntry 1 }
   
      -- 1.3.6.1.4.1.2011.6.10.1.2.6.1.11
     hwCfgModuleChangeTime OBJECT-TYPE
@@ -996,9 +1133,32 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "Time on changes of the module."
-        ::= { hwCfgModuelChangeTimeEntry 11 }
-  
-    
+        ::= { hwCfgModuleChangeTimeEntry 11 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.7
+    hwCfgOperateCompareConfig OBJECT-TYPE
+            SYNTAX INTEGER {initial(0),same(1),different(2)} 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "compare configuration of the files"
+            ::= { hwCfgOperate 7 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.8
+    hwCfgRestoreErrCode OBJECT-TYPE
+            SYNTAX INTEGER
+		{
+		warning(1),
+		fileOpenFail(2),
+		fileNotExist(3),
+		fileVerifyFail(4),
+		other(5)
+		}
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "ErrorCode: cause of an alarm.(1:Failed to restore some configurations. 2:Failed to restore all configurations because of a failure to open the configuration file. 3:Failed to restore all configurations because of the nonexistent configuration file. 4:Failed to restore all configurations because of the nonexistent configuration file. 5: Failed to restore all configurations because of other reasons.)"
+            ::= { hwCfgOperate 8 }
 
     -- ==========================================================================
     -- configuration save group
@@ -1012,11 +1172,8 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "The object records the  interval of saving configuration automatically.
-            If the value of interval is zero,the function of saving configuration 
-            automatically is disable,else the function of saving configuration 
-            automatically is enable"
-        DEFVAL { 0 }
+            "The object records the interval minute of saving configuration automatically.
+the function of saving configuration automatically is disable when the interval is zero, else it is enable(the default is 30 minutes). "
         ::= { hwCfgSave 1 } 
         
     -- 1.3.6.1.4.1.2011.6.10.1.3.2
@@ -1037,7 +1194,302 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The object records the latest date and time when the current 
             configurations were saved manually in the system."
-        ::= { hwCfgSave 3 }       
+        ::= { hwCfgSave 3 }   
+
+      -- 1.3.6.1.4.1.2011.6.10.1.3.4
+    hwCfgSaveAutoCpuLimit OBJECT-TYPE
+        SYNTAX Integer32(1..60)  --metric: %
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates the upper limit of the CPU usage when configurations are  
+             automatically saved.If the function of saving configuration automatically is not 
+             enabled, the value is insignificant. Default value is 50."
+        ::= { hwCfgSave 4 } 
+
+    -- 1.3.6.1.4.1.2011.6.10.1.3.5
+    hwCfgSaveAutoNoCfgInterval OBJECT-TYPE
+        SYNTAX Integer32(30..43200)  --metric: minute
+        MAX-ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            "This object indicates the interval from the time configurations are automatically 
+             saved to now.If the function of saving configuration automatically is not enabled, 
+             the value is insignificant. Default value is 30."
+        ::= { hwCfgSave 5 }           
+
+    -- 1.3.6.1.4.1.2011.6.10.1.3.6
+    hwCfgSaveAutoDelay OBJECT-TYPE
+        SYNTAX Integer32(1..60)  --metric: minute
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates the delay minute after some configurations change happens 
+            then configurations are automatically saved.If the function of saving configuration 
+            automatically is not enabled, the value is insignificant. Default value is 5."
+        ::= { hwCfgSave 6 }  
+                 
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7
+    hwCfgBackup2ServerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCfgBackup2ServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of config-operation requests.
+            "
+        ::= { hwCfgSave 7 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1
+    hwCfgBackup2ServerEntry OBJECT-TYPE
+        SYNTAX HwCfgBackup2ServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An operate request entry."
+        INDEX { hwCfgBackupIndex }
+        ::= { hwCfgBackup2ServerTable 1 }
+
+    
+    HwCfgBackup2ServerEntry ::=
+        SEQUENCE { 
+            hwCfgBackupIndex
+                Integer32,
+            hwCfgBackupServerIp
+                IpAddress,
+            hwCfgBackupProtocol
+                INTEGER,
+            hwCfgBackupUser
+                DisplayString,
+            hwCfgBackupPassword
+                OCTET STRING,
+            hwCfgBackupServerPath
+                DisplayString,
+            hwCfgBackupRowStatus
+                RowStatus,
+            hwCfgBackupResult
+                DisplayString,
+            hwCfgBackupVpnInstance
+                DisplayString
+         }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.1
+    hwCfgBackupIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..4)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The unique index value of a row in this table."
+        ::= { hwCfgBackup2ServerEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.2
+    hwCfgBackupServerIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The ip address of the FTP/TFTP/SFTP server to 
+            which to the device backup configuration automatically.  
+            Values of 0.0.0.0 or FF.FF.FF.FF are not permitted."
+        ::= { hwCfgBackup2ServerEntry 2 }
+        
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.3
+    hwCfgBackupProtocol OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            ftp(1),
+            tftp(2),
+            sftp(3)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The protocol used to backup configuration to server automatically."
+        ::= { hwCfgBackup2ServerEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.4
+    hwCfgBackupUser OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The length of the user name should range from 1 to 64."
+        ::= { hwCfgBackup2ServerEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.5
+    hwCfgBackupPassword OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..392))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The password can be plain text or encripted text.
+             If the password is plain text, its length should range from 0 to 255.
+             If the password is in cipher text, its length is 24 or from 32 to 392.
+             When get the value of the field, the device will return a zero-length string.
+             When set the field, its value cannot be a string that contains no character."
+        ::= { hwCfgBackup2ServerEntry 5 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.6
+    hwCfgBackupServerPath OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The length of the path in the backup server should range from 1 to 64."
+        ::= { hwCfgBackup2ServerEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.7
+    hwCfgBackupRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status of this table entry."
+        ::= { hwCfgBackup2ServerEntry 7 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.8
+    hwCfgBackupResult OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (1..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object is only for trap information, and does not support get and get-next operation."
+        ::= { hwCfgBackup2ServerEntry 8 }  
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.9
+    hwCfgBackupVpnInstance OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The VPN instance name that through which to transfer the file."
+        ::= { hwCfgBackup2ServerEntry 9 }  
+   
+        
+    -- ==========================================================================
+    -- configuration lock group
+    -- ==========================================================================
+    -- 1.3.6.1.4.1.2011.6.10.1.4 
+    hwCfgLock OBJECT IDENTIFIER ::= { hwConfigManObjects 4 }
+    -- 1.3.6.1.4.1.2011.6.10.1.4.1
+    hwCfgOperateLockConfigDataStore OBJECT-TYPE
+        SYNTAX INTEGER
+               {
+                   inactive(1),
+                   active(2)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Config data unit lock/unlock controller,if set active(2),the lock will be locked if no one locked it before.
+            if set inactive(1),the lock will be unlocked if the currunt user locked it before.
+            "
+        ::= { hwCfgLock 1 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2
+    hwCfgOperateLevelUsersTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCfgOperateLevelUsersEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table on users of configuration lock or level."
+        ::= { hwCfgLock 2 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2.1
+    hwCfgOperateLevelUsersEntry OBJECT-TYPE
+        SYNTAX HwCfgOperateLevelUsersEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Users entity on lock or level of the configuration module."
+        INDEX { hwCfgOperateLevelUsersSessionID }
+        ::= { hwCfgOperateLevelUsersTable 1 }
+        
+    HwCfgOperateLevelUsersEntry ::=
+        SEQUENCE {
+            hwCfgOperateLevelUsersSessionID
+                Integer32,
+            hwCfgOperateLevelUsersSessionDesc
+                DisplayString,
+            hwCfgOperateLevelUsersName
+                DisplayString,
+            hwCfgOperateLevelUsersLockedTime
+                DisplayString,
+            hwCfgOperateLevelUsersIPAddr
+                DisplayString, 
+            hwCfgOperateLevelUsersLastCfgTime
+                DisplayString,
+            hwCfgOperateLevelUsersTimeout
+                Integer32       
+         }
+         
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.1
+    hwCfgOperateLevelUsersSessionID OBJECT-TYPE
+        SYNTAX Integer32 (-1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SessionID of users who have the configuration level or have locked the configuration."
+        ::= { hwCfgOperateLevelUsersEntry 1 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.2
+    hwCfgOperateLevelUsersSessionDesc OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of users who have the configuration level or have locked the configuration."
+        ::= { hwCfgOperateLevelUsersEntry 2 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.3
+    hwCfgOperateLevelUsersName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "UserName of users who have the configuration level or have locked the configuration."
+        ::= { hwCfgOperateLevelUsersEntry 3 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.4
+    hwCfgOperateLevelUsersLockedTime OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "LoginTime of users who have the configuration level or have locked the configuration."
+        ::= { hwCfgOperateLevelUsersEntry 4 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.5
+    hwCfgOperateLevelUsersIPAddr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "IP Address of users who have the configuration level or have locked the configuration."
+        ::= { hwCfgOperateLevelUsersEntry 5 }
+        
+     -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.6
+    hwCfgOperateLevelUsersLastCfgTime  OBJECT-TYPE  
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The last configurate Time of users who have the configuration level or have locked the configuration."
+        ::= { hwCfgOperateLevelUsersEntry 6 }
+     -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.7
+    hwCfgOperateLevelUsersTimeout  OBJECT-TYPE  
+        SYNTAX Integer32 (1..7200)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Unlock without configuration seconds, 1-7200, the default is 30"
+        ::= { hwCfgOperateLevelUsersEntry 7 }       
+
     -- ==========================================================================
     -- configuration save group
     -- ==========================================================================
@@ -1048,7 +1500,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.6.10.2.1
     hwCfgManEventlog NOTIFICATION-TYPE
-        OBJECTS { hwCfgLogSrcCmd, hwCfgLogSrcData, hwCfgLogDesData, hwCfgLogTerminalUser, hwCfgLogCmdSrcAddress, hwCfgLogConfigChangeId, hwCfgLogChgType, hwCfgLogTime }
+        OBJECTS { hwCfgLogSrcCmd, hwCfgLogSrcData, hwCfgLogDesData, hwCfgLogTerminalUser, hwCfgLogCmdSrcAddress, hwCfgLogConfigChangeId, hwCfgLogTime, hwCfgLogCfgBaselineTime }
         STATUS current
         DESCRIPTION 
             "If the system configuration is changed,
@@ -1068,7 +1520,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.6.10.2.3
     hwCfgInconsistent NOTIFICATION-TYPE
-        STATUS current
+        STATUS obsolete
         DESCRIPTION 
             "When the system automatically detects 
             that configurations of the AMB and the SMB are inconsistent, 
@@ -1078,13 +1530,72 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         
     -- 1.3.6.1.4.1.2011.6.10.2.4
     hwCfgInconsistentResume  NOTIFICATION-TYPE
-        STATUS current
+        STATUS obsolete
         DESCRIPTION 
             "When the system automatically detects 
             that configurations of the AMB and the SMB change 
             from inconsistent to consistent, 
             the trap is generated."
         ::= { hwConfigManNotifications 4 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.2.5
+    hwCfgB2STransferFail  NOTIFICATION-TYPE
+        OBJECTS { hwCfgBackupIndex, hwCfgBackupServerIp, hwCfgBackupProtocol }
+        STATUS current
+        DESCRIPTION 
+            "When the system failed to backup current configuration to
+            specified server, this trap will generate to indicates the
+            details information."
+        ::= { hwConfigManNotifications 5 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.2.6
+    hwCfgB2SOperate  NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+            "When the system begin to backup current configuration to
+            servers, this trap will generate."
+        ::= { hwConfigManNotifications 6 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.7
+    hwCfgRestoreFail  NOTIFICATION-TYPE
+    		OBJECTS { hwCfgRestoreErrCode }
+        STATUS current
+        DESCRIPTION 
+            "When configuration restoration fails, this trap is generated."
+        ::= { hwConfigManNotifications 7 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.9
+    hwConfigInconsistent  NOTIFICATION-TYPE    		
+        STATUS current
+        DESCRIPTION 
+            "When system automatically detects that configurations of the main board and the slave board are inconsistent, this trap is generated."
+        ::= { hwConfigManNotifications 9 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.10
+    hwConfigInconsistentResume  NOTIFICATION-TYPE    		
+        STATUS current
+        DESCRIPTION 
+            "When system automatically detects that configurations of the main board and the slave board change from inconsistent to consistent, this trap is generated."
+        ::= { hwConfigManNotifications 10 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.11
+    hwCfgAppDataInconsistent  NOTIFICATION-TYPE    		
+        STATUS current
+        DESCRIPTION 
+           "When the system automatically detects 
+            that configurations of the application and the Master Main Board are inconsistent, 
+            the trap is generated."
+        ::= { hwConfigManNotifications 11 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.12
+    hwCfgAppDataInconsistentResume  NOTIFICATION-TYPE    		
+        STATUS current
+        DESCRIPTION 
+            "When the system automatically detects 
+            that configurations of the application and the Master Main Board  change 
+            from inconsistent to consistent, 
+            the trap is generated."
+        ::= { hwConfigManNotifications 12 }
         
     -- 1.3.6.1.4.1.2011.6.10.3
     hwConfigManConformance OBJECT IDENTIFIER ::= { hwConfig 3 }
@@ -1114,7 +1625,8 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
                         startup2Net(6)
                     }
                 DESCRIPTION 
-                    ""
+                    "The compliance statement for entities implementing
+                     the Huawei Configuration Management MIB."
         ::= { hwConfigManCompliances 1 }
 
     
@@ -1127,7 +1639,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwCfgRunModifiedLast, hwCfgRunSavedLast, hwCfgStartModifiedLast, hwCfgLogLimitedEntries, hwCfgLogDeletedEntries, 
             hwCfgLogTime, hwCfgLogSrcCmd, hwCfgLogTerminalType, hwCfgLogTerminalNum, hwCfgLogTerminalUser, 
             hwCfgLogTerminalLocation, hwCfgLogCmdSrcAddress, hwCfgLogVirHost, hwCfgLogServerAddress, hwCfgLogFile, 
-            hwCfgLogUserName, hwCfgLogWantBackup, hwCfgLogSrcData, hwCfgLogDesData, hwCfgLogConfigChangeId, hwCfgLogChgType }
+            hwCfgLogUserName, hwCfgLogWantBackup, hwCfgLogSrcData, hwCfgLogDesData, hwCfgLogConfigChangeId, hwCfgLogCfgBaselineTime }
         STATUS current
         DESCRIPTION 
             "A collection of objects configuration log group."
@@ -1138,9 +1650,11 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
     hwCfgOperateGroup OBJECT-GROUP
         OBJECTS { hwCfgOperateGlobalEntryLimit, hwCfgOperateEntryAgeOutTime, hwCfgOperateType, hwCfgOperateProtocol, hwCfgOperateFileName, 
             hwCfgOperateServerAddress, hwCfgOperateUserName, hwCfgOperateUserPassword, hwCfgOperateTime, hwCfgOperateEndNotificationSwitch, 
-            hwCfgOperateResultGlobalEntryLimit, hwCfgOperateState, hwCfgOperateRowStatus, hwCfgOperateServerPort, hwCfgOperateSourceAddress,
-            hwCfgOperateSourceInterface, hwCfgOperateResultOptIndex, hwCfgOperateResultOpType, hwCfgOperateEndTime,
-            hwCfgModuleChangeTime }
+            hwCfgOperateResultGlobalEntryLimit, hwCfgOperateState, hwCfgOperateRowStatus, hwCfgOperateServerPort, hwCfgOperateSourceAddress, hwCfgOperateSourceInterface, hwCfgOperateOnError, hwCfgOperateServerAddressType, hwCfgOperateServerAddressNet,hwCfgOperateVpnInstance, 
+            hwCfgOperateResultOptIndex, hwCfgOperateResultOpType, hwCfgOperateEndTime,hwCfgOperateTransferProgress,hwCfgOperateErrorReason,
+            hwCfgModuleChangeTime, hwCfgOperateLockConfigDataStore, hwCfgOperateLevelUsersSessionID, hwCfgOperateLevelUsersSessionDesc,
+            hwCfgOperateLevelUsersName, hwCfgOperateLevelUsersLockedTime, hwCfgOperateLevelUsersIPAddr,hwCfgOperateLevelUsersLastCfgTime,hwCfgOperateLevelUsersTimeout, 
+            hwCfgOperateCompareConfig}
         STATUS current
         DESCRIPTION 
             "A group of configuration operation."
@@ -1149,14 +1663,14 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.6.10.3.2.3
     hwCfgManNotificationGroup NOTIFICATION-GROUP
-        NOTIFICATIONS { hwCfgManEventlog, hwCfgOperateCompletion ,hwCfgInconsistent, hwCfgInconsistentResume }
+        NOTIFICATIONS { hwCfgManEventlog, hwCfgOperateCompletion ,hwCfgInconsistent, hwCfgInconsistentResume, hwCfgB2STransferFail, hwCfgB2SOperate, hwCfgRestoreFail, hwConfigInconsistent, hwConfigInconsistentResume, hwCfgAppDataInconsistent, hwCfgAppDataInconsistentResume}
         STATUS current
         DESCRIPTION 
             "Collection of notification objects."
         ::= { hwConfigManGroups 3 }
     -- 1.3.6.1.4.1.2011.6.10.3.2.4
     hwCfgSaveGroup OBJECT-GROUP
-        OBJECTS { hwCfgSaveAutoInterval, hwCfgSaveAutoTime, hwCfgSaveManualTime }
+        OBJECTS { hwCfgSaveAutoInterval, hwCfgSaveAutoTime, hwCfgSaveManualTime, hwCfgSaveAutoCpuLimit, hwCfgSaveAutoNoCfgInterval, hwCfgSaveAutoDelay, hwCfgRestoreErrCode }
         STATUS current
         DESCRIPTION 
             "A group of configuration operation."

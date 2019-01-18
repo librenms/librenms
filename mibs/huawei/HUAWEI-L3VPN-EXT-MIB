@@ -1,13 +1,13 @@
-
 --  ==================================================================
--- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI L3VPN Statistics Management MIB
 -- Reference:
--- Version:     V1.0
+-- Version:     V2.04
 -- History:
 --              V1.0 qiyanqing, 2007-04-12, publish
---              V1.1 rengaofeng, 2009-02-13, add qos statistics table 
+--              V1.1 rengaofeng, 2009-02-13, add qos statistics table
+--              V1.2 rengaofeng, 2009-12-18, add vpn mapping table 
 -- ==================================================================
     HUAWEI-L3VPN-EXT-MIB DEFINITIONS ::= BEGIN
  
@@ -19,7 +19,7 @@
             IpAddress,TimeTicks,Integer32,Gauge32, Unsigned32,Counter32,Counter64, OBJECT-TYPE, 
             MODULE-IDENTITY, NOTIFICATION-TYPE          
                 FROM SNMPv2-SMI         
-            DisplayString, TimeStamp, RowStatus         
+            DisplayString, TimeStamp, RowStatus, DateAndTime         
                 FROM SNMPv2-TC 
             EnabledStatus
                 FROM  P-BRIDGE-MIB
@@ -29,19 +29,36 @@
                 
                 
         hwL3vpn MODULE-IDENTITY 
-            LAST-UPDATED "200902171659Z"        -- Feb 13, 2009 at 16:59 GMT
-            ORGANIZATION 
-                "Huawei Technologies Co., Ltd."
+            LAST-UPDATED "201708171556Z"        -- Aug 17, 2017 at 1556 GMT
+            ORGANIZATION
+                "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
-                "R&D BeiJing, Huawei Technologies co.,Ltd.
-                 Huawei Bld.,NO.3 Xinxi Rd., 
-                 Shang-Di Information Industry Base,
-                 Hai-Dian District Beijing P.R. China
-                 http://www.huawei.com
-                 Zip:100085
-                "
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
             DESCRIPTION
                 "The HUAWEI-L3VPN-EXT-MIB contains objects to statistic L3VPN's traffic."
+
+            REVISION "201708171556Z" 
+            DESCRIPTION
+            "Modify description of MIB nodes"
+
+            REVISION "201706220928Z"
+            DESCRIPTION
+            "add 'hwL3vpnVrfV6VpnName' 'hwL3vpnVrfV6IfName' 'hwL3vpnVrfV6Up' 'hwL3vpnVrfV6Down'"
+
+            REVISION "201706220928Z"
+            DESCRIPTION
+            "Modify syntax ,include'hwL3vpnStatInTrafficRate' 'hwL3vpnStatOutTrafficRate' 'hwL3vpnStatInPacketsRate' 'hwL3vpnStatOutPacketsRate'"
+
+            REVISION "201701131445Z"
+            DESCRIPTION
+            "Add an enumeration value to a variable,include'HwL3vpnEnhancedStastic'"
+
             ::= { hwDatacomm 150 }
                 
                 
@@ -83,13 +100,13 @@
                 hwL3vpnVrfName
                     DisplayString,             
                 hwL3vpnStatInTrafficRate
-                    Gauge32,
+                    Counter64,
                 hwL3vpnStatOutTrafficRate
-                    Gauge32,
+                    Counter64,
                 hwL3vpnStatInPacketsRate
-                    Gauge32,
+                    Counter64,
                 hwL3vpnStatOutPacketsRate
-                    Gauge32,
+                    Counter64,
                 hwL3vpnStatInBytes
                     Counter64,
                 hwL3vpnStatOutBytes
@@ -111,7 +128,7 @@
                 hwL3vpnStatOutBroadcastPackets
                     Counter64,
                 hwL3vpnStatResetTime
-                    TimeTicks,
+                    DateAndTime,
                 hwL3vpnStatResetStatistic
                     INTEGER 
              }
@@ -129,7 +146,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "This object indicates the enable sign of L3VPN's traffic statistics."
+                "This object indicates whether statistics collection is enabled or not. 1 indicates enable, and 0 indicates disable."
             DEFVAL { disable }
             ::= { hwL3vpnStatisticsEntry 2 }
  
@@ -145,35 +162,35 @@
     
 
         hwL3vpnStatInTrafficRate OBJECT-TYPE
-            SYNTAX Gauge32
+            SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Average bytes of the traffic received per second."
+                "The value of this object identifies the rate for incoming bytes in the past 300s. The unit is bit/s."
             ::= { hwL3vpnStatisticsEntry 4 }
         
         hwL3vpnStatOutTrafficRate OBJECT-TYPE
-            SYNTAX Gauge32
+            SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Average bytes of the traffic transmitted out per second ."
+                "The value of this object identifies the rate (in bps) for outgoing bytes in the past 300s."
             ::= { hwL3vpnStatisticsEntry 5 }
         
         hwL3vpnStatInPacketsRate OBJECT-TYPE
-            SYNTAX Gauge32
+            SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Average packets of the traffic received per second."
+                "The value of this object identifies the rate (in pps) for incoming packets in the past 300s."
             ::= { hwL3vpnStatisticsEntry 6 }
         
         hwL3vpnStatOutPacketsRate OBJECT-TYPE
-            SYNTAX Gauge32
+            SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Average packets of the traffic transmitted out per second."
+                "The value of this object identifies the rate (in pps) for outgoing packets in the past 300s."
             ::= { hwL3vpnStatisticsEntry 7 } 
             
         hwL3vpnStatInBytes OBJECT-TYPE
@@ -257,7 +274,7 @@
             ::= { hwL3vpnStatisticsEntry 17 }
             
         hwL3vpnStatResetTime OBJECT-TYPE
-            SYNTAX TimeTicks
+            SYNTAX DateAndTime
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -267,12 +284,13 @@
        hwL3vpnStatResetStatistic OBJECT-TYPE
             SYNTAX INTEGER
             {
+                resetstatistic(0) ,
                 resetStatistic(1)                           
             }
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "Reset traffic statistics of the vpn instance."
+                "This object indicates a writable field, which is used to clear statistics. The value is 1."
             ::= { hwL3vpnStatisticsEntry 19 }
             
 -- The L3VPN Qos Statistic Table
@@ -450,7 +468,7 @@
                 hwL3vpnPeerVrfName
                     DisplayString,
                 hwL3vpnPeerStatResetTime
-                    TimeTicks,                                     
+                    DateAndTime,                                     
                 hwL3vpnPeerStatQosPacketsRate
                     Counter64,
                 hwL3vpnPeerStatQosBytesRate 
@@ -507,7 +525,7 @@
             ::= { hwL3vpnPeerStatisticsEntry 5 }  
                         
         hwL3vpnPeerStatResetTime OBJECT-TYPE
-            SYNTAX TimeTicks
+            SYNTAX DateAndTime
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -699,6 +717,48 @@
                 "Rate of discarded bytes for the past 30 seconds, based on peer of the vpn instance. Unit: bps"
             ::= { hwL3vpnPeerQosStatisticsEntry 11 }
 
+-- The L3VPN Name and Index mapping Table
+-- 
+        hwL3vpnStatMapTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL3vpnStatMapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the map of L3vpn name and index."
+            ::= { hwL3vpnStatMibObjects 5 }
+        
+        hwL3vpnStatMapEntry OBJECT-TYPE
+            SYNTAX HwL3vpnStatMapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the mapping information of the L3vpn name and L3vpn index."
+            INDEX { hwL3vpnStatMapVrfName }
+            ::= { hwL3vpnStatMapTable 1 }
+        
+        HwL3vpnStatMapEntry ::=
+            SEQUENCE {
+                hwL3vpnStatMapVrfName           
+                    DisplayString,
+                hwL3vpnStatMapVrfIndex           
+                    Unsigned32         
+            } 
+        hwL3vpnStatMapVrfName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the vpn instance's name."
+            ::= { hwL3vpnStatMapEntry 1 } 
+               
+        hwL3vpnStatMapVrfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Index of the vpn instance."
+            ::= { hwL3vpnStatMapEntry 2 }  
+        
 -- Conformance            
             
         hwL3vpnConformance OBJECT IDENTIFIER ::= { hwL3vpn 2 }
@@ -748,7 +808,13 @@
                 "The L3vpn Qos Statistics Group."
             ::= { hwL3vpnGroups 4 }
 
-                        
+-- L3vpn Stat Map Group            
+        hwL3vpnStatMapGroup OBJECT-GROUP
+            OBJECTS { hwL3vpnStatMapVrfIndex }
+            STATUS current
+            DESCRIPTION 
+                "The L3vpn Stat Map Group."
+            ::= { hwL3vpnGroups 5 }                        
 -- Compliance        
         hwL3vpnCompliances OBJECT IDENTIFIER ::= {hwL3vpnConformance 2}            
         
@@ -759,5 +825,39 @@
             MODULE -- this module
                 MANDATORY-GROUPS { hwL3vpnStatisticsGroup}
             ::= { hwL3vpnCompliances 1 }            
-    END
+-- L3vpnNotificationsObject
+        hwL3vpnNotificationsObjects OBJECT IDENTIFIER ::= { hwL3vpn 5 }
 
+        hwL3vpnVrfV6VpnName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Vpn Instance Name."
+            ::= { hwL3vpnNotificationsObjects 1 }
+
+        hwL3vpnVrfV6IfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..63))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Interface Name."
+            ::= { hwL3vpnNotificationsObjects 2 }
+
+-- Notification
+        hwL3vpnNotifications OBJECT IDENTIFIER ::= { hwL3vpn 6 }
+
+        hwL3vpnVrfV6Up NOTIFICATION-TYPE
+            OBJECTS { hwL3vpnVrfV6VpnName, hwL3vpnVrfV6IfName }
+            STATUS      current
+            DESCRIPTION
+                "The object indicates that IPv6 status on any interface bound to a VPN instance being Up."
+            ::= { hwL3vpnNotifications 1 }
+
+        hwL3vpnVrfV6Down NOTIFICATION-TYPE
+            OBJECTS { hwL3vpnVrfV6VpnName, hwL3vpnVrfV6IfName }
+            STATUS      current
+            DESCRIPTION
+                "The object indicates that IPv6 status on all interfaces bound to a VPN instance being Down."
+            ::= { hwL3vpnNotifications 2 }
+    END

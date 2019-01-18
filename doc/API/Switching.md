@@ -1,4 +1,5 @@
 source: API/Switching.md
+path: blob/master/doc/
 
 ### `list_vlans`
 
@@ -66,5 +67,123 @@ Output:
    "vlan_mtu": null
     }
   ]
+}
+```
+
+### `list_links`
+
+Get a list of all Links.
+
+Route: `/api/v0/resources/links`
+
+Input:
+
+  -
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/links
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "links": [
+        {
+            "id": 10,
+            "local_port_id": 100,
+            "local_device_id": 1,
+            "remote_port_id": 200,
+            "active": 1,
+            "protocol": "lldp",
+            "remote_hostname": "host2.example.com",
+            "remote_device_id": 2,
+            "remote_port": "xe-0/0/1",
+            "remote_platform": null,
+            "remote_version": "Example Router v.1.0"
+        },
+        ...
+    ],
+    "count": 100
+}
+```
+
+### `get_links`
+
+Get a list of Links per giver device.
+
+Route: `/api/v0/devices/:hostname/links`
+
+  - hostname can be either the device hostname or id
+
+Input:
+
+  -
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/links
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "links": [
+        {
+            "id": 10,
+            "local_port_id": 100,
+            "local_device_id": 1,
+            "remote_port_id": 200,
+            "active": 1,
+            "protocol": "lldp",
+            "remote_hostname": "host2.example.com",
+            "remote_device_id": 2,
+            "remote_port": "xe-0/0/1",
+            "remote_platform": null,
+            "remote_version": "Example Router v.1.0"
+        },
+        ...
+    ],
+    "count": 10
+}
+```
+
+### `get_link`
+
+Retrieves Link by ID
+
+Route: `/api/v0/resources/links/:id`
+
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/link/10
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "links": [
+        {
+            "id": 10,
+            "local_port_id": 100,
+            "local_device_id": 1,
+            "remote_port_id": 200,
+            "active": 1,
+            "protocol": "lldp",
+            "remote_hostname": "host2.example.com",
+            "remote_device_id": 2,
+            "remote_port": "xe-0/0/1",
+            "remote_platform": null,
+            "remote_version": "Example Router v.1.0"
+        }
+    ],
+    "count": 1
 }
 ```

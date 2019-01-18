@@ -24,12 +24,6 @@ if (empty($_SERVER['PATH_INFO'])) {
 
 // Set variables
 $msg_box = array();
-// Check for install.inc.php
-if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
-    // no config.php does so let's redirect to the install
-    header("Location: " . rtrim(Config::get('base_url'), '/') . "/install.php");
-    exit;
-}
 
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
@@ -103,10 +97,12 @@ if (empty($config['favicon'])) {
   <link href="css/leaflet.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
+  <link href="css/L.Control.Locate.min.css" rel="stylesheet" type="text/css" />
   <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
   <link href="css/select2.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="css/query-builder.default.min.css" rel="stylesheet" type="text/css" />
-  <link href="<?php echo($config['stylesheet']);  ?>?ver=291727421" rel="stylesheet" type="text/css" />
+  <link href="<?php echo($config['stylesheet']);  ?>?ver=20181201" rel="stylesheet" type="text/css" />
   <link href="css/<?php echo $config['site_style']; ?>.css?ver=632417642" rel="stylesheet" type="text/css" />
 <?php
 
@@ -115,6 +111,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
 }
 
 ?>
+  <script src="js/polyfill.min.js"></script>
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
@@ -140,7 +137,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
     }
     ?>
   <script src="js/select2.min.js"></script>
-  <script src="js/librenms.js?ver=20180511"></script>
+  <script src="js/librenms.js?ver=20181221"></script>
   <script type="text/javascript">
 
     <!-- Begin

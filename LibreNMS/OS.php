@@ -25,6 +25,7 @@
 
 namespace LibreNMS;
 
+use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -42,6 +43,7 @@ class OS implements ProcessorDiscovery
     }
 
     private $device; // annoying use of references to make sure this is in sync with global $device variable
+    private $device_model;
     private $cache; // data cache
     private $pre_cache; // pre-fetch data cache
 
@@ -72,6 +74,20 @@ class OS implements ProcessorDiscovery
     public function getDeviceId()
     {
         return (int)$this->device['device_id'];
+    }
+
+    /**
+     * Get the Eloquent Device Model for the current device
+     *
+     * @return Device
+     */
+    public function getDeviceModel()
+    {
+        if (is_null($this->device_model)) {
+            $this->device_model = Device::find($this->getDeviceId());
+        }
+
+        return $this->device_model;
     }
 
     public function preCache()
@@ -180,7 +196,6 @@ class OS implements ProcessorDiscovery
 
         $rf = new \ReflectionClass($this);
         $name = $rf->getShortName();
-        var_dump($name);
         preg_match_all("/[A-Z][a-z]*/", $name, $segments);
 
         return implode('-', array_map('strtolower', $segments[0]));

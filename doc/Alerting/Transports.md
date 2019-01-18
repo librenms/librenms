@@ -1,4 +1,5 @@
 source: Alerting/Transports.md
+path: blob/master/doc/
 
 # Transports
 
@@ -22,6 +23,24 @@ To include users that have `Global-Read`, `Administrator` or `Normal-User` permi
 
 ## Using a Proxy?
 [Proxy Configuration](../Support/Configuration.md#proxy-support)
+
+## Alertmanager
+Alertmanager is an alert handling software, initially developed for alert processing sent by Prometheus. 
+
+It has built-in functionality for deduplicating, grouping and routing alerts based on configurable criteria. 
+
+LibreNMS uses alert grouping by alert rule, which can produce an array of alerts of similar content for an array of hosts, whereas Alertmanager can group them by alert meta, ideally producing one single notice in case an issue occurs. 
+
+The one and only possible parameter to be passed is `source` - this is required to distinguish LibreNMS alerts from alerts coming from different sources. 
+
+[Alertmanager Docs](https://prometheus.io/docs/alerting/alertmanager/)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Alertmanager URL      | http://alertmanager.example.com |
+| Alertmanager Options: | source=librenms |
 
 ## API
 API transports definitions are a bit more complex than the E-Mail configuration.
@@ -316,9 +335,14 @@ Get your Access Token from your Pushbullet's settings page and set it in your tr
 | Access Token | MYFANCYACCESSTOKEN |
 
 ## Pushover
-If you want to change the [notification sounds](https://pushover.net/api#sounds) then add it in Pushover Options:
+If you want to change the default [notification sound](https://pushover.net/api#sounds) for all notifications then you can add the following in Pushover Options:
 
+`sound=falling`
+
+You also have the possibility to change sound per severity:
 `sound_critical=falling`
+`sound_warning=siren`
+`sound_ok=magic`
 
 Enabling Pushover support is fairly easy, there are only two required parameters.
 
@@ -335,6 +359,8 @@ Now copy your API Key and obtain your User Key from the newly created Applicatio
 | Api Key | APPLICATIONAPIKEYGOESHERE |
 | User Key | USERKEYGOESHERE |
 | Pushover Options | sound_critical=falling |
+|  | sound_warning=siren |
+|  | sound_ok=magic |
 
 ## Rocket.chat
 The Rocket.chat transport will POST the alert message to your Rocket.chat Incoming WebHook using the
@@ -413,16 +439,18 @@ Each fault will be sent as a separate syslog.
 
 2. Generate a new bot with the command "/newbot" BotFather is then asking for a username and a normal name. After that your bot is created and you get a HTTP token. (for more options for your bot type "/help")
 
-3. Add your bot to telegram with the following url: `http://telegram.me/<botname>` and send some text to the bot.
+3. Add your bot to telegram with the following url: `http://telegram.me/<botname>` to use app or `https://web.telegram.org/<botname>` to use in web, and send some text to the bot.
 
 4. The BotFather should have responded with a token, copy your token code and go to the following page in chrome: `https://api.telegram.org/bot<tokencode>/getUpdates`
 (this could take a while so continue to refresh until you see something similar to below)
 
-5. You see a json code with the message you sent to the bot. Copy the Chat id. In this example that is “-9787468”
-   `"message":{"message_id":7,"from":"id":656556,"first_name":"Joo","last_name":"Doo","username":"JohnDoo"},"chat":{"id":-9787468,"title":"Telegram Group"},"date":1435216924,"text":"Hi"}}]}`
+5. You see a json code with the message you sent to the bot. Copy the Chat id. In this example that is “-9787468” within this example:
+   `"message":{"message_id":7,"from":"id":656556,"first_name":"Joo","last_name":"Doo","username":"JohnDoo"},"chat":{"id":-9787468,"title":"Telegram Group"},"date":1435216924,"text":"Hi"}}]}`.
    
 6. Now create a new "Telegram transport" in LibreNMS (Global Settings -> Alerting Settings -> Telegram transport).
 Click on 'Add Telegram config' and put your chat id and token into the relevant box.
+
+7. If want to use a group to receive alerts, you need to pick the Chat ID of the group chat, and not of the Bot itself.
 
 [Telegram Docs](https://core.telegram.org/api)
 
@@ -432,6 +460,19 @@ Click on 'Add Telegram config' and put your chat id and token into the relevant 
 | ------ | ------- |
 | Chat ID | 34243432 |
 | Token | 3ed32wwf235234 |
+| Format | HTML or MARKDOWN |
+
+## Twilio SMS
+
+Twilio will send your alert via SMS.  From your Twilio account you will need your account SID, account token and your Twilio SMS phone number that you would like to send the alerts from.  Twilio's APIs are located at: https://www.twilio.com/docs/api?filter-product=sms
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| SID | ACxxxxxxxxxxxxxxxxxxxxxxxxxxxx |
+| Token | 7xxxx573acxxxbc2xxx308d6xxx652d32 |
+| Twilio SMS Number | 8888778660 |
 
 ## VictorOps
 VictorOps provide a webHook url to make integration extremely simple. To get the URL required login to your VictorOps 

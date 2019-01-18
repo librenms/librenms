@@ -66,6 +66,7 @@
                     "sensor_index": "0",
                     "sensor_type": "netspire",
                     "sensor_descr": "System Temperature",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 48,

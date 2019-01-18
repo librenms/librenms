@@ -1,37 +1,27 @@
 <?php
 
-$oids       = snmp_walk($device, 'tempHumidSensorHumidValue', '-Osqn', 'Sentry3-MIB');
+$oids = snmpwalk_cache_oid($device, 'tempHumidSensorEntry', array(), 'Sentry3-MIB');
 $divisor    = '1';
 $multiplier = '1';
-d_echo($oids."\n");
+d_echo($oids);
 
-$oids = trim($oids);
 if ($oids) {
-    echo 'ServerTech Sentry ';
-}
+    echo 'ServerTech Sentry3 Humidity ';
 
-foreach (explode("\n", $oids) as $data) {
-    $data = trim($data);
-    if ($data) {
-        list($oid,$descr) = explode(' ', $data, 2);
-        $split_oid        = explode('.', $oid);
-        $index            = $split_oid[(count($split_oid) - 1)];
-
+    foreach ($oids as $sensor_index => $data) {
         // tempHumidSensorHumidValue
-        $humidity_oid    = '.1.3.6.1.4.1.1718.3.2.5.1.10.1.'.$index;
-        $descr           = 'Removable Sensor '.$index;
-        $low_warn_limit  = '0';
-        $low_limit       = snmp_get($device, "tempHumidSensorHumidLowThresh.1.$index", '-Ovq', 'Sentry3-MIB');
-        $high_warn_limit = '0';
-        $high_limit      = snmp_get($device, "tempHumidSensorHumidHighThresh.1.$index", '-Ovq', 'Sentry3-MIB');
-        $current         = snmp_get($device, "$humidity_oid", '-Ovq', 'Sentry3-MIB');
+        $humidity_oid    = '.1.3.6.1.4.1.1718.3.2.5.1.10.'.$sensor_index;
+        $descr           = 'Removable Sensor '.$data['tempHumidSensorID'];
+        $low_warn_limit  = null;
+        $low_limit       = $data['tempHumidSensorHumidLowThresh'];
+        $high_warn_limit = null;
+        $high_limit      = $data['tempHumidSensorHumidHighThresh'];
+        $current         = $data['tempHumidSensorHumidValue'];
 
-        if ($current >= 0) {
-            discover_sensor($valid['sensor'], 'humidity', $device, $humidity_oid, $index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+        if (is_numeric($current) && $current >= 0) {
+            discover_sensor($valid['sensor'], 'humidity', $device, $humidity_oid, 'tempHumidSensorHumidValue'.$sensor_index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
     }
-
-    unset($data);
 }
 
 unset($oids);

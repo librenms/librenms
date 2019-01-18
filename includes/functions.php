@@ -24,40 +24,42 @@ use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\MemcacheLock;
 use Symfony\Component\Process\Process;
 
-/**
- * Set debugging output
- *
- * @param bool $state If debug is enabled or not
- * @param bool $silence When not debugging, silence every php error
- * @return bool
- */
-function set_debug($state = true, $silence = false)
-{
-    global $debug;
+if (!function_exists('set_debug')) {
+    /**
+     * Set debugging output
+     *
+     * @param bool $state If debug is enabled or not
+     * @param bool $silence When not debugging, silence every php error
+     * @return bool
+     */
+    function set_debug($state = true, $silence = false)
+    {
+        global $debug;
 
-    $debug = $state; // set to global
+        $debug = $state; // set to global
 
-    restore_error_handler(); // disable Laravel error handler
+        restore_error_handler(); // disable Laravel error handler
 
-    if (isset($debug) && $debug) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        ini_set('log_errors', 0);
-        error_reporting(E_ALL & ~E_NOTICE);
+        if (isset($debug) && $debug) {
+            ini_set('display_errors', 1);
+            ini_set('display_startup_errors', 1);
+            ini_set('log_errors', 0);
+            error_reporting(E_ALL & ~E_NOTICE);
 
-        \LibreNMS\Util\Laravel::enableCliDebugOutput();
-        \LibreNMS\Util\Laravel::enableQueryDebug();
-    } else {
-        ini_set('display_errors', 0);
-        ini_set('display_startup_errors', 0);
-        ini_set('log_errors', 1);
-        error_reporting($silence ? 0 : E_ERROR);
+            \LibreNMS\Util\Laravel::enableCliDebugOutput();
+            \LibreNMS\Util\Laravel::enableQueryDebug();
+        } else {
+            ini_set('display_errors', 0);
+            ini_set('display_startup_errors', 0);
+            ini_set('log_errors', 1);
+            error_reporting($silence ? 0 : E_ERROR);
 
-        \LibreNMS\Util\Laravel::disableCliDebugOutput();
-        \LibreNMS\Util\Laravel::disableQueryDebug();
+            \LibreNMS\Util\Laravel::disableCliDebugOutput();
+            \LibreNMS\Util\Laravel::disableQueryDebug();
+        }
+
+        return $debug;
     }
-
-    return $debug;
 }//end set_debug()
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
@@ -96,7 +98,7 @@ function array_sort_by_column($array, $on, $order = SORT_ASC)
 
 function mac_clean_to_readable($mac)
 {
-    return rtrim(chunk_split($mac, 2, ':'), ':');
+    return \LibreNMS\Util\Rewrite::readableMac($mac);
 }
 
 function only_alphanumeric($string)
@@ -939,17 +941,15 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         $device = device_by_id_cache($device);
     }
 
-    $insert = array('host' => ($device['device_id'] ?: 0),
+    dbInsert([
         'device_id' => ($device['device_id'] ?: 0),
-        'reference' => ($reference ?: "NULL"),
-        'type' => ($type ?: "NULL"),
-        'datetime' => array("NOW()"),
+        'reference' => $reference,
+        'type' => $type,
+        'datetime' => \Carbon\Carbon::now(),
         'severity' => $severity,
         'message' => $text,
         'username'  => isset(LegacyAuth::user()->username) ? LegacyAuth::user()->username : '',
-     );
-
-    dbInsert($insert, 'eventlog');
+    ], 'eventlog');
 }
 
 // Parse string with emails. Return array with email (as key) and name (as value)
@@ -2208,6 +2208,19 @@ function recordSnmpStatistic($stat, $start_time)
     return $runtime;
 }
 
+function runTraceroute($device)
+{
+    $address_family = snmpTransportToAddressFamily($device['transport']);
+    $trace_name = $address_family == 'ipv6' ? 'traceroute6' : 'traceroute';
+    $trace_path = Config::get($trace_name, $trace_name);
+    $process = new Process([$trace_path, '-q', '1', '-w', '1', $device['hostname']]);
+    $process->run();
+    if ($process->isSuccessful()) {
+        return ['traceroute' => $process->getOutput()];
+    }
+    return ['output' => $process->getErrorOutput()];
+}
+
 /**
  * @param $device
  * @param bool $record_perf
@@ -2221,7 +2234,12 @@ function device_is_up($device, $record_perf = false)
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = array('NOW()');
 
-    if ($record_perf === true && can_ping_device($device['attribs']) === true) {
+    if ($record_perf === true && can_ping_device($device['attribs'])) {
+        $trace_debug = [];
+        if ($ping_response['result'] === false && Config::get('debug.run_trace', false)) {
+            $trace_debug = runTraceroute($device);
+        }
+        $device_perf['debug'] = json_encode($trace_debug);
         dbInsert($device_perf, 'device_perf');
     }
     $response              = array();
@@ -2375,20 +2393,18 @@ function cache_peeringdb()
  */
 function dump_db_schema()
 {
-    global $config;
-
-    $output = array();
+    $output = [];
     $db_name = dbFetchCell('SELECT DATABASE()');
 
     foreach (dbFetchRows("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;") as $table) {
         $table = $table['TABLE_NAME'];
         foreach (dbFetchRows("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table'") as $data) {
-            $def = array(
+            $def = [
                 'Field'   => $data['COLUMN_NAME'],
                 'Type'    => $data['COLUMN_TYPE'],
                 'Null'    => $data['IS_NULLABLE'] === 'YES',
                 'Extra'   => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data['EXTRA']),
-            );
+            ];
 
             if (isset($data['COLUMN_DEFAULT']) && $data['COLUMN_DEFAULT'] != 'NULL') {
                 $default = trim($data['COLUMN_DEFAULT'], "'");
@@ -2403,15 +2419,30 @@ function dump_db_schema()
             if (isset($output[$table]['Indexes'][$key_name])) {
                 $output[$table]['Indexes'][$key_name]['Columns'][] = $key['Column_name'];
             } else {
-                $output[$table]['Indexes'][$key_name] = array(
+                $output[$table]['Indexes'][$key_name] = [
                     'Name'    => $key['Key_name'],
-                    'Columns' => array($key['Column_name']),
+                    'Columns' => [$key['Column_name']],
                     'Unique'  => !$key['Non_unique'],
                     'Type'    => $key['Index_type'],
-                );
+                ];
             }
         }
+
+        $create = dbFetchRow("SHOW CREATE TABLE `$table`")['Create Table'];
+        $constraint_regex = '/CONSTRAINT `(?<name>[A-Za-z_0-9]+)` FOREIGN KEY \(`(?<foreign_key>[A-Za-z_0-9]+)`\) REFERENCES `(?<table>[A-Za-z_0-9]+)` \(`(?<key>[A-Za-z_0-9]+)`\) ?(?<extra>[ A-Z]+)?/';
+        $constraint_count = preg_match_all($constraint_regex, $create, $constraints);
+        for ($i = 0; $i < $constraint_count; $i++) {
+            $constraint_name = $constraints['name'][$i];
+            $output[$table]['Constraints'][$constraint_name] = [
+                'name' => $constraint_name,
+                'foreign_key' => $constraints['foreign_key'][$i],
+                'table' => $constraints['table'][$i],
+                'key' => $constraints['key'][$i],
+                'extra' => $constraints['extra'][$i],
+            ];
+        }
     }
+
     return $output;
 }
 
@@ -2434,10 +2465,13 @@ function get_schema_list()
     $files = glob($config['install_dir'].'/sql-schema/*.sql');
 
     // set the keys to the db schema version
-    return array_reduce($files, function ($array, $file) {
-        $array[basename($file, '.sql')] = $file;
+    $files = array_reduce($files, function ($array, $file) {
+        $array[(int)basename($file, '.sql')] = $file;
         return $array;
-    }, array());
+    }, []);
+
+    ksort($files); // fix dbSchema 1000 order
+    return $files;
 }
 
 /**
@@ -2448,13 +2482,17 @@ function get_schema_list()
 function get_db_schema()
 {
     try {
-        return \LibreNMS\DB\Eloquent::DB()
-            ->table('dbSchema')
-            ->orderBy('version', 'DESC')
-            ->value('version');
+        $db = \LibreNMS\DB\Eloquent::DB();
+        if ($db) {
+            return (int)$db->table('dbSchema')
+                ->orderBy('version', 'DESC')
+                ->value('version');
+        }
     } catch (PDOException $e) {
-        return 0;
+        // return default
     }
+
+    return 0;
 }
 
 /**
@@ -2466,11 +2504,7 @@ function db_schema_is_current()
 {
     $current = get_db_schema();
 
-    $schemas = get_schema_list();
-    end($schemas);
-    $latest = key($schemas);
-
-    return $current >= $latest;
+    return $current >= 1000;
 }
 
 /**
@@ -2479,17 +2513,20 @@ function db_schema_is_current()
  */
 function get_device_oid_limit($device)
 {
-    global $config;
-
-    $max_oid = $device['snmp_max_oid'];
-
-    if (isset($max_oid) && $max_oid > 0) {
-        return $max_oid;
-    } elseif (isset($config['snmp']['max_oid']) && $config['snmp']['max_oid'] > 0) {
-        return $config['snmp']['max_oid'];
-    } else {
-        return 10;
+    // device takes priority
+    if ($device['snmp_max_oid'] > 0) {
+        return $device['snmp_max_oid'];
     }
+
+    // then os
+    $os_max = Config::getOsSetting($device['os'], 'snmp_max_oid', 0);
+    if ($os_max > 0) {
+        return $os_max;
+    }
+
+    // then global
+    $global_max = Config::get('snmp.max_oid', 10);
+    return $global_max > 0 ? $global_max : 10;
 }
 
 /**

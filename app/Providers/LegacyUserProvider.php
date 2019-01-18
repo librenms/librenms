@@ -32,6 +32,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
+use Log;
 use Request;
 use Session;
 use Toastr;
@@ -170,6 +171,7 @@ class LegacyUserProvider implements UserProvider
      * Fetch user by username from legacy auth, update it or add it to the db then return it.
      *
      * @param string $username
+     * @param string $password
      * @return User|null
      */
     protected function fetchUserByName($username, $password = null)
@@ -178,6 +180,11 @@ class LegacyUserProvider implements UserProvider
 
         $auth = LegacyAuth::get();
         $type = LegacyAuth::getType();
+
+        // ldap based auth we should bind before using, otherwise searches may fail due to anonymous bind
+        if (method_exists($auth, 'bind')) {
+            $auth->bind($username, $password);
+        }
 
         $auth_id = $auth->getUserid($username);
         $new_user = $auth->getUser($auth_id);
@@ -199,7 +206,7 @@ class LegacyUserProvider implements UserProvider
             }
 
             if (empty($new_user)) {
-                Toastr::info("No user ($auth_id) [$username]");
+                Log::error("Auth Error ($type): No user ($auth_id) [$username]");
                 return null;
             }
         }

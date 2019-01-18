@@ -118,8 +118,9 @@
                     @if($locations)
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
-                            <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> Geo Locations</a>
+                            <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('Geo Locations')</a>
                             <ul class="dropdown-menu scrollable-menu">
+                                <li><a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('All Locations')</a></li>
                             @foreach($locations as $location)
                                     <li><a href="{{ url("devices/location=" . urlencode($location)) }}"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> {{ $location }}</a></li>
                             @endforeach
@@ -364,13 +365,14 @@
                         <li><a href="{{ url('authlog') }}"><i class="fa fa-shield fa-fw fa-lg" aria-hidden="true"></i> Auth History</a></li>
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
-                            <a href="#"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
+                            <a href="{{ url('pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Pollers')</a>
                             <ul class="dropdown-menu scrollable-menu">
-                                <li><a href="{{ url('poll-log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>
-                                <li><a href="{{ url('pollers/tab=pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>
+                                <li><a href="{{ url('pollers/tab=pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Pollers')</a></li>
                                 @config('distributed_poller')
-                                <li><a href="{{ url('pollers/tab=groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Poller Groups</a></li>
+                                <li><a href="{{ url('pollers/tab=groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
                                 @endconfig
+                                <li><a href="{{ url('pollers/tab=performance') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Performance')</a></li>
+                                <li><a href="{{ url('pollers/tab=log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> @lang('History')</a></li>
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
@@ -468,9 +470,6 @@
     devices.initialize();
     ports.initialize();
     bgp.initialize();
-    $('#gsearch').bind('typeahead:select', function(ev, suggestion) {
-        window.location.href = suggestion.url;
-    });
     $('#gsearch').typeahead({
             hint: true,
             highlight: true,
@@ -511,8 +510,12 @@
                 header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
                 suggestion: Handlebars.compile('<p><a href="@{{url}}"><small>@{{bgp_image}} @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
             }
+        }).on('typeahead:select', function (ev, suggestion) {
+            window.location.href = suggestion.url;
+        }).on('keyup', function (e) {
+            // on enter go to the first selection
+            if (e.which === 13) {
+                $('.tt-selectable').first().click();
+            }
         });
-    $('#gsearch').bind('typeahead:open', function(ev, suggestion) {
-        $('#gsearch').addClass('search-box');
-    });
 </script>

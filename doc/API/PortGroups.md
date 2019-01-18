@@ -1,4 +1,5 @@
 source: API/PortGroups.md
+path: blob/master/doc/
 
 ### `get_graph_by_portgroup`
 

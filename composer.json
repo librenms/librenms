@@ -21,7 +21,6 @@
     ],
     "require": {
         "php": ">=5.6.4",
-        "ext-mysqlnd": "*",
         "ext-pdo": "*",
         "ext-pcre": "*",
         "ext-curl": "*",
@@ -48,18 +47,9 @@
         "laravel/laravel": "5.4.*",
         "oriceon/toastr-5-laravel": "dev-master",
         "wpb/string-blade-compiler": "3.4.x-dev",
-        "fico7489/laravel-pivot": "*",
+        "fico7489/laravel-pivot": "2.*",
         "fideloper/proxy": "^4.0",
-
-        "vlucas/phpdotenv": "2.4.0",
-        "doctrine/inflector": "1.1.*",
-        "symfony/event-dispatcher": "3.*",
-        "symfony/css-selector": "3.*",
-        "doctrine/instantiator": "1.0.*",
-        "phpdocumentor/reflection-docblock": "3.*",
-        "phpunit/php-token-stream": "1.*",
-        "myclabs/deep-copy": "1.7.*",
-        "nikic/php-parser": "v3.1.*"
+        "doctrine/dbal": "^2.5"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9.1",
@@ -74,15 +64,25 @@
     },
     "suggest": {
         "ext-memcached": "Required if you utilize distributed polling",
-        "ext-posix": "Allows for additional validation tests"
+        "ext-posix": "Allows for additional validation tests",
+        "ext-mysqlnd": "*"
     },
     "autoload": {
+        "exclude-from-classmap": [
+            "/vendor/laravel/laravel/database/"
+        ],
+        "classmap": [
+            "database"
+        ],
         "psr-4": {
             "App\\": "app",
             "LibreNMS\\": "LibreNMS",
             "LibreNMS\\Plugins\\" : "html/plugins",
             "LibreNMS\\Tests\\": "tests"
-        }
+        },
+        "files": [
+            "includes/helpers.php"
+        ]
     },
     "scripts": {
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",

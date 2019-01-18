@@ -95,7 +95,7 @@ if (str_contains(`tail config.php`, '?>')) {
 
 // Composer checks
 if (!file_exists('vendor/autoload.php')) {
-    print_fail('Composer has not been run, dependencies are missing', 'composer install --no-dev');
+    print_fail('Composer has not been run, dependencies are missing', './scripts/composer_wrapper.php install --no-dev');
     exit;
 }
 
@@ -126,7 +126,7 @@ if ($pre_checks_failed) {
     exit;
 }
 
-$init_modules = array('nodb');
+$init_modules = ['laravel'];
 require 'includes/init.php';
 
 // make sure install_dir is set correctly, or the next includes will fail
@@ -136,17 +136,11 @@ if (!file_exists(Config::get('install_dir').'/config.php')) {
     exit;
 }
 
-
-// Connect to MySQL
-\LibreNMS\DB\Eloquent::boot();
-
 if (\LibreNMS\DB\Eloquent::isConnected()) {
     $validator->ok('Database connection successful', null, 'database');
 } else {
     $validator->fail('Error connecting to your database.', null, 'database');
 }
-
-Config::load();
 
 $precheck_complete = true; // disable shutdown function
 print_header($validator->getVersions());

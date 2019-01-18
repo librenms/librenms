@@ -1,0 +1,279 @@
+{
+"applications": {
+    "discovery": {
+        "applications": [ {
+            "app_type": "fbsd-nfs-client",
+            "app_state": "UNKNOWN",
+            "discovered": "1",
+            "app_state_prev": null,
+            "app_status": "",
+            "app_instance": ""
+        } ],
+        "application_metrics": []
+    },
+    "poller": {
+        "applications": [ {
+            "app_type": "fbsd-nfs-client",
+            "app_state": "OK",
+            "discovered": "1",
+            "app_state_prev": "UNKNOWN",
+            "app_status": "",
+            "app_instance": ""
+        } ] ,
+        "application_metrics": [
+            {
+                "metric": "Access",
+                "value": "3466781",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "AccsHits",
+                "value": "185464479",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "AccsMisses",
+                "value": "3466788",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "AttrHits",
+                "value": "220102448",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "AttrMisses",
+                "value": "2766941",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "BioDHits",
+                "value": "307976",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "BioDMisses",
+                "value": "253474",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "BioRHits",
+                "value": "6732423",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "BioRLHits",
+                "value": "35758",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "BioRLMisses",
+                "value": "471",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "BioRMisses",
+                "value": "1089394",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "BioWHits",
+                "value": "2404874",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "BioWMisses",
+                "value": "586999",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Commit",
+                "value": "284630",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Create",
+                "value": "49839",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "DirEHits",
+                "value": "118413",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "DirEMisses",
+                "value": "41",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Fsinfo",
+                "value": "14",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Fsstat",
+                "value": "139608",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Getattr",
+                "value": "2766953",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Invalid",
+                "value": "393",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Link",
+                "value": "1638",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "LkupHits",
+                "value": "177587683",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "LkupMisses",
+                "value": "7633614",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Lookup",
+                "value": "7652459",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Mkdir",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Mknod",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "PathConf",
+                "value": "12",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "RdirPlus",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Read",
+                "value": "10126037",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Readdir",
+                "value": "289778",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Readlink",
+                "value": "471",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Remove",
+                "value": "40834",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Rename",
+                "value": "39039",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Requests",
+                "value": "25500410",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Retries",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Rmdir",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Setattr",
+                "value": "55235",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Symlink",
+                "value": "40",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "TimedOut",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "Write",
+                "value": "586992",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            },
+            {
+                "metric": "XReplies",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-client"
+            }
+        ]
+    }
+}
+}

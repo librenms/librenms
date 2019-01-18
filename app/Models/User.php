@@ -31,7 +31,7 @@ class User extends Authenticatable
      */
     public function hasGlobalRead()
     {
-        return $this->isAdmin() || $this->level == 5;
+        return $this->hasGlobalAdmin() || $this->level == 5;
     }
 
     /**

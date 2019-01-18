@@ -40,6 +40,6 @@ if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
 
 rrdtool_initialize();
 
-PingCheck::dispatch(new PingCheck($groups));
+PingCheck::dispatch($groups);
 
 rrdtool_close();

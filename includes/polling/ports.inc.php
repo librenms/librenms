@@ -220,6 +220,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 
         foreach ($polled_ports as $port_id => $port) {
             $ifIndex = $port['ifIndex'];
+            $port_stats[$ifIndex]['ifType'] = $port['ifType']; // we keep it as it is not included in $base_oids
 
             if (is_port_valid($port, $device)) {
                 if (!$walk_base) {
@@ -301,6 +302,10 @@ if ($device['os'] == 'cxr-ts') {
 
 if ($device['os'] == 'cmm') {
     require_once 'ports/cmm.inc.php';
+}
+
+if ($device['os'] == 'timos') {
+    require_once 'ports/timos.inc.php';
 }
 
 if ($config['enable_ports_adsl']) {
@@ -417,7 +422,7 @@ foreach ($port_stats as $ifIndex => $port) {
         d_echo(' valid');
 
         // Port newly discovered?
-        if (! $ports[$port_id]) {
+        if (!$port_id || empty($ports[$port_id])) {
             /**
               * When using the ifName or ifDescr as means to map discovered ports to
               * known ports in the DB (think of port association mode) it's possible
@@ -571,6 +576,11 @@ foreach ($ports as $port) {
             }
         }
 
+        // work around invalid values for ifHighSpeed (fortigate)
+        if ($this_port['ifHighSpeed'] == 4294901759) {
+            $this_port['ifHighSpeed'] = null;
+        }
+
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
             d_echo('ifHighSpeed ');
             $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
@@ -683,7 +693,7 @@ foreach ($ports as $port) {
                 }
             } else {
                 if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
-                    if ($port[$oid . '_prev'] != $this_port[$oid]) {
+                    if ($port[$oid.'_prev'] == null) {
                         $port['update'][$oid . '_prev'] = $this_port[$oid];
                     }
                 }

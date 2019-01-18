@@ -22,7 +22,7 @@
  * @copyright  2017 Simone Fini
  * @author     Simone Fini<tomfordfirst@gmail.com>
  */
-$oids = 'genGroupHWVersion.0 rndSerialNumber.0 rndApsoluteOSVersion.0 rdwrDevicePortsConfig.0';
+$oids = ['genGroupHWVersion.0', 'rndSerialNumber.0', 'rndApsoluteOSVersion.0', 'rdwrDevicePortsConfig.0'];
 $data = snmp_get_multi($device, $oids, '-OQs', 'RADWARE-MIB');
 $serial = trim($data[0]['rndSerialNumber'], '"');
 $version = trim($data[0]['rndApsoluteOSVersion'], '"');

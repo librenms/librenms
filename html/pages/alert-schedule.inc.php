@@ -43,7 +43,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                     <th data-column-id="end_recurring_hr">End recurring hr</th>
                     <th data-column-id="recurring_day" data-sortable="false" data-searchable="false">Recurring on days</th>
                     <th data-column-id="actions" data-sortable="false" data-searchable="false" data-formatter="commands">Actions</th>
-                    <th data-column-id="status" data-sortable="false" data-searchable="false" data-formatter="schedstatus">Status</th>
+                    <th data-column-id="status" data-searchable="false" data-formatter="schedstatus">Status</th>
                 </tr>
             </thead>
         </table>

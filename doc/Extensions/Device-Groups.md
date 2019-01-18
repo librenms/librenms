@@ -1,4 +1,5 @@
 source: Extensions/Device-Groups.md
+path: blob/master/doc/
 
 LibreNMS supports grouping your devices together in much the same way as you can configure alerts. This document will hopefully help you get started.
 

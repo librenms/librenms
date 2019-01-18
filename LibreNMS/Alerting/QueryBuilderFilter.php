@@ -110,7 +110,7 @@ class QueryBuilderFilter implements \JsonSerializable
 
                 $field = "$table.$column";
 
-                if (ends_with($column, ['_perc', '_current'])) {
+                if (ends_with($column, ['_perc', '_current', '_usage', '_perc_warn'])) {
                     $this->filter[$field] = [
                         'id' => $field,
                         'type' => 'string',
@@ -144,7 +144,8 @@ class QueryBuilderFilter implements \JsonSerializable
         if (starts_with($type, ['varchar', 'text', 'double', 'float'])) {
             return 'string';
         } elseif (starts_with($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'])) {
-            return 'integer';
+            //TODO implement field selection and change back to integer
+            return 'string';
         } elseif (starts_with($type, ['timestamp', 'datetime'])) {
             return 'datetime';
         } elseif (starts_with($type, 'enum')) {

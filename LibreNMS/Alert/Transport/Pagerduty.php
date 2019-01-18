@@ -21,6 +21,7 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
 use GuzzleHttp\Client;
@@ -55,7 +56,7 @@ class Pagerduty extends Transport
         // This code uses events for PD
         $protocol = array(
             'service_key' => $opts,
-            'incident_key' => ($obj['id'] ? $obj['id'] : $obj['uid']),
+            'incident_key' => $obj['alert_id'],
             'description' => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
             'client' => 'LibreNMS',
         );
@@ -88,11 +89,12 @@ class Pagerduty extends Transport
         $data = [
             'routing_key'  => $config['service_key'],
             'event_action' => $obj['event_type'],
-            'dedup_key'    => $obj['uid'],
+            'dedup_key'    => $obj['alert_id'],
             'payload'    => [
-                'summary'  => implode(PHP_EOL, array_column($obj['faults'], 'string')) ?: 'Test',
+                'custom_details'  => substr(implode(PHP_EOL, array_column($obj['faults'], 'string')), 0, 1020) . '....' ?: 'Test',
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
+                'summary'  => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
             ],
         ];
 

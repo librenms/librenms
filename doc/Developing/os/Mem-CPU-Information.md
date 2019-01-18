@@ -1,4 +1,5 @@
 source: Developing/os/Mem-CPU-Information.md
+path: blob/master/doc/
 
 This document will guide you through adding detection for Memory / Processor for your new device.
 

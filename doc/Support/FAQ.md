@@ -1,4 +1,5 @@
 source: Support/FAQ.md
+path: blob/master/doc/
 ### Getting started
  - [How do I install LibreNMS?](#faq1)
  - [How do I add a device?](#faq2)
@@ -7,6 +8,7 @@ source: Support/FAQ.md
  - [Do you have a demo available?](#faq5)
 
 ### Support
+ - [How does LibreNMS use MIBs?](#how-does-librenms-use-mibs)
  - [Why do I get blank pages sometimes in the WebUI?](#faq6)
  - [Why do I not see any graphs?](#faq10)
  - [How do I debug pages not loading correctly?](#faq7)
@@ -33,6 +35,7 @@ source: Support/FAQ.md
  - [How do I change the Device Type?](#faq33)
  - [Where do I update my database credentials?](#faq-where-do-i-update-my-database-credentials)
  - [My reverse proxy is not working](#my-reverse-proxy-is-not-working)
+ - [My alerts aren't being delivered on time](#my-alerts-aren't-being-delivered-on-time)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -77,6 +80,9 @@ However we will always aim to help wherever possible so if you are running a dis
 #### <a name="faq5"> Do you have a demo available?</a>
 
 We do indeed, you can find access to the demo [here](https://demo.librenms.org)
+
+### <a name='how-does-librenms-use-mibs'>How does LibreNMS use MIBs?</a>
+LibreNMS does not parse MIBs to discover sensors for devices.  LibreNMS uses static discovery definitions written in YAML or PHP.  Therefore, updating a MIB alone will not improve OS support, the definitions must be updated.  LibreNMS only uses MIBs to make OIDs easier to read.
 
 #### <a name="faq6"> Why do I get blank pages sometimes in the WebUI?</a>
 
@@ -346,10 +352,10 @@ Configs can often contain sensitive data. Because of that only global admins can
 Demo users allow full access except adding/editing users and deleting devices and can't change passwords.
 
 ### <a name="faq31"> Why does modifying 'Default Alert Template' fail?</a>
-This template's entry could be missing in the database. Please run:
+This template's entry could be missing in the database. Please run this from the LibreNMS directory:
 
 ```bash
-mysql -u librenms -p < sql-schema/202.sql
+php artisan db:seed --class=DefaultAlertTemplateSeeder
 ```
 ### <a name="faq32"> Why would alert un-mute itself?</a> 
 If alert un-mutes itself then it most likely means that the alert cleared and is then triggered again.
@@ -380,9 +386,15 @@ DB_PASSWORD=
 DB_PORT=
 ```
 
-### My reverse proxy is not working
+### <a name='my-reverse-proxy-is-not-working'>My reverse proxy is not working</a>
 
 Make sure your proxy is passing the proper variables.
 At a minimum: X-Forwarded-For and X-Forwarded-Proto (X-Forwarded-Port if needed)
 
 You also need to [Set the proxy or proxies as trusted](../Support/Environment-Variables.md#trusted-reverse-proxies)
+
+If you are using a subdirectory on the reverse proxy and not on the actual web server,
+you may need to set [APP_URL](../Support/Environment-Variables.md#base-url) and `$config['base_url']`.
+
+### <a name='my-alerts-aren't-being-delivered-on-time'>My alerts aren't being delivered on time</a>
+If you're running MySQL/MariaDB on a separate machine or container make sure the timezone is set properly on both the LibreNMS **and**  MySQL/MariaDB instance. Alerts will be delivered according to MySQL/MariaDB's time, so a mismatch between the two can cause alerts to be delivered late if LibreNMS is on a timezone later than MySQL/MariaDB.

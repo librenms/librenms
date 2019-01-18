@@ -2,7 +2,7 @@
 /**
  * netagent2.inc.php
  *
- * LibreNMS os polling module for Megatec
+ * LibreNMS os polling module for Megatec NetAgent II and NetAgent Mini
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,10 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2018 Mikael Sipilainen
+ * @author     Mikael Sipilainen <mikael.sipilainen@gmail.com>
  */
 
-// NET Agent II
-
-$version  = snmp_get($device, '.1.3.6.1.2.1.33.1.1.4.0', '-OQv');
-$hardware = $device['sysDescr'];
+$oid = snmp_get_multi($device, ['.1.3.6.1.2.1.33.1.1.4.0', '.1.3.6.1.2.1.33.1.1.1.0'], '-OQU');
+$version  = $oid[0]['.1.3.6.1.2.1.33.1.1.4.0'];
+$hardware = $oid[0]['.1.3.6.1.2.1.33.1.1.1.0'];

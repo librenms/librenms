@@ -88,7 +88,11 @@ foreach ($validator->getAllResults() as $group => $results) {
         if ($result->hasFix() || $result->hasList()) {
             echo '<div class="panel-body">';
             if ($result->hasFix()) {
-                echo 'Fix: <code>' . linkify($result->getFix()) . '</code>';
+                echo 'Fix: <code>';
+                foreach ((array)$result->getFix() as $fix) {
+                    echo '<br />' . linkify($fix) . PHP_EOL;
+                }
+                echo '</code>';
                 if ($result->hasList()) {
                     echo '<br /><br />';
                 }

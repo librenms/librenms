@@ -62,7 +62,7 @@
                                                                     "$ref": "#/definitions/comparison"
                                                                 },
                                                                 "value": {
-                                                                    "type": "integer"
+                                                                    "type": ["integer", "string"]
                                                                 }
                                                             },
                                                             "additionalProperties": false,
@@ -81,7 +81,10 @@
                                         "type": "string"
                                     },
                                     "snmp_flags": {
-                                        "type": "string"
+                                        "type": [
+                                            "string",
+                                            "array"
+                                        ]
                                     }
                                 },
                                 "additionalProperties": false,
@@ -114,9 +117,30 @@
                                             "value": {
                                                 "type": "string"
                                             },
+                                            "group": {
+                                                "type": "string"
+                                            },
+                                            "low_limit": {
+                                                "type": ["number", "string"]
+                                            },
+                                            "low_warn_limit": {
+                                                "type": ["number", "string"]
+                                            },
+                                            "warn_limit": {
+                                                "type": ["number", "string"]
+                                            },
+                                            "high_limit": {
+                                                "type": ["number", "string"]
+                                            },
+                                            "skip_value_lt": {
+                                                "type": "number"
+                                            },
+                                            "skip_value_gt": {
+                                                "type": "number"
+                                            },
                                             "num_oid": {
                                                 "type": "string",
-                                                "pattern": "^(\\.\\d+)+\\.?$"
+                                                "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
                                             },
                                             "descr": {
                                                 "type": "string"
@@ -174,7 +198,7 @@
                                                                     "$ref": "#/definitions/comparison"
                                                                 },
                                                                 "value": {
-                                                                    "type": "integer"
+                                                                    "type": ["integer", "string"]
                                                                 }
                                                             },
                                                             "required": [
@@ -187,9 +211,13 @@
                                                 ]
                                             },
                                             "snmp_flags": {
-                                                "type": "string"
+                                                "type": [
+                                                    "string",
+                                                    "array"
+                                                ]
                                             }
                                         },
+                                        "additionalProperties": false,
                                         "required": [
                                             "descr",
                                             "num_oid",
@@ -286,7 +314,7 @@
                     },
                     "num_oid": {
                         "type": "string",
-                        "pattern": "^(\\.\\d+)+\\.?$"
+                        "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
                     },
                     "index": {
                         "type": ["integer", "string"]
@@ -297,8 +325,32 @@
                     "divisor": {
                         "type": "integer"
                     },
+                    "multiplier": {
+                        "type": "integer"
+                    },
                     "value": {
                         "type": "string"
+                    },
+                    "group": {
+                        "type": "string"
+                    },
+                    "low_limit": {
+                        "type": ["number", "string"]
+                    },
+                    "low_warn_limit": {
+                        "type": ["number", "string"]
+                    },
+                    "warn_limit": {
+                        "type": ["number", "string"]
+                    },
+                    "high_limit": {
+                        "type": ["number", "string"]
+                    },
+                    "skip_value_lt": {
+                        "type": "number"
+                    },
+                    "skip_value_gt": {
+                        "type": "number"
                     },
                     "skip_values": {
                         "type": ["number", "array"],
@@ -312,7 +364,7 @@
                                     "$ref": "#/definitions/comparison"
                                 },
                                 "value": {
-                                    "type": "integer"
+                                    "type": ["integer", "string"]
                                 }
                             },
                             "additionalProperties": false,
@@ -324,15 +376,22 @@
                         }
                     },
                     "snmp_flags": {
-                        "type": "string"
+                        "type": [
+                            "string",
+                            "array"
+                        ]
                     },
                     "entPhysicalIndex": {
                         "type": "string"
                     },
                     "entPhysicalIndex_measured": {
                         "type": "string"
+                    },
+                    "user_func": {
+                        "type": "string"
                     }
                 },
+                "additionalProperties": false,
                 "required": [
                     "descr",
                     "num_oid",
