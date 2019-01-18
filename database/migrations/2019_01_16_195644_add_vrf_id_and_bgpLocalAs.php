@@ -14,7 +14,7 @@ class AddVrfIdAndBgpLocalAs extends Migration
     public function up()
     {
         Schema::table('bgpPeers', function (Blueprint $table) {
-            $table->integer('vrf_id')->after('device_id');
+            $table->integer('vrf_id')->nullable()->after('device_id');
         });
         Schema::table('vrfs', function (Blueprint $table) {
             $table->unsignedInteger('bgpLocalAs')->nullable()->after('vrf_name');
