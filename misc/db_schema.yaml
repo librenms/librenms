@@ -188,7 +188,7 @@ bgpPeers:
   Columns:
     - { Field: bgpPeer_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-    - { Field: vrf_id, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: vrf_id, Type: int(11), 'Null': false, Extra: '' }
     - { Field: astext, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: bgpPeerIdentifier, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerRemoteAs, Type: bigint(20), 'Null': false, Extra: '' }
@@ -850,6 +850,13 @@ mibdefs:
     - { Field: last_modified, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [module, mib, object_type], Unique: true, Type: BTREE }
+migrations:
+  Columns:
+    - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: migration, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: batch, Type: int(11), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 munin_plugins:
   Columns:
     - { Field: mplug_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
