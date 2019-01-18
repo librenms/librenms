@@ -21,6 +21,8 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
+use LibreNMS\Util\IPv4;
+use LibreNMS\Util\IPv6;
 use LibreNMS\Util\MemcacheLock;
 use Symfony\Component\Process\Process;
 
@@ -553,13 +555,10 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     } else {
         $ip = $host;
     }
-    if ($force_add !== true && $port_id = ip_exists($ip)) {
-        $hostname = \App\Models\Device::query()->whereHas('ports', function ($query) use ($port_id) {
-            $query->where('port_id', $port_id);
-        })->value('hostname');
+    if ($force_add !== true && $device = device_has_ip($ip)) {
         $message = "Cannot add $host, already have device with this IP $ip";
-        if ($ip != $hostname) {
-            $message .= " ($hostname)";
+        if ($ip != $device->hostname) {
+            $message .= " ($device->hostname)";
         }
         $message .= '. You may force add to ignore this.';
         throw new HostIpExistsException($message);
@@ -1457,17 +1456,31 @@ function fix_integer_value($value)
     return $return;
 }
 
-function ip_exists($ip)
+/**
+ * Find a device that has this IP. Checks ipv4_addresses and ipv6_addresses tables.
+ *
+ * @param string $ip
+ * @return \App\Models\Device|false
+ */
+function device_has_ip($ip)
 {
-    // Function to check if an IP exists in the DB already
-    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-        return dbFetchCell("SELECT `port_id` FROM `ipv6_addresses` WHERE `ipv6_address` = ? OR `ipv6_compressed` = ?", array($ip, $ip));
-    } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
-        return dbFetchCell("SELECT `port_id` FROM `ipv4_addresses` WHERE `ipv4_address` = ?", array($ip));
+    if (IPv6::isValid($ip)) {
+        $ip_address = \App\Models\Ipv6Address::query()
+            ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
+            ->with('port.device')
+            ->first();
+    } elseif (IPv4::isValid($ip)) {
+        $ip_address = \App\Models\Ipv4Address::query()
+            ->where('ipv4_address', $ip)
+            ->with('port.device')
+            ->first();
     }
 
-    // not an ipv4 or ipv6 address...
-    return false;
+    if (isset($ip_address) && $ip_address->port) {
+        return $ip_address->port->device;
+    }
+
+    return false; // not an ipv4 or ipv6 address...
 }
 
 /**
