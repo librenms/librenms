@@ -51,7 +51,7 @@ class Database extends BaseValidation
         if ($current === 0 || $current === $latest) {
             \Artisan::call('migrate', ['--pretend' => true, '--force' => true]);
             if (\Artisan::output() !== "Nothing to migrate.\n") {
-                $validator->fail("Your database is out of date!", './librenms migrate');
+                $validator->fail("Your database is out of date!", './lnms migrate');
                 return;
             }
         } elseif ($current < $latest) {
