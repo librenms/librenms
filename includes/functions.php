@@ -553,8 +553,16 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     } else {
         $ip = $host;
     }
-    if ($force_add !== true && ip_exists($ip)) {
-        throw new HostIpExistsException("Already have host with this IP $host");
+    if ($force_add !== true && $port_id = ip_exists($ip)) {
+        $hostname = \App\Models\Device::query()->whereHas('ports', function ($query) use ($port_id) {
+            $query->where('port_id', $port_id);
+        })->value('hostname');
+        $message = "Cannot add $host, already have device with this IP $ip";
+        if ($ip != $hostname) {
+            $message .= " ($hostname)";
+        }
+        $message .= '. You may force add to ignore this.';
+        throw new HostIpExistsException($message);
     }
 
     // Test reachability
@@ -1453,11 +1461,9 @@ function ip_exists($ip)
 {
     // Function to check if an IP exists in the DB already
     if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-        $dbresult = dbFetchRow("SELECT `ipv6_address_id` FROM `ipv6_addresses` WHERE `ipv6_address` = ? OR `ipv6_compressed` = ?", array($ip, $ip));
-        return !empty($dbresult);
+        return dbFetchCell("SELECT `port_id` FROM `ipv6_addresses` WHERE `ipv6_address` = ? OR `ipv6_compressed` = ?", array($ip, $ip));
     } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
-        $dbresult = dbFetchRow("SELECT `ipv4_address_id` FROM `ipv4_addresses` WHERE `ipv4_address` = ?", array($ip));
-        return !empty($dbresult);
+        return dbFetchCell("SELECT `port_id` FROM `ipv4_addresses` WHERE `ipv4_address` = ?", array($ip));
     }
 
     // not an ipv4 or ipv6 address...
