@@ -8,6 +8,22 @@ $link_array = [
     'tab' => 'nac',
 ];
 $pagetitle[] = 'NAC';
+
+//manage the column visibility depending on OS
+$vlan_visibility = ' data-visible="false"';
+$t_elapsed_visibility = ' data-visible="false"';
+$t_left_visibility = ' data-visible="false"';
+$timeout_visibility = ' data-visible="false"';
+$mode_visibility = ' data-visible="false"';
+if ($device['os'] === 'vrp') {
+    $vlan_visibility = '';
+    $t_elapsed_visibility = '';
+} else {
+    $t_left_visibility = '';
+    $timeout_visibility = '';
+    $mode_visibility = '';
+}
+
 ?>
 <br/>
 <div class="container-fluid">
@@ -22,12 +38,14 @@ $pagetitle[] = 'NAC';
                     <th data-column-id="port_id">Port</th>
                     <th data-column-id="mac_address">MAC Address</th>
                     <th data-column-id="ip_address">IP Address</th>
+                    <th data-column-id="vlan"<?php echo $vlan_visibility ?>>Vlan</th>
                     <th data-column-id="domain" data-formatter="nac_domain">Domain</th>
-                    <th data-column-id="host_mode" data-formatter="nac_mode">Mode</th>
+                    <th data-column-id="host_mode"<?php echo $mode_visibility ?>data-formatter="nac_mode">Mode</th>
                     <th data-column-id="username">Username</th>
                     <th data-column-id="authz_by" data-visible="false">Auth By</th>
-                    <th data-column-id="timeout">Timeout</th>
-                    <th data-column-id="time_left">Time Left</th>
+                    <th data-column-id="timeout"<?php echo $timeout_visibility ?>>Timeout</th>
+                    <th data-column-id="time_elapsed"<?php echo $t_elapsed_visibility ?> data-formatter="time_interval">Time Elapsed</th>
+                    <th data-column-id="time_left"<?php echo $t_left_visibility ?> data-formatter="time_interval">Time Left</th>
                     <th data-column-id="authc_status" data-formatter="nac_authc">AuthC</th>
                     <th data-column-id="authz_status" data-formatter="nac_authz">AuthZ</th>
                     <th data-column-id="method" data-formatter="nac_method">Method</th>
@@ -49,10 +67,15 @@ $pagetitle[] = 'NAC';
             };
         },
         formatters: {
+            "time_interval": function (column, row) {
+                var value = row[column.id];
+                return moment.duration(Number(value), 's').humanize();
+            },
             "nac_authz": function (column, row) {
                 var value = row[column.id];
 
-                if (value === 'authorizationSuccess') {
+                if (value === 'authorizationSuccess' || value === 'sussess') { 
+                    //typo in huawei MIB so we must keep sussess
                     return "<i class=\"fa fa-check-circle fa-lg icon-theme\"  aria-hidden=\"true\" style=\"color:green;\"></i>";
                 } else if (value === 'authorizationFailed') {
                     return "<i class=\"fa fa-times-circle fa-lg icon-theme\" aria-hidden=\"true\" style=\"color:red;\"></i>";
