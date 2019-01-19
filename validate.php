@@ -66,7 +66,7 @@ register_shutdown_function(function () {
 
     if (!$precheck_complete) {
         // use this in case composer autoloader isn't available
-        spl_autoload_register(function($class) {
+        spl_autoload_register(function ($class) {
             include str_replace('\\', '/', $class) . '.php';
         });
         print_header(version_info());
