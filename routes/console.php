@@ -83,7 +83,8 @@ Artisan::command('device:add
     if (!in_array($this->option('transport'), ['udp', 'udp6', 'tcp', 'tcp6'])) {
         $this->error(__('Invalid SNMP transport'));
     }
-    if (!is_int($this->option('port'))) {
+    $port = (int)$this->option('port');
+    if ($port < 1 || $port > 65535) {
         $this->error(__('Port should be 1-65535'));
     }
 
@@ -135,18 +136,20 @@ Artisan::command('device:add
         $command[] = $this->option('port');
         $command[] = $this->option('transport');
     }
+
+    $version = $this->hasOption('v3') ? 'v3' : ($this->hasOption('v1') ? 'v1' : 'v2c');
     $additional = [];
 
     try {
         $init_modules = [];
         include(base_path('includes/init.php'));
         $device_id = addHost(
-            $this->option('hostname'),
-            $this->option('hostname'),
+            $this->argument('hostname'),
+            $version,
             $this->option('port'),
             $this->option('transport'),
             $this->option('group'),
-            $this->hasOption('force'),
+            $this->option('force'),
             $this->option('port-association-mode'),
             $additional
         );
