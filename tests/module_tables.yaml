@@ -13,9 +13,10 @@ arp-table:
         order_by: ipv4_mac.context_name, ipv4_mac.ipv4_address, ipv4_mac.mac_address
 bgp-peers:
     bgpPeers:
-        excluded_fields: [device_id, bgpPeer_id]
+        excluded_fields: [device_id, bgpPeer_id, vrf_id]
         joins:
-        - { left: bgpPeers.device_id, right: devices.device_id, select: [bgpLocalAs] }
+        - { left: bgpPeers.device_id, right: devices.device_id, select: [devices.bgpLocalAs] }
+        - { left: bgpPeers.vrf_id, right: vrfs.vrf_id, select: [vrfs.bgpLocalAs as vrfLocalAs] }
     bgpPeers_cbgp:
         excluded_fields: [device_id]
 fdb-table:
