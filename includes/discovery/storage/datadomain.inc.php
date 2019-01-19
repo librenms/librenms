@@ -8,7 +8,7 @@
 
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 ACL
+ * @copyright  2019 ACL
  * @author     Abel Laura <abel.laura@gmail.com>
 */
 
@@ -22,6 +22,9 @@ if (is_array($ddos_storage)) {
         $total = $storage['fileSystemSpaceSize'] * $units;
         $used = $storage['fileSystemSpaceUsed'] * $units;
         if ($descr == "/data: post-comp") {
+            if (is_null($index)) {
+                $index=$tmp_index;
+            }
             discover_storage($valid_storage, $device, $index, $fstype, 'datadomain', $descr, $total, $units, $used);
         }
     }
