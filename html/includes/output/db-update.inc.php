@@ -57,18 +57,12 @@ $db_vars = array(
 ]);
 
 
-echo "Starting Update...\n";
-$ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true , '--database' => 'setup']);
+\Artisan::call('migrate', ['--seed' => true, '--force' => true , '--database' => 'setup']);
 $fp = \Artisan::output();
+echo "Starting Update...\n";
 
 if ($fp) {
     echo $fp;
-}
-
-if ($ret == 0) {
-    echo "\nSuccess!";
-} else {
-    echo "\nError";
 }
 
 ob_end_flush();
