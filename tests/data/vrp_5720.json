@@ -14149,7 +14149,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65000
+                    "bgpLocalAs": 65000,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -14167,7 +14168,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65000
+                    "bgpLocalAs": 65000,
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": []
@@ -14190,7 +14192,8 @@
                     "bgpPeerFsmEstablishedTime": 281173,
                     "bgpPeerInUpdateElapsedTime": 281173,
                     "context_name": "",
-                    "bgpLocalAs": 65000
+                    "bgpLocalAs": 65000,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -14208,7 +14211,8 @@
                     "bgpPeerFsmEstablishedTime": 281206,
                     "bgpPeerInUpdateElapsedTime": 281206,
                     "context_name": "",
-                    "bgpLocalAs": 65000
+                    "bgpLocalAs": 65000,
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": []

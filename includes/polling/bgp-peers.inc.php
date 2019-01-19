@@ -5,13 +5,15 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 
 if ($config['enable_bgp']) {
-    $peers = dbFetchRows('SELECT * FROM bgpPeers WHERE device_id = ?', array($device['device_id']));
+    $peers = dbFetchRows('SELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', array($device['device_id']));
 
     if (!empty($peers)) {
         if ($device['os'] == 'junos') {
             $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
         } elseif ($device['os_group'] === 'arista') {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', array(), 'ARISTA-BGP4V2-MIB');
+        } elseif ($device['os'] === 'timos') {
+            $peer_data_check = snmpwalk_cache_multi_oid($device, 'tBgpInstanceRowStatus', [], 'TIMETRA-BGP-MIB', 'nokia');
         } else {
             $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', array(), 'CISCO-BGP4-MIB');
         }
@@ -19,6 +21,8 @@ if ($config['enable_bgp']) {
         foreach ($peers as $peer) {
             //add context if exist
             $device['context_name'] = $peer['context_name'];
+            $vrfOid = $peer['vrf_oid'];
+            $vrfId = $peer['vrf_id'];
 
             try {
                 $peer_ip = IP::parse($peer['bgpPeerIdentifier']);
@@ -76,6 +80,34 @@ if ($config['enable_bgp']) {
                             $peer_data['bgpLocalAddr'] = '';
                         }
                         d_echo("State = {$peer_data['bgpPeerState']} - AdminStatus: {$peer_data['bgpPeerAdminStatus']}\n");
+                    } elseif ($device['os'] == 'timos') {
+                        if (!isset($bgpPeers)) {
+                            echo "\nCaching Oids...";
+                            $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
+                            $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgOperEntry', $bgpPeersCache, 'TIMETRA-BGP-MIB', 'nokia');
+                            foreach ($bgpPeersCache as $key => $value) {
+                                $oid = explode(".", $key);
+                                $vrfInstance = $oid[0];
+                                $address = str_replace($oid[0].".".$oid[1].".", '', $key);
+                                if (strlen($address) > 15) {
+                                    $address = IP::fromHexString($address)->compressed();
+                                }
+                                $bgpPeers[$vrfInstance][$address] = $value;
+                            }
+                        }
+                        $address = (string)$peer_ip;
+                        $tmpTime = $bgpPeers[$vrfOid][$address]['tBgpPeerNgLastChanged'];
+                        $tmpTime = explode(".", $tmpTime);
+                        $tmpTime = explode(":", $tmpTime[0]);
+                        $establishedTime = ($tmpTime[0] * 86400) + ($tmpTime[1] * 3600) + ($tmpTime[2] * 60) + $tmpTime[3];
+
+                        $peer_data = [];
+                        $peer_data['bgpPeerState'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgConnState'];
+                        $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperLastEvent']; // not exactly the same
+                        $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsRcvd'];  // That are actually only octets available,
+                        $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsSent']; // not messages
+                        $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
+                        // ToDo, It seems that bgpPeer(In|Out)Updates, bgpPeerInUpdateElapsedTime and  bgpLocalAddr are actually not available over SNMP
                     } else {
                         $bgp_peer_ident = $peer_ip->toSnmpIndex();
 
@@ -217,7 +249,11 @@ if ($config['enable_bgp']) {
             unset($peer_data);
 
             if ($peer['update']) {
-                dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
+                if ($vrfId) {
+                    dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ? AND `vrf_id` = ?', array($device['device_id'], $peer['bgpPeerIdentifier'], $vrfId));
+                } else {
+                    dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
+                }
             }
 
             // --- Populate cbgp data ---

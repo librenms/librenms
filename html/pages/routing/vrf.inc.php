@@ -69,7 +69,7 @@ if (!LegacyAuth::user()->hasGlobalRead()) {
         // That's heavier on RAM, but much faster on CPU (1:40)
         // Specifying the fields reduces a lot the RAM used (1:4) .
         $vrf_fields  = 'vrf_id, mplsVpnVrfRouteDistinguisher, mplsVpnVrfDescription, vrf_name';
-        $dev_fields  = 'D.device_id as device_id, hostname, os, hardware, version, features, location, status, `ignore`, disabled';
+        $dev_fields  = 'D.device_id as device_id, hostname, os, hardware, version, features, location_id, status, `ignore`, disabled';
         $port_fields = 'port_id, ifvrf, device_id, ifDescr, ifAlias, ifName';
 
         foreach (dbFetchRows("SELECT $vrf_fields, $dev_fields FROM `vrfs` AS V, `devices` AS D WHERE D.device_id = V.device_id") as $vrf_device) {
