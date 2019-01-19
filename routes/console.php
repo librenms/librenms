@@ -281,7 +281,7 @@ Artisan::command('poller:billing-calculate
 })->describe(__('Run billing calculations'));
 
 Artisan::command('scan
-    {network?* : ' . __('Network(s) to scan, can be ommited if \'nets\' config is set') . '}
+    {network?* : ' . __('CIDR notation network(s) to scan, can be ommited if \'nets\' config is set') . '}
     {--P|ping-only : ' . __('Add the device as a ping only device if it replies to ping but not SNMP') . '}
     {--t|threads=32 : ' . __('How many IPs to scan at a time, more will increase the scan speed, but could overload your system') . '}
     {--l|legend : ' . __('Print the legend') . '}
@@ -319,8 +319,4 @@ Artisan::command('scan
     $command = array_merge($command, $this->argument('network'));
 
     (new Process($command))->setTty(true)->run();
-})->describe(__('Scan the network for hosts and try to add them to LibreNMS
-CIDR noted IP-Range can be specified multiple times
-                 Example: 192.168.0.0/24
-                 Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
-                 Example: 192.168.0.1/32 will be treated as a single host address'));
+})->describe(__('Scan the network for hosts and try to add them to LibreNMS'));
