@@ -61,6 +61,7 @@ $config['poller_modules']['hr-mib']                      = true;
 $config['poller_modules']['ucd-mib']                     = true;
 $config['poller_modules']['ipSystemStats']               = true;
 $config['poller_modules']['ports']                       = true;
+$config['poller_modules']['nac']                         = false;
 $config['poller_modules']['bgp-peers']                   = true;
 $config['poller_modules']['junose-atm-vp']               = false;
 $config['poller_modules']['toner']                       = false;
@@ -134,6 +135,8 @@ $config['os']['linux']['poller_modules']['unix-agent'] = true;
 `ipSystemStats`: IP statistics for device.
 
 `ports`: This module will detect all ports on a device excluding ones configured to be ignored by config options.
+
+`nac`: Network Access Control (NAC) or 802.1X support.
 
 `bgp-peers`: BGP detection and support.
 
