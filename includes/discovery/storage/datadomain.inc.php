@@ -14,7 +14,7 @@
 
 $ddos_storage = snmpwalk_cache_oid($device, 'fileSystemSpaceTable', null, 'DATA-DOMAIN-MIB', 'datadomain');
 if (is_array($ddos_storage)) {
-    foreach ($ddos_storage as $tmp_index => $storage) {
+    foreach ($ddos_storage as $index => $storage) {
         $index = $storage['fileSystemResourceIndex'];
         $fstype = $storage['fileSystemResourceTier'];
         $descr = $storage['fileSystemResourceName'];
@@ -22,9 +22,6 @@ if (is_array($ddos_storage)) {
         $total = $storage['fileSystemSpaceSize'] * $units;
         $used = $storage['fileSystemSpaceUsed'] * $units;
         if ($descr == "/data: post-comp") {
-            if (is_null($index)) {
-                $index=$tmp_index;
-            }
             discover_storage($valid_storage, $device, $index, $fstype, 'datadomain', $descr, $total, $units, $used);
         }
     }
