@@ -14,7 +14,7 @@
 
 $ddos_storage = snmpwalk_cache_oid($device, 'fileSystemSpaceTable', null, 'DATA-DOMAIN-MIB', 'datadomain');
 if (is_array($ddos_storage)) {
-    foreach ($ddos_storage as $storage) {
+    foreach ($ddos_storage as $tmp_index => $storage) {
         $index = $storage['fileSystemResourceIndex'];
         $fstype = $storage['fileSystemResourceTier'];
         $descr = $storage['fileSystemResourceName'];
