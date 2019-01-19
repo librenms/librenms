@@ -507,6 +507,8 @@ Specify the location of the collectd unix socket. Using a socket allows the coll
 
 ### Location mapping
 
+If you just want to set GPS coordinates on a location, you should visit Devices > Geo Locations > All Locations and edit the coordinates there.
+
 Exact Matching:
 ```php
 $config['location_map']['Under the Sink'] = "Under The Sink, The Office, London, UK";
