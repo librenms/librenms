@@ -2545,6 +2545,8 @@
                     "method": "other",
                     "timeout": "4",
                     "time_left": "32",
+                    "vlan": 0,
+                    "time_elapsed": null,
                     "ifIndex": 10001
                 },
                 {
@@ -2560,6 +2562,8 @@
                     "method": "other",
                     "timeout": "0",
                     "time_left": "43",
+                    "vlan": 0,
+                    "time_elapsed": null,
                     "ifIndex": 10001
                 },
                 {
@@ -2575,6 +2579,8 @@
                     "method": "dot1x",
                     "timeout": "4",
                     "time_left": "23",
+                    "vlan": 0,
+                    "time_elapsed": null,
                     "ifIndex": 10002
                 },
                 {
@@ -2590,6 +2596,8 @@
                     "method": "other",
                     "timeout": "6",
                     "time_left": "0",
+                    "vlan": 0,
+                    "time_elapsed": null,
                     "ifIndex": 10003
                 },
                 {
@@ -2605,6 +2613,8 @@
                     "method": "other",
                     "timeout": "5",
                     "time_left": "12",
+                    "vlan": 0,
+                    "time_elapsed": null,
                     "ifIndex": 10003
                 }
             ]
