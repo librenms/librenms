@@ -45,7 +45,8 @@ class FdbTablesController extends TableController
         return [
             'port_id' => 'nullable|integer',
             'device_id' => 'nullable|integer',
-            'serachby' => 'in:mac,vlan,dnsname,ip,description'
+            'serachby' => 'in:mac,vlan,dnsname,ip,description',
+            'dns' => 'nullable|in:true,false',
         ];
     }
 
@@ -239,12 +240,16 @@ class FdbTablesController extends TableController
                 ->pluck('ipv4_address');
 
             $dns = 'N/A';
-            // don't try too many dns queries, this is the slowest part
-            foreach ($ips->take(2) as $ip) {
-                $hostname = gethostbyaddr($ip);
-                if (!IP::isValid($hostname)) {
-                    $dns = $hostname;
-                    break;
+
+            // only fetch DNS if the column is visible
+            if (\Request::get('dns') == 'true') {
+                // don't try too many dns queries, this is the slowest part
+                foreach ($ips->take(3) as $ip) {
+                    $hostname = gethostbyaddr($ip);
+                    if (!IP::isValid($hostname)) {
+                        $dns = $hostname;
+                        break;
+                    }
                 }
             }
 

@@ -11,7 +11,7 @@
                 <th data-column-id="interface">Port</th>
                 <th data-column-id="vlan" data-width="60px">Vlan</th>
                 <th data-column-id="description">Description</th>
-                <th data-column-id="dnsname" data-sortable="false">DNS Name</th>
+                <th data-column-id="dnsname" data-sortable="false" data-visible="false">DNS Name</th>
             </tr>
         </thead>
     </table>
@@ -116,7 +116,8 @@ echo '"'.$vars['searchPhrase'].'"+';
         return {
             device_id: '<?php echo $vars['device_id']; ?>',
             searchby: '<?php echo $vars['searchby']; ?>',
-            searchPhrase: '<?php echo $vars['searchPhrase']; ?>'
+            searchPhrase: '<?php echo $vars['searchPhrase']; ?>',
+            dns: $("#fdb-search").bootgrid("getColumnSettings")[6].visible
         };
     },
     url: "ajax/table/fdb-tables"

@@ -8,7 +8,7 @@ $no_refresh = true;
             <th data-column-id="ipv4_address" data-sortable="false">IPv4 Address</th>
             <th data-column-id="interface">Port</th>
             <th data-column-id="vlan" data-width="60px">Vlan</th>
-            <th data-column-id="dnsname" data-sortable="false">DNS Name</th>
+            <th data-column-id="dnsname" data-sortable="false" data-visible="false">DNS Name</th>
         </tr>
     </thead>
 </table>
@@ -20,7 +20,8 @@ var grid = $("#port-fdb").bootgrid({
     post: function ()
     {
         return {
-            port_id: "<?php echo $port['port_id']; ?>"
+            port_id: "<?php echo $port['port_id']; ?>",
+            dns: $("#port-fdb").bootgrid("getColumnSettings")[4].visible
         };
     },
     url: "ajax/table/fdb-tables"
