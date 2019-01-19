@@ -18,7 +18,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -36,7 +37,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -54,7 +56,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -72,7 +75,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -90,7 +94,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -108,7 +113,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -126,7 +132,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -144,7 +151,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -162,7 +170,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -180,7 +189,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -198,7 +208,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -216,7 +227,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -234,7 +246,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -252,7 +265,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -270,7 +284,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -288,7 +303,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -306,7 +322,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -324,7 +341,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -342,7 +360,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -360,7 +379,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -378,7 +398,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -396,7 +417,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -414,7 +436,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -432,7 +455,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -450,7 +474,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -468,7 +493,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -486,7 +512,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -504,7 +531,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -522,7 +550,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -540,7 +569,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -558,7 +588,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -576,7 +607,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -594,7 +626,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -612,7 +645,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -1380,7 +1414,8 @@
                     "bgpPeerFsmEstablishedTime": 1308186,
                     "bgpPeerInUpdateElapsedTime": 14,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1398,7 +1433,8 @@
                     "bgpPeerFsmEstablishedTime": 1308119,
                     "bgpPeerInUpdateElapsedTime": 2933262,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1416,7 +1452,8 @@
                     "bgpPeerFsmEstablishedTime": 1308138,
                     "bgpPeerInUpdateElapsedTime": 12900159,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1434,7 +1471,8 @@
                     "bgpPeerFsmEstablishedTime": 1308162,
                     "bgpPeerInUpdateElapsedTime": 2933256,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1452,7 +1490,8 @@
                     "bgpPeerFsmEstablishedTime": 1308163,
                     "bgpPeerInUpdateElapsedTime": 12900159,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1470,7 +1509,8 @@
                     "bgpPeerFsmEstablishedTime": 9721188,
                     "bgpPeerInUpdateElapsedTime": 9721186,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1488,7 +1528,8 @@
                     "bgpPeerFsmEstablishedTime": 5917594,
                     "bgpPeerInUpdateElapsedTime": 5917591,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1506,7 +1547,8 @@
                     "bgpPeerFsmEstablishedTime": 3050652,
                     "bgpPeerInUpdateElapsedTime": 3050649,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1524,7 +1566,8 @@
                     "bgpPeerFsmEstablishedTime": 35789109,
                     "bgpPeerInUpdateElapsedTime": 35789107,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1542,7 +1585,8 @@
                     "bgpPeerFsmEstablishedTime": 35012857,
                     "bgpPeerInUpdateElapsedTime": 35012834,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1560,7 +1604,8 @@
                     "bgpPeerFsmEstablishedTime": 59346654,
                     "bgpPeerInUpdateElapsedTime": 73311,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1578,7 +1623,8 @@
                     "bgpPeerFsmEstablishedTime": 21542388,
                     "bgpPeerInUpdateElapsedTime": 21536506,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1596,7 +1642,8 @@
                     "bgpPeerFsmEstablishedTime": 20493157,
                     "bgpPeerInUpdateElapsedTime": 1307780,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1614,7 +1661,8 @@
                     "bgpPeerFsmEstablishedTime": 1423427,
                     "bgpPeerInUpdateElapsedTime": 2,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1632,7 +1680,8 @@
                     "bgpPeerFsmEstablishedTime": 2264958,
                     "bgpPeerInUpdateElapsedTime": 2264956,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1650,7 +1699,8 @@
                     "bgpPeerFsmEstablishedTime": 7976142,
                     "bgpPeerInUpdateElapsedTime": 7976139,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1668,7 +1718,8 @@
                     "bgpPeerFsmEstablishedTime": 1220645,
                     "bgpPeerInUpdateElapsedTime": 1220639,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1686,7 +1737,8 @@
                     "bgpPeerFsmEstablishedTime": 33584677,
                     "bgpPeerInUpdateElapsedTime": 1814,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1704,7 +1756,8 @@
                     "bgpPeerFsmEstablishedTime": 4410812,
                     "bgpPeerInUpdateElapsedTime": 4410807,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1722,7 +1775,8 @@
                     "bgpPeerFsmEstablishedTime": 30057244,
                     "bgpPeerInUpdateElapsedTime": 175341,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1740,7 +1794,8 @@
                     "bgpPeerFsmEstablishedTime": 2116848,
                     "bgpPeerInUpdateElapsedTime": 2116844,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1758,7 +1813,8 @@
                     "bgpPeerFsmEstablishedTime": 7976155,
                     "bgpPeerInUpdateElapsedTime": 7976152,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1776,7 +1832,8 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1794,7 +1851,8 @@
                     "bgpPeerFsmEstablishedTime": 19966196,
                     "bgpPeerInUpdateElapsedTime": 4288850,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1812,7 +1870,8 @@
                     "bgpPeerFsmEstablishedTime": 2659874,
                     "bgpPeerInUpdateElapsedTime": 1644752,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1830,7 +1889,8 @@
                     "bgpPeerFsmEstablishedTime": 59350192,
                     "bgpPeerInUpdateElapsedTime": 25567472,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1848,7 +1908,8 @@
                     "bgpPeerFsmEstablishedTime": 59350337,
                     "bgpPeerInUpdateElapsedTime": 19105427,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1866,7 +1927,8 @@
                     "bgpPeerFsmEstablishedTime": 1308161,
                     "bgpPeerInUpdateElapsedTime": 1,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1884,7 +1946,8 @@
                     "bgpPeerFsmEstablishedTime": 1424073,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1902,7 +1965,8 @@
                     "bgpPeerFsmEstablishedTime": 1308182,
                     "bgpPeerInUpdateElapsedTime": 24,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1920,7 +1984,8 @@
                     "bgpPeerFsmEstablishedTime": 1424064,
                     "bgpPeerInUpdateElapsedTime": 2,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1938,7 +2003,8 @@
                     "bgpPeerFsmEstablishedTime": 1423439,
                     "bgpPeerInUpdateElapsedTime": 470,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1956,7 +2022,8 @@
                     "bgpPeerFsmEstablishedTime": 59350165,
                     "bgpPeerInUpdateElapsedTime": 59348951,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -1974,7 +2041,8 @@
                     "bgpPeerFsmEstablishedTime": 59350183,
                     "bgpPeerInUpdateElapsedTime": 59348952,
                     "context_name": "",
-                    "bgpLocalAs": 65351
+                    "bgpLocalAs": 65351,
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [
