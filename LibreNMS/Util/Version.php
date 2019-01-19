@@ -56,11 +56,15 @@ class Version
     public function database()
     {
         if (Eloquent::isConnected()) {
-            $query = Eloquent::DB()->table('migrations');
-            return [
-                'last' => $query->orderBy('id', 'desc')->value('migration'),
-                'total' => $query->count(),
-            ];
+            try {
+                $query = Eloquent::DB()->table('migrations');
+                return [
+                    'last' => $query->orderBy('id', 'desc')->value('migration'),
+                    'total' => $query->count(),
+                ];
+            } catch (\Exception $e) {
+                return ['last' => 'No Schema', 'total' => 0];
+            }
         }
 
         return ['last' => 'Not Connected', 'total' => 0];
