@@ -1177,6 +1177,35 @@ function is_port_valid($port, $device)
     return true;
 }
 
+/**
+ * Try to fill in data for ifDescr, ifName, and ifAlias if devices do not provide them.
+ * Will not fill ifAlias if the user has overridden it
+ *
+ * @param array $port
+ * @param array $device
+ */
+function port_fill_missing(&$port, $device)
+{
+    // When devices do not provide data, populate with other data if available
+    if ($port['ifDescr'] == '' || $port['ifDescr'] == null) {
+        $port['ifDescr'] = $port['ifName'];
+        d_echo(' Using ifName as ifDescr');
+    }
+    if (!empty($device['attribs']['ifName:' . $port['ifName']])) {
+        // ifAlias overridden by user, don't update it
+        unset($port['ifAlias']);
+        d_echo(' ifAlias overriden by user');
+    } elseif ($port['ifAlias'] == '' || $port['ifAlias'] == null) {
+        $port['ifAlias'] = $port['ifDescr'];
+        d_echo(' Using ifDescr as ifAlias');
+    }
+
+    if ($port['ifName'] == '' || $port['ifName'] == null) {
+        $port['ifName'] = $port['ifDescr'];
+        d_echo(' Using ifDescr as ifName');
+    }
+}
+
 function scan_new_plugins()
 {
 
