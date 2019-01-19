@@ -35,20 +35,20 @@ if ($device['os'] === 'vrp') {
             <table id="nac-grid" data-toggle="bootgrid" class="table table-condensed table-responsive table-striped">
                 <thead>
                 <tr>
-                    <th data-column-id="port_id">Port</th>
-                    <th data-column-id="mac_address">MAC Address</th>
-                    <th data-column-id="ip_address">IP Address</th>
-                    <th data-column-id="vlan"<?php echo $vlan_visibility ?>>Vlan</th>
-                    <th data-column-id="domain" data-formatter="nac_domain">Domain</th>
+                    <th data-column-id="port_id" data-width="100px">Port</th>
+                    <th data-column-id="mac_address" data-width="150px" data-formatter="tooltip">MAC Address</th>
+                    <th data-column-id="ip_address" data-width="140px" data-formatter="tooltip">IP Address</th>
+                    <th data-column-id="vlan" data-width="60px" data-formatter="tooltip"<?php echo $vlan_visibility ?>>Vlan</th>
+                    <th data-column-id="domain" data-formatter="nac_domain" data-formatter="tooltip">Domain</th>
                     <th data-column-id="host_mode"<?php echo $mode_visibility ?>data-formatter="nac_mode">Mode</th>
-                    <th data-column-id="username">Username</th>
-                    <th data-column-id="authz_by" data-visible="false">Auth By</th>
-                    <th data-column-id="timeout"<?php echo $timeout_visibility ?>>Timeout</th>
+                    <th data-column-id="username" data-width="250px" data-formatter="tooltip">Username</th>
+                    <th data-column-id="authz_by" data-visible="false" data-formatter="tooltip">Auth By</th>
+                    <th data-column-id="timeout"<?php echo $timeout_visibility ?> data-formatter="time_interval">Timeout</th>
                     <th data-column-id="time_elapsed"<?php echo $t_elapsed_visibility ?> data-formatter="time_interval">Time Elapsed</th>
                     <th data-column-id="time_left"<?php echo $t_left_visibility ?> data-formatter="time_interval">Time Left</th>
-                    <th data-column-id="authc_status" data-formatter="nac_authc">AuthC</th>
-                    <th data-column-id="authz_status" data-formatter="nac_authz">AuthZ</th>
-                    <th data-column-id="method" data-formatter="nac_method">Method</th>
+                    <th data-column-id="authc_status" data-formatter="nac_authc" data-formatter="tooltip">AuthC</th>
+                    <th data-column-id="authz_status" data-width="70px" data-formatter="nac_authz">AuthZ</th>
+                    <th data-column-id="method" data-width="100px" data-formatter="nac_method">Method</th>
                 </tr>
                 </thead>
             </table>
@@ -69,9 +69,40 @@ if ($device['os'] === 'vrp') {
         formatters: {
             "time_interval": function (column, row) {
                 var value = row[column.id];
-                return moment.duration(Number(value), 's').humanize();
+                var duration = moment.duration(Number(value), 's');
+                var years = duration.years(),
+                    months = duration.months(),
+                    days = duration.days(),
+                    hrs = duration.hours(),
+                    mins = duration.minutes(),
+                    secs = duration.seconds();
+
+                var res = '';
+                    res_light = '';
+
+                if (years) {
+                    res += years + 'y ';
+                }
+                if (months) {
+                    res += months + 'm ';
+                }
+                if (days) {
+                    res += days + 'd ';
+                }
+                if (hrs) {
+                    res += hrs + 'h ';
+                }
+                res += mins + 'm ' + secs + 's ';
+                
+                var arr = res.split(' ');
+                res_light = arr.slice(0, 2).join(' ');
+
+                return "<span title=\'" + res.trim() + "\' data-toggle=\'tooltip\'>" + res_light + "</span>";
             },
-            "nac_authz": function (column, row) {
+            "tooltip": function (column, row) {
+                var value = row[column.id];
+                return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+            },            "nac_authz": function (column, row) {
                 var value = row[column.id];
 
                 if (value === 'authorizationSuccess' || value === 'sussess') { 
@@ -80,7 +111,7 @@ if ($device['os'] === 'vrp') {
                 } else if (value === 'authorizationFailed') {
                     return "<i class=\"fa fa-times-circle fa-lg icon-theme\" aria-hidden=\"true\" style=\"color:red;\"></i>";
                 } else {
-                    return "<span class=\'label label-default\'>" + value + "</span>";
+                    return "<span class=\'label label-default\' title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
                 }
             },
             "nac_domain": function (column, row) {
@@ -92,7 +123,7 @@ if ($device['os'] === 'vrp') {
                 } else if (value === 'Disabled') {
                     return "<i class=\"fa fa-desktop fa-lg icon-theme\"  aria-hidden=\"true\"></i>";
                 } else {
-                    return "<span class=\'label label-default\'>" + value + "</span>";
+                    return "<span class=\'label label-default\' title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
                 }
             },
             "nac_authc": function (column, row) {
@@ -110,7 +141,7 @@ if ($device['os'] === 'vrp') {
                 } else if (value === '6') {
                     return "<i class=\"fa fa-times-circle fa-lg icon-theme\"  aria-hidden=\"true\" style=\"color:red;\"></i>";
                 } else {
-                    return "<span class=\'label label-default\'>" + value + "</span>";
+                    return "<span class=\'label label-default\' title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
                 }
             },
             "nac_method": function (column, row) {
@@ -122,7 +153,7 @@ if ($device['os'] === 'vrp') {
                 } else if (value === 'other') {
                     return "<span class=\"label label-danger\">Disabled</span>";
                 } else {
-                    return "<span class=\'label label-default\'>" + value + "</span>";
+                    return "<span class=\'label label-default\' title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
                 }
             }
         }
