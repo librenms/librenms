@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Util;
 
+use LibreNMS\DB\Eloquent;
+
 class Version
 {
     // Update this on release
@@ -49,5 +51,18 @@ class Version
         }
 
         return self::VERSION;
+    }
+
+    public function database()
+    {
+        if (Eloquent::isConnected()) {
+            $query = Eloquent::DB()->table('migrations');
+            return [
+                'last' => $query->orderBy('id', 'desc')->value('migration'),
+                'total' => $query->count(),
+            ];
+        }
+
+        return ['last' => 'Not Connected', 'total' => 0];
     }
 }
