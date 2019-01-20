@@ -13,7 +13,6 @@ Currently we have support for the following health metrics along with the values
 | ber                             | ratio                       |
 | charge                          | %                           |
 | chromatic_disperision           | ps/nm                       |
-| clients                         |                             |
 | cooling                         | W                           |
 | count                           | #                           |
 | current                         | A                           |
