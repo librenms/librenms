@@ -102,7 +102,7 @@ if ($states) {
     $datas[] = 'state';
 }
 
-if ($states) {
+if ($count) {
     $datas[] = 'count';
 }
 
