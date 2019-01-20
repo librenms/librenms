@@ -211,6 +211,11 @@ class Port extends BaseModel
         return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
     }
 
+    public function fdbEntries()
+    {
+        return $this->hasMany('App\Models\PortsFdb', 'port_id', 'port_id');
+    }
+
     public function users()
     {
         // FIXME does not include global read

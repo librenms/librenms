@@ -36,9 +36,7 @@ function rewrite_location($location)
 
 function formatMac($mac)
 {
-    $mac = preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', $mac);
-
-    return $mac;
+    return \LibreNMS\Util\Rewrite::readableMac($mac);
 }
 
 
