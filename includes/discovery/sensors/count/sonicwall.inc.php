@@ -18,19 +18,22 @@
 if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.8741.6')) {
     $licenses = snmp_get($device, 'SNWL-SSLVPN-MIB::userLicense.0', '-Ovq');
     $licenses = str_replace(' Users', '', $licenses);
+    $current = snmp_get($device, '.1.3.6.1.4.1.8741.6.2.1.9.0', '-Ovq');
 
-    $class = 'clients';
-    $oid = '.1.3.6.1.4.1.8741.6.2.1.9.0'; // SNWL-SSLVPN-MIB::activeUserLicense.0
-    $index = 0;
-    $type = 'sonicwall';
-    $descr = 'SSL VPN clients';
-    $divisor = 1;
-    $multiplier = 1;
-    $low_limit = null;
-    $low_warn_limit = 0;
-    $warn_limit = $licenses - 10;
-    $high_limit = $licenses;
-    $current = snmp_get($device, $oid, '-Ovq');
-
-    discover_sensor($valid['sensor'], $class, $device, $oid, $index, $type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current);
+    discover_sensor(
+        $valid['sensor'],
+        'count',
+        $device,
+        '.1.3.6.1.4.1.8741.6.2.1.9.0', // SNWL-SSLVPN-MIB::activeUserLicense.0
+        0,
+        'sonicwall',
+        'SSL VPN clients',
+        1,
+        1,
+        null,
+        0,
+        $licenses - 10,
+        $licenses,
+        $current
+    );
 }
