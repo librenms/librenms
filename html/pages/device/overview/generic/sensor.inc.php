@@ -6,62 +6,8 @@ if ($sensor_class == 'state') {
 }
 
 if (count($sensors)) {
-    switch (strtolower($sensor_type)) {
-        case "charge":
-            $sensor_fa_icon = "fa-battery-half";
-            break;
-        case "temperature":
-            $sensor_fa_icon = "fa-thermometer-three-quarters";
-            break;
-        case "humidity":
-            $sensor_fa_icon = "fa-tint";
-            break;
-        case "fanspeed":
-            $sensor_fa_icon = "fa-asterisk";
-            break;
-        case "voltage":
-            $sensor_fa_icon = "fa-bolt";
-            break;
-        case "current":
-            $sensor_fa_icon = "fa-bolt";
-            break;
-        case "frequency":
-            $sensor_fa_icon = "fa-line-chart";
-            break;
-        case "runtime":
-            $sensor_fa_icon = "fa-hourglass";
-            break;
-        case "power":
-            $sensor_fa_icon = "fa-power-off";
-            break;
-        case "power_consumed":
-            $sensor_fa_icon = "fa-plug";
-            break;
-        case "power_factor":
-            $sensor_fa_icon = "fa-calculator";
-            break;
-        case "dBm":
-            $sensor_fa_icon = "fa-signal";
-            break;
-        case "state":
-            $sensor_fa_icon = "fa-bullseye";
-            break;
-        case "count":
-            $sensor_fa_icon = "fa-hashtag";
-            break;
-        case "load":
-            $sensor_fa_icon = "fa-percent";
-            break;
-        case "signal":
-            $sensor_fa_icon = "fa-signal";
-            break;
-        case "airflow":
-            $sensor_fa_icon = "fa-superpowers";
-            break;
-        default:
-            $sensor_fa_icon = "fa-delicious";
-            break;
-    }//end switch
+    $icons = \App\Models\Sensor::getIconMap();
+    $sensor_fa_icon = 'fa-' . (isset($icons[$sensor_class]) ? $icons[$sensor_class] : 'delicious');
 
     echo '
         <div class="row">
