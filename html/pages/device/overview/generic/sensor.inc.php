@@ -34,11 +34,20 @@ if (count($sensors)) {
         case "power":
             $sensor_fa_icon = "fa-power-off";
             break;
+        case "power_consumed":
+            $sensor_fa_icon = "fa-plug";
+            break;
+        case "power_factor":
+            $sensor_fa_icon = "fa-calculator";
+            break;
         case "dBm":
             $sensor_fa_icon = "fa-signal";
             break;
         case "state":
             $sensor_fa_icon = "fa-bullseye";
+            break;
+        case "count":
+            $sensor_fa_icon = "fa-hashtag";
             break;
         case "load":
             $sensor_fa_icon = "fa-percent";
@@ -59,7 +68,7 @@ if (count($sensors)) {
         <div class="col-md-12">
         <div class="panel panel-default panel-condensed">
         <div class="panel-heading">';
-    echo '<a href="device/device='.$device['device_id'].'/tab=health/metric='.strtolower($sensor_type).'/"><i class="fa '.$sensor_fa_icon.' fa-lg icon-theme" aria-hidden="true"></i><strong> '.$sensor_type.'</strong></a>';
+    echo '<a href="device/device='.$device['device_id'].'/tab=health/metric='.strtolower($sensor_type).'/"><i class="fa '.$sensor_fa_icon.' fa-lg icon-theme" aria-hidden="true"></i><strong> '.nicecase($sensor_type).'</strong></a>';
     echo '      </div>
         <table class="table table-hover table-condensed table-striped">';
     $group = '';

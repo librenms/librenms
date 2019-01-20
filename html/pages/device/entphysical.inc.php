@@ -21,10 +21,14 @@ function printEntPhysical($device, $ent, $level, $class)
             echo '<i class="fa fa-heartbeat fa-lg icon-theme" aria-hidden="true"></i> ';
             $sensor = dbFetchRow('SELECT * FROM `sensors` WHERE `device_id` = ? AND (`entPhysicalIndex` = ? OR `sensor_index` = ?)', array($device['device_id'], $ent['entPhysicalIndex'], $ent['entPhysicalIndex']));
             if (count($sensor)) {
-                $link = "<a href='device/device=" . $device['device_id'] . '/tab=health/metric=' . $sensor['sensor_class'] . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor['sensor_id'] . '&amp;type=sensor_' . $sensor['sensor_class'] . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor['sensor_id'] . '&amp;type=sensor_' . $sensor['sensor_class'] . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
+                $link = "<a href='graphs/id=" . $sensor['sensor_id'] . '/type=sensor_' . $sensor['sensor_class'] . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor['sensor_id'] . '&amp;type=sensor_' . $sensor['sensor_class'] . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor['sensor_id'] . '&amp;type=sensor_' . $sensor['sensor_class'] . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
             }
         } elseif ($ent['entPhysicalClass'] == 'backplane') {
             echo '<i class="fa fa-bars fa-lg icon-theme" aria-hidden="true"></i> ';
+        } elseif ($ent['entPhysicalClass'] == 'stack') {
+            echo '<i class="fa fa-list-ol fa-lg icon-theme" aria-hidden="true"></i> ';
+        } elseif ($ent['entPhysicalClass'] == 'powerSupply') {
+            echo '<i class="fa fa-bolt fa-lg icon-theme" aria-hidden="true"></i> ';
         }
 
         if ($ent['entPhysicalParentRelPos'] > '-1') {
@@ -97,6 +101,14 @@ function printEntPhysical($device, $ent, $level, $class)
 
         echo "<br /><div class='interface-desc' style='margin-left: 20px;'>".$ent['entPhysicalDescr'];
 
+        if ($ent['entPhysicalAlias'] && $ent['entPhysicalAssetID']) {
+            echo " <br />Alias: ".$ent['entPhysicalAlias']." - AssetID: ".$ent['entPhysicalAssetID'];
+        } elseif ($ent['entPhysicalAlias']) {
+            echo " <br />Alias: ".$ent['entPhysicalAlias'];
+        } elseif ($ent['entPhysicalAssetID']) {
+            echo " <br />AssetID: ".$ent['entPhysicalAssetID'];
+        }
+
         if ($ent['entPhysicalSerialNum']) {
             echo " <br /><span style='color: #000099;'>Serial No. ".$ent['entPhysicalSerialNum'].'</span> ';
         }
@@ -106,7 +118,7 @@ function printEntPhysical($device, $ent, $level, $class)
         $count = dbFetchCell("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalContainedIn = '".$ent['entPhysicalIndex']."'");
         if ($count) {
             echo '<ul>';
-            printEntPhysical($device, $ent['entPhysicalIndex'], ($level + 1), '');
+            printEntPhysical($device, $ent['entPhysicalIndex'], ($level + 1), 'liClosed');
             echo '</ul>';
         }
 

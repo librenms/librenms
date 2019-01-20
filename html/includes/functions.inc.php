@@ -64,7 +64,7 @@ function data_uri($file, $mime)
 function nicecase($item)
 {
     return \LibreNMS\Util\StringHelpers::niceCase($item);
-}//end nicecase()
+}
 
 
 function toner2colour($descr, $percent)
