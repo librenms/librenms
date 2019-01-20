@@ -94,7 +94,7 @@ abstract class PaginatedAjaxController extends Controller
      * @param Model $model
      * @return array|Collection|Model
      */
-    protected function formatItem($model)
+    public function formatItem($model)
     {
         return $model;
     }
@@ -123,6 +123,7 @@ abstract class PaginatedAjaxController extends Controller
      * @param Request $request
      * @param Builder $query
      * @param array $fields
+     * @return Builder
      */
     protected function filter($request, $query, $fields)
     {
@@ -135,6 +136,23 @@ abstract class PaginatedAjaxController extends Controller
                 }
             }
         }
+
+        return $query;
+    }
+
+    /**
+     * @param Request $request
+     * @param Builder $query
+     * @return Builder
+     */
+    protected function sort($request, $query)
+    {
+        $sort = $request->get('sort', []);
+        foreach ($sort as $column => $direction) {
+            $query->orderBy($column, $direction);
+        }
+
+        return $query;
     }
 
     /**
