@@ -1,0 +1,14 @@
+os: schleifenbauer
+text: 'Schleifenbauer SPDM'
+type: power
+icon: schleifenbauer
+group: schleifenbauer
+over:
+    - { graph: device_current, text: 'Current' }
+    - { graph: device_voltage, text: 'Voltage' }
+    - { graph: device_power, text: 'Power' }
+mib_dir:
+    - schleifenbauer
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.31034.11.1

@@ -392,6 +392,7 @@ function sensor_low_limit($class, $current)
         case 'humidity':
             $limit = 30;
             break;
+        case 'count':
         case 'current':
             $limit = null;
             break;
@@ -400,6 +401,10 @@ function sensor_low_limit($class, $current)
             break;
         case 'power':
             $limit = null;
+            break;
+        case 'power_consumed':
+        case 'power_factor':
+            $limit = -1;
             break;
         case 'signal':
             $limit = -80;
@@ -443,9 +448,14 @@ function sensor_limit($class, $current)
         case 'humidity':
             $limit = 70;
             break;
+        case 'count':
         case 'current':
         case 'power':
             $limit = $current * 1.50;
+            break;
+        case 'power_consumed':
+        case 'power_factor':
+            $limit = 1;
             break;
         case 'fanspeed':
             $limit = $current * 1.80;
@@ -740,6 +750,66 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
 }
 
 //end discover_toner()
+
+function discover_entity_physical(&$valid, $device, $entPhysicalIndex, $entPhysicalDescr, $entPhysicalClass, $entPhysicalName, $entPhysicalModelName, $entPhysicalSerialNum, $entPhysicalContainedIn, $entPhysicalMfgName, $entPhysicalParentRelPos, $entPhysicalVendorType, $entPhysicalHardwareRev, $entPhysicalFirmwareRev, $entPhysicalSoftwareRev, $entPhysicalIsFRU, $entPhysicalAlias, $entPhysicalAssetID, $ifIndex)
+{
+    d_echo("Discover Inventory Item: $entPhysicalIndex, $entPhysicalDescr, $entPhysicalClass, $entPhysicalName, $entPhysicalModelName, $entPhysicalSerialNum, $entPhysicalContainedIn, $entPhysicalMfgName, $entPhysicalParentRelPos, $entPhysicalVendorType, $entPhysicalHardwareRev, $entPhysicalFirmwareRev, $entPhysicalSoftwareRev, $entPhysicalIsFRU, $entPhysicalAlias, $entPhysicalAssetID, $ifIndex\n");
+
+    if ($entPhysicalDescr || $entPhysicalName) {
+        if (dbFetchCell('SELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ?', array($device['device_id'], $entPhysicalIndex)) == '0') {
+            $insert_data = array(
+                'device_id'               => $device['device_id'],
+                'entPhysicalIndex'        => $entPhysicalIndex,
+                'entPhysicalDescr'        => $entPhysicalDescr,
+                'entPhysicalClass'        => $entPhysicalClass,
+                'entPhysicalName'         => $entPhysicalName,
+                'entPhysicalModelName'    => $entPhysicalModelName,
+                'entPhysicalSerialNum'    => $entPhysicalSerialNum,
+                'entPhysicalContainedIn'  => $entPhysicalContainedIn,
+                'entPhysicalMfgName'      => $entPhysicalMfgName,
+                'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
+                'entPhysicalVendorType'   => $entPhysicalVendorType,
+                'entPhysicalHardwareRev'  => $entPhysicalHardwareRev,
+                'entPhysicalFirmwareRev'  => $entPhysicalFirmwareRev,
+                'entPhysicalSoftwareRev'  => $entPhysicalSoftwareRev,
+                'entPhysicalIsFRU'        => $entPhysicalIsFRU,
+                'entPhysicalAlias'        => $entPhysicalAlias,
+                'entPhysicalAssetID'      => $entPhysicalAssetID,
+            );
+            if (!empty($ifIndex)) {
+                $insert_data['ifIndex'] = $ifIndex;
+            }
+
+            $inserted = dbInsert($insert_data, 'entPhysical');
+            echo '+';
+            log_event('Inventory Item added: index ' . $entPhysicalIndex . ' descr ' . $entPhysicalDescr, $device, 'entity-physical', 3, $inserted);
+        } else {
+            echo '.';
+            $update_data = array(
+                'entPhysicalIndex'        => $entPhysicalIndex,
+                'entPhysicalDescr'        => $entPhysicalDescr,
+                'entPhysicalClass'        => $entPhysicalClass,
+                'entPhysicalName'         => $entPhysicalName,
+                'entPhysicalModelName'    => $entPhysicalModelName,
+                'entPhysicalSerialNum'    => $entPhysicalSerialNum,
+                'entPhysicalContainedIn'  => $entPhysicalContainedIn,
+                'entPhysicalMfgName'      => $entPhysicalMfgName,
+                'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
+                'entPhysicalVendorType'   => $entPhysicalVendorType,
+                'entPhysicalHardwareRev'  => $entPhysicalHardwareRev,
+                'entPhysicalFirmwareRev'  => $entPhysicalFirmwareRev,
+                'entPhysicalSoftwareRev'  => $entPhysicalSoftwareRev,
+                'entPhysicalIsFRU'        => $entPhysicalIsFRU,
+                'entPhysicalAlias'        => $entPhysicalAlias,
+                'entPhysicalAssetID'      => $entPhysicalAssetID,
+            );
+            dbUpdate($update_data, 'entPhysical', '`device_id`=? AND `entPhysicalIndex`=?', array($device['device_id'], $entPhysicalIndex));
+        }//end if
+        $valid[$entPhysicalIndex] = 1;
+    }//end if
+}
+
+//end discover_entity_physical()
 
 function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin, $context_name = '')
 {

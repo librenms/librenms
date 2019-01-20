@@ -1697,6 +1697,8 @@ function get_units_from_sensor($sensor)
         case 'cooling':
         case 'power':
             return 'W';
+        case 'power_consumed':
+            return 'kWh';
         case 'pressure':
             return 'kPa';
         case 'runtime':
