@@ -102,6 +102,10 @@ if ($states) {
     $datas[] = 'state';
 }
 
+if ($states) {
+    $datas[] = 'count';
+}
+
 if ($load) {
     $datas[] = 'load';
 }
@@ -148,10 +152,6 @@ if ($eer) {
 
 if ($waterflow) {
     $datas[] = 'waterflow';
-}
-
-if ($clients) {
-    $datas[] = 'clients';
 }
 
 $type_text['overview']             = 'Overview';
