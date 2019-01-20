@@ -116,7 +116,7 @@ class MenuComposer
             if (in_array($class, ['fanspeed', 'humidity', 'temperature', 'signal'])) {
                 // First group
                 $group = 0;
-            } elseif (in_array($class, ['current', 'frequency', 'power', 'voltage'])) {
+            } elseif (in_array($class, ['current', 'frequency', 'power', 'voltage', 'power_factor', 'power_consumed'])) {
                 // Second group
                 $group = 1;
             } else {
@@ -126,6 +126,7 @@ class MenuComposer
 
             $sensor_menu[$group][] = $sensor_model;
         }
+        ksort($sensor_menu); // ensure menu order
         $vars['sensor_menu'] = $sensor_menu;
 
         // Wireless menu
