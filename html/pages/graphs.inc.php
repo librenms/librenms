@@ -43,7 +43,7 @@ if (!$auth) {
     if (isset($config['graph_types'][$type][$subtype]['descr'])) {
         $title .= " :: " . $config['graph_types'][$type][$subtype]['descr'];
     } elseif ($type == "device" && $subtype == "collectd") {
-        $title .= " :: " . ucfirst($subtype) . " :: " . $vars['c_plugin'];
+        $title .= " :: " . nicecase($subtype) . " :: " . $vars['c_plugin'];
         if (isset($vars['c_plugin_instance'])) {
             $title .= " - " . $vars['c_plugin_instance'];
         }
@@ -52,7 +52,7 @@ if (!$auth) {
             $title .= " - " . $vars['c_type_instance'];
         }
     } else {
-        $title .= " :: " . ucfirst($subtype);
+        $title .= " :: " . nicecase($subtype);
     }
 
     $graph_array = $vars;

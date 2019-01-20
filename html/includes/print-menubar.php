@@ -392,8 +392,11 @@ $icons = array(
     'current' => 'bolt',
     'frequency' => 'line-chart',
     'power' => 'power-off',
+    'power_consumed' => 'plug',
+    'power_factor' => 'calculator',
     'voltage' => 'bolt',
     'charge' => 'battery-half',
+    'count' => 'hashtag',
     'dbm' => 'sun-o',
     'load' => 'percent',
     'runtime' => 'hourglass-half',
@@ -424,7 +427,7 @@ if ($sep && array_keys($menu_sensors)) {
     $sep = 0;
 }
 
-foreach (array('current','frequency','power','voltage') as $item) {
+foreach (array('current','frequency','power','voltage','power_consumed','power_factor') as $item) {
     if (isset($menu_sensors[$item])) {
         echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg" aria-hidden="true"></i> '.nicecase($item).'</a></li>');
         unset($menu_sensors[$item]);
