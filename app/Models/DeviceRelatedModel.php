@@ -36,6 +36,11 @@ class DeviceRelatedModel extends BaseModel
         return $this->hasDeviceAccess($query, $user);
     }
 
+    public function scopeInDeviceGroup(Builder $query, DeviceGroup $deviceGroup)
+    {
+        return $query->whereIn($this->getTable() . '.device_id', $deviceGroup->devices()->pluck('devices.device_id'));
+    }
+
     // ---- Define Relationships ----
 
     public function device()
