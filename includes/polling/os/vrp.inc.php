@@ -190,7 +190,7 @@ if (!empty($apTable)) {
                 );
             } else {
                 dbUpdate(
-                   array(
+                    array(
                         'mac_addr' => $mac,
                         'type' => $type,
                         'deleted' => 0,
