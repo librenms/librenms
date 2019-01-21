@@ -10,7 +10,7 @@ foreach ($oids as $index => $first) {
             $valid['sensor'],
             'voltage',
             $device,
-            ".1.3.6.1.4.1.1718.3.2.2.1.11.1.$index.$end",
+            ".1.3.6.1.4.1.1718.3.2.2.1.11.$index.$end",
             $index,
             'sentry3',
             'Tower ' . $index,
