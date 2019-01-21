@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class TnmsAlarm extends Model
 {
-    //
+    protected $table = 'tnmsalarms';
 }
 
