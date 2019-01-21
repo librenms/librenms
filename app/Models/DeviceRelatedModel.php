@@ -1,6 +1,6 @@
 <?php
 /**
- * Package.php
+ * DeviceRelatedModel.php
  *
  * -Description-
  *
@@ -19,14 +19,27 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 Tony Murray
+ * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Models;
 
-class Package extends DeviceRelatedModel
+use Illuminate\Database\Eloquent\Builder;
+
+class DeviceRelatedModel extends BaseModel
 {
-    public $timestamps = false;
-    protected $primaryKey = 'pkg_id';
+    // ---- Query Scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasDeviceAccess($query, $user);
+    }
+
+    // ---- Define Relationships ----
+
+    public function device()
+    {
+        return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
+    }
 }

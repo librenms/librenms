@@ -25,7 +25,7 @@
 
 namespace App\Models;
 
-class WirelessSensor extends BaseModel
+class WirelessSensor extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'sensors_id';
@@ -44,19 +44,5 @@ class WirelessSensor extends BaseModel
         return collect(collect(\LibreNMS\Device\WirelessSensor::getTypes())
             ->get($this->sensor_class, []))
             ->get('icon', 'signal');
-    }
-
-    // ---- Query Scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
-    // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id');
     }
 }

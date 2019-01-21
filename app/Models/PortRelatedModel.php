@@ -1,6 +1,6 @@
 <?php
 /**
- * Package.php
+ * PortRelatedModel.php
  *
  * -Description-
  *
@@ -19,14 +19,25 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 Tony Murray
+ * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Models;
 
-class Package extends DeviceRelatedModel
+abstract class PortRelatedModel extends BaseModel
 {
-    public $timestamps = false;
-    protected $primaryKey = 'pkg_id';
+    // ---- Query scopes ----
+
+    public function scopeHasAccess($query, User $user)
+    {
+        return $this->hasPortAccess($query, $user);
+    }
+
+    // ---- Define Relationships ----
+
+    public function port()
+    {
+        return $this->belongsTo('App\Models\Port', 'port_id', 'port_id');
+    }
 }
