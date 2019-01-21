@@ -101,10 +101,13 @@ if (count($sensors)) {
                 <td class="col-md-4">'.overlib_link($link, '<span '.$state_style.'>'.$state_translation['0']['state_descr'].'</span>', $overlib_content, $sensor_class).'</td>
                 </tr>';
         } else {
+            $sensor_current = $sensor_class == 'runtime' ? formatUptime($sensor['sensor_current'] * 60, 'short') : $sensor['sensor_current'] . $sensor_unit;
+            $alarmed = (!is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) || (!is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']);
+
             echo '<tr>
                 <td class="col-md-4">'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content, $sensor_class).'</td>
                 <td class="col-md-4">'.overlib_link($link, $sensor_minigraph, $overlib_content, $sensor_class).'</td>
-                <td class="col-md-4">'.overlib_link($link, '<span '.($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '').'>'.$sensor['sensor_current'].$sensor_unit.'</span>', $overlib_content, $sensor_class).'</td>
+                <td class="col-md-4">'.overlib_link($link, '<span '.($alarmed ? "style='color: red'" : '').'>'.$sensor_current.'</span>', $overlib_content, $sensor_class).'</td>
                 </tr>';
         }//end if
     }//end foreach
