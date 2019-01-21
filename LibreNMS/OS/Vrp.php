@@ -156,7 +156,8 @@ class Vrp extends OS implements
         $sensors = array();
         $total_oids = array();
 
-        $vapInfoTable = snmpwalk_group($this->getDevice(), 'hwWlanVapInfoTable', 'HUAWEI-WLAN-VAP-MIB', 3, array());
+        $vapInfoTable = $this->getCacheTable('hwWlanVapInfoTable', 'HUAWEI-WLAN-VAP-MIB', 3);
+        
         foreach ($vapInfoTable as $a_index => $ap) {
             //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
             $a_index_oid = implode(".", array_map("hexdec", explode(":", $a_index)));
