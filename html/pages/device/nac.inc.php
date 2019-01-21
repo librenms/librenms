@@ -47,7 +47,7 @@ if ($device['os'] === 'vrp') {
                     <th data-column-id="time_elapsed"<?php echo $t_elapsed_visibility ?> data-formatter="time_interval">Time Elapsed</th>
                     <th data-column-id="time_left"<?php echo $t_left_visibility ?> data-formatter="time_interval">Time Left</th>
                     <th data-column-id="authc_status" data-formatter="nac_authc" data-formatter="tooltip">AuthC</th>
-                    <th data-column-id="authz_status" data-width="70px" data-formatter="nac_authz">AuthZ</th>
+                    <th data-column-id="authz_status" data-width="76px" data-formatter="nac_authz">AuthZ</th>
                     <th data-column-id="method" data-width="100px" data-formatter="nac_method">Method</th>
                 </tr>
                 </thead>
