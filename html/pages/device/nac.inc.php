@@ -70,8 +70,7 @@ if ($device['os'] === 'vrp') {
             "time_interval": function (column, row) {
                 var value = row[column.id];
                 var res = humanize_duration(value);
-                var arr = res.split(' ');
-                var res_light = arr.slice(0, 2).join(' ');
+                var res_light = res.split(' ').slice(0, 2).join(' ');
                 return "<span title=\'" + res.trim() + "\' data-toggle=\'tooltip\'>" + res_light + "</span>";
             },
             "tooltip": function (column, row) {
