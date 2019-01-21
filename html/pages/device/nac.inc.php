@@ -44,8 +44,8 @@ if ($device['os'] === 'vrp') {
                     <th data-column-id="username" data-width="250px" data-formatter="tooltip">Username</th>
                     <th data-column-id="authz_by" data-visible="false" data-formatter="tooltip">Auth By</th>
                     <th data-column-id="timeout"<?php echo $timeout_visibility ?> data-formatter="time_interval">Timeout</th>
-                    <th data-column-id="time_elapsed"<?php echo $t_elapsed_visibility ?> data-formatter="time_interval">Time Elapsed</th>
-                    <th data-column-id="time_left"<?php echo $t_left_visibility ?> data-formatter="time_interval">Time Left</th>
+                    <th data-column-id="time_elapsed"<?php echo $t_elapsed_visibility ?> data-formatter="time_interval">Elapsed time</th>
+                    <th data-column-id="time_left"<?php echo $t_left_visibility ?> data-formatter="time_interval">Time left</th>
                     <th data-column-id="authc_status" data-formatter="nac_authc" data-formatter="tooltip">AuthC</th>
                     <th data-column-id="authz_status" data-width="76px" data-formatter="nac_authz">AuthZ</th>
                     <th data-column-id="method" data-width="100px" data-formatter="nac_method">Method</th>
@@ -69,34 +69,9 @@ if ($device['os'] === 'vrp') {
         formatters: {
             "time_interval": function (column, row) {
                 var value = row[column.id];
-                var duration = moment.duration(Number(value), 's');
-                var years = duration.years(),
-                    months = duration.months(),
-                    days = duration.days(),
-                    hrs = duration.hours(),
-                    mins = duration.minutes(),
-                    secs = duration.seconds();
-
-                var res = '';
-                    res_light = '';
-
-                if (years) {
-                    res += years + 'y ';
-                }
-                if (months) {
-                    res += months + 'm ';
-                }
-                if (days) {
-                    res += days + 'd ';
-                }
-                if (hrs) {
-                    res += hrs + 'h ';
-                }
-                res += mins + 'm ' + secs + 's ';
-                
+                var res = humanize_duration(value);
                 var arr = res.split(' ');
-                res_light = arr.slice(0, 2).join(' ');
-
+                var res_light = arr.slice(0, 2).join(' ');
                 return "<span title=\'" + res.trim() + "\' data-toggle=\'tooltip\'>" + res_light + "</span>";
             },
             "tooltip": function (column, row) {
