@@ -109,7 +109,11 @@ alter table widgets modify widget_id int unsigned auto_increment;
 alter table wireless_sensors modify sensor_id int unsigned auto_increment, modify access_point_id int unsigned null;
 
 LOCK TABLES sensors WRITE, sensors_to_state_indexes WRITE, state_indexes WRITE;
-alter table sensors_to_state_indexes drop foreign key sensors_to_state_indexes_ibfk_2, drop foreign key sensors_to_state_indexes_sensor_id_foreign;
+
+SELECT COUNT(*) INTO @FOREIGN_KEY_sensors_to_state_indexes_ibfk_1_ON_TABLE_sensors_to_state_indexes_EXISTS FROM `information_schema`.`table_constraints` WHERE `table_name` = 'sensors_to_state_indexes' AND `constraint_name` = 'sensors_to_state_indexes_ibfk_1' AND `constraint_type` = 'FOREIGN KEY'; SET @statement1 := IF(@FOREIGN_KEY_sensors_to_state_indexes_ibfk_1_ON_TABLE_sensors_to_state_indexes_EXISTS > 0, 'ALTER TABLE sensors_to_state_indexes DROP FOREIGN KEY sensors_to_state_indexes_ibfk_1', 'SELECT "info: foreign key sensors_to_state_indexes_ibfk_1 does not exist."'); PREPARE statement1 FROM @statement1; EXECUTE statement1;
+SELECT COUNT(*) INTO @FOREIGN_KEY_sensors_to_state_indexes_ibfk_2_ON_TABLE_sensors_to_state_indexes_EXISTS FROM `information_schema`.`table_constraints` WHERE `table_name` = 'sensors_to_state_indexes' AND `constraint_name` = 'sensors_to_state_indexes_ibfk_2' AND `constraint_type` = 'FOREIGN KEY'; SET @statement2 := IF(@FOREIGN_KEY_sensors_to_state_indexes_ibfk_2_ON_TABLE_sensors_to_state_indexes_EXISTS > 0, 'ALTER TABLE sensors_to_state_indexes DROP FOREIGN KEY sensors_to_state_indexes_ibfk_2', 'SELECT "info: foreign key sensors_to_state_indexes_ibfk_2 does not exist."'); PREPARE statement2 FROM @statement2; EXECUTE statement2;
+alter table sensors_to_state_indexes drop foreign key sensors_to_state_indexes_sensor_id_foreign;
+
 alter table sensors modify sensor_id int unsigned auto_increment;
 alter table sensors_to_state_indexes modify sensor_id int unsigned not null, modify state_index_id int unsigned not null;
 alter table state_indexes modify state_index_id int unsigned auto_increment;
