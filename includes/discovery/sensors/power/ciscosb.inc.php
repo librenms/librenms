@@ -2,7 +2,7 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com> 
+ * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -17,7 +17,7 @@ if (is_array($temp)) {
     $divisor = '1000';
     foreach ($temp as $index => $entry) {
         if (is_numeric($temp[$index]['rlPethPsePortOutputPower']) && $temp[$index]['rlPethPsePortOutputPower'] > 0) {
-            $port_descr = get_port_by_index_cache($device, str_replace('1.', '', $index));
+            $port_descr = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
             $descr = $port_descr['ifDescr'] . ' PoE';
             $highlimit = $temp[$index]['rlPethPsePortOperPowerLimit'] / $divisor;
             discover_sensor($valid['sensor'], 'power', $device, $cur_oid . $index, $index, 'ciscosb', $descr, $divisor, '1', null, null, null, $highlimit, $temp[$index]['rlPethPsePortOutputPower'] / $divisor, 'snmp', $index);

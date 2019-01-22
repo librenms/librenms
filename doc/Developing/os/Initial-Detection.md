@@ -1,4 +1,5 @@
 source: Developing/os/Initial-Detection.md
+path: blob/master/doc/
 
 This document will provide the information you should need to add basic detection for a new OS.
 
@@ -192,7 +193,7 @@ By optimizing the SVG you can shrink the file size in some cases to less than 20
 
 Discovery
 ```bash
-./discovery.php -h HOSTNAME
+./discovery.php -d -h HOSTNAME
 ```
 
 Polling

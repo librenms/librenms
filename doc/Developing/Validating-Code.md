@@ -1,4 +1,5 @@
 source: Developing/Validating-Code.md
+path: blob/master/doc/
 
 #### Validating Code
 

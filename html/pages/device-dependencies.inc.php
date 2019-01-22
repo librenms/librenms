@@ -12,7 +12,7 @@
  */
 
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh = true;
 
@@ -59,7 +59,7 @@ var grid = $("#hostdeps").bootgrid({
     templates: {
         header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
                     <div class="row"> \
-<?php if (Auth::user()->hasGlobalAdmin()) { ?>
+<?php if (LegacyAuth::user()->hasGlobalAdmin()) { ?>
                         <div class="col-sm-8 actionBar"> \
                             <span class="pull-left"> \
                             <button type="button" class="btn btn-primary btn-sm command-manage" data-toggle="modal" data-target="#manage-dependencies" data-template_id="">Manage Device Dependencies</button> \
@@ -124,27 +124,23 @@ var grid = $("#hostdeps").bootgrid({
 $(document).ready(function() {
     var editSelect = $('#availableparents').select2({
         dropdownParent: $('#edit-dependency'),
-        width: 'resolve',
-        tags: true,
+        width: 'resolve'
 
     });
 
     var manParentDevstoClr = $('#manclearchildren').select2({
         dropdownParent: $('#manage-dependencies'),
-        width: 'resolve',
-        tags: true
+        width: 'resolve'
     });
 
     var manParentDevs = $('#manavailableparents').select2({
         dropdownParent: $('#manage-dependencies'),
-        width: 'resolve',
-        tags: true
+        width: 'resolve'
     });
 
     var manAllDevs = $('#manalldevices').select2({
         dropdownParent: $('#manage-dependencies'),
-        width: 'resolve',
-        tags: true
+        width: 'resolve'
     });
 
     $.ajax({

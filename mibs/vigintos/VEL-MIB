@@ -1,0 +1,41 @@
+VEL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises			FROM RFC1155-SMI
+	MODULE-IDENTITY		FROM SNMPv2-SMI;
+		
+vel MODULE-IDENTITY
+	LAST-UPDATED	"201110050800Z"
+	ORGANIZATION	"Vigintos Elektronika"
+	CONTACT-INFO
+                "Contact:
+
+                Web: http://www.vigintos.com
+                Email: ve@vigintos.com
+    
+                Address: Ozo 4, Vilnius, LT-08200, Lithuania
+                Tel:			 +37052477465
+                Fax:       +37052477466"
+
+	DESCRIPTION
+				"This is the root MIB module for VEL with OID of
+				{iso org dod internet private enterprises 27993}.
+
+				IANA allocated this enterprise OID (object identifier) for the
+				exclusive use of Vigintos Elektronika (VEL). 
+				Other than internet network equipment
+				distributed or licensed by VEL, no other party has any right
+				what-so-ever to distribute or license internet network equipment
+				which responds to the VEL enterprise OID or its subsidiary
+				branches. VEL reserves the right to criminally prosecute and/or
+				to seek civil damages from anyone fraudently using the VEL
+				enterprise OID to the full extent of the law."
+
+	REVISION	"201110050800Z"
+	
+	DESCRIPTION
+				""
+              
+	::= {enterprises 27993}
+	
+END

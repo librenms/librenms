@@ -1,0 +1,894 @@
+--     =================================================================
+-- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description:  The HUAWEI-E-TRUNK-MIB.mib provides information about E-Trunk 
+-- Reference:
+-- Version:     V2.06 
+-- History: 
+--              liwei, 2015-7-30. 
+--              1. Add E-Trunk expected state trap. 
+
+-- Version:     V2.05 
+-- History: 
+--              wangguojin, 2014-10-29. 
+--              1. Add E-Trunk member reason for evpn. 
+-- Version:     V2.04 
+-- History: 
+--              mengfanlu, 2014-05-21. 
+--              1. Add backup port table. 
+-- Version:     V2.02 
+-- History: 
+--              caoli, 2014-05-04. 
+--              1, Add five new nodes based on V2.01 for E-Trunk auto BFD
+--                 hwETrunkAutoBFDEnable, hwETrunkAutoBFDTrackIfIndex, 
+--                 hwETrunkAutoBFDTxInterval, hwETrunkAutoBFDRxInterval, 
+--                 hwETrunkAutoBFDDetectMultiplier. 
+-- Version:     V1.0
+-- History: 
+--              zhenghebin,2008.11.25,publish 
+ 
+-- =================================================================
+
+    HUAWEI-E-TRUNK-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            huaweiMgmt 
+                FROM HUAWEI-MIB 
+            IpAddress,Integer32, Unsigned32, Counter32, Counter64, 
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE 
+                FROM SNMPv2-SMI 
+            PhysAddress,DisplayString,TruthValue,TimeStamp,RowStatus,TEXTUAL-CONVENTION 
+                FROM SNMPv2-TC
+            MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF;
+
+
+
+
+        hwETrunkMIB MODULE-IDENTITY 
+            LAST-UPDATED "201507221448Z"
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION
+                "Add hwETrunkExpectStateChange and hwETrunkExpectStateResume."     
+            REVISION "201507221448Z"        
+            DESCRIPTION 
+                "The HUAWEI-E-TRUNK-MIB.mib provides information about E-Trunk."
+            REVISION "201410291522Z"        
+            DESCRIPTION
+                "Add E-Trunk member reason for evpn."     
+            REVISION "201406302146Z"        
+            DESCRIPTION
+                "Add trill active-active reason."     
+            REVISION "201405210941Z"        
+            DESCRIPTION
+                "Add backup port table."     
+            REVISION "201405071057Z"        
+            DESCRIPTION
+                "Add five new nodes based on V2.01 for E-Trunk auto BFD."         
+            REVISION "201312021153Z"        
+            DESCRIPTION
+                "The specification of E-Trunk number expanded from 64 to 128."
+            REVISION "200810211010Z"        
+            DESCRIPTION
+                "Initial version." 
+                        ::= { hwDatacomm 178 }
+
+--
+-- Node definitions
+--
+
+        hwDatacomm OBJECT IDENTIFIER ::= { huaweiMgmt 25 }
+
+
+        hwETrunkObjects OBJECT IDENTIFIER ::= { hwETrunkMIB 1 }
+           
+           
+           
+-- E-Trunk
+        hwETrunkTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwETrunkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The E-Trunk table."
+            ::= { hwETrunkObjects 1 }
+
+
+        hwETrunkEntry OBJECT-TYPE
+            SYNTAX HwETrunkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "E-Trunk entry."
+            INDEX { hwETrunkId }
+            ::= { hwETrunkTable 1 }
+
+
+        HwETrunkEntry ::=
+            SEQUENCE {  
+                hwETrunkId
+                    Integer32,
+                hwETrunkSystemId
+                    PhysAddress, 
+                                  
+                hwETrunkPri
+                    Integer32,  
+          
+                hwETrunkStatus
+                    INTEGER, 
+                                         
+                hwETrunkStatusReason
+                    INTEGER,
+          
+                hwETrunkPeerIpAddr
+                    IpAddress,
+         
+                hwETrunkSourceIpAddr
+                    IpAddress,
+       
+                hwETrunkReceiveFailTimeMultiple
+                    Integer32,
+                                        
+                hwETrunkSendPeriod
+                    Integer32,
+                                       
+                hwETrunkPacketReceive
+                    Counter64,
+                               
+                hwETrunkPacketSend
+                    Counter64,
+                                       
+                hwETrunkPacketRecDrop
+                    Counter64,
+         
+                hwETrunkPacketSndDrop
+                    Counter64,
+                                 
+                hwETrunkPeerSystemId           
+                    PhysAddress,  
+      
+                hwETrunkPeerPri
+                    Integer32, 
+    
+                hwETrunkPeerReceiveFailTime
+                    Integer32, 
+           
+                hwETrunkSecurityKeyType 
+                    INTEGER,   
+                                 
+                hwETrunkSecurityKey
+                    OCTET STRING,
+                                  
+                hwETrunkBfdSessId
+                    Integer32, 
+                    
+                hwETrunkResetCounter
+                    Integer32,
+                    
+                hwETrunkRevertTime
+                    Integer32,
+
+                hwETrunkBfdSessName
+                    OCTET STRING,
+
+                hwETrunkDescription
+                    OCTET STRING,
+                    
+                hwETrunkAutoBFDEnable
+                    TruthValue,
+                    
+                hwETrunkAutoBFDTrackIfIndex
+                    Integer32,
+                    
+                hwETrunkAutoBFDTxInterval
+                    Integer32,
+                    
+                hwETrunkAutoBFDRxInterval
+                    Integer32,
+                    
+                hwETrunkAutoBFDDetectMultiplier
+                    Integer32,
+
+                hwETrunkExpectStatus
+                    INTEGER, 
+                                 
+                hwETrunkRowStatus
+                    RowStatus
+
+        }
+
+
+        hwETrunkId OBJECT-TYPE
+            SYNTAX Integer32 (1..128)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the E-Trunk."
+            ::= { hwETrunkEntry 1 }
+
+
+        hwETrunkSystemId OBJECT-TYPE
+            SYNTAX PhysAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The system ID of the E-Trunk. It is a physical address."
+            ::= { hwETrunkEntry 2 }
+
+
+        hwETrunkPri OBJECT-TYPE
+            SYNTAX Integer32 (1..254)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The priority of the E-Trunk. The default value is 100."
+            ::= { hwETrunkEntry 3 }
+
+
+
+        hwETrunkStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    initialize(1),
+                    backup(2),
+                    master(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the E-Trunk. 
+                 1:initialize. 
+                 2:backup. 
+                 3:master. "
+            ::= { hwETrunkEntry 4 }   
+
+
+        hwETrunkStatusReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    pri(1),
+                    timeout(2),
+                    bfdDown(3),
+                    peerTimeout(4),
+                    peerBfdDown(5),
+                    allMemberDown(6),
+                    init(7),
+                    peerNodeDown(8)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The reason for the E-Trunk being in the current status. 
+                 pri(1):Priority calculation.  
+                 timeout(2):The receiving timer timed out. 
+                 bfdDown(3):BFD detected the control link between the PE and peer down. 
+                 peerTimeout(4):The receiving timer of the peer timed out. 
+                 peerBfdDown(5):BFD of the peer detected the control link between the PE and peer down. 
+                 allMemberDown(6):All members of the E-Trunk were down. 
+                 init(7):Initiated the E-Trunk. 
+                 peerNodeDown(8):The peer node is down. 
+                "
+            ::= { hwETrunkEntry 5 }
+
+
+        hwETrunkPeerIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The peer IP address of the E-Trunk."
+            ::= { hwETrunkEntry 6 }
+
+
+        hwETrunkSourceIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The source IP address of the E-Trunk."
+            ::= { hwETrunkEntry 7 }
+
+        hwETrunkReceiveFailTimeMultiple OBJECT-TYPE
+            SYNTAX Integer32 (3..300)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The detection time multiplier for failure detection. It is the multiple of the sending period."
+            ::= { hwETrunkEntry 8 }
+
+
+        hwETrunkSendPeriod OBJECT-TYPE
+            SYNTAX Integer32 (5..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The period for sending packets of the E-Trunk. The unit is 100ms. "
+            ::= { hwETrunkEntry 9 }
+
+
+
+        hwETrunkPacketReceive OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of received packets."
+            ::= { hwETrunkEntry 10 }
+
+
+        hwETrunkPacketSend OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of sent packets."
+            ::= { hwETrunkEntry 11 }
+
+
+        hwETrunkPacketRecDrop OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of the dropped packets when the packets are received."
+            ::= { hwETrunkEntry 12 }
+
+
+        hwETrunkPacketSndDrop OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of the dropped packets when the packets are sent."
+            ::= { hwETrunkEntry 13 }
+
+
+        hwETrunkPeerSystemId OBJECT-TYPE
+            SYNTAX PhysAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The system ID of the peer E-Trunk. It is a physical address."
+            ::= { hwETrunkEntry 14 }
+
+
+        hwETrunkPeerPri OBJECT-TYPE
+            SYNTAX Integer32 (1..254)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The priority of the peer E-Trunk."
+            ::= { hwETrunkEntry 15 }
+
+
+        hwETrunkPeerReceiveFailTime OBJECT-TYPE
+            SYNTAX Integer32 (15..30000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The failure time for the peer E-Trunk to receive packets. The unit is 100ms. "
+            ::= { hwETrunkEntry 16 }
+
+
+
+        hwETrunkSecurityKeyType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    simple(1),
+                    cipher(2)
+                }
+
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The type of the security key. 
+                 1:The simple encrypt type.  
+                 2:The cipher encrypt type. "
+            ::= { hwETrunkEntry 17 }
+
+
+        hwETrunkSecurityKey OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..392))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object can be set to a simple password with a string of 0 to 255 characters or a encrypted password with a string less than 392 characters. For security purposes, a get on this returns a zero length string."
+            ::= { hwETrunkEntry 18 }
+
+
+        hwETrunkBfdSessId OBJECT-TYPE
+            SYNTAX Integer32 (0..8191)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The ID of a BFD session which is bound to the E-Trunk. 
+               When the status of the BFD session is changed, the status of the E-Trunk is also changed with BFD's status."
+            ::= { hwETrunkEntry 19}   
+  
+        hwETrunkResetCounter OBJECT-TYPE
+            SYNTAX Integer32 (0..0)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Reset hwETrunkPacketReceive,hwETrunkPacketSend,hwETrunkPacketRecDrop,hwETrunkPacketSndDrop."
+            ::= { hwETrunkEntry 20 }
+            
+        hwETrunkRevertTime OBJECT-TYPE
+            SYNTAX Integer32 (0..3600)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The delay time to revert. The unit is second. The default is 120. "
+            ::= { hwETrunkEntry 21 }
+
+        hwETrunkBfdSessName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..15))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The name of a BFD session which is bound to the E-Trunk. 
+               And BFD session name is composed of octet string which is 1 to 15 octet and can't contain space within it. 
+               When the status of the BFD session is changed, the status of the E-Trunk is also changed with BFD's status."
+            ::= { hwETrunkEntry 22}
+
+        hwETrunkDescription OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..242))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The description of the E-Trunk. The default is NULL"
+            ::= { hwETrunkEntry 23}
+        
+        hwETrunkAutoBFDEnable OBJECT-TYPE
+            SYNTAX TruthValue 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object indicates whether the E-trunk enable auto BFD  function. "
+            ::= { hwETrunkEntry 24}
+            
+        hwETrunkAutoBFDTrackIfIndex OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object indicates the index of an interface which is tracked by the E-Trunk auto BFD session."
+            ::= { hwETrunkEntry 25}
+        
+        hwETrunkAutoBFDTxInterval OBJECT-TYPE
+            SYNTAX Integer32 (3..1000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The sending interval of E-Trunk auto BFD session in milliseconds. The default is 10."
+            ::= { hwETrunkEntry 26}
+            
+        hwETrunkAutoBFDRxInterval OBJECT-TYPE
+            SYNTAX Integer32 (3..1000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The receiving interval of E-Trunk auto BFD session in milliseconds. The default is 10."
+            ::= { hwETrunkEntry 27}
+            
+        hwETrunkAutoBFDDetectMultiplier OBJECT-TYPE
+            SYNTAX Integer32 (3..50)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The detect multiplier of E-Trunk auto BFD session. The default is 3."
+            ::= { hwETrunkEntry 28}         
+
+        hwETrunkExpectStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    backup(1),
+                    master(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The expect status of the E-Trunk. 
+                 1:backup. 
+                 2:master. "
+            ::= { hwETrunkEntry 29 }   
+
+        hwETrunkRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Current operation status of the row. It is used to manage the creation and deletion of conceptual rows."
+            ::= { hwETrunkEntry 50}
+
+
+
+
+
+--Memeber 
+        hwETrunkMemberTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwETrunkMemberEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The member table of the E-Trunk."
+            ::= { hwETrunkObjects 2 }
+
+
+
+        hwETrunkMemberEntry OBJECT-TYPE
+            SYNTAX HwETrunkMemberEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Member Entry."
+            INDEX { hwETrunkMemberParentId,hwETrunkMemberType, hwETrunkMemberId}
+            ::= { hwETrunkMemberTable 1 } 
+
+
+
+
+        HwETrunkMemberEntry ::=
+            SEQUENCE {  
+                hwETrunkMemberParentId
+                    Integer32,
+         
+
+                hwETrunkMemberType
+                    Integer32,
+                              
+
+                hwETrunkMemberId
+                    Unsigned32,
+
+
+                hwETrunkMemberStatus
+                    INTEGER,  
+
+
+                hwETrunkMemberStatusReason
+                    INTEGER,
+
+
+                hwETrunkMemberWorkMode
+                    INTEGER,
+
+
+                hwETrunkMemberPhyStatus
+                    INTEGER,  
+   
+
+                hwETrunkMemberRemoteId
+                    Unsigned32,
+                    
+
+                hwETrunkMemberRowStatus
+                    RowStatus
+
+        }  
+  
+
+        hwETrunkMemberParentId OBJECT-TYPE
+            SYNTAX Integer32 (1..128)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ID of the E-Trunk to which the member belongs."
+            ::= { hwETrunkMemberEntry 1 }
+
+
+
+        hwETrunkMemberType OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The type of the member. Now it is Eth-Trunk and Global-VE.
+                 1:Eth-Trunk.
+                 2:Global-VE."
+            ::= { hwETrunkMemberEntry 2 } 
+  
+
+        hwETrunkMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ID of the member."
+            ::= { hwETrunkMemberEntry 3 }
+
+
+
+        hwETrunkMemberStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    backup(1),
+                    master(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The member status.  
+                 1:backup. 
+                 2:master. "
+            ::= { hwETrunkMemberEntry 4 } 
+
+
+        hwETrunkMemberStatusReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    forceBackup(1),
+                    forceMaster(2),
+                    etrunkInit(3),
+                    etrunkBackup(4),
+                    etrunkMaster(5),
+                    peerMemberDown(6),
+                    peerMemberUp(7),
+                    activeActive(8),
+                    degradedActive(9),
+                    peerLinkDown(10),
+                    linkDown(11),
+                    allActive(12)	
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The reason for the member being in the current status.   
+                 forceBackup(1):The work mode of the member is force-backup. 
+                 forceMaster(2):The work mode of the member is force-master. 
+                 etrunkInit(3):The work mode of the member is auto. The status of E-Trunk is initialize. 
+                 etrunkBackup(4):The work mode of the member is auto. The status of E-Trunk is backup. 
+                 etrunkMaster(5):The work mode of the member is auto. The status of E-Trunk is master. 
+                 peerMemberDown(6):The status of the member belonging to the peer E-Trunk is down.  
+                 peerMemberUp(7):The status of the member belonging to the peer E-Trunk is up.
+                 activeActive(8):The status of the trill active-active is ok.
+                 degradedActive(9):The status of the trill active-active is fail, but the status of the peerlink is up.
+                 peerLinkDown(10):The status of the trill active-active is fail, and the status of the peerlink is down. 
+                 linkDown(11):The status of the E-Trunk member is down.
+                 allActive(12):The E-Trunk member is bound to an EVPN instance, and the redundancy mode is all-active."
+            ::= { hwETrunkMemberEntry 5 }
+
+   
+
+        hwETrunkMemberWorkMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    auto(1),
+                    forceBackup(2),
+                    forceMaster(3),
+                    activeActive(4)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The work mode of the member. 
+                 1:auto. 
+                 2:forceBackup. 
+                 3:forceMaster. 
+                 4:activeActive."
+            ::= { hwETrunkMemberEntry 6 }   
+
+        hwETrunkMemberPhyStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    up(1),
+                    down(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The physical status of the member. 
+                 1:up. 
+                 2:down. "
+            ::= { hwETrunkMemberEntry 7 } 
+
+            
+       hwETrunkMemberRemoteId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the ID of a remote E-Trunk member. By default, the ID of a remote E-Trunk member is the same as the ID of the local E-Trunk member. When both ends have E-Trunk member with different IDs, you need to specify the ID of a remote E-Trunk member."
+            ::= { hwETrunkMemberEntry 8 }
+            
+
+        hwETrunkMemberRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Current operation status of the row. It is used to manage the creation and deletion of conceptual rows."
+            ::= { hwETrunkMemberEntry 50 }
+
+--BackupPort
+            
+        hwETrunkBackupPortTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwETrunkBackupPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The backup port table of the E-Trunk."
+            ::= { hwETrunkObjects 3 }
+
+        hwETrunkBackupPortEntry OBJECT-TYPE
+            SYNTAX HwETrunkBackupPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Backup Port Entry."
+            INDEX { hwETrunkBackupETrunkId}
+            ::= { hwETrunkBackupPortTable 1 } 
+
+        HwETrunkBackupPortEntry::=
+            SEQUENCE {  
+                hwETrunkBackupETrunkId
+                    Integer32,
+                hwETrunkBackupPortNum
+                     Integer32,                
+                hwETrunkBackupPortRowStatus
+                    RowStatus
+        }  
+
+        hwETrunkBackupETrunkId OBJECT-TYPE
+            SYNTAX Integer32 (1..128)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the E-Trunk."
+            ::= { hwETrunkBackupPortEntry 1 }     
+
+        hwETrunkBackupPortNum OBJECT-TYPE
+            SYNTAX Integer32 (1025..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The backup port number of the E-Trunk for RBS."
+            ::= { hwETrunkBackupPortEntry 2 }                       
+
+        hwETrunkBackupPortRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Current operation status of the row. It is used to manage the creation and deletion of conceptual rows."
+            ::= { hwETrunkBackupPortEntry 3}
+
+
+-- Traps.
+
+        hwETrunkTraps            OBJECT IDENTIFIER ::= { hwETrunkMIB 2 } 
+        
+        hwETrunkStatusChange NOTIFICATION-TYPE
+            OBJECTS { 
+                hwETrunkStatus, 
+                hwETrunkStatusReason}
+            STATUS  current
+            DESCRIPTION
+                "The trap is generated when the status of the E-Trunk is changed or the status reason of the E-Trunk is changed."
+            ::= { hwETrunkTraps 1 }
+        
+
+        hwETrunkMemberStatusChange NOTIFICATION-TYPE
+            OBJECTS {
+                hwETrunkMemberStatus,
+                hwETrunkMemberStatusReason}
+            STATUS  current
+            DESCRIPTION
+                "The trap is generated when the status of the memeber is changed or the status reason of the memeber is changed."
+            ::= { hwETrunkTraps 2 }   
+        
+        hwETrunkExpectStateChange  NOTIFICATION-TYPE
+            OBJECTS { hwETrunkExpectStatus, hwETrunkStatusReason}
+            STATUS  current
+            DESCRIPTION
+                 "The trap is generated when the status of the E-Trunk is inconsistant with expected state ." 
+            ::= { hwETrunkTraps 3 }   
+		     
+        hwETrunkExpectStateResume  NOTIFICATION-TYPE
+            OBJECTS { hwETrunkExpectStatus, hwETrunkStatusReason }
+            STATUS  current
+            DESCRIPTION
+                 "The expected state trap of E-Trunk resumed." 
+            ::= { hwETrunkTraps 4 }    
+
+                   
+        hwETrunkConformance OBJECT IDENTIFIER ::= { hwETrunkMIB 3 }
+
+        
+        hwETrunkCompliances OBJECT IDENTIFIER ::= { hwETrunkConformance 1 }
+
+        
+        --  this module
+        hwETrunkFullCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwETrunkGroup, hwETrunkMemberGroup, hwETrunkNotificationGroup }
+            ::= { hwETrunkCompliances 1 }
+
+        
+        hwETrunkGroups OBJECT IDENTIFIER ::= { hwETrunkConformance 2 }
+
+        
+        hwETrunkGroup OBJECT-GROUP
+            OBJECTS {
+                hwETrunkSystemId,
+                hwETrunkPri,
+                hwETrunkStatus,
+                hwETrunkStatusReason,
+                hwETrunkPeerIpAddr,
+                hwETrunkSourceIpAddr,
+                hwETrunkReceiveFailTimeMultiple,
+                hwETrunkSendPeriod,
+                hwETrunkPacketReceive,
+                hwETrunkPacketSend,
+                hwETrunkPacketRecDrop,
+                hwETrunkPacketSndDrop,
+                hwETrunkPeerSystemId,
+                hwETrunkPeerPri,
+                hwETrunkPeerReceiveFailTime,
+                hwETrunkSecurityKeyType,
+                hwETrunkSecurityKey,
+                hwETrunkBfdSessId,
+                hwETrunkResetCounter,
+                hwETrunkRevertTime,
+                hwETrunkBfdSessName,
+                hwETrunkDescription,
+                hwETrunkAutoBFDEnable,
+                hwETrunkAutoBFDTrackIfIndex,
+                hwETrunkAutoBFDTxInterval,
+                hwETrunkAutoBFDRxInterval,
+                hwETrunkAutoBFDDetectMultiplier,
+                hwETrunkExpectStatus,
+                hwETrunkRowStatus        
+            }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwETrunkGroups 1 }
+
+        
+        hwETrunkMemberGroup OBJECT-GROUP
+            OBJECTS {
+                hwETrunkMemberStatus,
+                hwETrunkMemberStatusReason,
+                hwETrunkMemberWorkMode,
+                hwETrunkMemberPhyStatus, 
+                hwETrunkMemberRemoteId,
+                hwETrunkMemberRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwETrunkGroups 2 }
+
+        hwETrunkNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwETrunkStatusChange, hwETrunkMemberStatusChange,hwETrunkExpectStateChange,hwETrunkExpectStateResume  }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwETrunkGroups 3 }
+
+       hwETrunkBackupPortGroup OBJECT-GROUP
+            OBJECTS {
+                hwETrunkBackupPortNum,
+                hwETrunkBackupPortRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The backup port infomation of the E-Trunk."
+            ::= { hwETrunkGroups 4 }
+           
+END
+
+--
+-- HUAWEI-E-TRUNK-MIB.mib
+--

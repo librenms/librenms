@@ -12,14 +12,23 @@
         "issues": "https://github.com/librenms/librenms/issues/",
         "irc": "irc://irc.freenode.org/#librenms"
     },
+    "repositories":
+    [
+      {
+        "type": "vcs",
+        "url": "https://github.com/librenms/StringBladeCompiler"
+      }
+    ],
     "require": {
         "php": ">=5.6.4",
-        "ext-mysqli": "*",
+        "ext-pdo": "*",
         "ext-pcre": "*",
         "ext-curl": "*",
         "ext-session": "*",
         "ext-xml": "*",
         "ext-gd": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
         "ezyang/htmlpurifier": "^4.8",
         "phpmailer/phpmailer": "^5.2.21",
         "slim/slim": "^2.6",
@@ -37,13 +46,10 @@
         "influxdb/influxdb-php": "^1.14",
         "laravel/laravel": "5.4.*",
         "oriceon/toastr-5-laravel": "dev-master",
-
-        "doctrine/inflector": "1.1.*",
-        "symfony/event-dispatcher": "3.*",
-        "symfony/css-selector": "3.*",
-        "doctrine/instantiator": "1.0.*",
-        "phpdocumentor/reflection-docblock": "3.*",
-        "phpunit/php-token-stream": "1.*"
+        "wpb/string-blade-compiler": "3.4.x-dev",
+        "fico7489/laravel-pivot": "2.*",
+        "fideloper/proxy": "^4.0",
+        "doctrine/dbal": "^2.5"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.9.1",
@@ -53,18 +59,30 @@
         "fojuth/readmegen": "1.*",
         "barryvdh/laravel-ide-helper": "^2.4",
         "barryvdh/laravel-debugbar": "~2.4",
-        "justinrainbow/json-schema": "^5.2"
+        "justinrainbow/json-schema": "^5.2",
+        "fzaninotto/faker": "^1.8"
     },
     "suggest": {
         "ext-memcached": "Required if you utilize distributed polling",
-        "ext-posix": "Allows for additional validation tests"
+        "ext-posix": "Allows for additional validation tests",
+        "ext-mysqlnd": "*"
     },
     "autoload": {
+        "exclude-from-classmap": [
+            "/vendor/laravel/laravel/database/"
+        ],
+        "classmap": [
+            "database"
+        ],
         "psr-4": {
             "App\\": "app",
             "LibreNMS\\": "LibreNMS",
+            "LibreNMS\\Plugins\\" : "html/plugins",
             "LibreNMS\\Tests\\": "tests"
-        }
+        },
+        "files": [
+            "includes/helpers.php"
+        ]
     },
     "scripts": {
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",

@@ -1,6 +1,6 @@
 <?php
 
-$oid_list = 'eipHwApplianceModel.0 eipHwApplianceSerial.0 eipSdsVersionNumber.0';
+$oid_list = ['eipHwApplianceModel.0', 'eipHwApplianceSerial.0', 'eipSdsVersionNumber.0'];
 
 $eip = snmp_get_multi($device, $oid_list, '-OUQs', 'EIP-MON-MIB');
 

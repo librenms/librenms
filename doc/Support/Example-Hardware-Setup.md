@@ -1,4 +1,5 @@
 source: Support/Example-Hardware-Setup.md
+path: blob/master/doc/
 ### Example hardware setups
 
 The information in this document is direct from users, it's a place for people to share their 
@@ -69,7 +70,7 @@ Running in Proxmox.
 
 > Work
 
-|                | LibreNMS            | MySQl               |
+|                | LibreNMS            | MySQL               |
 | -------------- | ------------------- | ------------------- |
 | Type           | HP Proliantdl380gen8| Same Server         |
 | OS             | CentOS 7            |                     |
@@ -81,3 +82,20 @@ Running in Proxmox.
 | Ports          | 16167               |                     |
 | Health sensors | 3223                |                     |
 | Load           | < 14.5              |                     |
+
+#### [LaZyDK](https://github.com/lazydk)
+
+> Home
+
+|                | LibreNMS            | MariaDB             |
+| -------------- | ------------------- | ------------------- |
+| Type           | VM - QNAP TS-453 Pro| Same Server         |
+| OS             | Ubuntu 16.04        |                     |
+| CPU            | 1 vCore             |                     |
+| Memory         | 2GB                 |                     |
+| Disk Type      | Raid 1, SATA Drives |                     |
+| Disk Space     | 10 GB               |                     |
+| Devices        | 26                  |                     |
+| Ports          | 228                 |                     |
+| Health sensors | 117                 |                     |
+| Load           | < 0.92              |                     |

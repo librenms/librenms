@@ -6,7 +6,7 @@ if (!is_array($storage_cache['hpe-ilo'])) {
     echo("HPE ILO4 ");
 }
 
-$entry = $storage_cache['hpe-ilo'][$storage[storage_index]];
+$entry = $storage_cache['hpe-ilo'][$storage['storage_index']];
 
 $storage['units'] = 1024*1024;
 $storage['size'] = ($entry['cpqHoFileSysSpaceTotal'] * $storage['units']);

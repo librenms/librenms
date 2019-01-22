@@ -4,6 +4,7 @@
  * LibreNMS
  *
  * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk>
+ * Copyright (c) 2018 TheGreatDoc <https://github.com/TheGreatDoc>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -12,31 +13,43 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-header('Content-type: text/plain');
+header('Content-type: application/json');
 
-// FUA
-
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
+    $response = array(
+        'status'  => 'error',
+        'message' => 'Need to be admin',
+    );
+    echo _json_encode($response);
+    exit;
 }
 
-if (!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id']) || !isset($_POST['data'])) {
-    echo 'error with data';
-    exit;
+$status  = 'error';
+$message = 'Error updating sensor limit';
+$device_id = $_POST['device_id'];
+$sensor_id = $_POST['sensor_id'];
+$value_type = $_POST['value_type'];
+$data = $_POST['data'];
+
+if (!is_numeric($device_id)) {
+    $message = 'Missing device id';
+} elseif (!is_numeric($sensor_id)) {
+    $message = 'Missing sensor id';
+} elseif (!isset($data)) {
+    $message = 'Missing data';
 } else {
-    $update = dbUpdate(
-        array($_POST['value_type'] => set_null($_POST['data'], array('NULL')), 'sensor_custom' => 'Yes'),
-        'sensors',
-        '`sensor_id` = ? AND `device_id` = ?',
-        array($_POST['sensor_id'], $_POST['device_id'])
-    );
-    if (!empty($update) || $update == '0') {
-        echo 'success';
-        exit;
+    if (dbUpdate(array($value_type => set_null($data, array('NULL')), 'sensor_custom' => 'Yes'), 'sensors', '`sensor_id` = ? AND `device_id` = ?', array($sensor_id, $device_id)) >= 0) {
+        $message = 'Sensor value updated';
+        $status = 'ok';
     } else {
-        echo 'error';
-        exit;
+        $message = 'Could not update sensor value';
     }
 }
+
+$response = array(
+    'status'        => $status,
+    'message'       => $message,
+);
+echo _json_encode($response);

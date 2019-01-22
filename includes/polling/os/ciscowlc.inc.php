@@ -14,7 +14,7 @@ global $config;
 
 use LibreNMS\RRD\RrdDefinition;
 
-$oids = 'entPhysicalModelName.1 entPhysicalSoftwareRev.1 entPhysicalSerialNum.1';
+$oids = ['entPhysicalModelName.1', 'entPhysicalSoftwareRev.1', 'entPhysicalSerialNum.1'];
 
 $data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB');
 

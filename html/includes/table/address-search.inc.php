@@ -1,14 +1,14 @@
 <?php
 
 use LibreNMS\Util\IP;
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $param = array();
 
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $perms_sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
     $where     .= ' AND `DP`.`user_id`=?';
-    $param[]    = array(Auth::id());
+    $param[]    = array(LegacyAuth::id());
 }
 
 list($address,$prefix) = explode('/', $vars['address']);
@@ -93,7 +93,7 @@ foreach (dbFetchRows($sql, $param) as $interface) {
     }
 
     if ($interface['in_errors'] > 0 || $interface['out_errors'] > 0) {
-        $error_img = generate_port_link($interface, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", errors);
+        $error_img = generate_port_link($interface, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'errors');
     } else {
         $error_img = '';
     }

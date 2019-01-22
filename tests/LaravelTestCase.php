@@ -1,10 +1,11 @@
 <?php
 
-namespace Tests;
+namespace LibreNMS\Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
-abstract class TestCase extends BaseTestCase
+abstract class LaravelTestCase extends BaseTestCase
 {
     use CreatesApplication;
+    use SnmpsimHelpers;
 }

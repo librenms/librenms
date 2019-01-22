@@ -1,7 +1,6 @@
 <?php
 
 if ($ports['total']) {
-    echo '<div class="container-fluid">';
     echo '<div class="row">
           <div class="col-md-12">
             <div class="panel panel-default panel-condensed">
@@ -59,7 +58,7 @@ if ($ports['total']) {
 
     $ifsep = '';
 
-    foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1'", array($device['device_id'])) as $data) {
+    foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1' AND `disabled` = 0", array($device['device_id'])) as $data) {
         $data = cleanPort($data);
         $data = array_merge($data, $device);
         echo "$ifsep".generate_port_link($data, makeshortif(strtolower($data['label'])));
@@ -70,7 +69,6 @@ if ($ports['total']) {
     echo '  </td>';
     echo '</tr>';
     echo '</table>';
-    echo '</div>';
     echo '</div>';
     echo '</div>';
     echo '</div>';

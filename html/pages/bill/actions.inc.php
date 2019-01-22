@@ -1,7 +1,7 @@
 <?php
 
 if ($_POST['action'] == 'delete_bill' && $_POST['confirm'] == 'confirm') {
-    dbDelete('bill_hist', '`bill_id` = ?', array($bill_id));
+    dbDelete('bill_history', '`bill_id` = ?', array($bill_id));
     dbDelete('bill_ports', '`bill_id` = ?', array($bill_id));
     dbDelete('bill_data', '`bill_id` = ?', array($bill_id));
     dbDelete('bill_perms', '`bill_id` = ?', array($bill_id));
@@ -14,7 +14,7 @@ if ($_POST['action'] == 'delete_bill' && $_POST['confirm'] == 'confirm') {
 
 if ($_POST['action'] == 'reset_bill' && ($_POST['confirm'] == 'rrd' || $_POST['confirm'] == 'mysql')) {
     if ($_POST['confirm'] == 'mysql') {
-        dbDelete('bill_hist', '`bill_id` = ?', array($bill_id));
+        dbDelete('bill_history', '`bill_id` = ?', array($bill_id));
         dbDelete('bill_data', '`bill_id` = ?', array($bill_id));
     }
 
@@ -76,12 +76,13 @@ if ($_POST['action'] == 'update_bill') {
         }
     }//end if
 
+    // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
     if (dbUpdate(
         array(
             'bill_name'   => $_POST['bill_name'],
             'bill_day'    => $_POST['bill_day'],
-            'bill_quota'  => $bill_quota,
-            'bill_cdr'    => $bill_cdr,
+            'bill_quota'  => (string)$bill_quota,
+            'bill_cdr'    => (string)$bill_cdr,
             'bill_type'   => $_POST['bill_type'],
             'bill_custid' => $_POST['bill_custid'],
             'bill_ref'    => $_POST['bill_ref'],

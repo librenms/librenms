@@ -1,4 +1,5 @@
 source: Extensions/SNMP-Proxy.md
+path: blob/master/doc/
 # SNMP Proxy
 
 If you have machines that you want to monitor but are not reachable directly, you can use [SNMPD Proxy](http://www.net-snmp.org/wiki/index.php/Snmpd_proxy). This will use the reachable SNMPD to proxy requests to the unreachable SNMPD.

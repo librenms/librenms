@@ -302,6 +302,12 @@ class DeviceGroup extends BaseModel
 
     // ---- Define Relationships ----
 
+
+    public function alertSchedules()
+    {
+        return $this->morphToMany('App\Models\AlertSchedule', 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+    }
+
     public function rules()
     {
         return $this->belongsToMany('App\Models\AlertRule', 'alert_group_map', 'group_id', 'rule_id');
@@ -310,5 +316,10 @@ class DeviceGroup extends BaseModel
     public function devices()
     {
         return $this->belongsToMany('App\Models\Device', 'device_group_device', 'device_group_id', 'device_id');
+    }
+
+    public function services()
+    {
+        return $this->belongsToMany('App\Models\Service', 'device_group_device', 'device_group_id', 'device_id');
     }
 }

@@ -20,6 +20,7 @@ require 'includes/collectd/config.php';
 require 'includes/collectd/functions.php';
 require 'includes/collectd/definitions.php';
 
+global $MetaGraphDefs;
 load_graph_definitions();
 
 
@@ -86,7 +87,7 @@ foreach ($pinsts as &$instance) {
         $typeinstances = collectd_list_tinsts($device['hostname'], $vars['plugin'], $instance, $type);
 
         if ($MetaGraphDefs[$type]) {
-            $typeinstances = array($MetaGraphDefs[$type]);
+            $typeinstances = array('');
         }
 
         foreach ($typeinstances as &$tinst) {

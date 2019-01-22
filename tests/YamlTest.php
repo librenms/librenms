@@ -26,6 +26,7 @@
 namespace LibreNMS\Tests;
 
 use JsonSchema\Constraints\Constraint;
+use JsonSchema\Exception\JsonDecodingException;
 use LibreNMS\Config;
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -33,11 +34,17 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlTest extends TestCase
 {
+    /**
+     * @group os
+     */
     public function testOSDefinitionSchema()
     {
         $this->validateYamlFilesAgainstSchema('/includes/definitions', '/misc/os_schema.json');
     }
 
+    /**
+     * @group os
+     */
     public function testDiscoveryDefinitionSchema()
     {
         $this->validateYamlFilesAgainstSchema('/includes/definitions/discovery', '/misc/discovery_schema.json');
@@ -56,12 +63,18 @@ class YamlTest extends TestCase
                 throw new PHPUnitException("$path Could not be parsed", null, $e);
             }
 
-            $validator = new \JsonSchema\Validator;
-            $validator->validate(
-                $data,
-                $schema,
-                Constraint::CHECK_MODE_TYPE_CAST  // | Constraint::CHECK_MODE_VALIDATE_SCHEMA
-            );
+            try {
+                $validator = new \JsonSchema\Validator;
+                $validator->validate(
+                    $data,
+                    $schema,
+                    Constraint::CHECK_MODE_TYPE_CAST  // | Constraint::CHECK_MODE_VALIDATE_SCHEMA
+                );
+            } catch (JsonDecodingException $e) {
+                // Output the filename so we know what file failed
+                echo "Json format invalid in $schema_file\n";
+                throw $e;
+            }
 
             $errors = collect($validator->getErrors())
                 ->reduce(function ($out, $error) {

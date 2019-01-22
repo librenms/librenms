@@ -27,10 +27,10 @@
  * @param array $modules Which modules to initialize
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
-global $config, $permissions, $vars;
+global $config, $permissions, $vars, $console_color;
 
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 ini_set('display_errors', 1);
@@ -39,10 +39,9 @@ ini_set('display_startup_errors', 1);
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-require_once $install_dir . '/includes/common.php';
-
 # composer autoload
 if (!is_file($install_dir . '/vendor/autoload.php')) {
+    require_once $install_dir . '/includes/common.php';
     c_echo("%RError: Missing dependencies%n, run: %B./scripts/composer_wrapper.php install --no-dev%n\n\n");
 }
 require_once $install_dir . '/vendor/autoload.php';
@@ -55,6 +54,7 @@ if (!function_exists('module_selected')) {
 }
 
 // function only files
+require_once $install_dir . '/includes/common.php';
 require_once $install_dir . '/includes/dbFacile.php';
 require_once $install_dir . '/includes/rrdtool.inc.php';
 require_once $install_dir . '/includes/influxdb.inc.php';
@@ -92,26 +92,22 @@ if (module_selected('alerts', $init_modules)) {
     require_once $install_dir . '/includes/alerts.inc.php';
 }
 
+if (module_selected('laravel', $init_modules)) {
+    \LibreNMS\Util\Laravel::bootCli();
+}
+
+if (!module_selected('nodb', $init_modules)) {
+    \LibreNMS\DB\Eloquent::boot();
+
+    if (!\LibreNMS\DB\Eloquent::isConnected()) {
+        echo "Could not connect to database, check logs/librenms.log.\n";
+        exit;
+    }
+}
+
 // Display config.php errors instead of http 500
 $display_bak = ini_get('display_errors');
 ini_set('display_errors', 1);
-
-if (!module_selected('nodb', $init_modules)) {
-    // Connect to database
-    try {
-        // \LibreNMS\DB\Eloquent::boot();
-
-        dbConnect();
-    } catch (\LibreNMS\Exceptions\DatabaseConnectException $e) {
-        if (isCli()) {
-            echo 'MySQL Error: ' . $e->getMessage() . PHP_EOL;
-            exit(2);
-        } else {
-            // punt to the Laravel error handler
-            throw $e;
-        }
-    }
-}
 
 // Load config if not already loaded (which is the case if inside Laravel)
 if (!Config::has('install_dir')) {
@@ -127,7 +123,7 @@ if (isset($config['php_memory_limit']) && is_numeric($config['php_memory_limit']
 }
 
 try {
-    Auth::get();
+    LegacyAuth::get();
 } catch (Exception $exception) {
     print_error('ERROR: no valid auth_mechanism defined!');
     echo $exception->getMessage() . PHP_EOL;
@@ -158,5 +154,20 @@ if (module_selected('auth', $init_modules) ||
         $config['allow_unauth_graphs'] != true
     )
 ) {
-    require $install_dir . '/html/includes/authenticate.inc.php';
+    // populate the permissions cache TODO: remove?
+    $permissions = [];
+
+    $user_id = LegacyAuth::id();
+    foreach (dbFetchColumn('SELECT device_id FROM devices_perms WHERE user_id=?', [$user_id]) as $device_id) {
+        $permissions['device'][$device_id] = 1;
+    }
+
+    foreach (dbFetchColumn('SELECT port_id FROM ports_perms WHERE user_id=?', [$user_id]) as $port_id) {
+        $permissions['port'][$port_id] = 1;
+    }
+
+    foreach (dbFetchColumn('SELECT bill_id FROM bill_perms WHERE user_id=?', [$user_id]) as $bill_id) {
+        $permissions['bill'][$bill_id] = 1;
+    }
+    unset($user_id, $device_id, $port_id, $bill_id);
 }

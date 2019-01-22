@@ -1,4 +1,5 @@
 source: Alerting/Rules.md
+path: blob/master/doc/
 
 # Rules
 Rules are defined using a logical language.
@@ -41,9 +42,9 @@ __Conditions__ can be any of:
 - Less or Equal `<=`
 - Regex `REGEXP`
 
-__Values__ can be an entity or any data.
+__Values__ can be an entity or any data. If using macros as value you must include the macro name into backticks. i.e. \`macros.past_60m`
 
-__Note__: Regex supports MySQL Regular expressions
+__Note__: Regex supports MySQL Regular expressions.
 
 Arithmetics are allowed as well.
 
@@ -59,6 +60,24 @@ Here are some of the other options available when adding an alerting rule:
 - Mute alerts: Disables sending alert rule through alert transport. But will still show the alert in the Web UI.
 - Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
 - Recovery alerts: This will disable the recovery notification from being sent if turned off.
+
+# Advanced
+
+On the Advanced tab, you can specify some additional options for the alert rule:
+
+- Override SQL: Enable this if you using a custom query
+- Query: The query to be used for the alert.
+ 
+- An example of this would be an average rule for all CPUs over 10%
+
+```sql
+SELECT *,AVG(processors.processor_usage) as cpu_avg FROM devices,processors WHERE (devices.device_id = ? AND devices.device_id = processors.device_id) AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1 HAVING AVG(processors.processor_usage)  > 10
+```
+
+> The 10 would then contain the average CPU usage value, you can change this value to be whatever you like.
+
+- You will to need copy and paste this into the Alert Rule under Advanced then paste into Query box and switch the Override SQL.
+
 
 ## Procedure
 You can associate a rule to a procedure by giving the URL of the procedure when creating the rule. Only links like "http://" are supported, otherwise an error will be returned. Once configured, procedure can be opened from the Alert widget through the "Open" button, which can be shown/hidden from the widget configuration box.

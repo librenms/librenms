@@ -1,7 +1,7 @@
 <?php
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\ObjectCache;
 
@@ -179,27 +179,29 @@ if (count($devices_groups) > 0) {
     unset($group);
     echo '</ul></li>';
 }
-if (Auth::user()->hasGlobalAdmin()) {
-    if ($config['show_locations']) {
-        if ($config['show_locations_dropdown']) {
-            $locations = getlocations();
-            if (count($locations) > 0) {
-                echo('
+if ($config['show_locations']) {
+    if ($config['show_locations_dropdown']) {
+        $locations = getlocations();
+        if (count($locations) > 0) {
+            echo('
                     <li role="presentation" class="divider"></li>
                     <li class="dropdown-submenu">
                     <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> Geo Locations</a>
                     <ul class="dropdown-menu scrollable-menu">
+                    <li><a href="locations"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> All Locations</a></li>
                 ');
-                foreach ($locations as $location) {
-                    echo('            <li><a href="devices/location=' . urlencode($location) . '/"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> ' . $location . ' </a></li>');
-                }
-                echo('
+            foreach ($locations as $location) {
+                echo('            <li><a href="devices/location=' . $location['id'] . '/"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> ' . htmlentities($location['location']) . ' </a></li>');
+            }
+            echo('
                     </ul>
                     </li>
                 ');
-            }
         }
     }
+}
+
+if (Auth::user()->hasGlobalAdmin()) {
     echo '
             <li role="presentation" class="divider"></li>';
     if (is_module_enabled('poller', 'mib')) {
@@ -383,33 +385,8 @@ if ($menu_sensors) {
     echo('            <li role="presentation" class="divider"></li>');
 }
 
-$icons = array(
-    'fanspeed' => 'tachometer',
-    'humidity' => 'tint',
-    'temperature' => 'thermometer-full',
-    'current' => 'bolt',
-    'frequency' => 'line-chart',
-    'power' => 'power-off',
-    'voltage' => 'bolt',
-    'charge' => 'battery-half',
-    'dbm' => 'sun-o',
-    'load' => 'percent',
-    'runtime' => 'hourglass-half',
-    'state' => 'bullseye',
-    'signal' => 'wifi',
-    'snr' => 'signal',
-    'pressure' => 'thermometer-empty',
-    'cooling' => 'thermometer-full',
-    'airflow' => 'angle-double-right',
-    'delay' => 'clock-o',
-    'chromatic_dispersion' => 'indent',
-    'ber' => 'sort-amount-desc',
-    'quality_factor' => 'arrows',
-    'eer' => 'snowflake-o',
-    'waterflow' => 'tint',
-    'sessions' => 'users',
+$icons = \App\Models\Sensor::getIconMap();
 
-);
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {
     if (isset($menu_sensors[$item])) {
         echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg" aria-hidden="true"></i> '.nicecase($item).'</a></li>');
@@ -423,7 +400,7 @@ if ($sep && array_keys($menu_sensors)) {
     $sep = 0;
 }
 
-foreach (array('current','frequency','power','voltage') as $item) {
+foreach (array('current','frequency','power','voltage','power_consumed','power_factor') as $item) {
     if (isset($menu_sensors[$item])) {
         echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg" aria-hidden="true"></i> '.nicecase($item).'</a></li>');
         unset($menu_sensors[$item]);
@@ -612,6 +589,7 @@ if ($alerts['active_count'] > 0) {
                     <li><a href="<?php echo(generate_url(array('page'=>'alert-rules'))); ?>"><i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> Alert Rules</a></li>
                     <li><a href="<?php echo(generate_url(array('page'=>'alert-schedule'))); ?>"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Scheduled Maintenance</a></li>
                     <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-file fa-fw fa-lg" aria-hidden="true"></i> Alert Templates</a></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'alert-transports'))); ?>"><i class="fa fa-bus fa-fw fa-lg" aria-hidden="true"></i> Alert Transports</a></li>
                 <?php } ?>
           </ul>
       </li>
@@ -652,8 +630,16 @@ if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
 <?php
 
 if (Auth::check()) {
-    echo('
-           <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> Logout</a></li>');
+    echo '<li><a href="';
+    echo route('logout');
+    echo '" onclick="event.preventDefault(); document.getElementById(\'logout-form\').submit();">';
+    echo ' <i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> ';
+    echo __('Logout');
+    echo '</a><form id="logout-form" action="';
+    echo route('logout');
+    echo '" method="POST" style="display: none;">';
+    echo csrf_field();
+    echo '</form></li>';
 }
 ?>
          </ul>
@@ -671,7 +657,7 @@ if (Auth::user()->hasGlobalAdmin()) {
           <li role="presentation" class="divider"></li>
 
 <?php if (Auth::user()->hasGlobalAdmin()) {
-    if (Auth::get()->canManageUsers()) {
+    if (LegacyAuth::get()->canManageUsers()) {
         echo('
            <li><a href="adduser/"><i class="fa fa-user-plus fa-fw fa-lg" aria-hidden="true"></i> Add User</a></li>
            <li><a href="deluser/"><i class="fa fa-user-times fa-fw fa-lg" aria-hidden="true"></i> Remove User</a></li>
@@ -683,15 +669,16 @@ if (Auth::user()->hasGlobalAdmin()) {
            <li role="presentation" class="divider"></li> ');
     echo('
            <li class="dropdown-submenu">
-               <a href="#"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
+               <a href="pollers"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a>
                <ul class="dropdown-menu scrollable-menu">
-               <li><a href="poll-log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> Poller History</a></li>
                <li><a href="pollers/tab=pollers/"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> Pollers</a></li>');
 
     if ($config['distributed_poller'] === true) {
         echo ('
-                    <li><a href="pollers/tab=groups/"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Poller Groups</a></li>');
+                    <li><a href="pollers/tab=groups/"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Groups</a></li>');
     }
+    echo '    <li><a href="pollers/tab=performance/"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> Performance</a></li>';
+    echo '    <li><a href="pollers/tab=log/"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> History</a></li>';
     echo ('
                </ul>
            </li>
@@ -803,9 +790,6 @@ if ($(window).width() < 768) {
 devices.initialize();
 ports.initialize();
 bgp.initialize();
-$('#gsearch').bind('typeahead:select', function(ev, suggestion) {
-    window.location.href = suggestion.url;
-});
 $('#gsearch').typeahead({
     hint: true,
     highlight: true,
@@ -846,9 +830,13 @@ $('#gsearch').typeahead({
         header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
         suggestion: Handlebars.compile('<p><a href="{{url}}"><small>{{{bgp_image}}} {{name}} - {{hostname}}<br />AS{{localas}} -> AS{{remoteas}}</small></a></p>')
     }
-});
-$('#gsearch').bind('typeahead:open', function(ev, suggestion) {
-    $('#gsearch').addClass('search-box');
+}).on('typeahead:select', function(ev, suggestion) {
+    window.location.href = suggestion.url;
+}).on('keyup', function(e) {
+    // on enter go to the first selection
+    if(e.which === 13) {
+        $('.tt-selectable').first().click();
+    }
 });
 </script>
 

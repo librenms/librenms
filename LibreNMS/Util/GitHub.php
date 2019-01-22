@@ -41,7 +41,7 @@ class GitHub
     protected $pull_requests = [];
     protected $changelog = [];
     protected $markdown;
-    protected $labels = ['webui', 'api', 'documentation', 'security', 'feature', 'enhancement', 'device', 'bug', 'alerting'];
+    protected $labels = ['webui', 'api', 'documentation', 'security', 'feature', 'enhancement', 'device', 'bug', 'alerting','Breaking-Change'];
     protected $github = 'https://api.github.com/repos/librenms/librenms';
 
     public function __construct($tag, $from, $file, $token = null, $pr = null)
@@ -50,7 +50,7 @@ class GitHub
         $this->from = $from;
         $this->file = $file;
         $this->pr   = $pr;
-        if (is_null($token) === false || getenv('GH_TOKEN')) {
+        if (!is_null($token) || getenv('GH_TOKEN')) {
             $this->token = $token ?: getenv('GH_TOKEN');
         }
     }
@@ -63,7 +63,7 @@ class GitHub
      */
     public function getHeaders()
     {
-        if (is_null($this->token) === false) {
+        if (!is_null($this->token)) {
             return ['Authorization' => "token {$this->token}"];
         }
         return [];
@@ -104,16 +104,21 @@ class GitHub
      */
     public function getPullRequests($date, $page = 1)
     {
-        $prs = Requests::get($this->github . "/pulls?state=closed&page=$page", $this->getHeaders());
+        $prs = Requests::get($this->github . "/pulls?state=closed&sort=updated&direction=desc&page=$page", $this->getHeaders());
         $prs = json_decode($prs->body, true);
         foreach ($prs as $k => $pr) {
             if ($pr['merged_at']) {
+                $created    = new DateTime($pr['created_at']);
                 $merged     = new DateTime($pr['merged_at']);
+                $updated    = new DateTime($pr['updated_at']);
                 $end_date   = new DateTime($date);
                 if (isset($this->pr['merged_at']) && $merged > new DateTime($this->pr['merged_at'])) {
                     // If the date of this PR is newer than the final PR then skip over it
                     continue;
-                } elseif ($merged < $end_date) {
+                } elseif ($created < $end_date && $merged < $end_date && $updated >= $end_date) {
+                    // If this PR was created and merged before the last tag but has been updated since then skip over
+                    continue;
+                } elseif ($created < $end_date && $merged < $end_date && $updated < $end_date) {
                     // If the date of this PR is older than the last release we're done
                     return true;
                 } else {
@@ -141,6 +146,7 @@ class GitHub
             if ($pr['merged_at']) {
                 foreach ($pr['labels'] as $key => $label) {
                     $name = preg_replace('/ :[\S]+:/', '', strtolower($label['name']));
+                    $name = str_replace('-', ' ', $name);
                     if (in_array($name, $this->labels)) {
                         $title = ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title'])));
                         $output[$name][] = "$title ([#{$pr['number']}]({$pr['html_url']})) - [{$pr['user']['login']}]({$pr['user']['html_url']})" . PHP_EOL;
@@ -162,7 +168,7 @@ class GitHub
         $tmp_markdown = "##$this->tag" . PHP_EOL;
         $tmp_markdown .= '*(' . date('Y-m-d') . ')*' . PHP_EOL . PHP_EOL;
         if (!empty($this->changelog['users'])) {
-            $tmp_markdown .= "A big thank you to the following " . count($this->changelog['users']) . " contributors this last month:" . PHP_EOL;
+            $tmp_markdown .= "A big thank you to the following " . count($this->changelog['users']) . " contributors this last month:" . PHP_EOL . PHP_EOL;
             asort($this->changelog['users']);
             foreach (array_reverse($this->changelog['users']) as $user => $count) {
                 $tmp_markdown .= "  - $user ($count)" . PHP_EOL;
@@ -211,31 +217,55 @@ class GitHub
 
     public function createRelease()
     {
-        //FIXME Come back to this
-        return false;
-        $sha = isset($this->pr['merge_commit_sha']) ? $this->pr['merge_commit_sha'] : 'master';
-        $release = Requests::post($this->github . "/releases", $this->getHeaders(), [
+        // push the changelog
+        $existing = \Requests::get($this->github . '/contents/' . $this->file, $this->getHeaders());
+        $existing_sha = json_decode($existing->body)->sha;
+
+        $updated = Requests::put($this->github . '/contents/' . $this->file, $this->getHeaders(), json_encode([
+            'message' => 'Changelog for ' . $this->tag,
+            'content' => base64_encode(file_get_contents($this->file)),
+            'sha' => $existing_sha,
+        ]));
+
+        $updated_sha = json_decode($updated->body)->commit->sha;
+
+        // make sure the markdown is built
+        if (empty($this->markdown)) {
+            $this->createChangelog(false);
+        }
+
+        $release = Requests::post($this->github . "/releases", $this->getHeaders(), json_encode([
             'tag_name' => $this->tag,
-            'target_commitish' => $sha,
-            'body' => $this->getMarkdown(),
-            'draft' => true,
-        ]);
+            'target_commitish' => $updated_sha,
+            'body' => $this->markdown,
+            'draft' => false,
+        ]));
+
+        return $release->status_code == 201;
     }
 
     /**
-     *
      * Function to control the creation of creating a change log.
-     *
+     * @param bool $write
+     * @throws \Exception
      */
-    public function createChangelog()
+    public function createChangelog($write = true)
     {
         $previous_release = $this->getRelease($this->from);
-        if (is_null($this->pr) !== true) {
+        if (!is_null($this->pr)) {
             $this->getPullRequest();
         }
+
+        if (!isset($previous_release['published_at'])) {
+            throw new \Exception("Could not find previous release tag.");
+        }
+
         $this->getPullRequests($previous_release['published_at']);
         $this->buildChangeLog();
         $this->formatChangeLog();
-        $this->writeChangeLog();
+
+        if ($write) {
+            $this->writeChangeLog();
+        }
     }
 }

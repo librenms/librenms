@@ -119,7 +119,7 @@ if (is_numeric($jitter)) {
     unset($rrd_filename, $jitter);
 }
 
-$multi_get_array = snmp_get_multi($device, "regCount.0 regFailureCount.0", "-OQU", "WHISP-APS-MIB");
+$multi_get_array = snmp_get_multi($device, ['regCount.0', 'regFailureCount.0'], "-OQU", "WHISP-APS-MIB");
 d_echo($multi_get_array);
 $registered = $multi_get_array[0]["WHISP-APS-MIB::regCount"];
 $failed = $multi_get_array[0]["WHISP-APS-MIB::regFailureCount"];

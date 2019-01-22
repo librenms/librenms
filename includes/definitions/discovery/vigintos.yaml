@@ -1,0 +1,76 @@
+mib: VEL-HOST2-MIB
+modules:
+  sensors:
+    pre-cache:
+       data:
+           - oid:
+               - host2DevIndex
+    state:
+      data:
+        -
+          oid: host2DevLanState
+          num_oid: '.1.3.6.1.4.1.27993.5.6.1.4.{{ $index }}'
+          descr: "Lan {{ $host2DevIndex }} State"
+          state_name: host2DevLanState
+          states:
+            - { value: 0, generic: 2, graph: 1, descr: 'disconnected' }
+            - { value: 1, generic: 0, graph: 1, descr: 'connected' }
+    temperature:
+      data:
+        -
+          oid: host2DevParTable
+          value: host2DevParValue
+          num_oid: '.1.3.6.1.4.1.27993.5.9.1.3.{{ $index }}'
+          descr: host2DevParName
+          skip_values:
+          -
+            oid: host2DevParName
+            op: '!='
+            value: Temperature
+    voltage:
+      data:
+        -
+          oid: host2DevParTable
+          value: host2DevParValue
+          num_oid: '.1.3.6.1.4.1.27993.5.9.1.3.{{ $index }}'
+          descr: host2DevParName
+          skip_values:
+          -
+            oid: host2DevParName
+            op: '!='
+            value: Voltage
+    current:
+      data:
+        -
+          oid: host2DevParTable
+          value: host2DevParValue
+          num_oid: '.1.3.6.1.4.1.27993.5.9.1.3.{{ $index }}'
+          descr: host2DevParName
+          skip_values:
+          -
+            oid: host2DevParUnit
+            op: '!='
+            value: A
+    power:
+      data:
+        -
+          oid: host2DevParTable
+          value: host2DevParValue
+          num_oid: '.1.3.6.1.4.1.27993.5.9.1.3.{{ $index }}'
+          descr: host2DevParName
+          skip_values:
+          -
+            oid: host2DevParUnit
+            op: '!='
+            value: W
+        -
+          oid: host2DevParTable
+          value: host2DevParValue
+          num_oid: '.1.3.6.1.4.1.27993.5.9.1.3.{{ $index }}'
+          descr: host2DevParName
+          divisor: 1000
+          skip_values:
+          -
+            oid: host2DevParUnit
+            op: '!='
+            value: mW

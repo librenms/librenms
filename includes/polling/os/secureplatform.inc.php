@@ -7,7 +7,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$tmp_splat = snmp_get_multi_oid($device, 'svnVersion.0 svnApplianceProductName.0 svnApplianceSerialNumber.0', '-OUQs', 'CHECKPOINT-MIB');
+$tmp_splat = snmp_get_multi_oid($device, ['svnVersion.0', 'svnApplianceProductName.0', 'svnApplianceSerialNumber.0'], '-OUQs', 'CHECKPOINT-MIB');
 $serial   = $tmp_splat['svnApplianceSerialNumber.0'];
 $hardware = $tmp_splat['svnApplianceProductName.0'];
 $version  = $tmp_splat['svnVersion.0'];

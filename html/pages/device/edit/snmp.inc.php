@@ -1,9 +1,9 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 if ($_POST['editing']) {
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (LegacyAuth::user()->hasGlobalAdmin()) {
         $poller_group = isset($_POST['poller_group']) ? clean($_POST['poller_group']) : 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');
         if ($snmp_enabled) {
@@ -186,8 +186,7 @@ echo "      </select>
         <select name='port_assoc_mode' id='port_assoc_mode' class='form-control input-sm'>
 ";
 
-foreach (get_port_assoc_modes() as $pam) {
-    $pam_id = get_port_assoc_mode_id($pam);
+foreach (get_port_assoc_modes() as $pam_id => $pam) {
     echo "           <option value='$pam_id'";
 
     if ($pam_id == $device['port_association_mode']) {

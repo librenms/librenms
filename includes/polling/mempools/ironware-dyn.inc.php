@@ -27,7 +27,7 @@ else {
     $mempool_cache['ironware-dyn'] = snmpwalk_cache_multi_oid($device, 'snAgentBrdMemoryTotal', $mempool_cache['ironware-dyn'], 'FOUNDRY-SN-AGENT-MIB');
     d_echo($mempool_cache);
 
-    $entry = $mempool_cache['ironware-dyn'][$mempool[mempool_index]];
+    $entry = $mempool_cache['ironware-dyn'][$mempool['mempool_index']];
 
     $perc = $entry['snAgentBrdMemoryUtil100thPercent'];
 

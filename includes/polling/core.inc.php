@@ -11,9 +11,11 @@
  * See COPYING for more details.
  */
 
+use App\Models\Location;
+use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
-$snmpdata = snmp_get_multi_oid($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysObjectID.0 sysDescr.0', '-OQnUt', 'SNMPv2-MIB');
+$snmpdata = snmp_get_multi_oid($device, ['sysUpTime.0', 'sysLocation.0', 'sysContact.0', 'sysName.0', 'sysObjectID.0', 'sysDescr.0'], '-OQnUt', 'SNMPv2-MIB');
 
 $poll_device['sysUptime']   = $snmpdata['.1.3.6.1.2.1.1.3.0'];
 $poll_device['sysLocation'] = $snmpdata['.1.3.6.1.2.1.1.6.0'];
@@ -27,7 +29,7 @@ if (!empty($agent_data['uptime'])) {
     $uptime = round($uptime);
     echo "Using UNIX Agent Uptime ($uptime)\n";
 } else {
-    $uptime_data = snmp_get_multi($device, 'snmpEngineTime.0 hrSystemUptime.0', '-OQnUst', 'HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
+    $uptime_data = snmp_get_multi($device, ['snmpEngineTime.0', 'hrSystemUptime.0'], '-OQnUst', 'HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
 
     $uptime = max(
         round($poll_device['sysUptime'] / 100),
@@ -79,14 +81,23 @@ foreach (array('sysContact', 'sysObjectID', 'sysName', 'sysDescr') as $elem) {
     }
 }
 
-if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocation'] && $device['override_sysLocation'] == 0) {
-    $update_array['location'] = $poll_device['sysLocation'];
-    $device['location']       = $poll_device['sysLocation'];
-    log_event('Location -> ' . $poll_device['sysLocation'], $device, 'system', 3);
+if ($device['override_sysLocation'] == 0 && $poll_device['sysLocation']) {
+    /** @var Location $location */
+    $location = Location::firstOrCreate(['location' => $poll_device['sysLocation']]);
+
+    if ($device['location_id'] != $location->id) {
+        $device['location_id'] = $location->id;
+        $update_array['location_id'] = $location->id;
+        log_event('Location -> ' . $location->location, $device, 'system', 3);
+    }
 }
 
-if ($config['geoloc']['latlng'] === true) {
-    location_to_latlng($device);
+// make sure the location has coordinates
+if (Config::get('geoloc.latlng', true) && ($location || $location = Location::find($device['location_id']))) {
+    if (!$location->hasCoordinates()) {
+        $location->lookupCoordinates();
+        $location->save();
+    }
 }
 
 unset($snmpdata, $uptime_data, $uptime, $tags, $poll_device);

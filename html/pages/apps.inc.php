@@ -273,6 +273,11 @@ $graphs['powerdns-dnsdist'] = array(
     'rules_stats',
     'queries_drop',
 );
+$graphs['asterisk'] = array(
+    'calls',
+    'channels',
+    'sip',
+);
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";

@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $pagetitle[] = 'About';
 $git_log = `git log -10`;
@@ -90,7 +90,7 @@ echo "
     <table class='table table-condensed'>
       <tr>";
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (LegacyAuth::user()->hasGlobalAdmin()) {
     echo "        <td colspan='4'><span class='bg-danger'>$callback</span><br />
           Online stats: <a href='https://stats.librenms.org/'>stats.librenms.org</a></td>
         <tr>
@@ -170,7 +170,7 @@ echo "
 <div class='table-responsive'>
     <table class='table table-condensed' border='0'>
       <tr><td><b>Version</b></td><td><a href='http://www.librenms.org/changelog.html'>$version - <span id='version_date'>$version_date</span></a></td></tr>
-      <tr><td><b>DB Schema</b></td><td>#$schema_version</td></tr>
+      <tr><td><b>DB Schema</b></td><td>$schema_version</td></tr>
       <tr><td><b>Web Server</b></td><td>$webserv_version</td></tr>
       <tr><td><b>PHP</b></td><td>$php_version</td></tr>
       <tr><td><b>MySQL</b></td><td>$mysql_version</td></tr>
@@ -220,9 +220,9 @@ echo "
         event.preventDefault();
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: { type: "callback-statistics", state: state},
-            dataType: "html",
+            dataType: "json",
             success: function(data){
              },
              error:function(){
@@ -234,9 +234,9 @@ echo "
         event.preventDefault();
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/form',
             data: { type: "callback-clear"},
-            dataType: "html",
+            dataType: "json",
             success: function(data){
                 location.reload(true);
              },

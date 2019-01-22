@@ -12,49 +12,38 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    $status = array('status' => 1, 'message' => 'You need to be admin');
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
+    $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
-    foreach ($_POST['parent_ids'] as $parent) {
+    $parent_ids = (array)$_POST['parent_ids'];
+    $device_ids = (array)$_POST['device_ids'];
+
+    foreach ($parent_ids as $parent) {
         if (!is_numeric($parent)) {
-            $status = array('status' => 1, 'message' => 'Parent ID must be an integer!');
+            $status = ['status' => 1, 'message' => 'Parent ID must be an integer!'];
             break;
         }
     }
 
-    if (count($_POST['parent_ids']) > 1 && in_array('0', $_POST['parent_ids'])) {
-        $status = array('status' => 1, 'message' => 'Multiple parents cannot contain None-Parent!');
+    if (count($parent_ids) > 1 && in_array('0', $parent_ids)) {
+        $status = ['status' => 1, 'message' => 'Multiple parents cannot contain None-Parent!'];
     }
 
-    // A bit of an effort to reuse this code with dependency editing and the dependency wizard (editing multiple hosts at the same time)
-    $device_arr = array();
-    foreach ($_POST['device_ids'] as $dev) {
-        if (!is_numeric($dev)) {
-            $status = array('status' => 1, 'message' => 'Device ID must be an integer!');
+    foreach ($device_ids as $device_id) {
+        if (!is_numeric($device_id)) {
+            $status = ['status' => 1, 'message' => 'Device ID must be an integer!'];
             break;
-        } elseif (in_array($dev, $_POST['parent_ids'])) {
-            $status = array('status' => 1, 'message' => 'A device cannot depend itself');
+        } elseif (in_array($device_id, $parent_ids)) {
+            $status = ['status' => 1, 'message' => 'A device cannot depend itself'];
             break;
         }
-        $insert = array();
-        foreach ($_POST['parent_ids'] as $parent) {
-            if (is_numeric($parent) && $parent != 0) {
-                $insert[] = array('parent_device_id' => $parent, 'child_device_id' => $dev);
-            } elseif ($parent == 0) {
-                // In case we receive a mixed array with $parent = 0 (which shouldn't happen)
-                // Empty the insert array so we remove any previous dependency so 'None' takes precedence
-                $insert = array();
-                break;
-            }
-        }
-        dbDelete('device_relationships', '`child_device_id` = ?', array($dev));
-        if (!empty($insert)) {
-            dbBulkInsert($insert, 'device_relationships');
-        }
+
+        \App\Models\Device::find($device_id)->parents()->sync($parent_ids);
+
         $status = array('status' => 0, 'message' => 'Device dependencies have been saved');
     }
 }
 header('Content-Type: application/json');
-echo _json_encode($status);
+echo json_encode($status);

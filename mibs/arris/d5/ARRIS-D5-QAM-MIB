@@ -1,0 +1,994 @@
+    ARRIS-D5-QAM-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            D5Program
+                FROM ARRIS-D5-VIDEO-MIB           
+            arrisD5UEQam
+                FROM ARRIS-MIB
+            TenthdBmV, TenthdB
+                FROM DOCS-IF-MIB            
+            ifIndex, InterfaceIndex         
+                FROM IF-MIB         
+            PhysicalIndex
+                FROM ENTITY-MIB
+            OBJECT-GROUP, MODULE-COMPLIANCE         
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, Counter32, Gauge32, IpAddress,
+            OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI         
+            InetPortNumber          
+                FROM INET-ADDRESS-MIB
+            TruthValue, RowStatus, DisplayString            
+                FROM SNMPv2-TC;
+    
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5
+        d5QamMib MODULE-IDENTITY 
+            LAST-UPDATED "201001271744Z"        -- January 27, 2010 at 17:45 GMT
+            ORGANIZATION 
+                "Arris International"
+            CONTACT-INFO 
+                "Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+            DESCRIPTION 
+                "Arris D5 UEQ QAM Management MIB"
+            REVISION "201001271744Z"
+            DESCRIPTION
+                "Changed low bound on d5QamRFChannelSymbolRate to 3450000"
+            ::= { arrisD5UEQam 5 }
+
+-- ------------------------------------------------------------------------
+-- Type definitions
+-- ------------------------------------------------------------------------
+
+-- ------------------------------------------------------------------------
+-- QAM sections
+-- ------------------------------------------------------------------------
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1
+        d5QamRFObjects OBJECT IDENTIFIER ::= { d5QamMib 1 }
+        -- 1.3.6.1.4.1.4115.1.8.1.5.3
+        d5QamStatObjects OBJECT IDENTIFIER ::= { d5QamMib 3 }
+        -- 1.3.6.1.4.1.4115.1.8.1.5.4
+        d5QamSpareObjects OBJECT IDENTIFIER ::= { d5QamMib 4 }
+        -- 1.3.6.1.4.1.4115.1.8.1.5.5
+        d5QamDocsisObjects OBJECT IDENTIFIER ::= { d5QamMib 5 }
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6
+        d5QamMonitorObjects OBJECT IDENTIFIER ::= { d5QamMib 6 }
+        
+-- ------------------------------------------------------------------------
+-- QAM RF section
+-- ------------------------------------------------------------------------
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1.1
+        d5QamRFChannelTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF D5QamRFChannelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table extends docsIfDownstreamChannelTable with extra 
+                RF properties."
+            ::= { d5QamRFObjects 1 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1.1.1
+        d5QamRFChannelEntry OBJECT-TYPE
+            SYNTAX D5QamRFChannelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for a D5 QAM Channel RF Properties"
+            INDEX { ifIndex }
+            ::= { d5QamRFChannelTable 1 }
+
+        
+        D5QamRFChannelEntry ::=
+            SEQUENCE { 
+                d5QamRFChannelAnnex
+                    INTEGER,
+                d5QamRFChannelFrequency
+                    Unsigned32,
+                d5QamRFChannelModulation
+                    INTEGER,
+                d5QamRFChannelFECInterleaverLevel
+                    INTEGER,
+                d5QamRFChannelFECInterleaverMode
+                    INTEGER,
+                d5QamRFChannelPower
+                    TenthdBmV,
+                d5QamRFChannelSpectralInversion
+                    TruthValue,
+                d5QamRFChannelSymbolRate
+                    Unsigned32,
+                d5QamRFChannelWidth
+                    Unsigned32,
+                d5QamRFChannelRowStatus
+                    RowStatus
+             }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1.1.1.1
+        d5QamRFChannelAnnex OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                other(0),
+                annexA(1),
+                annexB(2),
+                annexC(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object indicates the conformance of
+                the implementation to important regional cable standards.
+                     annexA : Annex A from ITU-J83 is used.
+                     annexB : Annex B from ITU-J83 is used.
+                     annexC : Annex C from ITU-J83 is used."
+            ::= { d5QamRFChannelEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1.1.1.2
+        d5QamRFChannelFrequency OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "hertz"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The center of the downstream frequency associated with
+                this channel."
+            ::= { d5QamRFChannelEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1.1.1.3
+        d5QamRFChannelModulation OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                other(0),
+                qam64(6),
+                qam128(7),
+                qam256(8)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The modulation type associated with this downstream
+                channel."
+            DEFVAL { qam256 }
+            ::= { d5QamRFChannelEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1.1.1.4
+        d5QamRFChannelFECInterleaverLevel OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                fixed(1),
+                variable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This value contains the interleaving level in Annex B standard.
+                Level 1 (static) is specified for 64-QAM transmission only. This
+                mode accommodates the installed based of legacy 64-QAM only
+                digital set top. While in this level, a single interleaving depth
+                is supported, nameley I=128, J=1.
+                Level 2 (variable) encompasses both 64-QAM and 256-QAM transmissions
+                and is capable of supporting variable interleaving, whose depth is 
+                specified in d5QamRFChannelFECInterleaverMode"
+            DEFVAL { variable }
+            ::= { d5QamRFChannelEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1.1.1.5
+        d5QamRFChannelFECInterleaverMode OBJECT-TYPE
+            SYNTAX INTEGER (0..10 | 12..14)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This value contain the control word representing a
+                specific interleaving depth for Annex B level 2 (variable)
+                interleaving standard, which is one of the following:
+                
+                    0  - I=128 J=1
+                    1  - I=128 J=1
+                    2  - I=128 J=2
+                    3  - I=64  J=2
+                    4  - I=128 J=3
+                    5  - I=32  J=4
+                    6  - I=128 J=4
+                    7  - I=16  J=8
+                    8  - I=128 J=5
+                    9  - I=8   J=16
+                    10 - I=128 J=6
+                    11 - reserved
+                    13 - I=128 J=6
+                    12 - I=128 J=7
+                    14 - I=128 J=8
+                    15 - reserved
+                    16 - reserved"
+            DEFVAL { 6 }
+            ::= { d5QamRFChannelEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1.1.1.6
+        d5QamRFChannelPower OBJECT-TYPE
+            SYNTAX TenthdBmV
+            UNITS "dBmV"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "the transmit power associated with this channel."
+            ::= { d5QamRFChannelEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1.1.1.7
+        d5QamRFChannelSpectralInversion OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "true(1) if QAM Channel carrier spectrum is inverted"
+            DEFVAL { false }
+            ::= { d5QamRFChannelEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1.1.1.8
+        d5QamRFChannelSymbolRate OBJECT-TYPE
+            SYNTAX Unsigned32 (3450000..7040000)
+            UNITS "symbols/s"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Symbol rate of current transmission, this value is fixed for
+                64-QAM and 256-QAM transmission in Annex B standard.
+                It is variable in Annex A standard and can only be changed
+                while in this mode."
+            DEFVAL { 6952000 }
+            ::= { d5QamRFChannelEntry 8 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1.1.1.9
+        d5QamRFChannelWidth OBJECT-TYPE
+            SYNTAX Unsigned32 (6000000..8000000)
+            UNITS "hertz"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The distance between the center frequencies of the downstream frequency associated with
+                this channel."
+            ::= { d5QamRFChannelEntry 9 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.1.1.1.99
+        d5QamRFChannelRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The RowStatus for controlling entries in this table."
+            ::= { d5QamRFChannelEntry 99 }
+
+        
+-- ------------------------------------------------------------------------
+-- QAM Stats section
+-- ------------------------------------------------------------------------
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.3.1
+        d5QamStatProgramCounterTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF D5QamStatProgramCounterEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains counters of all MPEG packets whose PIDs
+                are associated with a program currently being streamed through
+                a QAM interface"
+            ::= { d5QamStatObjects 1 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.3.1.1
+        d5QamStatProgramCounterEntry OBJECT-TYPE
+            SYNTAX D5QamStatProgramCounterEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for a single program stream on a QAM interface"
+            INDEX { d5QamStatProgramCounterQamIfIndex, d5QamStatProgramCounterProgram }
+            ::= { d5QamStatProgramCounterTable 1 }
+
+        
+        D5QamStatProgramCounterEntry ::=
+            SEQUENCE { 
+                d5QamStatProgramCounterQamIfIndex
+                    InterfaceIndex,
+                d5QamStatProgramCounterProgram
+                    D5Program,
+                d5QamStatProgramCounterPackets
+                    Counter32
+             }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.3.1.1.1
+        d5QamStatProgramCounterQamIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "QAM interface associated with program stream."
+            ::= { d5QamStatProgramCounterEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.3.1.1.2
+        d5QamStatProgramCounterProgram OBJECT-TYPE
+            SYNTAX D5Program (1..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Program Number of program stream."
+            ::= { d5QamStatProgramCounterEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.3.1.1.3
+        d5QamStatProgramCounterPackets OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Count of all MPEG packets associated with the program stream."
+            ::= { d5QamStatProgramCounterEntry 3 }
+ 
+
+-- ------------------------------------------------------------------------
+-- QAM Redundancy section
+-- ------------------------------------------------------------------------
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.4.1
+        d5QamSpareGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF D5QamSpareGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains QAM physical entities that are part of 
+                redundancy spare groups. Spare groups are identified by the
+                spare entity itself through its physical index. A group must
+                contain 1 to N primaries QAM entities allowing 1:1 or 1:N
+                redundancy ability."
+            ::= { d5QamSpareObjects 1 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.4.1.1
+        d5QamSpareGroupEntry OBJECT-TYPE
+            SYNTAX D5QamSpareGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Each entry describe a single QAM physical entity and its
+                relationship to and role within a spare group."
+            INDEX { d5QamSpareGroupPrimaryPhysicalIndex }
+            ::= { d5QamSpareGroupTable 1 }
+
+
+        D5QamSpareGroupEntry ::=
+            SEQUENCE { 
+                d5QamSpareGroupPrimaryPhysicalIndex
+                    PhysicalIndex,
+                d5QamSpareGroupSparePhysicalIndex
+                    PhysicalIndex,
+                d5QamSpareGroupFailbackMode
+                    INTEGER,
+                d5QamSpareGroupFailoverStatus
+                    INTEGER,
+                d5QamSpareGroupRowStatus
+                    RowStatus
+             }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.4.1.1.1
+        d5QamSpareGroupPrimaryPhysicalIndex OBJECT-TYPE
+            SYNTAX      PhysicalIndex
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The Physical Index of the QAM entity."
+            ::= { d5QamSpareGroupEntry 1 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.4.1.1.2
+        d5QamSpareGroupSparePhysicalIndex OBJECT-TYPE
+            SYNTAX PhysicalIndex
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The Physical Index of the QAM spare entity. Spare must
+                identify itself."
+            ::= { d5QamSpareGroupEntry 2 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.4.1.1.3
+        d5QamSpareGroupFailbackMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                manual(1),
+                auto(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Must be 'none' for primary entities. For spare entities, it
+                defines the failback mode when the fault has cleared."
+            ::= { d5QamSpareGroupEntry 3 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.4.1.1.4
+        d5QamSpareGroupFailoverStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                active(1),
+                standby(2),
+                switched(3),
+                fail(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of this physical entity in spare group.
+                 active:   indicates that a primary entity is running normally.
+                           indicates that a spare entity has been failed over.
+                 standby:  indicates that spare entity is standing by.
+                 switched: indicates that a primary entity has failed over
+                           to spare.
+                 fail:     indicates that either primary or spare are not
+                           in service."   
+                       
+            ::= { d5QamSpareGroupEntry 4 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.4.1.1.99
+        d5QamSpareGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The RowStatus for controlling entries in this table."
+            ::= { d5QamSpareGroupEntry 99 }
+
+-- QAM Redundancy Notifications --
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.4.2
+        d5QamSpareGroupTraps OBJECT IDENTIFIER ::= { d5QamSpareObjects 2 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.4.2.1
+        d5QamSpareGroupFailOver NOTIFICATION-TYPE
+            OBJECTS
+                { 
+                d5QamSpareGroupPrimaryPhysicalIndex,
+                d5QamSpareGroupSparePhysicalIndex
+                }
+            STATUS current
+            DESCRIPTION
+                "This event signifies that a primary QAM physical entity has
+                been switched over to its spare."
+            ::= { d5QamSpareGroupTraps 1 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.4.2.2
+        d5QamSpareGroupFailBack NOTIFICATION-TYPE
+            OBJECTS
+                { 
+                d5QamSpareGroupPrimaryPhysicalIndex,
+                d5QamSpareGroupSparePhysicalIndex
+                }
+            STATUS current
+            DESCRIPTION
+                "This event signifies that a primary QAM physical entity is
+                no longer switched over to spare, which has been restored to 
+                stand-by duty."
+            ::= { d5QamSpareGroupTraps 2 }
+
+
+-- ------------------------------------------------------------------------
+-- QAM DOCSIS section
+-- ------------------------------------------------------------------------
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.5.1
+        d5QamDocsisChannelTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF D5QamDocsisChannelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table extends docsIfDownstreamChannelTable with DOCSIS 
+                 properties."
+            ::= { d5QamDocsisObjects 1 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.5.1.1
+        d5QamDocsisChannelEntry OBJECT-TYPE
+            SYNTAX D5QamDocsisChannelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for a D5 QAM Channel DOCSIS Properties"
+            INDEX { ifIndex }
+            ::= { d5QamDocsisChannelTable 1 }
+
+        
+        D5QamDocsisChannelEntry ::=
+            SEQUENCE { 
+                d5QamDocsisChannelDtiOffset
+                    INTEGER
+             }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.5.1.1.1
+        d5QamDocsisChannelDtiOffset OBJECT-TYPE
+            SYNTAX INTEGER (-30000..30000)
+            UNITS "ticks"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "DOCSIS Timing Interface: offset to be added to egress SYNC 
+                 timestamp messages."
+            DEFVAL { 0 }
+            ::= { d5QamDocsisChannelEntry 1 }
+
+
+-- ------------------------------------------------------------------------
+-- QAM Monitoring section
+-- ------------------------------------------------------------------------
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1
+        d5QamSnoopObjects OBJECT IDENTIFIER ::= { d5QamMonitorObjects 1 }
+
+-- QAM Data Monitoring --
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1.1
+        d5QamSnoopTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF D5QamSnoopEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table lists of QAM channels under snoop."
+            ::= { d5QamSnoopObjects 1 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1.1.1
+        d5QamSnoopEntry OBJECT-TYPE
+            SYNTAX D5QamSnoopEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for a single D5 QAM channel snoop"
+            INDEX { ifIndex, d5QamSnoopProbe }
+            ::= { d5QamSnoopTable 1 }
+
+
+        D5QamSnoopEntry ::=
+            SEQUENCE { 
+                d5QamSnoopProbe
+                    INTEGER,
+                d5QamSnoopTSID
+                    Unsigned32,
+                d5QamSnoopEncapsulation
+                    INTEGER,
+                d5QamSnoopIpSrc
+                    IpAddress,
+                d5QamSnoopPortSrc
+                    Unsigned32,
+                d5QamSnoopIpDest
+                    IpAddress,
+                d5QamSnoopPortDest
+                    Unsigned32,
+                d5QamSnoopRowStatus
+                    RowStatus
+             }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1.1.1.1
+        d5QamSnoopProbe OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                post-mux(1),
+                post-rf(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This value returns the probe type for snooping, which can
+                 be one of:
+                    post-mux: probe after muxing stage and before RF modulation
+                    post-rf: probe after RF modulation using builtin demodulator"
+            ::= { d5QamSnoopEntry 1 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1.1.1.2
+        d5QamSnoopTSID OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "After row creation, this value is read only and returns the
+                 current Transport Stream Identifier for this QAM channel.
+                 On row creation, if this value is non-zero, it will be used as
+                 an alternative identifier to ifIndex for the QAM channel;
+                 in which case, ifIndex must be 0."
+            DEFVAL { 0 }
+            ::= { d5QamSnoopEntry 2 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1.1.1.3
+        d5QamSnoopEncapsulation OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                udp(0)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value contains the encapsulation type for snooped data."
+            DEFVAL { udp }
+            ::= { d5QamSnoopEntry 3 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1.1.1.4
+        d5QamSnoopIpSrc OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This value returns the source IP address of snooped packets"
+            ::= { d5QamSnoopEntry 4 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1.1.1.5
+        d5QamSnoopPortSrc OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This value returns the source port of snooped packets"
+            ::= { d5QamSnoopEntry 5 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1.1.1.6
+        d5QamSnoopIpDest OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This value contains the target IP address of snooped packets"
+            ::= { d5QamSnoopEntry 6 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1.1.1.7
+        d5QamSnoopPortDest OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This value contains the target port of snooped packets"
+            ::= { d5QamSnoopEntry 7 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1.1.1.99
+        d5QamSnoopRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The RowStatus for controlling entries in this table."
+            ::= { d5QamSnoopEntry 99 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1.1.2
+        d5QamSnoopTOS OBJECT-TYPE
+            SYNTAX Unsigned32 (1..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value is used to fill in the Type Of Service field for egress
+                 IP packets containing snooped data."
+            ::= { d5QamSnoopObjects 2 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.1.1.3
+        d5QamSnoopVlanPriority OBJECT-TYPE
+            SYNTAX Unsigned32 (0..7)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value is used to fill in the VLAN priority field for egress
+                 Ethernet frames containing snooped IP packets."
+            ::= { d5QamSnoopObjects 3 }
+
+-- QAM RF Signal Monitoring --
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.2
+        d5QamRFSignalObjects OBJECT IDENTIFIER ::= { d5QamMonitorObjects 2 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.2.1
+        d5QamRFSignalQualityTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF D5QamRFSignalQualityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table lists signal quality for QAM channels."
+            ::= { d5QamRFSignalObjects 1 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.6.2.1.1
+        d5QamRFSignalQualityEntry OBJECT-TYPE
+            SYNTAX D5QamRFSignalQualityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for a single D5 QAM channel"
+            INDEX { ifIndex }
+            ::= { d5QamRFSignalQualityTable 1 }
+
+
+        D5QamRFSignalQualityEntry ::=
+            SEQUENCE { 
+                d5QamRFSigQMeasureControl
+                    INTEGER,
+                d5QamRFSigQMeasureDelay
+                    Unsigned32,
+                d5QamRFSigQMpegLock
+                    TruthValue,
+                d5QamRFSigQBitErrorRate
+                    Gauge32,
+                d5QamRFSigQUnerroreds
+                    Counter32,
+                d5QamRFSigQCorrecteds
+                    Counter32,
+                d5QamRFSigQUncorrectables
+                    Counter32,
+                d5QamRFSigQSignalNoise
+                    TenthdB
+             }
+
+
+        d5QamRFSigQMeasureControl OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                off(0),     -- channel scanning is disabled
+                scan(1)     -- channel scanning is enabled
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This value indicates wether on-board demodulator scans this
+                 channel for RF signal quality measurement."
+            DEFVAL { scan }
+            ::= { d5QamRFSignalQualityEntry 1 }
+
+
+        d5QamRFSigQMeasureDelay OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "ms"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This value contains the amount of time in milliseconds the
+                 demodulator stay on this channel once it has acquired a lock.
+                 The longer the time, the more relevant the measurement, a
+                 value of zero means that only lock status will be a meaningful
+                 measurement."
+            DEFVAL { 70 }
+            ::= { d5QamRFSignalQualityEntry 2 }
+
+
+        d5QamRFSigQMpegLock OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This value returns whether the on-board demodulator has
+                 acquired a full MPEG lock the last time if was scanning this
+                 channel."
+            ::= { d5QamRFSignalQualityEntry 3 }
+
+
+        d5QamRFSigQBitErrorRate OBJECT-TYPE
+            SYNTAX Gauge32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This value returns the bit error rate measured during the 
+                 last scan period. This value is in the order of 10E-08."
+            ::= { d5QamRFSignalQualityEntry 4 }
+
+
+        d5QamRFSigQUnerroreds OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value returns the accumulated count of unerrored codewords
+                 for all previous scan periods since this counter was cleared."
+            ::= { d5QamRFSignalQualityEntry 5 }
+
+
+        d5QamRFSigQCorrecteds OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value returns the accumulated count of corrected codewords
+                 for all previous scan periods since this counter was cleared."
+            ::= { d5QamRFSignalQualityEntry 6 }
+
+
+        d5QamRFSigQUncorrectables OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value returns the accumulated count of uncorrected codewords
+                 for all previous scan periods since this counter was cleared."
+            ::= { d5QamRFSignalQualityEntry 7 }
+
+
+        d5QamRFSigQSignalNoise OBJECT-TYPE
+            SYNTAX TenthdB
+            UNITS "dB"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This value returns the Signal To Noise ratio measured during
+                 the last scan period." 
+            ::= { d5QamRFSignalQualityEntry 8 }
+
+-- ------------------------------------------------------------------------
+-- QAM Conformance section
+-- ------------------------------------------------------------------------
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.99
+        d5QamConformance OBJECT IDENTIFIER ::= { d5QamMib 99 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.99.1
+        d5QamObjectGroups OBJECT IDENTIFIER ::= { d5QamConformance 1 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.99.2
+        d5QamNotificationGroups OBJECT IDENTIFIER ::= { d5QamConformance 2 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.99.3
+        d5QamCompliances OBJECT IDENTIFIER ::= { d5QamConformance 3 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.99.1.1
+        d5QamRFObjectGroup OBJECT-GROUP
+            OBJECTS {
+                d5QamRFChannelAnnex,
+                d5QamRFChannelFrequency,
+                d5QamRFChannelModulation,
+                d5QamRFChannelFECInterleaverLevel,
+                d5QamRFChannelFECInterleaverMode, 
+                d5QamRFChannelPower,
+                d5QamRFChannelSpectralInversion,
+                d5QamRFChannelSymbolRate,
+                d5QamRFChannelWidth,
+                d5QamRFChannelRowStatus
+            }
+            STATUS current
+            DESCRIPTION 
+                "The d5QamRF group of objects."
+            ::= { d5QamObjectGroups 1 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.99.1.2
+        d5QamStatObjectGroup OBJECT-GROUP
+            OBJECTS {
+                d5QamStatProgramCounterQamIfIndex,
+                d5QamStatProgramCounterProgram,
+                d5QamStatProgramCounterPackets
+            }
+            STATUS current
+            DESCRIPTION 
+                "The d5QamStat group of objects."
+            ::= { d5QamObjectGroups 2 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.99.1.3
+        d5QamSpareObjectGroup OBJECT-GROUP
+            OBJECTS {
+                d5QamSpareGroupPrimaryPhysicalIndex,
+                d5QamSpareGroupSparePhysicalIndex,
+                d5QamSpareGroupFailbackMode,
+                d5QamSpareGroupFailoverStatus
+            }
+            STATUS current
+            DESCRIPTION 
+                "The d5QamSpare group of objects."
+            ::= { d5QamObjectGroups 3 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.99.1.4
+        d5QamDocsisObjectGroup OBJECT-GROUP
+            OBJECTS {
+                d5QamDocsisChannelDtiOffset
+            }
+            STATUS current
+            DESCRIPTION 
+                "The d5Docsis group of objects."
+            ::= { d5QamObjectGroups 4 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.99.1.5
+        d5QamSnoopObjectGroup OBJECT-GROUP
+            OBJECTS {
+                d5QamSnoopTSID,
+                d5QamSnoopProbe,
+                d5QamSnoopEncapsulation,
+                d5QamSnoopIpSrc,
+                d5QamSnoopPortSrc,
+                d5QamSnoopIpDest,
+                d5QamSnoopPortDest,
+                d5QamSnoopRowStatus,
+                d5QamSnoopTOS,
+                d5QamSnoopVlanPriority
+            }
+            STATUS current
+            DESCRIPTION 
+                "The d5QamSnoop group of objects."
+            ::= { d5QamObjectGroups 5 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.99.1.6
+        d5QamRFSigQObjectGroup OBJECT-GROUP
+            OBJECTS {
+                d5QamRFSigQMeasureControl,
+                d5QamRFSigQMeasureDelay,
+                d5QamRFSigQMpegLock,
+                d5QamRFSigQBitErrorRate,
+                d5QamRFSigQUnerroreds,
+                d5QamRFSigQCorrecteds,
+                d5QamRFSigQUncorrectables,
+                d5QamRFSigQSignalNoise
+            }
+            STATUS current
+            DESCRIPTION 
+                "The d5QamRFSignalQuality group of objects."
+            ::= { d5QamObjectGroups 6 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.99.2.1
+        d5QamSpareGroupNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS {
+                d5QamSpareGroupFailOver,
+                d5QamSpareGroupFailBack
+            }
+            STATUS current
+            DESCRIPTION 
+                "The d5QamSpare group of notifications."
+            ::= { d5QamNotificationGroups 1 }
+
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.99.3.1
+        d5QamCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for ARRIS-D5-QAM-MIB."
+            MODULE -- d5QamMib
+                MANDATORY-GROUPS {
+                    d5QamRFObjectGroup,
+                    d5QamStatObjectGroup,
+                    d5QamSpareObjectGroup,
+                    d5QamSpareGroupNotificationGroup,
+                    d5QamDocsisObjectGroup,
+                    d5QamSnoopObjectGroup,
+                    d5QamRFSigQObjectGroup
+                }
+            ::= { d5QamCompliances 1 }
+
+        
+    END

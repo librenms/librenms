@@ -1,4 +1,5 @@
 source: Support/Discovery Support.md
+path: blob/master/doc/
 ### discovery.php
 
 This document will explain how to use discovery.php to debug issues or manually running to process data.
@@ -18,7 +19,7 @@ This document will explain how to use discovery.php to debug issues or manually 
 Debugging and testing options:
 -d                                           Enable debugging output
 -v                                           Enable verbose debugging output
--m                                           Specify single module to be run
+-m                                           Specify module(s) to be run. Comma separate modules, submodules may be added with /
 
 
 ```

@@ -5,31 +5,34 @@ namespace App\Models;
 class Sensor extends BaseModel
 {
     public $timestamps = false;
-    protected $primaryKey = 'sensors_id';
+    protected $primaryKey = 'sensor_id';
 
     protected static $icons = array(
-        'fanspeed' => 'tachometer',
-        'humidity' => 'tint',
-        'temperature' => 'thermometer-full',
-        'current' => 'bolt',
-        'frequency' => 'line-chart',
-        'power' => 'power-off',
-        'voltage' => 'bolt',
+        'airflow' => 'angle-double-right',
+        'ber' => 'sort-amount-desc',
         'charge' => 'battery-half',
+        'chromatic_dispersion' => 'indent',
+        'cooling' => 'thermometer-full',
+        'count' => 'hashtag',
+        'current' => 'bolt fa-flip-horizontal',
         'dbm' => 'sun-o',
+        'delay' => 'clock-o',
+        'eer' => 'snowflake-o',
+        'fanspeed' => 'refresh',
+        'frequency' => 'line-chart',
+        'humidity' => 'tint',
         'load' => 'percent',
+        'power' => 'power-off',
+        'power_consumed' => 'plug',
+        'power_factor' => 'calculator',
+        'pressure' => 'thermometer-empty',
+        'quality_factor' => 'arrows',
         'runtime' => 'hourglass-half',
-        'state' => 'bullseye',
         'signal' => 'wifi',
         'snr' => 'signal',
-        'pressure' => 'thermometer-empty',
-        'cooling' => 'thermometer-full',
-        'airflow' => 'angle-double-right',
-        'delay' => 'clock-o',
-        'chromatic_dispersion' => 'indent',
-        'ber' => 'sort-amount-desc',
-        'quality_factor' => 'arrows',
-        'eer' => 'snowflake-o',
+        'state' => 'bullseye',
+        'temperature' => 'thermometer-three-quarters',
+        'voltage' => 'bolt',
         'waterflow' => 'tint',
         'sessions' => 'users',
     );
@@ -49,7 +52,13 @@ class Sensor extends BaseModel
 
     public function icon()
     {
-        return collect(self::$icons)->get($this->sensor_class, 'heartbeat');
+        return collect(self::$icons)->get($this->sensor_class, 'delicius');
+    }
+
+    // for the legacy menu
+    public static function getIconMap()
+    {
+        return self::$icons;
     }
 
     // ---- Query Scopes ----
@@ -64,5 +73,10 @@ class Sensor extends BaseModel
     public function device()
     {
         return $this->belongsTo('App\Models\Device', 'device_id');
+    }
+
+    public function events()
+    {
+        return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
     }
 }

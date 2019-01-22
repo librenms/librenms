@@ -1,7 +1,8 @@
 source: Developing/os/Wireless-Sensors.md
+path: blob/master/doc/
 
 This document will guide you through adding wireless sensors for your new wireless device.
- 
+
 Currently we have support for the following wireless metrics along with the values we expect to see the data in:
 
 | Type        | Measurement | Interface                    | Description                                                                                     |
@@ -22,6 +23,7 @@ Currently we have support for the following wireless metrics along with the valu
 | rate        | bps         | WirelessRateDiscovery        | The negotiated rate of the connection (not data transfer)                                       |
 | rssi        | dBm         | WirelessRssiDiscovery        | The Received Signal Strength Indicator                                                          |
 | snr         | dB          | WirelessSnrDiscovery         | The Signal to Noise ratio, which is signal - noise floor                                        |
+| xpi         | dBm         | WirelessXpiDiscovery         | The Cross Polar Interference values                                                             |
 | ssr         | dB          | WirelessSsrDiscovery         | The Signal strength ratio, the ratio(or difference) of Vertical rx power to Horizontal rx power |
 | utilization | %           | WirelessUtilizationDiscovery | The % of utilization compared to the current rate                                               |
 
@@ -76,7 +78,7 @@ All discovery interfaces will require you to return an array of WirelessSensor o
   - $entPhysicalIndex = Defaults to null. Sets the entPhysicalIndex to be used to look up further hardware if available.
   - $entPhysicalIndexMeasured = Defaults to null. Sets the type of entPhysicalIndex used, i.e ports.
 
-Polling is done automatically based on the discovered data.  If for some reason you need to override polling, you can implement 
+Polling is done automatically based on the discovered data.  If for some reason you need to override polling, you can implement
 the required polling interface in `LibreNMS/Interfaces/Polling/Sensors`.  Using the polling interfaces should be avoided if possible.
 
 Graphing is performed automatically for wireless sensors, no custom graphing is required or supported.

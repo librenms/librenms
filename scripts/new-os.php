@@ -9,14 +9,7 @@ $options = getopt('h:o:t:v:d::');
 if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
     $type = $options['t'];
     $vendor = $options['v'];
-    if (isset($options['d'])) {
-        $debug = true;
-        $vdebug = true;
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        ini_set('log_errors', 1);
-        ini_set('error_reporting', 1);
-    }
+    set_debug(isset($options['d']));
 
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
     $device = device_by_id_cache($device_id);
@@ -104,6 +97,9 @@ discovery:
             mkdir($config['install_dir'] . "/mibs/$vendor/");
         }
         rename($config['temp_dir'] . "/{$options['o']}.mib", $config['install_dir'] . "/mibs/$vendor/$mib_name");
+    } elseif ($mib_name) {
+        $tmp_mib = explode('/', $mib_name);
+        $mib_name = array_pop($tmp_mib);
     }
 
     $tables = `{$config['snmptranslate']} -M {$config['mib_dir']}:{$config['mib_dir']}/$vendor -m $mib_name -TB '.*Table$' -Os`;
@@ -128,7 +124,7 @@ discovery:
                 -
                     oid: $table_name
                     value: $value
-                    num_oid: {$tmp_table[$value]}.
+                    num_oid: '{$tmp_table[$value]}.{{ \$index }}'
                     descr: $descr";
                     if ($multiplier) {
                         $discovery[$type] .= "\n                    multiplier: $multiplier";

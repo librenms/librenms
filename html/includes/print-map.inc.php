@@ -13,7 +13,7 @@
  */
 
 //Don't know where this should come from, but it is used later, so I just define it here.
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 $row_colour="#ffffff";
 
@@ -27,10 +27,10 @@ if (!empty($device['hostname'])) {
     $sql = ' ';
 }
 
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $join_sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D1`.`device_id` = `DP`.`device_id`';
     $sql  .= ' AND `DP`.`user_id`=?';
-    $sql_array[] = Auth::id();
+    $sql_array[] = LegacyAuth::id();
 }
 
 $devices_by_id = array();
@@ -50,11 +50,15 @@ if (is_numeric($vars['group'])) {
 
 if (in_array('mac', $config['network_map_items'])) {
     $ports = dbFetchRows("SELECT
+                             `D1`.`status` AS `local_status`,
                              `D1`.`device_id` AS `local_device_id`,
+                             `D1`.`disabled` AS `local_disabled`,
                              `D1`.`os` AS `local_os`,
                              `D1`.`hostname` AS `local_hostname`,
                              `D1`.`sysName` AS `local_sysName`,
+                             `D2`.`status` AS `remote_status`,
                              `D2`.`device_id` AS `remote_device_id`,
+                             `D2`.`disabled` AS `remote_disabled`,
                              `D2`.`os` AS `remote_os`,
                              `D2`.`hostname` AS `remote_hostname`,
                              `D2`.`sysName` AS `remote_sysName`,
@@ -95,11 +99,15 @@ if (in_array('mac', $config['network_map_items'])) {
 
 if (in_array('xdp', $config['network_map_items'])) {
     $devices = dbFetchRows("SELECT
+                             `D1`.`status` AS `local_status`,
                              `D1`.`device_id` AS `local_device_id`,
                              `D1`.`os` AS `local_os`,
+                             `D1`.`disabled` AS `local_disabled`,
                              `D1`.`hostname` AS `local_hostname`,
                              `D1`.`sysName` AS `local_sysName`,
+                             `D2`.`status` AS `remote_status`,
                              `D2`.`device_id` AS `remote_device_id`,
+                             `D2`.`disabled` AS `remote_disabled`,
                              `D2`.`os` AS `remote_os`,
                              `D2`.`hostname` AS `remote_hostname`,
                              `D2`.`sysName` AS `remote_sysName`,
@@ -138,25 +146,99 @@ if (in_array('xdp', $config['network_map_items'])) {
 
 $list = array_merge($ports, $devices);
 
+// Build the style variables we need
+
+$node_disabled_style = array(
+    'color' => array(
+        'highlight' => array(
+            'background' => $config['network_map_legend']['di.node'],
+        ),
+        'border' => $config['network_map_legend']['di.border'],
+        'background' => $config['network_map_legend']['di.node'],
+    ),
+);
+$node_down_style = array(
+    'color' => array(
+        'highlight' => array(
+            'background' => $config['network_map_legend']['dn.node'],
+            'border' => $config['network_map_legend']['dn.border'],
+        ),
+        'border' => $config['network_map_legend']['dn.border'],
+        'background' => $config['network_map_legend']['dn.node'],
+    ),
+);
+$edge_disabled_style = array(
+    'dashes' => array(8,12),
+    'color' => array(
+        'color' => $config['network_map_legend']['di.edge'],
+        'highlight' => $config['network_map_legend']['di.edge'],
+    ),
+);
+$edge_down_style = array(
+    'dashes' => array(8,12),
+    'color' => array(
+        'border' => $config['network_map_legend']['dn.border'],
+        'highlight' => $config['network_map_legend']['dn.edge'],
+        'color' => $config['network_map_legend']['dn.edge'],
+    ),
+);
+
 // Iterate though ports and links, generating a set of devices (nodes)
 // and links (edges) that make up the topology graph.
-foreach ($list as $items) {
-    $local_device = array('device_id'=>$items['local_device_id'], 'os'=>$items['local_os'], 'hostname'=>$items['local_hostname']);
-    $remote_device = array('device_id'=>$items['remote_device_id'], 'os'=>$items['remote_os'], 'hostname'=>$items['remote_hostname']);
 
-    $local_port = array('port_id'=>$items['local_port_id'],'device_id'=>$items['local_port_device_id'],'ifName'=>$items['local_ifname'],'ifSpeed'=>$items['local_ifspeed'],'ifOperStatus'=>$items['local_ifoperstatus'],'ifAdminStatus'=>$items['local_adminstatus']);
-    $remote_port = array('port_id'=>$items['remote_port_id'],'device_id'=>$items['remote_port_device_id'],'ifName'=>$items['remote_ifname'],'ifSpeed'=>$items['remote_ifspeed'],'ifOperStatus'=>$items['remote_ifoperstatus'],'ifAdminStatus'=>$items['remote_adminstatus']);
+foreach ($list as $items) {
+    $local_device = array(
+        'device_id'=>$items['local_device_id'],
+        'os'=>$items['local_os'],
+        'hostname'=>$items['local_hostname'],
+    );
+    $remote_device = array(
+        'device_id'=>$items['remote_device_id'],
+        'os'=>$items['remote_os'],
+        'hostname'=>$items['remote_hostname'],
+    );
+    $local_port = array(
+        'port_id'=>$items['local_port_id'],
+        'device_id'=>$items['local_port_device_id'],
+        'ifName'=>$items['local_ifname'],
+        'ifSpeed'=>$items['local_ifspeed'],
+        'ifOperStatus'=>$items['local_ifoperstatus'],
+        'ifAdminStatus'=>$items['local_adminstatus'],
+    );
+    $remote_port = array(
+        'port_id'=>$items['remote_port_id'],
+        'device_id'=>$items['remote_port_device_id'],
+        'ifName'=>$items['remote_ifname'],
+        'ifSpeed'=>$items['remote_ifspeed'],
+        'ifOperStatus'=>$items['remote_ifoperstatus'],
+        'ifAdminStatus'=>$items['remote_adminstatus'],
+    );
 
     $local_device_id = $items['local_device_id'];
     if (!array_key_exists($local_device_id, $devices_by_id)) {
         $items['sysName'] = $items['local_sysName'];
-        $devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>shorthost(format_hostname($items, $items['local_hostname']), 1),'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
+        $devices_by_id[$local_device_id] = array(
+            'id'=>$local_device_id,
+            'label'=>shorthost(format_hostname($items, $items['local_hostname']), 1),
+            'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),
+            'shape'=>'box',
+        );
+        if ($items['local_disabled'] != '0') {
+            $devices_by_id[$local_device_id] = array_merge($devices_by_id[$local_device_id], $node_disabled_style);
+        } elseif ($items['local_status'] == '0') {
+            $devices_by_id[$local_device_id] = array_merge($devices_by_id[$local_device_id], $node_down_style);
+        }
     }
 
     $remote_device_id = $items['remote_device_id'];
     if (!array_key_exists($remote_device_id, $devices_by_id)) {
         $items['sysName'] = $items['remote_sysName'];
         $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>shorthost(format_hostname($items, $items['remote_hostname']), 1),'title'=>generate_device_link($remote_device, '', array(), '', '', '', 0),'shape'=>'box');
+        if ($items['remote_disabled'] != '0') {
+            $devices_by_id[$remote_device_id] = array_merge($devices_by_id[$remote_device_id], $node_disabled_style);
+        } elseif ($items['remote_status'] == '0') {
+            $devices_by_id[$remote_device_id] = array_merge($devices_by_id[$remote_device_id], $node_down_style);
+        }
     }
 
     $speed = $items['local_ifspeed']/1000/1000;
@@ -172,11 +254,25 @@ foreach ($list as $items) {
     } else {
         $link_used = $link_out_used;
     }
-    $link_used = round($link_used, -1);
+    $link_used = round(2 * $link_used, -1) / 2;
     if ($link_used > 100) {
         $link_used = 100;
     }
-    $link_color = $config['network_map_legend'][$link_used];
+
+    $link_style = array('color' => array('border' => $config['network_map_legend'][$link_used], 'highlight' => $config['network_map_legend'][$link_used], 'color' => $config['network_map_legend'][$link_used]));
+
+
+    if (($items['remote_ifoperstatus'] == 'down') || ($items['local_ifoperstatus'] == 'down')) {
+        $link_style = $edge_down_style;
+    }
+    if (($items['remote_disabled'] != '0') && ($items['local_disabled'] != '0')) {
+        $link_style = $edge_disabled_style;
+    } elseif (($items['remote_status'] == '0') && ($items['local_status'] == '0')) {
+        $link_style = $edge_down_style;
+    } elseif (($items['remote_status'] == '1' && $items['remote_ifoperstatus'] == 'down') || ($items['local_status'] == '1' && $items['local_ifoperstatus'] == 'down')) {
+        $link_style = $edge_down_style;
+    }
+
     $link_id1 = $items['local_port_id'].':'.$items['remote_port_id'];
     $link_id2 = $items['remote_port_id'].':'.$items['local_port_id'];
     $device_id1 = $items['local_device_id'].':'.$items['remote_device_id'];
@@ -189,7 +285,16 @@ foreach ($list as $items) {
         !array_key_exists($device_id2, $device_assoc_seen)) {
         $local_port = cleanPort($local_port);
         $remote_port = cleanPort($remote_port);
-        $links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#", "", $row_colour)."'>\n", '', 0, 1),'width'=>$width,'color'=>$link_color);
+        $links[] = array_merge(
+            array(
+                'from'=>$items['local_device_id'],
+                'to'=>$items['remote_device_id'],
+                'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),
+                'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#", "", $row_colour)."'>\n", '', 0, 1),
+                'width'=>$width,
+            ),
+            $link_style
+        );
     }
     $link_assoc_seen[$link_id1] = 1;
     $link_assoc_seen[$link_id2] = 1;

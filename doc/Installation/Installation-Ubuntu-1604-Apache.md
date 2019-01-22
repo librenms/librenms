@@ -1,4 +1,5 @@
 source: Installation/Installation-Ubuntu-1604-Apache.md
+path: blob/master/doc/
 > NOTE: These instructions assume you are the **root** user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
 **Please note the minimum supported PHP version is 5.6.4**
@@ -36,13 +37,10 @@ exit
 
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
 
-> NOTE: Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
-
 Within the `[mysqld]` section please add:
 
 ```bash
 innodb_file_per_table=1
-sql-mode=""
 lower_case_table_names=0
 ```
     systemctl restart mysql

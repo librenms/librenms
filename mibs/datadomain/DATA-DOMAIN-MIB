@@ -27,16 +27,16 @@ DATA-DOMAIN-MIB DEFINITIONS ::=	BEGIN
             FROM IF-MIB;
         
     dataDomainMib MODULE-IDENTITY
-        LAST-UPDATED "201510290000Z"  -- 29 oct, 2015 
+        LAST-UPDATED "201705160000Z"  -- 16 may, 2017 
 	ORGANIZATION "Data Domain, Inc"
 	CONTACT-INFO
 	    "Phone: +1-408-980-4800 
 	     Fax:   +1-408-980-8620"
 	DESCRIPTION
 	    "This MIB is used for managing the suite of Data Domain Products."
-        REVISION "201510290000Z"  -- 29 oct, 2015 
+        REVISION "201705160000Z"  -- 16 may, 2017 
         DESCRIPTION
-           "Updated mib on 29 oct, 2015. Please refer to Release Guide for list of changes."
+           "Updated mib on 16 may, 2017. Please refer to Release Guide for list of changes."
 	::= { enterprises 19746 }
 
     dataDomainMibConformance	OBJECT IDENTIFIER ::= { dataDomainMib 0 }
@@ -1634,7 +1634,28 @@ DATA-DOMAIN-MIB DEFINITIONS ::=	BEGIN
                                 twoWay          (2),
                                 anonymous       (3)
                             }
-   
+
+    HaSystemStatusTC                 ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+               "The status of the high availabiilty system."
+    SYNTAX      INTEGER     {
+                                  unknown(0),
+                                  highlyAvailable(1),
+                                  degraded(2)
+                            }
+
+    HaStatusTC                       ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+               "The status of a high availabiilty component."
+    SYNTAX      INTEGER     {
+                                  unknown(0),
+                                  ok(1),
+                                  notOk(2),
+                                  notApplicable(3)
+                            }
+  
 -- **********************************************************************
 --
 -- Environmentals 
@@ -9108,77 +9129,217 @@ DATA-DOMAIN-MIB DEFINITIONS ::=	BEGIN
 
     highAvailabilityStatus       OBJECT IDENTIFIER ::= { highAvailability 1 }
 
-    haSystemStatus OBJECT-TYPE
-        SYNTAX  DDMibString96TC
+    haSystemName OBJECT-TYPE
+        SYNTAX  DDMibTableString128TC
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
-            "The HA/System Status"
+            "High Availability System Name"
         ::= { highAvailabilityStatus 1 }
 
-    localNodeRole OBJECT-TYPE
-        SYNTAX  DDMibString96TC
+    haSystemStatus OBJECT-TYPE
+        SYNTAX  HaSystemStatusTC
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
-            "The Local Node role"
+            "High Availability System Status"
         ::= { highAvailabilityStatus 2 }
 
-    localHaState OBJECT-TYPE
-        SYNTAX  DDMibString96TC
+    haInterconnectStatus OBJECT-TYPE
+        SYNTAX   HaStatusTC
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
-            "The Local HA State"
+            "High Availability Interconnect Status"
         ::= { highAvailabilityStatus 3 }
 
-    peerNodeRole OBJECT-TYPE
-        SYNTAX  DDMibString96TC
+    haPrimaryHeartbeatStatus OBJECT-TYPE
+        SYNTAX  HaStatusTC
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
-            "The Peer Node Role"
+            "High Availability Primary Heartbeat Status"
         ::= { highAvailabilityStatus 4 }
 
-    peerHaState OBJECT-TYPE
-        SYNTAX  DDMibString96TC
+    haExternalLanHeartbeatStatus OBJECT-TYPE
+        SYNTAX  HaStatusTC
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
-            "The Peer HA State"
+            "High Availability External LAN Heartbeat Status"
         ::= { highAvailabilityStatus 5 }
 
+    haHardwareCompatibilityCheck OBJECT-TYPE
+        SYNTAX  HaStatusTC
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "High Availability Hardware Compatibility Check"
+        ::= { highAvailabilityStatus 6 }
+
+    haSoftwareVersionCheck OBJECT-TYPE
+        SYNTAX  HaStatusTC
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "High Availability Software Version Check"
+        ::= { highAvailabilityStatus 7 }
 
 
 -- **********************************************************************
 --
--- highAvailabilityConfig
+-- highAvailabilityNode
 -- ====================
 --
 -- dataDomainMib                (1.3.6.1.4.1.19746)
 --   dataDomainMibObjects       (1.3.6.1.4.1.19746.1)
 --     highAvailability         (1.3.6.1.4.1.19746.1.22)
---       highAvailabilityConfig (1.3.6.1.4.1.19746.1.20.2)
+--       highAvailabilityNode   (1.3.6.1.4.1.19746.1.22.2)
 --
 -- **********************************************************************
 
-    highAvailabilityConfig       OBJECT IDENTIFIER ::= { highAvailability 2 }
+    highAvailabilityNode       OBJECT IDENTIFIER ::= { highAvailability 2 }
 
-    haConfiguredMode OBJECT-TYPE
-        SYNTAX  DDMibString96TC
+    highAvailabilityNodeTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF HighAvailabilityNodeEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table provides high availability node information.
+            "
+        ::= { highAvailabilityNode 1 }
+
+    highAvailabilityNodeEntry OBJECT-TYPE
+        SYNTAX  HighAvailabilityNodeEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry represents one instance about a high availability node.
+	    "
+        INDEX { highAvailabilityNodeIdx }
+        ::= { highAvailabilityNodeTable 1 }
+
+    HighAvailabilityNodeEntry ::= SEQUENCE {
+        highAvailabilityNodeIdx                DDMibTableIndexTC,
+        highAvailabilityNodeName               DDMibTableString128TC,
+        highAvailabilityNodeId                 DDMibTableString128TC,
+        highAvailabilityNodeRole               DDMibTableString128TC,
+        highAvailabilityNodeState              DDMibTableString128TC,
+        highAvailabilityNodeHealth             HaStatusTC
+    }
+
+    highAvailabilityNodeIdx OBJECT-TYPE
+        SYNTAX  DDMibTableIndexTC 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The index into this table indentifying a particular node."
+        ::= { highAvailabilityNodeEntry 1 }
+
+    highAvailabilityNodeName OBJECT-TYPE
+        SYNTAX  DDMibTableString128TC
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
-            "The HA Configured Mode"
-        ::= { highAvailabilityConfig 1 }
+            "The name of a high availability node."
+        ::= { highAvailabilityNodeEntry 2 }
 
-    haLocalPnodeId OBJECT-TYPE
-        SYNTAX  DDMibInteger32TC
+    highAvailabilityNodeId OBJECT-TYPE
+        SYNTAX  DDMibTableString128TC
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
-            "The HA local pnode id"
-        ::= { highAvailabilityConfig 2 }
+            "The ID of a high availability node."
+        ::= { highAvailabilityNodeEntry 3 }
+
+    highAvailabilityNodeRole OBJECT-TYPE
+        SYNTAX  DDMibTableString128TC
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The role of a high availability node."
+        ::= { highAvailabilityNodeEntry 4 }
+
+    highAvailabilityNodeState OBJECT-TYPE
+        SYNTAX  DDMibTableString128TC
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The state of a high availability node."
+        ::= { highAvailabilityNodeEntry 5 }
+
+    highAvailabilityNodeHealth OBJECT-TYPE
+        SYNTAX  HaStatusTC
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The health of the high availability node's resources."
+        ::= { highAvailabilityNodeEntry 6 }
+
+
+-- **********************************************************************
+--
+-- highAvailabilityComponent
+-- =========================
+--
+-- dataDomainMib                    (1.3.6.1.4.1.19746)
+--   dataDomainMibObjects           (1.3.6.1.4.1.19746.1)
+--     highAvailability             (1.3.6.1.4.1.19746.1.22)
+--       highAvailabilityComponent  (1.3.6.1.4.1.19746.1.22.3)
+--
+-- **********************************************************************
+
+    highAvailabilityComponent       OBJECT IDENTIFIER ::= { highAvailability 3 }
+
+    highAvailabilityComponentTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF HighAvailabilityComponentEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table provides high availability component information.
+            "
+        ::= { highAvailabilityComponent 1 }
+
+    highAvailabilityComponentEntry OBJECT-TYPE
+        SYNTAX  HighAvailabilityComponentEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry represents one instance about a high availability component.
+	    "
+        INDEX { highAvailabilityComponentIdx }
+        ::= { highAvailabilityComponentTable 1 }
+
+    HighAvailabilityComponentEntry ::= SEQUENCE {
+        highAvailabilityComponentIdx                DDMibTableIndexTC,
+        highAvailabilityComponentName               DDMibTableString128TC,
+        highAvailabilityComponentState              HaStatusTC
+    }
+
+    highAvailabilityComponentIdx OBJECT-TYPE
+        SYNTAX  DDMibTableIndexTC 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The index into this table indentifying a particular component."
+        ::= { highAvailabilityComponentEntry 1 }
+
+    highAvailabilityComponentName OBJECT-TYPE
+        SYNTAX  DDMibTableString128TC
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The name of the component."
+        ::= { highAvailabilityComponentEntry 2 }
+
+    highAvailabilityComponentState OBJECT-TYPE
+        SYNTAX  HaStatusTC
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The status of the component."
+        ::= { highAvailabilityComponentEntry 3 }
+
 
 -- ************************************************************ **********
 --
@@ -10524,6 +10685,7 @@ NOTIFICATIONS {
    dNSUnresponsive,
    nISCommFailure,
    iOModuleMacFault,
+   missingSlaveInterface,
    nTPDFailed,
    nvramWarning,
    nvramBatteryAlert,
@@ -10609,7 +10771,9 @@ NOTIFICATIONS {
    upgradeInProgress,
    vDiskSCSITargetMismatch,
    tapeReposition,
-   duplicateVTLPoolNames
+   duplicateVTLPoolNames,
+   vTLEnabled,
+   vTLDisabled
 }
 STATUS  current
 DESCRIPTION
@@ -12281,6 +12445,20 @@ STATUS current
     "
 ::= { dataDomainMibTraps 10013 }
 
+missingSlaveInterface NOTIFICATION-TYPE
+   OBJECTS { systemSerialNumber, alertInfoDescription }
+STATUS current
+   DESCRIPTION
+   "Description: 
+        The bonded interface has been created with the remaining interfaces and
+        may experience degraded performance or reduced failover capability.
+    
+   Action: 
+        Replace the network interface or reconfigure the bonded interface to
+        restore functionality. If the problem persists, contact your contracted support provider or visit us online at https://support.emc.com
+    "
+::= { dataDomainMibTraps 10523 }
+
 nTPDFailed NOTIFICATION-TYPE
    OBJECTS { systemSerialNumber, alertInfoDescription }
 STATUS current
@@ -13461,6 +13639,30 @@ STATUS current
 "
 ::= { dataDomainMibTraps 10010 }
 
+vTLEnabled NOTIFICATION-TYPE
+   OBJECTS { systemSerialNumber, alertInfoDescription }
+STATUS current
+   DESCRIPTION
+   "Description: 
+        VTL is enabled. VTL functionality is available to the user.
+    
+   Action: 
+        Some backup applications may need manual rescanning for devices.
+    "
+::= { dataDomainMibTraps 11105 }
+
+vTLDisabled NOTIFICATION-TYPE
+   OBJECTS { systemSerialNumber, alertInfoDescription }
+STATUS current
+   DESCRIPTION
+   "Description: 
+        VTL is disabled. VTL functionality is unavailable to the user.
+    
+   Action: 
+        No Action required.
+    "
+::= { dataDomainMibTraps 11106 }
+
 -- **********************************************************************
 --
 -- DataDomainMibCompliance 
@@ -14555,13 +14757,20 @@ STATUS current
 
         highAvailabilityGroup OBJECT-GROUP
         OBJECTS {
+            haSystemName,
             haSystemStatus,
-            localNodeRole,
-            localHaState,
-            peerNodeRole,
-            peerHaState,
-            haConfiguredMode,
-            haLocalPnodeId
+            haInterconnectStatus,
+            haPrimaryHeartbeatStatus,
+            haExternalLanHeartbeatStatus,
+            haHardwareCompatibilityCheck,
+            haSoftwareVersionCheck,
+            highAvailabilityNodeName,
+            highAvailabilityNodeId,
+            highAvailabilityNodeRole,
+            highAvailabilityNodeState,
+            highAvailabilityNodeHealth,
+            highAvailabilityComponentName,
+            highAvailabilityComponentState
         }
         STATUS  current
         DESCRIPTION

@@ -6,12 +6,12 @@
         <thead>
             <tr>
                 <th data-column-id="device">Device</th>
-                <th data-column-id="mac_address">MAC Address</th>
-                <th data-column-id="ipv4_address">IPv4 Address</th>
+                <th data-column-id="mac_address" data-width="150px">MAC Address</th>
+                <th data-column-id="ipv4_address" data-sortable="false">IPv4 Address</th>
                 <th data-column-id="interface">Port</th>
-                <th data-column-id="vlan">Vlan</th>
+                <th data-column-id="vlan" data-width="60px">Vlan</th>
                 <th data-column-id="description">Description</th>
-                <th data-column-id="dnsname">DNS Name</th>
+                <th data-column-id="dnsname" data-sortable="false" data-visible="false">DNS Name</th>
             </tr>
         </thead>
     </table>
@@ -31,16 +31,16 @@ var grid = $("#fdb-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
 // Select the devices only with FDB tables
 $sql = 'SELECT D.device_id AS device_id, `hostname` FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D';
 
 $param = array();
-if (!Auth::user()->hasGlobalRead()) {
+if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
     $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = Auth::id();
+    $param[] = LegacyAuth::id();
 }
 
 $sql .= " WHERE F.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname` ORDER BY `hostname`";
@@ -114,13 +114,13 @@ echo '"'.$vars['searchPhrase'].'"+';
     post: function ()
     {
         return {
-            id: "fdb-search",
             device_id: '<?php echo $vars['device_id']; ?>',
             searchby: '<?php echo $vars['searchby']; ?>',
-            searchPhrase: '<?php echo $vars['searchPhrase']; ?>'
+            searchPhrase: '<?php echo $vars['searchPhrase']; ?>',
+            dns: $("#fdb-search").bootgrid("getColumnSettings")[6].visible
         };
     },
-    url: "ajax_table.php"
+    url: "ajax/table/fdb-tables"
 });
 
 </script>

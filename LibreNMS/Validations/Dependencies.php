@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Validations;
 
+use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
@@ -38,6 +39,12 @@ class Dependencies extends BaseValidation
      */
     public function validate(Validator $validator)
     {
+        # if git is not installed, do not assume composer is either
+        if (!Git::repoPresent()) {
+            $validator->ok("Installed from package; no Composer required");
+            return;
+        }
+
         $composer_output = trim(shell_exec($validator->getBaseDir() . '/scripts/composer_wrapper.php --version'));
         $found = preg_match(
             '/Composer.*(\d+\.\d+\.\d+(-RC\d*|-beta\d?|-alpha\d+)?)/',

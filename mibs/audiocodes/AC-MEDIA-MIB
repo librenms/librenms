@@ -1,0 +1,4867 @@
+
+AC-MEDIA-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+
+        OBJECT-TYPE, 
+        MODULE-IDENTITY                             FROM SNMPv2-SMI
+        TAddress, 
+        DisplayString, 
+        DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+        IpAddress                                   FROM RFC1155-SMI
+        Unsigned32,
+		Integer32,
+        enterprises                                 FROM SNMPv2-SMI
+	RowStatus      				    FROM SNMPv2-TC
+		SnmpAdminString			    FROM SNMP-FRAMEWORK-MIB
+		audioCodes,       
+        acRegistrations,
+        acGeneric, 
+        acProducts,acBoardMibs 						FROM AUDIOCODES-TYPES-MIB;
+
+       
+acMedia  MODULE-IDENTITY       
+    LAST-UPDATED "201207260501Z"          --Thursday, July 26 2012
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+	     AudioCodes LTD
+             1 Hayarden Street
+             Airport City 
+	     Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"		
+
+    DESCRIPTION       
+    ""
+
+
+
+    ::= {acBoardMibs 4}  
+
+
+
+
+
+
+
+
+     acMediaConfiguration OBJECT IDENTIFIER ::= {acMedia 1}
+
+
+     acMediaDSPConfig OBJECT IDENTIFIER ::= {acMediaConfiguration 1}
+
+
+     acMediaDSPConfigVersionTemplateNumber OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Selects the DSP load number. Each load has a different coder
+list, a different channel capacity and different features supported.
+
+Range = 0 to 255.
+Access: Offline.
+AC INI-Param: DSPVERSIONTEMPLATENUMBER"
+       ::= {acMediaDSPConfig 1}
+
+
+
+     -- ****************************************
+     -- acMediaDsp table declaration
+     -- ****************************************
+     acMediaDspTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcMediaDspEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acMediaDSPConfig 21}
+
+
+
+     -- ****************************************
+     -- acMediaDsp table entry
+     -- ****************************************
+     acMediaDspEntry OBJECT-TYPE
+       SYNTAX AcMediaDspEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acMediaDspIndex}
+       ::= {acMediaDspTable 1}
+
+
+
+     -- ****************************************
+     -- acMediaDsp TABLE
+     -- ****************************************
+     AcMediaDspEntry ::= SEQUENCE {
+       acMediaDspIndex                                 Unsigned32,
+       acMediaDspRowStatus                             RowStatus,
+       acMediaDspTemplateNumber                        Unsigned32,
+       acMediaDspResourcesPercentage                   Unsigned32
+     }
+
+
+
+     acMediaDspIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Entry number in the table.
+AC INI-Param: DspTemplates_Index"
+       ::= {acMediaDspEntry 1}
+
+
+
+     acMediaDspRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS field for line. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acMediaDspEntry 2}
+
+
+
+     acMediaDspTemplateNumber OBJECT-TYPE
+       SYNTAX Unsigned32 (0..16)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "DSP template number.
+Access: Offline.
+AC INI-Param: DspTemplates_DspTemplateNumber"
+       ::= {acMediaDspEntry 3}
+
+
+
+     acMediaDspResourcesPercentage OBJECT-TYPE
+       SYNTAX Unsigned32 (0..100)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Percentage use for the specified template.
+Access: Offline.
+AC INI-Param: DspTemplates_DspResourcesPercentage"
+       ::= {acMediaDspEntry 4}
+
+
+
+     acMediaVoiceConfig OBJECT IDENTIFIER ::= {acMediaConfiguration 2}
+
+
+     acVoice OBJECT IDENTIFIER ::= {acMediaVoiceConfig 1}
+
+
+     acVoicePayloadFormat OBJECT-TYPE
+       SYNTAX INTEGER {
+                  voicePayloadFormatRTP(0)
+,
+                  voicePayloadFormatATM(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the voice payload format. Choose either 0 = RTP or 1 =
+ATM (which enables working with vendors that use G.726 ATM Payload
+Format over RTP. Uses the enum acTVoicePayloadFormat.
+0 = VoicePayloadFormatRTP
+1 = VoicePayloadFormatATM
+2 = VoicePAyloadFormatIllegal.
+Access: Online.
+AC INI-Param: VOICEPAYLOADFORMAT"
+       ::= {acVoice 1}
+
+
+
+     acVoiceVolume OBJECT-TYPE
+       SYNTAX Integer32 (-32..31)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the voice output gain control.
+Range: -32 dB to +31 dB in 1 dB steps
+-32 = mute
+Default = 0 = No Gain.
+Access: Online.
+AC INI-Param: VOICEVOLUME"
+       ::= {acVoice 2}
+
+
+
+     acVoiceInputGain OBJECT-TYPE
+       SYNTAX Integer32 (-32..31)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the PCM input gain. 
+Range = -32 dB to +31 dB in 1 dB steps.
+Default = No Gain.
+Access: Online.
+AC INI-Param: INPUTGAIN"
+       ::= {acVoice 3}
+
+
+
+     acVoiceTestMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  coderLoopback(0)
+,
+                  pCMLoopback(1)
+,
+                  toneInjection(2)
+,
+                  noLoopback(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the type of testing mode applied:
+
+0 = Coder Loopback performs an encoder/decoder loopback inside
+the DSP device
+1 = PCM Loopback loops back an incoming PCM to the outgoing
+PCM.
+2 = ToneInjection generates a 1000 Hz tone to the outgoing
+PCM
+3 = NoLoopback sets the channel to work in normal mode.
+Access: Online.
+AC INI-Param: TESTMODE"
+       ::= {acVoice 4}
+
+
+
+     acVoiceTTYTransportType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  inband-Relay(2)
+,
+                  bypass (1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the transferring method of TTY signals during a call
+
+
+0 = Disable
+1= Bypass
+2 = Relay
+.
+Access: Online.
+AC INI-Param: TTYTRANSPORTTYPE"
+       ::= {acVoice 5}
+
+
+
+     acVoiceEnableMediaSecurity OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables Media Security protocol (SRTP) . Enabling
+this parameter might reduce the board channel capacity.
+
+0 = Disable
+1 = Enable.
+Access: Offline.
+AC INI-Param: ENABLEMEDIASECURITY"
+       ::= {acVoice 6}
+
+
+
+     acVoiceAriaProtocolSupport OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables Aria encryption protocol. Enabling this
+parameter might reduce the board channel capacity.
+
+0 = Disable
+1 = Enable
+Supported on TP6310, TP8410 and M800.
+Access: Offline.
+AC INI-Param: AriaProtocolSupport"
+       ::= {acVoice 7}
+
+
+
+     acVoiceCoderRate OBJECT IDENTIFIER ::= {acVoice 20}
+
+
+     acVoiceCoderRateEVRC OBJECT-TYPE
+       SYNTAX INTEGER {
+                  variableRate(0)
+,
+                  ac1kbps(1)
+,
+                  ac4kbps(2)
+,
+                  ac8kbps(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter is used to configure the EVRC coder bit rate.
+0 = Variable Rate
+1 = 1 kbps
+2 = 4 kbps
+3 = 8 kbps.
+Access: Online.
+AC INI-Param: EVRCRate"
+       ::= {acVoiceCoderRate 1}
+
+
+
+     acVoiceCoderRateQCELP8 OBJECT-TYPE
+       SYNTAX INTEGER {
+                  variableRate(0)
+,
+                  ac1kbps(1)
+,
+                  ac2kbps(2)
+,
+                  ac4kbps(3)
+,
+                  ac8kbps(4)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter is used to configure the QCELP8  coder bit rate.
+0 = Variable Rate
+1 = 1 kbps
+2 = 2 kbps
+3 = 4 kbps
+4 = 8 kbps.
+Access: Online.
+AC INI-Param: QCELP8Rate"
+       ::= {acVoiceCoderRate 2}
+
+
+
+     acVoiceCoderRateQCELP13 OBJECT-TYPE
+       SYNTAX INTEGER {
+                  variableRate(0)
+,
+                  ac1kbps(1)
+,
+                  ac3kbps(2)
+,
+                  ac7kbps(3)
+,
+                  ac13kbps(4)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter is used to configure the QCELP13 coder bit rate.
+0 = Variable Rate
+1 = 1 kbps
+2 = 3 kbps
+3 = 7 kbps
+4 = 13 kbps
+
+.
+Access: Online.
+AC INI-Param: QCELP13Rate"
+       ::= {acVoiceCoderRate 3}
+
+
+
+     acVoiceCoderRateG729EVMaxBitRate OBJECT-TYPE
+       SYNTAX INTEGER {
+                  g729EV-RATE-8-KBPS (0)
+,
+                  g729EV-RATE-12-KBPS (1)
+,
+                  g729EV-RATE-14-KBPS (2)
+,
+                  g729EV-RATE-16-KBPS (3)
+,
+                  g729EV-RATE-18-KBPS (4)
+,
+                  g729EV-RATE-20-KBPS (5)
+,
+                  g729EV-RATE-22-KBPS (6)
+,
+                  g729EV-RATE-24-KBPS (7)
+,
+                  g729EV-RATE-26-KBPS (8)
+,
+                  g729EV-RATE-28-KBPS (9)
+,
+                  g729EV-RATE-30-KBPS (10)
+,
+                  g729EV-RATE-32-KBPS (11)
+,
+                  g729EV-RATE-UNDEFINED (15)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the maximum generation bitrate for all participants
+in a session using G729EV coder. This parameter is defined
+per session and is equal for all the parties. The initial
+generation bit rate is the minimum between the MaxBitRate and
+the MBS values.
+
+Possible values are:
+0 = G729EV_RATE_8_KBPS
+1 = G729EV_RATE_12_KBPS 
+2 = G729EV_RATE_14_KBPS
+3 = G729EV_RATE_16_KBPS 
+4 = G729EV_RATE_18_KBPS
+5 = G729EV_RATE_20_KBPS 
+6 = G729EV_RATE_22_KBPS
+7 = G729EV_RATE_24_KBPS 
+8 = G729EV_RATE_26_KBPS
+9 = G729EV_RATE_28_KBPS 
+10 = G729EV_RATE_30_KBPS
+11 = G729EV_RATE_32_KBPS 
+15 = G729EV_RATE_UNDEFINED.
+Access: Online.
+AC INI-Param: G729EVMaxBitRate"
+       ::= {acVoiceCoderRate 4}
+
+
+
+     acVoiceCoderRateG729EVLocalMBS OBJECT-TYPE
+       SYNTAX INTEGER {
+                  g729EV-RATE-8-KBPS (0)
+,
+                  g729EV-RATE-12-KBPS (1)
+,
+                  g729EV-RATE-14-KBPS (2)
+,
+                  g729EV-RATE-16-KBPS (3)
+,
+                  g729EV-RATE-18-KBPS (4)
+,
+                  g729EV-RATE-20-KBPS (5)
+,
+                  g729EV-RATE-22-KBPS (6)
+,
+                  g729EV-RATE-24-KBPS (7)
+,
+                  g729EV-RATE-26-KBPS (8)
+,
+                  g729EV-RATE-28-KBPS (9)
+,
+                  g729EV-RATE-30-KBPS (10)
+,
+                  g729EV-RATE-32-KBPS (11)
+,
+                  g729EV-RATE-UNDEFINED (15)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the maximal bitrate, which may be used  by the G729EV
+coder at a specific channel. This parameter is defined
+per channel and may vary between the parties. The initial generation
+bit rate is the minimum between the MaxBitRate and
+the MBS values.
+
+Possible values are:
+0 = G729EV_RATE_8_KBPS
+1 = G729EV_RATE_12_KBPS 
+2 = G729EV_RATE_14_KBPS
+3 = G729EV_RATE_16_KBPS 
+4 = G729EV_RATE_18_KBPS
+5 = G729EV_RATE_20_KBPS 
+6 = G729EV_RATE_22_KBPS
+7 = G729EV_RATE_24_KBPS 
+8 = G729EV_RATE_26_KBPS
+9 = G729EV_RATE_28_KBPS 
+10 = G729EV_RATE_30_KBPS
+11 = G729EV_RATE_32_KBPS 
+15 = G729EV_RATE_UNDEFINED.
+Access: Online.
+AC INI-Param: G729EVLocalMBS"
+       ::= {acVoiceCoderRate 5}
+
+
+
+     acVoiceCoderRateG729EVReceiveMBS OBJECT-TYPE
+       SYNTAX INTEGER {
+                  g729EV-RATE-8-KBPS (0)
+,
+                  g729EV-RATE-12-KBPS (1)
+,
+                  g729EV-RATE-14-KBPS (2)
+,
+                  g729EV-RATE-16-KBPS (3)
+,
+                  g729EV-RATE-18-KBPS (4)
+,
+                  g729EV-RATE-20-KBPS (5)
+,
+                  g729EV-RATE-22-KBPS (6)
+,
+                  g729EV-RATE-24-KBPS (7)
+,
+                  g729EV-RATE-26-KBPS (8)
+,
+                  g729EV-RATE-28-KBPS (9)
+,
+                  g729EV-RATE-30-KBPS (10)
+,
+                  g729EV-RATE-32-KBPS (11)
+,
+                  g729EV-RATE-UNDEFINED (15)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the value of the MBS field of the G729EV frames to
+be sent to the other party. This parameter reflects the maximum
+bit rate, which the local G729EV  supports as a receiver.
+
+Possible values are:
+0 = G729EV_RATE_8_KBPS
+1 = G729EV_RATE_12_KBPS 
+2 = G729EV_RATE_14_KBPS
+3 = G729EV_RATE_16_KBPS 
+4 = G729EV_RATE_18_KBPS
+5 = G729EV_RATE_20_KBPS 
+6 = G729EV_RATE_22_KBPS
+7 = G729EV_RATE_24_KBPS 
+8 = G729EV_RATE_26_KBPS
+9 = G729EV_RATE_28_KBPS 
+10 = G729EV_RATE_30_KBPS
+11 = G729EV_RATE_32_KBPS 
+15 = G729EV_RATE_UNDEFINED.
+Access: Online.
+AC INI-Param: G729EVReceiveMBS"
+       ::= {acVoiceCoderRate 6}
+
+
+
+     acVoiceCoderRateMsRtaForwardErrorCorrectionEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the Microsoft RTA coder forward error correction
+mode.
+
+0 - Disable.
+1 - Enable.
+Access: Online.
+AC INI-Param: MSRTAForwardErrorCorrectionEnable"
+       ::= {acVoiceCoderRate 7}
+
+
+
+     acVoiceCoderRateMsRtaTxBitRate OBJECT-TYPE
+       SYNTAX Unsigned32 (0..29000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the Microsoft RTA coder TX bit rate.
+
+0 - Automatic.
+Any value between 8,800 - 29,000.
+Access: Online.
+AC INI-Param: MSRTATxBitRate"
+       ::= {acVoiceCoderRate 8}
+
+
+
+     acVoiceCoderRateSilkTxInbandFEC OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the SILK encoder forward error correction mode.
+Access: Online.
+AC INI-Param: SilkTxInbandFEC"
+       ::= {acVoiceCoderRate 9}
+
+
+
+     acVoiceCoderRateSilkMaxAverageBitRate OBJECT-TYPE
+       SYNTAX Unsigned32 (5000..30000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the SILK encoder maximal average bit rate. Narrow
+band range is 5000-16000 .Wide band range is 8000-30000.
+Access: Online.
+AC INI-Param: SilkMaxAverageBitRate"
+       ::= {acVoiceCoderRate 10}
+
+
+
+     acVoiceCoderRateSpeexNBBitRate OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cE-SPEEX-NB-RATE-2-15-KBPS(1)
+,
+                  cE-SPEEX-NB-RATE-5-95-KBPS(2)
+,
+                  cE-SPEEX-NB-RATE-8-00-KBPS(3)
+,
+                  cE-SPEEX-NB-RATE-11-0-KBPS(4)
+,
+                  cE-SPEEX-NB-RATE-15-0-KBPS(5)
+,
+                  cE-SPEEX-NB-RATE-18-2-KBPS(6)
+,
+                  cE-SPEEX-NB-RATE-24-6-KBPS(7)
+,
+                  cE-SPEEX-NB-RATE-3-95-KBPS(8)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the bitrate of Speex NB coder.
+Access: Instant.
+AC INI-Param: SpeexNBBitRate"
+       ::= {acVoiceCoderRate 11}
+
+
+
+     acVoiceCoderRateSpeexWBBitRate OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cE-SPEEX-WB-RATE-3-95-KBPS(0)
+,
+                  cE-SPEEX-WB-RATE-5-75-KBPS(1)
+,
+                  cE-SPEEX-WB-RATE-7-75-KBPS(2)
+,
+                  cE-SPEEX-WB-RATE-9-80-KBPS(3)
+,
+                  cE-SPEEX-WB-RATE-12-8-KBPS(4)
+,
+                  cE-SPEEX-WB-RATE-16-8-KBPS(5)
+,
+                  cE-SPEEX-WB-RATE-20-6-KBPS(6)
+,
+                  cE-SPEEX-WB-RATE-23-8-KBPS(7)
+,
+                  cE-SPEEX-WB-RATE-27-8-KBPS(8)
+,
+                  cE-SPEEX-WB-RATE-34-2-KBPS(9)
+,
+                  cE-SPEEX-WB-RATE-42-2-KBPS(10)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the bitrate of Speex WB coder.
+Access: Instant.
+AC INI-Param: SpeexWBBitRate"
+       ::= {acVoiceCoderRate 12}
+
+
+
+     acVoiceAGC OBJECT IDENTIFIER ::= {acMediaVoiceConfig 2}
+
+
+     acVoiceAGCEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Activates the AGC (Automatic Gain Control).
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: ENABLEAGC"
+       ::= {acVoiceAGC 1}
+
+
+
+     acVoiceAGCGainSlope OBJECT-TYPE
+       SYNTAX Unsigned32 (0..31)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the AGC (Automatic Gain Control) convergence rate.
+Range = 0 to 31 (according to acTAGCGainSlope)
+Default = 3 (= 1 db/sec).
+Access: Online.
+AC INI-Param: AGCGAINSLOPE"
+       ::= {acVoiceAGC 2}
+
+
+
+     acVoiceAGCRedirection OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the AGC (Automatic Gain Control) direction. 
+0 = AGC works on signals from the TDM side 
+1 = AGC works on signals coming from the Network side.
+Access: Online.
+AC INI-Param: AGCREDIRECTION"
+       ::= {acVoiceAGC 3}
+
+
+
+     acVoiceAGCTargetEnergy OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the signal energy value [-dBm] that the AGC (Automatic
+Gain Control) attempts to attain.
+
+Range = 0 to 63.
+Access: Online.
+AC INI-Param: AGCTARGETENERGY"
+       ::= {acVoiceAGC 4}
+
+
+
+     acVoiceAGCMinGain OBJECT-TYPE
+       SYNTAX Unsigned32 (0..31)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the minimum gain by the AGC when activated [- db].
+
+Range = 0 to -31.
+Access: Offline.
+AC INI-Param: AGCMINGAIN"
+       ::= {acVoiceAGC 5}
+
+
+
+     acVoiceAGCMaxGain OBJECT-TYPE
+       SYNTAX Unsigned32 (0..18)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the maximum gain by the AGC when activated [db].
+
+Range =  0 to 18.
+Access: Offline.
+AC INI-Param: AGCMAXGAIN"
+       ::= {acVoiceAGC 6}
+
+
+
+     acVoiceAGCDisableFastAdaptation OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Disables the AGC Fast Adaptation mode.
+
+Enable = 1 
+Disable = 0.
+Access: Offline.
+AC INI-Param: AGCDISABLEFASTADAPTATION"
+       ::= {acVoiceAGC 7}
+
+
+
+     acVoiceEC OBJECT IDENTIFIER ::= {acMediaVoiceConfig 3}
+
+
+     acVoiceECEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables the Echo Canceller.
+
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: ENABLEECHOCANCELLER"
+       ::= {acVoiceEC 1}
+
+
+
+     acVoiceECMaxLength OBJECT-TYPE
+       SYNTAX INTEGER {
+                  eCLengthDefault(0)
+,
+                  eCLength15MSec(1)
+,
+                  eCLength20MSec(2)
+,
+                  eCLength25MSec(3)
+,
+                  eCLength32MSec(4)
+,
+                  eCLength35MSec(5)
+,
+                  eCLength40MSec(6)
+,
+                  eCLength45MSec(7)
+,
+                  eCLength50MSec(8)
+,
+                  eCLength55MSec(9)
+,
+                  eCLength60MSec(10)
+,
+                  eCLength64MSec(11)
+,
+                  eCLength128MSec(22)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the maximum board EC (Echo Canceler) length capability.
+
+0 = EC length determined internally to reach maximum channel
+capacity.
+4 = 32 msec
+11 = 64 msec
+22 = 128 msec
+TP-1610 only: 
+Using 64 or 128 msec reduces the channel capacity to 200 channels.
+.
+Access: Offline.
+AC INI-Param: MAXECHOCANCELLERLENGTH"
+       ::= {acVoiceEC 2}
+
+
+
+     acVoiceECHybridLoss OBJECT-TYPE
+       SYNTAX INTEGER {
+                  eCHybridLoss6DBM(0)
+,
+                  eCHybridLoss0DBM(2)
+,
+                  eCHybridLoss3DBM(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the worst case ratio between the signal level transmitted
+to the hybrid and the echo level returning from hybrid. Set
+this per worst hybrid in the system in terms of echo return
+loss. Refer to the enumeration acTECHybridLoss.
+
+0 = 6 dBm
+2 = 0 dBm
+3 = 3 dBm.
+Access: Online.
+AC INI-Param: ECHYBRIDLOSS"
+       ::= {acVoiceEC 3}
+
+
+
+     acVoiceECToneDetector OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Used to configure the Echo Canceler Tone Detector. Detects a
+2100 Hz tone at the input signal to the TDM (received signal).
+Improves Echo Canceler operation accordingly. Detects 2100,
+2100 with phase reversals and 2100 with AM. Improves the
+operation of the Echo Canceler by slowing adaptation when the
+signal is detected. This data is also used by the fax state
+machine.
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: ECEnableToneDetector"
+       ::= {acVoiceEC 4}
+
+
+
+     acVoiceECComfortNoiseGeneration OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Use this parameter to enable or enable Echo Canceler Comfort
+Noise Generation, which generates comfort noise when the Non
+Linear Processor (NLP) is active. 
+When the NLP ascertains that the signal is echo and not doubletalk
+and decides to clip, instead of transmitting silence
+it transmits a synthesized signal similar to the background
+noise.
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: ECEnableComfortNoiseGeneration"
+       ::= {acVoiceEC 5}
+
+
+
+     acVoiceSC OBJECT IDENTIFIER ::= {acMediaVoiceConfig 4}
+
+
+     acVoiceSCMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  sILENCE-COMPRESION-DISABLE(0)
+,
+                  sILENCE-COMPRESION-ENABLE(1)
+,
+                  sILENCE-COMPRESION-ENABLE-NOISE-ADAPTATION-DISABLE(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables Silence Suppression Mode. 
+
+0 = Disable = SILENCE_COMPRESION_DISABLE
+1 = Enable = SILENCE_COMPRESION_ENABLE
+2 = Enable without adaptation =  SILENCE_COMPRESION_ENABLE_NOISE_ADAPTATION_DISABLE.
+Access: Online.
+AC INI-Param: ENABLESILENCECOMPRESSION"
+       ::= {acVoiceSC 1}
+
+
+
+     acVoiceSCVBRCoderDTXMin OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the minimum number of frames gap between two SID frames,
+when using the EVRC voice activity detector.
+.
+Access: Online.
+AC INI-Param: EVRCDTXMin"
+       ::= {acVoiceSC 2}
+
+
+
+     acVoiceSCVBRCoderDTXMax OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the maximum number of frames gap between two SID frames,
+when using the EVRC voice activity detector.
+Access: Online.
+AC INI-Param: EVRCDTXMax"
+       ::= {acVoiceSC 3}
+
+
+
+     acVoiceSCVBRCoderHangover OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "For indicating the desired number of silence frames at the beginning
+of each silence period, when using the VBR CODER silence
+suppression.
+.
+Access: Online.
+AC INI-Param: VBRCoderHangover"
+       ::= {acVoiceSC 4}
+
+
+
+     acMediaFaxModemConfig OBJECT IDENTIFIER ::= {acMediaConfiguration 3}
+
+
+     acFaxModem OBJECT IDENTIFIER ::= {acMediaFaxModemConfig 1}
+
+
+     acFMCommon OBJECT IDENTIFIER ::= {acFaxModem 1}
+
+
+     acFMCommonRelayVolume OBJECT-TYPE
+       SYNTAX Integer32 (-18..-3)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the fax gain control. 
+
+The range -18 to -3 relates to -18.5 dBm to -3.5 dBm in steps
+of 1 dBm.
+Access: Online.
+AC INI-Param: FAXMODEMRELAYVOLUME"
+       ::= {acFMCommon 1}
+
+
+
+     acFMCommonV34Transport OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  relayEnable(1)
+,
+                  byPassEnable(2)
+,
+                  eventsOnly(3)
+,
+                  ansMute(4)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the V.34 modem transport method.
+
+0 = Transparent
+2 = Bypass 
+3 = Transparent with Events
+4 = AnsMute.
+Access: Online.
+AC INI-Param: V34MODEMTRANSPORTTYPE"
+       ::= {acFMCommon 2}
+
+
+
+     acFMCommonEnableInbandNetworkDetection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables inband network detection related to fax/modem.
+
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: EnableFaxModemInbandNetworkDetection"
+       ::= {acFMCommon 3}
+
+
+
+     acFMCommonCEDTransferMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  usingFaxRelayOrVBD(0)
+,
+                  voiceModeOrVBD(1)
+,
+                  rFC4733BlockingRTPVBD(2)
+,
+                  rFC4733AlongWithRTPVBD(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "0 - transfer CED using T38.
+1 - transfer CED over VBD(some Vxx=2) or VoIP(Vxx=0).
+2 - transfer CED using RFC, and block CED over VBD/VoIP.
+3 - transfer CED using RFC in parallel with CED over VBD/VoIP.
+Access: Instant.
+AC INI-Param: CEDTransferMode"
+       ::= {acFMCommon 4}
+
+
+
+     acFMBypass OBJECT IDENTIFIER ::= {acFaxModem 2}
+
+
+     acFMBypassCoderType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  g711Alaw-64(0)
+,
+                  g711Mulaw(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Users can use this parameter to set the fax/modem bypass coder
+(according to acTCoders).
+
+0 = G.711 A-Law
+1 = G.711 Mu-Law.
+Access: Online.
+AC INI-Param: FAXMODEMBYPASSCODERTYPE"
+       ::= {acFMBypass 1}
+
+
+
+     acFMBypassPacketizationPeriod OBJECT-TYPE
+       SYNTAX Unsigned32 (1..12)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the number of basic frames to generate one RTP fax/modem
+bypass packet.
+Access: Online.
+AC INI-Param: FAXMODEMBYPASSM"
+       ::= {acFMBypass 2}
+
+
+
+     acFMBypassBasicPacketInterval OBJECT-TYPE
+       SYNTAX INTEGER {
+                  pACKET-INTERVAL-DEFAULT(0)
+,
+                  pACKET-INTERVAL-5-MSEC(1)
+,
+                  pACKET-INTERVAL-10-MSEC(2)
+,
+                  pACKET-INTERVAL-20-MSEC(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the basic Fax / Modem Bypass RTP packet rate.
+0 = Default (set internally) (PACKET_INTERVAL_DEFAULT)
+1 = 5 msec (PACKET_INTERVAL_5_MSEC)
+2 = 10 msec (PACKET_INTERVAL_10_MSEC)
+3 = 20 msec (PACKET_INTERVAL_20_MSEC).
+Access: Online.
+AC INI-Param: FAXMODEMBYPASSBASICRTPPACKETINTERVAL"
+       ::= {acFMBypass 3}
+
+
+
+     acFMBypassDJBufMinDelay OBJECT-TYPE
+       SYNTAX Unsigned32 (0..150)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the Jitter Buffer constant delay (in milliseconds)
+during a Fax & Modem Bypass session. (The minimum Jitter Buffer
+Size).
+
+Range = 0 to 150.
+Access: Online.
+AC INI-Param: FAXMODEMBYPASDJBUFMINDELAY"
+       ::= {acFMBypass 4}
+
+
+
+     acFMBypassFaxBypassOutputGain OBJECT-TYPE
+       SYNTAX Integer32 (-31..31)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the fax bypass output gain control.
+Range: -31 dB to +31 dB in 1 dB steps
+Default = 0 = No Gain.
+Access: Online.
+AC INI-Param: FaxBypassOutputGain"
+       ::= {acFMBypass 5}
+
+
+
+     acFMBypassModemBypassOutputGain OBJECT-TYPE
+       SYNTAX Integer32 (-31..31)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the modem bypass output gain control.
+Range: -31 dB to +31 dB in 1 dB steps
+Default = 0 = No Gain.
+Access: Online.
+AC INI-Param: ModemBypassOutputGain"
+       ::= {acFMBypass 6}
+
+
+
+     acFMNSE OBJECT IDENTIFIER ::= {acFaxModem 3}
+
+
+     acFMNSEPayloadType OBJECT-TYPE
+       SYNTAX Unsigned32 (96..127)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Users can use this parameter to modify the NSE packet's payload
+type.
+
+Range = 96 to 127.
+Access: Online.
+AC INI-Param: NSEPAYLOADTYPE"
+       ::= {acFMNSE 1}
+
+
+
+     acFMNSEMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables Cisco's NSE fax / modem automatic pass-through
+mode.
+
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: NSEMODE"
+       ::= {acFMNSE 2}
+
+
+
+     acFax OBJECT IDENTIFIER ::= {acMediaFaxModemConfig 2}
+
+
+     acFaxTransportMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  relayEnable(1)
+,
+                  byPassEnable(2)
+,
+                  eventsOnly(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the Fax over IP transport method.
+
+0 = Transparent
+1 = Relay
+2 = Bypass
+3 = Transparent with Events.
+Access: Online.
+AC INI-Param: FAXTRANSPORTMODE"
+       ::= {acFax 1}
+
+
+
+     acFaxBypassPayloadType OBJECT-TYPE
+       SYNTAX Unsigned32 (0..127)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Users can use this parameter to modify the Fax Bypass Mode RTP
+packet's payload type. 
+In the case of congestion (if the selected payload type is
+already used for other coders/modes), then a TP_SETUP_PARAMETER_INVALID_ERROR
+is issued and the payload type is set to the
+default value (102). 
+It is the user's responsibility to avoid congestion with other
+payload types.
+
+Range = 0 to 127.
+Access: Online.
+AC INI-Param: FAXBYPASSPAYLOADTYPE"
+       ::= {acFax 2}
+
+
+
+     acFaxRelayECMEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables the using of ECM mode during Fax Relay.
+
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: FAXRELAYECMENABLE"
+       ::= {acFax 3}
+
+
+
+     acFaxRelayMaxRate OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acRate2400bps(0)
+,
+                  acRate4800bps(1)
+,
+                  acRate7200bps(2)
+,
+                  acRate9600bps(3)
+,
+                  acRate12000bps(4)
+,
+                  acRate14400bps(5)
+,
+                  acRate16800bps(6)
+,
+                  acRate19200b(7)
+,
+                  acRate21600bps(8)
+,
+                  acRate24000bps(9)
+,
+                  acRate26400bps(10)
+,
+                  acRate28800bps(11)
+,
+                  acRate31200bps(12)
+,
+                  acRate33600bps(13)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Limits the maximum rate at which fax messages are transmitted.
+
+0 = 2400 bps
+1 = 4800 bps
+2 = 7200 bps
+3 = 9600 bps
+4 = 12000 bps
+5 = 14400 bps
+6 = 16800 bps
+7 = 19200 bps
+8 = 21600 bps
+9 = 24000 bps
+10 = 26400 bps
+11 = 28800 bps
+12 = 31200 bps
+13 = 33600 bps.
+Access: Online.
+AC INI-Param: FAXRELAYMAXRATE"
+       ::= {acFax 4}
+
+
+
+     acFaxRelayRedundancyDepth OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the depth of redundancy for fax packets. This parameter
+is applicable only to non-V.21 packets.
+
+0 = No redundancy
+1 = 1 packet redundancy
+2 = 2 packet redundancy.
+Access: Online.
+AC INI-Param: FAXRELAYREDUNDANCYDEPTH"
+       ::= {acFax 5}
+
+
+
+     acFaxEnhancedRelayRedundancyDepth OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the number of repetitions to be applied to control
+packets when using the T.38 standard.
+
+0 = No redundancy
+1 = 1 packet redundancy
+2 = 2 packet redundancy
+3 = 3 packet redundancy
+4 = Maximum redundancy.
+Access: Online.
+AC INI-Param: FAXRELAYENHANCEDREDUNDANCYDEPTH"
+       ::= {acFax 6}
+
+
+
+     acFaxCNGDetectorMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cNG-DETECTOR-MODE-DISABLE(0)
+,
+                  cNG-DETECTOR-MODE-RELAY(1)
+,
+                  cNG-DETECTOR-MODE-EVENT-ONLY(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the CNG Detector mode. 
+0 = Disable 
+1 = Relay 
+2 = Event Only.
+Access: Online.
+AC INI-Param: CNGDETECTORMODE"
+       ::= {acFax 7}
+
+
+
+     acFaxV34TransportMethod OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  relayEnable(1)
+,
+                  byPassEnable(2)
+,
+                  eventsOnly(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the V.34 fax  transport method.
+
+One of the following values:
+
+0 = Transparent
+1 = Relay
+2 = Bypass 
+3 = Transparent with Events.
+Access: Online.
+AC INI-Param: V34FAXTRANSPORTTYPE"
+       ::= {acFax 8}
+
+
+
+     acFaxT38Version OBJECT-TYPE
+       SYNTAX INTEGER {
+                  t38Version0(0)
+,
+                  t38Version3(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "T38 fax relay version.
+
+0 = T.38 version 0 (from 06/1998)
+3 = T.38 version 3 (V.34 over T.38 support)
+
+Default = 3.
+Access: Online.
+AC INI-Param: T38Version"
+       ::= {acFax 9}
+
+
+
+     acModem OBJECT IDENTIFIER ::= {acMediaFaxModemConfig 3}
+
+
+     acModemV22Transport OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  relayEnable(1)
+,
+                  byPassEnable(2)
+,
+                  eventsOnly(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the V.22 modem transport method.
+
+0 = Transparent
+2 = Bypass
+3 = Transparent with Events.
+Access: Online.
+AC INI-Param: V22MODEMTRANSPORTTYPE"
+       ::= {acModem 1}
+
+
+
+     acModemV23Transport OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  relayEnable(1)
+,
+                  byPassEnable(2)
+,
+                  eventsOnly(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the V.23 modem transport method.
+0 = Transparent
+2 = Bypass
+3 = Transparent with Events.
+Access: Online.
+AC INI-Param: V23MODEMTRANSPORTTYPE"
+       ::= {acModem 2}
+
+
+
+     acModemV32Transport OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  relayEnable(1)
+,
+                  byPassEnable(2)
+,
+                  eventsOnly(3)
+,
+                  ansMute(4)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the V.32 modem transport method.
+
+0 = Transparent
+2 = Bypass
+3 = Transparent with Events
+4 = AnsMute.
+Access: Online.
+AC INI-Param: V32MODEMTRANSPORTTYPE"
+       ::= {acModem 3}
+
+
+
+     acModemBypassPayloadType OBJECT-TYPE
+       SYNTAX Unsigned32 (0..127)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Users can use this parameter to modify the Modem Bypass Mode
+RTP packet's payload type. 
+In the case of congestion (if the selected payload type is
+already used for other coders/modes), then a TP_SETUP_PARAMETER_INVALID_ERROR
+is issued and the payload type is set to the
+default value (103). 
+It is the user's responsibility to avoid congestion with other
+payload types.
+
+Range = 0 to 127.
+Access: Online.
+AC INI-Param: MODEMBYPASSPAYLOADTYPE"
+       ::= {acModem 4}
+
+
+
+     acModemBellTransportType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  byPassEnable(2)
+,
+                  eventsOnly(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Use this parameter to set the Bell modem transport method. 
+0 = Transparent 
+2 = Bypass (enum ByPassEnable)
+3 = Transparent with Events (enum EventsOnly).
+Access: Online.
+AC INI-Param: BellModemTransportType"
+       ::= {acModem 5}
+
+
+
+     acModemV21Transport OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  relayEnable(1)
+,
+                  byPassEnable(2)
+,
+                  eventsOnly(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Sets the V.21 modem transport method (must be set to 0 = Disable).
+
+0 = Transparent
+2 = Bypass
+3 = Transparent with Events.
+Access: Online.
+AC INI-Param: V21ModemTransportType"
+       ::= {acModem 6}
+
+
+
+     acModemEnableV150ModemRelaySupport OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Determines whether to enable V.150.1 modem relay support.
+
+Range:
+0 - Disable
+1 - Enable.
+Access: Offline.
+AC INI-Param: EnableV150ModemRelaySupport"
+       ::= {acModem 7}
+
+
+
+     acV150dot1 OBJECT IDENTIFIER ::= {acMediaFaxModemConfig 4}
+
+
+     acV150dot1AllocationProfile OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Selects the V.150.1 profile, determining how many DSP channels
+ have V.150.1 support.
+
+Range = 0 to 3.
+Access: Offline.
+AC INI-Param: V1501AllocationProfile"
+       ::= {acV150dot1 1}
+
+
+
+     acV150dot1SSEPayloadTypeRx OBJECT-TYPE
+       SYNTAX Unsigned32 (96..127)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "SSE payload type RX.
+Access: Online.
+AC INI-Param: V1501SSEPayloadTypeRx"
+       ::= {acV150dot1 2}
+
+
+
+     acV150dot1SSEPayloadTypeTx OBJECT-TYPE
+       SYNTAX Unsigned32 (96..127)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "SSE payload type TX.
+Access: Online.
+AC INI-Param: V1501SSEPayloadTypeTx"
+       ::= {acV150dot1 3}
+
+
+
+     acV150dot1SSERedundancyDepth OBJECT-TYPE
+       SYNTAX Unsigned32 (1..6)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "SSE is a part of V150.1 modem relay protocol and SSE messages
+are sent over RTP. 
+SSE redundancy refers to the sending of SSE messages several
+times to increase reliability. This parameter determines the
+number of times each SSE message is to be resent.
+Access: Online.
+AC INI-Param: V1501SSERedundancyDepth"
+       ::= {acV150dot1 4}
+
+
+
+     acV150dot1SPRTPayloadTypeRx OBJECT-TYPE
+       SYNTAX Unsigned32 (96..127)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "SPRT payload type RX.
+Access: Online.
+AC INI-Param: V1501SPRTPayloadTypeRx"
+       ::= {acV150dot1 5}
+
+
+
+     acV150dot1SPRTPayloadTypeTx OBJECT-TYPE
+       SYNTAX Unsigned32 (96..127)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "SPRT payload type TX.
+Access: Online.
+AC INI-Param: V1501SPRTPayloadTypeTx"
+       ::= {acV150dot1 6}
+
+
+
+     acV150dot1SPRTTransportChannel0MaxPayloadSize OBJECT-TYPE
+       SYNTAX Unsigned32 (140..256)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "SPRT transport channel 0 max payload size.
+Access: Online.
+AC INI-Param: V1501SPRTTransportChannel0MaxPayloadSize"
+       ::= {acV150dot1 7}
+
+
+
+     acV150dot1SPRTTransportChannel2MaxPayloadSize OBJECT-TYPE
+       SYNTAX Unsigned32 (132..256)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "SPRT transport channel 2 max payload size.
+Access: Online.
+AC INI-Param: V1501SPRTTransportChannel2MaxPayloadSize"
+       ::= {acV150dot1 8}
+
+
+
+     acV150dot1SPRTTransportChannel2MaxWindowSize OBJECT-TYPE
+       SYNTAX Unsigned32 (8..32)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "SPRT transport channel 2 max window size.
+Access: Online.
+AC INI-Param: V1501SPRTTransportChannel2MaxWindowSize"
+       ::= {acV150dot1 9}
+
+
+
+     acV150dot1SPRTTransportChannel3MaxPayloadSize OBJECT-TYPE
+       SYNTAX Unsigned32 (140..256)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "SPRT transport channel 3 max payload size.
+Access: Online.
+AC INI-Param: V1501SPRTTransportChannel3MaxPayloadSize"
+       ::= {acV150dot1 10}
+
+
+
+     acMediaRtpRtcpConfig OBJECT IDENTIFIER ::= {acMediaConfiguration 4}
+
+
+     acRtpRtcp OBJECT IDENTIFIER ::= {acMediaRtpRtcpConfig 1}
+
+
+     acRtpRtcpBrokenConnectionEventTimeout OBJECT-TYPE
+       SYNTAX Unsigned32 (3..2684354)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines for how long the RTP connection should be broken
+before the Broken Connection event is issued. In units of 100
+msec.
+.
+Access: Online.
+AC INI-Param: BROKENCONNECTIONEVENTTIMEOUT"
+       ::= {acRtpRtcp 1}
+
+
+
+     acRtpRtcpBrokenConnectionEventActivationMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  afterFirstIncomingRTPPacket(0)
+,
+                  onRTPStreamActivation(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines if the broken connection mechanism is activated when
+the RTP stream is activated or when the first RTP packet
+is received.
+0 = After First incoming packet (default)
+1 = Upon channel’s RTP activation. 
+.
+Access: Online.
+AC INI-Param: BROKENCONNECTIONEVENTACTIVATIONMODE"
+       ::= {acRtpRtcp 2}
+
+
+
+     acRtpRtcpBasicRTPPacketInterval OBJECT-TYPE
+       SYNTAX INTEGER {
+                  pACKET-INTERVAL-DEFAULT(0)
+,
+                  pACKET-INTERVAL-5-MSEC(1)
+,
+                  pACKET-INTERVAL-10-MSEC(2)
+,
+                  pACKET-INTERVAL-20-MSEC(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Selects the RTP packet rate for sample based coders (such as
+G.711, G.726, G.727). Also applicable for G.729, G.729E & G.728.
+0 = Default (set internally)
+1 = 5 msec
+2 = 10 msec
+3 = 20 msec.
+Access: Online.
+AC INI-Param: BASICRTPPACKETINTERVAL"
+       ::= {acRtpRtcp 3}
+
+
+
+     acRtpRtcpConnectionEstablishNotificationMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  afterBrokenConnection(0)
+,
+                  uponFirstRTPFrameDetection(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the notification mode for the RTP connection establishment
+event acEV_CONNECTION_ESTABLISHED.
+0 = Notify only after a broken connection event
+1 = Also notify when the first RTP packet is received.
+Access: Online.
+AC INI-Param: CONNECTIONESTABLISHEMENTNOTIFICATIONMODE"
+       ::= {acRtpRtcp 4}
+
+
+
+     acRtpRtcpEnableMediaUDPChecksum OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines whether to enable the UDP checksum calculation for
+RTP media TX over IPv4. One of the following possible values:
+
+
+0 = Disable (No checksum: UDP checksum for IPv4 TX = 0)
+1 = Enable (UDP checksum will be in the UDP header upon IPv4
+TX)
+.
+Access: Offline.
+AC INI-Param: EnableMediaUDPChecksum"
+       ::= {acRtpRtcp 5}
+
+
+
+     acRtp OBJECT IDENTIFIER ::= {acMediaRtpRtcpConfig 2}
+
+
+     acRtpBaseUDPPort OBJECT-TYPE
+       SYNTAX Unsigned32 (1024..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the lower boundary of UDP ports to be used by the board.
+The upper boundary is calculated on the basis of BoardBaseUDPPort
++ 10 * (Number of Channels). This parameter value
+must be a multiple of 10.
+
+
+.
+Access: Offline.
+AC INI-Param: BASEUDPPORT"
+       ::= {acRtp 1}
+
+
+
+     acRtpComfortNoiseEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "When set to 1 (Enable), SID packets are sent with the RTP SID
+type (RFC 3389).
+0 = Disable
+1 = Enable
+Determines whether Silence Indicator (SID) packets that are
+sent and received are according to RFC 3389. 
+0 = Disabled (default).
+1 = Enabled.
+Note: Applicable only to MP-11x and Mediant 1000.
+.
+Access: Online.
+AC INI-Param: ENABLESTANDARDSIDPAYLOADTYPE"
+       ::= {acRtp 2}
+
+
+
+     acRtpEnableRFC2658Interleaving OBJECT-TYPE
+       SYNTAX INTEGER {
+                  withOut-RFC2658Interleaving-And-TOC(0)
+,
+                  including-RFC2658Interleaving-And-TOC(1)
+,
+                  including-TOC-Only(2)
+,
+                  interleave-Bundling(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "When enabled, RTP packets include an interleaving byte for VBR
+coders.
+
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: ENABLERFC2658INTERLEAVING"
+       ::= {acRtp 3}
+
+
+
+     acRtpRxTxMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  rTPTxRx(0)
+,
+                  rTPTxOnly(1)
+,
+                  rTPRxOnly(2)
+,
+                  rTPUnactive(3)
+,
+                  rTPRxRFC2833Tx(4)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Selects which RTP directions are enabled. Both Tx and Rx sides
+can be disabled.
+0 = RTPTxRx
+1 = RTPTxOnly
+2 = RTPRxOnly
+3 = RTPUnactive
+4 = RTPRxRFC2833Tx.
+Access: Online.
+AC INI-Param: RTPDIRECTIONCONTROL"
+       ::= {acRtp 4}
+
+
+
+     acRtpRFC2833TxPayloadType OBJECT-TYPE
+       SYNTAX Unsigned32 (96..127)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Controls the RFC 2833 Tx Relay RTP Payload type.
+
+Range = 96 to 127.
+Access: Online.
+AC INI-Param: RFC2833TXPAYLOADTYPE"
+       ::= {acRtp 5}
+
+
+
+     acRtpRFC2833RxPayloadType OBJECT-TYPE
+       SYNTAX Unsigned32 (96..127)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Controls the RFC 2833 Rx Relay RTP Payload type.
+
+Range = 96 to 127.
+Access: Online.
+AC INI-Param: RFC2833RXPAYLOADTYPE"
+       ::= {acRtp 6}
+
+
+
+     acRtpRedundancyPayloadType OBJECT-TYPE
+       SYNTAX Unsigned32 (96..127)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter sets the RFC 2198 (RTP Redundancy) packet's parameter
+'RTP Payload Type'.
+
+Range: 96 to 127.
+Access: Online.
+AC INI-Param: RFC2198PAYLOADTYPE"
+       ::= {acRtp 7}
+
+
+
+     acRtpRedundancyDepth OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Redundancy depth of RFC 2198 redundancy packets.
+
+0 = Disabled
+In Gen 3 boards: range is 0-5
+For other Gens 0-1.
+Access: Online.
+AC INI-Param: RTPREDUNDANCYDEPTH"
+       ::= {acRtp 8}
+
+
+
+     acRtpPacketizationFactor OBJECT-TYPE
+       SYNTAX Unsigned32 (1..12)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the number of DSP payloads for generating one RTP packet.
+Range = Hardware dependent.
+Access: Online.
+AC INI-Param: RTPPACKINGFACTOR"
+       ::= {acRtp 9}
+
+
+
+     acRtpNoOpPayloadType OBJECT-TYPE
+       SYNTAX Unsigned32 (96..127)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "User can modify the Noop packets RTP Payload type by setting
+this parameter.
+
+Range = 96 to 127.
+Access: Online.
+AC INI-Param: RTPNOOPPAYLOADTYPE"
+       ::= {acRtp 10}
+
+
+
+     acRtpNoOpEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables / disable Noop packets sending mode.
+
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: NoOpEnable"
+       ::= {acRtp 11}
+
+
+
+     acRtpNoOpInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (20..600000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Used to modify the Noop  packets sending interval 
+
+Parameter value is in milliseconds
+Default value = 10 sec (10000 msec)
+
+Range = 20 to 600000
+(20 msec to 10 min - 10 min = 600000).
+Access: Online.
+AC INI-Param: NoOpInterval"
+       ::= {acRtp 12}
+
+
+
+     acRtpVBRCoderHeaderFormat OBJECT-TYPE
+       SYNTAX INTEGER {
+                  withOut-RFC2658Interleaving-And-TOC(0)
+,
+                  including-RFC2658Interleaving-And-TOC(1)
+,
+                  including-TOC-Only(2)
+,
+                  interleave-Bundling(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "0 -  payload only (no header, no toc, no m-factor)
+
+1- support RFC 2658 format, 1 byte for interleaving header
+(always 0) and toc, no m-factor
+
+2 – payload including toc only, allow m-factor
+
+3- RFC 3358 format
+.
+Access: Online.
+AC INI-Param: VBRCoderHeaderFormat"
+       ::= {acRtp 13}
+
+
+
+     acRtpAMRCoderHeaderFormat OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cE-AMR-DEFAULT-FORMAT(0)
+,
+                  cE-AMR-RFC-3267-BUNDLING(1)
+,
+                  cE-AMR-RFC-3267-INTERLEAVING(2)
+,
+                  cE-AMR-IF2(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "AMR_CODER_HEADER_DEFAULT_FORMAT=0 - old m factor, each frame
+contains CRM byte and toc
+RFC_3267_BUNDLING=1 - single CRM byte followed by toc tables
+RFC_3267_INTERLEAVING=2 - supported as receivers only.
+Access: Online.
+AC INI-Param: AMRCODERHEADERFORMAT"
+       ::= {acRtp 14}
+
+
+
+     acRtpAMRFECRedundancyDepth OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cE-AMR-FEC-REDUNDANCY-LEVEL-NONE(0)
+,
+                  cE-AMR-FEC-REDUNDANCY-LEVEL-1(1)
+,
+                  cE-AMR-FEC-REDUNDANCY-LEVEL-2(2)
+,
+                  cE-AMR-FEC-REDUNDANCY-LEVEL-3(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the AMR / WB-AMR Redundancy depth according to RFC 3267.
+
+0 = No Redundancy
+1 = Redundancy depth of a single packet
+2 = Redundancy depth of 2 packets
+3 = Redundancy depth of 3 packets
+.
+Access: Online.
+AC INI-Param: AMRFECREDUNDANCYDEPTH"
+       ::= {acRtp 15}
+
+
+
+     acRtpAMRFECNumOfMngtPolicyEntries OBJECT-TYPE
+       SYNTAX Unsigned32 (0..9)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the number of entries to be defined at the AMR management
+policy table. Each entry defines the policy of a different
+rate.
+Access: Online.
+AC INI-Param: AMRFECNUMBEROFCODECMODES"
+       ::= {acRtp 16}
+
+
+
+     acRtpAMRFECDelayHysteresis OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the hysteresis of the Delay Threshold for AMR Hand-out
+events (in msec).
+Access: Online.
+AC INI-Param: AMRFECDELAYHYSTERESIS"
+       ::= {acRtp 17}
+
+
+
+     acRtpAMRFECDelayThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the one-way delay value (in msec) that may cause the
+AMR Hand Out report.
+
+0 = 'Hand Out' report is disabled (default).
+Access: Online.
+AC INI-Param: AMRFECDELAYTHRESHHOLD"
+       ::= {acRtp 18}
+
+
+
+     acRtpQcelpCoderHeaderFormat OBJECT-TYPE
+       SYNTAX INTEGER {
+                  parameter-Is-Not-Used(-1) 
+,
+                  including-RFC2658Interleaving-And-TOC(1)
+,
+                  including-TOC-Only(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines whether to define a separate header format for the
+QCELP coder (different to the header format of EVRC coder).
+One of the following values:
+
+-1       - QCELP coder uses the same header format as EVRC
+coder,
+            according to VBRCoderHeaderFormat parameter.
+1 to 2 - QCELP coder uses the value defined by this parameter
+to  
+            define its header format.
+
+This parameter is relevant only for Control Protocol users.
+TPNCP and PCI users should always use -1 value.
+Access: Instant.
+AC INI-Param: QcelpCoderHeaderFormat"
+       ::= {acRtp 19}
+
+
+
+     acRtpAMROctetAlignedEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "0 = disable the AMR Octet Aligned mode.
+ 1 = enable the AMR Octet Aligned mode.
+Access: Online.
+AC INI-Param: AmrOctetAlignedEnable"
+       ::= {acRtp 20}
+
+
+
+     acAMRFECCodecPolicies OBJECT IDENTIFIER ::= {acRtp 21}
+
+
+     -- ****************************************
+     -- acAMRFECCodecPolicies table declaration
+     -- ****************************************
+     acAMRFECCodecPoliciesTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcAMRFECCodecPoliciesEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acAMRFECCodecPolicies 1}
+
+
+
+     -- ****************************************
+     -- acAMRFECCodecPolicies table entry
+     -- ****************************************
+     acAMRFECCodecPoliciesEntry OBJECT-TYPE
+       SYNTAX AcAMRFECCodecPoliciesEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acAMRFECCodecPoliciesIndex}
+       ::= {acAMRFECCodecPoliciesTable 1}
+
+
+
+     -- ****************************************
+     -- acAMRFECCodecPolicies TABLE
+     -- ****************************************
+     AcAMRFECCodecPoliciesEntry ::= SEQUENCE {
+       acAMRFECCodecPoliciesIndex                      Unsigned32,
+       acAMRFECCodecPoliciesRowStatus                  RowStatus,
+       acAMRFECCodecPoliciesRate                       Unsigned32,
+       acAMRFECCodecPoliciesRedundancyLevel            Unsigned32,
+       acAMRFECCodecPoliciesThreshold                  Unsigned32,
+       acAMRFECCodecPoliciesHysteresis                 Unsigned32
+     }
+
+
+
+     acAMRFECCodecPoliciesIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..7)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: AMRFECCodecPolicies_Index"
+       ::= {acAMRFECCodecPoliciesEntry 1}
+
+
+
+     acAMRFECCodecPoliciesRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acAMRFECCodecPoliciesEntry 2}
+
+
+
+     acAMRFECCodecPoliciesRate OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "AMR Rate x of policy x (values 0-8).
+Access: Online.
+AC INI-Param: AMRFECCodecPolicies_Rate"
+       ::= {acAMRFECCodecPoliciesEntry 3}
+
+
+
+     acAMRFECCodecPoliciesRedundancyLevel OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Redundancy Level for policy x. Same values as ‘RFC 3267 Redundancy”
+field.
+Access: Online.
+AC INI-Param: AMRFECCodecPolicies_RedundancyLevel"
+       ::= {acAMRFECCodecPoliciesEntry 4}
+
+
+
+     acAMRFECCodecPoliciesThreshold OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "FLR (Frame Loss Ratio) threshold of policy 1. Values are taken
+from 3GPP TS 44.318 (0-63).
+Access: Online.
+AC INI-Param: AMRFECCodecPolicies_Threshold"
+       ::= {acAMRFECCodecPoliciesEntry 5}
+
+
+
+     acAMRFECCodecPoliciesHysteresis OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Hysteresis of FLR threshold for policy 1. Values are taken from
+3GPP TS 44.318. (0-15).
+Access: Online.
+AC INI-Param: AMRFECCodecPolicies_Hysteresis"
+       ::= {acAMRFECCodecPoliciesEntry 6}
+
+
+
+     acRtcp OBJECT IDENTIFIER ::= {acMediaRtpRtcpConfig 3}
+
+
+     acRtcpDisableIntervalRandomization OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Controls whether RTCP report intervals are randomized or whether
+each report interval accords exactly to the parameter defining
+RTCP Mean Tx Interval (in milliseconds).
+0 = Randomize
+1 = Don’t Randomize.
+Access: Online.
+AC INI-Param: DISABLERTCPRANDOMIZE"
+       ::= {acRtcp 1}
+
+
+
+     acRtcpXr OBJECT IDENTIFIER ::= {acMediaRtpRtcpConfig 4}
+
+
+     acRtcpXrBurstThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..12)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "voice quality monitoring - excessive burst alert threshold.
+if set to -1, no alerts will be issued.
+Access: Online.
+AC INI-Param: VQMONBURSTHR"
+       ::= {acRtcpXr 1}
+
+
+
+     acRtcpXrDelayThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..12)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "voice quality monitoring - excessive delay alert threshold.
+if set to -1, no alerts will be issued.
+Access: Online.
+AC INI-Param: VQMONDELAYTHR"
+       ::= {acRtcpXr 2}
+
+
+
+     acRtcpXrEndOofCallRvalDelayThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..12)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "voice quality monitoring - end of call low quality alert threshold.
+if set to -1, no alerts will be issued.
+Access: Online.
+AC INI-Param: VQMONEOCRVALTHR"
+       ::= {acRtcpXr 3}
+
+
+
+     acRtcpXrGMin OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "voice quality monitoring - minimum gap size (number of frames).
+Access: Online.
+AC INI-Param: VQMONGMIN"
+       ::= {acRtcpXr 4}
+
+
+
+     acRtcpXrEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+,
+                  enableOnlyCalculation(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets voice quality monitoring (RTCP-XR) mode.
+
+0 = Disable
+1 = Enable all
+2 = Enable Only Calculation.
+Access: Offline.
+AC INI-Param: VQMONENABLE"
+       ::= {acRtcpXr 5}
+
+
+
+     acVideoRtpRtcp OBJECT IDENTIFIER ::= {acMediaRtpRtcpConfig 5}
+
+
+     acVideoRtpRtcpDisableRtcpIntervalRandomization OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines whether to enable RTCP Interval Randomization. One
+of the following values: 0 Enable RTCP Interval Randomization
+1 Disable RTCP Interval Randomization
+.
+Access: Online.
+AC INI-Param: VideoDisableRtcpIntervalRandomization"
+       ::= {acVideoRtpRtcp 1}
+
+
+
+     acVideoRtpRtcpMeanTxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the mean interval between two transmitted RTCP packets
+(milliseconds). If the interval is set to 0, no RTCP packets
+are transmitted at all.
+Access: Online.
+AC INI-Param: VideoRtcpMeanTxInterval"
+       ::= {acVideoRtpRtcp 2}
+
+
+
+     acVideoRtpRtcpBrokenConnectionActivationMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  afterFirstIncomingRtpPacket (0)
+,
+                  onRtpStreamActivation (1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Broken connection event activation mode.
+0 - Activate broken connection after the arrival of the first
+RTP packet.
+1 - Activate broken connection immediately after the Activate
+RTP command.
+.
+Access: Online.
+AC INI-Param: VideoBrokenConnectionActivationMode"
+       ::= {acVideoRtpRtcp 3}
+
+
+
+     acVideoRtpRtcpBrokenConnectionEventTimeout OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Timeout that defines when broken connection event occurs.
+Time resolution is 20msec.
+Access: Online.
+AC INI-Param: VideoBrokenConnectionEventTimeout"
+       ::= {acVideoRtpRtcp 4}
+
+
+
+     acMediaIBSConfig OBJECT IDENTIFIER ::= {acMediaConfiguration 5}
+
+
+     acIBS OBJECT IDENTIFIER ::= {acMediaIBSConfig 1}
+
+
+     acIBSAnalogSignalTransportType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  ignore(0)
+,
+                  transfer(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the analog signal transport type. 
+0 = Ignore
+1 = Transfer hookflash via RFC 2833.
+Access: Online.
+AC INI-Param: ANALOGSIGNALTRANSPORTTYPE"
+       ::= {acIBS 1}
+
+
+
+     acIBSDTMFVolume OBJECT-TYPE
+       SYNTAX Integer32 (-31..0)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines and controls the DTMF generation volume [-dBm].
+
+Range = -31 to 0.
+Access: Online.
+AC INI-Param: DTMFVOLUME"
+       ::= {acIBS 2}
+
+
+
+     acIBSDTMFTransportType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acMuteDTMF(0)
+,
+                  acTransparentDTMF(2)
+,
+                  acRFC2833RelayDTMF(3)
+,
+                  acRFC2833RelayDecoderMute(7)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the type of DTMF transport. 
+
+0 = Erase DTMFs from voice transport not relayed to remote
+2 = DTMFs not erased are not relayed to remote
+3 = DTMFs are muted from the voice stream and relayed according
+to RFC 2833
+7 = DTMFs are sent according to RFC 2833 and muted when received.
+Access: Online.
+AC INI-Param: DTMFTRANSPORTTYPE"
+       ::= {acIBS 3}
+
+
+
+     acIBSMFTransportType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acMuteMF(0)
+,
+                  acTransparentMF(2)
+,
+                  acRFC2833RalayMF(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the type of MF transport.
+
+0 = Erase MFs from voice transport not relayed to remote
+2 = MFs not erased are not relayed to remote
+3 = MFs are muted from the voice stream and relayed according
+to RFC 2833.
+Access: Online.
+AC INI-Param: MFTRANSPORTTYPE"
+       ::= {acIBS 4}
+
+
+
+     acIBSTrunkTestingTonesEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disables (0)
+,
+                  enables (1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables trunk testing tones.
+0 = Disables trunk testing tones
+1 = Enables trunk testing tones.
+Access: Offline.
+AC INI-Param: ENABLETRUNKTESTINGTONES"
+       ::= {acIBS 5}
+
+
+
+     acIBSCASRelayTransportMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cASEventsOnly(0)
+,
+                  cASRFC2833Relay(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Controls the ABCD signaling transport type over IP. 
+
+0 = No Relay over the network
+1 = Enable CAS relay according to RFC 2833.
+Access: Online.
+AC INI-Param: CASTRANSPORTTYPE"
+       ::= {acIBS 6}
+
+
+
+     acIBSRxDtmfHangOverTime OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Used to configure the Voice Silence time (in ms units) after
+playing DTMF or MF digits to the TDM side that arrived as Relay
+from the Network side.
+
+Range from 0 to 2000, Default 1000.
+Access: Online.
+AC INI-Param: RxDtmfHangOverTime"
+       ::= {acIBS 7}
+
+
+
+     acIBSTxDtmfHangOverTime OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Voice Silence time (in ms units) after detecting the end of
+DTMF or MF digits at the TDM side when the DTMF Transport Type
+is either Relay or Mute.This feature allows the user to configure
+the silence time. 
+.
+Access: Online.
+AC INI-Param: TxDtmfHangOverTime"
+       ::= {acIBS 8}
+
+
+
+     acIBSDTMFTwistControl OBJECT-TYPE
+       SYNTAX Integer32 (-10..10)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines a delta (in dB) between the high and low frequency component
+in the DTMF signal. dB Positive values cause the higher
+frequency component to be stronger than the lower one.
+Negative values cause the opposite effect. For any parameter
+value, both components change so that their average is constant.
+
+Range = -10 to 10.
+Access: Offline.
+AC INI-Param: DTMFGenerationTwist"
+       ::= {acIBS 9}
+
+
+
+     acIBSNTEMaxDuration OBJECT-TYPE
+       SYNTAX Integer32 (-1..200000000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Maximal time for sending NTEs (Named Telephony Events) to the
+network, regardless of the time range when the TDM signal
+is detected.
+
+-1= NTE will stop only upon detection of End event (default).
+Access: Online.
+AC INI-Param: NTEMaxDuration"
+       ::= {acIBS 10}
+
+
+
+     acIBSDetectors OBJECT IDENTIFIER ::= {acMediaIBSConfig 2}
+
+
+     acIBSDetectorsMFR1Enable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables detection of MFR1 signaling.
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: MFR1DETECTORENABLE"
+       ::= {acIBSDetectors 1}
+
+
+
+     acIBSDetectorsMFR2ForwardEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables detection of MFR2 forward signaling.
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: MFR2FORWARDDETECTORENABLE"
+       ::= {acIBSDetectors 2}
+
+
+
+     acIBSDetectorsMFR2BackwardEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables detection of MFR2 backward signaling.
+Access: Online.
+AC INI-Param: MFR2BACKWARDDETECTORENABLE"
+       ::= {acIBSDetectors 3}
+
+
+
+     acIBSDetectorsR1LineEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables detection of Line signaling.
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: R1LINEDETECTORENABLE"
+       ::= {acIBSDetectors 4}
+
+
+
+     acIBSDetectorsR2LineEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables detection of Line signaling.
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: R2LINEDETECTORENABLE"
+       ::= {acIBSDetectors 5}
+
+
+
+     acIBSDetectorsAC15Enable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables detection of Line signaling.
+Access: Online.
+AC INI-Param: AC15DETECTORENABLE"
+       ::= {acIBSDetectors 6}
+
+
+
+     acIBSDetectorsDTMFEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables detection of DTMF signaling. 
+
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: DTMFDETECTORENABLE"
+       ::= {acIBSDetectors 7}
+
+
+
+     acIBSDetectorsCallProgressEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables detection of Call Progress Tones.
+
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: CALLPROGRESSDETECTORENABLE"
+       ::= {acIBSDetectors 8}
+
+
+
+     acIBSDetectorsUserDefinedToneEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables detection of User Defined Tones signaling.
+
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: USERDEFINEDTONEDETECTORENABLE"
+       ::= {acIBSDetectors 9}
+
+
+
+     acIBSDetectorsDetectionRedirection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  pcm(0)
+,
+                  network(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the IBS (In-Band Signaling) Detection Direction.
+
+
+0 = PCM 
+1 = Network.
+Access: Online.
+AC INI-Param: IBSDETECTIONREDIRECTION"
+       ::= {acIBSDetectors 10}
+
+
+
+     acIBSDetectorsSS4Enable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables detection of Line signaling.
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: SS4DETECTORENABLE"
+       ::= {acIBSDetectors 11}
+
+
+
+     acIBSDetectorsMFSS5Enable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables detection of MF SS5 line signaling.
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: MFSS5DETECTORENABLE"
+       ::= {acIBSDetectors 12}
+
+
+
+     acIBSDetectorsSS5Enable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Detection of Line signaling.
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: SS5DETECTORENABLE"
+       ::= {acIBSDetectors 13}
+
+
+
+     acIBSDetectorsSITEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables SIT (Special Information Tone) detection
+according to the ITU-T recommendation E.180/Q.35.
+
+0 = Disable
+1 = Enable.
+Access: Offline.
+AC INI-Param: SITDETECTORENABLE"
+       ::= {acIBSDetectors 14}
+
+
+
+     acIBSDetectorsCOTEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables Continuity Test tone detection and generation
+according to the ITU-T Q.724 recommendation.
+
+0 = Disable
+1 = Enable.
+Access: Offline.
+AC INI-Param: ENABLECONTINUITYTONES"
+       ::= {acIBSDetectors 15}
+
+
+
+     acIBSDetectorsR1DetectionStandard OBJECT-TYPE
+       SYNTAX INTEGER {
+                  mfR1DetectionStandardItu (0)
+,
+                  mfR1DetectionStandardR15 (1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter determines which one of the R1 MF protocol flavors
+will be used for detection.
+
+0 = ITU
+1 = R1.5.
+Access: Offline.
+AC INI-Param: R1DetectionStandard"
+       ::= {acIBSDetectors 16}
+
+
+
+     acIBSDetectorsUDTDetectorFrequencyDeviation OBJECT-TYPE
+       SYNTAX Unsigned32 (1..50)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the deviation allowed for the detection of each signal
+frequency. Units are in Hertz.
+Valid values range 1-50.
+Default value 50 Hz.
+.
+Access: Offline.
+AC INI-Param: UDTDETECTORFREQUENCYDEVIATION"
+       ::= {acIBSDetectors 17}
+
+
+
+     acIBSDetectorsCPTDetectorFrequencyDeviation OBJECT-TYPE
+       SYNTAX Unsigned32 (1..30)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the deviation allowed for the detection of each CPT
+signal frequency. Units are in Hertz.
+Valid values range 1-30.
+Default value 10 Hz.
+.
+Access: Offline.
+AC INI-Param: CPTDETECTORFREQUENCYDEVIATION"
+       ::= {acIBSDetectors 18}
+
+
+
+     acIPMediaConfig OBJECT IDENTIFIER ::= {acMediaConfiguration 6}
+
+
+     acIPMedia OBJECT IDENTIFIER ::= {acIPMediaConfig 1}
+
+
+     acIPMediaDSPDetectorsEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables DSP IP Media Detectors. Enabling this parameter
+might reduce the board channel capacity.
+
+0 = Disable
+1 = Enable.
+Access: Offline.
+AC INI-Param: ENABLEDSPIPMDETECTORS"
+       ::= {acIPMedia 1}
+
+
+
+     acIPMediaEnableMCApplication OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables media control functionality.
+Access: Offline.
+AC INI-Param: ENABLEMEDIACONTROL"
+       ::= {acIPMedia 2}
+
+
+
+     acIPMAnswerDetector OBJECT IDENTIFIER ::= {acIPMediaConfig 2}
+
+
+     acIPMAnswerDetectorEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  no(0)
+,
+                  yes(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables activation of the AD (Answer Detector).
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: ENABLEANSWERDETECTOR"
+       ::= {acIPMAnswerDetector 1}
+
+
+
+     acIPMAnswerDetectorActivityDelay OBJECT-TYPE
+       SYNTAX Unsigned32 (0..128)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Controls (in 100 msec resolution) the time between sending Activation
+command (AnswerDetector = 1) and the time that the
+detector actually starts to work.
+Range = 0 to 0x3FF.
+Access: Online.
+AC INI-Param: ANSWERDETECTORACTIVITYDELAY"
+       ::= {acIPMAnswerDetector 2}
+
+
+
+     acIPMAnswerDetectorSilenceTime OBJECT-TYPE
+       SYNTAX Unsigned32 (0..128)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter controls the silence time period (in 100 msec
+resolution) from no speech input until the END_OF_SPEECH event
+is sent.
+10 = 1 second
+Range = 0 to 0x3FF.
+Access: Online.
+AC INI-Param: ANSWERDETECTORSILENCETIME"
+       ::= {acIPMAnswerDetector 3}
+
+
+
+     acIPMAnswerDetectorRedirection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  speechPCMSideDetected(0)
+,
+                  speechIPSideDetected(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the AD (Answer Detector) Redirection. 
+0 (PCM) = Speech from the PCM side is detected 
+1 (Network) = Speech from the IP side is detected.
+Access: Online.
+AC INI-Param: ANSWERDETECTORREDIRECTION"
+       ::= {acIPMAnswerDetector 4}
+
+
+
+     acIPMAnswerDetectorSensitivity OBJECT-TYPE
+       SYNTAX Unsigned32 (0..7)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Controls the AD (Answer Detector) sensitivity.
+
+The allowed values are different for different boards:
+DSP Gen2-based products: range 0 - 2, default 0.
+DSP Gen2-based products: range 0 - 7, default 3.
+
+Lowest value matches highest sensitivity and vice versa.
+Access: Online.
+AC INI-Param: ANSWERDETECTORSENSITIVITY"
+       ::= {acIPMAnswerDetector 5}
+
+
+
+     acIPMEnergyDetector OBJECT IDENTIFIER ::= {acIPMediaConfig 3}
+
+
+     acIPMEnergyDetectorEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  no(0)
+,
+                  yes(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Activates the ED (Energy Detector). 
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: ENABLEENERGYDETECTOR"
+       ::= {acIPMEnergyDetector 1}
+
+
+
+     acIPMEnergyDetectorQualityFactor OBJECT-TYPE
+       SYNTAX Unsigned32 (0..10)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the ED's (Energy Detector's) sensitivity (0 -10).
+
+0 = Insensitive
+10 = Most Sensitive
+
+Range = 0 to 10.
+Access: Online.
+AC INI-Param: ENERGYDETECTORQUALITYFACTOR"
+       ::= {acIPMEnergyDetector 2}
+
+
+
+     acIPMEnergyDetectorThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..7)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the ED's (Energy Detector's) threshold. A signal exceeding
+the threshold invokes an 'Above' or 'Below' event. 
+ActualThreshold = -44 dBm + (EDThreshold * 6)
+Default = 3 = -26 dBm
+
+Range: 0 to 7.
+Access: Online.
+AC INI-Param: ENERGYDETECTORTHRESHOLD"
+       ::= {acIPMEnergyDetector 3}
+
+
+
+     acIPMEnergyDetectorEnergyRedirection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  tDM(0)
+,
+                  network(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Selects the direction of the energy detection.
+0 = Detect from the TDM side
+1 = Detect from the network side.
+Access: Online.
+AC INI-Param: ENERGYDETECTORREDIRECTION"
+       ::= {acIPMEnergyDetector 4}
+
+
+
+     acIPMediaPatternDetector OBJECT IDENTIFIER ::= {acIPMediaConfig 4}
+
+
+     acIPMediaPatternDetectorEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  no(0)
+,
+                  yes(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables activation of the PD (Pattern Detector).
+0 = Disable
+1 = Enable.
+Access: Online.
+AC INI-Param: ENABLEPATTERNDETECTOR"
+       ::= {acIPMediaPatternDetector 1}
+
+
+
+     acIPMediaPatternDetectorDetectionThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..31)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the number of consecutive patterns to trigger the pattern
+detection event.
+
+Range = 0 to 31.
+Access: Offline.
+AC INI-Param: PDTHRESHOLD"
+       ::= {acIPMediaPatternDetector 2}
+
+
+
+     acIPMediaAMD OBJECT IDENTIFIER ::= {acIPMediaConfig 5}
+
+
+     acIPMediaAMDDetectionDirection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acAmdTdmDetection(0)
+,
+                  acAmdNetworkDetection(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the AMD (Answer Machine Detector) detection direction.
+
+One of the following values:
+
+0 = Detection from the TDM side
+1 = Detection from the Network side.
+Access: Online.
+AC INI-Param: AMDDETECTIONDIRECTION"
+       ::= {acIPMediaAMD 1}
+
+
+
+     acIPMediaAMDSensitivity OBJECT-TYPE
+       SYNTAX Unsigned32 (0..7)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the AMD (Answer Machine Detector) detection sensitivity:
+
+0 = Best detection of an answering machine
+7 = Best detection of a live call.
+Access: Online.
+AC INI-Param: AMDDetectionSensitivity"
+       ::= {acIPMediaAMD 2}
+
+
+
+     acIPMediaAMDDetectionSensitivityHighResolution OBJECT-TYPE
+       SYNTAX Unsigned32 (0..15)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the AMD (Answer Machine Detector) high resolution
+detection sensitivity.
+The high resolution has 16 levels of sensitivity while the
+normal resolution (Answer Machine Detector Sensitivity) has
+8 levels.
+
+0 = Best detection of an answering machine
+15 = Best detection of a live call.
+Access: Online.
+AC INI-Param: AMDSensitivityLevel"
+       ::= {acIPMediaAMD 3}
+
+
+
+     acIPMediaAMDSensitivityResolution OBJECT-TYPE
+       SYNTAX INTEGER {
+                  normal(0)
+,
+                  high(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the AMD (Answer Machine Detector) detection sensitivity
+resolution:
+
+0 = Normal detection sensitivity resolution (8 sensitivity
+levels)
+1 = High detection sensitivity resolution (16 sensitivity levels).
+Access: Online.
+AC INI-Param: AMDSensitivityParameterSuit"
+       ::= {acIPMediaAMD 4}
+
+
+
+     acIPMediaAMDBeepDetectionTimeout OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1638)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the AMD (Answer Machine Detector) Beep detection
+timeout.
+
+Units of 100 milliseconds, values from 0 to 1638 (163.8 seconds).
+Access: Online.
+AC INI-Param: AMDBeepDetectionTimeout"
+       ::= {acIPMediaAMD 5}
+
+
+
+     acIPMediaAMDBeepDetectionSensitivity OBJECT-TYPE
+       SYNTAX Unsigned32 (0..3)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the AMD (Answer Machine Detector) Beep detection
+sensitivity.
+
+0 - Least sensitive.
+3 - Most sensitive.
+Access: Online.
+AC INI-Param: AMDBeepDetectionSensitivity"
+       ::= {acIPMediaAMD 6}
+
+
+
+     acIPMediaAMDSensitivityParameterSuit OBJECT-TYPE
+       SYNTAX Unsigned32 (0..7)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the serial number of the AMD (Answer Machine Detector)
+parameter suit:
+0 = USA Parameter Suit with normal detection  sensitivity resolution
+(8 sensitivity levels)
+1 = USA Parameter Suit with high detection sensitivity resolution
+(16 sensitivity levels)
+2-7 : other countries parameter suits with up to 16 sensitivity
+levels.
+Access: Online.
+AC INI-Param: AMDSensitivityParameterSuit"
+       ::= {acIPMediaAMD 7}
+
+
+
+     acIPMediaAMDSensitivityLevel OBJECT-TYPE
+       SYNTAX Unsigned32 (0..15)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the AMD (Answer Machine Detector) level of detection
+sensitivity.
+It has 16 levels of sensitivity :
+0 = Best detection of an answering machine
+15 = Best detection of a live call.
+Access: Online.
+AC INI-Param: AMDSensitivityLevel"
+       ::= {acIPMediaAMD 8}
+
+
+
+     acIPMConference OBJECT IDENTIFIER ::= {acIPMediaConfig 6}
+
+
+     acIPMConferenceGASNMinInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (10..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Minimum interval between Active Speaker Notification (ASN) events.
+An ASN event reports on the active speakers in a conference.
+The event is issued whenever the active speakers change.
+units = 100 ms
+Minimum configurable interval between events is 500 ms (5 units).
+Access: Instant.
+AC INI-Param: ACTIVESPEAKERSNOTIFICATIONMININTERVAL"
+       ::= {acIPMConference 1}
+
+
+
+     acIPMConferenceEnergythreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..39)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Conference -  Minimum energy level for a user to be included
+in Active Speaker Notification (ASN) events (units: -dBm).
+
+Valid range 0 to (-39) dbm.
+Access: Instant.
+AC INI-Param: ActiveSpeakerEnergyThreshold"
+       ::= {acIPMConference 2}
+
+
+
+     acIPMConferenceEnableHDConference OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enable\Disable HD Conference.
+Access: Offline.
+AC INI-Param: EnableHDConference"
+       ::= {acIPMConference 3}
+
+
+
+     acIPMVideoConference OBJECT IDENTIFIER ::= {acIPMediaConfig 7}
+
+
+     acIPMVideoConferenceSwitchingInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the video view rotation interval in seconds. Applicable
+when using timer trigger switching mode.
+Access: Online.
+AC INI-Param: VideoConferenceSwitchingInterval"
+       ::= {acIPMVideoConference 1}
+
+
+
+     acIPMVideoConferenceEnableActiveSpeakerHighlight OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Highlights the speaker for participants viewing a symmetric
+layout (2x2 or 3x3) .
+0 - Don't highlight active speaker.
+1 - Highlight active speaker.
+Access: Online.
+AC INI-Param: VideoEnableActiveSpeakerHighlight"
+       ::= {acIPMVideoConference 2}
+
+
+
+     acIPMVideoConferenceParticipantType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  regular(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Indicates a participant's capabilities in the conference.
+Regular (2) – Regular participant who is able to both send
+and receive video.
+.
+Access: Online.
+AC INI-Param: VideoConferenceParticipantType"
+       ::= {acIPMVideoConference 3}
+
+
+
+     acIPMVideoConferenceParticipantTriggerMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  triggerMode-Speaker(0)
+,
+                  triggerMode-Timer(1)
+,
+                  triggerMode-Fixed(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Participant trigger mode defines the trigger for modifying the
+participant's view.
+Voice Activated Video Switch (0) – A participant’s view will
+be changed according to the active speakers’ detection. 
+Timer (1) – A participant’s view is rotated every configured
+time among the different video participants in the conference.
+Fixed (3) – A participant’s view is fixed.
+.
+Access: Online.
+AC INI-Param: VideoConferenceParticipantTriggerMode"
+       ::= {acIPMVideoConference 4}
+
+
+
+     acIPMVideoConferenceParticipantLayout OBJECT-TYPE
+       SYNTAX INTEGER {
+                  layout-1XUSER(0)
+,
+                  layout-2x2-USERS(1)
+,
+                  layout-3x3-USERS(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Indicates the participant's view layout.
+1 user (0).
+2*2 users (1). All same size.
+3*3 users (2). All same size.
+
+
+.
+Access: Online.
+AC INI-Param: VideoConferenceParticipantLayout"
+       ::= {acIPMVideoConference 5}
+
+
+
+     acIPMVideoConferenceEnableConferenceParticipantSelfView OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Self view indication.
+0 - The participant cannot view himself
+1 - The participant can view himself.
+Access: Online.
+AC INI-Param: VideoEnableConferenceParticipantSelfView"
+       ::= {acIPMVideoConference 6}
+
+
+
+     acMediaCallerIDConfig OBJECT IDENTIFIER ::= {acMediaConfiguration 7}
+
+
+     acCallerID OBJECT IDENTIFIER ::= {acMediaCallerIDConfig 1}
+
+
+     acCallerIDTypes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  bellcore (0)
+,
+                  eTSI (1)
+,
+                  nTT (2)
+,
+                  bT (4)
+,
+                  dTMF-Based-ETSI (16)
+,
+                  denmark (17)
+,
+                  indian (18)
+,
+                  brazilian (19)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the supported Caller ID standard.
+0 = Bellcore
+1 = ETSI
+2 = NTT
+4 = British
+16 = ETSI_ETS
+17 = Denmark
+18 = Indian
+19 = Brazilian.
+Access: Online.
+AC INI-Param: CALLERIDTYPE"
+       ::= {acCallerID 1}
+
+
+
+     acCallerIDTransportType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  callerID-DISABLE(0)
+,
+                  callerID-RELAY(1)
+,
+                  callerID-MUTE(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the CallerID Transport type.
+
+0 = Disable 
+1 = Relay 
+3 = Mute.
+Access: Online.
+AC INI-Param: CallerIDTransportType"
+       ::= {acCallerID 2}
+
+
+
+     acCallerIDDTMFBasedMaxDigits OBJECT-TYPE
+       SYNTAX Unsigned32 (0..26)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the maximum number of DTMF digits in a DTMF-based
+Caller ID string.
+
+Range = 0 to 26.
+Access: Online.
+AC INI-Param: MAXDTMFDIGITSINCIDSTRING"
+       ::= {acCallerID 3}
+
+
+
+     acCallerIDDTMFBasedMinDigits OBJECT-TYPE
+       SYNTAX Unsigned32 (0..26)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the mimumum number of DTMF digits in a DTMF-based
+Caller ID string.
+
+Range = 0 to 26.
+Access: Online.
+AC INI-Param: MINDTMFDIGITSINCIDSTRING"
+       ::= {acCallerID 4}
+
+
+
+     acCallerIDNTTDIDSignallingForm OBJECT-TYPE
+       SYNTAX INTEGER {
+                  nttDidFskSignalling (0)
+,
+                  nttDidDtmfBasedSignalling (1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Configures the signalling format used when generating an NTT
+DID.
+
+0 = FSK Siganl
+1 = DTMF Based Signal.
+Access: Online.
+AC INI-Param: NTTDIDSignallingForm"
+       ::= {acCallerID 5}
+
+
+
+     acMediaNetworkConfig OBJECT IDENTIFIER ::= {acMediaConfiguration 8}
+
+
+     acMediaNetwork OBJECT IDENTIFIER ::= {acMediaNetworkConfig 1}
+
+
+     acMediaNetworkDisableNAT OBJECT-TYPE
+       SYNTAX INTEGER {
+                  no(0)
+,
+                  yes(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables or disables the NAT feature.
+0 = Do not disable NAT
+1 = Disable NAT.
+Access: Online.
+AC INI-Param: DISABLENAT"
+       ::= {acMediaNetwork 1}
+
+
+
+     acMediaNetworkRtpIpTos OBJECT-TYPE
+       SYNTAX Unsigned32 (0..15)
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Sets value of IP Type Of Service field in IP header for all
+packets generated from this channel. Follow the acTIPTOS enumeration.
+Access: Instant.
+AC INI-Param: IPTOS"
+       ::= {acMediaNetwork 2}
+
+
+
+     acMediaNetworkRtpIpPrecedence OBJECT-TYPE
+       SYNTAX Unsigned32 (0..7)
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Sets value of the IP precedence field in the IP header for all
+packets generated from this channel. Follow the acTIPPrecedence
+enumeration.
+Access: Instant.
+AC INI-Param: IPPRECEDENCE"
+       ::= {acMediaNetwork 3}
+
+
+
+     acMediaNetworkIPDiffServ OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Defines the value of the 'DiffServ' field in the IP header for
+media (RTP) traffic.
+
+Range: 0 to 63.
+Access: Instant.
+AC INI-Param: IPDIFFSERV"
+       ::= {acMediaNetwork 4}
+
+
+
+     acMediaNetworkInboundLatchMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  strict(0)
+,
+                  dynamic(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the way of handling incoming  media packets from
+non-expected address/port.
+Access: Online.
+AC INI-Param: InboundMediaLatchMode"
+       ::= {acMediaNetwork 5}
+
+
+
+     acMediaJBConfig OBJECT IDENTIFIER ::= {acMediaConfiguration 9}
+
+
+     acJitterBuffer OBJECT IDENTIFIER ::= {acMediaJBConfig 1}
+
+
+     acJitterBufferMinDelay OBJECT-TYPE
+       SYNTAX Unsigned32 (0..150)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the Dynamic Jitter Buffer Minimum Delay (in msec).
+
+Recommended value for a regular voice call is 10.
+Access: Online.
+AC INI-Param: DJBUFMINDELAY"
+       ::= {acJitterBuffer 1}
+
+
+
+     acJitterBufferOptFactor OBJECT-TYPE
+       SYNTAX Unsigned32 (0..13)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the Dynamic Jitter Buffer frame error/delay optimization.
+Recommended value for a regular voice call is 10.
+Access: Online.
+AC INI-Param: DJBUFOPTFACTOR"
+       ::= {acJitterBuffer 2}
+
+
+
+     acVideoJitterBuffer OBJECT IDENTIFIER ::= {acMediaJBConfig 2}
+
+
+     acVideoJitterBufferMinDelay OBJECT-TYPE
+       SYNTAX Unsigned32 (0..500)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Jitter buffer minimum delay in milliseconds. Must be less than
+JitterBufferMaxDelay.
+Access: Online.
+AC INI-Param: VideoJitterBufferMinDelay"
+       ::= {acVideoJitterBuffer 1}
+
+
+
+     acVideoJitterBufferMaxDelay OBJECT-TYPE
+       SYNTAX Unsigned32 (0..500)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Jitter buffer maximum delay in milliseconds.
+Access: Online.
+AC INI-Param: VideoJitterBufferMaxDelay"
+       ::= {acVideoJitterBuffer 2}
+
+
+
+     acVideoJitterBufferDJBOptimizationFactor OBJECT-TYPE
+       SYNTAX Unsigned32 (0..10)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "JB Optimization Factor controls the jitter buffer's adaptation
+rates
+ A High factor means fast adaptation when jitter increases,
+and a slow adaptation when jitter decrease. 
+Small factor means slow adaptation when jitter increases, and
+a fast adaptation when jitter decreases.   
+.
+Access: Online.
+AC INI-Param: VideoDJBOptimizationFactor"
+       ::= {acVideoJitterBuffer 3}
+
+
+
+     acMediaStatus OBJECT IDENTIFIER ::= {acMedia 2}
+
+
+     acMediaAggregation OBJECT IDENTIFIER ::= {acMediaConfiguration 10}
+
+
+     acMediaAggregationRemoteBaseUDPPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Remote Base UDP Port For Aggrigation.
+Access: Offline.
+AC INI-Param: REMOTEBASEUDPPORT"
+       ::= {acMediaAggregation 1}
+
+
+
+     acMediaAggregationL1L1ComplexRxUDPPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The UDP port for the incoming (from the remote side) and the
+outgoing (destination UDP) packets, for Complex Multiplexed
+RTP mode.
+Access: Offline.
+AC INI-Param: L1L1ComplexRxUDPPort"
+       ::= {acMediaAggregation 2}
+
+
+
+     acMediaAggregationL1L1ComplexTxUDPPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The Source UDP port for the outgoing UDP Multiplexed RTP packets,
+for Complex-Multiplex RTP mode.
+Access: Offline.
+AC INI-Param: L1L1ComplexTxUDPPort"
+       ::= {acMediaAggregation 3}
+
+
+
+     acIPLegs OBJECT IDENTIFIER ::= {acMediaStatus 1}
+
+
+     -- ****************************************
+     -- acIPLegs table declaration
+     -- ****************************************
+     acIPLegsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcIPLegsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acIPLegs 1}
+
+
+
+     -- ****************************************
+     -- acIPLegs table entry
+     -- ****************************************
+     acIPLegsEntry OBJECT-TYPE
+       SYNTAX AcIPLegsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acIPLegsLegIndex}
+       ::= {acIPLegsTable 1}
+
+
+
+     -- ****************************************
+     -- acIPLegs TABLE
+     -- ****************************************
+     AcIPLegsEntry ::= SEQUENCE {
+       acIPLegsLegIndex                                Unsigned32,
+       acIPLegsCallIndex                               Unsigned32,
+       acIPLegsRTPActive                               INTEGER,
+       acIPLegsCoderType                               INTEGER,
+       acIPLegsSilenceCompression                      INTEGER,
+       acIPLegsDTMFDetection                           INTEGER,
+       acIPLegsLocalRTPPort                            Unsigned32,
+       acIPLegsRemoteRTPAddress                        IpAddress,
+       acIPLegsFaxTransportType                        INTEGER,
+       acIPLegsRxPackets                               Unsigned32,
+       acIPLegsTxPackets                               Unsigned32,
+       acIPLegsRxBytes                                 Unsigned32,
+       acIPLegsTxBytes                                 Unsigned32,
+       acIPLegsJitter                                  Unsigned32,
+       acIPLegsPacketLoss                              Unsigned32,
+       acIPLegsSSRCOfSender                            Unsigned32,
+       acIPLegsDSPDevice                               Unsigned32,
+       acIPLegsLegName                                 SnmpAdminString
+     }
+
+
+
+     acIPLegsLegIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Describes Rtp Endpoint In A Specific Call.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 1}
+
+
+
+     acIPLegsCallIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Decribes The Call which The Rtp EndPoint Participant In It.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 2}
+
+
+
+     acIPLegsRTPActive OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Decribes whether the RTP is active or not.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 3}
+
+
+
+     acIPLegsCoderType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acG711Alaw-64(0)
+,
+                  acG711Mulaw(1)
+,
+                  acG726-16(2)
+,
+                  acG726-24(3)
+,
+                  acG726-32 (4)
+,
+                  acG726-40(5)
+,
+                  acG727-16(6)
+,
+                  acG727-24-16(7)
+,
+                  acG727-24(8)
+,
+                  acG727-32-16(9)
+,
+                  acG727-32-24(10)
+,
+                  acG727-32(11)
+,
+                  acG727-40-16(12)
+,
+                  acG727-40-24(13)
+,
+                  acG727-40-32(14)
+,
+                  acG723Low(15)
+,
+                  acG723High(16)
+,
+                  acG729(17)
+,
+                  acGSM610(18)
+,
+                  vacGSM610MS(20)
+,
+                  acGSM-EFR(21)
+,
+                  acTransparent(22)
+,
+                  acG728(23)
+,
+                  acNetCoder-4-8(25)
+,
+                  acNetCoder-5-6(26)
+,
+                  acNetCoder-6-4(27)
+,
+                  acNetCoder-7-2(28)
+,
+                  acNetCoder-8(29)
+,
+                  acNetCoder-8-8(30)
+,
+                  acNetCoder-9-(31)
+,
+                  acEVRC(32)
+,
+                  acEVRC-TFO(33)
+,
+                  acQCELP-8(34)
+,
+                  acQCELP-8-TFO(35)
+,
+                  acQCELP-13(36)
+,
+                  acQCELP-13-TFO(37)
+,
+                  acEVRC-TTY(38)
+,
+                  acNoCoder(40)
+,
+                  acModemAnswer(41)
+,
+                  acModemCall(42)
+,
+                  acVoxADPCM(43)
+,
+                  acG711Alaw-5-5(45)
+,
+                  acG711Mulaw-5-5(46)
+,
+                  acG726-32-5-5(47)
+,
+                  acG729E(48)
+,
+                  acLinearPCM(49)
+,
+                  acAMR-4-7(50)
+,
+                  acAMR-5-15(51)
+,
+                  acAMR-5-9(52)
+,
+                  acAMR-6-7(53)
+,
+                  acAMR-7-4(54)
+,
+                  acAMR-7-95(55)
+,
+                  acAMR-10-2(56)
+,
+                  acAMR-12-2(57)
+,
+                  acEVRC-B(58)
+,
+                  acEVRC-TFOV(60)
+,
+                  acQCELP-8-TFOV(61)
+,
+                  acQCELP-13-TFOV(62)
+,
+                  acILBC-15(63)
+,
+                  acILBC-13(64)
+,
+                  acBV-16(65)
+,
+                  acAMRWB-6-6(66)
+,
+                  acAMRWB-8-85(67)
+,
+                  acAMRWB-12-65(68)
+,
+                  acAMRWB-14-25(69)
+,
+                  acAMRWB-15-85(70)
+,
+                  acAMRWB-18-25(71)
+,
+                  acAMRWB-19-85(72)
+,
+                  acAMRWB-23-05(73)
+,
+                  acAMRWB-23-85(74)
+,
+                  acG722-48K(75)
+,
+                  acG722-56K(76)
+,
+                   acG722-64K(77)
+,
+                  acDPNSSCoder(78)
+,
+                  acEG711Alaw-10ms(80)
+,
+                  acEG711Alaw-20ms(81)
+,
+                  acEG711Alaw-30ms(82)
+,
+                  acEG711Mulaw-10ms(83)
+,
+                  acEG711Mulaw-20ms(84)
+,
+                  acEG711Mulaw-30ms(85)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "describes the coder Type.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 4}
+
+
+
+     acIPLegsSilenceCompression OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Enables or Disables the Silence Compression.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 5}
+
+
+
+     acIPLegsDTMFDetection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Enables or Disables the DTMF Detection.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 6}
+
+
+
+     acIPLegsLocalRTPPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the RTP port of the Leg.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 7}
+
+
+
+     acIPLegsRemoteRTPAddress OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the RTP address.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 8}
+
+
+
+     acIPLegsFaxTransportType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  transparent(0)
+,
+                  relay(1)
+,
+                  bypass(2)
+,
+                  withevents(3)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Fax transfor Type currently working.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 9}
+
+
+
+     acIPLegsRxPackets OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the received packets on the Leg.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 10}
+
+
+
+     acIPLegsTxPackets OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Transmitted  packets on the Leg.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 11}
+
+
+
+     acIPLegsRxBytes OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the received Bytes on the Leg.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 12}
+
+
+
+     acIPLegsTxBytes OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Transmitted packets on the Leg.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 13}
+
+
+
+     acIPLegsJitter OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Jitter on the Leg.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 14}
+
+
+
+     acIPLegsPacketLoss OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Lost packets on the Leg.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 15}
+
+
+
+     acIPLegsSSRCOfSender OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the SSRC Of the Sender.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 16}
+
+
+
+     acIPLegsDSPDevice OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the DSP Device Of the Leg.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 17}
+
+
+
+     acIPLegsLegName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Leg Name as in the Control Protocol.
+AC INI-Param: N/A"
+       ::= {acIPLegsEntry 18}
+
+
+
+     acStreamingCache OBJECT IDENTIFIER ::= {acMediaConfiguration 11}
+
+
+     acStreamingCacheSize OBJECT-TYPE
+       SYNTAX Unsigned32 (0..32)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the streaming cache size in MBs.
+The remaining size (out of 32MBs) is used as VoicePrompt storage.
+Access: Offline.
+AC INI-Param: gStreamingCacheSize"
+       ::= {acStreamingCache 1}
+
+
+
+     acStreamingCacheRefreshTime OBJECT-TYPE
+       SYNTAX Integer32 (-1..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the streaming cache data refresh time in minutes. If
+-1 is set, refresh is off.
+Access: Offline.
+AC INI-Param: gStreamingCacheRefreshTime"
+       ::= {acStreamingCache 2}
+
+
+
+     acStreamingCacheClearService OBJECT-TYPE
+       SYNTAX Unsigned32 (1..2)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "reset the streaming cache.
+Access: Instant.
+AC INI-Param: N/A"
+       ::= {acStreamingCache 3}
+
+
+
+     acMediaVideoConfig OBJECT IDENTIFIER ::= {acMediaConfiguration 12}
+
+
+     acMediaVideoConfigEncoderIntraInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the frequency for the number of frames at which the encoder
+outputs an Intra frame.
+Access: Online.
+AC INI-Param: VideoEncoderIntraInterval"
+       ::= {acMediaVideoConfig 1}
+
+
+
+     acMediaVideoConfigMaxPacketSize OBJECT-TYPE
+       SYNTAX Unsigned32 (1..1400)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the maximum packet size in bytes.
+Access: Online.
+AC INI-Param: VideoMaxPacketSize"
+       ::= {acMediaVideoConfig 2}
+
+
+
+     acMediaVideoConfigTargetBitrate OBJECT-TYPE
+       SYNTAX Unsigned32 (1..384)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the target output bit rate.
+Access: Online.
+AC INI-Param: VideoTargetBitrate"
+       ::= {acMediaVideoConfig 3}
+
+
+
+     acMediaVideoConfigQualityParameterForRateControl OBJECT-TYPE
+       SYNTAX Unsigned32 (0..31)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This value determines the trade off between video quality and
+frame rate. A low value indicates a higher quality with a
+lower frame rate and vice versa.
+Access: Online.
+AC INI-Param: VideoQualityParameterForRateControl"
+       ::= {acMediaVideoConfig 4}
+
+
+
+     acMediaVideoConfigRateControlType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  ceVideoConstantBitRate (0)
+,
+                  ceVideoVaribleBitRate(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets bitrate output to either a constant or a variable bit rate.
+
+CBR (0) – Constant Bit Rate.
+VBR (1) – Variable Bit Rate. Target Bitrate indicates the target
+average output bit rate. 
+.
+Access: Online.
+AC INI-Param: VideoRateControlType"
+       ::= {acMediaVideoConfig 5}
+
+
+
+     acMediaVideoConfigEnableReSyncHeader OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Indicates whether to add a video packet header to every packet
+in order to increase error resilience.
+0 - Disable
+1 - Enable.
+Access: Online.
+AC INI-Param: VideoEnableReSyncHeader"
+       ::= {acMediaVideoConfig 6}
+
+
+
+     acMediaVideoConfigEnableAudioVideoSynchronization OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines whether to enable audio and video synchronization.
+0 - No synchronization between audio and video streams
+1 - Synchronization between audio and video streams
+
+.
+Access: Online.
+AC INI-Param: EnableAudioVideoSynchronization"
+       ::= {acMediaVideoConfig 7}
+
+
+
+     acIPMediaChannels OBJECT IDENTIFIER ::= {acMediaConfiguration 13}
+
+
+     acIPMediaChannelsEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Whether to enable DSP channels reservation for IPmedia support.
+Relevant for Mediant 1000 board only. One of the following
+possible 
+
+0 = Disable
+1 - Enable.
+Access: Offline.
+AC INI-Param: EnableIPMediaChannels"
+       ::= {acIPMediaChannels 1}
+
+
+
+     -- ****************************************
+     -- acIPMediaChannelsResources table declaration
+     -- ****************************************
+     acIPMediaChannelsResourcesTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcIPMediaChannelsResourcesEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "IPMedia channels info"
+       ::= {acIPMediaChannels 21}
+
+
+
+     -- ****************************************
+     -- acIPMediaChannelsResources table entry
+     -- ****************************************
+     acIPMediaChannelsResourcesEntry OBJECT-TYPE
+       SYNTAX AcIPMediaChannelsResourcesEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acIPMediaChannelsResourcesIndex}
+       ::= {acIPMediaChannelsResourcesTable 1}
+
+
+
+     -- ****************************************
+     -- acIPMediaChannelsResources TABLE
+     -- ****************************************
+     AcIPMediaChannelsResourcesEntry ::= SEQUENCE {
+       acIPMediaChannelsResourcesIndex                 Unsigned32,
+       acIPMediaChannelsResourcesRowStatus             RowStatus,
+       acIPMediaChannelsResourcesAction                INTEGER,
+       acIPMediaChannelsResourcesActionRes             INTEGER,
+       acIPMediaChannelsResourcesModuleID              Unsigned32,
+       acIPMediaChannelsResourcesDSPChannelsReserved   Unsigned32
+     }
+
+
+
+     acIPMediaChannelsResourcesIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index Field for line. Internal parameter.
+AC INI-Param: IPMediaChannels_Index"
+       ::= {acIPMediaChannelsResourcesEntry 1}
+
+
+
+     acIPMediaChannelsResourcesRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS field for line. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acIPMediaChannelsResourcesEntry 2}
+
+
+
+     acIPMediaChannelsResourcesAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acIPMediaChannelsResourcesEntry 3}
+
+
+
+     acIPMediaChannelsResourcesActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acIPMediaChannelsResourcesEntry 4}
+
+
+
+     acIPMediaChannelsResourcesModuleID OBJECT-TYPE
+       SYNTAX Unsigned32 (0..6)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Refers to M1K board only, module at which slot.
+Access: Offline.
+AC INI-Param: IPMediaChannels_ModuleID"
+       ::= {acIPMediaChannelsResourcesEntry 5}
+
+
+
+     acIPMediaChannelsResourcesDSPChannelsReserved OBJECT-TYPE
+       SYNTAX Unsigned32 (0..10000)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "How many DSP channels reserve for IPMedia channels.
+Access: Offline.
+AC INI-Param: IPMediaChannels_DSPChannelsReserved"
+       ::= {acIPMediaChannelsResourcesEntry 6}
+
+
+
+     acAcousticEchoSuppressor OBJECT IDENTIFIER ::= {acMediaConfiguration 14}
+
+
+     acAcousticEchoSuppressorEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enable support of network echo suppressor on board level. Reduces
+board resource capacity.
+Access: Offline.
+AC INI-Param: ACOUSTICECHOSUPPRESSORSUPPORT"
+       ::= {acAcousticEchoSuppressor 1}
+
+
+
+     acAcousticEchoSuppressorEchoCancellerType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  lineEchoCanceller(0)
+,
+                  acousticEchoSuppressorNetwork(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Echo Canceller type. Line echo canceller for TDM Side or acoustic
+echo suppressor on network side.
+Access: Online.
+AC INI-Param: ECHOCANCELLERTYPE"
+       ::= {acAcousticEchoSuppressor 2}
+
+
+
+     acAcousticEchoSuppressorAttenuationIntensity OBJECT-TYPE
+       SYNTAX Unsigned32 (0..3)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Acoustic echo suppressor attenuation intensity. intensity of
+attenuation on signals identified as echo.
+Access: Online.
+AC INI-Param: ACOUSTICECHOSUPPATTENUATIONINTENSITY"
+       ::= {acAcousticEchoSuppressor 3}
+
+
+
+     acAcousticEchoSuppressorMaxERLThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..60)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Acoustic echo suppressor max ERL threshold in DB. Max ratio
+between signal level and retruned echo from phone.
+Access: Online.
+AC INI-Param: ACOUSTICECHOSUPPMAXERLTHRESHOLD"
+       ::= {acAcousticEchoSuppressor 4}
+
+
+
+     acAcousticEchoSuppressorMinReferenceDelay OBJECT-TYPE
+       SYNTAX Unsigned32 (0..40)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Acoustic echo suppressor MIN reference delay in mSec. The reference
+delay in the network helps echo suppression algorithm
+to identify echo signals. The entered value will be multiplied
+by 10.
+Access: Online.
+AC INI-Param: ACOUSTICECHOSUPPMINREFDELAYx10MS"
+       ::= {acAcousticEchoSuppressor 5}
+
+
+
+     acAcousticEchoSuppressorMaxReferenceDelay OBJECT-TYPE
+       SYNTAX Unsigned32 (0..40)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Acoustic echo suppressor MAX reference delay. The reference
+delay in the network helps echo suppression algorithm to identify
+echo signals. The entered value will be multiplied by
+10.
+Access: Online.
+AC INI-Param: ACOUSTICECHOSUPPMAXREFDELAYx10MS"
+       ::= {acAcousticEchoSuppressor 6}
+
+
+
+
+
+END

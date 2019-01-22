@@ -23,48 +23,90 @@
  */
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Interfaces\Alert\Transport;
+use LibreNMS\Alert\Transport;
 
-class Rocket implements Transport
+class Rocket extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        foreach ($opts as $tmp_api) {
-            $host          = $tmp_api['url'];
-            $curl          = curl_init();
-            $rocket_msg    = strip_tags($obj['msg']);
-            $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
-            $data          = array(
-                'attachments' => array(
-                    0 => array(
-                        'fallback' => $rocket_msg,
-                        'color' => $color,
-                        'title' => $obj['title'],
-                        'text' => $rocket_msg,
-                    )
-                ),
-                'channel' => $tmp_api['channel'],
-                'username' => $tmp_api['username'],
-                'icon_url' => $tmp_api['icon_url'],
-                'icon_emoji' => $tmp_api['icon_emoji'],
-            );
-            $alert_message = json_encode($data);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-            set_curl_proxy($curl);
-            curl_setopt($curl, CURLOPT_URL, $host);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
+        if (empty($this->config)) {
+            return $this->deliverAlertOld($obj, $opts);
+        }
+        $rocket_opts['url'] = $this->config['rocket-url'];
+        foreach (explode(PHP_EOL, $this->config['rocket-options']) as $option) {
+            list($k,$v) = explode('=', $option);
+            $rocket_opts[$k] = $v;
+        }
+        return $this->contactRocket($obj, $rocket_opts);
+    }
 
-            $ret  = curl_exec($curl);
-            $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            if ($code != 200) {
-                var_dump("API '$host' returned Error"); //FIXME: propper debuging
-                var_dump("Params: " . $alert_message); //FIXME: propper debuging
-                var_dump("Return: " . $ret); //FIXME: propper debuging
-                return 'HTTP Status code ' . $code;
-            }
+    public function deliverAlertOld($obj, $opts)
+    {
+        foreach ($opts as $tmp_api) {
+            $this->contactRocket($obj, $tmp_api);
         }
         return true;
+    }
+
+    public static function contactRocket($obj, $api)
+    {
+        $host          = $api['url'];
+        $curl          = curl_init();
+        $rocket_msg    = strip_tags($obj['msg']);
+        $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
+        $data          = array(
+            'attachments' => array(
+                0 => array(
+                    'fallback' => $rocket_msg,
+                    'color' => $color,
+                    'title' => $obj['title'],
+                    'text' => $rocket_msg,
+                )
+            ),
+            'channel' => $api['channel'],
+            'username' => $api['username'],
+            'icon_url' => $api['icon_url'],
+            'icon_emoji' => $api['icon_emoji'],
+        );
+        $alert_message = json_encode($data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        set_curl_proxy($curl);
+        curl_setopt($curl, CURLOPT_URL, $host);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
+
+        $ret  = curl_exec($curl);
+        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($code != 200) {
+            var_dump("API '$host' returned Error"); //FIXME: propper debuging
+            var_dump("Params: " . $alert_message); //FIXME: propper debuging
+            var_dump("Return: " . $ret); //FIXME: propper debuging
+            return 'HTTP Status code ' . $code;
+        }
+        return true;
+    }
+
+    public static function configTemplate()
+    {
+        return [
+            'config' => [
+                [
+                    'title' => 'Webhook URL',
+                    'name' => 'rocket-url',
+                    'descr' => 'Rocket.chat Webhook URL',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Rocket.chat Options',
+                    'name' => 'rocket-options',
+                    'descr' => 'Rocket.chat Options',
+                    'type' => 'textarea',
+                ]
+            ],
+            'validation' => [
+                'rocket-url' => 'required|url',
+            ]
+        ];
     }
 }

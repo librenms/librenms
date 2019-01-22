@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppPollingFailedException;
@@ -81,10 +82,10 @@ function poll_sensor($device, $class)
             } elseif ($class == 'state') {
                 if (!is_numeric($sensor_value)) {
                     $state_value = dbFetchCell(
-                        'SELECT `state_value` 
-                        FROM `state_translations` LEFT JOIN `sensors_to_state_indexes` 
-                        ON `state_translations`.`state_index_id` = `sensors_to_state_indexes`.`state_index_id` 
-                        WHERE `sensors_to_state_indexes`.`sensor_id` = ? 
+                        'SELECT `state_value`
+                        FROM `state_translations` LEFT JOIN `sensors_to_state_indexes`
+                        ON `state_translations`.`state_index_id` = `sensors_to_state_indexes`.`state_index_id`
+                        WHERE `sensors_to_state_indexes`.`sensor_id` = ?
                         AND `state_translations`.`state_descr` LIKE ?',
                         array($sensor['sensor_id'], $sensor_value)
                     );
@@ -203,8 +204,8 @@ function record_sensor_data($device, $all_sensors)
         if ($sensor['sensor_class'] == 'state' && $prev_sensor_value != $sensor_value) {
             $trans = array_column(
                 dbFetchRows(
-                    "SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN ($sensor_value,$prev_sensor_value)",
-                    array($sensor['sensor_id'])
+                    "SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN (?,?)",
+                    [$sensor['sensor_id'], $sensor_value, $prev_sensor_value]
                 ),
                 'state_descr',
                 'state_value'
@@ -219,11 +220,11 @@ function record_sensor_data($device, $all_sensors)
 }
 
 /**
- * @param $device
- * @param $options
+ * @param array $device The device to poll
+ * @param bool $force_module Ignore device module overrides
  * @return bool
  */
-function poll_device($device, $options)
+function poll_device($device, $force_module = false)
 {
     global $config, $device;
 
@@ -244,7 +245,8 @@ function poll_device($device, $options)
     echo 'Device ID: ' . $device['device_id'] . PHP_EOL;
     echo 'OS: ' . $device['os'];
     $ip = dnslookup($device);
-    $db_ip = inet_pton($ip);
+
+    $db_ip = isset($ip) ? inet_pton($ip) : null;
 
     if (!empty($db_ip) && inet6_ntop($db_ip) != inet6_ntop($device['ip'])) {
         log_event('Device IP changed to ' . $ip, $device, 'system', 3);
@@ -276,20 +278,9 @@ function poll_device($device, $options)
         $graphs    = array();
         $oldgraphs = array();
 
-        $force_module = false;
         if ($device['snmp_disable']) {
             $config['poller_modules'] = array();
         } else {
-            if ($options['m']) {
-                $config['poller_modules'] = array();
-                foreach (explode(',', $options['m']) as $module) {
-                    if (is_file('includes/polling/' . $module . '.inc.php')) {
-                        $config['poller_modules'][$module] = 1;
-                        $force_module = true;
-                    }
-                }
-            }
-
             // we always want the core module to be included, prepend it
             $config['poller_modules'] = array('core' => true) + $config['poller_modules'];
         }
@@ -307,7 +298,16 @@ function poll_device($device, $options)
                 $start_memory = memory_get_usage();
                 $module_start = microtime(true);
                 echo "\n#### Load poller module $module ####\n";
-                include "includes/polling/$module.inc.php";
+
+                try {
+                    include "includes/polling/$module.inc.php";
+                } catch (Exception $e) {
+                    // isolate module exceptions so they don't disrupt the polling process
+                    echo $e->getTraceAsString() .PHP_EOL;
+                    c_echo("%rError in $module module.%n " . $e->getMessage() . PHP_EOL);
+                    logfile("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+                }
+
                 $module_time = microtime(true) - $module_start;
                 $module_mem  = (memory_get_usage() - $start_memory);
                 printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
@@ -514,7 +514,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
 function get_main_serial($device)
 {
     if ($device['os_group'] == 'cisco') {
-        $serial_output = snmp_get_multi($device, 'entPhysicalSerialNum.1 entPhysicalSerialNum.1001', '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+        $serial_output = snmp_get_multi($device, ['entPhysicalSerialNum.1', 'entPhysicalSerialNum.1001'], '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
         if (!empty($serial_output[1]['entPhysicalSerialNum'])) {
             return $serial_output[1]['entPhysicalSerialNum'];
         } elseif (!empty($serial_output[1000]['entPhysicalSerialNum'])) {
@@ -524,74 +524,6 @@ function get_main_serial($device)
         }
     }
 }//end get_main_serial()
-
-
-function location_to_latlng($device)
-{
-    global $config;
-    if (function_check('curl_version') !== true) {
-        d_echo("Curl support for PHP not enabled\n");
-        return false;
-    }
-    $bad_loc = false;
-    $device_location = $device['location'];
-    if (!empty($device_location)) {
-        $new_device_location = preg_replace("/ /", "+", $device_location);
-        $new_device_location = preg_replace('/[^A-Za-z0-9\-\+]/', '', $new_device_location); // Removes special chars.
-        // We have a location string for the device.
-        $loc = parse_location($device_location);
-        if (!is_array($loc)) {
-            $loc = dbFetchRow("SELECT `lat`,`lng` FROM `locations` WHERE `location`=? LIMIT 1", array($device_location));
-        }
-        if (is_array($loc) === false) {
-            // Grab data from which ever Geocode service we use.
-            switch ($config['geoloc']['engine']) {
-                case "google":
-                default:
-                    d_echo("Google geocode engine being used\n");
-                    $api_key = ($config['geoloc']['api_key']);
-                    if (!empty($api_key)) {
-                        d_echo("Use Google API key: $api_key\n");
-                        $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location&key=$api_key";
-                    } else {
-                        $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location";
-                    }
-                    break;
-            }
-            $curl_init = curl_init($api_url);
-            set_curl_proxy($curl_init);
-            curl_setopt($curl_init, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl_init, CURLOPT_TIMEOUT, 2);
-            curl_setopt($curl_init, CURLOPT_TIMEOUT_MS, 2000);
-            curl_setopt($curl_init, CURLOPT_CONNECTTIMEOUT, 5);
-            $data = json_decode(curl_exec($curl_init), true);
-            // Parse the data from the specific Geocode services.
-            switch ($config['geoloc']['engine']) {
-                case "google":
-                default:
-                    if ($data['status'] == 'OK') {
-                        $loc = $data['results'][0]['geometry']['location'];
-                    } else {
-                        $bad_loc = true;
-                    }
-                    break;
-            }
-            if ($bad_loc === true) {
-                d_echo("Bad lat / lng received\n");
-            } else {
-                $loc['timestamp'] = array('NOW()');
-                $loc['location'] = $device_location;
-                if (dbInsert($loc, 'locations')) {
-                    d_echo("Device lat/lng created\n");
-                } else {
-                    d_echo("Device lat/lng could not be created\n");
-                }
-            }
-        } else {
-            d_echo("Using cached lat/lng from other device\n");
-        }
-    }
-}// end location_to_latlng()
 
 /**
  * Update the application status and output in the database.
@@ -667,15 +599,15 @@ function update_application($app, $response, $metrics = array(), $status = '')
                     array(
                         'app_id' => $app['app_id'],
                         'metric' => $metric_name,
-                        'value' => (int)$value,
+                        'value' => $value,
                     ),
                     'application_metrics'
                 );
                 echo '+';
-            } elseif ((int)$value != (int)$db_metrics[$metric_name]['value']) {
+            } elseif ($value != $db_metrics[$metric_name]['value']) {
                 dbUpdate(
                     array(
-                        'value' => (int)$value,
+                        'value' => $value,
                         'value_prev' => $db_metrics[$metric_name]['value'],
                     ),
                     'application_metrics',
@@ -752,7 +684,12 @@ function convert_to_celsius($value)
  * @param integer $min_version the minimum version to accept for the returned JSON. default: 1
  *
  * @return array The json output data parsed into an array
+ * @throws JsonAppBlankJsonException
+ * @throws JsonAppExtendErroredException
+ * @throws JsonAppMissingKeysException
+ * @throws JsonAppParsingFailedException
  * @throws JsonAppPollingFailedException
+ * @throws JsonAppWrongVersionException
  */
 function json_app_get($device, $extend, $min_version = 1)
 {
@@ -790,4 +727,39 @@ function json_app_get($device, $extend, $min_version = 1)
     }
 
     return $parsed_json;
+}
+
+/**
+ * Some data arrays returned with json_app_get are deeper than
+ * update_application likes. This recurses through the array
+ * and flattens it out so it can nicely be inserted into the
+ * database.
+ *
+ * One argument is taken and that is the array to flatten.
+ *
+ * @param array $array
+ * @param string $prefix What to prefix to the name. Defaults to '', nothing.
+ * @param string $joiner The string to join the prefix, if set to something other
+ *                       than '', and array keys with.
+ *
+ * @return array The flattened array.
+ */
+function data_flatten($array, $prefix = '', $joiner = '_')
+{
+    $return = array();
+    foreach ($array as $key => $value) {
+        if (is_array($value)) {
+            if (strcmp($prefix, '')) {
+                $key=$prefix.$joiner.$key;
+            }
+            $return = array_merge($return, data_flatten($value, $key, $joiner));
+        } else {
+            if (strcmp($prefix, '')) {
+                $key=$prefix.$joiner.$key;
+            }
+            $return[$key] = $value;
+        }
+    }
+
+    return $return;
 }

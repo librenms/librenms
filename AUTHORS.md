@@ -159,7 +159,7 @@ LibreNMS contributors:
 - Joachim Tingvold <joachim@tingvold.com> (jallakim)
 - Martin Zatloukal <slezi2@pvfree.net> (erotel)
 - Matthew Schwen <mschwen@gmail.com> (mattschwen)
-- Joel Cant <joel@linuxmod.co.uk> (NerdBlender
+- Joel Cant <joel@linuxmod.co.uk> (NerdBlender)
 - Aldemir Akpinar <aldemir.akpinar@gmail.com> (aldemira)
 - Rob Nichols <rob@ignition360.com> (rdnn)
 - Patrick Fruh <info@kaeltis.de> (Kaeltis)
@@ -210,6 +210,7 @@ LibreNMS contributors:
 - Frank Petrilli <frank@petril.li> (frankpetrilli)
 - Joel Kociolek <joel@kociolek.org> (lejoko)
 - Rémy Jacquin <remy@remyj.fr> (remyj38)
+- PipoCanaja <pipocanaja@gmail.com> [pipocanaja](https://github.com/pipocanaja/)
 
 Observium was written by:
 - Adam Armstrong

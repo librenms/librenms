@@ -29,6 +29,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use LibreNMS\Config;
+use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
@@ -36,8 +37,13 @@ class Updates extends BaseValidation
 {
     public function validate(Validator $validator)
     {
+        if (!Git::repoPresent()) {
+            $validator->warn('Non-git install, updates are manual or from package');
+            return;
+        }
+
         // if git is not available, we cannot do the other tests
-        if (!check_git_exists()) {
+        if (!Git::binaryExists()) {
             $validator->warn('Unable to locate git. This should probably be installed.');
             return;
         }

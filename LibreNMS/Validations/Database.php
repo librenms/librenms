@@ -25,7 +25,10 @@
 
 namespace LibreNMS\Validations;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 use Symfony\Component\Yaml\Yaml;
@@ -39,50 +42,57 @@ class Database extends BaseValidation
         }
 
         $this->checkMode($validator);
+        $this->checkTime($validator);
 
         // check database schema version
         $current = get_db_schema();
+        $latest = 1000;
 
-        $schemas = get_schema_list();
-        end($schemas);
-        $latest = key($schemas);
-
-        if ($current < $latest) {
+        if ($current === 0 || $current === $latest) {
+            \Artisan::call('migrate', ['--pretend' => true, '--force' => true]);
+            if (\Artisan::output() !== "Nothing to migrate.\n") {
+                $validator->fail("Your database is out of date!", './lnms migrate');
+                return;
+            }
+        } elseif ($current < $latest) {
             $validator->fail(
                 "Your database schema ($current) is older than the latest ($latest).",
                 "Manually run ./daily.sh, and check for any errors."
             );
             return;
         } elseif ($current > $latest) {
-            $validator->warn("Your schema ($current) is newer than than expected ($latest).  If you just switch to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
+            $validator->warn("Your database schema ($current) is newer than expected ($latest). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
         }
 
         $this->checkCollation($validator);
         $this->checkSchema($validator);
     }
 
+    private function checkTime(Validator $validator)
+    {
+        $raw_time = Eloquent::DB()->selectOne(Eloquent::DB()->raw('SELECT NOW() as time'))->time;
+        $db_time = new Carbon($raw_time);
+        $php_time = Carbon::now();
+
+        $diff = $db_time->diffAsCarbonInterval($php_time);
+
+        if ($diff->compare(CarbonInterval::minute(1)) > 0) {
+            $message = "Time between this server and the mysql database is off\n";
+            $message .= " Mysql time " . $db_time->toDateTimeString() . PHP_EOL;
+            $message .= " PHP time " . $php_time->toDateTimeString() . PHP_EOL;
+
+            $validator->fail($message);
+        }
+    }
+
     private function checkMode(Validator $validator)
     {
-        // Test for MySQL Strict mode
-        $strict_mode = dbFetchCell("SELECT @@global.sql_mode");
-        if (str_contains($strict_mode, 'STRICT_TRANS_TABLES')) {
-            //FIXME - Come back to this once other MySQL modes are fixed
-            //$valid->fail('You have MySQL STRICT_TRANS_TABLES enabled, please disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
-        }
-
         // Test for lower case table name support
         $lc_mode = dbFetchCell("SELECT @@global.lower_case_table_names");
         if ($lc_mode != 0) {
             $validator->fail(
                 'You have lower_case_table_names set to 1 or true in mysql config.',
                 'Set lower_case_table_names=0 in your mysql config file in the [mysqld] section.'
-            );
-        }
-
-        if (empty($strict_mode) === false) {
-            $validator->fail(
-                "You have not set sql_mode='' in your mysql config.",
-                "Set sql-mode='' in your mysql config file in the [mysqld] section."
             );
         }
     }
@@ -161,7 +171,7 @@ class Database extends BaseValidation
                             unset($data['Indexes']['PRIMARY']);
                             $primary = true;
                         }
-                        $schema_update[] = $this->addColumnSql($table, $cdata, $data['Columns'][$index - 1]['Field'], $primary);
+                        $schema_update[] = $this->addColumnSql($table, $cdata, isset($data['Columns'][$index - 1]) ? $data['Columns'][$index - 1]['Field'] : null, $primary);
                     } elseif ($cdata !== $current_columns[$column]) {
                         $validator->fail("Database: incorrect column ($table/$column)");
                         $schema_update[] = $this->updateTableSql($table, $column, $cdata);
@@ -175,14 +185,15 @@ class Database extends BaseValidation
                     $schema_update[] = $this->dropColumnSql($table, $column);
                 }
 
+                $index_changes = [];
                 if (isset($data['Indexes'])) {
                     foreach ($data['Indexes'] as $name => $index) {
                         if (empty($current_schema[$table]['Indexes'][$name])) {
                             $validator->fail("Database: missing index ($table/$name)");
-                            $schema_update[] = $this->addIndexSql($table, $index);
+                            $index_changes[] = $this->addIndexSql($table, $index);
                         } elseif ($index != $current_schema[$table]['Indexes'][$name]) {
                             $validator->fail("Database: incorrect index ($table/$name)");
-                            $schema_update[] = $this->updateIndexSql($table, $name, $index);
+                            $index_changes[] = $this->updateIndexSql($table, $name, $index);
                         }
 
                         unset($current_schema[$table]['Indexes'][$name]);
@@ -195,6 +206,32 @@ class Database extends BaseValidation
                         $schema_update[] = $this->dropIndexSql($table, $name);
                     }
                 }
+                $schema_update = array_merge($schema_update, $index_changes); // drop before create/update
+
+
+                $constraint_changes = [];
+                if (isset($data['Constraints'])) {
+                    foreach ($data['Constraints'] as $name => $constraint) {
+                        if (empty($current_schema[$table]['Constraints'][$name])) {
+                            $validator->fail("Database: missing constraint ($table/$name)");
+                            $constraint_changes[] = $this->addConstraintSql($table, $constraint);
+                        } elseif ($constraint != $current_schema[$table]['Constraints'][$name]) {
+                            $validator->fail("Database: incorrect constraint ($table/$name)");
+                            $constraint_changes[] = $this->dropConstraintSql($table, $name);
+                            $constraint_changes[] = $this->addConstraintSql($table, $constraint);
+                        }
+
+                        unset($current_schema[$table]['Constraints'][$name]);
+                    }
+                }
+
+                if (isset($current_schema[$table]['Constraints'])) {
+                    foreach ($current_schema[$table]['Constraints'] as $name => $_unused) {
+                        $validator->fail("Database: extra constraint ($table/$name)");
+                        $schema_update[] = $this->dropConstraintSql($table, $name);
+                    }
+                }
+                $schema_update = array_merge($schema_update, $constraint_changes); // drop before create/update
             }
 
             unset($current_schema[$table]); // remove checked tables
@@ -208,7 +245,7 @@ class Database extends BaseValidation
         if (empty($schema_update)) {
             $validator->ok('Database schema correct');
         } else {
-            $result = ValidationResult::fail("We have detected that your database schema may be wrong, please report the following to us on IRC or the community site (https://t.libren.ms/5gscd):")
+            $result = ValidationResult::fail("We have detected that your database schema may be wrong, please report the following to us on Discord (https://t.libren.ms/discord) or the community site (https://t.libren.ms/5gscd):")
                 ->setFix('Run the following SQL statements to fix.')
                 ->setList('SQL Statements', $schema_update);
             $validator->result($result);
@@ -218,9 +255,9 @@ class Database extends BaseValidation
     private function addTableSql($table, $table_schema)
     {
         $columns = array_map(array($this, 'columnToSql'), $table_schema['Columns']);
-        $indexes = array_map(array($this, 'indexToSql'), $table_schema['Indexes']);
+        $indexes = array_map(array($this, 'indexToSql'), isset($table_schema['Indexes']) ? $table_schema['Indexes'] : []);
 
-        $def = implode(', ', array_merge(array_values($columns), array_values($indexes)));
+        $def = implode(', ', array_merge(array_values((array)$columns), array_values((array)$indexes)));
 
         return "CREATE TABLE `$table` ($def);";
     }
@@ -321,5 +358,22 @@ class Database extends BaseValidation
         }, $index_data['Columns']));
 
         return sprintf($index, $columns);
+    }
+
+    private function addConstraintSql($table, $constraint)
+    {
+        $sql = "ALTER TABLE `$table` ADD CONSTRAINT `{$constraint['name']}` FOREIGN KEY (`{$constraint['foreign_key']}`) ";
+        $sql .= " REFERENCES `{$constraint['table']}` (`{$constraint['key']}`)";
+        if (!empty($constraint['extra'])) {
+            $sql .= ' ' . $constraint['extra'];
+        }
+        $sql .= ';';
+
+        return $sql;
+    }
+
+    private function dropConstraintSql($table, $name)
+    {
+        return "ALTER TABLE `$table` DROP FOREIGN KEY `$name`;";
     }
 }

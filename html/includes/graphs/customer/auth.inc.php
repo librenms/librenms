@@ -1,9 +1,9 @@
 <?php
 
 // FIXME - wtfbbq
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (Auth::user()->hasGlobalRead() || $auth) {
+if (LegacyAuth::user()->hasGlobalRead() || $auth) {
     $id    = mres($vars['id']);
     $title = generate_device_link($device);
     $auth  = true;

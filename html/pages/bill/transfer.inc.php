@@ -28,7 +28,7 @@ $unix_prev_from = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastfrom')");
 $unix_prev_to   = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastto')");
 $lastmonth      = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))');
 $yesterday      = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))');
-$rightnow       = date(U);
+$rightnow       = date('U');
 
 $cur_days   = date('d', (strtotime('now') - strtotime($datefrom)));
 $total_days = date('d', (strtotime($dateto) - strtotime($datefrom)));

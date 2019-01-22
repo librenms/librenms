@@ -44,6 +44,7 @@ if (defined('SHOW_SETTINGS')) {
     $current_state = isset($widget_settings['state']) ? $widget_settings['state'] : '';
     $current_group = isset($widget_settings['group']) ? $widget_settings['group'] : '';
     $current_proc = isset($widget_settings['proc']) ? $widget_settings['proc'] : '';
+    $current_sorting = isset($widget_settings['sort']) ? $widget_settings['sort'] : '';
 
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
@@ -140,6 +141,21 @@ if (defined('SHOW_SETTINGS')) {
       </select>
     </div>
   </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="sort" class="control-label">Sort alerts by: </label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="sort">';
+    $common_output[] = '<option value=""' . ($current_sorting == '' ? ' selected' : '')
+                       . '>timestamp, descending</option>';
+    $common_output[] = '<option value="severity"' . ($current_sorting == 'severity' ? ' selected' : ' ')
+                       . '>severity, descending</option>';
+
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
 
   <div class="form-group">
     <div class="col-sm-12">
@@ -156,6 +172,7 @@ if (defined('SHOW_SETTINGS')) {
     $min_severity = $widget_settings['min_severity'];
     $group = $widget_settings['group'];
     $proc = $widget_settings['proc'];
+    $sort = $widget_settings['sort'];
 
     $title = "Alerts";
 
@@ -192,6 +209,10 @@ if (defined('SHOW_SETTINGS')) {
             $sev_name = array_search($min_severity, $alert_severities);
             $title = "$title " . ($min_severity > 3 ? "" : ">") . "=$sev_name";
         }
+    }
+
+    if (!empty($sort)) {
+        $title = "$title " . "sorted by severity (higher first)";
     }
 
     $widget_settings['title'] = $title;
@@ -254,6 +275,10 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         $common_output[] = "proc: '$proc',\n";
     }
 
+    if (isset($sort) && sort != '') {
+        $common_output[] = "sort: '$sort',\n";
+    }
+
     $common_output[] = '
             device_id: \'' . $device['device_id'] . '\'
         }
@@ -281,36 +306,11 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
     alerts_grid.find(".command-ack-alert").on("click", function(e) {
         e.preventDefault();
         var alert_state = $(this).data("alert_state");
-        if (alert_state != 2) {
-            var ack_msg = window.prompt("Enter the reason you are acknowledging this alert:");
-        } else {
-            var ack_msg = "";
-        }
-        if (typeof ack_msg == "string") {
-            var alert_id = $(this).data("alert_id");
-            var state = $(this).data("state");
-            $.ajax({
-                type: "POST",
-                url: "ajax_form.php",
-                dataType: "json",
-                data: { type: "ack-alert", alert_id: alert_id, state: state, ack_msg: ack_msg },
-                success: function (data) {
-                    if (data.status == "ok") {
-                        toastr.success(data.message);
-                        $(".alerts").each(function(index) {
-                            var $sortDictionary = $(this).bootgrid("getSortDictionary");
-                            $(this).reload;
-                            $(this).bootgrid("sort", $sortDictionary);
-                        });
-                    } else {
-                        toastr.error(data.message);
-                    }
-                },
-                error: function(){
-                     toastr.error(data.message);
-                }
-            });
-         }
+        var alert_id = $(this).data(\'alert_id\');
+        $(\'#ack_alert_id\').val(alert_id);
+        $(\'#ack_alert_state\').val(alert_state);
+        $(\'#ack_msg\').val(\'\');
+        $("#alert_ack_modal").modal(\'show\');
     });
     alerts_grid.find(".command-alert-note").on("click", function(e) {
         e.preventDefault();

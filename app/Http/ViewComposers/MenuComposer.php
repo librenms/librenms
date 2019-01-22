@@ -2,7 +2,7 @@
 /**
  * Menu.php
  *
- * -Description-
+ * Builds data for LibreNMS menu
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ use App\Models\CefSwitching;
 use App\Models\Component;
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\Location;
 use App\Models\Notification;
 use App\Models\OspfInstance;
 use App\Models\Package;
@@ -73,7 +74,7 @@ class MenuComposer
         $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->get()->pluck('type')->filter();
 
         if (Config::get('show_locations') && Config::get('show_locations_dropdown')) {
-            $vars['locations'] = Device::hasAccess($user)->select('location')->distinct()->get()->pluck('location')->filter();
+            $vars['locations'] = Location::hasAccess($user)->select('location')->get()->map->display()->filter();
         } else {
             $vars['locations'] = [];
         }
@@ -115,7 +116,7 @@ class MenuComposer
             if (in_array($class, ['fanspeed', 'humidity', 'temperature', 'signal'])) {
                 // First group
                 $group = 0;
-            } elseif (in_array($class, ['current', 'frequency', 'power', 'voltage'])) {
+            } elseif (in_array($class, ['current', 'frequency', 'power', 'voltage', 'power_factor', 'power_consumed'])) {
                 // Second group
                 $group = 1;
             } else {
@@ -125,6 +126,7 @@ class MenuComposer
 
             $sensor_menu[$group][] = $sensor_model;
         }
+        ksort($sensor_menu); // ensure menu order
         $vars['sensor_menu'] = $sensor_menu;
 
         // Wireless menu

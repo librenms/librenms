@@ -1,6 +1,7 @@
 <?php
 
-use LibreNMS\Authentication\Auth;
+use App\Models\PortsNac;
+use LibreNMS\Authentication\LegacyAuth;
 
 if (!is_numeric($vars['device'])) {
     $vars['device'] = getidbyname($vars['device']);
@@ -354,7 +355,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             </a>
             </li>';
 
-        if (Auth::user()->hasGlobalAdmin()) {
+        if (LegacyAuth::user()->hasGlobalAdmin()) {
             if (!is_array($config['rancid_configs'])) {
                 $config['rancid_configs'] = array($config['rancid_configs']);
             }
@@ -436,6 +437,14 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                 </li>';
         }
 
+        if (PortsNac::where('device_id', $device['device_id'])->exists()) {
+            echo '<li role="presentation" '.$select['nac'].'>
+                <a href="'.generate_device_url($device, array('tab' => 'nac')).'">
+                <i class="fa fa-lock fa-lg icon-theme"  aria-hidden="true"></i> NAC
+                </a>
+                </li>';
+        }
+
         echo '<li role="presentation" '.$select['notes'].'>
             <a href="'.generate_device_url($device, array('tab' => 'notes')).'">
             <i class="fa fa-file-text-o fa-lg icon-theme"  aria-hidden="true"></i> Notes
@@ -454,10 +463,10 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                   <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-cog fa-lg icon-theme"  aria-hidden="true"></i>
                   <span class="caret"></span></button>
                   <ul class="dropdown-menu">
-                    <li><a href="https://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme"  aria-hidden="true"></i> Web</a></li>';
+                    <li><a href="https://'.$device['hostname'].'" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme"  aria-hidden="true"></i> Web</a></li>';
         if (isset($config['gateone']['server'])) {
             if ($config['gateone']['use_librenms_user'] == true) {
-                    echo '<li><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . Auth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
+                    echo '<li><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . LegacyAuth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
             } else {
                     echo '<li><a href="' . $config['gateone']['server'] . '?ssh=ssh://' . $device['hostname'] . '&location=' . $device['hostname'] .'" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
             }
@@ -467,7 +476,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
         }
             echo '<li><a href="telnet://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-terminal fa-lg icon-theme"  aria-hidden="true"></i> Telnet</a></li>';
 
-        if (Auth::user()->hasGlobalAdmin()) {
+        if (LegacyAuth::user()->hasGlobalAdmin()) {
             echo '<li>
                 <a href="'.generate_device_url($device, array('tab' => 'edit')).'">
                 <i class="fa fa-pencil fa-lg icon-theme"  aria-hidden="true"></i> Edit </a>

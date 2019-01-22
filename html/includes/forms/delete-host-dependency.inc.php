@@ -12,42 +12,37 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\Auth;
+use LibreNMS\Authentication\LegacyAuth;
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    $status = array('status' => 1, 'message' => 'You need to be admin');
+if (!LegacyAuth::user()->hasGlobalAdmin()) {
+    $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
     if ($_POST['device_id']) {
         if (!is_numeric($_POST['device_id'])) {
-            $status = array('status' => 1, 'message' => 'Wrong device id!');
+            $status = ['status' => 1, 'message' => 'Wrong device id!'];
         } else {
-            if (dbDelete('device_relationships', '`child_device_id` = ?', array($_POST['device_id']))) {
-                $status = array('status' => 0, 'message' => 'Device dependency has been deleted.');
+            $device = \App\Models\Device::find($_POST['device_id']);
+            if ($device->parents()->detach()) {
+                $status = ['status' => 0, 'message' => 'Device dependency has been deleted.'];
             } else {
-                $status = array('status' => 1, 'message' => 'Device dependency cannot be deleted.');
+                $status = ['status' => 1, 'message' => 'Device dependency cannot be deleted.'];
             }
         }
     } elseif ($_POST['parent_ids']) {
-        $error = false;
+        $status = ['status' => 0, 'message' => 'Device dependencies has been deleted'];
         foreach ($_POST['parent_ids'] as $parent) {
             if (is_numeric($parent) && $parent != 0) {
-                if (!dbDelete('device_relationships', ' `parent_device_id` = ?', array($parent))) {
-                    $error = true;
-                    $status = array('status' => 1, 'message' => 'Device dependency cannot be deleted.');
+                $device = \App\Models\Device::find($_POST['device_id']);
+                if (!$device->children()->detach()) {
+                    $status = ['status' => 1, 'message' => 'Device dependency cannot be deleted.'];
                 }
             } elseif ($parent == 0) {
-                $status = array('status' => 1, 'message' => 'No dependency to delete.');
-                $error = true;
+                $status = ['status' => 1, 'message' => 'No dependency to delete.'];
                 break;
             }
-        }
-
-        if (!$error) {
-            $status = array('status' => 0, 'message' => 'Device dependencies has been deleted');
-        } else {
         }
     }
 }
 
 header('Content-Type: application/json');
-echo _json_encode($status);
+echo json_encode($status);

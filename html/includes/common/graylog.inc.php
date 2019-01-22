@@ -17,7 +17,7 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\Auth;
+use App\Models\Device;
 
 if (empty($results_limit)) {
     $results_limit = 25;
@@ -28,11 +28,12 @@ $tmp_output = '
     <table id="graylog" class="table table-hover table-condensed graylog">
         <thead>
             <tr>
-                <th data-column-id="timestamp">Timestamp</th>
-                <th data-column-id="level">Level</th>
-                <th data-column-id="source">Source</th>
-                <th data-column-id="message">Message</th>
-                <th data-column-id="facility">Facility</th>
+            <th data-column-id="severity" data-sortable="false"></th>
+            <th data-column-id="timestamp" data-formatter="browserTime">Timestamp</th>
+            <th data-column-id="level" data-sortable="false">Level</th>
+            <th data-column-id="source">Source</th>
+            <th data-column-id="message" data-sortable="false">Message</th>
+            <th data-column-id="facility" data-sortable="false">Facility</th>
             </tr>
         </thead>
     </table>
@@ -45,37 +46,30 @@ searchbar = "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">
             "Filter: "+
 ';
 
+$tmp_output .= '"<div class=\"form-group\"><select name=\"stream\" id=\"stream\" class=\"form-control\" data-placeholder=\"All Messages\">"+';
+if ($vars['stream']) {
+    $tmp_output .= '"<option value=\"' . display($vars['stream']) . '\">' . display($vars['stream']) . '</option>" +';
+    $filter_device = $device->device_id;
+}
+$tmp_output .= '"</select>&nbsp;</div>"+';
+
 if (!empty($filter_device)) {
     $tmp_output .= '
-            "<input type=\"hidden\" name=\"hostname\" id=\"hostname\" value=\"'. $filter_device .'\">"+
+            "<input type=\"hidden\" name=\"device\" id=\"device\" value=\"'. $filter_device .'\">"+
 ';
 } else {
     $tmp_output .= '
-            "<div class=\"form-group\"><select name=\"hostname\" id=\"hostname\" class=\"form-control input-sm\">"+
-            "<option value=\"\">All devices</option>"+
+            "<div class=\"form-group\"><select name=\"device\" id=\"device\" class=\"form-control\" data-placeholder=\"All Devices\">"+
+            
 ';
-
-    if (Auth::user()->hasGlobalRead()) {
-        $results = dbFetchRows("SELECT `hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
-    } else {
-        $results = dbFetchRows("SELECT `D`.`hostname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hostname` ORDER BY `hostname`", array(Auth::id()));
-    }
-
-    foreach ($results as $data) {
-        $tmp_output .= '"<option value=\"'.$data['hostname'].'\""+';
-        if (isset($vars['hostname']) && $data['hostname'] == $vars['hostname']) {
-            $tmp_output .= '"selected"+';
-        }
-        $tmp_output .= '">'.$data['hostname'].'</option>"+';
+    if ($vars['device'] && $device = Device::find($vars['device'])) {
+        $tmp_output .= '"<option value=\"' . $device->device_id . '\">' . $device->displayName() . '</option>" +';
+        $filter_device = $device->device_id;
     }
 
     $tmp_output .= '
                 "</select>&nbsp;</div>"+
 ';
-}
-
-if (empty($filter_device) && isset($_POST['hostname'])) {
-    $filter_device = mres($_POST['hostname']);
 }
 
 if (isset($config['graylog']['timezone'])) {
@@ -85,7 +79,8 @@ if (isset($config['graylog']['timezone'])) {
 }
 
 $tmp_output .= '
-                "<div class=\"form-group\"><select name=\"range\" class=\"form-group input-sm\">"+
+                "<div class=\"form-group\"><select name=\"range\" class=\"form-control\">"+
+                "<option value=\"0\">Search all time</option>"+
                 "<option value=\"300\">Search last 5 minutes</option>"+
                 "<option value=\"900\">Search last 15 minutes</option>"+
                 "<option value=\"1800\">Search last 30 minutes</option>"+
@@ -98,9 +93,8 @@ $tmp_output .= '
                 "<option value=\"604800\">Search last 7 days</option>"+
                 "<option value=\"1209600\">Search last 14 days</option>"+
                 "<option value=\"2592000\">Search last 30 days</option>"+
-                "<option value=\"0\">Search all time</option>"+
                 "</select>&nbsp;</div>"+
-                "<button type=\"submit\" class=\"btn btn-success btn-sm\">Filter</button>&nbsp;"+
+                "<button type=\"submit\" class=\"btn btn-success\">Filter</button>&nbsp;"+
                 "</form></div>"+
                 "<div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
 
@@ -126,13 +120,16 @@ $tmp_output .= '
         post: function ()
         {
             return {
-                id: "graylog",
-                hostname: "' . (isset($filter_device) ? $filter_device : '') . '",
+                stream: "' . (isset($_POST['stream']) ? mres($_POST['stream']) : '') . '",
+                device: "' . (isset($filter_device) ? $filter_device : '') . '",
                 range: "' . (isset($_POST['range']) ? mres($_POST['range']) : '')  . '"
             };
         },
-        url: "ajax_table.php",
+        url: "ajax/table/graylog",
     });
+    
+    init_select2("#stream", "graylog-streams", {}, "' . (isset($_POST['stream']) ? mres($_POST['stream']) : '') . '");
+    init_select2("#device", "device", {limit: 100}, "' . (isset($filter_device) ? $filter_device : '') . '");
 </script>
 
 ';
