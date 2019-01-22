@@ -102,7 +102,7 @@ if (count($sensors)) {
                 </tr>';
         } else {
             $sensor_current = $sensor_class == 'runtime' ? formatUptime($sensor['sensor_current'] * 60, 'short') : $sensor['sensor_current'] . $sensor_unit;
-            $alarmed = (!is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) || (!is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']);
+            $alarmed = ((!is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) || (!is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']));
 
             echo '<tr>
                 <td class="col-md-4">'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content, $sensor_class).'</td>
