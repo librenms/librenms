@@ -1149,8 +1149,9 @@ function parse_location($location)
 function version_info($remote = false)
 {
     global $config;
+    $version = \LibreNMS\Util\Version::get();
     $output = [
-        'local_ver' => \LibreNMS\Util\Version::get()->local(),
+        'local_ver' => $version->local(),
     ];
     if (Git::repoPresent() && Git::binaryExists()) {
         if ($remote === true && $config['update_channel'] == 'master') {
@@ -1169,7 +1170,7 @@ function version_info($remote = false)
         $output['local_date']   = $local_date;
         $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
     }
-    $output['db_schema']   = dbIsConnected() ? get_db_schema() : '?';
+    $output['db_schema']   = vsprintf('%s (%s)', $version->database());
     $output['php_ver']     = phpversion();
     $output['mysql_ver']   = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
     $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
