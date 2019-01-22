@@ -1,0 +1,191 @@
+-- *****************************************************************
+-- SNWL-SSLVPN-MIB.MIB
+--
+-- 04-22-10 - Updated for new OIDs
+-- 11-15-09 - Initial version
+-- 07-24-12 - Updated company copyright and organization
+-- 01-06-17 - Updated company copyright and organization, Derek Yu
+
+-- Copyright (c) 2017 SonicWall Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+SNWL-SSLVPN-MIB DEFINITIONS ::= BEGIN
+ 
+IMPORTS
+	DisplayString			FROM SNMPv2-TC
+	
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY			FROM SNMPv2-SMI
+	
+	sonicwallSSLVPN			FROM SONICWALL-SMI;
+
+sonicwallSSLVPN MODULE-IDENTITY
+	LAST-UPDATED "201701060000z"
+	ORGANIZATION "SonicWall"
+	CONTACT-INFO
+		"	SonicWall Inc.
+
+		Postal: 5455 Great America Parkway
+			Santa Clara, CA 95054
+			USA
+
+		   Tel: +1 408 745 9600
+		   Fax: +1 408 745 9300
+
+		E-mail: support@sonicwall.com"
+	DESCRIPTION
+		"This MIB module defines functions and features for
+		 SonicWall SMA products"
+	REVISION      "201701060000Z"
+	DESCRIPTION   "Updated company copyright and organization."
+	REVISION      "200910260000Z"
+	DESCRIPTION
+		"Initial version."
+	::= { sonicwall 6 }
+	
+--
+-- top level structure
+-- 1.3.6.1.4.1.8741.6
+--
+
+-- ===============================================================
+-- Reserved for future use
+-- sslvpnTrapModule    OBJECT IDENTIFIER ::= { sonicwallSSLVPN 1 }
+-- ===============================================================
+sslvpnSystemModule     OBJECT IDENTIFIER ::= { sonicwallSSLVPN 2 }
+sslvpnLicenseModule    OBJECT IDENTIFIER ::= { sonicwallSSLVPN 3 }
+
+-- =======================
+-- sslvpnSystemModule
+-- =======================
+
+sslvpnSys OBJECT IDENTIFIER ::= { sslvpnSystemModule 1 }
+    
+sslvpnAuthCode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Authentication code"
+    ::= { sslvpnSys 1 }
+
+cpuType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "CPU type"
+    ::= { sslvpnSys 2 }    
+
+cpuUtilization OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "CPU utilization"
+    ::= { sslvpnSys 3 }
+
+memoryTotal OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total memory"
+    ::= { sslvpnSys 4 }
+
+memoryUtilization OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Memory utilization"
+    ::= { sslvpnSys 5 } 
+ 
+systemTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "System clock time"
+    ::= { sslvpnSys 6 }
+    
+systemUptime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "System up time."
+    ::= { sslvpnSys 7 }
+
+activeUsers OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Active user sessions"
+    ::= { sslvpnSys 8 }
+
+activeUserLicense OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "User licenses in use"
+    ::= { sslvpnSys 9 }
+
+activeNetExtenderConnections OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Active NetExtender connections"
+    ::= { sslvpnSys 10 }
+
+activeVirtualAssistTechnicians OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Active Virtual Assist technicians"
+    ::= { sslvpnSys 11 }
+
+-- =======================
+-- sslvpnLicenseModule
+-- =======================
+ 
+sslvpnLicense OBJECT IDENTIFIER ::= { sslvpnLicenseModule 1 }
+
+userLicense OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "User license information."
+    ::= { sslvpnLicense 1 }
+    
+viewPointLicense OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "ViewPoint license information."
+    ::= { sslvpnLicense 2 }
+  
+virtualAssistLicense OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Virtual assist license information."
+    ::= { sslvpnLicense 3 }
+    
+wafLicense OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Web Application license information."
+    ::= { sslvpnLicense 4 }
+    	
+END
