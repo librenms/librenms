@@ -27,7 +27,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DevicePerf extends BaseModel
+class DevicePerf extends DeviceRelatedModel
 {
     protected $table = 'device_perf';
     protected $fillable = ['device_id', 'timestamp', 'xmt', 'rcv', 'loss', 'min', 'max', 'avg'];
@@ -54,12 +54,5 @@ class DevicePerf extends BaseModel
         static::creating(function ($model) {
             $model->timestamp = $model->freshTimestamp();
         });
-    }
-
-    // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
     }
 }

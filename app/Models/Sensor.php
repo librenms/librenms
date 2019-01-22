@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-class Sensor extends BaseModel
+class Sensor extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'sensor_id';
@@ -60,20 +60,7 @@ class Sensor extends BaseModel
         return self::$icons;
     }
 
-    // ---- Query Scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
     // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id');
-    }
-
     public function events()
     {
         return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');

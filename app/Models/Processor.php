@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-class Processor extends BaseModel
+class Processor extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'processor_id';
@@ -31,19 +31,5 @@ class Processor extends BaseModel
         $descr = str_replace('  ', ' ', $descr);
 
         return $descr;
-    }
-
-    // ---- Query Scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
-    // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
     }
 }
