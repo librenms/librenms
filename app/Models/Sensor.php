@@ -34,7 +34,6 @@ class Sensor extends BaseModel
         'temperature' => 'thermometer-three-quarters',
         'voltage' => 'bolt',
         'waterflow' => 'tint',
-        'sessions' => 'users',
     );
 
     // ---- Helper Functions ----

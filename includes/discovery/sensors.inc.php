@@ -65,7 +65,6 @@ $run_sensors = array(
     'ber',
     'eer',
     'waterflow',
-    'sessions',
 );
 
 // filter submodules
