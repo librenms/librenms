@@ -25,22 +25,8 @@
 
 namespace App\Models;
 
-class Ipv6Address extends BaseModel
+class Ipv6Address extends PortRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'ipv6_address_id';
-
-    // ---- Query scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasPortAccess($query, $user);
-    }
-
-    // ---- Define Relationships ----
-
-    public function port()
-    {
-        return $this->belongsTo('App\Models\Port', 'port_id', 'port_id');
-    }
 }

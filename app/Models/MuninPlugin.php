@@ -25,22 +25,8 @@
 
 namespace App\Models;
 
-class MuninPlugin extends BaseModel
+class MuninPlugin extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'mplug_id';
-
-    // ---- Query scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
-    // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id');
-    }
 }

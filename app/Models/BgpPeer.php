@@ -27,7 +27,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 
-class BgpPeer extends BaseModel
+class BgpPeer extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $table = 'bgpPeers';
@@ -42,17 +42,5 @@ class BgpPeer extends BaseModel
             $query->where('bgpPeerAdminStatus', 'start')
                 ->orWhere('bgpPeerAdminStatus', 'running');
         })->where('bgpPeerState', '!=', 'established');
-    }
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
-    // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id');
     }
 }
