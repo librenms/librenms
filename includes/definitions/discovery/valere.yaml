@@ -1,11 +1,6 @@
 mib: VALERE-DC-POWER-MIB
 modules:
   sensors:
-    pre-cache:
-      data:
-        - oid:
-            - vpwrBayIndex
-            - vpwrModuleIndex
     voltage:
       data:
         -
