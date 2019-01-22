@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Vlan extends Model
+class Vlan extends DeviceRelatedModel
 {
     public $timestamps = false;
 }
