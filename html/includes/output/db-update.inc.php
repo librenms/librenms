@@ -63,9 +63,9 @@ try {
 
     echo \Artisan::output();
 
-    echo $ret == 0 ? "\nSuccess!" : "\nError";
+    echo $ret == 0 ? "\n\nSuccess!" : "\n\nError!";
 } catch (Exception $e) {
-    echo $e->getMessage() . "\nError";
+    echo $e->getMessage() . "\n\nError!";
 }
 
 ob_end_flush();
