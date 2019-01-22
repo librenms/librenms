@@ -137,7 +137,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
     }
     ?>
   <script src="js/select2.min.js"></script>
-  <script src="js/librenms.js?ver=20181221"></script>
+  <script src="js/librenms.js?ver=20190122"></script>
   <script type="text/javascript">
 
     <!-- Begin

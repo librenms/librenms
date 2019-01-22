@@ -498,3 +498,32 @@ function init_select2(selector, type, data, selected) {
         $select.trigger('change');
     }
 }
+
+function humanize_duration(seconds) {
+    // transform xxx seconds into yy years MM months dd days hh hours mm:ss
+    
+    var duration = moment.duration(Number(seconds), 's');
+    var years = duration.years(),
+        months = duration.months(),
+        days = duration.days(),
+        hrs = duration.hours(),
+        mins = duration.minutes(),
+        secs = duration.seconds();
+    var res = '';
+
+    if (years) {
+        res += years + 'y ';
+    }
+    if (months) {
+        res += months + 'm ';
+    }
+    if (days) {
+        res += days + 'd ';
+    }
+    if (hrs) {
+        res += hrs + 'h ';
+    }
+    res += mins + 'm ' + secs + 's ';
+
+    return res;
+}
