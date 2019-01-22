@@ -1,0 +1,252 @@
+-- History
+--	@RA XTSce98612	Eric Auffret			13/11/2002
+--		SNMP trap : error in file  /etc/snmp/mibs/export/HPOV-NNM.txt,
+--		compilation of the file by SNMP supervisor not possible / 1-73880476
+--		@@
+
+
+HPOV-NNM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, 
+    NOTIFICATION-TYPE, enterprises
+        FROM SNMPv2-SMI
+    DisplayString, 
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+hp		OBJECT IDENTIFIER ::= { enterprises 11 }
+nm		OBJECT IDENTIFIER ::= { hp 2 }
+openView	OBJECT IDENTIFIER ::= { nm 17 }
+
+hpOpenView MODULE-IDENTITY
+    LAST-UPDATED "9607080000Z"
+    ORGANIZATION "Hewlett-Packard, Network & System Management Division"
+    CONTACT-INFO
+            "Support: Hewlett-Packard Response Center
+                 Tel: +1 (800) 633-3600"
+
+    DESCRIPTION
+            "General management information used within the 
+             HP OpenView Network Node Manager product.
+	     
+	     This object identifier also serves as the 
+	     OpenView Enterprise ID for SNMPv1 Traps."
+
+    REVISION      "9607080000Z"
+    DESCRIPTION
+            "Initial revision published as part of hp-unix MIB.
+	     Updated to add support for SNMPv2 Security Proxy.
+	     Updated to use the SNMPv2 SMI."
+    ::= { openView 1 }
+
+
+--
+-- Textual Conventions
+-- /* RA CDHva56260 */
+
+OVTextString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+            "Represents textual information consisting of either 
+            single- or multi-byte characters.  
+
+            The character string is interpreted using the locale 
+            (language) of the interpreting entity because the locale 
+            is NOT included.  Therefore, transmitting an object value 
+            of this syntax across different locales is not supported."
+
+    SYNTAX       OCTET STRING (SIZE (0..255))
+
+
+--
+-- OpenView NNM Notification Group 
+--
+-- The OpenView trap variables defined below cannot be retrieved 
+-- from the SNMP Agent. They are defined only for use within OpenView
+-- NNM notifications (traps).
+ 
+openViewTrapVars OBJECT IDENTIFIER ::= { openView 2 }
+
+openViewSourceId OBJECT-TYPE
+	SYNTAX	INTEGER				-- Should be an ENUM
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"The identifier of the software generating the trap/event.
+		 This number is used by HP OpenView software when it sends
+		 an event to the OpenView event system.  It identifies
+		 which software component sent the event."
+	::= { openViewTrapVars 1 }
+
+openViewSourceName OBJECT-TYPE
+	SYNTAX	OVTextString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"The source of the event (may not be the machine upon
+		 which the event was generated).  This string is used
+		 by HP OpenView software when it sends an event.  It
+		 identifies for which node the event is generated."
+	::= { openViewTrapVars 2 }
+
+openViewObjectId OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"The OpenView Windows object identifier associated 
+                 with the source of the trap/event."
+	::= { openViewTrapVars 3 }
+
+openViewData OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"Any miscellaneous data sent with an OpenView trap/event."
+	::= { openViewTrapVars 4 }
+
+openViewSeverity OBJECT-TYPE
+	SYNTAX	OVTextString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"The OpenView event severity associated with the trap/event."
+	::= { openViewTrapVars 5 }
+
+openViewCategory OBJECT-TYPE
+	SYNTAX	OVTextString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"The OpenView event category associated with the trap/event."
+	::= { openViewTrapVars 6 }
+
+openViewFilter OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"The event filter for an application connecting to the
+		 OpenView event system."
+	::= { openViewTrapVars 7 }
+
+openViewEntity OBJECT-TYPE
+	SYNTAX	OVTextString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"The entity (string name) of an application connecting
+		 to the OpenView event system."
+	::= { openViewTrapVars 8 }
+
+openViewAddress OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"The IP address of the node from where an application
+		 is connecting to the OpenView event system."
+	::= { openViewTrapVars 9 }
+
+openViewPid OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"The process ID of an application connecting to the
+		 OpenView event system."
+	::= { openViewTrapVars 10 }
+	
+openViewCmipManagedObjectClass OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"A cmisEventReport managedObjectClass.  Only valid when
+		 running with the HP OpenView DM product."
+	::= { openViewTrapVars 11 }
+
+openViewCmipEventTime OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"A cmisEventReport eventTime.  Only valid when
+		 running with the HP OpenView DM product."
+	::= { openViewTrapVars 12 }
+
+openViewCmipEventType OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"A cmisEventReport eventType.  Only valid when
+		 running with the HP OpenView DM product."
+	::= { openViewTrapVars 13 }
+
+openViewCmipEventInfo OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"A cmisEventReport eventInfo.  Only valid when
+		 running with the HP OpenView DM product."
+	::= { openViewTrapVars 14 }
+
+openViewCmipManagedObjectInstanceId OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"A cmisEventReport managedObjectInstance.  Only valid when
+		 running with the HP OpenView DM product."
+	::= { openViewTrapVars 15 }
+
+openViewEventUUID OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"An OpenView Event UUID which uniquely identifies an event."
+	::= { openViewTrapVars 16 }
+
+openViewEcsCorrelateEvUUID OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"If an OpenView event contains this var-bind, it indicates to
+		the Event Correlation System that the event should be correlated
+		with the event whose UUID is the value of this var-bind.  If the
+		var-bind is missing or has a zero length value, then no event
+		correlation occurs."
+	::= { openViewTrapVars 17 }
+
+openViewEcsNodeImportance OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"If an OpenView event contains this var-bind, it indicates to
+		the Event Correlation System the importance of the node from
+		an event correlation perspective.  In situations where the
+		ECS system would normally suppress an event, it may choose not
+		to suppress it if the node is very important (e.g. an important
+		server node).  The integral value of this MIB object may evolve
+		over time.  For now, non-integral values are invalid, a value of
+		zero indicates that the node is a regular node and a non-zero 
+		value indicates that the node is an important node."
+	::= { openViewTrapVars 18 }
+
+
+hpOVNNMTraps	 OBJECT IDENTIFIER ::= { hpOpenView 0 }
+	--
+	-- TODO: the bazillion NNM traps go here.
+	--
+
+END
+
