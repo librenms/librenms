@@ -38,6 +38,8 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     // Ajax routes
     Route::group(['prefix' => 'ajax'], function () {
         Route::post('set_resolution', 'ResolutionController@set');
+        Route::post('netcmd', 'NetCommand@run');
+        Route::any('ripe/raw', 'RipeNccApiController@raw');
         Route::resource('location', 'LocationController', ['only' => ['update', 'destroy']]);
 
         Route::group(['prefix' => 'form', 'namespace' => 'Form'], function () {

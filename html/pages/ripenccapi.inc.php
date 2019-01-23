@@ -10,6 +10,8 @@
  * the source code distribution for details.
  */
 $pagetitle[] = 'RIPE NCC - API Tools';
+$no_refresh = true;
+
 ?>
 <h3> RIPE NCC API Tools </h3>
 <hr>
@@ -29,26 +31,28 @@ $pagetitle[] = 'RIPE NCC - API Tools';
     </div>
 </form>
 <br />
-<div id="ripe-output" class="alert alert-success" style="display: none;"></div>
+<div class="alert alert-success" style="display: none;">
+    <pre id="ripe-output"></pre>
+</div>
 <br />
 <script>
     $("[name='btn-query']").on('click', function(event) {
         event.preventDefault();
-        var $this = $(this);
         var data_param = $('input[name=data_radio]:checked').val();
         var query_param = $("#input-parameter").val();
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: 'ajax/ripe/raw',
             data: {
-                type: "query-ripenccapi",
                 data_param: data_param,
                 query_param: query_param
             },
             dataType: "json",
             success: function(data) {
-                $('#ripe-output').empty();
-                $("#ripe-output").show();
+                var output = $('#ripe-output');
+                output.empty();
+                output.parent().show();
+
                 if (data.output.data.records)
                     $.each(data.output.data.records[0], function(row, value) {
                         $('#ripe-output').append(value['key'] + ' = ' + value['value'] + '<br />');
@@ -58,8 +62,18 @@ $pagetitle[] = 'RIPE NCC - API Tools';
                         $('#ripe-output').append(value['description'] + ' = ' + value['email'] + '<br />');
                     });
             },
-            error: function() {
-                toastr.error('Error');
+            error: function(data) {
+                if (data.status === 422) {
+                    var json = data.responseJSON;
+                    var errors = [];
+                    for (var attrib in json) {
+                        errors.push(json[attrib]);
+                    }
+
+                    toastr.error('Error: ' + errors.join("<br />"));
+                } else {
+                    toastr.error(data.responseJSON.message);
+                }
             }
         });
     });
