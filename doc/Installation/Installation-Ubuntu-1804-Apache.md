@@ -99,6 +99,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 ### Cron job
 
     cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
+> NOTE: Ensure necessary environment variables, like proxy settings, are properly read when cron triggers to job.
 
 #### Copy logrotate config
 
