@@ -47,7 +47,7 @@ class NetCommand extends Controller
                 $cmd = [Config::get('whois', 'whois'), $request->get('query')];
                 break;
             case 'ping':
-                $cmd = [Config::get('ping', 'ping'), '-c', '50', $request->get('query')];
+                $cmd = [Config::get('ping', 'ping'), '-c', '5', $request->get('query')];
                 break;
             case 'tracert':
                 $cmd = [Config::get('mtr', 'mtr'), '-r', '-c', '5', $request->get('query')];
@@ -68,8 +68,17 @@ class NetCommand extends Controller
 
         //stream output
         return (new StreamedResponse(
-            function () use ($proc) {
-                echo str_repeat("\f", 4096); // bust browser initial cache with form feeds
+            function () use ($proc, $request) {
+                // a bit dirty, bust browser initial cache
+                $ua = $request->header('User-Agent');
+                if (str_contains($ua, ['Chrome', 'Trident'])) {
+                    $char = "\f"; // line feed
+                } else {
+                    $char = "";
+                }
+                echo str_repeat($char, 4096);
+                echo PHP_EOL; // avoid first line mess ups due to line feed
+
                 $proc->run(function ($type, $buffer) {
                     echo $buffer;
                     ob_flush();
@@ -78,7 +87,7 @@ class NetCommand extends Controller
             },
             200,
             [
-                'Content-Type' => 'text/plain;',
+                'Content-Type' => 'text/plain; charset=utf-8',
                 'X-Accel-Buffering' => 'no',
             ]
         ))->send();
