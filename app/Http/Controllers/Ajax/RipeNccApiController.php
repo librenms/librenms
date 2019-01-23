@@ -23,9 +23,10 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Ajax;
 
 use App\ApiClients\RipeApi;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use LibreNMS\Exceptions\ApiException;
 

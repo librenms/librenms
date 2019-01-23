@@ -21,6 +21,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         return view('laravel');
     });
 
+    // pages
     Route::get('locations', 'LocationController@index');
 
     // old route redirects
@@ -37,15 +38,22 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // Ajax routes
     Route::group(['prefix' => 'ajax'], function () {
-        Route::post('set_resolution', 'ResolutionController@set');
-        Route::post('netcmd', 'NetCommand@run');
-        Route::any('ripe/raw', 'RipeNccApiController@raw');
+        // page ajax controllers
         Route::resource('location', 'LocationController', ['only' => ['update', 'destroy']]);
 
+        // misc ajax controllers
+        Route::group(['namespace' => 'Ajax'], function () {
+            Route::post('set_resolution', 'ResolutionController@set');
+            Route::get('netcmd', 'NetCommand@run');
+            Route::post('ripe/raw', 'RipeNccApiController@raw');
+        });
+
+        // form ajax handlers, perhaps should just be page controllers
         Route::group(['prefix' => 'form', 'namespace' => 'Form'], function () {
             Route::resource('widget-settings', 'WidgetSettingsController');
         });
 
+        // js select2 data controllers
         Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
             Route::get('application', 'ApplicationController');
             Route::get('bill', 'BillController');
@@ -61,6 +69,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::get('port-field', 'PortFieldController');
         });
 
+        // jquery bootgrid data controllers
         Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
             Route::post('customers', 'CustomersController');
             Route::post('eventlog', 'EventlogController');
@@ -71,6 +80,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('syslog', 'SyslogController');
         });
 
+        // dashboard widgets
         Route::group(['prefix' => 'dash', 'namespace' => 'Widgets'], function () {
             Route::post('alerts', 'AlertsController');
             Route::post('availability-map', 'AvailabilityMapController');

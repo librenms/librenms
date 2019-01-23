@@ -23,16 +23,16 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Ajax;
 
+use App\Http\Controllers\Controller;
 use Config;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Process\Process;
 
 class NetCommand extends Controller
 {
-
-
     public function run(Request $request)
     {
         $this->validate($request, [
@@ -42,41 +42,45 @@ class NetCommand extends Controller
 
         ini_set('allow_url_fopen', 0);
 
-        // return both stdout and stderr
-        $callback = function ($type, $buffer) {
-            return $buffer;
-        };
-
         switch ($request->get('cmd')) {
             case 'whois':
                 $cmd = [Config::get('whois', 'whois'), $request->get('query')];
-                $callback = function ($type, $buffer) {
-                    return preg_replace('/^%.*$/m', '', $buffer);
-                };
                 break;
             case 'ping':
-                $cmd = [Config::get('ping', 'ping'), '-c', '5', $request->get('query')];
+                $cmd = [Config::get('ping', 'ping'), '-c', '50', $request->get('query')];
                 break;
             case 'tracert':
                 $cmd = [Config::get('mtr', 'mtr'), '-r', '-c', '5', $request->get('query')];
                 break;
             case 'nmap':
                 if (!$request->user()->isAdmin()) {
-                    return response()->json(['status' => 'error', 'message' => 'Insufficient privileges']);
+                    return response('Insufficient privileges');
                 } else {
                     $cmd = [Config::get('nmap', 'nmap'), $request->get('query')];
                 }
                 break;
             default:
-                return response()->json(['status' => 'error', 'message' => 'Invalid command']);
+                return response('Invalid command');
         }
 
         $proc = new Process($cmd);
-        $proc->run($callback);
+        $proc->setTimeout(240);
 
-        return response()->json([
-            'status' => 'ok',
-            'output' => htmlentities(trim($proc->getOutput()), ENT_QUOTES),
-        ]);
+        //stream output
+        return (new StreamedResponse(
+            function () use ($proc) {
+                echo str_repeat("\f", 4096); // bust browser initial cache with form feeds
+                $proc->run(function ($type, $buffer) {
+                    echo $buffer;
+                    ob_flush();
+                    flush();
+                });
+            },
+            200,
+            [
+                'Content-Type' => 'text/plain;',
+                'X-Accel-Buffering' => 'no',
+            ]
+        ))->send();
     }
 }
