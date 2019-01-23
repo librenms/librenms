@@ -403,7 +403,7 @@ if ($format == "graph") {
             post: function () {
                 return {
                     format: ' <?php echo mres($vars['format']); ?>',
-                    searchquery: '<?php echo htmlspecialchars($vars['searchquery']); ?>',
+                    searchPhrase: '<?php echo htmlspecialchars($vars['searchquery']); ?>',
                     os: '<?php echo mres($vars['os']); ?>',
                     version: '<?php echo mres($vars['version']); ?>',
                     hardware: '<?php echo mres($vars['hardware']); ?>',

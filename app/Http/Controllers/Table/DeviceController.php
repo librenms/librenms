@@ -38,18 +38,27 @@ class DeviceController extends TableController
     {
         return [
             'format' => 'nullable|in:list_basic,list_detail',
-            'searchquery' => 'nullable|string',
             'os' => 'nullable|string',
             'version' => 'nullable|string',
             'hardware' => 'nullable|string',
             'features' => 'nullable|string',
             'location' => 'nullable|string',
             'type' => 'nullable|string',
-            'state' => 'nullable|string',
-            'disabled' => 'nullable|boolean',
-            'ignore' => 'nullable|boolean',
+            'state' => 'nullable|in:0,1',
+            'disabled' => 'nullable|in:0,1',
+            'ignore' => 'nullable|in:0,1',
             'group' => 'nullable|int',
         ];
+    }
+
+    protected function filterFields($request)
+    {
+        return ['os', 'version', 'hardware', 'features', 'type', 'state', 'disabled', 'ignore'];
+    }
+
+    protected function searchFields($request)
+    {
+        return ['sysName', 'hostname', 'hardware', 'os']; // TODO location
     }
 
     /**
@@ -61,6 +70,7 @@ class DeviceController extends TableController
     protected function baseQuery($request)
     {
         return Device::hasAccess($request->user())->with('location');
+        // TODO filter location, group
     }
 
     private function isDetailed()
