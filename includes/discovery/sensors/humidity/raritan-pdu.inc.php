@@ -29,7 +29,6 @@ $multiplier = '1';
 d_echo('Humidity for Raritan PDU2');
 foreach ($pre_cache['raritan_extSensorConfig'] as $index => $data) {
     // sensor type 10 for temperature
-    d_echo('value for sensor type '.$data['externalSensorType'].'\n');
     if ($data['externalSensorType'] == 'humidity') {
         $descr           = $data['externalSensorName'];
         $oid             = ".1.3.6.1.4.1.13742.6.5.5.3.1.4.$index";
@@ -41,10 +40,8 @@ foreach ($pre_cache['raritan_extSensorConfig'] as $index => $data) {
         $measure_data = $pre_cache['raritan_extSensorMeasure'][$index];
         $current      = ($measure_data['measurementsExternalSensorValue'] / $divisor);
         $sensor_available = $measure_data['measurementsExternalSensorIsAvailable'];
-        d_echo("Raritan pdu stuff ".$current." ".$sensor_available." \n");
-        d_echo("Raritan pdu stuff ".$oid."\n");
         $user_func = null;
-        if (is_numeric($current) && $current >= 0 && sensor_available == true) {
+        if (is_numeric($current) && $current >= 0 && $sensor_available == true) {
             discover_sensor($valid['sensor'], 'humidity', $device, $oid, 'measurementsExternalSensorValue.'.$index, 'raritan', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
         }
     }

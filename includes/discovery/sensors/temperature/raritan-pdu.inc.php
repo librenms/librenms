@@ -59,7 +59,7 @@ if (is_array($raritan_data) && !empty($raritan_data)) {
                 $current = fahrenheit_to_celsius($current, $raritan_temp_scale);
                 $user_func = 'fahrenheit_to_celsius';
             }
-            if (is_numeric($current) && $current >= 0 && sensor_available == true) {
+            if (is_numeric($current) && $current >= 0 && $sensor_available == true) {
                 discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'measurementsExternalSensorValue.'.$index, 'raritan', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
             }
         }
