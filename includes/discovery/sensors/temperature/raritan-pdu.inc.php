@@ -35,17 +35,16 @@ if (is_array($raritan_data) && !empty($raritan_data)) {
     $high_limit = $raritan_data['unitTempUpperCritical.0'];
     $current = $raritan_data['unitCpuTemp.0'] / $divisor;
     discover_sensor($valid["sensor"], "temperature", $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
-}
-else {
+} else {
     $multiplier = '1';
     foreach ($pre_cache['raritan_extSensorConfig'] as $index => $data) {
         if ($data['externalSensorType'] == 'temperature') {
             $descr           = $data['externalSensorName'];
             $oid             = ".1.3.6.1.4.1.13742.6.5.5.3.1.4.$index";
-            $low_limit       = $data['externalSensorLowerCriticalThreshold'];
-            $low_warn_limit  = $data['externalSensorLowerWarningThreshold'];
-            $high_limit      = $data['externalSensorUpperCriticalThreshold'];
-            $high_warn_limit = $data['externalSensorUpperWarningThreshold'];
+            $low_limit       = ($data['externalSensorLowerCriticalThreshold'] / $divisor);
+            $low_warn_limit  = ($data['externalSensorLowerWarningThreshold'] / $divisor);
+            $high_limit      = ($data['externalSensorUpperCriticalThreshold'] / $divisor);
+            $high_warn_limit = ($data['externalSensorUpperWarningThreshold'] / $divisor);
 
             $measure_data = $pre_cache['raritan_extSensorMeasure'][$index];
             $current      = ($measure_data['measurementsExternalSensorValue'] / $divisor);
