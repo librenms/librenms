@@ -92,6 +92,8 @@ if (isset($vars['bare']) && $vars['bare'] == "yes") {
 }
 
 list($format, $subformat) = explode("_", $vars['format'], 2);
+$detailed = $subformat == 'detail';
+
 
 if ($format == "graph") {
     if (empty($vars['from'])) {
@@ -352,62 +354,32 @@ if ($format == "graph") {
         }
     }
     $types_options .= "</select>";
-
-    echo '
+?>
     <div class="panel panel-default panel-condensed">
     <div class="panel-heading">
         <div class="row" style="padding: 0px 10px 0px 10px;">
-            <div class="pull-left">
-            ' . $listoptions . '
-            </div>
-            <div class="pull-right">
-            ' . $headeroptions . '
-            </div>
+            <div class="pull-left"><?php echo $listoptions; ?></div>
+            <div class="pull-right"><?php echo $headeroptions; ?></div>
         </div>
     </div>
     <div class="table-responsive">
         <table id="devices" class="table table-hover table-condensed table-striped">  
             <thead>
                 <tr>
-    ';
-
-    if ($subformat == "detail") {
-        echo '<th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>';
-        echo '<th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon">Vendor</th>';
-    }
-
-    if ($subformat != "detail") {
-        echo '<th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>';
-        echo '<th data-column-id="hostname" data-order="asc" data-formatter="device">Device</th>';
-    } else {
-        echo '<th data-column-id="hostname" data-order="asc">Device</th>';
-    }
-
-    if ($subformat == "detail") {
-        echo '<th data-column-id="ports" data-width="100px" data-sortable="false" data-searchable="false">Metrics</th>';
-    }
-
-    echo '
+                    <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>
+                    <th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Vendor</th>
+                    <th data-column-id="hostname" data-order="asc" <?php echo $detailed ? 'data-formatter="device"' : ''; ?>>Device</th>
+                    <th data-column-id="metrics" data-width="100px" data-sortable="false" data-searchable="false" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Metrics</th>
                     <th data-column-id="hardware">Platform</th>
                     <th data-column-id="os">Operating System</th>
                     <th data-column-id="uptime">Uptime</th>
-    ';
-
-    if ($subformat == "detail") {
-        echo '<th data-column-id="location">Location</th>';
-    }
-
-    echo '
-                    <th data-column-id="actions" data-width="90px" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions">Actions</th>
+                    <th data-column-id="location" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Location</th>
+                    <th data-column-id="actions" data-width="<?php echo $detailed ? '90px' : '200px'; ?>" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions">Actions</th>
                 </tr>
             </thead>
         </table>
     </div>
     </div>
-    ';
-
-    ?>
-
     <script>
         var grid = $("#devices").bootgrid({
             ajax: true,
@@ -415,7 +387,7 @@ if ($format == "graph") {
             columnSelection: true,
             formatters: {
                 "status": function (column, row) {
-                    return "<span class=\"alert-status " + row.extra + "\"></span>";
+                    return "<span class=\"<?php echo $detailed ? 'alert-status' : 'alert-status-small' ?> " + row.extra + "\"></span>";
                 },
                 "icon": function (column, row) {
                     return "<span class=\"device-table-icon\">" + row.icon + "</span>";
@@ -430,7 +402,6 @@ if ($format == "graph") {
             },
             post: function () {
                 return {
-                    id: "devices",
                     format: ' <?php echo mres($vars['format']); ?>',
                     searchquery: '<?php echo htmlspecialchars($vars['searchquery']); ?>',
                     os: '<?php echo mres($vars['os']); ?>',
@@ -445,7 +416,7 @@ if ($format == "graph") {
                     group: '<?php echo mres($vars['group']); ?>',
                 };
             },
-            url: "ajax_table.php"
+            url: "ajax/table/device"
         });
 
         <?php

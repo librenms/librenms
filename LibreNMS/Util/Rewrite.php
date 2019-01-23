@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Util;
 
+use App\Models\Device;
+
 class Rewrite
 {
     public static function normalizeIfType($type)
@@ -118,5 +120,39 @@ class Rewrite
     public static function readableMac($mac)
     {
         return rtrim(chunk_split($mac, 2, ':'), ':');
+    }
+
+    /**
+     * Make Cisco hardware human readable
+     *
+     * @param Device $device
+     * @param bool $short
+     * @return string
+     */
+    public static function ciscoHardware(&$device, $short = false)
+    {
+        if ($device['os'] == "ios") {
+            if ($device['hardware']) {
+                if (preg_match("/^WS-C([A-Za-z0-9]+)/", $device['hardware'], $matches)) {
+                    if (!$short) {
+                        $device['hardware'] = "Catalyst " . $matches[1] . " (" . $device['hardware'] . ")";
+                    } else {
+                        $device['hardware'] = "Catalyst " . $matches[1];
+                    }
+                } elseif (preg_match("/^CISCO([0-9]+)(.*)/", $device['hardware'], $matches)) {
+                    if (!$short && $matches[2]) {
+                        $device['hardware'] = "Cisco " . $matches[1] . " (" . $device['hardware'] . ")";
+                    } else {
+                        $device['hardware'] = "Cisco " . $matches[1];
+                    }
+                }
+            } elseif (preg_match("/Cisco IOS Software, C([A-Za-z0-9]+) Software.*/", $device['sysDescr'], $matches)) {
+                $device['hardware'] = "Catalyst " . $matches[1];
+            } elseif (preg_match("/Cisco IOS Software, ([0-9]+) Software.*/", $device['sysDescr'], $matches)) {
+                $device['hardware'] = "Cisco " . $matches[1];
+            }
+        }
+
+        return $device['hardware'];
     }
 }

@@ -61,6 +61,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
         Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
             Route::post('customers', 'CustomersController');
+            Route::post('device', 'DeviceController');
             Route::post('eventlog', 'EventlogController');
             Route::post('fdb-tables', 'FdbTablesController');
             Route::post('graylog', 'GraylogController');

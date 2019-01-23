@@ -2192,6 +2192,13 @@ label {
   height: 32px;
 }
 
+.alert-status-small {
+  display: inline-block;
+  width: 7px;
+  min-height: 16px;
+  height: 20px
+}
+
 .device-services-page {
   font-weight: bold;
   margin-left: 20px;
