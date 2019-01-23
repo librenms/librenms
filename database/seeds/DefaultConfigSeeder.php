@@ -398,6 +398,18 @@ class DefaultConfigSeeder extends Seeder
                 "config_disabled" => "0",
             ],
             [
+                "config_name" => "alert.transports.mail",
+                "config_value" => "false",
+                "config_default" => "false",
+                "config_descr" => "Mail alerting transport",
+                "config_group" => "alerting",
+                "config_group_order" => "0",
+                "config_sub_group" => "transports",
+                "config_sub_group_order" => "0",
+                "config_hidden" => "0",
+                "config_disabled" => "0",
+            ],
+            [
                 "config_name" => "alert.pagerduty.account",
                 "config_value" => "",
                 "config_default" => "",
