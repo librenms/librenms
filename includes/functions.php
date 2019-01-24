@@ -513,9 +513,6 @@ function delete_device($id)
 /**
  * Add a device to LibreNMS
  *
- * Perform basic sanity and reachability checks, and invoke createHost() to
- * actually add the device to the database.
- *
  * @param string $host dns name or ip address
  * @param string $snmp_version If this is empty, try v2c,v3,v1.  Otherwise, use this specific version.
  * @param string $port the port to connect to for snmp
@@ -555,7 +552,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         $ip = $host;
     }
     if ($force_add !== true && ip_exists($ip)) {
-        throw new HostIpExistsException("Already have a host with IP $ip (in ipvX_addresses table)");
+        throw new HostIpExistsException("Already have host with this IP $host");
     }
 
     // Test reachability
