@@ -1,0 +1,877 @@
+
+IEEE8021-SPANNING-TREE-MIB DEFINITIONS ::= BEGIN
+
+-- =============================================================
+-- MIB for IEEE 802.1D spanning tree devices
+-- =============================================================
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Counter64, Integer32, TimeTicks
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TruthValue
+        FROM SNMPv2-TC
+    ieee802dot1mibs, IEEE8021PbbComponentIdentifier,
+    IEEE8021BridgePortNumber
+        FROM IEEE8021-TC-MIB
+    BridgeId, Timeout
+        FROM BRIDGE-MIB
+    ;
+
+ieee8021SpanningTreeMib MODULE-IDENTITY
+    LAST-UPDATED "200810150000Z" -- October 15, 2008
+    ORGANIZATION "IEEE 802.1 Working Group"
+    CONTACT-INFO
+        "  WG-URL: http://grouper.ieee.org/groups/802/1/index.html
+         WG-EMail: stds-802-1@ieee.org
+
+          Contact: David Levi
+           Postal: 4655 GREAT AMERICA PARKWAY
+                   SANTA CLARA, CALIFORNIA
+                   95054
+                   USA
+              Tel: +1-408-495-5138
+           E-mail: dlevi@nortel.com"
+    DESCRIPTION
+        "The Spanning-Tree MIB module for managing devices that
+        support IEEE 802.1D.  This MIB module is derived from the
+        IETF BRIDGE-MIB, RFC 4188.
+
+        Unless otherwise indicated, the references in this MIB
+        module are to IEEE 802.1Q-2005 as amended by IEEE 802.1ad,
+        IEEE 802.1ak, IEEE 802.1ag and IEEE 802.1ah.
+
+        Copyright (C) IEEE.
+        This version of this MIB module is part of IEEE802.1Q;
+        see the draft itself for full legal notices."
+    REVISION     "200810150000Z" -- October 15, 2008
+    DESCRIPTION
+         "Initial revision, derived from RFC 4188."
+    ::= { ieee802dot1mibs 3 }
+
+-- =============================================================
+-- subtrees in the Spanning-Tree MIB
+-- =============================================================
+
+ieee8021SpanningTreeNotifications
+    OBJECT IDENTIFIER ::= { ieee8021SpanningTreeMib 0 }
+
+ieee8021SpanningTreeObjects
+    OBJECT IDENTIFIER ::= { ieee8021SpanningTreeMib 1 }
+
+ieee8021SpanningTreeConformance
+    OBJECT IDENTIFIER ::= { ieee8021SpanningTreeMib 2 }
+
+
+-- =============================================================
+-- the ieee8021SpanningTreeTable
+-- =============================================================
+ieee8021SpanningTreeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021SpanningTreeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information related to STP about
+        every bridge."
+    REFERENCE   "12.8.1"
+    ::= { ieee8021SpanningTreeObjects 1 }
+
+ieee8021SpanningTreeEntry OBJECT-TYPE
+    SYNTAX      Ieee8021SpanningTreeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing information for each bridge
+         about the Spanning Tree Protocol for that bridge."
+    INDEX  { ieee8021SpanningTreeComponentId }
+    ::= { ieee8021SpanningTreeTable 1 }
+
+Ieee8021SpanningTreeEntry ::=
+    SEQUENCE {
+        ieee8021SpanningTreeComponentId
+            IEEE8021PbbComponentIdentifier,
+        ieee8021SpanningTreeProtocolSpecification
+            INTEGER,
+        ieee8021SpanningTreePriority
+            Integer32,
+        ieee8021SpanningTreeTimeSinceTopologyChange
+            TimeTicks,
+        ieee8021SpanningTreeTopChanges
+            Counter64,
+        ieee8021SpanningTreeDesignatedRoot
+            BridgeId,
+        ieee8021SpanningTreeRootCost
+            Integer32,
+        ieee8021SpanningTreeRootPort
+            IEEE8021BridgePortNumber,
+        ieee8021SpanningTreeMaxAge
+            Timeout,
+        ieee8021SpanningTreeHelloTime
+            Timeout,
+        ieee8021SpanningTreeHoldTime
+            Integer32,
+        ieee8021SpanningTreeForwardDelay
+            Timeout,
+        ieee8021SpanningTreeBridgeMaxAge
+            Timeout,
+        ieee8021SpanningTreeBridgeHelloTime
+            Timeout,
+        ieee8021SpanningTreeBridgeForwardDelay
+            Timeout,
+        ieee8021SpanningTreeVersion
+            INTEGER,
+        ieee8021SpanningTreeRstpTxHoldCount
+            Integer32
+    }
+
+ieee8021SpanningTreeComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The component identifier is used to distinguish between the
+        multiple virtual bridge instances within a PBB.  In simple
+        situations where there is only a single component the default
+        value is 1."
+    ::= { ieee8021SpanningTreeEntry 1 }
+
+ieee8021SpanningTreeProtocolSpecification OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(1),
+                    decLb100(2),
+                    ieee8021d(3),
+                    ieee8021q(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An indication of what version of the Spanning Tree Protocol is
+        being run.  The value 'decLb100(2)' indicates the DEC LANbridge
+        100 Spanning Tree protocol.  IEEE 802.1D implementations will
+        return 'ieee8021d(3)'.  New enumerated values may be added in
+        the future to the definition of this object to reflect future
+        versions of the IEEE Spanning Tree protocol."
+    ::= { ieee8021SpanningTreeEntry 2 }
+
+ieee8021SpanningTreePriority OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the write-able portion of the Bridge ID
+        (i.e., the first two octets of the (8 octet long) Bridge
+        ID).  The other (last) 6 octets of the Bridge ID are
+        given by the value of ieee8021BridgeBaseBridgeAddress.
+        On bridges supporting IEEE 802.1t or IEEE 802.1w,
+        permissible values are 0-61440, in steps of 4096.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.8.1.1.3 a)"
+    ::= { ieee8021SpanningTreeEntry 3 }
+
+ieee8021SpanningTreeTimeSinceTopologyChange OBJECT-TYPE
+    SYNTAX      TimeTicks
+    UNITS       "centi-seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time (in hundredths of a second) since the
+        last time a topology change was detected by the
+        bridge entity.
+        For RSTP, this reports the time since the tcWhile
+        timer for any port on this Bridge was nonzero."
+    REFERENCE   "12.8.1.1.3 b)"
+    ::= { ieee8021SpanningTreeEntry 4 }
+
+ieee8021SpanningTreeTopChanges OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "topology changes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of topology changes detected by
+        this bridge since the management entity was last
+        reset or initialized.
+
+        Discontinuities in the value of the counter can occur
+        at re-initialization of the management system."
+    REFERENCE   "12.8.1.1.3 c)"
+    ::= { ieee8021SpanningTreeEntry 5 }
+
+ieee8021SpanningTreeDesignatedRoot OBJECT-TYPE
+    SYNTAX      BridgeId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The bridge identifier of the root of the spanning
+        tree, as determined by the Spanning Tree Protocol,
+        as executed by this node.  This value is used as
+        the Root Identifier parameter in all Configuration
+        Bridge PDUs originated by this node."
+    REFERENCE   "12.8.1.1.3 e)"
+    ::= { ieee8021SpanningTreeEntry 6 }
+
+ieee8021SpanningTreeRootCost OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The cost of the path to the root as seen from
+        this bridge."
+    REFERENCE   "12.8.1.1.3 f)"
+    ::= { ieee8021SpanningTreeEntry 7 }
+
+ieee8021SpanningTreeRootPort OBJECT-TYPE
+    SYNTAX      IEEE8021BridgePortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port number of the port that offers the lowest
+        cost path from this bridge to the root bridge."
+    REFERENCE   "12.8.1.1.3 g)"
+    ::= { ieee8021SpanningTreeEntry 8 }
+
+ieee8021SpanningTreeMaxAge OBJECT-TYPE
+    SYNTAX      Timeout
+    UNITS       "centi-seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum age of Spanning Tree Protocol information
+        learned from the network on any port before it is
+        discarded, in units of hundredths of a second.  This is
+        the actual value that this bridge is currently using."
+    REFERENCE   "12.8.1.1.3 h)"
+    ::= { ieee8021SpanningTreeEntry 9 }
+
+ieee8021SpanningTreeHelloTime OBJECT-TYPE
+    SYNTAX      Timeout
+    UNITS       "centi-seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of time between the transmission of
+        Configuration bridge PDUs by this node on any port when
+        it is the root of the spanning tree, or trying to become
+        so, in units of hundredths of a second.  This is the
+        actual value that this bridge is currently using."
+    REFERENCE   "12.8.1.1.3 k)"
+    ::= { ieee8021SpanningTreeEntry 10 }
+
+ieee8021SpanningTreeHoldTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "centi-seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This time value determines the interval length
+        during which no more than two Configuration bridge
+        PDUs shall be transmitted by this node, in units
+        of hundredths of a second."
+    REFERENCE   "12.8.1.1.3 m)"
+    ::= { ieee8021SpanningTreeEntry 11 }
+
+ieee8021SpanningTreeForwardDelay OBJECT-TYPE
+    SYNTAX      Timeout
+    UNITS       "centi-seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This time value, measured in units of hundredths of a
+        second, controls how fast a port changes its spanning
+        state when moving towards the Forwarding state.  The
+        value determines how long the port stays in each of the
+        Listening and Learning states, which precede the
+        Forwarding state.  This value is also used when a
+        topology change has been detected and is underway, to
+        age all dynamic entries in the Filtering Database.
+        [Note that this value is the one that this bridge is
+        currently using, in contrast to
+        ieee8021SpanningTreeBridgeForwardDelay, which is the
+        value that this bridge and all others would start using
+        if/when this bridge were to become the root.]"
+    REFERENCE   "12.8.1.1.3 i)"
+    ::= { ieee8021SpanningTreeEntry 12 }
+
+ieee8021SpanningTreeBridgeMaxAge OBJECT-TYPE
+    SYNTAX      Timeout (600..4000)
+    UNITS       "centi-seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value that all bridges use for MaxAge when this
+        bridge is acting as the root.  Note that 802.1D-1998
+        specifies that the range for this parameter is related
+        to the value of ieee8021SpanningTreeBridgeHelloTime.  The
+        granularity of this timer is specified by 802.1D-1998 to
+        be 1 second.  An agent may return an SNMP badValue error
+        (or its equivalent if another protocol is used) if a set
+        is attempted to a value that is not a whole number of
+        seconds.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.8.1.1.3 j)"
+    ::= { ieee8021SpanningTreeEntry 13 }
+
+ieee8021SpanningTreeBridgeHelloTime OBJECT-TYPE
+    SYNTAX      Timeout (100..1000)
+    UNITS       "centi-seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value that all bridges use for HelloTime when this
+        bridge is acting as the root.  The granularity of this
+        timer is specified by 802.1D-1998 to be 1 second.  An
+        agent may return an SNMP badValue error (or its equivalent
+        if another protocol is used) if a set is attempted to a
+        value that is not a whole number of seconds.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.8.1.1.3 k)"
+    ::= { ieee8021SpanningTreeEntry 14 }
+
+ieee8021SpanningTreeBridgeForwardDelay OBJECT-TYPE
+    SYNTAX      Timeout (400..3000)
+    UNITS       "centi-seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value that all bridges use for ForwardDelay when
+        this bridge is acting as the root.  Note that
+        802.1D-1998 specifies that the range for this parameter
+        is related to the value of ieee8021SpanningTreeBridgeMaxAge.
+        The granularity of this timer is specified by 802.1D-1998
+        to be 1 second.  An agent may return an SNMP badValue error
+        (or its equivalent if another protocol is used) if a set is
+        attempted to a value that is not a whole number of seconds.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.8.1.1.3 l)"
+    ::= { ieee8021SpanningTreeEntry 15 }
+
+ieee8021SpanningTreeVersion OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    stp(0),
+                    rstp(2),
+                    mstp(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The version of Spanning Tree Protocol the bridge is
+        currently running.  The values are directly from
+        the IEEE standard.  New values may be defined as future
+        versions of the protocol become available.
+
+        The value 'stp(0)' indicates the bridge is running the
+        Spanning Tree Protocol specified in IEEE 802.1D-1998.
+
+        The value 'rstp(2)' indicates the bridge is running the
+        Rapid Spanning Tree Protocol specified in IEEE 802.1w and
+        clause 17 of 802.1D-2004.
+
+        The value 'mstp(3)' indicates the bridge is running the
+        Multiple Spanning Tree Protocol specified in IEEE802.1s
+        and clause 13 of 802.1Q-2005.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.8.1.1.3 n)"
+    ::= { ieee8021SpanningTreeEntry 16 }
+
+ieee8021SpanningTreeRstpTxHoldCount OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value used by the Port Transmit state machine to limit
+         the maximum transmission rate.  This is used by bridges
+         that are running the Rapid Spanning Tree Protocol.
+
+         The value of this object MUST be retained across
+         reinitializations of the management system."
+    REFERENCE   "12.8.1.1.3 m)"
+    DEFVAL      { 3 }
+    ::= { ieee8021SpanningTreeEntry 17 }
+
+-- =============================================================
+-- The Spanning Tree Port Table
+-- =============================================================
+
+ieee8021SpanningTreePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021SpanningTreePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains port-specific information
+        for the Spanning Tree Protocol."
+    REFERENCE   "12.8.2"
+    ::= { ieee8021SpanningTreeObjects 2 }
+
+ieee8021SpanningTreePortEntry OBJECT-TYPE
+    SYNTAX      Ieee8021SpanningTreePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing information maintained by
+         every port about the Spanning Tree Protocol state for
+         that port."
+    INDEX   { ieee8021SpanningTreePortComponentId,
+              ieee8021SpanningTreePort }
+    ::= { ieee8021SpanningTreePortTable 1 }
+
+Ieee8021SpanningTreePortEntry ::=
+    SEQUENCE {
+        ieee8021SpanningTreePortComponentId
+            IEEE8021PbbComponentIdentifier,
+        ieee8021SpanningTreePort
+            IEEE8021BridgePortNumber,
+        ieee8021SpanningTreePortPriority
+            Integer32,
+        ieee8021SpanningTreePortState
+            INTEGER,
+        ieee8021SpanningTreePortEnabled
+            TruthValue,
+        ieee8021SpanningTreePortPathCost
+            Integer32,
+        ieee8021SpanningTreePortDesignatedRoot
+            BridgeId,
+        ieee8021SpanningTreePortDesignatedCost
+            Integer32,
+        ieee8021SpanningTreePortDesignatedBridge
+            BridgeId,
+        ieee8021SpanningTreePortDesignatedPort
+            OCTET STRING,
+        ieee8021SpanningTreePortForwardTransitions
+            Counter64,
+        ieee8021SpanningTreeRstpPortProtocolMigration
+            TruthValue,
+        ieee8021SpanningTreeRstpPortAdminEdgePort
+            TruthValue,
+        ieee8021SpanningTreeRstpPortOperEdgePort
+            TruthValue,
+        ieee8021SpanningTreeRstpPortAdminPathCost
+            Integer32
+    }
+
+ieee8021SpanningTreePortComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The component identifier is used to distinguish between the
+        multiple virtual bridge instances within a PBB.  In simple
+        situations where there is only a single component the default
+        value is 1."
+    ::= { ieee8021SpanningTreePortEntry 1 }
+
+ieee8021SpanningTreePort OBJECT-TYPE
+    SYNTAX      IEEE8021BridgePortNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The port number of the port for which this entry
+        contains Spanning Tree Protocol management information."
+    REFERENCE   "12.8.2.1.2 a)"
+    ::= { ieee8021SpanningTreePortEntry 2 }
+
+ieee8021SpanningTreePortPriority OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the priority field that is contained in
+        the first (in network byte order) octet of the (2 octet
+        long) Port ID.  The other octet of the Port ID is given
+        by the value of ieee8021SpanningTreePort.
+        On bridges supporting IEEE 802.1t or IEEE 802.1w,
+        permissible values are 0-240, in steps of 16.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.8.2.1.3 c)"
+    ::= { ieee8021SpanningTreePortEntry 3 }
+
+ieee8021SpanningTreePortState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(1),
+                    blocking(2),
+                    listening(3),
+                    learning(4),
+                    forwarding(5),
+                    broken(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port's current state, as defined by application of
+        the Spanning Tree Protocol.  This state controls what
+        action a port takes on reception of a frame.  If the
+        bridge has detected a port that is malfunctioning, it
+        will place that port into the broken(6) state.  For
+        ports that are disabled (see
+        ieee8021SpanningTreePortEnabled), this object will have a
+        value of disabled(1).  The values disabled, blocking, 
+        listening, and broken correspond to the Clause 12 port 
+        state of 'Discarding'. The value learning corresponds to 
+        the Clause 12 port state of 'Learning'. The value forwarding
+        corresponds to the Clause 12 port state of 'Forwarding'."
+
+    REFERENCE   "12.8.2.1.3 b)"
+    ::= { ieee8021SpanningTreePortEntry 4 }
+
+ieee8021SpanningTreePortEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enabled/disabled status of the port.  A value of true(1)
+        means the spanning-tree protocol is enabled for this port.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.8.2.1.3 m)"
+    ::= { ieee8021SpanningTreePortEntry 5 }
+
+ieee8021SpanningTreePortPathCost OBJECT-TYPE
+    SYNTAX      Integer32 (1..200000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The contribution of this port to the path cost of
+        paths towards the spanning tree root which include
+        this port.  802.1D-1998 recommends that the default
+        value of this parameter be in inverse proportion to
+        the speed of the attached LAN.
+
+        The value of this object MUST be retained across
+        reinitializations of the management system."
+    REFERENCE   "12.8.2.1.3 d)"
+        ::= { ieee8021SpanningTreePortEntry 6 }
+
+ieee8021SpanningTreePortDesignatedRoot OBJECT-TYPE
+    SYNTAX      BridgeId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unique Bridge Identifier of the Bridge
+        recorded as the Root in the Configuration BPDUs
+        transmitted by the Designated Bridge for the
+        segment to which the port is attached."
+    REFERENCE   "12.8.2.1.3 e)"
+    ::= { ieee8021SpanningTreePortEntry 7 }
+
+ieee8021SpanningTreePortDesignatedCost OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The path cost of the Designated Port of the segment
+        connected to this port.  This value is compared to the
+        Root Path Cost field in received bridge PDUs."
+    REFERENCE   "12.8.2.1.3 f)"
+    ::= { ieee8021SpanningTreePortEntry 8 }
+
+ieee8021SpanningTreePortDesignatedBridge OBJECT-TYPE
+    SYNTAX      BridgeId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Bridge Identifier of the bridge that this
+        port considers to be the Designated Bridge for
+        this port's segment."
+    REFERENCE   "12.8.2.1.3 g)"
+    ::= { ieee8021SpanningTreePortEntry 9 }
+
+ieee8021SpanningTreePortDesignatedPort OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Port Identifier of the port on the Designated
+        Bridge for this port's segment."
+    REFERENCE   "12.8.2.1.3 h)"
+    ::= { ieee8021SpanningTreePortEntry 10 }
+
+ieee8021SpanningTreePortForwardTransitions OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "forwarding transitions"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times this port has transitioned
+        from the Learning state to the Forwarding state.
+
+        Discontinuities in the value of the counter can occur
+        at re-initialization of the management system, and at
+        other times as indicated by the value of
+        ifCounterDiscontinuityTime object of the associated
+        interface (if any)."
+    ::= { ieee8021SpanningTreePortEntry 11 }
+
+ieee8021SpanningTreeRstpPortProtocolMigration OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When operating in RSTP (version 2) mode, writing true(1)
+         to this object forces this port to transmit RSTP BPDUs.
+         Any other operation on this object has no effect and
+         it always returns false(2) when read."
+    REFERENCE   "12.8.2.5"
+    ::= { ieee8021SpanningTreePortEntry 12 }
+
+ieee8021SpanningTreeRstpPortAdminEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative value of the Edge Port parameter.
+         A value of true(1) indicates that this port should be
+         assumed as an edge-port, and a value of false(2) indicates
+         that this port should be assumed as a non-edge-port.
+
+         Setting this object will also cause the corresponding
+         instance of ieee8021SpanningTreeRstpPortOperEdgePort to
+         change to the same value.  Note that even when this
+         object's value is true(1), the value of the corresponding
+         instance of ieee8021SpanningTreeRstpPortOperEdgePort can
+         be false(2) if a BPDU has been received.
+
+         The value of this object MUST be retained across
+         reinitializations of the management system."
+    REFERENCE   "12.8.2.1.3 k)"
+    ::= { ieee8021SpanningTreePortEntry 13 }
+
+ieee8021SpanningTreeRstpPortOperEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational value of the Edge Port parameter.  The
+         object is initialized to the value of the corresponding
+         instance of ieee8021SpanningTreeRstpPortAdminEdgePort.
+         When the corresponding instance of
+         ieee8021SpanningTreeRstpPortAdminEdgePort is set, this
+         object will be changed as well.  This object will also be
+         changed to false(2) on reception of a BPDU."
+    REFERENCE   "12.8.2.1.3 l)"
+    ::= { ieee8021SpanningTreePortEntry 14 }
+
+ieee8021SpanningTreeRstpPortAdminPathCost OBJECT-TYPE
+    SYNTAX      Integer32 (0..200000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned value for the contribution
+         of this port to the path cost of paths toward the spanning
+         tree root.
+
+         Writing a value of '0' assigns the automatically calculated
+         default Path Cost value to the port.  If the default Path
+         Cost is being used, this object returns '0' when read.
+
+         This complements the object ieee8021SpanningTreePortPathCost,
+         which returns the operational value of the path cost.
+
+         The value of this object MUST be retained across
+         reinitializations of the management system."
+    REFERENCE   "12.8.2.1.3 d)"
+    ::= { ieee8021SpanningTreePortEntry 15 }
+
+-- =============================================================
+-- Notifications for use by Bridges
+-- =============================================================
+-- Notifications for the Spanning Tree Protocol
+-- =============================================================
+
+ieee8021SpanningTreeNewRoot NOTIFICATION-TYPE
+    -- OBJECTS     { }
+    STATUS      current
+    DESCRIPTION
+        "The ieee8021SpanningTreeNewRoot notification indicates that
+        the sending agent has become the new root of the Spanning Tree;
+        the notification is sent by a bridge soon after its election
+        as the new root, e.g., upon expiration of the Topology Change
+        Timer, immediately subsequent to its election."
+    ::= { ieee8021SpanningTreeNotifications 1 }
+
+ieee8021SpanningTreeTopologyChange NOTIFICATION-TYPE
+    -- OBJECTS     { }
+    STATUS      current
+    DESCRIPTION
+        "A ieee8021SpanningTreeTopologyChange notification is sent
+        by a bridge when any of its configured ports transitions from
+        the Learning state to the Forwarding state, or from the
+        Forwarding state to the Blocking state.  The notification
+        is not sent if a ieee8021SpanningTreeNewRoot notification
+        is sent for the same transition."
+    ::= { ieee8021SpanningTreeNotifications 2 }
+
+-- =============================================================
+-- IEEE 802.1D MIB - Conformance Information
+-- =============================================================
+
+ieee8021SpanningTreeCompliances
+    OBJECT IDENTIFIER ::= { ieee8021SpanningTreeConformance 1 }
+ieee8021SpanningTreeGroups
+    OBJECT IDENTIFIER ::= { ieee8021SpanningTreeConformance 2 }
+
+-- =============================================================
+-- units of conformance
+-- =============================================================
+
+-- =============================================================
+-- the ieee8021SpanningTree group
+-- =============================================================
+
+ieee8021SpanningTreeGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021SpanningTreeProtocolSpecification,
+        ieee8021SpanningTreePriority,
+        ieee8021SpanningTreeTimeSinceTopologyChange,
+        ieee8021SpanningTreeTopChanges,
+        ieee8021SpanningTreeDesignatedRoot,
+        ieee8021SpanningTreeRootCost,
+        ieee8021SpanningTreeRootPort,
+        ieee8021SpanningTreeMaxAge,
+        ieee8021SpanningTreeHelloTime,
+        ieee8021SpanningTreeHoldTime,
+        ieee8021SpanningTreeForwardDelay,
+        ieee8021SpanningTreeBridgeMaxAge,
+        ieee8021SpanningTreeBridgeHelloTime,
+        ieee8021SpanningTreeBridgeForwardDelay,
+        ieee8021SpanningTreeVersion
+    }
+    STATUS      current
+    DESCRIPTION
+        "Bridge level Spanning Tree data for this device."
+    ::= { ieee8021SpanningTreeGroups 1 }
+
+ieee8021SpanningTreeRstpGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021SpanningTreeRstpTxHoldCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "Bridge level Rstp data for this device."
+    ::= { ieee8021SpanningTreeGroups 2 }
+
+ieee8021SpanningTreePortGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021SpanningTreePortPriority,
+        ieee8021SpanningTreePortState,
+        ieee8021SpanningTreePortEnabled,
+        ieee8021SpanningTreePortPathCost,
+        ieee8021SpanningTreePortDesignatedRoot,
+        ieee8021SpanningTreePortDesignatedCost,
+        ieee8021SpanningTreePortDesignatedBridge,
+        ieee8021SpanningTreePortDesignatedPort,
+        ieee8021SpanningTreePortForwardTransitions
+    }
+    STATUS      current
+    DESCRIPTION
+        "Spanning Tree data for each port on this device."
+    ::= { ieee8021SpanningTreeGroups 3 }
+
+ieee8021SpanningTreeRstpPortGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021SpanningTreeRstpPortProtocolMigration,
+        ieee8021SpanningTreeRstpPortAdminEdgePort,
+        ieee8021SpanningTreeRstpPortOperEdgePort,
+        ieee8021SpanningTreeRstpPortAdminPathCost
+    }
+    STATUS      current
+    DESCRIPTION
+        "Rstp data for each port on this device."
+    ::= { ieee8021SpanningTreeGroups 4 }
+
+-- =============================================================
+-- The Notification Group
+-- =============================================================
+
+ieee8021SpanningTreeNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ieee8021SpanningTreeNewRoot,
+        ieee8021SpanningTreeTopologyChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "Group of notifications."
+    ::= { ieee8021SpanningTreeGroups 5 }
+
+-- =============================================================
+-- compliance statements
+-- =============================================================
+
+ieee8021SpanningTreeCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices supporting the
+        Spanning Tree Protocol."
+
+    MODULE
+        MANDATORY-GROUPS {
+            ieee8021SpanningTreeGroup,
+            ieee8021SpanningTreePortGroup
+        }
+
+    OBJECT ieee8021SpanningTreePriority
+    SYNTAX Integer32 (0|4096|8192|12288|16384|20480|24576
+                     |28672|32768|36864|40960|45056|49152
+                     |53248|57344|61440)
+    DESCRIPTION
+        "The possible values defined by IEEE 802.1t."
+
+    OBJECT ieee8021SpanningTreePortPriority
+    SYNTAX Integer32 (0|16|32|48|64|80|96|112|128
+                     |144|160|176|192|208|224|240)
+    DESCRIPTION
+        "The possible values defined by IEEE 802.1t."
+
+    GROUP ieee8021SpanningTreeNotificationGroup
+    DESCRIPTION
+        "Implementation of this group is optional."
+
+    ::= { ieee8021SpanningTreeCompliances 1 }
+
+ieee8021SpanningTreeRstpCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices supporting the
+        Rapid Spanning Tree Protocol."
+
+    MODULE
+        MANDATORY-GROUPS {
+            ieee8021SpanningTreeGroup,
+            ieee8021SpanningTreeRstpGroup,
+            ieee8021SpanningTreePortGroup,
+            ieee8021SpanningTreeRstpPortGroup
+        }
+
+    OBJECT ieee8021SpanningTreePriority
+    SYNTAX Integer32 (0|4096|8192|12288|16384|20480|24576
+                     |28672|32768|36864|40960|45056|49152
+                     |53248|57344|61440)
+    DESCRIPTION
+        "The possible values defined by IEEE 802.1t."
+
+    OBJECT ieee8021SpanningTreePortPriority
+    SYNTAX Integer32 (0|16|32|48|64|80|96|112|128
+                     |144|160|176|192|208|224|240)
+    DESCRIPTION
+        "The possible values defined by IEEE 802.1t."
+
+    GROUP ieee8021SpanningTreeNotificationGroup
+    DESCRIPTION
+        "Implementation of this group is optional."
+
+    ::= { ieee8021SpanningTreeCompliances 2 }
+
+END
+

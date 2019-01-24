@@ -1,0 +1,2871 @@
+PTPBASE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    Gauge32,
+    Unsigned32,
+    Counter32,
+    Counter64
+        FROM SNMPv2-SMI
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    TruthValue,
+    DisplayString
+        FROM SNMPv2-TC
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    InetAddressType,
+    InetAddress
+        FROM INET-ADDRESS-MIB
+	tnExperimental FROM TRANSITION-SMI;		
+
+
+ptpbaseMIB MODULE-IDENTITY
+    LAST-UPDATED    "201201230000Z"
+    ORGANIZATION    "TICTOC Working Group"
+    CONTACT-INFO
+          "WG Email: tictoc@ietf.org
+
+           Vinay Shankarkumar
+           Cisco Systems,
+           Email: vinays@cisco.com
+
+           Laurent Montini,
+           Cisco Systems,
+           Email: lmontini@cisco.com
+
+           Tim Frost,
+           Symmetricom Inc.,
+           Email: tfrost@symmetricom.com
+
+           Greg Dowd,
+           Symmetricom Inc.,
+           Email: gdowd@symmetricom.com"
+
+    DESCRIPTION
+        "The MIB module for PTP version 2 (IEEE Std. 1588(TM)-2008)
+
+        Overview of PTP version 2 (IEEE Std. 1588(TM)-2008)
+
+        [IEEE 1588-2008] defines a protocol enabling precise
+        synchronization of clocks in measurement and control systems
+        implemented with packet-based networks, the Precision Time
+        Protocol Version 2 (PTPv2).  This MIB does not address the
+        earlier version IEEE Std. 1588(TM)-2002 (PTPv1).  The protocol
+        is applicable to network elements communicating using IP.  The
+        protocol enables heterogeneous systems that include clocks of
+        various inherent precision, resolution, and stability to
+        synchronize to a grandmaster clock.
+
+        The protocol supports system-wide synchronization accuracy in
+        the sub-microsecond range with minimal network and local clock
+        computing resources. [IEEE 1588-2008] uses UDP/IP or
+        Ethernet and can be adapted to other mappings. It includes
+        formal mechanisms for message extensions, higher sampling rates,
+        correction for asymmetry, a clock type to reduce error
+        accumulation in large topologies, and specifications on how to
+        incorporate the resulting additional data into the
+        synchronization protocol. The [IEEE 1588-2008] defines
+        conformance and management capability also.
+
+        MIB description
+
+        This MIB is to support the Precision Time Protocol version 2
+        (PTPv2, hereafter designated as PTP) features of network element
+        system devices, when using the default PTP profile described in
+        [IEEE 1588-2008], or the Telecom Profile described in
+        [G.8265.1], when running over the IP network layer.
+
+        It is envisioned this MIB will complement other managed objects
+        to be defined to monitor, measure the performance of the PTP
+        devices and telecom clocks.
+
+        Some other PTP profiles have their own MIBs defined as part of
+        the profile, and this MIB is not intended to replace those MIBs.
+
+
+        Acronyms:
+                ARB     Arbitrary Timescale
+                E2E     End-to-End
+                EUI     Extended Unique Identifier.
+                GPS     Global Positioning System
+                IANA    Internet Assigned Numbers Authority
+                IP      Internet Protocol
+                MAC     Media Access Control
+                        according to [IEEE 802.3-2008]
+                NIST    National Institute of Standards and Technology
+                NTP     Network Time Protocol (see IETF [RFC 5905])
+                OUI     Organizational Unique Identifier
+                        (allocated by the IEEE)
+                P2P     Peer-to-Peer
+                PTP     Precision Time Protocol
+                TAI     International Atomic Time
+                TC      Transparent Clock
+                UDP     User Datagram Protocol
+                UTC     Coordinated Universal Time
+
+        References:
+        [IEEE 1588-2008] IEEE Standard for A Precision Clock
+            Synchronization Protocol for Networked Measurement and
+            Control Systems, IEEE Std. 1588(TM)-2008, 24 July 2008.
+
+        [G.8265.1] Precision Time Protocol Telecom Profile for
+            Frequency Synchronization, ITU-T Recommendation G.8265.1,
+            October 2010.
+
+
+        As defined in [IEEE 1588-2008]:
+
+        Accuracy:
+        The mean of the time or frequency error between the clock under
+        test and a perfect reference clock, over an ensemble of
+        measurements.  Stability is a measure of how the mean varies
+        with respect to variables such as time, temperature, and so on,
+        while the precision is a measure of the deviation of the error
+        from the mean.
+
+        Atomic process:
+        A process is atomic if the values of all inputs to the process
+        are not permitted to change until all of the results of the
+        process are instantiated, and the outputs of the process are
+        not visible to other processes until the processing of each
+        output is complete.
+
+        Boundary clock:
+        A clock that has multiple Precision Time Protocol (PTP) ports in
+        a domain and maintains the timescale used in the domain.  It
+        may serve as the source of time, i.e., be a master clock, and
+        may synchronize to another clock, i.e., be a slave clock.
+
+        Boundary node clock:
+        A clock that has multiple Precision Time Protocol(PTP) ports in
+        a domain and maintains the timescale used in the domain.  It
+        differs from a boundary clock in that the clock roles can
+        change.
+
+        Clock:
+        A node participating in the Precision Time Protocol (PTP) that
+        is capable of providing a measurement of the passage of time
+        since a defined epoch.
+
+        Domain:
+        A logical grouping of clocks that synchronize to each other
+        using the protocol, but that are not necessarily synchronized
+        to clocks in another domain.
+
+        End-to-end transparent clock:
+        A transparent clock that supports the use of the end-to-end
+        delay measurement mechanism between slave clocks and the master
+        clock.  Each node must measure the residence time of PTP event
+        messages and accumulate it in Correction Field.
+
+        Epoch:
+        The origin of a timescale.
+
+        Event:
+        An abstraction of the mechanism by which signals or conditions
+        are generated and represented.
+
+        Foreign master:
+        An ordinary or boundary clock sending Announce messages to
+        another clock that is not the current master recognized by the
+        other clock.
+
+        Grandmaster clock:
+        Within a domain, a clock that is the ultimate source of time
+        for clock synchronization using the protocol.
+
+        Holdover:
+        A clock previously synchronized/syntonized to another clock
+        (normally a primary reference or a master clock) but now
+        free-running based on its own internal oscillator, whose
+        frequency is being adjusted using data acquired while it had
+        been synchronized/syntonized to the other clock.  It is said to
+        be in holdover or in the holdover mode, as long as it is within
+        its accuracy requirements.
+
+        Link:
+        A network segment between two Precision Time Protocol ports
+        supporting the peer delay mechanism of this standard.  The peer
+        delay mechanism is designed to measure the propagation time
+        over such a link.
+
+        Management node:
+        A device that configures and monitors clocks.
+
+        Master clock:
+        In the context of a single Precision Time Protocol
+        communication path, a clock that is the source of time to which
+        all other clocks on that path synchronize.
+
+        Message timestamp point:
+        A point within a Precision Time Protocol event message serving
+        as a reference point in the message.  A timestamp is defined by
+        the instant a message timestamp point passes the reference
+        plane of a clock.
+
+        Multicast communication:
+        A communication model in which each Precision Time Protocol
+        message sent from any PTP port is capable of being received and
+        processed by all PTP ports on the same PTP communication path.
+
+        Node:
+        A device that can issue or receive Precision Time Protocol
+        communications on a network.
+
+        One-step clock:
+        A clock that provides time information using a single event
+        message.
+
+        On-pass support:
+        Indicates that each node in the synchronization chain from
+        master to slave can support IEEE-1588.
+
+        Ordinary clock:
+        A clock that has a single Precision Time Protocol port in a
+        domain and maintains the timescale used in the domain.  It may
+        serve as a source of time, i.e., be a master clock, or may
+        synchronize to another clock, i.e., be a slave clock.
+
+        Parent clock:
+        The master clock to which a clock is synchronized.
+
+        Peer-to-peer transparent clock:
+        A transparent clock that, in addition to providing Precision
+        Time Protocol event transit time information, also provides
+        corrections for the propagation delay of the link connected to
+        the port receiving the PTP event message.  In the presence of
+        peer-to-peer transparent clocks, delay measurements between
+        slave clocks and the master clock are performed using the
+        peer-to-peer delay measurement mechanism.
+
+        Phase change rate:
+        The observed rate of change in the measured time with respect
+        to the reference time.  The phase change rate is equal to the
+        fractional frequency offset between the measured frequency and
+        the reference frequency.
+
+        PortNumber:
+        An index identifying a specific Precision Time Protocol port on
+        a PTP node.
+
+        Primary reference:
+        A source of time and or frequency that is traceable to
+        international standards.
+
+        Profile:
+        The set of allowed Precision Time Protocol features applicable
+        to a device.
+
+        Precision Time Protocol communication:
+        Information used in the operation of the protocol, transmitted
+        in a PTP message over a PTP communication path.
+
+        Precision Time Protocol communication path:
+        The signaling path portion of a particular network enabling
+        direct communication among ordinary and boundary clocks.
+
+        Precision Time Protocol node:
+        PTP ordinary, boundary, or transparent clock or a device that
+        generates or parses PTP messages.
+
+        Precision Time Protocol port:
+        A logical access point of a clock for PTP communications to the
+        communications network.
+
+        Recognized standard time source:
+        A recognized standard time source is a source external to
+        Precision Time Protocol that provides time and/or frequency as
+        appropriate that is traceable to the international standards
+        laboratories maintaining clocks that form the basis for the
+        International Atomic Time and Universal Coordinated Time
+        timescales.  Examples of these are GPS, NTP, and NIST
+        timeservers.
+
+        Requestor:
+        The port implementing the peer-to-peer delay mechanism that
+        initiates the mechanism by sending a Pdelay_Req message.
+
+        Responder:
+        The port responding to the receipt of a Pdelay_Req message as
+        part of the operation of the peer-to-peer delay mechanism.
+
+        Synchronized clocks:
+        Two clocks are synchronized to a specified uncertainty if they
+        have the same epoch and their measurements of the time of a
+        single event at an arbitrary time differ by no more than that
+        uncertainty.
+
+        Syntonized clocks:
+        Two clocks are syntonized if the duration of the second is the
+        same on both, which means the time as measured by each advances
+        at the same rate. They may or may not share the same epoch.
+
+        Timeout:
+        A mechanism for terminating requested activity that, at least
+        from the requester's perspective, does not complete within the
+        specified time.
+
+        Timescale:
+        A linear measure of time from an epoch.
+
+        Traceability:
+        A property of the result of a measurement or the value of a
+        standard whereby it can be related to stated references,
+        usually national or international standards, through an
+        unbroken chain of comparisons all having stated uncertainties.
+
+        Translation device:
+        A boundary clock or, in some cases, a transparent clock that
+        translates the protocol messages between regions implementing
+        different transport and messaging protocols, between different
+        versions of [IEEE 1588-2008], or different PTP profiles.
+
+        Transparent clock:
+        A device that measures the time taken for a Precision Time
+        Protocol event message to transit the device and provides this
+        information to clocks receiving this PTP event message.
+
+        Two-step clock:
+        A clock that provides time information using the combination of
+        an event message and a subsequent general message.
+
+        The below table specifies the object formats of the various
+        textual conventions used.
+
+        Data type mapping   Textual Convention SYNTAX
+        ------------------- ------------------ ---------------------
+        5.3.2 TimeInterval  ClockTimeInterval OCTET STRING(SIZE(1..255))
+        5.3.3 Timestamp     ClockTimestamp    OCTET STRING(SIZE(6))
+        5.3.4 ClockIdentity ClockIdentity     OCTET STRING(SIZE(1..255))
+        5.3.5 PortIdentity  ClockPortNumber   INTEGER(1..65535)
+        5.3.7 ClockQuality  ClockQualityClassType
+
+
+        Simple master-slave hierarchy, section 6.6.2.4 [IEEE 1588-2008]:
+
+                  +---------------+
+                  |   Ordinary    |
+                  |   Clock -1    |
+                  | (GrandMaster) |
+                  +-------M-------+
+                          |
+                          1
+                          |
+          +---------------S-----------------+
+          |            Boundary             |
+          |            Clock -1             |
+          +-----M---------------------M-----+
+                |                     |
+                2                     3
+                |                     |
+          +-----S-----+  +------------S-------------+
+          | Ordinary  |  |         Boundary         |
+          | Clock -2  |  |         Clock -2         |
+          +-----------+  +-----M--------------M-----+
+                               |              |
+                               4              5
+                               |              |
+                         +-----S-----+  +-----S-----+
+                         | Ordinary  |  | Ordinary  |
+                         | Clock -3  |  | Clock -4  |
+                         +-----------+  +-----------+
+
+          Grandmaster
+
+          Boundary Clock(0-N)   Ordinary Clocks(0-N)
+          Ordinary Clocks(0-N)
+
+
+        Relationship cardinality:
+           PTP system 1 : N PTP Clocks
+           PTP Clock  1 : 1 Domain
+           PTP Clock  1 : N PTP Ports
+           PTP Ports  N : M Physical Ports (interface in IF-MIB)
+
+        Transparent clock diagram, section 6.7.1.3 of [IEEE 1588-2008]:
+
+                         +-----------------------------+
+                         |     Boundary clock - 1      |
+                         +-----------------------------+
+                           |                         |
+                           |                         |
+                   +-- A --+                         B
+                   |                                 |
+        +----------------------+                     |
+        |  Ordinary clock      |                     |
+        +----------------------+                     |
+                                          +----------------------+
+        +----------------------+          |      End-to-end      |
+        |  Ordinary clock 1-1  |----------|  transparent clock-  |
+        +----------------------+          |        1 - 1         |
+                                          +----------------------+
+                                                     |
+                                                     C
+                                                     |
+                                          +----------------------+
+        +----------------------+          |      End-to-end      |
+        |  Ordinary clock 1-2  |----------|  transparent clock-  |
+        +----------------------+          |        1 - 2         |
+                                          +----------------------+
+
+
+        The MIB refers to the sections of [IEEE 1588-2008]."
+
+      -- revision log
+
+      -- ::= { mib-2 XXX }_-- XXX to be assigned by IANA
+      ::= { tnExperimental 1 } --Assign under TN Tree for experimental mibs
+
+
+
+ClockDomainType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "The Domain is identified by an integer, the domainNumber, in
+        the range of 0 to 255. An integer value that is used to assign
+        each PTP device to a particular domain. The following values
+        define the valid domains.
+
+                 Value       Definition
+                 ---------   -------------------
+                 0           Default domain
+                 1           Alternate domain 1
+                 2           Alternate domain 2
+                 3           Alternate domain 3
+                 4 - 127     User-defined domains
+                 128 - 255   Reserved"
+
+    REFERENCE   "Section 7.1 Domains, Table 2 of [IEEE 1588-2008]"
+    SYNTAX      Unsigned32 (0..255)
+
+ClockIdentity ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The clock Identity is an 8-octet array and will be presented in
+        the form of a character array. The value of the
+        ClockIdentity should be taken from the IEEE EUI-64 individual
+        assigned numbers as indicated in Section 7.5.2.2.2 of
+        [IEEE 1588-2008].  The EUI-64 address is divided into the
+        following fields:
+
+             OUI bytes (0-2)
+             Extension identifier bytes (3-7)
+
+        The clock identifier can be constructed from existing EUI-48
+        assignments and here is an abbreviated example extracted from
+        section 7.5.2.2.2 [IEEE 1588-2008].
+
+             Company EUI-48 = 0xACDE4823456716
+             EUI-64 = ACDE48FFFE23456716
+
+        It is important to note the IEEE Registration Authority has
+        deprecated the use of MAC-48 in any new design."
+
+    REFERENCE       "Section 7.5.2.2.1 of [IEEE 1588-2008]"
+    SYNTAX          OCTET STRING (SIZE (1..255))
+
+ClockIntervalBase2 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "The interval included in message types Announce, Sync,
+        Delay_Req, and Pdelay_Req as indicated in section 7.7.2.1 of
+        [IEEE 1588-2008].
+
+        The mean time interval between successive messages shall be
+        represented as the logarithm to the base 2 of this time
+        interval measured in seconds on the local clock of the device
+        sending the message. The values of these logarithmic attributes
+        shall be selected from integers in the range -128 to 127 subject
+        to further limits established in an applicable PTP profile."
+
+    REFERENCE   "Section 7.7.2.1 General interval specification of
+                [IEEE 1588-2008]"
+    SYNTAX      Integer32 (-128..127)
+
+ClockMechanismType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The clock type based on whether End to End or peer to peer
+        mechanisms are used. The mechanism used to calculate the Mean
+        Path Delay as indicated in Table 9 of [IEEE 1588-2008].
+
+        Delay mechanism   Value(hex)  Specification
+        ---------------   ----------  -------------
+        E2E                  01       The port is configured to use the
+                                      delay request-response mechanism.
+        P2P                  02       The port is configured to use the
+                                      peer delay mechanism.
+        DISABLED             FE       The port does not implement the
+                                      delay mechanism."
+
+    REFERENCE   "Sections 8.2.5.4.4, 6.6.4, 7.4.2 of [IEEE 1588-2008]."
+    SYNTAX      INTEGER {
+                    e2e(1),
+                    p2p(2),
+                    disabled(254)
+                    }
+
+ClockInstanceType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "The instance of the Clock of a given clock type in a given
+        domain."
+    SYNTAX          Unsigned32 (0..255)
+
+ClockPortNumber ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "An index identifying a specific Precision Time Protocol (PTP)
+        port on a PTP node."
+
+    REFERENCE   "Sections 7.5.2.3 and 5.3.5 of [IEEE 1588-2008]"
+    SYNTAX      Unsigned32 (0..65535)
+
+ClockPortState ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This is the value of the current state of the protocol engine
+        associated with this port.
+        Port state      Value     Description
+        -----------------------------------------------------------
+        initializing      1       In this state a port initializes
+                                  its data sets, hardware, and
+                                  communication facilities.
+        faulty            2       The fault state of the protocol.
+        disabled          3       The port shall not place any
+                                  messages on its communication path.
+        listening         4       The port is waiting for the
+                                  announceReceiptTimeout to expire or
+                                  to receive an Announce message from
+                                  a master.
+        preMaster         5       The port shall behave in all respects
+                                  as though it were in the MASTER state
+                                  except that it shall not place any
+                                  messages on its communication path
+                                  except for Pdelay_Req, Pdelay_Resp,
+                                  Pdelay_Resp_Follow_Up, signaling, or
+                                  management messages.
+        master            6       The port is behaving as a master port.
+        passive           7       The port shall not place any messages
+                                  on its communication path except for
+                                  Pdelay_Req, Pdelay_Resp,
+                                  Pdelay_Resp_Follow_Up, or signaling
+                                  messages, or management messages that
+                                  are a required response to another
+                                  management message
+        uncalibrated      8       The local port is preparing to
+                                  synchronize to the master port.
+        slave             9       The port is synchronizing to the
+                                  selected master port."
+
+    REFERENCE       "Section 8.2.5.3.1 portState and 9.2.5 of
+                     [IEEE 1588-2008]"
+    SYNTAX          INTEGER  {
+                        initializing(1),
+                        faulty(2),
+                        disabled(3),
+                        listening(4),
+                        preMaster(5),
+                        master(6),
+                        passive(7),
+                        uncalibrated(8),
+                        slave(9)
+                    }
+
+ClockProfileType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Clock Profile used. A profile is the set of allowed Precision
+        Time Protocol (PTP) features applicable to a device."
+
+    REFERENCE       "Section 3.1.30 and 19.3 PTP profiles of
+                     [IEEE 1588-2008]"
+    SYNTAX          INTEGER  {
+                        default(1),
+                        telecom(2),
+                        vendorspecific(3)
+                    }
+
+ClockQualityAccuracyType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The ClockQuality as specified in section 5.3.7, 7.6.2.5 and
+        Table 6 of [IEEE 1588-2008].
+
+        The following values are not represented in the enumerated
+        values.
+
+                 0x01-0x1F Reserved
+                 0x32-0x7F Reserved
+
+        It is important to note that section 7.1.1 RFC2578 allows for
+        gaps and enumerate values to start with zero when indicated by
+        the protocol."
+
+    REFERENCE       "Section 5.3.7, 7.6.2.5 and Table 6 of
+                     [IEEE 1588-2008]"
+    SYNTAX          INTEGER  {
+                        reserved00(1),       -- 0
+                        nanoSecond25(32),    -- 0x20
+                        nanoSecond100(33),   -- 0x21
+                        nanoSecond250(34),   -- 0x22
+                        microSec1(35),       -- 0x23
+                        microSec2dot5(36),   -- 0x24
+                        microSec10(37),      -- 0x25
+                        microSec25(38),      -- 0x26
+                        microSec100(39),     -- 0x27
+                        microSec250(40),     -- 0x28
+                        milliSec1(41),       -- 0x29
+                        milliSec2dot5(42),   -- 0x2A
+                        milliSec10(43),      -- 0x2B
+                        milliSec25(44),      -- 0x2C
+                        milliSec100(45),     -- 0x2D
+                        milliSec250(46),     -- 0x2E
+                        second1(47),         -- 0x2F
+                        second10(48),        -- 0x30
+                        secondGreater10(49), -- 0x31
+                        unknown(254),        -- 0xFE
+                        reserved255(255)     -- 0xFF
+                    }
+
+ClockQualityClassType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "The ClockQuality as specified in section 5.3.7, 7.6.2.4 and
+        Table 5 of [IEEE 1588-2008].
+
+        Value     Description
+        --------  ------------------------------------------------
+               0  Reserved to enable compatibility with future
+                  versions.
+             1-5  Reserved
+               6  Shall designate a clock that is synchronized
+                  to a primary reference time source.  The
+                  timescale distributed shall be PTP.  A
+                  clockClass 6 clock shall not be a slave to
+                  another clock in the domain.
+               7  Shall designate a clock that has previously
+                  been designated as clockClass 6 but that has
+                  lost the ability to synchronize to a primary
+                  reference time source and is in holdover mode
+                  and within holdover specifications. The
+                  timescale distributed shall be PTP.  A
+                  clockClass 7 clock shall not be a slave to
+                  another clock in the domain.
+               8  Reserved.
+            9-10  Reserved to enable compatibility with future
+                  versions.
+           11-12  Reserved.
+              13  Shall designate a clock that is synchronized
+                  to an application-specific source of time.
+                  The timescale distributed shall be ARB.  A
+                  clockClass 13 clock shall not be a slave to
+                  another clock in the domain.
+              14  Shall designate a clock that has previously
+                  been designated as clockClass 13 but that
+                  has lost the ability to synchronize to an
+                  application-specific source of time and is
+                  in holdover mode and within holdover
+                  specifications. The timescale distributed
+                  shall be ARB.  A clockClass 14 clock shall
+                  not be a slave to another clock in the domain.
+           15-51  Reserved.
+              52  Degradation alternative A for a clock of
+                  clockClass 7 that is not within holdover
+                  specification.  A clock of clockClass 52
+                  shall not be a slave to another clock in
+                  the domain.
+           53-57  Reserved.
+              58  Degradation alternative A for a clock of
+                  clockClass 14 that is not within holdover
+                  specification. A clock of clockClass 58 shall
+                  not be a slave to another clock in the domain.
+           59-67  Reserved.
+          68-122  For use by alternate PTP profiles.
+         123-127  Reserved.
+         128-132  Reserved.
+         133-170  For use by alternate PTP profiles.
+         171-186  Reserved.
+
+             187  Degradation alternative B for a clock of
+                  clockClass 7 that is not within holdover
+                  specification. A clock of clockClass 187 may
+                  be a slave to another clock in the domain.
+         188-192  Reserved.
+             193  Degradation alternative B for a clock of
+                  clockClass 14 that is not within holdover
+                  specification. A clock of clockClass 193 may
+                  be a slave to another clock in the domain.
+         194-215  Reserved.
+         216-232  For use by alternate PTP profiles.
+         233-247  Reserved.
+             248  Default. This clockClass shall be used if
+                  none of the other clockClass definitions apply.
+         249-250  Reserved.
+             251  Reserved for version 1 compatibility; see Clause 18.
+         252-254  Reserved.
+             255  Shall be the clockClass of a slave-only clock; see
+                  9.2.2."
+
+    REFERENCE       "Section 5.3.7, 7.6.2.4 and Table 5 of
+                     [IEEE 1588-2008]."
+    SYNTAX          Unsigned32 (0..255)
+
+ClockRoleType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The Clock Role. The protocol generates a Master Slave
+        relationship among the clocks in the system.
+
+        Clock Role      Value     Description
+        --------------------------------------------------------------
+        Master clock     1        A clock that is the source of
+                                  time to which all other clocks on
+                                  that path synchronize.
+
+        Slave clock      2        A clock which synchronizes to
+                                  another clock (master)."
+    SYNTAX          INTEGER  {
+                        master(1),
+                        slave(2)
+                    }
+
+ClockStateType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The clock state returned by PTP engine.
+
+        Clock State      Value   Description
+        --------------------------------------------------------------
+        Freerun state       1   Applies to a slave device that is not
+                                locked to a master. This is the initial
+                                state a slave starts out with when it
+                                is not getting any PTP packets from the
+                                master or because of some other input
+                                error (erroneous packets, etc).
+
+        Holdover state      2  In this state the slave device is
+                                locked to a master but communication
+                                with the master is lost or the
+                                timestamps in the ptp packets are
+                                incorrect. But since the slave was
+                                locked to the master, it can run with
+                                the same accuracy for sometime. The
+                                slave can continue to operate in this
+                                state for some time. If communication
+                                with the master is not restored for a
+                                while, the device is moved to the
+                                FREERUN state.
+
+        Acquiring state     3   The slave device is receiving packets
+                                from a master and is trying to acquire
+                                a lock.
+
+        Freq_locked state   4   Slave device is locked to the Master
+                                with respect to frequency, but not phase
+                                aligned
+
+        Phase_aligned state 5   Locked to the master with respect to
+                                frequency and phase."
+    SYNTAX          INTEGER  {
+                        freerun(1),
+                        holdover(2),
+                        acquiring(3),
+                        frequencyLocked(4),
+                        phaseAligned(5)
+                    }
+
+ClockTimeSourceType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The ClockQuality as specified in section 5.3.7, 7.6.2.6 and
+        Table 7 of [IEEE 1588-2008].
+
+        The following values are not represented in the enumerated
+        values.
+
+        0xF0-0xFE  For use by alternate PTP profiles
+        0xFF       Reserved
+
+        It is important to note that section 7.1.1 RFC2578 allows for
+        gaps and enumerate values to start with zero when indicated by
+        the protocol."
+
+    REFERENCE       "Section 5.3.7, 7.6.2.6 and Table 7 of
+                     [IEEE 1588-2008]."
+    SYNTAX          INTEGER  {
+                        atomicClock(16), -- 0x10
+                        gps(32), -- 0x20
+                        terrestrialRadio(48), -- 0x22
+                        ptp(64), -- 0x40
+                        ntp(80), -- 0x50
+                        handSet(96), -- 0x60
+                        other(144), -- 0x90
+                        internalOsillator(160) -- 0xA0
+                    }
+
+ClockTimeInterval ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention corresponds to the TimeInterval
+        structure indicated in section 5.3.2 of [IEEE 1588-2008].
+        It will be presented in the form of a character array.
+
+        The TimeInterval type represents time intervals.
+
+             struct TimeInterval
+             {
+                  Integer64 scaledNanoseconds;
+             };
+
+        The scaledNanoseconds member is the time interval expressed in
+        units of nanoseconds and multiplied by 2**16.
+
+        Positive or negative time intervals outside the maximum range
+        of this data type shall be encoded as the largest positive and
+        negative values of the data type, respectively.
+
+        For example, 2.5 ns is expressed as 0000 0000 0002 8000 in
+        Base16."
+
+    REFERENCE
+        "Section 5.3.2 and setion 7.7.2.1 Timer interval
+         specification of [IEEE 1588-2008]"
+    SYNTAX          OCTET STRING (SIZE (1..255))
+
+ClockTxModeType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Transmission mode.
+
+        unicast. Using unicast communication channel.
+
+        multicast. Using Multicast communication channel.
+
+        multicast-mix. Using multicast-unicast communication channel"
+    SYNTAX          INTEGER  {
+                        unicast(1),
+                        multicast(2),
+                        multicastmix(3)
+                    }
+
+ClockType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The clock types as defined in the MIB module description."
+
+    REFERENCE       "Section 6.5.1 of [IEEE 1588-2008]."
+    SYNTAX          INTEGER  {
+                        ordinaryClock(1),
+                        boundaryClock(2),
+                        transparentClock(3),
+                        boundaryNode(4)
+                    }
+ptpbaseMIBNotifs  OBJECT IDENTIFIER
+    ::= { ptpbaseMIB 0 }
+
+ptpbaseMIBObjects  OBJECT IDENTIFIER
+    ::= { ptpbaseMIB 1 }
+
+ptpbaseMIBConformance  OBJECT IDENTIFIER
+    ::= { ptpbaseMIB 2 }
+
+ptpbaseMIBSystemInfo  OBJECT IDENTIFIER
+    ::= { ptpbaseMIBObjects 1 }
+
+-- Conformance Information Definition
+
+ptpbaseMIBCompliances  OBJECT IDENTIFIER
+    ::= { ptpbaseMIBConformance 1 }
+
+ptpbaseMIBGroups  OBJECT IDENTIFIER
+    ::= { ptpbaseMIBConformance 2 }
+
+
+ptpbaseMIBCompliances1 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "Compliance statement for agents that provide read-only support
+        for PTPBASE-MIB. Such devices can only be monitored using this
+        MIB module.
+
+        The Module is implemented with support for read-only. In other
+        words, only monitoring is available by implementing this
+        MODULE-COMPLIANCE."
+    MODULE          -- this module
+    MANDATORY-GROUPS { ptpbaseMIBSystemInfoGroup }
+    ::= { ptpbaseMIBCompliances 1 }
+
+ptpbaseMIBCompliances2 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "Compliance statement for agents that provide read-only support
+        for PTPBASE-MIB. Such devices can only be monitored using this
+        MIB module.
+
+        The Module is implemented with support for read-only. In other
+        words, only monitoring is available by implementing this
+        MODULE-COMPLIANCE."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ptpbaseMIBClockCurrentDSGroup,
+                        ptpbaseMIBClockParentDSGroup,
+                        ptpbaseMIBClockDefaultDSGroup,
+                        ptpbaseMIBClockRunningGroup,
+                        ptpbaseMIBClockTimepropertiesGroup
+                    }
+    ::= { ptpbaseMIBCompliances 2 }
+
+ptpbaseMIBCompliances3 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "Compliance statement for agents that provide read-only support
+        for PTPBASE-MIB. Such devices can only be monitored using this
+        MIB module.
+
+        The Module is implemented with support for read-only. In other
+        words, only monitoring is available by implementing this
+        MODULE-COMPLIANCE."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ptpbaseMIBClockPortGroup,
+                        ptpbaseMIBClockPortDSGroup,
+                        ptpbaseMIBClockPortRunningGroup,
+                        ptpbaseMIBClockPortAssociateGroup
+                    }
+    ::= { ptpbaseMIBCompliances 3 }
+
+ptpbaseMIBCompliances4 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "Compliance statement for agents that provide read-only support
+        for PTPBASE-MIB. Such devices can only be monitored using this
+        MIB module.
+
+        The Module is implemented with support for read-only. In other
+        words, only monitoring is available by implementing this
+        MODULE-COMPLIANCE."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ptpbaseMIBClockTranparentDSGroup,
+                        ptpbaseMIBClockPortTransDSGroup
+                    }
+    ::= { ptpbaseMIBCompliances 4 }
+
+ptpbaseMIBSystemInfoGroup OBJECT-GROUP
+    OBJECTS         {
+                        ptpbaseSystemDomainTotals,
+                        ptpDomainClockPortsTotal,
+                        ptpbaseSystemProfile
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Group which aggregates objects describing system-wide
+        information"
+    ::= { ptpbaseMIBGroups 1 }
+
+ptpbaseMIBClockCurrentDSGroup OBJECT-GROUP
+    OBJECTS         {
+                        ptpbaseClockCurrentDSStepsRemoved,
+                        ptpbaseClockCurrentDSOffsetFromMaster,
+                        ptpbaseClockCurrentDSMeanPathDelay
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Group which aggregates objects describing PTP Current Dataset
+        information"
+    ::= { ptpbaseMIBGroups 2 }
+
+ptpbaseMIBClockParentDSGroup OBJECT-GROUP
+    OBJECTS         {
+                        ptpbaseClockParentDSParentPortIdentity,
+                        ptpbaseClockParentDSParentStats,
+                        ptpbaseClockParentDSOffset,
+                        ptpbaseClockParentDSClockPhChRate,
+                        ptpbaseClockParentDSGMClockIdentity,
+                        ptpbaseClockParentDSGMClockPriority1,
+                        ptpbaseClockParentDSGMClockPriority2,
+                        ptpbaseClockParentDSGMClockQualityClass,
+                        ptpbaseClockParentDSGMClockQualityAccuracy,
+                        ptpbaseClockParentDSGMClockQualityOffset
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Group which aggregates objects describing PTP Parent Dataset
+        information"
+    ::= { ptpbaseMIBGroups 3 }
+
+ptpbaseMIBClockDefaultDSGroup OBJECT-GROUP
+    OBJECTS         {
+                        ptpbaseClockDefaultDSTwoStepFlag,
+                        ptpbaseClockDefaultDSClockIdentity,
+                        ptpbaseClockDefaultDSPriority1,
+                        ptpbaseClockDefaultDSPriority2,
+                        ptpbaseClockDefaultDSSlaveOnly,
+                        ptpbaseClockDefaultDSQualityClass,
+                        ptpbaseClockDefaultDSQualityAccuracy,
+                        ptpbaseClockDefaultDSQualityOffset
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Group which aggregates objects describing PTP Default Dataset
+        information"
+    ::= { ptpbaseMIBGroups 4 }
+
+ptpbaseMIBClockRunningGroup OBJECT-GROUP
+    OBJECTS         {
+                        ptpbaseClockRunningState,
+                        ptpbaseClockRunningPacketsSent,
+                        ptpbaseClockRunningPacketsReceived
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Group which aggregates objects describing PTP running state
+        information"
+    ::= { ptpbaseMIBGroups 5 }
+
+ptpbaseMIBClockTimepropertiesGroup OBJECT-GROUP
+    OBJECTS  {
+                ptpbaseClockTimePropertiesDSCurrentUTCOffsetValid,
+                ptpbaseClockTimePropertiesDSCurrentUTCOffset,
+                ptpbaseClockTimePropertiesDSLeap59,
+                ptpbaseClockTimePropertiesDSLeap61,
+                ptpbaseClockTimePropertiesDSTimeTraceable,
+                ptpbaseClockTimePropertiesDSFreqTraceable,
+                ptpbaseClockTimePropertiesDSPTPTimescale,
+                ptpbaseClockTimePropertiesDSSource
+              }
+    STATUS          current
+    DESCRIPTION
+        "Group which aggregates objects describing PTP Time Properties
+        information"
+    ::= { ptpbaseMIBGroups 6 }
+
+ptpbaseMIBClockTranparentDSGroup OBJECT-GROUP
+    OBJECTS         {
+                        ptpbaseClockTransDefaultDSClockIdentity,
+                        ptpbaseClockTransDefaultDSNumOfPorts,
+                        ptpbaseClockTransDefaultDSDelay,
+                        ptpbaseClockTransDefaultDSPrimaryDomain
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Group which aggregates objects describing PTP Transparent
+        Dataset
+        information"
+    ::= { ptpbaseMIBGroups 7 }
+
+ptpbaseMIBClockPortGroup OBJECT-GROUP
+    OBJECTS         {
+                        ptpbaseClockPortName,
+                        ptpbaseClockPortSyncOneStep,
+                        ptpbaseClockPortCurrentPeerAddress,
+                        ptpbaseClockPortNumOfAssociatedPorts,
+                        ptpbaseClockPortCurrentPeerAddressType,
+                        ptpbaseClockPortRole
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Group which aggregates objects describing information for a
+        given PTP Port."
+    ::= { ptpbaseMIBGroups 8 }
+
+ptpbaseMIBClockPortDSGroup OBJECT-GROUP
+    OBJECTS         {
+                        ptpbaseClockPortDSName,
+                        ptpbaseClockPortDSPortIdentity,
+                        ptpbaseClockPortDSAnnouncementInterval,
+                        ptpbaseClockPortDSAnnounceRctTimeout,
+                        ptpbaseClockPortDSSyncInterval,
+                        ptpbaseClockPortDSMinDelayReqInterval,
+                        ptpbaseClockPortDSPeerDelayReqInterval,
+                        ptpbaseClockPortDSDelayMech,
+                        ptpbaseClockPortDSPeerMeanPathDelay,
+                        ptpbaseClockPortDSGrantDuration,
+                        ptpbaseClockPortDSPTPVersion
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Group which aggregates objects describing PTP Port Dataset
+        information"
+    ::= { ptpbaseMIBGroups 9 }
+
+ptpbaseMIBClockPortRunningGroup OBJECT-GROUP
+    OBJECTS         {
+                        ptpbaseClockPortRunningName,
+                        ptpbaseClockPortRunningState,
+                        ptpbaseClockPortRunningRole,
+                        ptpbaseClockPortRunningInterfaceIndex,
+                        ptpbaseClockPortRunningIPversion,
+                        ptpbaseClockPortRunningEncapsulationType,
+                        ptpbaseClockPortRunningTxMode,
+                        ptpbaseClockPortRunningRxMode,
+                        ptpbaseClockPortRunningPacketsReceived,
+                        ptpbaseClockPortRunningPacketsSent
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Group which aggregates objects describing PTP running interface
+        information"
+    ::= { ptpbaseMIBGroups 10 }
+
+ptpbaseMIBClockPortTransDSGroup OBJECT-GROUP
+    OBJECTS         {
+                        ptpbaseClockPortTransDSPortIdentity,
+                        ptpbaseClockPortTransDSlogMinPdelayReqInt,
+                        ptpbaseClockPortTransDSFaultyFlag,
+                        ptpbaseClockPortTransDSPeerMeanPathDelay
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Group which aggregates objects describing PTP TransparentDS
+        Dataset
+        information"
+    ::= { ptpbaseMIBGroups 11 }
+
+ptpbaseMIBClockPortAssociateGroup OBJECT-GROUP
+    OBJECTS         {
+                        ptpbaseClockPortAssociatePacketsSent,
+                        ptpbaseClockPortAssociatePacketsReceived,
+                        ptpbaseClockPortAssociateAddress,
+                        ptpbaseClockPortAssociateAddressType,
+                        ptpbaseClockPortAssociateInErrors,
+                        ptpbaseClockPortAssociateOutErrors
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Group which aggregates objects describing information on peer
+        PTP ports for a given PTP clock-port."
+    ::= { ptpbaseMIBGroups 12 }
+ptpbaseMIBClockInfo  OBJECT IDENTIFIER
+    ::= { ptpbaseMIBObjects 2 }
+
+
+ptpbaseSystemTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseSystemEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of count information about the PTP system for all
+        domains."
+    ::= { ptpbaseMIBSystemInfo 1 }
+
+ptpbaseSystemEntry OBJECT-TYPE
+    SYNTAX          PtpbaseSystemEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing count information about a
+        single domain. New row entries are added when the PTP clock for
+        this domain is configured, while the unconfiguration of the PTP
+        clock removes it."
+    INDEX           {
+                        ptpDomainIndex,
+                        ptpInstanceIndex
+                    }
+    ::= { ptpbaseSystemTable 1 }
+
+PtpbaseSystemEntry ::= SEQUENCE {
+        ptpDomainIndex           ClockDomainType,
+        ptpInstanceIndex         ClockInstanceType,
+        ptpDomainClockPortsTotal Gauge32
+}
+
+ptpDomainIndex OBJECT-TYPE
+    SYNTAX          ClockDomainType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the domain number used to create logical
+        group of PTP devices. The Clock Domain is a logical group of
+        clocks and devices that synchronize with each other using the
+        PTP protocol.
+
+        0           Default domain
+        1           Alternate domain 1
+        2           Alternate domain 2
+        3           Alternate domain 3
+        4 - 127     User-defined domains
+        128 - 255   Reserved"
+    ::= { ptpbaseSystemEntry 1 }
+
+ptpInstanceIndex OBJECT-TYPE
+    SYNTAX          ClockInstanceType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the instance of the Clock for this
+        domain."
+    ::= { ptpbaseSystemEntry 2 }
+
+ptpDomainClockPortsTotal OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "ptp ports"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the total number of clock ports
+        configured within a domain."
+    ::= { ptpbaseSystemEntry 3 }
+
+
+
+ptpbaseSystemDomainTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseSystemDomainEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of information about the PTP system for all clock modes
+        -- ordinary, boundary or transparent."
+    ::= { ptpbaseMIBSystemInfo 2 }
+
+ptpbaseSystemDomainEntry OBJECT-TYPE
+    SYNTAX          PtpbaseSystemDomainEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing information about a single
+        clock mode for the PTP system. A row entry gets added when PTP
+        clocks are configured on the router."
+    INDEX           { ptpbaseSystemDomainClockTypeIndex }
+    ::= { ptpbaseSystemDomainTable 1 }
+
+PtpbaseSystemDomainEntry ::= SEQUENCE {
+        ptpbaseSystemDomainClockTypeIndex ClockType,
+        ptpbaseSystemDomainTotals         Unsigned32
+}
+
+ptpbaseSystemDomainClockTypeIndex OBJECT-TYPE
+    SYNTAX          ClockType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the clock type as defined in the
+        Textual convention description."
+    ::= { ptpbaseSystemDomainEntry 1 }
+
+ptpbaseSystemDomainTotals OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "domains"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the total number of PTP domains for this
+        particular clock type configured in this node."
+    ::= { ptpbaseSystemDomainEntry 2 }
+
+
+
+ptpbaseSystemProfile OBJECT-TYPE
+    SYNTAX          ClockProfileType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the PTP Profile implemented on the
+        system."
+    REFERENCE       "Section 19.3 PTP profiles of [IEEE 1588-2008]"
+    ::= { ptpbaseMIBSystemInfo 3 }
+
+ptpbaseClockCurrentDSTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseClockCurrentDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of information about the PTP clock Current Datasets for
+        all domains."
+    ::= { ptpbaseMIBClockInfo 1 }
+
+ptpbaseClockCurrentDSEntry OBJECT-TYPE
+    SYNTAX          PtpbaseClockCurrentDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing information about a single
+        PTP clock Current Datasets for a domain."
+    REFERENCE
+        "1588 Version 2.0 Section 8.2.2 currentDS data set member
+        specifications of [IEEE 1588-2008]"
+    INDEX           {
+                        ptpbaseClockCurrentDSDomainIndex,
+                        ptpbaseClockCurrentDSClockTypeIndex,
+                        ptpbaseClockCurrentDSInstanceIndex
+                    }
+    ::= { ptpbaseClockCurrentDSTable 1 }
+
+PtpbaseClockCurrentDSEntry ::= SEQUENCE {
+        ptpbaseClockCurrentDSDomainIndex      ClockDomainType,
+        ptpbaseClockCurrentDSClockTypeIndex   ClockType,
+        ptpbaseClockCurrentDSInstanceIndex    ClockInstanceType,
+        ptpbaseClockCurrentDSStepsRemoved     Unsigned32,
+        ptpbaseClockCurrentDSOffsetFromMaster ClockTimeInterval,
+        ptpbaseClockCurrentDSMeanPathDelay    ClockTimeInterval
+}
+
+ptpbaseClockCurrentDSDomainIndex OBJECT-TYPE
+    SYNTAX          ClockDomainType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the domain number used to create logical
+        group of PTP devices."
+    ::= { ptpbaseClockCurrentDSEntry 1 }
+
+ptpbaseClockCurrentDSClockTypeIndex OBJECT-TYPE
+    SYNTAX          ClockType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the clock type as defined in the
+        Textual convention description."
+    ::= { ptpbaseClockCurrentDSEntry 2 }
+
+ptpbaseClockCurrentDSInstanceIndex OBJECT-TYPE
+    SYNTAX          ClockInstanceType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the instance of the clock for this clock
+        type in the given domain."
+    ::= { ptpbaseClockCurrentDSEntry 3 }
+
+ptpbaseClockCurrentDSStepsRemoved OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Steps"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current clock dataset StepsRemoved value.
+
+        This object specifies the distance measured by the number of
+        Boundary clocks between the local clock and the Foreign master
+        as indicated in the stepsRemoved field of Announce messages."
+    REFERENCE       "1588 Version 2.0 Section 8.2.2.2 stepsRemoved"
+    ::= { ptpbaseClockCurrentDSEntry 4 }
+
+ptpbaseClockCurrentDSOffsetFromMaster OBJECT-TYPE
+    SYNTAX          ClockTimeInterval
+    UNITS           "Time Interval"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the current clock dataset ClockOffset
+        value. The value of the computation of the offset in time
+        between a slave and a master clock."
+    REFERENCE       "1588 Version 2.0 Section 8.2.2.3 of
+                     [IEEE 1588-2008]"
+    ::= { ptpbaseClockCurrentDSEntry 5 }
+
+ptpbaseClockCurrentDSMeanPathDelay OBJECT-TYPE
+    SYNTAX          ClockTimeInterval
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the current clock dataset
+        MeanPathDelay value.
+
+        The mean path delay between a pair of ports as measure by the
+        delay request-response mechanism."
+    REFERENCE       "1588 Version 2.0 Section 8.2.2.4 mean path delay"
+    ::= { ptpbaseClockCurrentDSEntry 6 }
+
+
+
+ptpbaseClockParentDSTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseClockParentDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of information about the PTP clock Parent Datasets for
+        all domains."
+    ::= { ptpbaseMIBClockInfo 2 }
+
+ptpbaseClockParentDSEntry OBJECT-TYPE
+    SYNTAX          PtpbaseClockParentDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing information about a single
+        PTP clock Parent Datasets for a domain."
+    REFERENCE
+        "Section 8.2.3 parentDS data set member specifications of
+        [IEEE 1588-2008]"
+    INDEX           {
+                        ptpbaseClockParentDSDomainIndex,
+                        ptpbaseClockParentDSClockTypeIndex,
+                        ptpbaseClockParentDSInstanceIndex
+                    }
+    ::= { ptpbaseClockParentDSTable 1 }
+
+PtpbaseClockParentDSEntry ::= SEQUENCE {
+    ptpbaseClockParentDSDomainIndex            ClockDomainType,
+    ptpbaseClockParentDSClockTypeIndex         ClockType,
+    ptpbaseClockParentDSInstanceIndex          ClockInstanceType,
+    ptpbaseClockParentDSParentPortIdentity     OCTET STRING,
+    ptpbaseClockParentDSParentStats            TruthValue,
+    ptpbaseClockParentDSOffset                 ClockIntervalBase2,
+    ptpbaseClockParentDSClockPhChRate          Integer32,
+    ptpbaseClockParentDSGMClockIdentity        ClockIdentity,
+    ptpbaseClockParentDSGMClockPriority1       Unsigned32,
+    ptpbaseClockParentDSGMClockPriority2       Unsigned32,
+    ptpbaseClockParentDSGMClockQualityClass    ClockQualityClassType,
+    ptpbaseClockParentDSGMClockQualityAccuracy ClockQualityAccuracyType,
+    ptpbaseClockParentDSGMClockQualityOffset   Unsigned32
+}
+
+ptpbaseClockParentDSDomainIndex OBJECT-TYPE
+    SYNTAX          ClockDomainType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the domain number used to create logical
+        group of PTP devices."
+    ::= { ptpbaseClockParentDSEntry 1 }
+
+ptpbaseClockParentDSClockTypeIndex OBJECT-TYPE
+    SYNTAX          ClockType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the clock type as defined in the
+        Textual convention description."
+    ::= { ptpbaseClockParentDSEntry 2 }
+
+ptpbaseClockParentDSInstanceIndex OBJECT-TYPE
+    SYNTAX          ClockInstanceType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the instance of the clock for this clock
+        type in the given domain."
+    ::= { ptpbaseClockParentDSEntry 3 }
+
+ptpbaseClockParentDSParentPortIdentity OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(1..256))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the value of portIdentity of the port on
+        the master that issues the Sync messages used in synchronizing
+        this clock."
+    REFERENCE
+        "Section 8.2.3.2 parentDS.parentPortIdentity of
+         [IEEE 1588-2008]"
+    ::= { ptpbaseClockParentDSEntry 4 }
+
+ptpbaseClockParentDSParentStats OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Parent Dataset ParentStats value.
+
+        This value indicates whether the values of ParentDSOffset
+        and ParentDSClockPhChRate have been measured and are valid.
+        A TRUE value shall indicate valid data."
+    REFERENCE       "Section 8.2.3.3 parentDS.parentStats of
+                     [IEEE 1588-2008]"
+    ::= { ptpbaseClockParentDSEntry 5 }
+
+ptpbaseClockParentDSOffset OBJECT-TYPE
+    SYNTAX          ClockIntervalBase2 (-128..127)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Parent Dataset
+        ParentOffsetScaledLogVariance value.
+
+        This value is the variance of the parent clocks phase as
+        measured by the local clock."
+    REFERENCE
+        "Section 8.2.3.4
+        parentDS.observedParentOffsetScaledLogVariance
+        [IEEE 1588-2008]"
+    ::= { ptpbaseClockParentDSEntry 6 }
+
+ptpbaseClockParentDSClockPhChRate OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the clock's parent dataset
+        ParentClockPhaseChangeRate value.
+
+        This value is an estimate of the parent clocks phase change
+        rate as measured by the slave clock."
+    REFERENCE
+        "Section 8.2.3.5
+        parentDS.observedParentClockPhaseChangeRate of
+        [IEEE 1588-2008]"
+    ::= { ptpbaseClockParentDSEntry 7 }
+
+ptpbaseClockParentDSGMClockIdentity OBJECT-TYPE
+    SYNTAX          ClockIdentity
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the parent dataset Grandmaster clock
+        identity."
+    REFERENCE
+        "Section 8.2.3.6 parentDS.grandmasterIdentity of
+         [IEEE 1588-2008]"
+    ::= { ptpbaseClockParentDSEntry 8 }
+
+ptpbaseClockParentDSGMClockPriority1 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the parent dataset Grandmaster clock
+        priority1."
+    REFERENCE
+        "Section 8.2.3.8 parentDS.grandmasterPriority1 of
+         [IEEE 1588-2008]"
+    ::= { ptpbaseClockParentDSEntry 9 }
+
+ptpbaseClockParentDSGMClockPriority2 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the parent dataset grandmaster clock
+        priority2."
+    REFERENCE
+        "Section 8.2.3.9 parentDS.grandmasterPriority2 of
+         [IEEE 1588-2008]"
+    ::= { ptpbaseClockParentDSEntry 10 }
+
+ptpbaseClockParentDSGMClockQualityClass OBJECT-TYPE
+    SYNTAX          ClockQualityClassType (0..255)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the parent dataset grandmaster clock
+        quality class."
+    REFERENCE
+        "Section 8.2.3.7 parentDS.grandmasterClockQuality of
+         [IEEE 1588-2008]"
+    ::= { ptpbaseClockParentDSEntry 11 }
+
+ptpbaseClockParentDSGMClockQualityAccuracy OBJECT-TYPE
+    SYNTAX          ClockQualityAccuracyType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the parent dataset grandmaster clock
+        quality accuracy."
+    REFERENCE
+        "Section 8.2.3.7 parentDS.grandmasterClockQuality of
+         [IEEE 1588-2008]"
+    ::= { ptpbaseClockParentDSEntry 12 }
+
+ptpbaseClockParentDSGMClockQualityOffset OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the parent dataset grandmaster clock
+        quality offset."
+    REFERENCE
+        "Section 8.2.3.7 parentDS.grandmasterClockQuality of
+         [IEEE 1588-2008]"
+    ::= { ptpbaseClockParentDSEntry 13 }
+
+
+
+ptpbaseClockDefaultDSTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseClockDefaultDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of information about the PTP clock Default Datasets for
+        all domains."
+    ::= { ptpbaseMIBClockInfo 3 }
+
+ptpbaseClockDefaultDSEntry OBJECT-TYPE
+    SYNTAX          PtpbaseClockDefaultDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing information about a single
+        PTP clock Default Datasets for a domain."
+    INDEX           {
+                        ptpbaseClockDefaultDSDomainIndex,
+                        ptpbaseClockDefaultDSClockTypeIndex,
+                        ptpbaseClockDefaultDSInstanceIndex
+                    }
+    ::= { ptpbaseClockDefaultDSTable 1 }
+
+PtpbaseClockDefaultDSEntry ::= SEQUENCE {
+        ptpbaseClockDefaultDSDomainIndex     ClockDomainType,
+        ptpbaseClockDefaultDSClockTypeIndex  ClockType,
+        ptpbaseClockDefaultDSInstanceIndex   ClockInstanceType,
+        ptpbaseClockDefaultDSTwoStepFlag     TruthValue,
+        ptpbaseClockDefaultDSClockIdentity   ClockIdentity,
+        ptpbaseClockDefaultDSPriority1       Unsigned32,
+        ptpbaseClockDefaultDSPriority2       Unsigned32,
+        ptpbaseClockDefaultDSSlaveOnly       TruthValue,
+        ptpbaseClockDefaultDSQualityClass    ClockQualityClassType,
+        ptpbaseClockDefaultDSQualityAccuracy ClockQualityAccuracyType,
+        ptpbaseClockDefaultDSQualityOffset   Integer32
+}
+
+ptpbaseClockDefaultDSDomainIndex OBJECT-TYPE
+    SYNTAX          ClockDomainType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the domain number used to create logical
+        group of PTP devices."
+    ::= { ptpbaseClockDefaultDSEntry 1 }
+
+ptpbaseClockDefaultDSClockTypeIndex OBJECT-TYPE
+    SYNTAX          ClockType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the clock type as defined in the
+        Textual convention description."
+    ::= { ptpbaseClockDefaultDSEntry 2 }
+
+ptpbaseClockDefaultDSInstanceIndex OBJECT-TYPE
+    SYNTAX          ClockInstanceType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the instance of the clock for this clock
+        type in the given domain."
+    ::= { ptpbaseClockDefaultDSEntry 3 }
+
+ptpbaseClockDefaultDSTwoStepFlag OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether the Two Step process is used."
+    ::= { ptpbaseClockDefaultDSEntry 4 }
+
+ptpbaseClockDefaultDSClockIdentity OBJECT-TYPE
+    SYNTAX          ClockIdentity
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the default Datasets clock identity."
+    ::= { ptpbaseClockDefaultDSEntry 5 }
+
+ptpbaseClockDefaultDSPriority1 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the default Datasets clock Priority1."
+    ::= { ptpbaseClockDefaultDSEntry 6 }
+
+ptpbaseClockDefaultDSPriority2 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the default Datasets clock Priority2."
+    ::= { ptpbaseClockDefaultDSEntry 7 }
+
+ptpbaseClockDefaultDSSlaveOnly OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Whether the SlaveOnly flag is set."
+    ::= { ptpbaseClockDefaultDSEntry 8 }
+
+ptpbaseClockDefaultDSQualityClass OBJECT-TYPE
+    SYNTAX          ClockQualityClassType (0..255)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the default dataset Quality Class."
+    ::= { ptpbaseClockDefaultDSEntry 9 }
+
+ptpbaseClockDefaultDSQualityAccuracy OBJECT-TYPE
+    SYNTAX          ClockQualityAccuracyType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the default dataset Quality Accurarcy."
+    ::= { ptpbaseClockDefaultDSEntry 10 }
+
+ptpbaseClockDefaultDSQualityOffset OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the default dataset Quality offset."
+    ::= { ptpbaseClockDefaultDSEntry 11 }
+
+
+
+ptpbaseClockRunningTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseClockRunningEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of information about the PTP clock Running Datasets for
+        all domains."
+    ::= { ptpbaseMIBClockInfo 4 }
+
+ptpbaseClockRunningEntry OBJECT-TYPE
+    SYNTAX          PtpbaseClockRunningEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing information about a single
+        PTP clock running Datasets for a domain."
+    INDEX           {
+                        ptpbaseClockRunningDomainIndex,
+                        ptpbaseClockRunningClockTypeIndex,
+                        ptpbaseClockRunningInstanceIndex
+                    }
+    ::= { ptpbaseClockRunningTable 1 }
+
+PtpbaseClockRunningEntry ::= SEQUENCE {
+        ptpbaseClockRunningDomainIndex     ClockDomainType,
+        ptpbaseClockRunningClockTypeIndex  ClockType,
+        ptpbaseClockRunningInstanceIndex   ClockInstanceType,
+        ptpbaseClockRunningState           ClockStateType,
+        ptpbaseClockRunningPacketsSent     Counter64,
+        ptpbaseClockRunningPacketsReceived Counter64
+}
+
+ptpbaseClockRunningDomainIndex OBJECT-TYPE
+    SYNTAX          ClockDomainType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the domain number used to create logical
+        group of PTP devices."
+    ::= { ptpbaseClockRunningEntry 1 }
+
+ptpbaseClockRunningClockTypeIndex OBJECT-TYPE
+    SYNTAX          ClockType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the clock type as defined in the
+        Textual convention description."
+    ::= { ptpbaseClockRunningEntry 2 }
+
+ptpbaseClockRunningInstanceIndex OBJECT-TYPE
+    SYNTAX          ClockInstanceType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the instance of the clock for this clock
+        type in the given domain."
+    ::= { ptpbaseClockRunningEntry 3 }
+
+ptpbaseClockRunningState OBJECT-TYPE
+    SYNTAX          ClockStateType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Clock state returned by PTP engine
+        which was described earlier.
+
+        Freerun state. Applies to a slave device that is not locked to
+        a master. This is the initial state a slave starts out with
+        when
+        it is not getting any PTP packets from the master or because of
+        some other input error (erroneous packets, etc).
+
+        Holdover state. In this state the slave device is locked to a
+        master but communication with the master is lost or the
+        timestamps in the ptp packets are incorrect. But since the
+        slave was locked to the master, it can run with the same
+        accuracy for
+        sometime. The slave can continue to operate in this state for
+        some time. If communication with the master is not restored for
+        a while, the device is moved to the FREERUN state.
+
+        Acquiring state. The slave device is receiving packets from a
+        master and is trying to acquire a lock.
+
+        Freq_locked state. Slave device is locked to the Master with
+        respect to frequency, but not phase aligned
+
+        Phase_aligned state. Locked to the master with respect to
+        frequency and phase."
+    ::= { ptpbaseClockRunningEntry 4 }
+
+ptpbaseClockRunningPacketsSent OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the total number of all packet Unicast
+        and multicast that have been sent out for this clock in this
+        domain for this type."
+    ::= { ptpbaseClockRunningEntry 5 }
+
+ptpbaseClockRunningPacketsReceived OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the total number of all packet Unicast
+        and multicast that have been received for this clock in this
+        domain for this type."
+    ::= { ptpbaseClockRunningEntry 6 }
+
+
+
+ptpbaseClockTimePropertiesDSTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseClockTimePropertiesDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of information about the PTP clock Timeproperties
+        Datasets for all domains."
+    ::= { ptpbaseMIBClockInfo 5 }
+
+ptpbaseClockTimePropertiesDSEntry OBJECT-TYPE
+    SYNTAX          PtpbaseClockTimePropertiesDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing information about a single
+        PTP clock timeproperties Datasets for a domain."
+    REFERENCE       "Section 8.2.4 of [IEEE 1588-2008]"
+    INDEX           {
+                        ptpbaseClockTimePropertiesDSDomainIndex,
+                        ptpbaseClockTimePropertiesDSClockTypeIndex,
+                        ptpbaseClockTimePropertiesDSInstanceIndex
+                    }
+    ::= { ptpbaseClockTimePropertiesDSTable 1 }
+
+PtpbaseClockTimePropertiesDSEntry ::= SEQUENCE {
+  ptpbaseClockTimePropertiesDSDomainIndex           ClockDomainType,
+  ptpbaseClockTimePropertiesDSClockTypeIndex        ClockType,
+  ptpbaseClockTimePropertiesDSInstanceIndex         ClockInstanceType,
+  ptpbaseClockTimePropertiesDSCurrentUTCOffsetValid TruthValue,
+  ptpbaseClockTimePropertiesDSCurrentUTCOffset      Integer32,
+  ptpbaseClockTimePropertiesDSLeap59                TruthValue,
+  ptpbaseClockTimePropertiesDSLeap61                TruthValue,
+  ptpbaseClockTimePropertiesDSTimeTraceable         TruthValue,
+  ptpbaseClockTimePropertiesDSFreqTraceable         TruthValue,
+  ptpbaseClockTimePropertiesDSPTPTimescale          TruthValue,
+  ptpbaseClockTimePropertiesDSSource                ClockTimeSourceType
+}
+
+ptpbaseClockTimePropertiesDSDomainIndex OBJECT-TYPE
+    SYNTAX          ClockDomainType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the domain number used to create logical
+        group of PTP devices."
+    ::= { ptpbaseClockTimePropertiesDSEntry 1 }
+
+ptpbaseClockTimePropertiesDSClockTypeIndex OBJECT-TYPE
+    SYNTAX          ClockType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the clock type as defined in the
+        Textual convention description."
+    ::= { ptpbaseClockTimePropertiesDSEntry 2 }
+
+ptpbaseClockTimePropertiesDSInstanceIndex OBJECT-TYPE
+    SYNTAX          ClockInstanceType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the instance of the clock for this clock
+        type in the given domain."
+    ::= { ptpbaseClockTimePropertiesDSEntry 3 }
+
+ptpbaseClockTimePropertiesDSCurrentUTCOffsetValid OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the timeproperties dataset value of
+        whether current UTC offset is valid."
+    REFERENCE       "Section 8.2.4.2 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockTimePropertiesDSEntry 4 }
+
+ptpbaseClockTimePropertiesDSCurrentUTCOffset OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the timeproperties dataset value of
+        current UTC offset.
+
+        In PTP systems whose epoch is the PTP epoch, the value of
+        timePropertiesDS.currentUtcOffset is the offset
+        between TAI and UTC; otherwise the value has no meaning. The
+        value shall be in units of seconds.
+        The initialization value shall be selected as follows:
+        a) If the timePropertiesDS.ptpTimescale (see 8.2.4.8) is TRUE,
+        the value is the value obtained from a
+        primary reference if the value is known at the time of
+        initialization, else.
+        b) The value shall be the current number of leap seconds (7.2.3)
+        when the node is designed."
+    REFERENCE       "Section 8.2.4.3 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockTimePropertiesDSEntry 5 }
+
+ptpbaseClockTimePropertiesDSLeap59 OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Leap59 value in the clock Current
+        Dataset."
+    REFERENCE       "Section 8.2.4.4 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockTimePropertiesDSEntry 6 }
+
+ptpbaseClockTimePropertiesDSLeap61 OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Leap61 value in the clock Current
+        Dataset."
+    REFERENCE       "Section 8.2.4.5 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockTimePropertiesDSEntry 7 }
+
+ptpbaseClockTimePropertiesDSTimeTraceable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Timetraceable value in the clock
+        Current Dataset."
+    REFERENCE       "Section 8.2.4.6 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockTimePropertiesDSEntry 8 }
+
+ptpbaseClockTimePropertiesDSFreqTraceable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Frequency Traceable value in the
+        clock Current Dataset."
+    REFERENCE       "Section 8.2.4.7 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockTimePropertiesDSEntry 9 }
+
+ptpbaseClockTimePropertiesDSPTPTimescale OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the PTP Timescale value in the clock
+        Current Dataset."
+    REFERENCE       "Section 8.2.4.8 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockTimePropertiesDSEntry 10 }
+
+ptpbaseClockTimePropertiesDSSource OBJECT-TYPE
+    SYNTAX          ClockTimeSourceType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Timesource value in the clock Current
+        Dataset."
+    REFERENCE       "Section 8.2.4.9 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockTimePropertiesDSEntry 11 }
+
+
+
+ptpbaseClockTransDefaultDSTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseClockTransDefaultDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of information about the PTP Transparent clock Default
+        Datasets for all domains."
+    ::= { ptpbaseMIBClockInfo 6 }
+
+ptpbaseClockTransDefaultDSEntry OBJECT-TYPE
+    SYNTAX          PtpbaseClockTransDefaultDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing information about a single
+        PTP Transparent clock Default Datasets for a domain."
+    REFERENCE       "Section 8.3.2 of [IEEE 1588-2008]"
+    INDEX           {
+                        ptpbaseClockTransDefaultDSDomainIndex,
+                        ptpbaseClockTransDefaultDSInstanceIndex
+                    }
+    ::= { ptpbaseClockTransDefaultDSTable 1 }
+
+PtpbaseClockTransDefaultDSEntry ::= SEQUENCE {
+        ptpbaseClockTransDefaultDSDomainIndex   ClockDomainType,
+        ptpbaseClockTransDefaultDSInstanceIndex ClockInstanceType,
+        ptpbaseClockTransDefaultDSClockIdentity ClockIdentity,
+        ptpbaseClockTransDefaultDSNumOfPorts    Counter32,
+        ptpbaseClockTransDefaultDSDelay         ClockMechanismType,
+        ptpbaseClockTransDefaultDSPrimaryDomain Integer32
+}
+
+ptpbaseClockTransDefaultDSDomainIndex OBJECT-TYPE
+    SYNTAX          ClockDomainType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the domain number used to create logical
+        group of PTP devices."
+    ::= { ptpbaseClockTransDefaultDSEntry 1 }
+
+ptpbaseClockTransDefaultDSInstanceIndex OBJECT-TYPE
+    SYNTAX          ClockInstanceType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the instance of the clock for this clock
+        type in the given domain."
+    ::= { ptpbaseClockTransDefaultDSEntry 2 }
+
+ptpbaseClockTransDefaultDSClockIdentity OBJECT-TYPE
+    SYNTAX          ClockIdentity
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the value of the clockIdentity attribute
+        of the local clock."
+    REFERENCE       "Section 8.3.2.2.1 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockTransDefaultDSEntry 3 }
+
+ptpbaseClockTransDefaultDSNumOfPorts OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the number of PTP ports of the device."
+    REFERENCE       "Section 8.3.2.2.2 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockTransDefaultDSEntry 4 }
+
+ptpbaseClockTransDefaultDSDelay OBJECT-TYPE
+    SYNTAX          ClockMechanismType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object, if the transparent clock is an end-to-end
+        transparent clock, has the value shall be E2E; If the
+        transparent clock is a peer-to-peer transparent clock, the
+        value
+        shall be P2P."
+    REFERENCE       "Section 8.3.2.3.1 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockTransDefaultDSEntry 5 }
+
+ptpbaseClockTransDefaultDSPrimaryDomain OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the value of the primary syntonization
+        domain. The initialization value shall be 0."
+    REFERENCE       "Section 8.3.2.3.2 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockTransDefaultDSEntry 6 }
+
+
+
+ptpbaseClockPortTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseClockPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of information about the clock ports for a particular
+        domain."
+    ::= { ptpbaseMIBClockInfo 7 }
+
+ptpbaseClockPortEntry OBJECT-TYPE
+    SYNTAX          PtpbaseClockPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing information about a single
+        clock port."
+    INDEX           {
+                        ptpbaseClockPortDomainIndex,
+                        ptpbaseClockPortClockTypeIndex,
+                        ptpbaseClockPortClockInstanceIndex,
+                        ptpbaseClockPortTablePortNumberIndex
+                    }
+    ::= { ptpbaseClockPortTable 1 }
+
+PtpbaseClockPortEntry ::= SEQUENCE {
+        ptpbaseClockPortDomainIndex            ClockDomainType,
+        ptpbaseClockPortClockTypeIndex         ClockType,
+        ptpbaseClockPortClockInstanceIndex     ClockInstanceType,
+        ptpbaseClockPortTablePortNumberIndex   ClockPortNumber,
+        ptpbaseClockPortName                   DisplayString,
+        ptpbaseClockPortRole                   ClockRoleType,
+        ptpbaseClockPortSyncOneStep            TruthValue,
+        ptpbaseClockPortCurrentPeerAddressType InetAddressType,
+        ptpbaseClockPortCurrentPeerAddress     InetAddress,
+        ptpbaseClockPortNumOfAssociatedPorts   Gauge32
+}
+
+ptpbaseClockPortDomainIndex OBJECT-TYPE
+    SYNTAX          ClockDomainType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the domain number used to create logical
+        group of PTP devices."
+    ::= { ptpbaseClockPortEntry 1 }
+
+ptpbaseClockPortClockTypeIndex OBJECT-TYPE
+    SYNTAX          ClockType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the clock type as defined in the
+        Textual convention description."
+    ::= { ptpbaseClockPortEntry 2 }
+
+ptpbaseClockPortClockInstanceIndex OBJECT-TYPE
+    SYNTAX          ClockInstanceType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the instance of the clock for this clock
+        type in the given domain."
+    ::= { ptpbaseClockPortEntry 3 }
+
+ptpbaseClockPortTablePortNumberIndex OBJECT-TYPE
+    SYNTAX          ClockPortNumber (1..65535)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the PTP Portnumber for this port."
+    ::= { ptpbaseClockPortEntry 4 }
+
+ptpbaseClockPortName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE  (1..64))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the PTP clock port name configured on the
+        router."
+    ::= { ptpbaseClockPortEntry 5 }
+
+ptpbaseClockPortRole OBJECT-TYPE
+    SYNTAX          ClockRoleType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object describes the current role (slave/master) of the
+        port."
+    ::= { ptpbaseClockPortEntry 6 }
+
+ptpbaseClockPortSyncOneStep OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies that one-step clock operation between
+        the PTP master and slave device is enabled."
+    ::= { ptpbaseClockPortEntry 7 }
+
+ptpbaseClockPortCurrentPeerAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the current peer's network address used
+        for PTP communication. Based on the scenario and the setup
+        involved, the values might look like these -
+        Scenario                   Value
+        -------------------   ----------------
+        Single Master          master port
+        Multiple Masters       selected master port
+        Single Slave           slave port
+        Multiple Slaves        <empty>
+
+        (In relevant setups, information on available
+        slaves and available masters will be available through
+        ptpClockPortAssociateTable)"
+    ::= { ptpbaseClockPortEntry 8 }
+
+ptpbaseClockPortCurrentPeerAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the current peer's network address used
+        for PTP communication. Based on the scenario and the setup
+        involved, the values might look like these -
+        Scenario                   Value
+        -------------------   ----------------
+        Single Master          master port
+        Multiple Masters       selected master port
+        Single Slave           slave port
+        Multiple Slaves        <empty>
+
+        (In relevant setups, information on available
+        slaves and available masters will be available through
+        ptpClockPortAssociateTable)"
+    ::= { ptpbaseClockPortEntry 9 }
+
+ptpbaseClockPortNumOfAssociatedPorts OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies -
+        For a master port - the number of PTP slave sessions (peers)
+        associated with this PTP port.
+        For a slave port - the number of masters available to this slave
+        port (might or might not be peered)."
+    ::= { ptpbaseClockPortEntry 10 }
+
+
+
+ptpbaseClockPortDSTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseClockPortDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of information about the clock ports dataset for a
+        particular domain."
+    ::= { ptpbaseMIBClockInfo 8 }
+
+ptpbaseClockPortDSEntry OBJECT-TYPE
+    SYNTAX          PtpbaseClockPortDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing port dataset information for
+        a single clock port."
+    INDEX           {
+                        ptpbaseClockPortDSDomainIndex,
+                        ptpbaseClockPortDSClockTypeIndex,
+                        ptpbaseClockPortDSClockInstanceIndex,
+                        ptpbaseClockPortDSPortNumberIndex
+                    }
+    ::= { ptpbaseClockPortDSTable 1 }
+
+PtpbaseClockPortDSEntry ::= SEQUENCE {
+        ptpbaseClockPortDSDomainIndex          ClockDomainType,
+        ptpbaseClockPortDSClockTypeIndex       ClockType,
+        ptpbaseClockPortDSClockInstanceIndex   ClockInstanceType,
+        ptpbaseClockPortDSPortNumberIndex      ClockPortNumber,
+        ptpbaseClockPortDSName                 DisplayString,
+        ptpbaseClockPortDSPortIdentity         OCTET STRING,
+        ptpbaseClockPortDSAnnouncementInterval Integer32,
+        ptpbaseClockPortDSAnnounceRctTimeout   Integer32,
+        ptpbaseClockPortDSSyncInterval         Integer32,
+        ptpbaseClockPortDSMinDelayReqInterval  Integer32,
+        ptpbaseClockPortDSPeerDelayReqInterval Integer32,
+        ptpbaseClockPortDSDelayMech            ClockMechanismType,
+        ptpbaseClockPortDSPeerMeanPathDelay    ClockTimeInterval,
+        ptpbaseClockPortDSGrantDuration        Unsigned32,
+        ptpbaseClockPortDSPTPVersion           Integer32
+}
+
+ptpbaseClockPortDSDomainIndex OBJECT-TYPE
+    SYNTAX          ClockDomainType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the domain number used to create logical
+        group of PTP devices."
+    ::= { ptpbaseClockPortDSEntry 1 }
+
+ptpbaseClockPortDSClockTypeIndex OBJECT-TYPE
+    SYNTAX          ClockType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the clock type as defined in the
+        Textual convention description."
+    ::= { ptpbaseClockPortDSEntry 2 }
+
+ptpbaseClockPortDSClockInstanceIndex OBJECT-TYPE
+    SYNTAX          ClockInstanceType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the instance of the clock for this clock
+        type in the given domain."
+    ::= { ptpbaseClockPortDSEntry 3 }
+
+ptpbaseClockPortDSPortNumberIndex OBJECT-TYPE
+    SYNTAX          ClockPortNumber (1..65535)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the PTP portnumber associated with this
+        PTP port."
+    ::= { ptpbaseClockPortDSEntry 4 }
+
+ptpbaseClockPortDSName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE  (1..64))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the PTP clock port name."
+    ::= { ptpbaseClockPortDSEntry 5 }
+
+ptpbaseClockPortDSPortIdentity OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(1..256))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the PTP clock port Identity."
+    ::= { ptpbaseClockPortDSEntry 6 }
+
+ptpbaseClockPortDSAnnouncementInterval OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Announce message transmission
+        interval associated with this clock port."
+    ::= { ptpbaseClockPortDSEntry 7 }
+
+ptpbaseClockPortDSAnnounceRctTimeout OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Announce receipt timeout associated
+        with this clock port."
+    ::= { ptpbaseClockPortDSEntry 8 }
+
+ptpbaseClockPortDSSyncInterval OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Sync message transmission interval."
+    ::= { ptpbaseClockPortDSEntry 9 }
+
+ptpbaseClockPortDSMinDelayReqInterval OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Delay_Req message transmission
+        interval."
+    ::= { ptpbaseClockPortDSEntry 10 }
+
+ptpbaseClockPortDSPeerDelayReqInterval OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Pdelay_Req message transmission
+        interval."
+    ::= { ptpbaseClockPortDSEntry 11 }
+
+ptpbaseClockPortDSDelayMech OBJECT-TYPE
+    SYNTAX          ClockMechanismType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the delay mechanism used. If the clock
+        is an end-to-end clock, the value of the is e2e, else if the
+        clock is a peer to-peer clock, the value shall be p2p."
+    ::= { ptpbaseClockPortDSEntry 12 }
+
+ptpbaseClockPortDSPeerMeanPathDelay OBJECT-TYPE
+    SYNTAX          ClockTimeInterval
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the peer meanPathDelay."
+    ::= { ptpbaseClockPortDSEntry 13 }
+
+ptpbaseClockPortDSGrantDuration OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the grant duration allocated by the
+        master."
+    ::= { ptpbaseClockPortDSEntry 14 }
+
+ptpbaseClockPortDSPTPVersion OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the PTP version being used."
+    ::= { ptpbaseClockPortDSEntry 15 }
+
+
+
+ptpbaseClockPortRunningTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseClockPortRunningEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of information about the clock ports running dataset for
+        a particular domain."
+    ::= { ptpbaseMIBClockInfo 9 }
+
+ptpbaseClockPortRunningEntry OBJECT-TYPE
+    SYNTAX          PtpbaseClockPortRunningEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing runing dataset information
+        about a single clock port."
+    INDEX           {
+                        ptpbaseClockPortRunningDomainIndex,
+                        ptpbaseClockPortRunningClockTypeIndex,
+                        ptpbaseClockPortRunningClockInstanceIndex,
+                        ptpbaseClockPortRunningPortNumberIndex
+                    }
+    ::= { ptpbaseClockPortRunningTable 1 }
+
+PtpbaseClockPortRunningEntry ::= SEQUENCE {
+        ptpbaseClockPortRunningDomainIndex        ClockDomainType,
+        ptpbaseClockPortRunningClockTypeIndex     ClockType,
+        ptpbaseClockPortRunningClockInstanceIndex ClockInstanceType,
+        ptpbaseClockPortRunningPortNumberIndex    ClockPortNumber,
+        ptpbaseClockPortRunningName               DisplayString,
+        ptpbaseClockPortRunningState              ClockPortState,
+        ptpbaseClockPortRunningRole               ClockRoleType,
+        ptpbaseClockPortRunningInterfaceIndex     InterfaceIndexOrZero,
+        ptpbaseClockPortRunningIPversion          Integer32,
+        ptpbaseClockPortRunningEncapsulationType  Integer32,
+        ptpbaseClockPortRunningTxMode             ClockTxModeType,
+        ptpbaseClockPortRunningRxMode             ClockTxModeType,
+        ptpbaseClockPortRunningPacketsReceived    Counter64,
+        ptpbaseClockPortRunningPacketsSent        Counter64
+}
+
+ptpbaseClockPortRunningDomainIndex OBJECT-TYPE
+    SYNTAX          ClockDomainType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the domain number used to create logical
+        group of PTP devices."
+    ::= { ptpbaseClockPortRunningEntry 1 }
+
+ptpbaseClockPortRunningClockTypeIndex OBJECT-TYPE
+    SYNTAX          ClockType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the clock type as defined in the
+        Textual convention description."
+    ::= { ptpbaseClockPortRunningEntry 2 }
+
+ptpbaseClockPortRunningClockInstanceIndex OBJECT-TYPE
+    SYNTAX          ClockInstanceType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the instance of the clock for this clock
+        type in the given domain."
+    ::= { ptpbaseClockPortRunningEntry 3 }
+
+ptpbaseClockPortRunningPortNumberIndex OBJECT-TYPE
+    SYNTAX          ClockPortNumber (1..65535)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the PTP portnumber associated with this
+        clock port."
+    ::= { ptpbaseClockPortRunningEntry 4 }
+
+ptpbaseClockPortRunningName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE  (1..64))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the PTP clock port name."
+    ::= { ptpbaseClockPortRunningEntry 5 }
+
+ptpbaseClockPortRunningState OBJECT-TYPE
+    SYNTAX          ClockPortState
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the port state returned by PTP engine.
+
+        initializing - In this state a port initializes
+                       its data sets, hardware, and
+                       communication facilities.
+        faulty       - The fault state of the protocol.
+        disabled     - The port shall not place any
+                       messages on its communication path.
+        listening    - The port is waiting for the
+                       announceReceiptTimeout to expire or
+                       to receive an Announce message from
+                       a master.
+        preMaster    - The port shall behave in all respects
+                       as though it were in the MASTER state
+                       except that it shall not place any
+                       messages on its communication path
+                       except for Pdelay_Req, Pdelay_Resp,
+                       Pdelay_Resp_Follow_Up, signaling, or
+                       management messages.
+        master       - The port is behaving as a master port.
+        passive      - The port shall not place any
+                       messages on its communication path
+                       except for Pdelay_Req, Pdelay_Resp,
+                       Pdelay_Resp_Follow_Up, or signaling
+                       messages, or management messages
+                       that are a required response to
+                       another management message
+        uncalibrated - The local port is preparing to
+                       synchronize to the master port.
+        slave        - The port is synchronizing to the
+                       selected master port."
+    ::= { ptpbaseClockPortRunningEntry 6 }
+
+ptpbaseClockPortRunningRole OBJECT-TYPE
+    SYNTAX          ClockRoleType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Clock Role."
+    ::= { ptpbaseClockPortRunningEntry 7 }
+
+ptpbaseClockPortRunningInterfaceIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the interface on the router being used by
+        the PTP Clock for PTP communication."
+    ::= { ptpbaseClockPortRunningEntry 8 }
+
+ptpbaseClockPortRunningIPversion OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the IP version being used for PTP
+        communication (the mapping used)."
+    ::= { ptpbaseClockPortRunningEntry 9 }
+
+ptpbaseClockPortRunningEncapsulationType OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the type of encapsulation if the
+        interface is adding extra layers (eg. VLAN, Pseudowire
+        encapsulation...) for the PTP messages."
+    ::= { ptpbaseClockPortRunningEntry 10 }
+
+ptpbaseClockPortRunningTxMode OBJECT-TYPE
+    SYNTAX          ClockTxModeType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the clock transmission mode as
+
+        unicast:       Using unicast communication channel.
+        multicast:     Using Multicast communication channel.
+        multicast-mix: Using multicast-unicast communication channel"
+    ::= { ptpbaseClockPortRunningEntry 11 }
+
+ptpbaseClockPortRunningRxMode OBJECT-TYPE
+    SYNTAX          ClockTxModeType
+    MAX-ACCESS      read-only
+
+    STATUS          current
+    DESCRIPTION
+        "This object specifie the clock receive mode as
+
+        unicast:       Using unicast communication channel.
+        multicast:     Using Multicast communication channel.
+        multicast-mix: Using multicast-unicast communication channel"
+    ::= { ptpbaseClockPortRunningEntry 12 }
+
+ptpbaseClockPortRunningPacketsReceived OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the packets received on the clock port
+        (cummulative)."
+    ::= { ptpbaseClockPortRunningEntry 13 }
+
+ptpbaseClockPortRunningPacketsSent OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the packets sent on the clock port
+        (cummulative)."
+    ::= { ptpbaseClockPortRunningEntry 14 }
+
+
+
+ptpbaseClockPortTransDSTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseClockPortTransDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of information about the Transparent clock ports running
+        dataset for a particular domain."
+    ::= { ptpbaseMIBClockInfo 10 }
+
+ptpbaseClockPortTransDSEntry OBJECT-TYPE
+    SYNTAX          PtpbaseClockPortTransDSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing clock port Transparent
+        dataset information about a single clock port"
+    INDEX           {
+                        ptpbaseClockPortTransDSDomainIndex,
+                        ptpbaseClockPortTransDSInstanceIndex,
+                        ptpbaseClockPortTransDSPortNumberIndex
+                    }
+    ::= { ptpbaseClockPortTransDSTable 1 }
+
+PtpbaseClockPortTransDSEntry ::= SEQUENCE {
+        ptpbaseClockPortTransDSDomainIndex        ClockDomainType,
+        ptpbaseClockPortTransDSInstanceIndex      ClockInstanceType,
+        ptpbaseClockPortTransDSPortNumberIndex    ClockPortNumber,
+        ptpbaseClockPortTransDSPortIdentity       ClockIdentity,
+        ptpbaseClockPortTransDSlogMinPdelayReqInt Integer32,
+        ptpbaseClockPortTransDSFaultyFlag         TruthValue,
+        ptpbaseClockPortTransDSPeerMeanPathDelay  ClockTimeInterval
+}
+
+ptpbaseClockPortTransDSDomainIndex OBJECT-TYPE
+    SYNTAX          ClockDomainType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the domain number used to create logical
+        group of PTP devices."
+    ::= { ptpbaseClockPortTransDSEntry 1 }
+
+ptpbaseClockPortTransDSInstanceIndex OBJECT-TYPE
+    SYNTAX          ClockInstanceType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the instance of the clock for this clock
+        type in the given domain."
+    ::= { ptpbaseClockPortTransDSEntry 2 }
+
+ptpbaseClockPortTransDSPortNumberIndex OBJECT-TYPE
+    SYNTAX          ClockPortNumber (1..65535)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the PTP port number associated with this
+        port."
+    REFERENCE       "Section 7.5.2 Port Identity [IEEE 1588-2008]"
+    ::= { ptpbaseClockPortTransDSEntry 3 }
+
+ptpbaseClockPortTransDSPortIdentity OBJECT-TYPE
+    SYNTAX          ClockIdentity
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the value of the PortIdentity
+        attribute of the local port."
+    REFERENCE       "Section 8.3.3.2.1 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockPortTransDSEntry 4 }
+
+ptpbaseClockPortTransDSlogMinPdelayReqInt OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the value of the logarithm to the
+        base 2 of the minPdelayReqInterval."
+    REFERENCE       "Section 8.3.3.3.1 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockPortTransDSEntry 5 }
+
+ptpbaseClockPortTransDSFaultyFlag OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the value TRUE if the port is faulty
+        and FALSE if the port is operating normally."
+    REFERENCE       "Section 8.3.3.3.2 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockPortTransDSEntry 6 }
+
+ptpbaseClockPortTransDSPeerMeanPathDelay OBJECT-TYPE
+    SYNTAX          ClockTimeInterval
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies, (if the delayMechanism used is P2P) the
+        value is the estimate of the current one-way propagation delay,
+        i.e., <meanPathDelay> on the link attached to this port
+        computed
+        using the peer delay mechanism. If the value of the
+        delayMechanism
+        used is E2E, then the value will be zero."
+    REFERENCE       "Section 8.3.3.3.3 of [IEEE 1588-2008]"
+    ::= { ptpbaseClockPortTransDSEntry 7 }
+
+
+
+ptpbaseClockPortAssociateTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PtpbaseClockPortAssociateEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Table of information about a given port's associated ports.
+
+        For a master port - multiple slave ports which have established
+        sessions with the current master port.
+        For a slave port - the list of masters available for a given
+        slave port.
+
+        Session information (pkts, errors) to be displayed based on
+        availability and scenario."
+    ::= { ptpbaseMIBClockInfo 11 }
+
+ptpbaseClockPortAssociateEntry OBJECT-TYPE
+    SYNTAX          PtpbaseClockPortAssociateEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the table, containing information about a single
+        associated port for the given clockport."
+    INDEX           {
+                        ptpClockPortCurrentDomainIndex,
+                        ptpClockPortCurrentClockTypeIndex,
+                        ptpClockPortCurrentClockInstanceIndex,
+                        ptpClockPortCurrentPortNumberIndex,
+                        ptpbaseClockPortAssociatePortIndex
+                    }
+    ::= { ptpbaseClockPortAssociateTable 1 }
+
+PtpbaseClockPortAssociateEntry ::= SEQUENCE {
+        ptpClockPortCurrentDomainIndex           ClockDomainType,
+        ptpClockPortCurrentClockTypeIndex        ClockType,
+        ptpClockPortCurrentClockInstanceIndex    ClockInstanceType,
+        ptpClockPortCurrentPortNumberIndex       ClockPortNumber,
+        ptpbaseClockPortAssociatePortIndex       Unsigned32,
+        ptpbaseClockPortAssociateAddressType     InetAddressType,
+        ptpbaseClockPortAssociateAddress         InetAddress,
+        ptpbaseClockPortAssociatePacketsSent     Counter64,
+        ptpbaseClockPortAssociatePacketsReceived Counter64,
+        ptpbaseClockPortAssociateInErrors        Counter64,
+        ptpbaseClockPortAssociateOutErrors       Counter64
+}
+
+ptpClockPortCurrentDomainIndex OBJECT-TYPE
+    SYNTAX          ClockDomainType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the given port's domain number."
+    ::= { ptpbaseClockPortAssociateEntry 1 }
+
+ptpClockPortCurrentClockTypeIndex OBJECT-TYPE
+    SYNTAX          ClockType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the given port's clock type."
+    ::= { ptpbaseClockPortAssociateEntry 2 }
+
+ptpClockPortCurrentClockInstanceIndex OBJECT-TYPE
+    SYNTAX          ClockInstanceType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the instance of the clock for this clock
+        type in the given domain."
+    ::= { ptpbaseClockPortAssociateEntry 3 }
+
+ptpClockPortCurrentPortNumberIndex OBJECT-TYPE
+    SYNTAX          ClockPortNumber
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the PTP Port Number for the given port."
+    ::= { ptpbaseClockPortAssociateEntry 4 }
+
+ptpbaseClockPortAssociatePortIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..65535)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the associated port's serial number in
+        the current port's context."
+    ::= { ptpbaseClockPortAssociateEntry 5 }
+
+ptpbaseClockPortAssociateAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the peer port's network address type used
+        for PTP communication."
+    ::= { ptpbaseClockPortAssociateEntry 6 }
+
+ptpbaseClockPortAssociateAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the peer port's network address used for
+        PTP communication."
+    ::= { ptpbaseClockPortAssociateEntry 7 }
+
+ptpbaseClockPortAssociatePacketsSent OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of packets sent to this peer port from the current
+        port."
+    ::= { ptpbaseClockPortAssociateEntry 8 }
+
+ptpbaseClockPortAssociatePacketsReceived OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of packets received from this peer port by the
+        current port."
+    ::= { ptpbaseClockPortAssociateEntry 9 }
+
+ptpbaseClockPortAssociateInErrors OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the input errors associated with the
+        peer port."
+    ::= { ptpbaseClockPortAssociateEntry 10 }
+
+ptpbaseClockPortAssociateOutErrors OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the output errors associated with the
+        peer port."
+    ::= { ptpbaseClockPortAssociateEntry 11 }
+
+
+END
