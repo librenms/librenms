@@ -2098,11 +2098,7 @@ label {
 }
 
 .devices-search-header {
-    margin: 5px;
-}
-
-.devices-input-small {
-    line-height: 14px;
+    margin: 0 5px;
 }
 
 .devices-status-box-detail {
@@ -2124,9 +2120,9 @@ label {
     text-align: center;
 }
 
-.devices-headers-table-menu {
-    padding: 0;
+.devices-headers-table-menu > .actions {
     float: right;
+    margin-bottom: 5px;
 }
 
 .devices-overlib-box {

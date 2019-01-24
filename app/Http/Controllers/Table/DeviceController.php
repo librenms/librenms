@@ -26,6 +26,8 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Device;
+use App\Models\Location;
+use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
@@ -58,7 +60,7 @@ class DeviceController extends TableController
 
     protected function searchFields($request)
     {
-        return ['sysName', 'hostname', 'hardware', 'os']; // TODO location
+        return ['sysName', 'hostname', 'hardware', 'os', 'locations.location'];
     }
 
     /**
@@ -69,8 +71,26 @@ class DeviceController extends TableController
      */
     protected function baseQuery($request)
     {
-        return Device::hasAccess($request->user())->with('location');
-        // TODO filter location, group
+        /** @var Builder $query */
+        $query = Device::hasAccess($request->user())->with('location')->select('devices.*');
+
+        // if searching join the locations table
+        if ($request->get('term')) {
+            $query->leftJoin('locations', 'locations.id', 'devices.location_id');
+        }
+
+        // handle non-id locations too
+        if ($location = $request->get('location')) {
+            if (!is_numeric($location)) {
+                $location = Location::where('location', $location)->value('id');
+            }
+            $query->where('location_id', $location);
+        }
+
+
+        // TODO filter group
+
+        return $query;
     }
 
     private function isDetailed()
@@ -174,7 +194,8 @@ class DeviceController extends TableController
             $metrics[] = $this->formatMetric($device, $wireless_count, 'wireless', 'fa-wifi');
         }
 
-        $metrics_content = implode(count($metrics) == 2 ? '<br />' : '', $metrics);
+        $glue = $this->isDetailed() ? '<br />' : ' ';
+        $metrics_content = implode(count($metrics) == 2 ? $glue : '', $metrics);
         return '<div class="device-table-metrics">' . $metrics_content . '</div>';
     }
 
