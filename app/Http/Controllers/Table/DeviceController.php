@@ -74,12 +74,12 @@ class DeviceController extends TableController
         /** @var Builder $query */
         $query = Device::hasAccess($request->user())->with('location')->select('devices.*');
 
-        // if searching join the locations table
-        if ($request->get('term')) {
+        // if searching or sorting the location field, join the locations table
+        if ($request->get('term') || in_array('location', array_keys($request->get('sort', [])))) {
             $query->leftJoin('locations', 'locations.id', 'devices.location_id');
         }
 
-        // handle non-id locations too
+        // filter non-id locations too
         if ($location = $request->get('location')) {
             if (!is_numeric($location)) {
                 $location = Location::where('location', $location)->value('id');
@@ -87,8 +87,12 @@ class DeviceController extends TableController
             $query->where('location_id', $location);
         }
 
-
-        // TODO filter group
+        // filter device group, not sure this is the most efficient query
+        if ($group = $request->get('group')) {
+            $query->whereHas('groups', function ($query) use ($group) {
+                $query->where('id', $group);
+            });
+        }
 
         return $query;
     }
