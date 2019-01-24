@@ -1,0 +1,152 @@
+-- ***********************************************************************************************
+-- TN-POWER-SUPPLY-MIB.smi: Transition Networks, Inc. Enterprise MIB for power-supply management.
+--
+-- Copyright (c) 2013 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- ***********************************************************************************************
+--
+
+TN-POWER-SUPPLY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, Counter32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    tnProducts
+        FROM TRANSITION-SMI;
+
+tnPowerSupply MODULE-IDENTITY
+    LAST-UPDATED    "201303120000Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+        "Transition Networks
+         Technical Support
+
+         10900 Red Circle Drive
+         Minnetonka, MN 55343 USA
+         Tel: +1-800-526-9267
+
+         E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "This mib is related to the manamgement of power-supply."
+
+    REVISION        "201303120000Z"
+    DESCRIPTION
+        "Defined in Mar 12th, 2013."
+    ::= { tnProducts 20 }
+
+TnPowerSupplyPowerType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "A kind of variable-type definition indicates the means of power-supply,
+         AC or DC."
+    SYNTAX    INTEGER {
+        ac(1),
+        dc(2)
+    }
+
+tnPowerSupplyEnvMonNotifications OBJECT IDENTIFIER ::= { tnPowerSupply 1 }
+
+tnPowerSupplyEnvMonFailureNotif NOTIFICATION-TYPE
+    OBJECTS {
+        tnPowerSupplyPowered
+    }
+    STATUS    current
+    DESCRIPTION
+        "A tnPowerSupplyEnvMonFailureNotif will be sent when the power-supply
+         is not functioning properly."
+    ::= { tnPowerSupplyEnvMonNotifications 1 }
+
+tnPowerSupplyEnvMonTemperatureNotif NOTIFICATION-TYPE
+    OBJECTS {
+        tnPowerSupplyTemperature
+    }
+    STATUS    current
+    DESCRIPTION
+        "A tnPowerSupplyEnvMonTemperatureNotif will be sent when the
+         temperature of the power-supply is out of controlled range."
+    ::= { tnPowerSupplyEnvMonNotifications 2 }
+
+tnPowerSupplyMIBObject OBJECT IDENTIFIER ::= { tnPowerSupply 2 }
+
+tnPowerSupplyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnPowerSupplyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table defines the managment of power-supply."
+    ::= { tnPowerSupplyMIBObject 1 }
+
+tnPowerSupplyEntry OBJECT-TYPE
+    SYNTAX        TnPowerSupplyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Indicates the entry of power-supply table."
+    INDEX { tnPowerSupplyIndex }
+    ::= { tnPowerSupplyTable 1 }
+
+TnPowerSupplyEntry  ::=
+    SEQUENCE {
+        tnPowerSupplyIndex          Unsigned32,
+        tnPowerSupplyPresent        TruthValue,
+        tnPowerSupplyPowerType      TnPowerSupplyPowerType,
+        tnPowerSupplyPowered        TruthValue,
+        tnPowerSupplyFanRPM         Unsigned32,
+        tnPowerSupplyTemperature    INTEGER
+    }
+
+tnPowerSupplyIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Indicates the index of table entry."
+   ::= { tnPowerSupplyEntry 1 }
+
+tnPowerSupplyPresent OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the current choice of power-supply."
+     ::= { tnPowerSupplyEntry 2 }
+
+tnPowerSupplyPowerType OBJECT-TYPE
+    SYNTAX        TnPowerSupplyPowerType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the type of power-supply."
+    ::= { tnPowerSupplyEntry 3 }
+
+tnPowerSupplyPowered OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates power-supply is on or off. In this case, true represents powered-on,
+         and otherwise, powered-off."
+     ::= { tnPowerSupplyEntry 4 }
+
+tnPowerSupplyFanRPM OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the RPM of fan."
+    ::= { tnPowerSupplyEntry 5 }
+
+tnPowerSupplyTemperature OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the temperature of the power-supply."
+    ::= { tnPowerSupplyEntry 6 }
+
+tnPowerSupplyMibConformance OBJECT IDENTIFIER ::= { tnPowerSupply 3 }
+
+END

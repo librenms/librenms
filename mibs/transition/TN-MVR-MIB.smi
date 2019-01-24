@@ -1,0 +1,572 @@
+-- *****************************************************************
+-- Transition Networks MVR MIB
+--
+-- Copyright (C) 2012  Transition Networks, Inc. All Rights Reserved.
+-- *****************************************************************
+
+TN-MVR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    DisplayString, RowStatus, TruthValue
+                FROM SNMPv2-TC
+    InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    enterprises, Unsigned32 FROM SNMPv2-SMI
+    entPhysicalIndex FROM ENTITY-MIB
+    PortList, VlanIndex FROM Q-BRIDGE-MIB
+    ifIndex, InterfaceIndex FROM IF-MIB
+    tnProducts FROM TRANSITION-SMI;
+
+tnMVRMIB MODULE-IDENTITY
+        LAST-UPDATED "201211090000Z"
+        ORGANIZATION "Transition Networks, Inc."
+        CONTACT-INFO
+        "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+        E-mail: techsupport@transition.com"
+        DESCRIPTION
+        "The mib module is designed for Multicast VLAN Registration."
+
+    ::= { tnProducts 50 }
+
+tnMVRMIBNotifications   OBJECT IDENTIFIER ::= { tnMVRMIB 1 }
+tnMVRMIBObjects         OBJECT IDENTIFIER ::= { tnMVRMIB 2 }
+tnMVRMIBConformance     OBJECT IDENTIFIER ::= { tnMVRMIB 3 }
+
+--
+-- MIB variables
+--
+
+tnMVRMIBMgmt OBJECT IDENTIFIER ::= { tnMVRMIBObjects 1 }
+
+--
+-- tnMVRModeTable
+--
+
+tnMVRModeTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TNMVRModeEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "This table contains MVR mode configuration."
+    ::= { tnMVRMIBMgmt 1 }
+
+tnMVRModeEntry OBJECT-TYPE
+    SYNTAX        TNMVRModeEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Each entry represents the MVR configuration on a device."
+    INDEX { entPhysicalIndex }
+    ::= { tnMVRModeTable 1 }
+
+TNMVRModeEntry ::= SEQUENCE {
+    tnMVRMode             TruthValue,
+    tnMVRStatisticsClear  TruthValue
+    }
+
+tnMVRMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "To enable or disable the MVR on a device."
+    ::= { tnMVRModeEntry 1 }
+
+tnMVRStatisticsClear OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION  "True for clearing statistics of MVR on a device."
+    ::= { tnMVRModeEntry 2 }
+
+--
+-- tnMVRInterfaceTable
+--
+
+tnMVRInterfaceTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TNMVRInterfaceEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "This table contains MVR VLAN interface settings."
+    ::= { tnMVRMIBMgmt 2 }
+
+tnMVRInterfaceEntry OBJECT-TYPE
+    SYNTAX        TNMVRInterfaceEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Each entry represents a MVR interface on a device."
+    INDEX { tnMVRVID }
+    ::= { tnMVRInterfaceTable 1 }
+
+TNMVRInterfaceEntry ::= SEQUENCE {
+    tnMVRVID                VlanIndex,
+    tnMVRName               DisplayString,
+    tnMVRInterfaceMode      INTEGER,
+    tnMVRInterfaceTagging   INTEGER,
+    tnMVRInterfacePriority  INTEGER,
+    tnMVRInterfaceLLQI      INTEGER,
+    tnMVRInactivePortList   PortList,
+    tnMVRSourcePortList     PortList,
+    tnMVRReceiverPortList   PortList,
+    tnMVRInterfaceRowStatus RowStatus
+    }
+
+tnMVRVID OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The multicast vlan id of a MVR interface."
+    ::= { tnMVRInterfaceEntry 1 }
+
+tnMVRName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The name of a MVR interface."
+    ::= { tnMVRInterfaceEntry 2 }
+
+tnMVRInterfaceMode OBJECT-TYPE
+    SYNTAX      INTEGER { dynamic (1), compatible (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The mode of a MVR interface, either dynamic or compatible."
+    ::= { tnMVRInterfaceEntry 3 }
+
+tnMVRInterfaceTagging OBJECT-TYPE
+    SYNTAX      INTEGER { untagged (1), tagged (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specify whether the traversed IGMP/MLD control frames will be sent as Untagged or Tagged with MVR VID. The default is Tagged. "
+    ::= { tnMVRInterfaceEntry 4 }
+
+tnMVRInterfacePriority OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specify how the traversed IGMP/MLD control frames will be sent in prioritized manner. The default Priority is 0."
+    ::= { tnMVRInterfaceEntry 5 }
+
+tnMVRInterfaceLLQI OBJECT-TYPE
+    SYNTAX      INTEGER (0..31744)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Define the maximum time to wait for IGMP/MLD report memberships on a receiver port before removing the port from multicast group membership. The value is in units of tenths of a seconds. The range is from 0 to 31744. The default LLQI is 5 tenths or one-half second."
+    ::= { tnMVRInterfaceEntry 6 }
+
+tnMVRInactivePortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "To indicate the ports as inactive when the relative bits are set to 1."
+    ::= { tnMVRInterfaceEntry 7 }
+
+tnMVRSourcePortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "To indicate the ports as source when the relative bits are set to 1."
+    ::= { tnMVRInterfaceEntry 8 }
+
+tnMVRReceiverPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "To indicate the ports as receiver when the relative bits are set to 1."
+    ::= { tnMVRInterfaceEntry 9 }
+
+tnMVRInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The row status of MVR interface table."
+    ::= { tnMVRInterfaceEntry 10 }
+
+--
+-- tnMVRImmediateLeaveTable
+--
+
+tnMVRImmediateLeaveTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TNMVRImmediateLeaveEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table contains the immediate leave setting of MVR."
+    ::= { tnMVRMIBMgmt 3 }
+
+tnMVRImmediateLeaveEntry OBJECT-TYPE
+    SYNTAX     TNMVRImmediateLeaveEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry represents MVR immediate leave on an interface."
+    INDEX { ifIndex }
+    ::= { tnMVRImmediateLeaveTable 1 }
+
+TNMVRImmediateLeaveEntry ::= SEQUENCE {
+    tnMVRImmediateLeaveEnabled       TruthValue
+}
+
+tnMVRImmediateLeaveEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Enable or disable immediate leave on each interface."
+    ::= { tnMVRImmediateLeaveEntry 1 }
+
+--
+-- tnMVRChannelConfigTable
+--
+
+tnMVRChannelConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TNMVRChannelConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table contains MVR channel configuration."
+    ::= { tnMVRMIBMgmt 4 }
+
+tnMVRChannelConfigEntry OBJECT-TYPE
+    SYNTAX     TNMVRChannelConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry represents a MVR channel configuration."
+    INDEX { tnMVRChannelVID,
+            tnMVRChannelStartEndAddrType,
+            tnMVRChannelStartAddr }
+    ::= { tnMVRChannelConfigTable 1 }
+
+TNMVRChannelConfigEntry ::= SEQUENCE {
+    tnMVRChannelVID               VlanIndex,
+    tnMVRChannelStartEndAddrType  InetAddressType,
+    tnMVRChannelStartAddr         InetAddress,
+    tnMVRChannelEndAddr           InetAddress,
+    tnMVRChannelName              DisplayString,
+    tnMVRChannelRowStatus         RowStatus
+}
+
+tnMVRChannelVID OBJECT-TYPE
+    SYNTAX     VlanIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The multicast vlan id of a mvr channel. This id should exist in tnMVRInterfaceTable."
+    ::= { tnMVRChannelConfigEntry 1 }
+
+tnMVRChannelStartEndAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The address type of MVR channel starting and ending address."
+    ::= { tnMVRChannelConfigEntry 2 }
+
+tnMVRChannelStartAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The starting ipv4/ipv6 multicast address of a MVR channel."
+    ::= { tnMVRChannelConfigEntry 3 }
+
+tnMVRChannelEndAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The ending ipv4/ipv6 multicast address of a MVR channel."
+    ::= { tnMVRChannelConfigEntry 4 }
+
+tnMVRChannelName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicate the name of the Channel of the specific Multicast VLAN. Maximum length of the Channel Name string is 32. Channel Name can only contain alphabets or numbers. Channel name should contain at least one alphabet. Channel name can be edited for the existing Channel entries or it can be added to the new entries."
+    ::= { tnMVRChannelConfigEntry 5 }
+
+tnMVRChannelRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The row status of MVR channel configuration table."
+    ::= { tnMVRChannelConfigEntry 6 }
+
+--
+-- tnMVRStatisticsTable
+--
+
+tnMVRStatisticsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TNMVRStatisticsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "This table contains the statistics of MVR."
+    ::= { tnMVRMIBMgmt 5 }
+
+tnMVRStatisticsEntry OBJECT-TYPE
+    SYNTAX        TNMVRStatisticsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Each entry represents the MVR statistics of a specific vlan id."
+    INDEX { tnMVRStatisticsVID }
+    ::= { tnMVRStatisticsTable 1 }
+
+TNMVRStatisticsEntry ::= SEQUENCE {
+    tnMVRStatisticsVID          INTEGER,
+    tnMVRIGMPQueriesRx             Unsigned32,
+    tnMVRMLDQueriesRx              Unsigned32,
+    tnMVRIGMPQueriesTx             Unsigned32,
+    tnMVRMLDQueriesTx              Unsigned32,
+    tnMVRIGMPv1JoinsRx             Unsigned32,
+    tnMVRIGMPv2ReportsRx           Unsigned32,
+    tnMVRMLDv1ReportsRx            Unsigned32,
+    tnMVRIGMPv3ReportsRx           Unsigned32,
+    tnMVRMLDv2ReportsRx            Unsigned32,
+    tnMVRIGMPv2LeavesRx            Unsigned32,
+    tnMVRMLDv1LeavesRx             Unsigned32
+    }
+
+tnMVRStatisticsVID OBJECT-TYPE
+    SYNTAX       INTEGER (1..4094)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "The multicast vlan id."
+    ::= { tnMVRStatisticsEntry 1 }
+
+tnMVRIGMPQueriesRx OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of Received Queries for IGMP."
+    ::= { tnMVRStatisticsEntry 2 }
+
+tnMVRMLDQueriesRx OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of Received Queries for MLD."
+    ::= { tnMVRStatisticsEntry 3 }
+
+tnMVRIGMPQueriesTx OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of Transmitted Queries for IGMP."
+    ::= { tnMVRStatisticsEntry 4 }
+
+tnMVRMLDQueriesTx OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of Transmitted Queries for MLD."
+    ::= { tnMVRStatisticsEntry 5 }
+
+tnMVRIGMPv1JoinsRx OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of Received IGMPv1 Joins."
+    ::= { tnMVRStatisticsEntry 6 }
+
+tnMVRIGMPv2ReportsRx OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of Received IGMPv2 Reports."
+    ::= { tnMVRStatisticsEntry 7 }
+
+tnMVRMLDv1ReportsRx OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of Received MLDv1 Reports."
+    ::= { tnMVRStatisticsEntry 8 }
+
+tnMVRIGMPv3ReportsRx OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of Received IGMPv3 Reports."
+    ::= { tnMVRStatisticsEntry 9 }
+
+tnMVRMLDv2ReportsRx OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of Received MLDv2 Reports."
+    ::= { tnMVRStatisticsEntry 10 }
+
+tnMVRIGMPv2LeavesRx OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of Received IGMPv2 Leaves."
+    ::= { tnMVRStatisticsEntry 11 }
+
+tnMVRMLDv1LeavesRx OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of Received MLDv1 Leaves."
+    ::= { tnMVRStatisticsEntry 12 }
+
+--
+-- tnMVRGroupInfoTable
+--
+
+tnMVRGroupInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNMVRGroupInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table contains MVR groups (channels) information."
+    ::= { tnMVRMIBMgmt 6 }
+
+tnMVRGroupInfoEntry OBJECT-TYPE
+    SYNTAX      TNMVRGroupInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Each entry represents the group information for a specific vlan id."
+    INDEX { tnMVRGroupVID,
+            tnMVRGroupAddrType,
+            tnMVRGroupAddr }
+    ::= { tnMVRGroupInfoTable 1 }
+
+TNMVRGroupInfoEntry ::= SEQUENCE {
+    tnMVRGroupVID           INTEGER,
+    tnMVRGroupAddrType      InetAddressType,
+    tnMVRGroupAddr          InetAddress,
+    tnMVRGroupPortMembers   PortList
+}
+
+tnMVRGroupVID OBJECT-TYPE
+    SYNTAX      INTEGER (1..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The vlan id of a MVR group."
+    ::= { tnMVRGroupInfoEntry 1 }
+
+tnMVRGroupAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The MVR group ip address type."
+    ::= { tnMVRGroupInfoEntry 2 }
+
+tnMVRGroupAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The ipv4/ipv6 address of a MVR group."
+    ::= { tnMVRGroupInfoEntry 3 }
+
+tnMVRGroupPortMembers OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "To indicate which port is under the current group."
+    ::= { tnMVRGroupInfoEntry 4 }
+
+--
+-- tnMVRSFMTable
+--
+
+tnMVRSFMTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNMVRSFMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table contains the SFM(Source-Filtered Multicast) information of MVR."
+    ::= { tnMVRMIBMgmt 7 }
+
+tnMVRSFMEntry OBJECT-TYPE
+    SYNTAX      TNMVRSFMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Each entry represents the SFM information for a specific vlan id."
+    INDEX { tnMVRSFMVID,
+            tnMVRSFMGroupAddrType,
+            tnMVRSFMGroupAddr,
+            tnMVRSFMIfIndex,
+            tnMVRSFMMode,
+            tnMVRSFMSourceAddrType,
+            tnMVRSFMSourceAddr }
+    ::= { tnMVRSFMTable 1 }
+
+TNMVRSFMEntry ::= SEQUENCE {
+    tnMVRSFMVID               INTEGER,
+    tnMVRSFMGroupAddrType     InetAddressType,
+    tnMVRSFMGroupAddr         InetAddress,
+    tnMVRSFMIfIndex           InterfaceIndex,
+    tnMVRSFMMode              INTEGER,
+    tnMVRSFMSourceAddrType    InetAddressType,
+    tnMVRSFMSourceAddr        InetAddress,
+    tnMVRSFMType              INTEGER,
+    tnMVRSFMHardwareFilter    TruthValue
+}
+
+tnMVRSFMVID OBJECT-TYPE
+    SYNTAX      INTEGER (1..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The vlan id of a mvr group."
+    ::= { tnMVRSFMEntry 1 }
+
+tnMVRSFMGroupAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The ip address type of the mvr group."
+    ::= { tnMVRSFMEntry 2 }
+
+tnMVRSFMGroupAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The ipv4/ipv6 group address."
+    ::= { tnMVRSFMEntry 3 }
+
+tnMVRSFMIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The port number under the vlan and group."
+    ::= { tnMVRSFMEntry 4 }
+
+tnMVRSFMMode OBJECT-TYPE
+    SYNTAX      INTEGER { include (1), exclude (2) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Indicates the filtering mode maintained per (VLAN ID, port number, Group Address) basis. It can be either Include or Exclude."
+    ::= { tnMVRSFMEntry 5 }
+
+tnMVRSFMSourceAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The address type of the source."
+    ::= { tnMVRSFMEntry 6 }
+
+tnMVRSFMSourceAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "IP Address of the source. Currently, system limits the total number of IP source addresses for filtering to be 128. When there is no source filtering address, the text None is shown in the Source Address field."
+    ::= { tnMVRSFMEntry 7 }
+
+tnMVRSFMType OBJECT-TYPE
+    SYNTAX      INTEGER { allow (1), deny (2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "To indicate the type of the SFM, either allow or deny."
+    ::= { tnMVRSFMEntry 8 }
+
+tnMVRSFMHardwareFilter OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates whether data plane destined to the specific group address from the source IPv4/IPv6 address could be handled by chip or not."
+    ::= { tnMVRSFMEntry 9 }
+
+END

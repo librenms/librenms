@@ -1,0 +1,432 @@
+-- *****************************************************************
+-- TN-TC:  Textual Conventions
+--
+-- Copyright (c) 2009 by Transition Networks, Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+
+TN-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32 FROM SNMPv2-SMI
+    Gauge32 FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+-- definition of textual conventions
+
+TNInteger8 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "Represents an 8-bit signed integer."
+    SYNTAX      INTEGER (-128..127)
+
+TNInteger16 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "Represents a 16-bit signed integer."
+    SYNTAX      INTEGER (-32768..32767)
+
+TNInteger64 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "8x"
+    STATUS      current
+    DESCRIPTION
+        "Represents a 64-bit signed integer encoded as two's complement in
+        network order."
+    SYNTAX      OCTET STRING (SIZE (8))
+
+TNUnsigned8 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "Represents an 8-bit unsigned integer."
+    SYNTAX      Gauge32 (0..255)
+
+TNUnsigned16 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "Represents a 16-bit unsigned integer."
+    SYNTAX      Gauge32 (0..65535)
+
+TNUnsigned64 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "8x"
+    STATUS      current
+    DESCRIPTION
+        "Represents a 64-bit unsigned integer encoded in network order."
+    SYNTAX      OCTET STRING (SIZE (8))
+
+TNTimeStamp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "8x"
+    STATUS      current
+    DESCRIPTION
+        "Represents a timestamp in seconds since epoch. The data is encoded as
+        a 64-bit unsigned integer in network order."
+    SYNTAX      OCTET STRING (SIZE (8))
+
+TNEtherType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x"
+    STATUS       current
+    DESCRIPTION
+        "Represents a 16-bit Ethernet Type."
+    SYNTAX      Gauge32 (0..65535)
+
+TNInterfaceIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "The interface index is a unique identification of an arbitrary
+         interface in the system. Example of interfaces could be physical ports,
+         aggregations, VLAN interfaces and others.
+
+         The interface indexes used by the system is deterministic and is
+         chosen using the schema below.
+
+         NONE                          0 -             0 (standalone/stacking)
+         
+         Usid1 /ports                  1 -           999 (standalone/stacking)
+         
+         Usid1 /llagr                501 -          4999 (standalone/stacking)
+         
+         VLAN                      50001 -        54.095 (standalone/stacking)
+
+         GLAG                100.000.001 -   100.000.999 (standalone/stacking)
+
+         EVC                 200.000.001 -   200.099.999 (standalone)
+
+         MPLS links          300.000.001 -   300.009.999 (standalone)
+
+         MPLS tunnels        400.000.001 -   400.099.999 (standalone)
+
+         MPLS pseudo-wires   500.000.001 -   500.099.999 (standalone)
+
+         MPLS lsp            600.000.001 -   600.099.999 (standalone)"
+
+    SYNTAX       Integer32 (0..2147483647)
+
+TNRowEditorState ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "The RowEditorState is used both as a column in the dynamic tables, and
+         as a object in the row editor. The meaning of the row editor state
+         depends on the context where it is used.
+
+         In either case it is used to implement actions related to add or delete
+         columns in dynamic tables.
+
+         When used as a column in a dynamic table
+         ----------------------------------------
+
+         Read back of this value will always be zero. If the value 1 is written
+         to this object the given row will be deleted. Values different from 0
+         and 1 are reserved for future use and should not be used.
+
+         When used as an object in a row editor
+         --------------------------------------
+
+         A value used to control the row editor protocol. The values 0-255 are
+         reserved to be used in the row editor protocol, all other values tokes
+         the manager can use to reserve the row editor.
+
+         The values 0, 1 and 2 is currently use din the row editor protocol
+         while the values 3-255 are reserved for future use.
+
+         Following is the names of the values used in the row editor protocol:
+
+           0:              IDLE STATE
+           1:              CLEAR-ACTION
+           2:              COMMIT-ACTION
+           256-4294967295: MANAGER-ID
+
+         The following state machine defines the row editor protocol:
+
+                 +--------------+                 +------------------+
+                 |              |<----------------|                  |
+                 |              |   CLEAR         |                  |
+                 |     IDLE     |<----------------|     RESERVED     |
+                 |              |   COMMIT        |                  |
+                 |              |---------------->|                  |
+                 +--------------+   MANAGER-ID    +------------------+
+
+         When the RowEditorState is being read one will either read the value
+         zero: meaning that the row editor is in the idle state. Or a value
+         between 256-4294967295: meaning that the row editor is reserved with
+         the given ID.
+
+         When the row editor is in the IDLE state the manager may try to reserve
+         it by writing its own MANAGER-ID to the RowEditorState object. If the
+         write succeeds the manager can read-back the MANAGER-ID.
+
+         When the row editor is in the RESERVED state the manager can either
+         clear the changes by writing CLEAR, or it can commit the changes by
+         writing COMMIT. Both actions will cause the state to jump back to the
+         IDLE state, but only the COMMIT will cause the row to be added."
+
+    SYNTAX       Gauge32
+
+TNPercent ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "An integer in the range 0..100 representing a percent value"
+    SYNTAX       Gauge32(0..100)
+
+TNPortList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "128x"
+    STATUS       current
+    DESCRIPTION
+        "A list of ports that may be distributed across more stack units.
+
+         The type should be interpreted as a sequence of bits, each bit
+         representing a port. If a bit is set (1) the represented port is
+         included in the port list. If a bit is not set (0) the represented port
+         is not included in the port list.
+
+         Each switch in a stack is represented by an ID in the range [1-16] both
+         included. Each switch in the stack has a reserved range of 64 bits
+         or 8 bytes in this octet string. If the switch is not stackable it will
+         be represented as 'Switch 1'.
+
+         The switch with ID 1 owns the byte range 0-7, switch ID 2 owns the
+         byte range 8-15, etc.
+
+         The physical ports are represented by the bit index relative to the
+         range owned by a given switch. Bit number zero is the least significant
+         bit of the first entry in the byte sequence owned by the switch (port
+         number 0 if such a port exists). Bit number one is the second least
+         significant bit in the first byte of the range owned by the switch.
+
+         This is illustrated below:
+
+          Port 7 switch 1                 Port 7 switch 2
+          ^    Port 0 switch 1            ^    Port 0 switch 2
+          |    ^ Port 15 switch 1         |    ^     Port 63 switch 2
+          |    | ^    Port 8 switch 1     |    |     ^     Port 56 switch 2
+          |    | |    ^ Port 23 switch 1       |     |     ^
+          |    | |    | ^    Port 16 switch 1        |     |
+          |    | |    | |    ^     Port 63 switch 1        |
+          |    | |    | |    |     ^    Port 56 switch 1   |
+          |    | |    | |    |     |    ^                  |
+          |    | |    | |    |     |    | |    |     |     |
+          v    v v    v v    v     v    v v    v     v     v
+         +---------------------------------------------------------------+
+         |byte 0|byte 1|byte 2|...|byte 7|byte 8|...|byte 15|...|byte 127|
+         +---------------------------------------------------------------+
+         \______________  ______________/ \________  ______/ \____  ____/
+                        \/                         \/             \/
+                      Switch 1                  Switch 2       Switch 3-16
+
+         The octet string is truncated at most significant byte which is not
+         zero. An empty port list is encoded as [0x00].
+
+         Example: a non-stackable switch where 48 is the highest port number
+         needs seven bytes to represent a complete port list. If the port list
+         only contains port 1, 2 and 20 then the SNMP encoded port list is:
+         [0x06, 0x00, 0x10].
+
+         NOTE: Even though port 0 does not exists in the port map it is still
+         represented by a bit in this port list. The same is true for the higher
+         indices. Configuring non-existing ports using the port list will have
+         no effect on the target."
+    SYNTAX       OCTET STRING (SIZE (1..128))
+
+TNVlan ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "An integer representing a VLAN ID."
+    SYNTAX      Gauge32 (1..4095)
+
+TNVlanListQuarter ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "128x"
+    STATUS       current
+    DESCRIPTION
+        "A list representing 1024 VLAN IDs.
+
+         The type should be interpreted as a sequence of bits, each bit
+         representing one VLAN ID. If a bit is set (1) the represented VLAN is
+         included in the VLAN list. If a bit is not set (0) the represented VLAN
+         is not included in the VLAN list.
+
+         The least significant bit of each byte represents a smaller VLAN ID
+         than a more significant bit of a byte.
+
+         If for example the VLAN list represents VLAN IDs from 0 to 1023,
+         bit 0 of the first byte represents VLAN ID 0, bit 1 of the first byte
+         represents VLAN ID 1, and so on. The most significant bit of the 128th
+         byte therefore represents VLAN ID 1023.
+
+         An implementation that needs to represent all 4K VLANs will divide
+         the VLAN list into four equally sized objects. VLAN ID 0 is included
+         in the first object even though it is not used."
+    SYNTAX       OCTET STRING (SIZE (128))
+
+TNDisplayString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "Represents textual information taken from the ASCII character 
+         set, as defined in ANSI X3.4-1986 with some restrictions.
+
+         The following rules apply:
+
+          - only character codes 32-126 (decimal) are supported
+
+          - the graphics characters (32-126) are interpreted as
+            US ASCII
+
+         Any object defined using this syntax may not exceed 255
+         characters in length."
+    SYNTAX       OCTET STRING (SIZE (0..255))
+
+TNInetAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "Represents an internet address. Following is the list of supported
+        address types: IPv4 address, IPv6 address, Domain name or No-Address.
+
+        The addresses are encoded as a human readable string as defined here:
+
+         - IPv4 address is encoded as 'a.b.c.d' where a-d are integer numbers in
+           the range from 0-255.
+
+         - IPv6 address is encoded as defined in RFC5952.
+
+         - Domain names are passed through in their native representation.
+
+         - No-Address is encoded as the string literal: '<no-address>'.
+
+        This type is not allowed to be used as indices in tables."
+    SYNTAX       OCTET STRING (SIZE (1..253))
+
+TNIpAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "Represents an internet address. Following is the list of supported
+        address types: IPv4 address, IPv6 address or No-Address.
+
+        The addresses are encoded as a human readable string as defined here:
+
+         - IPv4 address is encoded as 'a.b.c.d' where a-d are integer numbers in
+           the range from 0-255.
+
+         - IPv6 address is encoded as defined in RFC5952.
+
+         - No-Address is encoded as the string literal: '<no-address>'."
+    SYNTAX       OCTET STRING (SIZE (1..46))
+
+TNVclProtoEncap ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "6x"
+    STATUS       current
+    DESCRIPTION
+        "Represents a protocol encapsulation, needed by the Protocol part of
+        the VCL module.
+
+        The protocol encapsulation type, along with the respective encapsulation
+        fields are encoded as an octet string of variable size ranging from 3 to 6.
+
+        Currently, the VCL module only supports three protocol encapsulation types:
+
+        - Ethernet II encapsulation, defined by setting the first octet to 1. Two more
+          octets are used to describe the 'type' field. The type can range from 0x0600-0xffff.
+
+          I.e. ETH2:    1            TYPE
+                     {byte 0} {byte 1 +  byte 2}
+
+          E.g. 1.2048 := ETH2, TYPE = 0x0800
+
+        - LLC SNAP encapsulation, defined by setting the first octet to 2. Three more
+          octets are used for the 'OID' field and two for the 'PID' field. The OID can range
+          from 0x000000-0xffffff and the PID from 0x0000-0xffff. Special case is when OID is
+          0x000000; then PID can only range from 0x0600-0xffff.
+
+          I.e. LLC-SNAP:    2      OUI[0]   OUI[1]   OUI[2]         PID
+                         {byte 0} {byte 1} {byte 2} {byte 3} {byte 4 +  byte 5}
+
+          E.g. 2.0.1.24.562 := SNAP, OUI = 0x00:01:18, PID = 0x0232
+
+        - LLC Other encapsulation, defined by setting the first octet to 3. Two more
+          octets are used for the 'DSAP' and 'SSAP' fields respectively. Each of these two fields
+          can range from 0-255
+
+          I.e. LLC-OTHER:    3       DSAP     SSAP
+                          {byte 0} {byte 1} {byte 2}
+
+          E.g. 3.42.85 := LLC, DSAP = 0x2A, SSAP = 0x55
+
+        Default, empty encapsulation is 0.0.0"
+    SYNTAX       OCTET STRING (SIZE (3..6))
+
+TNBitType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents a bit selector."
+    SYNTAX      INTEGER { any(0), zero(1), one(2) }
+
+TNDestMacType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents a destination MAC type selector."
+    SYNTAX      INTEGER { any(0), unicast(1), multicast(2), broadcast(3) }
+
+TNVcapKeyType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents a VCAP key type selector."
+    SYNTAX      INTEGER { normal(0), doubleTag(1), ipAddr(2), macIpAddr(3) }
+
+TNVlanTagPriority ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "VLAN priority."
+    SYNTAX      INTEGER { any(0), value0(1), value1(2), value2(3), value3(4), value4(5), value5(6), value6(7), value7(8), range0to1(9), range2to3(10), range4to5(11), range6to7(12), range0to3(13), range4to7(14) }
+
+TNVlanTagType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents a VLAN tag type selector."
+    SYNTAX      INTEGER { any(0), untagged(1), tagged(2), cTagged(3), sTagged(4) }
+
+TNASRType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents an Any/Specific/Range selector."
+    SYNTAX      INTEGER { any(0), specific(1), range(2) }
+
+TNAdvDestMacType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents a destination MAC type selector."
+    SYNTAX      INTEGER { any(0), unicast(1), multicast(2), broadcast(3), specific(4) }
+
+TNASType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents an Any/Specific selector."
+    SYNTAX      INTEGER { any(0), specific(1) }
+
+TNSfpTransceiver ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations show the SFP transceiver type."
+    SYNTAX      INTEGER {
+        none(0),
+        notSupported(1),
+        sfp100FX(2),
+        sfp1000BaseT(7),
+        sfp1000BaseCx(8),
+        sfp1000BaseSx(9),
+        sfp1000BaseLx(10),
+        sfp1000BaseX(11),
+        sfp2G5(12),
+        sfp5G(13),
+        sfp10G(14)
+    }
+
+END

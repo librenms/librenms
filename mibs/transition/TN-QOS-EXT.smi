@@ -1,0 +1,2276 @@
+-- ***********************************************************************************************
+-- TN-QOS-EXT-MIB.mib:  Transition Networks, Inc. Enterprise MIB for VLAN management
+--
+-- Copyright (c) 2014 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- ***********************************************************************************************
+--
+
+TN-QOS-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Counter64
+        FROM SNMPv2-SMI
+    TruthValue, TimeInterval, MacAddress, RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InetAddress, InetAddressType FROM INET-ADDRESS-MIB
+    entPhysicalIndex FROM ENTITY-MIB
+    VlanIndex, PortList
+        FROM Q-BRIDGE-MIB
+    InterfaceIndexOrZero, InterfaceIndex, ifIndex FROM IF-MIB
+    tnProducts
+        FROM TRANSITION-SMI;
+
+tnQosExtMIB MODULE-IDENTITY
+    LAST-UPDATED "201400060000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+        "    Transition Networks
+            Technical Support
+
+            10900 Red Circle Drive
+            Minnetonka, MN 55343 USA
+            Tel: +1-800-526-9267
+
+            E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib module for managing extra QoS features in TN platform products."
+
+    REVISION      "201205310000Z"
+        DESCRIPTION
+        "Initial Revision of this module"
+    REVISION      "201400060000Z"
+        DESCRIPTION
+        "Added Serval MIBs tnQosExtPortWredMaxThresh,
+              tnQosExtPortWredMaxUnit to this module"
+    ::= { tnProducts 9 }
+
+
+--
+-- Textual Conventions
+--
+TnQosExtRateUnitType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "T"
+    SYNTAX  INTEGER {
+        kbps(1),
+        fps(2),
+        mbps(3),
+        kfps(4)
+    }
+
+TnQosExtRateInFps  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "T"
+    SYNTAX  INTEGER {
+        fps1(1),
+        fps2(2),
+        fps4(3),
+        fps8(4),
+        fps16(5),
+        fps32(6),
+        fps64(7),
+        fps128(8),
+        fps256(9),
+        fps512(10),
+        fps1k(11),
+        fps2k(12),
+        fps4k(13),
+        fps8k(14),
+        fps16k(15),
+        fps32k(16),
+        fps64k(17),
+        fps128k(18),
+        fps256k(19),
+        fps512k(20),
+        fps1024k(21),
+        fps2048k(22),
+        fps4096k(23),
+        fps8192k(24),
+        fps16384k(25),
+        fps32768k(26)
+    }
+
+tnQosExtMIBObjects OBJECT IDENTIFIER ::= { tnQosExtMIB 1 }
+
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- groups in the TN-QOS-EXT-MIB MIB
+-- -------------------------------------------------------------
+tnQosExtPortMgmt         OBJECT IDENTIFIER ::= { tnQosExtMIBObjects 1 }
+tnQosExtL2CosMgmt        OBJECT IDENTIFIER ::= { tnQosExtMIBObjects 2 }
+tnQosExtDscpMgmt         OBJECT IDENTIFIER ::= { tnQosExtMIBObjects 3 }
+tnQosExtQclMgmt          OBJECT IDENTIFIER ::= { tnQosExtMIBObjects 4 }
+
+-- -------------------------------------------------------------
+-- tables in the tnQosExtPortMgmt
+-- -------------------------------------------------------------
+--
+-- QoS Ingress Port Policers
+--
+tnQosExtPortPolicerTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtPortPolicerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A port policer table can limit the bandwidth of received frames per port."
+    ::= { tnQosExtPortMgmt 1 }
+
+tnQosExtPortPolicerEntry OBJECT-TYPE
+    SYNTAX TnQosExtPortPolicerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table controls the bandwidth of received frames per port. It is located in front of the ingress queue."
+    INDEX { ifIndex }
+    ::= { tnQosExtPortPolicerTable 1 }
+
+TnQosExtPortPolicerEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtPortPolicerStatus       INTEGER,
+        tnQosExtPortPolicerRate         INTEGER,
+        tnQosExtPortPolicerUnit         TnQosExtRateUnitType,
+        tnQosExtPortPolicerFlowControl  INTEGER
+    }
+
+tnQosExtPortPolicerStatus OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the per port policer status. The policer can limit the
+     bandwidth of received frames. It is located in front of the Ingress queue."
+     ::= { tnQosExtPortPolicerEntry 1 }
+
+tnQosExtPortPolicerRate OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the rate for the port policer. The rate unit is defined in tnQosExtPortPolicerUnit."
+     ::= { tnQosExtPortPolicerEntry 2 }
+
+tnQosExtPortPolicerUnit OBJECT-TYPE
+    SYNTAX        TnQosExtRateUnitType
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "the rate unit for the port policer. Depend on the implement, some unit type may not be supported."
+     ::= { tnQosExtPortPolicerEntry 3 }
+
+tnQosExtPortPolicerFlowControl OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the port policer flow control. If policer flow control is enabled and the port is in flow control mode,
+     then pause frames are sent instead of discarding frames."
+     ::= { tnQosExtPortPolicerEntry 4 }
+
+--
+-- QoS Ingress Queue Policers
+--
+tnQosExtPortQueuePolicerTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtPortQueuePolicerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A port queue policer table can limit the bandwidth of received frames per port per queue."
+    ::= { tnQosExtPortMgmt 2 }
+
+tnQosExtPortQueuePolicerEntry OBJECT-TYPE
+    SYNTAX TnQosExtPortQueuePolicerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table controls the bandwidth of received frames per port per queue. It is located in front of the ingress queue."
+    INDEX { ifIndex, tnQosExtPortQueuePolicerQid }
+    ::= { tnQosExtPortQueuePolicerTable 1 }
+
+TnQosExtPortQueuePolicerEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtPortQueuePolicerQid          INTEGER,
+        tnQosExtPortQueuePolicerStatus       INTEGER,
+        tnQosExtPortQueuePolicerRate         INTEGER,
+        tnQosExtPortQueuePolicerUnit         TnQosExtRateUnitType
+    }
+
+tnQosExtPortQueuePolicerQid OBJECT-TYPE
+    SYNTAX        INTEGER (1..11111)  -- range added by Jing
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The ingress queue id for queue policer.
+     tnQosExtPortQueuePolicerQid is a number in the range (0..(dot1dPortNumTrafficClasses-1))"
+     ::= { tnQosExtPortQueuePolicerEntry 1 }
+
+tnQosExtPortQueuePolicerStatus OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls whether the policer is enabled on the specific queue."
+     ::= { tnQosExtPortQueuePolicerEntry 2 }
+
+tnQosExtPortQueuePolicerRate OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the rate for the queue policer. The rate unit is defined in tnQosExtPortQueuePolicerUnit."
+     ::= { tnQosExtPortQueuePolicerEntry 3 }
+
+tnQosExtPortQueuePolicerUnit OBJECT-TYPE
+    SYNTAX        TnQosExtRateUnitType
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The rate unit for the queue policer. Depend on the implement, some unit type may not be supported."
+     ::= { tnQosExtPortQueuePolicerEntry 4 }
+--
+-- QoS Egress Port Schedulers
+--
+tnQosExtPortSchedulerTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtPortSchedulerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A port scheduler table controls the egress queue scheduler method per port."
+    ::= { tnQosExtPortMgmt 3 }
+
+tnQosExtPortSchedulerEntry OBJECT-TYPE
+    SYNTAX TnQosExtPortSchedulerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table controls the egress queue scheduler method per port."
+    INDEX { ifIndex }
+    ::= { tnQosExtPortSchedulerTable 1 }
+
+TnQosExtPortSchedulerEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtPortSchedulerMode       INTEGER,
+        tnQosExtPortSchedulerQueueMask  BITS
+    }
+
+tnQosExtPortSchedulerMode OBJECT-TYPE
+    SYNTAX        INTEGER {strict(1), weighted(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the port egress scheduler mode, strict or weighted."
+     ::= { tnQosExtPortSchedulerEntry 1 }
+
+tnQosExtPortSchedulerQueueMask OBJECT-TYPE
+    SYNTAX        BITS { none(0) } -- value added by Jing
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the queues mask which is in the weighted schedule mode. Other queues are in strict mode."
+     ::= { tnQosExtPortSchedulerEntry 2 }
+
+tnQosExtPortSchedulerWeightTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtPortSchedulerWeightEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A port scheduler weight table controls the egress queue weight value in weighted scheduler mode per port."
+    ::= { tnQosExtPortMgmt 4 }
+
+tnQosExtPortSchedulerWeightEntry OBJECT-TYPE
+    SYNTAX TnQosExtPortSchedulerWeightEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table controls the egress queue weight value in weighted scheduler mode per port."
+    INDEX { ifIndex, tnQosExtPortSchedulerWeightQid }
+    ::= { tnQosExtPortSchedulerWeightTable 1 }
+
+TnQosExtPortSchedulerWeightEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtPortSchedulerWeightQid        INTEGER,
+        tnQosExtPortSchedulerWeightVal        INTEGER,
+        tnQosExtPortSchedulerWeightPercent    INTEGER
+    }
+
+tnQosExtPortSchedulerWeightQid OBJECT-TYPE
+    SYNTAX        INTEGER (1..11111)  -- range added by Jing
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The egress queue id for scheduler.
+     tnQosExtPortSchedulerWeightQid is a number in the range (0..(dot1dPortNumTrafficClasses-1))"
+     ::= { tnQosExtPortSchedulerWeightEntry 1 }
+
+tnQosExtPortSchedulerWeightVal  OBJECT-TYPE
+    SYNTAX        INTEGER (1..100)
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The egress queue weight value. the value range is from 1 to 100."
+     ::= { tnQosExtPortSchedulerWeightEntry 2 }
+
+tnQosExtPortSchedulerWeightPercent  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+    "The egress queue weight in percent view."
+     ::= { tnQosExtPortSchedulerWeightEntry 3 }
+--
+-- QoS Egress Port Shapers
+--
+tnQosExtPortShaperTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtPortShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A port shaper table can limit the bandwidth of egress frames per port."
+    ::= { tnQosExtPortMgmt 5 }
+
+tnQosExtPortShaperEntry OBJECT-TYPE
+    SYNTAX TnQosExtPortShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table controls the bandwidth of egress frames per port."
+    INDEX { ifIndex }
+    ::= { tnQosExtPortShaperTable 1 }
+
+TnQosExtPortShaperEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtPortShaperStatus       INTEGER,
+        tnQosExtPortShaperRate         INTEGER,
+        tnQosExtPortShaperUnit         TnQosExtRateUnitType
+    }
+
+tnQosExtPortShaperStatus OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the per port shaper status. The shaper can limit the
+     bandwidth of transmit frames in egress side."
+     ::= { tnQosExtPortShaperEntry 1 }
+
+tnQosExtPortShaperRate OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the rate for the port shaper. The rate unit is defined in tnQosExtPortShaperUnit."
+     ::= { tnQosExtPortShaperEntry 2 }
+
+tnQosExtPortShaperUnit OBJECT-TYPE
+    SYNTAX        TnQosExtRateUnitType
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "the rate unit for the port shaper. Depend on the implement, some unit type may not be supported."
+     ::= { tnQosExtPortShaperEntry 3 }
+
+--
+-- QoS Egress Queue Shapers
+--
+tnQosExtPortQueueShaperTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtPortQueueShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A port queue shaper table can limit the bandwidth of egress frames per port per queue."
+    ::= { tnQosExtPortMgmt 6 }
+
+tnQosExtPortQueueShaperEntry OBJECT-TYPE
+    SYNTAX TnQosExtPortQueueShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table controls the bandwidth of egress frames per port per queue."
+    INDEX { ifIndex, tnQosExtPortQueueShaperQid }
+    ::= { tnQosExtPortQueueShaperTable 1 }
+
+TnQosExtPortQueueShaperEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtPortQueueShaperQid          INTEGER,
+        tnQosExtPortQueueShaperStatus       INTEGER,
+        tnQosExtPortQueueShaperRate         INTEGER,
+        tnQosExtPortQueueShaperUnit         TnQosExtRateUnitType,
+        tnQosExtPortQueueShaperExcess       INTEGER
+    }
+
+tnQosExtPortQueueShaperQid OBJECT-TYPE
+    SYNTAX        INTEGER (1..11111)  -- range added by Jing
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The egress queue id for queue shaper.
+     tnQosExtPortQueueShaperQid is a number in the range (0..(dot1dPortNumTrafficClasses-1))"
+     ::= { tnQosExtPortQueueShaperEntry 1 }
+
+tnQosExtPortQueueShaperStatus OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls whether the shaper is enabled on the specific queue."
+     ::= { tnQosExtPortQueueShaperEntry 2 }
+
+tnQosExtPortQueueShaperRate OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the rate for the queue shaper. The rate unit is defined in tnQosExtPortQueueShaperUnit."
+     ::= { tnQosExtPortQueueShaperEntry 3 }
+
+tnQosExtPortQueueShaperUnit OBJECT-TYPE
+    SYNTAX        TnQosExtRateUnitType
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The rate unit for the queue shaper. Depend on the implement, some unit type may not be supported."
+     ::= { tnQosExtPortQueueShaperEntry 4 }
+
+tnQosExtPortQueueShaperExcess OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls whether the queue is allowed to use excess bandwidth."
+     ::= { tnQosExtPortQueueShaperEntry 5 }
+
+--
+-- Storm Control Configuration
+--
+tnQosExtPortStormControlTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtPortStormControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Storm control settings table."
+    ::= { tnQosExtPortMgmt 7 }
+
+tnQosExtPortStormControlEntry   OBJECT-TYPE
+    SYNTAX  TnQosExtPortStormControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the storm control settings on an interface."
+    INDEX { ifIndex }
+    ::= { tnQosExtPortStormControlTable 1 }
+
+TnQosExtPortStormControlEntry   ::=
+    SEQUENCE
+    {
+        tnQosExtPortStormControlUnicastStatus      INTEGER,
+        tnQosExtPortStormControlUnicastRate        TnQosExtRateInFps,
+        tnQosExtPortStormControlMulticastStatus    INTEGER,
+        tnQosExtPortStormControlMulticastRate      TnQosExtRateInFps,
+        tnQosExtPortStormControlBroadcastStatus    INTEGER,
+        tnQosExtPortStormControlBroadcastRate      TnQosExtRateInFps
+    }
+
+tnQosExtPortStormControlUnicastStatus  OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Enable or disable the storm control status for unicast."
+     ::= { tnQosExtPortStormControlEntry 1 }
+
+tnQosExtPortStormControlUnicastRate  OBJECT-TYPE
+    SYNTAX        TnQosExtRateInFps
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The rate unit is packets per second (pps)."
+     ::= { tnQosExtPortStormControlEntry 2 }
+
+tnQosExtPortStormControlMulticastStatus  OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Enable or disable the storm control status for multicast."
+     ::= { tnQosExtPortStormControlEntry 3 }
+
+tnQosExtPortStormControlMulticastRate  OBJECT-TYPE
+    SYNTAX        TnQosExtRateInFps
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The rate unit is packets per second (pps)."
+     ::= { tnQosExtPortStormControlEntry 4 }
+
+tnQosExtPortStormControlBroadcastStatus  OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Enable or disable the storm control status for broadcast."
+     ::= { tnQosExtPortStormControlEntry 5 }
+
+tnQosExtPortStormControlBroadcastRate  OBJECT-TYPE
+    SYNTAX        TnQosExtRateInFps
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The rate unit is packets per second (pps)."
+     ::= { tnQosExtPortStormControlEntry 6 }
+
+tnQosExtPortStormControl2Table   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtPortStormControl2Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Storm control settings table 2."
+    ::= { tnQosExtPortMgmt 8 }
+
+tnQosExtPortStormControl2Entry   OBJECT-TYPE
+    SYNTAX  TnQosExtPortStormControl2Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the storm control settings on an interface."
+    INDEX { ifIndex, tnQosExtPortStormControl2FrameType }
+    ::= { tnQosExtPortStormControl2Table 1 }
+
+TnQosExtPortStormControl2Entry   ::=
+    SEQUENCE
+    {
+        tnQosExtPortStormControl2FrameType         INTEGER,
+        tnQosExtPortStormControl2Rate              INTEGER,
+        tnQosExtPortStormControl2RateUnit          TnQosExtRateUnitType,
+        tnQosExtPortStormControl2Status            TruthValue
+    }
+
+tnQosExtPortStormControl2FrameType  OBJECT-TYPE
+    SYNTAX        INTEGER {
+                    unicast(1),
+                    broadcast(2),
+                    unknown(3)
+                  }
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The frame type that storm control takes effect. Implement may use values like:
+      unicast   - unicast frame
+      broadcast - broadcast frame
+      unknown   - unknown(flooding) frame"
+    ::= { tnQosExtPortStormControl2Entry 1 }
+
+tnQosExtPortStormControl2Rate  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the rate for the storm control. The rate unit is defined in tnQosExtPortStormControl2RateUnit"
+    ::= { tnQosExtPortStormControl2Entry 2 }
+
+tnQosExtPortStormControl2RateUnit  OBJECT-TYPE
+    SYNTAX        TnQosExtRateUnitType
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the rate unit for the storm control. The rate is defined in tnQosExtPortStormControl2Rate"
+    ::= { tnQosExtPortStormControl2Entry 3 }
+
+tnQosExtPortStormControl2Status  OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Enable or disable the storm control status for the certain frame type."
+    ::= { tnQosExtPortStormControl2Entry 4 }
+
+--
+-- Weighted Random Early Detection Configuration
+--
+tnQosExtPortWredTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtPortWredEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table used to configure the Weighted Random Early Detection feature."
+    ::= { tnQosExtPortMgmt 9 }
+
+tnQosExtPortWredEntry OBJECT-TYPE
+    SYNTAX TnQosExtPortWredEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table used to configure the Weighted Random Early Detection feature."
+    INDEX { ifIndex, tnQosExtPortWredQid }
+    ::= { tnQosExtPortWredTable 1 }
+
+TnQosExtPortWredEntry  ::=
+    SEQUENCE
+      {
+          tnQosExtPortWredQid           INTEGER,
+          tnQosExtPortWredEnable        TruthValue,
+          tnQosExtPortWredThresholdMin  INTEGER,
+          tnQosExtPortWredMaxDp1        INTEGER,
+          tnQosExtPortWredMaxDp2        INTEGER,
+          tnQosExtPortWredMaxDp3        INTEGER,
+          tnQosExtPortWredMaxThresh     INTEGER,
+          tnQosExtPortWredMaxUnit       INTEGER
+      }
+
+tnQosExtPortWredQid  OBJECT-TYPE
+    SYNTAX        INTEGER (1..11111)  -- range added by Jing
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The queue id for the weighted random early detection."
+     ::= { tnQosExtPortWredEntry 1 }
+
+tnQosExtPortWredEnable  OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Enable or disable the weighted random early detection for a certain traffic queue."
+     ::= { tnQosExtPortWredEntry 2 }
+
+tnQosExtPortWredThresholdMin  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the lower RED threshold for a certain traffic queue.
+     If the average queue filling level is below this threshold, the drop probability is zero. This value is restricted to 0-100."
+     ::= { tnQosExtPortWredEntry 3 }
+
+tnQosExtPortWredMaxDp1  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the drop probability for frames marked with Drop Precedence Level 1 when the average queue filling level is 100%.
+     This value is restricted to 0-100."
+     ::= { tnQosExtPortWredEntry 4 }
+
+tnQosExtPortWredMaxDp2  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the drop probability for frames marked with Drop Precedence Level 2 when the average queue filling level is 100%.
+     This value is restricted to 0-100."
+     ::= { tnQosExtPortWredEntry 5 }
+
+tnQosExtPortWredMaxDp3  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the drop probability for frames marked with Drop Precedence Level 3 when the average queue filling level is 100%.
+     This value is restricted to 0-100."
+     ::= { tnQosExtPortWredEntry 6 }
+
+tnQosExtPortWredMaxThresh  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the upper RED drop probability or fill level threshold for frames marked with Drop Precedence Level 1 (yellow frames).
+     This value is restricted to 1-100%."
+     ::= { tnQosExtPortWredEntry 7 }
+
+tnQosExtPortWredMaxUnit  OBJECT-TYPE
+    SYNTAX        INTEGER{
+                      drop(1),
+                      fill(2)
+                    }
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Selects the unit for Max. Threshold. Possible values are:
+         Drop Probability: Max. Threshold controls the drop probability just below 100% fill level.
+         Fill Level: Max. Threshold controls the fill level where drop probability reaches 100%."
+     ::= { tnQosExtPortWredEntry 8 }
+
+--
+-- QoS Port Policer Order Configuration
+--
+tnQosExtPortPolicerOrderTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtPortPolicerOrderEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table used to configure the QoS Policer Order per port."
+    ::= { tnQosExtPortMgmt 10 }
+
+tnQosExtPortPolicerOrderEntry OBJECT-TYPE
+    SYNTAX TnQosExtPortPolicerOrderEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table used to configure the QoS Policer Order per port."
+    INDEX { ifIndex }
+    ::= { tnQosExtPortPolicerOrderTable 1 }
+
+TnQosExtPortPolicerOrderEntry  ::= SEQUENCE
+    {
+        tnQosExtPortPolicerOrder    INTEGER
+    }
+
+tnQosExtPortPolicerOrder OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "QoS policer order on the entry. depend on implement, the valid policer order would be:
+       1 - in this mode, QoS policer order is Port Queue Policer first, then Port Policer, ACL Policer is the last (default).
+       2 - in this mode, QoS policer order is ACL Policer first, then Port Queue Policer, Port Policer is the last."
+    DEFVAL { 1 }
+     ::= { tnQosExtPortPolicerOrderEntry 1 }
+
+-- -------------------------------------------------------------
+-- tables in the tnQosExtL2CosMgmt
+-- -------------------------------------------------------------
+--
+-- L2 CoS Ingress Default Classification
+--
+tnQosExtL2CosIfClassifDefaultTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtL2CosIfClassifDefaultEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Qos layer 2 default Ingress Classification table."
+    ::= { tnQosExtL2CosMgmt 1 }
+
+tnQosExtL2CosIfClassifDefaultEntry OBJECT-TYPE
+    SYNTAX TnQosExtL2CosIfClassifDefaultEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the QoS layer 2 default Ingress Classification settings on an interface."
+    INDEX { ifIndex }
+    ::= { tnQosExtL2CosIfClassifDefaultTable 1 }
+
+TnQosExtL2CosIfClassifDefaultEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtL2CosIfClassifDefaultClass    INTEGER,
+        tnQosExtL2CosIfClassifDefaultDpl      INTEGER,
+        tnQosExtL2CosIfClassifDefaultPcp      INTEGER,
+        tnQosExtL2CosIfClassifDefaultDei      INTEGER
+    }
+
+tnQosExtL2CosIfClassifDefaultClass OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the default QoS class (the QoS class for frames not classified in any other way). There is a one to
+     one mapping between QoS class, queue and priority. A QoS class of 0 (zero) has the lowest priority.
+     tnQosExtL2CosIfClassifDefaultClass is a number in the range (0..(dot1dPortNumTrafficClasses-1))"
+     ::= { tnQosExtL2CosIfClassifDefaultEntry 1 }
+
+tnQosExtL2CosIfClassifDefaultDpl  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the default DP (Drop Precedence) level for frames not classified in any other way."
+     ::= { tnQosExtL2CosIfClassifDefaultEntry 2 }
+
+tnQosExtL2CosIfClassifDefaultPcp  OBJECT-TYPE
+    SYNTAX        INTEGER (0..7 )
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the default PCP for untagged frames. PCP (Priority Code Point) is a 3-bit field storing the priority
+     level for the 802.1Q frame. It is also known as User Priority."
+     ::= { tnQosExtL2CosIfClassifDefaultEntry 3 }
+
+tnQosExtL2CosIfClassifDefaultDei  OBJECT-TYPE
+    SYNTAX        INTEGER (0..1 )
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the default DEI for untagged frames. DEI (Drop Eligible Indicator) is a 1-bit field in the VLAN tag."
+     ::= { tnQosExtL2CosIfClassifDefaultEntry 4 }
+
+--
+-- L2 CoS Ingress priority tagged Classification Mode
+--
+tnQosExtL2CosIfClassifTagTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtL2CosIfClassifTagEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Layer 2 Cos ingress priority-tagged frame classification mode Table."
+    ::= { tnQosExtL2CosMgmt 2 }
+
+tnQosExtL2CosIfClassifTagEntry OBJECT-TYPE
+    SYNTAX TnQosExtL2CosIfClassifTagEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the Layer 2 Cos ingress priority-tagged frame classification mode on an interface."
+    INDEX { ifIndex }
+    ::= { tnQosExtL2CosIfClassifTagTable 1 }
+
+TnQosExtL2CosIfClassifTagEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtL2CosIfClassifTagMode      INTEGER
+    }
+
+tnQosExtL2CosIfClassifTagMode  OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the classification mode for priority tagged frames on this interface.
+     Disabled - Use default QoS class and DP level for priority tagged frames.
+     Enabled - Use mapped value of PCP and DEI for priority tagged frames."
+     ::= { tnQosExtL2CosIfClassifTagEntry 1 }
+
+--
+-- Layer 2 CoS Classification Mapping Table
+--
+tnQosExtL2CosIfClassifTagMapTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtL2CosIfClassifTagMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "classified (PCP, DEI) to (QoS class, DP level) mapping table."
+    ::= { tnQosExtL2CosMgmt 3 }
+
+tnQosExtL2CosIfClassifTagMapEntry OBJECT-TYPE
+    SYNTAX TnQosExtL2CosIfClassifTagMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the mapping of the classified (PCP, DEI) to (QoS class, DP level) values.
+    This mapping is valid when tnQosExtL2CosIfClassifTagMode is set to Enabled."
+    INDEX { ifIndex, tnQosExtL2CosIfClassifTagMapPcp, tnQosExtL2CosIfClassifTagMapDei }
+    ::= { tnQosExtL2CosIfClassifTagMapTable 1 }
+
+TnQosExtL2CosIfClassifTagMapEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtL2CosIfClassifTagMapPcp      INTEGER,
+        tnQosExtL2CosIfClassifTagMapDei      INTEGER,
+        tnQosExtL2CosIfClassifTagMapClass    INTEGER,
+        tnQosExtL2CosIfClassifTagMapDpl      INTEGER
+    }
+
+tnQosExtL2CosIfClassifTagMapPcp  OBJECT-TYPE
+    SYNTAX        INTEGER (0..7 )
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The carried Pcp (Priority Code Point) field value if recieved frame is IEEE tagged frame."
+     ::= { tnQosExtL2CosIfClassifTagMapEntry 1 }
+
+tnQosExtL2CosIfClassifTagMapDei  OBJECT-TYPE
+    SYNTAX        INTEGER (0..1 )
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The carried Dei (Drop Eligible Indicator) field value if recieved frame is IEEE tagged frame."
+     ::= { tnQosExtL2CosIfClassifTagMapEntry 2 }
+
+tnQosExtL2CosIfClassifTagMapClass  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The Traffic Class the received frame is mapped to.
+     tnQosExtL2CosIfClassifTagMapClass is a number in the range (0..(dot1dPortNumTrafficClasses-1))."
+     ::= { tnQosExtL2CosIfClassifTagMapEntry 3 }
+
+tnQosExtL2CosIfClassifTagMapDpl  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The DP (Drop Precedence) level the received frame is mapped to."
+     ::= { tnQosExtL2CosIfClassifTagMapEntry 4 }
+
+--
+-- L2 CoS Egress Tag Remarking Mode
+--
+tnQosExtL2CosIfTagRemarkingModeTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtL2CosIfTagRemarkingModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table can control the egress frame tag remarking mode on an interface."
+    ::= { tnQosExtL2CosMgmt 4 }
+
+tnQosExtL2CosIfTagRemarkingModeEntry OBJECT-TYPE
+    SYNTAX TnQosExtL2CosIfTagRemarkingModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table controls the egress frame tag remarking mode on an interface."
+    INDEX { ifIndex }
+    ::= { tnQosExtL2CosIfTagRemarkingModeTable 1 }
+
+TnQosExtL2CosIfTagRemarkingModeEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtL2CosIfTagRemarkingMode       INTEGER
+    }
+
+tnQosExtL2CosIfTagRemarkingMode  OBJECT-TYPE
+    SYNTAX        INTEGER { classified(1), default(2), mapped(3) }
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the tag remarking mode for this port.
+     Classified - Use classified PCP/DEI values.
+     Default    - Use default PCP/DEI values.
+     Mapped     - Use mapped versions of QoS class and DP level."
+     ::= { tnQosExtL2CosIfTagRemarkingModeEntry 1 }
+
+--
+-- L2 CoS Egress Default Tag Remarking
+--
+tnQosExtL2CosIfTagRemarkingDefaultTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtL2CosIfTagRemarkingDefaultEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table represents the egress frame tag remarking mapping per port, when tnQosExtL2CosIfTagRemarkingMode is set to default mode."
+    ::= { tnQosExtL2CosMgmt 5 }
+
+tnQosExtL2CosIfTagRemarkingDefaultEntry OBJECT-TYPE
+    SYNTAX TnQosExtL2CosIfTagRemarkingDefaultEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the egress frame tag remarking mapping per port, when tnQosExtL2CosIfTagRemarkingMode is set to default mode."
+    INDEX { ifIndex }
+    ::= { tnQosExtL2CosIfTagRemarkingDefaultTable 1 }
+
+TnQosExtL2CosIfTagRemarkingDefaultEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtL2CosIfTagRemarkingDefaultPcp   INTEGER,
+        tnQosExtL2CosIfTagRemarkingDefaultDei   INTEGER
+    }
+
+tnQosExtL2CosIfTagRemarkingDefaultPcp  OBJECT-TYPE
+    SYNTAX        INTEGER (0..7)
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Default PCP (Priority Code Point) is a 3-bit field storing the priority level for the 802.1Q frame. It is also
+     known as User Priority. The valid range is 0 - 7. The default is 0."
+     ::= { tnQosExtL2CosIfTagRemarkingDefaultEntry 1 }
+
+tnQosExtL2CosIfTagRemarkingDefaultDei  OBJECT-TYPE
+    SYNTAX        INTEGER (0..1)
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Default DEI (Drop Eligible Indicator) is a 1-bit field in the VLAN tag. The valid range is 0 - 1.
+     The default is 0."
+     ::= { tnQosExtL2CosIfTagRemarkingDefaultEntry 2 }
+
+--
+-- L2 CoS Egress Tag Remarking Mapping Table
+--
+tnQosExtL2CosIfTagRemarkingMappingTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtL2CosIfTagRemarkingMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table represents the egress frame tag remarking mapping per port, when tnQosExtL2CosIfTagRemarkingMode is set to mapping mode."
+    ::= { tnQosExtL2CosMgmt 6 }
+
+tnQosExtL2CosIfTagRemarkingMappingEntry OBJECT-TYPE
+    SYNTAX TnQosExtL2CosIfTagRemarkingMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the egress frame tag remarking mapping per port, when tnQosExtL2CosIfTagRemarkingMode is set to mapping mode."
+    INDEX { ifIndex, tnQosExtL2CosIfTagRemarkingClass, tnQosExtL2CosIfTagRemarkingDpl }
+    ::= { tnQosExtL2CosIfTagRemarkingMappingTable 1 }
+
+TnQosExtL2CosIfTagRemarkingMappingEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtL2CosIfTagRemarkingClass     INTEGER,
+        tnQosExtL2CosIfTagRemarkingDpl       INTEGER,
+        tnQosExtL2CosIfTagRemarkingPcp       INTEGER,
+        tnQosExtL2CosIfTagRemarkingDei       INTEGER
+    }
+
+tnQosExtL2CosIfTagRemarkingClass  OBJECT-TYPE
+    SYNTAX        INTEGER (1..11111)  -- range added by Jing
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The traffic class of the transmit frame belongs to.
+     tnQosExtIfTagRemarkingClass is a number in the range (0..(dot1dPortNumTrafficClasses-1))."
+     ::= { tnQosExtL2CosIfTagRemarkingMappingEntry 1 }
+
+tnQosExtL2CosIfTagRemarkingDpl  OBJECT-TYPE
+    SYNTAX        INTEGER (1..11111)  -- range added by Jing
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The DP (Drop Precedence) level of the transmit frame belongs to."
+     ::= { tnQosExtL2CosIfTagRemarkingMappingEntry 2 }
+
+tnQosExtL2CosIfTagRemarkingPcp  OBJECT-TYPE
+    SYNTAX        INTEGER (0..7)
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "PCP (Priority Code Point) is a 3-bit field storing the priority level for the 802.1Q frame. It is also
+     known as User Priority. The valid range is 0 - 7."
+     ::= { tnQosExtL2CosIfTagRemarkingMappingEntry 3 }
+
+tnQosExtL2CosIfTagRemarkingDei  OBJECT-TYPE
+    SYNTAX        INTEGER (0..1)
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "DEI (Drop Eligible Indicator) is a 1-bit field in the VLAN tag. The valid range is 0 - 1."
+     ::= { tnQosExtL2CosIfTagRemarkingMappingEntry 4 }
+
+--
+--  L2 CoS Egress Tag Remarking DPL Mapping Table
+--
+tnQosExtL2CosIfTagRemarkingDplMappingTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtL2CosIfTagRemarkingDplMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table represents the egress frame tag remarking DP level mapping per port, when tnQosExtL2CosIfTagRemarkingMode is set to mapping mode."
+    ::= { tnQosExtL2CosMgmt 7 }
+
+tnQosExtL2CosIfTagRemarkingDplMappingEntry OBJECT-TYPE
+    SYNTAX TnQosExtL2CosIfTagRemarkingDplMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the egress frame tag remarking dpl mapping per port, when tnQosExtL2CosIfTagRemarkingMode is set to mapping mode."
+    INDEX { ifIndex, tnQosExtL2CosIfTagRemarkingDplMappingClassifDpl }
+    ::= { tnQosExtL2CosIfTagRemarkingDplMappingTable 1 }
+
+TnQosExtL2CosIfTagRemarkingDplMappingEntry  ::=
+    SEQUENCE
+    {
+        tnQosExtL2CosIfTagRemarkingDplMappingClassifDpl     INTEGER,
+        tnQosExtL2CosIfTagRemarkingDplMappingDpl            INTEGER
+    }
+
+tnQosExtL2CosIfTagRemarkingDplMappingClassifDpl  OBJECT-TYPE
+    SYNTAX        INTEGER (1..11111)  -- range added by Jing
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The Classified DP (Drop Precedence) level of the transmit frame belongs to."
+     ::= { tnQosExtL2CosIfTagRemarkingDplMappingEntry 1 }
+
+tnQosExtL2CosIfTagRemarkingDplMappingDpl  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The DP (Drop Precedence) level used for tag remarking process."
+     ::= { tnQosExtL2CosIfTagRemarkingDplMappingEntry 2 }
+
+-- -------------------------------------------------------------
+-- tables in the tnQosExtDscpMgmt
+-- -------------------------------------------------------------
+--
+-- QoS Port Classification DSCP based
+--
+tnQosExtDscpIfClassifBaseTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtDscpIfClassifBaseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table represents the QoS classification mode basis on an interface."
+    ::= { tnQosExtDscpMgmt 1 }
+
+tnQosExtDscpIfClassifBaseEntry   OBJECT-TYPE
+    SYNTAX  TnQosExtDscpIfClassifBaseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the QoS classification mode basis on an interface."
+    INDEX { ifIndex }
+    ::= { tnQosExtDscpIfClassifBaseTable 1 }
+
+TnQosExtDscpIfClassifBaseEntry   ::=
+    SEQUENCE
+    {
+        tnQosExtDscpIfClassifBaseDscp      INTEGER
+    }
+
+tnQosExtDscpIfClassifBaseDscp  OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls whether the QoS classification mode is based on DSCP value in IP frames on an interface.
+     Disabled - Disable DSCP based classification.
+     Enabled - Enable DSCP based classification."
+     ::= { tnQosExtDscpIfClassifBaseEntry 1 }
+
+--
+-- QoS Port DSCP Translation Mode table
+--
+tnQosExtDscpIfTransTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtDscpIfTransEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table represents the DSCP ingress translation mode on an interface."
+    ::= { tnQosExtDscpMgmt 2 }
+
+tnQosExtDscpIfTransEntry   OBJECT-TYPE
+    SYNTAX  TnQosExtDscpIfTransEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the DSCP ingress translation mode on an interface."
+    INDEX { ifIndex }
+    ::= { tnQosExtDscpIfTransTable 1 }
+
+TnQosExtDscpIfTransEntry   ::=
+    SEQUENCE
+    {
+        tnQosExtDscpIfTransMode      INTEGER
+    }
+
+tnQosExtDscpIfTransMode   OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the ingress DSCP translation setting on an interface."
+     ::= { tnQosExtDscpIfTransEntry 1 }
+
+--
+-- QoS DSCP Translation Map table
+--
+tnQosExtDscpIfTransMapTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtDscpIfTransMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table perform the ingress DSCP translation on an interface."
+    ::= { tnQosExtDscpMgmt 3 }
+
+tnQosExtDscpIfTransMapEntry   OBJECT-TYPE
+    SYNTAX  TnQosExtDscpIfTransMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A entry in this table perform the ingress DSCP translation on an interface."
+    INDEX { ifIndex, tnQosExtDscpIfTransMapDscp }
+    ::= { tnQosExtDscpIfTransMapTable 1 }
+
+TnQosExtDscpIfTransMapEntry   ::=
+    SEQUENCE
+    {
+        tnQosExtDscpIfTransMapDscp             INTEGER,
+        tnQosExtDscpIfTransMapToDscp           INTEGER
+    }
+
+tnQosExtDscpIfTransMapDscp  OBJECT-TYPE
+    SYNTAX        INTEGER (0..63)
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The received frame carried DSCP value, used for DSCP transmit input.
+     DSCP (Differentiated Services Code Point) is a field in the header of IP packets for packet classification purposes.
+     The valid range is 0 - 63"
+     ::= { tnQosExtDscpIfTransMapEntry 1 }
+
+tnQosExtDscpIfTransMapToDscp  OBJECT-TYPE
+    SYNTAX        INTEGER (0..63)
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The mapping DSCP value from the frame DSCP value, used for DSCP classification.
+     DSCP (Differentiated Services Code Point) is a field in the header of IP packets for packet classification purposes.
+     The valid range is 0 - 63"
+     ::= { tnQosExtDscpIfTransMapEntry 2 }
+
+--
+-- DSCP-Based QoS Ingress Classification map
+--
+tnQosExtDscpClassifMapTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtDscpClassifMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table represents the DSCP-Based QoS ingress classification mapping on an interface."
+    ::= { tnQosExtDscpMgmt 4 }
+
+tnQosExtDscpClassifMapEntry   OBJECT-TYPE
+    SYNTAX  TnQosExtDscpClassifMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the DSCP-Based QoS ingress classification mapping on an interface."
+    INDEX { ifIndex, tnQosExtDscpClassifMapDscp }
+    ::= { tnQosExtDscpClassifMapTable 1 }
+
+TnQosExtDscpClassifMapEntry   ::=
+    SEQUENCE
+    {
+        tnQosExtDscpClassifMapDscp       INTEGER,
+        tnQosExtDscpClassifMapTrust      INTEGER,
+        tnQosExtDscpClassifMapClass      INTEGER,
+        tnQosExtDscpClassifMapDpl        INTEGER
+    }
+
+tnQosExtDscpClassifMapDscp  OBJECT-TYPE
+    SYNTAX        INTEGER (0..63)
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "DSCP value used to map Qos class and DPL is either translated DSCP value or incoming frame DSCP value."
+     ::= { tnQosExtDscpClassifMapEntry 1 }
+
+tnQosExtDscpClassifMapTrust  OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls whether a specific DSCP value is trusted. Only frames with trused DSCP values are mapped to a specific QoS class and DPL.
+     Frames with untrusted DSCP values are treated as a non-IP frame.
+     Enabled - Set DSCP as trusted DSCP.
+     Disabled - Set DSCP as un-trusted DSCP."
+     ::= { tnQosExtDscpClassifMapEntry 2 }
+
+tnQosExtDscpClassifMapClass  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The traffic class of the recieved frame mapped to.
+     tnQosExtDscpClassifMapClass is a number in the range (0..(dot1dPortNumTrafficClasses-1))."
+     ::= { tnQosExtDscpClassifMapEntry 3 }
+
+tnQosExtDscpClassifMapDpl  OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The DP (Drop Precedence) level of the transmit frame mapped to"
+     ::= { tnQosExtDscpClassifMapEntry 4 }
+
+--
+-- port DSCP classification table
+--
+tnQosExtDscpIfClassifExtTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtDscpIfClassifExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table represents the DSCP classification based on QoS class and DP level on an interface."
+    ::= { tnQosExtDscpMgmt 5 }
+
+tnQosExtDscpIfClassifExtEntry   OBJECT-TYPE
+    SYNTAX  TnQosExtDscpIfClassifExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the DSCP classification based on QoS class and DP level on an interface."
+    INDEX { ifIndex }
+    ::= { tnQosExtDscpIfClassifExtTable 1 }
+
+TnQosExtDscpIfClassifExtEntry   ::=
+    SEQUENCE
+    {
+        tnQosExtDscpIfClassifExtMode      INTEGER
+    }
+
+tnQosExtDscpIfClassifExtMode   OBJECT-TYPE
+    SYNTAX        INTEGER {disable(1), dscp0(2), selected(3), all(4)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the ingress DSCP classification setting on an interface.
+     Disable - No Ingress DSCP Classification.
+     DSCP=0 - Classify if incoming (or translated if enabled) DSCP is 0.
+     Selected: Classify only selected DSCP for which classification is enabled.
+     All: Classify all DSCP."
+     ::= { tnQosExtDscpIfClassifExtEntry 1 }
+
+--
+-- QoS DSCP Classification table
+--
+tnQosExtDscpIfClassifExtDscpTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtDscpIfClassifExtDscpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table represents the DSCP classification mode per DSCP value."
+    ::= { tnQosExtDscpMgmt 6 }
+
+tnQosExtDscpIfClassifExtDscpEntry   OBJECT-TYPE
+    SYNTAX  TnQosExtDscpIfClassifExtDscpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the DSCP classification mode per DSCP value."
+    INDEX { ifIndex, tnQosExtDscpIfClassifExtDscp }
+    ::= { tnQosExtDscpIfClassifExtDscpTable 1 }
+
+TnQosExtDscpIfClassifExtDscpEntry   ::=
+    SEQUENCE
+    {
+        tnQosExtDscpIfClassifExtDscp          INTEGER,
+        tnQosExtDscpIfClassifExtDscpMode      INTEGER
+    }
+
+tnQosExtDscpIfClassifExtDscp   OBJECT-TYPE
+    SYNTAX        INTEGER (0..63)
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "DSCP (Differentiated Services Code Point) is a field in the header of IP packets for packet classification purposes.
+     The valid range is 0 - 63"
+     ::= { tnQosExtDscpIfClassifExtDscpEntry 1 }
+
+tnQosExtDscpIfClassifExtDscpMode   OBJECT-TYPE
+    SYNTAX        INTEGER {enabled(1), disabled(2)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Control the DSCP ingress classification mode on an interface. If port DSCP classification is 'selected',
+     DSCP will be classified based on QoS class and DP level only for DSCP value with classification mode 'enabled'.
+     DSCP may be translated DSCP if translation is enabled for the port.
+     Enabled -  Enable DSCP ingress classification.
+     Disabled - Disable DSCP ingress classification."
+     ::= { tnQosExtDscpIfClassifExtDscpEntry 2 }
+
+--
+-- QoS DSCP Classification Map table
+--
+tnQosExtDscpIfClassifExtMapTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtDscpIfClassifExtMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table config the Dscp ingress classification mapping."
+    ::= { tnQosExtDscpMgmt 7 }
+
+tnQosExtDscpIfClassifExtMapEntry   OBJECT-TYPE
+    SYNTAX  TnQosExtDscpIfClassifExtMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in this table perform the Dscp ingress classification mapping."
+    INDEX { ifIndex, tnQosExtDscpIfClassifExtMapClass, tnQosExtDscpIfClassifExtMapDpl }
+    ::= { tnQosExtDscpIfClassifExtMapTable 1 }
+
+TnQosExtDscpIfClassifExtMapEntry   ::=
+    SEQUENCE
+    {
+        tnQosExtDscpIfClassifExtMapClass            INTEGER,
+        tnQosExtDscpIfClassifExtMapDpl              INTEGER,
+        tnQosExtDscpIfClassifExtMapDscp             INTEGER
+    }
+
+tnQosExtDscpIfClassifExtMapClass   OBJECT-TYPE
+    SYNTAX        INTEGER (1..11111)  -- range added by Jing
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The Traffic Class the received frame is mapped to.
+     tnQosExtDscpIfClassifExtMapClass is a number in the range (0..(dot1dPortNumTrafficClasses-1))."
+     ::= { tnQosExtDscpIfClassifExtMapEntry 1 }
+
+tnQosExtDscpIfClassifExtMapDpl   OBJECT-TYPE
+    SYNTAX        INTEGER (1..11111)  -- range added by Jing
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The DP (Drop Precedence) level the received frame is mapped to."
+     ::= { tnQosExtDscpIfClassifExtMapEntry 2 }
+
+tnQosExtDscpIfClassifExtMapDscp   OBJECT-TYPE
+    SYNTAX        INTEGER (0..63)
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The Classified DSCP from QoS class and DP level. The DSCP which needs to be classified depends on interface DSCP
+     classification and DSCP classification mode. Incoming frame DSCP may be translated before using the value for classification."
+     ::= { tnQosExtDscpIfClassifExtMapEntry 3 }
+
+--
+-- QoS Port DSCP Egress Remark Mode table
+--
+tnQosExtDscpIfEgressRemarkTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtDscpIfEgressRemarkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table represents the DSCP egress remark mode on an interface."
+    ::= { tnQosExtDscpMgmt 8 }
+
+tnQosExtDscpIfEgressRemarkEntry   OBJECT-TYPE
+    SYNTAX  TnQosExtDscpIfEgressRemarkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the DSCP egress remark mode on an interface."
+    INDEX { ifIndex }
+    ::= { tnQosExtDscpIfEgressRemarkTable 1 }
+
+TnQosExtDscpIfEgressRemarkEntry   ::=
+    SEQUENCE
+    {
+        tnQosExtDscpIfEgressRemarkMode      INTEGER
+    }
+
+tnQosExtDscpIfEgressRemarkMode   OBJECT-TYPE
+    SYNTAX        INTEGER {disable(1), enable(2), remapDpUnaware(3), remapDpAware(4)}
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "Controls the egress frame DSCP field rewrite setting per port.
+     Disable: No Egress rewrite.
+     Enable: Rewrite enable without remapped.
+     Remap DP Unaware: DSCP from analyzer is remapped and frame is remarked with remapped DSCP value.
+     Remap DP Aware: DSCP from analyzer is remapped and frame is remarked with remapped DSCP value."
+     ::= { tnQosExtDscpIfEgressRemarkEntry 1 }
+
+--
+-- QoS DSCP Egress Remark Map table
+--
+tnQosExtDscpIfEgressRemarkMapTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtDscpIfEgressRemarkMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table represents the DSCP egress remark map on an interface."
+    ::= { tnQosExtDscpMgmt 9 }
+
+tnQosExtDscpIfEgressRemarkMapEntry   OBJECT-TYPE
+    SYNTAX  TnQosExtDscpIfEgressRemarkMapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table represents the DSCP egress remark map on an interface."
+    INDEX { ifIndex, tnQosExtDscpIfEgressRemarkMapDscp, tnQosExtDscpIfEgressRemarkMapDpl}
+    ::= { tnQosExtDscpIfEgressRemarkMapTable 1 }
+
+TnQosExtDscpIfEgressRemarkMapEntry   ::=
+    SEQUENCE
+    {
+        tnQosExtDscpIfEgressRemarkMapDscp        INTEGER,
+        tnQosExtDscpIfEgressRemarkMapDpl         INTEGER,
+        tnQosExtDscpIfEgressRemarkMapToDscp      INTEGER
+    }
+
+tnQosExtDscpIfEgressRemarkMapDscp  OBJECT-TYPE
+    SYNTAX        INTEGER (0..63)
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The classified DSCP value of the specific IP frame, used for DSCP egress remark. DSCP valid range is 0 - 63"
+     ::= { tnQosExtDscpIfEgressRemarkMapEntry 1 }
+
+tnQosExtDscpIfEgressRemarkMapDpl  OBJECT-TYPE
+    SYNTAX        INTEGER (1..11111)  -- range added by Jing
+    MAX-ACCESS    not-accessible
+    STATUS current
+    DESCRIPTION
+    "The classified DP (Drop Precedence) level of the specific frame, used for DSCP egress remark."
+     ::= { tnQosExtDscpIfEgressRemarkMapEntry 2 }
+
+tnQosExtDscpIfEgressRemarkMapToDscp  OBJECT-TYPE
+    SYNTAX        INTEGER (0..63)
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The DSCP value to which you want to remap for the egress side. This remap is based on classified DSCP and DP level."
+     ::= { tnQosExtDscpIfEgressRemarkMapEntry 3 }
+
+-- -------------------------------------------------------------
+-- tables in the tnQosExtQclMgmt
+-- -------------------------------------------------------------
+tnQosExtQclTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtQclEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table used to configure the QoS Control List settings."
+    ::= { tnQosExtQclMgmt 1 }
+
+tnQosExtQclEntry   OBJECT-TYPE
+    SYNTAX  TnQosExtQclEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table used to configure the QoS Control List settings."
+    INDEX { tnQosExtQclIndex }
+    ::= { tnQosExtQclTable 1 }
+
+TnQosExtQclEntry   ::=
+    SEQUENCE
+    {
+        tnQosExtQclIndex            INTEGER,
+        tnQosExtQclId               INTEGER,
+        tnQosExtQclNextQclId        INTEGER,
+        tnQosExtQclPortList         PortList,
+
+        --key parameter
+        tnQosExtQclTagType          INTEGER,
+        tnQosExtQclTagVlanType      INTEGER,
+        tnQosExtQclTagVlanVal       VlanIndex,
+        tnQosExtQclTagVlanMin       VlanIndex,
+        tnQosExtQclTagVlanMax       VlanIndex,
+        tnQosExtQclTagPcp           BITS,
+        tnQosExtQclTagDei           INTEGER,
+        tnQosExtQclSMacType         INTEGER,
+        tnQosExtQclSMac             MacAddress,
+        tnQosExtQclDMacType         INTEGER,
+        tnQosExtQclFrameType        INTEGER,
+
+        --Action
+        tnQosExtQclActClassDefault  INTEGER,
+        tnQosExtQclActClass         INTEGER,
+        tnQosExtQclActDplDefault    INTEGER,
+        tnQosExtQclActDpl           INTEGER,
+        tnQosExtQclActDscpDefault   INTEGER,
+        tnQosExtQclActDscp          INTEGER,
+
+        tnQosExtQclConflict         INTEGER,
+        tnQosExtQclStatus           RowStatus
+    }
+
+tnQosExtQclIndex  OBJECT-TYPE
+        SYNTAX      INTEGER (1..11111)  -- range added by Jing
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The row index of the QCL. "
+        ::= { tnQosExtQclEntry 1 }
+
+tnQosExtQclId   OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The identifier of the QCL. "
+        ::= { tnQosExtQclEntry 2 }
+
+tnQosExtQclNextQclId   OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Specify the created ECE is placed before which QCL. "
+        ::= { tnQosExtQclEntry 3 }
+
+tnQosExtQclPortList    OBJECT-TYPE
+    SYNTAX    PortList
+    MAX-ACCESS  read-create
+    STATUS current
+    DESCRIPTION
+    "The list of port members for the QCL."
+    ::= { tnQosExtQclEntry 4 }
+
+tnQosExtQclTagType    OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      tagged(1),
+                      untagged(2),
+                      any(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The frame tag type for matching the QCL. The possible values are:
+         tagged: The QCL will match tagged frames only.
+         untagged: The QCL will match untagged frames only.
+         any: The QCL will match both tagged and untagged frames. "
+    ::= { tnQosExtQclEntry 5 }
+
+tnQosExtQclTagVlanType   OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2),
+                      range(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The VLAN ID filter type for matching the QCL. It is only significant if tnQosExtQclTagType
+          is 'tagged' or 'any'. The possible values are:
+         any: No VLAN ID filter is specified. (VLAN ID filter status is 'don't-care'.)
+         specific: If you want to filter a specific VLAN ID value with this QCL, choose this
+                   value. A field for entering a specific value appears.
+         range: If you want to filter a specific VLAN ID range filter with this QCL, choose
+                this value. A field for entering a range appears.  "
+    ::= { tnQosExtQclEntry 6 }
+
+tnQosExtQclTagVlanVal    OBJECT-TYPE
+    SYNTAX          VlanIndex
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Specific VLAN ID filter for matching the QCL. It is only significant if tnQosExtQclTagVlanType
+         is selected 'specific'."
+    ::= { tnQosExtQclEntry 7 }
+
+tnQosExtQclTagVlanMin    OBJECT-TYPE
+    SYNTAX          VlanIndex
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Start of Range VLAN ID filter for matching the QCL. It is only significant if tnQosExtQclTagVlanType
+         is selected 'range'. this value should be lower than tnQosExtQclTagVlanMax value."
+    ::= { tnQosExtQclEntry 8 }
+
+tnQosExtQclTagVlanMax    OBJECT-TYPE
+    SYNTAX          VlanIndex
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The End of Range VLAN ID filter for matching the QCL. It is only significant if tnQosExtQclTagVlanType
+         is selected 'range'. this value should be higher than tnQosExtQclTagVlanMin value."
+    ::= { tnQosExtQclEntry 9 }
+
+tnQosExtQclTagPcp       OBJECT-TYPE
+    SYNTAX          BITS { none(0) } -- value added by Jing
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The PCP value for mataching the QCL. It is only significant if tnQosExtQclTagType
+          is 'tagged' or 'any'. The possible values are:
+         any: The QCL will match any PCP value(all bits will be set to 1).
+         specific: each bit matchs a specific PCP of QCL(from bit0 to bit7).
+         range: The QCL will match PCP values in the selected range, valid range is depend on the specific implement.
+		 e.g: for S3280, the valid range are bit0-bit1, bit2-bit3, bit4-bit5, bit6-bit7, bit0-bit3 or bit4-bit7."
+    ::= { tnQosExtQclEntry 10 }
+
+tnQosExtQclTagDei       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      dei0(2),
+                      dei1(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The DEI value for mataching the QCL. It is only significant if tnQosExtQclTagType
+          is 'tagged' or 'any'. The possible values are: 'any', 'dei0' or 'dei1'."
+    ::= { tnQosExtQclEntry 11 }
+
+tnQosExtQclSMacType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The source MAC address filter type for matching the QCL. The possible values are:
+         any: No source MAC address filter is specified. (source MAC address filter status is 'don't-care'.)
+         specific: choose this value to filter a specific source MAC address value with this QCL."
+    ::= { tnQosExtQclEntry 12 }
+
+tnQosExtQclSMac       OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "The source MAC address filter for matching the QCL.
+     In S3280 implement, only MAC OUI(first three octets) are used for MAC address matching process."
+    ::= { tnQosExtQclEntry 13 }
+
+tnQosExtQclDMacType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      unicast(2),
+                      multicast(3),
+                      broadcast(4)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The destination MAC address filter for matching the QCL. The possible values are:
+         any: No destination MAC address filter is specified. (destination MAC address filter status is 'don't-care'.)
+         unicast: Match the unicast destination MAC address for the QCL.
+         multicast: Match the multicast destination MAC address for the QCL.
+         broadcast: Match the broadcast destination MAC address for the QCL."
+    ::= { tnQosExtQclEntry 14 }
+
+tnQosExtQclFrameType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      ethernet(2),
+                      llc(3),
+                      snap(4),
+                      ipv4(5),
+                      ipv6(6)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The frame type for the QCL. The possible values are:
+         any: The QCL will match any frame type.
+         ethernet: The QCL will match Ethernet frame type.
+         llc: The QCL will match LLC frame type.
+         snap: The QCL will match SNAP frame type.
+         ipv4: The QCL will match IPv4 frames.
+         ipv6: The QCL will match IPv6 frames."
+    ::= { tnQosExtQclEntry 15 }
+
+tnQosExtQclActClassDefault       OBJECT-TYPE
+    SYNTAX          INTEGER {default(1), specific(2)}
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "Determe the type of matched frame traffic class modification.
+    default: QCL do not change the traffic class of the matched received frames.
+    specific: QCL will change the traffic class to the specific value of the matched received frames."
+    ::= { tnQosExtQclEntry 16 }
+
+tnQosExtQclActClass       OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "If a frame matches the QCE it will be put in the queue. It is only significant if tnQosExtQclActClassDefault
+     is selected 'specific' value.
+     tnQosExtQclActClass is a number in the range (0..(dot1dPortNumTrafficClasses-1))."
+    ::= { tnQosExtQclEntry 17 }
+
+tnQosExtQclActDplDefault       OBJECT-TYPE
+    SYNTAX          INTEGER {default(1), specific(2)}
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "Determe the type of matched frame traffic DP (Drop Precedence) level modification.
+    default: QCL do not change the DP (Drop Precedence) level of the matched received frames.
+    specific: QCL will change the DP (Drop Precedence) level to the specific value of the matched received frames."
+    ::= { tnQosExtQclEntry 18 }
+
+tnQosExtQclActDpl       OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "If a frame matches the QCE then DP level will set to the value. It is only significant if tnQosExtQclActDplDefault
+     is selected 'specific' value."
+    ::= { tnQosExtQclEntry 19 }
+
+tnQosExtQclActDscpDefault       OBJECT-TYPE
+    SYNTAX          INTEGER {default(1), specific(2)}
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "Determe the type of matched frame DSCP modification.
+    default: QCL do not change the DSCP of the matched received frames.
+    specific: QCL will change the DSCP to the specific value of the matched received frames."
+    ::= { tnQosExtQclEntry 20 }
+
+tnQosExtQclActDscp       OBJECT-TYPE
+    SYNTAX          INTEGER (0..63)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+    "If a frame matches the QCE then DSCP will be classified with the value. It is only significant if tnQosExtQclActDscpDefault
+     is selected 'specific' value."
+    ::= { tnQosExtQclEntry 21 }
+
+tnQosExtQclConflict       OBJECT-TYPE
+    SYNTAX          INTEGER {yes(1), no(2)}
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "QCE status. It may be that resources required to add a QCE may not be available; in
+    that case it shows conflict status as 'yes', otherwise it is always 'no'."
+    ::= { tnQosExtQclEntry 22 }
+
+tnQosExtQclStatus       OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status of this conceptual row entry of QCL table. This object isused to manage the
+      creation and deletion of conceptual rows.
+
+      The status column has six defined values:
+
+           - 'active', which indicates that the conceptual row is
+           available for use by the managed device;
+
+           - 'notInService', which indicates that the conceptual
+           row exists in the agent, but is unavailable for use by
+           the managed device (see NOTE below);
+
+           - 'notReady', which indicates that the conceptual row
+           exists in the agent, but is missing information
+           necessary in order to be available for use by the
+           managed device;
+
+           - 'createAndGo', which is supplied by a management
+           station wishing to create a new instance of a
+           conceptual row and to have its status automatically set
+           to active, making it available for use by the managed
+           device;
+
+           - 'createAndWait', which is supplied by a management
+           station wishing to create a new instance of a
+           conceptual row (but not make it available for use by
+           the managed device); and,
+
+           - 'destroy', which is supplied by a management station
+           wishing to delete all of the instances associated with
+           an existing conceptual row.
+
+           For a detailed description of this object, please refer to
+           SNMPv2-TC MIB."
+    ::= { tnQosExtQclEntry 23 }
+--
+-- QCL Layer 2 table
+--
+tnQosExtQclL2Table   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtQclL2Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table used to configure the QoS Control List layer 2 frame settings."
+    ::= { tnQosExtQclMgmt 2 }
+
+tnQosExtQclL2Entry   OBJECT-TYPE
+    SYNTAX  TnQosExtQclL2Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table used to configure the QoS Control List layer 2 fram settings."
+    INDEX { tnQosExtQclIndex }
+    ::= { tnQosExtQclL2Table 1 }
+
+TnQosExtQclL2Entry   ::=
+    SEQUENCE
+    {
+        --ethernet parameter
+        tnQosExtQclEtherType        INTEGER,
+        tnQosExtQclEtherVal         INTEGER,
+
+        --llc parameter
+        tnQosExtQclLlcSsapType      INTEGER,
+        tnQosExtQclLlcSsapVal       INTEGER,
+        tnQosExtQclLlcDsapType      INTEGER,
+        tnQosExtQclLlcDsapVal       INTEGER,
+        tnQosExtQclLlcControlType   INTEGER,
+        tnQosExtQclLlcControlVal    INTEGER,
+
+        --snap parameter
+        tnQosExtQclSnapPidType      INTEGER,
+        tnQosExtQclSnapPidVal       INTEGER
+    }
+
+tnQosExtQclEtherType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The Ether type filter for matching the QCL. It is only significant if tnQosExtQclFrameType
+          'ethernet' is selected. The possible values are:
+         any: No Ether type filter is specified. (Ether type filter status is 'don't-care'.)
+         specific: Choose this value to filter a specific Ether type value with this QCL."
+    ::= { tnQosExtQclL2Entry 1 }
+
+tnQosExtQclEtherVal       OBJECT-TYPE
+    SYNTAX          INTEGER(1536..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclEtherType is selected 'Specific' value, you can enter a specific value.
+         The allowed value is from 0x0600 through 0xFFFF. If implement supports ipv4 or ipv6 selection in
+         tnQosExtQclFrameType, the value 0x0800(ipv4) or 0x86DD(ipv6) are reserved from setting."
+    ::= { tnQosExtQclL2Entry 2 }
+
+tnQosExtQclLlcSsapType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The LLC SSAP type filter for matching the QCL. It is only significant if tnQosExtQclFrameType
+          'llc' is selected. The possible values are:
+         any: No SSAP type filter is specified. (SSAP type filter status is 'don't-care'.)
+         specific: Choose this value to filter a specific SSAP type value with this QCL."
+    ::= { tnQosExtQclL2Entry 3 }
+
+tnQosExtQclLlcSsapVal       OBJECT-TYPE
+    SYNTAX          INTEGER(0..255)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclLlcSsapType is selected 'Specific' value, you can enter a specific value.
+         The allowed value is from 0 through 255."
+    ::= { tnQosExtQclL2Entry 4 }
+
+tnQosExtQclLlcDsapType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The LLC DSAP type filter for matching the QCL. It is only significant if tnQosExtQclFrameType
+         'llc' is selected. The possible values are:
+         any: No DSAP type filter is specified. (DSAP type filter status is 'don't-care'.)
+         specific: Choose this value to filter a specific DSAP type value with this QCL."
+    ::= { tnQosExtQclL2Entry 5 }
+
+tnQosExtQclLlcDsapVal       OBJECT-TYPE
+    SYNTAX          INTEGER(0..255)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclLlcDsapType is selected 'Specific' value, you can enter a specific value.
+         The allowed value is from 0 through 255."
+    ::= { tnQosExtQclL2Entry 6 }
+
+tnQosExtQclLlcControlType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The LLC Control type filter for matching the QCL. It is only significant if tnQosExtQclFrameType
+         'llc' is selected. The possible values are:
+         any: No Control type filter is specified. (Control type filter status is 'don't-care'.)
+         specific: Choose this value to filter a specific Control type value with this QCL."
+    ::= { tnQosExtQclL2Entry 7 }
+
+tnQosExtQclLlcControlVal       OBJECT-TYPE
+    SYNTAX          INTEGER(0..255)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclLlcControlType is selected 'Specific' value, you can enter a specific value.
+         The allowed value is from 0 through 255."
+    ::= { tnQosExtQclL2Entry 8 }
+
+tnQosExtQclSnapPidType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The SNAP PID type filter for matching the QCL. It is only significant if tnQosExtQclFrameType
+         'snap' is selected. The possible values are:
+         any: No SNAP PIDtype filter is specified. (SNAP PID type filter status is 'don't-care'.)
+         specific: Choose this value to filter a specific SNAP PID type value with this QCL."
+    ::= { tnQosExtQclL2Entry 9 }
+
+tnQosExtQclSnapPidVal       OBJECT-TYPE
+    SYNTAX          INTEGER(1536..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclSnapPidType is selected 'Specific' value, you can enter a specific value.
+         The allowed value is from 0x600 through 0xFFFF. If implement supports ipv4 or ipv6 selection in
+         tnQosExtQclFrameType, the value 0x0800(ipv4) or 0x86DD(ipv6) are reserved from setting."
+    ::= { tnQosExtQclL2Entry 10 }
+--
+-- QCL IP table
+--
+tnQosExtQclIpTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF  TnQosExtQclIpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table used to configure the QoS Control List IP settings."
+    ::= { tnQosExtQclMgmt 3 }
+
+tnQosExtQclIpEntry   OBJECT-TYPE
+    SYNTAX  TnQosExtQclIpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "An entry in the table used to configure the QoS Control List IP settings."
+    INDEX { tnQosExtQclIndex }
+    ::= { tnQosExtQclIpTable 1 }
+
+TnQosExtQclIpEntry   ::=
+    SEQUENCE
+    {
+        --ipv4/ipv6 common
+        tnQosExtQclProtoType        INTEGER,
+        tnQosExtQclProtoVal         INTEGER,
+        tnQosExtQclDscpType         INTEGER,
+        tnQosExtQclDscpVal          INTEGER,
+        tnQosExtQclDscpMin          INTEGER,
+        tnQosExtQclDscpMax          INTEGER,
+        tnQosExtQclSrcIpType        INTEGER,
+        tnQosExtQclSrcIpAddrType    InetAddressType,
+        tnQosExtQclSrcIpAddr        InetAddress,
+        tnQosExtQclSrcIpMaskType    InetAddressType,
+        tnQosExtQclSrcIpMask        InetAddress,
+
+        --ipv4 parameter
+        tnQosExtQclIpv4Fragment     INTEGER,
+
+        --tcp/udp parameter
+        tnQosExtQclTcpUdpSportType     INTEGER,
+        tnQosExtQclTcpUdpSportVal      INTEGER,
+        tnQosExtQclTcpUdpSportMin      INTEGER,
+        tnQosExtQclTcpUdpSportMax      INTEGER,
+        tnQosExtQclTcpUdpDportType     INTEGER,
+        tnQosExtQclTcpUdpDportVal      INTEGER,
+        tnQosExtQclTcpUdpDportMin      INTEGER,
+        tnQosExtQclTcpUdpDportMax      INTEGER
+    }
+
+tnQosExtQclProtoType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      udp(2),
+                      tcp(3),
+                      specific(4)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The IP protocol for matching the QCL.The possible values are:
+         any: No protocol filter is specified. (Protocol filter status is 'don't-care'.)
+         udp: Specify the UDP for matching the QCL.
+         tcp: Specify the TCP for matching the QCL.
+         specific: Choose this value to filter a specific protocol value with this QCL."
+    ::= { tnQosExtQclIpEntry 1 }
+
+tnQosExtQclProtoVal       OBJECT-TYPE
+    SYNTAX          INTEGER(0..255)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclProtoType is selected 'Specific' value, you can enter a specific value.
+         The allowed value is from 0 through 255. If implement supports udp or tcp selection in
+         tnQosExtQclProtoType, the value 6(tcp) or 17(udp) are reserved from setting."
+    ::= { tnQosExtQclIpEntry 2 }
+
+tnQosExtQclDscpType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2),
+                      range(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The DSCP filter for matching the QCL. The possible values are:
+         any: No DSCP filter is specified. (DSCP filter status is 'don't-care'.)
+         specific: choose this value to filter a specific DSCP value with this QCL.
+         range: Choose this value to filter a specific DSCP range filter with this QCL."
+    ::= { tnQosExtQclIpEntry 3 }
+
+tnQosExtQclDscpVal       OBJECT-TYPE
+    SYNTAX          INTEGER(0..63)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclDscpType is selected 'Specific' value, you can enter a specific value.
+         The allowed value is from 0 through 63."
+    ::= { tnQosExtQclIpEntry 4 }
+
+tnQosExtQclDscpMin       OBJECT-TYPE
+    SYNTAX          INTEGER(0..63)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclDscpType is selected 'Range' value, you can enter a specific range.
+         this value should be lower than tnQosExtQclDscpMax value.
+         The allowed range start is from 0 through 63."
+    ::= { tnQosExtQclIpEntry 5 }
+
+tnQosExtQclDscpMax       OBJECT-TYPE
+    SYNTAX          INTEGER(0..63)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclDscpType is selected 'Range' value, you can enter a specific range.
+         this value should be higher than tnQosExtQclDscpMin value.
+         The allowed range end is from 0 through 63."
+    ::= { tnQosExtQclIpEntry 6 }
+
+tnQosExtQclSrcIpType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The source IP address type filter for matching the QCL.
+         The possible values are:
+         any: No source IP address filter is specified. (source IP address filter status is 'don't-care'.)
+         specific: Choose this value to filter a specific source IP address with this QCL."
+    ::= { tnQosExtQclIpEntry 7 }
+
+tnQosExtQclSrcIpAddrType       OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the tnQosExtQclSrcIpAddr type."
+    ::= { tnQosExtQclIpEntry 8 }
+
+tnQosExtQclSrcIpAddr       OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclSrcIpType is selected 'Specific' value, you can enter a specific host or network address."
+    ::= { tnQosExtQclIpEntry 9 }
+
+tnQosExtQclSrcIpMaskType       OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specify the tnQosExtQclSrcIpMask type."
+    ::= { tnQosExtQclIpEntry 10 }
+
+tnQosExtQclSrcIpMask       OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclSrcIpType is selected 'Specific' value, you can enter a specific network mask for the source IP address."
+    ::= { tnQosExtQclIpEntry 11 }
+
+tnQosExtQclIpv4Fragment       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      fragment(2),
+                      nonfragment(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The IPv4 Fragment for matching the QCL. This involves the settings for the More Fragments (MF) bit
+         and the Fragment Offset (FRAG OFFSET) field for an IPv4 frame. The possible values are:
+         any: The QCL will match any MF bit.
+         fragment: IPv4 frames where the MF bit is set or the FRAG OFFSET field is greater than zero must be
+                   able to match this entry.
+         nonfragment: IPv4 frames where the MF bit is set or the FRAG OFFSET field is greater than zero must
+                       not be able to match this entry. "
+    ::= { tnQosExtQclIpEntry 12 }
+
+tnQosExtQclTcpUdpSportType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2),
+                      range(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The TCP/UDP source port for matching the QCL. It is only significant if protocol
+         filter 'UDP' or 'TCP' is selected. The possible values are:
+         any: No TCP/UDP source port filter is specified. (Source port filter status is 'don't-care'.)
+         specific: Choose this value to filter a specific TCP/UDP source port No. with this QCL.
+         range: Choose this value to filter a specific TCP/UDP source port range filter with this QCL."
+    ::= { tnQosExtQclIpEntry 13 }
+
+tnQosExtQclTcpUdpSportVal       OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclTcpUdpSportType is selected 'Specific' value, you can enter a specific value.
+         The allowed value is from 0 through 65535."
+    ::= { tnQosExtQclIpEntry 14 }
+
+tnQosExtQclTcpUdpSportMin       OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclTcpUdpSportType is selected 'Range' value, you can enter a specific range.
+         this value should be lower than tnQosExtQclTcpUdpSportMax value.
+         The allowed range start is from 0 through 65535."
+    ::= { tnQosExtQclIpEntry 15 }
+
+tnQosExtQclTcpUdpSportMax       OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclTcpUdpSportType is selected 'Range' value, you can enter a specific range.
+         this value should be higher than tnQosExtQclTcpUdpSportMin value.
+         The allowed range end is from 0 through 65535."
+    ::= { tnQosExtQclIpEntry 16 }
+
+tnQosExtQclTcpUdpDportType       OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2),
+                      range(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The TCP/UDP destination port for matching the QCL. It only significant if protocol
+         filter 'UDP' or 'TCP' is selected. The possible values are:
+         any: No TCP/UDP destination port filter is specified. (Source port filter status is 'don't-care'.)
+         specific: Choose this value to filter a specific TCP/UDP source port No. with this QCL.
+         range: Choose this value to filter a specific TCP/UDP source port range filter with this QCL."
+    ::= { tnQosExtQclIpEntry 17 }
+
+tnQosExtQclTcpUdpDportVal       OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclTcpUdpDportVal is selected 'Specific' value, you can enter a specific value.
+         The allowed value is from 0 through 65535."
+    ::= { tnQosExtQclIpEntry 18 }
+
+tnQosExtQclTcpUdpDportMin       OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclTcpUdpDportVal is selected 'Range' value, you can enter a specific range.
+         this value should be lower than tnQosExtQclTcpUdpDportMax value.
+         The allowed range start is from 0 through 65535."
+    ::= { tnQosExtQclIpEntry 19 }
+
+tnQosExtQclTcpUdpDportMax       OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When tnQosExtQclTcpUdpDportVal is selected 'Range' value, you can enter a specific range.
+         this value should be higher than tnQosExtQclTcpUdpDportMin value.
+         The allowed range end is from 0 through 65535."
+    ::= { tnQosExtQclIpEntry 20 }
+END
+

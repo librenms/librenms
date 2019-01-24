@@ -1,0 +1,648 @@
+TN-SIP-MIB DEFINITIONS ::= BEGIN
+
+-- ------------------------------------------------------------
+-- MIB for L3 Static Routing
+-- ------------------------------------------------------------
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Unsigned32, enterprises  FROM SNMPv2-SMI
+    PhysAddress, TimeStamp, RowStatus   FROM SNMPv2-TC
+    InetAddress, InetAddressType,
+	InetAddressPrefixLength				FROM INET-ADDRESS-MIB
+    ipv4InterfaceEntry                  FROM IP-MIB
+    inetCidrRouteEntry                  FROM IP-FORWARD-MIB
+	transition, tnProducts              FROM TRANSITION-SMI;
+
+tnSipMIB MODULE-IDENTITY
+    LAST-UPDATED "201210230000Z" -- October 23, 2012
+    ORGANIZATION "Transition Networks"
+    CONTACT-INFO
+        "Copyright (C) 2012  Transition Networks, Inc. All Rights Reserved."
+    DESCRIPTION
+        "A MIB module provides L3 Static Routing management interface."
+    ::= { enterprises transition(868) products(2) tnProducts(5) 121 }
+
+--
+-- Routing Endpoint Configuration Table
+--
+tnRoutingEndpointTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnRoutingEndpointEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+            "This table contains additional objects for configuration of the
+             routing endpoints."
+    ::= { tnSipMIB 1 }
+
+tnRoutingEndpointEntry OBJECT-TYPE
+    SYNTAX       TnRoutingEndpointEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+            "An entry containing management information of the L3 routing
+             endpoints."
+	INDEX   { tnRoutingEndpointId }
+    ::= { tnRoutingEndpointTable 1 }
+
+TnRoutingEndpointEntry  ::=
+    SEQUENCE {
+		tnRoutingEndpointId                  Unsigned32,
+		tnRoutingEndpointIfIndex             Unsigned32,
+		tnRoutingEndpointAdmin               Unsigned32,
+		tnRoutingEndpointPortsBitmask        Unsigned32,
+		tnRoutingEndpointInetAddrType        InetAddressType,
+		tnRoutingEndpointInetAddr            InetAddress,
+		tnRoutingEndpointPfxLen              InetAddressPrefixLength,
+		tnRoutingEndpointVlanType            Unsigned32,
+		tnRoutingEndpointVlanId              Unsigned32,
+        tnRoutingEndpointHorizon             Unsigned32,
+        tnRoutingEndpointSplitHorizonStatus  Unsigned32,
+        tnRoutingEndpointArpProxyGroup       Unsigned32,
+        tnRoutingEndpointArpProxyStatus      Unsigned32,
+		tnRoutingEndpointRowStatus           RowStatus
+    }
+tnRoutingEndpointId    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Unique routing endpoint identifier."
+    ::= { tnRoutingEndpointEntry 1 }
+
+tnRoutingEndpointIfIndex    OBJECT-TYPE
+    SYNTAX     	Unsigned32
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "Inerfce index assigned to the routing endpoint. Routing endpoint
+			can be accessed in ifTable by this index."
+    ::= { tnRoutingEndpointEntry 2 }
+
+tnRoutingEndpointAdmin    OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                 enable(1),
+                 disable(2)
+    }
+    MAX-ACCESS 	read-write
+    STATUS      current
+    DESCRIPTION
+            "Routing endpoint administrative status. Routing operations not performed
+			if status is disabled."
+	DEFVAL { 2 }
+    ::= { tnRoutingEndpointEntry 3 }
+
+tnRoutingEndpointPortsBitmask    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS 	read-write
+    STATUS      current
+    DESCRIPTION
+            "A bitmap structure presenting phisical ports assigned to
+            this routing endpoint. Bits are numbered from 1 to 256 starting with the
+            high order bit of the first octet.  Each bit which is set
+            indicates the physical port number assigned to the this endpoint."
+    ::= { tnRoutingEndpointEntry 4 }
+
+tnRoutingEndpointInetAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS 	read-create
+    STATUS      current
+    DESCRIPTION
+            "The type of the tnRoutingEndpointInetAddr address, as defined in the
+			InetAddress MIB."
+	DEFVAL { ipv4 }
+    ::= { tnRoutingEndpointEntry 5 }
+
+tnRoutingEndpointInetAddr    OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS 	read-create
+    STATUS      current
+    DESCRIPTION
+            "Routing edpoint IP address."
+    ::= { tnRoutingEndpointEntry 6 }
+
+tnRoutingEndpointPfxLen    OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS 	read-create
+    STATUS      current
+    DESCRIPTION
+            "Indicates the number of leading one bits that form the
+            mask to be logical-ANDed with the destination address
+            before being compared to the value in the
+            tnRoutingEndpointInetAddr field."
+    ::= { tnRoutingEndpointEntry 7 }
+
+tnRoutingEndpointVlanType    OBJECT-TYPE
+    SYNTAX    Unsigned32 {
+				untagged(1),
+				c-tagged(2),
+				s-tagged(3),
+				unaware(4)
+	}
+    MAX-ACCESS 	read-create
+    STATUS      current
+    DESCRIPTION
+            "Vlan type of the routing endpoint."
+    ::= { tnRoutingEndpointEntry 8 }
+
+tnRoutingEndpointVlanId    OBJECT-TYPE
+    SYNTAX    Unsigned32 (0..4095)
+    MAX-ACCESS 	read-create
+    STATUS      current
+    DESCRIPTION
+            "Vlan identifier if endpoit is tagged or 0 otherwise."
+    ::= { tnRoutingEndpointEntry 9 }
+
+tnRoutingEndpointHorizon    OBJECT-TYPE
+    SYNTAX    Unsigned32 {
+                 downlink(1),
+                 uplink(2)
+    }
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+            "Specifies horizon of the routing endpoint is Split Horizon
+             routing enabled."
+    DEFVAL { 1 }
+    ::= { tnRoutingEndpointEntry 10 }
+
+tnRoutingEndpointSplitHorizonStatus OBJECT-TYPE
+    SYNTAX     Unsigned32 {
+                 enable(1),
+                 disable(2)
+    }
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+            "Specifies enable or disable status for the split horizon
+             routing. "
+    DEFVAL { 2 }
+    ::= { tnRoutingEndpointEntry 11 }
+
+tnRoutingEndpointArpProxyGroup OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..16)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Specifies the number of the ARP proxy group of the routing
+             entry."
+    DEFVAL { 1 }
+    ::= { tnRoutingEndpointEntry 12 }
+
+tnRoutingEndpointArpProxyStatus OBJECT-TYPE
+    SYNTAX       Unsigned32 {
+                 enable(1),
+                 disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Specifies enable or disable status for the split horizon
+             routing."
+    DEFVAL { 1 }
+    ::= { tnRoutingEndpointEntry 13 }
+
+tnRoutingEndpointRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The row status variable, used according to row installation
+			and removal conventions. A row entry cannot be modified when
+			the status is marked as active(1)."
+    DEFVAL { disable }
+    ::= { tnRoutingEndpointEntry 14 }
+
+--
+-- Routing Endpoint Statistics Table
+--
+tnRoutingEndpointStatsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnRoutingEndpointStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+            "This table contains statistics information of the
+             routing endpoints."
+    ::= { tnSipMIB 2 }
+
+tnRoutingEndpointStatsEntry OBJECT-TYPE
+    SYNTAX       TnRoutingEndpointStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+            "An entry statistics information of the L3 routing
+             endpoints."
+	INDEX   { tnRoutingEndpointStatsEndpointId }
+    ::= { tnRoutingEndpointStatsTable 1 }
+
+TnRoutingEndpointStatsEntry  ::=
+    SEQUENCE {
+		tnRoutingEndpointStatsEndpointId     Unsigned32,
+		tnRoutingEndpointRxPackets           Counter64,
+		tnRoutingEndpointRxOctets            Counter64,
+		tnRoutingEndpointRxMcPackets         Counter64,
+		tnRoutingEndpointRxBcPackets         Counter64,
+		tnRoutingEndpointRxForwDgrams        Counter64,
+		tnRoutingEndpointRxDiscards          Counter32,
+		tnRoutingEndpointRxNoRoutes          Counter32,
+		tnRoutingEndpointRxAddrErrs          Counter32,
+		tnRoutingEndpointRxUnknownProtos     Counter32,
+		tnRoutingEndpointRxHdrErrs           Counter32,
+
+		tnRoutingEndpointTxPackets           Counter64,
+		tnRoutingEndpointTxOctets            Counter64,
+		tnRoutingEndpointTxMcPackets         Counter64,
+		tnRoutingEndpointTxBcPackets         Counter64,
+		tnRoutingEndpointTxForwDgrams        Counter64,
+		tnRoutingEndpointTxRequests          Counter64,
+		tnRoutingEndpointTxDiscards          Counter32,
+
+		tnRoutingEndpointRxIcmpPackets       Counter64,
+		tnRoutingEndpointRxIcmpDiscards      Counter64,
+		tnRoutingEndpointTxIcmpPackets       Counter64
+    }
+tnRoutingEndpointStatsEndpointId    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Unique routing endpoint identifier."
+    ::= { tnRoutingEndpointStatsEntry 1 }
+
+tnRoutingEndpointRxPackets    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of input IP datagrams received, including
+            those received in error."
+    ::= { tnRoutingEndpointStatsEntry 2 }
+
+tnRoutingEndpointRxOctets    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of octets received in input IP datagrams,
+            including those received in error."
+    ::= { tnRoutingEndpointStatsEntry 3 }
+
+tnRoutingEndpointRxMcPackets    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of IP multicast datagrams received."
+    ::= { tnRoutingEndpointStatsEntry 4 }
+
+tnRoutingEndpointRxBcPackets    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of IP broadcast datagrams received."
+    ::= { tnRoutingEndpointStatsEntry 5 }
+
+tnRoutingEndpointRxForwDgrams    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of input datagrams for which this entity was not
+            their final IP destination and for which this entity
+            attempted to find a route to forward them to that final
+            destination."
+    ::= { tnRoutingEndpointStatsEntry 6 }
+
+tnRoutingEndpointRxDiscards    OBJECT-TYPE
+    SYNTAX     	Counter32
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of input IP datagrams for which no problems were
+            encountered to prevent their continued processing, but
+            were discarded (e.g., for lack of buffer space)."
+    ::= { tnRoutingEndpointStatsEntry 7 }
+
+tnRoutingEndpointRxNoRoutes    OBJECT-TYPE
+    SYNTAX     	Counter32
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of input IP datagrams discarded because no route
+            could be found to transmit them to their destination."
+    ::= { tnRoutingEndpointStatsEntry 8 }
+
+tnRoutingEndpointRxAddrErrs    OBJECT-TYPE
+    SYNTAX     	Counter32
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of input IP datagrams discarded because the IP
+            address in their IP header's destination field was not a
+            valid address to be received at this entity.  This count
+            includes invalid addresses (e.g., ::0)."
+    ::= { tnRoutingEndpointStatsEntry 9 }
+
+tnRoutingEndpointRxUnknownProtos    OBJECT-TYPE
+    SYNTAX     	Counter32
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of locally-addressed IP datagrams received
+            successfully but discarded because of an unknown or
+            unsupported protocol."
+    ::= { tnRoutingEndpointStatsEntry 10 }
+
+tnRoutingEndpointRxHdrErrs    OBJECT-TYPE
+    SYNTAX     	Counter32
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of input IP datagrams discarded due to errors in
+            their IP headers, including version number mismatch, other
+            format errors, hop count exceeded, errors discovered in
+            processing their IP options, etc."
+    ::= { tnRoutingEndpointStatsEntry 11 }
+
+tnRoutingEndpointTxPackets    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of IP datagrams that this entity supplied
+            to the lower layers for transmission.  This includes
+            datagrams generated locally and those forwarded by this
+            entity."
+    ::= { tnRoutingEndpointStatsEntry 12 }
+
+tnRoutingEndpointTxOctets    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of octets in IP datagrams delivered to the
+            lower layers for transmission."
+    ::= { tnRoutingEndpointStatsEntry 13 }
+
+tnRoutingEndpointTxMcPackets    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of IP multicast datagrams transmitted."
+    ::= { tnRoutingEndpointStatsEntry 14 }
+
+tnRoutingEndpointTxBcPackets    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of IP broadcast datagrams transmitted."
+    ::= { tnRoutingEndpointStatsEntry 15 }
+
+tnRoutingEndpointTxForwDgrams    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of datagrams for which this entity was not their
+            final IP destination and for which it was successful in
+            finding a path to their final destination."
+    ::= { tnRoutingEndpointStatsEntry 16 }
+
+tnRoutingEndpointTxRequests    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of IP datagrams that local IP user-
+            protocols (including ICMP) supplied to IP in requests for
+            transmission."
+    ::= { tnRoutingEndpointStatsEntry 17 }
+
+tnRoutingEndpointTxDiscards    OBJECT-TYPE
+    SYNTAX     	Counter32
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of output IP datagrams for which no problem was
+            encountered to prevent their transmission to their
+            destination, but were discarded (e.g., for lack of
+            buffer space)."
+    ::= { tnRoutingEndpointStatsEntry 18 }
+
+tnRoutingEndpointRxIcmpPackets    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of ICMP datagrams received."
+    ::= { tnRoutingEndpointStatsEntry 19 }
+
+tnRoutingEndpointRxIcmpDiscards    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of discarded ICMP datagrams."
+    ::= { tnRoutingEndpointStatsEntry 20 }
+
+tnRoutingEndpointTxIcmpPackets    OBJECT-TYPE
+    SYNTAX     	Counter64
+    MAX-ACCESS 	read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of ICMP datagrams transmitted."
+    ::= { tnRoutingEndpointStatsEntry 21 }
+
+--
+-- Route Ext table
+--
+tnInetCidrRouteExtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnInetCidrRouteExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains additional objects for configuration of the
+             routing table. It is an extension to the CIDR Inet route table."
+    ::= { tnSipMIB 3 }
+
+tnInetCidrRouteExtEntry  OBJECT-TYPE
+    SYNTAX      TnInetCidrRouteExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing additional management information
+             applicable to a particular inet route."
+    AUGMENTS    { inetCidrRouteEntry }
+    ::= { tnInetCidrRouteExtTable 1 }
+
+TnInetCidrRouteExtEntry  ::=
+    SEQUENCE {
+        tnInetCidrRouteExtHorizon        INTEGER,
+    }
+
+tnInetCidrRouteExtHorizon OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 downlink(1),
+                 uplink(2)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Specifies horizon of the route for Split Horizon routing."
+    ::= { tnInetCidrRouteExtEntry 1 }
+
+
+--
+-- ARP table
+--
+tnRoutingArpTable  OBJECT-TYPE
+    SYNTAX         SEQUENCE OF TnRoutingArpEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+            "This table contains ARP table information with respect to Static
+             IP routing."
+    ::= { tnSipMIB 4 }
+
+tnRoutingArpEntry  OBJECT-TYPE
+    SYNTAX         TnRoutingArpEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+            "An entry containing information of the ARP table record."
+    INDEX       { tnRoutingArpEgrVlanType,
+                  tnRoutingArpEgrVlanId,
+				  tnRoutingArpDestNetAddr }
+    ::= { tnRoutingArpTable 1 }
+
+TnRoutingArpEntry ::=
+    SEQUENCE {
+		tnRoutingArpEgrVlanType   Unsigned32,
+        tnRoutingArpEgrVlanId     Unsigned32,
+		tnRoutingArpDestNetAddr   IpAddress,
+        tnRoutingArpDestMacAddr   PhysAddress,
+        tnRoutingArpEgressPort    Unsigned32,
+        tnRoutingArpLastUpdated   TimeStamp,
+        tnRoutingArpState         INTEGER
+    }
+
+tnRoutingArpEgrVlanType OBJECT-TYPE
+    SYNTAX    Unsigned32 {
+				untagged(1),
+				c-tagged(2),
+				s-tagged(3),
+				unaware(4)
+	}
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Specifies the egress vlan ethernt type of the address."
+    ::= { tnRoutingArpEntry 1 }
+
+tnRoutingArpEgrVlanId OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4095)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Specifies the egress vlan id of the address."
+    ::= { tnRoutingArpEntry 2 }
+
+tnRoutingArpDestNetAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The IP Address corresponding to the media-dependent
+            physical address."
+    ::= { tnRoutingArpEntry 3 }
+
+tnRoutingArpDestMacAddr OBJECT-TYPE
+    SYNTAX     PhysAddress (SIZE(0..65535))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The media-dependent (MAC) physical address."
+    ::= { tnRoutingArpEntry 4 }
+
+tnRoutingArpEgressPort OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..16)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Egress port to reach the destination host."
+    ::= { tnRoutingArpEntry 5 }
+
+tnRoutingArpLastUpdated OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The value of sysUpTime at the time this entry was last
+            updated.  If this entry was updated prior to the last re-
+            initialization of the local network management subsystem,
+            then this object contains a zero value."
+    ::= { tnRoutingArpEntry 6 }
+
+tnRoutingArpState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 ok(1),
+                 failed(2),
+                 resolving(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Host reachability state."
+    DEFVAL { disable }
+    ::= { tnRoutingArpEntry 7 }
+
+--
+-- ARP config parameters
+--
+tnRoutingArpConfigReplyWaitTime OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..10)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Specifies timeout in seconds between ARP request send
+             and declaration of ARP failed."
+	DEFVAL { 2 }
+    ::= { tnSipMIB 5 }
+
+tnRoutingArpConfigAgeingTime OBJECT-TYPE
+    SYNTAX     Unsigned32 (60..86400)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Specifies timeout in seconds to keep unused ARP record
+             in the ARP table."
+    DEFVAL { 120 }
+    ::= { tnSipMIB 6 }
+
+tnRoutingArpConfigRefreshTime OBJECT-TYPE
+    SYNTAX     Unsigned32 (60..86400)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Specifies timeout in seconds between consequential refreshing
+             ARP request sent for the record in the ARP table."
+    DEFVAL { 600 }
+    ::= { tnSipMIB 7 }
+
+tnRoutingArpConfigGarpStatus    OBJECT-TYPE
+    SYNTAX      Unsigned32 {
+                 enable(1),
+                 disable(2)
+    }
+    MAX-ACCESS 	read-write
+    STATUS      current
+    DESCRIPTION
+            "Gratuitous ARP status. GARP operations not performed
+			if status is disabled."
+	DEFVAL { 1 }
+    ::= { tnSipMIB 8 }
+
+END
+

@@ -1,0 +1,315 @@
+-- *****************************************************************
+-- TN-DHCP-RELAY-MIB.mib : TN DHCP RELAY private MIB
+--
+-- Copyright (c) 2015 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+TN-DHCP-RELAY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    tnProducts
+        FROM TRANSITION-SMI
+    IpAddress FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    ;
+
+tnDhcpRelayMib MODULE-IDENTITY
+    LAST-UPDATED "201504200000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+        "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+            E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib module for DHCP settings."
+
+        REVISION "201504200000Z"
+        DESCRIPTION
+        "Initial Revision of this module"
+     ::= { tnProducts 148 }
+
+
+TNDhcpRelayInformationPolicyType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates the DHCP relay information policy type."
+    SYNTAX      INTEGER { replace(0), keep(1), drop(2) }
+
+tnDhcpRelayMibObjects OBJECT IDENTIFIER
+    ::= { tnDhcpRelayMib 1 }
+
+tnDhcpRelayConfig OBJECT IDENTIFIER
+    ::= { tnDhcpRelayMibObjects 2 }
+
+tnDhcpRelayConfigGlobals OBJECT IDENTIFIER
+    ::= { tnDhcpRelayConfig 1 }
+
+tnDhcpRelayConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Global mode of DHCP relay. true is to enable DHCP relay and false is to
+         disable it."
+    ::= { tnDhcpRelayConfigGlobals 1 }
+
+tnDhcpRelayConfigGlobalsServerIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Server IP address. This IP address is for DHCP server where the DHCP
+         relay will relay DHCP packets to."
+    ::= { tnDhcpRelayConfigGlobals 2 }
+
+tnDhcpRelayConfigGlobalsInformationMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the DHCP relay information mode option operation. Possible
+         modes are - Enabled: Enable DHCP relay information mode operation. When
+         DHCP relay information mode operation is enabled, the agent inserts
+         specific information (option 82) into a DHCP message when forwarding to
+         DHCP server and removes it from a DHCP message when transferring to
+         DHCP client. It only works when DHCP relay operation mode is enabled.
+         Disabled: Disable DHCP relay information mode operation."
+    ::= { tnDhcpRelayConfigGlobals 3 }
+
+tnDhcpRelayConfigGlobalsInformationPolicy OBJECT-TYPE
+    SYNTAX      TNDhcpRelayInformationPolicyType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the DHCP relay information option policy. When DHCP relay
+         information mode operation is enabled, if the agent receives a DHCP
+         message that already contains relay agent information it will enforce
+         the policy. The 'Replace' policy is invalid when relay information mode
+         is disabled."
+    ::= { tnDhcpRelayConfigGlobals 4 }
+
+tnDhcpRelayStatus OBJECT IDENTIFIER
+    ::= { tnDhcpRelayMibObjects 3 }
+
+tnDhcpRelayStatusStatistics OBJECT IDENTIFIER
+    ::= { tnDhcpRelayStatus 1 }
+
+tnDhcpRelayStatusStatisticsServerPacketsRelayed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Packets relayed from server to client."
+    ::= { tnDhcpRelayStatusStatistics 1 }
+
+tnDhcpRelayStatusStatisticsServerPacketErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Errors sending packets to servers."
+    ::= { tnDhcpRelayStatusStatistics 2 }
+
+tnDhcpRelayStatusStatisticsClientPacketsRelayed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Packets relayed from client to server."
+    ::= { tnDhcpRelayStatusStatistics 3 }
+
+tnDhcpRelayStatusStatisticsClientPacketErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Errors sending packets to clients."
+    ::= { tnDhcpRelayStatusStatistics 4 }
+
+tnDhcpRelayStatusStatisticsAgentOptionErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of packets forwarded without agent options because there was no
+         room."
+    ::= { tnDhcpRelayStatusStatistics 5 }
+
+tnDhcpRelayStatusStatisticsMissingAgentOption OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of packets dropped because no RAI option matching our ID was
+         found."
+    ::= { tnDhcpRelayStatusStatistics 6 }
+
+tnDhcpRelayStatusStatisticsBadCircuitId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Circuit ID option in matching RAI option did not match any known
+         circuit ID."
+    ::= { tnDhcpRelayStatusStatistics 7 }
+
+tnDhcpRelayStatusStatisticsMissingCircuitId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Circuit ID option in matching RAI option was missing."
+    ::= { tnDhcpRelayStatusStatistics 8 }
+
+tnDhcpRelayStatusStatisticsBadRemoteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Remote ID option in matching RAI option did not match any known remote
+         ID."
+    ::= { tnDhcpRelayStatusStatistics 9 }
+
+tnDhcpRelayStatusStatisticsMissingRemoteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Remote ID option in matching RAI option was missing."
+    ::= { tnDhcpRelayStatusStatistics 10 }
+
+tnDhcpRelayStatusStatisticsReceiveServerPackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Receive DHCP message from server."
+    ::= { tnDhcpRelayStatusStatistics 11 }
+
+tnDhcpRelayStatusStatisticsReceiveClientPackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Receive DHCP message from client."
+    ::= { tnDhcpRelayStatusStatistics 12 }
+
+tnDhcpRelayStatusStatisticsReceiveClientAgentOption OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Receive relay agent information option from client."
+    ::= { tnDhcpRelayStatusStatistics 13 }
+
+tnDhcpRelayStatusStatisticsReplaceAgentOption OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Replace relay agent information option."
+    ::= { tnDhcpRelayStatusStatistics 14 }
+
+tnDhcpRelayStatusStatisticsKeepAgentOption OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Keep relay agent information option."
+    ::= { tnDhcpRelayStatusStatistics 15 }
+
+tnDhcpRelayStatusStatisticsDropAgentOption OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Drop relay agent information option."
+    ::= { tnDhcpRelayStatusStatistics 16 }
+
+tnDhcpRelayControl OBJECT IDENTIFIER
+    ::= { tnDhcpRelayMibObjects 4 }
+
+tnDhcpRelayControlClearStatistics OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The action to clear statistics. true is to clear the statistics data.
+         false, then, does nothing."
+    ::= { tnDhcpRelayControl 1 }
+
+tnDhcpRelayMibConformance OBJECT IDENTIFIER
+    ::= { tnDhcpRelayMib 2 }
+
+tnDhcpRelayMibCompliances OBJECT IDENTIFIER
+    ::= { tnDhcpRelayMibConformance 1 }
+
+tnDhcpRelayMibGroups OBJECT IDENTIFIER
+    ::= { tnDhcpRelayMibConformance 2 }
+
+tnDhcpRelayConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { tnDhcpRelayConfigGlobalsMode, 
+                  tnDhcpRelayConfigGlobalsServerIpAddress, 
+                  tnDhcpRelayConfigGlobalsInformationMode, 
+                  tnDhcpRelayConfigGlobalsInformationPolicy }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnDhcpRelayMibGroups 1 }
+
+tnDhcpRelayStatusStatisticsInfoGroup OBJECT-GROUP
+    OBJECTS     { tnDhcpRelayStatusStatisticsServerPacketsRelayed, 
+                  tnDhcpRelayStatusStatisticsServerPacketErrors, 
+                  tnDhcpRelayStatusStatisticsClientPacketsRelayed, 
+                  tnDhcpRelayStatusStatisticsClientPacketErrors, 
+                  tnDhcpRelayStatusStatisticsAgentOptionErrors, 
+                  tnDhcpRelayStatusStatisticsMissingAgentOption, 
+                  tnDhcpRelayStatusStatisticsBadCircuitId, 
+                  tnDhcpRelayStatusStatisticsMissingCircuitId, 
+                  tnDhcpRelayStatusStatisticsBadRemoteId, 
+                  tnDhcpRelayStatusStatisticsMissingRemoteId, 
+                  tnDhcpRelayStatusStatisticsReceiveServerPackets, 
+                  tnDhcpRelayStatusStatisticsReceiveClientPackets, 
+                  tnDhcpRelayStatusStatisticsReceiveClientAgentOption, 
+                  tnDhcpRelayStatusStatisticsReplaceAgentOption, 
+                  tnDhcpRelayStatusStatisticsKeepAgentOption, 
+                  tnDhcpRelayStatusStatisticsDropAgentOption }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnDhcpRelayMibGroups 2 }
+
+tnDhcpRelayControlInfoGroup OBJECT-GROUP
+    OBJECTS     { tnDhcpRelayControlClearStatistics }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnDhcpRelayMibGroups 3 }
+
+tnDhcpRelayMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { tnDhcpRelayConfigGlobalsInfoGroup, 
+                  tnDhcpRelayStatusStatisticsInfoGroup, 
+                  tnDhcpRelayControlInfoGroup }
+
+    ::= { tnDhcpRelayMibCompliances 1 }
+
+END

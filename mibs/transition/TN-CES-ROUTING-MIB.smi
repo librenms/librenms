@@ -1,0 +1,930 @@
+-- *****************************************************************
+-- Transition Networks CES ROUTING MIB
+--
+-- Copyright (C) 2014  Transition Networks, Inc. All Rights Reserved.
+-- *****************************************************************
+
+-- ---------------------------------------------------------- --
+-- MIB for the Circuit Emulation Service (CES) call routing
+-- features of Transition Networks products.
+-- ---------------------------------------------------------- --
+
+TN-CES-ROUTING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32 FROM SNMPv2-SMI
+    InetAddressType, InetAddress FROM INET-ADDRESS-MIB
+    TruthValue, DisplayString FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE FROM SNMPv2-CONF
+    tnProducts FROM TRANSITION-SMI;
+
+tnCesRoutingMIB MODULE-IDENTITY
+    LAST-UPDATED "201406300000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+    "Transition Networks
+     Technical Support
+
+     10900 Red Circle Drive
+     Minnetonka, MN 55343 USA
+     Tel: +1-800-526-9267
+
+     E-mail: techsupport@transition.com"
+    DESCRIPTION
+    "The MIB module for the Circuit Emulation Service call routing."
+    REVISION "201406300000Z"
+    DESCRIPTION
+    "Initial version."
+    ::= { tnProducts 61 }
+
+-- Top level structure
+
+tnCesRoutingObjects OBJECT IDENTIFIER ::= { tnCesRoutingMIB 1 }
+tnCesRoutingConformance OBJECT IDENTIFIER ::= { tnCesRoutingMIB 2 }
+tnCesRoutingCompliances OBJECT IDENTIFIER ::= { tnCesRoutingConformance 1 }
+tnCesRoutingGroups OBJECT IDENTIFIER ::= { tnCesRoutingConformance 2 }
+
+-- Call routing group configuration
+
+tnCesGroupTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesGroupEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of interface groups that can be used in call routing profiles."
+    ::= { tnCesRoutingObjects 1 }
+
+tnCesGroupEntry OBJECT-TYPE
+    SYNTAX       TnCesGroupEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry is a group of interfaces that can be used in call routing profiles."
+    INDEX        { tnCesGroupIndex,
+                   tnCesGroupPortNumber }
+    ::= { tnCesGroupTable 1 }
+
+TnCesGroupEntry ::= SEQUENCE {
+    tnCesGroupIndex Unsigned32,
+    tnCesGroupPortNumber Unsigned32,
+    tnCesGroupName DisplayString,
+    tnCesGroupCyclicPortSearch TruthValue,
+    tnCesGroupCyclicChannelSearch TruthValue,
+    tnCesGroupChannels Unsigned32
+}
+
+tnCesGroupIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Index number of a call routing group. This index can be used as a call routing source or destination."
+    ::= { tnCesGroupEntry 1 }
+
+tnCesGroupPortNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The TDM or RS530 port number."
+    ::= { tnCesGroupEntry 2 }
+
+tnCesGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The name of this call routing group."
+    ::= { tnCesGroupEntry 3 }
+
+tnCesGroupCyclicPortSearch OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Causes calls to be routed to channels in this group by increasing port number."
+    ::= { tnCesGroupEntry 4 }
+
+tnCesGroupCyclicChannelSearch OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Causes calls to be routed to channels in this group by increasing channel number."
+    ::= { tnCesGroupEntry 5 }
+
+tnCesGroupChannels OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Bitmap of whether each channel on this TDM port is assigned to this group."
+    ::= { tnCesGroupEntry 6 }
+
+-- Call routing IP names configuration.
+
+tnCesIPNameTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesIPNameEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of named IP address that can be used as routing destinations."
+    ::= { tnCesRoutingObjects 2 }
+
+tnCesIPNameEntry OBJECT-TYPE
+    SYNTAX       TnCesIPNameEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry is a named IP address that can be used as a call routing destination."
+    INDEX        { tnCesIPNameIndex }
+    ::= { tnCesIPNameTable 1 }
+
+TnCesIPNameEntry ::= SEQUENCE {
+    tnCesIPNameIndex Unsigned32,
+    tnCesIPNameName DisplayString,
+    tnCesIPNameIpAddrType InetAddressType,
+    tnCesIPNameIpAddr InetAddress
+}
+
+tnCesIPNameIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Index number of an IP named. This index can be used as a call routing destination."
+    ::= { tnCesIPNameEntry 1 }
+
+tnCesIPNameName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "A name associated with this IP address."
+    ::= { tnCesIPNameEntry 2 }
+
+tnCesIPNameIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP address type of this entry. Must be ipv4 or ipv6."
+    ::= { tnCesIPNameEntry 3 }
+
+tnCesIPNameIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP address of this entry."
+    ::= { tnCesIPNameEntry 4 }
+
+-- Routing profile configuration
+
+tnCesProfileTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of call routing profiles."
+    ::= { tnCesRoutingObjects 3 }
+
+tnCesProfileEntry OBJECT-TYPE
+    SYNTAX       TnCesProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry is a call routing profile."
+    INDEX        { tnCesProfileIndex }
+    ::= { tnCesProfileTable 1 }
+
+TnCesProfileEntry ::= SEQUENCE {
+    tnCesProfileIndex Unsigned32,
+    tnCesProfileName DisplayString,
+    tnCesProfileType INTEGER,
+    tnCesProfileEnabled TruthValue,
+    tnCesProfileRerouteUnanswered TruthValue,
+    tnCesProfileRerouteUnansweredSec Unsigned32,
+    tnCesProfileSourceEndpointType INTEGER,
+    tnCesProfileSourceItemIndex Unsigned32,
+    tnCesProfileSourceChanNumber Unsigned32,
+    tnCesProfileDestPrimEndpointType INTEGER,
+    tnCesProfileDestPrimItemIndex Unsigned32,
+    tnCesProfileDestPrimChanNumber Unsigned32,
+    tnCesProfileDestSecEndpointType INTEGER,
+    tnCesProfileDestSecItemIndex Unsigned32,
+    tnCesProfileDestSecChanNumber Unsigned32,
+    tnCesProfileDestTerEndpointType INTEGER,
+    tnCesProfileDestTerItemIndex Unsigned32,
+    tnCesProfileDestTerChanNumber Unsigned32,
+    tnCesProfileVoiceConversion INTEGER,
+    tnCesProfilePrimaryCalledNumber DisplayString,
+    tnCesProfilePrimaryCallingNumber DisplayString,
+    tnCesProfileSecCalledNumber DisplayString,
+    tnCesProfileSecCallingNumber DisplayString,
+    tnCesProfileTerCalledNumber DisplayString,
+    tnCesProfileTerCallingNumber DisplayString
+}
+
+tnCesProfileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..254)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Index of call routing profile."
+    ::= { tnCesProfileEntry 1 }
+
+tnCesProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The name of this call routing profile."
+    ::= { tnCesProfileEntry 2 }
+
+tnCesProfileType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                standard (0),
+                converting (1),
+                barring (2),
+                nailed (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The call routing profile type. Standard profiles route incoming calls from a souce interface to a destination interface. Convering profiles additionally perform number translations. Barring profiles block matching calls."
+    ::= { tnCesProfileEntry 3 }
+
+tnCesProfileEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether this call routing profile is enabled or disabled."
+    ::= { tnCesProfileEntry 4 }
+
+tnCesProfileRerouteUnanswered OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether to reroute calls that are not answered within a time limit."
+    ::= { tnCesProfileEntry 5 }
+
+tnCesProfileRerouteUnansweredSec OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Time limit in seconds after which to re-route unanswered calls. Only relevant when tnCesProfileRerouteUnanswered is true."
+    ::= { tnCesProfileEntry 6 }
+
+tnCesProfileSourceEndpointType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none (0),
+                all (1),
+                tdmport (2),
+                tdmchannel (3),
+                logicallink (4),
+                group (5)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The type of source endpoint."
+    ::= { tnCesProfileEntry 7 }
+
+tnCesProfileSourceItemIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Call source, depending on tnCesProfileSourceEndpointType: tdmport or tdmchannel - the TDM port number, logicallink - the logical link number, group - the index in tnCesGroupTable of the group."
+    ::= { tnCesProfileEntry 8 }
+
+tnCesProfileSourceChanNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..31)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Call source channel number, only relevant when tnCesProfileSourceEndpointType is tdmchannel."
+    ::= { tnCesProfileEntry 9 }
+
+tnCesProfileDestPrimEndpointType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none (0),
+                all (1),
+                tdmport (2),
+                tdmchannel (3),
+                logicallink (4),
+                group (5),
+                ipname (6)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The type of primary destination endpoint."
+    ::= { tnCesProfileEntry 10 }
+
+tnCesProfileDestPrimItemIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Call primary destination, depending on tnCesProfileDestPrimEndpointType: tdmport or tdmchannel - the TDM port number, logicallink - the logical link number, group - the index in tnCesGroupTable of the group, ipname - the index in tnCesIPNameTable of the IP name."
+    ::= { tnCesProfileEntry 11 }
+
+tnCesProfileDestPrimChanNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..31)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Call primary destination channel number, only relevant when tnCesProfileDestPrimEndpointType is tdmchannel."
+    ::= { tnCesProfileEntry 12 }
+
+tnCesProfileDestSecEndpointType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none (0),
+                all (1),
+                tdmport (2),
+                tdmchannel (3),
+                logicallink (4),
+                group (5),
+                ipname (6)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The type of secondary destination endpoint."
+    ::= { tnCesProfileEntry 13 }
+
+tnCesProfileDestSecItemIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Call secondary destination, depending on tnCesProfileDestSecEndpointType: tdmport or tdmchannel - the TDM port number, logicallink - the logical link number, group - the index in tnCesGroupTable of the group, ipname - the index in tnCesIPNameTable of the IP name."
+    ::= { tnCesProfileEntry 14 }
+
+tnCesProfileDestSecChanNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..31)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Call secondary destination channel number, only relevant when tnCesProfileDestSecEndpointType is tdmchannel."
+    ::= { tnCesProfileEntry 15 }
+
+tnCesProfileDestTerEndpointType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none (0),
+                all (1),
+                tdmport (2),
+                tdmchannel (3),
+                logicallink (4),
+                group (5),
+                ipname (6)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The type of tertiary destination endpoint."
+    ::= { tnCesProfileEntry 16 }
+
+tnCesProfileDestTerItemIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Call tertiary destination, depending on tnCesProfileDestTerEndpointType: tdmport or tdmchannel - the TDM port number, logicallink - the logical link number, group - the index in tnCesGroupTable of the group, ipname - the index in tnCesIPNameTable of the IP name."
+    ::= { tnCesProfileEntry 17 }
+
+tnCesProfileDestTerChanNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..31)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Call tertiary destination channel number, only relevant when tnCesProfileDestTerEndpointType is tdmchannel."
+    ::= { tnCesProfileEntry 18 }
+
+tnCesProfileVoiceConversion OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none (0),
+                utoa (1),
+                atou (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether to do voice conversion, none, u law to A law or A law to u law."
+    ::= { tnCesProfileEntry 19 }
+
+tnCesProfilePrimaryCalledNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..19))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Primary called number in call conversions. Only applies when tnCesProfileType is converting."
+    ::= { tnCesProfileEntry 20 }
+
+tnCesProfilePrimaryCallingNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..19))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Primary calling number in call conversions. Only applies when tnCesProfileType is converting."
+    ::= { tnCesProfileEntry 21 }
+
+tnCesProfileSecCalledNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..19))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Secondary called number in call conversions. Only applies when tnCesProfileType is converting."
+    ::= { tnCesProfileEntry 22 }
+
+tnCesProfileSecCallingNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..19))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Secondary calling number in call conversions. Only applies when tnCesProfileType is converting."
+    ::= { tnCesProfileEntry 23 }
+
+tnCesProfileTerCalledNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..19))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Tertiary called number in call conversions. Only applies when tnCesProfileType is converting."
+    ::= { tnCesProfileEntry 24 }
+
+tnCesProfileTerCallingNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..19))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Tertiary calling number in call conversions. Only applies when tnCesProfileType is converting."
+    ::= { tnCesProfileEntry 25 }
+
+-- Call routing profile called number list.
+
+tnCesProfCalledNumTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesProfCalledNumEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of call routing profile called numbers configuration."
+    ::= { tnCesRoutingObjects 4 }
+
+tnCesProfCalledNumEntry OBJECT-TYPE
+    SYNTAX       TnCesProfCalledNumEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry is a call routing profile called number list."
+    INDEX        { tnCesProfCalledNumProfileIndex }
+    ::= { tnCesProfCalledNumTable 1 }
+
+TnCesProfCalledNumEntry ::= SEQUENCE {
+    tnCesProfCalledNumProfileIndex Unsigned32,
+    tnCesProfCalledNumValue OCTET STRING
+}
+
+tnCesProfCalledNumProfileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..254)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Index of call routing profile that this called number list applies to."
+    ::= { tnCesProfCalledNumEntry 1 }
+
+tnCesProfCalledNumValue OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "List of comma separated called number values."
+    ::= { tnCesProfCalledNumEntry 2 }
+
+-- Call routing profile calling number list.
+
+tnCesProfCallingNumTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesProfCallingNumEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of call routing profile calling numbers configuration."
+    ::= { tnCesRoutingObjects 5 }
+
+tnCesProfCallingNumEntry OBJECT-TYPE
+    SYNTAX       TnCesProfCallingNumEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry is a call routing profile calling number list."
+    INDEX        { tnCesProfCallingNumProfileIndex }
+    ::= { tnCesProfCallingNumTable 1 }
+
+TnCesProfCallingNumEntry ::= SEQUENCE {
+    tnCesProfCallingNumProfileIndex Unsigned32,
+    tnCesProfCallingNumValue OCTET STRING
+}
+
+tnCesProfCallingNumProfileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..254)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Index of call routing profile that this calling number applies to."
+    ::= { tnCesProfCallingNumEntry 1 }
+
+tnCesProfCallingNumValue OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "List of comma separated calling number values."
+    ::= { tnCesProfCallingNumEntry 2 }
+
+-- Call routing profile schedule configuration.
+
+tnCesProfSchedTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesProfileSchedEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of call routing profile schedule configuration."
+    ::= { tnCesRoutingObjects 6 }
+
+tnCesProfSchedEntry OBJECT-TYPE
+    SYNTAX       TnCesProfileSchedEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the current configuration of a call routing profile schedule."
+    INDEX        { tnCesProfSchedProfileIndex,
+                   tnCesProfSchedNumber }
+    ::= { tnCesProfSchedTable 1 }
+
+TnCesProfileSchedEntry ::= SEQUENCE {
+    tnCesProfSchedProfileIndex Unsigned32,
+    tnCesProfSchedNumber Unsigned32,
+    tnCesProfSchedEnable TruthValue,
+    tnCesProfSchedStartTimeMonHours Unsigned32,
+    tnCesProfSchedStartTimeMonMins Unsigned32,
+    tnCesProfSchedStopTimeMonHours Unsigned32,
+    tnCesProfSchedStopTimeMonMins Unsigned32,
+    tnCesProfSchedStartTimeTueHours Unsigned32,
+    tnCesProfSchedStartTimeTueMins Unsigned32,
+    tnCesProfSchedStopTimeTueHours Unsigned32,
+    tnCesProfSchedStopTimeTueMins Unsigned32,
+    tnCesProfSchedStartTimeWedHours Unsigned32,
+    tnCesProfSchedStartTimeWedMins Unsigned32,
+    tnCesProfSchedStopTimeWedHours Unsigned32,
+    tnCesProfSchedStopTimeWedMins Unsigned32,
+    tnCesProfSchedStartTimeThuHours Unsigned32,
+    tnCesProfSchedStartTimeThuMins Unsigned32,
+    tnCesProfSchedStopTimeThuHours Unsigned32,
+    tnCesProfSchedStopTimeThuMins Unsigned32,
+    tnCesProfSchedStartTimeFriHours Unsigned32,
+    tnCesProfSchedStartTimeFriMins Unsigned32,
+    tnCesProfSchedStopTimeFriHours Unsigned32,
+    tnCesProfSchedStopTimeFriMins Unsigned32,
+    tnCesProfSchedStartTimeSatHours Unsigned32,
+    tnCesProfSchedStartTimeSatMins Unsigned32,
+    tnCesProfSchedStopTimeSatHours Unsigned32,
+    tnCesProfSchedStopTimeSatMins Unsigned32,
+    tnCesProfSchedStartTimeSunHours Unsigned32,
+    tnCesProfSchedStartTimeSunMins Unsigned32,
+    tnCesProfSchedStopTimeSunHours Unsigned32,
+    tnCesProfSchedStopTimeSunMins Unsigned32
+}
+
+tnCesProfSchedProfileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..254)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Index of call routing profile that this schedule applies to."
+    ::= { tnCesProfSchedEntry 1 }
+
+tnCesProfSchedNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Schedule number for this call routing profile. Currently only a single schedule per call routing profile is supported."
+    ::= { tnCesProfSchedEntry 2 }
+
+tnCesProfSchedEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether to enable this call routing profile schedule. When false, there is no scheduling and this profile is always active. When true, the profile is enabled according to its schedule."
+    ::= { tnCesProfSchedEntry 3 }
+
+tnCesProfSchedStartTimeMonHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 4 }
+
+tnCesProfSchedStartTimeMonMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 5 }
+
+tnCesProfSchedStopTimeMonHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 6 }
+
+tnCesProfSchedStopTimeMonMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 7 }
+
+tnCesProfSchedStartTimeTueHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 8 }
+
+tnCesProfSchedStartTimeTueMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 9 }
+
+tnCesProfSchedStopTimeTueHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 10 }
+
+tnCesProfSchedStopTimeTueMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 11 }
+
+tnCesProfSchedStartTimeWedHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 12 }
+
+tnCesProfSchedStartTimeWedMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 13 }
+
+tnCesProfSchedStopTimeWedHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 14 }
+
+tnCesProfSchedStopTimeWedMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 15 }
+
+tnCesProfSchedStartTimeThuHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 16 }
+
+tnCesProfSchedStartTimeThuMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 17 }
+
+tnCesProfSchedStopTimeThuHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 18 }
+
+tnCesProfSchedStopTimeThuMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 19 }
+
+tnCesProfSchedStartTimeFriHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 20 }
+
+tnCesProfSchedStartTimeFriMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 21 }
+
+tnCesProfSchedStopTimeFriHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 22 }
+
+tnCesProfSchedStopTimeFriMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 23 }
+
+tnCesProfSchedStartTimeSatHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 24 }
+
+tnCesProfSchedStartTimeSatMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 25 }
+
+tnCesProfSchedStopTimeSatHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 26 }
+
+tnCesProfSchedStopTimeSatMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 27 }
+
+tnCesProfSchedStartTimeSunHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 28 }
+
+tnCesProfSchedStartTimeSunMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesProfSchedEntry 29 }
+
+tnCesProfSchedStopTimeSunHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 30 }
+
+tnCesProfSchedStopTimeSunMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesProfSchedEntry 31 }
+
+-- Compliance section.
+
+tnCesRoutingGroup OBJECT-GROUP
+    OBJECTS { tnCesIPNameName,
+              tnCesIPNameIpAddrType,
+              tnCesIPNameIpAddr,
+              tnCesGroupName,
+              tnCesGroupCyclicPortSearch,
+              tnCesGroupCyclicChannelSearch,
+              tnCesGroupChannels,
+              tnCesProfileName,
+              tnCesProfileType,
+              tnCesProfileEnabled,
+              tnCesProfileRerouteUnanswered,
+              tnCesProfileRerouteUnansweredSec,
+              tnCesProfileSourceEndpointType,
+              tnCesProfileSourceItemIndex,
+              tnCesProfileSourceChanNumber,
+              tnCesProfileDestPrimEndpointType,
+              tnCesProfileDestPrimItemIndex,
+              tnCesProfileDestPrimChanNumber,
+              tnCesProfileDestSecEndpointType,
+              tnCesProfileDestSecItemIndex,
+              tnCesProfileDestSecChanNumber,
+              tnCesProfileDestTerEndpointType,
+              tnCesProfileDestTerItemIndex,
+              tnCesProfileDestTerChanNumber,
+              tnCesProfileVoiceConversion,
+              tnCesProfilePrimaryCalledNumber,
+              tnCesProfilePrimaryCallingNumber,
+              tnCesProfileSecCalledNumber,
+              tnCesProfileSecCallingNumber,
+              tnCesProfileTerCalledNumber,
+              tnCesProfileTerCallingNumber,
+              tnCesProfCalledNumValue,
+              tnCesProfCallingNumValue,
+              tnCesProfSchedEnable,
+              tnCesProfSchedStartTimeMonHours,
+              tnCesProfSchedStartTimeMonMins,
+              tnCesProfSchedStopTimeMonHours,
+              tnCesProfSchedStopTimeMonMins,
+              tnCesProfSchedStartTimeTueHours,
+              tnCesProfSchedStartTimeTueMins,
+              tnCesProfSchedStopTimeTueHours,
+              tnCesProfSchedStopTimeTueMins,
+              tnCesProfSchedStartTimeWedHours,
+              tnCesProfSchedStartTimeWedMins,
+              tnCesProfSchedStopTimeWedHours,
+              tnCesProfSchedStopTimeWedMins,
+              tnCesProfSchedStartTimeThuHours,
+              tnCesProfSchedStartTimeThuMins,
+              tnCesProfSchedStopTimeThuHours,
+              tnCesProfSchedStopTimeThuMins,
+              tnCesProfSchedStartTimeFriHours,
+              tnCesProfSchedStartTimeFriMins,
+              tnCesProfSchedStopTimeFriHours,
+              tnCesProfSchedStopTimeFriMins,
+              tnCesProfSchedStartTimeSatHours,
+              tnCesProfSchedStartTimeSatMins,
+              tnCesProfSchedStopTimeSatHours,
+              tnCesProfSchedStopTimeSatMins,
+              tnCesProfSchedStartTimeSunHours,
+              tnCesProfSchedStartTimeSunMins,
+              tnCesProfSchedStopTimeSunHours,
+              tnCesProfSchedStopTimeSunMins
+            }
+  STATUS  current
+  DESCRIPTION
+    "Objects which implement CES support on a device."
+  ::= { tnCesRoutingGroups 1 }
+
+tnCesRoutingMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+    "You will comply. Respect my authority!"
+    MODULE  -- compliance to the containing MIB module
+    MANDATORY-GROUPS { tnCesRoutingGroup }
+    ::= { tnCesRoutingCompliances 1 }
+
+END

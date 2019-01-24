@@ -1,0 +1,2769 @@
+-- *****************************************************************
+-- Transition Networks CES MIB
+--
+-- Copyright (C) 2013  Transition Networks, Inc. All Rights Reserved.
+-- *****************************************************************
+
+-- ---------------------------------------------------------- --
+-- MIB for the Circuit Emulation Service (CES) features of
+-- Transition Networks products.
+-- ---------------------------------------------------------- --
+
+TN-CES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Unsigned32, Counter32,
+    Integer32 FROM SNMPv2-SMI
+    InetAddressType, InetAddress FROM INET-ADDRESS-MIB
+    TruthValue, MacAddress, DisplayString, DateAndTime FROM SNMPv2-TC
+    OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE FROM SNMPv2-CONF
+    tnProducts FROM TRANSITION-SMI;
+
+tnCesMIB MODULE-IDENTITY
+    LAST-UPDATED "201511250000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+    "Transition Networks
+     Technical Support
+
+     10900 Red Circle Drive
+     Minnetonka, MN 55343 USA
+     Tel: +1-800-526-9267
+
+     E-mail: techsupport@transition.com"
+    DESCRIPTION
+    "The MIB module for the Circuit Emulation Service."
+    REVISION "201511250000Z"
+    DESCRIPTION
+    "Initial version."
+    ::= { tnProducts 60 }
+
+-- Top level structure
+
+tnCesNotifications OBJECT IDENTIFIER ::= { tnCesMIB 0 }
+tnCesEventId OBJECT IDENTIFIER ::= { tnCesNotifications 3 }
+tnCesEventIdGeneral OBJECT IDENTIFIER ::= { tnCesEventId 0 }
+tnCesObjects OBJECT IDENTIFIER ::= { tnCesMIB 1 }
+tnCesConformance OBJECT IDENTIFIER ::= { tnCesMIB 2 }
+tnCesCompliances OBJECT IDENTIFIER ::= { tnCesConformance 1 }
+tnCesGroups OBJECT IDENTIFIER ::= { tnCesConformance 2 }
+
+-- Protocol configuration.
+
+tnCesProtocol OBJECT IDENTIFIER ::= { tnCesObjects 1 }
+
+tnCesProtocolType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                ipUdpRtp (0),
+                ip (1),
+                mpls (2),
+                ethernet (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Which network protocol to use for TDM over IP packets. Note that MPLS is not currenly supported."
+    ::= { tnCesProtocol 1 }
+
+tnCesProtocolUnderrunFixed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Determins the underrun value in a TDM timeslot when no data was available in the logical link jitter buffer. When true, use the fixed value specified by tnCesProtocolUnderrunValue. When false, use the last value sent on the timeslot."
+    ::= { tnCesProtocol 2 }
+
+tnCesProtocolUnderrunValue OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Determins the underrun value in a TDM timeslot when no data was available in the logical link jitter buffer. Used when tnCesProtocolUnderrunFixed is false."
+    ::= { tnCesProtocol 3 }
+
+tnCesProtocolUDPBasePort OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65472)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The UDP port number used for the first logical link. The 2nd logical link uses this value plus one, and so on. Only relevent when tnCesProtocolType is ipUdpRtp."
+    ::= { tnCesProtocol 4 }
+
+tnCesProtocolEnableSSRCChecking OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether to check the RTP SSRC value on received packets. Disabling the check can be useful in aiding compatibility with equipment from other vendors. Only used when tnCesProtocolType is ipUdpRtp."
+    ::= { tnCesProtocol 5 }
+
+-- Alternate clock architecture global configuration.
+
+tnCesClockingAlternate OBJECT IDENTIFIER ::= { tnCesObjects 2 }
+
+tnCesClockingAlternateEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether to use the alternate clocking architecure which supports asymmeric and plesiosynchronous operation."
+    ::= { tnCesClockingAlternate 1 }
+
+-- Clock recovery configuration.
+
+tnCesClockRecovery OBJECT IDENTIFIER ::= { tnCesObjects 3 }
+
+tnCesClockRecoveryAlgorithm OBJECT-TYPE
+    SYNTAX      INTEGER {
+                adaptive (1),
+                adaptiveEnhanced (2),
+                adaptiveFrequency (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Which algorithm to use for TDM over IP clock recovery."
+    ::= { tnCesClockRecovery 1 }
+
+tnCesClockRecoveryFilter OBJECT-TYPE
+    SYNTAX      INTEGER {
+                type1 (1),
+                type2 (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Which filter setting to use for TDM over IP clock recovery."
+    ::= { tnCesClockRecovery 2 }
+
+tnCesClockRecoveryMaxDeviation OBJECT-TYPE
+    SYNTAX      Unsigned32 (5..200)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The maximum step change allowed in the recovered clock in PPM."
+    ::= { tnCesClockRecovery 3 }
+
+-- Event reporting configuration.
+
+tnCesEvent OBJECT IDENTIFIER ::= { tnCesObjects 4 }
+
+tnCesEventThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Priority threshold for reporting events related to CES. Events with a priority above this level are not reported to the system log or notified in SNMP traps."
+    ::= { tnCesEvent 1 }
+
+tnCesEventReportingInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1440)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "How frequently to report certain CES events when thesholds are exceeded. The interval is specicifed in minutes."
+    ::= { tnCesEvent 2 }
+
+tnCesEventThresholdEarly OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Threshold above which to report early packet errors. When this value is zero, reporting is disabled."
+    ::= { tnCesEvent 3 }
+
+tnCesEventThresholdLate OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Threshold above which to report late packet errors. When this value is zero, reporting is disabled."
+    ::= { tnCesEvent 4 }
+
+tnCesEventThresholdUnderrun OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Threshold above which to report underrun errors. When this value is zero, reporting is disabled."
+    ::= { tnCesEvent 5 }
+
+tnCesEventThresholdDCO OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Threshold above which to report clock recovery DCO changes. When this value is zero, reporting is disabled."
+    ::= { tnCesEvent 6 }
+
+-- Packet Processor status.
+
+tnCesProcessor OBJECT IDENTIFIER ::= { tnCesObjects 5 }
+
+tnCesProcessorVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..100))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "CES packet processor hardware and software version information."
+    ::= { tnCesProcessor 1 }
+
+tnCesProcessorProtocolMatch1 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of frames which hit protocol matching rule 1."
+    ::= { tnCesProcessor 2 }
+
+tnCesProcessorProtocolMatch2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of frames which hit protocol matching rule 2."
+    ::= { tnCesProcessor 3 }
+
+tnCesProcessorProtocolMatch3 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of frames which hit protocol matching rule 3."
+    ::= { tnCesProcessor 4 }
+
+tnCesProcessorProtocolMatch4 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of frames which hit protocol matching rule 4."
+    ::= { tnCesProcessor 5 }
+
+tnCesProcessorProtocolNoMatch OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of frames which hit no protocol matching rules."
+    ::= { tnCesProcessor 6 }
+
+tnCesProcessorClassifyFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of frames which fail to classify."
+    ::= { tnCesProcessor 7 }
+
+tnCesProcessorVerifyFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of frames which fail to verify."
+    ::= { tnCesProcessor 8 }
+
+tnCesProcessorIpv4ChecksumFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of frames with IPV4 checksum failures."
+    ::= { tnCesProcessor 9 }
+
+tnCesProcessorUdpChecksumFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of frames with UDP checksum failures."
+    ::= { tnCesProcessor 10 }
+
+-- Global clocking status.
+
+tnCesClockStatus OBJECT IDENTIFIER ::= { tnCesObjects 6 }
+
+tnCesClockStatusLock OBJECT-TYPE
+    SYNTAX      INTEGER {
+                clockLockAutomatic (0),
+                clockLockNormal (1),
+                clockLockHoldover (2),
+                clockLockFreerun (3),
+                clockLockUnknown (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The CES processor DPLL lock status."
+    ::= { tnCesClockStatus 1 }
+
+tnCesClockStatusSlaveMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Whether the CES processor clock is in slave (true) or master (false) mode."
+    ::= { tnCesClockStatus 2 }
+
+tnCesClockStatusSource OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Name of the current clock source."
+    ::= { tnCesClockStatus 3 }
+
+-- Temperature status.
+
+tnCesTemperature OBJECT IDENTIFIER ::= { tnCesObjects 7 }
+
+tnCesTemperatureBoardWhole OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Temperature measurement of circuit board. Whole part before the decimal point."
+    ::= { tnCesTemperature 1 }
+
+tnCesTemperatureBoardFrac OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Temperature measurement of circuit board. Fractional part after the decimal point."
+    ::= { tnCesTemperature 2 }
+
+tnCesTemperatureProcessorWhole OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Temperature measurement of processor. Whole part before the decimal point."
+    ::= { tnCesTemperature 3 }
+
+tnCesTemperatureProcessorFrac OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Temperature measurement of processor. Fractional part after the decimal point."
+    ::= { tnCesTemperature 4 }
+
+-- IP address configuration.
+
+tnCesIP OBJECT IDENTIFIER ::= { tnCesObjects 8 }
+
+tnCesIpv4AddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The IP address type associated with tnCesIpv4Addr. Has the value ipv4."
+::= { tnCesIP 1 }
+
+tnCesIpv4Addr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IPv4 address to use for TDM over IP packets. Applies when the remote end of a circuit has an IPv4 address."
+    ::= { tnCesIP 2 }
+
+tnCesIpv4PrefixLength OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The prefix length associated with the CES IPv4 address."
+    ::= { tnCesIP 3 }
+
+tnCesIpv6AddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The IP address type associated with tnCesIpv6Addr. Has the value ipv6."
+::= { tnCesIP 4 }
+
+tnCesIpv6Addr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IPv6 address to use for TDM over IP packets. Applies when the remote end of a circuit has an IPv6 address."
+    ::= { tnCesIP 5 }
+
+tnCesIpv6PrefixLength OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The prefix length associated with the CES IPv6 address."
+    ::= { tnCesIP 6 }
+
+-- Clock priority configuration.
+
+tnCesClockPriority OBJECT IDENTIFIER ::= { tnCesObjects 9 }
+
+tnCesMiscClockPriorityTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesMiscClockPriorityEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of clock priorities for miscellaneous sources."
+    ::= { tnCesClockPriority 1 }
+
+tnCesMiscClockPriorityEntry OBJECT-TYPE
+    SYNTAX       TnCesMiscClockPriorityEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the clock priority for a particular clock source."
+    INDEX        { tnCesMiscClockPriorityItem }
+    ::= { tnCesMiscClockPriorityTable 1 }
+
+TnCesMiscClockPriorityEntry ::= SEQUENCE {
+    tnCesMiscClockPriorityItem INTEGER,
+    tnCesMiscClockPriority Unsigned32
+}
+
+tnCesMiscClockPriorityItem OBJECT-TYPE
+    SYNTAX      INTEGER {
+                internal (1)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Which clock source this clock priority is for."
+    ::= { tnCesMiscClockPriorityEntry 1 }
+
+tnCesMiscClockPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..19)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The clock priority of a clock source. A lower numeric value indicates a higher priority."
+    ::= { tnCesMiscClockPriorityEntry 2 }
+
+tnCesPRIClockPriorityTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesPRIClockPriorityEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of clock priorities for TDM ports."
+    ::= { tnCesClockPriority 2 }
+
+tnCesPRIClockPriorityEntry OBJECT-TYPE
+    SYNTAX       TnCesPRIClockPriorityEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the clock priority for a TDM port."
+    INDEX        { tnCesPRIClockPriorityIndex }
+    ::= { tnCesPRIClockPriorityTable 1 }
+
+TnCesPRIClockPriorityEntry ::= SEQUENCE {
+    tnCesPRIClockPriorityIndex Unsigned32,
+    tnCesPRIClockPriority Unsigned32
+}
+
+tnCesPRIClockPriorityIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Which TDM port this clock priority is for."
+    ::= { tnCesPRIClockPriorityEntry 1 }
+
+tnCesPRIClockPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..19)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The clock priority of a TDM port. A lower numeric value indicates a higher priority."
+    ::= { tnCesPRIClockPriorityEntry 2 }
+
+tnCesLLClockPriorityTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesLLClockPriorityEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of clock priorities for logical link clock streams."
+    ::= { tnCesClockPriority 3 }
+
+tnCesLLClockPriorityEntry OBJECT-TYPE
+    SYNTAX       TnCesLLClockPriorityEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the clock priority for a logical link clock stream."
+    INDEX        { tnCesLLClockPriorityIndex }
+    ::= { tnCesLLClockPriorityTable 1 }
+
+TnCesLLClockPriorityEntry ::= SEQUENCE {
+    tnCesLLClockPriorityIndex Unsigned32,
+    tnCesLLClockPriority Unsigned32
+}
+
+tnCesLLClockPriorityIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Which logical link clocking stream this clock priority is for."
+    ::= { tnCesLLClockPriorityEntry 1 }
+
+tnCesLLClockPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..19)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The clock priority of a logical link clock stream. A lower numeric value indicates a higher priority."
+    ::= { tnCesLLClockPriorityEntry 2 }
+
+-- Multicast join configuration.
+
+tnCesMulticastJoinTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesMulticastJoinEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of multicast groups to join."
+    ::= { tnCesObjects 10 }
+
+tnCesMulticastJoinEntry OBJECT-TYPE
+    SYNTAX       TnCesMulticastJoinEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the configuration for a multicast group to join."
+    INDEX        { tnCesMulticastJoinIndex }
+    ::= { tnCesMulticastJoinTable 1 }
+
+TnCesMulticastJoinEntry ::= SEQUENCE {
+    tnCesMulticastJoinIndex Unsigned32,
+    tnCesMulticastJoinAction TruthValue,
+    tnCesMulticastJoinAddrType InetAddressType,
+    tnCesMulticastJoinAddr InetAddress
+}
+
+tnCesMulticastJoinIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Index of multicast group."
+    ::= { tnCesMulticastJoinEntry 1 }
+
+tnCesMulticastJoinAction OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether to join a multicast group. When true, join the group specified by tnCesMulticastJoinAddr. When false, do not join any group and leave any previously joined goup."
+    ::= { tnCesMulticastJoinEntry 2 }
+
+tnCesMulticastJoinAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP address type of the multicast group to join. Must be ipv4 or ipv6."
+    ::= { tnCesMulticastJoinEntry 3 }
+
+tnCesMulticastJoinAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP address of the multicast group to join. This must be a multicast address."
+    ::= { tnCesMulticastJoinEntry 4 }
+
+-- TDM port configuration.
+
+tnCesTDMTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesTDMEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of TDM ports."
+    ::= { tnCesObjects 11 }
+
+tnCesTDMEntry OBJECT-TYPE
+    SYNTAX       TnCesTDMEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the configuration for a TDM port."
+    INDEX        { tnCesTDMPortNumber }
+    ::= { tnCesTDMTable 1 }
+
+TnCesTDMEntry ::= SEQUENCE {
+    tnCesTDMPortNumber Unsigned32,
+    tnCesTDMPresentation INTEGER,
+    tnCesTDMFraming INTEGER,
+    tnCesTDMMode INTEGER,
+    tnCesTDMTS0Passthrough TruthValue,
+    tnCesTDMCRC4 TruthValue,
+    tnCesTDMShutdownCallsOnFail TruthValue,
+    tnCesTDMImpedance INTEGER,
+    tnCesTDMT1Framing INTEGER,
+    tnCesTDMT1LineCode INTEGER,
+    tnCesTDMT1LoopCodeType INTEGER,
+    tnCesTDMT1LoopCodeRxEnable TruthValue,
+    tnCesTDMT1LoopCodeUserUp Unsigned32,
+    tnCesTDMT1LoopCodeUserDown Unsigned32,
+    tnCesTDMT1LoopCodeUserLength Unsigned32,
+    tnCesTDMDTE TruthValue
+}
+
+tnCesTDMPortNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The TDM port number."
+    ::= { tnCesTDMEntry 1 }
+
+tnCesTDMPresentation OBJECT-TYPE
+    SYNTAX      INTEGER {
+                te (0),
+                nt (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Network or user presentation. This options is not supported on all products. Modifications will be ignore on such products."
+    ::= { tnCesTDMEntry 2 }
+
+tnCesTDMFraming OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  full (0),
+                  fractional (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether the TDM port operates in framed fractional or unframed full mode. It is not possible to set a port mode which would exclude any TDM channels that are assigned to a logical link (see tnCesLLChanSelectUsed). Any such channel must be deassigned first."
+    ::= { tnCesTDMEntry 3 }
+
+tnCesTDMMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                e1 (0),
+                t1 (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "TDM port mode T1 or E1. It is not possible to set a port mode which would exclude any TDM channels that are assigned to a logical link (see tnCesLLChanSelectUsed). Any such channel must be deassigned first."
+    ::= { tnCesTDMEntry 4 }
+
+tnCesTDMTS0Passthrough OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether timeslot zero is passed in E1 fractional mode. Only valid when tnCesTDMFraming is fractional and tnCesTDMMode is E1."
+    ::= { tnCesTDMEntry 5 }
+
+tnCesTDMCRC4 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether the TDM framing uses CRC4. Only valid when tnCesTDMFraming is fractional."
+    ::= { tnCesTDMEntry 6 }
+
+tnCesTDMShutdownCallsOnFail OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether to shutdown the CES connections or ISDN calls using this port when the port fails."
+    ::= { tnCesTDMEntry 7 }
+
+tnCesTDMImpedance OBJECT-TYPE
+    SYNTAX      INTEGER {
+                impedance120ohms (0),
+                impedance75ohms (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Electrical impedance of the TDM port, 75ohms or 120ohms."
+    ::= { tnCesTDMEntry 8 }
+
+tnCesTDMT1Framing OBJECT-TYPE
+    SYNTAX      INTEGER {
+                esf (0),
+                d4 (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The frame structure in T1 mode. Only used when tnCesTDMMode is T1."
+    ::= { tnCesTDMEntry 9 }
+
+tnCesTDMT1LineCode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                b8zs (0),
+                ami (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The line code in T1 mode. Only used when tnCesTDMMode is T1."
+    ::= { tnCesTDMEntry 10 }
+
+tnCesTDMT1LoopCodeType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                fac1 (0),
+                fac2 (1),
+                fac3 (2),
+                user (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The type of loop code which when detected on the port will cause loops to be switched on or off."
+    ::= { tnCesTDMEntry 11 }
+
+tnCesTDMT1LoopCodeRxEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether detection of loop codes is enabled or disabled on the port."
+    ::= { tnCesTDMEntry 12 }
+
+tnCesTDMT1LoopCodeUserUp OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "User defined bit pattern to cause loop up for the FACU option."
+    ::= { tnCesTDMEntry 13 }
+
+tnCesTDMT1LoopCodeUserDown OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "User defined bit pattern to cause loop down for the FACU option."
+    ::= { tnCesTDMEntry 14 }
+
+tnCesTDMT1LoopCodeUserLength OBJECT-TYPE
+    SYNTAX      Unsigned32 (4..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The number of bits in tnCesTDMT1LoopCodeUserUp and tnCesTDMT1LoopCodeUserDown."
+    ::= { tnCesTDMEntry 15 }
+
+tnCesTDMDTE OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether the port is configured as DTE (true) or DCE (false). Only applies to Contra ports."
+    ::= { tnCesTDMEntry 16 }
+
+-- Logical link configuration.
+
+tnCesLLTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesLLEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of logical link configuration."
+    ::= { tnCesObjects 12 }
+
+tnCesLLEntry OBJECT-TYPE
+    SYNTAX       TnCesLLEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the current configuration of a logical link."
+    INDEX        { tnCesLLNumber }
+    ::= { tnCesLLTable 1 }
+
+TnCesLLEntry ::= SEQUENCE {
+    tnCesLLNumber Unsigned32,
+    tnCesLLname DisplayString,
+    tnCesLLDirection INTEGER,
+    tnCesLLRemoteIpAddrType InetAddressType,
+    tnCesLLRemoteIpAddr InetAddress,
+    tnCesLLSecondaryRemoteIpAddrType InetAddressType,
+    tnCesLLSecondaryRemoteIpAddr InetAddress,
+    tnCesLLQosType INTEGER,
+    tnCesLLQosTOS Unsigned32,
+    tnCesLLQosDiffserv Unsigned32,
+    tnCesLLVlanTag TruthValue,
+    tnCesLLVlanId Unsigned32,
+    tnCesLLVlanPriority Unsigned32,
+    tnCesLLJitterBufferLength Unsigned32,
+    tnCesLLFramesPerPacket Unsigned32,
+    tnCesLLRemoteLinkNumber Unsigned32
+}
+
+tnCesLLNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The logical link number."
+    ::= { tnCesLLEntry 1 }
+
+tnCesLLname OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "An optional name for the logical link."
+    ::= { tnCesLLEntry 2 }
+
+tnCesLLDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                disable (0),
+                rx (1),
+                tx (2),
+                both (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Direction of data flow over the packet network for a logical link."
+    ::= { tnCesLLEntry 3 }
+
+tnCesLLRemoteIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP address type of the remote end of the logical link. Must be ipv4 or ipv6."
+    ::= { tnCesLLEntry 4 }
+
+tnCesLLRemoteIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP address of the remote end of the logical link. If tnCesLLDirection is tx or both then this may be a unicast or multicast address. If tnCesLLDirection is rx then this must be a unicast address."
+    ::= { tnCesLLEntry 5 }
+
+tnCesLLSecondaryRemoteIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The secondary IP address type of the remote end of the logical link. Must be ipv4 or ipv6."
+    ::= { tnCesLLEntry 6 }
+
+tnCesLLSecondaryRemoteIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The secondary IP address of the remote end of the logical link. If tnCesLLDirection is tx or both then this may be a unicast or multicast address. If tnCesLLDirection is rx then this must be a unicast address."
+    ::= { tnCesLLEntry 7 }
+
+tnCesLLQosType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                tos (0),
+                diffserv (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether logical link QOS is encoded as Type of Service (TOS) or Diffserv."
+    ::= { tnCesLLEntry 8 }
+
+tnCesLLQosTOS OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Type Of Service value for logical link QOS. Only used when tnCesLLQosType is tos."
+    ::= { tnCesLLEntry 9 }
+
+tnCesLLQosDiffserv OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Diffserv codepoint value for logical link QOS. Only used when tnCesLLQosType is diffserv."
+    ::= { tnCesLLEntry 10 }
+
+tnCesLLVlanTag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether Ethernet frames for this logical link are VLAN tagged."
+    ::= { tnCesLLEntry 11 }
+
+tnCesLLVlanId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "VLAN ID for Ethernet frames for this logical link. Only applies when tnCesLLVlanTag is true."
+    ::= { tnCesLLEntry 12 }
+
+tnCesLLVlanPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Priority value for Ethernet frames for this logical link. Only applies when tnCesLLVlanTag is true."
+    ::= { tnCesLLEntry 13 }
+
+tnCesLLJitterBufferLength OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..400)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Jitter buffer length in ms for this logical link."
+    ::= { tnCesLLEntry 14 }
+
+tnCesLLFramesPerPacket OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "In framed mode, the number of TDM frames in the packet payload for this logical link."
+    ::= { tnCesLLEntry 15 }
+
+tnCesLLRemoteLinkNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The remote logical link number that this link exchanges packets with."
+    ::= { tnCesLLEntry 16 }
+
+-- Logical link schedule configuration.
+
+tnCesLLSchedTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesLLSchedEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of logical link schedule configuration."
+    ::= { tnCesObjects 13 }
+
+tnCesLLSchedEntry OBJECT-TYPE
+    SYNTAX       TnCesLLSchedEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the current configuration of a logical link schedule."
+    INDEX        { tnCesLLSchedNumber }
+    ::= { tnCesLLSchedTable 1 }
+
+TnCesLLSchedEntry ::= SEQUENCE {
+    tnCesLLSchedNumber Unsigned32,
+    tnCesLLSchedEnable TruthValue,
+    tnCesLLSchedStartTimeMonHours Unsigned32,
+    tnCesLLSchedStartTimeMonMins Unsigned32,
+    tnCesLLSchedStopTimeMonHours Unsigned32,
+    tnCesLLSchedStopTimeMonMins Unsigned32,
+    tnCesLLSchedStartTimeTueHours Unsigned32,
+    tnCesLLSchedStartTimeTueMins Unsigned32,
+    tnCesLLSchedStopTimeTueHours Unsigned32,
+    tnCesLLSchedStopTimeTueMins Unsigned32,
+    tnCesLLSchedStartTimeWedHours Unsigned32,
+    tnCesLLSchedStartTimeWedMins Unsigned32,
+    tnCesLLSchedStopTimeWedHours Unsigned32,
+    tnCesLLSchedStopTimeWedMins Unsigned32,
+    tnCesLLSchedStartTimeThuHours Unsigned32,
+    tnCesLLSchedStartTimeThuMins Unsigned32,
+    tnCesLLSchedStopTimeThuHours Unsigned32,
+    tnCesLLSchedStopTimeThuMins Unsigned32,
+    tnCesLLSchedStartTimeFriHours Unsigned32,
+    tnCesLLSchedStartTimeFriMins Unsigned32,
+    tnCesLLSchedStopTimeFriHours Unsigned32,
+    tnCesLLSchedStopTimeFriMins Unsigned32,
+    tnCesLLSchedStartTimeSatHours Unsigned32,
+    tnCesLLSchedStartTimeSatMins Unsigned32,
+    tnCesLLSchedStopTimeSatHours Unsigned32,
+    tnCesLLSchedStopTimeSatMins Unsigned32,
+    tnCesLLSchedStartTimeSunHours Unsigned32,
+    tnCesLLSchedStartTimeSunMins Unsigned32,
+    tnCesLLSchedStopTimeSunHours Unsigned32,
+    tnCesLLSchedStopTimeSunMins Unsigned32
+}
+
+tnCesLLSchedNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The logical link number."
+    ::= { tnCesLLSchedEntry 1 }
+
+tnCesLLSchedEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether to enable the logical link schedule. When false, there is no scheduling and this link is always on. When true, the link is enabled according to its schedule."
+    ::= { tnCesLLSchedEntry 2 }
+
+tnCesLLSchedStartTimeMonHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 3 }
+
+tnCesLLSchedStartTimeMonMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 4 }
+
+tnCesLLSchedStopTimeMonHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 5 }
+
+tnCesLLSchedStopTimeMonMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 6 }
+
+tnCesLLSchedStartTimeTueHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 7 }
+
+tnCesLLSchedStartTimeTueMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 8 }
+
+tnCesLLSchedStopTimeTueHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 9 }
+
+tnCesLLSchedStopTimeTueMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 10 }
+
+tnCesLLSchedStartTimeWedHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 11 }
+
+tnCesLLSchedStartTimeWedMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 12 }
+
+tnCesLLSchedStopTimeWedHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 13 }
+
+tnCesLLSchedStopTimeWedMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 14 }
+
+tnCesLLSchedStartTimeThuHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 15 }
+
+tnCesLLSchedStartTimeThuMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 16 }
+
+tnCesLLSchedStopTimeThuHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 17 }
+
+tnCesLLSchedStopTimeThuMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 18 }
+
+tnCesLLSchedStartTimeFriHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 19 }
+
+tnCesLLSchedStartTimeFriMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 20 }
+
+tnCesLLSchedStopTimeFriHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 21 }
+
+tnCesLLSchedStopTimeFriMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 22 }
+
+tnCesLLSchedStartTimeSatHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 23 }
+
+tnCesLLSchedStartTimeSatMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 24 }
+
+tnCesLLSchedStopTimeSatHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 25 }
+
+tnCesLLSchedStopTimeSatMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 26 }
+
+tnCesLLSchedStartTimeSunHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 27 }
+
+tnCesLLSchedStartTimeSunMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLSchedEntry 28 }
+
+tnCesLLSchedStopTimeSunHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 29 }
+
+tnCesLLSchedStopTimeSunMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLSchedEntry 30 }
+
+-- Logical link dynamic jitter buffer adjustment configuration.
+
+tnCesLLJATable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesLLJAEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of logical link dynamic jitter buffer adjustment configuration."
+    ::= { tnCesObjects 14 }
+
+tnCesLLJAEntry OBJECT-TYPE
+    SYNTAX       TnCesLLJAEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the current dynamic jitter adjustment configuration of a logical link."
+    INDEX        { tnCesLLJANumber }
+    ::= { tnCesLLJATable 1 }
+
+TnCesLLJAEntry ::= SEQUENCE {
+    tnCesLLJANumber Unsigned32,
+    tnCesLLJitterAdjustmentMode INTEGER,
+    tnCesLLJitterAdjustmentAfter Unsigned32,
+    tnCesLLJASchedStartTimeMonHours Unsigned32,
+    tnCesLLJASchedStartTimeMonMins Unsigned32,
+    tnCesLLJASchedStopTimeMonHours Unsigned32,
+    tnCesLLJASchedStopTimeMonMins Unsigned32,
+    tnCesLLJASchedStartTimeTueHours Unsigned32,
+    tnCesLLJASchedStartTimeTueMins Unsigned32,
+    tnCesLLJASchedStopTimeTueHours Unsigned32,
+    tnCesLLJASchedStopTimeTueMins Unsigned32,
+    tnCesLLJASchedStartTimeWedHours Unsigned32,
+    tnCesLLJASchedStartTimeWedMins Unsigned32,
+    tnCesLLJASchedStopTimeWedHours Unsigned32,
+    tnCesLLJASchedStopTimeWedMins Unsigned32,
+    tnCesLLJASchedStartTimeThuHours Unsigned32,
+    tnCesLLJASchedStartTimeThuMins Unsigned32,
+    tnCesLLJASchedStopTimeThuHours Unsigned32,
+    tnCesLLJASchedStopTimeThuMins Unsigned32,
+    tnCesLLJASchedStartTimeFriHours Unsigned32,
+    tnCesLLJASchedStartTimeFriMins Unsigned32,
+    tnCesLLJASchedStopTimeFriHours Unsigned32,
+    tnCesLLJASchedStopTimeFriMins Unsigned32,
+    tnCesLLJASchedStartTimeSatHours Unsigned32,
+    tnCesLLJASchedStartTimeSatMins Unsigned32,
+    tnCesLLJASchedStopTimeSatHours Unsigned32,
+    tnCesLLJASchedStopTimeSatMins Unsigned32,
+    tnCesLLJASchedStartTimeSunHours Unsigned32,
+    tnCesLLJASchedStartTimeSunMins Unsigned32,
+    tnCesLLJASchedStopTimeSunHours Unsigned32,
+    tnCesLLJASchedStopTimeSunMins Unsigned32
+}
+
+tnCesLLJANumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The logical link number."
+    ::= { tnCesLLJAEntry 1 }
+
+tnCesLLJitterAdjustmentMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none (0),
+                always (1),
+                schedule (2),
+                once (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The mode in which automatic jitter buffer adustment is to be run. None - No automatic adjuistment of the jitter buffer will be carried out for this logical link. Always - Automatic jitter buffer adjustment is carried out periodically for this logical link while it is active. Schedule - Automatic jitter buffer adjustment is carried out periodically while this link is active during the specified schedule times. Once - Automatic jitter buffer adjustment is carried out once after this logical link becomes active."
+    ::= { tnCesLLJAEntry 2 }
+
+tnCesLLJitterAdjustmentAfter OBJECT-TYPE
+    SYNTAX      Unsigned32 (3..999)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "How long to wait in minutes before doing any jitter buffer adjustment once the logical link has become active. Only used when tnCesLLJitterAdjustmentMode is always or once."
+    ::= { tnCesLLJAEntry 3 }
+
+tnCesLLJASchedStartTimeMonHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+  ::= { tnCesLLJAEntry 4 }
+
+tnCesLLJASchedStartTimeMonMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 5 }
+
+tnCesLLJASchedStopTimeMonHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 6 }
+
+tnCesLLJASchedStopTimeMonMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 7 }
+
+tnCesLLJASchedStartTimeTueHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 8 }
+
+tnCesLLJASchedStartTimeTueMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 9 }
+
+tnCesLLJASchedStopTimeTueHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 10 }
+
+tnCesLLJASchedStopTimeTueMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 11 }
+
+tnCesLLJASchedStartTimeWedHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 12 }
+
+tnCesLLJASchedStartTimeWedMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 13 }
+
+tnCesLLJASchedStopTimeWedHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 14 }
+
+tnCesLLJASchedStopTimeWedMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 15 }
+
+tnCesLLJASchedStartTimeThuHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 16 }
+
+tnCesLLJASchedStartTimeThuMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 17 }
+
+tnCesLLJASchedStopTimeThuHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 18 }
+
+tnCesLLJASchedStopTimeThuMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 19 }
+
+tnCesLLJASchedStartTimeFriHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 20 }
+
+tnCesLLJASchedStartTimeFriMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 21 }
+
+tnCesLLJASchedStopTimeFriHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 22 }
+
+tnCesLLJASchedStopTimeFriMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 23 }
+
+tnCesLLJASchedStartTimeSatHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 24 }
+
+tnCesLLJASchedStartTimeSatMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 25 }
+
+tnCesLLJASchedStopTimeSatHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 26 }
+
+tnCesLLJASchedStopTimeSatMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 27 }
+
+tnCesLLJASchedStartTimeSunHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 28 }
+
+tnCesLLJASchedStartTimeSunMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule start time. The start time must not be later than the stop time."
+    ::= { tnCesLLJAEntry 29 }
+
+tnCesLLJASchedStopTimeSunHours OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Hours component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 30 }
+
+tnCesLLJASchedStopTimeSunMins OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Minutes component of schedule stop time. The stop time must not be earlier than the start time."
+    ::= { tnCesLLJAEntry 31 }
+
+-- Logical link channel selection configuration.
+
+tnCesLLChanSelectTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesLLChanSelectEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of TDM channels selected for a logical link."
+    ::= { tnCesObjects 15 }
+
+tnCesLLChanSelectEntry OBJECT-TYPE
+    SYNTAX       TnCesLLChanSelectEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the channel selection configuration of a logical link."
+    INDEX        { tnCesLLChanSelectLLNumber,
+                   tnCesLLChanSelectPortNumber }
+    ::= { tnCesLLChanSelectTable 1 }
+
+TnCesLLChanSelectEntry ::= SEQUENCE {
+    tnCesLLChanSelectLLNumber Unsigned32,
+    tnCesLLChanSelectPortNumber Unsigned32,
+    tnCesLLChanSelectAvailable Unsigned32,
+    tnCesLLChanSelectUsed Unsigned32
+}
+
+tnCesLLChanSelectLLNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The logical link number."
+    ::= { tnCesLLChanSelectEntry 1 }
+
+tnCesLLChanSelectPortNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The TDM or RS530 port number."
+    ::= { tnCesLLChanSelectEntry 2 }
+
+tnCesLLChanSelectAvailable OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Bitmap of whether each channel on this TDM port is available for use by this logical link. Channels are unavailable if they unavailable in the TDM port configuration (full/fractional/E1/T1) or are already selected for another logical link. Bit 0 is for the first channel, bit one for the second, etc."
+    ::= { tnCesLLChanSelectEntry 3 }
+
+tnCesLLChanSelectUsed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Bitmap of whether each channel on this TDM port is assigned for use by this logical link. A channel cannot be assigned to a logical link if the channel is unavailable in the TDM port configuration (full/fractional/E1/T1), the channel is already assigned to another logical link, the channel is on a different TDM port from other channels in this link, or the logical link would have more than 32 channels assigned. Bit 0 is for the first channel, bit one for the second, etc. For products with RS530 ports, this item is ignored. The channels used will be configured automatically from the serial port bitrate whenever this table entry is updated."
+    ::= { tnCesLLChanSelectEntry 4 }
+
+-- Alternate clock architecture stream configuration.
+
+tnCesLLAlternateTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesLLAlternateEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of logical link configuration items for the alternate clocking mode."
+    ::= { tnCesObjects 16 }
+
+tnCesLLAlternateEntry OBJECT-TYPE
+    SYNTAX       TnCesLLAlternateEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the logical link configuration for the alternate clocking mode."
+    INDEX        { tnCesLLAlternateLLNumber }
+    ::= { tnCesLLAlternateTable 1 }
+
+TnCesLLAlternateEntry ::= SEQUENCE {
+    tnCesLLAlternateLLNumber Unsigned32,
+    tnCesLLPlesiosynchronous TruthValue,
+    tnCesLLAsymmetric TruthValue,
+    tnCesLLBytesPerPacketRx Unsigned32,
+    tnCesLLBytesPerPacketTx Unsigned32
+}
+
+tnCesLLAlternateLLNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The clocking stream / logical link number."
+    ::= { tnCesLLAlternateEntry 1 }
+
+tnCesLLPlesiosynchronous OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether clocking for stream is plesiosynchronous. Only used when tnCesClockingAlternateEnable is true."
+    ::= { tnCesLLAlternateEntry 2 }
+
+tnCesLLAsymmetric OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Asymmetric clocking mode. Only applies when the associated TDM port is full and when tnCesClockingAlternateEnable is true."
+    ::= { tnCesLLAlternateEntry 3 }
+
+tnCesLLBytesPerPacketRx OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1500)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "In unframed mode, the number of bytes in the packet payload for the logical link in the receive direction."
+    ::= { tnCesLLAlternateEntry 4 }
+
+tnCesLLBytesPerPacketTx OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1500)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "In unframed mode, the number of bytes in the packet payload for the logical link in the transmit direction."
+    ::= { tnCesLLAlternateEntry 5 }
+
+-- Logical link status.
+
+tnCesLLStatusTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesLLStatusEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of logical link status."
+    ::= { tnCesObjects 17 }
+
+tnCesLLStatusEntry OBJECT-TYPE
+    SYNTAX       TnCesLLStatusEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the current status of a logical link."
+    INDEX        { tnCesLLStatusNumber }
+    ::= { tnCesLLStatusTable 1 }
+
+TnCesLLStatusEntry ::= SEQUENCE {
+    tnCesLLStatusNumber Unsigned32,
+    tnCesLLStatusEnabled TruthValue,
+    tnCesLLStatusActive TruthValue,
+    tnCesLLStatusArpResolved TruthValue,
+    tnCesLLStatusNumberOfChannels Unsigned32,
+    tnCesLLStatusRemoteMac MacAddress,
+    tnCesLLStatusRemoteIpAddrType InetAddressType,
+    tnCesLLStatusRemoteIpAddr InetAddress,
+    tnCesLLStatusRemoteContextKnown TruthValue,
+    tnCesLLStatusRemoteContextNumber Unsigned32,
+    tnCesLLStatusRemotePortKnown TruthValue,
+    tnCesLLStatusRemotePort Unsigned32,
+    tnCesLLStatusQueueLengthValid TruthValue,
+    tnCesLLStatusMinQueueLength Unsigned32,
+    tnCesLLStatusMaxQueueLength Unsigned32,
+    tnCesLLStatusAveQueueLengthWhole Unsigned32,
+    tnCesLLStatusAveQueueLengthFrac Unsigned32,
+    tnCesLLStatusEarly Counter32,
+    tnCesLLStatusLate Counter32,
+    tnCesLLStatusUnderrun Counter32,
+    tnCesLLStatusLastSequence Counter32,
+    tnCesLLStatusPacketsRx Counter32,
+    tnCesLLStatusPacketsTx Counter32,
+    tnCesLLStatusSlipsReduceCount Counter32,
+    tnCesLLStatusSlipsExtendCount Counter32,
+    tnCesLLLocalLoop TruthValue,
+    tnCesLLRemoteLoop TruthValue,
+    tnCesLLNudge Integer32,
+    tnCesLLResetErrorStats TruthValue
+}
+
+tnCesLLStatusNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The logical link number."
+    ::= { tnCesLLStatusEntry 1 }
+
+tnCesLLStatusEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Whether the logical link is enabled for use."
+    ::= { tnCesLLStatusEntry 2 }
+
+tnCesLLStatusActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Whether the logical link is active."
+    ::= { tnCesLLStatusEntry 3 }
+
+tnCesLLStatusArpResolved OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Whether address resolution has been completed for the logical link."
+    ::= { tnCesLLStatusEntry 4 }
+
+tnCesLLStatusNumberOfChannels OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of TDM channels being transported by this logical link."
+    ::= { tnCesLLStatusEntry 5 }
+
+tnCesLLStatusRemoteMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The MAC address of the remote end of the logical link, or the gateway MAC address when the remote end is on a different IP subnet."
+    ::= { tnCesLLStatusEntry 6 }
+
+tnCesLLStatusRemoteIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The IP address type of the remote end of the logical link."
+    ::= { tnCesLLStatusEntry 7 }
+
+tnCesLLStatusRemoteIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The IP address of the remote end of the logical link."
+    ::= { tnCesLLStatusEntry 8 }
+
+tnCesLLStatusRemoteContextKnown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Whether the logical link number on the remote end is known."
+    ::= { tnCesLLStatusEntry 9 }
+
+tnCesLLStatusRemoteContextNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The logical link number on the remote end (if known)."
+    ::= { tnCesLLStatusEntry 10 }
+
+tnCesLLStatusRemotePortKnown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Whether the UDP port number of the remote end of the logical link is known."
+    ::= { tnCesLLStatusEntry 11 }
+
+tnCesLLStatusRemotePort OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The UDP port number of the remote end of the logical link (if known)."
+    ::= { tnCesLLStatusEntry 12 }
+
+tnCesLLStatusQueueLengthValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Whether the jitter buffer statistics are available for the logical link."
+    ::= { tnCesLLStatusEntry 13 }
+
+tnCesLLStatusMinQueueLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The minimum fill level of the logical link jitter buffer."
+    ::= { tnCesLLStatusEntry 14 }
+
+tnCesLLStatusMaxQueueLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The maximum fill level of the logical link jitter buffer."
+    ::= { tnCesLLStatusEntry 15 }
+
+tnCesLLStatusAveQueueLengthWhole OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The average fill level of the logical link jitter buffer. Whole part before the decimal point."
+    ::= { tnCesLLStatusEntry 16 }
+
+tnCesLLStatusAveQueueLengthFrac OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The average fill level of the logical link jitter buffer. Fractional part after the decimal point."
+    ::= { tnCesLLStatusEntry 17 }
+
+tnCesLLStatusEarly OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of packets which arrived too early to be put into the logical link jitter buffer."
+    ::= { tnCesLLStatusEntry 18 }
+
+tnCesLLStatusLate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of packets which arrived too late to be put into the logical link jitter buffer."
+    ::= { tnCesLLStatusEntry 19 }
+
+tnCesLLStatusUnderrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of underruns on the TDM interface caused by missing packets in the logical link jitter buffer."
+    ::= { tnCesLLStatusEntry 20 }
+
+tnCesLLStatusLastSequence OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The sequence number of the last packet received for the logical link."
+    ::= { tnCesLLStatusEntry 21 }
+
+tnCesLLStatusPacketsRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of packets received on the logical link."
+    ::= { tnCesLLStatusEntry 22 }
+
+tnCesLLStatusPacketsTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of packets transmitted on the logical link."
+    ::= { tnCesLLStatusEntry 23 }
+
+tnCesLLStatusSlipsReduceCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of times the jitter buffer has been slipped to reduced latency."
+    ::= { tnCesLLStatusEntry 24 }
+
+tnCesLLStatusSlipsExtendCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The number of times the jitter buffer has been slipped to extend latency."
+    ::= { tnCesLLStatusEntry 25 }
+
+tnCesLLLocalLoop OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether the logical link local loop is enabled."
+    ::= { tnCesLLStatusEntry 26 }
+
+tnCesLLRemoteLoop OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether the logical link remote loop is enabled."
+   ::= { tnCesLLStatusEntry 27 }
+
+tnCesLLNudge OBJECT-TYPE
+    SYNTAX      Integer32 (-128..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The number of packets by which to nudge the jitter buffer for this logical link. A positive number extends the latency, a negative number reduces the latency, zero has no effect."
+   ::= { tnCesLLStatusEntry 28 }
+
+tnCesLLResetErrorStats OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Set to true to reset the jitter buffer error counts for this logical link."
+   ::= { tnCesLLStatusEntry 29 }
+
+-- TDM port status.
+
+tnCesTDMStatusTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesTDMStatusEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of TDM port status."
+    ::= { tnCesObjects 18 }
+
+tnCesTDMStatusEntry OBJECT-TYPE
+    SYNTAX       TnCesTDMStatusEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the current status of a TDM port."
+    INDEX        { tnCesTDMStatusNumber }
+    ::= { tnCesTDMStatusTable 1 }
+
+TnCesTDMStatusEntry ::= SEQUENCE {
+    tnCesTDMStatusNumber Unsigned32,
+    tnCesTDMStatusPhysical DisplayString,
+    tnCesTDMStatusRxSignalLevel DisplayString,
+    tnCesTDMStatusRxError DisplayString,
+    tnCesTDMLocalLoop TruthValue,
+    tnCesTDMRemoteLoop TruthValue,
+    tnCesTDMBreakCalls TruthValue
+}
+
+tnCesTDMStatusNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The TDM port number."
+    ::= { tnCesTDMStatusEntry 1 }
+
+tnCesTDMStatusPhysical OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..50))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Physical layer state of the TDM port."
+    ::= { tnCesTDMStatusEntry 2 }
+
+tnCesTDMStatusRxSignalLevel OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..50))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Receive signal level on the TDM port."
+    ::= { tnCesTDMStatusEntry 3 }
+
+tnCesTDMStatusRxError OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..50))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Receive error status of the TDM port."
+    ::= { tnCesTDMStatusEntry 4 }
+
+tnCesTDMLocalLoop OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether the TDM port local loop is enabled."
+    ::= { tnCesTDMStatusEntry 5 }
+
+tnCesTDMRemoteLoop OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether the TDM port remote loop is enabled."
+    ::= { tnCesTDMStatusEntry 6 }
+
+tnCesTDMBreakCalls OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Set to true to break the CES connections or ISDN calls active on this port."
+    ::= { tnCesTDMStatusEntry 7 }
+
+-- Call status.
+
+tnCesCallStatusTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesCallStatusEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of calls."
+    ::= { tnCesObjects 19 }
+
+tnCesCallStatusEntry OBJECT-TYPE
+    SYNTAX       TnCesCallStatusEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the current status of a CES call."
+    INDEX        { tnCesCallStatusNumber }
+    ::= { tnCesCallStatusTable 1 }
+
+TnCesCallStatusEntry ::= SEQUENCE {
+    tnCesCallStatusNumber Unsigned32,
+    tnCesCallStatusStartTime DateAndTime,
+    tnCesCallStatusSource DisplayString,
+    tnCesCallStatusDestination DisplayString,
+    tnCesCallStatusOriginator TruthValue,
+    tnCesCallStatusDestinationNumber DisplayString,
+    tnCesCallStatusSourceNumber DisplayString,
+    tnCesCallStatusState DisplayString
+}
+
+tnCesCallStatusNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The CES call number."
+    ::= { tnCesCallStatusEntry 1 }
+
+tnCesCallStatusStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Time the call was started."
+    ::= { tnCesCallStatusEntry 2 }
+
+tnCesCallStatusSource OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Source interface of the call."
+    ::= { tnCesCallStatusEntry 3 }
+
+tnCesCallStatusDestination OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Destination interface of the call."
+    ::= { tnCesCallStatusEntry 4 }
+
+tnCesCallStatusOriginator OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Whether this system originated the call."
+    ::= { tnCesCallStatusEntry 5 }
+
+tnCesCallStatusDestinationNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..100))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Destination number of the call."
+    ::= { tnCesCallStatusEntry 6 }
+
+tnCesCallStatusSourceNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..100))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Source number of the call."
+    ::= { tnCesCallStatusEntry 7 }
+
+tnCesCallStatusState OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..30))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "State of the call."
+    ::= { tnCesCallStatusEntry 8 }
+
+-- Per stream clocking status.
+
+tnCesClockStatusTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesClockStatusEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of clock recovery status."
+    ::= { tnCesObjects 20 }
+
+tnCesClockStatusEntry OBJECT-TYPE
+    SYNTAX       TnCesClockStatusEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the current status of a CES clock stream."
+    INDEX        { tnCesClockStatusStreamNumber }
+    ::= { tnCesClockStatusTable 1 }
+
+TnCesClockStatusEntry ::= SEQUENCE {
+    tnCesClockStatusStreamNumber Unsigned32,
+    tnCesClockStatusStreamStatus INTEGER,
+    tnCesClockStatusStreamMode INTEGER,
+    tnCesClockStatusStreamDCO Integer32,
+    tnCesClockStatusStreamDCOMin Integer32,
+    tnCesClockStatusStreamDCOMax Integer32,
+    tnCesClockStatusStreamDCOAvg Integer32
+}
+
+tnCesClockStatusStreamNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The CES clock stream number."
+    ::= { tnCesClockStatusEntry 1 }
+
+tnCesClockStatusStreamStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                freerun (0),
+                holdover (1),
+                acquiring (2),
+                acquired (3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status of the clock recovery on the clock stream."
+    ::= { tnCesClockStatusEntry 2 }
+
+tnCesClockStatusStreamMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                clockRecoveryDisabled (0),
+                adaptive (1),
+                adaptiveEnhanced (2),
+                adaptiveFrequency (3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The clock recovery algorithm running on the clock stream, or disabled if no clock recovery is running."
+    ::= { tnCesClockStatusEntry 3 }
+
+tnCesClockStatusStreamDCO OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Recovered clock frequency offset in PPB. NB Limited to 32 bit range."
+    ::= { tnCesClockStatusEntry 4 }
+
+tnCesClockStatusStreamDCOMin OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Minimum value of the recovered clock frequency offset in PPB. NB Limited to 32 bit range."
+    ::= { tnCesClockStatusEntry 5 }
+
+tnCesClockStatusStreamDCOMax OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Maximum value of the recovered clock frequency offset in PPB. NB Limited to 32 bit range."
+    ::= { tnCesClockStatusEntry 6 }
+
+tnCesClockStatusStreamDCOAvg OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Average value of the recovered clock frequency offset in PPB. NB Limited to 32 bit range."
+    ::= { tnCesClockStatusEntry 7 }
+
+-- Debug settings.
+
+tnCesDebug OBJECT IDENTIFIER ::= { tnCesObjects 21 }
+
+tnCesDebugTDMTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesDebugTDMEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of TDM port debug settings."
+    ::= { tnCesDebug 1 }
+
+tnCesDebugTDMEntry OBJECT-TYPE
+    SYNTAX       TnCesDebugTDMEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the debug setting for a TDM port."
+    INDEX        { tnCesDebugTDMPortNumber }
+    ::= { tnCesDebugTDMTable 1 }
+
+TnCesDebugTDMEntry ::= SEQUENCE {
+    tnCesDebugTDMPortNumber Unsigned32,
+    tnCesDebugTDMPortEnable TruthValue
+    }
+
+tnCesDebugTDMPortNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The TDM port number."
+    ::= { tnCesDebugTDMEntry 1 }
+
+tnCesDebugTDMPortEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether to enable (true) or disable (false) debug on this TDM port."
+    ::= { tnCesDebugTDMEntry 2 }
+
+tnCesDebugLLTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesDebugLLEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of logical link debug settings."
+    ::= { tnCesDebug 2 }
+
+tnCesDebugLLEntry OBJECT-TYPE
+    SYNTAX       TnCesDebugLLEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the current debug setting for a logical link."
+    INDEX        { tnCesDebugLLNumber }
+    ::= { tnCesDebugLLTable 1 }
+
+TnCesDebugLLEntry ::= SEQUENCE {
+    tnCesDebugLLNumber Unsigned32,
+    tnCesDebugLLEnable TruthValue
+    }
+
+tnCesDebugLLNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The logical link number."
+    ::= { tnCesDebugLLEntry 1 }
+
+tnCesDebugLLEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether to enable (true) or disable (false) debug on this logical link."
+    ::= { tnCesDebugLLEntry 2 }
+
+tnCesDebugMiscTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesDebugMiscEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of miscellaneous debug settings."
+    ::= { tnCesDebug 3 }
+
+tnCesDebugMiscEntry OBJECT-TYPE
+    SYNTAX       TnCesDebugMiscEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the current debug setting for a miscellaneous item."
+    INDEX        { tnCesDebugMiscItem }
+    ::= { tnCesDebugMiscTable 1 }
+
+TnCesDebugMiscEntry ::= SEQUENCE {
+    tnCesDebugMiscItem INTEGER,
+    tnCesDebugMiscEnable TruthValue
+    }
+
+tnCesDebugMiscItem OBJECT-TYPE
+    SYNTAX      INTEGER {
+                control (1),
+                arp (2),
+                sip (3),
+                logicalLinkControl (4),
+                logicalLinkGlobal (5)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The debug item to enable or disable."
+    ::= { tnCesDebugMiscEntry 1 }
+
+tnCesDebugMiscEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether to enable (true) or disable (false) debug for this item."
+    ::= { tnCesDebugMiscEntry 2 }
+
+-- RS530 serial port configuration.
+
+tnCesRS530Table OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesRS530Entry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of RS530 serial ports."
+    ::= { tnCesObjects 22 }
+
+tnCesRS530Entry OBJECT-TYPE
+    SYNTAX       TnCesRS530Entry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the configuration for a RS530 serial port."
+    INDEX        { tnCesRS530PortNumber }
+    ::= { tnCesRS530Table 1 }
+
+TnCesRS530Entry ::= SEQUENCE {
+    tnCesRS530PortNumber Unsigned32,
+    tnCesRS530Rate Unsigned32,
+    tnCesRS530ShutdownCallsOnFail TruthValue
+}
+
+tnCesRS530PortNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The RS530 serial port number."
+    ::= { tnCesRS530Entry 1 }
+
+tnCesRS530Rate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The RS530 serial port bit rate in bits per second. Valid rates are 64K to 2048K in 64K steps, or one of the following subrates: 38400, 19200, 9600, 4800, 2400."
+    ::= { tnCesRS530Entry 2 }
+
+tnCesRS530ShutdownCallsOnFail OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether to shutdown the CES connections using this port when the port fails."
+    ::= { tnCesRS530Entry 3 }
+
+-- RS530 serial port status.
+
+tnCesRS530StatusTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnCesRS530StatusEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Table of RS530 serial port status."
+    ::= { tnCesObjects 23 }
+
+tnCesRS530StatusEntry OBJECT-TYPE
+    SYNTAX       TnCesRS530StatusEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+    "Each entry has the current status of a RS530 serial port."
+    INDEX        { tnCesRS530StatusNumber }
+    ::= { tnCesRS530StatusTable 1 }
+
+TnCesRS530StatusEntry ::= SEQUENCE {
+    tnCesRS530StatusNumber Unsigned32,
+    tnCesRS530InterfaceType DisplayString,
+    tnCesRS530StatusDTR TruthValue,
+    tnCesRS530StatusDCD TruthValue,
+    tnCesRS530StatusRTS TruthValue,
+    tnCesRS530StatusCTS TruthValue,
+    tnCesRS530StatusDSR TruthValue,
+    tnCesRS530LocalLoop TruthValue,
+    tnCesRS530RemoteLoop TruthValue,
+    tnCesRS530BreakCalls TruthValue
+}
+
+tnCesRS530StatusNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The RS530 serial port number."
+    ::= { tnCesRS530StatusEntry 1 }
+
+tnCesRS530InterfaceType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..50))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Describes the type of physical interface used by the RS530 serial."
+    ::= { tnCesRS530StatusEntry 2 }
+
+tnCesRS530StatusDTR OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status of the RS530 serial port C/DTR lead."
+    ::= { tnCesRS530StatusEntry 3 }
+
+tnCesRS530StatusDCD OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status of the RS530 serial port I/DCD lead."
+    ::= { tnCesRS530StatusEntry 4 }
+
+tnCesRS530StatusRTS OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status of the RS530 serial port RTS lead."
+    ::= { tnCesRS530StatusEntry 5 }
+
+tnCesRS530StatusCTS OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status of the RS530 serial port CTS lead."
+    ::= { tnCesRS530StatusEntry 6 }
+
+tnCesRS530StatusDSR OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status of the RS530 serial port DSR lead."
+    ::= { tnCesRS530StatusEntry 7 }
+
+tnCesRS530LocalLoop OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether the RS530 serial port local loop is enabled."
+    ::= { tnCesRS530StatusEntry 8 }
+
+tnCesRS530RemoteLoop OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Whether the RS530 port remote loop is enabled."
+    ::= { tnCesRS530StatusEntry 9 }
+
+tnCesRS530BreakCalls OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Set to true to break the CES connections or ISDN calls active on this port."
+    ::= { tnCesRS530StatusEntry 10 }
+
+-- Traps
+
+tnCesEventDetails OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Text information describing the event that has occurred."
+    ::= { tnCesNotifications 1 }
+
+tnCesEventPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..6)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Priority of this event."
+    ::= { tnCesNotifications 2 }
+
+tnCesGeneralEvent NOTIFICATION-TYPE
+    OBJECTS
+    {
+        tnCesEventDetails,
+        tnCesEventPriority
+    }
+    STATUS      current
+    DESCRIPTION
+    "Notification of an event relating to CES."
+    ::= { tnCesEventIdGeneral 1 }
+
+-- Compliance section.
+
+tnCesGroup OBJECT-GROUP
+    OBJECTS { tnCesMiscClockPriority,
+              tnCesPRIClockPriority,
+              tnCesLLClockPriority,
+              tnCesEventThreshold,
+              tnCesEventReportingInterval,
+              tnCesEventThresholdEarly,
+              tnCesEventThresholdLate,
+              tnCesEventThresholdUnderrun,
+              tnCesEventThresholdDCO,
+              tnCesMulticastJoinAction,
+              tnCesMulticastJoinAddrType,
+              tnCesMulticastJoinAddr,
+              tnCesProtocolUnderrunFixed,
+              tnCesProtocolUnderrunValue,
+              tnCesProtocolUDPBasePort,
+              tnCesProtocolType,
+              tnCesProtocolEnableSSRCChecking,
+              tnCesClockRecoveryAlgorithm,
+              tnCesClockRecoveryFilter,
+              tnCesClockRecoveryMaxDeviation,
+              tnCesTDMPresentation,
+              tnCesTDMFraming,
+              tnCesTDMMode,
+              tnCesTDMTS0Passthrough,
+              tnCesTDMCRC4,
+              tnCesTDMShutdownCallsOnFail,
+              tnCesTDMImpedance,
+              tnCesTDMT1Framing,
+              tnCesTDMT1LineCode,
+              tnCesTDMT1LoopCodeType,
+              tnCesTDMT1LoopCodeRxEnable,
+              tnCesTDMT1LoopCodeUserDown,
+              tnCesTDMT1LoopCodeUserUp,
+              tnCesTDMT1LoopCodeUserLength,
+              tnCesTDMDTE,
+              tnCesLLname,
+              tnCesLLDirection,
+              tnCesLLRemoteIpAddrType,
+              tnCesLLRemoteIpAddr,
+              tnCesLLSecondaryRemoteIpAddrType,
+              tnCesLLSecondaryRemoteIpAddr,
+              tnCesLLQosType,
+              tnCesLLQosTOS,
+              tnCesLLQosDiffserv,
+              tnCesLLVlanTag,
+              tnCesLLVlanId,
+              tnCesLLVlanPriority,
+              tnCesLLJitterBufferLength,
+              tnCesLLFramesPerPacket,
+              tnCesLLRemoteLinkNumber,
+              tnCesLLSchedEnable,
+              tnCesLLSchedStartTimeMonHours,
+              tnCesLLSchedStartTimeMonMins,
+              tnCesLLSchedStopTimeMonHours,
+              tnCesLLSchedStopTimeMonMins,
+              tnCesLLSchedStartTimeTueHours,
+              tnCesLLSchedStartTimeTueMins,
+              tnCesLLSchedStopTimeTueHours,
+              tnCesLLSchedStopTimeTueMins,
+              tnCesLLSchedStartTimeWedHours,
+              tnCesLLSchedStartTimeWedMins,
+              tnCesLLSchedStopTimeWedHours,
+              tnCesLLSchedStopTimeWedMins,
+              tnCesLLSchedStartTimeThuHours,
+              tnCesLLSchedStartTimeThuMins,
+              tnCesLLSchedStopTimeThuHours,
+              tnCesLLSchedStopTimeThuMins,
+              tnCesLLSchedStartTimeFriHours,
+              tnCesLLSchedStartTimeFriMins,
+              tnCesLLSchedStopTimeFriHours,
+              tnCesLLSchedStopTimeFriMins,
+              tnCesLLSchedStartTimeSatHours,
+              tnCesLLSchedStartTimeSatMins,
+              tnCesLLSchedStopTimeSatHours,
+              tnCesLLSchedStopTimeSatMins,
+              tnCesLLSchedStartTimeSunHours,
+              tnCesLLSchedStartTimeSunMins,
+              tnCesLLSchedStopTimeSunHours,
+              tnCesLLSchedStopTimeSunMins,
+              tnCesLLJitterAdjustmentMode,
+              tnCesLLJitterAdjustmentAfter,
+              tnCesLLJASchedStartTimeMonHours,
+              tnCesLLJASchedStartTimeMonMins,
+              tnCesLLJASchedStopTimeMonHours,
+              tnCesLLJASchedStopTimeMonMins,
+              tnCesLLJASchedStartTimeTueHours,
+              tnCesLLJASchedStartTimeTueMins,
+              tnCesLLJASchedStopTimeTueHours,
+              tnCesLLJASchedStopTimeTueMins,
+              tnCesLLJASchedStartTimeWedHours,
+              tnCesLLJASchedStartTimeWedMins,
+              tnCesLLJASchedStopTimeWedHours,
+              tnCesLLJASchedStopTimeWedMins,
+              tnCesLLJASchedStartTimeThuHours,
+              tnCesLLJASchedStartTimeThuMins,
+              tnCesLLJASchedStopTimeThuHours,
+              tnCesLLJASchedStopTimeThuMins,
+              tnCesLLJASchedStartTimeFriHours,
+              tnCesLLJASchedStartTimeFriMins,
+              tnCesLLJASchedStopTimeFriHours,
+              tnCesLLJASchedStopTimeFriMins,
+              tnCesLLJASchedStartTimeSatHours,
+              tnCesLLJASchedStartTimeSatMins,
+              tnCesLLJASchedStopTimeSatHours,
+              tnCesLLJASchedStopTimeSatMins,
+              tnCesLLJASchedStartTimeSunHours,
+              tnCesLLJASchedStartTimeSunMins,
+              tnCesLLJASchedStopTimeSunHours,
+              tnCesLLJASchedStopTimeSunMins,
+              tnCesLLChanSelectAvailable,
+              tnCesLLChanSelectUsed,
+              tnCesClockingAlternateEnable,
+              tnCesLLPlesiosynchronous,
+              tnCesLLAsymmetric,
+              tnCesLLBytesPerPacketRx,
+              tnCesLLBytesPerPacketTx,
+              tnCesLLStatusEnabled,
+              tnCesLLStatusActive,
+              tnCesLLStatusArpResolved,
+              tnCesLLStatusNumberOfChannels,
+              tnCesLLStatusRemoteMac,
+              tnCesLLStatusRemoteIpAddrType,
+              tnCesLLStatusRemoteIpAddr,
+              tnCesLLStatusRemoteContextKnown,
+              tnCesLLStatusRemoteContextNumber,
+              tnCesLLStatusRemotePortKnown,
+              tnCesLLStatusRemotePort,
+              tnCesLLStatusQueueLengthValid,
+              tnCesLLStatusMinQueueLength,
+              tnCesLLStatusMaxQueueLength,
+              tnCesLLStatusAveQueueLengthWhole,
+              tnCesLLStatusAveQueueLengthFrac,
+              tnCesLLStatusEarly,
+              tnCesLLStatusLate,
+              tnCesLLStatusUnderrun,
+              tnCesLLStatusLastSequence,
+              tnCesLLStatusPacketsRx,
+              tnCesLLStatusPacketsTx,
+              tnCesLLStatusSlipsReduceCount,
+              tnCesLLStatusSlipsExtendCount,
+              tnCesLLLocalLoop,
+              tnCesLLRemoteLoop,
+              tnCesLLNudge,
+              tnCesLLResetErrorStats,
+              tnCesTDMStatusPhysical,
+              tnCesTDMStatusRxSignalLevel,
+              tnCesTDMStatusRxError,
+              tnCesTDMLocalLoop,
+              tnCesTDMRemoteLoop,
+              tnCesTDMBreakCalls,
+              tnCesProcessorVersion,
+              tnCesProcessorProtocolMatch1,
+              tnCesProcessorProtocolMatch2,
+              tnCesProcessorProtocolMatch3,
+              tnCesProcessorProtocolMatch4,
+              tnCesProcessorProtocolNoMatch,
+              tnCesProcessorClassifyFail,
+              tnCesProcessorVerifyFail,
+              tnCesProcessorIpv4ChecksumFail,
+              tnCesProcessorUdpChecksumFail,
+              tnCesCallStatusStartTime,
+              tnCesCallStatusSource,
+              tnCesCallStatusDestination,
+              tnCesCallStatusOriginator,
+              tnCesCallStatusDestinationNumber,
+              tnCesCallStatusSourceNumber,
+              tnCesCallStatusState,
+              tnCesClockStatusLock,
+              tnCesClockStatusSlaveMode,
+              tnCesClockStatusSource,
+              tnCesClockStatusStreamStatus,
+              tnCesClockStatusStreamMode,
+              tnCesClockStatusStreamDCO,
+              tnCesClockStatusStreamDCOMin,
+              tnCesClockStatusStreamDCOMax,
+              tnCesClockStatusStreamDCOAvg,
+              tnCesTemperatureBoardWhole,
+              tnCesTemperatureBoardFrac,
+              tnCesTemperatureProcessorWhole,
+              tnCesTemperatureProcessorFrac,
+              tnCesDebugTDMPortEnable,
+              tnCesDebugLLEnable,
+              tnCesDebugMiscEnable,
+              tnCesEventDetails,
+              tnCesEventPriority,
+              tnCesRS530Rate,
+              tnCesRS530ShutdownCallsOnFail,
+              tnCesRS530InterfaceType,
+              tnCesRS530StatusDTR,
+              tnCesRS530StatusDCD,
+              tnCesRS530StatusRTS,
+              tnCesRS530StatusCTS,
+              tnCesRS530StatusDSR,
+              tnCesRS530LocalLoop,
+              tnCesRS530RemoteLoop,
+              tnCesRS530BreakCalls,
+              tnCesIpv4AddrType,
+              tnCesIpv4Addr,
+              tnCesIpv4PrefixLength,
+              tnCesIpv6AddrType,
+              tnCesIpv6Addr,
+              tnCesIpv6PrefixLength
+            }
+  STATUS  current
+  DESCRIPTION
+    "Objects which implement CES support on a device."
+  ::= { tnCesGroups 1 }
+
+tnCesTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+              tnCesGeneralEvent
+            }
+  STATUS  current
+  DESCRIPTION
+    "Notifications which implement CES support on a device."
+  ::= { tnCesGroups 2 }
+
+tnCesMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+    "You will comply. Respect my authority!"
+    MODULE  -- compliance to the containing MIB module
+    MANDATORY-GROUPS { tnCesGroup, tnCesTrapGroup }
+    ::= { tnCesCompliances 1 }
+
+END

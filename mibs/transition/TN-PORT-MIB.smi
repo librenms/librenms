@@ -1,0 +1,232 @@
+-- *****************************************************************
+-- TN-PORT-MIB.my : TN Port Configuration MIB
+--
+-- Copyright (c) 2013 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *************************************************************************************************
+--
+
+TN-PORT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB
+    tnProducts
+        FROM TRANSITION-SMI;
+
+  tnPortMIB MODULE-IDENTITY
+  LAST-UPDATED "201306130000Z"
+  ORGANIZATION "Transition Networks, Inc."
+  CONTACT-INFO
+       "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+        E-mail: techsupport@transition.com
+       "
+  DESCRIPTION
+       "The mib module for managing configuration
+        of port.
+       "
+  ::= { tnProducts 141 }
+
+--
+-- main body
+--
+tnPortMibNotifications  OBJECT IDENTIFIER ::= { tnPortMIB 0 }
+tnPortMibObjects        OBJECT IDENTIFIER ::= { tnPortMIB 1 }
+tnPortMibConformance    OBJECT IDENTIFIER ::= { tnPortMIB 2 }
+
+-- ******************************************************************
+-- Port Cconfiguration Table
+-- ******************************************************************
+tnPortConfigTable                       OBJECT-TYPE
+    SYNTAX                              SEQUENCE OF TnPortConfigEntry
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "This table displays current port configurations."
+    ::= { tnPortMibObjects 1 }
+
+tnPortConfigEntry                       OBJECT-TYPE
+    SYNTAX                              TnPortConfigEntry
+    MAX-ACCESS                          not-accessible
+    STATUS                              current
+    DESCRIPTION
+        "Each entry represents a port configuration."
+    INDEX { ifIndex }
+    ::= { tnPortConfigTable 1 }
+
+TnPortConfigEntry       ::= SEQUENCE {
+    tnPortSpeedConfigured               INTEGER,
+    tnPortSpeedCurrent                  INTEGER,
+    tnPortFlowControlCurrentConfigured  TruthValue,
+    tnPortFlowControlCurrentRx          INTEGER,
+    tnPortFlowControlCurrentTx          INTEGER,
+    tnPortExcessiveCollisionMode        INTEGER,
+    tnPortPowerControl                  INTEGER
+}
+
+tnPortSpeedConfigured                   OBJECT-TYPE
+    SYNTAX                              INTEGER {
+                                            disabled(1),
+                                            auto(2),
+                                            hdx10mbps(3),
+                                            fdx10mbps(4),
+                                            hdx100mbps(5),
+                                            fdx100mbps(6),
+                                            fdx1Gbps(7),
+                                            fdx2500mbps(8),
+                                            fdx10Gbps(9)
+                                        }
+    MAX-ACCESS                          read-write
+    STATUS                              current
+    DESCRIPTION
+        "Selects any available link speed for the given
+         switch port. Only speeds supported by the
+         specific port is shown. Possible speeds are:
+         Disabled - Disables the switch port operation.
+         Auto - Port auto negotiating speed with the link
+         partner and selects the highest speed that is
+         compatible with the link partner.
+         10Mbps HDX - Forces the port in 10Mbps half duplex
+         mode.
+         10Mbps FDX - Forces the port in 10Mbps full duplex
+         mode.
+         100Mbps HDX - Forces the port in 100Mbps half duplex
+         mode.
+         100Mbps FDX - Forces the port in 100Mbps full duplex
+         mode.
+         1Gbps FDX - Forces the port in 1Gbps full duplex mode.
+         2.5Gbps FDX - Forces the port in 2.5Gbps full duplex
+         mode
+         10Gbps FDX - Forces the port in 10Gbps full duplex
+         mode."
+    ::= { tnPortConfigEntry 1 }
+
+tnPortSpeedCurrent                      OBJECT-TYPE
+    SYNTAX                              INTEGER {
+                                            unknown(1),
+                                            hdx10mbps(2),
+                                            fdx10mbps(3),
+                                            hdx100mbps(4),
+                                            fdx100mbps(5),
+                                            fdx1Gbps(6),
+                                            fdx2500mbps(7),
+                                            fdx10Gbps(8)
+                                        }
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+        "Provides the current link speed of the port.
+         Unknown - Link down.
+         10Mbps HDX - Forces the port in 10Mbps half duplex
+         mode.
+         10Mbps FDX - Forces the port in 10Mbps full duplex
+         mode.
+         100Mbps HDX - Forces the port in 100Mbps half duplex
+         mode.
+         100Mbps FDX - Forces the port in 100Mbps full duplex
+         mode.
+         1Gbps FDX - Forces the port in 1Gbps full duplex mode.
+         2.5Gbps FDX - Forces the port in 2.5Gbps full duplex
+         mode
+         10Gbps FDX - Forces the port in 10Gbps full duplex
+         mode.
+        "
+    ::= { tnPortConfigEntry 2 }
+
+tnPortFlowControlCurrentConfigured      OBJECT-TYPE
+    SYNTAX                              TruthValue
+    MAX-ACCESS                          read-write
+    STATUS                              current
+    DESCRIPTION
+        "When Auto Speed is selected on a port, this section
+         indicates the flow control capability that is
+         advertised to the link partner. 
+         Check the configuredto use flow control. This setting
+         is related to the setting for Configured Link Speed.
+        "
+    ::= { tnPortConfigEntry 3 }
+
+tnPortFlowControlCurrentRx              OBJECT-TYPE
+    SYNTAX                              INTEGER {
+                                            enable(1),
+                                            disable(2)
+                                        }
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+        "When Auto Speed is selected on a port, this section
+         indicates the flow control capability that is
+         advertised to the link partner.
+         When a fixed-speed setting is selected, that is what
+         is used. The Current Rx indicates whether pause frames
+         on the port are obeyed.
+         The Rx settings are determined by the result of the
+         last Auto-Negotiation.
+        "
+    ::= { tnPortConfigEntry 4 }
+
+tnPortFlowControlCurrentTx              OBJECT-TYPE
+    SYNTAX                              INTEGER {
+                                            enable(1),
+                                            disable(2)
+                                        }
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+        "When Auto Speed is selected on a port, this section
+         indicates the flow control capability that is
+         advertised to the link partner.
+         When a fixed-speed setting is selected, that is what
+         is used. The Current Tx indicates whether pause frames
+         on the port are transmitted.
+         The Tx settings are determined by the result of the
+         last Auto-Negotiation.
+        "
+    ::= { tnPortConfigEntry 5 }
+
+tnPortExcessiveCollisionMode            OBJECT-TYPE
+    SYNTAX                              INTEGER {
+                                            discard(1),
+                                            restart(2)
+                                        }
+    MAX-ACCESS                          read-write
+    STATUS                              current
+    DESCRIPTION
+        "Configure port transmit collision behavior.
+         Discard: Discard frame after 16 collisions (default).
+         Restart: Restart backoff algorithm after 16 collisions.
+        "
+    ::= { tnPortConfigEntry 6 }
+
+tnPortPowerControl                      OBJECT-TYPE
+    SYNTAX                              INTEGER {
+                                            disable(1),
+                                            actiphy(2),
+                                            perfectreach(3),
+                                            enable(4)
+                                        }
+    MAX-ACCESS                          read-write
+    STATUS                              current
+    DESCRIPTION
+        "The Usage column shows the current percentage of
+         the power consumption per port. The Configured
+         column allows for changing the power savings mode
+         parameters per port.
+         Disabled: All power savings mechanisms disabled.
+         ActiPHY: Link down power savings enabled.
+         PerfectReach: Link up power savings enabled.
+         Enabled: Both link up and link down power savings enabled.
+        "
+    ::= { tnPortConfigEntry 7 }
+END

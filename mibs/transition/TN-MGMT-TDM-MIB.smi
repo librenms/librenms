@@ -1,0 +1,507 @@
+-- ***********************************************************************************************
+-- TN-MGMT-MIB.my:  Transition Networks, Inc. Enterprise MIB for basic management of the ION Platform
+--
+-- Copyright (c) 2009 by Transition Networks, Inc.
+-- All rights reserved.
+--                     
+-- ***********************************************************************************************
+--
+
+TN-MGMT-TDM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises FROM SNMPv2-SMI
+	TimeStamp, TruthValue, DisplayString FROM SNMPv2-TC
+	entPhysicalIndex FROM ENTITY-MIB  
+	InterfaceIndexOrZero, InterfaceIndex FROM IF-MIB 
+	tnMgmtNotifications, tnInterfaceMgmt FROM TN-MGMT-MIB
+	CpsConnector FROM TRANSITION-TC;		 
+   
+--   
+-- TDM Interface table entries
+--                             
+tnIfTDMTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfTDMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "This table has entries for the  TDM attributes."
+    ::= { tnInterfaceMgmt 6 }    
+        
+tnIfTDMEntry OBJECT-TYPE
+    SYNTAX      TnIfTDMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "A entry in the table represents  TDM attributes."
+    INDEX  { ifIndex }        
+    ::= { tnIfTDMTable 1 }
+  
+TnIfTDMEntry::=
+    SEQUENCE {
+        tnIfTDMAISTransmit       INTEGER,         
+        tnIfTDMAISFormat         INTEGER,
+        tnIfTDMAlarmIndicationSignal INTEGER,
+        tnIfTDMLongHaul          INTEGER,
+        tnIfTDMType              INTEGER,
+        tnIfTDMT1E1LineBuildout  INTEGER,
+        tnIfTDMDS3E3LineBuildout     INTEGER,
+        tnIfTDMConnectorType     CpsConnector      
+    }
+
+tnIfTDMAISTransmit   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        enabled(1),
+        disabled(2),
+        notApplicable(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Transmit AIS(All Ones/BLUE) on Fiber(Copper) as an error signal when
+                     Copper interface(Fiber Interface) is down. When this error signal
+                     is transmitted, the AIS of the device
+                     on the other end is activated, if supported  "
+    ::= { tnIfTDMEntry 1 }
+
+tnIfTDMAISFormat   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        allones(1),
+        blue(2),
+        notApplicable(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Transmit AIS(All Ones:1111... sequence/BLUE:0101... sequence) on Fiber(Copper) as an error signal for DS3/E3/STS-1 port"
+    ::= { tnIfTDMEntry 2 }
+
+tnIfTDMAlarmIndicationSignal OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    alarm(1),
+                    normal(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+    "When equal to alarm(1),
+     this means that the other end has TAOS enabled
+     and is currently transmitting an alarm condition.
+     when equal to normal, this means no alarm."
+    ::= { tnIfTDMEntry 3 }
+
+tnIfTDMLongHaul OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    yes(1),
+                    no(2),
+                    notApplicable(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+    "This variable indicates the current position of the 
+                     remote device's Short/Long haul configuration switch."
+    ::= { tnIfTDMEntry 4 }
+
+tnIfTDMType OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unknown(0),
+                    t1(1),
+                    e1(2),
+                    j1(3),
+                    dS3(4),
+                    e3(5),
+                    sts-1(6)
+                }                
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This variable indicates the type of  the current device.
+                 T1=1.544MHz; E1=2.048MHz;E3 = 34.4Mb/s; DS3 = 44.7Mb/s; STS-1 = 51.8Mb/s "
+    ::= { tnIfTDMEntry 5 }
+
+tnIfTDMT1E1LineBuildout OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unknown(0),
+                    e13-0V120ohm(1),
+                    e12-37V75ohm(2),
+                    t1SH-DSX-0-133ANSIT1403(3),
+                    t1SH-DSX-133-266(4),
+                    t1SH-DSX-266-399(5), 
+                    t1SH-DSX-399-533(6), 
+                    t1SH-DSX-533-655(7),
+                    t1SH-DSX-6V(8),
+                    t1LH-0dB(9),
+                    t1LH-m7-5dB(10), 
+                    t1LH-m15dB(11),
+                    t1LH-m22-5dB(12)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+    "The characteristics T1E1 card's copper interface."
+    ::= { tnIfTDMEntry 6}
+
+tnIfTDMDS3E3LineBuildout OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unknown(0),
+                    boost(1),
+                    normal(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    "The characteristics of DS3E3 card's copper interface."
+    ::= { tnIfTDMEntry 7}        
+    
+tnIfTDMConnectorType OBJECT-TYPE
+    SYNTAX      CpsConnector
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+    "The style of  connector built into this device."
+    ::= { tnIfTDMEntry 8 }
+
+
+--
+--  Interface Port: TDM Ext Table 
+--
+tnIfTDMExtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfTDMExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "This table has entries for the Extral TDM attributes."
+    ::= { tnInterfaceMgmt 9 } 
+	
+tnIfTDMExtEntry OBJECT-TYPE
+    SYNTAX      TnIfTDMExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "A entry in the table represents Extral TDM attributes."
+    INDEX  { ifIndex, tnIfTDMExtId }        
+    ::= { tnIfTDMExtTable 1 }
+	
+TnIfTDMExtEntry ::= SEQUENCE
+{
+	tnIfTDMExtId						INTEGER,
+	tnIfTDMExtAISTrasmit				INTEGER,
+	tnIfTDMExtAISFormat					INTEGER,
+	tnIfTDMExtAlarmIndicationSingnal	INTEGER,
+	tnIfTDMExtLoopback					INTEGER,
+	tnIfTDMExtYellowTrasmit				INTEGER
+}	
+
+tnIfTDMExtId OBJECT-TYPE
+	SYNTAX		INTEGER	(1..99999999)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An index that uniquely identifies an entry
+		in the tnIfTDMExtTable. This index permits
+		 the same interface to have several different
+		 channels"
+	::= { tnIfTDMExtEntry 1 }
+	
+tnIfTDMExtAISTrasmit OBJECT-TYPE
+	SYNTAX		INTEGER
+    {
+        enabled(1),
+        disabled(2),
+        notApplicable(3)
+    }	
+	MAX-ACCESS	read-write
+	STATUS      current
+	DESCRIPTION 
+		"Transmit AIS(All Ones/BLUE) on the Channel as an error signal when
+		Copper interface(Fiber Interface) is down. When this error signal
+		is transmitted, the AIS of the device on the other end is activated, 
+		if supported "
+	::= { tnIfTDMExtEntry 2 }	
+	
+tnIfTDMExtAISFormat 	OBJECT-TYPE
+	SYNTAX		INTEGER
+    {
+        allones(1),
+        blue(2),
+        notApplicable(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+		"Transmit AIS(All Ones:1111... sequence/BLUE:0101... sequence) 
+		on the Channel as an error signal for the pair port"
+    ::= { tnIfTDMExtEntry 3 }	
+	
+tnIfTDMExtAlarmIndicationSingnal 	OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        alarm(1),
+        normal(2),
+		yellow(3),
+		red(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+    "When equal to alarm(1),
+     this means that the other end of Channel has AIS enabled
+     and is currently transmitting an alarm condition.
+     when equal to normal(2), this means no alarm.
+	 when equal to yellow(3), this means the other end of Channel has YELLOW enabled
+	 and is currently transmitting a YELLOW condition.
+	 when equal to red(4), this means the local end of Channel has detect a LOS on receiver."
+    ::= { tnIfTDMExtEntry 4 }
+
+tnIfTDMExtLoopback		OBJECT-TYPE
+	SYNTAX		INTEGER
+	{
+		enabled(1),
+		disabled(2),
+		notApplicable(3)
+	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This variable indicates the loopback state of the current Channel"
+	::= { tnIfTDMExtEntry 5 }	
+
+tnIfTDMExtYellowTrasmit OBJECT-TYPE
+	SYNTAX		INTEGER
+	{
+		enabled(1),
+		disabled(2),
+		notApplicable(3)
+	}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Transmit Yellow on the Channel as an error signal when Local Copper Interface is down. 
+		When this error signal is transmitted."
+	::= { tnIfTDMExtEntry 6 }
+	
+--
+--  Interface Port: TDM 2 Table 
+--                                
+
+tnIfTDM2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfTDM2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "This table has entries for the TDM 2 attributes."
+    ::= { tnInterfaceMgmt 10 } 
+
+tnIfTDM2Entry OBJECT-TYPE
+    SYNTAX      TnIfTDM2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "A entry in the table represents the TDM 2 attributes."
+    INDEX  { ifIndex }        
+    ::= { tnIfTDM2Table 1 }	
+
+TnIfTDM2Entry ::= SEQUENCE {
+	tnIfTDM2FiberLineNum				INTEGER,
+	tnIfTDM2FiberActiveLine			INTEGER,
+	tnIfTDM2FiberRevertive				INTEGER,
+	tnIfTDM2FiberPrimaryLinkStatus		INTEGER,
+	tnIfTDM2FiberSecondaryLinkStatus	INTEGER,
+	tnIfTDM2InBandLPEnable				INTEGER,
+	tnIfTDM2InBandLPStartPatten		DisplayString,
+	tnIfTDM2InBandLPStopPatten			DisplayString,
+	tnIfTDM2InBandPEERLPEnable			INTEGER,
+	tnIfTDM2InBandPEERLPStartPatten	DisplayString,
+	tnIfTDM2InBandPEERLPStopPatten		DisplayString,
+	tnIfTDM2InBandLPTimeoutEnable		INTEGER,
+	tnIfTDM2InBandLPTimeoutCount		INTEGER,
+	tnIfTDM2InBandPEERLPTimeoutEnable	INTEGER,
+	tnIfTDM2InBandPEERLPTimeoutCount	INTEGER
+}
+
+tnIfTDM2FiberLineNum		OBJECT-TYPE	
+	SYNTAX		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"This variable is indicate the links number of the Fiber Port, maybe single line or dual line"
+	::= { tnIfTDM2Entry 1 }	
+	
+tnIfTDM2FiberActiveLine	OBJECT-TYPE	
+	SYNTAX		INTEGER
+	{
+		primary(0),
+		secondary(1)
+	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This variable is indicate the active fiber link, if a multi-fiber line
+		is used for hardware redundancy"
+	::= { tnIfTDM2Entry 2 }
+
+tnIfTDM2FiberRevertive	OBJECT-TYPE	
+	SYNTAX		INTEGER
+	{
+		enabled(1),
+		disabled(2),
+		notApplicable(3)
+	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This variable is used to decide whether to revertive the fiber link to primary link if applicable"
+	::= { tnIfTDM2Entry 3 }
+
+tnIfTDM2FiberPrimaryLinkStatus 	OBJECT-TYPE	
+	SYNTAX		INTEGER
+	{
+		up(1),
+		down(2),
+		testing(3),
+		unknown(4)
+	}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"This variable indicates the fiber port primary line link status"
+	::= { tnIfTDM2Entry 4 }	
+
+tnIfTDM2FiberSecondaryLinkStatus 	OBJECT-TYPE	
+	SYNTAX		INTEGER
+	{
+		up(1),
+		down(2),
+		testing(3),
+		unknown(4)
+	}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"This variable indicates the fiber port secondary line link status"
+	::= { tnIfTDM2Entry 5 }	
+	
+tnIfTDM2InBandLPEnable 	OBJECT-TYPE	
+	SYNTAX		INTEGER
+	{
+		enabled(1),
+		disabled(2),
+		notApplicable(3)
+	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This variable indicates whether In-band Loopback detect is enabled"
+	::= { tnIfTDM2Entry 6 }	
+	
+tnIfTDM2InBandLPStartPatten 	OBJECT-TYPE	
+	SYNTAX		DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This binary string is used to set the In-band Loopback start Patten,
+		 such as 11000 string"
+	::= { tnIfTDM2Entry 7 }	
+
+tnIfTDM2InBandLPStopPatten 	OBJECT-TYPE	
+	SYNTAX		DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This binary string is used to set the In-band Loopback stop Patten,
+		such as 11100 string"
+	::= { tnIfTDM2Entry 8 }		
+
+tnIfTDM2InBandPEERLPEnable 	OBJECT-TYPE	
+	SYNTAX		INTEGER
+	{
+		enabled(1),
+		disabled(2),
+		notApplicable(3)
+	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This variable indicates whether the PEER interface In-band Loopback detect is enabled"
+	::= { tnIfTDM2Entry 9 }	
+	
+tnIfTDM2InBandPEERLPStartPatten 	OBJECT-TYPE	
+	SYNTAX		DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This binary string is used to set the PEER interface In-band Loopback start Patten,
+		 such as 11000 string"
+	::= { tnIfTDM2Entry 10 }	
+
+tnIfTDM2InBandPEERLPStopPatten 	OBJECT-TYPE	
+	SYNTAX		DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This binary string is used to set the PEER interface In-band Loopback stop Patten,
+		such as 11100 string"
+	::= { tnIfTDM2Entry 11 }		
+
+tnIfTDM2InBandLPTimeoutEnable		OBJECT-TYPE
+	SYNTAX		INTEGER
+	{
+		enabled(1),
+		disabled(2),
+		notApplicable(3)
+	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This variable indicates whether the In-band Loopback timeout watchdog is enabled"
+	::= { tnIfTDM2Entry 12 }
+
+tnIfTDM2InBandLPTimeoutCount		OBJECT-TYPE
+	SYNTAX		INTEGER	(1..4095)
+	MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This variable is used to set the In-band Loopback timeout watchdog value, the unit is minute"
+	::= { tnIfTDM2Entry 13 }
+
+tnIfTDM2InBandPEERLPTimeoutEnable		OBJECT-TYPE
+	SYNTAX		INTEGER
+	{
+		enabled(1),
+		disabled(2),
+		notApplicable(3)
+	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This variable indicates whether the Peer In-band Loopback timeout watchdog is enabled"
+	::= { tnIfTDM2Entry 14 }
+
+tnIfTDM2InBandPEERLPTimeoutCount		OBJECT-TYPE
+	SYNTAX		INTEGER	(1..4095)
+	MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"This variable is used to set the Peer In-band Loopback timeout watchdog value, the unit is minute"
+	::= { tnIfTDM2Entry 15 }
+
+    
+tnIfTDMAlarmIndicationSignalEvt  NOTIFICATION-TYPE
+    OBJECTS { 
+                ifIndex, 
+                tnIfTDMAlarmIndicationSignal  
+            }             
+    STATUS  current
+    DESCRIPTION            
+    "A alarm indication signal event is sent when there is a warning or alarm on TDM port."
+    ::= { tnMgmtNotifications 6 }
+
+END
+

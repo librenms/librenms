@@ -1,0 +1,1862 @@
+-- *****************************************************************
+-- TN-ETHSOAM-MIB.my : TN Ethernet OAM MIB
+--
+-- Author : Angela Xing & Tony Lei
+--
+-- Copyright (c) 2014 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *************************************************************************************************
+--
+
+TN-ETHSOAM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Unsigned32,
+    Integer32,
+    Gauge32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, RowStatus,TruthValue,
+    MacAddress
+        FROM SNMPv2-TC     -- [RFC2579]
+    InterfaceIndex,
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    IEEE8021PriorityValue
+        FROM IEEE8021-TC-MIB
+    VlanIdOrNone, VlanId
+        FROM Q-BRIDGE-MIB
+    dot1agCfmMepEntry, dot1agCfmLtrEntry,
+    dot1agCfmMepIdentifier
+        FROM IEEE8021-CFM-MIB   -- IEEE 802.1ag
+    tnProducts
+        FROM TRANSITION-SMI;
+
+-- Textual Conventions
+Dot1agCfmMepId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "Maintenance association End Point Identifier (MEPID): A small
+        integer, unique over a given Maintenance Association,
+        identifying a specific MEP.
+       "
+    REFERENCE
+       "802.1ag clauses 3.19 and 19.2.1"
+    SYNTAX      Unsigned32 (1..8191)
+
+Dot1agCfmMpDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the direction in which the Maintenance
+        association (MEP or MIP) faces on the bridge port:
+
+        down(1)    Sends Continuity Check Messages away from the
+                   MAC Relay Entity.
+        up(2)      Sends Continuity Check Messages towards the
+                   MAC Relay Entity.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.6.3.2:c"
+    SYNTAX      INTEGER {
+                  down  (1),
+                  up    (2)
+                }
+
+Dot1agCfmMaintDomainName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Denotes a generic Maintenance Domain Name.
+        A Dot1agCfmMaintDomainName value is always interpreted within
+        the context of a Dot1agCfmMaintDomainNameType value.  Every
+        usage of the Dot1agCfmMaintDomainName textual convention is
+        required to specify the Dot1agCfmMaintDomainNameType object
+        that provides the context.  It is suggested that the
+        Dot1agCfmMaintDomainNameType object be logically registered
+        before the object(s) that use the Dot1agCfmMaintDomainName
+        textual convention, if they appear in the same logical row.
+        The value of a Dot1agCfmMaintDomainName object must always
+        be consistent with the value of the associated
+        Dot1agCfmMaintDomainNameType object. Attempts to set
+        an Dot1agCfmMaintDomainName object to a value inconsistent
+        with the associated Dot1agCfmMaintDomainNameType must fail
+        with an inconsistentValue error.
+        When this textual convention is used as the syntax of an
+        index object, there may be issues with the limit of 128
+        sub-identifiers specified in SMIv2, IETF STD 58.  In this
+        case, the object definition MUST include a 'SIZE' clause
+        to limit the number of potential instance sub-identifiers;
+        otherwise the applicable constraints MUST be stated in
+        the appropriate conceptual row DESCRIPTION clauses, or
+        in the surrounding documentation if there is no single
+        DESCRIPTION clause that is appropriate.
+        A value of none(1) in the associated
+        Dot1agCfmMaintDomainNameType object means that no Maintenance
+        Domain name is present, and the contents of the
+        Dot1agCfmMaintDomainName object are meaningless.
+        See the DESCRIPTION of the Dot1agCfmMaintAssocNameType
+        TEXTUAL-CONVENTION for a discussion of the length limits on
+        the Maintenance Domain name and Maintenance Association name.
+       "
+    REFERENCE
+         "802.1ag clause 21.6.5"
+    SYNTAX      OCTET STRING (SIZE(1..43))
+
+Dot1agCfmMaintAssocName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Denotes a generic Maintenance Association Name. It is the
+        part of the Maintenance Association Identifier which is
+        unique within the Maintenance Domain Name and is appended
+        to the Maintenance Domain Name to form the Maintenance
+        Association Identifier (MAID).
+        A Dot1agCfmMaintAssocName value is always interpreted within
+        the context of a Dot1agCfmMaintAssocNameType value.  Every
+        usage of the Dot1agCfmMaintAssocName textual convention is
+        required to specify the Dot1agCfmMaintAssocNameType object
+        that provides the context.  It is suggested that the
+        Dot1agCfmMaintAssocNameType object be logically registered
+        before the object(s) that use the Dot1agCfmMaintAssocName
+        textual convention, if they appear in the same logical row.
+        The value of a Dot1agCfmMaintAssocName object must
+        always be consistent with the value of the associated
+        Dot1agCfmMaintAssocNameType object. Attempts to set
+        an Dot1agCfmMaintAssocName object to a value inconsistent
+        with the associated Dot1agCfmMaintAssocNameType must fail
+        with an inconsistentValue error.
+        When this textual convention is used as the syntax of an
+        index object, there may be issues with the limit of 128
+        sub-identifiers specified in SMIv2, IETF STD 58.  In this
+        case, the object definition MUST include a 'SIZE' clause
+        to limit the number of potential instance sub-identifiers;
+        otherwise the applicable constraints MUST be stated in
+        the appropriate conceptual row DESCRIPTION clauses, or
+        in the surrounding documentation if there is no single
+        DESCRIPTION clause that is appropriate.
+       "
+    REFERENCE
+       "802.1ag clauses 21.6.5.4, 21.6.5.5, 21.6.5.6"
+    SYNTAX      OCTET STRING (SIZE(1..45))
+
+Dot1agCfmMDLevel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "Integer identifying the Maintenance Domain Level (MD Level).
+        Higher numbers correspond to higher Maintenance Domains,
+        those with the greatest physical reach, with the highest
+        values for customers' CFM PDUs.  Lower numbers correspond
+        to lower Maintenance Domains, those with more limited
+        physical reach, with the lowest values for CFM PDUs
+        protecting single bridges or physical links.
+       "
+    REFERENCE
+       "802.1ag clauses 18.3, 21.4.1"
+    SYNTAX      Integer32 (0..7)
+
+TnEthSoamType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the type of the domain in which the Maintenance
+        association.
+       "
+    SYNTAX      INTEGER {
+                  port  (1),
+                  esp   (2),
+                  evc   (3),
+                  vlan  (4),
+                  mplslink (5),
+                  mplstunnel (6),
+                  mplspw (7),
+                  mplslsp (8)
+                }
+
+TnEthSoamTestPatternType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This enumeration data type indicates the type of test pattern to be
+        sent in an OAM PDU Test TLV.
+
+        The valid enumerated values associated with this type are:
+
+        All Zreo(1)   pattern will be '00000000'
+        All One(2)    pattern will be '11111111'
+        OneZero(3)    pattern will be '10101010'
+       "
+    REFERENCE
+       "[MEF7.1], Appendix III.2 Enumeration, [Y.1731] 7.7"
+    SYNTAX      INTEGER {
+                         allzero    (1),
+                         allone     (2),
+                         onezero    (3)
+                }
+
+--
+-- main body
+--
+tnEthSoamMIB MODULE-IDENTITY
+    LAST-UPDATED    "201405060000Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+            "Transition Networks
+             Technical Support
+             10900 Red Circle Drive
+             Minnetonka, MN 55343 USA
+             Tel: +1-800-526-9267
+             E-mail: techsupport@transition.com
+            "
+    DESCRIPTION
+        "TBD"
+    REVISION        "201204200000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    REVISION        "201405060000Z"
+    DESCRIPTION
+        "Added Serval MIB tnEthSoamVOE to this MIB module."
+    ::= { tnProducts 105 }
+
+tnEthSoamMIBNotifications  OBJECT IDENTIFIER ::= { tnEthSoamMIB 0 }
+
+tnEthSoamMIBObjects  OBJECT IDENTIFIER ::= { tnEthSoamMIB 1 }
+
+tnEthSoamMIBConformance  OBJECT IDENTIFIER ::= { tnEthSoamMIB 2 }
+
+-- ******************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- These notifications will be sent to the management entity
+-- whenever a MEP active/disactive contact with one or more other MEPs.
+-- ******************************************************************
+
+tnEthSoamFaultAlarm NOTIFICATION-TYPE
+    OBJECTS     { dot1agCfmMepIdentifier,
+                  tnEthSoamStatusCCMLevel,
+                  tnEthSoamStatusCCMMeg,
+                  tnEthSoamStatusCCMMep,
+                  tnEthSoamStatusAIS,
+                  tnEthSoamStatusCLK,
+                  tnEthSoamStatusSSF
+                }
+    STATUS      current
+    DESCRIPTION
+       "An EthSoam has a persistent defect condition. A notification
+        (fault alarm) is sent to the management entity with the OID
+        of the EthSoam that has detected the fault.
+
+        The management entity receiving the notification can identify
+        the system from the network source address of the
+        notification, and can identify the EthSoam reporting the defect
+        by the indices in the OID of the variables in the notification:
+
+           tnEthSoamInstance - Also the index of the EthSoam status table entry
+                                 (tnEthSoamStatusTable).
+       "
+    ::= { tnEthSoamMIBNotifications 1 }
+
+tnEthSoamPeerFaultAlarm NOTIFICATION-TYPE
+    OBJECTS     { dot1agCfmMepIdentifier,
+                  tnEthSoamPeerStatuscLOC,
+                  tnEthSoamPeerStatuscRDI,
+                  tnEthSoamPeerStatuscPeriod,
+                  tnEthSoamPeerStatuscPriority
+                }
+    STATUS      current
+    DESCRIPTION
+       "An EthSoamPeer has a persistent defect condition. A notification
+        (fault alarm) is sent to the management entity with the OID
+        of the EthSoamPeer that has detected the fault.
+
+        The management entity receiving the notification can identify
+        the system from the network source address of the
+        notification, and can identify the EthSoamPeer reporting the defect
+        by the indices in the OID of the variables in the notification:
+
+           tnEthSoamInstance - Also the index of the EthSoam Peer status table entry
+                                 (tnEthSoamPeerStatusTable).
+
+           tnEthSoamPeerStatusMepId -  Also the index of the EthSoam Peer status table entry
+                                         (tnEthSoamPeerStatusTable).
+
+      "
+    ::= { tnEthSoamMIBNotifications 2 }
+
+--
+-- sub Objects list
+--
+tnEthSoamMPMgmt          OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 1 }
+tnEthSoamPeerCfgMgmt     OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 2 }
+tnEthSoamPeerStatusMgmt  OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 3 }
+tnEthSoamAPSCfgMgmt      OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 4 }
+tnEthSoamClientCfgMgmt   OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 5 }
+tnEthSoamLocalCfgMgmt    OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 6 }
+tnEthSoamStatusMgmt      OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 7 }
+tnEthSoamLossStateMgmt   OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 8 }
+tnEthSoamTSExtMgmt       OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 9 }
+tnEthSoamLtmMgmt         OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 10 }
+tnEthSoamLtrMgmt         OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 11 }
+tnEthSoamAisCfgMgmt      OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 12 }
+tnEthSoamDmCfgMgmt       OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 13 }
+tnEthSoamDmStateMgmt    OBJECT IDENTIFIER ::= { tnEthSoamMIBObjects 14 }
+
+-- ******************************************************************
+-- tn tnEthSoamMPtabletable  by Tony Lei
+-- ******************************************************************
+tnEthSoamMPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnEthSoamMPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+     "This table provides configuration of SOAM Maintenance Point.
+     "
+    ::= { tnEthSoamMPMgmt 1 }
+
+tnEthSoamMPEntry OBJECT-TYPE
+    SYNTAX      TnEthSoamMPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents a configuration for local SOAM."
+    INDEX { tnEthSoaminstance }
+    ::= { tnEthSoamMPTable 1 }
+
+TnEthSoamMPEntry ::=
+    SEQUENCE{
+        tnEthSoaminstance          Unsigned32,
+        tnEthSoamDomaintype        TnEthSoamType,
+        tnEthSoamMode              INTEGER,
+        tnEthSoamdirection         Dot1agCfmMpDirection,
+        tnEthSoamresidencePort     InterfaceIndex,
+        tnEthSoamlevel             Dot1agCfmMDLevel,
+        tnEthSoamFlowInstance      INTEGER,
+        tnEthSoamTaggedVID         VlanIdOrNone,
+        tnEthSoamAlarm             TruthValue,
+        tnEthSoamStatus            RowStatus
+    }
+
+tnEthSoaminstance OBJECT-TYPE
+    SYNTAX     Unsigned32(1..4294967295)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This is the configuration of the two possible Maintenance Association Identifier formats.
+         ITU ICC: This is defined by ITU. 'ICC' can be max. 6 char. 'MEG id' can be max. 7 char.
+         IEEE String: This is defined by IEEE. 'Domain Name' can be max. 8 char. 'MEG id' can be max. 8 char.
+         "
+    ::= { tnEthSoamMPEntry 1 }
+
+tnEthSoamDomaintype OBJECT-TYPE
+    SYNTAX          TnEthSoamType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Domain Mode affects the OAM. The allowed values are
+         Port: This is a MEP in the Port Domain. 'Flow Instance' is a Port.
+         Esp: Future use.
+         Evc: This is a MEP in the EVC Domain. 'Flow Instance' is a EVC.
+         Mpls: Future use.
+         Vlan: This is a MEP in the VLAN Domain. 'Flow Instance' is a VLAN.
+       "
+    ::= { tnEthSoamMPEntry 2}
+
+tnEthSoamMode OBJECT-TYPE
+    SYNTAX          INTEGER{
+                    mep   (1),
+                    mip   (2)
+                }
+
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "MEP: This is a Maintenance Entity End Point.
+         MIP: This is a Maintenance Entity Intermediate Point.
+        "
+    ::= { tnEthSoamMPEntry 3}
+
+tnEthSoamdirection OBJECT-TYPE
+    SYNTAX          Dot1agCfmMpDirection
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Direction in which the MP faces on the Bridge Port.
+        "
+    ::= { tnEthSoamMPEntry 4}
+
+tnEthSoamresidencePort OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object is the interface index of the interface either a
+        bridge port, or an aggregated IEEE 802.1 link within a bridge
+        port, to which the MEP is attached."
+    ::= { tnEthSoamMPEntry 5}
+
+tnEthSoamlevel OBJECT-TYPE
+    SYNTAX          Dot1agCfmMDLevel
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Level of the Maintenance Point."
+    ::= { tnEthSoamMPEntry 6}
+
+tnEthSoamFlowInstance OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The MEP is related to this flow - See 'Domain'."
+    ::= { tnEthSoamMPEntry 7}
+
+tnEthSoamTaggedVID OBJECT-TYPE
+    SYNTAX          VlanIdOrNone
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Port MEP: An outer C/S-tag (depending on VLAN Port Type) is added with this VID.
+         Entering '0' means no TAG added."
+    ::= { tnEthSoamMPEntry 8}
+
+tnEthSoamAlarm OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "An active alarm on the MEP.
+        "
+    ::= { tnEthSoamMPEntry 9}
+
+tnEthSoamStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+        The writable columns in a row can not be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated.
+       "
+    ::= { tnEthSoamMPEntry 11 }
+
+-- ******************************************************************
+-- tn S3280 SOAM peer configuration managment table  by Angelax
+-- ******************************************************************
+
+tnEthSoamPeerCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnEthSoamPeerCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table has entries which generate a configuration for peer SOAM.
+    "
+    ::= { tnEthSoamPeerCfgMgmt 1 }
+
+tnEthSoamPeerCfgEntry OBJECT-TYPE
+    SYNTAX      TnEthSoamPeerCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents a configuration for peer SOAM.
+    "
+    INDEX  { tnEthSoaminstance, tnEthSoamPeerCfgMepId }
+    ::= { tnEthSoamPeerCfgTable 1 }
+
+TnEthSoamPeerCfgEntry ::=
+    SEQUENCE{
+        tnEthSoamPeerCfgMepId            Dot1agCfmMepId,
+        tnEthSoamPeerCfgUnicastMac        MacAddress,
+        tnEthSoamPeerCfgRowState       RowStatus
+    }
+
+tnEthSoamPeerCfgMepId OBJECT-TYPE
+    SYNTAX     Dot1agCfmMepId
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The ID of the MEP.
+        "
+    ::= { tnEthSoamPeerCfgEntry 1 }
+
+tnEthSoamPeerCfgUnicastMac OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This MAC will be used when unicast is selected with this peer MEP.
+         Also this MAC is used to create HW checking of receiving CCM PDU (LOC detection) from this MEP.
+        "
+    ::= { tnEthSoamPeerCfgEntry 2 }
+
+tnEthSoamPeerCfgRowState OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "row status.
+        "
+    ::= { tnEthSoamPeerCfgEntry 3 }
+
+-- ******************************************************************
+-- tn S3280 SOAM tnEthSoampeerstatustable  by Tony Lei
+-- ******************************************************************
+tnEthSoamPeerStatusTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEthSoamPeerStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides configuration about the SOAM that provide
+         OAM services.
+         "
+    ::= { tnEthSoamPeerStatusMgmt 1 }
+
+tnEthSoamPeerStatusEntry OBJECT-TYPE
+    SYNTAX          TnEthSoamPeerStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents configuration about the SOAM that provide
+         OAM services.
+         "
+    INDEX           { tnEthSoaminstance,tnEthSoamPeerStatusMepId }
+    ::= { tnEthSoamPeerStatusTable 1 }
+
+TnEthSoamPeerStatusEntry ::= SEQUENCE{
+        tnEthSoamPeerStatusMepId             Dot1agCfmMepId,
+        tnEthSoamPeerStatuscLOC              TruthValue,
+        tnEthSoamPeerStatuscRDI              TruthValue,
+        tnEthSoamPeerStatuscPeriod             TruthValue,
+        tnEthSoamPeerStatuscPriority        TruthValue
+    }
+
+tnEthSoamPeerStatusMepId OBJECT-TYPE
+    SYNTAX          Dot1agCfmMepId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "MEPID.
+        "
+    ::= { tnEthSoamPeerStatusEntry 1}
+
+tnEthSoamPeerStatuscLOC OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Fault Cause indicating that no CCM has been received (in 3,5 periods) - from this peer MEP.
+        "
+    ::= { tnEthSoamPeerStatusEntry 2}
+
+tnEthSoamPeerStatuscRDI OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Fault Cause indicating that a CCM is received with Remote Defect Indication - from this peer MEP.
+        "
+    ::= { tnEthSoamPeerStatusEntry 3}
+
+tnEthSoamPeerStatuscPeriod OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Fault Cause indicating that a CCM is received with a period different what is configured for this MEP - from this peer MEP.
+        "
+    ::= { tnEthSoamPeerStatusEntry 4}
+
+tnEthSoamPeerStatuscPriority OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Fault Cause indicating that a CCM is received with a priority different what is configured for this MEP - from this peer MEP.
+        "
+    ::= { tnEthSoamPeerStatusEntry 5}
+
+-- ******************************************************************
+-- tn S3280 SOAM tnEthSoamAPSCfgtable table    by angelax
+-- ******************************************************************
+tnEthSoamAPSCfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEthSoamAPSCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides configuration about the APSCfg that provide
+         OAM services.
+        "
+    ::= { tnEthSoamAPSCfgMgmt 1 }
+
+tnEthSoamAPSCfgEntry OBJECT-TYPE
+    SYNTAX          TnEthSoamAPSCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents configuration about the SOAM that provide
+         OAM services.
+        "
+    INDEX           { tnEthSoaminstance }
+    ::= { tnEthSoamAPSCfgTable 1 }
+
+TnEthSoamAPSCfgEntry ::= SEQUENCE{
+        tnEthSoamAPSCfgEnable            TruthValue,
+        tnEthSoamAPSCfgPriority          IEEE8021PriorityValue,
+        tnEthSoamAPSCfgCast              INTEGER,
+        tnEthSoamAPSCfgType              INTEGER,
+        tnEthSoamAPSCfgLastOctet         Unsigned32
+    }
+
+tnEthSoamAPSCfgEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Automatic Protection Switching protocol information transportation based on transmitting/receiving R-APS/L-APS PDU can be enabled/disabled.
+         Must be enabled to support ERPS/ELPS implementing APS. This is only valid with one Peer MEP configured.
+        "
+    ::= { tnEthSoamAPSCfgEntry 1}
+
+tnEthSoamAPSCfgPriority OBJECT-TYPE
+    SYNTAX          IEEE8021PriorityValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The priority to be inserted as PCP bits in TAG (if any). "
+    ::= { tnEthSoamAPSCfgEntry 2}
+
+tnEthSoamAPSCfgCast OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unicast     (0),
+                    multicast   (1)
+                }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Selection of APS PDU transmitted unicast or multi-cast.
+         The unicast MAC will be taken from the 'Unicast Peer MAC' configuration.
+         Unicast is only valid for L-APS - see 'Type'.
+         The R-APS PDU is always transmitted with multi-cast MAC described in G.8032.
+        "
+    ::= { tnEthSoamAPSCfgEntry 3}
+
+tnEthSoamAPSCfgType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  raps    (0),
+                  laps     (1)
+                }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "R-APS: APS PDU is transmitted as R-APS - this is for ERPS.
+         L-APS: APS PDU is transmitted as L-APS - this is for ELPS.
+        "
+    ::= { tnEthSoamAPSCfgEntry 4}
+
+tnEthSoamAPSCfgLastOctet OBJECT-TYPE
+    SYNTAX          Unsigned32(0..255)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This is the last octet of the transmitted and expected RAPS multi-cast MAC.
+         In G.8031 (03/2010) a RAPS multi-cast MAC is defined as 01-19-A7-00-00-XX.
+         In current standard the value for this last octet is '01' and the usage of other values is for further study.
+        "
+    ::= { tnEthSoamAPSCfgEntry 5}
+
+-- ******************************************************************
+-- tn S3280 SOAM tnEthSoamClientCfgtable table    by angelax
+-- ******************************************************************
+
+tnEthSoamClientCfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEthSoamClientCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides configuration about the Link Trace reply that provide
+         OAM services.
+        "
+    ::= { tnEthSoamClientCfgMgmt 1 }
+
+tnEthSoamClientCfgEntry OBJECT-TYPE
+    SYNTAX          TnEthSoamClientCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents configuration about the Client Configuration that provide
+         OAM services.
+        "
+    INDEX           { tnEthSoaminstance}
+    ::= { tnEthSoamClientCfgTable 1 }
+
+TnEthSoamClientCfgEntry ::= SEQUENCE{
+        tnEthSoamClientCfgDomain           TnEthSoamType,
+        tnEthSoamClientCfgLevel            Dot1agCfmMDLevel,
+        tnEthSoamClientCfgFlow1            Unsigned32,
+        tnEthSoamClientCfgFlow2            Unsigned32,
+        tnEthSoamClientCfgFlow3            Unsigned32,
+        tnEthSoamClientCfgFlow4               Unsigned32,
+        tnEthSoamClientCfgFlow5               Unsigned32,
+        tnEthSoamClientCfgFlow6            Unsigned32,
+        tnEthSoamClientCfgFlow7              Unsigned32,
+        tnEthSoamClientCfgFlow8              Unsigned32,
+        tnEthSoamClientCfgFlow9              Unsigned32,
+        tnEthSoamClientCfgFlow10             Unsigned32
+    }
+
+tnEthSoamClientCfgDomain OBJECT-TYPE
+    SYNTAX          TnEthSoamType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The domain of the client layer. Must be EVC.
+        "
+    ::= { tnEthSoamClientCfgEntry 1}
+
+tnEthSoamClientCfgLevel OBJECT-TYPE
+    SYNTAX      Dot1agCfmMDLevel
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Client layer level - meaning that PDU transmitted in client layer flows will be on this level.
+       "
+    ::= { tnEthSoamClientCfgEntry 2}
+
+tnEthSoamClientCfgFlow1 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Client layer flow instance numbers.
+        "
+    ::= { tnEthSoamClientCfgEntry 3}
+
+tnEthSoamClientCfgFlow2 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Client layer flow instance numbers.
+        "
+    ::= { tnEthSoamClientCfgEntry 4}
+
+tnEthSoamClientCfgFlow3 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Client layer flow instance numbers.
+        "
+    ::= { tnEthSoamClientCfgEntry 5}
+
+
+tnEthSoamClientCfgFlow4 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Client layer flow instance numbers.
+        "
+    ::= { tnEthSoamClientCfgEntry 6}
+
+tnEthSoamClientCfgFlow5 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Client layer flow instance numbers.
+        "
+    ::= { tnEthSoamClientCfgEntry 7}
+
+tnEthSoamClientCfgFlow6 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Client layer flow instance numbers.
+        "
+    ::= { tnEthSoamClientCfgEntry 8}
+
+tnEthSoamClientCfgFlow7 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Client layer flow instance numbers.
+        "
+    ::= { tnEthSoamClientCfgEntry 9}
+
+tnEthSoamClientCfgFlow8 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Client layer flow instance numbers.
+        "
+    ::= { tnEthSoamClientCfgEntry 10}
+
+tnEthSoamClientCfgFlow9 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Client layer flow instance numbers.
+        "
+    ::= { tnEthSoamClientCfgEntry 11}
+
+tnEthSoamClientCfgFlow10 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Client layer flow instance numbers.
+        "
+    ::= { tnEthSoamClientCfgEntry 12}
+
+-- ******************************************************************
+-- tn S3280 SOAM local configuration managment table  by Angelax
+-- ******************************************************************
+
+tnEthSoamLocalCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnEthSoamLocalCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table has entries which generate a configuration for local SOAM.
+    "
+    ::= { tnEthSoamLocalCfgMgmt 1 }
+
+tnEthSoamLocalCfgEntry OBJECT-TYPE
+    SYNTAX      TnEthSoamLocalCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents a configuration for local SOAM."
+    INDEX  { tnEthSoaminstance }
+    ::= { tnEthSoamLocalCfgTable 1 }
+
+TnEthSoamLocalCfgEntry ::=
+    SEQUENCE{
+        tnEthSoamFormat          INTEGER,
+        tnEthSoamDomainName      OCTET STRING,
+        tnEthSoamMegOrMaName     OCTET STRING,
+        tnEthSoamMepID           Dot1agCfmMepId,
+        tnEthSoamCcmInterval     INTEGER,
+        tnEthSoamEVCQos          INTEGER,
+        tnEthSoamEVCPolicyID     INTEGER,
+        tnEthSoamVOE             TruthValue
+    }
+
+tnEthSoamFormat OBJECT-TYPE
+    SYNTAX     INTEGER {
+               itu     (1),
+               ieee    (2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This is the configuration of the two possible Maintenance Association Identifier formats.
+         ITU ICC: This is defined by ITU. 'ICC' can be max. 6 char. 'MEG id' can be max. 7 char.
+         IEEE String: This is defined by IEEE. 'Domain Name' can be max. 8 char. 'MEG id' can be max. 8 char.
+         "
+    ::= { tnEthSoamLocalCfgEntry 1 }
+
+tnEthSoamDomainName OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This is either ITU ICC (MEG ID value[1-6]) or IEEE Maintenance Domain Name - depending on 'Format'. See 'Format'.
+        "
+    ::= { tnEthSoamLocalCfgEntry 2 }
+
+tnEthSoamMegOrMaName OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This is either ITU UMC (MEG ID value[7-13]) or IEEE Short MA Name - depending on 'Format'. See 'Format'.
+        In case of ITU ICC format this can be max. 7 char. If only 6 char. is entered the MEG ID value[13] will become NULL."
+    ::= { tnEthSoamLocalCfgEntry 3 }
+tnEthSoamMepID OBJECT-TYPE
+    SYNTAX     Dot1agCfmMepId
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This value will become the transmitted two byte CCM MEP ID."
+    ::= { tnEthSoamLocalCfgEntry 4 }
+
+tnEthSoamCcmInterval OBJECT-TYPE
+    SYNTAX     INTEGER {
+               interval300s    (1),
+               interval100s    (2),
+               interval10s     (3),
+               interval1s      (4),
+               interval6M      (5),
+               interval1M      (6),
+               interval6H      (7)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Interval between CCM transmissions to be used by all MEPs
+        in the MA.
+       "
+      ::= { tnEthSoamLocalCfgEntry 5 }
+
+tnEthSoamEVCQos OBJECT-TYPE
+    SYNTAX     INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This is only relevant for a EVC MEP.
+       This is the Qos of the EVC used for getting QoS counters for Loss Measurement.
+       "
+      ::= { tnEthSoamLocalCfgEntry 6 }
+
+tnEthSoamEVCPolicyID OBJECT-TYPE
+    SYNTAX     INTEGER(1..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This is relevant for an EVC Egress/Up-MEP. This is the Policy number of the relevant ECE.
+        The Policy ID that the generated TST frames will get as IS1 action. Can be the same as any ECE Policy Number,
+        enabling it to hit the same ACL and thereby the same EVC policer.
+       "
+      ::= { tnEthSoamLocalCfgEntry 7 }
+
+tnEthSoamVOE  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This will attempt to utilize VOE HW for MEP implementation. Not all platforms support VOE.
+       "
+      ::= { tnEthSoamLocalCfgEntry 8 }
+
+-- ******************************************************************
+-- tn S3280 SOAM tnEthSoamStatusTable managment table  by Tony Lei
+-- ******************************************************************
+
+tnEthSoamStatusTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEthSoamStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides configuration about the SOAM that provide
+         OAM services.
+        "
+    ::= { tnEthSoamStatusMgmt 1 }
+
+tnEthSoamStatusEntry OBJECT-TYPE
+    SYNTAX          TnEthSoamStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents configuration about the SOAM that provide
+         OAM services.
+         "
+    INDEX           { tnEthSoaminstance }
+    ::= { tnEthSoamStatusTable 1 }
+
+TnEthSoamStatusEntry ::= SEQUENCE {
+        tnEthSoamStatusCCMLevel        TruthValue,
+        tnEthSoamStatusCCMMeg          TruthValue,
+        tnEthSoamStatusCCMMep          TruthValue,
+        tnEthSoamStatusAIS             TruthValue,
+        tnEthSoamStatusCLK             TruthValue,
+        tnEthSoamStatusSSF             TruthValue,
+        tnEthSoamStatusBLK             TruthValue,
+        tnEthSoamStatusTSF             TruthValue
+      }
+
+tnEthSoamStatusCCMLevel OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Fault Cause indicating that a CCM is received with a lower level than the configured for this MEP.
+        "
+    ::= { tnEthSoamStatusEntry 1}
+
+tnEthSoamStatusCCMMeg OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Fault Cause indicating that a CCM is received with a MEG ID different from configured for this MEP.
+        "
+    ::= { tnEthSoamStatusEntry 2}
+
+tnEthSoamStatusCCMMep OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Fault Cause indicating that a CCM is received with a MEP ID different from all 'Peer MEP ID' configured for this MEP.
+        "
+    ::= { tnEthSoamStatusEntry 3}
+
+tnEthSoamStatusAIS OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Fault Cause indicating that AIS PDU is received.
+        "
+    ::= { tnEthSoamStatusEntry 4}
+
+tnEthSoamStatusCLK OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Fault Cause indicating that LCK PDU is received.
+        "
+    ::= { tnEthSoamStatusEntry 5}
+
+tnEthSoamStatusSSF OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Fault Cause indicating that server layer is indicating Signal Fail.
+        "
+    ::= { tnEthSoamStatusEntry 6}
+
+tnEthSoamStatusBLK  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The consequent action of blocking service frames in this flow is active.
+        "
+    ::= { tnEthSoamStatusEntry 7}
+
+tnEthSoamStatusTSF OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The consequent action of indicating Trail Signal Fail to-wards protection is active.
+       "
+    ::= { tnEthSoamStatusEntry 8}
+
+-- ******************************************************************
+
+-- tn S3280 SOAM loss measurement State table
+
+-- ******************************************************************
+
+tnEthSoamLossStateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnEthSoamLossStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table has entries which generate a configuration for loss measurement State.
+    "
+    ::= { tnEthSoamLossStateMgmt 1 }
+
+tnEthSoamLossStateEntry OBJECT-TYPE
+    SYNTAX      TnEthSoamLossStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents a configuration for loss measurement State.
+    "
+    INDEX  { tnEthSoaminstance }
+    ::= { tnEthSoamLossStateTable 1 }
+
+TnEthSoamLossStateEntry ::=
+    SEQUENCE{
+        tnEthSoamLossStateTxCount          Gauge32,
+        tnEthSoamLossStateRxCount          Gauge32,
+        tnEthSoamLossStateNELossCount      Gauge32,
+        tnEthSoamLossStateFELossCount      Gauge32,
+        tnEthSoamLossStateNELossRatio      Gauge32,
+        tnEthSoamLossStateFELossRatio      Gauge32,
+        tnEthSoamLossStateAction           TruthValue
+    }
+
+tnEthSoamLossStateTxCount OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The accumulated Tx frame loss count.
+        "
+    ::= { tnEthSoamLossStateEntry 1 }
+
+tnEthSoamLossStateRxCount OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The accumulated Rx frame loss count.
+        "
+    ::= { tnEthSoamLossStateEntry 2 }
+
+tnEthSoamLossStateNELossCount OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The accumulated near end frame loss count - since last 'clear'.
+        "
+    ::= { tnEthSoamLossStateEntry 3 }
+
+tnEthSoamLossStateFELossCount OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The accumulated far end frame loss count - since last 'clear'.
+        "
+    ::= { tnEthSoamLossStateEntry 4 }
+
+tnEthSoamLossStateNELossRatio OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The near end frame loss ratio calculated based on the near end frame loss count and far end
+         frame transmitted - in the latest 'FLR Interval'. The result is given in percent.
+        "
+    ::= { tnEthSoamLossStateEntry 5 }
+
+tnEthSoamLossStateFELossRatio OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The far end frame loss ratio calculated based on the far end frame loss count and
+         near end frame transmitted - in the latest 'FLR Interval'. The result is given in percent.
+        "
+    ::= { tnEthSoamLossStateEntry 6 }
+
+tnEthSoamLossStateAction OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Set of this check and save will clear the accumulated counters and restart ratio calculation.
+        "
+    ::= { tnEthSoamLossStateEntry 7 }
+
+-- ******************************************************************
+-- tn S3280 SOAM test signal state table
+-- ******************************************************************
+
+tnEthSoamTSExtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnEthSoamTSExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table has entries which generate a configuration for test signal.
+    "
+    ::= { tnEthSoamTSExtMgmt 1 }
+
+tnEthSoamTSExtEntry OBJECT-TYPE
+    SYNTAX      TnEthSoamTSExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents a configuration for test signal.
+    "
+    INDEX  { tnEthSoaminstance }
+    ::= { tnEthSoamTSExtTable 1 }
+
+TnEthSoamTSExtEntry ::=
+    SEQUENCE {
+        tnEthSoamTSSeqNum            TruthValue,
+        tnEthSoamTSStateRxRate       INTEGER,
+        tnEthSoamTSStateAction       TruthValue,
+        tnEthSoamTestCfgPattern      TnEthSoamTestPatternType
+    }
+
+tnEthSoamTSSeqNum OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "sequence number.
+        "
+    ::= { tnEthSoamTSExtEntry 1 }
+
+tnEthSoamTSStateRxRate OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current received TST frame bit rate in 100 Kbps. This is calculated on a 1 s.
+         basis, starting when first TST frame is received after 'Clear'. The frame size used for this calculation is
+         the first received after 'Clear' .
+        "
+    ::= { tnEthSoamTSExtEntry 2 }
+
+tnEthSoamTSStateAction OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This will clear all Test Signal State. Transmission of TST frame will be restarted.
+         Calculation of 'Rx frame count', 'RX rate' and 'Test time' will be started when receiving first TST frame.
+        "
+    ::= { tnEthSoamTSExtEntry 3}
+
+tnEthSoamTestCfgPattern OBJECT-TYPE
+    SYNTAX      TnEthSoamTestPatternType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This attribute specifies the type of test pattern to be
+        sent or received in an OAM PDU Test TLV.
+       "
+    REFERENCE
+       "[MEF7.1] 9.3.4.3"
+    DEFVAL { allzero }  -- changed from none to allzero by Jing
+    ::= { tnEthSoamTSExtEntry 4 }
+
+-- ******************************************************************
+-- tn S3280 SOAM tnEthSoamLtm table    by angelax
+-- ******************************************************************
+tnEthSoamLtmTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEthSoamLtmEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides configuration about ltm priority that provide
+         OAM services.
+        "
+    ::= { tnEthSoamLtmMgmt 1 }
+
+tnEthSoamLtmEntry OBJECT-TYPE
+    SYNTAX          TnEthSoamLtmEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents configuration about the SOAM that provide
+         OAM services.
+        "
+    INDEX           { tnEthSoaminstance }
+    ::= { tnEthSoamLtmTable 1 }
+
+TnEthSoamLtmEntry ::= SEQUENCE{
+        tnEthSoamltmPriority   IEEE8021PriorityValue
+    }
+
+tnEthSoamltmPriority OBJECT-TYPE
+    SYNTAX          IEEE8021PriorityValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The priority to be inserted as PCP bits in TAG (if any).
+        "
+    ::= { tnEthSoamLtmEntry 1}
+
+-- ******************************************************************
+-- tn S3280 SOAM tnEthSoamLtr table    by angelax
+-- ******************************************************************
+tnEthSoamLtrTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEthSoamLtrEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides configuration about ltm priority that provide
+         OAM services.
+        "
+    ::= { tnEthSoamLtrMgmt 1 }
+
+tnEthSoamLtrEntry OBJECT-TYPE
+    SYNTAX          TnEthSoamLtrEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents configuration about the SOAM that provide
+         OAM services.
+        "
+    AUGMENTS { dot1agCfmLtrEntry }
+    ::= { tnEthSoamLtrTable 1 }
+
+TnEthSoamLtrEntry ::= SEQUENCE{
+        tnEthSoamLtrDirection          INTEGER
+    }
+
+tnEthSoamLtrDirection OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        down  (0),
+                        up    (1)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The priority to be inserted as PCP bits in TAG (if any).
+        "
+    ::= { tnEthSoamLtrEntry 1}
+
+-- ******************************************************************
+-- tn S3280 SOAM tnEthSoamAisCfg table    by angelax
+-- ******************************************************************
+tnEthSoamAisCfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEthSoamAisCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides configuration about ais that provide
+         OAM services.
+        "
+    ::= { tnEthSoamAisCfgMgmt 1 }
+
+tnEthSoamAisCfgEntry OBJECT-TYPE
+    SYNTAX          TnEthSoamAisCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents configuration about the SOAM that provide
+         OAM services.
+        "
+    AUGMENTS { dot1agCfmMepEntry }
+    ::= { tnEthSoamAisCfgTable 1 }
+
+TnEthSoamAisCfgEntry ::= SEQUENCE{
+        tnEthSoamAisCfgProtection          TruthValue
+    }
+
+tnEthSoamAisCfgProtection OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Selecting this means that the first 3 AIS PDU is transmitted as fast as possible -
+        in case of using this for protection in the end point."
+    ::= { tnEthSoamAisCfgEntry 1}
+
+-- ******************************************************************
+-- tn S3280 SOAM tnEthSoamDmCfg table    by angelax
+-- ******************************************************************
+
+tnEthSoamDmCfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEthSoamDmCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides configuration about the Delay Measurement that provide
+         OAM services.
+        "
+    ::= { tnEthSoamDmCfgMgmt 1 }
+
+tnEthSoamDmCfgEntry OBJECT-TYPE
+    SYNTAX          TnEthSoamDmCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents configuration about the  Delay Measurement that provide
+         OAM services.
+        "
+    INDEX           { tnEthSoaminstance}
+    ::= { tnEthSoamDmCfgTable 1 }
+
+TnEthSoamDmCfgEntry ::=
+    SEQUENCE {
+        tnEthSoamDmCfgEnable            TruthValue,
+        tnEthSoamDmCfgPriority          IEEE8021PriorityValue,
+        tnEthSoamDmCfgCast              INTEGER,
+        tnEthSoamDmCfgPeerId             Dot1agCfmMepId,
+        tnEthSoamDmCfgWayType            INTEGER,
+        tnEthSoamDmCfgTxMode            INTEGER,
+        tnEthSoamDmCfgCalc              INTEGER,
+        tnEthSoamDmCfgGap                Unsigned32,
+        tnEthSoamDmCfgCount             INTEGER,
+        tnEthSoamDmCfgUnit               INTEGER,
+        tnEthSoamDmCfgD2forD1            TruthValue,
+        tnEthSoamDmCfgCOAction           INTEGER
+    }
+
+tnEthSoamDmCfgEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Delay Measurement based on transmitting 1DM/DMM PDU can be enabled/disabled.
+         Delay Measurement based on receiving and handling 1DM/DMR PDU is always enabled.
+        "
+    ::= { tnEthSoamDmCfgEntry 1}
+
+tnEthSoamDmCfgPriority OBJECT-TYPE
+    SYNTAX          IEEE8021PriorityValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The priority to be inserted as PCP bits in TAG (if any).
+        "
+    ::= { tnEthSoamDmCfgEntry 2}
+
+tnEthSoamDmCfgCast OBJECT-TYPE
+    SYNTAX            INTEGER{
+                        unicast    (0),
+                        multicast  (1)
+                      }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Selection of 1DM/DMM PDU transmitted unicast or multicast.
+         The unicast MAC will be configured through 'Peer MEP'.
+        "
+    ::= { tnEthSoamDmCfgEntry 3}
+
+tnEthSoamDmCfgPeerId OBJECT-TYPE
+    SYNTAX          Dot1agCfmMepId
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Peer MEP ID.
+        "
+    ::= { tnEthSoamDmCfgEntry 4}
+
+tnEthSoamDmCfgWayType OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        oneway  (1),
+                        twoway  (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        " One-Way: One-Way Delay Measurement implemented on 1DM.
+          Two-Way: Two-Way Delay Measurement implemented on DMM/DMR.
+        "
+    ::= { tnEthSoamDmCfgEntry 5}
+
+tnEthSoamDmCfgTxMode OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        standardize  (1),
+                        proprietary  (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        " Standardize: Y.1731 standardize way to transmit 1DM/DMR.
+          Proprietary: Vitesse proprietary way with follow-up packets to transmit 1DM/DMR.
+        "
+    ::= { tnEthSoamDmCfgEntry 6}
+
+tnEthSoamDmCfgCalc OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        roundtrip  (1),
+                        flow       (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        " This is only used if the 'Way' is configured to Two-way.
+          Round trip: The frame dealy calculated by the transmitting and receiving timestamps of initiators.
+          Frame Delay = RxTimeb-TxTimeStampf
+          Flow: The frame dealy calculated by the transmitting and receiving timestamps of initiators and remotes.
+          Frame Delay = (RxTimeb-TxTimeStampf)-(TxTimeStampb-RxTimeStampf).
+        "
+    ::= { tnEthSoamDmCfgEntry 7}
+
+tnEthSoamDmCfgGap OBJECT-TYPE
+    SYNTAX          Unsigned32(10..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        " The gap between transmitting 1DM/DMM PDU in 10ms. The range is 10 to 65535.
+        "
+    ::= { tnEthSoamDmCfgEntry 8}
+
+
+tnEthSoamDmCfgCount OBJECT-TYPE
+    SYNTAX          INTEGER(10..2000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        " The number of last records to calculate. The range is 10 to 2000.
+        "
+    ::= { tnEthSoamDmCfgEntry 9}
+
+tnEthSoamDmCfgUnit OBJECT-TYPE
+    SYNTAX          INTEGER{
+                         ns  (1),
+                         us  (2)
+                      }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        " The time resolution.
+        "
+    ::= { tnEthSoamDmCfgEntry 10}
+
+tnEthSoamDmCfgD2forD1  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        " Enable to use DMM/DMR packet to calculate one-way DM. If the option is enabled, the following action will be taken.
+          When DMR is received, two-way delay (roundtrip or flow) and both near-end-to-far-end and far-end-to-near-end one-way delay are calcualted.
+          When DMM or 1DM is received, only far-end-to-near-end one-way delay is calculated.
+        "
+    ::= { tnEthSoamDmCfgEntry 11}
+
+tnEthSoamDmCfgCOAction OBJECT-TYPE
+    SYNTAX          INTEGER{
+                         keep   (1),
+                         reset  (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The action to counter when overflow happens.
+        "
+    ::= { tnEthSoamDmCfgEntry 12}
+
+-- ******************************************************************
+-- tn SOAM delay measurement status table
+-- ******************************************************************
+
+tnEthSoamDmStateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnEthSoamDmStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table has entries which generate a configuration for delay measurement state.
+        "
+    ::= { tnEthSoamDmStateMgmt 1 }
+
+tnEthSoamDmStateEntry OBJECT-TYPE
+    SYNTAX      TnEthSoamDmStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A entry in the table which generate a configuration for delay measurement state."
+    INDEX  { tnEthSoaminstance }
+    ::= { tnEthSoamDmStateTable 1 }
+
+TnEthSoamDmStateEntry ::=
+    SEQUENCE {
+        tnEthSoamDmStateFNTxCount             Gauge32,
+        tnEthSoamDmStateFNRxTimeout           Gauge32,
+        tnEthSoamDmStateFNRxCount             Gauge32,
+        tnEthSoamDmStateFNRxError             Gauge32,
+        tnEthSoamDmStateFNAvgTotal            Gauge32,
+        tnEthSoamDmStateFNAvgLastN            Gauge32,
+        tnEthSoamDmStateFNAvgVarTotal         Gauge32,
+        tnEthSoamDmStateFNAvgVarLastN         Gauge32,
+        tnEthSoamDmStateFNMinValue            Gauge32,
+        tnEthSoamDmStateFNMaxValue            Gauge32,
+        tnEthSoamDmStateFNOverFlow            Gauge32,
+        tnEthSoamDmStateNFTxCount             Gauge32,
+        tnEthSoamDmStateNFRxTimeout           Gauge32,
+        tnEthSoamDmStateNFRxCount             Gauge32,
+        tnEthSoamDmStateNFRxError             Gauge32,
+        tnEthSoamDmStateNFAvgTotal            Gauge32,
+        tnEthSoamDmStateNFAvgLastN            Gauge32,
+        tnEthSoamDmStateNFAvgVarTotal         Gauge32,
+        tnEthSoamDmStateNFAvgVarLastN         Gauge32,
+        tnEthSoamDmStateNFMinValue            Gauge32,
+        tnEthSoamDmStateNFMaxValue            Gauge32,
+        tnEthSoamDmStateNFOverFlow            Gauge32,
+        tnEthSoamDmStateTwoWayTxCount         Gauge32,
+        tnEthSoamDmStateTwoWayRxTimeout       Gauge32,
+        tnEthSoamDmStateTwoWayRxCount         Gauge32,
+        tnEthSoamDmStateTwoWayRxError         Gauge32,
+        tnEthSoamDmStateTwoWayAvgTotal        Gauge32,
+        tnEthSoamDmStateTwoWayAvgLastN        Gauge32,
+        tnEthSoamDmStateTwoWayAvgVarTotal     Gauge32,
+        tnEthSoamDmStateTwoWayAvgVarLastN     Gauge32,
+        tnEthSoamDmStateTwoWayMinValue        Gauge32,
+        tnEthSoamDmStateTwoWayMaxValue        Gauge32,
+        tnEthSoamDmStateTwoWayOverFlow        Gauge32,
+        tnEthSoamDmStateAction                TruthValue
+    }
+
+tnEthSoamDmStateFNTxCount OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The accumulated transmit count - since last 'clear'.
+        "
+    ::= { tnEthSoamDmStateEntry 1 }
+
+tnEthSoamDmStateFNRxTimeout OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The accumulated receive timeout count for two-way only - since last 'clear'.
+        "
+    ::= { tnEthSoamDmStateEntry 2 }
+
+tnEthSoamDmStateFNRxCount OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The accumulated receive count - since last 'clear'.
+        "
+    ::= { tnEthSoamDmStateEntry 3 }
+
+tnEthSoamDmStateFNRxError OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The accumulated receive error count - since last 'clear'. The frame delay is larger than 1 second(timeout).
+        "
+    ::= { tnEthSoamDmStateEntry 4 }
+
+tnEthSoamDmStateFNAvgTotal OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The average delay - since last 'clear'. The unit is microsecond.
+        "
+    ::= { tnEthSoamDmStateEntry 5 }
+
+tnEthSoamDmStateFNAvgLastN OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The average delay of the last n packets - since last 'clear'. The unit is microsecond.
+        "
+    ::= { tnEthSoamDmStateEntry 6 }
+
+tnEthSoamDmStateFNAvgVarTotal OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The average delay variation - since last 'clear'. The unit is microsecond.
+        "
+    ::= { tnEthSoamDmStateEntry 7 }
+
+tnEthSoamDmStateFNAvgVarLastN OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The average delay variation of the last n packets - since last 'clear'. The unit is microsecond.
+        "
+    ::= { tnEthSoamDmStateEntry 8 }
+
+tnEthSoamDmStateFNMinValue OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The minimum delay - since last 'clear'. The unit is microsecond.
+        "
+    ::= { tnEthSoamDmStateEntry 9 }
+
+tnEthSoamDmStateFNMaxValue OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The maximum delay - since last 'clear'. The unit is microsecond.
+        "
+    ::= { tnEthSoamDmStateEntry 10 }
+
+tnEthSoamDmStateFNOverFlow OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The number of counter overflow - since last 'clear'.
+        "
+    ::= { tnEthSoamDmStateEntry 11 }
+
+tnEthSoamDmStateNFTxCount OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The accumulated transmit count - since last 'clear'.
+        "
+    ::= { tnEthSoamDmStateEntry 12 }
+
+tnEthSoamDmStateNFRxTimeout OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The accumulated receive timeout count for two-way only - since last 'clear'.
+        "
+    ::= { tnEthSoamDmStateEntry 13 }
+
+tnEthSoamDmStateNFRxCount OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The accumulated receive count - since last 'clear'.
+        "
+    ::= { tnEthSoamDmStateEntry 14 }
+
+tnEthSoamDmStateNFRxError OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The accumulated receive error count - since last 'clear'. The frame delay is larger than 1 second(timeout). "
+    ::= { tnEthSoamDmStateEntry 15 }
+
+tnEthSoamDmStateNFAvgTotal OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The average delay - since last 'clear'. The unit is microsecond. "
+    ::= { tnEthSoamDmStateEntry 16 }
+
+tnEthSoamDmStateNFAvgLastN OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The average delay of the last n packets - since last 'clear'. The unit is microsecond. "
+    ::= { tnEthSoamDmStateEntry 17 }
+
+tnEthSoamDmStateNFAvgVarTotal OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The average delay variation - since last 'clear'. The unit is microsecond. "
+    ::= { tnEthSoamDmStateEntry 18 }
+
+tnEthSoamDmStateNFAvgVarLastN OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The average delay variation of the last n packets - since last 'clear'. The unit is microsecond. "
+    ::= { tnEthSoamDmStateEntry 19 }
+
+tnEthSoamDmStateNFMinValue OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The minimum delay - since last 'clear'. The unit is microsecond. "
+    ::= { tnEthSoamDmStateEntry 20 }
+
+tnEthSoamDmStateNFMaxValue OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The maximum delay - since last 'clear'. The unit is microsecond. "
+    ::= { tnEthSoamDmStateEntry 21 }
+
+tnEthSoamDmStateNFOverFlow OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The number of counter overflow - since last 'clear'. "
+    ::= { tnEthSoamDmStateEntry 22 }
+
+tnEthSoamDmStateTwoWayTxCount OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The accumulated transmit count - since last 'clear'. "
+    ::= { tnEthSoamDmStateEntry 23 }
+
+tnEthSoamDmStateTwoWayRxTimeout OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The accumulated receive timeout count for two-way only - since last 'clear'. "
+    ::= { tnEthSoamDmStateEntry 24 }
+
+tnEthSoamDmStateTwoWayRxCount OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The accumulated receive count - since last 'clear'. "
+    ::= { tnEthSoamDmStateEntry 25 }
+
+tnEthSoamDmStateTwoWayRxError OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The accumulated receive error count - since last 'clear'. The frame delay is larger than 1 second(timeout). "
+    ::= { tnEthSoamDmStateEntry 26 }
+
+tnEthSoamDmStateTwoWayAvgTotal OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The average delay - since last 'clear'. The unit is microsecond. "
+    ::= { tnEthSoamDmStateEntry 27 }
+
+tnEthSoamDmStateTwoWayAvgLastN OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The average delay of the last n packets - since last 'clear'. The unit is microsecond. "
+    ::= { tnEthSoamDmStateEntry 28 }
+
+tnEthSoamDmStateTwoWayAvgVarTotal OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The average delay variation - since last 'clear'. The unit is microsecond. "
+    ::= { tnEthSoamDmStateEntry 29 }
+
+tnEthSoamDmStateTwoWayAvgVarLastN OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The average delay variation of the last n packets - since last 'clear'. The unit is microsecond. "
+    ::= { tnEthSoamDmStateEntry 30 }
+
+tnEthSoamDmStateTwoWayMinValue OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The minimum delay - since last 'clear'. The unit is microsecond. "
+    ::= { tnEthSoamDmStateEntry 31 }
+
+tnEthSoamDmStateTwoWayMaxValue OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The maximum delay - since last 'clear'. The unit is microsecond. "
+    ::= { tnEthSoamDmStateEntry 32 }
+
+tnEthSoamDmStateTwoWayOverFlow OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        " The number of counter overflow - since last 'clear'. "
+    ::= { tnEthSoamDmStateEntry 33 }
+
+tnEthSoamDmStateAction OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        " The number of counter overflow - since last 'clear'. "
+    ::= { tnEthSoamDmStateEntry 34 }
+
+
+END

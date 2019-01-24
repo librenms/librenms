@@ -1,0 +1,586 @@
+-- *****************************************************************
+-- TN-ELPS-MIB.my : TN Ethernet Linear Protection Switch MIB
+--
+-- Author : Angela Xing
+-- update by Tony Lei
+-- Copyright (c) 2009 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *************************************************************************************************
+--
+
+TN-ELPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Unsigned32,
+    Gauge32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    RowStatus,TruthValue,
+    MacAddress
+        FROM SNMPv2-TC     -- [RFC2579]
+    InterfaceIndex
+        FROM IF-MIB
+    Dot1agCfmMepId
+    FROM IEEE8021-CFM-MIB
+    tnProducts
+        FROM TRANSITION-SMI
+    tnProtectionMIB
+        FROM TN-PROTECTION-MIB;
+
+--
+-- main body
+--
+tnElpsMib OBJECT IDENTIFIER ::= { tnProtectionMIB 2 }
+
+tnElpsMibNotifications  OBJECT IDENTIFIER ::= { tnElpsMib 0 }
+tnElpsMibObjects        OBJECT IDENTIFIER ::= { tnElpsMib 1 }
+tnElpsMibConformance    OBJECT IDENTIFIER ::= { tnElpsMib 2 }
+--
+-- sub Objects list
+--
+tnElpsCfgMgmt          OBJECT IDENTIFIER ::= { tnElpsMibObjects 1 }
+tnElpsStateMgmt        OBJECT IDENTIFIER ::= { tnElpsMibObjects 2 }
+tnElpsLinkOverMgmt     OBJECT IDENTIFIER ::= { tnElpsMibObjects 3 }
+
+-- Textual Conventions
+TnElpsProtSwitchState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates ELPS protection switch state."
+    SYNTAX      INTEGER {
+                  disabled          (1),
+                  noRequestW        (2),
+                  noRequestP        (3),
+                  lockout           (4),
+                  forcedSwitch      (5),
+                  signalFailW       (6),
+                  signalFailP       (7),
+                  manualSwitchW     (8),
+                  manualSwitchP     (9),
+                  waitToRestore     (10),
+                  exerciseW         (11),
+                  exerciseP         (12),
+                  reverseRequestW   (13),
+                  reverseRequestP   (14),
+                  doNotRevert       (15)
+                }
+
+TnElpsDefectState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates ELPS working/protecting state."
+    SYNTAX      INTEGER {
+                  signalOk      (1),
+                  signalFail    (2),
+                  signalDegrade (3)
+                }
+
+TnElpsRequestType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates ELPS received/transmitted APS request type."
+    SYNTAX      INTEGER {
+                  noRequest             (1),
+                  doNotRevert           (2),
+                  reverseRequest        (3),
+                  exercise              (4),
+                  wait2Restore          (5),
+                  manualSwitch          (6),
+                  signalDegrade         (7),
+                  signalFailForWorking  (8),
+                  forcedWwitch          (9),
+                  signalFailForProtection  (10),
+                  lockoutOfProtection      (11)
+                }
+
+-- ******************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- These notifications will be sent to the management entity
+-- whenever a MEP loses/restores contact with one or more other MEPs.
+-- ******************************************************************
+
+tnElpsAlarmUp NOTIFICATION-TYPE
+    OBJECTS     { tnElpsProtectionState,
+                  tnElpsWFlowState,
+                  tnElpsPFlowState,
+                  tnElpsArchitectureMismatch,
+                  tnElpsAPSOnWorking,
+                  tnElpsSwitchingIncomplete
+                }
+    STATUS      current
+    DESCRIPTION
+       "A Elps has a persistent defect condition. A notification
+        (fault alarm) is sent to the management entity with the OID
+        of the Elps that has detected the fault.
+
+        The management entity receiving the notification can identify
+        the system from the network source address of the
+        notification, and can identify the ELPS reporting the defect
+        by the indices in the OID of the variables in the notification:
+
+           tnElpsInstance - Also the index of the EPLS state table entry
+                              (tnElpsStateTable).
+       "
+     ::= { tnElpsMibNotifications 1 }
+
+tnElpsAlarmDown NOTIFICATION-TYPE
+    OBJECTS     { tnElpsProtectionState,
+                  tnElpsWFlowState,
+                  tnElpsPFlowState,
+                  tnElpsArchitectureMismatch,
+                  tnElpsAPSOnWorking,
+                  tnElpsSwitchingIncomplete
+                }
+    STATUS      current
+    DESCRIPTION
+       "A Elps has a persistent defect condition. A notification
+        (fault alarm) is sent to the management entity with the OID
+        of the Elps that has detected the fault.
+
+        The management entity receiving the notification can identify
+        the system from the network source address of the
+        notification, and can identify the ELPS reporting the defect
+        by the indices in the OID of the variables in the notification:
+
+           tnElpsInstance - Also the index of the EPLS state table entry
+                              (tnElpsStateTable).
+       "
+     ::= { tnElpsMibNotifications 2 }
+
+
+-- ******************************************************************
+-- TN Elps Cfg Table
+-- ******************************************************************
+tnElpsCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnElpsCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+     "This table provides configuration of ELPS."
+    ::= { tnElpsCfgMgmt 1 }
+
+tnElpsCfgEntry OBJECT-TYPE
+    SYNTAX      TnElpsCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents a configuration for ELPS."
+    INDEX { tnElpsInstance }
+    ::= { tnElpsCfgTable 1 }
+
+TnElpsCfgEntry ::=
+    SEQUENCE{
+        tnElpsInstance         Unsigned32,
+        tnElpsDomain           INTEGER,
+        tnElpsArchitecture     INTEGER,
+        tnElpsWFlowPortId      InterfaceIndex,
+        tnElpsPFlowPortId      InterfaceIndex,
+        tnElpsWSfMepId         Dot1agCfmMepId,
+        tnElpsPSfMepId         Dot1agCfmMepId,
+        tnElpsApsMepId         Dot1agCfmMepId,
+        tnElpsConfigured       TruthValue,
+        tnElpsDirection        INTEGER,
+        tnElpsApsEnable        TruthValue,
+        tnElpsRevertiveEnable  TruthValue,
+        tnElpsWTRTime          INTEGER,
+        tnElpsHoldOffTime      INTEGER,
+        tnElpsCmd              INTEGER,
+        tnElpsStatus           RowStatus
+    }
+
+tnElpsInstance OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The ID of the ELPS."
+    ::= { tnElpsCfgEntry 1 }
+
+tnElpsDomain OBJECT-TYPE
+    SYNTAX          INTEGER {
+                       port (1)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Port: This will create a ELPS in the Port Domain. 'W/P Flow' is a Port."
+    ::= { tnElpsCfgEntry 2}
+
+tnElpsArchitecture OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      onePlusOne   (1),
+                      oneForOne    (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Port: This will create a 1+1 ELPS.
+         Port: This will create a 1:1 ELPS."
+    ::= { tnElpsCfgEntry 3}
+
+tnElpsWFlowPortId OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The working flow for the ELPS - See 'Domain' above."
+    ::= { tnElpsCfgEntry 4}
+
+tnElpsPFlowPortId OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The protecting flow for the ELPS - See 'Domain' above."
+    ::= { tnElpsCfgEntry 5}
+
+tnElpsWSfMepId OBJECT-TYPE
+    SYNTAX          Dot1agCfmMepId
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The working Signal Fail reporting MEP."
+    ::= { tnElpsCfgEntry 6}
+
+tnElpsPSfMepId OBJECT-TYPE
+    SYNTAX          Dot1agCfmMepId
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The protecting Signal Fail reporting MEP."
+    ::= { tnElpsCfgEntry 7}
+
+tnElpsApsMepId OBJECT-TYPE
+    SYNTAX          Dot1agCfmMepId
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The APS PDU handling MEP."
+    ::= { tnElpsCfgEntry 8}
+
+tnElpsConfigured OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "False: This ELPS is only created and has not yet been configured - is not active.
+         True: This ELPS is configured - is active."
+    ::= { tnElpsCfgEntry 9 }
+
+tnElpsDirection OBJECT-TYPE
+    SYNTAX       INTEGER{
+                     unidirectional   (1),
+                     bidirectional    (2)
+                  }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "Unidirectional: ELPS in the two ends can select traffic from different 
+                         working/protecting flow. This is only possible in case 
+                         of 1+1.
+         Bidirectional:  ELPS in the two ends is selecting traffic from the same 
+                         working/protecting flow. This requires APS enabled.
+                         This is mandatory for 1:1."
+    ::= { tnElpsCfgEntry 10 }
+
+tnElpsApsEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The Automatic Protection Switching protocol can be enabled/disabled. This is mandatory for 1:1.
+        "
+    ::= { tnElpsCfgEntry 11 }
+
+tnElpsRevertiveEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The revertive switching to working flow can be enabled/disabled.
+        "
+    ::= { tnElpsCfgEntry 12 }
+
+tnElpsWTRTime OBJECT-TYPE
+    SYNTAX     INTEGER{
+                    disabled   (0),
+                    t10sec      (1),
+                    t30sec      (2),
+                    t5min       (3),
+                    t6min       (4),
+                    t7min       (5),
+                    t8min       (6),
+                    t9min       (7),
+                    t10min      (8),
+                    t11min      (9),
+                    t12min      (10)
+                }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The Wait To Restore timing value to be used in revertive switching.
+        "
+    ::= { tnElpsCfgEntry 13 }
+
+tnElpsHoldOffTime OBJECT-TYPE
+    SYNTAX     INTEGER{
+                    disabled     (0),
+                    t100ms       (1),
+                    t200ms       (2),
+                    t300ms       (3),
+                    t400ms       (4),
+                    t500ms       (5),
+                    t600ms       (6),
+                    t700ms       (7),
+                    t800ms       (8),
+                    t900ms       (9),
+                    t1s          (10),
+                    t2s          (11),
+                    t3s          (12),
+                    t4s          (13),
+                    t5s          (14),
+                    t6s          (15),
+                    t7s          (16),
+                    t8s          (17),
+                    t9s          (18),
+                    t10s         (19)
+                }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The timing value to be used to make persistent check on Signal Fail before switching.
+        "
+    ::= { tnElpsCfgEntry 14 }
+
+tnElpsCmd OBJECT-TYPE
+    SYNTAX      INTEGER{
+                    none                  (0),
+                    clear                 (1),
+                    lockOut               (2),
+                    forcedSwitch          (3),
+                    manualSwitchP         (4),
+                    manualSwitchW         (5),
+                    exercise              (6),
+                    freeze                (7),
+                    lockOutLocal          (8)
+                }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "None: There is no active local command on this instance.
+         Clear: The active local command will be cleared.
+         Lock Out: This ELPS is locked to working (not active). In case of 1:N (more than one ELPS with same protecting flow) -
+                   when one ELPS switch to protecting flow, other ELPS is enforced this command
+         Forced Switch: Forced switch to protecting.
+         Manual Switch P: Manual switch to protecting.
+         Manual Switch W: Manual switch to working - this is only possible in 1:1 non-revertive.
+         Exercise: Exercise of the protocol - not traffic effecting.
+         Freeze: This ELPS is locally freezed - ignoring all input.
+         Lock Out Local: This ELPS is locally 'locked out' - ignoring local SF detected on working."
+    ::= { tnElpsCfgEntry 15 }
+
+tnElpsStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+        The writable columns in a row can not be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated."
+    ::= { tnElpsCfgEntry 16 }
+-- ******************************************************************
+-- TN Elps state table
+-- ******************************************************************
+tnElpsStateTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnElpsStateEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides configuration about ELPS state"
+    ::= { tnElpsStateMgmt 1 }
+
+tnElpsStateEntry OBJECT-TYPE
+    SYNTAX          TnElpsStateEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents configuration about ELPS state"
+    INDEX           { tnElpsInstance }
+    ::= { tnElpsStateTable 1 }
+
+TnElpsStateEntry ::= SEQUENCE{
+        tnElpsProtectionState             TnElpsProtSwitchState,
+        tnElpsWFlowState                  TnElpsDefectState,
+        tnElpsPFlowState                  TnElpsDefectState,
+        tnElpsTransmitRequestType         TnElpsRequestType,
+        tnElpsTransmitRequestedSignal     Unsigned32,
+        tnElpsTransmitBridgedSignal       Unsigned32,
+        tnElpsReceiveRequestType          TnElpsRequestType,
+        tnElpsReceiveRequestedSignal      Unsigned32,
+        tnElpsReceiveBridgedSignal        Unsigned32,
+        tnElpsArchitectureMismatch        TruthValue,
+        tnElpsAPSOnWorking                TruthValue,
+        tnElpsSwitchingIncomplete         TruthValue,
+        tnElpsNoApsReceived               TruthValue
+    }
+
+tnElpsProtectionState OBJECT-TYPE
+    SYNTAX          TnElpsProtSwitchState
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "ELPS Protection state"
+    ::= { tnElpsStateEntry 1}
+
+tnElpsWFlowState OBJECT-TYPE
+    SYNTAX          TnElpsDefectState
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "signalOk: State of working flow is ok
+         signalFail: State of working flow is Signal Fail
+         signalDegrade: State of working flow is Signal Degrade (for future use)"
+    ::= { tnElpsStateEntry 2}
+
+tnElpsPFlowState OBJECT-TYPE
+    SYNTAX          TnElpsDefectState
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "signalOk: State of protecting flow is ok
+         signalFail: State of protecting flow is Signal Fail
+         signalDegrade: State of protecting flow is Signal Degrade (for future use)"
+    ::= { tnElpsStateEntry 3}
+
+tnElpsTransmitRequestType OBJECT-TYPE
+    SYNTAX          TnElpsRequestType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The transmitted request type."
+    ::= { tnElpsStateEntry 4}
+
+tnElpsTransmitRequestedSignal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The transmitted request signal."
+    ::= { tnElpsStateEntry 5}
+
+tnElpsTransmitBridgedSignal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The transmitted bridged signal."
+    ::= { tnElpsStateEntry 6}
+
+tnElpsReceiveRequestType OBJECT-TYPE
+    SYNTAX          TnElpsRequestType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The requested type that is received from APS."
+    ::= { tnElpsStateEntry 7}
+
+tnElpsReceiveRequestedSignal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The requested signal received from APS."
+    ::= { tnElpsStateEntry 8}
+
+tnElpsReceiveBridgedSignal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The bridged signal received from APS ."
+    ::= { tnElpsStateEntry 9}
+
+tnElpsArchitectureMismatch OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The architecture indicated in the received APS does not match the locally configured."
+    ::= { tnElpsStateEntry 10}
+
+tnElpsAPSOnWorking OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "APS is received on the working flow."
+    ::= { tnElpsStateEntry 11}
+
+tnElpsSwitchingIncomplete OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Traffic is not selected from the same flow instance in the two ends."
+    ::= { tnElpsStateEntry 12}
+
+tnElpsNoApsReceived OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "APS PDU is not received from the other end."
+    ::= { tnElpsStateEntry 13}
+
+-- ******************************************************************
+-- TN Elps LinkOver table
+-- ******************************************************************
+tnElpsLinkOverTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnElpsLinkOverEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides configuration about ELPS Link Over based on the SOAM DM"
+    ::= { tnElpsLinkOverMgmt 1 }
+
+tnElpsLinkOverEntry OBJECT-TYPE
+    SYNTAX          TnElpsLinkOverEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents configuration about ELPS Link Over"
+    INDEX           { tnElpsInstance }
+    ::= { tnElpsLinkOverTable 1 }
+
+TnElpsLinkOverEntry ::= SEQUENCE{
+        tnElpsLinkOverEnabled             TruthValue,
+        tnElpsLinkOverDeltaValue          Unsigned32
+}
+
+tnElpsLinkOverEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The feature about the DM LinkOver can be enabled and disabeld.
+         False: This feature is disabled.
+         True:  This ELPS is enabled."
+    ::= { tnElpsLinkOverEntry 1 }
+
+tnElpsLinkOverDeltaValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The Delta value is ranged from 6 to 120. If the value that is on one link subtract the other one is
+         larger than the delta value, the data flow will be swithed to the link that own the better DM value."
+    ::= { tnElpsLinkOverEntry 2 }
+END

@@ -1,0 +1,29 @@
+-- *****************************************************************
+-- Transition Networks Security AAA MIB
+--
+-- Copyright (C) 2012  Transition Networks, Inc. All Rights Reserved.
+-- *****************************************************************
+
+TN-SECURITY-SWITCH-SSH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    DisplayString, TruthValue
+        FROM SNMPv2-TC
+    tnDevMgmt
+        FROM TN-MGMT-MIB;
+
+tnSecuritySwitchSSHMIB OBJECT IDENTIFIER ::= { tnDevMgmt 40 }
+
+--
+-- Mib variables
+--
+
+tnSSHModeEnable OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "To enable or disable SSH configuration."
+    DEFVAL         { false }
+    ::= { tnSecuritySwitchSSHMIB 1 }
+
+END
