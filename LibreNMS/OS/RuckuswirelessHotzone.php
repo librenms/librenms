@@ -29,7 +29,7 @@ class RuckuswirelessHotzone extends OS implements
         $utilization_5 = '.1.3.6.1.4.1.25053.1.1.12.1.1.1.3.1.50.2'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
         return array(
             new WirelessSensor('utilization', $this->getDeviceId(), $utilization_2, 'ruckuswireless-hotzone', 1, 'Utilization: 2.4G'),
-            new WirelessSensor('utilization', $this->getDeviceId(), $utelization_5, 'ruckuswireless-hotzone', 2, 'Utilization: 5G'),
+            new WirelessSensor('utilization', $this->getDeviceId(), $utilization_5, 'ruckuswireless-hotzone', 2, 'Utilization: 5G'),
         );
     }
     public function discoverWirelessNoiseFloor()
