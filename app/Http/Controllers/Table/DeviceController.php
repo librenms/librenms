@@ -46,7 +46,7 @@ class DeviceController extends TableController
             'features' => 'nullable|string',
             'location' => 'nullable|string',
             'type' => 'nullable|string',
-            'state' => 'nullable|in:0,1',
+            'state' => 'nullable|in:0,1,up,down',
             'disabled' => 'nullable|in:0,1',
             'ignore' => 'nullable|in:0,1',
             'group' => 'nullable|int',
@@ -55,7 +55,7 @@ class DeviceController extends TableController
 
     protected function filterFields($request)
     {
-        return ['os', 'version', 'hardware', 'features', 'type', 'state', 'disabled', 'ignore', 'location_id' => 'location'];
+        return ['os', 'version', 'hardware', 'features', 'type', 'status' => 'state', 'disabled', 'ignore', 'location_id' => 'location'];
     }
 
     protected function searchFields($request)
@@ -93,6 +93,10 @@ class DeviceController extends TableController
     {
         if ($field == 'location' && !is_numeric($value)) {
             return Location::query()->where('location', $value)->value('id');
+        }
+
+        if ($field == 'state' && !is_numeric($value)) {
+            return str_replace(['up', 'down'], [1, 0], $value);
         }
 
         return $value;

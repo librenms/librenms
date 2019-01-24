@@ -246,6 +246,11 @@ if ($format == "graph") {
     }
     echo '</div>';
 } else {
+    $state = isset($vars['state']) ? $vars['state'] : '';
+    $state_selection = "<select name='state' id='state' class='form-control'><option value=''>All</option>" .
+        "<option value='up'" . ($state == 'up' ? ' selected' : '') . ">Up</option>" .
+        "<option value='down'" . ($state == 'down' ? ' selected' : '') . ">Down</option><select>";
+
     $features_selected = isset($vars['features']) ? json_encode(['id' => $vars['features'], 'text' => $vars['features']]) : '""';
     $hardware_selected = isset($vars['hardware']) ? json_encode(['id' => $vars['hardware'], 'text' => $vars['hardware']]) : '""';
     $os_selected = isset($vars['os']) ? json_encode(['id' => $vars['os'], 'text' => $vars['hardware']]) : '""';
@@ -342,7 +347,8 @@ if ($format == "graph") {
             "<div class='form-group'>" +
             "<input type='text' name='searchquery' id='searchquery' value=''<?php echo $vars['searchquery']; ?>'' class='form-control' placeholder='Search'>" +
             "</div>" +
-            "<div class='form-group'><select name='os' id='os' class='form-control'><select></div>" +
+            "<div class='form-group'><?php echo $state_selection ?></div>" +
+            "<div class='form-group'><select name='os' id='os' class='form-control'></select></div>" +
             "<div class='form-group'><select name='version' id='version' class='form-control'></select></div>" +
             "<div class='form-group'><select name='hardware' id='hardware' class='form-control'></select></div>" +
             "<div class='form-group'><select name='features' id='features' class='form-control'></select></div>" +
