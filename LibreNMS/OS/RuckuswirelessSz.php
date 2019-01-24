@@ -6,7 +6,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\OS;
 
-class Ruckuswireless extends OS implements
+class RuckuswirelessSz extends OS implements
     WirelessClientsDiscovery,
     WirelessApCountDiscovery
 {
@@ -15,13 +15,13 @@ class Ruckuswireless extends OS implements
 
 // Find Per SSID Client Count
         $sensors = array();
-        $ssids = $this->getCacheByIndex('ruckusZDWLANSSID', 'RUCKUS-ZD-WLAN-MIB');
-        $counts = $this->getCacheByIndex('ruckusZDWLANNumSta', 'RUCKUS-ZD-WLAN-MIB');
+        $ssids = $this->getCacheByIndex('ruckusSZWLANSSID', 'RUCKUS-SZ-WLAN-MIB');
+        $counts = $this->getCacheByIndex('ruckusSZWLANNumSta', 'RUCKUS-SZ-WLAN-MIB');
 
         $total_oids = array();
         $total = 0;
         foreach ($counts as $index => $count) {
-            $oid = '.1.3.6.1.4.1.25053.1.2.2.1.1.1.1.1.12.' . $index;
+            $oid = '.1.3.6.1.4.1.25053.1.4.2.1.1.1.2.1.12.' . $index;
             $total_oids[] = $oid;
             $total += $count;
 
@@ -29,7 +29,7 @@ class Ruckuswireless extends OS implements
                 'clients',
                 $this->getDeviceId(),
                 $oid,
-                'ruckuswireless',
+                'ruckuswireless-sz',
                 $index,
                 'SSID: ' . $ssids[$index],
                 $count
@@ -38,19 +38,18 @@ class Ruckuswireless extends OS implements
 
 // Find Total Client Count
 
-        $oid = '.1.3.6.1.4.1.25053.1.2.1.1.1.15.2.0'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
-        array_push($sensors, new WirelessSensor('clients', $this->getDeviceId(), $oid, 'ruckuswireless', ($index + 1), 'System Total:'));
+        $oid = '.1.3.6.1.4.1.25053.1.4.1.1.1.15.2.0'; //RUCKUS-SZ-SYSTEM-MIB::ruckusSZSystemStatsNumSta.0
+        array_push($sensors, new WirelessSensor('clients', $this->getDeviceId(), $oid, 'ruckuswireless-sz', ($index + 1), 'System Total:'));
         return $sensors;
-    }
-
+}
 
 // Find Total AP Count
 
     public function discoverWirelessApCount()
     {
-        $oid = '.1.3.6.1.4.1.25053.1.2.1.1.1.15.1.0'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumAP.0
+        $oid = '.1.3.6.1.4.1.25053.1.4.1.1.1.15.1.0'; //RUCKUS-SZ-SYSTEM-MIB::ruckusSZSystemStatsNumAP.0
         return array(
-            new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'ruckuswireless', 1, 'Connected APs')
+            new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'ruckuswireless-sz', 1, 'Connected APs')
         );
     }
 }

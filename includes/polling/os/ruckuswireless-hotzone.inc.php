@@ -14,12 +14,12 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-$ruckus_data = snmp_get_multi_oid($device, ['.1.3.6.1.4.1.25053.1.2.1.1.1.1.18.0', '.1.3.6.1.4.1.25053.1.2.1.1.1.1.15.0', '.1.3.6.1.4.1.25053.1.2.1.1.1.1.12.0', '.1.3.6.1.4.1.25053.1.2.1.1.1.1.9.0', '.1.3.6.1.4.1.25053.1.2.1.1.1.1.20.0']);
-$version      = $ruckus_data['.1.3.6.1.4.1.25053.1.2.1.1.1.1.18.0'];
-$serial       = $ruckus_data['.1.3.6.1.4.1.25053.1.2.1.1.1.1.15.0'];
-$features     = "Licenses: " . $ruckus_data['.1.3.6.1.4.1.25053.1.2.1.1.1.1.12.0'];
-$hardware     = $ruckus_data['.1.3.6.1.4.1.25053.1.2.1.1.1.1.9.0'];
-$ruckuscountry = $ruckus_data['.1.3.6.1.4.1.25053.1.2.1.1.1.1.20.0'];
+$ruckus_data = snmp_get_multi_oid($device, ['.1.3.6.1.4.1.25053.1.1.2.1.1.1.1.0', '.1.3.6.1.4.1.25053.1.1.3.1.1.1.1.1.3.1', '.1.3.6.1.4.1.25053.1.1.2.1.1.1.2.0', '.1.3.6.1.4.1.25053.1.1.4.1.1.1.4.0']);
+
+$hardware      = $ruckus_data['.1.3.6.1.4.1.25053.1.1.2.1.1.1.1.0'];
+$version       = $ruckus_data['.1.3.6.1.4.1.25053.1.1.3.1.1.1.1.1.3.1'];
+$serial        = $ruckus_data['.1.3.6.1.4.1.25053.1.1.2.1.1.1.2.0'];
+$ruckuscountry = $ruckus_data['.1.3.6.1.4.1.25053.1.1.4.1.1.1.4.0'];
 
 if (isset($ruckuscountry) && $ruckuscountry != '') {
     $version .= " ($ruckuscountry)";

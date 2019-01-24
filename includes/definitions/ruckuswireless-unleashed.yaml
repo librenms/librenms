@@ -1,5 +1,5 @@
-os: ruckuswireless
-text: 'Ruckus Wireless ZoneDirector'
+os: ruckuswireless-unleashed
+text: 'Ruckus Wireless Unleashed'
 type: wireless
 icon: ruckus
 mib_dir:
@@ -10,14 +10,15 @@ over:
     - { graph: device_wireless_clients, text: 'Number of Clients' }
 register_mibs:
     ruckusZDSystemStats: RUCKUS-ZD-SYSTEM-MIB
-    ruckusZDWLANTable: RUCKUS-ZD-WLAN-MIB
-    ruckusZDWLANAPTable: RUCKUS-ZD-WLAN-MIB
-    ruckusZDWLANAPRadioStatsTable: RUCKUS-ZD-WLAN-MIB
+    ruckusUnleashedSystemStats: RUCKUS-UNLEASHED-SYSTEM-MIB
+    ruckusUnleashedWLANTable: RUCKUS-UNLEASHED-WLAN-MIB
+    ruckusUnleashedWLANAPTable: RUCKUS-UNLEASHED-WLAN-MIB
 discovery:
-    - sysObjectID: .1.3.6.1.4.1.25053.3.1.5
-      snmpget:
-          oid: '.1.3.6.1.4.1.25053.1.2.1.1.1.1.9.0'
-          op: starts
+    - 
+      sysObjectID: .1.3.6.1.4.1.25053.3.1.5.15
+      snmpget_except:
+          oid: 'RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemModel.0'
+          op: contains
           value: [ ZD, zd ]
 poller_modules:
     wireless: true
