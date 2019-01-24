@@ -4,7 +4,7 @@ path: blob/master/doc/
 
 One of the goals of the LibreNMS project is to enable users to get all of the help they need from our documentation.
 
-Our documentation is generated with [mkdocs](https://www.mkdocs.org/). If you want to build a local copy, install `mkdocs` and `mkdocs-material`, then run `make docs`. This produces the HTML in `docs/out` directory.
+The documentation is generated with [mkdocs](https://www.mkdocs.org/). If you want to build a local copy, install `mkdocs` and `mkdocs-material`, then run `make docs`. This produces the HTML in `docs/out` directory.
 
 Alternatively you can start a webserver at http://localhost:8000 for live preview by executing `mkdocs serve`
 
