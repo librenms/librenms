@@ -32,10 +32,12 @@ class Mattermost extends Transport
         if (empty($this->config)) {
             return $this->deliverAlertOld($obj, $opts);
         }
-        $mattermost_opts['url'] = $this->config['mattermost-url'];
-        $mattermost_opts['username'] = $this->config['mattermost-username'];
-        $mattermost_opts['icon'] = $this->config['mattermost-icon'];
-        $mattermost_opts['channel'] = $this->config['mattermost-channel'];
+        $mattermost_opts = [
+            'url' => $this->config['mattermost-url'],
+            'username' => $this->config['mattermost-username'],
+            'icon' => $this->config['mattermost-icon'],
+            'channel' => $this->config['mattermost-channel'],
+        ];
         return $this->contactMattermost($obj, $mattermost_opts);
     }
 
@@ -86,7 +88,6 @@ class Mattermost extends Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
             d_echo("Mattermost Connection Error: " . $ret);
-            return false;
             return 'HTTP Status code ' . $code;
         } else {
             d_echo("Mattermost message sent for " . $device);
