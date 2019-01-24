@@ -40,7 +40,7 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20190122" rel="stylesheet" type="text/css" />
+    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20190123" rel="stylesheet" type="text/css" />
     <link href="{{ asset('css/' . LibreNMS\Config::get('site_style', 'light') . '.css?ver=632417642') }}" rel="stylesheet" type="text/css" />
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet" type="text/css" />
@@ -69,7 +69,7 @@
         <script src="js/lazyload.js"></script>
     @endif
     <script src="{{ asset('js/select2.min.js') }}"></script>
-    <script src="{{ asset('js/librenms.js?ver=20190122') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=20190123') }}"></script>
     <script type="text/javascript">
 
         <!-- Begin
