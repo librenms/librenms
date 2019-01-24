@@ -55,7 +55,7 @@ class DeviceController extends TableController
 
     protected function filterFields($request)
     {
-        return ['os', 'version', 'hardware', 'features', 'type', 'state', 'disabled', 'ignore'];
+        return ['os', 'version', 'hardware', 'features', 'type', 'state', 'disabled', 'ignore', 'location_id' => 'location'];
     }
 
     protected function searchFields($request)
@@ -79,14 +79,6 @@ class DeviceController extends TableController
             $query->leftJoin('locations', 'locations.id', 'devices.location_id');
         }
 
-        // filter non-id locations too
-        if ($location = $request->get('location')) {
-            if (!is_numeric($location)) {
-                $location = Location::where('location', $location)->value('id');
-            }
-            $query->where('location_id', $location);
-        }
-
         // filter device group, not sure this is the most efficient query
         if ($group = $request->get('group')) {
             $query->whereHas('groups', function ($query) use ($group) {
@@ -95,6 +87,15 @@ class DeviceController extends TableController
         }
 
         return $query;
+    }
+
+    protected function adjustFilterValue($field, $value)
+    {
+        if ($field == 'location' && !is_numeric($value)) {
+            return Location::query()->where('location', $value)->value('id');
+        }
+
+        return $value;
     }
 
     private function isDetailed()
