@@ -1,7 +1,6 @@
 # Ignore all dotfiles #
 #######################
 .*
-*~
 !/.gitignore
 !/.editorconfig
 !/.scrutinizer.yml
@@ -14,7 +13,6 @@
 
 # Others #
 ##########
-TAGS
 __pycache__
 *.pyc
 *.swp
