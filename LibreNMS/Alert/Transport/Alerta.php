@@ -21,14 +21,6 @@ class Alerta extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            $opts['url'] = $this->config['alerta-url'];
-            $opts['environment'] = $this->config['environment'];
-            $opts['apikey'] = $this->config['apikey'];
-            $opts['alertstate'] = $this->config['alertstate'];
-            $opts['recoverstate'] = $this->config['recoverstate'];
-            return $this->contactAlerta($obj, $opts);
-        }
         $opts['url'] = $this->config['alerta-url'];
         $opts['environment'] = $this->config['environment'];
         $opts['apikey'] = $this->config['apikey'];
