@@ -36,8 +36,11 @@ class DefaultLegacySchemaSeeder extends Seeder
     {
         // insert version 1000 to prevent legacy schema code from running.
         // additionally prevents seeder from being run again by build-base.php / includes/sql-schema/update.php.
-        if (!\DB::table('dbSchema')->exists()) {
+        $version = \DB::table('dbSchema')->value('version');
+        if (!$version) {
             \DB::table('dbSchema')->insert(['version' => 1000]);
+        } elseif ($version == 281) {
+            \DB::table('dbSchema')->update(['version' => 1000]);
         }
     }
 }
