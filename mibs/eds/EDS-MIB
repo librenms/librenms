@@ -272,55 +272,30 @@ EDS-MIB DEFINITIONS ::= BEGIN
     owDeviceTypes OBJECT IDENTIFIER ::= { owDevices 1 }
 
     owNone OBJECT IDENTIFIER ::= { owDeviceTypes 0 }
-
     owUnknown OBJECT IDENTIFIER ::= { owDeviceTypes 1 }
-
     owDS2406 OBJECT IDENTIFIER ::= { owDeviceTypes 2 }
-
     owDS18B20 OBJECT IDENTIFIER ::= { owDeviceTypes 3 }
-
     owDS18S20 OBJECT IDENTIFIER ::= { owDeviceTypes 4 }
-
     owDS2438 OBJECT IDENTIFIER ::= { owDeviceTypes 5 }
-
     owDS2423 OBJECT IDENTIFIER ::= { owDeviceTypes 6 }
-
     owDS2408 OBJECT IDENTIFIER ::= { owDeviceTypes 7 }
-
     owDS2450 OBJECT IDENTIFIER ::= { owDeviceTypes 8 }
-
     owEDS0064 OBJECT IDENTIFIER ::= { owDeviceTypes 9 }
-
     owEDS0065 OBJECT IDENTIFIER ::= { owDeviceTypes 10 }
-
     owEDS0066 OBJECT IDENTIFIER ::= { owDeviceTypes 11 }
-
     owEDS0067 OBJECT IDENTIFIER ::= { owDeviceTypes 12 }
-
     owEDS0068 OBJECT IDENTIFIER ::= { owDeviceTypes 13 }
-
     owEDS0069 OBJECT IDENTIFIER ::= { owDeviceTypes 14 }
-
     owEDS0070 OBJECT IDENTIFIER ::= { owDeviceTypes 15 }
-
     owEDS0071 OBJECT IDENTIFIER ::= { owDeviceTypes 16 }
-
     owEDS0080 OBJECT IDENTIFIER ::= { owDeviceTypes 17 }
-
     owEDS0082 OBJECT IDENTIFIER ::= { owDeviceTypes 18 }
-
     owEDS0083 OBJECT IDENTIFIER ::= { owDeviceTypes 19 }
-
     owEDS0085 OBJECT IDENTIFIER ::= { owDeviceTypes 20 }
-
     owEDS0090 OBJECT IDENTIFIER ::= { owDeviceTypes 21 }
-
     owEDS0091 OBJECT IDENTIFIER ::= { owDeviceTypes 22 }
-
     owEDS0092 OBJECT IDENTIFIER ::= { owDeviceTypes 23 }
-
     owDS28EA00 OBJECT IDENTIFIER ::= { owDeviceTypes 24 }
-
     owEDS0050 OBJECT IDENTIFIER ::= { owDeviceTypes 25 }
 
     owDeviceInfo OBJECT IDENTIFIER ::= { owDevices 2 }

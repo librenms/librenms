@@ -6,8 +6,8 @@
 //EDS-MIB::eFirmwareDate.0 = STRING: "May 17 2017"
 
 $oids = array (
-    'version' => 'eFirmwareVersion',
-    'hardware'   => 'eProductName'
+    'version' => 'eFirmwareVersion.0',
+    'hardware'   => 'eProductName.0'
 );
 
 $data = snmp_get_multi_oid($device, $oids, '-OUQs', 'EDS-MIB');
