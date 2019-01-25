@@ -13,7 +13,7 @@
                     "os": "protelevision-t1",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "protelevision.png",
                     "location": null
                 }
             ]
@@ -31,7 +31,7 @@
                     "os": "protelevision-t1",
                     "type": "network",
                     "serial": "3303302",
-                    "icon": "generic.svg",
+                    "icon": "protelevision.png",
                     "location": "<private>"
                 }
             ]
