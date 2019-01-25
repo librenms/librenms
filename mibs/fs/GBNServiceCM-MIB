@@ -1,0 +1,245 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : gbn8021xCM.mib
+--  Description  : Sample admin 802.1x CM module configuration MIB 
+--  Version      : 1.0  
+--  Date         : July 2, 2002     
+--
+--  Copyright (c) 1999-2000 admin Systems, Inc.  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+
+    GBNServiceCM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, IpAddress, 
+        NOTIFICATION-TYPE                       FROM SNMPv2-SMI
+        
+        DisplayString, MacAddress,
+        RowStatus, TruthValue                   FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnServiceAAA                           FROM ADMIN-MASTER-MIB
+        ;
+        
+
+    gbn8021xCmMib MODULE-IDENTITY
+        LAST-UPDATED    "2002/07/02"  -- July 2, 2002
+        ORGANIZATION    "admin Systems, Inc."
+        CONTACT-INFO    "admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "admin CM Enterprise MIB definition."
+
+        REVISION        "2002/07/02"  -- July 2, 2002
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnServiceAAA 1 }
+
+
+------------------------------------------------------------------------------
+--  Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+    --
+    --  "DURABLE":
+    --    Objects that are saved across a system reset and/or power cycle
+    --    are noted as "DURABLE" for convenience in the DESCRIPTION
+    --    section of the object definition.  Code must be explicitly
+    --    written to implement these DURABLE objects.
+    --
+
+------------------------------------------------------------------------------
+--  define groups in GBN-8021xCM-MIB
+------------------------------------------------------------------------------
+
+
+        -------------------------------------------------------------------
+        --Add gbn8021xCmConfTable MIB      2002/07/02     ouyangchunbo
+        -------------------------------------------------------------------
+        gbn8021xCmConfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF gbn8021xCmConfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of Radius configuration table"
+        ::= { gbn8021xCmMib 1 }
+
+        gbn8021xCmConfEntry OBJECT-TYPE
+        SYNTAX gbn8021xCmConfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of radius parameters."
+        INDEX { DomainIndex }
+        ::= { gbn8021xCmConfTable 1 }
+
+        gbn8021xCmConfEntry ::= SEQUENCE {
+            DomainIndex    Integer32,
+            DomainName     DisplayString,
+            ServerName     DisplayString,
+            MaxLinks       Integer32,
+            CurrentLinks   Integer32,
+            nActive        TruthValue,
+            bCmUsed        TruthValue,
+            scheme          Integer32
+        }
+
+        DomainIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1024)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A simple index into 'gbn8021xCmConfTable'."
+        ::= { gbn8021xCmConfEntry 1 }
+
+        DomainName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..24))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " A simple DomainName of gbn8021xCmConfEntry."
+        ::= { gbn8021xCmConfEntry 2 }
+        
+        ServerName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " A simple ServerName of gbn8021xCmConfEntry."
+        ::= { gbn8021xCmConfEntry 3 }
+        
+        MaxLinks OBJECT-TYPE
+        SYNTAX Integer32(1..640)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { 1024:all }
+             A simple MaxLinks of  'gbn8021xCmConfTable'.0xFFFF means disable"
+        ::= { gbn8021xCmConfEntry 4 }
+
+        CurrentLinks OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             "A simple CurrentLinks of  'gbn8021xCmConfTable'."
+        ::= { gbn8021xCmConfEntry 5 }
+
+        nActive OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "Status of the current Domain 1-acitved  2 - unactived'."
+        ::= { gbn8021xCmConfEntry 6 }
+
+
+        bCmUsed OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "Status of the current Domain 1-used  2 - unused'."
+        ::= { gbn8021xCmConfEntry 7 }
+
+        scheme OBJECT-TYPE
+          SYNTAX Integer32 {
+              radius(0),
+              local(1),
+              radiuslocal(2)
+          }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "scheme of this domain.default is radius(0)'."
+        ::= { gbn8021xCmConfEntry 8 }
+
+
+        gbn8021xEAPType OBJECT-TYPE
+          SYNTAX Integer32 {
+              eap-finish(1),
+              eap-transfer(2)  
+          }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The operation form of EAP.
+        eap-finish :Eap msg be processed in local device 
+        eap-transfer:Eap msg will be transfered to RADIUS Server
+        "
+        ::= { gbn8021xCmMib 2 }
+        
+
+        defaultDomain OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..24))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+          " A simple default domain name."
+        ::= { gbn8021xCmMib 3 }
+
+        gbnLocalUserTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GbnLocalUserEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of local user table"
+        ::= { gbn8021xCmMib 4 }
+
+        gbnLocalUserEntry OBJECT-TYPE
+        SYNTAX GbnLocalUserEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of local user."
+        INDEX { localUserName }
+        ::= { gbnLocalUserTable 1 }
+
+        GbnLocalUserEntry ::= SEQUENCE {
+            localUserName    DisplayString,
+            localUserPassword     DisplayString,
+            localUserVlan     Integer32,
+            localUserStatus   RowStatus
+        }
+
+        localUserName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "name of a local user'."
+        ::= { gbnLocalUserEntry 1 }        
+
+        localUserPassword OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "password of a local user'."
+        ::= { gbnLocalUserEntry 2 }        
+
+        localUserVlan OBJECT-TYPE
+        SYNTAX Integer32 (1..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "vlan attribute of a local user'."
+        ::= { gbnLocalUserEntry 3 }        
+
+        localUserStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "rowstartus of a local user'."
+        ::= { gbnLocalUserEntry 4 }        
+        
+--
+-- END of GBN-8021xCM-MIB                
+--
+
+END
+

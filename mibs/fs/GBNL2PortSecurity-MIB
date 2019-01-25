@@ -1,0 +1,501 @@
+
+    GBNL2PortSecurity-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, IpAddress,
+        NOTIFICATION-TYPE                       FROM SNMPv2-SMI
+
+        DisplayString, MacAddress,
+        RowStatus, TruthValue                   FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnL2                                   FROM ADMIN-MASTER-MIB
+        ;
+        
+    gbnL2Switch                 OBJECT IDENTIFIER ::= { gbnL2 1 }
+
+    gbnL2PortSecurityMib MODULE-IDENTITY
+        LAST-UPDATED    "2013/01/24"  -- Jan 24, 2013
+        ORGANIZATION    "Admin"
+        CONTACT-INFO    "Admin
+                         E-mail: support@admin.com"
+
+        DESCRIPTION     "gbn PortSecurity Enterprise MIB definition."
+
+        REVISION        "2013/01/24"  -- Jan 24, 2013
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL2Switch 8 }
+
+
+------------------------------------------------------------------------------
+--  Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+    --
+    --  "DURABLE":
+    --    Objects that are saved across a system reset and/or power cycle
+    --    are noted as "DURABLE" for convenience in the DESCRIPTION
+    --    section of the object definition.  Code must be explicitly
+    --    written to implement these DURABLE objects.
+    --
+
+------------------------------------------------------------------------------
+--  define groups in gbn-PortSecurity-MIB
+
+portSecurityNotifications OBJECT IDENTIFIER ::= { gbnL2PortSecurityMib 0 }
+
+	portSecurityPortTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF PortSecurityPortEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "table of information of ports."
+	    REFERENCE
+	        "9.6.1"
+	    ::= { gbnL2PortSecurityMib 1 }
+
+	portSecurityPortEntry OBJECT-TYPE
+	    SYNTAX      PortSecurityPortEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "table of information of ports."
+	    INDEX { portSecurityPortNum }
+	    ::= { portSecurityPortTable 1 }
+
+	PortSecurityPortEntry ::=
+	    SEQUENCE {
+	        portSecurityPortNum
+	            Unsigned32,
+	        portSecurityEnable
+	            TruthValue,
+	        portSecurityMaxNum
+	            Integer32,
+	        portSecurityCurrentNum
+	            Integer32,
+	        portSecurityViolationMode
+	            INTEGER,
+	        portSecurityAgingStatic
+	            TruthValue,
+	        portSecurityAgingTime
+	            Integer32,
+	        portSecuritySticky
+	            TruthValue,
+	        portSecurityShutdown
+	            TruthValue,
+            portSecurityRecovery
+                TruthValue,
+            portSecurityRecoveryTime
+                Integer32
+	        }
+
+	portSecurityPortNum OBJECT-TYPE
+	    SYNTAX      Unsigned32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "The Port number associated with this Port."
+	    ::= { portSecurityPortEntry 1 }
+
+
+	portSecurityEnable OBJECT-TYPE
+	    SYNTAX      TruthValue
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "Enable/disable port security of this Port.default is disabled."
+	    ::= { portSecurityPortEntry 2 }
+
+     portSecurityMaxNum OBJECT-TYPE
+        SYNTAX Integer32 (0..4000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Max secure mac address.default is 0."
+	    ::= { portSecurityPortEntry 3 }
+
+     portSecurityCurrentNum OBJECT-TYPE
+        SYNTAX Integer32 (0..4000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Current mac address."
+	    ::= { portSecurityPortEntry 4 }
+	    
+     portSecurityViolationMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  protect(0),    -- drop packets
+                  restrict(1),   -- drop packets, send trap
+                  shutdown(2)    -- drop packets, send trap, shutdown port
+              }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "action when receive illegal packets.default is protect."
+	    ::= { portSecurityPortEntry 5 }
+
+     portSecurityAgingStatic OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "enable static mac aging.default is false."
+	    ::= { portSecurityPortEntry 6 }
+
+     portSecurityAgingTime OBJECT-TYPE
+        SYNTAX Integer32 (1..1440)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "value of aging time.default is 1 minute"
+	    ::= { portSecurityPortEntry 7 }
+
+     portSecuritySticky OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "enable sticky function.default is false."
+	    ::= { portSecurityPortEntry 8 }
+
+     portSecurityShutdown OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "whether port is shutdown by port-security."
+	    ::= { portSecurityPortEntry 9 }
+
+     portSecurityRecovery OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "whether port auto recovery after shutdown."
+	    ::= { portSecurityPortEntry 10 }
+
+     portSecurityRecoveryTime OBJECT-TYPE
+        SYNTAX Integer32 (1..3660)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "value of auto recovery time.default is 5 minute"
+	    ::= { portSecurityPortEntry 11 }
+
+	portSecurityMacRuleTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF PortSecurityMacRuleEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "table of mac rules of ports."
+	    REFERENCE
+	        "9.6.1"
+	    ::= { gbnL2PortSecurityMib 2 }
+
+	portSecurityMacRuleEntry OBJECT-TYPE
+	    SYNTAX      PortSecurityMacRuleEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "table of mac rules of ports."
+	    INDEX { portSecurityMacRulePortNum, portSecurityMacRuleMac }
+	    ::= { portSecurityMacRuleTable 1 }
+
+	PortSecurityMacRuleEntry ::=
+	    SEQUENCE {
+	        portSecurityMacRulePortNum
+	            Unsigned32,
+	        portSecurityMacRuleMac
+	            MacAddress,
+            portSecurityMacRuleAction
+                INTEGER,
+            portSecurityMacRuleVid
+                Integer32,
+            portSecurityMacRuleIpv4
+                IpAddress,
+            portSecurityMacRuleType
+                INTEGER,
+            portsecurityMacRuleRowStatus
+                RowStatus
+	        }
+
+	portSecurityMacRulePortNum OBJECT-TYPE
+	    SYNTAX      Unsigned32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "The Port number associated with this Port."
+	    ::= { portSecurityMacRuleEntry 1 }
+
+	portSecurityMacRuleMac OBJECT-TYPE
+	    SYNTAX      MacAddress
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "mac address."
+	    ::= { portSecurityMacRuleEntry 2 }
+
+	portSecurityMacRuleAction OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  permit(0),
+                  deny(1),
+                  sticky(2)
+              }
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "forward action of mac address."
+	    ::= { portSecurityMacRuleEntry 3 }
+
+	portSecurityMacRuleVid OBJECT-TYPE
+	    SYNTAX      Integer32 (0..4094)
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "vlan id of mac address.0 means no configured."
+	    ::= { portSecurityMacRuleEntry 4 }
+
+	portSecurityMacRuleIpv4 OBJECT-TYPE
+	    SYNTAX      IpAddress
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "vlan if of mac address.0.0.0.0 means no configured."
+	    ::= { portSecurityMacRuleEntry 5 }
+
+	portSecurityMacRuleType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  mac(0),
+                  macvid(1),
+                  macip(2)
+              }
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "type of mac address."
+	    ::= { portSecurityMacRuleEntry 6 }
+
+	portsecurityMacRuleRowStatus OBJECT-TYPE
+        SYNTAX RowStatus 
+        MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "use to create or delete a rule.step:1)portsecurityMacRuleRowStatus with value 5(create and wait);2)other mib needed;
+	        for mac rule just portSecurityMacRuleType and portSecurityMacRuleAction, for mac+vid rule just portSecurityMacRuleType, portSecurityMacRuleAction,
+	        and portSecurityMacRuleVid, for mac+ip rule just portSecurityMacRuleType, portSecurityMacRuleAction, and portSecurityMacRuleIpv4;
+	        3)portsecurityMacRuleRowStatus with value 4(create and go) to create, or portsecurityMacRuleRowStatus with value 6(destroy) to delete"
+	    ::= { portSecurityMacRuleEntry 7 }
+
+	portSecurityIpRuleTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF PortSecurityIpRuleEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "table of ip rules of ports."
+	    REFERENCE
+	        "9.6.1"
+	    ::= { gbnL2PortSecurityMib 3 }
+
+	portSecurityIpRuleEntry OBJECT-TYPE
+	    SYNTAX      PortSecurityIpRuleEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "table of ip rules of ports."
+	    INDEX { portSecurityIpRulePortNum, portSecurityIpRuleIpv4Start, portSecurityIpRuleIpv4End }
+	    ::= { portSecurityIpRuleTable 1 }
+
+	PortSecurityIpRuleEntry ::=
+	    SEQUENCE {
+	        portSecurityIpRulePortNum
+	            Unsigned32,
+	        portSecurityIpRuleIpv4Start
+	            IpAddress,
+            portSecurityIpRuleIpv4End
+                IpAddress,
+            portSecurityIpRuleAction
+                INTEGER,
+            portsecurityIpRuleRowStatus
+                RowStatus
+	        }
+
+	portSecurityIpRulePortNum OBJECT-TYPE
+	    SYNTAX      Unsigned32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "The Port number associated with this Port."
+	    ::= { portSecurityIpRuleEntry 1 }
+
+	portSecurityIpRuleIpv4Start OBJECT-TYPE
+	    SYNTAX      IpAddress
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "start ip address of this rule."
+	    ::= { portSecurityIpRuleEntry 2 }
+
+	portSecurityIpRuleIpv4End OBJECT-TYPE
+	    SYNTAX      IpAddress
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "end ip address of this rule."
+	    ::= { portSecurityIpRuleEntry 3 }
+
+	portSecurityIpRuleAction OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  permit(0),
+                  deny(1)
+              }
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "forward action of ip address."
+	    ::= { portSecurityIpRuleEntry 4 }
+
+	portsecurityIpRuleRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "use to create or delete a rule.step:1)portsecurityIpRuleRowStatus with value 5(create and wait);2)portSecurityIpRuleAction;
+	        3)portsecurityIpRuleRowStatus with value 4(create and go) to create, or portsecurityIpRuleRowStatus with value 6(destroy) to delete"
+	    ::= { portSecurityIpRuleEntry 5 }
+
+	portSecurityActiveMacTable OBJECT-TYPE
+	    SYNTAX      SEQUENCE OF PortSecurityActiveMacEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "table of active mac."
+	    REFERENCE
+	        "9.6.1"
+	    ::= { gbnL2PortSecurityMib 4 }
+
+	portSecurityActiveMacEntry OBJECT-TYPE
+	    SYNTAX      PortSecurityActiveMacEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION
+	        "table of active mac."
+	    INDEX { portSecurityActiveMacDevice, portSecurityActiveMacMacAddr }
+	    ::= { portSecurityActiveMacTable 1 }
+
+	PortSecurityActiveMacEntry ::=
+	    SEQUENCE {
+	        portSecurityActiveMacDevice
+	            Integer32,
+	        portSecurityActiveMacMacAddr
+	            MacAddress,
+	        portSecurityActiveMacPortNum
+	            Unsigned32,	            
+            portSecurityActiveMacAction
+                INTEGER,
+            portSecurityActiveMacVid
+                Integer32,
+            portSecurityActiveMacIpv4
+                IpAddress,
+            portSecurityActiveMacType
+                INTEGER,
+	        }
+
+	portSecurityActiveMacDevice OBJECT-TYPE
+	    SYNTAX      Integer32 (0..7)
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "member unit of the switch."
+	    ::= { portSecurityActiveMacEntry 0 }
+
+	portSecurityActiveMacMacAddr OBJECT-TYPE
+	    SYNTAX      MacAddress
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "mac address."
+	    ::= { portSecurityActiveMacEntry 1 }
+
+	portSecurityActiveMacPortNum OBJECT-TYPE
+	    SYNTAX      Unsigned32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "The Port number associated with this Port."
+	    ::= { portSecurityActiveMacEntry 2 }
+
+	portSecurityActiveMacAction OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  permit(0),
+                  deny(1)
+              }
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "forward action of ip address."
+	    ::= { portSecurityActiveMacEntry 3 }
+
+	portSecurityActiveMacVid OBJECT-TYPE
+	    SYNTAX      Integer32 (1..4094)
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "vlan id of mac address."
+	    ::= { portSecurityActiveMacEntry 4 }
+
+	portSecurityActiveMacIpv4 OBJECT-TYPE
+	    SYNTAX      IpAddress
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "vlan if of mac address.0.0.0.0 means no information."
+	    ::= { portSecurityActiveMacEntry 5 }
+
+	portSecurityActiveMacType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  mac(0),
+                  macvid(1),
+                  macip(2),
+                  ip(3),
+                  learned(4)
+              }
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	        "type of mac address."
+	    ::= { portSecurityActiveMacEntry 6 }
+
+--
+-- Notifications Section
+--
+--
+
+     portSecurityMacDenyNotification NOTIFICATION-TYPE
+         OBJECTS     { portSecurityActiveMacPortNum, portSecurityActiveMacVid, portSecurityActiveMacIpv4, portSecurityActiveMacType }
+         STATUS      current
+         DESCRIPTION
+             " This notification indicates that a mac address matching a deny rule."
+          ::= { portSecurityNotifications 1 }
+
+     portSecurityMaxDenyNotification NOTIFICATION-TYPE
+         OBJECTS     { portSecurityCurrentNum }
+         STATUS      current
+         DESCRIPTION
+             " This notification indicates that current learned mac address number is bigger than max number."
+          ::= { portSecurityNotifications 2 }
+
+     portSecurityShutdownNotification NOTIFICATION-TYPE
+         OBJECTS     { portSecurityShutdown }
+         STATUS      current
+         DESCRIPTION
+             " This notification indicates that port is shutdown by port-security."
+          ::= { portSecurityNotifications 3 }
+
+--
+-- END of gbn-PortSecurity-MIB                
+--
+
+END
+

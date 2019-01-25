@@ -1,0 +1,774 @@
+MSTP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32
+            FROM SNMPv2-SMI
+        TruthValue, RowStatus, DisplayString
+            FROM SNMPv2-TC
+        TimeTicks
+            FROM RFC1155-SMI 
+        BridgeId, Timeout, dot1dBridge
+            FROM BRIDGE-MIB;
+        --gbnL2 FROM ADMIN-MASTER-MIB;
+
+    mstpMib MODULE-IDENTITY
+        LAST-UPDATED "0412050000Z"
+        ORGANIZATION "IETF Bridge MIB Working Group"
+        CONTACT-INFO
+                     "Email: Bridge-mib@ietf.org"
+        DESCRIPTION
+                     " The Bridge MIB Extension module for managing Sdevices
+                       that support the Multiple Spanning Tree Protocol defined
+                       by IEEE 802.1s."
+        REVISION     "0412050000Z"
+        DESCRIPTION
+                     "Draft 1"
+        ::= { dot1dBridge 8 }
+
+    mstpMIBObjects    OBJECT IDENTIFIER ::= { mstpMib 1 }
+    dot1sStp          OBJECT IDENTIFIER ::= { mstpMIBObjects 1 }
+    
+          dot1sStpName OBJECT-TYPE
+              SYNTAX      DisplayString (SIZE (0..32))
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "The configuration name that identifies the MST
+                           region and is used as one of the inputs in the 
+                           computation of the MST Configuration Identifier.
+                           This object does not have any default value."
+              REFERENCE
+                          "IEEE 802.1s clause 13.7"
+              ::= { dot1sStp 1 }
+  
+          dot1sStpRevision OBJECT-TYPE
+              SYNTAX      Integer32 (0..65535)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "This object identifies the MST revision that 
+                           identifies the MST region and is used as one
+                           of the inputs in the computation of the MST 
+                           configuration Identifier. This object does not
+                           have any default value."
+              REFERENCE
+                          "IEEE 802.1s: Section 13.7"
+              ::= { dot1sStp 2 }
+  
+          dot1sStpEnable OBJECT-TYPE
+              SYNTAX      TruthValue
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "This parameter is used for enabling or disabling
+                           MST globally on all the bridging ports."
+              REFERENCE
+                          "IEEE 802.1s"
+              DEFVAL      { 2 }
+              ::= { dot1sStp 3 }
+  
+          dot1sStpBridgeMaxAge OBJECT-TYPE
+              SYNTAX      Timeout (6..40)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "The value that all bridges use for MaxAge when
+                           this bridge is acting as the root. This parameter 
+                           is applicable for all MST Instances including CIST."
+              REFERENCE
+                          "IEEE 802.1s: Section 13.23.4, 13.23.10"
+              DEFVAL      { 20 }
+              ::= { dot1sStp 4 }
+  
+          dot1sStpBridgeHelloTime OBJECT-TYPE
+              SYNTAX      Timeout (1..10)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "The value that all bridges use for HelloTime when
+                           this bridge is acting as the root. This parameter 
+                           is applicable for all MST Instances including CIST."
+              REFERENCE
+                          "IEEE 802.1s: Section 13.23.4, 13.23.10"
+              DEFVAL      { 2 }
+              ::= { dot1sStp 5 }
+  
+          dot1sStpBridgeForwardDelay OBJECT-TYPE
+              SYNTAX      Timeout (4..30)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "The value that all bridges use for ForwardDelay
+                           when this bridge is acting as the root. This parameter 
+                           is applicable for all MST Instances including CIST."
+              REFERENCE
+                          "IEEE 802.1s: Section 13.23.4, 13.23.10"
+              DEFVAL      { 15 }
+              ::= { dot1sStp 6 }
+    
+          dot1sStpBridgeMaxHops OBJECT-TYPE
+              SYNTAX      Unsigned32 (0..255)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                         "The maximum number of hops that the information for a
+                          particular Spanning Tree instance may traverse (via
+                          relay of BPDUs within the applicable MST region) before
+                          being discarded.  This value is used only if this bridge
+                          is the CIST Regional Root and/or the MSTI Regional Root
+                          for one or more Multiple Spanning Tree instances."
+              DEFVAL { 20 }
+              ::= { dot1sStp 7 }
+              
+          dot1sStpTxHoldCount OBJECT-TYPE
+              SYNTAX      Integer32 (1..15)
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The value used by the Port Transmit state machine to
+                           limit the maximum transmission rate of MST BPDUs within
+                           the hello interval."
+              REFERENCE
+                          "IEEE 802.1s: Section 13.22"
+              DEFVAL      { 3 }
+              ::= { dot1sStp 8 }
+              
+          dot1sStpProtocolSpecification OBJECT-TYPE
+              SYNTAX      INTEGER {
+                            unknown(1),
+                            decLb100(2),
+                            ieee8021d(3),
+                            ieee8021w(4),
+                            ieee8021s(5)
+                          }
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "An indication of what version of the Spanning
+                           Tree Protocol is being run.  The value
+                           'decLb100(2)' indicates the DEC LANbridge 100
+                           Spanning Tree protocol.  IEEE 802.1w
+                           implementations will return 'ieee8021w(4)'. IEEE
+                           802.1s implementations will return 'ieee8021s(5). If
+                           future versions of the IEEE Spanning Tree Protocol
+                           are released that are incompatible with the
+                           current version a new value will be defined."
+              REFERENCE
+                          "IEEE 802.1s: Section 13.22"
+              DEFVAL      { 5 }
+              ::= { dot1sStp 9 }
+  
+          dot1sStpInstTable OBJECT-TYPE
+              SYNTAX      SEQUENCE OF Dot1sStpInstEntry 
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                          "A table that contains MST instance-specific
+                           configuration and operational information."
+              ::= { dot1sStp 10 }
+           
+          dot1sStpInstEntry OBJECT-TYPE
+              SYNTAX      Dot1sStpInstEntry
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                          "A list of information maintained by every mst instance
+                           about the STP topology for that instance."
+              INDEX       { dot1sStpInstId }
+              ::= { dot1sStpInstTable 1 }
+  
+          Dot1sStpInstEntry ::=
+              SEQUENCE {
+                  dot1sStpInstId
+                      Integer32, 
+                  dot1sStpPriority                     
+                      Integer32,
+                  dot1sStpInstTimeSinceTopologyChange  
+                      TimeTicks,
+                  dot1sStpInstTopChanges               
+                      Counter32,
+                  dot1sStpInstDesignatedRoot           
+                      BridgeId,
+                  dot1sStpInstRootCost                 
+                      Integer32,
+                  dot1sStpInstRootPort                 
+                      Integer32,
+                  dot1sStpInstMaxAge
+                      Timeout,                   
+                  dot1sStpInstHelloTime                
+                      Timeout,
+                  dot1sStpInstForwardDelay             
+                      Timeout,
+                  dot1sStpInstAdminEnable 
+                      TruthValue,
+                  dot1sStpInstOperEnable 
+                      TruthValue 
+              }
+              
+          dot1sStpInstId OBJECT-TYPE
+              SYNTAX      Integer32 (1..64)
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                          "Identifier of this MST Instance"
+              REFERENCE
+                          "IEEE 802.1s"
+              ::= { dot1sStpInstEntry 1 }
+  
+          dot1sStpPriority OBJECT-TYPE
+              SYNTAX      Integer32 (0..61440)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "The value of the write-able portion of the Bridge
+                           ID, i.e., the first two octets, out of which the 
+                           priority is the most significant 4 bits of the first 
+                           octet of the (8 octet long) Bridge ID.  The other 
+                           (last) 6 octets of the Bridge ID are given by the 
+                           value of dot1dBaseBridgeAddress in the BRIDGE-MIB. 
+                           The value of this object should always be a multiple
+                           of 4096."
+              REFERENCE
+                          "IEEE 802.1s: Section 13.23.2"
+              DEFVAL      { 32768 }
+              ::= { dot1sStpInstEntry 2 }
+              
+          dot1sStpInstTimeSinceTopologyChange OBJECT-TYPE
+              SYNTAX      TimeTicks
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The time (in hundredths of a second) since the
+                           last time a topology change was detected by the
+                           bridge entity running MSTP."
+              REFERENCE
+                          " IEEE 802.1D-1990: Section 6.8.1.1.3"
+              ::= { dot1sStpInstEntry 3 }
+  
+          dot1sStpInstTopChanges OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The total number of topology changes detected by
+                           this bridge entity running MST since the management
+                           entity was last reset or initialized."
+              REFERENCE
+                          " IEEE 802.1D-1990: Section 6.8.1.1.3"
+              ::= { dot1sStpInstEntry 4 }
+  
+          dot1sStpInstDesignatedRoot OBJECT-TYPE
+              SYNTAX      BridgeId
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The bridge identifier of the root of the 
+                           corresponding spanning tree instance as determined
+                           by the Spanning Tree Protocol for that instance.  
+                           This value is used as the CIST Root Identifier or MSTI
+                           regional root identifier parameter in all MST BPDUs 
+                           originated by this node."
+              REFERENCE
+                          "IEEE 802.1s: Section 13.23.6, 13.23.12"
+              ::= { dot1sStpInstEntry 5 }
+  
+          dot1sStpInstRootCost OBJECT-TYPE
+              SYNTAX      Integer32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The cost of the path to the root as seen from
+                           this bridge for this instance."
+              REFERENCE
+                          "IEEE 802.1s: Section 13.23.6, 13.23.12"
+              ::= { dot1sStpInstEntry 6 }
+  
+          dot1sStpInstRootPort OBJECT-TYPE
+              SYNTAX      Integer32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The port number of the port which offers the
+                           lowest cost path from this bridge to the root
+                           bridge for this instance."
+              REFERENCE
+                          "IEEE 802.1s: Section 13.23.6, 13.23.12"
+              ::= { dot1sStpInstEntry 7 }
+  
+          dot1sStpInstMaxAge OBJECT-TYPE
+              SYNTAX      Timeout
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The maximum age of Spanning Tree Protocol
+                           information learned from the network on any port
+                           before it is discarded, in units of hundredths of
+                           a second.  This is the actual value, which is 
+                           advertised by the Root bridge and is currently 
+                           used for this MST Instance."
+              REFERENCE
+                          "IEEE 802.1s: Section 13.23.7, 13.23.13"
+              ::= { dot1sStpInstEntry 8 }
+  
+          dot1sStpInstHelloTime OBJECT-TYPE
+              SYNTAX      Timeout
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The period of time between the transmission of
+                           MST BPDUs by this node on any port when it is the
+                           root of the spanning tree or trying to become so, 
+                           in units of hundredths of a second. This is the actual
+                           value, which is advertised by the Root bridge and is 
+                           currently used for this MST Instance."
+              REFERENCE
+                          "IEEE 802.1s: Section 13.23.7, 13.23.13"
+              ::= { dot1sStpInstEntry 9 }
+  
+          dot1sStpInstForwardDelay OBJECT-TYPE
+              SYNTAX      Timeout
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "This time value, measured in units of hundredths
+                           of a second, controls how fast a port changes its
+                           spanning state when moving towards the Forwarding
+                           state.  The value determines how long the port
+                           stays in each of the Discarding and Learning
+                           states, which precede the Forwarding state.  This
+                           value is also used, when a topology change has
+                           been detected and is underway, to age all dynamic
+                           entries in the Forwarding Database.  [Note that
+                           this value is the one that this bridge is
+                           currently using, in contrast to
+                           dot1sStpBridgeForwardDelay which is the value that
+                           this bridge and all others would start using
+                           if/when this bridge were to become the root.]"
+              REFERENCE
+                          "IEEE 802.1s: Section 13.23.7, 13.23.13"
+              ::= { dot1sStpInstEntry 10 }
+  
+          dot1sStpInstAdminEnable OBJECT-TYPE
+              SYNTAX      TruthValue
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "The administrative enabled/disabled status of the
+                           instance"
+              REFERENCE
+                          "IEEE 802.1s"
+              DEFVAL      { 2 }
+              ::= { dot1sStpInstEntry 11 }
+  
+          dot1sStpInstOperEnable OBJECT-TYPE
+              SYNTAX      TruthValue
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The operational enabled/disabled status of the
+                           instance. An MST Instance may be administratively 
+                           enabled but may not be operationally running, for
+                           example, when no VLAN is mapped to that MST Instance."
+              REFERENCE
+                          "IEEE 802.1s"
+              DEFVAL      { 2 }
+              ::= { dot1sStpInstEntry 12 }
+  
+          dot1sStpPortTable OBJECT-TYPE
+              SYNTAX      SEQUENCE OF Dot1sStpPortEntry
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                  "A table that contains MSTP ports' information."
+              ::= { dot1sStp 11 }
+  
+          dot1sStpPortEntry OBJECT-TYPE
+              SYNTAX  Dot1sStpPortEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                  "A list of information maintained by every MST port
+                   about the Spanning Tree Protocol state for that port."
+              INDEX   { dot1sStpPort }
+              ::= { dot1sStpPortTable 1 }
+  
+          Dot1sStpPortEntry ::=
+              SEQUENCE {
+                  dot1sStpPort
+                      Integer32, 
+                  dot1sStpPortAdminEdgePort
+                      TruthValue,
+                  dot1sStpPortAdminPointToPoint
+                      INTEGER,
+                  dot1sStpPortOperEdgePort
+                      TruthValue,
+                  dot1sStpPortOperPointToPoint
+                      TruthValue,
+                  dot1sStpPortExterPathCost
+                      Integer32,
+                  dot1sStpVersion
+                      INTEGER,
+                  dot1sStpPortSnoopingEnable
+                      TruthValue
+              }
+  
+          dot1sStpPort OBJECT-TYPE
+              SYNTAX  Integer32 (0..65535)
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                  "The port number of the port for which this entry
+                   contains Spanning Tree Protocol management
+                   information."
+               REFERENCE
+                   " IEEE 802.1s: Section 13.24.21"
+               ::= { dot1sStpPortEntry 1 }
+  
+  
+          dot1sStpPortAdminEdgePort OBJECT-TYPE
+              SYNTAX      TruthValue
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                  "The administrative value of the Edge Port parameter.  A
+                   value of TRUE(1) indicates that this port should be
+                   assumed as an edge-port and a value of FALSE(2) indicates
+                   that this port should be assumed as a non-edge-port."
+              REFERENCE
+                  "IEEE 802.1s: Section 12.8.2.1.3"
+           ::= { dot1sStpPortEntry 2 }
+  
+          dot1sStpPortAdminPointToPoint OBJECT-TYPE
+              SYNTAX      INTEGER {
+                              forceTrue(1),
+                              forceFalse(2),
+                              auto(3)
+                          }
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                  "The administrative point-to-point status of the LAN segment
+                   attached to this port.  A value of forceTrue(1) indicates that
+                   this port should always be treated as if it is connected to
+                   a point-to-point link.  A value of forceFalse(2) indicates
+                   that this port should be treated as having a shared media
+                   connection.  A value of auto(3) indicates that this port is
+                   considered to have a point-to-point link if it is an Aggregator
+                   and all of its members are aggregatable, or if the MAC entity
+                   is configured for full duplex operation, either through
+                   auto-negotiation or by management means."
+             REFERENCE
+                 "IEEE 802.1s: Section 13.18"
+             ::= { dot1sStpPortEntry 3 }
+  
+          dot1sStpPortOperEdgePort OBJECT-TYPE
+              SYNTAX      TruthValue
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                  "The operational value of the Edge Port parameter.  A
+                   value of TRUE(1) indicates that this port should be
+                   assumed as an edge-port and a value of FALSE(2) indicates
+                   that this port should be assumed as a non-edge-port."
+              REFERENCE
+                  "IEEE 802.1s: Section 12.8.2.1.3"
+           ::= { dot1sStpPortEntry 4 } 
+                         
+           dot1sStpPortOperPointToPoint OBJECT-TYPE
+               SYNTAX      TruthValue
+               MAX-ACCESS  read-only
+               STATUS      current
+               DESCRIPTION
+                   "The operational point-to-point status of the LAN segment
+                    attached to this port.  It indicates whether a port is
+                    considered to have a point-to-point connection or not.
+                    The value is determined by management or by auto-detection,
+                    as described in the dot1dStpPortAdminPointToPoint object."
+               REFERENCE
+                   "IEEE 802.1s: Section 13.18"
+               ::= { dot1sStpPortEntry 5 }
+               
+           dot1sStpPortExterPathCost OBJECT-TYPE
+              SYNTAX  Integer32 (1..200000000)
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                  "The contribution of this port to the path cost of
+                   paths towards the spanning tree root which include
+                   this port.  802.1D-1990 recommends that the
+                   default value of this parameter be in inverse
+                   proportion to the speed of the attached LAN."
+              REFERENCE
+                  "IEEE 802.1s: Section 13.24.8, 13.24.17"
+              ::= { dot1sStpPortEntry 6 }
+              
+          dot1sStpVersion OBJECT-TYPE
+              SYNTAX      INTEGER {
+                              stpCompatible(0),
+                              rstp-mstp(2)
+                          }
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                  "The version of Spanning Tree Protocol the bridge is
+                   currently running.  The value 'stpCompatible(0)'
+                   indicates the Spanning Tree Protocol specified in
+                   IEEE 802.1D and 'rstp/mstp(2)' indicates the Rapid 
+                   Spanning Tree Protocol specified in IEEE 802.1w and
+                   Multiple Spanning Tree Protocol specified in IEEE
+                   802.1s. New value may be defined as future versions 
+                   of the protocol become available."
+              REFERENCE
+                  "IEEE 802.1s: Section 14.2"
+              DEFVAL      { rstp-mstp }
+              ::= { dot1sStpPortEntry 7 }
+              
+          dot1sStpInstPortTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Dot1sStpInstPortEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                  "A table that contains MST port and instance 
+                   information."
+              ::= { dot1sStp 12 }
+  
+          dot1sStpInstPortEntry OBJECT-TYPE
+              SYNTAX  Dot1sStpInstPortEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                  "A list of information maintained by every MST port 
+                   for each MST instance it belongs to about the Spanning 
+                   Tree Protocol state for that port."
+              INDEX   { dot1sStpInstId, dot1sStpPort }
+              ::= { dot1sStpInstPortTable 1 }
+  
+          Dot1sStpInstPortEntry ::=
+              SEQUENCE {
+                  dot1sStpInstPortPriority
+                      Integer32,
+                  dot1sStpInstPortState
+                      INTEGER,
+                  dot1sStpInstPortPathCost
+                      Integer32,
+                  dot1sStpInstPortDesignatedRoot
+                      BridgeId,
+                  dot1sStpInstPortDesignatedCost
+                      Integer32,
+                  dot1sStpInstPortDesignatedBridge
+                      BridgeId,
+                  dot1sStpInstPortDesignatedPort
+                      OCTET STRING,
+                  dot1sStpInstPortForwardTransitions
+                      Counter32,
+                  dot1sStpInstPortRole
+                      INTEGER
+                                
+              }
+  
+          dot1sStpInstPortPriority OBJECT-TYPE
+              SYNTAX  Integer32 (0..240)
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                  "The value of the priority field which is
+                   contained in the most significant 4 bits 
+                   of the first (in network byte order)
+                   octet of the (2 octet long) Port ID. As it is
+                   contained only in 4 bits, the value has to be 
+                   a multiple of 16. The other octet of the Port 
+                   ID is given by the value of dot1dStpPort."
+          REFERENCE
+                  "IEEE 802.1s: Section 13.24.21"
+              ::= { dot1sStpInstPortEntry 1 }
+  
+          dot1sStpInstPortState OBJECT-TYPE
+              SYNTAX  INTEGER {
+                  disabled(1),
+                  discarding(2),
+                  learning(3),
+                  forwarding(4)
+              }
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                  "The port's current state as defined by
+                   application of the Spanning Tree Protocol.  This
+                   state controls what action a port takes on
+                   reception of a frame. For ports which
+                   are disabled (see dot1dStpPortEnable), this object
+                   will have a value of disabled(1)."
+              REFERENCE
+                  "IEEE 802.1s: Section 13.16"
+              ::= { dot1sStpInstPortEntry 2 }
+  
+          dot1sStpInstPortPathCost OBJECT-TYPE
+              SYNTAX  Integer32 (1..200000000)
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                  "The contribution of this port to the path cost of
+                   paths towards the spanning tree root which include
+                   this port.  802.1D-1990 recommends that the
+                   default value of this parameter be in inverse
+                   proportion to the speed of the attached LAN."
+              REFERENCE
+                  "IEEE 802.1s: Section 13.24.8, 13.24.17"
+              ::= { dot1sStpInstPortEntry 3 }
+  
+          dot1sStpInstPortDesignatedRoot OBJECT-TYPE
+              SYNTAX  BridgeId
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                  "The unique Bridge Identifier of the Bridge
+                   recorded as the Root in the Configuration BPDUs
+                   transmitted by the Designated Bridge for the
+                   segment to which the port is attached."
+               REFERENCE
+                  "IEEE 802.1s: Section 13.24.4, 13.24.11"
+               ::= { dot1sStpInstPortEntry 4 }
+  
+          dot1sStpInstPortDesignatedCost OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                  "The path cost of the Designated Port of the
+                   segment connected to this port.  This value is
+                   compared to the Root Path Cost field in received
+                   bridge PDUs."
+              REFERENCE
+                  "IEEE 802.1s: Section 13.24.4, 13.24.11"
+              ::= { dot1sStpInstPortEntry 5 }
+  
+          dot1sStpInstPortDesignatedBridge OBJECT-TYPE
+              SYNTAX  BridgeId
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                  "The Bridge Identifier of the bridge which this
+                   port considers to be the Designated Bridge for
+                   this port's segment."
+              REFERENCE
+                  "IEEE 802.1s: Section 13.24.4, 13.24.11"
+              ::= { dot1sStpInstPortEntry 6 }
+  
+          dot1sStpInstPortDesignatedPort OBJECT-TYPE
+              SYNTAX  OCTET STRING (SIZE (2))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                  "The Port Identifier of the port on the Designated
+                   Bridge for this port's segment."
+              REFERENCE
+                  "IEEE 802.1s: Section 13.24.4, 13.24.11"
+              ::= { dot1sStpInstPortEntry 7 }
+  
+          dot1sStpInstPortForwardTransitions OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                  "The number of times this port has transitioned
+                   from the Learning state to the Forwarding state."
+              REFERENCE
+                  "IEEE 802.1s"
+              ::= { dot1sStpInstPortEntry 8 }
+  
+          dot1sStpInstPortRole OBJECT-TYPE
+              SYNTAX INTEGER {
+                  master(0),
+                  alternate-backup(1),
+                  root(2),
+                  designated(3)
+              }
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                  "The role of the port. As per IEEE 802.1s, the 
+                   port can have any of the following roles:
+                   Disabled, Root, Designated, Alternate, Backup,
+                   Master"
+              REFERENCE
+                  "IEEE 802.1s: Section 13.24.25"
+              ::= { dot1sStpInstPortEntry 9 }
+          
+          dot1sStpVlanTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Dot1sStpVlanEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                  "A table that contains MSTI-VLAN mapping."
+              ::= { dot1sStp 13 }
+          
+          dot1sStpVlanEntry OBJECT-TYPE
+              SYNTAX  Dot1sStpVlanEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                  "A list of information maintained by every MST instance 
+                   about the VLANs mapped to that instance."
+              INDEX   { dot1sStpVlanIndex }
+              ::= { dot1sStpVlanTable 1 }
+  
+          Dot1sStpVlanEntry ::=
+              SEQUENCE {
+                  dot1sStpVlanIndex
+                      Integer32, 
+                  dot1sStpVlanInstId
+                      Integer32
+              }
+  
+          dot1sStpVlanIndex OBJECT-TYPE
+              SYNTAX      Integer32 (1..4094)
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                  "This is the primary index to the MSTI-VLAN Table. 
+                   It signifies the index to the VLAN range entry in 
+                   the table."
+              REFERENCE
+                  "IEEE 802.1s"
+           ::= { dot1sStpVlanEntry 1 }
+  
+          dot1sStpVlanInstId OBJECT-TYPE
+              SYNTAX      Integer32 (0..15)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                  "The MST Instance value the VLAN mapped to."
+             REFERENCE
+                 "IEEE 802.1s"
+             ::= { dot1sStpVlanEntry 2 }
+     
+          dot1sStpPortSnoopingEnable  OBJECT-TYPE
+              SYNTAX      TruthValue
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                  "This parameter is used for enabling or disabling
+                           digest snooping on  the bridge port."
+                  --使能或关闭摘要侦听特性
+           ::= { dot1sStpPortEntry 8}         
+           
+          dot1sStpTrapTable OBJECT IDENTIFIER ::= { dot1sStp 14 }
+          
+          dot1sStpTrapEntry OBJECT IDENTIFIER ::= { dot1sStpTrapTable 1 }
+  
+          dot1sStpInstNewRoot NOTIFICATION-TYPE
+              OBJECTS { dot1sStpInstDesignatedRoot }
+              STATUS  current
+              DESCRIPTION
+                  "Root bridge changed for the mstp."
+       	     ::= { dot1sStpTrapEntry 1 }
+       	     
+       	  dot1sStpInstPortForwarding NOTIFICATION-TYPE
+              OBJECTS { dot1sStpPort }
+              STATUS  current
+              DESCRIPTION
+                  "Port status is turned from blocking to forwarding."
+       	     ::= { dot1sStpTrapEntry 2 }
+         
+                          
+  END
