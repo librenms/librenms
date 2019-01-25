@@ -468,7 +468,7 @@ function http_fallback(link) {
     return false;
 }
 
-function init_select2(selector, type, data, selected) {
+function init_select2(selector, type, data, selected, placeholder) {
     var $select = $(selector);
 
     // allow function to be assigned to pass data
@@ -485,6 +485,7 @@ function init_select2(selector, type, data, selected) {
         theme: "bootstrap",
         dropdownAutoWidth : true,
         width: "auto",
+        placeholder: placeholder,
         allowClear: true,
         ajax: {
             url: 'ajax/select/' + type,
@@ -494,8 +495,13 @@ function init_select2(selector, type, data, selected) {
     });
 
     if (selected) {
-        $select.val(selected);
-        $select.trigger('change');
+        console.log(selected);
+        if (typeof selected !== 'object') {
+            selected = {id: selected, text: selected};
+        }
+
+        var newOption = new Option(selected.text, selected.id, true, true);
+        $select.append(newOption).trigger('change');
     }
 }
 
