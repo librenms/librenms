@@ -13,8 +13,6 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $pagetitle[] = "Devices";
 
 if (!isset($vars['format'])) {
@@ -92,6 +90,9 @@ if (isset($vars['bare']) && $vars['bare'] == "yes") {
 }
 
 list($format, $subformat) = explode("_", $vars['format'], 2);
+$detailed = $subformat == 'detail';
+$no_refresh = $format == "list";
+
 
 if ($format == "graph") {
     if (empty($vars['from'])) {
@@ -245,169 +246,59 @@ if ($format == "graph") {
     }
     echo '</div>';
 } else {
-    if (LegacyAuth::user()->hasGlobalRead()) {
-        $os = "SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`";
-        $ver = "SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`";
-        $platform = "SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`";
-        $features = "SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`";
-        $types = "SELECT `type` FROM `devices` AS D WHERE 1 GROUP BY `type` ORDER BY `type`";
-    } else {
-        $os = "SELECT `os` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `os` ORDER BY `os`";
-        $ver = "SELECT `version` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `version` ORDER BY `version`";
-        $platform = "SELECT `hardware` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `hardware` ORDER BY `hardware`";
-        $features = "SELECT `features` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `features` ORDER BY `features`";
-        $types = "SELECT `type` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` GROUP BY `type` ORDER BY `type`";
-        $param[] = LegacyAuth::id();
+    $state = isset($vars['state']) ? $vars['state'] : '';
+    $state_selection = "<select name='state' id='state' class='form-control'><option value=''>All</option>" .
+        "<option value='up'" . ($state == 'up' ? ' selected' : '') . ">Up</option>" .
+        "<option value='down'" . ($state == 'down' ? ' selected' : '') . ">Down</option><select>";
+
+    $features_selected = isset($vars['features']) ? json_encode(['id' => $vars['features'], 'text' => $vars['features']]) : '""';
+    $hardware_selected = isset($vars['hardware']) ? json_encode(['id' => $vars['hardware'], 'text' => $vars['hardware']]) : '""';
+    $os_selected = isset($vars['os']) ? json_encode(['id' => $vars['os'], 'text' => $vars['hardware']]) : '""';
+    $type_selected = isset($vars['type']) ? json_encode(['id' => $vars['type'], 'text' => ucfirst($vars['type'])]) : '""';
+    $version_selected = isset($vars['version']) ? json_encode(['id' => $vars['version'], 'text' => $vars['version']]) : '""';
+
+    $os_selected = '""';
+    if (isset($vars['os'])) {
+        $device = ['os' => $vars['os']];
+        load_os($device);
+        $os_selected = json_encode(['id' => $vars['os'], 'text' => \LibreNMS\Config::getOsSetting($vars['os'], 'text', $vars['os'])]);
     }
 
-
-    $os_options = "<select name='os' id='os' class='form-control input-sm'>";
-    $os_options .= "<option value=''>All OSes</option>";
-    foreach (dbFetch($os, $param) as $data) {
-        if ($data['os']) {
-            $tmp_os = clean_bootgrid($data['os']);
-            if ($tmp_os == $vars['os']) {
-                $os_selected = 'selected';
-            } else {
-                $os_selected = '';
-            }
-            $os_options .= "<option value='" . $tmp_os . "' " . $os_selected . ">" . $config['os'][$tmp_os]['text'] . "</option>";
+    $location_selected = '""';
+    if (isset($vars['location'])) {
+        $location_text = $vars['location'];
+        if (is_numeric($vars['location'])) {
+            $location_text = \App\Models\Location::where('id', $vars['location'])->value('location') ?: $vars['location'];
         }
+        $location_selected = json_encode(['id' => $vars['location'], 'text' => $location_text]);
     }
-    $os_options .= "<select>";
 
-    $ver_options = "<select name='version' id='version' class='form-control input-sm'>";
-    $ver_options .= "<option value=''>All Versions</option>";
-    foreach (dbFetch($ver, $param) as $data) {
-        if ($data['version']) {
-            $tmp_version = clean_bootgrid($data['version']);
-            if ($tmp_version == $vars['version']) {
-                $ver_selected = 'selected';
-            } else {
-                $ver_selected = '';
-            }
-            $ui_version = strlen($tmp_version) > 15 ? substr($tmp_version, 0, 15) . "..." : $tmp_version;
-            $ver_options .= "<option value='" . $tmp_version . "' " . $ver_selected . ">" . $ui_version . "</option>";
-        }
-    }
-    $ver_options .= "</select>";
-
-    $platform_options = "<select name='hardware' id='hardware' class='form-control input-sm'>";
-    $platform_options .= "<option value=''>All Platforms</option>";
-    foreach (dbFetch($platform, $param) as $data) {
-        if ($data['hardware']) {
-            $tmp_hardware = clean_bootgrid($data['hardware']);
-            if ($tmp_hardware == $vars['hardware']) {
-                $platform_selected = 'selected';
-            } else {
-                $platform_selected = '';
-            }
-            $platform_options .= "<option value='" . $tmp_hardware . "' " . $platform_selected . ">" . $tmp_hardware . "</option>";
-        }
-    }
-    $platform_options .= "</select>";
-
-
-    $features_options = "<select name='features' id='features' class='form-control input-sm'>";
-    $features_options .= "<option value=''>All Featuresets</option>";
-    foreach (dbFetch($features, $param) as $data) {
-        if ($data['features']) {
-            $tmp_features = clean_bootgrid($data['features']);
-            if ($tmp_features == $vars['features']) {
-                $feature_selected = 'selected';
-            } else {
-                $feature_selected = '';
-            }
-            $features_options .= "<option value='" . $tmp_features . "' " . $feature_selected . ">" . $tmp_features . "</option>";
-        }
-    }
-    $features_options .= "</select>";
-
-    $locations_options = "<select name='location' id='location' class='form-control input-sm'>";
-    $locations_options .= "<option value=''>All Locations</option>";
-    foreach (getlocations() as $location_row) {
-        $location = clean_bootgrid($location_row['location']);
-        $location_id = $location_row['id'];
-        if (isset($vars['location']) && ($location_id == $vars['location'] || $location == $vars['location'])) {
-            $location_selected = 'selected';
-        } else {
-            $location_selected = '';
-        }
-
-        $ui_location = strlen($location) > 15 ? substr($location, 0, 15) . "..." : $location;
-        $locations_options .= "<option value='" . $location_id . "' " . $location_selected . ">" . $ui_location . "</option>";
-    }
-    $locations_options .= "</select>";
-
-    $types_options = "<select name='type' id='type' class='form-control input-sm'>";
-    $types_options .= "<option value=''>All Device Types</option>";
-    foreach (dbFetch($types, $param) as $data) {
-        if ($data['type']) {
-            if ($data['type'] == $vars['type']) {
-                $type_selected = 'selected';
-            } else {
-                $type_selected = '';
-            }
-            $types_options .= "<option value='" . $data['type'] . "' " . $type_selected . ">" . ucfirst($data['type']) . "</option>";
-        }
-    }
-    $types_options .= "</select>";
-
-    echo '
+    ?>
     <div class="panel panel-default panel-condensed">
     <div class="panel-heading">
         <div class="row" style="padding: 0px 10px 0px 10px;">
-            <div class="pull-left">
-            ' . $listoptions . '
-            </div>
-            <div class="pull-right">
-            ' . $headeroptions . '
-            </div>
+            <div class="pull-left"><?php echo $listoptions; ?></div>
+            <div class="pull-right"><?php echo $headeroptions; ?></div>
         </div>
     </div>
     <div class="table-responsive">
         <table id="devices" class="table table-hover table-condensed table-striped">  
             <thead>
                 <tr>
-    ';
-
-    if ($subformat == "detail") {
-        echo '<th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>';
-        echo '<th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon">Vendor</th>';
-    }
-
-    if ($subformat != "detail") {
-        echo '<th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>';
-        echo '<th data-column-id="hostname" data-order="asc" data-formatter="device">Device</th>';
-    } else {
-        echo '<th data-column-id="hostname" data-order="asc">Device</th>';
-    }
-
-    if ($subformat == "detail") {
-        echo '<th data-column-id="ports" data-width="100px" data-sortable="false" data-searchable="false">Metrics</th>';
-    }
-
-    echo '
+                    <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>
+                    <th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Vendor</th>
+                    <th data-column-id="hostname" data-order="asc" <?php echo $detailed ? 'data-formatter="device"' : ''; ?>>Device</th>
+                    <th data-column-id="metrics" data-width="<?php echo $detailed ? '100px' : '150px'; ?>" data-sortable="false" data-searchable="false" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Metrics</th>
                     <th data-column-id="hardware">Platform</th>
                     <th data-column-id="os">Operating System</th>
                     <th data-column-id="uptime">Uptime</th>
-    ';
-
-    if ($subformat == "detail") {
-        echo '<th data-column-id="location">Location</th>';
-    }
-
-    echo '
-                    <th data-column-id="actions" data-width="90px" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions">Actions</th>
+                    <th data-column-id="location" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Location</th>
+                    <th data-column-id="actions" data-width="<?php echo $detailed ? '90px' : '200px'; ?>" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions">Actions</th>
                 </tr>
             </thead>
         </table>
     </div>
     </div>
-    ';
-
-    ?>
-
     <script>
         var grid = $("#devices").bootgrid({
             ajax: true,
@@ -415,7 +306,7 @@ if ($format == "graph") {
             columnSelection: true,
             formatters: {
                 "status": function (column, row) {
-                    return "<span class=\"alert-status " + row.extra + "\"></span>";
+                    return "<span class=\"<?php echo $detailed ? 'alert-status' : 'alert-status-small' ?> " + row.extra + "\"></span>";
                 },
                 "icon": function (column, row) {
                     return "<span class=\"device-table-icon\">" + row.icon + "</span>";
@@ -430,9 +321,8 @@ if ($format == "graph") {
             },
             post: function () {
                 return {
-                    id: "devices",
                     format: ' <?php echo mres($vars['format']); ?>',
-                    searchquery: '<?php echo htmlspecialchars($vars['searchquery']); ?>',
+                    searchPhrase: '<?php echo htmlspecialchars($vars['searchquery']); ?>',
                     os: '<?php echo mres($vars['os']); ?>',
                     version: '<?php echo mres($vars['version']); ?>',
                     hardware: '<?php echo mres($vars['hardware']); ?>',
@@ -445,7 +335,7 @@ if ($format == "graph") {
                     group: '<?php echo mres($vars['group']); ?>',
                 };
             },
-            url: "ajax_table.php"
+            url: "ajax/table/device"
         });
 
         <?php
@@ -455,23 +345,31 @@ if ($format == "graph") {
             "<div class='pull-left'>" +
             "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
             "<div class='form-group'>" +
-            "<input type='text' name='searchquery' id='searchquery' value=''<?php echo $vars['searchquery']; ?>'' class='form-control input-sm' placeholder='Search'>" +
+            "<input type='text' name='searchquery' id='searchquery' value=''<?php echo $vars['searchquery']; ?>'' class='form-control' placeholder='Search'>" +
             "</div>" +
-            "<div class='form-group'><?php echo $os_options; ?></div>" +
-            "<div class='form-group'><?php echo $ver_options; ?></div>" +
-            "<div class='form-group'><?php echo $platform_options; ?></div>" +
-            "<div class='form-group'><?php echo $features_options; ?></div>" +
-            "<div class='form-group'><?php echo $locations_options; ?></div>" +
-            "<div class='form-group'><?php echo $types_options; ?></div>" +
-            "<input type='submit' class='btn btn-default input-sm devices-input-small' value='Search'>" +
-            "<a href='<?php echo generate_url($vars) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-default input-sm devices-input-small'>Update URL</a>" +
-            "<a href='<?php echo generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare'])) ?>' title='Reset criteria to default.' class='btn btn-default input-sm devices-input-small'>Reset</a>" +
+            "<div class='form-group'><?php echo $state_selection ?></div>" +
+            "<div class='form-group'><select name='os' id='os' class='form-control'></select></div>" +
+            "<div class='form-group'><select name='version' id='version' class='form-control'></select></div>" +
+            "<div class='form-group'><select name='hardware' id='hardware' class='form-control'></select></div>" +
+            "<div class='form-group'><select name='features' id='features' class='form-control'></select></div>" +
+            "<div class='form-group'><select name='location' id='location' class='form-control'></select></div>" +
+            "<div class='form-group'><select name='type' id='device-type' class='form-control'></select></div>" +
+            "<input type='submit' class='btn btn-default' value='Search'>" +
+            "<a href='<?php echo generate_url($vars) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-default'>Update URL</a>" +
+            "<a href='<?php echo generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare'])) ?>' title='Reset criteria to default.' class='btn btn-default'>Reset</a>" +
             "</form>" +
             "</div>"
         );
         <?php
         }
         ?>
+
+        init_select2("#features", "device-field", {field: 'features'}, <?php echo $features_selected ?>, 'All Featuresets');
+        init_select2("#hardware", "device-field", {field: 'hardware'}, <?php echo $hardware_selected ?>, 'All Platforms');
+        init_select2("#os", "device-field", {field: 'os'}, <?php echo $os_selected ?>, 'All OS');
+        init_select2("#device-type", "device-field", {field: 'type'}, <?php echo $type_selected ?>, 'All Device Types');
+        init_select2("#version", "device-field", {field: 'version'}, <?php echo $version_selected ?>, 'All Versions');
+        init_select2("#location", "location", {}, <?php echo $location_selected ?>, 'All Locations');
     </script>
     <?php
 }

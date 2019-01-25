@@ -129,6 +129,7 @@ abstract class PaginatedAjaxController extends Controller
     {
         foreach ($fields as $target => $field) {
             if ($value = $request->get($field)) {
+                $value = $this->adjustFilterValue($field, $value);
                 if (is_string($target)) {
                     $query->where($target, $value);
                 } else {
@@ -169,5 +170,18 @@ abstract class PaginatedAjaxController extends Controller
         $full_rules = array_replace($this->baseRules(), $rules);
 
         parent::validate($request, $full_rules, $messages, $customAttributes);
+    }
+
+    /**
+     * Sometimes filter values need to be modified to work
+     * For example if the filter value is a string, when it needs to be an id
+     *
+     * @param string $field The field being filtered
+     * @param mixed $value The current value
+     * @return mixed
+     */
+    protected function adjustFilterValue($field, $value)
+    {
+        return $value;
     }
 }
