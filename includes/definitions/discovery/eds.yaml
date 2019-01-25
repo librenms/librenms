@@ -52,3 +52,4 @@ modules:
                         - { descr: owDS28EA00, graph: 0, value: 24, generic: 0 }
                         - { descr: owEDS0050, graph: 0, value: 25, generic: 0 }
                         - { descr: chassis, graph: 0, value: 30, generic: 0 }
+

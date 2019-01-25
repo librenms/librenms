@@ -3,7 +3,6 @@ text: 'EDS'
 type: appliance
 icon: eds
 group: eds
-over:
 mib_dir:
     - eds
 poller_modules:
