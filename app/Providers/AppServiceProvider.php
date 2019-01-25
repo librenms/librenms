@@ -6,9 +6,13 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rule;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\DatabaseConnectException;
+use LibreNMS\Util\IP;
+use LibreNMS\Util\Validate;
 use Request;
+use Validator;
 
 include_once __DIR__ . '/../../includes/dbFacile.php';
 
@@ -48,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
             return "<?php endif; ?>";
         });
 
+        $this->bootCustomValidators();
         $this->configureMorphAliases();
 
         // Development service providers
@@ -107,5 +112,13 @@ class AppServiceProvider extends ServiceProvider
                     return $app->make(\App\ApiClients\GoogleMapsApi::class);
             }
         });
+    }
+
+    private function bootCustomValidators()
+    {
+        Validator::extend('ip_or_hostname', function ($attribute, $value, $parameters, $validator) {
+            $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too
+            return IP::isValid($ip) || Validate::hostname($value);
+        }, __('The :attribute must a valid IP address/network or hostname.'));
     }
 }
