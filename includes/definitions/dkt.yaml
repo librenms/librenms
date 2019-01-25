@@ -5,9 +5,7 @@ type: network
 icon: dkt
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_processor, text: 'Processor Usage' }
-    - { graph: device_mempool, text: 'Memory Usage' }
 mib_dir:
-    - huawei
+    - dkt
 discovery:
-    - sysObjectID: .1.3.6.1.4.1.2730
+    - sysObjectID: .1.3.6.1.4.1.27304
