@@ -58,12 +58,14 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::get('application', 'ApplicationController');
             Route::get('bill', 'BillController');
             Route::get('device', 'DeviceController');
+            Route::get('device-field', 'DeviceFieldController');
             Route::get('device-group', 'DeviceGroupController');
             Route::get('eventlog', 'EventlogController');
             Route::get('graph', 'GraphController');
             Route::get('graph-aggregate', 'GraphAggregateController');
             Route::get('graylog-streams', 'GraylogStreamsController');
             Route::get('syslog', 'SyslogController');
+            Route::get('location', 'LocationController');
             Route::get('munin', 'MuninPluginController');
             Route::get('port', 'PortController');
             Route::get('port-field', 'PortFieldController');
@@ -72,6 +74,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         // jquery bootgrid data controllers
         Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
             Route::post('customers', 'CustomersController');
+            Route::post('device', 'DeviceController');
             Route::post('eventlog', 'EventlogController');
             Route::post('fdb-tables', 'FdbTablesController');
             Route::post('graylog', 'GraylogController');
