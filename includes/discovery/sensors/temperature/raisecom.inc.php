@@ -22,3 +22,12 @@ foreach ($pre_cache['raisecomOpticalTransceiverDDMTable'] as $index => $data) {
         }
     }
 }
+$descr = 'System Temperature';
+$oid  = ".1.3.6.1.4.1.8886.1.1.4.2.1.0"; // raisecomTemperatureValue
+$value = snmp_get($device, $oid, ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');
+$low_limit = snmp_get($device, 'raisecomTemperatureThresholdLow.0', ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');
+$high_limit = snmp_get($device, 'raisecomTemperatureThresholdHigh.0', ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');
+
+if (is_numeric($value)) {
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, 0, 'raisecomTemperatureValue', $descr, '1', '1', $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
+}
