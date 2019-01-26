@@ -8,5 +8,5 @@ if ($device['os'] === 'raisecom') {
     
     if (is_numeric($total) && is_numeric($avail)) {
         discover_mempool($valid_mempool, $device, 0, 'raisecom', 'Memory');
-    }   
+    }
 }
