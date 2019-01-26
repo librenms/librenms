@@ -1,0 +1,34 @@
+#  DO NOT CHANGE THIS FILE
+#  If you need to change this file, you are doing something wrong.
+
+Options +FollowSymlinks +Multiviews
+
+AddType image/svg+xml .svg
+<IfModule mod_filter.c>
+  <IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/xsd
+    AddOutputFilterByType DEFLATE text/xsl
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE image/x-icon
+  </IfModule>
+</IfModule>
+
+RewriteEngine on
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !\.(js|ico|txt|gif|jpg|png|css|php)
+RewriteRule ^api/v0(.*)$ api_v0.php/$1 [L]
+RewriteCond %{REQUEST_URI} !=/server-status
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !\.(js|ico|txt|gif|jpg|png|css|php)
+RewriteRule ^(.*)$ index.php
+
+AcceptPathInfo On
