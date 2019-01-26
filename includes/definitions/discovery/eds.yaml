@@ -1,6 +1,10 @@
 mib: EDS-MIB
 modules:
     sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - owDeviceName
         count:
             data:
                 -
@@ -9,6 +13,19 @@ modules:
                     num_oid: '.1.3.6.1.4.1.31440.10.2.1.{{ $index }}'
                     descr: '1wire devices'
                     index: 'NumActive'
+        temperature:
+            data:
+                -
+                    oid: owDS18B20Entry
+                    value: owDS18B20Temperature
+                    num_oid: '.1.3.6.1.4.1.31440.10.5.1.1.{{ $index }}'
+                    descr: '#{{ $index }}: {{ $owDeviceName }}'
+                    index: 'owDS18B20Temperature{{ $index }}'
+                    skip_values:
+                        -
+                            oid: owDS18B20Resolution
+                            op: '='
+                            value: 0
         state:
             data:
                 -
