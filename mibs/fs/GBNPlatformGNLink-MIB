@@ -70,8 +70,8 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
         ggmpStatus OBJECT-TYPE
         SYNTAX INTEGER {
              enable(1),
-             disable_packet_discard(2),
-             disable_packet_forward_no_location(4)
+             disablepacketdiscard(2),
+             disablepacketforwardnolocation(4)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -180,10 +180,10 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
         ggmplanStatus OBJECT-TYPE
         SYNTAX Integer32
         {
-            ls_Error(0),
-            ls_Normal(1),
-            ls_Register(2),
-            ls_Null(255)
+            lsError(0),
+            lsNormal(1),
+            lsRegister(2),
+            lsNull(255)
         }
         MAX-ACCESS read-only
         STATUS current
@@ -347,23 +347,23 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
         STATUS current
         DESCRIPTION
             "A list of Lanswitch port property parameters."
-        INDEX { ggmpport_mac, ggmpport_portnumber }
+        INDEX { ggmpportmac, ggmpportportnumber }
         ::= { gbnGgmpPortPropertyTable 1 }
 
         GbnGgmpPortPropertyEntry ::= SEQUENCE {
-            ggmpport_mac              MacAddress,
-            ggmpport_portnumber       Integer32,
-            ggmpport_portclosed       Integer32,
-            ggmpport_portlink         Integer32,
-            ggmpport_portvlanid       Integer32,
-            ggmpport_porttagged       Integer32,
-            ggmpport_portduplex       Integer32,
-            ggmpport_portactualduplex Integer32,
-            ggmpport_portlockmac      Integer32,
-            ggmpport_portgrnstp       Integer32
+            ggmpportmac              MacAddress,
+            ggmpportportnumber       Integer32,
+            ggmpportportclosed       Integer32,
+            ggmpportportlink         Integer32,
+            ggmpportportvlanid       Integer32,
+            ggmpportporttagged       Integer32,
+            ggmpportportduplex       Integer32,
+            ggmpportportactualduplex Integer32,
+            ggmpportportlockmac      Integer32,
+            ggmpportportgrnstp       Integer32
         }
 
-        ggmpport_mac OBJECT-TYPE
+        ggmpportmac OBJECT-TYPE
         SYNTAX MacAddress
         MAX-ACCESS read-only
         STATUS current
@@ -371,7 +371,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
             " mac address of the regist lanswtich ."
         ::= { gbnGgmpPortPropertyEntry 1 }
 
-        ggmpport_portnumber OBJECT-TYPE
+        ggmpportportnumber OBJECT-TYPE
         SYNTAX Integer32
         MAX-ACCESS read-only
         STATUS current
@@ -379,7 +379,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
             " port number of lanswitch "
         ::= { gbnGgmpPortPropertyEntry 2 }
 
-        ggmpport_portclosed OBJECT-TYPE
+        ggmpportportclosed OBJECT-TYPE
         SYNTAX Integer32
         {
             interfaceEnable(1),
@@ -391,7 +391,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
             " port state of closed or open ."
         ::= { gbnGgmpPortPropertyEntry 3 }
 
-        ggmpport_portlink OBJECT-TYPE
+        ggmpportportlink OBJECT-TYPE
         SYNTAX Integer32
         {
             portlinkup(1),
@@ -403,7 +403,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
              " the port link status  "
         ::= { gbnGgmpPortPropertyEntry 4 }
 
-        ggmpport_portvlanid OBJECT-TYPE
+        ggmpportportvlanid OBJECT-TYPE
         SYNTAX Integer32
         MAX-ACCESS read-write
         STATUS current
@@ -411,11 +411,11 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
              " The ports default vlan id "
         ::= { gbnGgmpPortPropertyEntry 5 }
 
-        ggmpport_porttagged OBJECT-TYPE
+        ggmpportporttagged OBJECT-TYPE
         SYNTAX Integer32
         {
-            port_trunk(1),
-            port_access(2)
+            porttrunk(1),
+            portaccess(2)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -423,16 +423,16 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
              " The ports tagged or untagged status "
         ::= { gbnGgmpPortPropertyEntry 6 }
 
-        ggmpport_portduplex OBJECT-TYPE
+        ggmpportportduplex OBJECT-TYPE
         SYNTAX Integer32
         {
             auto(1),
-            half_10(2),
-            full_10(3),
-            half_100(4),
-            full_100(5),
-            half_1000(6),
-            full_1000(7)
+            half10(2),
+            full10(3),
+            half100(4),
+            full100(5),
+            half1000(6),
+            full1000(7)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -440,16 +440,16 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
              " The ports duplex "
         ::= { gbnGgmpPortPropertyEntry 7 }
 
-        ggmpport_portactualduplex OBJECT-TYPE
+        ggmpportportactualduplex OBJECT-TYPE
         SYNTAX Integer32
         {
             unknown(1),
-            half_10(2),
-            full_10(3),
-            half_100(4),
-            full_100(5),
-            half_1000(6),
-            full_1000(7)
+            half10(2),
+            full10(3),
+            half100(4),
+            full100(5),
+            half1000(6),
+            full1000(7)
         }
         MAX-ACCESS read-only
         STATUS current
@@ -457,7 +457,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
              " The ports actual duplex "
         ::= { gbnGgmpPortPropertyEntry 8 }
 
-        ggmpport_portlockmac OBJECT-TYPE
+        ggmpportportlockmac OBJECT-TYPE
         SYNTAX Integer32
         MAX-ACCESS read-write
         STATUS current
@@ -465,14 +465,14 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
              " The ports locked mac-address number "
         ::= { gbnGgmpPortPropertyEntry 9 }
 
-        ggmpport_portgrnstp OBJECT-TYPE
+        ggmpportportgrnstp OBJECT-TYPE
         SYNTAX Integer32
         {
-            stp_disable(0),
-            stp_blocking(1),
-            stp_learning(2),
-            stp_forwarding(3),
-            stp_unknown(4)
+            stpdisable(0),
+            stpblocking(1),
+            stplearning(2),
+            stpforwarding(3),
+            stpunknown(4)
         }
         MAX-ACCESS read-only
         STATUS current
@@ -480,9 +480,6 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
              " The ports grn stp status "
         ::= { gbnGgmpPortPropertyEntry 10 }
 
-        ----------------------------------------------------------------------------------
-        --LANSWITCH VLAN 属性数据MIB表--
-        ----------------------------------------------------------------------------------
         gbnGgmpVlanPropertyTable OBJECT-TYPE
         SYNTAX SEQUENCE OF GbnGgmpVlanPropertyEntry
         MAX-ACCESS not-accessible
@@ -497,24 +494,24 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
         STATUS current
         DESCRIPTION
             "A list of Lanswitch Vlan property parameters."
-        INDEX { ggmpvlan_mac, ggmpvlan_vlanid }
+        INDEX { ggmpvlanmac, ggmpvlanvlanid }
         ::= { gbnGgmpVlanPropertyTable 1 }
 
         GbnGgmpVlanPropertyEntry ::= SEQUENCE {
-            ggmpvlan_mac                MacAddress,
-            ggmpvlan_vlanid             Integer32,
-            ggmpvlan_name               DisplayString (SIZE(1..32)),
-            ggmpvlan_static             Integer32,
-            ggmpvlan_membermap          PortList,
-            ggmpvlan_untaggedmap        PortList,
-            ggmpvlan_addportmap         PortList,
-            ggmpvlan_delportmap         PortList,
-            ggmpvlan_rowstatus          RowStatus,
-            ggmpvlan_addtag_portmap     PortList,
-            ggmpvlan_adduntag_portmap   PortList
+            ggmpvlanmac                MacAddress,
+            ggmpvlanvlanid             Integer32,
+            ggmpvlanname               DisplayString (SIZE(1..32)),
+            ggmpvlanstatic             Integer32,
+            ggmpvlanmembermap          PortList,
+            ggmpvlanuntaggedmap        PortList,
+            ggmpvlanaddportmap         PortList,
+            ggmpvlandelportmap         PortList,
+            ggmpvlanrowstatus          RowStatus,
+            ggmpvlanaddtagportmap     PortList,
+            ggmpvlanadduntagportmap   PortList
         }
 
-        ggmpvlan_mac OBJECT-TYPE
+        ggmpvlanmac OBJECT-TYPE
         SYNTAX MacAddress
         MAX-ACCESS read-only
         STATUS current
@@ -522,7 +519,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
             " mac address of the regist lanswtich ."
         ::= { gbnGgmpVlanPropertyEntry 1 }
 
-        ggmpvlan_vlanid OBJECT-TYPE
+        ggmpvlanvlanid OBJECT-TYPE
         SYNTAX Integer32
         MAX-ACCESS read-only
         STATUS current
@@ -530,7 +527,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
             " the id of vlan "
         ::= { gbnGgmpVlanPropertyEntry 2 }
 
-        ggmpvlan_name OBJECT-TYPE
+        ggmpvlanname OBJECT-TYPE
         SYNTAX DisplayString (SIZE(1..32))
         MAX-ACCESS read-only
         STATUS current
@@ -539,7 +536,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
               to identify the VLAN., but TiNet s2008 should not config vlan name"
         ::= { gbnGgmpVlanPropertyEntry 3 }
 
-        ggmpvlan_static OBJECT-TYPE
+        ggmpvlanstatic OBJECT-TYPE
         SYNTAX Integer32
         {
            other(1),
@@ -565,7 +562,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
                 removed when the last port leaves the VLAN. "
         ::= { gbnGgmpVlanPropertyEntry 4 }
 
-        ggmpvlan_membermap OBJECT-TYPE
+        ggmpvlanmembermap OBJECT-TYPE
         SYNTAX PortList
         MAX-ACCESS read-only
         STATUS current
@@ -574,7 +571,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
           this VLAN as either tagged or untagged frames. "
         ::= { gbnGgmpVlanPropertyEntry 5 }
 
-        ggmpvlan_untaggedmap OBJECT-TYPE
+        ggmpvlanuntaggedmap OBJECT-TYPE
         SYNTAX PortList
         MAX-ACCESS read-only
         STATUS current
@@ -583,7 +580,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
                this VLAN as untagged frames."
         ::= { gbnGgmpVlanPropertyEntry 6 }
 
-        ggmpvlan_addportmap OBJECT-TYPE
+        ggmpvlanaddportmap OBJECT-TYPE
         SYNTAX PortList
         MAX-ACCESS read-write
         STATUS current
@@ -592,7 +589,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
                this VLAN as adding ports."
         ::= { gbnGgmpVlanPropertyEntry 7 }
 
-        ggmpvlan_delportmap OBJECT-TYPE
+        ggmpvlandelportmap OBJECT-TYPE
         SYNTAX PortList
         MAX-ACCESS read-write
         STATUS current
@@ -601,7 +598,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
                this VLAN as adding ports."
         ::= { gbnGgmpVlanPropertyEntry 8 }
 
-        ggmpvlan_rowstatus OBJECT-TYPE
+        ggmpvlanrowstatus OBJECT-TYPE
         SYNTAX RowStatus
         MAX-ACCESS read-write
         STATUS current
@@ -609,7 +606,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
              " This object indicates the status of this entry."
         ::= { gbnGgmpVlanPropertyEntry 9 }
 
-        ggmpvlan_addtag_portmap OBJECT-TYPE
+        ggmpvlanaddtagportmap OBJECT-TYPE
         SYNTAX PortList
         MAX-ACCESS read-write
         STATUS current
@@ -617,7 +614,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
             " Modify member port of this vlan type to tagged. "
         ::= { gbnGgmpVlanPropertyEntry 10 }
 
-        ggmpvlan_adduntag_portmap OBJECT-TYPE
+        ggmpvlanadduntagportmap OBJECT-TYPE
         SYNTAX PortList
         MAX-ACCESS read-write
         STATUS current
@@ -625,9 +622,6 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
             " Modify member port of this vlan type to untagged. "
         ::= { gbnGgmpVlanPropertyEntry 11 }
 
-        ----------------------------------------------------------------------------------
-        --LANSWITCH数据保存MIB表--
-        ----------------------------------------------------------------------------------
         gbnGgmpLsSaveTable OBJECT-TYPE
         SYNTAX SEQUENCE OF GbnGgmpLsSaveEntry
         MAX-ACCESS not-accessible
@@ -705,7 +699,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
         SYNTAX Integer32
         {
             noop(1),
-            synchronize_lsw_property(2)
+            synchronizelswproperty(2)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -717,7 +711,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
         SYNTAX Integer32
         {
             noop(1),
-            synchronize_port_table(2)
+            synchronizeporttable(2)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -729,7 +723,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
         SYNTAX Integer32
         {
             noop(1),
-            synchronize_vlan_table(2)
+            synchronizevlantable(2)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -753,9 +747,6 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
              " Set all port untag property. untagged[bit=1],do not change[bit=0]"
         ::= { gbnGgmpLsSaveEntry 9 }
 
-        ----------------------------------------------------------------------------------
-        --GGMP SERVER 属性数据MIB--
-        ----------------------------------------------------------------------------------
 
         ggmpRefusedPort OBJECT-TYPE
         SYNTAX PortList
@@ -906,17 +897,17 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
         STATUS current
         DESCRIPTION
             "A table that is used to search lanswitch ARL table"
-        INDEX { ggmparl_lanMAC, ggmparl_lanarlMAC }
+        INDEX { ggmparllanMAC, ggmparllanarlMAC }
         ::= { gbnGgmpLsARLTable 1 }
 
 
         GbnGgmpLsARLEntry ::= SEQUENCE {
-            ggmparl_lanMAC          MacAddress,
-            ggmparl_lanarlMAC       MacAddress,
+            ggmparllanMAC          MacAddress,
+            ggmparllanarlMAC       MacAddress,
             ggmpmac2port            Integer32
         }
 
-        ggmparl_lanMAC OBJECT-TYPE
+        ggmparllanMAC OBJECT-TYPE
         SYNTAX MacAddress
         MAX-ACCESS not-accessible
         STATUS current
@@ -924,7 +915,7 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
             " MAC address of the registered lanswtich"
         ::= { gbnGgmpLsARLEntry 1 }
 
-        ggmparl_lanarlMAC OBJECT-TYPE
+        ggmparllanarlMAC OBJECT-TYPE
         SYNTAX MacAddress
         MAX-ACCESS not-accessible
         STATUS current
@@ -945,28 +936,28 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
         ----------------------------------------------------------------------------------
 
         ggmpClientPortLoop NOTIFICATION-TYPE
-        OBJECTS { ggmpport_portgrnstp }
+        OBJECTS { ggmpportportgrnstp }
         STATUS  current
         DESCRIPTION
                "Client port loop"
         ::= { gbnGgmpTrap 1 }
 
         ggmpClientPortLoopFree NOTIFICATION-TYPE
-        OBJECTS { ggmpport_portgrnstp }
+        OBJECTS { ggmpportportgrnstp }
         STATUS  current
         DESCRIPTION
                "Client port loop free"
         ::= { gbnGgmpTrap 2 }
 
         ggmpClientPortLinkUp NOTIFICATION-TYPE
-        OBJECTS { ggmpport_portlink }
+        OBJECTS { ggmpportportlink }
         STATUS  current
         DESCRIPTION
                "Client port link up"
         ::= { gbnGgmpTrap 3 }
 
         ggmpClientPortLinkDown NOTIFICATION-TYPE
-        OBJECTS { ggmpport_portlink }
+        OBJECTS { ggmpportportlink }
         STATUS  current
         DESCRIPTION
                "Client port link down"
@@ -1314,15 +1305,6 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
                S2024C->0x0c010000,S2016C->0x0d010000,S2008C->0x0e010000,
                S2008C-F->0x0f010000,S2008B->0x11010000,these entries are protected
                by software.unknown device-type-number needs configging manually"
-             --设备id 作为设备类型的标识，下面是现存的设备类型对应的id号：
-             --S3042V->0x01000000，S2008E->0x02000000，S2016E->0x03000000,
-             --S2016EF->0x03010000，S2024E->0x04000000，S2024EF->0x04010000m,
-             --S2208->0x05000000，S2024M->0x06010000,S2016M->0x07010000,
-             --S2008M->0x08010000,S2024EI->0x09010000,S2016EI->0x0a010000,
-             --S2008EI->0x0b010000,S2008EI-S->0x13010000,S2008EI-SF->0x14010000,
-             --S2024C->0x0c010000,S2016C->0x0d010000,S2008C->0x0e010000,
-             --S2008C-F->0x0f010000,S2008B->0x11010000,这些信息占据了设备id表的前20
-             --个表项，受软件保护.未知的设备类型对应的类型号需要手工配置.
         ::= { ggmpGbnDeviceIdEntry 2 }
 
         ggmpGbnDeviceDesc OBJECT-TYPE
@@ -1331,7 +1313,6 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
         STATUS current
         DESCRIPTION
              " lanswitch's device-type name，such as ‘TiNet S2008E’"
-             --设备类型的名称 ，比如‘TiNet S2008E’
         ::= { ggmpGbnDeviceIdEntry 3 }
 
         ggmpGbnDeviceIDRowStatus   OBJECT-TYPE
@@ -1340,25 +1321,19 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
         STATUS current
         DESCRIPTION
              "Status of this entry."
-            --表项的状态
         ::= { ggmpGbnDeviceIdEntry 4 }
 
         ggmpGbnDevLowMidHighType  OBJECT-TYPE
         SYNTAX INTEGER {
-             low_switch(1),
-             mid-high_switch(2)
+             lowswitch(1),
+             mid-highswitch(2)
         }
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
              " define whether device is low switch or mid-high switch"
-             --定义设备是低端设备还是中高端设备
         ::= { ggmpGbnDeviceIdEntry 5 }
 
-
-        ----------------------------------------------------------------------------------
-        --GGMP CLIENT 属性数据MIB--
-        ----------------------------------------------------------------------------------
 
         ggmpClientmac OBJECT-TYPE
         SYNTAX MacAddress
@@ -1366,7 +1341,6 @@ gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
         STATUS current
         DESCRIPTION
             " ZY.Link protocol packets' destination MAC address"
-            --ZY.Link协议报文的目的MAC地址
         ::= { gbnGgmpClientProperty 1 }
 
         ggmpClientManageVlan OBJECT-TYPE

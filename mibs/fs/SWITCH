@@ -41,7 +41,7 @@ IMPORTS
 -- Child OID declare
 
 switch MODULE-IDENTITY
-	LAST-UPDATED "200806260000Z"        -- June 26, 2008 at 00:00 GMT
+	LAST-UPDATED "201006260000Z"        -- June 26, 2008 at 00:00 GMT
 	ORGANIZATION
 	   ""
 	CONTACT-INFO
@@ -72,8 +72,8 @@ stpExt                    OBJECT IDENTIFIER ::= { switch 14 }
 igmpExt                   OBJECT IDENTIFIER ::= { switch 16 }
 boardHealthyMonitor       OBJECT IDENTIFIER ::= { switch 17 }
 arpInsp                   OBJECT IDENTIFIER ::= { switch 20 }
---pimsmExt                  OBJECT IDENTIFIER ::= { switch 21 }
---ospfExt                   OBJECT IDENTIFIER ::= { switch 22 }
+pimsmExt                  OBJECT IDENTIFIER ::= { switch 21 }
+ospfExt                   OBJECT IDENTIFIER ::= { switch 22 }
 user                      OBJECT IDENTIFIER ::= { switch 30 }
 snmpExt                   OBJECT IDENTIFIER ::= { switch 32 }
 stm                       OBJECT IDENTIFIER ::= { switch 33 }
@@ -83,19 +83,20 @@ dhcp                      OBJECT IDENTIFIER ::= { switch 36 }
 lswdevMMib                OBJECT IDENTIFIER ::= { switch 37 }
 lswTrapMib                OBJECT IDENTIFIER ::= { switch 39 }
 ipSourceGuard             OBJECT IDENTIFIER ::= { switch 40 }
+vrrpExt                   OBJECT IDENTIFIER ::= { switch 41 }
 interface                 OBJECT IDENTIFIER ::= { switch 42 }
 management                OBJECT IDENTIFIER ::= { switch 43 }
 mvr                       OBJECT IDENTIFIER ::= { switch 44 }
 erps                      OBJECT IDENTIFIER ::= { switch 45 }
 prefixList                OBJECT IDENTIFIER ::= { switch 46 }
 ipUnicast                 OBJECT IDENTIFIER ::= { switch 47 }
---vrf                       OBJECT IDENTIFIER ::= { switch 48 }
+vrf                       OBJECT IDENTIFIER ::= { switch 48 }
 aaa                       OBJECT IDENTIFIER ::= { switch 49 }
 evc                       OBJECT IDENTIFIER ::= { switch 51 }
 qinq                      OBJECT IDENTIFIER ::= { switch 52 }
 rmonExt                   OBJECT IDENTIFIER ::= { switch 53 }
---routeMap                  OBJECT IDENTIFIER ::= { switch 54 }
---ripExt                    OBJECT IDENTIFIER ::= { switch 57 }
+routeMap                  OBJECT IDENTIFIER ::= { switch 54 }
+ripExt                    OBJECT IDENTIFIER ::= { switch 57 }
 ldpExt                    OBJECT IDENTIFIER ::= { switch 60 }
 bgp                       OBJECT IDENTIFIER ::= { switch 68 }
 mpls                      OBJECT IDENTIFIER ::= { switch 69 }
@@ -109,8 +110,8 @@ udld                      OBJECT IDENTIFIER ::= { switch 76 }
 policyBasedRouting        OBJECT IDENTIFIER ::= { switch 77 }
 ddos                      OBJECT IDENTIFIER ::= { switch 78 }
 l2ping                    OBJECT IDENTIFIER ::= { switch 79 }
---ipg                       OBJECT IDENTIFIER ::= { switch 80 }
-syncE                       OBJECT IDENTIFIER ::= { switch 81 }
+ipg                       OBJECT IDENTIFIER ::= { switch 80 }
+syncE                     OBJECT IDENTIFIER ::= { switch 81 }
 arpConfig                 OBJECT IDENTIFIER ::= { switch 82 }
 cfm                       OBJECT IDENTIFIER ::= { switch 83 }
 efm                       OBJECT IDENTIFIER ::= { switch 84 }
@@ -126,11 +127,6 @@ product                   OBJECT IDENTIFIER ::= { switch 99 }
 l2protocol                OBJECT IDENTIFIER ::= { switch 100 }
 loopbackDetect            OBJECT IDENTIFIER ::= { switch 105 }
 ipsla                     OBJECT IDENTIFIER ::= { switch 106 }
-
-
-
--- Module declares
--- Sub Module: product
 
 	e3008TS OBJECT-IDENTITY
 		STATUS	current
@@ -978,7 +974,7 @@ summerTimeState         OBJECT-TYPE
     6 means Destroy"
     ::= { summerTimeEntry 11 }
 
--- cpuUsage OBJECT IDENTIFIER    ::= { system 9 }
+cpuUsage OBJECT IDENTIFIER    ::= { system 9 }
     
 fiveSeconds         OBJECT-TYPE
     SYNTAX          OCTET STRING (SIZE(0..256))
@@ -8871,16 +8867,17 @@ cbQoSBehaviorCarType        OBJECT-TYPE
          Set (4) is select bwp mode."
     ::= { cbQoSBehaviorCarCfgInfoEntry 8 }
 
--- cbQoSBehaviorCarEbs         OBJECT-TYPE
---     SYNTAX          Integer32 (1000..128000)
---     MAX-ACCESS      read-create
---     STATUS          current
---     DESCRIPTION
---         "Excess burst size (bytes).Range is <1000-128000>.
---              Only for policer behavior.
---         "
---         -- DEFVAL {128000}
---     ::= { cbQoSBehaviorCarCfgInfoEntry 9 }
+cbQoSBehaviorCarEbs         OBJECT-TYPE
+    SYNTAX          Integer32 (1000..128000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Excess burst size (bytes).Range is <1000-128000>.
+             Only for policer behavior.
+        "
+
+    DEFVAL {128000}
+    ::= { cbQoSBehaviorCarCfgInfoEntry 9 }
 
 cbQoSBehaviorCarPir         OBJECT-TYPE
     SYNTAX          Integer32 (8..10000000)
@@ -8900,7 +8897,7 @@ cbQoSBehaviorCarPbs         OBJECT-TYPE
         "Peak burst size (bytes).Range is <1000-128000>.
              Only for policer behavior.
         "
-        -- DEFVAL {128000}
+    DEFVAL {128000}
     ::= { cbQoSBehaviorCarCfgInfoEntry 11 }
 
 cbQoSBehaviorCarDropColor         OBJECT-TYPE
@@ -15741,9 +15738,6 @@ arpInspLogbuffRowStatus        OBJECT-TYPE
         "The status of this conceptual row.Now only realize CreateAndGo(4) and Destroy(6) and Active(1)."
     ::= { arpInspLogbuffLogsEntry 3 }  
 
--- Sub Module: PIMSMEXT
-
-
     pimsmMibObject OBJECT-IDENTITY
         STATUS current
         DESCRIPTION
@@ -18940,11 +18934,6 @@ ospfExtAsExtLsaExternalRouteTag         OBJECT-TYPE
     DESCRIPTION
         "OSPF LSA external route tag, used by as_external LSA."
     ::= { ospfExtAsExtLsdbEntry 15 }
-
---  OSPF General Variables
-
---      These parameters apply globally to the Router's
---      OSPF Process.
 
 ospfExtGeneralGroup OBJECT IDENTIFIER ::= { ospfExt 30 }
 
@@ -25904,7 +25893,7 @@ interfaceSpeed         OBJECT-TYPE
                 speed10G(4),
                 speed40G(5),
                 speed100G(6),
-                speed2_5G(7),
+                speed2halfG(7),
                 speed5G(8)
             }
     MAX-ACCESS      read-write
@@ -39459,7 +39448,6 @@ mplsVplsShowGroupPeerLastReporter  OBJECT-TYPE
         "The Address of VPLS Igmp Snooping Group Last Reporter on this peer."
     ::= { mplsVplsShowGroupPeerEntry 7 }
 
-----mpls interface vpws policy-map table
  mplsInterfaceMplsVpwsPolicyTable OBJECT-TYPE
     SYNTAX  SEQUENCE OF MplsInterfaceMplsVpwsPolicyEntry
     MAX-ACCESS not-accessible
@@ -45030,8 +45018,8 @@ efmOAMStateLocalLinkStatus          OBJECT-TYPE
 efmOAMStateLocalPduStatus          OBJECT-TYPE
     SYNTAX          INTEGER
     {
-        lf_info(1),
-        rx_info(2),
+        lfInfo(1),
+        rxInfo(2),
         info(3),
         any(4)
     }

@@ -225,9 +225,9 @@
              full-100(5),
              half-1000(6),
              full-1000(7),
-             auto_10(8),
-             auto_100(9),
-             auto_1000(10), 
+             auto10(8),
+             auto100(9),
+             auto1000(10), 
              full-10000(11),
              illegal(99),
 	         full-2500(13),
@@ -255,7 +255,7 @@
 
   oemArchIfaceFlowControl OBJECT-TYPE
       SYNTAX  INTEGER {
-                enable(1), 
+               enable(1), 
                disable(2)
               }
       ACCESS read-write
@@ -318,12 +318,6 @@
             	bit5 <----> VTP
             	bit6-bit31 <--> reserved.
             when set one, corresponding PDU tunneling is asserted, deasserted otherwise."
-            --当二层协议实体通过VPN网络相连时，这些实体的二层协议报文需要无改变地经由VPN透传，
-            --为了实现此目的，就必须在VPN的边界端口开启二层协议隧道，每个端口使用一个32位的整
-            --数来描述对何种协议开启隧道功能，目前我们只使用最低的6个bit，每个bit代表一个协议
-            --具体如下：bit0代表CDP协议，bit1代表LACP协议，bit2代表PAGP协议，bit3代表STP协议，
-            --bit代表UDLD协议，bit5代表VTP协议，bit6~bit31保留不用，当对应的bit置位的时候，表
-            --示对此协议开启了隧道功能
       ::= { oemArchIfaceEntry 17 }
       
    oemArchIfaceLinkUpTime OBJECT-TYPE

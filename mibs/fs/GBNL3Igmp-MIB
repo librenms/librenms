@@ -386,9 +386,9 @@ PortList ::= TEXTUAL-CONVENTION
 
 --- IGMP MFIB extend MIB. added by x0084(2007-11-27)
     IgmpProxyState ::= INTEGER {
-    	non_member(0),
-    	delaying_member(1),
-    	idle_member(2)
+    	nonMember(0),
+    	delayingMember(1),
+    	idleMember(2)
     }
     	
     igmpMFIBTable OBJECT-TYPE
@@ -397,7 +397,6 @@ PortList ::= TEXTUAL-CONVENTION
         STATUS   current
         DESCRIPTION
            " the Multicast Forward Information Base."    
-           --组播转发信息库
        	::= { gbnL3IgmpMib 6 }
   	
     igmpMFIBEntry OBJECT-TYPE

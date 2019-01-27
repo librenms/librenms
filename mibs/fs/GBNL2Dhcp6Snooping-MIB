@@ -33,7 +33,6 @@
         STATUS current
         DESCRIPTION
             "start/stop dhcp6snooping.Default is off。"
-            --开启关闭Dhcp6snooping功能。
         ::= { gbnL2Dhcp6Snooping 1 }
 
     dhcp6snoopingPortTable OBJECT-TYPE
@@ -42,7 +41,6 @@
         STATUS      current
         DESCRIPTION
             "A table that contains port informations of dhcp6snooping."
-            --DHCP6Snooping的端口信息表。
         ::= { gbnL2Dhcp6Snooping 2 }
 
     dhcp6snoopingPortEntry OBJECT-TYPE
@@ -52,7 +50,6 @@
         DESCRIPTION
             "Port informations of dhcp6snooping. This is indexed
             by the port number."
-            --DHCP6Snooping的端口信息表，以端口号为索引。
         INDEX { portIndex }
         ::= { dhcp6snoopingPortTable 1 }
 
@@ -74,7 +71,6 @@
         STATUS       current
         DESCRIPTION
             "The Index of the port."
-            --端口索引，也就是端口号
         ::= { dhcp6snoopingPortEntry 1 }
 
     portTrustMode OBJECT-TYPE
@@ -86,7 +82,6 @@
     STATUS       current
     DESCRIPTION
         "Port mode of dhcp6snooping.Default is untrust."
-        --端口模式，默认为untrust。
     ::= { dhcp6snoopingPortEntry 2 }
 
     portMaxNum OBJECT-TYPE
@@ -95,7 +90,6 @@
         STATUS current
         DESCRIPTION
             "Max clients in this port.Range is from 0 to 2048.Default is 2048."
-            --端口最多可以学习到的DHCP6客户端，取值范围为0~2048。默认为2048。
         ::= { dhcp6snoopingPortEntry 3 }
 
     portIpSourceGuardMode OBJECT-TYPE
@@ -107,7 +101,6 @@
     STATUS       current
     DESCRIPTION
         "Port IP source guard mode .Default is off."
-        --端口IP地址保护模式，默认为关闭。
     ::= { dhcp6snoopingPortEntry 4 }
 
     dhcp6snoopingVlanTable OBJECT-TYPE
@@ -116,7 +109,6 @@
         STATUS      current
         DESCRIPTION
             "A table that contains vlan informations of dhcp6snooping."
-            --DHCP6Snooping的VLAN信息表。
         ::= { gbnL2Dhcp6Snooping 3 }
 
     dhcp6snoopingVlanEntry OBJECT-TYPE
@@ -126,7 +118,6 @@
         DESCRIPTION
             "VLAN informations of dhcp6snooping. This is indexed
             by the vlan number."
-            --DHCP6Snooping的VLAN信息表，以VLAN号为索引。
         INDEX { vlanIndex }
         ::= { dhcp6snoopingVlanTable 1 }
 
@@ -144,7 +135,6 @@
         STATUS       current
         DESCRIPTION
             "The Index of the vlan."
-            --VLAN索引，也就是VLAN号
         ::= { dhcp6snoopingVlanEntry 1 }    
         
     vlanMaxNum OBJECT-TYPE
@@ -153,7 +143,6 @@
         STATUS current
         DESCRIPTION
             "Max clients in this vlan.Range is from 0 to 2048.Default is 2048."
-            --VLAN最多可以学习到的DHCP6客户端，取值范围为0~2048。默认为2048。
         ::= { dhcp6snoopingVlanEntry 2 }
         
     dhcp6snoopingPortDownAction OBJECT-TYPE
@@ -168,7 +157,7 @@
              if auto-aging is enabled, switch will wait until lease time expires and remove entries." 
         ::= { gbnL2Dhcp6Snooping 4 }
         
--- dhcpv6 snooping client table -------
+-- dhcpv6 snooping client table
     dhcp6snoopingClientTable OBJECT-TYPE
         SYNTAX      SEQUENCE OF Dhcp6snoopingClientEntry
         MAX-ACCESS  not-accessible
@@ -242,8 +231,8 @@
         STATUS       current
         DESCRIPTION
             "dhcpv6 snooping client lease time string."
-        ::= { dhcp6snoopingClientEntry 7 }  
--- dhcpv6 snooping ipv6 source guard bind table -------
+        ::= { dhcp6snoopingClientEntry 7 }
+-- dhcpv6 snooping ipv6 source guard bind table
     dhcpsIpv6SourceGuardBindTable OBJECT-TYPE
         SYNTAX      SEQUENCE OF DhcpsIpv6SourceGuardBindEntry
         MAX-ACCESS  not-accessible
@@ -310,7 +299,7 @@
         DESCRIPTION
             "RowStatus."
         ::= { dhcpsIpv6SourceGuardBindEntry 6 }  
--- others -------------------------
+-- others
     ipv6SourceGuardDisabledVlanString OBJECT-TYPE
         SYNTAX       OCTET STRING (SIZE(0..255))
         MAX-ACCESS   read-write
@@ -318,7 +307,7 @@
         DESCRIPTION
             "IP Source Guard is disabled in following vlans."
         ::= { gbnL2Dhcp6Snooping 8 }  
--- dhcp6snooping infomation -------------
+-- dhcp6snooping infomation
 dhcp6snoopingInfomation		OBJECT IDENTIFIER ::= { gbnL2Dhcp6Snooping 20 }
     dhcp6snoopingInfoOption18Enable OBJECT-TYPE
         SYNTAX     INTEGER { true(1), false(0) }

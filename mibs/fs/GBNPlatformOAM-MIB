@@ -117,7 +117,7 @@
             If gbnCommonIPStatus returns modified(2), one or more objects
             were changed, but have not been applied.  Both notModified(1)
             and modified(2) are read-only values; the agent returns a
-            SNMP_BADVALUE for sets using these values.  Both restore(3) and
+            SNMPBADVALUE for sets using these values.  Both restore(3) and
             apply(4) are valid SET values.  If one or more of the gbnCommonIP
             objects were modified, the user can restore the parameters to a
             mirror of the NVM values using restore(3)."
@@ -290,7 +290,6 @@
             STATUS current
             DESCRIPTION
                 "System host name"
-                --系统主机名
             ::= { gbnPlatformOAMSystem 10 }
 
     cpuIdle OBJECT-TYPE
@@ -299,7 +298,6 @@
         STATUS       current
         DESCRIPTION
                 "The percentage of free CPU in the current system."
-                --当前系统的CPU空闲百分比。
         ::= {  gbnPlatformOAMSystem 11 }
 
     memorySize OBJECT-TYPE
@@ -308,7 +306,6 @@
         STATUS       current
         DESCRIPTION
                 "The current system memory size, unit is byte."
-                --当前系统的内存大小，单位为字节。
         ::= {  gbnPlatformOAMSystem 12 }
 
     memoryIdle OBJECT-TYPE
@@ -317,7 +314,6 @@
         STATUS       current
         DESCRIPTION
                 "The current system free memory size, unit is byte."
-                --当前系统的空闲内存大小，单位为字节。
         ::= {  gbnPlatformOAMSystem 13 }
 
     systemClock OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 14 }
@@ -329,9 +325,6 @@
         DESCRIPTION
            "The current calendar time in seconds. The based time is 1979/1/1.
             Year of the date must be the number between 2000 and 2099"
-           --当前日历时间，即从1970年1月1日起到现在的秒数，
-           --年份的取值范围为：2000-2099，比如要设置时间为2008年1月1日，则设置的时间
-           --应该为:((2008年1月1日) - (1970年1月1日))(年数) * 365(天数) * 24(小时) * 3600(秒数)
       ::= { systemClock 1 }
 
     timeZoneName OBJECT-TYPE
@@ -340,7 +333,6 @@
         STATUS   current
         DESCRIPTION
            "the timezone name,1-32 letters.eg CCT(China Coast, USSR Zone 7)"
-           --配置的时区名字，1－32个字符--
        ::= { systemClock 2 }
 
     timeZoneOffset OBJECT-TYPE
@@ -349,19 +341,17 @@
         STATUS   current
         DESCRIPTION
            "seconds between current timezone and GMT "
-           --当前时区与GMT的时间差（秒数），这里只是绝对值--
       ::= { systemClock 3 }
 
     offsetNegFlag OBJECT-TYPE
         SYNTAX INTEGER{    
-               true(1),     -----    negtive
-               false(2)     -----    positive
+               true(1),
+               false(2)
         }
         MAX-ACCESS   read-write
         STATUS   current
         DESCRIPTION
            "earlier or latter than GMT,it is true when timeZoneOffset is negative"
-           --时区偏移量的正负标志，当偏移为负值时，它为真--
       ::= { systemClock 4 }
 
     productName OBJECT-TYPE
@@ -429,7 +419,7 @@
     saveNMInterfaceConfig   OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 18 }
 ------------------------------------------------------------------------------
 --
---  saveNMInterfaceConfig - Save nm_interface configuration Group
+--  saveNMInterfaceConfig - Save nminterface configuration Group
 --
 ------------------------------------------------------------------------------
     nmInterfaceId OBJECT-TYPE
@@ -437,7 +427,7 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "interface id of vlan saved for nm_interface configuration."
+            "interface id of vlan saved for nminterface configuration."
             --此节点用于存储vlan接口ID。当值为0时默认为vlan 1 的接口。
         ::= { saveNMInterfaceConfig 1 }
 
@@ -446,7 +436,7 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "ip address saved for nm_interface configuration."
+            "ip address saved for nminterface configuration."
             --此节点用于存储vlan接口的ip地址。
         ::= { saveNMInterfaceConfig 2 }
 
@@ -455,7 +445,7 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "mask saved for nm_interface configuration. "
+            "mask saved for nminterface configuration. "
             --此节点用于存储vlan接口的掩码。
         ::= { saveNMInterfaceConfig 3 }
 
@@ -464,23 +454,23 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "gateway address saved for nm_interface configuration. "
+            "gateway address saved for nminterface configuration. "
             --此节点用于存储vlan接口的网关地址。
         ::= { saveNMInterfaceConfig 4 }
 
         writeNMInterfaceConifig OBJECT-TYPE
         SYNTAX INTEGER{
-                   saveNmconfig(1)        -- save nm_interface configuration parameters to NVM
+                   saveNmconfig(1)
           }
           MAX-ACCESS read-write
           STATUS current
           DESCRIPTION
-            "We save the nm_interface configuration through setting this Mib. When setting to
-            'saveNmconfig(1)', nm_interface configuration is starting to be saved.
+            "We save the nminterface configuration through setting this Mib. When setting to
+            'saveNmconfig(1)', nminterface configuration is starting to be saved.
             At the same time the value of writeNMInterfaceConifigStatus Mib is set to 'saveInProgress(2)'.
             Then the value of nmInterfaceId, nmInterfaceIpAddress, nmInterfaceNetMask,
             nmInterfaceGateAddress will be read one by one.According to these value,
-            the nm_interface configuration is to be saved.
+            the nminterface configuration is to be saved.
             Untill the process was over the value of writeNMInterfaceConifigStatus Mib is
             changed to 'saveSuccess(1)'. And if the process was ended for exception the value
             of writeNMInterfaceConifigStatus Mib is set to a error code from
@@ -772,7 +762,7 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "A Table of usr_name and Password."
+            "A Table of usrname and Password."
         ::= { gbnPlatformOAMMuser 1 }
 
     musrEntry OBJECT-TYPE
@@ -961,12 +951,12 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
                onuImage(9),
                geApplication(10),
                geBootRom(11),
-               _10geApplication(12),
-               _10geBootRom(13),
+               10geApplication(12),
+               10geBootRom(13),
                eponApplication(14),
                eponBootRom(15),
-               _10geponApplication(16),
-               _10geponBootRom(17),
+               10geponApplication(16),
+               10geponBootRom(17),
                gponApplication(18),
                gponBootRom(19)
         }

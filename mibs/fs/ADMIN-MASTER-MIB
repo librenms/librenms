@@ -78,13 +78,13 @@ IMPORTS
 
         ::= { enterprises 13464 }
     
--- ADMIN Products---------------------------------------------------
+-- ADMIN Products
 dataCom           OBJECT IDENTIFIER ::= {admin 1} 
 transmission      OBJECT IDENTIFIER ::= {admin 2} 
 wireCom            OBJECT IDENTIFIER ::= {admin 3} 
 
 
--- DataCom Products-----------------------------------------------------    
+-- DataCom Products
 vdsl			OBJECT IDENTIFIER ::= {dataCom 1}
 gbn             OBJECT IDENTIFIER ::= {dataCom 2 } 
 switch			OBJECT IDENTIFIER ::= {dataCom 3}
@@ -93,7 +93,7 @@ bas			OBJECT IDENTIFIER ::= {dataCom 6}
 voip			OBJECT IDENTIFIER ::= {dataCom 7}
 mnt			OBJECT IDENTIFIER ::= {dataCom 10}
 
---VDSL Products---------------------------------------------------------
+--VDSL Products
 S5330-28TX   OBJECT IDENTIFIER ::= {vdsl 1}   
 
 -- ADMIN Major MIB Categories
@@ -108,9 +108,9 @@ S5330-28TX   OBJECT IDENTIFIER ::= {vdsl 1}
     rmonMib            OBJECT IDENTIFIER ::= { gbnService 2}--gbnServiceRMON
     gbnServiceMACNotification            OBJECT IDENTIFIER ::= { gbnService 3}
     
------Switch Products------------------------------------------------------
+-- Switch Products
 S5330          OBJECT IDENTIFIER ::= { mnt 10 }
-------S5330---------------------------------------------------
+-- S5330
 S5330-28TX           OBJECT IDENTIFIER ::= {S5330  24 }
 --
 -- END of ADMIN-MASTER-MIB

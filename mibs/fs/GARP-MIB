@@ -231,13 +231,6 @@ gDot1qGvrpStatus OBJECT-TYPE
     DEFVAL      { disabled }
     ::= { gDot1qBase 5 }
 
---
--- gDot1qVlanIndexMappingTable -- this table maps durable VLAN
--- slots to VLAN indices.  It is necessary since CCDGEN doesn't support
--- nonlinear indices.  A table like this one will be necessary for
--- every class of tables which uses a nonlinear index.
---
-
 gDot1qVlanIndexMappingTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GarpDot1qVlanIndexMappingEntry
     MAX-ACCESS  not-accessible
@@ -886,17 +879,11 @@ gDot1qStaticMulticastEntry OBJECT-TYPE
         ports to which frames received from this specific port
         for this VLAN and containing this Multicast or Broadcast
         destination address are allowed to be forwarded."
---
--- This table is actually indexed by VLAN ID, MAC address, and port.
--- For the purposes of default value table generation, we introduce a 
--- phony index of the dimension of the VLAN slot table.
---
     INDEX   {
         gDot1qVlanIndex,
         gDot1qStaticMulticastAddress,
         gDot1qStaticMulticastReceivePort
     }
---  INDEX   { gDot1qVlanSlotIndex }	-- Don't use this index at runtime
     ::= { gDot1qStaticMulticastTable 1 }
 
 GarpDot1qStaticMulticastEntry ::=
@@ -1234,10 +1221,6 @@ gDot1qVlanStaticEgressPorts OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
---
--- Note: I'm not sure what our syntax is here, but the default value for
--- this thing needs to be all F's -- every port is a member.
---
         "DURABLE: { 0:all }
 		The set of ports which are permanently assigned to the
         egress list for this VLAN by management.  Changes to a

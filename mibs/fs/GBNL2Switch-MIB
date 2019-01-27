@@ -816,9 +816,9 @@
 
     portMode OBJECT-TYPE
         SYNTAX INTEGER {
-                    trunk_port(1),
-                    access_port(2),
-                    hybrid_port(3)
+                    trunkPort(1),
+                    accessPort(2),
+                    hybridPort(3)
         }
         MAX-ACCESS read-write
         STATUS current

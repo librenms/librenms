@@ -315,7 +315,6 @@ IMPORTS
       STATUS current
       DESCRIPTION
         "
-        OLT板卡表        
         This table shall include rows for all slots, including the slots has
         a presence state of 'NotInstalled'.
         "
@@ -369,9 +368,7 @@ IMPORTS
       MAX-ACCESS not-accessible
       STATUS current
       DESCRIPTION
-        "
-        OLT设备索引号。        
-        一个OLT节点可以由多台OLT设备组成。节点内的每台OLT设备由OLT设备索引号唯一标识"
+        ""
       ::= { boardEntry 1 }
 
     bCardIndex  OBJECT-TYPE
@@ -392,22 +389,13 @@ IMPORTS
         switchBoard(4),
         other(5),
         vacant(6),
-        control_uplinkBoard(7),
-        pon_uplinkBoard(8)
+        controlUplinkBoard(7),
+        ponUplinkBoard(8)
         }
       MAX-ACCESS read-only
       STATUS current
       DESCRIPTION
         "
-        板卡类型        
-        controlBoard(1) - 主控板
-        geponBoard(2)    - GE EPON板
-        uplinkBoard(3)  - 上联板
-        switchBoard(4)  - 交换板（考虑存在交换板和主控板分开的情况）
-        other(5)        - 未知类型板卡 
-        vacant(6)   - 板卡未插入 
-        control_uplink_board(7) -带上联口的主控板
-        pon_uplink_board(8)     -pon口和上联口混合板（8pon 6ge 板）
         "
       ::= { boardEntry 3 }
     
@@ -422,14 +410,7 @@ IMPORTS
       MAX-ACCESS read-only
       STATUS current
       DESCRIPTION
-        "
-        板卡属性 - 用于描述主控卡和交换卡在主备冗余方式下的状态
-        
-        active(1)        - 该板卡为主用板卡 
-        standby(2)       - 该板卡为备用板卡
-        standalone(3)    - 独立工作，用于描述OLT设备不支持主控卡和交换卡主备冗余方式
-                           时的工作状态
-        notApplicable(4) - 该板卡不是主控卡和交换卡，此对象不适用于该板卡"
+        ""
       ::= { boardEntry 4 }
     
     bOperationStatus OBJECT-TYPE
@@ -1106,7 +1087,6 @@ IMPORTS
         The attribute of the file"
       ::= { fileInfoManagementEntry 6 }    
       
- --------------------------------onuUpgrade---------------------------------------      
     onuUpgradeManagement OBJECT-IDENTITY
       STATUS current
       DESCRIPTION 

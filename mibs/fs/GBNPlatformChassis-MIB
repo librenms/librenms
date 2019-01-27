@@ -130,7 +130,6 @@
 		STATUS current
 		DESCRIPTION
 			"Power status table."
-			--电源状态表.
 		::= { gbnChassis 5 } 
 	
 	powerEntry OBJECT-TYPE 
@@ -139,7 +138,6 @@
 		STATUS current
 		DESCRIPTION 
 			"Power table entry." 
-			--电源表条目. 
 		INDEX { powerIndex }
 		::= { powerTable 1 } 
 
@@ -151,14 +149,13 @@
 		
 	powerIndex OBJECT-TYPE
 		SYNTAX INTEGER {    
-			power_0(0),
-			power_1(1)
+			power0(0),
+			power1(1)
 		}
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION 
 			"Power index."
-			--电源索引.  
 		::= { powerEntry 1 }
 		
 	powerInsertedStaus OBJECT-TYPE
@@ -170,33 +167,25 @@
 		STATUS current
 		DESCRIPTION
 			"Power inserted status."
-			--电源插入状态.
 		::= { powerEntry 2 }
 	
 	powerRunningStatus OBJECT-TYPE
 		SYNTAX INTEGER {
-			no_good(0),
+			notGood(0),
 			good(1)
 		}
 		MAX-ACCESS read-only 
 		STATUS current
 		DESCRIPTION 
 			"Power running status."
-			--电源运行状态.
 		::= { powerEntry 3 }
 				
-------------------------------------------------------------------------------
---
---  gbnBoard
---
-------------------------------------------------------------------------------
     boardTable OBJECT-TYPE
         SYNTAX SEQUENCE OF BoardEntry
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
             "Board table,for board management."
-            --插板表，用于插板管理.
         ::= { gbnBoard 1 }
 
     boardEntry OBJECT-TYPE
@@ -205,7 +194,6 @@
         STATUS current
         DESCRIPTION
             "board table entry,for board management."
-            --插板表entey，用于插板管理.
         INDEX { boardIndex }
         ::= { boardTable 1 }
 
@@ -250,18 +238,16 @@
         DESCRIPTION
             "Status of board；Below four states for control board: 'noInsert(0)', 'insertAsMaster(1)' ,'insertAsSlave(2)' and insertButUnconnected(3).
              Below three states for line board: 'noInsert(0)', 'insertButUnconnected(3)' and 'insertAndConnected(4)'."
-            --插板状态。以下4个状态用于主控板：'noInsert(0)', 'insertAsMaster(1)' ,'insertAsSlave(2)' and insertButUnconnected(3).
-            --以下3个状态用于业务板 ：'noInsert(0)', 'insertButUnconnected(3)' and 'insertAndConnected(4)'.
         ::= { boardEntry 2 }
 
     boardType OBJECT-TYPE
         SYNTAX INTEGER{
                unknown(0),
-               control_board_0(1),
-               line_board_0_fiber(2),
-               line_board_1_copper(3),
-               line_board_2_copper(4),
-               line_board_3_fiber(5)
+               controlboard0(1),
+               lineboard0fiber(2),
+               lineboard1copper(3),
+               lineboard2copper(4),
+               lineboard3fiber(5)
         }
         MAX-ACCESS read-only
         STATUS current
@@ -275,7 +261,6 @@
         STATUS current
         DESCRIPTION
             "The number of physical interface in line board,or 0 if unavailable.For a control board ,it's always returned 0."
-            --业务板的物理接口数，如果不能获取则返回0.对于主控板，总是返回0。
         ::= { boardEntry 4 }
 
 
@@ -378,7 +363,6 @@
             "Performs a hardware reset of the board.  Use with care.
              A 'reset(2)' resets the board,and 'noop(1)'does nothing.
              A value of 'noop(1)' is always returned for a GET operation."
-             --插板硬件重启，请小心使用。'reset(2)'用于重启插板，而'noop(1)'没有任何操作。对于一个get请求，总是返回'noop(1)'的值.
         ::= { boardEntry 16 }
 
 
@@ -388,7 +372,6 @@
         STATUS current
         DESCRIPTION
             "Interface index table,show interface index in all connected lineboards."
-            --接口索引表，显示所有已连接的板上的接口索引。
         ::= { gbnBoard 2}
 
     boardIfIndexEntry OBJECT-TYPE
@@ -397,7 +380,6 @@
         STATUS current
         DESCRIPTION
             "Interface index table,show interface index in all connected lineboards."
-            --接口索引表，显示所有已连接的板上的接口索引。
         INDEX { boardNumber, boardPortLocalIndex }
         ::= { boardIfIndexTable 1 }
 
@@ -413,7 +395,6 @@
         STATUS current
         DESCRIPTION
             "board number, matches boardTable boardIndex."
-            --插板号，对应于boardTable中的boardIndex
         ::= { boardIfIndexEntry 1 }
 
     boardPortLocalIndex OBJECT-TYPE
@@ -422,8 +403,7 @@
         STATUS current
         DESCRIPTION
             "Local index of port of the board, from 1 start, end of max port num of the board.
-             For example,the boardPortLocalIndex range of line_1_copper is 1-24. "
-            --插板上端口的本地索引，从1开始，以本板最大端口号结束。例如，插板line_1_copper的本地端口索引范围为1-24。
+             For example,the boardPortLocalIndex range of line1copper is 1-24. "
         ::= { boardIfIndexEntry 2 }
 
     boardIfIndex OBJECT-TYPE
@@ -436,16 +416,13 @@
         ::= { boardIfIndexEntry 3 }
 
 
-------------------------------------------------------------------------------
 --
 --  gbnChassisTrap - chassis status TRAP
 --
-------------------------------------------------------------------------------
     powerRemoveTrap NOTIFICATION-TYPE
         STATUS  current
         DESCRIPTION
             "Power remove trap."
-             --电源 拔出trap
         ::= { gbnChassisTrap 1 }
 
     powerInsertTrap NOTIFICATION-TYPE
@@ -459,14 +436,12 @@
         STATUS current
         DESCRIPTION
             "Fan remove trap."
-            --风扇 拔出trap.
         ::= { gbnChassisTrap 3 }
 
     fanInsertTrap NOTIFICATION-TYPE
         STATUS current
         DESCRIPTION
             "Fan remove trap."
-            --风扇 插入trap.
         ::= { gbnChassisTrap 4 }
 
     boardRemoveTrap NOTIFICATION-TYPE

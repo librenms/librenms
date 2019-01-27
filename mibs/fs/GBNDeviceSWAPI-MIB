@@ -1749,10 +1749,6 @@ TimeFilter ::= TEXTUAL-CONVENTION
             "Weight of queue"
         ::= { oemQueueWeightEntry 2 }
 
------------------------------------------------------
--- the OEM DSCP to CoS map table
------------------------------------------------------
- 
    oemDscpToCosMapTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF OemDscpToCosMapEntry
        ACCESS  not-accessible
@@ -1794,9 +1790,8 @@ TimeFilter ::= TEXTUAL-CONVENTION
                "the map result CoS. "
        ::= { oemDscpToCosMapEntry 2 } 
 
--- -------------------------------------------------------------
 -- The OEM DSCP to Cos map status
--- -------------------------------------------------------------
+
    oemDscpToCosMapStatus OBJECT-TYPE
        SYNTAX  TruthValue
        ACCESS  read-write
@@ -3151,7 +3146,6 @@ sMIBCompliances OBJECT IDENTIFIER ::= { sMIBConformance 2 }
 
     sMIBMauGroup OBJECT-GROUP
      OBJECTS {
-         sIfMauSwitchIndex,
          sIfMauIndex,
          sIfMauType,
          sIfMauMediaAvailable,
@@ -3251,7 +3245,6 @@ sMIBCompliances OBJECT IDENTIFIER ::= { sMIBConformance 2 }
             "The compliance statement for s module."
      MODULE
      MANDATORY-GROUPS {
-         sMIBBaseGroup,
          sMIBDot1dGroup,
          sMIBRMONGroup,
          sMIBMauGroup,

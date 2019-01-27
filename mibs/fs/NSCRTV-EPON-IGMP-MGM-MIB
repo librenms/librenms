@@ -545,8 +545,7 @@ IMPORTS
       MAX-ACCESS not-accessible
       STATUS current
       DESCRIPTION
-        "
-        该可控组播业务包的索引（流水号）"
+        ""
       ::= { controlledMulticastPackageEntry 1 }
     
     cmName OBJECT-TYPE
@@ -644,7 +643,6 @@ IMPORTS
         "
         行状态"
       ::= { controlledMulticastPackageEntry 10 }
- -------------------------------------onu-multicast-----------------------------
     igmpOnuUniTable  OBJECT-TYPE
         SYNTAX      SEQUENCE OF igmpOnuUniEntry
         MAX-ACCESS  not-accessible

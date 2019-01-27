@@ -22,38 +22,22 @@
         
         MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
         
-        gbnServiceAAA                           FROM admin-MASTER-MIB;
+        gbnServiceAAA                           FROM ADMIN-MASTER-MIB;
         
 
     gbnRadiusMib MODULE-IDENTITY
-        LAST-UPDATED    "2002/07/02"  -- July 2, 2002
+        LAST-UPDATED    "0008290000Z"
         ORGANIZATION    "admin Systems, Inc."
         CONTACT-INFO    "admin Systems, Inc.
                          E-mail: support@admin.com.cn"
-
         DESCRIPTION     "admin Radius Enterprise MIB definition."
-
-        REVISION        "2002/07/02"  -- July 2, 2002
-        DESCRIPTION     "Initial MIB creation."
-
+        REVISION        "0008290000Z"
+        DESCRIPTION     "admin Radius Enterprise MIB definition."
         ::= { gbnServiceAAA 2 }
-
-
-------------------------------------------------------------------------------
---  Textual Conventions (i.e., these do not affect object encoding):
-------------------------------------------------------------------------------
-    --
-    --  "DURABLE":
-    --    Objects that are saved across a system reset and/or power cycle
-    --    are noted as "DURABLE" for convenience in the DESCRIPTION
-    --    section of the object definition.  Code must be explicitly
-    --    written to implement these DURABLE objects.
-    --
 
 ------------------------------------------------------------------------------
 --  define groups in admin-RADIUS-MIB
 ------------------------------------------------------------------------------
-
 
         -------------------------------------------------------------------
         --Add gbnRadiusConfTable MIB      2002/07/02     ouyangchunbo

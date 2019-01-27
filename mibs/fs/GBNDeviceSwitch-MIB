@@ -539,7 +539,6 @@ MirrorMacType ::= TEXTUAL-CONVENTION
         STATUS  current
         DESCRIPTION
                "Port ingress packet rate become too big, port flow exceed alarm happen."
-               --如果端口进来的报文速率变得过大，则发出端口速率过大的trap
         ::= { portFlowAlarmTrap 1 }
 
     portFlowAlarmNormalTrap NOTIFICATION-TYPE
@@ -550,9 +549,7 @@ MirrorMacType ::= TEXTUAL-CONVENTION
                --如果端口进来的报文速率恢复正常，则发出端口速率正常的trap
         ::= { portFlowAlarmTrap 2 }
 
-   -----------------------------------------------------
-   -- the quene-scheduer QOS
-   -----------------------------------------------------
+-- the quene-scheduer QOS
 
    qosQueueSchedulerGroup  OBJECT IDENTIFIER ::= { gbnDeviceSwitchQueneScheduer 1 }
 
@@ -654,9 +651,6 @@ MirrorMacType ::= TEXTUAL-CONVENTION
                --队列8的权重。对于3650，范围为0到255，对于3750-24/48，范围为1到15
        ::= { qosQueueSchedulerGroup 10 }
 
-   -----------------------------------------------------
-   -- the line-rate configuration
-   -----------------------------------------------------
    qosLineRateTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF QosLineRateEntry
        ACCESS  not-accessible
@@ -726,9 +720,6 @@ MirrorMacType ::= TEXTUAL-CONVENTION
                --入口端口限速目标速率(Kbps)
        ::= { qosLineRateEntry 4 }  
        
-   -----------------------------------------------------
-   -- the port-isolation configuration
-   -----------------------------------------------------
    portIsolationGroup  OBJECT IDENTIFIER ::= { gbnDeviceSwitchPortIsolation 1 }
 
    portIsolationDownLinkPorts OBJECT-TYPE
@@ -785,9 +776,6 @@ MirrorMacType ::= TEXTUAL-CONVENTION
                --上行口列表，当配置后，端口只允许跟它的上行口通信
        ::= { portIsolationUpLinkEntry 2 }
 
-   -----------------------------------------------------
-   -- the storm control
-   -----------------------------------------------------
 
    stormControlTable OBJECT-TYPE
        SYNTAX  SEQUENCE OF StormControlEntry
@@ -868,16 +856,12 @@ MirrorMacType ::= TEXTUAL-CONVENTION
                "the mode of the storm control. "
        ::= { stormControlEntry 5 }
        
------------------------------------------------------
---gbnDeviceSwitchAntiDos
------------------------------------------------------
     ipfragmnetnumber OBJECT-TYPE
         SYNTAX INTEGER (0..800)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
             "The ip fragment number."
-        --IP分片报文的处理数目.默认为800,取值为0到800,当为0的时候不处理分片报文. 
         ::= { gbnDeviceSwitchAntiDos 1 }  
         
     ipTTL  OBJECT-TYPE
@@ -888,9 +872,6 @@ MirrorMacType ::= TEXTUAL-CONVENTION
            "Control IP with TTL=0 packet,default is not traffic  to the  CPU."
          --控制TTL=0的报文是否送往CPU,默认情况是关闭上报CPU.
          ::= { gbnDeviceSwitchAntiDos 2 } 
-   -----------------------------------------------------
-   -- the bandwidth control
-   -----------------------------------------------------
 
    bandwidthcontrolTable OBJECT-TYPE
         SYNTAX SEQUENCE OF BandwidthcontrolEntry
@@ -2505,9 +2486,9 @@ MirrorMacType ::= TEXTUAL-CONVENTION
         SYNTAX INTEGER {
             SFPNotExist(0),
             SC(1),
-            FibreChannelStyle_1_CopperConnector(2),
-            FibreChannelStyle_2_CopperConnector(3),
-            BNC_TNC(4),
+            FibreChannelStyle1CopperConnector(2),
+            FibreChannelStyle2CopperConnector(3),
+            BNCTNC(4),
             FibreChannelCoaxialHeaders(5),
             FiberJack(6),
             LC(7),
@@ -2516,7 +2497,7 @@ MirrorMacType ::= TEXTUAL-CONVENTION
             SG(10),
             OpticalPigtail(11),
             MPOParallelOptic(12),
-            HSSDC_II(32),
+            HSSDCII(32),
             CopperPigtail(33),
             RJ45(34),
             Electrical-Mode(35),
