@@ -18,7 +18,7 @@ if ($device['os'] == 'fs') {
                 }
                 $descr    .= " Memory";
                 $usage     = $entry['memoryIdle'];
-                discover_mempool($valid_mempool, $device, $index, 'fs', $descr, '-1', null, null);
+                discover_mempool($valid_mempool, $device, $index, 'fs', $descr, '1', null, null);
             } //end if
         } //end foreach
     } //end if
