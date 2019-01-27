@@ -45,7 +45,7 @@ class FS extends OS implements ProcessorDiscovery
             $processors[] = Processor::discover(
                 $this->getName(),
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.13464.1.2.1.1.2.11.0', //GBNPlatformOAM-MIB::cpuIdle.0 = INTEGER: 95
+                '.1.3.6.1.4.1.13464.1.2.1.1.2.11.'.$index, //GBNPlatformOAM-MIB::cpuIdle.0 = INTEGER: 95
                 1,
                 $entry['cpuDescription'],
                 -1,

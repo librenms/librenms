@@ -25,13 +25,9 @@
                Copyright (C) The IETF Trust (2007).  This version
                of this MIB module is part of RFC yyyy; see the RFC
                itself for full legal notices."
-   -- RFC Ed.: replace yyyy with actual RFC number & remove this note
        REVISION     "200702040000Z" -- 4 February 2007
        DESCRIPTION  "Initial version, published as RFC yyyy."
-   -- RFC Ed.: replace yyyy with actual RFC number & remove this note
-   --  ::= { mib-2 XXX }
        ::= { gbnL3 9 }
-   -- RFC Ed.: replace XXX with IANA-assigned number & remove this note
 
    --
    -- Top-level structure
@@ -60,7 +56,6 @@
                "The (conceptual) table listing the IP multicast group
                prefixes for which the local router is to advertise
                itself as a Candidate-RP."
-               --Candidate-RP表，该表包含本地路由器中所有的配置了C-RP的接口的信息。
        ::= { pimBsrObjects 1 }
 
    pimBsrCandidateRPEntry OBJECT-TYPE
@@ -70,7 +65,6 @@
        DESCRIPTION
                "An entry (conceptual row) in the
                 pimBsrCandidateRPTable."
-                --Candidate-RP表条目
        INDEX      { pimBsrCandidateRPAddressType,
                     pimBsrCandidateRPAddress,
                     pimBsrCandidateRPGroupAddress,

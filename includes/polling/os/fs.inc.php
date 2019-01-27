@@ -9,10 +9,9 @@ $hwOidList = [
      '.1.3.6.1.4.1.13464.1.2.1.1.2.15.0',    //GBNPlatformOAM-MIB::productName.0
  ];
 foreach ($hwOidList as $oid) {
-    $hardware_tmp = snmp_get($device, $oid, '-OQv'); 
+    $hardware_tmp = snmp_get($device, $oid, '-OQv');
     if (!empty($hardware_tmp)) {
         $hardware = $hardware_tmp;
-
     }
 }
 
@@ -23,13 +22,11 @@ $verOidList = [
 ];
 foreach ($verOidList as $oid) {
     $version_tmp = snmp_get($device, $oid, '-OQv');
-
     if (!empty($version_tmp)) {
         $version = $version_tmp;
         break;
     }
 }
-
 
 //List of OIDs for SN, add any potential device SN OID here
 $snOidList = [
