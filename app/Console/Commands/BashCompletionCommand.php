@@ -78,6 +78,7 @@ class BashCompletionCommand extends Command
                         break;
                     case 'help':
                         $completions = $completions->merge($this->completeCommand(end($words)));
+                        break;
                     default:
                 }
             }
@@ -127,5 +128,4 @@ class BashCompletionCommand extends Command
         }
         return $completions;
     }
-
 }
