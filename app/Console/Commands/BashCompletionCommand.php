@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Device;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 class BashCompletionCommand extends Command
@@ -41,15 +42,20 @@ class BashCompletionCommand extends Command
         if (count($words) < 3) {
             $completions = $this->completeCommand($command);
         } else {
-            /** @var Command $cmd */
-            $cmd = $this->getApplication()->all()[$command];
+            $commands = $this->getApplication()->all();
+            if (isset($commands[$command])) {
+                $command_def = $commands[$command]->getDefinition();
+                $previous_name = ltrim($previous, '-');
 
-            if (starts_with($previous, '-') && ($previous_option = $cmd->getDefinition()->getOption(ltrim($previous, '-')))->acceptValue()) {
-                $completions = $this->completeOptionValue($previous_option, $current);
-            } elseif (starts_with($current, '-')) {
-                $completions = $this->completeOption($cmd, $current);
-            } else {
-                $completions = $this->completeArguments($command, $current, end($words));
+                if (starts_with($previous, '-') && $command_def->hasOption($previous_name) && $command_def->getOption($previous_name)->acceptValue()) {
+                    $completions = $this->completeOptionValue($command_def->getOption($previous_name), $current);
+                } else {
+                    $completions = collect();
+                    if (!starts_with($previous, '-')) {
+                        $completions = $this->completeArguments($command, $current, end($words));
+                    }
+                    $completions = $completions->merge($this->completeOption($command_def, $current));
+                }
             }
         }
 
@@ -102,7 +108,7 @@ class BashCompletionCommand extends Command
     /**
      * Complete options for the given command
      *
-     * @param Command $command
+     * @param InputDefinition $command
      * @param string $partial
      * @return \Illuminate\Support\Collection
      */
@@ -125,7 +131,7 @@ class BashCompletionCommand extends Command
         ]);
 
         if ($command) {
-            $options = collect($command->getDefinition()->getOptions())
+            $options = collect($command->getOptions())
                 ->flatMap(function ($option) {
                     return $this->parseOption($option);
                 })->merge($options);
