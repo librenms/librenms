@@ -41,50 +41,19 @@ class BashCompletionCommand extends Command
         if (count($words) < 3) {
             $completions = $this->completeCommand($command);
         } else {
-            $completions = collect();
-
             /** @var Command $cmd */
             $cmd = $this->getApplication()->all()[$command];
-            // handle options with values (if a list is enumerate in the description)
-            if (starts_with($previous, '-') && ($previous_option = $cmd->getDefinition()->getOption(ltrim($previous, '-')))->acceptValue()) {
-                if (preg_match('/\[(.+)\]/', $previous_option->getDescription(), $values)) {
-                    $completions = $completions->merge(collect(explode(',', $values[1]))
-                        ->map(function ($value) {
-                            return trim($value);
-                        })
-                        ->filter(function ($value) use ($current) {
-                            return empty($current) || starts_with($value, $current);
-                        }));
-                }
-            } elseif (starts_with($current, '-')) {
-                $completions = collect($cmd->getDefinition()->getOptions())
-                    ->flatMap(function ($option) {
-                        return $this->parseOption($option);
-                    })->filter(function ($option) use ($current) {
-                        return empty($current) || starts_with($option, $current);
-                    });
-            } else {
-                // handle commands with arguments
-                switch ($command) {
-                    case 'device:remove':
-                        // fall through
-                    case 'device:rename':
-                        $device_query = Device::select('hostname')->limit(5)->orderBy('hostname');
-                        if ($current) {
-                            $device_query->where('hostname', 'like', $current . '%');
-                        }
 
-                        $completions = $completions->merge($device_query->pluck('hostname'));
-                        break;
-                    case 'help':
-                        $completions = $completions->merge($this->completeCommand(end($words)));
-                        break;
-                    default:
-                }
+            if (starts_with($previous, '-') && ($previous_option = $cmd->getDefinition()->getOption(ltrim($previous, '-')))->acceptValue()) {
+                $completions = $this->completeOptionValue($previous_option, $current);
+            } elseif (starts_with($current, '-')) {
+                $completions = $this->completeOption($cmd, $current);
+            } else {
+                $completions = $this->completeArguments($command, $current, end($words));
             }
         }
 
-        \Log::critical(json_encode(get_defined_vars(), JSON_PRETTY_PRINT));
+        \Log::debug('Bash completion values', get_defined_vars());
 
         echo $completions->implode(PHP_EOL);
         return 0;
@@ -106,26 +75,114 @@ class BashCompletionCommand extends Command
     }
 
     /**
-     * @param static $all_commands
-     * @param $command
-     * @return mixed
+     * Complete a command
+     *
+     * @param string $partial
+     * @return \Illuminate\Support\Collection
      */
-    private function completeCommand($command)
+    private function completeCommand($partial)
     {
         $all_commands = collect(\Artisan::all())->keys()->filter(function ($cmd) {
             return $cmd != 'list:bash-completion';
         });
 
-        $completions = $all_commands->filter(function ($cmd) use ($command) {
-            return empty($command) || starts_with($cmd, $command);
+        $completions = $all_commands->filter(function ($cmd) use ($partial) {
+            return empty($partial) || starts_with($cmd, $partial);
         });
 
         // handle : silliness
-        if (str_contains($command, ':')) {
+        if (str_contains($partial, ':')) {
             $completions = $completions->map(function ($cmd) {
                 return substr($cmd, strpos($cmd, ':') + 1);
             });
         }
         return $completions;
+    }
+
+    /**
+     * Complete options for the given command
+     *
+     * @param Command $command
+     * @param string $partial
+     * @return \Illuminate\Support\Collection
+     */
+    private function completeOption($command, $partial)
+    {
+        // default options
+        $options = collect([
+            '-h',
+            '--help',
+            '-V',
+            '--version',
+            '--ansi',
+            '--no-ansi',
+            '-n',
+            '--no-interaction',
+            '--env',
+            '-v',
+            '-vv',
+            '-vvv',
+        ]);
+
+        if ($command) {
+            $options = collect($command->getDefinition()->getOptions())
+                ->flatMap(function ($option) {
+                    return $this->parseOption($option);
+                })->merge($options);
+        }
+
+        return $options->filter(function ($option) use ($partial) {
+            return empty($partial) || starts_with($option, $partial);
+        });
+    }
+
+    /**
+     * Complete options with values (if a list is enumerate in the description)
+     *
+     * @param InputOption $option
+     * @param string $partial
+     * @return \Illuminate\Support\Collection
+     */
+    private function completeOptionValue($option, $partial)
+    {
+        if ($option && preg_match('/\[(.+)\]/', $option->getDescription(), $values)) {
+            return collect(explode(',', $values[1]))
+                ->map(function ($value) {
+                    return trim($value);
+                })
+                ->filter(function ($value) use ($partial) {
+                    return empty($partial) || starts_with($value, $partial);
+                });
+        }
+        return collect();
+    }
+
+    /**
+     * Complete commands with arguments
+     *
+     * @param string $command Name of the current command
+     * @param string $partial
+     * @param string $current_word
+     * @return \Illuminate\Support\Collection
+     */
+    private function completeArguments($command, $partial, $current_word)
+    {
+        switch ($command) {
+            case 'device:remove':
+                // fall through
+            case 'device:rename':
+                $device_query = Device::select('hostname')->limit(5)->orderBy('hostname');
+                if ($partial) {
+                    $device_query->where('hostname', 'like', $partial . '%');
+                }
+
+                return $device_query->pluck('hostname');
+                break;
+            case 'help':
+                return $this->completeCommand($current_word);
+                break;
+            default:
+                return collect();
+        }
     }
 }
