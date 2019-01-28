@@ -6,7 +6,8 @@ if (!empty($matches[2])) {
 
 // List of OIDs for HW recognition, add any potential HW OID here. 
 $hwOidList = [
-     '.1.3.6.1.4.1.13464.1.2.1.1.2.15.0',    //GBNPlatformOAM-MIB::productName.0
+    '.1.3.6.1.4.1.13464.1.2.1.1.2.15.0',    //GBNPlatformOAM-MIB::productName.0
+    '.1.3.6.1.4.1.27975.37.1.5.1.4.1.1',
  ];
 foreach ($hwOidList as $oid) {
     $hardware_tmp = snmp_get($device, $oid, '-OQv');
@@ -19,6 +20,7 @@ foreach ($hwOidList as $oid) {
 // As the mib is really buggy, let's use numeric OID for now
 $verOidList = [
     '.1.3.6.1.4.1.13464.1.2.1.1.2.2.0', //GBNPlatformOAM-MIB::softwareVersion.0
+    '.1.3.6.1.4.1.27975.1.3.5.0', //SWITCH::version.0
 ];
 foreach ($verOidList as $oid) {
     $version_tmp = snmp_get($device, $oid, '-OQv');
@@ -31,6 +33,7 @@ foreach ($verOidList as $oid) {
 //List of OIDs for SN, add any potential device SN OID here
 $snOidList = [
     '.1.3.6.1.4.1.13464.1.2.1.1.2.19.0',
+    '.1.3.6.1.4.1.27975.37.1.5.1.10.1.1',
 ];
 foreach ($snOidList as $oid) {
     $serial_tmp = snmp_get($device, $oid, '-OQv');

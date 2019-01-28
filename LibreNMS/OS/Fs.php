@@ -39,17 +39,29 @@ class FS extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        $processors_data = snmpwalk_cache_multi_oid($this->getDevice(), 'cpuDescription', [], 'GBNPlatformOAM-MIB', 'fs');
-        $processors_data = snmpwalk_cache_multi_oid($this->getDevice(), 'cpuIdle', $processors_data, 'GBNPlatformOAM-MIB', 'fs');
+        $processors_data = snmpwalk_cache_oid($this->getDevice(), 'cpuDescription', [], 'GBNPlatformOAM-MIB', 'fs');
+        $processors_data = snmpwalk_cache_oid($this->getDevice(), 'cpuIdle', $processors_data, 'GBNPlatformOAM-MIB', 'fs');
         foreach ($processors_data as $index => $entry) {
             $processors[] = Processor::discover(
                 $this->getName(),
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.13464.1.2.1.1.2.11.'.$index, //GBNPlatformOAM-MIB::cpuIdle.0 = INTEGER: 95
-                1,
+                $index,
                 $entry['cpuDescription'],
                 -1,
                 100 - $entry['cpuIdle']
+            );
+        }
+        $processors_data = snmpwalk_cache_oid($this->getDevice(), 'ssCpuIdle', [], 'SWITCH', 'fs');
+        foreach ($processors_data as $index => $entry) {
+            $processors[] = Processor::discover(
+                "fs-SWITCHMIB",
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.27975.1.2.11'.$index, 
+                $index,
+                "CPU",
+                -1,
+                100 - $entry['ssCpuIdle']
             );
         }
         return $processors;
