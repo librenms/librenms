@@ -182,8 +182,6 @@ An example config setup for use with Jumpcloud LDAP as a service is:
 
 ```php
 $config['auth_mechanism'] = "ldap";
-unset($config['auth_ldap_group']); #Remove built-in group
-unset($config['auth_ldap_groups']); #Remove built-in groups
 $config['auth_ldap_version'] = 3;
 $config['auth_ldap_server'] = "ldap.jumpcloud.com"; #Set to ldaps://ldap.jumpcloud.com to enable LDAPS
 $config['auth_ldap_port'] = 389; #Set to 636 if using LDAPS
@@ -191,11 +189,18 @@ $config['auth_ldap_prefix'] = "uid=";
 $config['auth_ldap_suffix'] = ",ou=Users,o={id},dc=jumpcloud,dc=com";
 $config['auth_ldap_groupbase'] = "ou=Users,o={id},dc=jumpcloud,dc=com";
 $config['auth_ldap_groupmemberattr'] = "member";
-$config['auth_ldap_groups']['{group}']['level'] = 10;
+$config['auth_ldap_groups'] = ['{group}' => ['level' => 10],];
 $config['auth_ldap_userdn'] = true;
 ```
-Replace {id} with the unique ID provided by Jumpcloud.
-Replace {group} with the unique group name created in Jumpcloud. This field is case sensitive.
+Replace {id} with the unique ID provided by Jumpcloud.  Replace {group} with the unique group name created in Jumpcloud.  This field is case sensitive.
+
+Note: If you have multiple user groups to define individual access levels replace the `$config['auth_ldap_groups']` line with the following:
+```php
+$config['auth_ldap_groups'] = [
+    '{admin_group}' => ['level' => 10],
+    '{global_readonly_group}' => ['level' => 5],
+];
+```
 
 
 # Radius Authentication
