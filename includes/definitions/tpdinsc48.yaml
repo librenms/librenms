@@ -10,5 +10,5 @@ over:
 mib_dir:
     - tycon/tpdinsc48
 discovery:
-        - sysDescr:
-            - 'MPPT Controller - PoE Switch'
+    - sysDescr:
+        - 'MPPT Controller - PoE Switch'
