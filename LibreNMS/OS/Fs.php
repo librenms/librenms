@@ -57,7 +57,7 @@ class FS extends OS implements ProcessorDiscovery
             $processors[] = Processor::discover(
                 "fs-SWITCHMIB",
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.27975.1.2.11'.$index, 
+                '.1.3.6.1.4.1.27975.1.2.11.' . $index, 
                 $index,
                 "CPU",
                 -1,
