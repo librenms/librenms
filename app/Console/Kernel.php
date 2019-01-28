@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
      *
      * @var array
      */
-    protected $commands = [];
+    protected $commands = [
+        \App\Console\Commands\BashCompletionCommand::class,
+    ];
 
     /**
      * Define the application's command schedule.
@@ -41,7 +43,7 @@ class Kernel extends ConsoleKernel
         }
     }
 
-    protected function getArtisan()
+    public function getArtisan()
     {
         if (is_null($this->artisan)) {
             parent::getArtisan();
