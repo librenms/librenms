@@ -1535,7 +1535,12 @@ function load_os(&$device)
     global $config;
 
     if (!isset($device['os'])) {
-        d_echo('No OS to load');
+        d_echo("No OS to load\n");
+        return;
+    }
+
+    if (isset($config['os'][$device['os']]['definition_loaded'])) {
+        d_echo("OS already loaded\n");
         return;
     }
 
@@ -1562,6 +1567,8 @@ function load_os(&$device)
     } else {
         unset($device['os_group']);
     }
+
+    $config['os'][$device['os']]['definition_loaded'] = true;
 }
 
 /**

@@ -188,7 +188,7 @@ class Device extends BaseModel
     {
         global $config;
 
-        if (empty($config['os'][$this->os]) || $force) {
+        if (empty($config['os'][$this->os]['definition_loaded']) || $force) {
             $os = \Symfony\Component\Yaml\Yaml::parse(
                 file_get_contents(base_path('/includes/definitions/' . $this->os . '.yaml'))
             );
@@ -198,6 +198,8 @@ class Device extends BaseModel
             } else {
                 $config['os'][$this->os] = $os;
             }
+
+            $config['os'][$this->os]['definition_loaded'] = true;
         }
     }
 

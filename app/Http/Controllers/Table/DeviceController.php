@@ -75,7 +75,7 @@ class DeviceController extends TableController
         $query = Device::hasAccess($request->user())->with('location')->select('devices.*');
 
         // if searching or sorting the location field, join the locations table
-        if ($request->get('term') || in_array('location', array_keys($request->get('sort', [])))) {
+        if ($request->get('searchPhrase') || in_array('location', array_keys($request->get('sort', [])))) {
             $query->leftJoin('locations', 'locations.id', 'devices.location_id');
         }
 
