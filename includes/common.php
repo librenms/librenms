@@ -1568,7 +1568,7 @@ function load_os(&$device)
         unset($device['os_group']);
     }
 
-    $config['os'][$this->os]['definition_loaded'] = true;
+    $config['os'][$device['os']]['definition_loaded'] = true;
 }
 
 /**
