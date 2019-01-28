@@ -1539,7 +1539,7 @@ function load_os(&$device)
         return;
     }
 
-    if (isset($config['os'][$this->os]['definition_loaded'])) {
+    if (isset($config['os'][$device['os']]['definition_loaded'])) {
         d_echo("OS already loaded\n");
         return;
     }
