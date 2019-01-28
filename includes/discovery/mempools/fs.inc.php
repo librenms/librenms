@@ -6,7 +6,6 @@ if ($device['os'] == 'fs') {
     $mempools_array = snmpwalk_cache_oid($device, 'memoryIdle', $mempools_array, 'GBNPlatformOAM-MIB', 'fs');
     $mempools_array = snmpwalk_cache_oid($device, 'cpuDescription', $mempools_array, 'GBNPlatformOAM-MIB', 'fs');
     d_echo($mempools_array);
-
     if (is_array($mempools_array)) {
         foreach ($mempools_array as $index => $entry) {
             if ($entry['memorySize'] != 0) {
@@ -21,12 +20,10 @@ if ($device['os'] == 'fs') {
             } //end if
         } //end foreach
     } //end if
-
     $mempools_array = snmpwalk_cache_oid($device, 'memTotalReal', [], 'SWITCH', 'fs');
     $mempools_array = snmpwalk_cache_oid($device, 'memTotalFree', $mempools_array, 'SWITCH', 'fs');
     $mempools_array = snmpwalk_cache_oid($device, 'memTotalUsed', $mempools_array, 'SWITCH', 'fs');
     d_echo($mempools_array);
-
     if (is_array($mempools_array)) {
         foreach ($mempools_array as $index => $entry) {
             if ($entry['memTotalReal'] > 0) {
@@ -38,6 +35,5 @@ if ($device['os'] == 'fs') {
             } //end if
         } //end foreach
     } //end if
-
 } //end if
 unset($mempools_array);
