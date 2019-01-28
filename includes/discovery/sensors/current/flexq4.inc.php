@@ -1,8 +1,8 @@
 <?php
 /**
- * tpdin.inc.php
+ * flexq4.inc.php
  *
- * LibreNMS temperature discovery module for Tycon TPDIN (Gen 1)
+ * LibreNMS amperage discovery module for FlexScada Q4 as Used by Celerity Networks LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,14 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$oid = '.1.3.6.1.4.1.17095.3.13.0';
+$oid = '.1.3.6.1.4.1.4128.2';
 $current = (snmp_get($device, $oid, '-Oqv'));
-discover_sensor($valid['sensor'], 'temperature', $device, $oid, 1, 'tpdin', 'temp1', 1, 1, null, null, null, null, $current);
+discover_sensor($valid['sensor'], 'current', $device, $oid, 1, 'flexq4', 'input2-Solar', 1, 1, null, null, null, null, $current);
 
-$oid = '.1.3.6.1.4.1.17095.3.14.0';
+$oid = '.1.3.6.1.4.1.4128.4';
 $current = (snmp_get($device, $oid, '-Oqv'));
-discover_sensor($valid['sensor'], 'temperature', $device, $oid, 2, 'tpdin', 'temp2', 1, 1, null, null, null, null, $current);
+discover_sensor($valid['sensor'], 'current', $device, $oid, 2, 'flexq4', 'input4-Batt', 1, 1, null, null, null, null, $current);
+
+$oid = '.1.3.6.1.4.1.4128.6';
+$current = (snmp_get($device, $oid, '-Oqv'));
+discover_sensor($valid['sensor'], 'current', $device, $oid, 3, 'flexq4', 'input6-Load-24v', 1, 1, null, null, null, null, $current);

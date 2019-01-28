@@ -1,0 +1,166 @@
+TPDIN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, enterprises, 
+	Integer32
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC;
+
+webvoltmeter MODULE-IDENTITY
+	LAST-UPDATED "201303152346Z"
+	ORGANIZATION 
+		"Tycon Power Systems"
+	CONTACT-INFO 
+		""
+	DESCRIPTION 
+		"Web Voltmeter custom MIBs"
+::= { enterprises 3 }
+
+
+-- Web Voltmeter
+
+tycon                OBJECT IDENTIFIER ::= { enterprises 17095 }
+product              OBJECT IDENTIFIER ::= { tycon 1 }
+control              OBJECT IDENTIFIER ::= { tycon 3 }
+
+   ON-OFF          ::=   INTEGER { ON(1), OFF(0) }
+
+name  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { product 1 }
+
+version  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { product 2 }
+
+builddate  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { product 3 }
+
+-- Controls relay 1
+
+relay1  OBJECT-TYPE
+	SYNTAX     INTEGER { OFF(0), ON(1) }
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 1 control"
+	::= { control 1 }
+
+relay2  OBJECT-TYPE
+	SYNTAX     INTEGER { OFF(0), ON(1) }
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 2 control"
+	::= { control 2 }
+
+relay3  OBJECT-TYPE
+	SYNTAX     INTEGER { OFF(0), ON(1) }
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 3 control"
+	::= { control 3 }
+
+relay4  OBJECT-TYPE
+	SYNTAX     INTEGER { OFF(0), ON(1) }
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 4 control"
+	::= { control 4 }
+
+volt1  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Volt 1 reading"
+	::= { control 5 }
+
+volt2  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Volt 2 reading"
+	::= { control 6 }
+
+volt3  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Volt 3 reading"
+	::= { control 7 }
+
+volt4  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Volt 4 reading"
+	::= { control 8 }
+
+amp1  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 1 reading in Amps"
+	::= { control 9 }
+
+amp2  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 2 reading in Amps"
+	::= { control 10 }
+
+amp3  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 3 reading in Amps"
+	::= { control 11 }
+
+amp4  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 4 reading in Amps"
+	::= { control 12 }
+
+temp1  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Temperature on board in Celsius"
+	::= { control 13 }
+
+temp2  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Temperature measured by external sensor in Celsius"
+	::= { control 14 }
+END

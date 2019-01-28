@@ -1,8 +1,8 @@
 <?php
 /**
- * tpdin.inc.php
+ * tpdinsc48.inc.php
  *
- * LibreNMS temperature discovery module for Tycon TPDIN (Gen 1)
+ * LibreNMS OS poller module for Tycon Systems TPDIN-SC48-20
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,9 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$oid = '.1.3.6.1.4.1.17095.3.13.0';
-$current = (snmp_get($device, $oid, '-Oqv'));
-discover_sensor($valid['sensor'], 'temperature', $device, $oid, 1, 'tpdin', 'temp1', 1, 1, null, null, null, null, $current);
+$tycon_data = snmp_get_multi_oid($device, ['name.0', 'version.0'], '-OUQs', 'TPDIN-SC48-20-MIB');
 
-$oid = '.1.3.6.1.4.1.17095.3.14.0';
-$current = (snmp_get($device, $oid, '-Oqv'));
-discover_sensor($valid['sensor'], 'temperature', $device, $oid, 2, 'tpdin', 'temp2', 1, 1, null, null, null, null, $current);
+$hardware = $tycon_data['name.0'];
+$version  = $tycon_data['version.0'];
+
+unset($tycon_data);

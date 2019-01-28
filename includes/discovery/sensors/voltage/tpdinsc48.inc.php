@@ -1,8 +1,8 @@
 <?php
 /**
- * tpdin.inc.php
+ * tpdinsc48.inc.php
  *
- * LibreNMS temperature discovery module for Tycon TPDIN (Gen 1)
+ * LibreNMS voltage discovery module for Tycon TPDIN SC48 MPPT
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$oid = '.1.3.6.1.4.1.17095.3.13.0';
+$oid = '.1.3.6.1.4.1.45621.2.2.9.0';
 $current = (snmp_get($device, $oid, '-Oqv'));
-discover_sensor($valid['sensor'], 'temperature', $device, $oid, 1, 'tpdin', 'temp1', 1, 1, null, null, null, null, $current);
+discover_sensor($valid['sensor'], 'voltage', $device, $oid, 1, 'tpdinsc48', 'batteryvoltage', 1, 1, null, null, null, null, $current);
 
-$oid = '.1.3.6.1.4.1.17095.3.14.0';
+$oid = '.1.3.6.1.4.1.45621.2.2.15.0';
 $current = (snmp_get($device, $oid, '-Oqv'));
-discover_sensor($valid['sensor'], 'temperature', $device, $oid, 2, 'tpdin', 'temp2', 1, 1, null, null, null, null, $current);
+discover_sensor($valid['sensor'], 'voltage', $device, $oid, 2, 'tpdinsc48', 'inputvoltage', 1, 1, null, null, null, null, $current);

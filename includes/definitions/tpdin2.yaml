@@ -1,5 +1,5 @@
-os: tpdin
-text: 'Tycon Systems TPDIN'
+os: tpdin2
+text: 'Tycon Systems TPDIN2'
 type: power
 icon: tyconsystems
 nobulk: true
@@ -8,7 +8,7 @@ over:
     - { graph: device_current, text: 'Device Current' }
     - { graph: device_temperature, text: 'Device Temperature' }
 mib_dir:
-    - tycon/tpdin
+    - tycon/tpdin2
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.17095
+    - sysDescr:
+            - 'TPDIN2'

@@ -1,0 +1,256 @@
+SPPOESW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, enterprises, 
+	Integer32
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC;
+
+solarpoeswitch MODULE-IDENTITY
+	LAST-UPDATED "201503291313Z"
+	ORGANIZATION 
+		"Tycon Power Systems"
+	CONTACT-INFO 
+		"http://www.tyconsystems.com/"
+	DESCRIPTION 
+		"Solar controller - PoE switch custom MIB"
+::= { tycon 2 }
+
+-- Solar controller - PoE Switch
+
+tycon                OBJECT IDENTIFIER ::= { enterprises 45621 }
+product              OBJECT IDENTIFIER ::= { solarpoeswitch 1 }
+monitor              OBJECT IDENTIFIER ::= { solarpoeswitch 2 }
+
+-- product properties
+
+
+Tenths ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION
+            "tenths"
+    SYNTAX       INTEGER (0..10000)
+    
+			
+
+name  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Product name."
+	::= { product 1 }
+
+version  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Product version."
+	::= { product 2 }
+
+builddate  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Build date."
+	::= { product 3 }
+
+-- monitor properties
+
+port1  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Port 1 power control"
+	::= { monitor 1 }
+
+port2  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Port 2 power control"
+	::= { monitor 2 }
+
+port3  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Port 3 power control"
+	::= { monitor 3 }
+
+port4  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Port 4 power control"
+	::= { monitor 4 }
+
+port5  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Port 5 power control"
+	::= { monitor 5 }
+
+port6  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Port 6 power control"
+	::= { monitor 6 }
+
+port7  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Port 7 power control"
+	::= { monitor 7 }
+
+auxport  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Aux port power control"
+	::= { monitor 8 }
+
+batteryvoltage  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery voltage"
+	::= { monitor 9 }
+
+batterycurrent  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery current"
+	::= { monitor 10 }
+
+inputcurrent  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Input current"
+	::= { monitor 11 }
+
+loadpower  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Load power"
+	::= { monitor 12 }
+
+batterytemp  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery temperature"
+	::= { monitor 13 }
+
+batterystatus  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Battery status"
+	::= { monitor 14 }
+
+inputvoltage  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Input voltage"
+	::= { monitor 15 }
+	
+internaltemp  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(10))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Internal temperature"
+	::= { monitor 16 }
+	
+batteryVoltageInt  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery voltage"
+	::= { monitor 17 }
+
+batteryCurrentInt  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery current"
+	::= { monitor 18 }
+
+inputCurrentInt  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Input current"
+	::= { monitor 19 }
+
+loadPowerInt  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Load power"
+	::= { monitor 20 }
+
+batteryTempInt  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery temperature"
+	::= { monitor 21 }
+
+batteryStatusInt  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Battery status"
+	::= { monitor 22 }
+
+inputVoltageInt  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Input voltage"
+	::= { monitor 23 }
+	
+internalTempInt  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Internal temperature"
+	::= { monitor 24 }
+	
+END

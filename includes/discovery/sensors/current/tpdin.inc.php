@@ -2,7 +2,7 @@
 /**
  * tpdin.inc.php
  *
- * LibreNMS current discovery module for Tycon Systems TPDIN
+ * LibreNMS amperage discovery module for Tycon TPDIN (Gen 1)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,37 +23,18 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$tpdin_oids = array(
-    array(
-        'oid'     => '.1.3.6.1.4.1.45621.2.2.9.0',
-        'index'   => 'current1',
-        'descr'   => 'Current 1',
-        'current' => $pre_cache['tpdin_monitor'][0]['current1'],
-    ),
-    array(
-        'oid'     => '.1.3.6.1.4.1.45621.2.2.10.0',
-        'index'   => 'current2',
-        'descr'   => 'Current 2',
-        'current' => $pre_cache['tpdin_monitor'][0]['current2'],
-    ),
-    array(
-        'oid'     => '.1.3.6.1.4.1.45621.2.2.11.0',
-        'index'   => 'current3',
-        'descr'   => 'Current 3',
-        'current' => $pre_cache['tpdin_monitor'][0]['current3'],
-    ),
-    array(
-        'oid'     => '.1.3.6.1.4.1.45621.2.2.12.0',
-        'index'   => 'current4',
-        'descr'   => 'Current 4',
-        'current' => $pre_cache['tpdin_monitor'][0]['current4'],
-    ),
-);
+$oid = '.1.3.6.1.4.1.17095.3.9.0';
+$current = (snmp_get($device, $oid, '-Oqv'));
+discover_sensor($valid['sensor'], 'current', $device, $oid, 1, 'tpdin', 'amp1', 1, 1, null, null, null, null, $current);
 
-foreach ($tpdin_oids as $data) {
-    if ($data['current'] > 0) {
-        discover_sensor($valid['sensor'], 'current', $device, $data['oid'], $data['index'], $device['os'], $data['descr'], 10, '1', null, null, null, null, $data['current']);
-    }
-}
+$oid = '.1.3.6.1.4.1.17095.3.10.0';
+$current = (snmp_get($device, $oid, '-Oqv'));
+discover_sensor($valid['sensor'], 'current', $device, $oid, 2, 'tpdin', 'amp2', 1, 1, null, null, null, null, $current);
 
-unset($tpdin_oids);
+$oid = '.1.3.6.1.4.1.17095.3.11.0';
+$current = (snmp_get($device, $oid, '-Oqv'));
+discover_sensor($valid['sensor'], 'current', $device, $oid, 3, 'tpdin', 'amp3', 1, 1, null, null, null, null, $current);
+
+$oid = '.1.3.6.1.4.1.17095.3.12.0';
+$current = (snmp_get($device, $oid, '-Oqv'));
+discover_sensor($valid['sensor'], 'current', $device, $oid, 4, 'tpdin', 'amp4', 1, 1, null, null, null, null, $current);
