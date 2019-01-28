@@ -1,6 +1,6 @@
 <?php
 /**
- * Pbn.php
+ * Fs.php
  *
  * -Description-
  *
@@ -39,6 +39,7 @@ class FS extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
+        // Test first pair of OIDs from GBNPlatformOAM-MIB
         $processors_data = snmpwalk_cache_oid($this->getDevice(), 'cpuDescription', [], 'GBNPlatformOAM-MIB', 'fs');
         $processors_data = snmpwalk_cache_oid($this->getDevice(), 'cpuIdle', $processors_data, 'GBNPlatformOAM-MIB', 'fs');
         foreach ($processors_data as $index => $entry) {
@@ -52,6 +53,7 @@ class FS extends OS implements ProcessorDiscovery
                 100 - $entry['cpuIdle']
             );
         }
+        // Tests OID from SWITCH MIB. 
         $processors_data = snmpwalk_cache_oid($this->getDevice(), 'ssCpuIdle', [], 'SWITCH', 'fs');
         foreach ($processors_data as $index => $entry) {
             $processors[] = Processor::discover(

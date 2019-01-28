@@ -1,9 +1,13 @@
 <?php
-
+//
+// Polling for "fs-mibswitch" mempool_type, which belongs to Fiberstore devices, using
+// SWITCH mib
+//
+// other Fiberstore devices might be handled by fs.inc.php
+//
 $oid = $mempool['mempool_index'];
 
 d_echo('FS Mempool (SWITCHMIB)');
-
 
 if (!is_array($mempool_cache['fs-switchmib'])) {
     d_echo('caching');
@@ -13,8 +17,10 @@ if (!is_array($mempool_cache['fs-switchmib'])) {
     d_echo($mempool_cache);
 }
 
-$entry = $mempool_cache['fs-switchmib'][$mempool['mempool_index']];
-
+$entry = $mempool_cache['fs-switchmib'][$oid];
+//
+// Let's do some simple calculation
+//
 if ($entry['memTotalReal'] > 0) {
     $perc             = ($entry['memTotalUsed']) / $entry['memTotalReal'] * 100;
     $mempool['total'] = ($entry['memTotalReal'] * 1024);
