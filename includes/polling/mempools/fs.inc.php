@@ -7,10 +7,9 @@ d_echo('FS Mempool');
 if (!is_array($mempool_cache['fs'])) {
     d_echo('caching');
 
-
     $mempool_cache['fs'] = array();
-    $mempool_cache['fs'] = snmpwalk_cache_multi_oid($device, 'memorySize', $mempool_cache['fs'], 'GBNPlatformOAM-MIB', 'fs');
-    $mempool_cache['fs'] = snmpwalk_cache_multi_oid($device, 'memoryIdle', $mempool_cache['fs'], 'GBNPlatformOAM-MIB', 'fs');
+    $mempool_cache['fs'] = snmpwalk_cache_oid($device, 'memorySize', $mempool_cache['fs'], 'GBNPlatformOAM-MIB', 'fs');
+    $mempool_cache['fs'] = snmpwalk_cache_oid($device, 'memoryIdle', $mempool_cache['fs'], 'GBNPlatformOAM-MIB', 'fs');
     d_echo($mempool_cache);
 }
 

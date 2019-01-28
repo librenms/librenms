@@ -4,8 +4,10 @@ type: network
 icon: fs
 group: fs
 over:
+over:
     - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 mib_dir:
     - fs
 discovery:
