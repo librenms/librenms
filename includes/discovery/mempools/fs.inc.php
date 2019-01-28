@@ -19,9 +19,9 @@ if ($device['os'] == 'fs') {
     if (is_array($mempools_array)) {
         foreach ($mempools_array as $index => $entry) {
             //
-            // We keep the foreach in case multiple replies are seen here. 
-            // We could replace it with a condition (if we suppose only 1 reply will ever come) but 
-            // this would not change the complexity. 
+            // We keep the foreach in case multiple replies are seen here.
+            // We could replace it with a condition (if we suppose only 1 reply will ever come) but
+            // this would not change the complexity.
             //
             if ($entry['memorySize'] != 0) {
                 d_echo($index.' '.$entry['memorySize'].' -> '.$entry['memoryIdle'].' ('.$entry['cpuDescription'].")\n");
