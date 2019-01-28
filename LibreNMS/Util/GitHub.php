@@ -218,7 +218,7 @@ class GitHub
     public function createRelease()
     {
         // push the changelog and version bump
-        $this->pushFileContents($this->file, file_get_contents($this->file),  "Changelog for $this->tag");
+        $this->pushFileContents($this->file, file_get_contents($this->file), "Changelog for $this->tag");
         $updated_sha = $this->pushVersionBump();
 
         // make sure the markdown is built
