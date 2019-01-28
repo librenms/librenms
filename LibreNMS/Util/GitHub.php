@@ -218,7 +218,7 @@ class GitHub
     public function createRelease()
     {
         // push the changelog and version bump
-        $this->pushFileContents($this->file, file_get_contents($this->file));
+        $this->pushFileContents($this->file, file_get_contents($this->file),  "Changelog for $this->tag");
         $updated_sha = $this->pushVersionBump();
 
         // make sure the markdown is built
@@ -267,21 +267,22 @@ class GitHub
         $contents = file_get_contents(base_path($version_file));
         $updated_contents = preg_replace("/const VERSION = '[^']+';/", "const VERSION = '$this->tag';", $contents);
 
-        return $this->pushFileContents($version_file, $updated_contents);
+        return $this->pushFileContents($version_file, $updated_contents, "Bump version to $this->tag");
     }
 
     /**
      * @param string $file Path in git repo
      * @param string $contents new file contents
+     * @param string $message The commit message
      * @return \Requests_Response
      */
-    private function pushFileContents($file, $contents)
+    private function pushFileContents($file, $contents, $message)
     {
         $existing = \Requests::get($this->github . '/contents/' . $file, $this->getHeaders());
         $existing_sha = json_decode($existing->body)->sha;
 
         $updated = Requests::put($this->github . '/contents/' . $file, $this->getHeaders(), json_encode([
-            'message' => 'Changelog for ' . $this->tag,
+            'message' => $message,
             'content' => base64_encode($contents),
             'sha' => $existing_sha,
         ]));
