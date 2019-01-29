@@ -39,6 +39,8 @@ class FS extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
+        $processors = [];
+
         // Test first pair of OIDs from GBNPlatformOAM-MIB
         $processors_data = snmpwalk_cache_oid($this->getDevice(), 'cpuDescription', [], 'GBNPlatformOAM-MIB', 'fs');
         $processors_data = snmpwalk_cache_oid($this->getDevice(), 'cpuIdle', $processors_data, 'GBNPlatformOAM-MIB', 'fs');
@@ -56,7 +58,6 @@ class FS extends OS implements ProcessorDiscovery
         // Tests OID from SWITCH MIB.
         $processors_data = snmpwalk_cache_oid($this->getDevice(), 'ssCpuIdle', [], 'SWITCH', 'fs');
 
-        $processors = [];
         foreach ($processors_data as $index => $entry) {
             $processors[] = Processor::discover(
                 "fs-SWITCHMIB",
