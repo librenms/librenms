@@ -2,7 +2,7 @@
 /**
  * tpdinsc48.inc.php
  *
- * LibreNMS voltage discovery module for Tycon TPDIN SC48 MPPT
+ * LibreNMS power discovery module for Tycon TPDIN SC48 MPPT
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
