@@ -102,7 +102,7 @@ function external_exec($command)
         $replacements = [
             '-c\' \'COMMUNITY\'',
             '-u\' \'USER\'',
-            '-u\' \'USER\'',
+            '-U\' \'USER\'',
             '-A\' \'PASSWORD\'',
             '-X\' \'PASSWORD\'',
             '-P\' \'PASSWORD\'',
