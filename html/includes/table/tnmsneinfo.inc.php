@@ -31,7 +31,7 @@ if (isset($vars['device_id'])) {
     $sql = 'SELECT `neName`,`neLocation`,`neType`,`neOpMode`,`neAlarm`,`neOpState` FROM `tnmsneinfo`';
     $wheresql = ' WHERE `device_id` = ?';
     $sortcolumns = 3;
-    $count_sql = "SELECT COUNT(id) FROM `tnmsneinfo`".$wheresql;
+    $count_sql = "SELECT COUNT(*) FROM `tnmsneinfo`".$wheresql;
 
     // all columns are searchable - search across them
     if (isset($searchPhrase) && !empty($searchPhrase)) {
