@@ -1540,7 +1540,6 @@ function load_os(&$device)
     }
 
     if (!isset($config['os'][$device['os']]['definition_loaded'])) {
-        d_echo("OS already loaded\n");
         $tmp_os = Symfony\Component\Yaml\Yaml::parse(
             file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
         );
