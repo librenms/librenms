@@ -120,6 +120,6 @@ SELECT COUNT(*) INTO @FOREIGN_KEY_sensors_to_state_indexes_sensor_id_foreign_ON_
 alter table sensors modify sensor_id int unsigned auto_increment;
 alter table sensors_to_state_indexes modify sensor_id int unsigned not null, modify state_index_id int unsigned not null;
 alter table state_indexes modify state_index_id int unsigned auto_increment;
-ALTER TABLE `sensors_to_state_indexes` ADD FOREIGN KEY (`state_index_id`) REFERENCES `state_indexes`(`state_index_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `sensors_to_state_indexes` ADD CONSTRAINT `sensors_to_state_indexes_ibfk_1` FOREIGN KEY (`state_index_id`) REFERENCES `state_indexes`(`state_index_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 ALTER TABLE `sensors_to_state_indexes` ADD CONSTRAINT `sensors_to_state_indexes_sensor_id_foreign` FOREIGN KEY (`sensor_id`) REFERENCES `sensors` (`sensor_id`) ON DELETE CASCADE;
 UNLOCK TABLES;
