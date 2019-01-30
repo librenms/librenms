@@ -188,10 +188,10 @@ class Device extends BaseModel
     {
         global $config;
 
-        if (empty($config['os'][$this->os]['definition_loaded']) || $force) {
-            $os = \Symfony\Component\Yaml\Yaml::parse(
-                file_get_contents(base_path('/includes/definitions/' . $this->os . '.yaml'))
-            );
+        $yaml_file = base_path('/includes/definitions/' . $this->os . '.yaml');
+
+        if ((empty($config['os'][$this->os]['definition_loaded']) || $force) && file_exists($yaml_file)) {
+            $os = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($yaml_file));
 
             if (isset($config['os'][$this->os])) {
                 $config['os'][$this->os] = array_replace_recursive($os, $config['os'][$this->os]);

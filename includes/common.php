@@ -1539,19 +1539,16 @@ function load_os(&$device)
         return;
     }
 
-    if (isset($config['os'][$device['os']]['definition_loaded'])) {
-        d_echo("OS already loaded\n");
-        return;
-    }
+    if (!isset($config['os'][$device['os']]['definition_loaded'])) {
+        $tmp_os = Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
+        );
 
-    $tmp_os = Symfony\Component\Yaml\Yaml::parse(
-        file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
-    );
-
-    if (isset($config['os'][$device['os']])) {
-        $config['os'][$device['os']] = array_replace_recursive($tmp_os, $config['os'][$device['os']]);
-    } else {
-        $config['os'][$device['os']] = $tmp_os;
+        if (isset($config['os'][$device['os']])) {
+            $config['os'][$device['os']] = array_replace_recursive($tmp_os, $config['os'][$device['os']]);
+        } else {
+            $config['os'][$device['os']] = $tmp_os;
+        }
     }
 
     // Set type to a predefined type for the OS if it's not already set
