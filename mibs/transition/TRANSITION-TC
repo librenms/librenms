@@ -1,0 +1,166 @@
+-- ***********************************************************************************************
+-- TRANSITION-TC.my:  Transition Networks Inc MIB Textual Conventions
+--
+-- Copyright (c) 2013 by Transition Networks, Inc.
+-- All rights reserved.
+--                   
+-- ***********************************************************************************************
+
+TRANSITION-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Gauge32, Integer32 FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    InetAddressType, InetAddress FROM INET-ADDRESS-MIB
+    tnModules FROM TRANSITION-SMI;
+
+transitionTC MODULE-IDENTITY
+    LAST-UPDATED    "201311210000Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+  		"	Transition Networks
+			Technical Support
+
+			10900 Red Circle Drive
+			Minnetonka, MN 55343 USA
+			Tel: +1-800-526-9267
+			
+		    E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "This module defines textual conventions used in the
+        transition enterprise mibs."
+    REVISION        "201311210000Z"
+    DESCRIPTION
+        "Initial version, imports textual conventions from other standard mibs."
+    ::= { tnModules 1 }
+  
+-- The types of connectors that can be built into a Point System converter.
+-- No type of converter uses all of these connector types.
+-- Some converters return 16 bit connector style values that contain additional
+-- information on the connector in the upper byte. In these cases, the lower 
+-- byte is one of the values below. 
+CpsConnector ::= TEXTUAL-CONVENTION  
+	STATUS 	current
+	DESCRIPTION
+		" This enumerates all the Transition networks supported media connectors."
+		
+	SYNTAX 		INTEGER {  
+						   rj45(10),      -- RJ-45, unshielded twisted pair
+                           stmm(11),      -- ST fiber, multimode
+                           stsm(12),      -- ST fiber, singlemode
+                           scmm(13),      -- SC fiber, multimode
+                           scsm(14),      -- SC fiber, singlemode
+                           scsmlh(15),    -- SC fiber, singlemode, long haul
+                           scsmelh(16),   -- SC fiber, singlemode, extra long haul
+                           scsmlhlw(17),  -- SC fiber, long haul, long wavelength
+                           mtrjmm(18),    -- MT-RJ multimode fiber
+                           lc(19),        -- LC fiber, singlemode
+                           bnc(20),       -- BNC coax
+                           stsmlh(21),    -- ST Singlemode Long Haul
+                           stsmelh(22),   -- ST Singlemode Extra Long Haul
+                           scmm1300(23),  -- SC Multimode 1300nm
+                           stmm1300(24),  -- ST Multimode 1300nm
+                           mtrjsm(25),    -- MTRJ singlemode fiber
+                           serial26(26),  -- Universal 26-pin Serial Interface Connector
+                           stmmlh(27),    -- ST Multimode Long Haul
+                           scsmsh(28),    -- SC Singlemode Short Haul
+                           scsimplex(29), -- SC Simplex
+                           bncdual(30),   -- Dual BNC coax connectors
+                           db9rsxxx(31),  -- DB9 for RS232 and RS485
+                           termblock(32), -- Terminal Block for RS485
+                           rj11(33),      -- RJ-11, unshielded twisted pair
+                           sc40km(34),    -- SC fiber, 1550nm 40km 
+                           sc125km(35),    -- SC fiber, 1 x 9, 125km Gigiabit
+                           din6(38), 	  -- DIN 6-Pin for RS232   
+                           sfp(40)		  -- SFP cage
+                        }
+ 
+TNEthernetSpeed ::= TEXTUAL-CONVENTION  
+	STATUS 	current
+	DESCRIPTION
+		" This enumerates all the Transition networks supported Ethernet speeds."
+		
+	SYNTAX 		INTEGER {
+                        mbps10(1),
+                        mbps100(2),
+                        gbps1(3),
+                        gbps10(4),
+                        mbps2500(5),
+                        gbps5(6),
+                        gbps12(7)
+                        }
+
+TNEthernetDuplex ::= TEXTUAL-CONVENTION  
+	STATUS 	current
+	DESCRIPTION
+		" This enumerates all the Transition networks supported Ethernet interface duplex."
+		
+	SYNTAX 		INTEGER {
+                        halfDuplex(1),
+                        fullDuplex(2)
+                        }
+                        
+TNEthernetAutoCross ::= TEXTUAL-CONVENTION  
+	STATUS 	current
+	DESCRIPTION
+		" This enumerates all the Transition networks Ethernet Autocross values."
+		
+	SYNTAX 		INTEGER {
+                        mdi(1),
+                        mdiX(2),
+                        autocross(3),
+                        notApplicable(4)
+                        }						
+
+TNLoopbackModeCapBits ::= TEXTUAL-CONVENTION  
+	STATUS 	current
+	DESCRIPTION
+		"This enumerates all the Transition networks loopback modes capability."
+		
+	SYNTAX 		BITS {         
+						unused(0),      
+                        phyLayerLBCapable(1),
+                        macLayerLBCapable(2),
+                        alternateLBCapable(3),
+                        remotePeerLBCapable(4)
+                     }            
+                     
+TNLoopbackModes ::= TEXTUAL-CONVENTION  
+	STATUS 	current
+	DESCRIPTION
+		"This enumerates all the Transition networks loopback modes supported."
+		
+	SYNTAX 		INTEGER {   
+							noLoopback(0),
+                            phyLayerLB(1),
+                            macLayerLB(2),
+                            alternateLB(3),
+                            remotePeerLB(4)
+                        }  
+                        
+TNVlanIndexOrZero ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+            "The VLAN ID as VlanIndex as defined in Q-BRIDGE including zero. 
+            If the value is between 1 and 4095 inclusive, 
+            it represents an IEEE 802.1Q VLAN-ID.
+            If the value is zero, it is object-specific and
+            must therefore be defined as part of the
+            description of any object which uses this syntax."
+    SYNTAX    INTEGER(0..4095)
+       
+TNEthPhyMode ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+            "The different Ethernet PHY interfaces supported."
+    SYNTAX    INTEGER {                  
+    					unknown(0),
+    					phy10x100BaseT(1),
+    					phy100BaseFX(2),
+    					phy1000BaseX(3),
+    					phy10x100x1000BaseT(4),
+    					phySGMII(5)
+    				  }
+
+END
