@@ -108,4 +108,3 @@ if (!empty($oids_ntp)) {
         create_sensor_to_state_index($device, $state_ntp, $index);
     }
 }
-
