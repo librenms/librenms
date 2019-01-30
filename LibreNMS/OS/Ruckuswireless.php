@@ -11,7 +11,7 @@ class Ruckuswireless extends OS implements
     WirelessApCountDiscovery
 {
     public function discoverWirelessClients()
-   {
+    {
 
 // Find Per SSID Client Count
         $sensors = array();
@@ -41,7 +41,7 @@ class Ruckuswireless extends OS implements
         $oid = '.1.3.6.1.4.1.25053.1.2.1.1.1.15.2.0'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
         array_push($sensors, new WirelessSensor('clients', $this->getDeviceId(), $oid, 'ruckuswireless', ($index + 1), 'System Total:'));
         return $sensors;
-   }
+    }
 
 
 // Find Total AP Count
