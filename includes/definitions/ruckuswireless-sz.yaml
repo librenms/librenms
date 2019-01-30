@@ -17,6 +17,14 @@ ignore_mount_string:
     - var
     - java
     - cassandra
+    - home
+    - usr
+    - boot_mbr
+    - dev
+    - cgroup
+    - media
+    - tmp
+    - data
 poller_modules:
     wireless: true
 discovery_modules:
