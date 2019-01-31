@@ -1,0 +1,822 @@
+--MibName=raisecomOpticalMonitorMIB
+-- *****************************************************************
+-- RAISECOM-OPTICAL-MONITOR-MIB.my
+--
+-- May 2006, chenyu
+--
+-- Copyright(c) 2003-2005 by RAISECOM TECH, Ltd. 
+-- All rights reserved.
+-- *****************************************************************
+
+
+RAISECOM-OPTICAL-MONITOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, Unsigned32,
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    TimeTicks                       	FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                  FROM SNMPv2-TC
+    MODULE-COMPLIANCE,
+    NOTIFICATION-GROUP,
+    OBJECT-GROUP                        FROM SNMPv2-CONF
+    ifIndex                             FROM IF-MIB   
+    EnableVar        					FROM SWITCH-TC
+    raisecomAgent                       FROM RAISECOM-BASE-MIB;
+
+raisecomOpticalMonitorMIB MODULE-IDENTITY
+    LAST-UPDATED   "200606060000Z"
+    ORGANIZATION   "Raisecom, Inc."
+    CONTACT-INFO  
+                "       Raise Systems
+                        
+                Postal: Beijing,
+                        China
+
+                   Tel: 86-010-82884499
+
+                E-mail: chenyu@raisecom.com"
+    DESCRIPTION
+        "This MIB module defines objects to monitor optical
+        characteristics on the optical interfaces in a network element. "
+        REVISION   "200606060000Z"
+        DESCRIPTION
+            "The initial revision of this MIB."
+        ::={ raisecomAgent 9 }
+
+
+-- Textual Conventions
+
+OpticalParameterType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "This value indicates the optical parameter that is
+        being monitored. Valid values are -
+
+        temperature(1)        
+        supplyVoltage(2)           
+        biasCurrent(3)               
+        txOutputPower(4)       
+        receivedPower(5)               "
+    SYNTAX    INTEGER {
+ 			       		temperature(1),         
+    			    	supplyVoltage(2),    
+      				  	biasCurrent(3),      
+        				txOutputPower(4),         
+        				receivedPower(5)       
+              }
+
+
+OpticalParameterValue ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "The value of the optical parameter that is being monitored.
+
+        The range of values varies depending on the type of optical
+        parameter being monitored, as identified by a corresponding
+        object with syntax OpticalParameterType.
+
+        When the optical parameter being monitored is 'temperature',
+        the supported range is from -32768 to 32768, in units of
+        1/256 degrees centigrade.
+        Example: A value of 6016 represents a temperature reading of
+        23.5 degrees C.
+
+        When the optical parameter being monitored is 'supplyVoltage',
+        the supported range is from 0 to 65535, in units of 1/10 millivolts.
+        Example: A value of 55000 represents a supplyVoltage reading of
+        5.5 V.
+
+        When the optical parameter being monitored is 'biasCurrent',
+        the supported range is from 0 to 65535, in units of 1/500 
+        microamperes.
+        Example: A value of 500 represents a bias current reading of
+        1 microamperes.
+
+        When the optical parameter being monitored is 'txOutputPower',
+        the supported range is from 0 to 65535, in units of 1/10000 mW ..and express in units of dBm¡£
+        Example: A value of 60000 represents a txOutputPower reading of 7.78 dBm.    
+        
+        When the optical parameter being monitored is 'receivedPower',
+        the supported range is from 0 to 65535, in units of 1/10000 mW ..and express in units of dBm¡£
+        Example: A value of 60000 represents a receivedPower reading of 7.78 dBm.        "
+    SYNTAX    Integer32 (-1000000..65535 )
+
+OpticalPMPeriod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This value indicates the time period over which performance
+        monitoring data has been collected."
+    SYNTAX      INTEGER {
+                    fifteenMin(1),
+                    twentyFourHour(2)
+                }
+
+-- MIB Object Definitions
+
+raisecomOpticalMonitorMIBObjects        OBJECT IDENTIFIER ::=
+                                        {raisecomOpticalMonitorMIB 1 }
+
+-- groups in this MIB module
+
+raisecomOpticalMonGroup                OBJECT IDENTIFIER ::=
+                                        {raisecomOpticalMonitorMIBObjects 1 }
+
+raisecomOpticalPMGroup                 OBJECT IDENTIFIER ::=
+                                        {raisecomOpticalMonitorMIBObjects 2 }
+
+-- raisecomTranceiverInfoTable
+
+raisecomTranceiverInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RaisecomTranceiverInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Trancetver information Table."
+        ::= { raisecomOpticalMonitorMIBObjects 4 }
+
+raisecomTranceiverInfoEntry OBJECT-TYPE
+    SYNTAX      RaisecomTranceiverInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the raisecomSfpAccessA0Table."
+    INDEX        { ifIndex }
+    ::={ raisecomTranceiverInfoTable 1 }
+
+
+RaisecomTranceiverInfoEntry ::= SEQUENCE {
+	raisecomTranceiverType        OCTET STRING,
+	raisecomTranceiverConnectorType       OCTET STRING,
+	raisecomTranceiverWavelength  Integer32,
+	raisecomTranceiverVendorName  OCTET STRING,
+	raisecomTranceiverVendorPN    OCTET STRING,
+	raisecomTranceiverVendorSN    OCTET STRING,
+	raisecomTransceiverFiberType INTEGER,
+	raisecomTransceiverTransferDistance  Integer32
+}
+
+raisecomTranceiverType OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Type of the interface, such as 1000_BASE_SX_SFP"
+		::= { raisecomTranceiverInfoEntry 1 }
+		
+raisecomTranceiverConnectorType OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"ConnectorType of the interface, such as SC/LC"
+		::= { raisecomTranceiverInfoEntry 2 }
+		
+raisecomTranceiverWavelength OBJECT-TYPE
+		SYNTAX	Integer32
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Wavelength of the interface, measured in nm."
+		::= { raisecomTranceiverInfoEntry 3 }
+		
+raisecomTranceiverVendorName OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Vendor name of the interface."
+		::= { raisecomTranceiverInfoEntry 4 }
+		
+raisecomTranceiverVendorPN OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Vendor part number of the interface."
+		::= { raisecomTranceiverInfoEntry 5 }
+		
+raisecomTranceiverVendorSN OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Vendor serial number of the interface."
+		::= { raisecomTranceiverInfoEntry 6 }
+		
+raisecomTransceiverFiberType OBJECT-TYPE
+		SYNTAX INTEGER
+       {
+          single_mode(1),
+          multi_mode(2),
+          none(3)                 
+        }
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Types of the fiber, 
+            single_mode, multi_mode, none."
+		::= { raisecomTranceiverInfoEntry 7 }
+		
+raisecomTransceiverTransferDistance OBJECT-TYPE
+		SYNTAX	Integer32
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The max distance which the interface could transmit,
+            measured in meter."
+		::= { raisecomTranceiverInfoEntry 8 }
+		
+
+
+
+-- raisecomOpticalMonTable
+
+raisecomOpticalMonTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RaisecomOpticalMonEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides objects to monitor optical
+        parameters in a network element. "
+    ::={ raisecomOpticalMonGroup 1 }
+
+raisecomOpticalMonEntry OBJECT-TYPE
+    SYNTAX      RaisecomOpticalMonEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the raisecomOpticalMonTable provides objects to
+        monitor an optical parameter at an optical interface.
+        "
+    INDEX        { ifIndex, raisecomOpticalMonParameterType }
+    ::={ raisecomOpticalMonTable 1 }
+
+
+RaisecomOpticalMonEntry ::= SEQUENCE {
+    raisecomOpticalMonParameterType            OpticalParameterType,
+    raisecomOpticalParameterValue              OpticalParameterValue,
+    raisecomOpticalParamHighAlarmThresh        OpticalParameterValue,
+    raisecomOpticalParamHighWarningThresh      OpticalParameterValue,
+    raisecomOpticalParamLowAlarmThresh         OpticalParameterValue,
+    raisecomOpticalParamLowWarningThresh       OpticalParameterValue,
+    raisecomOpticalParamAlarmStatus            INTEGER,
+    raisecomOpticalParamAlarmLastValue         OpticalParameterValue,
+    raisecomOpticalParamAlarmLastChange        TimeTicks,
+    raisecomOpticalMon15MinValidIntervals      Unsigned32,
+    raisecomOpticalMon24HrValidIntervals       Unsigned32,
+    raisecomOpticalMonValidStatus        INTEGER 
+}
+
+raisecomOpticalMonParameterType OBJECT-TYPE
+    SYNTAX      OpticalParameterType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the optical parameter that is being
+        monitored in this entry."
+    ::={ raisecomOpticalMonEntry 1 }
+
+raisecomOpticalParameterValue OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the value measured for the particular
+        optical parameter specified by the raisecomOpticalMonParameterType
+        object."
+    ::={ raisecomOpticalMonEntry 2 }
+
+raisecomOpticalParamHighAlarmThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the high alarm threshold on the
+        optical parameter being monitored.
+
+        An alarm condition will be raised if the value given by
+        raisecomOpticalParameterValue goes from below the value of 
+        this object to above the value of this object, or if
+        the initial value of raisecomOpticalParameterValue exceeds the value
+        of this object. This alarm will be indicated in the 
+        raisecomOpticalParamAlarmStatus object."
+    ::={ raisecomOpticalMonEntry 3 }
+
+raisecomOpticalParamHighWarningThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a high warning threshold on
+        the optical parameter being monitored.
+
+        A threshold crossing condition will be indicated if the value
+        given by raisecomOpticalParameterValue goes from below the value
+        of this object to above the value of this
+        object, or if the initial value of raisecomOpticalParameterValue
+        exceeds the value of this object. This alarm will be indicated in the 
+        raisecomOpticalParamAlarmStatus object.
+        "
+    ::={ raisecomOpticalMonEntry 4 }
+
+raisecomOpticalParamLowAlarmThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a low alarm threshold on the
+        optical parameter being monitored.
+
+        An alarm condition will be raised if the value given by
+        raisecomOpticalParameterValue goes from above the value of
+        this object to below the value of this object, or if
+        the initial value of raisecomOpticalParameterValue is lower than the
+        value of this object. This alarm
+        will be indicated in the raisecomOpticalParamAlarmStatus object .."
+    ::={ raisecomOpticalMonEntry 5 }
+
+raisecomOpticalParamLowWarningThresh OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to set a low warning threshold on
+        the optical parameter being monitored.
+
+        A threshold crossing condition will be indicated if the value
+        given by raisecomOpticalParameterValue goes from above the value
+        of this object to below the value of this
+        object, or if the initial value of raisecomOpticalParameterValue
+        object is lower than the value of this object. For
+        network elements in the status
+        indications, this threshold violation will be indicated in the
+        raisecomOpticalParamAlarmStatus object ."
+    ::={ raisecomOpticalMonEntry 6 }
+
+raisecomOpticalParamAlarmStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+    		          none(0),
+                          high-alarm-threshold(1),
+                          high-warning-threshold(2),
+                          low-alarm-threshold(3),
+                          low-warning-threshold(4)
+                      }
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to indicate the current status of
+        the thresholds for the monitored optical parameter
+        on the interface.
+
+           If a threshold is currently being exceeded on the   
+           interface, the object  will be set. Otherwise, 
+           the object will be set to 0."
+    ::={ raisecomOpticalMonEntry 7 }
+
+raisecomOpticalParamAlarmLastValue OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the optical parameter value at the last time
+        a threshold related to a particular optical parameter was
+        exceeded on the interface.
+        If no threshold value is currently being
+        exceeded, then the value '-1000000' is returned."
+    ::={ raisecomOpticalMonEntry 8 }
+
+raisecomOpticalParamAlarmLastChange OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the value of sysUpTime at the last time
+        a threshold related to a particular optical parameter was
+        exceeded on the interface."
+    ::={ raisecomOpticalMonEntry 9 }
+
+raisecomOpticalMon15MinValidIntervals OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..96)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the number of previous 15 minute
+        intervals for which valid performance monitoring data
+        has been stored on the interface.
+
+        The value of this object will be n (where n is the maximum
+        number of 15 minute intervals supported at this interface),
+        unless the measurement was (re-)started within the last
+        (nx15) minutes, in which case the value will be the
+        number of previous 15 minute intervals for which the agent
+        has some data."
+    ::={ raisecomOpticalMonEntry 10 }
+
+raisecomOpticalMon24HrValidIntervals OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the number of previous 24 hour
+        intervals for which valid performance monitoring data
+        has been stored on the interface.
+
+        The value of this object will be 0 if the measurement
+        was (re-)started within the last 24 hours, or 1 otherwise."
+    ::={ raisecomOpticalMonEntry 11 }
+       
+raisecomOpticalMonValidStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    valid(1),
+                    invalid(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the parameter row is valid or not."
+    ::={ raisecomOpticalMonEntry 12 }
+
+-- Notification related objects
+
+raisecomOpticalNotifyEnable OBJECT-TYPE
+    SYNTAX      EnableVar
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the generation of raisecomOpticalMonParameterStatus notifications.
+        "
+    DEFVAL { enable}
+    ::={ raisecomOpticalMonGroup 2 }
+
+raisecomOpticalDigitalDiagnoticEnable OBJECT-TYPE
+    SYNTAX      EnableVar
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable digitaldiagnotic on the switch."
+    DEFVAL { disable}
+    ::={ raisecomOpticalMonGroup 3 }
+
+-- raisecomOpticalPMCurrent Table
+
+raisecomOpticalPMCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RaisecomOpticalPMCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains performance monitoring data for the
+        various optical parameters, collected over the current 15
+        minute or the current 24 hour interval."
+    ::={ raisecomOpticalPMGroup 1 }
+
+raisecomOpticalPMCurrentEntry OBJECT-TYPE
+    SYNTAX      RaisecomOpticalPMCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the raisecomOpticalPMCurrentTable. It contains
+        performance monitoring data for a monitored optical
+        parameter at an interface, collected over the current 15
+        minute or the current 24 hour interval.
+        "
+    INDEX       { ifIndex,                  
+                  raisecomOpticalPMCurrentPeriod,
+				  raisecomOpticalPMCurrentParamType }
+    ::={ raisecomOpticalPMCurrentTable 1 }
+
+RaisecomOpticalPMCurrentEntry ::= SEQUENCE {
+    raisecomOpticalPMCurrentPeriod             OpticalPMPeriod,
+    raisecomOpticalPMCurrentParamType          OpticalParameterType,
+    raisecomOpticalPMCurrentMaxParam           OpticalParameterValue,
+    raisecomOpticalPMCurrentMinParam           OpticalParameterValue,
+    raisecomOpticalPMCurrentMeanParam          OpticalParameterValue
+}
+
+raisecomOpticalPMCurrentPeriod OBJECT-TYPE
+    SYNTAX      OpticalPMPeriod
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the optical parameter values
+        given in this entry are collected over the current 15 minute or
+        the current 24 hour interval."
+    ::={ raisecomOpticalPMCurrentEntry 1 }
+
+raisecomOpticalPMCurrentParamType OBJECT-TYPE
+    SYNTAX      OpticalParameterType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the optical parameter that is being
+        monitored, in this entry."
+    ::={ raisecomOpticalPMCurrentEntry 2 }
+
+raisecomOpticalPMCurrentMaxParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the maximum value measured for the monitored
+        optical parameter, in the current 15 minute or the current
+        24 hour interval."
+    ::={ raisecomOpticalPMCurrentEntry 3 }
+
+raisecomOpticalPMCurrentMinParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the minimum value measured for the monitored
+        optical parameter, in the current 15 minute or the current
+        24 hour interval."
+    ::={ raisecomOpticalPMCurrentEntry 4 }
+
+raisecomOpticalPMCurrentMeanParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the average value of the monitored
+        optical parameter, in the current 15 minute or the current
+        24 hour interval."
+    ::={ raisecomOpticalPMCurrentEntry 5 }
+
+-- raisecomOpticalPMInterval Table
+
+raisecomOpticalPMIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RaisecomOpticalPMIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table stores performance monitoring data for the
+        various optical parameters, collected over previous
+        intervals.
+
+        This table can have entries for one complete 24 hour
+        interval and up to 96 complete 15 minute
+        intervals. A system is required to store at least
+        4 completed 15 minute intervals. The number of valid
+        15 minute intervals in this table is indicated by the
+        cOpticalMon15MinValidIntervals object and the number of
+        valid 24 hour intervals is indicated by the
+        cOpticalMon24HrValidIntervals object."
+    ::={ raisecomOpticalPMGroup 2 }
+
+raisecomOpticalPMIntervalEntry OBJECT-TYPE
+    SYNTAX      RaisecomOpticalPMIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the raisecomOpticalPMIntervalTable. It contains
+        performance monitoring data for an optical parameter,
+        collected over a previous interval.
+        "
+    INDEX      { ifIndex,
+    			raisecomOpticalPMIntervalPeriod,
+                 raisecomOpticalPMIntervalNumber,                 
+                 raisecomOpticalPMIntervalParamType }
+    ::={ raisecomOpticalPMIntervalTable 1 }
+
+RaisecomOpticalPMIntervalEntry ::= SEQUENCE {
+    raisecomOpticalPMIntervalPeriod            OpticalPMPeriod,
+    raisecomOpticalPMIntervalNumber            Integer32,
+    raisecomOpticalPMIntervalParamType         OpticalParameterType,
+    raisecomOpticalPMIntervalMaxParam          OpticalParameterValue,
+    raisecomOpticalPMIntervalMinParam          OpticalParameterValue,
+    raisecomOpticalPMIntervalMeanParam         OpticalParameterValue
+    }
+
+raisecomOpticalPMIntervalPeriod OBJECT-TYPE
+    SYNTAX      OpticalPMPeriod
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the optical parameter values,
+        given in this entry, are collected over a period of 15 minutes
+        or 24 hours."
+    ::={ raisecomOpticalPMIntervalEntry 1 }
+
+raisecomOpticalPMIntervalNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number between 1 and 96, which identifies the
+         interval for which the set of optical parameter values is
+         available. The interval identified by 1 is the most recently
+         completed 15 minute or 24 hour interval, and the interval
+         identified by N is the interval immediately preceding the one
+         identified by N-1."
+    ::={ raisecomOpticalPMIntervalEntry 2 }
+
+raisecomOpticalPMIntervalParamType OBJECT-TYPE
+    SYNTAX      OpticalParameterType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the optical parameter that is being
+        monitored, in this entry."
+    ::={ raisecomOpticalPMIntervalEntry 3 }
+
+raisecomOpticalPMIntervalMaxParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the maximum value measured for the optical
+        parameter, in a particular 15 minute or 24 hour interval."
+    ::={ raisecomOpticalPMIntervalEntry 4 }
+
+raisecomOpticalPMIntervalMinParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the minimum value measured for the optical
+        parameter, in a particular 15 minute or 24 hour interval."
+    ::={ raisecomOpticalPMIntervalEntry 5 }
+
+raisecomOpticalPMIntervalMeanParam OBJECT-TYPE
+    SYNTAX      OpticalParameterValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the average value of the measured optical
+        parameter, in a particular 15 minute or 24 hour interval."
+    ::={ raisecomOpticalPMIntervalEntry 6 }
+
+
+-- Notifications
+
+raisecomOpticalMonitorMIBNotifications OBJECT IDENTIFIER ::=
+                                 { raisecomOpticalMonitorMIB 2 }
+
+raisecomOpticalMonParameterStatus NOTIFICATION-TYPE
+    OBJECTS     { raisecomOpticalParameterValue,
+                  raisecomOpticalParamAlarmStatus
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when any threshold related to an
+        optical parameter is exceeded on an interface.
+
+        This notification may be suppressed under the following
+        conditions:
+        - depending on the value of the raisecomOpticalNotifyEnable object.
+        "
+    ::={ raisecomOpticalMonitorMIBNotifications 1 }
+
+-- MIB Conformance Statements
+
+raisecomOpticalMonitorMIBConformance  OBJECT IDENTIFIER ::=
+                                { raisecomOpticalMonitorMIB 3 }
+
+raisecomOpticalMonitorMIBCompliances  OBJECT IDENTIFIER ::=
+                                { raisecomOpticalMonitorMIBConformance 1 }
+
+raisecomOpticalMonitorMIBGroups       OBJECT IDENTIFIER ::=
+                                { raisecomOpticalMonitorMIBConformance 2 }
+
+
+raisecomOpticalMonitorMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for network elements that
+        monitor optical characteristics and thresholds on the
+        optical interfaces in a network element."
+    MODULE      -- this module
+        MANDATORY-GROUPS { raisecomOpticalMIBMonGroup }
+
+    GROUP raisecomOpticalMIBThresholdGroup
+    DESCRIPTION
+        "This group is required for network elements that support
+        thresholds on optical parameters."
+
+    GROUP raisecomOpticalMIBPMGroup
+    DESCRIPTION
+        "This group is required for network elements that
+        support collection of optical performance monitoring
+        data for 15 minute or 24 hour intervals."
+
+    GROUP raisecomOpticalMIBNotifyEnableGroup
+    DESCRIPTION
+        "This group is required for network elements that
+        support the cOpticalMIBNotifGroup."
+
+    GROUP raisecomOpticalMIBNotifGroup
+    DESCRIPTION
+        "This group is required for network elements that
+        generate notifications when a threshold is exceeded or
+        cleared on an interface."
+
+    OBJECT     raisecomOpticalParamHighAlarmThresh
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     raisecomOpticalParamHighWarningThresh
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     raisecomOpticalParamLowAlarmThresh
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     cOpticalParamLowWarningThresh
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     raisecomOpticalParamHighAlarmSev
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     cOpticalParamHighWarningSev
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     raisecomOpticalParamLowAlarmSev
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT     raisecomOpticalParamLowWarningSev
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    ::={ raisecomOpticalMonitorMIBCompliances 1 }
+
+-- Units of Conformance
+
+raisecomOpticalMIBMonGroup OBJECT-GROUP
+    OBJECTS {
+        raisecomOpticalParameterValue
+    }
+    STATUS        current
+    DESCRIPTION
+        "A mandatory object that provides monitoring of optical
+        characteristics."
+    ::={ raisecomOpticalMonitorMIBGroups 1 }
+
+raisecomOpticalMIBThresholdGroup OBJECT-GROUP
+    OBJECTS {
+        raisecomOpticalParamHighAlarmThresh,
+        raisecomOpticalParamHighWarningThresh,
+        raisecomOpticalParamLowAlarmThresh,
+        raisecomOpticalParamLowWarningThresh,
+        raisecomOpticalParamAlarmStatus,
+        raisecomOpticalParamAlarmLastValue,
+        raisecomOpticalParamAlarmLastChange
+    }
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects that support thresholds on optical
+        parameters and provide status information when the thresholds
+        are exceeded ."
+    ::={ raisecomOpticalMonitorMIBGroups 2 }
+
+raisecomOpticalMIBPMGroup OBJECT-GROUP
+    OBJECTS {
+        raisecomOpticalMon15MinValidIntervals,
+        raisecomOpticalMon24HrValidIntervals,
+        raisecomOpticalPMCurrentMaxParam,
+        raisecomOpticalPMCurrentMinParam,
+        raisecomOpticalPMCurrentMeanParam,
+        raisecomOpticalPMIntervalMaxParam,
+        raisecomOpticalPMIntervalMinParam,
+        raisecomOpticalPMIntervalMeanParam
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects that provide optical performance
+        monitoring data for 15 minute and 24 hour intervals."
+    ::={ raisecomOpticalMonitorMIBGroups 3 }
+
+raisecomOpticalMIBNotifyEnableGroup OBJECT-GROUP
+    OBJECTS {
+        raisecomOpticalNotifyEnable
+    }
+    STATUS        current
+    DESCRIPTION
+        "An object to control the generation of notifications."
+    ::={ raisecomOpticalMonitorMIBGroups 4 }
+
+raisecomOpticalMIBNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        raisecomOpticalMonParameterStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A notification generated when a threshold on an optical
+         parameter is exceeded or cleared."
+    ::={ raisecomOpticalMonitorMIBGroups 5 }
+
+END
