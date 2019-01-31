@@ -1,0 +1,173 @@
+-- MibName=rcPowerMonitor
+-- *****************************************************************
+-- Version 1.0 Created 2011.1.25 by wangjiangbo
+-- This version of MIB is created just for the Management of Power .
+--
+-- Copyright(c) 2002-2012 by RAISECOM TECH, Ltd. 
+-- All rights reserved.
+--
+-- modify history 
+--  01£¬20110901,hetao, Ìí¼Ó raisecomPowerStatusTrapºÍ raisecomPowerStatus 
+-- *****************************************************************         
+RAISECOM-POWERMONITOR-MIB  DEFINITIONS ::= BEGIN
+IMPORTS
+        raisecomAgent
+            FROM RAISECOM-BASE-MIB     
+  --        TruthValue
+  --            FROM SNMPv2-TC
+        Integer32,Unsigned32,Counter32                         
+        	FROM SNMPv2-SMI;
+
+	raisecomPowerMonitor MODULE-IDENTITY
+        LAST-UPDATED    "201101190000Z"
+        ORGANIZATION    "Raisecom, Inc."
+        CONTACT-INFO
+                "       Raise Systems
+
+                Postal: Beijing,
+                        China
+
+                   Tel: 86-010-82884499
+
+                E-mail: support@raisecom.com"
+
+        DESCRIPTION "The initial revision of this MIB."
+                ::= { raisecomAgent 24}         
+                
+-- 
+-- groups in the raisecomPowerMonitor MIB
+--
+raisecomPowerMonitorNotification   OBJECT IDENTIFIER ::= { raisecomPowerMonitor 1 }  
+raisecomPowerMonitorMibObjects    OBJECT IDENTIFIER ::= { raisecomPowerMonitor 2 }  
+                         
+-- 
+-- raisecomPowerMonitorNotification
+-- 
+    raisecomPowerVoltNormal NOTIFICATION-TYPE
+        OBJECTS { raisecomPowerIndex,  
+                  raisecomPowerVoltReference,
+                  raisecomPowerVoltValue
+                }
+        STATUS current
+        DESCRIPTION
+                "The trap notification occur when power-card value translating from abnormal to normal."            
+        ::= { raisecomPowerMonitorNotification 1 }  
+        
+    raisecomPowerVoltAbnormal NOTIFICATION-TYPE
+        OBJECTS { raisecomPowerIndex, 
+                  raisecomPowerVoltReference,
+                  raisecomPowerVoltValue
+                }
+        STATUS current
+        DESCRIPTION
+                "The trap notification occur when power-card value translating from normal to abnormal."            
+        ::= { raisecomPowerMonitorNotification 2 } 
+ 
+    raisecomPowerStatusTrap NOTIFICATION-TYPE
+	    -- OBJECTS { raisecomAlarmHistStatus, raisecomAlarmHistSource,raisecomAlarmHistDescr, raisecomAlarmHistTimestamp, raisecomAlarmHistType }
+	    OBJECTS { raisecomPowerIndex,  
+	              raisecomPowerStatus
+	            }
+	    STATUS  current
+		DESCRIPTION
+		       "A raisecomPowerTrap trap is sent when a power alarm generate."				               
+       	::= { raisecomPowerMonitorNotification 3 }  
+       	
+    raisecomDyingGaspTrap NOTIFICATION-TYPE  
+        STATUS  current
+		DESCRIPTION
+		       "Dying gasp."				               
+       	::= { raisecomPowerMonitorNotification 4 }
+
+ 
+--
+-- raisecomPowerMonitorStateTable
+--
+    raisecomPowerMonitorStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RaisecomPowerMonitorStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Power monitor state table."
+        ::= { raisecomPowerMonitorMibObjects 1 }
+
+    raisecomPowerMonitorStateEntry OBJECT-TYPE
+        SYNTAX RaisecomPowerMonitorStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Power monitor state entry."
+        INDEX { raisecomPowerIndex }
+        ::= { raisecomPowerMonitorStateTable 1 }
+
+    RaisecomPowerMonitorStateEntry ::= SEQUENCE {
+        raisecomPowerIndex               Unsigned32,
+        raisecomPowerSerialNumber        OCTET STRING,
+        raisecomPowerType        	     INTEGER,
+        raisecomPowerVoltReference       INTEGER,  
+        raisecomPowerVoltValue           INTEGER, 
+        raisecomPowerStatus              INTEGER
+        }
+    
+    raisecomPowerIndex OBJECT-TYPE
+        SYNTAX  Unsigned32  
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Specify the sequence number of Power."
+        ::= { raisecomPowerMonitorStateEntry 1 } 
+        
+    raisecomPowerSerialNumber OBJECT-TYPE       
+    	SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only        
+        STATUS      current
+        DESCRIPTION
+           	"specify the identical serial number of current power card,this 
+           	string number will be set when device leaving factory" 
+        ::= { raisecomPowerMonitorStateEntry 2 }
+    
+    raisecomPowerType OBJECT-TYPE
+      SYNTAX	INTEGER	
+        {
+        ac(1),
+    	dc(2)     	
+        }
+        MAX-ACCESS  read-only        
+        STATUS      current
+        DESCRIPTION
+          	"Specify the current type of the power.
+			 ac(1) means the current power AC Input.
+			 dc(2) means the current power DC Input." 
+        ::= { raisecomPowerMonitorStateEntry 3 }      
+            
+    raisecomPowerVoltReference OBJECT-TYPE
+        SYNTAX  INTEGER  
+        MAX-ACCESS read-only                   
+        STATUS current
+        DESCRIPTION               
+            "Specify the reference of the volt value of Power."
+        ::= { raisecomPowerMonitorStateEntry 4 }    
+        
+    raisecomPowerVoltValue OBJECT-TYPE
+        SYNTAX  INTEGER  
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specify the volt value of Power."
+        ::= { raisecomPowerMonitorStateEntry 5 }
+        
+      
+        
+     raisecomPowerStatus OBJECT-TYPE
+		SYNTAX INTEGER { 
+		                offline(1),
+		                online(2),
+		                power-on(3)
+		               }  
+        MAX-ACCESS  read-only
+        STATUS      current    
+        DESCRIPTION  
+            "The status of power alarm."
+        ::= {raisecomPowerMonitorStateEntry 6 }    
+        
+END
