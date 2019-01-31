@@ -19,9 +19,11 @@ Here we will provide configuration details for these modules.
 
 - Single Sign-on: [sso](#single-sign-on)
 
+⚠️ **When enabling a new authentication module, the local users will no longer be available to log in.**
+
 ### Enable authentication module
 
-To enable a particular authentication module you need to set this up in config.php.
+To enable a particular authentication module you need to set this up in config.php. Please note that only ONE module can be enabled. LibreNMS doesn't support multiple authentication mechanism at the same time.
 
 ```php
 $config['auth_mechanism'] = "mysql";
