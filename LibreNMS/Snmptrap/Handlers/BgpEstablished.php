@@ -59,5 +59,6 @@ class BgpEstablished implements SnmptrapHandler
         }
 
         $bgpPeer->save();
+        RunRules($device->device_id);
     }
 }

@@ -49,5 +49,6 @@ class UpsmgUtilityRestored implements SnmptrapHandler
         $sensor->save();
         $device_array = $device->toArray();
         log_event("UPS power restored, state sensor " . $sensor->sensor_descr . " has changed to ".$sensor->sensor_current . ".", $device_array, "Power", 1);
+        RunRules($device->device_id);
     }
 }

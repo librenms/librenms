@@ -59,5 +59,6 @@ class BgpBackwardTransition implements SnmptrapHandler
         }
 
         $bgpPeer->save();
+        RunRules($device->device_id);
     }
 }

@@ -68,5 +68,6 @@ class LinkUp implements SnmptrapHandler
         }
 
         $port->save();
+        RunRules($device->device_id);
     }
 }
