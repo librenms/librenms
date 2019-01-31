@@ -59,7 +59,7 @@ class Php extends BaseValidation
     private function checkSessionDirWritable(Validator $validator)
     {
         $path = session_save_path() === '' ? '/tmp' : session_save_path();
-        if (!is_writable($path)) {
+        if (!is_writable($path) and ini_get(save_handler) == "file") {
             $result = ValidationResult::fail("The session directory ($path) is not writable.");
 
             $group_id = filegroup($path);
