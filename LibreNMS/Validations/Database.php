@@ -27,7 +27,6 @@ namespace LibreNMS\Validations;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use Doctrine\DBAL\Schema\SchemaException;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\DB\Schema;
