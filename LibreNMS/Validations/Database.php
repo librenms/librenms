@@ -27,8 +27,10 @@ namespace LibreNMS\Validations;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
+use Doctrine\DBAL\Schema\SchemaException;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\DB\Schema;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 use Symfony\Component\Yaml\Yaml;
@@ -49,10 +51,14 @@ class Database extends BaseValidation
         $latest = 1000;
 
         if ($current === 0 || $current === $latest) {
-            \Artisan::call('migrate', ['--pretend' => true, '--force' => true]);
-            if (\Artisan::output() !== "Nothing to migrate.\n") {
+            if (!Schema::isCurrent()) {
                 $validator->fail("Your database is out of date!", './lnms migrate');
                 return;
+            }
+
+            if ($migrations = Schema::getUnexpectedMigrations()) {
+                $validator->warn("Your database schema has extra migrations (" . $migrations->implode(', ') .
+                "). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
             }
         } elseif ($current < $latest) {
             $validator->fail(
