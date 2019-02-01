@@ -2,41 +2,45 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-/**
- * Check if a port on a Proxmox VM exists
- * @param string  $p Port name
- * @param string  $c Clustername
- * @param integer $i VM ID
- * @return integer|boolean The port-ID if the port exists, false if it doesn't exist
- */
-function proxmox_port_exists($i, $c, $p)
-{
-    if ($row = dbFetchRow("SELECT pmp.id FROM proxmox_ports pmp, proxmox pm WHERE pm.id = pmp.vm_id AND pmp.port = ? AND pm.cluster = ? AND pm.vmid = ?", array($p, $c, $i))) {
-        return $row['id'];
-    }
+if (!function_exists('proxmox_port_exists')) {
+    /**
+     * Check if a port on a Proxmox VM exists
+     * @param string $p Port name
+     * @param string $c Clustername
+     * @param integer $i VM ID
+     * @return integer|boolean The port-ID if the port exists, false if it doesn't exist
+     */
+    function proxmox_port_exists($i, $c, $p)
+    {
+        if ($row = dbFetchRow("SELECT pmp.id FROM proxmox_ports pmp, proxmox pm WHERE pm.id = pmp.vm_id AND pmp.port = ? AND pm.cluster = ? AND pm.vmid = ?", [$p, $c, $i])) {
+            return $row['id'];
+        }
 
-    return false;
+        return false;
+    }
 }
 
-/**
- * Check if a Proxmox VM exists
- * @param integer $i VM ID
- * @param string  $c Clustername
- * @param array   $pmxcache Reference to the Proxmox VM Cache
- * @return boolean true if the VM exists, false if it doesn't
- */
-function proxmox_vm_exists($i, $c, &$pmxcache)
-{
+if (!function_exists('proxmox_vm_exists')) {
+    /**
+     * Check if a Proxmox VM exists
+     * @param integer $i VM ID
+     * @param string $c Clustername
+     * @param array $pmxcache Reference to the Proxmox VM Cache
+     * @return boolean true if the VM exists, false if it doesn't
+     */
+    function proxmox_vm_exists($i, $c, &$pmxcache)
+    {
 
-    if (isset($pmxcache[$c][$i]) && $pmxcache[$c][$i] > 0) {
-        return true;
-    }
-    if ($row = dbFetchRow("SELECT id FROM proxmox WHERE vmid = ? AND cluster = ?", array($i, $c))) {
-        $pmxcache[$c][$i] = (integer) $row['id'];
-        return true;
-    }
+        if (isset($pmxcache[$c][$i]) && $pmxcache[$c][$i] > 0) {
+            return true;
+        }
+        if ($row = dbFetchRow("SELECT id FROM proxmox WHERE vmid = ? AND cluster = ?", [$i, $c])) {
+            $pmxcache[$c][$i] = (integer)$row['id'];
+            return true;
+        }
 
-    return false;
+        return false;
+    }
 }
 
 $name = 'proxmox';
