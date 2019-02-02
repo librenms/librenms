@@ -1,0 +1,1507 @@
+-- ===========================================================================
+
+--  MODULE IDENTITY
+--  LAST-UPDATED "200810151200Z"
+--  ORGANIZATION "Alcatel"
+--  CONTACT-INFO "email:asam.mibsupport@alcatel.be"
+--  DESCRIPTION
+--     "IANAifType definitions.
+--      Interfaces group and ifMIB from MIB-II (RFC1573)."
+--
+--  REVISION "200810151200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA E3.4.0.0
+--      Editor: Lucien Marcotte
+--      Changes:
+--      * ANTmt25551: Changed Alcatel Note to indicate objects #2-13 
+--                    of the IFxTable are not supported on the IACM."
+--
+--  REVISION "201212071200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA E4.0.10.3.2
+--      Editor: Vijayakumar KANNIAH
+--      Changes:
+--      * Implemented ALU01183232: Change SYNTAX definitions of ifXTable items
+--        ifHCInOctets, ifHCInUcastPkts, ifHCInMulticastPkts, ifHCInBroadcastPkts,
+--        ifHCOutOctets, ifHCOutUcastPkts, ifHCOutMulticastPkts and
+--        ifHCOutBroadcastPkts from Counter to OCTET STRING"
+--      * Implemented ALU01183232: Change SUPPORT statuses of ifXTable itmes
+--        ifHCInOctets, ifHCInUcastPkts, ifHCInMulticastPkts, ifHCInBroadcastPkts,
+--        ifHCOutOctets, ifHCOutUcastPkts, ifHCOutMulticastPkts and
+--        ifHCOutBroadcastPkts from NO to YES"
+--
+--  REVISION "200612191200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA E4.2.1.2
+--      Editor: Diankun Zhang
+--      Changes:
+--      * Implemented BDFhw54921: Change SYNTAX definitions of ifXTable items
+--        ifHCInOctets, ifHCInUcastPkts, ifHCInMulticastPkts, ifHCInBroadcastPkts,
+--        ifHCOutOctets, ifHCOutUcastPkts, ifHCOutMulticastPkts and
+--        ifHCOutBroadcastPkts from Counter64 to Counter"
+--      * Implemented BDFhw54921: Change SUPPORT statuses of ifXTable itmes
+--        ifHCInOctets, ifHCInUcastPkts, ifHCInMulticastPkts, ifHCInBroadcastPkts,
+--        ifHCOutOctets, ifHCOutUcastPkts, ifHCOutMulticastPkts and
+--        ifHCOutBroadcastPkts from NO to YES"
+--
+--  REVISION "200612181200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA E4.2.1.1
+--      Editor: Diankun Zhang
+--      Changes:
+--      * Implemented BDFhw54921: Change SYNTAX definitions of ifXTable items
+--        ifHCInOctets, ifHCInUcastPkts, ifHCInMulticastPkts, ifHCInBroadcastPkts,
+--        ifHCOutOctets, ifHCOutUcastPkts, ifHCOutMulticastPkts and 
+--        ifHCOutBroadcastPkts from Counter to Counter64 for complying with RFC
+--        standards"
+--      * Implemented BDFhw54921: Change SUPPORT statuses of ifXTable itmes
+--        ifHCInOctets, ifHCInUcastPkts, ifHCInMulticastPkts, ifHCInBroadcastPkts,
+--        ifHCOutOctets, ifHCOutUcastPkts, ifHCOutMulticastPkts and
+--        ifHCOutBroadcastPkts from YES to NO"
+--
+--  REVISION "200612051200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA E4.2.1.0
+--      Editor: Diankun Zhang
+--      Changes:
+--      * Implemented BDFhw54921: Change SYNTAX definitions of ifXTable items
+--        ifHCInOctets and ifHCOutOctets are commented out for complying with
+--        SNMPv1 standards"
+
+--  REVISION "200601231200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA_V2.4.1.0.0
+--      Editor: Bart Bogaert
+--      Changes:
+--      * Implemented BDFhw70643: strict syntax checks (smilint)"
+--
+--  REVISION "200503151200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA_E2.2.0.0
+--      Editor: Diane Pholien
+--      Changes:
+--      * addition of atmBonding(244) ifType value."
+--
+--  REVISION "200404101200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA_E1.1.0.1
+--      Editor: Rafael Van Driessche
+--      Changes:
+--      * removed the range in the definition of InterfaceIndex."
+--
+--  REVISION "200404081200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA_E1.1.0.0
+--      Editor: Rafael Van Driessche
+--      Changes:
+--      * addition of ifType values;
+--      * addition of the range in the definition of InterfaceIndex;
+--      * addition of InterfaceIndexOrZero."
+--
+--  REVISION "200401121200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA_E1.0.0.0
+--      Editor: Rafael Van Driessche
+--      Changes:
+--      * revision for iSAM with editorial changes;
+--      * addition of ifType values."
+--
+--  REVISION "200210311200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505AAAA_E5.0.1.0
+--      Editor: F. Devolder
+--      Changes:
+--      * Add ifType to support GE-LSM in R5.0.10: hclTransport.
+--      * Add ifTypes introduced in other releases:
+--        vdsl, interleave, fast, ruemRuFiberLink, virtualTransport."
+--
+--  REVISION "200108081200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505AAAA_E5.0.0.0
+--      Editor: F. Devolder
+--      Changes:
+--      * Update Description-field of ifAdminStatus and ifOperStatus to
+--        indicate that some states are not supported.
+--      * Add IMA ifType to IANAifType.
+--      * Replace INTEGER (-2147483648..2147483647) by INTEGER."
+--
+--  REVISION "200101151200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505AAAA_E4.2.0.0
+--      Editor: D. Chorafakis
+--      Changes:
+--      * Add IPGW ifTypes to IANAifType."
+--
+--  REVISION "200006291200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505AAAA_E4.1.0.0
+--      Editor: KGB
+--      Changes:
+--      * Add VoDSL ifTypes to IANAifType."
+--
+--  REVISION "200002231200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505AAAA_E4.1.0.0
+--      Editor: K. Van Eynde
+--      Changes:
+--      * Add idsl and hdsl ifTypes to IANAifType."
+--
+-- ===========================================================================
+
+ITF-MIB DEFINITIONS ::= BEGIN
+   
+   IMPORTS
+      AutonomousType, TruthValue, TestAndIncr, RowStatus   FROM SNMPv2-TC
+      PhysAddress, DisplayString, interfaces, mib-2        FROM RFC1213-MIB
+      OBJECT-TYPE                                          FROM RFC-1212
+      TimeTicks, Counter, Gauge                            FROM RFC1155-SMI
+      IANAifType                                           FROM IANAifType-MIB;
+    
+   -- created from ifMIB (9311082155Z)
+   
+   ifMIB OBJECT IDENTIFIER ::= { mib-2 31 }
+   
+   ifMIBObjects OBJECT IDENTIFIER ::= { ifMIB 1 }
+   
+   OwnerString ::= OCTET STRING
+   
+   InterfaceIndex ::= INTEGER
+
+   -- Alcatel note:
+   -- following definition is not part of RFC1573;
+   -- it has been added in RFC2233.
+
+   InterfaceIndexOrZero ::= INTEGER (0..2147483647)
+   
+   ifNumber OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The number of network interfaces (regardless of their current
+          state) present on this system.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { interfaces 1 }
+
+   --
+   --  ifTable
+   --
+   
+   ifTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IfEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A list of interface entries.  The number of entries is given by
+          the value of ifNumber.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP ifNumber."
+      ::= { interfaces 2 }
+   
+   ifEntry OBJECT-TYPE
+      SYNTAX IfEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry containing management information applicable to a
+          particular interface.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { ifIndex }
+      ::= { ifTable  1 }
+   
+   IfEntry ::= SEQUENCE {
+         ifIndex             InterfaceIndex,
+         ifDescr             DisplayString,
+         ifType              IANAifType,
+         ifMtu               INTEGER,
+         ifSpeed             Gauge,
+         ifPhysAddress       PhysAddress,
+         ifAdminStatus       INTEGER,
+         ifOperStatus        INTEGER,
+         ifLastChange        TimeTicks,
+         ifInOctets          Counter,
+         ifInUcastPkts       Counter,
+         ifInNUcastPkts      Counter,
+         ifInDiscards        Counter,
+         ifInErrors          Counter,
+         ifInUnknownProtos   Counter,
+         ifOutOctets         Counter,
+         ifOutUcastPkts      Counter,
+         ifOutNUcastPkts     Counter,
+         ifOutDiscards       Counter,
+         ifOutErrors         Counter,
+         ifOutQLen           Gauge,
+         ifSpecific          OBJECT IDENTIFIER
+      }
+   
+   ifIndex OBJECT-TYPE
+      SYNTAX InterfaceIndex
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "A unique value, greater than zero, for each
+          interface.  It is recommended that values are assigned
+          contiguously starting from 1.  The value for each
+          interface sub-layer must remain constant at least from
+          one re-initialization of the entity's network
+          management system to the next re-initialization.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifEntry  1 }
+   
+   ifDescr OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "A textual string containing information about the
+          interface.  This string should include the name of the
+          manufacturer, the product name and the version of the
+          interface hardware/software.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifEntry  2 }
+   
+   ifType OBJECT-TYPE
+      SYNTAX IANAifType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The type of interface.  Additional values for ifType
+          are assigned by the Internet Assigned Numbers
+          Authority (IANA), through updating the syntax of the
+          IANAifType textual convention.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifEntry  3 }
+   
+   ifMtu OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The size of the largest packet which can be
+          sent/received on the interface, specified in octets.
+          For interfaces that are used for transmitting network
+          datagrams, this is the size of the largest network
+          datagram that can be sent on the interface.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: octets"
+      ::= { ifEntry  4 }
+
+   ifSpeed OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "An estimate of the interface's current bandwidth in
+          bits per second.  For interfaces which do not vary in
+          bandwidth or for those where no accurate estimation
+          can be made, this object should contain the nominal
+          bandwidth.  If the bandwidth of the interface is
+          greater than the maximum value reportable by this
+          object then this object should report its maximum
+          value (4,294,967,295) and ifHighSpeed must be used to
+          report the interace's speed.  For a sub-layer which
+          has no concept of bandwidth, this object should be zero.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: bits/second"
+      ::= { ifEntry  5 }
+   
+   ifPhysAddress OBJECT-TYPE
+      SYNTAX PhysAddress
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The interface's address at its protocol sub-layer.
+          The interface's media-specific MIB must define the bit
+          and byte ordering and format of the value contained by
+          this object.  For interfaces which do not have such an
+          address (e.g., a serial line), this object should
+          contain an octet string of zero length.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifEntry  6 }
+   
+   ifAdminStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+                up(1),
+                down(2),
+                testing(3)
+             }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The desired state of the interface.  The testing(3)
+          state indicates that no operational packets can be
+          passed.  When a managed system initializes, all
+          interfaces start with ifAdminStatus in the down(2)
+          state.  As a result of either explicit management
+          action or per configuration information retained by
+          the managed system, ifAdminStatus is then changed to
+          either the up(1) or testing(3) states (or remains in
+          the down(2) state).
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES    RANGE: 'testing' not supported
+             PERSIST: YES   DEFVALUE: down   UNITS: -"
+      ::= { ifEntry  7 }
+   
+   ifOperStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+                up(1),
+                down(2),
+                testing(3),
+                unknown(4),
+                dormant(5)
+             }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The current operational state of the interface.  The
+          testing(3) state indicates that no operational packets
+          can be passed.  If ifAdminStatus is down(2) then
+          ifOperStatus should be down(2).  If ifAdminStatus is
+          changed to up(1) then ifOperStatus should change to
+          up(1) if the interface is ready to transmit and
+          receive network traffic; it should change to
+          dormant(5) if the interface is waiting for external
+          actions (such as a serial line waiting for an
+          incomming connection); it should remain in the down(2)
+          state if and only if there is a fault that prevents if
+          from going to the up(1) state.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 'unknown', 'dormant'
+                                                  not supported
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifEntry  8 }
+   
+   ifLastChange OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The value of sysUpTime at the time the interface
+          entered its current operational state.  If the current
+          state was entered prior to the last re-initialization
+          of the local network management subsystem, then this
+          object contains a zero value.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifEntry  9 }
+   
+   ifInOctets OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The total number of octets received on the interface,
+          including framing characters.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: octets"
+      ::= { ifEntry  10 }
+   
+   ifInUcastPkts OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The number of packets, delivered by this sub-layer to
+          a higher (sub-)layer, which were not addressed to a
+          multicast or broadcast address at this sub-layer.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifEntry  11 }
+   
+   ifInNUcastPkts OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+         "The number of packets, delivered by this sub-layer to
+          a higher (sub-)layer, which were addressed to a
+          multicast or broadcast address at this sub-layer.
+          This object is deprecated in favour of
+          ifInMulticastPkts and ifInBroadcastPkts.
+
+          ALCATEL NOTE:
+             SUPPORT: NO   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: packets"
+      ::= { ifEntry  12 }
+   
+   ifInDiscards OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The number of inbound packets which were chosen to be
+          discarded even though no errors had been detected to
+          prevent their being deliverable to a higher-layer
+          protocol.  One possible reason for discarding such a
+          packet could be to free up buffer space.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifEntry  13 }
+   
+   ifInErrors OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "For packet-oriented interfaces, the number of inbound
+          packets that contained errors preventing them from
+          being deliverable to a higher-layer protocol.  For
+          character-oriented or fixed-length interfaces, the
+          number of inbound transmission units that contained
+          errors preventing them from being deliverable to a
+          higher-layer protocol.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifEntry  14 }
+   
+   ifInUnknownProtos OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "For packet-oriented interfaces, the number of packets
+          received via the interface which were discarded
+          because of an unknown or unsupported protocol.  For
+          character-oriented or fixed-length interfaces which
+          support protocol multiplexing the number of
+          transmission units received via the interface which
+          were discarded because of an unknown or unsupported
+          protocol.  For any interface which does not support
+          protocol multiplexing, this counter will always be 0.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifEntry  15 }
+   
+   ifOutOctets OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The total number of octets transmitted out of the
+          interface, including framing characters.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: octets"
+      ::= { ifEntry  16 }
+   
+   ifOutUcastPkts OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The total number of packets that higher-level
+          protocols requested be transmitted, and which were not
+          addressed to a multicast or broadcast address at this
+          sub-layer, including those that were discarded or not sent.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifEntry  17 }
+   
+   ifOutNUcastPkts OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+         "The total number of packets that higher-level
+          protocols requested be transmitted, and which were
+          addressed to a multicast or broadcast address at this
+          sub-layer, including those that were discarded or not sent.
+   
+          This object is deprecated in favour of
+          ifOutMulticastPkts and ifOutBroadcastPkts.
+
+          ALCATEL NOTE:
+             SUPPORT: NO   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: packets"
+      ::= { ifEntry  18 }
+   
+   ifOutDiscards OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The number of outbound packets which were chosen to
+          be discarded even though no errors had been detected
+          to prevent their being transmitted.  One possible
+          reason for discarding such a packet could be to free
+          up buffer space.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifEntry  19 }
+   
+   ifOutErrors OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "For packet-oriented interfaces, the number of
+          outbound packets that could not be transmitted because
+          of errors.  For character-oriented or fixed-length
+          interfaces, the number of outbound transmission units
+          that could not be transmitted because of errors.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifEntry  20 }
+   
+   ifOutQLen OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+         "The length of the output packet queue (in packets).
+
+          ALCATEL NOTE:
+             SUPPORT: NO   INSRVMOD: NA   RANGE: See above
+             PERSIST: NA   DEFVALUE: NA   UNITS: packets"
+      ::= { ifEntry  21 }
+   
+   ifSpecific OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER
+      ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+         "A reference to MIB definitions specific to the
+          particular media being used to realize the interface.
+          It is recommended that this value point to an instance
+          of a MIB object in the media-specific MIB, i.e., that
+          this object have the semantics associated with the
+          InstancePointer textual convention defined in RFC
+          1443.  In fact, it is recommended that the media-
+          specific MIB specify what value ifSpecific should/can
+          take for values of ifType.  If no MIB definitions
+          specific to the particular media are available, the
+          value should be set to the OBJECT IDENTIFIER { 0 0 }.
+
+          ALCATEL NOTE:
+             SUPPORT: NO   INSRVMOD: NA   RANGE: See above
+             PERSIST: NA   DEFVALUE: NA   UNITS: -"
+      ::= { ifEntry  22 }
+   
+   --
+   --  ifXTable
+   --
+   
+   ifXTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IfXEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A list of interface entries.  The number of entries
+          is given by the value of ifNumber.  This table
+          contains additional objects for the interface table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP ifNumber."
+      ::= { ifMIBObjects  1 }
+   
+   ifXEntry OBJECT-TYPE
+      SYNTAX IfXEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry containing additional management information
+          applicable to a particular interface.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+       -- AUGMENTS { ifEntry }
+       INDEX { ifIndex}
+       ::= { ifXTable  1 }
+   
+   IfXEntry ::= SEQUENCE {
+         ifName                   DisplayString,
+         ifInMulticastPkts        Counter,
+         ifInBroadcastPkts        Counter,
+         ifOutMulticastPkts       Counter,
+         ifOutBroadcastPkts       Counter,
+         ifHCInOctets             OCTET STRING,
+         ifHCInUcastPkts          OCTET STRING,
+         ifHCInMulticastPkts      OCTET STRING,
+         ifHCInBroadcastPkts      OCTET STRING,
+         ifHCOutOctets            OCTET STRING,
+         ifHCOutUcastPkts         OCTET STRING,
+         ifHCOutMulticastPkts     OCTET STRING,
+         ifHCOutBroadcastPkts     OCTET STRING,
+         ifLinkUpDownTrapEnable   INTEGER,
+         ifHighSpeed              Gauge,
+         ifPromiscuousMode        TruthValue,
+         ifConnectorPresent       TruthValue,
+         ifAlias                  DisplayString,
+         ifCounterDiscontinuityTime   INTEGER
+      }
+   
+   ifName OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The textual name of the interface.  The value of this
+          object should be the name of the interface as assigned
+          by the local device and should be suitable for use in
+          commands entered at the device's `console'.  This
+          might be a text name, such as `le0' or a simple port
+          number, such as `1', depending on the interface naming
+          syntax of the device.  If several entries in the
+          ifTable together represent a single interface as named
+          by the device, then each will have the same value of
+          ifName.  If there is no local name, or this object is
+          otherwise not applicable, then this object contains a
+          0-length string.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifXEntry  1 }
+   
+   ifInMulticastPkts OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The number of packets, delivered by this sub-layer to
+          a higher (sub-)layer, which were addressed to a
+          multicast address at this sub-layer.  For a MAC layer
+          protocol, this includes both Group and Functional
+          addresses.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifXEntry  2 }
+   
+   ifInBroadcastPkts OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The number of packets, delivered by this sub-layer to
+          a higher (sub-)layer, which were addressed to a
+          broadcast address at this sub-layer.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifXEntry  3 }
+   
+   ifOutMulticastPkts OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The total number of packets that higher-level
+          protocols requested be transmitted, and which were
+          addressed to a multicast address at this sub-layer,
+          including those that were discarded or not sent.  For
+          a MAC layer protocol, this includes both Group and
+          Functional addresses.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifXEntry  4 }
+   
+   ifOutBroadcastPkts OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The total number of packets that higher-level
+          protocols requested be transmitted, and which were
+          addressed to a broadcast address at this sub-layer,
+          including those that were discarded or not sent.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifXEntry  5 }
+   
+   ifHCInOctets OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The total number of octets received on the interface,
+          including framing characters.  This object is a 64-bit
+          version of ifInOctets.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: octets"
+      ::= { ifXEntry  6 }
+   
+   ifHCInUcastPkts OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The number of packets, delivered by this sub-layer to
+          a higher (sub-)layer, which were not addressed to a
+          multicast or broadcast address at this sub-layer.
+          This object is a 64-bit version of ifInUcastPkts.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifXEntry  7 }
+   
+   ifHCInMulticastPkts OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The number of packets, delivered by this sub-layer to
+          a higher (sub-)layer, which were addressed to a
+          multicast address at this sub-layer.  For a MAC layer
+          protocol, this includes both Group and Functional
+          addresses.  This object is a 64-bit version of
+          ifInMulticastPkts.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifXEntry  8 }
+   
+   ifHCInBroadcastPkts OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The number of packets, delivered by this sub-layer to
+          a higher (sub-)layer, which were addressed to a
+          broadcast address at this sub-layer.  This object is a
+          64-bit version of ifInBroadcastPkts.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifXEntry  9 }
+   
+   ifHCOutOctets OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The total number of octets transmitted out of the
+          interface, including framing characters.  This object
+          is a 64-bit version of ifOutOctets.
+
+        ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: octets"
+      ::= { ifXEntry  10 }
+   
+   ifHCOutUcastPkts OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The total number of packets that higher-level
+          protocols requested be transmitted, and which were not
+          addressed to a multicast or broadcast address at this
+          sub-layer, including those that were discarded or not
+          sent.  This object is a 64-bit version of ifOutUcastPkts.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifXEntry  11 }
+   
+   ifHCOutMulticastPkts OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The total number of packets that higher-level
+          protocols requested be transmitted, and which were
+          addressed to a multicast address at this sub-layer,
+          including those that were discarded or not sent.  For
+          a MAC layer protocol, this includes both Group and
+          Functional addresses.  This object is a 64-bit version
+          of ifOutMulticastPkts.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifXEntry  12 }
+   
+   ifHCOutBroadcastPkts OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The total number of packets that higher-level
+          protocols requested be transmitted, and which were
+          addressed to a broadcast address at this sub-layer,
+          including those that were discarded or not sent.  This
+          object is a 64-bit version of ifOutBroadcastPkts.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: packets"
+      ::= { ifXEntry  13 }
+   
+   ifLinkUpDownTrapEnable OBJECT-TYPE
+      SYNTAX INTEGER {
+                enabled(1),
+                disabled(2)
+             }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Indicates whether linkUp/linkDown traps should be
+          generated for this interface.
+   
+          By default, this object should have the value
+          enabled(1) for interfaces which do not operate on
+          'top' of any other interface (as defined in the
+          ifStackTable), and disabled(2) otherwise.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES         RANGE: See above
+             PERSIST: YES   DEFVALUE: See above   UNITS: -"
+      ::= { ifXEntry  14 }
+   
+   ifHighSpeed OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "An estimate of the interface's current bandwidth in
+          units of 1,000,000 bits per second.  If this object
+          reports a value of `n' then the speed of the interface
+          is somewhere in the range of `n-500,000' to
+          `n+499,999'.  For interfaces which do not vary in
+          bandwidth or for those where no accurate estimation
+          can be made, this object should contain the nominal
+          bandwidth.  For a sub-layer which has no concept of
+          bandwidth, this object should be zero.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: Mbit/second"
+      ::= { ifXEntry  15 }
+   
+   ifPromiscuousMode OBJECT-TYPE
+      SYNTAX TruthValue
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object has a value of false(2) if this interface
+          only accepts packets/frames that are addressed to this
+          station.  This object has a value of true(1) when the
+          station accepts all packets/frames transmitted on the
+          media.  The value true(1) is only legal on certain
+          types of media.  If legal, setting this object to a
+          value of true(1) may require the interface to be reset
+          before becoming effective.
+   
+          The value of ifPromiscuousMode does not affect the
+          reception of broadcast and multicast packets/frames by
+          the interface.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifXEntry  16 }
+
+   ifConnectorPresent OBJECT-TYPE
+      SYNTAX TruthValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object has the value 'true(1)' if the interface
+          sublayer has a physical connector and the value
+          'false(2)' otherwise.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifXEntry  17 }
+
+   -- the following ifAlias and ifCounterDiscontinuityTime mib objects are
+   -- added from lanx/ifmib to have a super mib
+  
+   ifAlias OBJECT-TYPE
+       SYNTAX DisplayString 
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+           "This object is an 'alias' name for the interface as
+                  specified by a network manager, and provides a non-
+                  volatile 'handle' for the interface.
+                                                                         
+                  On the first instantiation of an interface, the value
+                  of ifAlias associated with that interface is the
+                  zero-length string.  As and when a value is written
+                  into an instance of ifAlias through a network
+                  management set operation, then the agent must retain
+                  the supplied value in the ifAlias instance associated
+                  with the same interface for as long as that interface
+                  remains instantiated, including across all re-
+                  initializations/reboots of the network management
+                  system, including those which result in a change of
+                  the interface's ifIndex value.
+                                                                         
+                  An example of the value which a network manager might
+                  store in this object for a WAN interface is the
+                  (Telco's) circuit number/identifier of the interface.
+                                                                         
+                  Some agents may support write-access only for
+                  interfaces having particular values of ifType.  An
+                  agent which supports write access to this object is
+                  required to keep the value in non-volatile storage,
+                  but it may limit the length of new values depending on
+                  how much storage is already occupied by the current
+                  values for other interfaces."
+       ::=  { ifXEntry 18 }
+
+    ifCounterDiscontinuityTime OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The value of sysUpTime on the most recent occasion at
+                   which any one or more of this interface's counters
+                   suffered a discontinuity.  The relevant counters are
+                   the specific instances associated with this interface
+                   of any Counter32 or Counter64 object contained in the
+                   ifTable or ifXTable.  If no such discontinuities have
+                   occurred since the last re-initialization of the local
+                   management subsystem, then this object contains a zero
+                   value."
+        ::=  { ifXEntry 19 }
+   
+     
+   --
+   --  ifStackTable
+   --
+   
+   ifStackTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IfStackEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "The table containing information on the relationships between
+          the multiple sub-layers of network interfaces.
+          In particular, it contains information on which sub-layers run
+          'on top of' which other sub-layers.  Each sub-layer corresponds
+          to a conceptual row in the ifTable.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP."
+      ::= { ifMIBObjects  2 }
+   
+   ifStackEntry OBJECT-TYPE
+      SYNTAX IfStackEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Information on a particular relationship between two
+          sub-layers, specifying that one sub-layer runs on
+          'top' of the other sub-layer.  Each sub-layer
+          corresponds to a conceptual row in the ifTable.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { ifStackHigherLayer, ifStackLowerLayer }
+      ::= { ifStackTable  1 }
+   
+   IfStackEntry ::= SEQUENCE {
+         ifStackHigherLayer   INTEGER,
+         ifStackLowerLayer    INTEGER,
+         ifStackStatus        RowStatus
+      }
+   
+   ifStackHigherLayer OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "The value of ifIndex corresponding to the higher
+          sub-layer of the relationship, i.e., the sub-layer
+          which runs on 'top' of the sub-layer identified by the
+          corresponding instance of ifStackLowerLayer.  If there
+          is no higher sub-layer (below the internetwork layer),
+          then this object has the value 0.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifStackEntry  1 }
+   
+   ifStackLowerLayer OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "The value of ifIndex corresponding to the lower sub-
+          layer of the relationship, i.e., the sub-layer which
+          runs 'below' the sub-layer identified by the
+          corresponding instance of ifStackHigherLayer.  If
+          there is no lower sub-layer, then this object has the
+          value 0.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifStackEntry  2 }
+   
+   ifStackStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The status of the relationship between two sub-layers.
+   
+          Changing the value of this object from 'active' to
+          'notInService' or 'destroy' will likely have
+          consequences up and down the interface stack.  Thus,
+          write access to this object is likely to be
+          inappropriate for some types of interfaces, and many
+          implementations will choose not to support write-
+          access for any type of interface.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifStackEntry  3 }
+
+   --
+   -- The Interface Test Table
+   --
+   -- This group of objects is optional.  However, a media-specific
+   -- MIB may make implementation of this group mandatory.
+   --
+   -- This table replaces the ifExtnsTestTable
+   --
+
+   ifTestTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IfTestEntry
+      ACCESS not-accessible
+      STATUS optional
+      DESCRIPTION
+         "This table contains one entry per interface.  It
+          defines objects which allow a network manager to
+          instruct an agent to test an interface for various
+          faults.  Tests for an interface are defined in the
+          media-specific MIB for that interface.  After invoking
+          a test, the object ifTestResult can be read to
+          determine the outcome.  If an agent can not perform
+          the test, ifTestResult is set to so indicate.  The
+          object ifTestCode can be used to provide further
+          test-specific or interface-specific (or even
+          enterprise-specific) information concerning the
+          outcome of the test.  Only one test can be in progress
+          on each interface at any one time.  If one test is in
+          progress when another test is invoked, the second test
+          is rejected.  Some agents may reject a test when a
+          prior test is active on another interface.
+          Before starting a test, a manager-station must first
+          obtain 'ownership' of the entry in the ifTestTable for
+          the interface to be tested.  This is accomplished with
+          the ifTestId and ifTestStatus objects as follows:
+
+            try_again:
+                get (ifTestId, ifTestStatus)
+                while (ifTestStatus != notInUse)
+                    /*
+                     * Loop while a test is running or some other
+                     * manager is configuring a test.
+                     */
+                    short delay
+                    get (ifTestId, ifTestStatus)
+                }
+
+                /*
+                 * Is not being used right now -- let's compete
+                 * to see who gets it.
+                 */
+                lock_value = ifTestId
+
+                if ( set(ifTestId = lock_value, ifTestStatus = inUse,
+                         ifTestOwner = 'my-IP-address') == FAILURE)
+                    /*
+                     * Another manager got the ifTestEntry -- go
+                     * try again
+                     */
+                    goto try_again;
+
+                /*
+                 * I have the lock
+                 */
+                set up any test parameters.
+
+                /*
+                 * This starts the test
+                 */
+                set(ifTestType = test_to_run);
+
+                wait for test completion by polling ifTestResult
+
+                when test completes, agent sets ifTestResult
+                     agent also sets ifTestStatus = 'notInUse'
+
+                retrieve any additional test results, and ifTestId
+
+                if (ifTestId == lock_value+1) results are valid
+
+          A manager station first retrieves the value of the
+          appropriate ifTestId and ifTestStatus objects,
+          periodically repeating the retrieval if necessary,
+          until the value of ifTestStatus is 'notInUse'.  The
+          manager station then tries to set the same ifTestId
+          object to the value it just retrieved, the same
+          ifTestStatus object to 'inUse', and the corresponding
+          ifTestOwner object to a value indicating itself.  If
+          the set operation succeeds then the manager has
+          obtained ownership of the ifTestEntry, and the value of
+          the ifTestId object is incremented by the agent (per
+          the semantics of TestAndIncr).  Failure of the set
+          operation indicates that some other manager has
+          obtained ownership of the ifTestEntry.
+ 
+          Once ownership is obtained, any test parameters can be
+          setup, and then the test is initiated by setting
+          ifTestType.  On completion of the test, the agent sets
+          ifTestStatus to 'notInUse'.  Once this occurs, the
+          manager can retrieve the results.  In the (rare) event
+          that the invocation of tests by two network managers
+          were to overlap, then there would be a possibility that
+          the first test's results might be overwritten by the
+          second test's results prior to the first results being
+          read.  This unlikely circumstance can be detected by a
+          network manager retrieving ifTestId at the same time as
+          retrieving the test results, and ensuring that the
+          results are for the desired request.
+ 
+          If ifTestType is not set within an abnormally long
+          period of time after ownership is obtained, the agent
+          should time-out the manager, and reset the value of the
+          ifTestStatus object back to 'notInUse'.  It is
+          suggested that this time-out period be 5 minutes.
+ 
+          In general, a management station must not retransmit a
+          request to invoke a test for which it does not receive
+          a response; instead, it properly inspects an agent's
+          MIB to determine if the invocation was successful.
+          Only if the invocation was unsuccessful, is the
+          invocation request retransmitted.
+
+          Some tests may require the interface to be taken off-
+          line in order to execute them, or may even require the
+          agent to reboot after completion of the test.  In these
+          circumstances, communication with the management
+          station invoking the test may be lost until after
+          completion of the test.  An agent is not required to
+          support such tests.  However, if such tests are
+          supported, then the agent should make every effort to
+          transmit a response to the request which invoked the
+          test prior to losing communication.  When the agent is
+          restored to normal service, the results of the test are
+          properly made available in the appropriate objects.
+          Note that this requires that the ifIndex value assigned
+          to an interface must be unchanged even if the test
+          causes a reboot.  An agent must reject any test for
+          which it cannot, perhaps due to resource constraints,
+          make available at least the minimum amount of
+          information after that test completes.
+ 
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP ifNumber."
+      ::= { ifMIBObjects 3 }
+
+   ifTestEntry OBJECT-TYPE
+      SYNTAX IfTestEntry
+      ACCESS not-accessible
+      STATUS optional
+      DESCRIPTION
+         "An entry containing objects for invoking tests on an
+          interface.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      -- AUGMENTS  { ifEntry }
+      INDEX {ifIndex}
+      ::= { ifTestTable 1 }
+
+   IfTestEntry ::= SEQUENCE {
+         ifTestId           TestAndIncr,
+         ifTestStatus       INTEGER,
+         ifTestType         AutonomousType,
+         ifTestResult       INTEGER,
+         ifTestCode         OBJECT IDENTIFIER,
+         ifTestOwner        OwnerString
+      }
+
+   ifTestId OBJECT-TYPE
+      SYNTAX TestAndIncr
+      ACCESS read-write
+      STATUS optional
+      DESCRIPTION
+         "This object identifies the current invocation of the
+          interface's test.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= { ifTestEntry 1 }
+
+   ifTestStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+                notInUse(1),
+                inUse(2) 
+             }
+      ACCESS read-write
+      STATUS optional
+      DESCRIPTION
+         "This object indicates whether or not some manager
+          currently has the necessary 'ownership' required to
+          invoke a test on this interface.  A write to this
+          object is only successful when it changes its value
+          from 'notInUse(1)' to 'inUse(2)'.  After completion of
+          a test, the agent resets the value back to
+          'notInUse(1)'.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= { ifTestEntry 2 }
+
+   ifTestType OBJECT-TYPE
+      SYNTAX AutonomousType
+      ACCESS read-write
+      STATUS optional
+      DESCRIPTION
+         "A control variable used to start and stop operator-
+          initiated interface tests.  Most OBJECT IDENTIFIER
+          values assigned to tests are defined elsewhere, in
+          association with specific types of interface.
+          However, this document assigns a value for a full-
+          duplex loopback test, and defines the special meanings
+          of the subject identifier:
+
+              noTest  OBJECT IDENTIFIER ::= { 0 0 }
+
+          When the value noTest is written to this object, no
+          action is taken unless a test is in progress, in which
+          case the test is aborted.  Writing any other value to
+          this object is only valid when no test is currently in
+          progress, in which case the indicated test is
+          initiated.
+
+          When read, this object always returns the most recent
+          value that ifTestType was set to.  If it has not been
+          set since the last initialization of the network
+          management subsystem on the agent, a value of noTest
+          is returned.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= { ifTestEntry 3 }
+
+   ifTestResult OBJECT-TYPE
+      SYNTAX INTEGER {
+                none(1),          -- no test yet requested
+                success(2),
+                inProgress(3),
+                notSupported(4),
+                unAbleToRun(5),   -- due to state of system
+                aborted(6),
+                failed(7)
+             }
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+         "This object contains the result of the most recently
+          requested test, or the value none(1) if no tests have
+          been requested since the last reset.  Note that this
+          facility provides no provision for saving the results
+          of one test when starting another, as could be
+          required if used by multiple managers concurrently.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifTestEntry 4 }
+
+   ifTestCode  OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+         "This object contains a code which contains more
+          specific information on the test result, for example
+          an error-code after a failed test.  Error codes and
+          other values this object may take are specific to the
+          type of interface and/or test.  The value may have the
+          semantics of either the AutonomousType or
+          InstancePointer textual conventions as defined in RFC
+          1443.  The identifier:
+
+              testCodeUnknown  OBJECT IDENTIFIER ::= { 0 0 }
+
+          is defined for use if no additional result code is
+          available.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { ifTestEntry 5 }
+
+   ifTestOwner OBJECT-TYPE
+      SYNTAX OwnerString
+      ACCESS read-write
+      STATUS optional
+      DESCRIPTION
+         "The entity which currently has the 'ownership'
+          required to invoke a test on this interface.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= { ifTestEntry 6 }
+
+--   Generic Receive Address Table
+
+--
+
+-- This group of objects is mandatory for all types of
+
+-- interfaces which can receive packets/frames addressed to
+
+-- more than one address.
+
+--
+
+-- This table replaces the ifExtnsRcvAddr table.  The main
+
+-- difference is that this table makes use of the RowStatus
+
+-- textual convention, while ifExtnsRcvAddr did not.
+ifRcvAddressTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IfRcvAddressEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains an entry for each address
+               (broadcast, multicast, or uni-cast) for which the
+               system will receive packets/frames on a particular
+               interface, except as follows:
+
+               - for an interface operating in promiscuous mode,
+               entries are only required for those addresses for
+               which the system would receive frames were it not
+               operating in promiscuous mode.
+
+               - for 802.5 functional addresses, only one entry is
+               required, for the address which has the functional
+               address bit ANDed with the bit mask of all functional
+               addresses for which the interface will accept frames.
+
+               A system is normally able to use any unicast address
+               which corresponds to an entry in this table as a
+               source address."
+    ::=  { ifMIBObjects 4 }
+
+ifRcvAddressEntry OBJECT-TYPE
+    SYNTAX IfRcvAddressEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of objects identifying an address for which
+               the system will accept packets/frames on the
+               particular interface identified by the index value
+               ifIndex."
+    INDEX {ifIndex,ifRcvAddressAddress}
+    ::=  { ifRcvAddressTable 1 }
+
+IfRcvAddressEntry ::= SEQUENCE {
+    ifRcvAddressAddress    PhysAddress,
+    ifRcvAddressStatus    RowStatus,
+    ifRcvAddressType    INTEGER
+    }
+
+ifRcvAddressAddress OBJECT-TYPE
+    SYNTAX PhysAddress (SIZE(6))
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "An address for which the system will accept
+               packets/frames on this entry's interface."
+    ::=  { ifRcvAddressEntry 1 }
+
+ifRcvAddressStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to create and delete rows in the
+               ifRcvAddressTable."
+    ::=  { ifRcvAddressEntry 2 }
+
+ifRcvAddressType OBJECT-TYPE
+    SYNTAX INTEGER {
+              other          (1),
+              volatile          (2),
+              nonVolatile          (3)
+           }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object has the value nonVolatile(3) for those
+               entries in the table which are valid and will not be
+               deleted by the next restart of the managed system.
+               Entries having the value volatile(2) are valid and
+               exist, but have not been saved, so that will not exist
+               after the next restart of the managed system.  Entries
+               having the value other(1) are valid and exist but are
+               not classified as to whether they will continue to
+               exist after the next restart."
+    DEFVAL { volatile         }
+    ::=  { ifRcvAddressEntry 3 }
+
+END
