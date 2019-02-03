@@ -1,0 +1,51 @@
+-- Copyright 2017 BlueCat Networks. All rights reserved.
+-- *****************************************************************
+-- BCN-PRODUCTS-MIB.mib:  BlueCat Networks Product OID Assignments
+--
+--
+-- December 2010, Fabian Ischia
+--
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+BCN-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    bcnModules,
+    bcnProducts
+        FROM BCN-SMI-MIB;
+
+bcnProductsMIB MODULE-IDENTITY
+    LAST-UPDATED	"201011301200Z"
+    ORGANIZATION	"BlueCat Networks"
+    CONTACT-INFO
+        "BlueCat Networks. Customer Care.
+
+        North America
+        Call: +1.866.491.2228
+        Europe
+        Call: +44.8081.011.306
+        Other
+        Call: +1.416.646.8433
+        
+        Email: support@bluecatnetworks.com"
+    DESCRIPTION
+        "This module defines the object identifiers that are assigned to
+        hardware platforms or software systems.
+        This objects are returned as sysObjectID."
+    REVISION "201011301200Z"
+    DESCRIPTION
+                "Initial version of this MIB module."
+    ::= { bcnModules 2 }
+
+bcnProductsAdonis OBJECT IDENTIFIER ::= { bcnProducts 1 }
+bcnProductsProteus OBJECT IDENTIFIER ::= { bcnProducts 2 }
+bcnProductsAdonis250 OBJECT IDENTIFIER ::= { bcnProducts 3 }
+bcnProductsAdonis750 OBJECT IDENTIFIER ::= { bcnProducts 4 }
+bcnProductsAdonis1000 OBJECT IDENTIFIER ::= { bcnProducts 5 }
+bcnProductsPoteus2150 OBJECT IDENTIFIER ::= { bcnProducts 6 }
+
+END
