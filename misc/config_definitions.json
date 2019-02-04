@@ -438,8 +438,9 @@
     "autodiscovery.xdp": {
         "default": true
     },
-    "autodiscovery.xdp_exclude.sysdesc_regexp.0": {
-        "default": "\/-K9W8-\/"
+    "autodiscovery.xdp_exclude.sysdesc_regexp": {
+        "type": "array",
+        "default": ["\/-K9W8-\/"]
     },
     "availability-map-width": {
         "default": 25
@@ -447,119 +448,58 @@
     "bad_disk_regexp": {
         "default": []
     },
-    "bad_if.0": {
-        "default": "voip-null"
+    "bad_if": {
+        "type": "array",
+        "default": [
+            "voip-null",
+            "virtual-",
+            "unrouted",
+            "eobc",
+            "lp0",
+            "-atm",
+            "faith0",
+            "container",
+            "async",
+            "plip",
+            "-physical",
+            "container",
+            "unrouted",
+            "bluetooth",
+            "isatap",
+            "ras",
+            "qos",
+            "span rp",
+            "span sp",
+            "sslvpn",
+            "pppoe-",
+            "irtual",
+        ]
     },
-    "bad_if.1": {
-        "default": "virtual-"
+    "bad_if_regexp": {
+        "type": "array",
+        "default": [
+            "\/^ng[0-9]+$\/",
+            "\/^sl[0-9]\/"
+        ]
     },
-    "bad_if.10": {
-        "default": "-physical"
-    },
-    "bad_if.11": {
-        "default": "container"
-    },
-    "bad_if.12": {
-        "default": "unrouted"
-    },
-    "bad_if.13": {
-        "default": "bluetooth"
-    },
-    "bad_if.14": {
-        "default": "isatap"
-    },
-    "bad_if.15": {
-        "default": "ras"
-    },
-    "bad_if.16": {
-        "default": "qos"
-    },
-    "bad_if.17": {
-        "default": "span rp"
-    },
-    "bad_if.18": {
-        "default": "span sp"
-    },
-    "bad_if.19": {
-        "default": "sslvpn"
-    },
-    "bad_if.2": {
-        "default": "unrouted"
-    },
-    "bad_if.20": {
-        "default": "pppoe-"
-    },
-    "bad_if.21": {
-        "default": "irtual"
-    },
-    "bad_if.3": {
-        "default": "eobc"
-    },
-    "bad_if.4": {
-        "default": "lp0"
-    },
-    "bad_if.5": {
-        "default": "-atm"
-    },
-    "bad_if.6": {
-        "default": "faith0"
-    },
-    "bad_if.7": {
-        "default": "container"
-    },
-    "bad_if.8": {
-        "default": "async"
-    },
-    "bad_if.9": {
-        "default": "plip"
-    },
-    "bad_if_regexp.0": {
-        "default": "\/^ng[0-9]+$\/"
-    },
-    "bad_if_regexp.1": {
-        "default": "\/^sl[0-9]\/"
-    },
-    "bad_iftype.0": {
-        "default": "voiceEncap"
-    },
-    "bad_iftype.1": {
-        "default": "voiceFXO"
-    },
-    "bad_iftype.10": {
-        "default": "atmSubInterface"
-    },
-    "bad_iftype.11": {
-        "default": "aal5"
-    },
-    "bad_iftype.12": {
-        "default": "shdsl"
-    },
-    "bad_iftype.13": {
-        "default": "mpls"
-    },
-    "bad_iftype.2": {
-        "default": "voiceFXS"
-    },
-    "bad_iftype.3": {
-        "default": "voiceOverAtm"
-    },
-    "bad_iftype.4": {
-        "default": "voiceOverFrameRelay"
-    },
-    "bad_iftype.5": {
-        "default": "voiceOverIp"
-    },
-    "bad_iftype.6": {
-        "default": "ds0"
-    },
-    "bad_iftype.7": {
-        "default": "ds1"
-    },
-    "bad_iftype.8": {
-        "default": "ds3"
-    },
-    "bad_iftype.9": {
-        "default": "sonet"
+    "bad_iftype": {
+        "type": "array",
+        "default": [
+            "voiceEncap",
+            "voiceFXO",
+            "voiceFXS",
+            "voiceOverAtm",
+            "voiceOverFrameRelay",
+            "voiceOverIp",
+            "ds0",
+            "ds1",
+            "ds3",
+            "sonet",
+            "atmSubInterface",
+            "aal5",
+            "shdsl",
+            "mpls"
+        ]
     },
     "billing.base": {
         "default": 1000
