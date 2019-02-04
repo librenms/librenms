@@ -108,7 +108,7 @@ class OS implements ProcessorDiscovery
      * @param string $mib mib for this oid
      * @return array array indexed by the snmp index with the value as the data returned by snmp
      */
-    public function getCacheByIndex($oid, $mib = null)
+    public function getCacheByIndex($oid, $mib = null, $snmpflags)
     {
         if (str_contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
@@ -116,7 +116,7 @@ class OS implements ProcessorDiscovery
         }
 
         if (!isset($this->cache[$oid])) {
-            $data = snmpwalk_cache_oid($this->getDevice(), $oid, array(), $mib);
+            $data = snmpwalk_cache_oid($this->getDevice(), $oid, $snmpflags, array(), $mib);
             $this->cache[$oid] = array_map('current', $data);
         }
 
