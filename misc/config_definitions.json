@@ -4296,51 +4296,6 @@
     "temp_dir": {
         "default": "\/tmp"
     },
-    "time.day": {
-        "default": 1549215000
-    },
-    "time.fourhour": {
-        "default": 1549287000
-    },
-    "time.month": {
-        "default": 1546623000
-    },
-    "time.now": {
-        "default": 1549301400
-    },
-    "time.onehour": {
-        "default": 1549297800
-    },
-    "time.sixhour": {
-        "default": 1549279800
-    },
-    "time.sixmonth": {
-        "default": 1533231000
-    },
-    "time.threemonth": {
-        "default": 1541266200
-    },
-    "time.twelvehour": {
-        "default": 1549258200
-    },
-    "time.twoday": {
-        "default": 1549128600
-    },
-    "time.twomonth": {
-        "default": 1543944600
-    },
-    "time.twoweek": {
-        "default": 1548091800
-    },
-    "time.twoyear": {
-        "default": 1486229400
-    },
-    "time.week": {
-        "default": 1548696600
-    },
-    "time.year": {
-        "default": 1517765400
-    },
     "timestamp_format": {
         "default": "d-m-Y H:i:s"
     },
