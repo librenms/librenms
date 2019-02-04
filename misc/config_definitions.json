@@ -415,23 +415,19 @@
     "autodiscovery.bgp": {
         "default": true
     },
-    "autodiscovery.cdp_exclude.platform_regexp.0": {
-        "default": "\/^Cisco IP Phone\/"
+    "autodiscovery.cdp_exclude.platform_regexp": {
+        "type": "array",
+        "default": ["\/^Cisco IP Phone\/"]
     },
-    "autodiscovery.nets-exclude.0": {
-        "default": "0.0.0.0\/8"
-    },
-    "autodiscovery.nets-exclude.1": {
-        "default": "127.0.0.0\/8"
-    },
-    "autodiscovery.nets-exclude.2": {
-        "default": "169.254.0.0\/16"
-    },
-    "autodiscovery.nets-exclude.3": {
-        "default": "224.0.0.0\/4"
-    },
-    "autodiscovery.nets-exclude.4": {
-        "default": "240.0.0.0\/4"
+    "autodiscovery.nets-exclude": {
+        "type": "array",
+        "default": [
+            "0.0.0.0\/8",
+            "127.0.0.0\/8",
+            "169.254.0.0\/16",
+            "224.0.0.0\/4",
+            "240.0.0.0\/4"
+        ]
     },
     "autodiscovery.ospf": {
         "default": true
