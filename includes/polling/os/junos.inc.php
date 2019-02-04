@@ -35,7 +35,7 @@ if (strpos($device['sysDescr'], 'olive')) {
     $serial   = '';
 } else {
     $boxDescr = snmp_get($device, 'jnxBoxDescr.0', '-Oqv', 'JUNIPER-MIB');
-    if (!empty($boxDescr)) {
+    if (!empty($boxDescr) && $boxDescr != "Juniper Virtual Chassis Switch") {
         $hardware = $boxDescr;
     } else {
         $hardware = snmp_translate($device['sysObjectID'], 'Juniper-Products-MIB:JUNIPER-CHASSIS-DEFINES-MIB', 'junos');
