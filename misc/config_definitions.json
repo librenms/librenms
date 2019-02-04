@@ -920,7 +920,6 @@
         "default": 11211
     },
     "distributed_poller_name": {
-        "default": "hostname"
     },
     "dot": {
         "default": "\/usr\/bin\/dot"
@@ -1218,23 +1217,8 @@
     "graph_colours.blues.5": {
         "default": "000033"
     },
-    "graph_colours.default.0": {
-        "default": "A0A0E5"
-    },
-    "graph_colours.default.1": {
-        "default": "8080BD"
-    },
-    "graph_colours.default.2": {
-        "default": "606096"
-    },
-    "graph_colours.default.3": {
-        "default": "40406F"
-    },
-    "graph_colours.default.4": {
-        "default": "202048"
-    },
-    "graph_colours.default.5": {
-        "default": "000033"
+    "graph_colours.default": {
+        "type": "array"
     },
     "graph_colours.greens.0": {
         "default": "B6D14B"
@@ -1358,246 +1342,6 @@
     },
     "graph_colours.manycolours.9": {
         "default": "1E6C0B"
-    },
-    "graph_colours.mega.0": {
-        "default": "CC7CCC"
-    },
-    "graph_colours.mega.1": {
-        "default": "D0558F"
-    },
-    "graph_colours.mega.10": {
-        "default": "934A93"
-    },
-    "graph_colours.mega.11": {
-        "default": "943A57"
-    },
-    "graph_colours.mega.12": {
-        "default": "6D912D"
-    },
-    "graph_colours.mega.13": {
-        "default": "606096"
-    },
-    "graph_colours.mega.14": {
-        "default": "EB5B00"
-    },
-    "graph_colours.mega.15": {
-        "default": "773177"
-    },
-    "graph_colours.mega.16": {
-        "default": "792C38"
-    },
-    "graph_colours.mega.17": {
-        "default": "48721E"
-    },
-    "graph_colours.mega.18": {
-        "default": "40406F"
-    },
-    "graph_colours.mega.19": {
-        "default": "EF6A00"
-    },
-    "graph_colours.mega.2": {
-        "default": "B6D14B"
-    },
-    "graph_colours.mega.20": {
-        "default": "5B185B"
-    },
-    "graph_colours.mega.21": {
-        "default": "5C1F1E"
-    },
-    "graph_colours.mega.22": {
-        "default": "24520F"
-    },
-    "graph_colours.mega.23": {
-        "default": "202048"
-    },
-    "graph_colours.mega.24": {
-        "default": "F37900"
-    },
-    "graph_colours.mega.25": {
-        "default": "3F003F"
-    },
-    "graph_colours.mega.26": {
-        "default": "401F10"
-    },
-    "graph_colours.mega.27": {
-        "default": "003300"
-    },
-    "graph_colours.mega.28": {
-        "default": "000033"
-    },
-    "graph_colours.mega.29": {
-        "default": "F78800"
-    },
-    "graph_colours.mega.3": {
-        "default": "A0A0E5"
-    },
-    "graph_colours.mega.30": {
-        "default": "FB9700"
-    },
-    "graph_colours.mega.31": {
-        "default": "FFA700"
-    },
-    "graph_colours.mega.32": {
-        "default": "FFF8A3"
-    },
-    "graph_colours.mega.33": {
-        "default": "FAE16B"
-    },
-    "graph_colours.mega.34": {
-        "default": "F8D753"
-    },
-    "graph_colours.mega.35": {
-        "default": "F3C01C"
-    },
-    "graph_colours.mega.36": {
-        "default": "F0B400"
-    },
-    "graph_colours.mega.37": {
-        "default": "A9CC8F"
-    },
-    "graph_colours.mega.38": {
-        "default": "82B16A"
-    },
-    "graph_colours.mega.39": {
-        "default": "5C9746"
-    },
-    "graph_colours.mega.4": {
-        "default": "E43C00"
-    },
-    "graph_colours.mega.40": {
-        "default": "3D8128"
-    },
-    "graph_colours.mega.41": {
-        "default": "1E6C0B"
-    },
-    "graph_colours.mega.42": {
-        "default": "B2C8D9"
-    },
-    "graph_colours.mega.43": {
-        "default": "779DBF"
-    },
-    "graph_colours.mega.44": {
-        "default": "3E75A7"
-    },
-    "graph_colours.mega.45": {
-        "default": "205F9A"
-    },
-    "graph_colours.mega.46": {
-        "default": "00488C"
-    },
-    "graph_colours.mega.47": {
-        "default": "BEA37A"
-    },
-    "graph_colours.mega.48": {
-        "default": "907A52"
-    },
-    "graph_colours.mega.49": {
-        "default": "7A653E"
-    },
-    "graph_colours.mega.5": {
-        "default": "AF63AF"
-    },
-    "graph_colours.mega.50": {
-        "default": "63522B"
-    },
-    "graph_colours.mega.51": {
-        "default": "3D3000"
-    },
-    "graph_colours.mega.52": {
-        "default": "F3AA79"
-    },
-    "graph_colours.mega.53": {
-        "default": "EB8953"
-    },
-    "graph_colours.mega.54": {
-        "default": "E1662A"
-    },
-    "graph_colours.mega.55": {
-        "default": "DC5313"
-    },
-    "graph_colours.mega.56": {
-        "default": "D84000"
-    },
-    "graph_colours.mega.57": {
-        "default": "B5B5A9"
-    },
-    "graph_colours.mega.58": {
-        "default": "8B8D82"
-    },
-    "graph_colours.mega.59": {
-        "default": "74796F"
-    },
-    "graph_colours.mega.6": {
-        "default": "B34773"
-    },
-    "graph_colours.mega.60": {
-        "default": "5D645A"
-    },
-    "graph_colours.mega.61": {
-        "default": "434C43"
-    },
-    "graph_colours.mega.62": {
-        "default": "E6A4A5"
-    },
-    "graph_colours.mega.63": {
-        "default": "D6707B"
-    },
-    "graph_colours.mega.64": {
-        "default": "C4384F"
-    },
-    "graph_colours.mega.65": {
-        "default": "BC1C39"
-    },
-    "graph_colours.mega.66": {
-        "default": "B30023"
-    },
-    "graph_colours.mega.67": {
-        "default": "A0A0E5"
-    },
-    "graph_colours.mega.68": {
-        "default": "8080BD"
-    },
-    "graph_colours.mega.69": {
-        "default": "606096"
-    },
-    "graph_colours.mega.7": {
-        "default": "91B13C"
-    },
-    "graph_colours.mega.70": {
-        "default": "40406F"
-    },
-    "graph_colours.mega.71": {
-        "default": "202048"
-    },
-    "graph_colours.mega.72": {
-        "default": "000033"
-    },
-    "graph_colours.mega.73": {
-        "default": "CC0000"
-    },
-    "graph_colours.mega.74": {
-        "default": "008C00"
-    },
-    "graph_colours.mega.75": {
-        "default": "4096EE"
-    },
-    "graph_colours.mega.76": {
-        "default": "73880A"
-    },
-    "graph_colours.mega.77": {
-        "default": "D01F3C"
-    },
-    "graph_colours.mega.78": {
-        "default": "36393D"
-    },
-    "graph_colours.mega.79": {
-        "default": "FF0084"
-    },
-    "graph_colours.mega.8": {
-        "default": "8080BD"
-    },
-    "graph_colours.mega.9": {
-        "default": "E74B00"
     },
     "graph_colours.mixed.0": {
         "default": "CC0000"
@@ -3379,7 +3123,6 @@
         "default": "new"
     },
     "html_dir": {
-        "default": "\/home\/murrant\/projects\/librenms\/html"
     },
     "icmp_check": {
         "default": true
@@ -3475,7 +3218,6 @@
         "default": false
     },
     "install_dir": {
-        "default": "\/home\/murrant\/projects\/librenms"
     },
     "int_core": {
         "default": 1
@@ -3540,8 +3282,8 @@
     "irc_authtime": {
         "default": 3
     },
-    "irc_chan.0": {
-        "default": "##librenms"
+    "irc_chan": {
+        "type": "array"
     },
     "irc_ctcp": {
         "default": false
@@ -3562,7 +3304,6 @@
         "default": 3
     },
     "irc_nick": {
-        "default": "LibreNMS"
     },
     "irc_pass": {
         "default": ""
@@ -3610,10 +3351,8 @@
         "default": "#e3e3e3"
     },
     "log_dir": {
-        "default": "\/home\/murrant\/projects\/librenms\/logs"
     },
     "log_file": {
-        "default": "\/home\/murrant\/projects\/librenms\/logs\/librenms.log"
     },
     "login_message": {
         "default": "Unauthorised access or use shall render the user liable to criminal and\/or civil prosecution."
@@ -3625,7 +3364,6 @@
         "default": "maps\/world_countries.js"
     },
     "mib_dir": {
-        "default": "\/home\/murrant\/projects\/librenms\/mibs"
     },
     "mono_font": {
         "default": "DejaVuSansMono"
@@ -3859,7 +3597,6 @@
         "default": ""
     },
     "page_title_suffix": {
-        "default": "LibreNMS"
     },
     "peering_descr.0": {
         "default": "peering"
@@ -3884,7 +3621,6 @@
         "default": "\/bin\/ping"
     },
     "plugin_dir": {
-        "default": "\/home\/murrant\/projects\/librenms\/html\/plugins"
     },
     "poller_modules.applications": {
         "default": true
@@ -4033,9 +3769,6 @@
     "project_name": {
         "default": "LibreNMS"
     },
-    "project_name_version": {
-        "default": "LibreNMS"
-    },
     "prometheus.job": {
         "default": "librenms"
     },
@@ -4072,7 +3805,6 @@
         "disabled": false
     },
     "rrd_dir": {
-        "default": "\/home\/murrant\/projects\/librenms\/rrd"
     },
     "rrd_rra": {
         "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440  RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797  RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797  RRA:LAST:0.5:1:1440 "
@@ -4104,7 +3836,6 @@
         "disabled": false
     },
     "secure_cookies": {
-        "default": false
     },
     "sfdp": {
         "default": "\/usr\/bin\/sfdp"

@@ -29,6 +29,7 @@ use App\Models\GraphType;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Util\Version;
 
 class Config
 {
@@ -93,12 +94,18 @@ class Config
         $config['install_dir'] = $install_dir;
 
         // load defaults
-        require $install_dir . '/includes/defaults.inc.php';
-        require $install_dir . '/includes/definitions.inc.php';
+        $config_def = json_decode(file_get_contents($install_dir . '/misc/config_definitions.json'), true);
+        foreach ($config_def as $path => $def) {
+            if (isset($def['default'])) {
+                Arr::set($config, $path, $def['default']);
+            }
+        }
 
         // import standard settings
         $macros = json_decode(file_get_contents($install_dir . '/misc/macros.json'), true);
-        $config['alert']['macros']['rule'] = $macros;
+        Arr::set($config, 'alert.macros.rule', $macros);
+
+        self::processDefaults();
 
         // Load user config
         @include $install_dir . '/config.php';
@@ -127,22 +134,7 @@ class Config
             return $default;
         }
 
-        $keys = explode('.', $key);
-
-        $curr = &self::$config;
-        foreach ($keys as $k) {
-            // do not add keys that don't exist
-            if (!isset($curr[$k])) {
-                return $default;
-            }
-            $curr = &$curr[$k];
-        }
-
-        if (is_null($curr)) {
-            return $default;
-        }
-
-        return $curr;
+        return Arr::get(self::$config, $key, $default);
     }
 
     /**
@@ -255,15 +247,10 @@ class Config
     {
         if ($persist) {
             try {
-                \App\Models\Config::updateOrCreate(['config_name' => $key], collect([
+                \App\Models\Config::updateOrCreate(['config_name' => $key], [
                     'config_name' => $key,
-                    'config_default' => $default,
-                    'config_descr' => $descr,
-                    'config_group' => $group,
-                    'config_sub_group' => $sub_group,
-                ])->filter(function ($value, $field) {
-                    return !is_null($value);
-                })->put('config_value', $value)->toArray());
+                    'config_value' => $value,
+                ]);
             } catch (QueryException $e) {
                 if (class_exists(\Log::class)) {
                     \Log::error($e);
@@ -275,14 +262,7 @@ class Config
             }
         }
 
-        $keys = explode('.', $key);
-
-        $curr = &self::$config;
-        foreach ($keys as $k) {
-            $curr = &$curr[$k];
-        }
-
-        $curr = $value;
+        Arr::set(self::$config, $key, $value);
     }
 
     /**
@@ -301,19 +281,7 @@ class Config
             return false;
         }
 
-        $keys = explode('.', $key);
-        $last = array_pop($keys);
-
-        $curr = &self::$config;
-        foreach ($keys as $k) {
-            // do not add keys that don't exist
-            if (!isset($curr[$k])) {
-                return false;
-            }
-            $curr = &$curr[$k];
-        }
-
-        return is_array($curr) && isset($curr[$last]);
+        return Arr::has(self::$config, $key);
     }
 
     /**
@@ -382,15 +350,46 @@ class Config
     }
 
     /**
-     * Proces the config after it has been loaded.
+     * Handle defaults that are set programmatically
+     */
+    private static function processDefaults()
+    {
+        self::set('log_dir', self::get('install_dir') . '/logs');
+        self::set('distributed_poller_name', php_uname('n'));
+
+         // set base_url from access URL
+        if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
+            if (str_contains($_SERVER['SERVER_NAME'], ':')) {
+                // Literal IPv6
+                $base_url = 'http://['.$_SERVER['SERVER_NAME'].']'.($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
+            } else {
+                $base_url = 'http://'.$_SERVER['SERVER_NAME'].($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
+            }
+            self::set('base_url', $base_url);
+        }
+
+        // graph color copying
+        self::set('graph_colours.default', self::get('graph_colours.blues'));
+        self::set('graph_colours.mega', array_merge(
+            self::get('graph_colours.psychedelic'),
+            self::get('graph_colours.manycolours'),
+            self::get('graph_colours.default'),
+            self::get('graph_colours.mixed')
+        ));
+    }
+
+    /**
+     * Process the config after it has been loaded.
      * Make sure certain variables have been set properly and
      *
      * @param bool $persist Save binary locations and other settings to the database.
      */
     private static function processConfig($persist = true)
     {
-        if (!self::get('email_from')) {
-            self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
+        // If we're on SSL, let's properly detect it
+        if (isset($_SERVER['HTTPS'])) {
+            self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
+            self::set('secure_cookies', true);
         }
 
         // If we're on SSL, let's properly detect it
@@ -398,7 +397,15 @@ class Config
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
         }
 
-        // Define some variables if they aren't set by user definition in config.php
+        if (self::get('secure_cookies')) {
+            ini_set('session.cookie_secure', 1);
+        }
+
+        if (!self::get('email_from')) {
+            self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
+        }
+
+            // Define some variables if they aren't set by user definition in config.php
         self::setDefault('html_dir', '%s/html', ['install_dir']);
         self::setDefault('rrd_dir', '%s/rrd', ['install_dir']);
         self::setDefault('mib_dir', '%s/mibs', ['install_dir']);
@@ -406,6 +413,9 @@ class Config
         self::setDefault('log_file', '%s/%s.log', ['log_dir', 'project_id']);
         self::setDefault('plugin_dir', '%s/plugins', ['html_dir']);
         self::setDefault('temp_dir', sys_get_temp_dir() ?: '/tmp');
+        self::setDefault('irc_nick', '%s', ['project_name']);
+        self::setDefault('irc_chan.0', '##%s', ['project_id']);
+        self::setDefault('page_title_suffix', '%s', ['project_name']);
 //        self::setDefault('email_from', '"%s" <%s@' . php_uname('n') . '>', ['project_name', 'email_user']);  // FIXME email_from set because alerting config
 
         // deprecated variables
