@@ -13,7 +13,7 @@ class RuckuswirelessSz extends OS implements
     public function discoverWirelessClients()
     {
 
-// Find Per SSID Client Count
+// clients - Discover Per SSID Client Count
         $sensors = array();
         $ssids = $this->getCacheByIndex('ruckusSZWLANSSID', 'RUCKUS-SZ-WLAN-MIB');
         $counts = $this->getCacheByIndex('ruckusSZWLANNumSta', 'RUCKUS-SZ-WLAN-MIB');
@@ -36,10 +36,13 @@ class RuckuswirelessSz extends OS implements
             );
         }
 
-// Find Total Client Count
+// Do not get total client count if only 1 SSID
+	if (count($total_oids) > 1) {
 
+// clients - Discover System Total Client Count
         $oid = '.1.3.6.1.4.1.25053.1.4.1.1.1.15.2.0'; //RUCKUS-SZ-SYSTEM-MIB::ruckusSZSystemStatsNumSta.0
         array_push($sensors, new WirelessSensor('clients', $this->getDeviceId(), $oid, 'ruckuswireless-sz', ($index + 1), 'System Total:'));
+        }
         return $sensors;
     }
 
