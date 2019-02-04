@@ -1,0 +1,4839 @@
+{
+    "addhost_alwayscheckip": {
+        "default": false
+    },
+    "alert.ack_until_clear": {
+        "description": "Default acknowledge until alert clears",
+        "default": false,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.admins": {
+        "description": "Alert administrators",
+        "default": true,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.default_copy": {
+        "description": "Copy all email alerts to default contact",
+        "default": true,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.default_if_none": {
+        "description": "Send mail to default contact if no other contacts are found",
+        "default": false,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.default_mail": {
+        "description": "The default mail contact",
+        "default": false,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.default_only": {
+        "description": "Only alert default mail contact",
+        "default": true,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.disable": {
+        "description": "Stop alerts being generated",
+        "default": false,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.fixed-contacts": {
+        "description": "If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active",
+        "default": true,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.globals": {
+        "description": "Alert read only administrators",
+        "default": true,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.macros.rule.bill_cdr_over_quota": {
+        "default": "((%bills.rate_95th \/ %bills.bill_cdr)*100) && %bills.bill_type = \"cdr\""
+    },
+    "alert.macros.rule.bill_quota_over_quota": {
+        "default": "((%bills.total_data \/ %bills.bill_quota)*100) && %bills.bill_type = \"quota\""
+    },
+    "alert.macros.rule.component": {
+        "default": "(%component.disabled = 0 && %component.ignore = 0)"
+    },
+    "alert.macros.rule.component_critical": {
+        "default": "(%component.status = 2 && %macros.component)"
+    },
+    "alert.macros.rule.component_normal": {
+        "default": "(%component.status = 0 && %macros.component)"
+    },
+    "alert.macros.rule.component_warning": {
+        "default": "(%component.status = 1 && %macros.component)"
+    },
+    "alert.macros.rule.device": {
+        "default": "(%devices.disabled = 0 && %devices.ignore = 0)"
+    },
+    "alert.macros.rule.device_component_down_cisco": {
+        "default": "%sensors.sensor_current != \"1\" && %sensors.sensor_current != \"5\" && %sensors.sensor_type ~ \"^cisco.*State$\" && %sensors.sensor_alert = \"1\""
+    },
+    "alert.macros.rule.device_component_down_junos": {
+        "default": "%sensors.sensor_class = \"state\" && %sensors.sensor_current != \"6\" && %sensors.sensor_type = \"jnxFruState\" && %sensors.sensor_current != \"2\" && %sensors.sensor_alert = \"1\""
+    },
+    "alert.macros.rule.device_down": {
+        "default": "(%devices.status = 0 && %macros.device)"
+    },
+    "alert.macros.rule.device_up": {
+        "default": "(%devices.status = 1 && %macros.device)"
+    },
+    "alert.macros.rule.now": {
+        "default": "NOW()"
+    },
+    "alert.macros.rule.packet_loss_15m": {
+        "default": "(%macros.past_15m && %device_perf.loss)"
+    },
+    "alert.macros.rule.packet_loss_5m": {
+        "default": "(%macros.past_5m && %device_perf.loss)"
+    },
+    "alert.macros.rule.past_10m": {
+        "default": "DATE_SUB(NOW(),INTERVAL 10 MINUTE)"
+    },
+    "alert.macros.rule.past_15m": {
+        "default": "DATE_SUB(NOW(),INTERVAL 15 MINUTE)"
+    },
+    "alert.macros.rule.past_30m": {
+        "default": "DATE_SUB(NOW(),INTERVAL 30 MINUTE)"
+    },
+    "alert.macros.rule.past_5m": {
+        "default": "DATE_SUB(NOW(),INTERVAL 5 MINUTE)"
+    },
+    "alert.macros.rule.past_60m": {
+        "default": "DATE_SUB(NOW(),INTERVAL 60 MINUTE)"
+    },
+    "alert.macros.rule.pdu_over_amperage_apc": {
+        "default": "%sensors.sensor_class = \"current\" && %sensors.sensor_descr = \"Bank Total\" && %sensors.sensor_current > %sensors.sensor_limit && %devices.os = \"apc\""
+    },
+    "alert.macros.rule.port": {
+        "default": "(%ports.deleted = 0 && %ports.ignore = 0 && %ports.disabled = 0)"
+    },
+    "alert.macros.rule.port_down": {
+        "default": "(%ports.ifOperStatus = \"down\" && %ports.ifAdminStatus != \"down\" && %macros.port)"
+    },
+    "alert.macros.rule.port_has_xdp_neighbours": {
+        "default": "(%macros.port && %links.local_port_id = %ports.port_id)"
+    },
+    "alert.macros.rule.port_has_xdp_neighbours_device": {
+        "default": "(%macros.port_has_xdp_neighbours && %links.remote_port_id IS NOT NULL)"
+    },
+    "alert.macros.rule.port_in_usage_perc": {
+        "default": "((%ports.ifInOctets_rate*8) \/ %ports.ifSpeed)*100"
+    },
+    "alert.macros.rule.port_now_down": {
+        "default": "%ports.ifOperStatus != %ports.ifOperStatus_prev && %ports.ifOperStatus_prev = \"up\" && %ports.ifAdminStatus = \"up\" && %macros.port"
+    },
+    "alert.macros.rule.port_out_usage_perc": {
+        "default": "((%ports.ifOutOctets_rate*8) \/ %ports.ifSpeed)*100"
+    },
+    "alert.macros.rule.port_up": {
+        "default": "(%ports.ifOperStatus = \"up\" && %ports.ifAdminStatus = \"up\" && %macros.port)"
+    },
+    "alert.macros.rule.port_usage_perc": {
+        "default": "((%ports.ifInOctets_rate*8) \/ %ports.ifSpeed)*100"
+    },
+    "alert.macros.rule.sensor": {
+        "default": "(%sensors.sensor_alert = 1)"
+    },
+    "alert.macros.rule.sensor_port_link": {
+        "default": "(%sensors.entPhysicalIndex_measured = 'ports' && %sensors.entPhysicalIndex = %ports.ifIndex && %macros.port_up)"
+    },
+    "alert.macros.rule.state_sensor_critical": {
+        "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 2"
+    },
+    "alert.macros.rule.state_sensor_ok": {
+        "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 0"
+    },
+    "alert.macros.rule.state_sensor_unknown": {
+        "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 3"
+    },
+    "alert.macros.rule.state_sensor_warning": {
+        "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 1"
+    },
+    "alert.pagerduty.account": {
+        "description": "Pagerduty account name",
+        "default": false,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "transports",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.pagerduty.service": {
+        "description": "Pagerduty service name",
+        "default": false,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "transports",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.syscontact": {
+        "description": "Issue alerts to sysContact",
+        "default": true,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.tolerance_window": {
+        "description": "Tolerance window in seconds",
+        "default": 5,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert.users": {
+        "description": "Issue alerts to normal users",
+        "default": false,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "alert_graph_date_format": {
+        "default": "%Y-%m-%d %H:%i"
+    },
+    "alert_log_purge": {
+        "default": 365
+    },
+    "alerts.bgp.whitelist": {
+        "default": null
+    },
+    "alerts.email.enable": {
+        "default": false
+    },
+    "alerts.port.ifdown": {
+        "default": false
+    },
+    "alerts.port_util_alert": {
+        "default": false
+    },
+    "alerts.port_util_perc": {
+        "default": 85
+    },
+    "allow_duplicate_sysName": {
+        "default": false
+    },
+    "allow_entity_sensor.amperes": {
+        "default": 1
+    },
+    "allow_entity_sensor.celsius": {
+        "default": 1
+    },
+    "allow_entity_sensor.dBm": {
+        "default": 1
+    },
+    "allow_entity_sensor.specialEnum": {
+        "default": 1
+    },
+    "allow_entity_sensor.truthvalue": {
+        "default": 1
+    },
+    "allow_entity_sensor.voltsAC": {
+        "default": 1
+    },
+    "allow_entity_sensor.voltsDC": {
+        "default": 1
+    },
+    "allow_entity_sensor.watts": {
+        "default": 1
+    },
+    "allow_unauth_graphs": {
+        "default": false
+    },
+    "allow_unauth_graphs_cidr": {
+        "default": []
+    },
+    "api.cors.allowheaders.0": {
+        "default": "Origin"
+    },
+    "api.cors.allowheaders.1": {
+        "default": "X-Requested-With"
+    },
+    "api.cors.allowheaders.2": {
+        "default": "Content-Type"
+    },
+    "api.cors.allowheaders.3": {
+        "default": "Accept"
+    },
+    "api.cors.allowheaders.4": {
+        "default": "X-Auth-Token"
+    },
+    "api.cors.allowmethods.0": {
+        "default": "POST"
+    },
+    "api.cors.allowmethods.1": {
+        "default": "GET"
+    },
+    "api.cors.allowmethods.2": {
+        "default": "PUT"
+    },
+    "api.cors.allowmethods.3": {
+        "default": "DELETE"
+    },
+    "api.cors.allowmethods.4": {
+        "default": "PATCH"
+    },
+    "api.cors.enabled": {
+        "default": false
+    },
+    "api.cors.maxage": {
+        "default": "86400"
+    },
+    "api.cors.origin": {
+        "default": "*"
+    },
+    "api_demo": {
+        "default": 0
+    },
+    "astext.65332": {
+        "default": "Cymru FullBogon Feed"
+    },
+    "astext.65333": {
+        "default": "Cymru Bogon Feed"
+    },
+    "auth_ad_group_filter": {
+        "default": "(objectclass=group)"
+    },
+    "auth_ad_user_filter": {
+        "default": "(objectclass=user)"
+    },
+    "auth_ldap_attr.uid": {
+        "default": "uid"
+    },
+    "auth_ldap_cache_ttl": {
+        "default": 300
+    },
+    "auth_ldap_emailattr": {
+        "default": "mail"
+    },
+    "auth_ldap_group": {
+        "default": "cn=groupname,ou=groups,dc=example,dc=com"
+    },
+    "auth_ldap_groupbase": {
+        "default": "ou=group,dc=example,dc=com"
+    },
+    "auth_ldap_groupmemberattr": {
+        "default": "memberUid"
+    },
+    "auth_ldap_groups.admin.level": {
+        "default": 10
+    },
+    "auth_ldap_groups.pfy.level": {
+        "default": 7
+    },
+    "auth_ldap_groups.support.level": {
+        "default": 1
+    },
+    "auth_ldap_port": {
+        "default": 389
+    },
+    "auth_ldap_prefix": {
+        "default": "uid="
+    },
+    "auth_ldap_server": {
+        "default": "ldap.example.com"
+    },
+    "auth_ldap_suffix": {
+        "default": ",ou=People,dc=example,dc=com"
+    },
+    "auth_ldap_uid_attribute": {
+        "default": "uidnumber"
+    },
+    "auth_ldap_userdn": {
+        "default": false
+    },
+    "auth_ldap_version": {
+        "default": 3
+    },
+    "auth_mechanism": {
+        "default": "mysql"
+    },
+    "auth_remember": {
+        "default": "30"
+    },
+    "authlog_purge": {
+        "default": 30
+    },
+    "autodiscovery.bgp": {
+        "default": true
+    },
+    "autodiscovery.cdp_exclude.platform_regexp.0": {
+        "default": "\/^Cisco IP Phone\/"
+    },
+    "autodiscovery.nets-exclude.0": {
+        "default": "0.0.0.0\/8"
+    },
+    "autodiscovery.nets-exclude.1": {
+        "default": "127.0.0.0\/8"
+    },
+    "autodiscovery.nets-exclude.2": {
+        "default": "169.254.0.0\/16"
+    },
+    "autodiscovery.nets-exclude.3": {
+        "default": "224.0.0.0\/4"
+    },
+    "autodiscovery.nets-exclude.4": {
+        "default": "240.0.0.0\/4"
+    },
+    "autodiscovery.ospf": {
+        "default": true
+    },
+    "autodiscovery.snmpscan": {
+        "default": true
+    },
+    "autodiscovery.xdp": {
+        "default": true
+    },
+    "autodiscovery.xdp_exclude.sysdesc_regexp.0": {
+        "default": "\/-K9W8-\/"
+    },
+    "availability-map-width": {
+        "default": 25
+    },
+    "bad_disk_regexp": {
+        "default": []
+    },
+    "bad_if.0": {
+        "default": "voip-null"
+    },
+    "bad_if.1": {
+        "default": "virtual-"
+    },
+    "bad_if.10": {
+        "default": "-physical"
+    },
+    "bad_if.11": {
+        "default": "container"
+    },
+    "bad_if.12": {
+        "default": "unrouted"
+    },
+    "bad_if.13": {
+        "default": "bluetooth"
+    },
+    "bad_if.14": {
+        "default": "isatap"
+    },
+    "bad_if.15": {
+        "default": "ras"
+    },
+    "bad_if.16": {
+        "default": "qos"
+    },
+    "bad_if.17": {
+        "default": "span rp"
+    },
+    "bad_if.18": {
+        "default": "span sp"
+    },
+    "bad_if.19": {
+        "default": "sslvpn"
+    },
+    "bad_if.2": {
+        "default": "unrouted"
+    },
+    "bad_if.20": {
+        "default": "pppoe-"
+    },
+    "bad_if.21": {
+        "default": "irtual"
+    },
+    "bad_if.3": {
+        "default": "eobc"
+    },
+    "bad_if.4": {
+        "default": "lp0"
+    },
+    "bad_if.5": {
+        "default": "-atm"
+    },
+    "bad_if.6": {
+        "default": "faith0"
+    },
+    "bad_if.7": {
+        "default": "container"
+    },
+    "bad_if.8": {
+        "default": "async"
+    },
+    "bad_if.9": {
+        "default": "plip"
+    },
+    "bad_if_regexp.0": {
+        "default": "\/^ng[0-9]+$\/"
+    },
+    "bad_if_regexp.1": {
+        "default": "\/^sl[0-9]\/"
+    },
+    "bad_iftype.0": {
+        "default": "voiceEncap"
+    },
+    "bad_iftype.1": {
+        "default": "voiceFXO"
+    },
+    "bad_iftype.10": {
+        "default": "atmSubInterface"
+    },
+    "bad_iftype.11": {
+        "default": "aal5"
+    },
+    "bad_iftype.12": {
+        "default": "shdsl"
+    },
+    "bad_iftype.13": {
+        "default": "mpls"
+    },
+    "bad_iftype.2": {
+        "default": "voiceFXS"
+    },
+    "bad_iftype.3": {
+        "default": "voiceOverAtm"
+    },
+    "bad_iftype.4": {
+        "default": "voiceOverFrameRelay"
+    },
+    "bad_iftype.5": {
+        "default": "voiceOverIp"
+    },
+    "bad_iftype.6": {
+        "default": "ds0"
+    },
+    "bad_iftype.7": {
+        "default": "ds1"
+    },
+    "bad_iftype.8": {
+        "default": "ds3"
+    },
+    "bad_iftype.9": {
+        "default": "sonet"
+    },
+    "billing.base": {
+        "default": 1000
+    },
+    "billing.bill_autoadd": {
+        "default": 0
+    },
+    "billing.circuit_autoadd": {
+        "default": 0
+    },
+    "billing.customer_autoadd": {
+        "default": 0
+    },
+    "callback_clear": {
+        "default": "https:\/\/stats.librenms.org\/clear.php"
+    },
+    "callback_post": {
+        "default": "https:\/\/stats.librenms.org\/log.php"
+    },
+    "core_descr.0": {
+        "default": "core"
+    },
+    "cpu_details_overview": {
+        "default": false
+    },
+    "custom_descr.0": {
+        "default": ""
+    },
+    "customers_descr": {
+        "default": "cust"
+    },
+    "dateformat.byminute": {
+        "default": "Y-m-d H:i"
+    },
+    "dateformat.compact": {
+        "default": "Y-m-d H:i:s"
+    },
+    "dateformat.long": {
+        "default": "r"
+    },
+    "dateformat.mysql.compact": {
+        "default": "%Y-%m-%d %H:%i:%s"
+    },
+    "dateformat.mysql.date": {
+        "default": "%Y-%m-%d"
+    },
+    "dateformat.mysql.time": {
+        "default": "%H:%i:%s"
+    },
+    "dateformat.time": {
+        "default": "H:i:s"
+    },
+    "db_name": {
+        "default": "librenms"
+    },
+    "db_pass": {
+        "default": null
+    },
+    "db_port": {
+        "default": 3306
+    },
+    "db_socket": {
+        "default": null
+    },
+    "db_user": {
+        "default": "librenms"
+    },
+    "default_port_association_mode": {
+        "default": "ifIndex"
+    },
+    "device_perf_purge": {
+        "default": 7
+    },
+    "device_traffic_descr.0": {
+        "default": "\/loopback\/"
+    },
+    "device_traffic_descr.1": {
+        "default": "\/vlan\/"
+    },
+    "device_traffic_descr.2": {
+        "default": "\/tunnel\/"
+    },
+    "device_traffic_descr.3": {
+        "default": "\/bond\/"
+    },
+    "device_traffic_descr.4": {
+        "default": "\/null\/"
+    },
+    "device_traffic_descr.5": {
+        "default": "\/dummy\/"
+    },
+    "device_traffic_iftype.0": {
+        "default": "\/loopback\/"
+    },
+    "device_traffic_iftype.1": {
+        "default": "\/tunnel\/"
+    },
+    "device_traffic_iftype.2": {
+        "default": "\/virtual\/"
+    },
+    "device_traffic_iftype.3": {
+        "default": "\/mpls\/"
+    },
+    "device_traffic_iftype.4": {
+        "default": "\/ieee8023adLag\/"
+    },
+    "device_traffic_iftype.5": {
+        "default": "\/l2vlan\/"
+    },
+    "device_traffic_iftype.6": {
+        "default": "\/ppp\/"
+    },
+    "device_types.0.icon": {
+        "default": "server.png"
+    },
+    "device_types.0.text": {
+        "default": "Servers"
+    },
+    "device_types.0.type": {
+        "default": "server"
+    },
+    "device_types.1.icon": {
+        "default": "network.png"
+    },
+    "device_types.1.text": {
+        "default": "Network"
+    },
+    "device_types.1.type": {
+        "default": "network"
+    },
+    "device_types.10.icon": {
+        "default": "collaboration.png"
+    },
+    "device_types.10.text": {
+        "default": "Collaboration"
+    },
+    "device_types.10.type": {
+        "default": "collaboration"
+    },
+    "device_types.11.icon": {
+        "default": "workstation.png"
+    },
+    "device_types.11.text": {
+        "default": "Workstation"
+    },
+    "device_types.11.type": {
+        "default": "workstation"
+    },
+    "device_types.2.icon": {
+        "default": "wireless.png"
+    },
+    "device_types.2.text": {
+        "default": "Wireless"
+    },
+    "device_types.2.type": {
+        "default": "wireless"
+    },
+    "device_types.3.icon": {
+        "default": "firewall.png"
+    },
+    "device_types.3.text": {
+        "default": "Firewalls"
+    },
+    "device_types.3.type": {
+        "default": "firewall"
+    },
+    "device_types.4.icon": {
+        "default": "power.png"
+    },
+    "device_types.4.text": {
+        "default": "Power"
+    },
+    "device_types.4.type": {
+        "default": "power"
+    },
+    "device_types.5.icon": {
+        "default": "environment.png"
+    },
+    "device_types.5.text": {
+        "default": "Environment"
+    },
+    "device_types.5.type": {
+        "default": "environment"
+    },
+    "device_types.6.icon": {
+        "default": "loadbalancer.png"
+    },
+    "device_types.6.text": {
+        "default": "Load Balancers"
+    },
+    "device_types.6.type": {
+        "default": "loadbalancer"
+    },
+    "device_types.7.icon": {
+        "default": "storage.png"
+    },
+    "device_types.7.text": {
+        "default": "Storage"
+    },
+    "device_types.7.type": {
+        "default": "storage"
+    },
+    "device_types.8.icon": {
+        "default": "printer.png"
+    },
+    "device_types.8.text": {
+        "default": "Printers"
+    },
+    "device_types.8.type": {
+        "default": "printer"
+    },
+    "device_types.9.icon": {
+        "default": "appliance.png"
+    },
+    "device_types.9.text": {
+        "default": "Appliance"
+    },
+    "device_types.9.type": {
+        "default": "appliance"
+    },
+    "discover_services": {
+        "default": false
+    },
+    "discovery_by_ip": {
+        "default": false
+    },
+    "discovery_modules.applications": {
+        "default": false
+    },
+    "discovery_modules.arp-table": {
+        "default": true
+    },
+    "discovery_modules.bgp-peers": {
+        "default": true
+    },
+    "discovery_modules.cisco-cbqos": {
+        "default": false
+    },
+    "discovery_modules.cisco-cef": {
+        "default": false
+    },
+    "discovery_modules.cisco-mac-accounting": {
+        "default": false
+    },
+    "discovery_modules.cisco-otv": {
+        "default": false
+    },
+    "discovery_modules.cisco-pw": {
+        "default": false
+    },
+    "discovery_modules.cisco-sla": {
+        "default": false
+    },
+    "discovery_modules.cisco-vrf-lite": {
+        "default": true
+    },
+    "discovery_modules.discovery-arp": {
+        "default": false
+    },
+    "discovery_modules.discovery-protocols": {
+        "default": true
+    },
+    "discovery_modules.entity-physical": {
+        "default": true
+    },
+    "discovery_modules.entity-state": {
+        "default": false
+    },
+    "discovery_modules.fdb-table": {
+        "default": true
+    },
+    "discovery_modules.hr-device": {
+        "default": true
+    },
+    "discovery_modules.ipv4-addresses": {
+        "default": true
+    },
+    "discovery_modules.ipv6-addresses": {
+        "default": true
+    },
+    "discovery_modules.junose-atm-vp": {
+        "default": false
+    },
+    "discovery_modules.libvirt-vminfo": {
+        "default": false
+    },
+    "discovery_modules.loadbalancers": {
+        "default": false
+    },
+    "discovery_modules.mef": {
+        "default": false
+    },
+    "discovery_modules.mempools": {
+        "default": true
+    },
+    "discovery_modules.ntp": {
+        "default": true
+    },
+    "discovery_modules.os": {
+        "default": true
+    },
+    "discovery_modules.ports": {
+        "default": true
+    },
+    "discovery_modules.ports-stack": {
+        "default": true
+    },
+    "discovery_modules.processors": {
+        "default": true
+    },
+    "discovery_modules.route": {
+        "default": false
+    },
+    "discovery_modules.sensors": {
+        "default": true
+    },
+    "discovery_modules.services": {
+        "default": true
+    },
+    "discovery_modules.storage": {
+        "default": true
+    },
+    "discovery_modules.stp": {
+        "default": true
+    },
+    "discovery_modules.toner": {
+        "default": false
+    },
+    "discovery_modules.ucd-diskio": {
+        "default": true
+    },
+    "discovery_modules.vlans": {
+        "default": true
+    },
+    "discovery_modules.vmware-vminfo": {
+        "default": false
+    },
+    "discovery_modules.vrf": {
+        "default": false
+    },
+    "discovery_modules.wireless": {
+        "default": true
+    },
+    "distributed_poller": {
+        "default": false
+    },
+    "distributed_poller_group": {
+        "default": 0
+    },
+    "distributed_poller_memcached_host": {
+        "default": "example.net"
+    },
+    "distributed_poller_memcached_port": {
+        "default": "11211"
+    },
+    "distributed_poller_name": {
+        "default": "hostname"
+    },
+    "dot": {
+        "default": "\/usr\/bin\/dot"
+    },
+    "email_auto_tls": {
+        "description": "Enable \/ disable Auto TLS support",
+        "default": true,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "email_backend": {
+        "description": "The backend to use for sending email, can be mail, sendmail or smtp",
+        "default": "mail",
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "email_backend_options.0": {
+        "default": "mail"
+    },
+    "email_backend_options.1": {
+        "default": "sendmail"
+    },
+    "email_backend_options.2": {
+        "default": "smtp"
+    },
+    "email_from": {
+        "description": "Email address used for sending emails (from)",
+        "default": "NULL",
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "email_html": {
+        "description": "Send HTML emails",
+        "default": false,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "email_sendmail_path": {
+        "description": "Location of sendmail if using this option",
+        "default": "\/usr\/sbin\/sendmail",
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "email_smtp_auth": {
+        "description": "Enable \/ disable smtp authentication",
+        "default": false,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "email_smtp_host": {
+        "description": "SMTP Host for sending email if using this option",
+        "default": "localhost",
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "email_smtp_password": {
+        "description": "SMTP Auth password",
+        "default": "NULL",
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "email_smtp_port": {
+        "description": "SMTP port setting",
+        "default": 25,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "email_smtp_secure": {
+        "description": "Enable \/ disable encryption (use tls or ssl)",
+        "default": false,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "email_smtp_secure_options.0": {
+        "default": ""
+    },
+    "email_smtp_secure_options.1": {
+        "default": "tls"
+    },
+    "email_smtp_secure_options.2": {
+        "default": "ssl"
+    },
+    "email_smtp_timeout": {
+        "description": "SMTP timeout setting",
+        "default": 10,
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "email_smtp_username": {
+        "description": "SMTP Auth username",
+        "default": "NULL",
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "email_user": {
+        "description": "Name used as part of the from address",
+        "default": "LibreNMS",
+        "group": "alerting",
+        "group_order": 0,
+        "sub_group": "general",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "enable_bgp": {
+        "default": 1
+    },
+    "enable_billing": {
+        "default": 0
+    },
+    "enable_clear_discovery": {
+        "default": 1
+    },
+    "enable_footer": {
+        "default": 1
+    },
+    "enable_inventory": {
+        "default": 1
+    },
+    "enable_lazy_load": {
+        "default": true
+    },
+    "enable_libvirt": {
+        "default": 0
+    },
+    "enable_port_relationship": {
+        "default": true
+    },
+    "enable_ports_adsl": {
+        "default": 1
+    },
+    "enable_ports_etherlike": {
+        "default": 0
+    },
+    "enable_ports_junoseatmvp": {
+        "default": 0
+    },
+    "enable_ports_poe": {
+        "default": 0
+    },
+    "enable_pseudowires": {
+        "default": 1
+    },
+    "enable_sla": {
+        "default": 0
+    },
+    "enable_syslog": {
+        "default": 0
+    },
+    "enable_vrf_lite_cisco": {
+        "default": 1
+    },
+    "enable_vrfs": {
+        "default": 1
+    },
+    "eventlog_purge": {
+        "default": 30
+    },
+    "favicon": {
+        "default": ""
+    },
+    "force_hostname_to_sysname": {
+        "default": false
+    },
+    "force_ip_to_sysname": {
+        "default": false
+    },
+    "fping": {
+        "description": "Path to fping",
+        "default": "fping",
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "paths",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "fping6": {
+        "description": "Path to fping6",
+        "default": "fping6",
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "paths",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "fping_options.count": {
+        "default": 3
+    },
+    "fping_options.interval": {
+        "default": 500
+    },
+    "fping_options.timeout": {
+        "default": 500
+    },
+    "front_page": {
+        "default": "pages\/front\/tiles.php"
+    },
+    "front_page_down_box_limit": {
+        "default": 10
+    },
+    "front_page_settings.top.devices": {
+        "default": 10
+    },
+    "front_page_settings.top.ports": {
+        "default": 10
+    },
+    "geoloc.api_key": {
+        "description": "Geocoding API Key (Required to function)",
+        "default": "",
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "location",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "geoloc.engine": {
+        "description": "Geocoding Engine",
+        "default": false,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "location",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "github_api": {
+        "default": "https:\/\/api.github.com\/repos\/librenms\/librenms\/"
+    },
+    "graph_colours.blues.0": {
+        "default": "A0A0E5"
+    },
+    "graph_colours.blues.1": {
+        "default": "8080BD"
+    },
+    "graph_colours.blues.2": {
+        "default": "606096"
+    },
+    "graph_colours.blues.3": {
+        "default": "40406F"
+    },
+    "graph_colours.blues.4": {
+        "default": "202048"
+    },
+    "graph_colours.blues.5": {
+        "default": "000033"
+    },
+    "graph_colours.default.0": {
+        "default": "A0A0E5"
+    },
+    "graph_colours.default.1": {
+        "default": "8080BD"
+    },
+    "graph_colours.default.2": {
+        "default": "606096"
+    },
+    "graph_colours.default.3": {
+        "default": "40406F"
+    },
+    "graph_colours.default.4": {
+        "default": "202048"
+    },
+    "graph_colours.default.5": {
+        "default": "000033"
+    },
+    "graph_colours.greens.0": {
+        "default": "B6D14B"
+    },
+    "graph_colours.greens.1": {
+        "default": "91B13C"
+    },
+    "graph_colours.greens.2": {
+        "default": "6D912D"
+    },
+    "graph_colours.greens.3": {
+        "default": "48721E"
+    },
+    "graph_colours.greens.4": {
+        "default": "24520F"
+    },
+    "graph_colours.greens.5": {
+        "default": "003300"
+    },
+    "graph_colours.manycolours.0": {
+        "default": "FFF8A3"
+    },
+    "graph_colours.manycolours.1": {
+        "default": "FAE16B"
+    },
+    "graph_colours.manycolours.10": {
+        "default": "B2C8D9"
+    },
+    "graph_colours.manycolours.11": {
+        "default": "779DBF"
+    },
+    "graph_colours.manycolours.12": {
+        "default": "3E75A7"
+    },
+    "graph_colours.manycolours.13": {
+        "default": "205F9A"
+    },
+    "graph_colours.manycolours.14": {
+        "default": "00488C"
+    },
+    "graph_colours.manycolours.15": {
+        "default": "BEA37A"
+    },
+    "graph_colours.manycolours.16": {
+        "default": "907A52"
+    },
+    "graph_colours.manycolours.17": {
+        "default": "7A653E"
+    },
+    "graph_colours.manycolours.18": {
+        "default": "63522B"
+    },
+    "graph_colours.manycolours.19": {
+        "default": "3D3000"
+    },
+    "graph_colours.manycolours.2": {
+        "default": "F8D753"
+    },
+    "graph_colours.manycolours.20": {
+        "default": "F3AA79"
+    },
+    "graph_colours.manycolours.21": {
+        "default": "EB8953"
+    },
+    "graph_colours.manycolours.22": {
+        "default": "E1662A"
+    },
+    "graph_colours.manycolours.23": {
+        "default": "DC5313"
+    },
+    "graph_colours.manycolours.24": {
+        "default": "D84000"
+    },
+    "graph_colours.manycolours.25": {
+        "default": "B5B5A9"
+    },
+    "graph_colours.manycolours.26": {
+        "default": "8B8D82"
+    },
+    "graph_colours.manycolours.27": {
+        "default": "74796F"
+    },
+    "graph_colours.manycolours.28": {
+        "default": "5D645A"
+    },
+    "graph_colours.manycolours.29": {
+        "default": "434C43"
+    },
+    "graph_colours.manycolours.3": {
+        "default": "F3C01C"
+    },
+    "graph_colours.manycolours.30": {
+        "default": "E6A4A5"
+    },
+    "graph_colours.manycolours.31": {
+        "default": "D6707B"
+    },
+    "graph_colours.manycolours.32": {
+        "default": "C4384F"
+    },
+    "graph_colours.manycolours.33": {
+        "default": "BC1C39"
+    },
+    "graph_colours.manycolours.34": {
+        "default": "B30023"
+    },
+    "graph_colours.manycolours.4": {
+        "default": "F0B400"
+    },
+    "graph_colours.manycolours.5": {
+        "default": "A9CC8F"
+    },
+    "graph_colours.manycolours.6": {
+        "default": "82B16A"
+    },
+    "graph_colours.manycolours.7": {
+        "default": "5C9746"
+    },
+    "graph_colours.manycolours.8": {
+        "default": "3D8128"
+    },
+    "graph_colours.manycolours.9": {
+        "default": "1E6C0B"
+    },
+    "graph_colours.mega.0": {
+        "default": "CC7CCC"
+    },
+    "graph_colours.mega.1": {
+        "default": "D0558F"
+    },
+    "graph_colours.mega.10": {
+        "default": "934A93"
+    },
+    "graph_colours.mega.11": {
+        "default": "943A57"
+    },
+    "graph_colours.mega.12": {
+        "default": "6D912D"
+    },
+    "graph_colours.mega.13": {
+        "default": "606096"
+    },
+    "graph_colours.mega.14": {
+        "default": "EB5B00"
+    },
+    "graph_colours.mega.15": {
+        "default": "773177"
+    },
+    "graph_colours.mega.16": {
+        "default": "792C38"
+    },
+    "graph_colours.mega.17": {
+        "default": "48721E"
+    },
+    "graph_colours.mega.18": {
+        "default": "40406F"
+    },
+    "graph_colours.mega.19": {
+        "default": "EF6A00"
+    },
+    "graph_colours.mega.2": {
+        "default": "B6D14B"
+    },
+    "graph_colours.mega.20": {
+        "default": "5B185B"
+    },
+    "graph_colours.mega.21": {
+        "default": "5C1F1E"
+    },
+    "graph_colours.mega.22": {
+        "default": "24520F"
+    },
+    "graph_colours.mega.23": {
+        "default": "202048"
+    },
+    "graph_colours.mega.24": {
+        "default": "F37900"
+    },
+    "graph_colours.mega.25": {
+        "default": "3F003F"
+    },
+    "graph_colours.mega.26": {
+        "default": "401F10"
+    },
+    "graph_colours.mega.27": {
+        "default": "003300"
+    },
+    "graph_colours.mega.28": {
+        "default": "000033"
+    },
+    "graph_colours.mega.29": {
+        "default": "F78800"
+    },
+    "graph_colours.mega.3": {
+        "default": "A0A0E5"
+    },
+    "graph_colours.mega.30": {
+        "default": "FB9700"
+    },
+    "graph_colours.mega.31": {
+        "default": "FFA700"
+    },
+    "graph_colours.mega.32": {
+        "default": "FFF8A3"
+    },
+    "graph_colours.mega.33": {
+        "default": "FAE16B"
+    },
+    "graph_colours.mega.34": {
+        "default": "F8D753"
+    },
+    "graph_colours.mega.35": {
+        "default": "F3C01C"
+    },
+    "graph_colours.mega.36": {
+        "default": "F0B400"
+    },
+    "graph_colours.mega.37": {
+        "default": "A9CC8F"
+    },
+    "graph_colours.mega.38": {
+        "default": "82B16A"
+    },
+    "graph_colours.mega.39": {
+        "default": "5C9746"
+    },
+    "graph_colours.mega.4": {
+        "default": "E43C00"
+    },
+    "graph_colours.mega.40": {
+        "default": "3D8128"
+    },
+    "graph_colours.mega.41": {
+        "default": "1E6C0B"
+    },
+    "graph_colours.mega.42": {
+        "default": "B2C8D9"
+    },
+    "graph_colours.mega.43": {
+        "default": "779DBF"
+    },
+    "graph_colours.mega.44": {
+        "default": "3E75A7"
+    },
+    "graph_colours.mega.45": {
+        "default": "205F9A"
+    },
+    "graph_colours.mega.46": {
+        "default": "00488C"
+    },
+    "graph_colours.mega.47": {
+        "default": "BEA37A"
+    },
+    "graph_colours.mega.48": {
+        "default": "907A52"
+    },
+    "graph_colours.mega.49": {
+        "default": "7A653E"
+    },
+    "graph_colours.mega.5": {
+        "default": "AF63AF"
+    },
+    "graph_colours.mega.50": {
+        "default": "63522B"
+    },
+    "graph_colours.mega.51": {
+        "default": "3D3000"
+    },
+    "graph_colours.mega.52": {
+        "default": "F3AA79"
+    },
+    "graph_colours.mega.53": {
+        "default": "EB8953"
+    },
+    "graph_colours.mega.54": {
+        "default": "E1662A"
+    },
+    "graph_colours.mega.55": {
+        "default": "DC5313"
+    },
+    "graph_colours.mega.56": {
+        "default": "D84000"
+    },
+    "graph_colours.mega.57": {
+        "default": "B5B5A9"
+    },
+    "graph_colours.mega.58": {
+        "default": "8B8D82"
+    },
+    "graph_colours.mega.59": {
+        "default": "74796F"
+    },
+    "graph_colours.mega.6": {
+        "default": "B34773"
+    },
+    "graph_colours.mega.60": {
+        "default": "5D645A"
+    },
+    "graph_colours.mega.61": {
+        "default": "434C43"
+    },
+    "graph_colours.mega.62": {
+        "default": "E6A4A5"
+    },
+    "graph_colours.mega.63": {
+        "default": "D6707B"
+    },
+    "graph_colours.mega.64": {
+        "default": "C4384F"
+    },
+    "graph_colours.mega.65": {
+        "default": "BC1C39"
+    },
+    "graph_colours.mega.66": {
+        "default": "B30023"
+    },
+    "graph_colours.mega.67": {
+        "default": "A0A0E5"
+    },
+    "graph_colours.mega.68": {
+        "default": "8080BD"
+    },
+    "graph_colours.mega.69": {
+        "default": "606096"
+    },
+    "graph_colours.mega.7": {
+        "default": "91B13C"
+    },
+    "graph_colours.mega.70": {
+        "default": "40406F"
+    },
+    "graph_colours.mega.71": {
+        "default": "202048"
+    },
+    "graph_colours.mega.72": {
+        "default": "000033"
+    },
+    "graph_colours.mega.73": {
+        "default": "CC0000"
+    },
+    "graph_colours.mega.74": {
+        "default": "008C00"
+    },
+    "graph_colours.mega.75": {
+        "default": "4096EE"
+    },
+    "graph_colours.mega.76": {
+        "default": "73880A"
+    },
+    "graph_colours.mega.77": {
+        "default": "D01F3C"
+    },
+    "graph_colours.mega.78": {
+        "default": "36393D"
+    },
+    "graph_colours.mega.79": {
+        "default": "FF0084"
+    },
+    "graph_colours.mega.8": {
+        "default": "8080BD"
+    },
+    "graph_colours.mega.9": {
+        "default": "E74B00"
+    },
+    "graph_colours.mixed.0": {
+        "default": "CC0000"
+    },
+    "graph_colours.mixed.1": {
+        "default": "008C00"
+    },
+    "graph_colours.mixed.2": {
+        "default": "4096EE"
+    },
+    "graph_colours.mixed.3": {
+        "default": "73880A"
+    },
+    "graph_colours.mixed.4": {
+        "default": "D01F3C"
+    },
+    "graph_colours.mixed.5": {
+        "default": "36393D"
+    },
+    "graph_colours.mixed.6": {
+        "default": "FF0084"
+    },
+    "graph_colours.oranges.0": {
+        "default": "E43C00"
+    },
+    "graph_colours.oranges.1": {
+        "default": "E74B00"
+    },
+    "graph_colours.oranges.2": {
+        "default": "EB5B00"
+    },
+    "graph_colours.oranges.3": {
+        "default": "EF6A00"
+    },
+    "graph_colours.oranges.4": {
+        "default": "F37900"
+    },
+    "graph_colours.oranges.5": {
+        "default": "F78800"
+    },
+    "graph_colours.oranges.6": {
+        "default": "FB9700"
+    },
+    "graph_colours.oranges.7": {
+        "default": "FFA700"
+    },
+    "graph_colours.pinks.0": {
+        "default": "D0558F"
+    },
+    "graph_colours.pinks.1": {
+        "default": "B34773"
+    },
+    "graph_colours.pinks.2": {
+        "default": "943A57"
+    },
+    "graph_colours.pinks.3": {
+        "default": "792C38"
+    },
+    "graph_colours.pinks.4": {
+        "default": "5C1F1E"
+    },
+    "graph_colours.pinks.5": {
+        "default": "401F10"
+    },
+    "graph_colours.psychedelic.0": {
+        "default": "CC7CCC"
+    },
+    "graph_colours.psychedelic.1": {
+        "default": "D0558F"
+    },
+    "graph_colours.psychedelic.10": {
+        "default": "934A93"
+    },
+    "graph_colours.psychedelic.11": {
+        "default": "943A57"
+    },
+    "graph_colours.psychedelic.12": {
+        "default": "6D912D"
+    },
+    "graph_colours.psychedelic.13": {
+        "default": "606096"
+    },
+    "graph_colours.psychedelic.14": {
+        "default": "EB5B00"
+    },
+    "graph_colours.psychedelic.15": {
+        "default": "773177"
+    },
+    "graph_colours.psychedelic.16": {
+        "default": "792C38"
+    },
+    "graph_colours.psychedelic.17": {
+        "default": "48721E"
+    },
+    "graph_colours.psychedelic.18": {
+        "default": "40406F"
+    },
+    "graph_colours.psychedelic.19": {
+        "default": "EF6A00"
+    },
+    "graph_colours.psychedelic.2": {
+        "default": "B6D14B"
+    },
+    "graph_colours.psychedelic.20": {
+        "default": "5B185B"
+    },
+    "graph_colours.psychedelic.21": {
+        "default": "5C1F1E"
+    },
+    "graph_colours.psychedelic.22": {
+        "default": "24520F"
+    },
+    "graph_colours.psychedelic.23": {
+        "default": "202048"
+    },
+    "graph_colours.psychedelic.24": {
+        "default": "F37900"
+    },
+    "graph_colours.psychedelic.25": {
+        "default": "3F003F"
+    },
+    "graph_colours.psychedelic.26": {
+        "default": "401F10"
+    },
+    "graph_colours.psychedelic.27": {
+        "default": "003300"
+    },
+    "graph_colours.psychedelic.28": {
+        "default": "000033"
+    },
+    "graph_colours.psychedelic.29": {
+        "default": "F78800"
+    },
+    "graph_colours.psychedelic.3": {
+        "default": "A0A0E5"
+    },
+    "graph_colours.psychedelic.30": {
+        "default": "FB9700"
+    },
+    "graph_colours.psychedelic.31": {
+        "default": "FFA700"
+    },
+    "graph_colours.psychedelic.4": {
+        "default": "E43C00"
+    },
+    "graph_colours.psychedelic.5": {
+        "default": "AF63AF"
+    },
+    "graph_colours.psychedelic.6": {
+        "default": "B34773"
+    },
+    "graph_colours.psychedelic.7": {
+        "default": "91B13C"
+    },
+    "graph_colours.psychedelic.8": {
+        "default": "8080BD"
+    },
+    "graph_colours.psychedelic.9": {
+        "default": "E74B00"
+    },
+    "graph_colours.purples.0": {
+        "default": "CC7CCC"
+    },
+    "graph_colours.purples.1": {
+        "default": "AF63AF"
+    },
+    "graph_colours.purples.2": {
+        "default": "934A93"
+    },
+    "graph_colours.purples.3": {
+        "default": "773177"
+    },
+    "graph_colours.purples.4": {
+        "default": "5B185B"
+    },
+    "graph_colours.purples.5": {
+        "default": "3F003F"
+    },
+    "graph_descr.device_processor": {
+        "default": "This is an aggregate graph of all processors in the system."
+    },
+    "graph_descr.device_smokeping_in_all": {
+        "default": "This is an aggregate graph of the incoming smokeping tests to this host. The line corresponds to the average RTT. The shaded area around each line denotes the standard deviation."
+    },
+    "graph_types.device.agent.descr": {
+        "default": "Agent Execution Time"
+    },
+    "graph_types.device.agent.order": {
+        "default": "0"
+    },
+    "graph_types.device.agent.section": {
+        "default": "poller"
+    },
+    "graph_types.device.arbos_flows.descr": {
+        "default": "Accumulative flow count per SP device"
+    },
+    "graph_types.device.arbos_flows.order": {
+        "default": 0
+    },
+    "graph_types.device.arbos_flows.section": {
+        "default": "graphs"
+    },
+    "graph_types.device.arbos_flows.subtype": {
+        "default": "arbos_flows"
+    },
+    "graph_types.device.arbos_flows.type": {
+        "default": "device"
+    },
+    "graph_types.device.asa_conns.descr": {
+        "default": "Current connections"
+    },
+    "graph_types.device.asa_conns.order": {
+        "default": 0
+    },
+    "graph_types.device.asa_conns.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.asa_conns.subtype": {
+        "default": "asa_conns"
+    },
+    "graph_types.device.asa_conns.type": {
+        "default": "device"
+    },
+    "graph_types.device.asyncos_conns.descr": {
+        "default": "Current Connections"
+    },
+    "graph_types.device.asyncos_conns.order": {
+        "default": 0
+    },
+    "graph_types.device.asyncos_conns.section": {
+        "default": "proxy"
+    },
+    "graph_types.device.asyncos_conns.subtype": {
+        "default": "asyncos_conns"
+    },
+    "graph_types.device.asyncos_conns.type": {
+        "default": "device"
+    },
+    "graph_types.device.bigip_apm_sessions.descr": {
+        "default": "Active Sessions"
+    },
+    "graph_types.device.bigip_apm_sessions.order": {
+        "default": 0
+    },
+    "graph_types.device.bigip_apm_sessions.section": {
+        "default": "apm"
+    },
+    "graph_types.device.bigip_apm_sessions.subtype": {
+        "default": "bigip_apm_sessions"
+    },
+    "graph_types.device.bigip_apm_sessions.type": {
+        "default": "device"
+    },
+    "graph_types.device.bits.descr": {
+        "default": "Total Traffic"
+    },
+    "graph_types.device.bits.order": {
+        "default": "0"
+    },
+    "graph_types.device.bits.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.bluecoat_http_client_connections.descr": {
+        "default": "HTTP Client Connections"
+    },
+    "graph_types.device.bluecoat_http_client_connections.order": {
+        "default": "0"
+    },
+    "graph_types.device.bluecoat_http_client_connections.section": {
+        "default": "network"
+    },
+    "graph_types.device.bluecoat_http_client_connections_active.descr": {
+        "default": "HTTP Client Connections Active"
+    },
+    "graph_types.device.bluecoat_http_client_connections_active.order": {
+        "default": "0"
+    },
+    "graph_types.device.bluecoat_http_client_connections_active.section": {
+        "default": "network"
+    },
+    "graph_types.device.bluecoat_http_client_connections_idle.descr": {
+        "default": "HTTP Client Connections Idle"
+    },
+    "graph_types.device.bluecoat_http_client_connections_idle.order": {
+        "default": "0"
+    },
+    "graph_types.device.bluecoat_http_client_connections_idle.section": {
+        "default": "network"
+    },
+    "graph_types.device.bluecoat_http_server_connections.descr": {
+        "default": "HTTP Server Connections"
+    },
+    "graph_types.device.bluecoat_http_server_connections.order": {
+        "default": "0"
+    },
+    "graph_types.device.bluecoat_http_server_connections.section": {
+        "default": "network"
+    },
+    "graph_types.device.bluecoat_http_server_connections_active.descr": {
+        "default": "HTTP Server Connections Active"
+    },
+    "graph_types.device.bluecoat_http_server_connections_active.order": {
+        "default": "0"
+    },
+    "graph_types.device.bluecoat_http_server_connections_active.section": {
+        "default": "network"
+    },
+    "graph_types.device.bluecoat_http_server_connections_idle.descr": {
+        "default": "HTTP Server Connections Idle"
+    },
+    "graph_types.device.bluecoat_http_server_connections_idle.order": {
+        "default": "0"
+    },
+    "graph_types.device.bluecoat_http_server_connections_idle.section": {
+        "default": "network"
+    },
+    "graph_types.device.cambium-epmp-frameUtilization.descr": {
+        "default": "Frame Utilization"
+    },
+    "graph_types.device.cambium-epmp-frameUtilization.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.cambium_epmp_RFStatus.descr": {
+        "default": "RF Status"
+    },
+    "graph_types.device.cambium_epmp_RFStatus.order": {
+        "default": "0"
+    },
+    "graph_types.device.cambium_epmp_RFStatus.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.cambium_epmp_access.descr": {
+        "default": "Access Info"
+    },
+    "graph_types.device.cambium_epmp_access.order": {
+        "default": "4"
+    },
+    "graph_types.device.cambium_epmp_access.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.cambium_epmp_freq.descr": {
+        "default": "Frequency"
+    },
+    "graph_types.device.cambium_epmp_freq.order": {
+        "default": "6"
+    },
+    "graph_types.device.cambium_epmp_freq.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.cambium_epmp_gpsSync.descr": {
+        "default": "GPS Sync Status"
+    },
+    "graph_types.device.cambium_epmp_gpsSync.order": {
+        "default": "5"
+    },
+    "graph_types.device.cambium_epmp_gpsSync.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.cambium_epmp_modulation.descr": {
+        "default": "ePMP Modulation"
+    },
+    "graph_types.device.cambium_epmp_modulation.order": {
+        "default": "2"
+    },
+    "graph_types.device.cambium_epmp_modulation.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.cambium_epmp_registeredSM.descr": {
+        "default": "ePMP Registered SM"
+    },
+    "graph_types.device.cambium_epmp_registeredSM.order": {
+        "default": "3"
+    },
+    "graph_types.device.cambium_epmp_registeredSM.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.canopy_generic_450_linkRadioDbm.descr": {
+        "default": "Radio Link H\/V"
+    },
+    "graph_types.device.canopy_generic_450_linkRadioDbm.order": {
+        "default": "5"
+    },
+    "graph_types.device.canopy_generic_450_linkRadioDbm.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.canopy_generic_450_powerlevel.descr": {
+        "default": "Power Level of Registered SM"
+    },
+    "graph_types.device.canopy_generic_450_powerlevel.order": {
+        "default": "4"
+    },
+    "graph_types.device.canopy_generic_450_powerlevel.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.canopy_generic_450_ptpSNR.descr": {
+        "default": "Master SNR"
+    },
+    "graph_types.device.canopy_generic_450_ptpSNR.order": {
+        "default": "6"
+    },
+    "graph_types.device.canopy_generic_450_ptpSNR.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.canopy_generic_450_slaveHV.descr": {
+        "default": "Dbm H\/V"
+    },
+    "graph_types.device.canopy_generic_450_slaveHV.order": {
+        "default": "7"
+    },
+    "graph_types.device.canopy_generic_450_slaveHV.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.canopy_generic_crcErrors.descr": {
+        "default": "CRC Errors (Migrated to Wireless Sensor)"
+    },
+    "graph_types.device.canopy_generic_crcErrors.order": {
+        "default": "15"
+    },
+    "graph_types.device.canopy_generic_crcErrors.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.canopy_generic_errorCount.descr": {
+        "default": "Error Count (Migrated to Wireless Sensor)"
+    },
+    "graph_types.device.canopy_generic_errorCount.order": {
+        "default": "14"
+    },
+    "graph_types.device.canopy_generic_errorCount.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.canopy_generic_gpsStats.descr": {
+        "default": "GPS Stats"
+    },
+    "graph_types.device.canopy_generic_gpsStats.order": {
+        "default": "0"
+    },
+    "graph_types.device.canopy_generic_gpsStats.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.canopy_generic_jitter.descr": {
+        "default": "Jitter"
+    },
+    "graph_types.device.canopy_generic_jitter.order": {
+        "default": "2"
+    },
+    "graph_types.device.canopy_generic_jitter.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.canopy_generic_radioDbm.descr": {
+        "default": "Radio Dbm"
+    },
+    "graph_types.device.canopy_generic_radioDbm.order": {
+        "default": "13"
+    },
+    "graph_types.device.canopy_generic_radioDbm.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.canopy_generic_regCount.descr": {
+        "default": "Registered SM"
+    },
+    "graph_types.device.canopy_generic_regCount.order": {
+        "default": "11"
+    },
+    "graph_types.device.canopy_generic_regCount.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.canopy_generic_signalHV.descr": {
+        "default": "Signal"
+    },
+    "graph_types.device.canopy_generic_signalHV.order": {
+        "default": "3"
+    },
+    "graph_types.device.canopy_generic_signalHV.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ccambium-epmp-frameUtilization.order": {
+        "default": "7"
+    },
+    "graph_types.device.ceraos_DefectedBlocks.descr": {
+        "default": "DefectedBlocks"
+    },
+    "graph_types.device.ceraos_DefectedBlocks.order": {
+        "default": "4"
+    },
+    "graph_types.device.ceraos_DefectedBlocks.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ceraos_MSE.descr": {
+        "default": "Radial MSE"
+    },
+    "graph_types.device.ceraos_MSE.order": {
+        "default": "2"
+    },
+    "graph_types.device.ceraos_MSE.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ceraos_RxBitrate.descr": {
+        "default": "RxBitrate"
+    },
+    "graph_types.device.ceraos_RxBitrate.order": {
+        "default": "6"
+    },
+    "graph_types.device.ceraos_RxBitrate.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ceraos_RxLevel.descr": {
+        "default": "RX Level"
+    },
+    "graph_types.device.ceraos_RxLevel.order": {
+        "default": "0"
+    },
+    "graph_types.device.ceraos_RxLevel.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ceraos_TxBitrate.descr": {
+        "default": "TxBitrate"
+    },
+    "graph_types.device.ceraos_TxBitrate.order": {
+        "default": "5"
+    },
+    "graph_types.device.ceraos_TxBitrate.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ceraos_TxPower.descr": {
+        "default": "TX Power"
+    },
+    "graph_types.device.ceraos_TxPower.order": {
+        "default": "1"
+    },
+    "graph_types.device.ceraos_TxPower.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ceraos_XPI.descr": {
+        "default": "Cross Polarisation Interference"
+    },
+    "graph_types.device.ceraos_XPI.order": {
+        "default": "3"
+    },
+    "graph_types.device.ceraos_XPI.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.charge.descr": {
+        "default": "Battery Charge"
+    },
+    "graph_types.device.charge.order": {
+        "default": "0"
+    },
+    "graph_types.device.charge.section": {
+        "default": "system"
+    },
+    "graph_types.device.cipsec_flow_bits.descr": {
+        "default": "IPSec Tunnel Traffic Volume"
+    },
+    "graph_types.device.cipsec_flow_bits.order": {
+        "default": "0"
+    },
+    "graph_types.device.cipsec_flow_bits.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.cipsec_flow_pkts.descr": {
+        "default": "IPSec Tunnel Traffic Packets"
+    },
+    "graph_types.device.cipsec_flow_pkts.order": {
+        "default": "0"
+    },
+    "graph_types.device.cipsec_flow_pkts.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.cipsec_flow_stats.descr": {
+        "default": "IPSec Tunnel Statistics"
+    },
+    "graph_types.device.cipsec_flow_stats.order": {
+        "default": "0"
+    },
+    "graph_types.device.cipsec_flow_stats.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.cipsec_flow_tunnels.descr": {
+        "default": "IPSec Active Tunnels"
+    },
+    "graph_types.device.cipsec_flow_tunnels.order": {
+        "default": "0"
+    },
+    "graph_types.device.cipsec_flow_tunnels.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.cisco-iosdsp.descr": {
+        "default": "DSP Utilisation"
+    },
+    "graph_types.device.cisco-iosdsp.order": {
+        "default": "0"
+    },
+    "graph_types.device.cisco-iosdsp.section": {
+        "default": "voice"
+    },
+    "graph_types.device.cisco-iosmtp.descr": {
+        "default": "Hardware MTP Utilisation"
+    },
+    "graph_types.device.cisco-iosmtp.order": {
+        "default": "0"
+    },
+    "graph_types.device.cisco-iosmtp.section": {
+        "default": "voice"
+    },
+    "graph_types.device.cisco-iospri.descr": {
+        "default": "PRI Utilisation"
+    },
+    "graph_types.device.cisco-iospri.order": {
+        "default": "0"
+    },
+    "graph_types.device.cisco-iospri.section": {
+        "default": "voice"
+    },
+    "graph_types.device.cisco-iosxcode.descr": {
+        "default": "Transcoder Utilisation"
+    },
+    "graph_types.device.cisco-iosxcode.order": {
+        "default": "0"
+    },
+    "graph_types.device.cisco-iosxcode.section": {
+        "default": "voice"
+    },
+    "graph_types.device.cisco_wwan_mnc.descr": {
+        "default": "MNC"
+    },
+    "graph_types.device.cisco_wwan_mnc.order": {
+        "default": "1"
+    },
+    "graph_types.device.cisco_wwan_mnc.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.cisco_wwan_rssi.descr": {
+        "default": "Signal Rssi"
+    },
+    "graph_types.device.cisco_wwan_rssi.order": {
+        "default": "0"
+    },
+    "graph_types.device.cisco_wwan_rssi.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.cras_sessions.descr": {
+        "default": "Remote Access Sessions"
+    },
+    "graph_types.device.cras_sessions.order": {
+        "default": "0"
+    },
+    "graph_types.device.cras_sessions.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.fdb_count.descr": {
+        "default": "MAC Addresses Learnt"
+    },
+    "graph_types.device.fdb_count.order": {
+        "default": "0"
+    },
+    "graph_types.device.fdb_count.section": {
+        "default": "system"
+    },
+    "graph_types.device.fortigate_cpu.descr": {
+        "default": "CPU"
+    },
+    "graph_types.device.fortigate_cpu.order": {
+        "default": "0"
+    },
+    "graph_types.device.fortigate_cpu.section": {
+        "default": "system"
+    },
+    "graph_types.device.fortigate_sessions.descr": {
+        "default": "Active Sessions"
+    },
+    "graph_types.device.fortigate_sessions.order": {
+        "default": "0"
+    },
+    "graph_types.device.fortigate_sessions.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.fortios_lograte.descr": {
+        "default": "Log Rate"
+    },
+    "graph_types.device.fortios_lograte.order": {
+        "default": 0
+    },
+    "graph_types.device.fortios_lograte.section": {
+        "default": "analyzer"
+    },
+    "graph_types.device.fortios_lograte.subtype": {
+        "default": "fortios_lograte"
+    },
+    "graph_types.device.fortios_lograte.type": {
+        "default": "device"
+    },
+    "graph_types.device.hr_processes.descr": {
+        "default": "Running Processes"
+    },
+    "graph_types.device.hr_processes.order": {
+        "default": "0"
+    },
+    "graph_types.device.hr_processes.section": {
+        "default": "system"
+    },
+    "graph_types.device.hr_users.descr": {
+        "default": "Users Logged In"
+    },
+    "graph_types.device.hr_users.order": {
+        "default": "0"
+    },
+    "graph_types.device.hr_users.section": {
+        "default": "system"
+    },
+    "graph_types.device.ib_dhcp_messages.descr": {
+        "default": "DHCP messages"
+    },
+    "graph_types.device.ib_dhcp_messages.order": {
+        "default": "0"
+    },
+    "graph_types.device.ib_dhcp_messages.section": {
+        "default": "dhcp"
+    },
+    "graph_types.device.ib_dns_dyn_updates.descr": {
+        "default": "DNS dynamic updates"
+    },
+    "graph_types.device.ib_dns_dyn_updates.order": {
+        "default": "0"
+    },
+    "graph_types.device.ib_dns_dyn_updates.section": {
+        "default": "dns"
+    },
+    "graph_types.device.ib_dns_performance.descr": {
+        "default": "DNS performance"
+    },
+    "graph_types.device.ib_dns_performance.order": {
+        "default": "0"
+    },
+    "graph_types.device.ib_dns_performance.section": {
+        "default": "dns"
+    },
+    "graph_types.device.ib_dns_request_return_codes.descr": {
+        "default": "DNS request return codes"
+    },
+    "graph_types.device.ib_dns_request_return_codes.order": {
+        "default": "0"
+    },
+    "graph_types.device.ib_dns_request_return_codes.section": {
+        "default": "dns"
+    },
+    "graph_types.device.ipsystemstats_ipv4.descr": {
+        "default": "IPv4 Packet Statistics"
+    },
+    "graph_types.device.ipsystemstats_ipv4.order": {
+        "default": "0"
+    },
+    "graph_types.device.ipsystemstats_ipv4.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.ipsystemstats_ipv4_frag.descr": {
+        "default": "IPv4 Fragmentation Statistics"
+    },
+    "graph_types.device.ipsystemstats_ipv4_frag.order": {
+        "default": "0"
+    },
+    "graph_types.device.ipsystemstats_ipv4_frag.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.ipsystemstats_ipv6.descr": {
+        "default": "IPv6 Packet Statistics"
+    },
+    "graph_types.device.ipsystemstats_ipv6.order": {
+        "default": "0"
+    },
+    "graph_types.device.ipsystemstats_ipv6.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.ipsystemstats_ipv6_frag.descr": {
+        "default": "IPv6 Fragmentation Statistics"
+    },
+    "graph_types.device.ipsystemstats_ipv6_frag.order": {
+        "default": "0"
+    },
+    "graph_types.device.ipsystemstats_ipv6_frag.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.junos_jsrx_spu_flows.descr": {
+        "default": "SPU Flows"
+    },
+    "graph_types.device.junos_jsrx_spu_flows.order": {
+        "default": 0
+    },
+    "graph_types.device.junos_jsrx_spu_flows.section": {
+        "default": "network"
+    },
+    "graph_types.device.junos_jsrx_spu_flows.subtype": {
+        "default": "junos_jsrx_spu_flows"
+    },
+    "graph_types.device.junos_jsrx_spu_flows.type": {
+        "default": "device"
+    },
+    "graph_types.device.junos_jsrx_spu_sessions.descr": {
+        "default": "Flow Sessions"
+    },
+    "graph_types.device.junos_jsrx_spu_sessions.order": {
+        "default": 1
+    },
+    "graph_types.device.junos_jsrx_spu_sessions.section": {
+        "default": "network"
+    },
+    "graph_types.device.mempool.descr": {
+        "default": "Memory Pool Usage"
+    },
+    "graph_types.device.mempool.order": {
+        "default": "0"
+    },
+    "graph_types.device.mempool.section": {
+        "default": "system"
+    },
+    "graph_types.device.netscaler_tcp_bits.descr": {
+        "default": "TCP Traffic"
+    },
+    "graph_types.device.netscaler_tcp_bits.order": {
+        "default": "0"
+    },
+    "graph_types.device.netscaler_tcp_bits.section": {
+        "default": "load balancer"
+    },
+    "graph_types.device.netscaler_tcp_conn.descr": {
+        "default": "TCP Connections"
+    },
+    "graph_types.device.netscaler_tcp_conn.order": {
+        "default": "0"
+    },
+    "graph_types.device.netscaler_tcp_conn.section": {
+        "default": "load balancer"
+    },
+    "graph_types.device.netscaler_tcp_pkts.descr": {
+        "default": "TCP Packets"
+    },
+    "graph_types.device.netscaler_tcp_pkts.order": {
+        "default": "0"
+    },
+    "graph_types.device.netscaler_tcp_pkts.section": {
+        "default": "load balancer"
+    },
+    "graph_types.device.netstat_icmp.descr": {
+        "default": "ICMP Statistics"
+    },
+    "graph_types.device.netstat_icmp.order": {
+        "default": "0"
+    },
+    "graph_types.device.netstat_icmp.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.netstat_icmp_info.descr": {
+        "default": "ICMP Informational Statistics"
+    },
+    "graph_types.device.netstat_icmp_info.order": {
+        "default": "0"
+    },
+    "graph_types.device.netstat_icmp_info.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.netstat_ip.descr": {
+        "default": "IP Statistics"
+    },
+    "graph_types.device.netstat_ip.order": {
+        "default": "0"
+    },
+    "graph_types.device.netstat_ip.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.netstat_ip_forward.descr": {
+        "default": "IP Forwarding Statistics"
+    },
+    "graph_types.device.netstat_ip_forward.order": {
+        "default": "0"
+    },
+    "graph_types.device.netstat_ip_forward.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.netstat_ip_frag.descr": {
+        "default": "IP Fragmentation Statistics"
+    },
+    "graph_types.device.netstat_ip_frag.order": {
+        "default": "0"
+    },
+    "graph_types.device.netstat_ip_frag.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.netstat_snmp.descr": {
+        "default": "SNMP Statistics"
+    },
+    "graph_types.device.netstat_snmp.order": {
+        "default": "0"
+    },
+    "graph_types.device.netstat_snmp.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.netstat_snmp_pkt.descr": {
+        "default": "SNMP Packet Type Statistics"
+    },
+    "graph_types.device.netstat_snmp_pkt.order": {
+        "default": "0"
+    },
+    "graph_types.device.netstat_snmp_pkt.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.netstat_tcp.descr": {
+        "default": "TCP Statistics"
+    },
+    "graph_types.device.netstat_tcp.order": {
+        "default": "0"
+    },
+    "graph_types.device.netstat_tcp.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.netstat_udp.descr": {
+        "default": "UDP Statistics"
+    },
+    "graph_types.device.netstat_udp.order": {
+        "default": "0"
+    },
+    "graph_types.device.netstat_udp.section": {
+        "default": "netstats"
+    },
+    "graph_types.device.panos_activetunnels.descr": {
+        "default": "Active GlobalProtect Tunnels"
+    },
+    "graph_types.device.panos_activetunnels.order": {
+        "default": 0
+    },
+    "graph_types.device.panos_activetunnels.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.panos_activetunnels.subtype": {
+        "default": "panos_activetunnels"
+    },
+    "graph_types.device.panos_activetunnels.type": {
+        "default": "device"
+    },
+    "graph_types.device.panos_sessions.descr": {
+        "default": "Active Sessions"
+    },
+    "graph_types.device.panos_sessions.order": {
+        "default": "0"
+    },
+    "graph_types.device.panos_sessions.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.panos_sessions_icmp.descr": {
+        "default": "Active ICMP Sessions"
+    },
+    "graph_types.device.panos_sessions_icmp.order": {
+        "default": "0"
+    },
+    "graph_types.device.panos_sessions_icmp.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.panos_sessions_ssl.descr": {
+        "default": "Active SSL Proxy Sessions"
+    },
+    "graph_types.device.panos_sessions_ssl.order": {
+        "default": "0"
+    },
+    "graph_types.device.panos_sessions_ssl.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.panos_sessions_sslutil.descr": {
+        "default": "Active SSL Proxy Utilization"
+    },
+    "graph_types.device.panos_sessions_sslutil.order": {
+        "default": "0"
+    },
+    "graph_types.device.panos_sessions_sslutil.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.panos_sessions_tcp.descr": {
+        "default": "Active TCP Sessions"
+    },
+    "graph_types.device.panos_sessions_tcp.order": {
+        "default": "0"
+    },
+    "graph_types.device.panos_sessions_tcp.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.panos_sessions_udp.descr": {
+        "default": "Active UDP Sessions"
+    },
+    "graph_types.device.panos_sessions_udp.order": {
+        "default": "0"
+    },
+    "graph_types.device.panos_sessions_udp.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.pf_badoffset.descr": {
+        "default": "BadOffset"
+    },
+    "graph_types.device.pf_badoffset.order": {
+        "default": "6"
+    },
+    "graph_types.device.pf_badoffset.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.pf_fragmented.descr": {
+        "default": "Fragmented"
+    },
+    "graph_types.device.pf_fragmented.order": {
+        "default": "7"
+    },
+    "graph_types.device.pf_fragmented.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.pf_inserts.descr": {
+        "default": "Inserts"
+    },
+    "graph_types.device.pf_inserts.order": {
+        "default": "3"
+    },
+    "graph_types.device.pf_inserts.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.pf_matches.descr": {
+        "default": "Matches"
+    },
+    "graph_types.device.pf_matches.order": {
+        "default": "5"
+    },
+    "graph_types.device.pf_matches.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.pf_memdropped.descr": {
+        "default": "MemDropped"
+    },
+    "graph_types.device.pf_memdropped.order": {
+        "default": "10"
+    },
+    "graph_types.device.pf_memdropped.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.pf_normalized.descr": {
+        "default": "Normalized"
+    },
+    "graph_types.device.pf_normalized.order": {
+        "default": "9"
+    },
+    "graph_types.device.pf_normalized.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.pf_removals.descr": {
+        "default": "Removals"
+    },
+    "graph_types.device.pf_removals.order": {
+        "default": "4"
+    },
+    "graph_types.device.pf_removals.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.pf_searches.descr": {
+        "default": "Searches"
+    },
+    "graph_types.device.pf_searches.order": {
+        "default": "2"
+    },
+    "graph_types.device.pf_searches.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.pf_short.descr": {
+        "default": "Short"
+    },
+    "graph_types.device.pf_short.order": {
+        "default": "8"
+    },
+    "graph_types.device.pf_short.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.pf_states.descr": {
+        "default": "States"
+    },
+    "graph_types.device.pf_states.order": {
+        "default": "1"
+    },
+    "graph_types.device.pf_states.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.ping_perf.descr": {
+        "default": "Ping Response"
+    },
+    "graph_types.device.ping_perf.order": {
+        "default": "0"
+    },
+    "graph_types.device.ping_perf.section": {
+        "default": "poller"
+    },
+    "graph_types.device.poller_modules_perf.descr": {
+        "default": "Poller Modules Performance"
+    },
+    "graph_types.device.poller_modules_perf.order": {
+        "default": "0"
+    },
+    "graph_types.device.poller_modules_perf.section": {
+        "default": "poller"
+    },
+    "graph_types.device.poller_perf.descr": {
+        "default": "Poller Time"
+    },
+    "graph_types.device.poller_perf.order": {
+        "default": "0"
+    },
+    "graph_types.device.poller_perf.section": {
+        "default": "poller"
+    },
+    "graph_types.device.processor.descr": {
+        "default": "Processor Usage"
+    },
+    "graph_types.device.processor.order": {
+        "default": "0"
+    },
+    "graph_types.device.processor.section": {
+        "default": "system"
+    },
+    "graph_types.device.pulse_sessions.descr": {
+        "default": "Active Sessions"
+    },
+    "graph_types.device.pulse_sessions.order": {
+        "default": 0
+    },
+    "graph_types.device.pulse_sessions.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.pulse_sessions.subtype": {
+        "default": "pulse_sessions"
+    },
+    "graph_types.device.pulse_sessions.type": {
+        "default": "device"
+    },
+    "graph_types.device.pulse_users.descr": {
+        "default": "Active Users"
+    },
+    "graph_types.device.pulse_users.order": {
+        "default": 0
+    },
+    "graph_types.device.pulse_users.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.pulse_users.subtype": {
+        "default": "pulse_users"
+    },
+    "graph_types.device.pulse_users.type": {
+        "default": "device"
+    },
+    "graph_types.device.riverbed_connections.descr": {
+        "default": "Connections"
+    },
+    "graph_types.device.riverbed_connections.order": {
+        "default": 0
+    },
+    "graph_types.device.riverbed_connections.section": {
+        "default": "network"
+    },
+    "graph_types.device.riverbed_connections.subtype": {
+        "default": "riverbed_connections"
+    },
+    "graph_types.device.riverbed_connections.type": {
+        "default": "device"
+    },
+    "graph_types.device.riverbed_datastore.descr": {
+        "default": "Datastore productivity"
+    },
+    "graph_types.device.riverbed_datastore.order": {
+        "default": 0
+    },
+    "graph_types.device.riverbed_datastore.section": {
+        "default": "network"
+    },
+    "graph_types.device.riverbed_datastore.subtype": {
+        "default": "riverbed_datastore"
+    },
+    "graph_types.device.riverbed_datastore.type": {
+        "default": "device"
+    },
+    "graph_types.device.riverbed_optimization.descr": {
+        "default": "Optimization"
+    },
+    "graph_types.device.riverbed_optimization.order": {
+        "default": 0
+    },
+    "graph_types.device.riverbed_optimization.section": {
+        "default": "network"
+    },
+    "graph_types.device.riverbed_optimization.subtype": {
+        "default": "riverbed_optimization"
+    },
+    "graph_types.device.riverbed_optimization.type": {
+        "default": "device"
+    },
+    "graph_types.device.riverbed_passthrough.descr": {
+        "default": "Bandwidth passthrough"
+    },
+    "graph_types.device.riverbed_passthrough.order": {
+        "default": 0
+    },
+    "graph_types.device.riverbed_passthrough.section": {
+        "default": "network"
+    },
+    "graph_types.device.riverbed_passthrough.subtype": {
+        "default": "riverbed_passthrough"
+    },
+    "graph_types.device.riverbed_passthrough.type": {
+        "default": "device"
+    },
+    "graph_types.device.routeros_leases.descr": {
+        "default": "DHCP Lease Count"
+    },
+    "graph_types.device.routeros_leases.order": {
+        "default": 0
+    },
+    "graph_types.device.routeros_leases.section": {
+        "default": "network"
+    },
+    "graph_types.device.screenos_sessions.descr": {
+        "default": "Active Sessions"
+    },
+    "graph_types.device.screenos_sessions.order": {
+        "default": "0"
+    },
+    "graph_types.device.screenos_sessions.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.secureplatform_sessions.descr": {
+        "default": "Active connections"
+    },
+    "graph_types.device.secureplatform_sessions.order": {
+        "default": 0
+    },
+    "graph_types.device.secureplatform_sessions.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.sgos_average_requests.descr": {
+        "default": "Average HTTP Requests"
+    },
+    "graph_types.device.sgos_average_requests.order": {
+        "default": 0
+    },
+    "graph_types.device.sgos_average_requests.section": {
+        "default": "network"
+    },
+    "graph_types.device.sgos_average_requests.subtype": {
+        "default": "sgos_average_requests"
+    },
+    "graph_types.device.sgos_average_requests.type": {
+        "default": "device"
+    },
+    "graph_types.device.sgos_client_connections.descr": {
+        "default": "HTTP Client Connections"
+    },
+    "graph_types.device.sgos_client_connections.order": {
+        "default": 0
+    },
+    "graph_types.device.sgos_client_connections.section": {
+        "default": "network"
+    },
+    "graph_types.device.sgos_client_connections.subtype": {
+        "default": "sgos_client_connections"
+    },
+    "graph_types.device.sgos_client_connections.type": {
+        "default": "device"
+    },
+    "graph_types.device.sgos_client_connections_active.descr": {
+        "default": "HTTP Client Connections Active"
+    },
+    "graph_types.device.sgos_client_connections_active.order": {
+        "default": 0
+    },
+    "graph_types.device.sgos_client_connections_active.section": {
+        "default": "network"
+    },
+    "graph_types.device.sgos_client_connections_active.subtype": {
+        "default": "sgos_client_connections_active"
+    },
+    "graph_types.device.sgos_client_connections_active.type": {
+        "default": "device"
+    },
+    "graph_types.device.sgos_client_connections_idle.descr": {
+        "default": "HTTP Client Connections Idle"
+    },
+    "graph_types.device.sgos_client_connections_idle.order": {
+        "default": 0
+    },
+    "graph_types.device.sgos_client_connections_idle.section": {
+        "default": "network"
+    },
+    "graph_types.device.sgos_client_connections_idle.subtype": {
+        "default": "sgos_client_connections_idle"
+    },
+    "graph_types.device.sgos_client_connections_idle.type": {
+        "default": "device"
+    },
+    "graph_types.device.sgos_server_connections.descr": {
+        "default": "HTTP Server Connections"
+    },
+    "graph_types.device.sgos_server_connections.order": {
+        "default": 0
+    },
+    "graph_types.device.sgos_server_connections.section": {
+        "default": "network"
+    },
+    "graph_types.device.sgos_server_connections.subtype": {
+        "default": "sgos_server_connections"
+    },
+    "graph_types.device.sgos_server_connections.type": {
+        "default": "device"
+    },
+    "graph_types.device.sgos_server_connections_active.descr": {
+        "default": "HTTP Server Connections Active"
+    },
+    "graph_types.device.sgos_server_connections_active.order": {
+        "default": 0
+    },
+    "graph_types.device.sgos_server_connections_active.section": {
+        "default": "network"
+    },
+    "graph_types.device.sgos_server_connections_active.subtype": {
+        "default": "sgos_server_connections_active"
+    },
+    "graph_types.device.sgos_server_connections_active.type": {
+        "default": "device"
+    },
+    "graph_types.device.sgos_server_connections_idle.descr": {
+        "default": "HTTP Server Connections Idle"
+    },
+    "graph_types.device.sgos_server_connections_idle.order": {
+        "default": 0
+    },
+    "graph_types.device.sgos_server_connections_idle.section": {
+        "default": "network"
+    },
+    "graph_types.device.sgos_server_connections_idle.subtype": {
+        "default": "sgos_server_connections_idle"
+    },
+    "graph_types.device.sgos_server_connections_idle.type": {
+        "default": "device"
+    },
+    "graph_types.device.siklu_rfinterfaceOctets.descr": {
+        "default": "Traffic"
+    },
+    "graph_types.device.siklu_rfinterfaceOctets.order": {
+        "default": "5"
+    },
+    "graph_types.device.siklu_rfinterfaceOctets.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.siklu_rfinterfaceOtherOctets.descr": {
+        "default": "Other Octets"
+    },
+    "graph_types.device.siklu_rfinterfaceOtherOctets.order": {
+        "default": "6"
+    },
+    "graph_types.device.siklu_rfinterfaceOtherOctets.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.siklu_rfinterfaceOtherPkts.descr": {
+        "default": "Other Packets"
+    },
+    "graph_types.device.siklu_rfinterfaceOtherPkts.order": {
+        "default": "4"
+    },
+    "graph_types.device.siklu_rfinterfaceOtherPkts.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.siklu_rfinterfacePkts.descr": {
+        "default": "Packets"
+    },
+    "graph_types.device.siklu_rfinterfacePkts.order": {
+        "default": "3"
+    },
+    "graph_types.device.siklu_rfinterfacePkts.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.sonicwall_sessions.descr": {
+        "default": "Active Sessions"
+    },
+    "graph_types.device.sonicwall_sessions.order": {
+        "default": 0
+    },
+    "graph_types.device.sonicwall_sessions.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.sonicwall_sessions.subtype": {
+        "default": "sonicwall_sessions"
+    },
+    "graph_types.device.sonicwall_sessions.type": {
+        "default": "device"
+    },
+    "graph_types.device.storage.descr": {
+        "default": "Filesystem Usage"
+    },
+    "graph_types.device.storage.order": {
+        "default": "0"
+    },
+    "graph_types.device.storage.section": {
+        "default": "system"
+    },
+    "graph_types.device.sub10_sub10RadioLclAFER.descr": {
+        "default": "Radio Air Frame Error Rate"
+    },
+    "graph_types.device.sub10_sub10RadioLclAFER.order": {
+        "default": "4"
+    },
+    "graph_types.device.sub10_sub10RadioLclAFER.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.sub10_sub10RadioLclDataRate.descr": {
+        "default": "Data Rate on the Airside interface"
+    },
+    "graph_types.device.sub10_sub10RadioLclDataRate.order": {
+        "default": "4"
+    },
+    "graph_types.device.sub10_sub10RadioLclDataRate.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.sub10_sub10RadioLclLnkLoss.descr": {
+        "default": "Radio Link Loss"
+    },
+    "graph_types.device.sub10_sub10RadioLclLnkLoss.order": {
+        "default": "3"
+    },
+    "graph_types.device.sub10_sub10RadioLclLnkLoss.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.sub10_sub10RadioLclRxPower.descr": {
+        "default": "Radio Receive Power"
+    },
+    "graph_types.device.sub10_sub10RadioLclRxPower.order": {
+        "default": "1"
+    },
+    "graph_types.device.sub10_sub10RadioLclRxPower.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.sub10_sub10RadioLclTxPower.descr": {
+        "default": "Radio Transmit Power"
+    },
+    "graph_types.device.sub10_sub10RadioLclTxPower.order": {
+        "default": "0"
+    },
+    "graph_types.device.sub10_sub10RadioLclTxPower.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.sub10_sub10RadioLclVectErr.descr": {
+        "default": "Radio Vector Error"
+    },
+    "graph_types.device.sub10_sub10RadioLclVectErr.order": {
+        "default": "3"
+    },
+    "graph_types.device.sub10_sub10RadioLclVectErr.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.temperature.descr": {
+        "default": "temperature"
+    },
+    "graph_types.device.temperature.order": {
+        "default": "0"
+    },
+    "graph_types.device.temperature.section": {
+        "default": "system"
+    },
+    "graph_types.device.topvision_cmoffline.descr": {
+        "default": "Cable Modem Offline"
+    },
+    "graph_types.device.topvision_cmoffline.order": {
+        "default": 2
+    },
+    "graph_types.device.topvision_cmoffline.section": {
+        "default": "cmts"
+    },
+    "graph_types.device.topvision_cmreg.descr": {
+        "default": "Cable Modem Registered"
+    },
+    "graph_types.device.topvision_cmreg.order": {
+        "default": 1
+    },
+    "graph_types.device.topvision_cmreg.section": {
+        "default": "cmts"
+    },
+    "graph_types.device.topvision_cmtotal.descr": {
+        "default": "Cable Modem Total"
+    },
+    "graph_types.device.topvision_cmtotal.order": {
+        "default": 0
+    },
+    "graph_types.device.topvision_cmtotal.section": {
+        "default": "cmts"
+    },
+    "graph_types.device.ubnt_airfiber_Capacity.descr": {
+        "default": "Link Capacity"
+    },
+    "graph_types.device.ubnt_airfiber_Capacity.order": {
+        "default": "2"
+    },
+    "graph_types.device.ubnt_airfiber_Capacity.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ubnt_airfiber_LinkDist.descr": {
+        "default": "Link Distance"
+    },
+    "graph_types.device.ubnt_airfiber_LinkDist.order": {
+        "default": "1"
+    },
+    "graph_types.device.ubnt_airfiber_LinkDist.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ubnt_airfiber_RFTotOctetsRx.descr": {
+        "default": "RF Total Octets Rx"
+    },
+    "graph_types.device.ubnt_airfiber_RFTotOctetsRx.order": {
+        "default": "6"
+    },
+    "graph_types.device.ubnt_airfiber_RFTotOctetsRx.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ubnt_airfiber_RFTotOctetsTx.descr": {
+        "default": "RF Total Octets Tx"
+    },
+    "graph_types.device.ubnt_airfiber_RFTotOctetsTx.order": {
+        "default": "4"
+    },
+    "graph_types.device.ubnt_airfiber_RFTotOctetsTx.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ubnt_airfiber_RFTotPktsRx.descr": {
+        "default": "RF Total Packets Rx"
+    },
+    "graph_types.device.ubnt_airfiber_RFTotPktsRx.order": {
+        "default": "7"
+    },
+    "graph_types.device.ubnt_airfiber_RFTotPktsRx.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ubnt_airfiber_RFTotPktsTx.descr": {
+        "default": "RF Total Packets Tx"
+    },
+    "graph_types.device.ubnt_airfiber_RFTotPktsTx.order": {
+        "default": "5"
+    },
+    "graph_types.device.ubnt_airfiber_RFTotPktsTx.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ubnt_airfiber_RadioFreqs.descr": {
+        "default": "Radio Frequencies"
+    },
+    "graph_types.device.ubnt_airfiber_RadioFreqs.order": {
+        "default": "0"
+    },
+    "graph_types.device.ubnt_airfiber_RadioFreqs.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ubnt_airfiber_RadioTemp.descr": {
+        "default": "Radio Temperatures"
+    },
+    "graph_types.device.ubnt_airfiber_RadioTemp.order": {
+        "default": "3"
+    },
+    "graph_types.device.ubnt_airfiber_RadioTemp.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ubnt_airfiber_RxPower.descr": {
+        "default": "Radio Rx Power"
+    },
+    "graph_types.device.ubnt_airfiber_RxPower.order": {
+        "default": "8"
+    },
+    "graph_types.device.ubnt_airfiber_RxPower.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ubnt_airfiber_TxPower.descr": {
+        "default": "Radio Tx Power"
+    },
+    "graph_types.device.ubnt_airfiber_TxPower.order": {
+        "default": "0"
+    },
+    "graph_types.device.ubnt_airfiber_TxPower.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.ucd_contexts.descr": {
+        "default": "Context Switches"
+    },
+    "graph_types.device.ucd_contexts.order": {
+        "default": "0"
+    },
+    "graph_types.device.ucd_contexts.section": {
+        "default": "system"
+    },
+    "graph_types.device.ucd_cpu.descr": {
+        "default": "Detailed Processor Usage"
+    },
+    "graph_types.device.ucd_cpu.order": {
+        "default": "0"
+    },
+    "graph_types.device.ucd_cpu.section": {
+        "default": "system"
+    },
+    "graph_types.device.ucd_interrupts.descr": {
+        "default": "Interrupts"
+    },
+    "graph_types.device.ucd_interrupts.order": {
+        "default": "0"
+    },
+    "graph_types.device.ucd_interrupts.section": {
+        "default": "system"
+    },
+    "graph_types.device.ucd_io.descr": {
+        "default": "System I\/O Activity"
+    },
+    "graph_types.device.ucd_io.order": {
+        "default": "0"
+    },
+    "graph_types.device.ucd_io.section": {
+        "default": "system"
+    },
+    "graph_types.device.ucd_load.descr": {
+        "default": "Load Averages"
+    },
+    "graph_types.device.ucd_load.order": {
+        "default": "0"
+    },
+    "graph_types.device.ucd_load.section": {
+        "default": "system"
+    },
+    "graph_types.device.ucd_memory.descr": {
+        "default": "Detailed Memory Usage"
+    },
+    "graph_types.device.ucd_memory.order": {
+        "default": "0"
+    },
+    "graph_types.device.ucd_memory.section": {
+        "default": "system"
+    },
+    "graph_types.device.ucd_swap_io.descr": {
+        "default": "Swap I\/O Activity"
+    },
+    "graph_types.device.ucd_swap_io.order": {
+        "default": "0"
+    },
+    "graph_types.device.ucd_swap_io.section": {
+        "default": "system"
+    },
+    "graph_types.device.uptime.descr": {
+        "default": "System Uptime"
+    },
+    "graph_types.device.uptime.order": {
+        "default": "0"
+    },
+    "graph_types.device.uptime.section": {
+        "default": "system"
+    },
+    "graph_types.device.vpdn_sessions_l2tp.descr": {
+        "default": "VPDN L2TP Sessions"
+    },
+    "graph_types.device.vpdn_sessions_l2tp.order": {
+        "default": "0"
+    },
+    "graph_types.device.vpdn_sessions_l2tp.section": {
+        "default": "vpdn"
+    },
+    "graph_types.device.vpdn_tunnels_l2tp.descr": {
+        "default": "VPDN L2TP Tunnels"
+    },
+    "graph_types.device.vpdn_tunnels_l2tp.order": {
+        "default": "0"
+    },
+    "graph_types.device.vpdn_tunnels_l2tp.section": {
+        "default": "vpdn"
+    },
+    "graph_types.device.waas_cwotfostatsactiveoptconn.descr": {
+        "default": "Optimized TCP Connections"
+    },
+    "graph_types.device.waas_cwotfostatsactiveoptconn.order": {
+        "default": 0
+    },
+    "graph_types.device.waas_cwotfostatsactiveoptconn.section": {
+        "default": "graphs"
+    },
+    "graph_types.device.waas_cwotfostatsactiveoptconn.subtype": {
+        "default": "waas_cwotfostatsactiveoptconn"
+    },
+    "graph_types.device.waas_cwotfostatsactiveoptconn.type": {
+        "default": "device"
+    },
+    "graph_types.device.xirrus_stations.descr": {
+        "default": "Associated Stations"
+    },
+    "graph_types.device.xirrus_stations.order": {
+        "default": "0"
+    },
+    "graph_types.device.xirrus_stations.section": {
+        "default": "wireless"
+    },
+    "graph_types.device.zywall_sessions.descr": {
+        "default": "Sessions"
+    },
+    "graph_types.device.zywall_sessions.order": {
+        "default": 0
+    },
+    "graph_types.device.zywall_sessions.section": {
+        "default": "firewall"
+    },
+    "graph_types.device.zywall_sessions.subtype": {
+        "default": "zywall_sessions"
+    },
+    "graph_types.device.zywall_sessions.type": {
+        "default": "device"
+    },
+    "graphite.port": {
+        "default": 2003
+    },
+    "graphs.mini.normal.day": {
+        "default": "24 Hours"
+    },
+    "graphs.mini.normal.month": {
+        "default": "One Month"
+    },
+    "graphs.mini.normal.week": {
+        "default": "One Week"
+    },
+    "graphs.mini.normal.year": {
+        "default": "One Year"
+    },
+    "graphs.mini.widescreen.day": {
+        "default": "24 Hours"
+    },
+    "graphs.mini.widescreen.month": {
+        "default": "One Month"
+    },
+    "graphs.mini.widescreen.sixhour": {
+        "default": "6 Hours"
+    },
+    "graphs.mini.widescreen.twoday": {
+        "default": "48 Hours"
+    },
+    "graphs.mini.widescreen.twomonth": {
+        "default": "Two Months"
+    },
+    "graphs.mini.widescreen.twoweek": {
+        "default": "Two Weeks"
+    },
+    "graphs.mini.widescreen.twoyear": {
+        "default": "Two Years"
+    },
+    "graphs.mini.widescreen.week": {
+        "default": "One Week"
+    },
+    "graphs.mini.widescreen.year": {
+        "default": "One Year"
+    },
+    "graphs.row.normal.day": {
+        "default": "24 Hours"
+    },
+    "graphs.row.normal.month": {
+        "default": "One Month"
+    },
+    "graphs.row.normal.sixhour": {
+        "default": "6 Hours"
+    },
+    "graphs.row.normal.twoday": {
+        "default": "48 Hours"
+    },
+    "graphs.row.normal.twomonth": {
+        "default": "Two Months"
+    },
+    "graphs.row.normal.twoweek": {
+        "default": "Two Weeks"
+    },
+    "graphs.row.normal.twoyear": {
+        "default": "Two Years"
+    },
+    "graphs.row.normal.week": {
+        "default": "One Week"
+    },
+    "graphs.row.normal.year": {
+        "default": "One Year"
+    },
+    "gui.network-map.style": {
+        "default": "new"
+    },
+    "html_dir": {
+        "default": "\/home\/murrant\/projects\/librenms\/html"
+    },
+    "icmp_check": {
+        "default": true
+    },
+    "ignore_mount.0": {
+        "default": "\/kern"
+    },
+    "ignore_mount.1": {
+        "default": "\/mnt\/cdrom"
+    },
+    "ignore_mount.2": {
+        "default": "\/proc"
+    },
+    "ignore_mount.3": {
+        "default": "\/dev"
+    },
+    "ignore_mount.4": {
+        "default": "\/compat\/linux\/proc"
+    },
+    "ignore_mount.5": {
+        "default": "\/compat\/linux\/sys"
+    },
+    "ignore_mount_network": {
+        "default": 1
+    },
+    "ignore_mount_optical": {
+        "default": 1
+    },
+    "ignore_mount_regexp.0": {
+        "default": "\/on: \\\/packages\/"
+    },
+    "ignore_mount_regexp.1": {
+        "default": "\/on: \\\/dev\/"
+    },
+    "ignore_mount_regexp.10": {
+        "default": "\/^\\\/Volumes\\\/OS X Base System\/"
+    },
+    "ignore_mount_regexp.2": {
+        "default": "\/on: \\\/proc\/"
+    },
+    "ignore_mount_regexp.3": {
+        "default": "\/on: \\\/junos^\/"
+    },
+    "ignore_mount_regexp.4": {
+        "default": "\/on: \\\/junos\\\/dev\/"
+    },
+    "ignore_mount_regexp.5": {
+        "default": "\/on: \\\/jail\\\/dev\/"
+    },
+    "ignore_mount_regexp.6": {
+        "default": "\/^(dev|proc)fs\/"
+    },
+    "ignore_mount_regexp.7": {
+        "default": "\/^\\\/dev\\\/md0\/"
+    },
+    "ignore_mount_regexp.8": {
+        "default": "\/^\\\/var\\\/dhcpd\\\/dev\/"
+    },
+    "ignore_mount_regexp.9": {
+        "default": "\/UMA\/"
+    },
+    "ignore_mount_removable": {
+        "default": 1
+    },
+    "ignore_mount_string.0": {
+        "default": "packages"
+    },
+    "ignore_mount_string.1": {
+        "default": "devfs"
+    },
+    "ignore_mount_string.2": {
+        "default": "procfs"
+    },
+    "ignore_mount_string.3": {
+        "default": "linprocfs"
+    },
+    "ignore_mount_string.4": {
+        "default": "linsysfs"
+    },
+    "ignore_mount_string.5": {
+        "default": "UMA"
+    },
+    "ignore_mount_string.6": {
+        "default": "MALLOC"
+    },
+    "ignore_unmapable_port": {
+        "default": false
+    },
+    "influxdb.timeout": {
+        "default": 0
+    },
+    "influxdb.verifySSL": {
+        "default": false
+    },
+    "install_dir": {
+        "default": "\/home\/murrant\/projects\/librenms"
+    },
+    "int_core": {
+        "default": 1
+    },
+    "int_customers": {
+        "default": 1
+    },
+    "int_l2tp": {
+        "default": 0
+    },
+    "int_peering": {
+        "default": 1
+    },
+    "int_transit": {
+        "default": 1
+    },
+    "ipmi.type.0": {
+        "default": "lanplus"
+    },
+    "ipmi.type.1": {
+        "default": "lan"
+    },
+    "ipmi.type.2": {
+        "default": "imb"
+    },
+    "ipmi.type.3": {
+        "default": "open"
+    },
+    "ipmi_unit.Amps": {
+        "default": "current"
+    },
+    "ipmi_unit.RPM": {
+        "default": "fanspeed"
+    },
+    "ipmi_unit.Volts": {
+        "default": "voltage"
+    },
+    "ipmi_unit.Watts": {
+        "default": "power"
+    },
+    "ipmi_unit.degrees C": {
+        "default": "temperature"
+    },
+    "ipmi_unit.discrete": {
+        "default": ""
+    },
+    "ipmi_unit.percent": {
+        "default": "load"
+    },
+    "ipmitool": {
+        "default": "\/usr\/bin\/ipmitool"
+    },
+    "irc_alert": {
+        "default": false
+    },
+    "irc_alert_short": {
+        "default": false
+    },
+    "irc_alert_utf8": {
+        "default": false
+    },
+    "irc_authtime": {
+        "default": 3
+    },
+    "irc_chan.0": {
+        "default": "##librenms"
+    },
+    "irc_ctcp": {
+        "default": false
+    },
+    "irc_ctcp_version": {
+        "default": "LibreNMS IRCbot. https:\/\/www.librenms.org\/"
+    },
+    "irc_debug": {
+        "default": false
+    },
+    "irc_external": {
+        "default": ""
+    },
+    "irc_host": {
+        "default": ""
+    },
+    "irc_maxretry": {
+        "default": 3
+    },
+    "irc_nick": {
+        "default": "LibreNMS"
+    },
+    "irc_pass": {
+        "default": ""
+    },
+    "irc_port": {
+        "default": ""
+    },
+    "leaflet.default_lat": {
+        "default": "51.4800"
+    },
+    "leaflet.default_lng": {
+        "default": "0"
+    },
+    "leaflet.default_zoom": {
+        "default": 2
+    },
+    "leaflet.tile_url": {
+        "default": "{s}.tile.openstreetmap.org"
+    },
+    "libvirt_protocols.0": {
+        "default": "qemu+ssh"
+    },
+    "libvirt_protocols.1": {
+        "default": "xen+ssh"
+    },
+    "list_colour.even": {
+        "default": "#ffffff"
+    },
+    "list_colour.even_alt": {
+        "default": "#f9f9f9"
+    },
+    "list_colour.even_alt2": {
+        "default": "#f0f0f0"
+    },
+    "list_colour.highlight": {
+        "default": "#ffcccc"
+    },
+    "list_colour.odd": {
+        "default": "#eeeeee"
+    },
+    "list_colour.odd_alt": {
+        "default": "#f0f0f0"
+    },
+    "list_colour.odd_alt2": {
+        "default": "#e3e3e3"
+    },
+    "log_dir": {
+        "default": "\/home\/murrant\/projects\/librenms\/logs"
+    },
+    "log_file": {
+        "default": "\/home\/murrant\/projects\/librenms\/logs\/librenms.log"
+    },
+    "login_message": {
+        "default": "Unauthorised access or use shall render the user liable to criminal and\/or civil prosecution."
+    },
+    "map.engine": {
+        "default": "leaflet"
+    },
+    "mapael.default_map": {
+        "default": "maps\/world_countries.js"
+    },
+    "mib_dir": {
+        "default": "\/home\/murrant\/projects\/librenms\/mibs"
+    },
+    "mono_font": {
+        "default": "DejaVuSansMono"
+    },
+    "mtr": {
+        "default": "\/usr\/bin\/mtr"
+    },
+    "mysql_log_level": {
+        "default": "ERROR"
+    },
+    "nagios_plugins": {
+        "default": "\/usr\/lib\/nagios\/plugins"
+    },
+    "navbar.manage_groups.hide": {
+        "default": 0
+    },
+    "network_map_items.0": {
+        "default": "xdp"
+    },
+    "network_map_items.1": {
+        "default": "mac"
+    },
+    "network_map_legend.0": {
+        "default": "#008dca"
+    },
+    "network_map_legend.10": {
+        "default": "#009782"
+    },
+    "network_map_legend.100": {
+        "default": "#cc0000"
+    },
+    "network_map_legend.15": {
+        "default": "#009c5f"
+    },
+    "network_map_legend.20": {
+        "default": "#00a13b"
+    },
+    "network_map_legend.25": {
+        "default": "#00a617"
+    },
+    "network_map_legend.30": {
+        "default": "#0bad00"
+    },
+    "network_map_legend.35": {
+        "default": "#2fb700"
+    },
+    "network_map_legend.40": {
+        "default": "#53c100"
+    },
+    "network_map_legend.45": {
+        "default": "#77cc00"
+    },
+    "network_map_legend.5": {
+        "default": "#0092a6"
+    },
+    "network_map_legend.50": {
+        "default": "#9ad600"
+    },
+    "network_map_legend.55": {
+        "default": "#bee000"
+    },
+    "network_map_legend.60": {
+        "default": "#e2ea00"
+    },
+    "network_map_legend.65": {
+        "default": "#ead600"
+    },
+    "network_map_legend.70": {
+        "default": "#e5b200"
+    },
+    "network_map_legend.75": {
+        "default": "#e08e00"
+    },
+    "network_map_legend.80": {
+        "default": "#db6b00"
+    },
+    "network_map_legend.85": {
+        "default": "#d64700"
+    },
+    "network_map_legend.90": {
+        "default": "#d12300"
+    },
+    "network_map_legend.95": {
+        "default": "#cc0000"
+    },
+    "network_map_legend.di.border": {
+        "default": "#cccccc"
+    },
+    "network_map_legend.di.edge": {
+        "default": "#dddddd88"
+    },
+    "network_map_legend.di.node": {
+        "default": "#eeeeee"
+    },
+    "network_map_legend.dn.border": {
+        "default": "#ff5555"
+    },
+    "network_map_legend.dn.edge": {
+        "default": "#ff777788"
+    },
+    "network_map_legend.dn.node": {
+        "default": "#ffdddd"
+    },
+    "network_map_vis_options": {
+        "default": "{\n  layout:{\n      randomSeed:2\n  },\n  \"edges\": {\n    arrows: {\n          to:     {enabled: true, scaleFactor:0.5},\n    },\n    \"smooth\": {\n        enabled: false\n    },\n    font: {\n        size: 14,\n        color: \"red\",\n        face: \"sans\",\n        background: \"white\",\n        strokeWidth:3,\n        align: \"middle\",\n        strokeWidth: 2\n    }\n  },\n  \"physics\": {\n     \"barnesHut\": {\n      \"gravitationalConstant\": -2000,\n      \"centralGravity\": 0.3,\n      \"springLength\": 200,\n      \"springConstant\": 0.04,\n      \"damping\": 0.09,\n      \"avoidOverlap\": 1\n    },\n\n     \"forceAtlas2Based\": {\n      \"gravitationalConstant\": -50,\n      \"centralGravity\": 0.01,\n      \"springLength\": 200,\n      \"springConstant\": 0.08,\n      \"damping\": 0.4,\n      \"avoidOverlap\": 1\n    },\n\n     \"repulsion\": {\n      \"centralGravity\": 0.2,\n      \"springLength\": 250,\n      \"springConstant\": 0.2,\n      \"nodeDistance\": 200,\n      \"damping\": 0.07\n    },\n\n     \"hierarchicalRepulsion\": {\n      \"nodeDistance\": 300,\n      \"centralGravity\": 0.2,\n      \"springLength\": 300,\n      \"springConstant\": 0.2,\n      \"damping\": 0.07\n    },\n\n  \"maxVelocity\": 50,\n  \"minVelocity\": 0.4,\n  \"solver\": \"hierarchicalRepulsion\",\n  \"stabilization\": {\n    \"enabled\": true,\n    \"iterations\": 1000,\n    \"updateInterval\": 100,\n    \"onlyDynamicEdges\": false,\n    \"fit\": true\n  },\n\n  \"timestep\": 0.4,\n }\n}"
+    },
+    "nfsen_enable": {
+        "default": 0
+    },
+    "nmap": {
+        "default": "\/usr\/bin\/nmap"
+    },
+    "notifications.LibreNMS": {
+        "default": "http:\/\/www.librenms.org\/notifications.rss"
+    },
+    "notifications.local": {
+        "default": "misc\/notifications.rss"
+    },
+    "old_graphs": {
+        "default": 1
+    },
+    "os.default.over.0.graph": {
+        "default": "device_processor"
+    },
+    "os.default.over.0.text": {
+        "default": "Processor Usage"
+    },
+    "os.default.over.1.graph": {
+        "default": "device_mempool"
+    },
+    "os.default.over.1.text": {
+        "default": "Memory Usage"
+    },
+    "os_def_cache_time": {
+        "default": 86400
+    },
+    "os_group.unix.over.0.graph": {
+        "default": "device_processor"
+    },
+    "os_group.unix.over.0.text": {
+        "default": "Processor Usage"
+    },
+    "os_group.unix.over.1.graph": {
+        "default": "device_ucd_memory"
+    },
+    "os_group.unix.over.1.text": {
+        "default": "Memory Usage"
+    },
+    "os_group.unix.processor_stacked": {
+        "default": 1
+    },
+    "os_group.unix.type": {
+        "default": "server"
+    },
+    "overlib_defaults": {
+        "default": ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'"
+    },
+    "overview_show_sysDescr": {
+        "default": true
+    },
+    "own_hostname": {
+        "default": "localhost"
+    },
+    "oxidized.default_group": {
+        "description": "Set the default group returned",
+        "default": false,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "oxidized",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "oxidized.enabled": {
+        "description": "Enable Oxidized support",
+        "default": false,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "oxidized",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "oxidized.features.versioning": {
+        "description": "Enable Oxidized config versioning",
+        "default": false,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "oxidized",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "oxidized.group_support": {
+        "description": "Enable the return of groups to Oxidized",
+        "default": false,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "oxidized",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "oxidized.reload_nodes": {
+        "description": "Reload Oxidized nodes list, each time a device is added",
+        "default": false,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "oxidized",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "oxidized.url": {
+        "description": "Oxidized API url",
+        "default": false,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "oxidized",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "page_gen": {
+        "default": 0
+    },
+    "page_refresh": {
+        "default": "300"
+    },
+    "page_title_prefix": {
+        "default": ""
+    },
+    "page_title_suffix": {
+        "default": "LibreNMS"
+    },
+    "peering_descr.0": {
+        "default": "peering"
+    },
+    "peeringdb.enabled": {
+        "description": "Enable PeeringDB lookup (data is downloaded with daily.sh)",
+        "default": false,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "peeringdb",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "percentile_value": {
+        "default": 95
+    },
+    "perf_times_purge": {
+        "default": 30
+    },
+    "ping": {
+        "default": "\/bin\/ping"
+    },
+    "plugin_dir": {
+        "default": "\/home\/murrant\/projects\/librenms\/html\/plugins"
+    },
+    "poller_modules.applications": {
+        "default": true
+    },
+    "poller_modules.aruba-controller": {
+        "default": false
+    },
+    "poller_modules.bgp-peers": {
+        "default": true
+    },
+    "poller_modules.cipsec-tunnels": {
+        "default": false
+    },
+    "poller_modules.cisco-ace-loadbalancer": {
+        "default": false
+    },
+    "poller_modules.cisco-ace-serverfarms": {
+        "default": false
+    },
+    "poller_modules.cisco-asa-firewall": {
+        "default": false
+    },
+    "poller_modules.cisco-cbqos": {
+        "default": false
+    },
+    "poller_modules.cisco-cef": {
+        "default": false
+    },
+    "poller_modules.cisco-ipsec-flow-monitor": {
+        "default": false
+    },
+    "poller_modules.cisco-mac-accounting": {
+        "default": false
+    },
+    "poller_modules.cisco-otv": {
+        "default": false
+    },
+    "poller_modules.cisco-remote-access-monitor": {
+        "default": false
+    },
+    "poller_modules.cisco-sla": {
+        "default": false
+    },
+    "poller_modules.cisco-voice": {
+        "default": false
+    },
+    "poller_modules.cisco-vpdn": {
+        "default": false
+    },
+    "poller_modules.entity-physical": {
+        "default": true
+    },
+    "poller_modules.entity-state": {
+        "default": false
+    },
+    "poller_modules.hr-mib": {
+        "default": true
+    },
+    "poller_modules.ipSystemStats": {
+        "default": true
+    },
+    "poller_modules.ipmi": {
+        "default": true
+    },
+    "poller_modules.junose-atm-vp": {
+        "default": false
+    },
+    "poller_modules.loadbalancers": {
+        "default": false
+    },
+    "poller_modules.mef": {
+        "default": false
+    },
+    "poller_modules.mempools": {
+        "default": true
+    },
+    "poller_modules.mib": {
+        "default": false
+    },
+    "poller_modules.nac": {
+        "default": false
+    },
+    "poller_modules.netscaler-vsvr": {
+        "default": false
+    },
+    "poller_modules.netstats": {
+        "default": true
+    },
+    "poller_modules.ntp": {
+        "default": true
+    },
+    "poller_modules.os": {
+        "default": true
+    },
+    "poller_modules.ospf": {
+        "default": true
+    },
+    "poller_modules.ports": {
+        "default": true
+    },
+    "poller_modules.processors": {
+        "default": true
+    },
+    "poller_modules.sensors": {
+        "default": true
+    },
+    "poller_modules.storage": {
+        "default": true
+    },
+    "poller_modules.stp": {
+        "default": true
+    },
+    "poller_modules.toner": {
+        "default": false
+    },
+    "poller_modules.ucd-diskio": {
+        "default": true
+    },
+    "poller_modules.ucd-mib": {
+        "default": true
+    },
+    "poller_modules.unix-agent": {
+        "default": false
+    },
+    "poller_modules.wifi": {
+        "default": false
+    },
+    "poller_modules.wireless": {
+        "default": true
+    },
+    "port_descr_parser": {
+        "default": "includes\/port-descr-parser.inc.php"
+    },
+    "ports_page_default": {
+        "default": "details"
+    },
+    "project_home": {
+        "default": "http:\/\/www.librenms.org\/"
+    },
+    "project_id": {
+        "default": "librenms"
+    },
+    "project_issues": {
+        "default": "https:\/\/community.librenms.org\/c\/help"
+    },
+    "project_name": {
+        "default": "LibreNMS"
+    },
+    "project_name_version": {
+        "default": "LibreNMS"
+    },
+    "prometheus.job": {
+        "default": "librenms"
+    },
+    "public_status": {
+        "default": false
+    },
+    "rancid_ignorecomments": {
+        "default": 0
+    },
+    "rancid_repo_type": {
+        "default": "svn"
+    },
+    "rewrite_if_regexp.\/^cpu interface\/": {
+        "default": "Mgmt"
+    },
+    "rrd.heartbeat": {
+        "description": "Change the rrd heartbeat value (default 600)",
+        "default": 600,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "rrdtool",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "rrd.step": {
+        "description": "Change the rrd step value (default 300)",
+        "default": 300,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "rrdtool",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "rrd_dir": {
+        "default": "\/home\/murrant\/projects\/librenms\/rrd"
+    },
+    "rrd_rra": {
+        "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440  RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797  RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797  RRA:LAST:0.5:1:1440 "
+    },
+    "rrdgraph_def_text": {
+        "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c FONT#000000 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal"
+    },
+    "rrdgraph_real_percentile": {
+        "default": false
+    },
+    "rrdtool": {
+        "description": "Path to rrdtool",
+        "default": "rrdtool",
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "paths",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "rrdtool_tune": {
+        "description": "Auto tune maximum value for rrd port files",
+        "default": false,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "rrdtool",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "secure_cookies": {
+        "default": false
+    },
+    "sfdp": {
+        "default": "\/usr\/bin\/sfdp"
+    },
+    "show_locations": {
+        "default": 1
+    },
+    "show_locations_dropdown": {
+        "default": 1
+    },
+    "show_overview_tab": {
+        "default": true
+    },
+    "show_services": {
+        "default": 0
+    },
+    "site_style": {
+        "default": "light"
+    },
+    "sla_type_labels.dhcp": {
+        "default": "DHCP"
+    },
+    "sla_type_labels.dlsw": {
+        "default": "DLSW"
+    },
+    "sla_type_labels.dns": {
+        "default": "DNS"
+    },
+    "sla_type_labels.echo": {
+        "default": "ICMP ping"
+    },
+    "sla_type_labels.ethernetJitter": {
+        "default": "Ethernet jitter"
+    },
+    "sla_type_labels.ethernetPing": {
+        "default": "Ethernet ping"
+    },
+    "sla_type_labels.fileIO": {
+        "default": "File I\/O"
+    },
+    "sla_type_labels.ftp": {
+        "default": "FTP"
+    },
+    "sla_type_labels.http": {
+        "default": "HTTP"
+    },
+    "sla_type_labels.icmpjitter": {
+        "default": "ICMP jitter"
+    },
+    "sla_type_labels.jitter": {
+        "default": "Jitter"
+    },
+    "sla_type_labels.lspGroup": {
+        "default": "LSP group"
+    },
+    "sla_type_labels.lspPing": {
+        "default": "LSP ping"
+    },
+    "sla_type_labels.lspPingPseudowire": {
+        "default": "LSP Pseudowire ping"
+    },
+    "sla_type_labels.lspTrace": {
+        "default": "LSP trace"
+    },
+    "sla_type_labels.pathEcho": {
+        "default": "Path ICMP ping"
+    },
+    "sla_type_labels.rtp": {
+        "default": "RTP"
+    },
+    "sla_type_labels.script": {
+        "default": "Script"
+    },
+    "sla_type_labels.tcpConnect": {
+        "default": "TCP connect"
+    },
+    "sla_type_labels.udpEcho": {
+        "default": "UDP ping"
+    },
+    "sla_type_labels.voip": {
+        "default": "VoIP"
+    },
+    "slow_statistics": {
+        "default": true
+    },
+    "smokeping.pings": {
+        "default": 20
+    },
+    "snmp.community.0": {
+        "default": "public"
+    },
+    "snmp.port": {
+        "default": 161
+    },
+    "snmp.transports.0": {
+        "default": "udp"
+    },
+    "snmp.transports.1": {
+        "default": "udp6"
+    },
+    "snmp.transports.2": {
+        "default": "tcp"
+    },
+    "snmp.transports.3": {
+        "default": "tcp6"
+    },
+    "snmp.v3.0.authalgo": {
+        "default": "MD5"
+    },
+    "snmp.v3.0.authlevel": {
+        "default": "noAuthNoPriv"
+    },
+    "snmp.v3.0.authname": {
+        "default": "root"
+    },
+    "snmp.v3.0.authpass": {
+        "default": ""
+    },
+    "snmp.v3.0.cryptoalgo": {
+        "default": "AES"
+    },
+    "snmp.v3.0.cryptopass": {
+        "default": ""
+    },
+    "snmp.version.0": {
+        "default": "v2c"
+    },
+    "snmp.version.1": {
+        "default": "v3"
+    },
+    "snmp.version.2": {
+        "default": "v1"
+    },
+    "snmpbulkwalk": {
+        "default": "\/usr\/bin\/snmpbulkwalk"
+    },
+    "snmpget": {
+        "default": "\/usr\/bin\/snmpget"
+    },
+    "snmpgetnext": {
+        "description": "Path to snmpgetnext",
+        "default": "snmpgetnext",
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "paths",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "snmptranslate": {
+        "default": "\/usr\/bin\/snmptranslate"
+    },
+    "snmptraps.eventlog": {
+        "default": "unhandled"
+    },
+    "snmpwalk": {
+        "default": "\/usr\/bin\/snmpwalk"
+    },
+    "sso.create_users": {
+        "default": true
+    },
+    "sso.update_users": {
+        "default": true
+    },
+    "sso.user_attr": {
+        "default": "REMOTE_USER"
+    },
+    "stylesheet": {
+        "default": "css\/styles.css"
+    },
+    "summary_errors": {
+        "default": 0
+    },
+    "syslog_filter.0": {
+        "default": "last message repeated"
+    },
+    "syslog_filter.1": {
+        "default": "Connection from UDP: ["
+    },
+    "syslog_filter.2": {
+        "default": "ipSystemStatsTable node ipSystemStatsOutFragOKs not implemented"
+    },
+    "syslog_filter.3": {
+        "default": "diskio.c"
+    },
+    "syslog_purge": {
+        "default": 30
+    },
+    "temp_dir": {
+        "default": "\/tmp"
+    },
+    "time.day": {
+        "default": 1549215000
+    },
+    "time.fourhour": {
+        "default": 1549287000
+    },
+    "time.month": {
+        "default": 1546623000
+    },
+    "time.now": {
+        "default": 1549301400
+    },
+    "time.onehour": {
+        "default": 1549297800
+    },
+    "time.sixhour": {
+        "default": 1549279800
+    },
+    "time.sixmonth": {
+        "default": 1533231000
+    },
+    "time.threemonth": {
+        "default": 1541266200
+    },
+    "time.twelvehour": {
+        "default": 1549258200
+    },
+    "time.twoday": {
+        "default": 1549128600
+    },
+    "time.twomonth": {
+        "default": 1543944600
+    },
+    "time.twoweek": {
+        "default": 1548091800
+    },
+    "time.twoyear": {
+        "default": 1486229400
+    },
+    "time.week": {
+        "default": 1548696600
+    },
+    "time.year": {
+        "default": 1517765400
+    },
+    "timestamp_format": {
+        "default": "d-m-Y H:i:s"
+    },
+    "top_devices": {
+        "default": 1
+    },
+    "top_ports": {
+        "default": 1
+    },
+    "traceroute": {
+        "description": "Path to traceroute",
+        "default": "traceroute",
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "paths",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "traceroute6": {
+        "description": "Path to traceroute6",
+        "default": "traceroute6",
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "paths",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "transit_descr.0": {
+        "default": "transit"
+    },
+    "unix-agent-connection-time-out": {
+        "default": 10
+    },
+    "unix-agent-read-time-out": {
+        "default": 10
+    },
+    "unix-agent.connection-timeout": {
+        "description": "Unix-agent connection timeout",
+        "default": 10,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "unix-agent",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "unix-agent.port": {
+        "description": "Default port for the Unix-agent (check_mk)",
+        "default": 6556,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "unix-agent",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "unix-agent.read-timeout": {
+        "description": "Unix-agent read timeout",
+        "default": 10,
+        "group": "external",
+        "group_order": 0,
+        "sub_group": "unix-agent",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "update": {
+        "default": 1
+    },
+    "update_channel": {
+        "default": "master"
+    },
+    "uptime_warning": {
+        "default": "84600"
+    },
+    "vertical_summary": {
+        "default": 0
+    },
+    "virsh": {
+        "default": "\/usr\/bin\/virsh"
+    },
+    "vmware_guestid.asianux3Guest": {
+        "default": "Asianux Server 3"
+    },
+    "vmware_guestid.asianux3_64Guest": {
+        "default": "Asianux Server 3 (64 bit)"
+    },
+    "vmware_guestid.asianux4Guest": {
+        "default": "Asianux Server 4"
+    },
+    "vmware_guestid.asianux4_64Guest": {
+        "default": "Asianux Server 4 (64 bit)"
+    },
+    "vmware_guestid.centos64Guest": {
+        "default": "CentOS 4\/5 (64-bit)"
+    },
+    "vmware_guestid.centosGuest": {
+        "default": "CentOS 4\/5"
+    },
+    "vmware_guestid.darwin64Guest": {
+        "default": "Mac OS 10.5 (64 bit)"
+    },
+    "vmware_guestid.darwinGuest": {
+        "default": "Mac OS 10.5"
+    },
+    "vmware_guestid.debian4Guest": {
+        "default": "Debian GNU\/Linux 4"
+    },
+    "vmware_guestid.debian4_64Guest": {
+        "default": "Debian GNU\/Linux 4 (64 bit)"
+    },
+    "vmware_guestid.debian5Guest": {
+        "default": "Debian GNU\/Linux 5"
+    },
+    "vmware_guestid.debian5_64Guest": {
+        "default": "Debian GNU\/Linux 5 (64 bit)"
+    },
+    "vmware_guestid.debian6Guest": {
+        "default": "Debian GNU\/Linux 6"
+    },
+    "vmware_guestid.debian6_64Guest": {
+        "default": "Debian GNU\/Linux 6 (64 bit)"
+    },
+    "vmware_guestid.debian7Guest": {
+        "default": "Debian GNU\/Linux 7"
+    },
+    "vmware_guestid.debian7_64Guest": {
+        "default": "Debian GNU\/Linux 7 (64 bit)"
+    },
+    "vmware_guestid.debian8Guest": {
+        "default": "Debian GNU\/Linux 8"
+    },
+    "vmware_guestid.debian8_64Guest": {
+        "default": "Debian GNU\/Linux 8 (64 bit)"
+    },
+    "vmware_guestid.dosGuest": {
+        "default": "MS-DOS."
+    },
+    "vmware_guestid.eComStationGuest": {
+        "default": "eComStation"
+    },
+    "vmware_guestid.freebsd64Guest": {
+        "default": "FreeBSD x64"
+    },
+    "vmware_guestid.freebsdGuest": {
+        "default": "FreeBSD"
+    },
+    "vmware_guestid.mandriva64Guest": {
+        "default": "Mandriva Linux (64 bit)"
+    },
+    "vmware_guestid.mandrivaGuest": {
+        "default": "Mandriva Linux"
+    },
+    "vmware_guestid.netware4Guest": {
+        "default": "Novell NetWare 4"
+    },
+    "vmware_guestid.netware5Guest": {
+        "default": "Novell NetWare 5.1"
+    },
+    "vmware_guestid.netware6Guest": {
+        "default": "Novell NetWare 6.x"
+    },
+    "vmware_guestid.nld9Guest": {
+        "default": "Novell Linux Desktop 9"
+    },
+    "vmware_guestid.oesGuest": {
+        "default": "Open Enterprise Server"
+    },
+    "vmware_guestid.openServer5Guest": {
+        "default": "SCO OpenServer 5"
+    },
+    "vmware_guestid.openServer6Guest": {
+        "default": "SCO OpenServer 6"
+    },
+    "vmware_guestid.oracleLinux64Guest": {
+        "default": "Oracle Linux 4\/5 (64-bit)"
+    },
+    "vmware_guestid.oracleLinuxGuest": {
+        "default": "Oracle Linux 4\/5"
+    },
+    "vmware_guestid.os2Guest": {
+        "default": "OS\/2"
+    },
+    "vmware_guestid.other24xLinux64Guest": {
+        "default": "Linux 2.4x Kernel (64 bit) (experimental)"
+    },
+    "vmware_guestid.other24xLinuxGuest": {
+        "default": "Linux 2.4x Kernel"
+    },
+    "vmware_guestid.other26xLinux64Guest": {
+        "default": "Linux 2.6x Kernel (64 bit) (experimental)"
+    },
+    "vmware_guestid.other26xLinuxGuest": {
+        "default": "Linux 2.6x Kernel"
+    },
+    "vmware_guestid.otherGuest": {
+        "default": "Other Operating System"
+    },
+    "vmware_guestid.otherGuest64": {
+        "default": "Other Operating System (64 bit) (experimental)"
+    },
+    "vmware_guestid.otherLinux64Guest": {
+        "default": "Linux (64 bit) (experimental)"
+    },
+    "vmware_guestid.otherLinuxGuest": {
+        "default": "Other Linux"
+    },
+    "vmware_guestid.redhatGuest": {
+        "default": "Red Hat Linux 2.1"
+    },
+    "vmware_guestid.rhel2Guest": {
+        "default": "Red Hat Enterprise Linux 2"
+    },
+    "vmware_guestid.rhel3Guest": {
+        "default": "Red Hat Enterprise Linux 3"
+    },
+    "vmware_guestid.rhel3_64Guest": {
+        "default": "Red Hat Enterprise Linux 3 (64 bit)"
+    },
+    "vmware_guestid.rhel4Guest": {
+        "default": "Red Hat Enterprise Linux 4"
+    },
+    "vmware_guestid.rhel4_64Guest": {
+        "default": "Red Hat Enterprise Linux 4 (64 bit)"
+    },
+    "vmware_guestid.rhel5Guest": {
+        "default": "Red Hat Enterprise Linux 5"
+    },
+    "vmware_guestid.rhel5_64Guest": {
+        "default": "Red Hat Enterprise Linux 5 (64 bit) (experimental)"
+    },
+    "vmware_guestid.rhel6Guest": {
+        "default": "Red Hat Enterprise Linux 6"
+    },
+    "vmware_guestid.rhel6_64Guest": {
+        "default": "Red Hat Enterprise Linux 6 (64 bit)"
+    },
+    "vmware_guestid.sjdsGuest": {
+        "default": "Sun Java Desktop System"
+    },
+    "vmware_guestid.sles10Guest": {
+        "default": "Suse linux Enterprise Server 10"
+    },
+    "vmware_guestid.sles10_64Guest": {
+        "default": "Suse Linux Enterprise Server 10 (64 bit) (experimental)"
+    },
+    "vmware_guestid.sles11Guest": {
+        "default": "Suse linux Enterprise Server 11"
+    },
+    "vmware_guestid.sles11_64Guest": {
+        "default": "Suse Linux Enterprise Server 11 (64 bit)"
+    },
+    "vmware_guestid.sles64Guest": {
+        "default": "Suse Linux Enterprise Server 9 (64 bit)"
+    },
+    "vmware_guestid.slesGuest": {
+        "default": "Suse Linux Enterprise Server 9"
+    },
+    "vmware_guestid.solaris10Guest": {
+        "default": "Solaris 10 (32 bit) (experimental)"
+    },
+    "vmware_guestid.solaris10_64Guest": {
+        "default": "Solaris 10 (64 bit) (experimental)"
+    },
+    "vmware_guestid.solaris6Guest": {
+        "default": "Solaris 6"
+    },
+    "vmware_guestid.solaris7Guest": {
+        "default": "Solaris 7"
+    },
+    "vmware_guestid.solaris8Guest": {
+        "default": "Solaris 8"
+    },
+    "vmware_guestid.solaris9Guest": {
+        "default": "Solaris 9"
+    },
+    "vmware_guestid.suse64Guest": {
+        "default": "Suse Linux (64 bit)"
+    },
+    "vmware_guestid.suseGuest": {
+        "default": "Suse Linux"
+    },
+    "vmware_guestid.turboLinux64Guest": {
+        "default": "Turbolinux (64 bit)"
+    },
+    "vmware_guestid.turboLinuxGuest": {
+        "default": "Turbolinux"
+    },
+    "vmware_guestid.ubuntu64Guest": {
+        "default": "Ubuntu Linux (64 bit)"
+    },
+    "vmware_guestid.ubuntuGuest": {
+        "default": "Ubuntu Linux"
+    },
+    "vmware_guestid.unixWare7Guest": {
+        "default": "SCO UnixWare 7"
+    },
+    "vmware_guestid.win2000AdvServGuest": {
+        "default": "Windows 2000 Advanced Server"
+    },
+    "vmware_guestid.win2000ProGuest": {
+        "default": "Windows 2000 Professional"
+    },
+    "vmware_guestid.win2000ServGuest": {
+        "default": "Windows 2000 Server"
+    },
+    "vmware_guestid.win31Guest": {
+        "default": "Windows 3.1"
+    },
+    "vmware_guestid.win95Guest": {
+        "default": "Windows 95"
+    },
+    "vmware_guestid.win98Guest": {
+        "default": "Windows 98"
+    },
+    "vmware_guestid.winLonghorn64Guest": {
+        "default": "Windows Longhorn (64 bit) (experimental)"
+    },
+    "vmware_guestid.winLonghornGuest": {
+        "default": "Windows Longhorn (experimental)"
+    },
+    "vmware_guestid.winMeGuest": {
+        "default": "Windows Millenium Edition"
+    },
+    "vmware_guestid.winNTGuest": {
+        "default": "Windows NT 4"
+    },
+    "vmware_guestid.winNetBusinessGuest": {
+        "default": "Windows Small Business Server 2003"
+    },
+    "vmware_guestid.winNetDatacenter64Guest": {
+        "default": "Windows Server 2003, Datacenter Edition (64 bit) (experimental)"
+    },
+    "vmware_guestid.winNetDatacenterGuest": {
+        "default": "Windows Server 2003, Datacenter Edition"
+    },
+    "vmware_guestid.winNetEnterprise64Guest": {
+        "default": "Windows Server 2003, Enterprise Edition (64 bit)"
+    },
+    "vmware_guestid.winNetEnterpriseGuest": {
+        "default": "Windows Server 2003, Enterprise Edition"
+    },
+    "vmware_guestid.winNetStandard64Guest": {
+        "default": "Windows Server 2003, Standard Edition (64 bit)"
+    },
+    "vmware_guestid.winNetStandardGuest": {
+        "default": "Windows Server 2003, Standard Edition"
+    },
+    "vmware_guestid.winNetWebGuest": {
+        "default": "Windows Server 2003, Web Edition"
+    },
+    "vmware_guestid.winVista64Guest": {
+        "default": "Windows Vista (64 bit)"
+    },
+    "vmware_guestid.winVistaGuest": {
+        "default": "Windows Vista"
+    },
+    "vmware_guestid.winXPHomeGuest": {
+        "default": "Windows XP Home Edition"
+    },
+    "vmware_guestid.winXPPro64Guest": {
+        "default": "Windows XP Professional Edition (64 bit)"
+    },
+    "vmware_guestid.winXPProGuest": {
+        "default": "Windows XP Professional"
+    },
+    "vmware_guestid.windows7Guest": {
+        "default": "Windows 7"
+    },
+    "vmware_guestid.windows7Server64Guest": {
+        "default": "Windows Server 2008 R2 (64 bit)"
+    },
+    "vmware_guestid.windows7_64Guest": {
+        "default": "Windows 7 (64 bit)"
+    },
+    "warn.ifdown": {
+        "default": true
+    },
+    "warn_colour": {
+        "default": "#ffeeee"
+    },
+    "warn_colour_alt": {
+        "default": "#ffcccc"
+    },
+    "web_mouseover": {
+        "default": true
+    },
+    "webui.availability_map_box_size": {
+        "description": "Input desired tile width in pixels for box size in full view",
+        "default": 165,
+        "group": "webui",
+        "group_order": 0,
+        "sub_group": "graph",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "webui.availability_map_compact": {
+        "description": "Availability map old view",
+        "default": false,
+        "group": "webui",
+        "group_order": 0,
+        "sub_group": "graph",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "webui.availability_map_sort_status": {
+        "description": "Sort devices and services by status",
+        "default": false,
+        "group": "webui",
+        "group_order": 0,
+        "sub_group": "graph",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "webui.availability_map_use_device_groups": {
+        "description": "Enable usage of device groups filter",
+        "default": false,
+        "group": "webui",
+        "group_order": 0,
+        "sub_group": "graph",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "webui.default_dashboard_id": {
+        "description": "Global default dashboard_id for all users who do not have their own default set",
+        "default": false,
+        "group": "webui",
+        "group_order": 0,
+        "sub_group": "dashboard",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "webui.dynamic_graphs": {
+        "description": "Enable dynamic graphs",
+        "default": false,
+        "group": "webui",
+        "group_order": 0,
+        "sub_group": "graph",
+        "sub_group_order": 0,
+        "hidden": "",
+        "disabled": false
+    },
+    "webui.global_search_result_limit": {
+        "description": "Global search results limit",
+        "default": 8,
+        "group": "webui",
+        "group_order": 0,
+        "sub_group": "search",
+        "sub_group_order": 0,
+        "hidden": true,
+        "disabled": false
+    },
+    "webui.graph_stacked": {
+        "description": "Display stacked graphs instead of inverted graphs",
+        "default": false,
+        "group": "webui",
+        "group_order": 0,
+        "sub_group": "graph",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "webui.graph_type": {
+        "description": "Set the default graph type",
+        "default": "png",
+        "group": "webui",
+        "group_order": 0,
+        "sub_group": "graph",
+        "sub_group_order": 0,
+        "hidden": false,
+        "disabled": false
+    },
+    "webui.min_graph_height": {
+        "description": "Minimum Graph Height",
+        "default": 300,
+        "group": "webui",
+        "group_order": 0,
+        "sub_group": "graph",
+        "sub_group_order": 0,
+        "hidden": true,
+        "disabled": false
+    },
+    "whois": {
+        "default": "\/usr\/bin\/whois"
+    },
+    "xirrus_disable_stations": {
+        "default": false
+    }
+}
