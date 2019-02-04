@@ -16,7 +16,6 @@ use LibreNMS\Config;
 
 $no_refresh = true;
 
-$config_groups = get_config_by_group('alerting');
 
 if (Config::has('base_url') && filter_var(Config::get('base_url') . '/' . $_SERVER['REQUEST_URI'], FILTER_VALIDATE_URL)) {
     $callback = Config::get('base_url') . '/' . $_SERVER['REQUEST_URI'] . '/';
@@ -26,55 +25,6 @@ if (Config::has('base_url') && filter_var(Config::get('base_url') . '/' . $_SERV
 
 $callback = urlencode($callback);
 
-$general_conf = array(
-    array('name'               => 'alert.disable',
-          'descr'              => 'Disable alerting',
-          'type'               => 'checkbox',
-    ),
-    array('name'               => 'alert.admins',
-          'descr'              => 'Issue alerts to admins',
-          'type'               => 'checkbox',
-    ),
-    array('name'               => 'alert.globals',
-          'descr'              => 'Issue alerts to read only users',
-          'type'               => 'checkbox',
-    ),
-    array('name'               => 'alert.users',
-        'descr'                => 'Issue alerts to normal users',
-        'type'                 => 'checkbox',
-    ),
-    array('name'               => 'alert.syscontact',
-          'descr'              => 'Issue alerts to sysContact',
-          'type'               => 'checkbox',
-    ),
-    array('name'               => 'alert.default_only',
-          'descr'              => 'Send alerts to default contact only',
-          'type'               => 'checkbox',
-    ),
-    array('name'               => 'alert.default_copy',
-          'descr'              => 'Copy all email alerts to default contact',
-          'type'               => 'checkbox',
-    ),
-    array('name'               => 'alert.default_mail',
-          'descr'              => 'Default contact',
-          'type'               => 'text',
-          'pattern'            => '[a-zA-Z0-9_\-\.\+]+@[a-zA-Z0-9_\-\.]+\.[a-zA-Z]{2,18}',
-    ),
-    array('name'               => 'alert.tolerance_window',
-          'descr'              => 'Tolerance window for cron',
-          'type'               => 'numeric',
-          'required'           => true,
-    ),
-    array('name'               => 'alert.fixed-contacts',
-          'descr'              => 'Updates to contact email addresses not honored',
-          'type'               => 'checkbox',
-    ),
-    [
-        'name'                 => 'alert.ack_until_clear',
-        'descr'                => 'Default acknowledge until alert clears option',
-        'type'                 => 'checkbox',
-    ]
-);
 
 $mail_conf = [
     [
@@ -171,9 +121,8 @@ echo '
 ';
 echo csrf_field();
 
-echo generate_dynamic_config_panel('General alert settings', $config_groups, $general_conf);
-
-echo generate_dynamic_config_panel('Email options', $config_groups, $mail_conf);
+echo generate_dynamic_config_panel('General alert settings', $dynamic_config->getByGroup('alerting', 'general'));
+echo generate_dynamic_config_panel('Email options', $dynamic_config->getByGroup('alerting', 'email'));
 
 echo '
     </form>

@@ -42,12 +42,12 @@
 
 if (Auth::user()->hasGlobalAdmin()) {
     echo '<ul class="nav nav-tabs">';
-    $pages = dbFetchRows("SELECT DISTINCT `config_group` FROM `config` WHERE `config_group` IS NOT NULL AND `config_group` != ''");
-    array_unshift($pages, array('config_group' => 'Global')); // Add Global tab
+    $dynamic_config = new \LibreNMS\Util\DynamicConfig();
+
+    $pages = $dynamic_config->getGroups();
     $curr_page = basename($vars['sub'] ?? 'Global');
 
     foreach ($pages as $sub_page) {
-        $sub_page = $sub_page['config_group'];
         $page_name = ucfirst($sub_page) . ' Settings';
         echo '<li';
         if ($sub_page == $curr_page) {

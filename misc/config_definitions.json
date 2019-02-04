@@ -3,92 +3,101 @@
         "default": false
     },
     "alert.ack_until_clear": {
-        "description": "Default acknowledge until alert clears",
+        "description": "Default acknowledge until alert clears option",
+        "help": "Default acknowledge until alert clears",
         "default": false,
         "group": "alerting",
-        "group_order": 0,
         "sub_group": "general",
-        "sub_group_order": 0,
+        "order": 10,
+        "type": "boolean",
         "hidden": false,
         "disabled": false
     },
     "alert.admins": {
-        "description": "Alert administrators",
+        "description": "Issue alerts to admins",
+        "help": "Alert administrators",
         "default": true,
         "group": "alerting",
-        "group_order": 0,
         "sub_group": "general",
-        "sub_group_order": 0,
+        "order": 1,
+        "type": "boolean",
         "hidden": false,
         "disabled": false
     },
     "alert.default_copy": {
         "description": "Copy all email alerts to default contact",
+        "help": "Copy all email alerts to default contact",
         "default": true,
         "group": "alerting",
-        "group_order": 0,
         "sub_group": "general",
-        "sub_group_order": 0,
+        "order": 6,
+        "type": "boolean",
         "hidden": false,
         "disabled": false
     },
     "alert.default_if_none": {
-        "description": "Send mail to default contact if no other contacts are found",
+        "description": "cannot set in webui?",
+        "help": "Send mail to default contact if no other contacts are found",
         "default": false,
         "group": "alerting",
-        "group_order": 0,
         "sub_group": "general",
-        "sub_group_order": 0,
-        "hidden": false,
+        "order": 20,
+        "type": "boolean",
+        "hidden": true,
         "disabled": false
     },
     "alert.default_mail": {
-        "description": "The default mail contact",
+        "description": "Default contact",
+        "help": "The default mail contact",
         "default": false,
         "group": "alerting",
-        "group_order": 0,
         "sub_group": "general",
-        "sub_group_order": 0,
+        "order": 7,
+        "type": "email",
         "hidden": false,
         "disabled": false
     },
     "alert.default_only": {
-        "description": "Only alert default mail contact",
+        "description": "Send alerts to default contact only",
+        "help": "Only alert default mail contact",
         "default": true,
         "group": "alerting",
-        "group_order": 0,
         "sub_group": "general",
-        "sub_group_order": 0,
+        "order": 5,
+        "type": "boolean",
         "hidden": false,
         "disabled": false
     },
     "alert.disable": {
-        "description": "Stop alerts being generated",
+        "description": "Disable alerting",
+        "help": "Stop alerts being generated",
         "default": false,
         "group": "alerting",
-        "group_order": 0,
         "sub_group": "general",
-        "sub_group_order": 0,
+        "order": 0,
+        "type": "boolean",
         "hidden": false,
         "disabled": false
     },
     "alert.fixed-contacts": {
-        "description": "If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active",
+        "description": "Updates to contact email addresses not honored",
+        "help": "If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active",
         "default": true,
         "group": "alerting",
-        "group_order": 0,
         "sub_group": "general",
-        "sub_group_order": 0,
+        "order": 9,
+        "type": "boolean",
         "hidden": false,
         "disabled": false
     },
     "alert.globals": {
-        "description": "Alert read only administrators",
+        "description": "Issue alerts to read only users",
+        "help": "Alert read only administrators",
         "default": true,
         "group": "alerting",
-        "group_order": 0,
         "sub_group": "general",
-        "sub_group_order": 0,
+        "order": 2,
+        "type": "boolean",
         "hidden": false,
         "disabled": false
     },
@@ -197,53 +206,36 @@
     "alert.macros.rule.state_sensor_warning": {
         "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 1"
     },
-    "alert.pagerduty.account": {
-        "description": "Pagerduty account name",
-        "default": false,
-        "group": "alerting",
-        "group_order": 0,
-        "sub_group": "transports",
-        "sub_group_order": 0,
-        "hidden": false,
-        "disabled": false
-    },
-    "alert.pagerduty.service": {
-        "description": "Pagerduty service name",
-        "default": false,
-        "group": "alerting",
-        "group_order": 0,
-        "sub_group": "transports",
-        "sub_group_order": 0,
-        "hidden": false,
-        "disabled": false
-    },
     "alert.syscontact": {
         "description": "Issue alerts to sysContact",
+        "help": "Send alert to email in SNMP sysContact",
         "default": true,
         "group": "alerting",
-        "group_order": 0,
         "sub_group": "general",
-        "sub_group_order": 0,
+        "order": 4,
+        "type": "boolean",
         "hidden": false,
         "disabled": false
     },
     "alert.tolerance_window": {
-        "description": "Tolerance window in seconds",
+        "description": "Tolerance window for cron",
+        "help": "Tolerance window in seconds",
         "default": 5,
         "group": "alerting",
-        "group_order": 0,
         "sub_group": "general",
-        "sub_group_order": 0,
+        "order": 8,
+        "type": "integer",
         "hidden": false,
         "disabled": false
     },
     "alert.users": {
         "description": "Issue alerts to normal users",
+        "help": "Alert normal users",
         "default": false,
         "group": "alerting",
-        "group_order": 0,
         "sub_group": "general",
-        "sub_group_order": 0,
+        "order": 3,
+        "type": "boolean",
         "hidden": false,
         "disabled": false
     },
@@ -865,36 +857,33 @@
         "default": true,
         "group": "alerting",
         "group_order": 0,
-        "sub_group": "general",
+        "sub_group": "email",
         "sub_group_order": 0,
         "hidden": false,
         "disabled": false
     },
     "email_backend": {
-        "description": "The backend to use for sending email, can be mail, sendmail or smtp",
+        "description": "How to deliver mail",
+        "help": "The backend to use for sending email, can be mail, sendmail or smtp",
         "default": "mail",
         "group": "alerting",
-        "group_order": 0,
-        "sub_group": "general",
-        "sub_group_order": 0,
+        "sub_group": "email",
+        "order": 1,
+        "type": "select",
+        "options": [
+            "mail",
+            "sendmail",
+            "smtp"
+        ],
         "hidden": false,
         "disabled": false
-    },
-    "email_backend_options.0": {
-        "default": "mail"
-    },
-    "email_backend_options.1": {
-        "default": "sendmail"
-    },
-    "email_backend_options.2": {
-        "default": "smtp"
     },
     "email_from": {
         "description": "Email address used for sending emails (from)",
         "default": "NULL",
         "group": "alerting",
         "group_order": 0,
-        "sub_group": "general",
+        "sub_group": "email",
         "sub_group_order": 0,
         "hidden": false,
         "disabled": false
@@ -904,7 +893,7 @@
         "default": false,
         "group": "alerting",
         "group_order": 0,
-        "sub_group": "general",
+        "sub_group": "email",
         "sub_group_order": 0,
         "hidden": false,
         "disabled": false
@@ -914,7 +903,7 @@
         "default": "\/usr\/sbin\/sendmail",
         "group": "alerting",
         "group_order": 0,
-        "sub_group": "general",
+        "sub_group": "email",
         "sub_group_order": 0,
         "hidden": false,
         "disabled": false
@@ -924,7 +913,7 @@
         "default": false,
         "group": "alerting",
         "group_order": 0,
-        "sub_group": "general",
+        "sub_group": "email",
         "sub_group_order": 0,
         "hidden": false,
         "disabled": false
@@ -934,7 +923,7 @@
         "default": "localhost",
         "group": "alerting",
         "group_order": 0,
-        "sub_group": "general",
+        "sub_group": "email",
         "sub_group_order": 0,
         "hidden": false,
         "disabled": false
@@ -944,7 +933,7 @@
         "default": "NULL",
         "group": "alerting",
         "group_order": 0,
-        "sub_group": "general",
+        "sub_group": "email",
         "sub_group_order": 0,
         "hidden": false,
         "disabled": false
@@ -954,7 +943,7 @@
         "default": 25,
         "group": "alerting",
         "group_order": 0,
-        "sub_group": "general",
+        "sub_group": "email",
         "sub_group_order": 0,
         "hidden": false,
         "disabled": false
@@ -964,7 +953,7 @@
         "default": false,
         "group": "alerting",
         "group_order": 0,
-        "sub_group": "general",
+        "sub_group": "email",
         "sub_group_order": 0,
         "hidden": false,
         "disabled": false
@@ -983,7 +972,7 @@
         "default": 10,
         "group": "alerting",
         "group_order": 0,
-        "sub_group": "general",
+        "sub_group": "email",
         "sub_group_order": 0,
         "hidden": false,
         "disabled": false
@@ -993,7 +982,7 @@
         "default": "NULL",
         "group": "alerting",
         "group_order": 0,
-        "sub_group": "general",
+        "sub_group": "email",
         "sub_group_order": 0,
         "hidden": false,
         "disabled": false
@@ -1003,7 +992,7 @@
         "default": "LibreNMS",
         "group": "alerting",
         "group_order": 0,
-        "sub_group": "general",
+        "sub_group": "email",
         "sub_group_order": 0,
         "hidden": false,
         "disabled": false

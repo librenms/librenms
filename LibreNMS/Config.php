@@ -81,6 +81,17 @@ class Config
     }
 
     /**
+     * Get the config setting definitions
+     *
+     * @return array
+     */
+    public static function getDefinitions()
+    {
+        $config_def = json_decode(file_get_contents(self::get('install_dir') . '/misc/config_definitions.json'), true);
+        return $config_def;
+    }
+
+    /**
      * Load the user config from config.php, defaults.inc.php and definitions.inc.php, etc.
      * Erases existing config.
      *
@@ -94,7 +105,7 @@ class Config
         $config['install_dir'] = $install_dir;
 
         // load defaults
-        $config_def = json_decode(file_get_contents($install_dir . '/misc/config_definitions.json'), true);
+        $config_def = self::getDefinitions();
         foreach ($config_def as $path => $def) {
             if (isset($def['default'])) {
                 Arr::set($config, $path, $def['default']);
