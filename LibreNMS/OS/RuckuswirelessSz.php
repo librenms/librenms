@@ -43,28 +43,27 @@ class RuckuswirelessSz extends OS implements
         return $sensors;
     }
 
-// Total AP Count
+// ap-count - Discover System Connected APs
 
       public function discoverWirelessApCount()
       {
-        $apconnected = $this->getCacheByIndex('ruckusCtrlSystemNodeNumApConnected', '-Ob', 'RUCKUS-CTRL-MIB');
-
+        $apconnected = $this->getCacheByIndex('ruckusCtrlSystemNodeNumApConnected', 'RUCKUS-CTRL-MIB', '-OQUsb');
+        $dbindex = 0;
         foreach ($apconnected as $index => $connect) {
             $oid = '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.19.' . $index;
-
             $apstatus[] = new WirelessSensor(
                 'ap-count',
                 $this->getDeviceId(),
                 $oid,
                 'ruckuswireless-sz',
-                $index,
+                ++$dbindex,
                 'Connected APs',
                 $connect
           );
       }
-
+// ap-count - Discover System Total APs
         $oid = '.1.3.6.1.4.1.25053.1.4.1.1.1.15.1.0'; //RUCKUS-SZ-SYSTEM-MIB::ruckusSZSystemStatsNumAP.0
-        array_push($apstatus, new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'ruckuswireless-sz', ($index + 1), 'Total APs'));
+        array_push($apstatus, new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'ruckuswireless-sz', ++$dbindex, 'Total APs'));
         return $apstatus;
     }
 }
