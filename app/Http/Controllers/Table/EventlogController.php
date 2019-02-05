@@ -80,7 +80,9 @@ class EventlogController extends TableController
         if ($eventlog->type == 'interface') {
             if (is_numeric($eventlog->reference)) {
                 $port = $eventlog->related;
-                return '<b>' . Url::portLink($port, $port->getShortLabel()) . '</b>';
+                if (isset($port)) {
+                    return '<b>' . Url::portLink($port, $port->getShortLabel()) . '</b>';
+                }
             }
         }
 
