@@ -708,7 +708,7 @@ class Service:
                            .format(self.config.node_id, self.config.name, "librenms-service", ','.join(str(g) for g in self.config.group), 1 if self.is_master else 0))
 
             # Find our ID
-            self._db.query('SELECT id INTO @parent_poller_id FROM poller_cluster WHERE node_id="{0}"; '.format(self.config.node_id))
+            self._db.query('SELECT id INTO @parent_poller_id FROM poller_cluster WHERE node_id="{0}" AND poller_name="{1}"; '.format(self.config.node_id, self.config.name))
 
             for worker_type, counter in self.performance_stats.items():
                 worker_seconds, devices = counter.reset()

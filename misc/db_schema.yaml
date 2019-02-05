@@ -1112,7 +1112,7 @@ poller_cluster:
     - { Field: master, Type: tinyint(1), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    poller_cluster_node_id_unique: { Name: poller_cluster_node_id_unique, Columns: [node_id], Unique: true, Type: BTREE }
+    poller_cluster_node_id_poller_name_unique: { Name: poller_cluster_node_id_poller_name_unique, Columns: [node_id, poller_name], Unique: true, Type: BTREE }
 poller_cluster_stats:
   Columns:
     - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
