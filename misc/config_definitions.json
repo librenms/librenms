@@ -570,134 +570,82 @@
     "device_traffic_descr.5": {
         "default": "\/dummy\/"
     },
-    "device_traffic_iftype.0": {
-        "default": "\/loopback\/"
+    "device_traffic_iftype": {
+        "default": [
+            "\/loopback\/",
+            "\/tunnel\/",
+            "\/virtual\/",
+            "\/mpls\/",
+            "\/ieee8023adLag\/",
+            "\/l2vlan\/",
+            "\/ppp\/"
+        ],
+        "type": "array"
     },
-    "device_traffic_iftype.1": {
-        "default": "\/tunnel\/"
-    },
-    "device_traffic_iftype.2": {
-        "default": "\/virtual\/"
-    },
-    "device_traffic_iftype.3": {
-        "default": "\/mpls\/"
-    },
-    "device_traffic_iftype.4": {
-        "default": "\/ieee8023adLag\/"
-    },
-    "device_traffic_iftype.5": {
-        "default": "\/l2vlan\/"
-    },
-    "device_traffic_iftype.6": {
-        "default": "\/ppp\/"
-    },
-    "device_types.0.icon": {
-        "default": "server.png"
-    },
-    "device_types.0.text": {
-        "default": "Servers"
-    },
-    "device_types.0.type": {
-        "default": "server"
-    },
-    "device_types.1.icon": {
-        "default": "network.png"
-    },
-    "device_types.1.text": {
-        "default": "Network"
-    },
-    "device_types.1.type": {
-        "default": "network"
-    },
-    "device_types.10.icon": {
-        "default": "collaboration.png"
-    },
-    "device_types.10.text": {
-        "default": "Collaboration"
-    },
-    "device_types.10.type": {
-        "default": "collaboration"
-    },
-    "device_types.11.icon": {
-        "default": "workstation.png"
-    },
-    "device_types.11.text": {
-        "default": "Workstation"
-    },
-    "device_types.11.type": {
-        "default": "workstation"
-    },
-    "device_types.2.icon": {
-        "default": "wireless.png"
-    },
-    "device_types.2.text": {
-        "default": "Wireless"
-    },
-    "device_types.2.type": {
-        "default": "wireless"
-    },
-    "device_types.3.icon": {
-        "default": "firewall.png"
-    },
-    "device_types.3.text": {
-        "default": "Firewalls"
-    },
-    "device_types.3.type": {
-        "default": "firewall"
-    },
-    "device_types.4.icon": {
-        "default": "power.png"
-    },
-    "device_types.4.text": {
-        "default": "Power"
-    },
-    "device_types.4.type": {
-        "default": "power"
-    },
-    "device_types.5.icon": {
-        "default": "environment.png"
-    },
-    "device_types.5.text": {
-        "default": "Environment"
-    },
-    "device_types.5.type": {
-        "default": "environment"
-    },
-    "device_types.6.icon": {
-        "default": "loadbalancer.png"
-    },
-    "device_types.6.text": {
-        "default": "Load Balancers"
-    },
-    "device_types.6.type": {
-        "default": "loadbalancer"
-    },
-    "device_types.7.icon": {
-        "default": "storage.png"
-    },
-    "device_types.7.text": {
-        "default": "Storage"
-    },
-    "device_types.7.type": {
-        "default": "storage"
-    },
-    "device_types.8.icon": {
-        "default": "printer.png"
-    },
-    "device_types.8.text": {
-        "default": "Printers"
-    },
-    "device_types.8.type": {
-        "default": "printer"
-    },
-    "device_types.9.icon": {
-        "default": "appliance.png"
-    },
-    "device_types.9.text": {
-        "default": "Appliance"
-    },
-    "device_types.9.type": {
-        "default": "appliance"
+    "device_types": {
+        "default": [
+            {
+                "icon": "server.png",
+                "text": "Servers",
+                "type": "server"
+            },
+            {
+                "icon": "network.png",
+                "text": "Network",
+                "type": "network"
+            },
+            {
+                "icon": "collaboration.png",
+                "text": "Collaboration",
+                "type": "collaboration"
+            },
+            {
+                "icon": "workstation.png",
+                "text": "Workstation",
+                "type": "workstation"
+            },
+            {
+                "icon": "wireless.png",
+                "text": "Wireless",
+                "type": "wireless"
+            },
+            {
+                "icon": "firewall.png",
+                "text": "Firewalls",
+                "type": "firewall"
+            },
+            {
+                "icon": "power.png",
+                "text": "Power",
+                "type": "power"
+            },
+            {
+                "icon": "environment.png",
+                "text": "Environment",
+                "type": "environment"
+            },
+            {
+                "icon": "loadbalancer.png",
+                "text": "Load Balancers",
+                "type": "loadbalancer"
+            },
+            {
+                "icon": "storage.png",
+                "text": "Storage",
+                "type": "storage"
+            },
+            {
+                "icon": "printer.png",
+                "text": "Printers",
+                "type": "printer"
+            },
+            {
+                "icon": "appliance.png",
+                "text": "Appliance",
+                "type": "appliance"
+            }
+        ],
+        "type": "array"
     },
     "discover_services": {
         "default": false
