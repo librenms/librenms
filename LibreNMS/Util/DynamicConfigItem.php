@@ -84,45 +84,26 @@ class DynamicConfigItem implements \ArrayAccess
     // ArrayAccess functions
     public function offsetExists($offset)
     {
-        $offset = $this->convertLegacyField($offset);
-
         return isset($this->$offset);
     }
 
     public function offsetGet($offset)
     {
-        $offset = $this->convertLegacyField($offset);
-
         return isset($this->$offset) ? $this->$offset : null;
     }
 
     public function offsetSet($offset, $value)
     {
-        $offset = $this->convertLegacyField($offset);
-
         $this->$offset = $value;
     }
 
     public function offsetUnset($offset)
     {
-        $offset = $this->convertLegacyField($offset);
-
         unset($this->$offset);
     }
 
     public function getName()
     {
         return $this->name;
-    }
-
-    private function convertLegacyField($offset)
-    {
-        $offset = str_replace('config_', '', $offset);
-
-        if ($offset == 'descr') {
-            $offset = 'description';
-        }
-
-        return $offset;
     }
 }
