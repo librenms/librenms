@@ -63,9 +63,15 @@ try {
 
     echo \Artisan::output();
 
-    echo $ret == 0 ? "\n\nSuccess!" : "\n\nError!";
+    if ($ret == 0 && \LibreNMS\DB\Schema::isCurrent()) {
+        echo "\n\nSuccess!";
+    } else {
+        echo "\n\nError!";
+        http_response_code(500);
+    }
 } catch (Exception $e) {
     echo $e->getMessage() . "\n\nError!";
+    http_response_code(500);
 }
 
 ob_end_flush();
