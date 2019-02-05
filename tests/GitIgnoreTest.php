@@ -30,7 +30,9 @@ class GitIgnoreTest extends TestCase
     private $gitIgnoreFiles = [
         '.gitignore',
         'bootstrap/cache/.gitignore',
+        'cache/.gitignore',
         'logs/.gitignore',
+        'resources/views/alerts/templates/.gitignore',
         'rrd/.gitignore',
         'storage/app/.gitignore',
         'storage/app/public/.gitignore',
@@ -52,7 +54,7 @@ class GitIgnoreTest extends TestCase
     public function testGitIgnoresMode()
     {
         foreach ($this->gitIgnoreFiles as $file) {
-            $this->assertEquals('664', substr(sprintf('%o', fileperms($file)), -3), "$file file mode not 664");
+            $this->assertFalse(is_executable($file), "$file should not be executable");
         }
     }
 
