@@ -395,7 +395,9 @@
     },
     "autodiscovery.cdp_exclude.platform_regexp": {
         "type": "array",
-        "default": ["\/^Cisco IP Phone\/"]
+        "default": [
+            "\/^Cisco IP Phone\/"
+        ]
     },
     "autodiscovery.nets-exclude": {
         "type": "array",
@@ -418,7 +420,9 @@
     },
     "autodiscovery.xdp_exclude.sysdesc_regexp": {
         "type": "array",
-        "default": ["\/-K9W8-\/"]
+        "default": [
+            "\/-K9W8-\/"
+        ]
     },
     "bad_disk_regexp": {
         "default": []
@@ -842,16 +846,10 @@
         "section": "email",
         "order": 10,
         "type": "select",
-        "options": [
-            {
-                "value": "true",
-                "description": "Yes"
-            },
-            {
-                "value": "false",
-                "description": "No"
-            }
-        ],
+        "options": {
+            "true": "Yes",
+            "false": "No"
+        },
         "class": "smtp-form"
     },
     "email_backend": {
@@ -862,21 +860,11 @@
         "section": "email",
         "order": 4,
         "type": "select",
-        "options": [
-            {
-                "value": "mail",
-                "description": "mail"
-            },
-            {
-                "value": "sendmail",
-                "description": "sendmail"
-            },
-            {
-                "value": "smtp",
-                "description": "SMTP"
-
-            }
-        ]
+        "options": {
+            "mail": "mail",
+            "sendmail": "sendmail",
+            "smtp": "SMTP"
+        }
     },
     "email_from": {
         "description": "From email address",
@@ -949,21 +937,11 @@
         "section": "email",
         "order": 9,
         "type": "select",
-        "options": [
-            {
-                "value": "",
-                "description": "Disabled"
-            },
-            {
-                "value": "tls",
-                "description": "TLS"
-            },
-            {
-                "value": "ssl",
-                "description": "SSL"
-
-            }
-        ],
+        "options": {
+            "": "Disabled",
+            "tls": "TLS",
+            "ssl": "SSL"
+        },
         "class": "smtp-form"
     },
     "email_smtp_timeout": {
@@ -1109,24 +1087,12 @@
         "section": "location",
         "order": 0,
         "type": "select",
-        "options": [
-            {
-                "value": "google",
-                "description": "Google Maps"
-            },
-            {
-                "value": "openstreetmap",
-                "description": "OpenStreetMap"
-            },
-            {
-                "value": "mapquest",
-                "description": "MapQuest"
-            },
-            {
-                "value": "bing",
-                "description": "Bing Maps"
-            }
-        ]
+        "options": {
+            "google": "Google Maps",
+            "openstreetmap": "OpenStreetMap",
+            "mapquest": "MapQuest",
+            "bing": "Bing Maps"
+        }
     },
     "github_api": {
         "default": "https:\/\/api.github.com\/repos\/librenms\/librenms\/"
@@ -3205,7 +3171,6 @@
         "group": "external",
         "section": "paths",
         "type": "text"
-
     },
     "irc_alert": {
         "default": false
@@ -3311,7 +3276,6 @@
         "group": "external",
         "section": "paths",
         "type": "text"
-
     },
     "mysql_log_level": {
         "default": "ERROR"
@@ -3421,7 +3385,6 @@
         "group": "external",
         "section": "paths",
         "type": "text"
-
     },
     "notifications.LibreNMS": {
         "default": "http:\/\/www.librenms.org\/notifications.rss"
@@ -3560,7 +3523,6 @@
         "group": "external",
         "section": "paths",
         "type": "text"
-
     },
     "plugin_dir": {
     },
@@ -3778,7 +3740,6 @@
         "group": "external",
         "section": "paths",
         "type": "text"
-
     },
     "show_locations": {
         "default": 1
@@ -3915,7 +3876,6 @@
         "group": "external",
         "section": "paths",
         "type": "text"
-
     },
     "snmpget": {
         "description": "Path to snmpget",
@@ -3923,7 +3883,6 @@
         "group": "external",
         "section": "paths",
         "type": "text"
-
     },
     "snmpgetnext": {
         "description": "Path to snmpgetnext",
@@ -3938,7 +3897,6 @@
         "group": "external",
         "section": "paths",
         "type": "text"
-
     },
     "snmptraps.eventlog": {
         "default": "unhandled"
@@ -3949,7 +3907,6 @@
         "group": "external",
         "section": "paths",
         "type": "text"
-
     },
     "sso.create_users": {
         "default": true
@@ -4408,8 +4365,7 @@
         "group": "webui",
         "section": "dashboard",
         "order": 0,
-        "type": "select",
-        "options": []
+        "type": "select"
     },
     "webui.dynamic_graphs": {
         "description": "Enable dynamic graphs",
@@ -4447,16 +4403,10 @@
         "section": "graph",
         "order": 1,
         "type": "select",
-        "options":[
-            {
-                "value": "png",
-                "description": "PNG"
-            },
-            {
-                "value": "svg",
-                "description": "SVG"
-            }
-        ]
+        "options": {
+            "png": "PNG",
+            "svg": "SVG"
+        }
     },
     "webui.min_graph_height": {
         "description": "Set the minimum graph height",

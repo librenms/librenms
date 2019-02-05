@@ -42,14 +42,23 @@ class DynamicConfig
     /**
      * Check if a setting is valid
      *
-     * @param string $path
-     * @param mixed $value
-     * @return static
+     * @param string $name
+     * @return boolean
      */
-    public function isValidSetting($path, $value = null)
+    public function isValidSetting($name)
     {
-        // TODO test type too
-        return $this->definitions->has($path);
+        return $this->definitions->has($name) && $this->definitions->get($name)->isValid();
+    }
+
+    /**
+     * Get config item by name
+     *
+     * @param string $name
+     * @return DynamicConfigItem|null
+     */
+    public function get($name)
+    {
+        return $this->definitions->get($name);
     }
 
     /**

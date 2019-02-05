@@ -4,12 +4,9 @@
         <div data-toggle="tooltip" title="{{ $help }}" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
     @endif
     <div class="col-sm-6 col-lg-4 col-">
-        <select id="{{ $name }}" class="form-control bootselect" name="{{ $name }}">
-            if (!empty($item['options'])) {
-            $options = is_string($item['options']) ? Config::get($item['options']) : $item['options'];
-            foreach ($options as $option) {
-            @foreach($options as $option)
-                <option value="{{ $option['value'] }}" @if($value == $option['value']) selected @endif>{{ $option['description'] }}</option>
+        <select id="{{ $name }}" class="form-control bootselect" name="{{ $name }}" data-original="{{ $value }}">
+            @foreach($options as $option => $text)
+                <option value="{{ $option }}" @if($value == $option) selected @endif>{{ $text }}</option>
             @endforeach
         </select>
         <span class="form-control-feedback"></span>

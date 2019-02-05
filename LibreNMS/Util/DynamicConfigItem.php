@@ -39,6 +39,7 @@ class DynamicConfigItem implements \ArrayAccess
     private $hidden = false;
     private $required = false;
     private $disabled = false;
+    private $options = [];
     private $class;
     private $help;
     private $pattern;
@@ -47,9 +48,33 @@ class DynamicConfigItem implements \ArrayAccess
     {
         $this->name = $name;
         $this->value = Config::get($this->name, $this->default);
+
         foreach ($settings as $key => $value) {
             $this->$key = $value;
         }
+    }
+
+    /**
+     * Check given value is valid. Using the type of this config item and possibly other variables.
+     *
+     * @param $value
+     * @return bool|mixed
+     */
+    public function checkValue($value)
+    {
+        if ($this->type == 'boolean') {
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
+        } elseif ($this->type == 'integer') {
+            return filter_var($value, FILTER_VALIDATE_INT);
+        } elseif ($this->type == 'select') {
+            return isset($this->options[$value]);
+        } elseif ($this->type == 'email') {
+            return filter_var($value, FILTER_VALIDATE_EMAIL);
+        } elseif (in_array($this->type, ['text', 'password'])) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getGroup()
@@ -65,6 +90,11 @@ class DynamicConfigItem implements \ArrayAccess
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function getOptions()
+    {
+        return $this->options;
     }
 
     public function isHidden()

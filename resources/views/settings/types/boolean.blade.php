@@ -3,8 +3,9 @@
     @if($help)
         <div data-toggle="tooltip" title="{{ $help }}" class="toolTip fa fa-fw fa-lg fa-question-circle"></div>
     @endif
+    {{ dd($value) }}
     <div class="col-sm-6 col-lg-4">
         <input id="{{ $name }}" type="checkbox" name="{{ $name }}" @if($value) checked @endif data-on-text="Yes"
-               data-off-text="No" data-size="small" data-config_id="{{ $name }}">
+               data-off-text="No" data-size="small" data-original="{{ $value ? 1 : 0 }}">
     </div>
 </div>

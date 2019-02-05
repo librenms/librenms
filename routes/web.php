@@ -31,7 +31,9 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // admin pages
     Route::group(['guard' => 'admin'], function () {
-        Route::get('settings/{tab?}/{section?}', 'SettingsController@index');
+        Route::get('settings/{tab?}/{section?}', 'SettingsController@index')->name('settings');
+        Route::put('settings/{name}', 'SettingsController@update')->name('settings.update');
+        Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
     });
 
     // old route redirects

@@ -8,7 +8,8 @@
             <ul class="nav nav-tabs">
                 @foreach($tabs as $tab)
                     <li @if($tab == $active_tab)class="active"@endif>
-                        <a href="#tab-{{ $tab }}" data-toggle="tab" onclick="window.history.pushState('{{ $tab }}', '', '/settings/{{ $tab }}');">@lang("settings.tabs.$tab")</a>
+                        <a href="#tab-{{ $tab }}" data-toggle="tab"
+                           onclick="window.history.pushState('{{ $tab }}', '', '/settings/{{ $tab }}');">@lang("settings.tabs.$tab")</a>
                     </li>
                 @endforeach
             </ul>
@@ -28,17 +29,20 @@
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
                                             <h4 class="panel-title">
-                                                <a data-toggle="collapse" data-parent="#accordion-{{ $group }}" href="#{{ "$group-$section" }}" onclick="window.history.pushState('{{ $group }}/{{ $section }}', '', '/settings/{{ $group }}/{{ $section }}');">
+                                                <a data-toggle="collapse" data-parent="#accordion-{{ $group }}"
+                                                   href="#{{ "$group-$section" }}"
+                                                   onclick="window.history.pushState('{{ $group }}/{{ $section }}', '', '/settings/{{ $group }}/{{ $section }}');">
                                                     <i class="fa fa-caret-down"></i> @lang("settings.sections.$group.$section")
                                                 </a>
                                             </h4>
                                         </div>
-                                        <div id="{{ "$group-$section" }}" class="panel-collapse collapse @if($group == $active_tab && $section == $active_section) in @endif">
+                                        <div id="{{ "$group-$section" }}"
+                                             class="panel-collapse collapse @if($group == $active_tab && $section == $active_section) in @endif">
                                             <div class="panel-body">
                                                 <form class="form-horizontal section-form" role="form">
-                                                @foreach($configs as $config)
-                                                    @include('settings.types.' . $config->getType(), $config->toArray())
-                                                @endforeach
+                                                    @foreach($configs as $config)
+                                                        @include('settings.types.' . $config->getType(), $config->toArray())
+                                                    @endforeach
                                                 </form>
                                             </div>
                                         </div>
@@ -55,7 +59,7 @@
 
 @section('javascript')
     <script>
-        $( document ).ready(function() {
+        $(document).ready(function () {
             $(".toolTip").tooltip();
 
             $('#email_backend').change(function () {
@@ -82,95 +86,79 @@
             }).change(); // trigger initially
 
             // Checkbox config ajax calls
-            $('.section-form input[type=checkbox]').on('switchChange.bootstrapSwitch', function (event, state) {
+            $('.section-form-ass input[type=checkbox]').on('switchChange.bootstrapSwitch', function (event, state) {
                 event.preventDefault();
                 var $this = $(this);
-                var config_id = $this.data("config_id");
-                $.ajax({
-                    type: 'POST',
-                    url: 'ajax_form.php',
-                    data: {type: "update-config-item", config_id: config_id, config_value: state},
-                    dataType: "json",
-                    success: function (data) {
-                        if (data.status == 'ok') {
-                            toastr.success('Config updated');
-                        } else {
-                            toastr.error(data.message);
-                        }
-                    },
-                    error: function () {
-                        toastr.error(data.message);
-                    }
-                });
+                globalConfigUpdateValue($this, state);
             }).bootstrapSwitch('offColor', 'danger');
 
-            $('.section-form select').change(function (event) {
-                event.preventDefault();
-                var $this = $(this);
-                var config_id = $this.data("config_id");
-                var config_value = $this.val();
-                $.ajax({
-                    type: 'POST',
-                    url: 'ajax_form.php',
-                    data: {type: "update-config-item", config_id: config_id, config_value: config_value},
-                    dataType: "json",
-                    success: function (data) {
-                        if (data.status == 'ok') {
-                            $this.closest('.form-group').addClass('has-success');
-                            $this.next().addClass('fa-check');
-                            setTimeout(function () {
-                                $this.closest('.form-group').removeClass('has-success');
-                                $this.next().removeClass('fa-check');
-                            }, 2000);
-                        } else {
-                            $(this).closest('.form-group').addClass('has-error');
-                            $this.next().addClass('fa-times');
-                            setTimeout(function () {
-                                $this.closest('.form-group').removeClass('has-error');
-                                $this.next().removeClass('fa-times');
-                            }, 2000);
-                        }
-                    },
-                    error: function () {
-                        toastr.error('An error occurred.');
-                    }
-                });
-            });
-
             // Input field config ajax calls
-            $('.section-form input:not([type=checkbox])').on('blur keyup', function(event) {
+            $('.section-form input:not([type=checkbox])').on('blur keyup', function (event) {
                 if (event.type === 'keyup' && event.keyCode !== 13) {
                     return;
                 }
                 event.preventDefault();
                 var $this = $(this);
-                var config_id = $this.data("config_id");
-                var original = $this.data('original');
                 var value = $this.val();
 
-                // skip ajax if value is unchanged or validation fails
-                if (value != original && $this[0].checkValidity()) {
+                globalConfigUpdateValue($this, value);
+            });
+
+            $('.section-form select').change(function (event) {
+                event.preventDefault();
+                var $this = $(this);
+                var value = $this.val();
+                globalConfigUpdateValue($this, value);
+            });
+
+            function globalConfigUpdateValue(target, value) {
+                var name = target.attr('name');
+                var original = target.data('original');
+                if (original != value && target[0].checkValidity()) {
                     $.ajax({
-                        type: 'POST',
-                        url: 'ajax_form.php',
-                        data: {type: "update-config-item", config_id: config_id, config_value: value},
+                        type: 'PUT',
+                        url: '{{ route('settings.update', ['']) }}/' + name,
+                        data: {value: value},
+                        target: target,
                         dataType: "json",
                         success: function (data) {
-                            if (data.status == 'ok') {
-                                toastr.success('Config updated');
-                            } else {
-                                toastr.error(data.message);
-                            }
+                            globalConfigUpdateSuccess(this.target, data);
                         },
-                        error: function () {
-                            toastr.error(data.message);
+                        error: function (data) {
+                            globalConfigUpdateFailure(this.target, data.responseJSON);
                         }
                     });
                 }
-            });
+            }
+
+            function globalConfigUpdateSuccess(target, data) {
+                target.data('original', target.val());
+                target.closest('.form-group').addClass('has-success');
+                target.next().addClass('fa-check');
+                setTimeout(function () {
+                    target.closest('.form-group').removeClass('has-success');
+                    target.next().removeClass('fa-check');
+                }, 2000);
+                console.log(data.message);
+                toastr.success(data.message || 'Config ' + target.attr('name') + ' updated');
+            }
+
+            function globalConfigUpdateFailure(target, data) {
+                if (target.is(':checkbox')) {
+                    console.log(target.data('original'));
+                    target.bootstrapSwitch('state', target.data('original'));
+                } else {
+                    target.val(target.data('original')).change();
+                }
+                target.closest('.form-group').addClass('has-error');
+                target.next().addClass('fa-times');
+                setTimeout(function () {
+                    target.closest('.form-group').removeClass('has-error');
+                    target.next().removeClass('fa-times');
+                }, 2000);
+                toastr.error(data.message || 'Error occurred updating ' + target.attr('name'));
+            }
         });
-
-
     </script>
 @endsection
 
