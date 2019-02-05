@@ -7,8 +7,8 @@
         <div class="panel-heading">
             <ul class="nav nav-tabs">
                 @foreach($tabs as $tab)
-                    <li @if($tab == $active_tab)class="active"@endif><a href="#tab-{{ $tab }}"
-                                                                        data-toggle="tab">@lang("settings.tabs.$tab")</a>
+                    <li @if($tab == $active_tab)class="active"@endif>
+                        <a href="#tab-{{ $tab }}" data-toggle="tab" onclick="window.history.pushState('{{ $tab }}', '', '/settings/{{ $tab }}');">@lang("settings.tabs.$tab")</a>
                     </li>
                 @endforeach
             </ul>
@@ -28,14 +28,14 @@
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
                                             <h4 class="panel-title">
-                                                <a data-toggle="collapse" data-parent="#accordion-{{ $group }}" href="#{{ "$group-$section" }}">
+                                                <a data-toggle="collapse" data-parent="#accordion-{{ $group }}" href="#{{ "$group-$section" }}" onclick="window.history.pushState('{{ $group }}/{{ $section }}', '', '/settings/{{ $group }}/{{ $section }}');">
                                                     <i class="fa fa-caret-down"></i> @lang("settings.sections.$group.$section")
                                                 </a>
                                             </h4>
                                         </div>
                                         <div id="{{ "$group-$section" }}" class="panel-collapse collapse @if($group == $active_tab && $section == $active_section) in @endif">
                                             <div class="panel-body">
-                                                <form class="form-horizontal" role="form">
+                                                <form class="form-horizontal section-form" role="form">
                                                 @foreach($configs as $config)
                                                     @if (!$config->isHidden() && $config->getType())
                                                         @include('settings.types.' . $config->getType(), $config->toArray())
@@ -75,8 +75,7 @@
             }).change(); // trigger initially
 
             // Checkbox config ajax calls
-            $(".global-config-check").bootstrapSwitch('offColor', 'danger');
-            $('input.global-config-check').on('switchChange.bootstrapSwitch', function (event, state) {
+            $('.section-form input[type=checkbox]').on('switchChange.bootstrapSwitch', function (event, state) {
                 event.preventDefault();
                 var $this = $(this);
                 var config_id = $this.data("config_id");
@@ -96,9 +95,9 @@
                         toastr.error(data.message);
                     }
                 });
-            });
+            }).bootstrapSwitch('offColor', 'danger');
 
-            $('select').change(function (event) {
+            $('.section-form select').change(function (event) {
                 event.preventDefault();
                 var $this = $(this);
                 var config_id = $this.data("config_id");
@@ -126,11 +125,45 @@
                         }
                     },
                     error: function () {
-                        $("#message").html('<div class="alert alert-danger">An error occurred.</div>');
+                        toastr.error('An error occurred.');
                     }
                 });
             });
+
+            // Input field config ajax calls
+            $('.section-form input:not([type=checkbox])').on('blur keyup', function(event) {
+                if (event.type === 'keyup' && event.keyCode !== 13) {
+                    return;
+                }
+                event.preventDefault();
+                var $this = $(this);
+                var config_id = $this.data("config_id");
+                var original = $this.data('original');
+                var value = $this.val();
+
+                // skip ajax if value is unchanged or validation fails
+                if (value != original && $this[0].checkValidity()) {
+                    $.ajax({
+                        type: 'POST',
+                        url: 'ajax_form.php',
+                        data: {type: "update-config-item", config_id: config_id, config_value: value},
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.status == 'ok') {
+                                toastr.success('Config updated');
+                            } else {
+                                toastr.error(data.message);
+                            }
+                        },
+                        error: function () {
+                            toastr.error(data.message);
+                        }
+                    });
+                }
+            });
         });
+
+
     </script>
 @endsection
 

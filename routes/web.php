@@ -31,11 +31,14 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // admin pages
     Route::group(['guard' => 'admin'], function () {
-        Route::get('settings', 'SettingsController@index');
+        Route::get('settings/{tab?}/{section?}', 'SettingsController@index');
     });
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'pollers/tab=log/');
+    Route::get('settings/sub={tab}', function ($tab) {
+        return redirect("settings/$tab");
+    });
 
     // Two Factor Auth
     Route::group(['prefix' => '2fa', 'namespace' => 'Auth'], function () {

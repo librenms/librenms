@@ -10,15 +10,17 @@ class SettingsController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param string $tab
+     * @param string $section
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index($tab = 'global', $section = '')
     {
         $data = [];
         $config = new DynamicConfig();
 
-        $data['active_tab'] = $request->get('tab', 'global');
-        $data['active_section'] = $request->get('section');
+        $data['active_tab'] = $tab;
+        $data['active_section'] = $section;
         $data['groups'] = $config->getGrouped();
         $data['tabs'] = $data['groups']->keys();
 //        dd($data['groups']['alerting']['email']);
