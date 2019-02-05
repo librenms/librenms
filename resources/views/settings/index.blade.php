@@ -162,7 +162,6 @@
 
 @push('styles')
     <style>
-
         /* format tabs */
         .panel.with-nav-tabs > .panel-heading {
             padding: 5px 5px 0 5px;

@@ -2,7 +2,7 @@
 /**
  * DynamicConfig.php
  *
- * -Description-
+ * Class used by the webui to collect config definitions to create a dynamic config ui
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,6 +71,11 @@ class DynamicConfig
         return $this->definitions->pluck('group')->unique()->filter()->prepend('global');
     }
 
+    /**
+     * Get all config definitions grouped by group then section.
+     *
+     * @return Collection
+     */
     public function getGrouped()
     {
         // FIXME Laravel 5.5: $this->definitions->groupBy(['group', 'section']
