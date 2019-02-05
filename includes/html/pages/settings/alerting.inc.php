@@ -27,87 +27,87 @@ $callback = urlencode($callback);
 
 
 $mail_conf = [
-    [
+    0 => [
         'name'     => 'alert.transports.mail',
         'descr'    => 'Enable email alerting',
         'type'     => 'checkbox',
     ],
-    [
+    1 => [
         'name'     => 'email_backend',
         'descr'    => 'How to deliver mail',
         'options'  => Config::get('email_backend_options', ['mail', 'sendmail', 'smtp']),
         'type'     => 'select',
     ],
-    [
+    2 => [
         'name'     => 'email_user',
         'descr'    => 'From name',
         'type'     => 'text',
     ],
-    [
+    3 => [
         'name'     => 'email_from',
         'descr'    => 'From email address',
         'type'     => 'text',
         'pattern'  => '[a-zA-Z0-9_\-\.\+]+@[a-zA-Z0-9_\-\.]+\.[a-zA-Z]{2,18}',
     ],
-    [
+    4 => [
         'name'     => 'email_html',
         'descr'    => 'Use HTML emails',
         'type'     => 'checkbox',
     ],
-    [
+    5 => [
         'name'     => 'email_sendmail_path',
         'descr'    => 'Sendmail path',
         'type'     => 'text',
         'class'    => 'sendmail-form',
     ],
-    [
+    6 => [
         'name'     => 'email_smtp_host',
         'descr'    => 'SMTP Host',
         'type'     => 'text',
         'pattern'  => '[a-zA-Z0-9_\-\.]+',
         'class'    => 'smtp-form',
     ],
-    [
+    7 => [
         'name'     => 'email_smtp_port',
         'descr'    => 'SMTP Port',
         'type'     => 'numeric',
         'class'    => 'smtp-form',
         'required' => true,
     ],
-    [
+    8 => [
         'name'     => 'email_smtp_timeout',
         'descr'    => 'SMTP Timeout',
         'type'     => 'numeric',
         'class'    => 'smtp-form',
         'required' => true,
     ],
-    [
+    9 => [
         'name'     => 'email_smtp_secure',
         'descr'    => 'SMTP Secure',
         'type'     => 'select',
         'class'    => 'smtp-form',
         'options'  => Config::get('email_smtp_secure_options', ['', 'tls', 'ssl']),
     ],
-    [
+    10 => [
         'name'     => 'email_auto_tls',
         'descr'    => 'SMTP Auto TLS Support',
         'type'     => 'select',
         'class'    => 'smtp-form',
         'options'  => ['true', 'false'],
     ],
-    [
+    11 => [
         'name'     => 'email_smtp_auth',
         'descr'    => 'SMTP Authentication',
         'type'     => 'checkbox',
         'class'    => 'smtp-form',
     ],
-    [
+    12 => [
         'name'     => 'email_smtp_username',
         'descr'    => 'SMTP Authentication Username',
         'type'     => 'text',
         'class'    => 'smtp-form',
     ],
-    [
+    13 => [
         'name'     => 'email_smtp_password',
         'descr'    => 'SMTP Authentication Password',
         'type'     => 'password',

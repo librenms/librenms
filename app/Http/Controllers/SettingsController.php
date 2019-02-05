@@ -21,6 +21,7 @@ class SettingsController extends Controller
         $data['active_section'] = $request->get('section');
         $data['groups'] = $config->getGrouped();
         $data['tabs'] = $data['groups']->keys();
+//        dd($data['groups']['alerting']['email']);
 
         return view('settings.index', $data);
     }
