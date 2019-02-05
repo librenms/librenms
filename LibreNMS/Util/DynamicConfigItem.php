@@ -29,18 +29,22 @@ use LibreNMS\Config;
 
 class DynamicConfigItem implements \ArrayAccess
 {
-    private $path;
+    private $name;
     private $group;
-    private $sub_group;
+    private $section;
     private $value;
     private $description;
+    private $type;
     private $default;
     private $hidden = false;
+    private $class;
+    private $help;
+    private $pattern;
 
-    public function __construct($path, $settings = [])
+    public function __construct($name, $settings = [])
     {
-        $this->path = $path;
-        $this->value = Config::get($this->path, $this->default);
+        $this->name = $name;
+        $this->value = Config::get($this->name, $this->default);
         foreach ($settings as $key => $value) {
             $this->$key = $value;
         }
@@ -51,9 +55,9 @@ class DynamicConfigItem implements \ArrayAccess
         return $this->group;
     }
 
-    public function getSubGroup()
+    public function getSection()
     {
-        return $this->sub_group;
+        return $this->section;
     }
 
     public function getValue()
@@ -64,6 +68,16 @@ class DynamicConfigItem implements \ArrayAccess
     public function isHidden()
     {
         return $this->hidden;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function toArray()
+    {
+        return get_object_vars($this);
     }
 
 
@@ -94,6 +108,11 @@ class DynamicConfigItem implements \ArrayAccess
         $offset = $this->convertLegacyField($offset);
 
         unset($this->$offset);
+    }
+
+    public function getName()
+    {
+        return $this->name;
     }
 
     private function convertLegacyField($offset)

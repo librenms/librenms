@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Collection;
 use LibreNMS\Config;
 
 class DynamicConfig
@@ -61,6 +62,16 @@ class DynamicConfig
         return $this->definitions->pluck('group')->unique()->filter()->prepend('global');
     }
 
+    public function getGrouped()
+    {
+        // FIXME Laravel 5.5: $this->definitions->groupBy(['group', 'section']
+
+        /** @var Collection $grouped */
+        $grouped = $this->definitions->groupBy('group')->map->groupBy('section');
+        $grouped->prepend($grouped->pull(''), 'global'); // rename '' to global
+        return $grouped;
+    }
+
     public function getByGroup($group, $subgroup = null)
     {
         return $this->definitions->filter(function ($item) use ($group, $subgroup) {
@@ -69,7 +80,7 @@ class DynamicConfig
                 return false;
             }
 
-            if ($subgroup && $item->getSubGroup() != $subgroup) {
+            if ($subgroup && $item->getSection() != $subgroup) {
                 return false;
             }
 

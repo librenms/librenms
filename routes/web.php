@@ -29,6 +29,11 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::get('about', 'AboutController@index');
     Route::get('authlog', 'UserController@authlog');
 
+    // admin pages
+    Route::group(['guard' => 'admin'], function () {
+        Route::get('settings', 'SettingsController@index');
+    });
+
     // old route redirects
     Route::permanentRedirect('poll-log', 'pollers/tab=log/');
 
