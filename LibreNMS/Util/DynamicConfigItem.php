@@ -37,6 +37,8 @@ class DynamicConfigItem implements \ArrayAccess
     private $type;
     private $default;
     private $hidden = false;
+    private $required = false;
+    private $disabled = false;
     private $class;
     private $help;
     private $pattern;
@@ -70,6 +72,11 @@ class DynamicConfigItem implements \ArrayAccess
         return $this->hidden;
     }
 
+    public function isRequired()
+    {
+        return $this->required;
+    }
+
     public function getType()
     {
         return $this->type;
@@ -80,6 +87,10 @@ class DynamicConfigItem implements \ArrayAccess
         return get_object_vars($this);
     }
 
+    public function isValid()
+    {
+        return ($this->group == "" || $this->type) && !$this->hidden && !$this->disabled;
+    }
 
     // ArrayAccess functions
     public function offsetExists($offset)

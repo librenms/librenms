@@ -14,7 +14,7 @@ return [
             'email' => 'Email Options'
         ],
         'external' => [
-            'location' => 'Location Geocoding',
+            'location' => 'Location Settings',
             'oxidized' => 'Oxidized Integration',
             'paths' => 'Binary Locations',
             'peeringdb' => 'PeeringDB Integration',

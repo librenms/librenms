@@ -37,9 +37,7 @@
                                             <div class="panel-body">
                                                 <form class="form-horizontal section-form" role="form">
                                                 @foreach($configs as $config)
-                                                    @if (!$config->isHidden() && $config->getType())
-                                                        @include('settings.types.' . $config->getType(), $config->toArray())
-                                                    @endif
+                                                    @include('settings.types.' . $config->getType(), $config->toArray())
                                                 @endforeach
                                                 </form>
                                             </div>
@@ -71,6 +69,15 @@
                 } else {
                     $('.smtp-form').hide();
                     $('.sendmail-form').hide();
+                }
+            }).change(); // trigger initially
+
+            $('#geoloc\\.engine').change(function () {
+                var engine = this.value;
+                if (engine === 'openstreetmap') {
+                    $('.geoloc_api_key').hide();
+                } else {
+                    $('.geoloc_api_key').show();
                 }
             }).change(); // trigger initially
 

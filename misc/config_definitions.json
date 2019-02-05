@@ -9,9 +9,7 @@
         "group": "alerting",
         "section": "general",
         "order": 10,
-        "type": "boolean",
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "alert.admins": {
         "description": "Issue alerts to admins",
@@ -20,9 +18,7 @@
         "group": "alerting",
         "section": "general",
         "order": 1,
-        "type": "boolean",
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "alert.default_copy": {
         "description": "Copy all email alerts to default contact",
@@ -31,9 +27,7 @@
         "group": "alerting",
         "section": "general",
         "order": 6,
-        "type": "boolean",
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "alert.default_if_none": {
         "description": "cannot set in webui?",
@@ -43,8 +37,7 @@
         "section": "general",
         "order": 20,
         "type": "boolean",
-        "hidden": true,
-        "disabled": false
+        "hidden": true
     },
     "alert.default_mail": {
         "description": "Default contact",
@@ -53,9 +46,7 @@
         "group": "alerting",
         "section": "general",
         "order": 7,
-        "type": "email",
-        "hidden": false,
-        "disabled": false
+        "type": "email"
     },
     "alert.default_only": {
         "description": "Send alerts to default contact only",
@@ -64,9 +55,7 @@
         "group": "alerting",
         "section": "general",
         "order": 5,
-        "type": "boolean",
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "alert.disable": {
         "description": "Disable alerting",
@@ -75,9 +64,7 @@
         "group": "alerting",
         "section": "general",
         "order": 0,
-        "type": "boolean",
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "alert.fixed-contacts": {
         "description": "Updates to contact email addresses not honored",
@@ -86,9 +73,7 @@
         "group": "alerting",
         "section": "general",
         "order": 9,
-        "type": "boolean",
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "alert.globals": {
         "description": "Issue alerts to read only users",
@@ -97,9 +82,7 @@
         "group": "alerting",
         "section": "general",
         "order": 2,
-        "type": "boolean",
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "alert.macros.rule.bill_cdr_over_quota": {
         "default": "((%bills.rate_95th \/ %bills.bill_cdr)*100) && %bills.bill_type = \"cdr\""
@@ -213,9 +196,7 @@
         "group": "alerting",
         "section": "general",
         "order": 4,
-        "type": "boolean",
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "alert.transports.mail": {
         "description": "Enable email alerting",
@@ -224,9 +205,7 @@
         "group": "alerting",
         "section": "email",
         "order": 0,
-        "type": "boolean",
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "alert.tolerance_window": {
         "description": "Tolerance window for cron",
@@ -235,9 +214,7 @@
         "group": "alerting",
         "section": "general",
         "order": 8,
-        "type": "integer",
-        "hidden": false,
-        "disabled": false
+        "type": "integer"
     },
     "alert.users": {
         "description": "Issue alerts to normal users",
@@ -246,9 +223,7 @@
         "group": "alerting",
         "section": "general",
         "order": 3,
-        "type": "boolean",
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "alert_graph_date_format": {
         "default": "%Y-%m-%d %H:%i"
@@ -444,9 +419,6 @@
     "autodiscovery.xdp_exclude.sysdesc_regexp": {
         "type": "array",
         "default": ["\/-K9W8-\/"]
-    },
-    "availability-map-width": {
-        "default": 25
     },
     "bad_disk_regexp": {
         "default": []
@@ -880,9 +852,7 @@
                 "description": "No"
             }
         ],
-        "class": "smtp-form",
-        "hidden": false,
-        "disabled": false
+        "class": "smtp-form"
     },
     "email_backend": {
         "description": "How to deliver mail",
@@ -906,9 +876,7 @@
                 "description": "SMTP"
 
             }
-        ],
-        "hidden": false,
-        "disabled": false
+        ]
     },
     "email_from": {
         "description": "From email address",
@@ -917,9 +885,7 @@
         "group": "alerting",
         "section": "email",
         "order": 2,
-        "type": "email",
-        "hidden": false,
-        "disabled": false
+        "type": "email"
     },
     "email_html": {
         "description": "Use HTML emails",
@@ -928,9 +894,7 @@
         "group": "alerting",
         "section": "email",
         "order": 3,
-        "type": "boolean",
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "email_sendmail_path": {
         "description": "Location of sendmail if using this option",
@@ -939,9 +903,7 @@
         "section": "email",
         "order": 5,
         "type": "text",
-        "class": "sendmail-form",
-        "hidden": false,
-        "disabled": false
+        "class": "sendmail-form"
     },
     "email_smtp_auth": {
         "description": "Enable \/ disable smtp authentication",
@@ -950,9 +912,7 @@
         "section": "email",
         "order": 11,
         "type": "boolean",
-        "class": "smtp-form",
-        "hidden": false,
-        "disabled": false
+        "class": "smtp-form"
     },
     "email_smtp_host": {
         "description": "SMTP Host for sending email if using this option",
@@ -962,9 +922,7 @@
         "order": 6,
         "type": "text",
         "pattern": "[a-zA-Z0-9_\\-.]+",
-        "class": "smtp-form",
-        "hidden": false,
-        "disabled": false
+        "class": "smtp-form"
     },
     "email_smtp_password": {
         "description": "SMTP Auth password",
@@ -973,9 +931,7 @@
         "section": "email",
         "order": 13,
         "type": "password",
-        "class": "smtp-form",
-        "hidden": false,
-        "disabled": false
+        "class": "smtp-form"
     },
     "email_smtp_port": {
         "description": "SMTP port setting",
@@ -984,9 +940,7 @@
         "section": "email",
         "order": 7,
         "type": "integer",
-        "class": "smtp-form",
-        "hidden": false,
-        "disabled": false
+        "class": "smtp-form"
     },
     "email_smtp_secure": {
         "description": "Enable \/ disable encryption (use tls or ssl)",
@@ -1010,9 +964,7 @@
 
             }
         ],
-        "class": "smtp-form",
-        "hidden": false,
-        "disabled": false
+        "class": "smtp-form"
     },
     "email_smtp_timeout": {
         "description": "SMTP timeout setting",
@@ -1021,9 +973,7 @@
         "section": "email",
         "order": 8,
         "type": "integer",
-        "class": "smtp-form",
-        "hidden": false,
-        "disabled": false
+        "class": "smtp-form"
     },
     "email_smtp_username": {
         "description": "SMTP Auth username",
@@ -1032,9 +982,7 @@
         "section": "email",
         "order": 12,
         "type": "text",
-        "class": "smtp-form",
-        "hidden": false,
-        "disabled": false
+        "class": "smtp-form"
     },
     "email_user": {
         "description": "From name",
@@ -1043,9 +991,7 @@
         "group": "alerting",
         "section": "email",
         "order": 1,
-        "type": "text",
-        "hidden": false,
-        "disabled": false
+        "type": "text"
     },
     "enable_bgp": {
         "default": 1
@@ -1115,18 +1061,14 @@
         "default": "fping",
         "group": "external",
         "section": "paths",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "type": "text"
     },
     "fping6": {
         "description": "Path to fping6",
         "default": "fping6",
         "group": "external",
         "section": "paths",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "type": "text"
     },
     "fping_options.count": {
         "default": 3
@@ -1150,13 +1092,15 @@
         "default": 10
     },
     "geoloc.api_key": {
-        "description": "Geocoding API Key (Required to function)",
+        "description": "Geocoding API Key",
+        "help": "Geocoding API Key (Required to function)",
         "default": "",
         "group": "external",
         "section": "location",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 1,
+        "type": "text",
+        "class": "geoloc_api_key",
+        "required": true
     },
     "geoloc.engine": {
         "description": "Geocoding Engine",
@@ -1164,8 +1108,25 @@
         "group": "external",
         "section": "location",
         "order": 0,
-        "hidden": false,
-        "disabled": false
+        "type": "select",
+        "options": [
+            {
+                "value": "google",
+                "description": "Google Maps"
+            },
+            {
+                "value": "openstreetmap",
+                "description": "OpenStreetMap"
+            },
+            {
+                "value": "mapquest",
+                "description": "MapQuest"
+            },
+            {
+                "value": "bing",
+                "description": "Bing Maps"
+            }
+        ]
     },
     "github_api": {
         "default": "https:\/\/api.github.com\/repos\/librenms\/librenms\/"
@@ -3239,7 +3200,12 @@
         "default": "load"
     },
     "ipmitool": {
-        "default": "\/usr\/bin\/ipmitool"
+        "description": "Path to ipmtool",
+        "default": "\/usr\/bin\/ipmitool",
+        "group": "external",
+        "section": "paths",
+        "type": "text"
+
     },
     "irc_alert": {
         "default": false
@@ -3340,7 +3306,12 @@
         "default": "DejaVuSansMono"
     },
     "mtr": {
-        "default": "\/usr\/bin\/mtr"
+        "description": "Path to mtr",
+        "default": "\/usr\/bin\/mtr",
+        "group": "external",
+        "section": "paths",
+        "type": "text"
+
     },
     "mysql_log_level": {
         "default": "ERROR"
@@ -3445,7 +3416,12 @@
         "default": 0
     },
     "nmap": {
-        "default": "\/usr\/bin\/nmap"
+        "description": "Path to nmap",
+        "default": "\/usr\/bin\/nmap",
+        "group": "external",
+        "section": "paths",
+        "type": "text"
+
     },
     "notifications.LibreNMS": {
         "default": "http:\/\/www.librenms.org\/notifications.rss"
@@ -3503,9 +3479,8 @@
         "default": false,
         "group": "external",
         "section": "oxidized",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 4,
+        "type": "text"
     },
     "oxidized.enabled": {
         "description": "Enable Oxidized support",
@@ -3513,44 +3488,42 @@
         "group": "external",
         "section": "oxidized",
         "order": 0,
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "oxidized.features.versioning": {
-        "description": "Enable Oxidized config versioning",
+        "description": "Enable config versioning access",
+        "help": "Enable Oxidized config versioning (requires git backend)",
         "default": false,
         "group": "external",
         "section": "oxidized",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 2,
+        "type": "boolean"
     },
     "oxidized.group_support": {
         "description": "Enable the return of groups to Oxidized",
         "default": false,
         "group": "external",
         "section": "oxidized",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 3,
+        "type": "boolean"
     },
     "oxidized.reload_nodes": {
         "description": "Reload Oxidized nodes list, each time a device is added",
         "default": false,
         "group": "external",
         "section": "oxidized",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 5
     },
     "oxidized.url": {
-        "description": "Oxidized API url",
+        "description": "URL to your Oxidized API",
+        "help": "Oxidized API url (For example: http://127.0.0.1:8888)",
         "default": false,
         "group": "external",
         "section": "oxidized",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 1,
+        "type": "text",
+        "pattern": "[a-zA-Z0-9]{1,5}://.*",
+        "required": true
     },
     "page_gen": {
         "default": 0
@@ -3567,13 +3540,13 @@
         "default": "peering"
     },
     "peeringdb.enabled": {
-        "description": "Enable PeeringDB lookup (data is downloaded with daily.sh)",
+        "description": "Enable PeeringDB lookup",
+        "help": "Enable PeeringDB lookup (data is downloaded with daily.sh)",
         "default": false,
         "group": "external",
         "section": "peeringdb",
         "order": 0,
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "percentile_value": {
         "default": 95
@@ -3582,7 +3555,12 @@
         "default": 30
     },
     "ping": {
-        "default": "\/bin\/ping"
+        "description": "Path to ping",
+        "default": "\/bin\/ping",
+        "group": "external",
+        "section": "paths",
+        "type": "text"
+
     },
     "plugin_dir": {
     },
@@ -3753,18 +3731,16 @@
         "default": 600,
         "group": "external",
         "section": "rrdtool",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 3,
+        "type": "integer"
     },
     "rrd.step": {
         "description": "Change the rrd step value (default 300)",
         "default": 300,
         "group": "external",
         "section": "rrdtool",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 2,
+        "type": "integer"
     },
     "rrd_dir": {
     },
@@ -3781,24 +3757,28 @@
         "description": "Path to rrdtool",
         "default": "rrdtool",
         "group": "external",
-        "section": "paths",
+        "section": "rrdtool",
         "order": 0,
-        "hidden": false,
-        "disabled": false
+        "type": "text"
     },
     "rrdtool_tune": {
-        "description": "Auto tune maximum value for rrd port files",
+        "description": "Tune all rrd port files to use max values",
+        "help": "Auto tune maximum value for rrd port files",
         "default": false,
         "group": "external",
         "section": "rrdtool",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 1,
+        "type": "boolean"
     },
     "secure_cookies": {
     },
     "sfdp": {
-        "default": "\/usr\/bin\/sfdp"
+        "description": "Path to sfdp",
+        "default": "\/usr\/bin\/sfdp",
+        "group": "external",
+        "section": "paths",
+        "type": "text"
+
     },
     "show_locations": {
         "default": 1
@@ -3930,28 +3910,46 @@
         "default": "v1"
     },
     "snmpbulkwalk": {
-        "default": "\/usr\/bin\/snmpbulkwalk"
+        "description": "Path to snmpbulkwalk",
+        "default": "\/usr\/bin\/snmpbulkwalk",
+        "group": "external",
+        "section": "paths",
+        "type": "text"
+
     },
     "snmpget": {
-        "default": "\/usr\/bin\/snmpget"
+        "description": "Path to snmpget",
+        "default": "\/usr\/bin\/snmpget",
+        "group": "external",
+        "section": "paths",
+        "type": "text"
+
     },
     "snmpgetnext": {
         "description": "Path to snmpgetnext",
         "default": "snmpgetnext",
         "group": "external",
         "section": "paths",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 0
     },
     "snmptranslate": {
-        "default": "\/usr\/bin\/snmptranslate"
+        "description": "Path to snmptranslate",
+        "default": "\/usr\/bin\/snmptranslate",
+        "group": "external",
+        "section": "paths",
+        "type": "text"
+
     },
     "snmptraps.eventlog": {
         "default": "unhandled"
     },
     "snmpwalk": {
-        "default": "\/usr\/bin\/snmpwalk"
+        "description": "Path to snmpwalk",
+        "default": "\/usr\/bin\/snmpwalk",
+        "group": "external",
+        "section": "paths",
+        "type": "text"
+
     },
     "sso.create_users": {
         "default": true
@@ -4000,18 +3998,14 @@
         "default": "traceroute",
         "group": "external",
         "section": "paths",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 0
     },
     "traceroute6": {
         "description": "Path to traceroute6",
         "default": "traceroute6",
         "group": "external",
         "section": "paths",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 0
     },
     "transit_descr.0": {
         "default": "transit"
@@ -4027,27 +4021,25 @@
         "default": 10,
         "group": "external",
         "section": "unix-agent",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 1,
+        "type": "integer"
     },
     "unix-agent.port": {
-        "description": "Default port for the Unix-agent (check_mk)",
+        "description": "Default unix-agent port",
+        "help": "Default port for the unix-agent (check_mk)",
         "default": 6556,
         "group": "external",
         "section": "unix-agent",
         "order": 0,
-        "hidden": false,
-        "disabled": false
+        "type": "integer"
     },
     "unix-agent.read-timeout": {
         "description": "Unix-agent read timeout",
         "default": 10,
         "group": "external",
         "section": "unix-agent",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 2,
+        "type": "integer"
     },
     "update": {
         "default": 1
@@ -4062,7 +4054,11 @@
         "default": 0
     },
     "virsh": {
-        "default": "\/usr\/bin\/virsh"
+        "description": "Path to virsh",
+        "default": "\/usr\/bin\/virsh",
+        "group": "external",
+        "section": "paths",
+        "type": "text"
     },
     "vmware_guestid.asianux3Guest": {
         "default": "Asianux Server 3"
@@ -4371,40 +4367,40 @@
         "default": true
     },
     "webui.availability_map_box_size": {
-        "description": "Input desired tile width in pixels for box size in full view",
+        "description": "Availability box width",
+        "help": "Input desired tile width in pixels for box size in full view",
         "default": 165,
         "group": "webui",
-        "section": "graph",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "section": "availability-map",
+        "order": 3,
+        "type": "text"
     },
     "webui.availability_map_compact": {
-        "description": "Availability map old view",
+        "description": "Availability map compact view",
+        "help": "Availability map view with small indicators",
         "default": false,
         "group": "webui",
-        "section": "graph",
+        "section": "availability-map",
         "order": 0,
-        "hidden": false,
-        "disabled": false
+        "type": "boolean"
     },
     "webui.availability_map_sort_status": {
-        "description": "Sort devices and services by status",
+        "description": "Sort by status",
+        "help": "Sort devices and services by status",
         "default": false,
         "group": "webui",
-        "section": "graph",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "section": "availability-map",
+        "order": 1,
+        "type": "boolean"
     },
     "webui.availability_map_use_device_groups": {
-        "description": "Enable usage of device groups filter",
+        "description": "Use device groups filter",
+        "help": "Enable usage of device groups filter",
         "default": false,
         "group": "webui",
-        "section": "graph",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "section": "availability-map",
+        "order": 2,
+        "type": "boolean"
     },
     "webui.default_dashboard_id": {
         "description": "Global default dashboard_id for all users who do not have their own default set",
@@ -4412,56 +4408,71 @@
         "group": "webui",
         "section": "dashboard",
         "order": 0,
-        "hidden": false,
-        "disabled": false
+        "type": "select",
+        "options": []
     },
     "webui.dynamic_graphs": {
         "description": "Enable dynamic graphs",
+        "help": "Enable dynamic graphs, enables zooming and panning on graphs",
         "default": false,
         "group": "webui",
         "section": "graph",
-        "order": 0,
-        "hidden": "",
-        "disabled": false
+        "order": 3,
+        "type": "boolean"
     },
     "webui.global_search_result_limit": {
-        "description": "Global search results limit",
+        "description": "Set the max search result limit",
+        "help": "Global search results limit",
         "default": 8,
         "group": "webui",
         "section": "search",
         "order": 0,
-        "hidden": true,
-        "disabled": false
+        "type": "integer",
+        "required": true
     },
     "webui.graph_stacked": {
-        "description": "Display stacked graphs instead of inverted graphs",
+        "description": "Use stacked graphs",
+        "help": "Display stacked graphs instead of inverted graphs",
         "default": false,
         "group": "webui",
         "section": "graph",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 2,
+        "type": "boolean"
     },
     "webui.graph_type": {
-        "description": "Set the default graph type",
+        "description": "Set the graph type",
+        "help": "Set the default graph type",
         "default": "png",
         "group": "webui",
         "section": "graph",
-        "order": 0,
-        "hidden": false,
-        "disabled": false
+        "order": 1,
+        "type": "select",
+        "options":[
+            {
+                "value": "png",
+                "description": "PNG"
+            },
+            {
+                "value": "svg",
+                "description": "SVG"
+            }
+        ]
     },
     "webui.min_graph_height": {
-        "description": "Minimum Graph Height",
+        "description": "Set the minimum graph height",
+        "help": "Minimum Graph Height (default: 300)",
         "default": 300,
         "group": "webui",
         "section": "graph",
         "order": 0,
-        "hidden": true,
-        "disabled": false
+        "type": "integer"
     },
     "whois": {
-        "default": "\/usr\/bin\/whois"
+        "description": "Path to whois",
+        "default": "\/usr\/bin\/whois",
+        "group": "external",
+        "section": "paths",
+        "type": "text"
     },
     "xirrus_disable_stations": {
         "default": false
