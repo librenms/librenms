@@ -46,22 +46,15 @@ class Config
             return self::$config;
         }
 
-        self::loadFiles();
+        $config = self::loadFiles();
+        $def_config = self::loadDefaults();
+        $db_config = Eloquent::isConnected() ? self::loadDB() : [];
 
-        // Make sure the database is connected
-        if (Eloquent::isConnected()) {
-            // pull in the database config settings
-            self::mergeDb();
+        // merge all config sources together config.php > db config > config_definitions.json
+        $config = array_replace_recursive($def_config, $db_config, $config);
 
-            // load graph types from the database
-            self::loadGraphsFromDb();
-
-            // process $config to tidy up
-            self::processConfig(true);
-        } else {
-            // just process $config
-            self::processConfig(false);
-        }
+        // final cleanups and validations
+        self::processConfig();
 
         // set to global for legacy/external things
         global $config;
@@ -87,8 +80,27 @@ class Config
      */
     public static function getDefinitions()
     {
-        $config_def = json_decode(file_get_contents(self::get('install_dir') . '/misc/config_definitions.json'), true);
-        return $config_def;
+        return json_decode(file_get_contents(self::get('install_dir') . '/misc/config_definitions.json'), true);
+    }
+
+    private static function loadDefaults()
+    {
+        $def_config = [];
+        $definitions = self::getDefinitions();
+
+        foreach ($definitions as $path => $def) {
+            if (isset($def['default'])) {
+                Arr::set($def_config, $path, $def['default']);
+            }
+        }
+
+        // load macros from json
+        $macros = json_decode(file_get_contents(self::get('install_dir') . '/misc/macros.json'), true);
+        Arr::set($def_config, 'alert.macros.rule', $macros);
+
+        self::processDefaults($def_config);
+
+        return $def_config;
     }
 
     /**
@@ -97,26 +109,12 @@ class Config
      *
      * @return array
      */
-    private static function &loadFiles()
+    private static function loadFiles()
     {
         $config = []; // start fresh
 
         $install_dir = realpath(__DIR__ . '/../');
         $config['install_dir'] = $install_dir;
-
-        // load defaults
-        $config_def = self::getDefinitions();
-        foreach ($config_def as $path => $def) {
-            if (isset($def['default'])) {
-                Arr::set($config, $path, $def['default']);
-            }
-        }
-
-        // import standard settings
-        $macros = json_decode(file_get_contents($install_dir . '/misc/macros.json'), true);
-        Arr::set($config, 'alert.macros.rule', $macros);
-
-        self::processDefaults();
 
         // Load user config
         @include $install_dir . '/config.php';
@@ -249,12 +247,8 @@ class Config
      * @param mixed $key period separated config variable name
      * @param mixed $value
      * @param bool $persist set the setting in the database so it persists across runs
-     * @param string $default default (only set when initially created)
-     * @param string $descr webui description (only set when initially created)
-     * @param string $group webui group (only set when initially created)
-     * @param string $sub_group webui subgroup (only set when initially created)
      */
-    public static function set($key, $value, $persist = false, $default = null, $descr = null, $group = null, $sub_group = null)
+    public static function set($key, $value, $persist = false)
     {
         if ($persist) {
             try {
@@ -300,7 +294,7 @@ class Config
      *
      * @return string
      */
-    public static function json_encode()
+    public static function toJson()
     {
         return json_encode(self::$config);
     }
@@ -318,7 +312,7 @@ class Config
      * merge the database config with the global config
      * Global config overrides db
      */
-    private static function mergeDb()
+    private static function loadDB()
     {
         $db_config = [];
 
@@ -331,10 +325,13 @@ class Config
             // possibly table config doesn't exist yet
         }
 
-        self::$config = array_replace_recursive($db_config, self::$config);
+        // load graph types from the database
+        self::loadGraphsFromDb($db_config);
+
+        return $db_config;
     }
 
-    private static function loadGraphsFromDb()
+    private static function loadGraphsFromDb(&$config)
     {
         try {
             $graph_types = GraphType::all()->toArray();
@@ -356,17 +353,20 @@ class Config
                 $g[$key] = $v;
             }
 
-            self::$config['graph_types'][$g['type']][$g['subtype']] = $g;
+            $config['graph_types'][$g['type']][$g['subtype']] = $g;
         }
     }
 
     /**
      * Handle defaults that are set programmatically
+     *
+     * @param array $def_config
+     * @return array
      */
-    private static function processDefaults()
+    private static function processDefaults(&$def_config)
     {
-        self::set('log_dir', self::get('install_dir') . '/logs');
-        self::set('distributed_poller_name', php_uname('n'));
+        Arr::set($def_config, 'log_dir', self::get('install_dir') . '/logs');
+        Arr::set($def_config, 'distributed_poller_name', php_uname('n'));
 
          // set base_url from access URL
         if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
@@ -376,26 +376,27 @@ class Config
             } else {
                 $base_url = 'http://'.$_SERVER['SERVER_NAME'].($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
             }
-            self::set('base_url', $base_url);
+            Arr::set($def_config, 'base_url', $base_url);
         }
 
         // graph color copying
-        self::set('graph_colours.default', self::get('graph_colours.blues'));
-        self::set('graph_colours.mega', array_merge(
-            self::get('graph_colours.psychedelic'),
-            self::get('graph_colours.manycolours'),
-            self::get('graph_colours.default'),
-            self::get('graph_colours.mixed')
+        Arr::set($def_config, 'graph_colours.default', (array)Arr::get($def_config, 'graph_colours.blues', []));
+        Arr::set($def_config, 'graph_colours.mega', array_merge(
+            (array)Arr::get($def_config, 'graph_colours.psychedelic', []),
+            (array)Arr::get($def_config, 'graph_colours.manycolours', []),
+            (array)Arr::get($def_config, 'graph_colours.default', []),
+            (array)Arr::get($def_config, 'graph_colours.mixed', [])
         ));
+
+        return $def_config;
     }
 
     /**
      * Process the config after it has been loaded.
      * Make sure certain variables have been set properly and
      *
-     * @param bool $persist Save binary locations and other settings to the database.
      */
-    private static function processConfig($persist = true)
+    private static function processConfig()
     {
         // If we're on SSL, let's properly detect it
         if (isset($_SERVER['HTTPS'])) {
@@ -435,10 +436,11 @@ class Config
         self::deprecatedVariable('discovery_modules.cisco-vrf', 'discovery_modules.vrf');
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
+        $persist = Eloquent::isConnected();
         // make sure we have full path to binaries in case PATH isn't set
         foreach (array('fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6') as $bin) {
             if (!is_executable(self::get($bin))) {
-                self::set($bin, self::locateBinary($bin), $persist, $bin, "Path to $bin", 'external', 'paths');
+                self::set($bin, self::locateBinary($bin), $persist, $bin);
             }
         }
     }

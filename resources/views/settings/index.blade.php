@@ -57,112 +57,110 @@
     </div>
 @endsection
 
-@section('javascript')
+@push('scripts')
     <script>
-        $(document).ready(function () {
-            $(".toolTip").tooltip();
+        $(".toolTip").tooltip();
 
-            $('#email_backend').change(function () {
-                var type = this.value;
-                if (type === 'sendmail') {
-                    $('.smtp-form').hide();
-                    $('.sendmail-form').show();
-                } else if (type === 'smtp') {
-                    $('.sendmail-form').hide();
-                    $('.smtp-form').show();
-                } else {
-                    $('.smtp-form').hide();
-                    $('.sendmail-form').hide();
-                }
-            }).change(); // trigger initially
-
-            $('#geoloc\\.engine').change(function () {
-                var engine = this.value;
-                if (engine === 'openstreetmap') {
-                    $('.geoloc_api_key').hide();
-                } else {
-                    $('.geoloc_api_key').show();
-                }
-            }).change(); // trigger initially
-
-            // Checkbox config ajax calls
-            $('.section-form-ass input[type=checkbox]').on('switchChange.bootstrapSwitch', function (event, state) {
-                event.preventDefault();
-                var $this = $(this);
-                globalConfigUpdateValue($this, state);
-            }).bootstrapSwitch('offColor', 'danger');
-
-            // Input field config ajax calls
-            $('.section-form input:not([type=checkbox])').on('blur keyup', function (event) {
-                if (event.type === 'keyup' && event.keyCode !== 13) {
-                    return;
-                }
-                event.preventDefault();
-                var $this = $(this);
-                var value = $this.val();
-
-                globalConfigUpdateValue($this, value);
-            });
-
-            $('.section-form select').change(function (event) {
-                event.preventDefault();
-                var $this = $(this);
-                var value = $this.val();
-                globalConfigUpdateValue($this, value);
-            });
-
-            function globalConfigUpdateValue(target, value) {
-                var name = target.attr('name');
-                var original = target.data('original');
-                if (original != value && target[0].checkValidity()) {
-                    $.ajax({
-                        type: 'PUT',
-                        url: '{{ route('settings.update', ['']) }}/' + name,
-                        data: {value: value},
-                        target: target,
-                        dataType: "json",
-                        success: function (data) {
-                            globalConfigUpdateSuccess(this.target, data);
-                        },
-                        error: function (data) {
-                            globalConfigUpdateFailure(this.target, data.responseJSON);
-                        }
-                    });
-                }
+        $('#email_backend').change(function () {
+            var type = this.value;
+            if (type === 'sendmail') {
+                $('.smtp-form').hide();
+                $('.sendmail-form').show();
+            } else if (type === 'smtp') {
+                $('.sendmail-form').hide();
+                $('.smtp-form').show();
+            } else {
+                $('.smtp-form').hide();
+                $('.sendmail-form').hide();
             }
+        }).change(); // trigger initially
 
-            function globalConfigUpdateSuccess(target, data) {
-                target.data('original', target.val());
-                target.closest('.form-group').addClass('has-success');
-                target.next().addClass('fa-check');
-                setTimeout(function () {
-                    target.closest('.form-group').removeClass('has-success');
-                    target.next().removeClass('fa-check');
-                }, 2000);
-                console.log(data.message);
-                toastr.success(data.message || 'Config ' + target.attr('name') + ' updated');
+        $('#geoloc\\.engine').change(function () {
+            var engine = this.value;
+            if (engine === 'openstreetmap') {
+                $('.geoloc_api_key').hide();
+            } else {
+                $('.geoloc_api_key').show();
             }
+        }).change(); // trigger initially
 
-            function globalConfigUpdateFailure(target, data) {
-                if (target.is(':checkbox')) {
-                    console.log(target.data('original'));
-                    target.bootstrapSwitch('state', target.data('original'));
-                } else {
-                    target.val(target.data('original')).change();
-                }
-                target.closest('.form-group').addClass('has-error');
-                target.next().addClass('fa-times');
-                setTimeout(function () {
-                    target.closest('.form-group').removeClass('has-error');
-                    target.next().removeClass('fa-times');
-                }, 2000);
-                toastr.error(data.message || 'Error occurred updating ' + target.attr('name'));
+        // Checkbox config ajax calls
+        $('.section-form input[type=checkbox]').on('switchChange.bootstrapSwitch', function (event, state) {
+            event.preventDefault();
+            var $this = $(this);
+            globalConfigUpdateValue($this, state);
+        }).bootstrapSwitch('offColor', 'danger');
+
+        // Input field config ajax calls
+        $('.section-form input:not([type=checkbox])').on('blur keyup', function (event) {
+            if (event.type === 'keyup' && event.keyCode !== 13) {
+                return;
             }
+            event.preventDefault();
+            var $this = $(this);
+            var value = $this.val();
+
+            globalConfigUpdateValue($this, value);
         });
-    </script>
-@endsection
 
-@section('css')
+        $('.section-form select').change(function (event) {
+            event.preventDefault();
+            var $this = $(this);
+            var value = $this.val();
+            globalConfigUpdateValue($this, value);
+        });
+
+        function globalConfigUpdateValue(target, value) {
+            var name = target.attr('name');
+            var original = target.data('original');
+            if (original != value && target[0].checkValidity()) {
+                $.ajax({
+                    type: 'PUT',
+                    url: '{{ route('settings.update', ['']) }}/' + name,
+                    data: {value: value},
+                    target: target,
+                    dataType: "json",
+                    success: function (data) {
+                        globalConfigUpdateSuccess(this.target, data);
+                    },
+                    error: function (data) {
+                        globalConfigUpdateFailure(this.target, data.responseJSON);
+                    }
+                });
+            }
+        }
+
+        function globalConfigUpdateSuccess(target, data) {
+            target.data('original', target.val());
+            target.closest('.form-group').addClass('has-success');
+            target.next().addClass('fa-check');
+            setTimeout(function () {
+                target.closest('.form-group').removeClass('has-success');
+                target.next().removeClass('fa-check');
+            }, 2000);
+            console.log(data.message);
+            toastr.success(data.message || 'Config ' + target.attr('name') + ' updated');
+        }
+
+        function globalConfigUpdateFailure(target, data) {
+            if (target.is(':checkbox')) {
+                console.log(target.data('original'));
+                target.bootstrapSwitch('state', target.data('original'));
+            } else {
+                target.val(target.data('original')).change();
+            }
+            target.closest('.form-group').addClass('has-error');
+            target.next().addClass('fa-times');
+            setTimeout(function () {
+                target.closest('.form-group').removeClass('has-error');
+                target.next().removeClass('fa-times');
+            }, 2000);
+            toastr.error(data.message || 'Error occurred updating ' + target.attr('name'));
+        }
+    </script>
+@endpush
+
+@push('styles')
     <style>
 
         /* format tabs */
@@ -204,4 +202,4 @@
             border-bottom-color: transparent;
         }
     </style>
-@endsection
+@endpush

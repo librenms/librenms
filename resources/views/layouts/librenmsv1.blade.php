@@ -46,6 +46,7 @@
         <link href="{{ $custom_css }}" rel="stylesheet" type="text/css" />
     @endforeach
     @yield('css')
+    @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js') }}"></script>
@@ -112,5 +113,6 @@
 
 {!! Toastr::render() !!}
 
+@stack('scripts')
 </body>
 </html>
