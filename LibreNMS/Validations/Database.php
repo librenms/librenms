@@ -50,12 +50,14 @@ class Database extends BaseValidation
         $latest = 1000;
 
         if ($current === 0 || $current === $latest) {
+            // Using Laravel migrations
             if (!Schema::isCurrent()) {
                 $validator->fail("Your database is out of date!", './lnms migrate');
                 return;
             }
 
-            if ($migrations = Schema::getUnexpectedMigrations()) {
+            $migrations = Schema::getUnexpectedMigrations();
+            if ($migrations->isNotEmpty()) {
                 $validator->warn("Your database schema has extra migrations (" . $migrations->implode(', ') .
                 "). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
             }

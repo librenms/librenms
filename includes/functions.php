@@ -2522,18 +2522,6 @@ function get_db_schema()
 }
 
 /**
- * Check if the database schema is up to date.
- *
- * @return bool
- */
-function db_schema_is_current()
-{
-    $current = get_db_schema();
-
-    return $current >= 1000;
-}
-
-/**
  * @param $device
  * @return int|null
  */
