@@ -3947,10 +3947,22 @@
         "type": "integer"
     },
     "update": {
-        "default": 1
+        "description": "Enable updates in ./daily.sh",
+        "default": 1,
+        "group": "system",
+        "section": "updates",
+        "type": "boolean"
     },
     "update_channel": {
-        "default": "master"
+        "description": "Set update Channel",
+        "default": "master",
+        "group": "system",
+        "section": "updates",
+        "type": "select",
+        "options": {
+            "master": "master",
+            "release": "release"
+        }
     },
     "uptime_warning": {
         "default": 84600
