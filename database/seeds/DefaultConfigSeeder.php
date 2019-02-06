@@ -414,7 +414,6 @@ class DefaultConfigSeeder extends Seeder
                 "config_default" => "false",
                 "config_descr" => "Enable the return of groups to Oxidized",
                 "config_group" => "external",
-
                 "config_group_order" => "0",
                 "config_sub_group" => "oxidized",
                 "config_sub_group_order" => "0",
