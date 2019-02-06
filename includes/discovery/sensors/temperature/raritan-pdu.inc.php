@@ -35,4 +35,33 @@ if (is_array($raritan_data) && !empty($raritan_data)) {
     $high_limit = $raritan_data['unitTempUpperCritical.0'];
     $current = $raritan_data['unitCpuTemp.0'] / $divisor;
     discover_sensor($valid["sensor"], "temperature", $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
+} else {
+    $multiplier = '1';
+    foreach ($pre_cache['raritan_extSensorConfig'] as $index => $data) {
+        if ($data['externalSensorType'] == 'temperature') {
+            $descr           = $data['externalSensorName'];
+            $oid             = ".1.3.6.1.4.1.13742.6.5.5.3.1.4.$index";
+            $low_limit       = ($data['externalSensorLowerCriticalThreshold'] / $divisor);
+            $low_warn_limit  = ($data['externalSensorLowerWarningThreshold'] / $divisor);
+            $high_limit      = ($data['externalSensorUpperCriticalThreshold'] / $divisor);
+            $high_warn_limit = ($data['externalSensorUpperWarningThreshold'] / $divisor);
+
+            $measure_data = $pre_cache['raritan_extSensorMeasure'][$index];
+            $current      = ($measure_data['measurementsExternalSensorValue'] / $divisor);
+            $sensor_available = $measure_data['measurementsExternalSensorIsAvailable'];
+            $raritan_temp_scale = $data['externalSensorUnits'];
+            $user_func = null;
+            if ($raritan_temp_scale == 'degreeF') {
+                $low_warn_limit = fahrenheit_to_celsius($low_warn_limit, $raritan_temp_scale);
+                $low_limit = fahrenheit_to_celsius($low_limit, $raritan_temp_scale);
+                $high_warn_limit = fahrenheit_to_celsius($high_warn_limit, $raritan_temp_scale);
+                $high_limit = fahrenheit_to_celsius($high_limit, $raritan_temp_scale);
+                $current = fahrenheit_to_celsius($current, $raritan_temp_scale);
+                $user_func = 'fahrenheit_to_celsius';
+            }
+            if (is_numeric($current) && $current >= 0 && $sensor_available === "true") {
+                discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'measurementsExternalSensorValue.'.$index, 'raritan', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
+            }
+        }
+    }
 }

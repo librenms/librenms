@@ -1097,7 +1097,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $sensor_name = $data['state_name'] ?: $data['oid'];
                         create_state_index($sensor_name, $data['states']);
                     } else {
-                        // We default to 1 for both divisors / multipler so it should be safe to do the calculation using both.
+                        // We default to 1 for both divisors / multipliers so it should be safe to do the calculation using both.
                         $value = ($value / $divisor) * $multiplier;
                     }
 

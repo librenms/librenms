@@ -318,6 +318,10 @@ echo "</td></tr>";
         xhr.onprogress = function (e) {
             output.innerHTML = e.currentTarget.responseText;
             output.scrollTop = output.scrollHeight - output.clientHeight; // scrolls the output area
+            if (output.innerHTML.indexOf('Error!') !== -1) {
+                // if error word in output, show the retry button
+                $("#retry-btn").css("display", "");
+            }
         };
         xhr.timeout = 90000; // if no response for 90s, allow the user to retry
         xhr.ontimeout = function (e) {

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 
-class Service extends BaseModel
+class Service extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'service_id';
@@ -56,17 +56,5 @@ class Service extends BaseModel
     public function scopeIsDisabled($query)
     {
         return $query->where('service_disabled', 1);
-    }
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
-    // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id');
     }
 }

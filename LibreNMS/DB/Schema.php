@@ -27,6 +27,7 @@ namespace LibreNMS\DB;
 
 use LibreNMS\Config;
 use Symfony\Component\Yaml\Yaml;
+use \Schema as LaravelSchema;
 
 class Schema
 {
@@ -38,6 +39,51 @@ class Schema
 
     private $relationships;
     private $schema;
+
+    /**
+     * Check the database to see if the migrations have all been run
+     *
+     * @return bool
+     */
+    public static function isCurrent()
+    {
+        if (LaravelSchema::hasTable('migrations')) {
+            return self::getMigrationFiles()->diff(self::getAppliedMigrations())->isEmpty();
+        }
+
+        return false;
+    }
+
+    /**
+     * Check for extra migrations and return them
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getUnexpectedMigrations()
+    {
+        return self::getAppliedMigrations()->diff(self::getMigrationFiles());
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    private static function getMigrationFiles()
+    {
+        $migrations = collect(glob(base_path('database/migrations/') . '*.php'))
+            ->map(function ($migration_file) {
+                return basename($migration_file, '.php');
+            });
+        return $migrations;
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    private static function getAppliedMigrations()
+    {
+        $db = Eloquent::DB()->table('migrations')->pluck('migration');
+        return $db;
+    }
 
     /**
      * Get the primary key column(s) for a table

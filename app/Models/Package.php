@@ -25,22 +25,8 @@
 
 namespace App\Models;
 
-class Package extends BaseModel
+class Package extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'pkg_id';
-
-    // ---- Query Scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
-    // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->hasOne('App/Models/Device', 'device_id', 'device_id');
-    }
 }

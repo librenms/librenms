@@ -1,0 +1,136 @@
+--MibName=raisecom
+-- =======================================================================
+-- Version info 
+-- 
+-- Version 1.0 modified 2012.4.18 by WangMingjuan, add gazelle series 
+-- Version 1.0 modified 2011.12.14 by WangMingjuan
+-- Version 0.1 Created 2003.5.24 by GONGGUIDONG
+-- This version of MIB is created just for management of base and user. 
+-- 
+-- Copyright(c) 2000-2002 by Raisecom  Ltd. 
+
+RAISECOM-BASE-MIB    DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises   FROM RFC1155-SMI;
+		
+-- =======================================================================
+--
+--  Organization  branches
+-- =======================================================================
+
+  raisecom                OBJECT IDENTIFIER ::= { enterprises 8886 }
+
+--  RAISECOM Agent 
+  raisecomAgent           OBJECT IDENTIFIER ::= { raisecom 1 }
+
+-- =======================================================================
+--
+--  products
+-- =======================================================================   
+--  TransmitConvertorSeries Series
+  rc002                   OBJECT IDENTIFIER ::= { raisecom 2 }
+
+--  TransmitPDH Series  1U
+  rc003                   OBJECT IDENTIFIER ::= { raisecom 3 }
+
+--  TransmitPDH Series  10U
+  rc004                   OBJECT IDENTIFIER ::= { raisecom 4 }
+
+--  EOSAccess Series 
+  rc701FE                 OBJECT IDENTIFIER ::= { raisecom 5 }  
+  
+--  ISCOM Series 
+  iscomSeries             OBJECT IDENTIFIER ::= { raisecom 6 }
+  
+--  OPCOM Series 
+  opcomSeries             OBJECT IDENTIFIER ::= { raisecom 7 }  
+  
+--  RAISECOM Manager 
+  raisecomManager         OBJECT IDENTIFIER ::= { raisecom 8 }
+  
+--  TransmitPDH Series PC 
+  pcAgent                 OBJECT IDENTIFIER ::= { raisecom 9 }
+
+--  TransmitPCM Series 
+  pccomSeries             OBJECT IDENTIFIER ::= { raisecom 10 }
+
+--  OEM Series 
+  oemSeries               OBJECT IDENTIFIER ::= { raisecom 11 }   
+  
+--  rc Series 
+  rcSeries                OBJECT IDENTIFIER ::= { raisecom 12 }
+
+--  Common MIB for Optical System Group
+  raisecomOptSysCommon    OBJECT IDENTIFIER ::= { raisecom 15 }
+
+--  ros-light Series 
+  rosliteSeries           OBJECT IDENTIFIER ::= { raisecom 16 }     
+  
+--  draft   
+  draft                   OBJECT IDENTIFIER ::= { raisecom 17 } 
+
+--  PON Series 
+  ponSeries               OBJECT IDENTIFIER ::= { raisecom 18 }
+
+--  TDMoP Series                                                                  
+  tdmopSeries             OBJECT IDENTIFIER ::= { raisecom 19 }    
+  
+--  dlcom Series                                                                  
+  dlcomSeries             OBJECT IDENTIFIER ::= { raisecom 20 }    
+  
+--  raisecomTerminal Series   
+  raisecomTerminalMgmt    OBJECT IDENTIFIER ::= { raisecom 21 }
+  
+--  msg Series 
+  msgSeries               OBJECT IDENTIFIER ::= { raisecom 22 }
+  
+--  iTN Series 
+  iTNSeries               OBJECT IDENTIFIER ::= { raisecom 23 }
+
+--  Gazelle Switch Series 
+  gazelleSwitchSeries     OBJECT IDENTIFIER ::= { raisecom 26 }
+  
+--  Gazelle Transmit Series 
+  gazelleTransmitSeries   OBJECT IDENTIFIER ::= { raisecom 27 }
+  
+--  Gazelle Router Series 
+  gazelleRouterSeries     OBJECT IDENTIFIER ::= { raisecom 28 }
+    
+--  SHENLANXUNTONG Series 
+  shenlanxuntongSeries   OBJECT IDENTIFIER ::= { raisecom 29 }
+	
+--  SHENLANXUNTONG Transmit Series 
+  sltSeries   OBJECT IDENTIFIER ::= { shenlanxuntongSeries   1 }
+  
+-- OTN Product Series
+  otnSeries  OBJECT IDENTIFIER ::= { raisecom 30 }
+
+  
+-- =======================================================================
+--
+--   Common Switch management root MIB
+-- =======================================================================
+--ISCOM Switch  
+  iscomSwitch             OBJECT IDENTIFIER ::= { iscomSeries 1 }
+  
+  
+-- =======================================================================
+--
+--   Common ISCOM PM root MIB
+-- =======================================================================  
+-- ISCOM PM
+  iscomPM                 OBJECT IDENTIFIER ::= { raisecomManager 1 }   
+  
+  
+-- =======================================================================
+--
+--   Common MIB for Optical System Group
+-- =======================================================================
+  optSysMgmt              OBJECT IDENTIFIER ::= { raisecomOptSysCommon 1 }
+  optSysModules           OBJECT IDENTIFIER ::= { raisecomOptSysCommon 2 }
+  optAgentCapability      OBJECT IDENTIFIER ::= { raisecomOptSysCommon 3 }
+  optUdSysMgmt            OBJECT IDENTIFIER ::= { raisecomOptSysCommon 4 }
+  optUdSysModules         OBJECT IDENTIFIER ::= { raisecomOptSysCommon 5 }
+  
+END

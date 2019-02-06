@@ -468,7 +468,7 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = null, $mibdir = null, 
         $oid               = trim($oid);
         $value             = trim($value, "\" \\\n\r");
         list($oid, $index) = explode('.', $oid, 2);
-        if (!strstr($value, 'at this OID') && isset($oid) && isset($index)) {
+        if (!strstr($value, 'at this OID') && !empty($oid)) {
             $array[$index][$oid] = $value;
         }
     }
@@ -673,9 +673,9 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array(), 
     return $array;
 }
 
-function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
+function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0, $mibdir = null, $snmpflags = '-OQUs')
 {
-    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUs', $mib);
+    $cmd = gen_snmpwalk_cmd($device, $oid, $snmpflags, $mib, $mibdir);
     $data = trim(external_exec($cmd));
 
     foreach (explode("\n", $data) as $entry) {

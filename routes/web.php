@@ -21,6 +21,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         return view('laravel');
     });
 
+    // pages
     Route::get('locations', 'LocationController@index');
 
     // old route redirects
@@ -37,30 +38,43 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // Ajax routes
     Route::group(['prefix' => 'ajax'], function () {
-        Route::post('set_resolution', 'ResolutionController@set');
+        // page ajax controllers
         Route::resource('location', 'LocationController', ['only' => ['update', 'destroy']]);
 
+        // misc ajax controllers
+        Route::group(['namespace' => 'Ajax'], function () {
+            Route::post('set_resolution', 'ResolutionController@set');
+            Route::get('netcmd', 'NetCommand@run');
+            Route::post('ripe/raw', 'RipeNccApiController@raw');
+        });
+
+        // form ajax handlers, perhaps should just be page controllers
         Route::group(['prefix' => 'form', 'namespace' => 'Form'], function () {
             Route::resource('widget-settings', 'WidgetSettingsController');
         });
 
+        // js select2 data controllers
         Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
             Route::get('application', 'ApplicationController');
             Route::get('bill', 'BillController');
             Route::get('device', 'DeviceController');
+            Route::get('device-field', 'DeviceFieldController');
             Route::get('device-group', 'DeviceGroupController');
             Route::get('eventlog', 'EventlogController');
             Route::get('graph', 'GraphController');
             Route::get('graph-aggregate', 'GraphAggregateController');
             Route::get('graylog-streams', 'GraylogStreamsController');
             Route::get('syslog', 'SyslogController');
+            Route::get('location', 'LocationController');
             Route::get('munin', 'MuninPluginController');
             Route::get('port', 'PortController');
             Route::get('port-field', 'PortFieldController');
         });
 
+        // jquery bootgrid data controllers
         Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
             Route::post('customers', 'CustomersController');
+            Route::post('device', 'DeviceController');
             Route::post('eventlog', 'EventlogController');
             Route::post('fdb-tables', 'FdbTablesController');
             Route::post('graylog', 'GraylogController');
@@ -69,6 +83,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('syslog', 'SyslogController');
         });
 
+        // dashboard widgets
         Route::group(['prefix' => 'dash', 'namespace' => 'Widgets'], function () {
             Route::post('alerts', 'AlertsController');
             Route::post('availability-map', 'AvailabilityMapController');

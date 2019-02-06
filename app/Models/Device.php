@@ -151,6 +151,18 @@ class Device extends BaseModel
         return $this->hostname;
     }
 
+    public function name()
+    {
+        $displayName = $this->displayName();
+        if ($this->sysName !== $displayName) {
+            return $this->sysName;
+        } elseif ($this->hostname !== $displayName && $this->hostname !== $this->ip) {
+            return $this->hostname;
+        }
+
+        return '';
+    }
+
     public function isUnderMaintenance()
     {
         $query = AlertSchedule::isActive()
@@ -170,6 +182,25 @@ class Device extends BaseModel
             });
 
         return $query->exists();
+    }
+
+    public function loadOs($force = false)
+    {
+        global $config;
+
+        $yaml_file = base_path('/includes/definitions/' . $this->os . '.yaml');
+
+        if ((empty($config['os'][$this->os]['definition_loaded']) || $force) && file_exists($yaml_file)) {
+            $os = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($yaml_file));
+
+            if (isset($config['os'][$this->os])) {
+                $config['os'][$this->os] = array_replace_recursive($os, $config['os'][$this->os]);
+            } else {
+                $config['os'][$this->os] = $os;
+            }
+
+            $config['os'][$this->os]['definition_loaded'] = true;
+        }
     }
 
     /**
@@ -574,5 +605,10 @@ class Device extends BaseModel
     public function vrfs()
     {
         return $this->hasMany('App\Models\Vrf', 'device_id');
+    }
+
+    public function wirelessSensors()
+    {
+        return $this->hasMany('App\Models\WirelessSensor', 'device_id');
     }
 }

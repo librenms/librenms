@@ -46,7 +46,7 @@ If you need to debug the output of poller-wrapper.py then you can add `-d` to th
 #### Poller config
 
 These are the default poller config items. You can globally disable a module by setting it to 0. If you just want to
-disable it for one device then you can do this within the WebUI -> Settings -> Modules.
+disable it for one device then you can do this within the WebUI Device -> Edit -> Modules.
 
 ```php
 $config['poller_modules']['unix-agent']                  = false;

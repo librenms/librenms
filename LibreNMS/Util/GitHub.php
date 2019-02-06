@@ -217,17 +217,9 @@ class GitHub
 
     public function createRelease()
     {
-        // push the changelog
-        $existing = \Requests::get($this->github . '/contents/' . $this->file, $this->getHeaders());
-        $existing_sha = json_decode($existing->body)->sha;
-
-        $updated = Requests::put($this->github . '/contents/' . $this->file, $this->getHeaders(), json_encode([
-            'message' => 'Changelog for ' . $this->tag,
-            'content' => base64_encode(file_get_contents($this->file)),
-            'sha' => $existing_sha,
-        ]));
-
-        $updated_sha = json_decode($updated->body)->commit->sha;
+        // push the changelog and version bump
+        $this->pushFileContents($this->file, file_get_contents($this->file), "Changelog for $this->tag");
+        $updated_sha = $this->pushVersionBump();
 
         // make sure the markdown is built
         if (empty($this->markdown)) {
@@ -267,5 +259,34 @@ class GitHub
         if ($write) {
             $this->writeChangeLog();
         }
+    }
+
+    private function pushVersionBump()
+    {
+        $version_file = 'LibreNMS/Util/Version.php';
+        $contents = file_get_contents(base_path($version_file));
+        $updated_contents = preg_replace("/const VERSION = '[^']+';/", "const VERSION = '$this->tag';", $contents);
+
+        return $this->pushFileContents($version_file, $updated_contents, "Bump version to $this->tag");
+    }
+
+    /**
+     * @param string $file Path in git repo
+     * @param string $contents new file contents
+     * @param string $message The commit message
+     * @return \Requests_Response
+     */
+    private function pushFileContents($file, $contents, $message)
+    {
+        $existing = \Requests::get($this->github . '/contents/' . $file, $this->getHeaders());
+        $existing_sha = json_decode($existing->body)->sha;
+
+        $updated = Requests::put($this->github . '/contents/' . $file, $this->getHeaders(), json_encode([
+            'message' => $message,
+            'content' => base64_encode($contents),
+            'sha' => $existing_sha,
+        ]));
+
+        return json_decode($updated->body)->commit->sha;
     }
 }

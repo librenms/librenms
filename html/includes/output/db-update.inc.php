@@ -57,12 +57,21 @@ $db_vars = array(
 ]);
 
 
-\Artisan::call('migrate', ['--seed' => true, '--force' => true , '--database' => 'setup']);
-$fp = \Artisan::output();
 echo "Starting Update...\n";
+try {
+    $ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true, '--database' => 'setup']);
 
-if ($fp) {
-    echo $fp;
+    echo \Artisan::output();
+
+    if ($ret == 0 && \LibreNMS\DB\Schema::isCurrent()) {
+        echo "\n\nSuccess!";
+    } else {
+        echo "\n\nError!";
+        http_response_code(500);
+    }
+} catch (Exception $e) {
+    echo $e->getMessage() . "\n\nError!";
+    http_response_code(500);
 }
 
 ob_end_flush();

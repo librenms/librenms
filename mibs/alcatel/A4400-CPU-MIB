@@ -1,0 +1,63 @@
+A4400-CPU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises FROM RFC1155-SMI
+        OBJECT-TYPE FROM RFC-1212
+;
+
+alcatel		OBJECT IDENTIFIER ::= { enterprises 637 }
+abs		OBJECT IDENTIFIER ::= { alcatel 64 }
+a4400		OBJECT IDENTIFIER ::= { abs 4400 }
+
+-- -------------------------- --
+-- Mib definition begins here --
+-- -------------------------- --
+a4400CPU        OBJECT IDENTIFIER ::= { a4400 1 }
+
+-- returned to:  .iso.org.dod.internet.mgmt.mib-2.system.sysObjectID.0
+-- (mib version 1)
+pbxAgent        OBJECT IDENTIFIER ::= { a4400CPU 1 }
+
+-- hpux9		OBJECT IDENTIFIER ::= { pbxAgent 1 }
+-- hpux10		OBJECT IDENTIFIER ::= { pbxAgent 6 }
+-- sunos4		OBJECT IDENTIFIER ::= { pbxAgent 2 }
+-- solaris		OBJECT IDENTIFIER ::= { pbxAgent 3 }
+-- osf			OBJECT IDENTIFIER ::= { pbxAgent 4 }
+-- ultrix		OBJECT IDENTIFIER ::= { pbxAgent 5 }
+-- netbsd1		OBJECT IDENTIFIER ::= { pbxAgent 7 }
+-- freebsd		OBJECT IDENTIFIER ::= { pbxAgent 8 }
+-- irix			OBJECT IDENTIFIER ::= { pbxAgent 9 }
+linux           OBJECT IDENTIFIER ::= { pbxAgent 10 }
+-- bsdi		       OBJECT IDENTIFIER ::= { pbxAgent 11 }
+-- openbsd		OBJECT IDENTIFIER ::= { pbxAgent 12 }
+unknown         OBJECT IDENTIFIER ::= { pbxAgent 255 }
+
+-- mib version (currently 1)
+--
+pbxMibVersion   OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The PBX MIB Version."
+		::= { a4400CPU 0 }
+
+-- returned the PBX State (string).
+-- (mib version 1)
+pbxState	OBJECT-TYPE
+                SYNTAX INTEGER {
+		       indeterminate(0),
+		       critical(1),
+		       major(2),
+		       minor(3),
+		       warning(4),
+		       normal(5)
+		}
+                ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The PBX state as defined by the trap manager."
+		::= { a4400CPU 2 }
+
+END
+
