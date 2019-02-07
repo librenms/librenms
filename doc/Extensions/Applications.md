@@ -855,7 +855,7 @@ extend postgres /etc/snmp/postgres
 
 4: Restart snmpd on your host
 
-5: Install the Nagios check check_postgres.pl on your system.
+5: Install the Nagios check check_postgres.pl on your system: https://github.com/bucardo/check_postgres
 
 6: Verify the path to check_postgres.pl in /etc/snmp/postgres is correct.
 
