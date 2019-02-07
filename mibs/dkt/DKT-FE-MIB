@@ -1,0 +1,1415 @@
+DKT-FE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+    Counter32                   FROM SNMPv2-SMI
+    OBJECT-GROUP				FROM SNMPv2-CONF
+    dkt                         FROM DKT-MIB;
+
+feMIB MODULE-IDENTITY
+    LAST-UPDATED  "200812170000Z"
+    ORGANIZATION "DKT A/S"
+    CONTACT-INFO
+        "postal:  DKT A/S
+                  Fanoevej 6
+                  DK-4060 Kirke Saaby
+                  Denmark
+
+         email:   info@dktcomega.com"
+    DESCRIPTION   "DKT Fast Ethernet MIB."
+    ::= { dkt 12 }
+
+feSwitchEngine OBJECT IDENTIFIER ::= { feMIB 1 }
+
+
+feATU OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..20480))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Dumps the Address Translation Unit (ATU) Switch table in semi colon format" 
+    ::= { feSwitchEngine 1 }
+
+feUnicastDelete
+ OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Removes a unicast MAC address from the Address Translation Unit (ATU) Switch table."
+    ::= { feSwitchEngine 2 }
+
+feMulticastDelete
+ OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Removes a multicast IP address from the Address Translation Unit (ATU) Switch table."
+    ::= { feSwitchEngine 3 }
+
+feIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Starts/stops IGMP snooping, input parameter 0 = stops IGMP snooping, 1 = starts IGMP snooping. Per Default IGMP snooping is enabled, but has to be configured per port"
+    ::= { feSwitchEngine 4 }
+
+feVTU OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..9600))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Dumps the VLAN Table Unit (VTU) Switch table in semi colon format"  
+    ::= { feSwitchEngine 5 }
+
+feVLANCreate OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Creates a VLAN, input parameters are: VID:WAN:LAN1:LAN2:LAN3:LAN4:CPU:NRL-ENABLE"
+    ::= { feSwitchEngine 6 }
+
+feVLANDelete OBJECT-TYPE
+    SYNTAX	INTEGER (0..4095)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Deletes a VLAN, input parameter is VLAN VID: 0 - 4095"
+    ::= { feSwitchEngine 7 }
+
+feClearVTU OBJECT-TYPE
+    SYNTAX	INTEGER (1)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Clears the VLAN Table Unit (VTU) Switch table, input parameter 1 = clear VTU table"
+    ::= { feSwitchEngine 8 }
+
+feDumpPIRLBuckets OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Dumps a list of the active buckets."
+    ::= { feSwitchEngine 9 }
+
+feDisablePIRLBucket OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Disables an already defined Port Ingress Rate Limitation (PIRL) bucket, input parameter bucket 0 - 11."
+    ::= { feSwitchEngine 10 }
+
+feVLANProviderMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enable/disable VLAN provider mode, input parameter 0 = disable VLAN provider mode, 1 = enable VLAN provider mode. Per Default VLAN provider mode is disabled. NOTE: Provider VLAN ID should be setup in port default VID for the originating port."
+    ::= { feSwitchEngine 11 }
+
+fePorts OBJECT IDENTIFIER ::= { feMIB 2 }
+
+feCPUPort OBJECT IDENTIFIER ::= { fePorts 1 }
+
+feCPUPortAutoNegotiation OBJECT-TYPE
+    SYNTAX	INTEGER (0..10)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Enables/disables auto negotiation on the port. Set to 1 for enable and 0 for disable."
+    ::= { feCPUPort 1 }
+
+feCPUPortSpeedMode OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Sets/gets the speed and duplex mode on the port. Input parameters are: 100FD|100HD|10FD|10HD|AUTO|FD|HD"
+    ::= { feCPUPort 2 }
+
+
+feCPUPortLinkStatus OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Gets the Link status for the port"
+    ::= { feCPUPort 3 }
+
+
+feCPUPortFlowControl OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables flow control on the port. Set to 1 for enable and 0 for disable."
+    ::= { feCPUPort 4 }
+
+
+feCPUPortIEEEQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on there IEEE priority tags. Set to 1 for enable and 0 for disable."
+    ::= { feCPUPort 5 }
+
+
+feCPUPortIPQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on their IP4/IP6 priority fields. Set to 1 for enable and 0 for disable."
+    ::= { feCPUPort 6 }
+
+feCPUPortFramePriorityOverwrite OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Source Address(SA) or Destination Address(DA) Frame Priority Override on an ATU match. XX_FRAME_PRIO_OVERRIDE=0..1."
+    ::= { feCPUPort 7 }
+
+
+feCPUPortQueuePriorityOverwrite OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Source Address(SA) or Destination Address(SA) Queue Priority Override on an ATU match. XX_QUEUE_PRIO_OVERRIDE=0..1."
+    ::= { feCPUPort 8 }
+
+
+feCPUPortQueuePriority OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Queue priority, input parameters: PRIO:ENABLE     PRIO: 0 - 7  ENABLE: 0 - 1  "
+    ::= { feCPUPort 9 }
+
+
+feCPUPortQoSPortMapRule OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces queue priority for a port. Set to 1 for enable and 0 for disable."
+    ::= { feCPUPort 10 }
+
+
+feCPUPortVIDNRLEnable OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables per port the Non rate limit for VLANs with the NRL bit enabled. Set to 1 for enable and 0 for disable."
+    ::= { feCPUPort 11 }
+
+
+feCPUPortMap2PIRL OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds/maps the port to a Port Ingress Rate Limitation (PIRL) bucket. Input parameter is PIRL bucket no 0 - 11."
+    ::= { feCPUPort 12 }
+
+
+feCPUPortDeletePortMap2PIRL OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Deletes the port from a Port Ingress Rate Limitation (PIRL) bucket. Input parameter is PIRL bucket no 0 - 11."
+    ::= { feCPUPort 13 }
+
+
+feCPUPortEgressRateLimitation OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the egress limitation rate for the port. Input parameter is value in kbps"
+    ::= { feCPUPort 14 }
+
+
+feCPUPortIngressRateLimitation OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets a Port Input Rate Limit(PIRL) bucket. Input parameters are: bucket:rate:layer:(DROP|FC)"
+    ::= { feCPUPort 15 }
+
+
+feCPUPortDefaultVLAN OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the default VLAN ID(VID) for the port. Input parameter is 0 - 4095"
+    ::= { feCPUPort 16 }
+
+
+feCPUPortForceDefaultVID OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces the tagging of VID on all frames on the port. Set to 1 for enable and 0 for disable."
+    ::= { feCPUPort 17 }
+
+
+feCPUPortVLANPortMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..3)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the 802.1Q mode for the ingress port.
+       Mode either 0=disable,
+                   1=fallback,
+                   2=check,
+                   3=secure"
+    ::= { feCPUPort 18 }
+
+
+feCPUPortBlockAllUnknown OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"This will make sure that all frames received on the port are blocked, unless they are tagged with the correct VID."
+    ::= { feCPUPort 19 }
+
+
+feCPUPortIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables IGMP snooping. Set to 1 for enable and 0 for disable."
+    ::= { feCPUPort 20 }
+
+
+feCPUPortAddUnicast OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the unicast mac address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aa:bb:cc:dd:ee:ff"
+    ::= { feCPUPort 21 }
+
+
+feCPUPortAddMulticast OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the IP multicast address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aaa.bbb.ccc.ddd"
+    ::= { feCPUPort 22 }
+
+
+
+
+feWANPort OBJECT IDENTIFIER ::= { fePorts 2 }
+
+feWANPortAutoNegotiation OBJECT-TYPE
+    SYNTAX	INTEGER (0..10)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Enables/disables auto negotiation on the port. Set to 1 for enable and 0 for disable."
+    ::= { feWANPort 1 }
+
+feWANPortSpeedMode OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Sets/gets the speed and duplex mode on the port. Valid values are (100FD|100HD|10FD|10HD|AUTO|FD|HD)"
+    ::= { feWANPort 2 }
+
+
+feWANPortLinkStatus OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Gets the Link status for the port"
+    ::= { feWANPort 3 }
+
+
+feWANPortFlowControl OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables flow control on the port. Set to 1 for enable and 0 for disable."
+    ::= { feWANPort 4 }
+
+
+feWANPortIEEEQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on there IEEE priority tags. Set to 1 for enable and 0 for disable."
+    ::= { feWANPort 5 }
+
+
+feWANPortIPQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on their IP4/IP6 priority fields. Set to 1 for enable and 0 for disable."
+    ::= { feWANPort 6 }
+
+feWANPortFramePriorityOverwrite OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Source Address(SA) or Destination Address(DA) Frame Priority Override on an ATU match. XX_FRAME_PRIO_OVERRIDE=0..1."
+    ::= { feWANPort 7 }
+
+
+feWANPortQueuePriorityOverwrite OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Source Address(SA) or Destination Address(SA) Queue Priority Override on an ATU match. XX_QUEUE_PRIO_OVERRIDE=0..1."
+    ::= { feWANPort 8 }
+
+
+feWANPortQueuePriority OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Queue priority, input parameters: PRIO:ENABLE     PRIO: 0 - 7  ENABLE: 0 - 1  "
+    ::= { feWANPort 9 }
+
+
+feWANPortQoSPortMapRule OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces queue priority for a port. Set to 1 for enable and 0 for disable."
+    ::= { feWANPort 10 }
+
+
+feWANPortVIDNRLEnable OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables per port the Non rate limit for VLANs with the NRL bit enabled. Set to 1 for enable and 0 for disable."
+    ::= { feWANPort 11 }
+
+
+feWANPortMap2PIRL OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds/maps the port to a Port Ingress Rate Limitation (PIRL) bucket. Input parameter is PIRL bucket no 0 - 11."
+    ::= { feWANPort 12 }
+
+
+feWANPortDeletePortMap2PIRL OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Deletes the port from a Port Ingress Rate Limitation (PIRL) bucket. Input parameter is PIRL bucket no 0 - 11."
+    ::= { feWANPort 13 }
+
+
+feWANPortEgressRateLimitation OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the egress limitation rate for the port. Input parameter is value in kbps"
+    ::= { feWANPort 14 }
+
+
+feWANPortIngressRateLimitation OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Sets a Port Input Rate Limit(PIRL) bucket. Input parameters are: bucket:rate:layer:(DROP|FC)"
+    ::= { feWANPort 15 }
+
+
+feWANPortDefaultVLAN OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the default VLAN ID(VID) for the port. Input parameter is 0 - 4095"
+    ::= { feWANPort 16 }
+
+
+feWANPortForceDefaultVID OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces the tagging of VID on all frames on the port. Set to 1 for enable and 0 for disable."
+    ::= { feWANPort 17 }
+
+
+feWANPortVLANPortMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..3)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the 802.1Q mode for the ingress port.
+       Mode either 0=disable,
+                   1=fallback,
+                   2=check,
+                   3=secure"
+    ::= { feWANPort 18 }
+
+
+feWANPortBlockAllUnknown OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"This will make sure that all frames received on the port are blocked, unless they are tagged with the correct VID."
+    ::= { feWANPort 19 }
+
+
+feWANPortIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables IGMP snooping. Set to 1 for enable and 0 for disable."
+    ::= { feWANPort 20 }
+
+
+feWANPortAddUnicast OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the unicast mac address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aa:bb:cc:dd:ee:ff"
+    ::= { feWANPort 21 }
+
+
+feWANPortAddMulticast OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the IP multicast address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aaa.bbb.ccc.ddd"
+    ::= { feWANPort 22 }
+
+
+feWANPortArpMirroring OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Mirror ARP packets seen on the port to the CPU port."
+    ::= { feWANPort 23 }
+
+
+feLAN1Port OBJECT IDENTIFIER ::= { fePorts 3 }
+
+feLAN1PortAutoNegotiation OBJECT-TYPE
+    SYNTAX	INTEGER (0..10)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Enables/disables auto negotiation on the port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN1Port 1 }
+
+feLAN1PortSpeedMode OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Sets/gets the speed and duplex mode on the port. Valid values are (100FD|100HD|10FD|10HD|AUTO|FD|HD)"
+    ::= { feLAN1Port 2 }
+
+
+feLAN1PortLinkStatus OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Gets the Link status for the port"
+    ::= { feLAN1Port 3 }
+
+
+feLAN1PortFlowControl OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables flow control on the port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN1Port 4 }
+
+
+feLAN1PortIEEEQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on there IEEE priority tags. Set to 1 for enable and 0 for disable."
+    ::= { feLAN1Port 5 }
+
+
+feLAN1PortIPQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on their IP4/IP6 priority fields. Set to 1 for enable and 0 for disable."
+    ::= { feLAN1Port 6 }
+
+feLAN1PortFramePriorityOverwrite OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Source Address(SA) or Destination Address(DA) Frame Priority Override on an ATU match. XX_FRAME_PRIO_OVERRIDE=0..1."
+    ::= { feLAN1Port 7 }
+
+
+feLAN1PortQueuePriorityOverwrite OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Source Address(SA) or Destination Address(SA) Queue Priority Override on an ATU match. XX_QUEUE_PRIO_OVERRIDE=0..1."
+    ::= { feLAN1Port 8 }
+
+
+feLAN1PortQueuePriority OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Queue priority, input parameters: PRIO:ENABLE     PRIO: 0 - 7  ENABLE: 0 - 1  "
+    ::= { feLAN1Port 9 }
+
+
+feLAN1PortQoSPortMapRule OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces queue priority for a port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN1Port 10 }
+
+
+feLAN1PortVIDNRLEnable OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables per port the Non rate limit for VLANs with the NRL bit enabled. Set to 1 for enable and 0 for disable."
+    ::= { feLAN1Port 11 }
+
+
+feLAN1PortMap2PIRL OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds/maps the port to a Port Ingress Rate Limitation (PIRL) bucket. Input parameter is PIRL bucket no 0 - 11."
+    ::= { feLAN1Port 12 }
+
+
+feLAN1PortDeletePortMap2PIRL OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Deletes the port from a Port Ingress Rate Limitation (PIRL) bucket. Input parameter is PIRL bucket no 0 - 11."
+    ::= { feLAN1Port 13 }
+
+
+feLAN1PortEgressRateLimitation OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the egress limitation rate for the port. Input parameter is value in kbps"
+    ::= { feLAN1Port 14 }
+
+
+feLAN1PortIngressRateLimitation OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Sets a Port Input Rate Limit(PIRL) bucket. Input parameters are: bucket:rate:layer:(DROP|FC)"
+    ::= { feLAN1Port 15 }
+
+
+feLAN1PortDefaultVLAN OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the default VLAN ID(VID) for the port. Input parameter is 0 - 4095"
+    ::= { feLAN1Port 16 }
+
+
+feLAN1PortForceDefaultVID OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces the tagging of VID on all frames on the port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN1Port 17 }
+
+
+feLAN1PortVLANPortMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..3)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the 802.1Q mode for the ingress port.
+       Mode either 0=disable,
+                   1=fallback,
+                   2=check,
+                   3=secure"
+    ::= { feLAN1Port 18 }
+
+
+feLAN1PortBlockAllUnknown OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"This will make sure that all frames received on the port are blocked, unless they are tagged with the correct VID."
+    ::= { feLAN1Port 19 }
+
+
+feLAN1PortIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables IGMP snooping. Set to 1 for enable and 0 for disable."
+    ::= { feLAN1Port 20 }
+
+
+feLAN1PortAddUnicast OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the unicast mac address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aa:bb:cc:dd:ee:ff"
+    ::= { feLAN1Port 21 }
+
+
+feLAN1PortAddMulticast OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the IP multicast address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aaa.bbb.ccc.ddd"
+    ::= { feLAN1Port 22 }
+
+
+feLAN1PortArpMirroring OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Mirror ARP packets seen on the port to the CPU port."
+    ::= { feLAN1Port 23 }
+
+
+
+feLAN2Port OBJECT IDENTIFIER ::= { fePorts 4 }
+
+feLAN2PortAutoNegotiation OBJECT-TYPE
+    SYNTAX	INTEGER (0..10)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Enables/disables auto negotiation on the port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN2Port 1 }
+
+feLAN2PortSpeedMode OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Sets/gets the speed and duplex mode on the port. Valid values are (100FD|100HD|10FD|10HD|AUTO|FD|HD)"
+    ::= { feLAN2Port 2 }
+
+
+feLAN2PortLinkStatus OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Gets the Link status for the port"
+    ::= { feLAN2Port 3 }
+
+
+feLAN2PortFlowControl OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables flow control on the port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN2Port 4 }
+
+
+feLAN2PortIEEEQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on there IEEE priority tags. Set to 1 for enable and 0 for disable."
+    ::= { feLAN2Port 5 }
+
+
+feLAN2PortIPQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on their IP4/IP6 priority fields. Set to 1 for enable and 0 for disable."
+    ::= { feLAN2Port 6 }
+
+feLAN2PortFramePriorityOverwrite OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Source Address(SA) or Destination Address(DA) Frame Priority Override on an ATU match. XX_FRAME_PRIO_OVERRIDE=0..1."
+    ::= { feLAN2Port 7 }
+
+
+feLAN2PortQueuePriorityOverwrite OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Source Address(SA) or Destination Address(SA) Queue Priority Override on an ATU match. XX_QUEUE_PRIO_OVERRIDE=0..1."
+    ::= { feLAN2Port 8 }
+
+
+feLAN2PortQueuePriority OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Queue priority, input parameters: PRIO:ENABLE     PRIO: 0 - 7  ENABLE: 0 - 1  "
+    ::= { feLAN2Port 9 }
+
+
+feLAN2PortQoSPortMapRule OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces queue priority for a port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN2Port 10 }
+
+
+feLAN2PortVIDNRLEnable OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables per port the Non rate limit for VLANs with the NRL bit enabled. Set to 1 for enable and 0 for disable."
+    ::= { feLAN2Port 11 }
+
+
+feLAN2PortMap2PIRL OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds/maps the port to a Port Ingress Rate Limitation (PIRL) bucket. Input parameter is PIRL bucket no 0 - 11."
+    ::= { feLAN2Port 12 }
+
+
+feLAN2PortDeletePortMap2PIRL OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Deletes the port from a Port Ingress Rate Limitation (PIRL) bucket. Input parameter is PIRL bucket no 0 - 11."
+    ::= { feLAN2Port 13 }
+
+
+feLAN2PortEgressRateLimitation OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the egress limitation rate for the port. Input parameter is value in kbps"
+    ::= { feLAN2Port 14 }
+
+
+feLAN2PortIngressRateLimitation OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Sets a Port Input Rate Limit(PIRL) bucket. Input parameters are: bucket:rate:layer:(DROP|FC)"
+    ::= { feLAN2Port 15 }
+
+
+feLAN2PortDefaultVLAN OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the default VLAN ID(VID) for the port. Input parameter is 0 - 4095"
+    ::= { feLAN2Port 16 }
+
+
+feLAN2PortForceDefaultVID OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces the tagging of VID on all frames on the port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN2Port 17 }
+
+
+feLAN2PortVLANPortMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..3)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the 802.1Q mode for the ingress port.
+       Mode either 0=disable,
+                   1=fallback,
+                   2=check,
+                   3=secure"
+    ::= { feLAN2Port 18 }
+
+
+feLAN2PortBlockAllUnknown OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"This will make sure that all frames received on the port are blocked, unless they are tagged with the correct VID."
+    ::= { feLAN2Port 19 }
+
+
+feLAN2PortIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables IGMP snooping. Set to 1 for enable and 0 for disable."
+    ::= { feLAN2Port 20 }
+
+
+feLAN2PortAddUnicast OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the unicast mac address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aa:bb:cc:dd:ee:ff"
+    ::= { feLAN2Port 21 }
+
+
+feLAN2PortAddMulticast OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the IP multicast address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aaa.bbb.ccc.ddd"
+    ::= { feLAN2Port 22 }
+
+
+feLAN2PortArpMirroring OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Mirror ARP packets seen on the port to the CPU port."
+    ::= { feLAN2Port 23 }
+
+
+feLAN3Port OBJECT IDENTIFIER ::= { fePorts 5 }
+
+feLAN3PortAutoNegotiation OBJECT-TYPE
+    SYNTAX	INTEGER (0..10)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Enables/disables auto negotiation on the port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN3Port 1 }
+
+feLAN3PortSpeedMode OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Sets/gets the speed and duplex mode on the port. Valid values are (100FD|100HD|10FD|10HD|AUTO|FD|HD)"
+    ::= { feLAN3Port 2 }
+
+
+feLAN3PortLinkStatus OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Gets the Link status for the port"
+    ::= { feLAN3Port 3 }
+
+
+feLAN3PortFlowControl OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables flow control on the port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN3Port 4 }
+
+
+feLAN3PortIEEEQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on there IEEE priority tags. Set to 1 for enable and 0 for disable."
+    ::= { feLAN3Port 5 }
+
+
+feLAN3PortIPQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on their IP4/IP6 priority fields. Set to 1 for enable and 0 for disable."
+    ::= { feLAN3Port 6 }
+
+feLAN3PortFramePriorityOverwrite OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Source Address(SA) or Destination Address(DA) Frame Priority Override on an ATU match. XX_FRAME_PRIO_OVERRIDE=0..1."
+    ::= { feLAN3Port 7 }
+
+
+feLAN3PortQueuePriorityOverwrite OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Source Address(SA) or Destination Address(SA) Queue Priority Override on an ATU match. XX_QUEUE_PRIO_OVERRIDE=0..1."
+    ::= { feLAN3Port 8 }
+
+
+feLAN3PortQueuePriority OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Queue priority, input parameters: PRIO:ENABLE     PRIO: 0 - 7  ENABLE: 0 - 1  "
+    ::= { feLAN3Port 9 }
+
+
+feLAN3PortQoSPortMapRule OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces queue priority for a port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN3Port 10 }
+
+
+feLAN3PortVIDNRLEnable OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables per port the Non rate limit for VLANs with the NRL bit enabled. Set to 1 for enable and 0 for disable."
+    ::= { feLAN3Port 11 }
+
+
+feLAN3PortMap2PIRL OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds/maps the port to a Port Ingress Rate Limitation (PIRL) bucket. Input parameter is PIRL bucket no 0 - 11."
+    ::= { feLAN3Port 12 }
+
+
+feLAN3PortDeletePortMap2PIRL OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Deletes the port from a Port Ingress Rate Limitation (PIRL) bucket. Input parameter is PIRL bucket no 0 - 11."
+    ::= { feLAN3Port 13 }
+
+
+feLAN3PortEgressRateLimitation OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the egress limitation rate for the port. Input parameter is value in kbps"
+    ::= { feLAN3Port 14 }
+
+
+feLAN3PortIngressRateLimitation OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Sets a Port Input Rate Limit(PIRL) bucket. Input parameters are: bucket:rate:layer:(DROP|FC)"
+    ::= { feLAN3Port 15 }
+
+
+feLAN3PortDefaultVLAN OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the default VLAN ID(VID) for the port. Input parameter is 0 - 4095"
+    ::= { feLAN3Port 16 }
+
+
+feLAN3PortForceDefaultVID OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces the tagging of VID on all frames on the port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN3Port 17 }
+
+
+feLAN3PortVLANPortMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..3)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the 802.1Q mode for the ingress port.
+       Mode either 0=disable,
+                   1=fallback,
+                   2=check,
+                   3=secure"
+    ::= { feLAN3Port 18 }
+
+
+feLAN3PortBlockAllUnknown OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"This will make sure that all frames received on the port are blocked, unless they are tagged with the correct VID."
+    ::= { feLAN3Port 19 }
+
+
+feLAN3PortIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables IGMP snooping. Set to 1 for enable and 0 for disable."
+    ::= { feLAN3Port 20 }
+
+
+feLAN3PortAddUnicast OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the unicast mac address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aa:bb:cc:dd:ee:ff"
+    ::= { feLAN3Port 21 }
+
+
+feLAN3PortAddMulticast OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the IP multicast address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aaa.bbb.ccc.ddd"
+    ::= { feLAN3Port 22 }
+
+
+feLAN3PortArpMirroring OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Mirror ARP packets seen on the port to the CPU port."
+    ::= { feLAN3Port 23 }
+
+
+feLAN4Port OBJECT IDENTIFIER ::= { fePorts 6 }
+
+feLAN4PortAutoNegotiation OBJECT-TYPE
+    SYNTAX	INTEGER (0..10)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Enables/disables auto negotiation on the port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN4Port 1 }
+
+feLAN4PortSpeedMode OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Sets/gets the speed and duplex mode on the port. Valid values are (100FD|100HD|10FD|10HD|AUTO|FD|HD)"
+    ::= { feLAN4Port 2 }
+
+
+feLAN4PortLinkStatus OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Gets the Link status for the port"
+    ::= { feLAN4Port 3 }
+
+
+feLAN4PortFlowControl OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables flow control on the port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN4Port 4 }
+
+
+feLAN4PortIEEEQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on there IEEE priority tags. Set to 1 for enable and 0 for disable."
+    ::= { feLAN4Port 5 }
+
+
+feLAN4PortIPQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on their IP4/IP6 priority fields. Set to 1 for enable and 0 for disable."
+    ::= { feLAN4Port 6 }
+
+feLAN4PortFramePriorityOverwrite OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Source Address(SA) or Destination Address(DA) Frame Priority Override on an ATU match. XX_FRAME_PRIO_OVERRIDE=0..1."
+    ::= { feLAN4Port 7 }
+
+
+feLAN4PortQueuePriorityOverwrite OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Source Address(SA) or Destination Address(SA) Queue Priority Override on an ATU match. XX_QUEUE_PRIO_OVERRIDE=0..1."
+    ::= { feLAN4Port 8 }
+
+
+feLAN4PortQueuePriority OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Queue priority, input parameters: PRIO:ENABLE     PRIO: 0 - 7  ENABLE: 0 - 1  "
+    ::= { feLAN4Port 9 }
+
+
+feLAN4PortQoSPortMapRule OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces queue priority for a port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN4Port 10 }
+
+
+feLAN4PortVIDNRLEnable OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables per port the Non rate limit for VLANs with the NRL bit enabled. Set to 1 for enable and 0 for disable."
+    ::= { feLAN4Port 11 }
+
+
+feLAN4PortMap2PIRL OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds/maps the port to a Port Ingress Rate Limitation (PIRL) bucket. Input parameter is PIRL bucket no 0 - 11."
+    ::= { feLAN4Port 12 }
+
+
+feLAN4PortDeletePortMap2PIRL OBJECT-TYPE
+    SYNTAX	INTEGER (0..11)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Deletes the port from a Port Ingress Rate Limitation (PIRL) bucket. Input parameter is PIRL bucket no 0 - 11."
+    ::= { feLAN4Port 13 }
+
+
+feLAN4PortEgressRateLimitation OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the egress limitation rate for the port. Input parameter is value in kbps"
+    ::= { feLAN4Port 14 }
+
+
+feLAN4PortIngressRateLimitation OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Sets a Port Input Rate Limit(PIRL) bucket. Input parameters are: bucket:rate:layer:(DROP|FC)"
+    ::= { feLAN4Port 15 }
+
+
+feLAN4PortDefaultVLAN OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the default VLAN ID(VID) for the port. Input parameter is 0 - 4095"
+    ::= { feLAN4Port 16 }
+
+
+feLAN4PortForceDefaultVID OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces the tagging of VID on all frames on the port. Set to 1 for enable and 0 for disable."
+    ::= { feLAN4Port 17 }
+
+
+feLAN4PortVLANPortMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..3)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the 802.1Q mode for the ingress port.
+       Mode either 0=disable,
+                   1=fallback,
+                   2=check,
+                   3=secure"
+    ::= { feLAN4Port 18 }
+
+
+feLAN4PortBlockAllUnknown OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"This will make sure that all frames received on the port are blocked, unless they are tagged with the correct VID."
+    ::= { feLAN4Port 19 }
+
+
+feLAN4PortIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables IGMP snooping. Set to 1 for enable and 0 for disable."
+    ::= { feLAN4Port 20 }
+
+
+feLAN4PortAddUnicast OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the unicast mac address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aa:bb:cc:dd:ee:ff"
+    ::= { feLAN4Port 21 }
+
+
+feLAN4PortAddMulticast OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the IP multicast address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aaa.bbb.ccc.ddd"
+    ::= { feLAN4Port 22}
+
+feLAN4PortArpMirroring OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Mirror ARP packets seen on the port to the CPU port."
+    ::= { feLAN4Port 23 }
+
+
+
+
+feModuleGroup OBJECT-GROUP
+	OBJECTS {
+		feSwitchEngine,
+		feATU,
+		feUnicastDelete,
+		feMulticastDelete,
+		feIGMPSnooping,
+		feVTU,
+		feVLANCreate,
+		feVLANDelete,
+		feClearVTU,
+		feDumpPIRLBuckets,
+		feDisablePIRLBucket,
+		feVLANProviderMode,
+		fePorts,
+		feCPUPort,
+		feCPUPortAutoNegotiation, feCPUPortSpeedMode, feCPUPortLinkStatus, feCPUPortFlowControl, feCPUPortIEEEQoSPriority, feCPUPortIPQoSPriority, feCPUPortFramePriorityOverwrite, feCPUPortQueuePriorityOverwrite, feCPUPortQueuePriority, feCPUPortQoSPortMapRule, feCPUPortVIDNRLEnable, feCPUPortMap2PIRL, feCPUPortDeletePortMap2PIRL, feCPUPortEgressRateLimitation, feCPUPortIngressRateLimitation, feCPUPortDefaultVLAN, feCPUPortForceDefaultVID, feCPUPortVLANPortMode, feCPUPortBlockAllUnknown, feCPUPortIGMPSnooping, feCPUPortAddUnicast, feCPUPortAddMulticast, 
+		feWANPort,
+		feWANPortAutoNegotiation, feWANPortSpeedMode, feWANPortLinkStatus, feWANPortFlowControl, feWANPortIEEEQoSPriority, feWANPortIPQoSPriority, feWANPortFramePriorityOverwrite, feWANPortQueuePriorityOverwrite, feWANPortQueuePriority, feWANPortQoSPortMapRule, feWANPortVIDNRLEnable, feWANPortMap2PIRL, feWANPortDeletePortMap2PIRL, feWANPortEgressRateLimitation, feWANPortIngressRateLimitation, feWANPortDefaultVLAN, feWANPortForceDefaultVID, feWANPortVLANPortMode, feWANPortBlockAllUnknown, feWANPortIGMPSnooping, feWANPortAddUnicast, feWANPortAddMulticast, feWANPortArpMirroring, 
+		feLAN1Port,
+		feLAN1PortAutoNegotiation, feLAN1PortSpeedMode, feLAN1PortLinkStatus, feLAN1PortFlowControl, feLAN1PortIEEEQoSPriority, feLAN1PortIPQoSPriority, feLAN1PortFramePriorityOverwrite, feLAN1PortQueuePriorityOverwrite, feLAN1PortQueuePriority, feLAN1PortQoSPortMapRule, feLAN1PortVIDNRLEnable, feLAN1PortMap2PIRL, feLAN1PortDeletePortMap2PIRL, feLAN1PortEgressRateLimitation, feLAN1PortIngressRateLimitation, feLAN1PortDefaultVLAN, feLAN1PortForceDefaultVID, feLAN1PortVLANPortMode, feLAN1PortBlockAllUnknown, feLAN1PortIGMPSnooping, feLAN1PortAddUnicast, feLAN1PortAddMulticast, feLAN1PortArpMirroring, 
+		feLAN2Port,
+		feLAN2PortAutoNegotiation, feLAN2PortSpeedMode, feLAN2PortLinkStatus, feLAN2PortFlowControl, feLAN2PortIEEEQoSPriority, feLAN2PortIPQoSPriority, feLAN2PortFramePriorityOverwrite, feLAN2PortQueuePriorityOverwrite, feLAN2PortQueuePriority, feLAN2PortQoSPortMapRule, feLAN2PortVIDNRLEnable, feLAN2PortMap2PIRL, feLAN2PortDeletePortMap2PIRL, feLAN2PortEgressRateLimitation, feLAN2PortIngressRateLimitation, feLAN2PortDefaultVLAN, feLAN2PortForceDefaultVID, feLAN2PortVLANPortMode, feLAN2PortBlockAllUnknown, feLAN2PortIGMPSnooping, feLAN2PortAddUnicast, feLAN2PortAddMulticast, feLAN2PortArpMirroring, 
+		feLAN3Port,
+		feLAN3PortAutoNegotiation, feLAN3PortSpeedMode, feLAN3PortLinkStatus, feLAN3PortFlowControl, feLAN3PortIEEEQoSPriority, feLAN3PortIPQoSPriority, feLAN3PortFramePriorityOverwrite, feLAN3PortQueuePriorityOverwrite, feLAN3PortQueuePriority, feLAN3PortQoSPortMapRule, feLAN3PortVIDNRLEnable, feLAN3PortMap2PIRL, feLAN3PortDeletePortMap2PIRL, feLAN3PortEgressRateLimitation, feLAN3PortIngressRateLimitation, feLAN3PortDefaultVLAN, feLAN3PortForceDefaultVID, feLAN3PortVLANPortMode, feLAN3PortBlockAllUnknown, feLAN3PortIGMPSnooping, feLAN3PortAddUnicast, feLAN3PortAddMulticast, feLAN3PortArpMirroring, 
+		feLAN4Port,
+		feLAN4PortAutoNegotiation, feLAN4PortSpeedMode, feLAN4PortLinkStatus, feLAN4PortFlowControl, feLAN4PortIEEEQoSPriority, feLAN4PortIPQoSPriority, feLAN4PortFramePriorityOverwrite, feLAN4PortQueuePriorityOverwrite, feLAN4PortQueuePriority, feLAN4PortQoSPortMapRule, feLAN4PortVIDNRLEnable, feLAN4PortMap2PIRL, feLAN4PortDeletePortMap2PIRL, feLAN4PortEgressRateLimitation, feLAN4PortIngressRateLimitation, feLAN4PortDefaultVLAN, feLAN4PortForceDefaultVID, feLAN4PortVLANPortMode, feLAN4PortBlockAllUnknown, feLAN4PortIGMPSnooping, feLAN4PortAddUnicast, feLAN4PortAddMulticast, feLAN4PortArpMirroring 
+	}
+    STATUS current
+    DESCRIPTION
+        "The objects are related to the DKTCOMEGA Fast Ethernet module, MIB rev 02_00."
+    ::= { feMIB 4 }
+
+
+END
+
+
+
