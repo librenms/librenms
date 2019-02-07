@@ -1,5 +1,7 @@
 {
     "addhost_alwayscheckip": {
+        "description": "Check for duplicate IP when adding devices",
+        "help": "If a host is added as an ip address it is checked to ensure the ip is not already present. If the ip is present the host is not added. If host is added by hostname this check is not performed. If the setting is true hostnames are resolved and the check is also performed. This helps prevents accidental duplicate hosts.",
         "default": false
     },
     "alert.ack_until_clear": {
@@ -84,111 +86,6 @@
         "order": 2,
         "type": "boolean"
     },
-    "alert.macros.rule.bill_cdr_over_quota": {
-        "default": "((%bills.rate_95th \/ %bills.bill_cdr)*100) && %bills.bill_type = \"cdr\""
-    },
-    "alert.macros.rule.bill_quota_over_quota": {
-        "default": "((%bills.total_data \/ %bills.bill_quota)*100) && %bills.bill_type = \"quota\""
-    },
-    "alert.macros.rule.component": {
-        "default": "(%component.disabled = 0 && %component.ignore = 0)"
-    },
-    "alert.macros.rule.component_critical": {
-        "default": "(%component.status = 2 && %macros.component)"
-    },
-    "alert.macros.rule.component_normal": {
-        "default": "(%component.status = 0 && %macros.component)"
-    },
-    "alert.macros.rule.component_warning": {
-        "default": "(%component.status = 1 && %macros.component)"
-    },
-    "alert.macros.rule.device": {
-        "default": "(%devices.disabled = 0 && %devices.ignore = 0)"
-    },
-    "alert.macros.rule.device_component_down_cisco": {
-        "default": "%sensors.sensor_current != \"1\" && %sensors.sensor_current != \"5\" && %sensors.sensor_type ~ \"^cisco.*State$\" && %sensors.sensor_alert = \"1\""
-    },
-    "alert.macros.rule.device_component_down_junos": {
-        "default": "%sensors.sensor_class = \"state\" && %sensors.sensor_current != \"6\" && %sensors.sensor_type = \"jnxFruState\" && %sensors.sensor_current != \"2\" && %sensors.sensor_alert = \"1\""
-    },
-    "alert.macros.rule.device_down": {
-        "default": "(%devices.status = 0 && %macros.device)"
-    },
-    "alert.macros.rule.device_up": {
-        "default": "(%devices.status = 1 && %macros.device)"
-    },
-    "alert.macros.rule.now": {
-        "default": "NOW()"
-    },
-    "alert.macros.rule.packet_loss_15m": {
-        "default": "(%macros.past_15m && %device_perf.loss)"
-    },
-    "alert.macros.rule.packet_loss_5m": {
-        "default": "(%macros.past_5m && %device_perf.loss)"
-    },
-    "alert.macros.rule.past_10m": {
-        "default": "DATE_SUB(NOW(),INTERVAL 10 MINUTE)"
-    },
-    "alert.macros.rule.past_15m": {
-        "default": "DATE_SUB(NOW(),INTERVAL 15 MINUTE)"
-    },
-    "alert.macros.rule.past_30m": {
-        "default": "DATE_SUB(NOW(),INTERVAL 30 MINUTE)"
-    },
-    "alert.macros.rule.past_5m": {
-        "default": "DATE_SUB(NOW(),INTERVAL 5 MINUTE)"
-    },
-    "alert.macros.rule.past_60m": {
-        "default": "DATE_SUB(NOW(),INTERVAL 60 MINUTE)"
-    },
-    "alert.macros.rule.pdu_over_amperage_apc": {
-        "default": "%sensors.sensor_class = \"current\" && %sensors.sensor_descr = \"Bank Total\" && %sensors.sensor_current > %sensors.sensor_limit && %devices.os = \"apc\""
-    },
-    "alert.macros.rule.port": {
-        "default": "(%ports.deleted = 0 && %ports.ignore = 0 && %ports.disabled = 0)"
-    },
-    "alert.macros.rule.port_down": {
-        "default": "(%ports.ifOperStatus = \"down\" && %ports.ifAdminStatus != \"down\" && %macros.port)"
-    },
-    "alert.macros.rule.port_has_xdp_neighbours": {
-        "default": "(%macros.port && %links.local_port_id = %ports.port_id)"
-    },
-    "alert.macros.rule.port_has_xdp_neighbours_device": {
-        "default": "(%macros.port_has_xdp_neighbours && %links.remote_port_id IS NOT NULL)"
-    },
-    "alert.macros.rule.port_in_usage_perc": {
-        "default": "((%ports.ifInOctets_rate*8) \/ %ports.ifSpeed)*100"
-    },
-    "alert.macros.rule.port_now_down": {
-        "default": "%ports.ifOperStatus != %ports.ifOperStatus_prev && %ports.ifOperStatus_prev = \"up\" && %ports.ifAdminStatus = \"up\" && %macros.port"
-    },
-    "alert.macros.rule.port_out_usage_perc": {
-        "default": "((%ports.ifOutOctets_rate*8) \/ %ports.ifSpeed)*100"
-    },
-    "alert.macros.rule.port_up": {
-        "default": "(%ports.ifOperStatus = \"up\" && %ports.ifAdminStatus = \"up\" && %macros.port)"
-    },
-    "alert.macros.rule.port_usage_perc": {
-        "default": "((%ports.ifInOctets_rate*8) \/ %ports.ifSpeed)*100"
-    },
-    "alert.macros.rule.sensor": {
-        "default": "(%sensors.sensor_alert = 1)"
-    },
-    "alert.macros.rule.sensor_port_link": {
-        "default": "(%sensors.entPhysicalIndex_measured = 'ports' && %sensors.entPhysicalIndex = %ports.ifIndex && %macros.port_up)"
-    },
-    "alert.macros.rule.state_sensor_critical": {
-        "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 2"
-    },
-    "alert.macros.rule.state_sensor_ok": {
-        "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 0"
-    },
-    "alert.macros.rule.state_sensor_unknown": {
-        "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 3"
-    },
-    "alert.macros.rule.state_sensor_warning": {
-        "default": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 1"
-    },
     "alert.syscontact": {
         "description": "Issue alerts to sysContact",
         "help": "Send alert to email in SNMP sysContact",
@@ -229,7 +126,13 @@
         "default": "%Y-%m-%d %H:%i"
     },
     "alert_log_purge": {
-        "default": 365
+        "description": "Alert log entries older than (days)",
+        "help": "Cleanup done by daily.sh",
+        "default": 365,
+        "group": "system",
+        "section": "cleanup",
+        "order": 4,
+        "type": "integer"
     },
     "alerts.bgp.whitelist": {
         "default": null
@@ -388,7 +291,13 @@
         "default": 30
     },
     "authlog_purge": {
-        "default": 30
+        "description": "Auth log entries older than (days)",
+        "help": "Cleanup done by daily.sh",
+        "default": 30,
+        "group": "system",
+        "section": "cleanup",
+        "order": 4,
+        "type": "integer"
     },
     "autodiscovery.bgp": {
         "default": true
@@ -555,7 +464,13 @@
         "default": "ifIndex"
     },
     "device_perf_purge": {
-        "default": 7
+        "description": "Device performance entries older than (days)",
+        "help": "Cleanup done by daily.sh",
+        "default": 7,
+        "group": "system",
+        "section": "cleanup",
+        "order": 4,
+        "type": "integer"
     },
     "device_traffic_descr.0": {
         "default": "\/loopback\/"
@@ -976,7 +891,13 @@
         "default": 1
     },
     "eventlog_purge": {
-        "default": 30
+        "description": "Event log entries older than (days)",
+        "help": "Cleanup done by daily.sh",
+        "default": 30,
+        "group": "system",
+        "section": "cleanup",
+        "order": 4,
+        "type": "integer"
     },
     "favicon": {
         "default": ""
@@ -992,6 +913,7 @@
         "default": "fping",
         "group": "external",
         "section": "paths",
+        "order": 0,
         "type": "text"
     },
     "fping6": {
@@ -999,6 +921,7 @@
         "default": "fping6",
         "group": "external",
         "section": "paths",
+        "order": 1,
         "type": "text"
     },
     "fping_options.count": {
@@ -1050,23 +973,15 @@
     "github_api": {
         "default": "https:\/\/api.github.com\/repos\/librenms\/librenms\/"
     },
-    "graph_colours.blues.0": {
-        "default": "A0A0E5"
-    },
-    "graph_colours.blues.1": {
-        "default": "8080BD"
-    },
-    "graph_colours.blues.2": {
-        "default": "606096"
-    },
-    "graph_colours.blues.3": {
-        "default": "40406F"
-    },
-    "graph_colours.blues.4": {
-        "default": "202048"
-    },
-    "graph_colours.blues.5": {
-        "default": "000033"
+    "graph_colours.blues": {
+        "default": [
+            "A0A0E5",
+            "8080BD",
+            "606096",
+            "40406F",
+            "202048",
+            "000033"
+        ]
     },
     "graph_colours.default": {
         "type": "array"
@@ -3123,6 +3038,7 @@
         "default": "\/usr\/bin\/ipmitool",
         "group": "external",
         "section": "paths",
+        "order": 3,
         "type": "text"
     },
     "irc_alert": {
@@ -3228,6 +3144,7 @@
         "default": "\/usr\/bin\/mtr",
         "group": "external",
         "section": "paths",
+        "order": 4,
         "type": "text"
     },
     "mysql_log_level": {
@@ -3337,6 +3254,7 @@
         "default": "\/usr\/bin\/nmap",
         "group": "external",
         "section": "paths",
+        "order": 5,
         "type": "text"
     },
     "notifications.LibreNMS": {
@@ -3468,13 +3386,20 @@
         "default": 95
     },
     "perf_times_purge": {
-        "default": 30
+        "description": "Poller performance log entries older than (days)",
+        "help": "Cleanup done by daily.sh",
+        "default": 30,
+        "group": "system",
+        "section": "cleanup",
+        "order": 4,
+        "type": "integer"
     },
     "ping": {
         "description": "Path to ping",
         "default": "\/bin\/ping",
         "group": "external",
         "section": "paths",
+        "order": 6,
         "type": "text"
     },
     "plugin_dir": {
@@ -3692,6 +3617,7 @@
         "default": "\/usr\/bin\/sfdp",
         "group": "external",
         "section": "paths",
+        "order": 7,
         "type": "text"
     },
     "show_locations": {
@@ -3828,6 +3754,7 @@
         "default": "\/usr\/bin\/snmpbulkwalk",
         "group": "external",
         "section": "paths",
+        "order": 8,
         "type": "text"
     },
     "snmpget": {
@@ -3835,6 +3762,7 @@
         "default": "\/usr\/bin\/snmpget",
         "group": "external",
         "section": "paths",
+        "order": 9,
         "type": "text"
     },
     "snmpgetnext": {
@@ -3842,13 +3770,15 @@
         "default": "snmpgetnext",
         "group": "external",
         "section": "paths",
-        "order": 0
+        "order": 10,
+        "type": "text"
     },
     "snmptranslate": {
         "description": "Path to snmptranslate",
         "default": "\/usr\/bin\/snmptranslate",
         "group": "external",
         "section": "paths",
+        "order": 11,
         "type": "text"
     },
     "snmptraps.eventlog": {
@@ -3859,6 +3789,7 @@
         "default": "\/usr\/bin\/snmpwalk",
         "group": "external",
         "section": "paths",
+        "order": 12,
         "type": "text"
     },
     "sso.create_users": {
@@ -3889,7 +3820,13 @@
         "default": "diskio.c"
     },
     "syslog_purge": {
-        "default": 30
+        "description": "Syslog entries older than (days)",
+        "help": "Cleanup done by daily.sh",
+        "default": 30,
+        "group": "system",
+        "section": "cleanup",
+        "order": 4,
+        "type": "integer"
     },
     "temp_dir": {
         "default": "\/tmp"
@@ -3908,14 +3845,16 @@
         "default": "traceroute",
         "group": "external",
         "section": "paths",
-        "order": 0
+        "order": 13,
+        "type": "text"
     },
     "traceroute6": {
         "description": "Path to traceroute6",
         "default": "traceroute6",
         "group": "external",
         "section": "paths",
-        "order": 0
+        "order": 14,
+        "type": "text"
     },
     "transit_descr.0": {
         "default": "transit"
@@ -3980,6 +3919,7 @@
         "default": "\/usr\/bin\/virsh",
         "group": "external",
         "section": "paths",
+        "order": 15,
         "type": "text"
     },
     "vmware_guestid.asianux3Guest": {
@@ -4387,6 +4327,7 @@
         "default": "\/usr\/bin\/whois",
         "group": "external",
         "section": "paths",
+        "order": 16,
         "type": "text"
     },
     "xirrus_disable_stations": {

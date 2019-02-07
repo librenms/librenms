@@ -6,6 +6,7 @@ return [
         'external' => 'External',
         'global' => 'Global',
         'os' => 'OS',
+        'system' => 'System',
         'webui' => 'Web UI',
     ],
     'sections' => [
@@ -20,6 +21,10 @@ return [
             'peeringdb' => 'PeeringDB Integration',
             'rrdtool' => 'RRDTool Setup',
             'unix-agent' => 'Unix-Agent Integration',
+        ],
+        'system' => [
+            'cleanup' => 'Cleanup',
+            'updates' => 'Updates',
         ],
         'webui' => [
             'availability-map' => 'Availability Map Settings',

@@ -81,8 +81,8 @@ class DynamicConfig
         // FIXME Laravel 5.5: $this->definitions->groupBy(['group', 'section']
 
         /** @var Collection $grouped */
-        $grouped = $this->definitions->filter->isValid()->groupBy('group')->map(function ($group) {
-            return $group->groupBy('section')->map->sortBy('order');
+        $grouped = $this->definitions->filter->isValid()->sortBy('group')->groupBy('group')->map(function ($group) {
+            return $group->sortBy('section')->groupBy('section')->map->sortBy('order');
         });
         $grouped->prepend($grouped->pull(''), 'global'); // rename '' to global
         return $grouped;
