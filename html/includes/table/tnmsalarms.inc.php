@@ -12,7 +12,7 @@ if (isset($vars['device_id'])) {
     $params = array(
         $vars['device_id'],
     );
-    $sql = 'select `tnmsneinfo`.`neName`, `tnmsneinfo`.`neType`, `tnms_alarms`.`alarm_cause`, `tnms_alarms`.`alarm_location`, `tnms_alarms`.`neAlarmtimestamp` from `tnms_alarms` inner join `tnmsneinfo` on `tnms_alarms`.`tnmsne_info_id`=`tnmsneinfo`.`tnmsne_info_id`';
+    $sql = 'SELECT `tnmsneinfo`.`neName`, `tnmsneinfo`.`neType`, `tnms_alarms`.`alarm_cause`, `tnms_alarms`.`alarm_location`, `tnms_alarms`.`neAlarmtimestamp` FROM `tnms_alarms` INNER JOIN `tnmsneinfo` on `tnms_alarms`.`tnmsne_info_id`=`tnmsneinfo`.`tnmsne_info_id`';
     $wheresql = ' WHERE `device_id` = ?';
     $sortcolumns = 3;
     $count_sql = "SELECT COUNT(*) FROM `tnms_alarms`".$wheresql;
