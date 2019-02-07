@@ -2207,7 +2207,7 @@ function list_logs()
     $logs = dbFetchRows($full_query, $param);
 
     if ($type === 'list_alertlog') {
-        foreach($logs as $index => $log) {
+        foreach ($logs as $index => $log) {
             $logs[$index]['details'] = json_decode(gzuncompress($log['details']), true);
         }
     }
