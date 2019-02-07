@@ -74,7 +74,7 @@ Copy your access token from the Boxcar app or from the Boxcar.io website and set
 ## Canopsis
 Canopsis is a hypervision tool. LibreNMS can send alerts to Canopsis which are then converted to canopsis events. 
 
-[Canopsis Docs](http://www.canopsis.org/wp-content/themes/canopsis/doc/sakura/user-guide/event-spec.html)
+[Canopsis Docs](https://doc.canopsis.net/guide-developpement/struct-event/)
 
 **Example:**
 
