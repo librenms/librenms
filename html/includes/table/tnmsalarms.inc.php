@@ -22,7 +22,6 @@ if (isset($vars['device_id'])) {
         $searchsql = implode(' OR ', array_map("search_phrase_column", array_map("mres", $columns)));
         $wheresql .= " AND ( $searchsql )";
     }
-    $sql .= $wheresql;
 
     // get total
     $total = dbFetchCell($count_sql, $params);
