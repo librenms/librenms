@@ -160,9 +160,16 @@ if ($options['f'] === 'handle_notifiable') {
 
         // if update is not set to false and version is min or newer
         if (Config::get('update') && $options['r']) {
+            if ($options['r'] === 'php53') {
+                $phpver   = '5.6.4';
+                $eol_date = 'January 10th, 2018';
+            } else {
+                $phpver   = '7.1.3';
+                $eol_date = 'February 1st, 2019';
+            }
             new_notification(
                 $error_title,
-                'PHP version 5.6.4 is the minimum supported version as of January 10, 2018.  We recommend you update to PHP a supported version of PHP (7.1 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.',
+                "PHP version $phpver is the minimum supported version as of $eol_date.  We recommend you update to PHP a supported version of PHP (7.2 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.",
                 2,
                 'daily.sh'
             );
