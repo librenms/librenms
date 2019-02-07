@@ -131,15 +131,15 @@ check_php_ver() {
     if [[ "$branch" == "php53" ]] && [[ "$ver_56" == "0" ]]; then
         status_run "Supported PHP version, switched back to master branch." 'git checkout master'
         branch="master"
-    elif [[ "$branch" == "php70" ]] && [[ "$ver_71" == "0" ]]; then
+    elif [[ "$branch" == "php56" ]] && [[ "$ver_71" == "0" ]]; then
         status_run "Supported PHP version, switched back to master branch." 'git checkout master'
         branch="master"
     elif [[ "$branch" != "php53" ]] && [[ "$ver_56" == "1" ]]; then
         status_run "Unsupported PHP version, switched to php53 branch." 'git checkout php53'
         branch="php53"
-    elif [[ "$branch" != "php70" ]] && [[ "$ver_71" == "1" ]]; then
-        status_run "Unsupported PHP version, switched to php70 branch." 'git checkout php70'
-        branch="php70"
+    elif [[ "$branch" != "php56" ]] && [[ "$ver_71" == "1" ]]; then
+        status_run "Unsupported PHP version, switched to php56 branch." 'git checkout php56'
+        branch="php56"
     fi
 
     set_notifiable_result phpver ${branch}
