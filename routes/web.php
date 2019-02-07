@@ -102,6 +102,11 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('syslog', 'SyslogController');
         });
 
+        // bloodhound backends
+        Route::group(['prefix' => 'bloodhound', 'namespace' => 'Ajax\Bloodhound'], function () {
+            Route::get('settings', 'SettingsController');
+        });
+
         // dashboard widgets
         Route::group(['prefix' => 'dash', 'namespace' => 'Widgets'], function () {
             Route::post('alerts', 'AlertsController');

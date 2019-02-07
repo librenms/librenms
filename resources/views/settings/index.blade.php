@@ -5,20 +5,22 @@
 @section('content')
     <div class="panel with-nav-tabs panel-default">
         <div class="panel-heading">
-            <ul class="nav nav-tabs">
-                @foreach($tabs as $tab)
-                    <li @if($tab == $active_tab)class="active"@endif>
-                        <a href="#tab-{{ $tab }}" data-toggle="tab"
-                           onclick="window.history.pushState('{{ $tab }}', '', '/settings/{{ $tab }}');">@lang("settings.tabs.$tab")</a>
+            <ul class="nav nav-tabs settings-group-tabs">
+                @foreach($tabs as $group)
+                    <li @if($group == $active_tab)class="active"@endif>
+                        <a href="#tab-{{ $group }}" data-toggle="tab" data-group="{{ $group }}">@lang("settings.groups.$group")</a>
                     </li>
                 @endforeach
+                <li class="pull-right">
+                    @include('settings.search')
+                </li>
             </ul>
         </div>
         <div class="panel-body">
             <div class="tab-content">
                 @foreach($groups as $group => $sections)
                     <div class="tab-pane fade @if($group == $active_tab)in active @endif" id="tab-{{ $group }}">
-                        <div class="panel-group" id="accordion-{{ $group }}">
+                        <div class="panel-group settings-sections" id="accordion-{{ $group }}">
                             @foreach($sections as $section => $configs)
                                 @if($group == 'global')
                                     @foreach($configs as $config)
@@ -29,19 +31,17 @@
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
                                             <h4 class="panel-title">
-                                                <a data-toggle="collapse" data-parent="#accordion-{{ $group }}"
-                                                   href="#{{ "$group-$section" }}"
-                                                   onclick="window.history.pushState('{{ $group }}/{{ $section }}', '', '/settings/{{ $group }}/{{ $section }}');">
+                                                <a data-toggle="collapse" data-parent="#accordion-{{ $group }}" href="#{{ "$group-$section" }}">
                                                     <i class="fa fa-caret-down"></i> @lang("settings.sections.$group.$section")
                                                 </a>
                                             </h4>
                                         </div>
-                                        <div id="{{ "$group-$section" }}"
+                                        <div id="{{ "$group-$section" }}" data-group="{{ $group }}" data-section="{{ $section }}"
                                              class="panel-collapse collapse @if($group == $active_tab && $section == $active_section) in @endif">
                                             <div class="panel-body">
                                                 <form class="form-horizontal section-form" role="form">
                                                     @foreach($configs as $config)
-                                                        @include('settings.types.' . $config->getType(), $config->toArray())
+                                                        @includeIf('settings.types.' . $config->getType(), $config->toArray())
                                                     @endforeach
                                                 </form>
                                             </div>
@@ -60,6 +60,21 @@
 @push('scripts')
     <script>
         $(".toolTip").tooltip();
+
+        // tab and section update address bar
+        $('.settings-group-tabs a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+            var group = $(e.target).data('group');
+            window.history.pushState(group, '', '/settings/' + group);
+        });
+
+        $('.settings-sections .collapse').on('show.bs.collapse', function (e) {
+            var $target = $(e.target);
+            var slug = $target.data('group') + '/' + $target.data('section');
+            window.history.pushState(slug, '', '/settings/' + slug);
+        }).on('hide.bs.collapse', function (e) {
+            var group = $(e.target).data('group');
+            window.history.pushState(group, '', '/settings/' + group);
+        });
 
         $('#email_backend').change(function () {
             var type = this.value;

@@ -103,4 +103,14 @@ class DynamicConfig
             return $item->isValid();
         })->sortBy('order');
     }
+
+    /**
+     * Get all config items keyed by name
+     *
+     * @return Collection
+     */
+    public function all()
+    {
+        return $this->definitions;
+    }
 }

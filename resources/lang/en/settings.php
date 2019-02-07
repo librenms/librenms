@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'tabs' => [
+    'groups' => [
         'alerting' => 'Alerting',
         'external' => 'External',
         'global' => 'Global',

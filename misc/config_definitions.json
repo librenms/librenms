@@ -532,19 +532,24 @@
         "default": "H:i:s"
     },
     "db_name": {
-        "default": "librenms"
+        "default": "librenms",
+        "hidden": true
     },
     "db_pass": {
-        "default": null
+        "default": null,
+        "hidden": true
     },
     "db_port": {
-        "default": 3306
+        "default": 3306,
+        "hidden": true
     },
     "db_socket": {
-        "default": null
+        "default": null,
+        "hidden": true
     },
     "db_user": {
-        "default": "librenms"
+        "default": "librenms",
+        "hidden": true
     },
     "default_port_association_mode": {
         "default": "ifIndex"

@@ -29,20 +29,20 @@ use LibreNMS\Config;
 
 class DynamicConfigItem implements \ArrayAccess
 {
-    private $name;
-    private $group;
-    private $section;
-    private $value;
-    private $description;
-    private $type;
-    private $default;
-    private $hidden = false;
-    private $required = false;
-    private $disabled = false;
-    private $options = [];
-    private $class;
-    private $help;
-    private $pattern;
+    public $name;
+    public $group;
+    public $section;
+    public $value;
+    public $description;
+    public $type;
+    public $default;
+    public $hidden = false;
+    public $required = false;
+    public $disabled = false;
+    public $options = [];
+    public $class;
+    public $help;
+    public $pattern;
 
     public function __construct($name, $settings = [])
     {
@@ -110,6 +110,17 @@ class DynamicConfigItem implements \ArrayAccess
     public function getType()
     {
         return $this->type;
+    }
+
+    public function only($fields = [])
+    {
+        $array = [];
+
+        foreach ($fields as $field) {
+            $array[$field] = $this->$field;
+        }
+
+        return $array;
     }
 
     public function toArray()
