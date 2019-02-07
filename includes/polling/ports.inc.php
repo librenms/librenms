@@ -304,6 +304,10 @@ if ($device['os'] == 'cmm') {
     require_once 'ports/cmm.inc.php';
 }
 
+if ($device['os'] == 'nokia-isam') {
+    require_once 'ports/nokia-isam.inc.php';
+}
+
 if ($device['os'] == 'timos') {
     require_once 'ports/timos.inc.php';
 }

@@ -3,21 +3,25 @@ text: 'NOKIA ISAM'
 type: network
 icon: nokia
 group: nokia
-ifindex: true
 bad_ifXEntry:
-    - 
+    - NFXS-E
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
+    - sysDescr: NOKIA ISAM
     - sysObjectID:
         - .1.3.6.1.4.1.637.61
-poller_modules:
-    ports: false
-discovery_modules:
-    ports: false
-bad_if:
-    - 'LAG Interface Link'
-    - 'Bridge'
-    - 'VlanPort'
+        - .1.3.6.1.4.1.6527
+    - sysObjectID_except:
+       - .1.3.6.1.4.1.6527.1 #exclude the TiMOS Routing Plattform.
+mib_dir:
+    - nokia
+bad_iftype:
+    - aluGponOnu
+    - bridge
+    - ieee8023adLag
+    - l2vlan
+    - slip
+    - softwareLoopback
