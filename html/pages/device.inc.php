@@ -186,6 +186,14 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                     </a>
                     </li>';
             }
+            
+            if (dbFetchCell("SELECT 1 FROM tnms_alarms WHERE device_id = ?", array($device['device_id']))) {
+                echo '<li class="'.$select['tnmsnealarms'].'">
+                    <a href="'.generate_device_url($device, array('tab' => 'tnmsnealarms')).'">
+                    <i class="fa fa-exclamation-circle fa-lg icon-theme"  aria-hidden="true"></i> Alarms
+                    </a>
+                    </li>';
+            }
         }
 
         // $loadbalancer_tabs is used in device/loadbalancer/ to build the submenu. we do it here to save queries
