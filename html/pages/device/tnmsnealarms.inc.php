@@ -4,7 +4,7 @@ if (!isset($var['section'])) {
 }
 $pagetitle[] = 'TNMS Alarms';
 ?>
-<h4><i class="fa fa-file-info-text-o"></i>TNMS Alarms</h4>
+<h4><h4 class="text-center"> TNMS Alarms</h4>
 <div class="table-responsive">
    <table id="tnmsnealarms" class="table table-hover table-condensed tnmsnealarms">
        <thead>
