@@ -29,7 +29,7 @@ class Msteams extends Transport
         $url   = $opts['url'];
         $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
         $data  = array(
-            'title' => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
+            'title' => $obj['title'],
             'themeColor' => $color,
             'text' => strip_tags($obj['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>')
         );
