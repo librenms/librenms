@@ -102,7 +102,7 @@ if ($vars['view'] == 'minigraphs') {
     unset($seperator);
 
     // FIXME - FIX THIS. UGLY.
-    foreach (dbFetchRows('select * from ports WHERE device_id = ? ORDER BY ifIndex', array($device['device_id'])) as $port) {
+    foreach (dbFetchRows('select * from ports WHERE device_id = ? AND `disabled` = 0 ORDER BY ifIndex', array($device['device_id'])) as $port) {
         $port = cleanPort($port, $device);
         echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 183px; max-width:183px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e9e9e9;'>
             <div style='font-weight: bold;'>".makeshortif($port['ifDescr']).'</div>
