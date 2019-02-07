@@ -380,7 +380,6 @@ class Config
         }
 
         // graph color copying
-        Arr::set($def_config, 'graph_colours.default', (array)Arr::get($def_config, 'graph_colours.blues', []));
         Arr::set($def_config, 'graph_colours.mega', array_merge(
             (array)Arr::get($def_config, 'graph_colours.psychedelic', []),
             (array)Arr::get($def_config, 'graph_colours.manycolours', []),

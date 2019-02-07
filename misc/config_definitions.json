@@ -182,35 +182,25 @@
     "allow_unauth_graphs_cidr": {
         "default": []
     },
-    "api.cors.allowheaders.0": {
-        "default": "Origin"
+    "api.cors.allowheaders": {
+        "default": [
+            "Origin",
+            "X-Requested-With",
+            "Content-Type",
+            "Accept",
+            "X-Auth-Token"
+        ],
+        "type": "array"
     },
-    "api.cors.allowheaders.1": {
-        "default": "X-Requested-With"
-    },
-    "api.cors.allowheaders.2": {
-        "default": "Content-Type"
-    },
-    "api.cors.allowheaders.3": {
-        "default": "Accept"
-    },
-    "api.cors.allowheaders.4": {
-        "default": "X-Auth-Token"
-    },
-    "api.cors.allowmethods.0": {
-        "default": "POST"
-    },
-    "api.cors.allowmethods.1": {
-        "default": "GET"
-    },
-    "api.cors.allowmethods.2": {
-        "default": "PUT"
-    },
-    "api.cors.allowmethods.3": {
-        "default": "DELETE"
-    },
-    "api.cors.allowmethods.4": {
-        "default": "PATCH"
+    "api.cors.allowmethods": {
+        "default": [
+            "POST",
+            "GET",
+            "PUT",
+            "DELETE",
+            "PATCH"
+        ],
+        "type": "array"
     },
     "api.cors.enabled": {
         "default": false
@@ -472,23 +462,16 @@
         "order": 4,
         "type": "integer"
     },
-    "device_traffic_descr.0": {
-        "default": "\/loopback\/"
-    },
-    "device_traffic_descr.1": {
-        "default": "\/vlan\/"
-    },
-    "device_traffic_descr.2": {
-        "default": "\/tunnel\/"
-    },
-    "device_traffic_descr.3": {
-        "default": "\/bond\/"
-    },
-    "device_traffic_descr.4": {
-        "default": "\/null\/"
-    },
-    "device_traffic_descr.5": {
-        "default": "\/dummy\/"
+    "device_traffic_descr": {
+        "default": [
+            "\/loopback\/",
+            "\/vlan\/",
+            "\/tunnel\/",
+            "\/bond\/",
+            "\/null\/",
+            "\/dummy\/"
+        ],
+        "type": "array"
     },
     "device_traffic_iftype": {
         "default": [
@@ -981,310 +964,154 @@
             "40406F",
             "202048",
             "000033"
-        ]
-    },
-    "graph_colours.default": {
+        ],
         "type": "array"
     },
-    "graph_colours.greens.0": {
-        "default": "B6D14B"
-    },
-    "graph_colours.greens.1": {
-        "default": "91B13C"
-    },
-    "graph_colours.greens.2": {
-        "default": "6D912D"
-    },
-    "graph_colours.greens.3": {
-        "default": "48721E"
-    },
-    "graph_colours.greens.4": {
-        "default": "24520F"
-    },
-    "graph_colours.greens.5": {
-        "default": "003300"
-    },
-    "graph_colours.manycolours.0": {
-        "default": "FFF8A3"
-    },
-    "graph_colours.manycolours.1": {
-        "default": "FAE16B"
-    },
-    "graph_colours.manycolours.10": {
-        "default": "B2C8D9"
-    },
-    "graph_colours.manycolours.11": {
-        "default": "779DBF"
-    },
-    "graph_colours.manycolours.12": {
-        "default": "3E75A7"
-    },
-    "graph_colours.manycolours.13": {
-        "default": "205F9A"
-    },
-    "graph_colours.manycolours.14": {
-        "default": "00488C"
-    },
-    "graph_colours.manycolours.15": {
-        "default": "BEA37A"
-    },
-    "graph_colours.manycolours.16": {
-        "default": "907A52"
-    },
-    "graph_colours.manycolours.17": {
-        "default": "7A653E"
-    },
-    "graph_colours.manycolours.18": {
-        "default": "63522B"
-    },
-    "graph_colours.manycolours.19": {
-        "default": "3D3000"
-    },
-    "graph_colours.manycolours.2": {
-        "default": "F8D753"
-    },
-    "graph_colours.manycolours.20": {
-        "default": "F3AA79"
-    },
-    "graph_colours.manycolours.21": {
-        "default": "EB8953"
-    },
-    "graph_colours.manycolours.22": {
-        "default": "E1662A"
-    },
-    "graph_colours.manycolours.23": {
-        "default": "DC5313"
-    },
-    "graph_colours.manycolours.24": {
-        "default": "D84000"
-    },
-    "graph_colours.manycolours.25": {
-        "default": "B5B5A9"
-    },
-    "graph_colours.manycolours.26": {
-        "default": "8B8D82"
-    },
-    "graph_colours.manycolours.27": {
-        "default": "74796F"
-    },
-    "graph_colours.manycolours.28": {
-        "default": "5D645A"
-    },
-    "graph_colours.manycolours.29": {
-        "default": "434C43"
-    },
-    "graph_colours.manycolours.3": {
-        "default": "F3C01C"
-    },
-    "graph_colours.manycolours.30": {
-        "default": "E6A4A5"
-    },
-    "graph_colours.manycolours.31": {
-        "default": "D6707B"
-    },
-    "graph_colours.manycolours.32": {
-        "default": "C4384F"
-    },
-    "graph_colours.manycolours.33": {
-        "default": "BC1C39"
-    },
-    "graph_colours.manycolours.34": {
-        "default": "B30023"
-    },
-    "graph_colours.manycolours.4": {
-        "default": "F0B400"
-    },
-    "graph_colours.manycolours.5": {
-        "default": "A9CC8F"
-    },
-    "graph_colours.manycolours.6": {
-        "default": "82B16A"
-    },
-    "graph_colours.manycolours.7": {
-        "default": "5C9746"
-    },
-    "graph_colours.manycolours.8": {
-        "default": "3D8128"
-    },
-    "graph_colours.manycolours.9": {
-        "default": "1E6C0B"
-    },
-    "graph_colours.mixed.0": {
-        "default": "CC0000"
-    },
-    "graph_colours.mixed.1": {
-        "default": "008C00"
-    },
-    "graph_colours.mixed.2": {
-        "default": "4096EE"
-    },
-    "graph_colours.mixed.3": {
-        "default": "73880A"
-    },
-    "graph_colours.mixed.4": {
-        "default": "D01F3C"
-    },
-    "graph_colours.mixed.5": {
-        "default": "36393D"
-    },
-    "graph_colours.mixed.6": {
-        "default": "FF0084"
-    },
-    "graph_colours.oranges.0": {
-        "default": "E43C00"
-    },
-    "graph_colours.oranges.1": {
-        "default": "E74B00"
-    },
-    "graph_colours.oranges.2": {
-        "default": "EB5B00"
-    },
-    "graph_colours.oranges.3": {
-        "default": "EF6A00"
-    },
-    "graph_colours.oranges.4": {
-        "default": "F37900"
-    },
-    "graph_colours.oranges.5": {
-        "default": "F78800"
-    },
-    "graph_colours.oranges.6": {
-        "default": "FB9700"
-    },
-    "graph_colours.oranges.7": {
-        "default": "FFA700"
-    },
-    "graph_colours.pinks.0": {
-        "default": "D0558F"
-    },
-    "graph_colours.pinks.1": {
-        "default": "B34773"
-    },
-    "graph_colours.pinks.2": {
-        "default": "943A57"
-    },
-    "graph_colours.pinks.3": {
-        "default": "792C38"
-    },
-    "graph_colours.pinks.4": {
-        "default": "5C1F1E"
-    },
-    "graph_colours.pinks.5": {
-        "default": "401F10"
-    },
-    "graph_colours.psychedelic.0": {
-        "default": "CC7CCC"
-    },
-    "graph_colours.psychedelic.1": {
-        "default": "D0558F"
-    },
-    "graph_colours.psychedelic.10": {
-        "default": "934A93"
-    },
-    "graph_colours.psychedelic.11": {
-        "default": "943A57"
-    },
-    "graph_colours.psychedelic.12": {
-        "default": "6D912D"
-    },
-    "graph_colours.psychedelic.13": {
-        "default": "606096"
-    },
-    "graph_colours.psychedelic.14": {
-        "default": "EB5B00"
-    },
-    "graph_colours.psychedelic.15": {
-        "default": "773177"
-    },
-    "graph_colours.psychedelic.16": {
-        "default": "792C38"
-    },
-    "graph_colours.psychedelic.17": {
-        "default": "48721E"
-    },
-    "graph_colours.psychedelic.18": {
-        "default": "40406F"
-    },
-    "graph_colours.psychedelic.19": {
-        "default": "EF6A00"
-    },
-    "graph_colours.psychedelic.2": {
-        "default": "B6D14B"
-    },
-    "graph_colours.psychedelic.20": {
-        "default": "5B185B"
-    },
-    "graph_colours.psychedelic.21": {
-        "default": "5C1F1E"
-    },
-    "graph_colours.psychedelic.22": {
-        "default": "24520F"
-    },
-    "graph_colours.psychedelic.23": {
-        "default": "202048"
-    },
-    "graph_colours.psychedelic.24": {
-        "default": "F37900"
-    },
-    "graph_colours.psychedelic.25": {
-        "default": "3F003F"
-    },
-    "graph_colours.psychedelic.26": {
-        "default": "401F10"
-    },
-    "graph_colours.psychedelic.27": {
-        "default": "003300"
-    },
-    "graph_colours.psychedelic.28": {
-        "default": "000033"
-    },
-    "graph_colours.psychedelic.29": {
-        "default": "F78800"
-    },
-    "graph_colours.psychedelic.3": {
-        "default": "A0A0E5"
-    },
-    "graph_colours.psychedelic.30": {
-        "default": "FB9700"
-    },
-    "graph_colours.psychedelic.31": {
-        "default": "FFA700"
-    },
-    "graph_colours.psychedelic.4": {
-        "default": "E43C00"
-    },
-    "graph_colours.psychedelic.5": {
-        "default": "AF63AF"
-    },
-    "graph_colours.psychedelic.6": {
-        "default": "B34773"
-    },
-    "graph_colours.psychedelic.7": {
-        "default": "91B13C"
-    },
-    "graph_colours.psychedelic.8": {
-        "default": "8080BD"
-    },
-    "graph_colours.psychedelic.9": {
-        "default": "E74B00"
-    },
-    "graph_colours.purples.0": {
-        "default": "CC7CCC"
-    },
-    "graph_colours.purples.1": {
-        "default": "AF63AF"
-    },
-    "graph_colours.purples.2": {
-        "default": "934A93"
-    },
-    "graph_colours.purples.3": {
-        "default": "773177"
-    },
-    "graph_colours.purples.4": {
-        "default": "5B185B"
-    },
-    "graph_colours.purples.5": {
-        "default": "3F003F"
+    "graph_colours.default": {
+        "default": [
+            "A0A0E5",
+            "8080BD",
+            "606096",
+            "40406F",
+            "202048",
+            "000033"
+        ],
+        "type": "array"
+    },
+    "graph_colours.greens": {
+        "default": [
+            "B6D14B",
+            "91B13C",
+            "6D912D",
+            "48721E",
+            "24520F",
+            "003300"
+        ],
+        "type": "array"
+    },
+    "graph_colours.manycolours": {
+        "default": [
+            "FFF8A3",
+            "FAE16B",
+            "F8D753",
+            "F3C01C",
+            "F0B400",
+            "A9CC8F",
+            "82B16A",
+            "5C9746",
+            "3D8128",
+            "1E6C0B",
+            "B2C8D9",
+            "779DBF",
+            "3E75A7",
+            "205F9A",
+            "00488C",
+            "BEA37A",
+            "907A52",
+            "7A653E",
+            "63522B",
+            "3D3000",
+            "F3AA79",
+            "EB8953",
+            "E1662A",
+            "DC5313",
+            "D84000",
+            "B5B5A9",
+            "8B8D82",
+            "74796F",
+            "5D645A",
+            "434C43",
+            "E6A4A5",
+            "D6707B",
+            "C4384F",
+            "BC1C39",
+            "B30023"
+        ],
+        "type": "array"
+    },
+    "graph_colours.mixed": {
+        "default": [
+            "CC0000",
+            "008C00",
+            "4096EE",
+            "73880A",
+            "D01F3C",
+            "36393D",
+            "FF0084"
+        ],
+        "type": "array"
+    },
+    "graph_colours.oranges": {
+        "default": [
+            "E43C00",
+            "E74B00",
+            "EB5B00",
+            "EF6A00",
+            "F37900",
+            "F78800",
+            "FB9700",
+            "FFA700"
+        ],
+        "type": "array"
+    },
+    "graph_colours.pinks": {
+        "default": [
+            "D0558F",
+            "B34773",
+            "943A57",
+            "792C38",
+            "5C1F1E",
+            "401F10"
+        ],
+        "type": "array"
+    },
+    "graph_colours.psychedelic": {
+        "default": [
+            "CC7CCC",
+            "D0558F",
+            "B6D14B",
+            "A0A0E5",
+            "E43C00",
+            "AF63AF",
+            "B34773",
+            "91B13C",
+            "8080BD",
+            "E74B00",
+            "934A93",
+            "943A57",
+            "6D912D",
+            "606096",
+            "EB5B00",
+            "773177",
+            "792C38",
+            "48721E",
+            "40406F",
+            "EF6A00",
+            "5B185B",
+            "5C1F1E",
+            "24520F",
+            "202048",
+            "F37900",
+            "3F003F",
+            "401F10",
+            "003300",
+            "000033",
+            "F78800",
+            "FB9700",
+            "FFA700"
+        ],
+        "type": "array"
+    },
+    "graph_colours.purples": {
+        "default": [
+            "CC7CCC",
+            "AF63AF",
+            "934A93",
+            "773177",
+            "5B185B",
+            "3F003F"
+        ],
+        "type": "array"
     },
     "graph_descr.device_processor": {
         "default": "This is an aggregate graph of all processors in the system."
@@ -2893,86 +2720,52 @@
     "icmp_check": {
         "default": true
     },
-    "ignore_mount.0": {
-        "default": "\/kern"
-    },
-    "ignore_mount.1": {
-        "default": "\/mnt\/cdrom"
-    },
-    "ignore_mount.2": {
-        "default": "\/proc"
-    },
-    "ignore_mount.3": {
-        "default": "\/dev"
-    },
-    "ignore_mount.4": {
-        "default": "\/compat\/linux\/proc"
-    },
-    "ignore_mount.5": {
-        "default": "\/compat\/linux\/sys"
+    "ignore_mount": {
+        "default": [
+            "\/kern",
+            "\/mnt\/cdrom",
+            "\/proc",
+            "\/dev",
+            "\/compat\/linux\/proc",
+            "\/compat\/linux\/sys"
+        ],
+        "type": "array"
     },
     "ignore_mount_network": {
-        "default": 1
+        "default": true
     },
     "ignore_mount_optical": {
-        "default": 1
+        "default": true
     },
-    "ignore_mount_regexp.0": {
-        "default": "\/on: \\\/packages\/"
-    },
-    "ignore_mount_regexp.1": {
-        "default": "\/on: \\\/dev\/"
-    },
-    "ignore_mount_regexp.10": {
-        "default": "\/^\\\/Volumes\\\/OS X Base System\/"
-    },
-    "ignore_mount_regexp.2": {
-        "default": "\/on: \\\/proc\/"
-    },
-    "ignore_mount_regexp.3": {
-        "default": "\/on: \\\/junos^\/"
-    },
-    "ignore_mount_regexp.4": {
-        "default": "\/on: \\\/junos\\\/dev\/"
-    },
-    "ignore_mount_regexp.5": {
-        "default": "\/on: \\\/jail\\\/dev\/"
-    },
-    "ignore_mount_regexp.6": {
-        "default": "\/^(dev|proc)fs\/"
-    },
-    "ignore_mount_regexp.7": {
-        "default": "\/^\\\/dev\\\/md0\/"
-    },
-    "ignore_mount_regexp.8": {
-        "default": "\/^\\\/var\\\/dhcpd\\\/dev\/"
-    },
-    "ignore_mount_regexp.9": {
-        "default": "\/UMA\/"
+    "ignore_mount_regexp": {
+        "default": [
+            "\/on: \\\/packages\/",
+            "\/on: \\\/dev\/",
+            "\/on: \\\/proc\/",
+            "\/on: \\\/junos^\/",
+            "\/on: \\\/junos\\\/dev\/",
+            "\/on: \\\/jail\\\/dev\/",
+            "\/^(dev|proc)fs\/",
+            "\/^\\\/dev\\\/md0\/",
+            "\/^\\\/var\\\/dhcpd\\\/dev\/",
+            "\/UMA\/",
+            "\/^\\\/Volumes\\\/OS X Base System\/"
+        ]
     },
     "ignore_mount_removable": {
-        "default": 1
+        "default": true
     },
-    "ignore_mount_string.0": {
-        "default": "packages"
-    },
-    "ignore_mount_string.1": {
-        "default": "devfs"
-    },
-    "ignore_mount_string.2": {
-        "default": "procfs"
-    },
-    "ignore_mount_string.3": {
-        "default": "linprocfs"
-    },
-    "ignore_mount_string.4": {
-        "default": "linsysfs"
-    },
-    "ignore_mount_string.5": {
-        "default": "UMA"
-    },
-    "ignore_mount_string.6": {
-        "default": "MALLOC"
+    "ignore_mount_string": {
+        "default": [
+            "packages",
+            "devfs",
+            "procfs",
+            "linprocfs",
+            "linsysfs",
+            "UMA",
+            "MALLOC"
+        ],
+        "type": "array"
     },
     "ignore_unmapable_port": {
         "default": false
@@ -3000,38 +2793,24 @@
     "int_transit": {
         "default": 1
     },
-    "ipmi.type.0": {
-        "default": "lanplus"
+    "ipmi.type": {
+        "default": [
+            "lanplus",
+            "lan",
+            "imb",
+            "open"
+        ]
     },
-    "ipmi.type.1": {
-        "default": "lan"
-    },
-    "ipmi.type.2": {
-        "default": "imb"
-    },
-    "ipmi.type.3": {
-        "default": "open"
-    },
-    "ipmi_unit.Amps": {
-        "default": "current"
-    },
-    "ipmi_unit.RPM": {
-        "default": "fanspeed"
-    },
-    "ipmi_unit.Volts": {
-        "default": "voltage"
-    },
-    "ipmi_unit.Watts": {
-        "default": "power"
-    },
-    "ipmi_unit.degrees C": {
-        "default": "temperature"
-    },
-    "ipmi_unit.discrete": {
-        "default": ""
-    },
-    "ipmi_unit.percent": {
-        "default": "load"
+    "ipmi_unit": {
+        "default": {
+            "Amps": "current",
+            "RPM": "fanspeed",
+            "Volts": "voltage",
+            "Watts": "power",
+            "degrees C": "temperature",
+            "discrete": "",
+            "percent": "load"
+        }
     },
     "ipmitool": {
         "description": "Path to ipmtool",
@@ -3094,11 +2873,12 @@
     "leaflet.tile_url": {
         "default": "{s}.tile.openstreetmap.org"
     },
-    "libvirt_protocols.0": {
-        "default": "qemu+ssh"
-    },
-    "libvirt_protocols.1": {
-        "default": "xen+ssh"
+    "libvirt_protocols": {
+        "default": [
+            "qemu+ssh",
+            "xen+ssh"
+        ],
+        "type": "array"
     },
     "list_colour.even": {
         "default": "#ffffff"
@@ -3156,92 +2936,47 @@
     "navbar.manage_groups.hide": {
         "default": 0
     },
-    "network_map_items.0": {
-        "default": "xdp"
+    "network_map_items": {
+        "default": [
+            "xdp",
+            "mac"
+        ],
+        "type": "array"
     },
-    "network_map_items.1": {
-        "default": "mac"
-    },
-    "network_map_legend.0": {
-        "default": "#008dca"
-    },
-    "network_map_legend.10": {
-        "default": "#009782"
-    },
-    "network_map_legend.100": {
-        "default": "#cc0000"
-    },
-    "network_map_legend.15": {
-        "default": "#009c5f"
-    },
-    "network_map_legend.20": {
-        "default": "#00a13b"
-    },
-    "network_map_legend.25": {
-        "default": "#00a617"
-    },
-    "network_map_legend.30": {
-        "default": "#0bad00"
-    },
-    "network_map_legend.35": {
-        "default": "#2fb700"
-    },
-    "network_map_legend.40": {
-        "default": "#53c100"
-    },
-    "network_map_legend.45": {
-        "default": "#77cc00"
-    },
-    "network_map_legend.5": {
-        "default": "#0092a6"
-    },
-    "network_map_legend.50": {
-        "default": "#9ad600"
-    },
-    "network_map_legend.55": {
-        "default": "#bee000"
-    },
-    "network_map_legend.60": {
-        "default": "#e2ea00"
-    },
-    "network_map_legend.65": {
-        "default": "#ead600"
-    },
-    "network_map_legend.70": {
-        "default": "#e5b200"
-    },
-    "network_map_legend.75": {
-        "default": "#e08e00"
-    },
-    "network_map_legend.80": {
-        "default": "#db6b00"
-    },
-    "network_map_legend.85": {
-        "default": "#d64700"
-    },
-    "network_map_legend.90": {
-        "default": "#d12300"
-    },
-    "network_map_legend.95": {
-        "default": "#cc0000"
-    },
-    "network_map_legend.di.border": {
-        "default": "#cccccc"
-    },
-    "network_map_legend.di.edge": {
-        "default": "#dddddd88"
-    },
-    "network_map_legend.di.node": {
-        "default": "#eeeeee"
-    },
-    "network_map_legend.dn.border": {
-        "default": "#ff5555"
-    },
-    "network_map_legend.dn.edge": {
-        "default": "#ff777788"
-    },
-    "network_map_legend.dn.node": {
-        "default": "#ffdddd"
+    "network_map_legend": {
+        "default": {
+            "0": "#008dca",
+            "5": "#0092a6",
+            "10": "#009782",
+            "15": "#009c5f",
+            "20": "#00a13b",
+            "25": "#00a617",
+            "30": "#0bad00",
+            "35": "#2fb700",
+            "40": "#53c100",
+            "45": "#77cc00",
+            "50": "#9ad600",
+            "55": "#bee000",
+            "60": "#e2ea00",
+            "65": "#ead600",
+            "70": "#e5b200",
+            "75": "#e08e00",
+            "80": "#db6b00",
+            "85": "#d64700",
+            "90": "#d12300",
+            "95": "#cc0000",
+            "100": "#cc0000",
+            "di": {
+                "border": "#cccccc",
+                "edge": "#dddddd88",
+                "node": "#eeeeee"
+            },
+            "dn": {
+                "border": "#ff5555",
+                "edge": "#ff777788",
+                "node": "#ffdddd"
+            }
+        }
     },
     "network_map_vis_options": {
         "default": "{\n  layout:{\n      randomSeed:2\n  },\n  \"edges\": {\n    arrows: {\n          to:     {enabled: true, scaleFactor:0.5},\n    },\n    \"smooth\": {\n        enabled: false\n    },\n    font: {\n        size: 14,\n        color: \"red\",\n        face: \"sans\",\n        background: \"white\",\n        strokeWidth:3,\n        align: \"middle\",\n        strokeWidth: 2\n    }\n  },\n  \"physics\": {\n     \"barnesHut\": {\n      \"gravitationalConstant\": -2000,\n      \"centralGravity\": 0.3,\n      \"springLength\": 200,\n      \"springConstant\": 0.04,\n      \"damping\": 0.09,\n      \"avoidOverlap\": 1\n    },\n\n     \"forceAtlas2Based\": {\n      \"gravitationalConstant\": -50,\n      \"centralGravity\": 0.01,\n      \"springLength\": 200,\n      \"springConstant\": 0.08,\n      \"damping\": 0.4,\n      \"avoidOverlap\": 1\n    },\n\n     \"repulsion\": {\n      \"centralGravity\": 0.2,\n      \"springLength\": 250,\n      \"springConstant\": 0.2,\n      \"nodeDistance\": 200,\n      \"damping\": 0.07\n    },\n\n     \"hierarchicalRepulsion\": {\n      \"nodeDistance\": 300,\n      \"centralGravity\": 0.2,\n      \"springLength\": 300,\n      \"springConstant\": 0.2,\n      \"damping\": 0.07\n    },\n\n  \"maxVelocity\": 50,\n  \"minVelocity\": 0.4,\n  \"solver\": \"hierarchicalRepulsion\",\n  \"stabilization\": {\n    \"enabled\": true,\n    \"iterations\": 1000,\n    \"updateInterval\": 100,\n    \"onlyDynamicEdges\": false,\n    \"fit\": true\n  },\n\n  \"timestep\": 0.4,\n }\n}"
@@ -3266,33 +3001,34 @@
     "old_graphs": {
         "default": 1
     },
-    "os.default.over.0.graph": {
-        "default": "device_processor"
-    },
-    "os.default.over.0.text": {
-        "default": "Processor Usage"
-    },
-    "os.default.over.1.graph": {
-        "default": "device_mempool"
-    },
-    "os.default.over.1.text": {
-        "default": "Memory Usage"
+    "os.default.over": {
+        "default": [
+            {
+                "graph": "device_processor",
+                "text": "Processor Usage"
+            },
+            {
+                "graph": "device_mempool",
+                "text": "Memory Usage"
+            }
+        ]
     },
     "os_def_cache_time": {
         "default": 86400
     },
-    "os_group.unix.over.0.graph": {
-        "default": "device_processor"
+    "os_group.unix.over": {
+        "default": [
+            {
+                "graph": "device_processor",
+                "text": "Processor Usage"
+            },
+            {
+                "graph": "device_ucd_memory",
+                "text": "Memory Usage"
+            }
+        ]
     },
-    "os_group.unix.over.0.text": {
-        "default": "Processor Usage"
-    },
-    "os_group.unix.over.1.graph": {
-        "default": "device_ucd_memory"
-    },
-    "os_group.unix.over.1.text": {
-        "default": "Memory Usage"
-    },
+
     "os_group.unix.processor_stacked": {
         "default": 1
     },
@@ -3807,17 +3543,14 @@
     "summary_errors": {
         "default": 0
     },
-    "syslog_filter.0": {
-        "default": "last message repeated"
-    },
-    "syslog_filter.1": {
-        "default": "Connection from UDP: ["
-    },
-    "syslog_filter.2": {
-        "default": "ipSystemStatsTable node ipSystemStatsOutFragOKs not implemented"
-    },
-    "syslog_filter.3": {
-        "default": "diskio.c"
+    "syslog_filter": {
+        "description": "Filter syslog messages containing",
+        "default": [
+            "last message repeated",
+            "Connection from UDP: [",
+            "ipSystemStatsTable node ipSystemStatsOutFragOKs not implemented",
+            "diskio.c"
+        ]
     },
     "syslog_purge": {
         "description": "Syslog entries older than (days)",
