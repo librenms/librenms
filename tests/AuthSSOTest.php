@@ -270,7 +270,7 @@ class AuthSSOTest extends DBTestCase
         $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
-        $this->assertInternalType('string', $a->getExternalUsername());
+        $this->assertIsString($a->getExternalUsername());
 
         // Missing
         unset($_SERVER['REMOTE_USER']);
@@ -310,15 +310,15 @@ class AuthSSOTest extends DBTestCase
         $this->assertNull($a->authSSOGetAttr('foobar'));
         $this->assertNull($a->authSSOGetAttr(null));
         $this->assertNull($a->authSSOGetAttr(1));
-        $this->assertInternalType('string', $a->authSSOGetAttr('alsoVALID-ATTR'));
-        $this->assertInternalType('string', $a->authSSOGetAttr('HTTP_VALID_ATTR'));
+        $this->assertIsString($a->authSSOGetAttr('alsoVALID-ATTR'));
+        $this->assertIsString($a->authSSOGetAttr('HTTP_VALID_ATTR'));
 
         $config['sso']['mode'] = 'header';
         $this->assertNull($a->authSSOGetAttr('foobar'));
         $this->assertNull($a->authSSOGetAttr(null));
         $this->assertNull($a->authSSOGetAttr(1));
         $this->assertNull($a->authSSOGetAttr('alsoVALID-ATTR'));
-        $this->assertInternalType('string', $a->authSSOGetAttr('VALID-ATTR'));
+        $this->assertIsString($a->authSSOGetAttr('VALID-ATTR'));
     }
 
     public function testTrustedProxies()
