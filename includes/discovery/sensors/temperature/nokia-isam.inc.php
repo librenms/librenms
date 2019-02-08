@@ -12,8 +12,6 @@ foreach ($pre_cache['nokiaIsamSlotTemperature'] as $slotId => $slot) {
             $limit = $sensor['eqptBoardThermalSensorShutdownThresholdHigh']/$divisor;
             $warn_limit = $sensor['eqptBoardThermalSensorTcaThresholdHigh']/$divisor;
             $value = $sensor['eqptBoardThermalSensorActualTemperature']/$divisor;
-            //$entPhysicalIndex = $index;
-            //$entPhysicalIndex_measured = 'ports';
             discover_sensor($valid['sensor'], 'temperature', $device, $oid, $slotName.'.'.$sensorId.'-temp', 'nokia-isam', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
     }
