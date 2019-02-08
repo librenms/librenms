@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        \App\Console\Commands\BashCompletionCommand::class,
+        //
     ];
 
     /**
@@ -36,6 +36,8 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
+        $this->load(__DIR__.'/Commands');
+
         require base_path('routes/console.php');
 
         if ($this->app->environment() !== 'production') {
