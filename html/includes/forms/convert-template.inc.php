@@ -58,7 +58,7 @@ function convert_template($line)
                 '/%([\w\d]+)\.([\w\d]+)/',// Replaces %something.anything
             ],
             [
-                '@php echo \1; @endphp ',
+                "@php\necho \\1;\n@endphp ",
                 '$value[\'\2\']',
             ],
             $line
@@ -84,7 +84,7 @@ function convert_template($line)
             ' @foreach ($alert->faults as $key => $value)',
             ' @foreach ($alert->contacts as $key => $value)',
             ' @endforeach ',
-            ' @php echo \1; @endphp ',
+            " @php\necho \\1;\n@endphp ",
             '{{ $value[\'string\'] }}',
             '{{ $\1[\'\2\'] }}',
             '{{ $alert->\1 }}',
