@@ -76,6 +76,7 @@ if (empty($config['favicon'])) {
   <link rel="manifest" href="images/manifest.json">
   <link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#5bbad5">
   <link rel="shortcut icon" href="images/favicon.ico">
+  <meta name="csrf-token" content="<?php echo csrf_token(); ?>">
   <meta name="msapplication-config" content="images/browserconfig.xml">
   <meta name="theme-color" content="#ffffff">
 <?php
@@ -148,6 +149,12 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
       eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=1,width=550,height=600');");
     }
     // End -->
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
   </script>
   <script type="text/javascript" src="js/overlib_mini.js"></script>
   <script type="text/javascript" src="js/toastr.min.js"></script>
