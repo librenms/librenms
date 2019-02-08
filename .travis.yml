@@ -12,9 +12,6 @@ matrix:
   - php: 7.1
     env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
 
-  allow_failures:
-  - php: hhvm
-
 cache:
   directories:
     - vendor
