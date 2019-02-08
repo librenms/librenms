@@ -31,23 +31,7 @@ class AppServiceProvider extends ServiceProvider
         // load config
         Config::load();
 
-        // Blade directives (Yucky because of < L5.5)
-        Blade::directive('config', function ($key) {
-            return "<?php if (\LibreNMS\Config::get(($key))): ?>";
-        });
-        Blade::directive('notconfig', function ($key) {
-            return "<?php if (!\LibreNMS\Config::get(($key))): ?>";
-        });
-        Blade::directive('endconfig', function () {
-            return "<?php endif; ?>";
-        });
-        Blade::directive('admin', function () {
-            return "<?php if (auth()->check() && auth()->user()->isAdmin()): ?>";
-        });
-        Blade::directive('endadmin', function () {
-            return "<?php endif; ?>";
-        });
-
+        $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();
 
@@ -74,6 +58,19 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerGeocoder();
+    }
+
+    private function bootCustomBladeDirectives()
+    {
+        Blade::if('config', function ($key) {
+            return \LibreNMS\Config::get($key);
+        });
+        Blade::if('notconfig', function ($key) {
+            return !\LibreNMS\Config::get($key);
+        });
+        Blade::if('admin', function () {
+            return auth()->check() && auth()->user()->isAdmin();
+        });
     }
 
     private function configureMorphAliases()
