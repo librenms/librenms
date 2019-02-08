@@ -71,6 +71,7 @@ class Database extends BaseValidation
             $validator->warn("Your database schema ($current) is newer than expected ($latest). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
         }
 
+        $this->checkMysqlEngine($validator);
         $this->checkCollation($validator);
         $this->checkSchema($validator);
     }
@@ -100,6 +101,19 @@ class Database extends BaseValidation
             $validator->fail(
                 'You have lower_case_table_names set to 1 or true in mysql config.',
                 'Set lower_case_table_names=0 in your mysql config file in the [mysqld] section.'
+            );
+        }
+    }
+
+    private function checkMysqlEngine(Validator $validator)
+    {
+        $db = Config::get('db_name', 'librenms');
+        $query = "SELECT `TABLE_NAME` FROM information_schema.tables WHERE `TABLE_SCHEMA` = '$db' && `ENGINE` != 'InnoDB'";
+        $tables = dbFetchRows($query);
+        if (!empty($tables)) {
+            $validator->result(
+                ValidationResult::warn("Some tables are not using the recommended InnoDB engine, this may cause you issues.")
+                    ->setList('Tables', $tables)
             );
         }
     }
