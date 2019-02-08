@@ -25,9 +25,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::get('locations', 'LocationController@index');
 
     // old route redirects
-    Route::get('poll-log', function () {
-        return redirect('pollers/tab=log/');
-    });
+    Route::permanentRedirect('poll-log', 'pollers/tab=log/');
 
     // Two Factor Auth
     Route::get('2fa', 'TwoFactorController@showTwoFactorForm')->name('2fa.form');
@@ -124,9 +122,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     }
 
     // demo helper
-    Route::get('demo', function () {
-        return redirect('/');
-    });
+    Route::permanentRedirect('demo', '/');
 
     // Legacy routes
     Route::any('/{path?}', 'LegacyController@index')->where('path', '.*');
