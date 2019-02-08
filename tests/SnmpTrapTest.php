@@ -33,6 +33,9 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 
+include '/opt/librenms/includes/functions.inc.php';
+include '/opt/librenms/includes/alerts.inc.php';
+
 class SnmpTrapTest extends LaravelTestCase
 {
     use DatabaseTransactions;
@@ -144,7 +147,6 @@ OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"down\"\n";
 
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle linkDown');
-
 
         $port = $port->fresh(); // refresh from database
         $this->assertEquals($port->ifAdminStatus, 'down');

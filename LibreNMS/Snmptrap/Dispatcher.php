@@ -52,6 +52,8 @@ class Dispatcher
         $logging = Config::get('snmptraps.eventlog', 'unhandled');
         if ($logging == 'all' || ($fallback && $logging == 'unhandled')) {
             log_event("SNMP trap received: " . $trap->getTrapOid(), $trap->getDevice()->toArray(), 'trap');
+        } else {
+            RunRules($trap->getDevice()->device_id);
         }
 
         return !$fallback;
