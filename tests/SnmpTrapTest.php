@@ -145,7 +145,6 @@ OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"down\"\n";
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle linkDown');
 
-
         $port = $port->fresh(); // refresh from database
         $this->assertEquals($port->ifAdminStatus, 'down');
         $this->assertEquals($port->ifOperStatus, 'down');
@@ -175,5 +174,44 @@ OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"up\"\n";
         $port = $port->fresh(); // refresh from database
         $this->assertEquals($port->ifAdminStatus, 'up');
         $this->assertEquals($port->ifOperStatus, 'up');
+    }
+
+    public function testAdvaUserObjectCreation()
+    {
+        $device = factory(Device::class)->create();
+        $trapText = "$device->hostname
+UDP: [$device->ip]:36570->[10.0.0.1]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:40:34.67
+SNMPv2-MIB::snmpTrapOID.0 CM-SYSTEM-MIB::cmObjectCreationTrap
+CM-SECURITY-MIB::cmSecurityUserPrivLevel.\"test-trap-user\".false superuser
+CM-SECURITY-MIB::cmSecurityUserLoginTimeout.\"test-trap-user\".false 15
+CM-SECURITY-MIB::cmSecurityUserName.\"test-trap-user\".false trap-test-user
+CM-SECURITY-MIB::cmSecurityUserComment.\"test-trap-user\".false Remote User";
+
+        $trap = new Trap($trapText);
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle Adva User Creation');
+    }
+
+    public fuction testAdvaLAGObjectionCreation()
+    {
+        $device = factory(Device::class)->create();
+        $trapText = "$device->hostname
+        UDP: [$device->ip]:36570->[10.0.0.1]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
+SNMPv2-MIB::snmpTrapOID.0 CM-SYSTEM-MIB::cmObjectCreationTrap
+IEEE8023-LAG-MIB::dot3adAggCollectorMaxDelay.9 50
+IEEE8023-LAG-MIB::dot3adAggActorSystemPriority.9 32768
+IEEE8023-LAG-MIB::dot3adAggActorAdminKey.9 32768
+F3-LAG-MIB::f3LagProtocols.1.1 true
+F3-LAG-MIB::f3LagDiscardWrongConversation.1.1 false
+F3-LAG-MIB::f3LagFrameDistAlgorithm.1.1 activeStandby
+F3-LAG-MIB::f3LagMode.1.1 active-standby
+F3-LAG-MIB::f3LagLacpControl.1.1 true
+F3-LAG-MIB::f3LagCcmDefectsDetectionEnabled.1.1 false
+F3-LAG-MIB::f3LagName.1.1
+F3-LAG-MIB::f3LagEntry.14.1.1 \"B0 00 \"";
+
+        $trap = new Trap($trapText);
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle Adva LAG Creation');
     }
 }
