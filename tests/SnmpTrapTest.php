@@ -192,7 +192,7 @@ CM-SECURITY-MIB::cmSecurityUserComment.\"test-trap-user\".false Remote User";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle Adva User Creation');
     }
 
-    public fuction testAdvaLAGObjectionCreation()
+    public function testAdvaLAGObjectionCreation()
     {
         $device = factory(Device::class)->create();
         $trapText = "$device->hostname
