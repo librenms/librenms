@@ -146,12 +146,6 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
 
         /*
-         * Package Service Providers...
-         */
-        Kamaln7\Toastr\ToastrServiceProvider::class,
-        Fideloper\Proxy\TrustedProxyServiceProvider::class,
-
-        /*
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
