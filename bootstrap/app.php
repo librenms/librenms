@@ -41,11 +41,6 @@ $app->singleton(
     App\Exceptions\Handler::class
 );
 
-$app->configureMonologUsing(function (Monolog\Logger $logger) use ($app) {
-    $path = config('app.log') ?: $app->basePath('logs/librenms.log');
-    $logger->pushHandler(new \Monolog\Handler\StreamHandler($path, \Monolog\Logger::toMonologLevel(config('app.log_level', 'debug'))));
-});
-
 /*
 |--------------------------------------------------------------------------
 | Return The Application
