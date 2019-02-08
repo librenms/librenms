@@ -58,6 +58,38 @@ if ($device['os_group'] == 'printer') {
             );
         }
     }
+
+    echo PHP_EOL, 'Tray Paper Level', PHP_EOL;
+    $tray_oids = snmpwalk_cache_oid($device, 'prtInputName', [], 'Printer-MIB');
+    if (!empty($tray_oids)) {
+        $tray_oids = snmpwalk_cache_oid($device, 'prtInputCurrentLevel', $tray_oids, 'Printer-MIB');
+        $tray_oids = snmpwalk_cache_oid($device, 'prtInputMaxCapacity', $tray_oids, 'Printer-MIB');
+    }
+    d_echo($tray_oids);
+    foreach ($tray_oids as $index => $data) {
+        $last_index = substr($index, strrpos($index, '.') + 1);
+        $type = 'jetpapertray';
+        $capacity = $data['prtInputMaxCapacity'];
+        $current = $data['prtInputCurrentLevel'] / $capacity * 100;
+
+        $descr         = $data['prtInputName'];
+        $tray_oid     = ".1.3.6.1.2.1.43.8.2.1.10.$index";
+        $capacity_oid  = ".1.3.6.1.2.1.43.8.2.1.9.$index";
+
+        if (is_numeric($current)) {
+            discover_toner(
+                $valid_toner,
+                $device,
+                $tray_oid,
+                $last_index,
+                $type,
+                $descr,
+                $capacity_oid,
+                $capacity,
+                $current
+            );
+        }
+    }
 }
 
 // Delete removed toners
