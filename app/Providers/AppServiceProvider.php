@@ -34,20 +34,6 @@ class AppServiceProvider extends ServiceProvider
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();
-
-        // Development service providers
-        if ($this->app->environment() !== 'production') {
-            if (class_exists(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class)) {
-                $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
-            }
-
-            if (config('app.debug') && class_exists(\Barryvdh\Debugbar\ServiceProvider::class)) {
-                // disable debugbar for api routes
-                if (!Request::is('api/*')) {
-                    $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
-                }
-            }
-        }
     }
 
     /**

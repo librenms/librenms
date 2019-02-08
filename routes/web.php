@@ -103,27 +103,10 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         });
     });
 
-    // Debugbar routes need to be here because of catch-all
-    if (config('app.env') !== 'production' && config('app.debug') && config('debugbar.enabled') !== false) {
-        Route::get('/_debugbar/assets/stylesheets', [
-            'as' => 'debugbar-css',
-            'uses' => '\Barryvdh\Debugbar\Controllers\AssetController@css'
-        ]);
-
-        Route::get('/_debugbar/assets/javascript', [
-            'as' => 'debugbar-js',
-            'uses' => '\Barryvdh\Debugbar\Controllers\AssetController@js'
-        ]);
-
-        Route::get('/_debugbar/open', [
-            'as' => 'debugbar-open',
-            'uses' => '\Barryvdh\Debugbar\Controllers\OpenController@handler'
-        ]);
-    }
-
     // demo helper
     Route::permanentRedirect('demo', '/');
 
     // Legacy routes
-    Route::any('/{path?}', 'LegacyController@index')->where('path', '.*');
+    Route::any('/{path?}', 'LegacyController@index')
+        ->where('path', '^((?!_debugbar).)*');
 });
