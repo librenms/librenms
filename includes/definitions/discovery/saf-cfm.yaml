@@ -93,12 +93,12 @@ modules:
           oid: rf2Operation
           state_name: rf2Operation
           states: 
-            - { value: 0, descr: None, graph: 1, generic: 1 }
-            - { value: 1, descr: Booting, graph: 1, generic: 1 }
-            - { value: 2, descr: Ok, graph: 1, generic: 0, descr: Ok }
-            - { value: 3, descr: Testing, graph: 1, generic: 1 }
-            - { value: 4, descr: Error, graph: 1, generic: 2 }
-            - { value: 5, descr: 'No data from ODU', graph: 1, generic: 2 }
+            - { value: 0, graph: 1, generic: 1, descr: None }
+            - { value: 1, graph: 1, generic: 1, descr: Booting }
+            - { value: 2, graph: 1, generic: 0, descr: Ok }
+            - { value: 3, graph: 1, generic: 1, descr: Testing }
+            - { value: 4, graph: 1, generic: 2, descr: Error }
+            - { value: 5, graph: 1, generic: 2, descr: 'No data from ODU' }
         - 
           descr: 'R1 Humidity'
           index: 'rf1OduHumidity.{{ $index }}'
