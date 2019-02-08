@@ -72,5 +72,7 @@ class DocTest extends TestCase
             ->each(function ($missing_doc) {
                 $this->fail("The doc $missing_doc doesn't exist in mkdocs.yml, please add it to the relevant section");
             });
+
+        $this->expectNotToPerformAssertions();
     }
 }

@@ -217,13 +217,13 @@ class AuthSSOTest extends DBTestCase
         $this->basicEnvironmentEnv();
         unset($_SERVER);
 
-        $this->setExpectedException('LibreNMS\Exceptions\AuthenticationException');
+        $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authenticate(null, null);
 
         $this->basicEnvironmentHeader();
         unset($_SERVER);
 
-        $this->setExpectedException('LibreNMS\Exceptions\AuthenticationException');
+        $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authenticate(null, null);
     }
 
@@ -395,25 +395,25 @@ class AuthSSOTest extends DBTestCase
         //Invalid String
         $config['sso']['level_attr'] = 'level';
         $_SERVER['level'] = 'foobar';
-        $this->setExpectedException('LibreNMS\Exceptions\AuthenticationException');
+        $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authSSOCalculateLevel();
 
         //null
         $config['sso']['level_attr'] = 'level';
         $_SERVER['level'] = null;
-        $this->setExpectedException('LibreNMS\Exceptions\AuthenticationException');
+        $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authSSOCalculateLevel();
 
         //Unset pointer
         unset($config['sso']['level_attr']);
         $_SERVER['level'] = "9";
-        $this->setExpectedException('LibreNMS\Exceptions\AuthenticationException');
+        $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authSSOCalculateLevel();
 
         //Unset attr
         $config['sso']['level_attr'] = 'level';
         unset($_SERVER['level']);
-        $this->setExpectedException('LibreNMS\Exceptions\AuthenticationException');
+        $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authSSOCalculateLevel();
     }
 

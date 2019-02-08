@@ -58,6 +58,8 @@ class AlertTest extends TestCase
                 }
             }
         }
+
+        $this->expectNotToPerformAssertions();
     }
 
     private function getTransportFiles()
