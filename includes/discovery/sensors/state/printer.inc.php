@@ -44,8 +44,9 @@ if (is_numeric($state)) {
 
 $state = snmp_get($device, "hrPrinterDetectedErrorState.1", "-Ovqe", 'HOST-RESOURCES-MIB');
 if ($state) {
+    // https://www.ietf.org/rfc/rfc1759.txt hrPrinterDetectedErrorState
     //Create State Index
-    $printer_states = 
+    $printer_states =
         array(
             array('value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'),
             array('value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Paper Low'),
@@ -60,24 +61,24 @@ if ($state) {
             array('value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'Critical, multiple issues'),
         );
     $bit_flags = q_bridge_bits2indices($state);
-    $is_critical = False;
-    if(count($bit_flags) == 0) {
+    $is_critical = false;
+    if (count($bit_flags) == 0) {
         $state = 0;
     } else {
-        for($i = 0; $i < count($bit_flags); $i++) {
-            if($bit_flags[$i] < 9) {
-                $state = $printer_states[$bit_flags[$i]]['value'];
-                if($printer_states[$bit_flags[$i]]['generic'] == 2) {
-                    $is_critical = True;
-                    break;
-                }
+        for ($i = 0; $i < count($bit_flags); $i++) {
+            // second octet of error flags not reliable, skipping
+            if ($bit_flags[$i] > 8) continue;
+            $state = $printer_states[$bit_flags[$i]]['value'];
+            if ($printer_states[$bit_flags[$i]]['generic'] == 2) {
+                $is_critical = true;
+                break;
             }
         }
         // cannot create an index for each bit combination, instead warning or critical
-        if(count($bit_flags) > 1) {
-            $state = $is_critical?10:9; 
+        if (count($bit_flags) > 1) {
+            $state = $is_critical?10:9;
         }
-    } 
+    }
     
     $state_name = 'hrPrinterDetectedErrorState';
     create_state_index($state_name, $printer_states);
