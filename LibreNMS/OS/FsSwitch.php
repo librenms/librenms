@@ -1,6 +1,6 @@
 <?php
 /**
- * Fs.php
+ * Fs-switch.php
  *
  * -Description-
  *
@@ -29,7 +29,7 @@ use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
-class FS extends OS implements ProcessorDiscovery
+class FsSwitch extends OS implements ProcessorDiscovery
 {
     /**
      * Discover processors.
@@ -41,20 +41,6 @@ class FS extends OS implements ProcessorDiscovery
     {
         $processors = [];
 
-        // Test first pair of OIDs from GBNPlatformOAM-MIB
-        $processors_data = snmpwalk_cache_oid($this->getDevice(), 'cpuDescription', [], 'GBNPlatformOAM-MIB', 'fs');
-        $processors_data = snmpwalk_cache_oid($this->getDevice(), 'cpuIdle', $processors_data, 'GBNPlatformOAM-MIB', 'fs');
-        foreach ($processors_data as $index => $entry) {
-            $processors[] = Processor::discover(
-                $this->getName(),
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.13464.1.2.1.1.2.11.'.$index, //GBNPlatformOAM-MIB::cpuIdle.0 = INTEGER: 95
-                $index,
-                $entry['cpuDescription'],
-                -1,
-                100 - $entry['cpuIdle']
-            );
-        }
         // Tests OID from SWITCH MIB.
         $processors_data = snmpwalk_cache_oid($this->getDevice(), 'ssCpuIdle', [], 'SWITCH', 'fs');
 
