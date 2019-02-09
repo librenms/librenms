@@ -1,5 +1,5 @@
-os: fs-other
-text: 'Fiberstore Switch'
+os: fs-gbn
+text: 'Fiberstore GBN'
 type: network
 icon: fs
 group: fs

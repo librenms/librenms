@@ -1,10 +1,10 @@
 <?php
 //
-// Discovery for FS other devices.
+// Discovery for FS gbn devices.
 //
 //
 
-if ($device['os'] == 'fs-other') {
+if ($device['os'] == 'fs-gbn') {
     echo 'FS : ';
     //
     // OIDs from GBNPlatformOAM-MIB
@@ -28,7 +28,7 @@ if ($device['os'] == 'fs-other') {
                 }
                 $descr    .= " Memory";
                 $usage     = $entry['memoryIdle'];
-                discover_mempool($valid_mempool, $device, $index, 'fs-other', $descr, '1', null, null);
+                discover_mempool($valid_mempool, $device, $index, 'fs-gbn', $descr, '1', null, null);
             } //end if
         } //end foreach
     } //end if

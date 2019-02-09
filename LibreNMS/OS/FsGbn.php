@@ -29,7 +29,7 @@ use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
-class FsOther extends OS implements ProcessorDiscovery
+class FsGbn extends OS implements ProcessorDiscovery
 {
     /**
      * Discover processors.
