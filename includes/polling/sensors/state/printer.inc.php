@@ -22,7 +22,9 @@ if ($device['os_group'] == 'printer') {
             $sensor_value = 0;
         } else {
             for ($i = 0; $i < count($bit_flags); $i++) {
-                if ($bit_flags[$i] > 8) continue;
+                if ($bit_flags[$i] > 8) {
+                    continue;
+                }
                 $sensor_value = $printer_states[$bit_flags[$i]]['value'];
                 if ($printer_states[$bit_flags[$i]]['generic'] == 2) {
                     $is_critical = true;

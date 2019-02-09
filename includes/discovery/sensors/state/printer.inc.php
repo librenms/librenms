@@ -67,7 +67,9 @@ if ($state) {
     } else {
         for ($i = 0; $i < count($bit_flags); $i++) {
             // second octet of error flags not reliable, skipping
-            if ($bit_flags[$i] > 8) continue;
+            if ($bit_flags[$i] > 8) {
+                continue;
+            }
             $state = $printer_states[$bit_flags[$i]]['value'];
             if ($printer_states[$bit_flags[$i]]['generic'] == 2) {
                 $is_critical = true;
