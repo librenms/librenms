@@ -3,6 +3,7 @@
 return [
     'groups' => [
         'alerting' => 'Alerting',
+        'auth' => 'Authentication',
         'external' => 'External',
         'global' => 'Global',
         'os' => 'OS',
@@ -12,7 +13,12 @@ return [
     'sections' => [
         'alerting' => [
             'general' => 'General Alert Settings',
-            'email' => 'Email Options'
+            'email' => 'Email Options',
+        ],
+        'auth' => [
+            'general' => 'General Authentication Settings',
+            'ad' => 'Active Directory Settings',
+            'ldap' => 'LDAP Settings'
         ],
         'external' => [
             'location' => 'Location Settings',

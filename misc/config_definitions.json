@@ -1,4 +1,14 @@
 {
+    "active_directory.users_purge": {
+        "description": "Keep inactive users for",
+        "units": "days",
+        "help": "Delete users from LibreNMS after this may days of not logging in. 0 means never and users will be recreated if the user logs back in.",
+        "default": 0,
+        "group": "auth",
+        "section": "ad",
+        "order": 2,
+        "type": "integer"
+    },
     "addhost_alwayscheckip": {
         "description": "Check for duplicate IP when adding devices",
         "help": "If a host is added as an ip address it is checked to ensure the ip is not already present. If the ip is present the host is not added. If host is added by hostname this check is not performed. If the setting is true hostnames are resolved and the check is also performed. This helps prevents accidental duplicate hosts.",
@@ -126,7 +136,8 @@
         "default": "%Y-%m-%d %H:%i"
     },
     "alert_log_purge": {
-        "description": "Alert log entries older than (days)",
+        "description": "Alert log entries older than",
+        "units": "days",
         "help": "Cleanup done by daily.sh",
         "default": 365,
         "group": "system",
@@ -136,6 +147,8 @@
     },
     "alerts.bgp.whitelist": {
         "default": null
+    },
+    "alerts.email.default_only": {
     },
     "alerts.email.enable": {
         "default": false
@@ -153,34 +166,47 @@
         "default": false
     },
     "allow_entity_sensor.amperes": {
-        "default": 1
+        "default": true
     },
     "allow_entity_sensor.celsius": {
-        "default": 1
+        "default": true
     },
     "allow_entity_sensor.dBm": {
-        "default": 1
+        "default": true
     },
     "allow_entity_sensor.specialEnum": {
-        "default": 1
+        "default": true
     },
     "allow_entity_sensor.truthvalue": {
-        "default": 1
+        "default": true
     },
     "allow_entity_sensor.voltsAC": {
-        "default": 1
+        "default": true
     },
     "allow_entity_sensor.voltsDC": {
-        "default": 1
+        "default": true
     },
     "allow_entity_sensor.watts": {
-        "default": 1
+        "default": true
     },
     "allow_unauth_graphs": {
-        "default": false
+        "description": "Allow unauthenticated graph access",
+        "help": "Allows any one to access graphs without login",
+        "default": false,
+        "group": "webui",
+        "section": "graph",
+        "order": 4,
+        "type": "booean"
     },
     "allow_unauth_graphs_cidr": {
-        "default": []
+        "description": "Allow the given networks graph access",
+        "help": "Allow the given networks unauthenticated graph access (does not apply when unauthenticated graphs is enabled)",
+        "default": [],
+        "group": "webui",
+        "section": "graph",
+        "order": 5,
+        "type": "array"
+
     },
     "api.cors.allowheaders": {
         "default": [
@@ -212,73 +238,348 @@
         "default": "*"
     },
     "api_demo": {
-        "default": 0
+        "description": "This is the demo",
+        "default": false,
+        "type": "boolean"
     },
-    "astext.65332": {
-        "default": "Cymru FullBogon Feed"
+    "apps.powerdns-recursor.api-key": {
+        "description": "API key for PowerDNS Recursor",
+        "help": "API key for the PowerDNS Recursor app when connecting directly",
+        "type": "text"
     },
-    "astext.65333": {
-        "default": "Cymru Bogon Feed"
+    "apps.powerdns-recursor.https": {
+        "description": "PowerDNS Recursor use HTTPS?",
+        "help": "Use HTTPS instead of HTTP for the PowerDNS Recursor app when connecting directly",
+        "default": false,
+        "type": "boolean"
+    },
+    "apps.powerdns-recursor.port": {
+        "description": "PowerDNS Recursor port",
+        "help": "TCP port to use for the PowerDNS Recursor app when connecting directly",
+        "default": 8082,
+        "type": "integer"
+    },
+    "astext": {
+        "description": "Key to hold cache of autonomous systems descriptions"
+    },
+    "auth_ad_base_dn": {
+        "description": "Base DN",
+        "help": "groups and users must be under this dn. Example: dc=example,dc=com",
+        "group": "auth",
+        "section": "ad",
+        "order": 1,
+        "type": "text",
+        "required": true
+    },
+    "auth_ad_check_certificates": {
+        "description": "Check certificate",
+        "help": "Check certificates for validity. Some servers use self signed certificates, disabling this allows those.",
+        "default": false,
+        "group": "auth",
+        "section": "ad",
+        "order": 1,
+        "type": "boolean",
+        "required": true
     },
     "auth_ad_group_filter": {
-        "default": "(objectclass=group)"
+        "description": "Group LDAP filter",
+        "help": "Active Directory LDAP filter for selecting groups",
+        "default": "(objectclass=group)",
+        "group": "auth",
+        "section": "ad",
+        "order": 1,
+        "type": "text"
+    },
+    "auth_ad_groups": {
+        "description": "Group access",
+        "help": "Define groups that have access and level",
+        "default": {
+            "admin": {
+                "level": 10
+            },
+            "pfy": {
+                "level": 5
+            },
+            "support": {
+                "level": 1
+            }
+        },
+        "group": "auth",
+        "section": "ad",
+        "order": 4,
+        "type": "ldap-groups"
     },
     "auth_ad_user_filter": {
-        "default": "(objectclass=user)"
+        "description": "User LDAP filter",
+        "help": "Active Directory LDAP filter for selecting users",
+        "default": "(objectclass=user)",
+        "group": "auth",
+        "section": "ad",
+        "order": 0,
+        "type": "text"
     },
     "auth_ldap_attr.uid": {
-        "default": "uid"
+        "description": "Attribute to check username against",
+        "help": "Attribute used to identify users by username",
+        "default": "uid",
+        "group": "auth",
+        "section": "ldap",
+        "order": 15,
+        "type": "text"
+    },
+    "auth_ldap_binddn": {
+        "description": "Bind DN (overrides bind username)",
+        "help": "Full DN of bind user",
+        "group": "auth",
+        "section": "ldap",
+        "order": 9,
+        "type": "text"
+    },
+    "auth_ldap_bindpassword": {
+        "description": "Bind password",
+        "help": "Password for bind user",
+        "group": "auth",
+        "section": "ldap",
+        "order": 8,
+        "type": "password"
+    },
+    "auth_ldap_binduser": {
+        "description": "Bind username",
+        "help": "Used to query the LDAP server when no user is logged in (alerts, API, etc)",
+        "group": "auth",
+        "section": "ldap",
+        "order": 10,
+        "type": "text"
+    },
+    "auth_ad_binddn": {
+        "description": "Bind DN (overrides bind username)",
+        "help": "Full DN of bind user",
+        "group": "auth",
+        "section": "ldap",
+        "order": 9,
+        "type": "text"
+    },
+    "auth_ad_bindpassword": {
+        "description": "Bind password",
+        "help": "Password for bind user",
+        "group": "auth",
+        "section": "ldap",
+        "order": 8,
+        "type": "password"
+    },
+    "auth_ad_binduser": {
+        "description": "Bind username",
+        "help": "Used to query the AD server when no user is logged in (alerts, API, etc)",
+        "group": "auth",
+        "section": "ldap",
+        "order": 10,
+        "type": "text"
     },
     "auth_ldap_cache_ttl": {
-        "default": 300
+        "description": "LDAP cache expiration",
+        "units": "seconds",
+        "help": "Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.",
+        "default": 300,
+        "group": "auth",
+        "section": "ldap",
+        "order": 20,
+        "type": "integer"
+    },
+    "auth_ldap_debug": {
+        "description": "Show debug",
+        "help": "Shows debug information.  May expose private information, do not leave enabled.",
+        "default": false,
+        "group": "auth",
+        "section": "ldap",
+        "order": 21,
+        "type": "boolean"
     },
     "auth_ldap_emailattr": {
-        "default": "mail"
+        "description": "Mail attribute",
+        "default": "mail",
+        "group": "auth",
+        "section": "ldap",
+        "order": 18,
+        "type": "text"
     },
     "auth_ldap_group": {
-        "default": "cn=groupname,ou=groups,dc=example,dc=com"
+        "description": "Access group DN",
+        "help": "Distinguished name for a group to give normal level access. Example: cn=groupname,ou=groups,dc=example,dc=com",
+        "default": "",
+        "group": "auth",
+        "section": "ldap",
+        "order": 11,
+        "type": "text",
+        "disabled": true
     },
     "auth_ldap_groupbase": {
-        "default": "ou=group,dc=example,dc=com"
+        "description": "Group base DN",
+        "help": "Distinguished name to search for groups Example: ou=group,dc=example,dc=com",
+        "default": "",
+        "group": "auth",
+        "section": "ldap",
+        "order": 3,
+        "type": "text"
     },
     "auth_ldap_groupmemberattr": {
-        "default": "memberUid"
+        "description": "Group member attribute",
+        "default": "memberUid",
+        "group": "auth",
+        "section": "ldap",
+        "order": 15,
+        "type": "text"
     },
-    "auth_ldap_groups.admin.level": {
-        "default": 10
+    "auth_ldap_groupmembertype":{
+        "description": "Find group members by",
+        "Help": "Checks the given item against the Group member attribute, DN Search may be slow",
+        "group": "auth",
+        "section": "ldap",
+        "order": 16,
+        "type": "select",
+        "options": {
+            "username": "Username",
+            "fulldn": "Full DN (using prefix and suffix)",
+            "puredn": "DN Search (search using uid attribute)"
+        }
     },
-    "auth_ldap_groups.pfy.level": {
-        "default": 7
-    },
-    "auth_ldap_groups.support.level": {
-        "default": 1
+    "auth_ldap_groups": {
+        "description": "Group access",
+        "help": "Define groups that have access and level",
+        "default": {
+            "admin": {
+                "level": 10
+            },
+            "pfy": {
+                "level": 5
+            },
+            "support": {
+                "level": 1
+            }
+        },
+        "group": "auth",
+        "section": "ldap",
+        "order": 4,
+        "type": "ldap-groups"
     },
     "auth_ldap_port": {
-        "default": 389
+        "description": "LDAP port",
+        "help": "Port to connect to servers on. For LDAP it should be 389, for LDAPS it should be 636",
+        "default": 389,
+        "group": "auth",
+        "section": "ldap",
+        "order": 1,
+        "type": "integer"
     },
     "auth_ldap_prefix": {
-        "default": "uid="
+        "description": "User prefix",
+        "help": "Used to turn a username into a distinguished name",
+        "default": "uid=",
+        "group": "auth",
+        "section": "ldap",
+        "order": 6,
+        "type": "text"
     },
     "auth_ldap_server": {
-        "default": "ldap.example.com"
+        "description": "LDAP Server(s)",
+        "help": "Set server(s), space separated. Prefix with ldaps:// for ssl",
+        "default": "ldap.example.com",
+        "group": "auth",
+        "section": "ldap",
+        "order": 0,
+        "type": "text"
+    },
+    "auth_ldap_starttls": {
+        "description": "Use STARTTLS",
+        "help": "Use STARTTLS to secure the connection.  Alternative to LDAPS.",
+        "default": "ldap.example.com",
+        "group": "auth",
+        "section": "ldap",
+        "order": 0,
+        "type": "select",
+        "options": {
+            "disabled": "Disabled",
+            "optional": "Optional",
+            "required": "Required"
+        }
     },
     "auth_ldap_suffix": {
-        "default": ",ou=People,dc=example,dc=com"
+        "description": "User suffix",
+        "help": "Used to turn a username into a distinguished name",
+        "default": ",ou=People,dc=example,dc=com",
+        "group": "auth",
+        "section": "ldap",
+        "order": 7,
+        "type": "text"
+    },
+    "auth_ldap_timeout":{
+        "description": "Connection timeout",
+        "units": "seconds",
+        "help": "If one or more servers are unresponsive, higher timeouts will cause slow access. To low may cause connection failures in some cases",
+        "default": 5,
+        "group": "auth",
+        "section": "ldap",
+        "order": 7,
+        "type": "integer"
     },
     "auth_ldap_uid_attribute": {
-        "default": "uidnumber"
+        "description": "Unique ID attribute",
+        "help": "LDAP attribute to use to identify users, must be numeric",
+        "default": "uidnumber",
+        "group": "auth",
+        "section": "ldap",
+        "order": 16,
+        "type": "text"
     },
     "auth_ldap_userdn": {
-        "default": false
+        "description": "Use full user DN",
+        "help": "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it’s member: uid=username,ou=groups,dc=domain,dc=com)",
+        "default": false,
+        "group": "auth",
+        "section": "ldap",
+        "order": 5,
+        "type": "boolean"
     },
     "auth_ldap_version": {
-        "default": 3
+        "description": "LDAP version",
+        "help": "LDAP version to use to talk to the server.  Usually this should be v3",
+        "default": 3,
+        "group": "auth",
+        "section": "ldap",
+        "order": 2,
+        "type": "select",
+        "options": {
+            "2": 2,
+            "3": 3
+        }
     },
     "auth_mechanism": {
-        "default": "mysql"
+        "description": "Authorization Method (Caution!)",
+        "help": "Authorization method.  Caution, you may lose the ability to log in. You can override this back to mysql by setting \"$config['auth_mechanism'] = 'mysql';\" in your config.php",
+        "default": "mysql",
+        "group": "auth",
+        "section": "general",
+        "order": 0,
+        "type": "select",
+        "options": {
+            "mysql": "MySQL (default)",
+            "active_directory": "Active Directory",
+            "ldap": "LDAP",
+            "radius": "Radius",
+            "http-auth": "HTTP Authentication",
+            "ad-authorization": "Externally authenticated AD",
+            "ldap-authorization": "Externally authenticated LDAP",
+            "sso": "Single Sign On"
+        }
     },
     "auth_remember": {
-        "default": 30
+        "description": "Remember me duration",
+        "units": "days",
+        "help": "Number of days to keep a user logged in when checking the remember me checkbox at log in.",
+        "default": 30,
+        "group": "auth",
+        "section": "general",
+        "order": 1,
+        "type": "integer"
     },
     "authlog_purge": {
         "description": "Auth log entries older than (days)",
