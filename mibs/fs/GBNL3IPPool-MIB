@@ -1,0 +1,450 @@
+------------------------------------------------------------------------------
+--  File         : gbnL3IPPool-MIB.mi2
+--  Description  : ADMIN  Enterprise MIB 
+--  Version      : 0.03
+--  Date         : April 03, 2003     
+--
+--  Copyright (c) 2002-2005 admin Systems, Inc.  All Rights Reserved.
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    GBNL3IPPool-MIB  DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter32,
+        TimeTicks, IpAddress                    FROM SNMPv2-SMI
+        DisplayString, TruthValue,RowStatus     FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnL3                                   FROM ADMIN-MASTER-MIB;     
+        
+    gbnL3IPPoolMib  MODULE-IDENTITY
+        LAST-UPDATED    "0105030000Z"  -- May 03,2001  
+        ORGANIZATION    "admin Systems, Inc."
+        CONTACT-INFO    "admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "GBN Enterprise MIB definition."
+
+        REVISION        "0105030000Z"  -- May 03,2001
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL3 6 }
+
+------------------------------------------------------------------------------
+-- Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+--
+-- "DURABLE":
+--    Objects that are saved across a system reset and/or power cycle
+--    are noted as "DURABLE" for convenience in the DESCRIPTION
+--    section of the object definition.  Code must be explicitly
+--    written to implement these DURABLE objects.
+--
+
+
+------------------------------------------------------------------------------
+--  define groups in gbnL3IPPool-MIB
+------------------------------------------------------------------------------
+    ipPool      OBJECT IDENTIFIER ::= { gbnL3IPPoolMib 1 }
+    ipPoolTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF  ipPoolEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of Ip Pool."
+        ::= { ipPool 1 }
+
+
+    ipPoolEntry  OBJECT-TYPE
+        SYNTAX ipPoolEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry of Ip Pool."
+        INDEX { ipPoolIndex }
+        ::= { ipPoolTable 1 }
+
+        ipPoolEntry ::= SEQUENCE {
+        ipPoolIndex         INTEGER(1..12),
+        ipPoolName          DisplayString,
+        ipPoolGatewayIp     IpAddress,
+        ipPoolSubnetMask    IpAddress,
+        ipPoolPrimaryDNSIp  IpAddress,  
+        ipPoolSecondDNSIp   IpAddress,
+        ipPoolThirdDNSIp    IpAddress,
+        ipPoolFourthDNSIp   IpAddress,
+        ipPoolPrimaryNBNSIp IpAddress,   
+        ipPoolSecondNBNSIp  IpAddress,
+        ipPoolLeaseTime     Integer32,
+        ipPoolDnsSuffixName DisplayString,
+        ipPoolRowStatus     RowStatus,
+        ipPoolRouterIp        IpAddress,
+        ipPoolOption43Format  INTEGER,
+        ipPoolOption43Value  OCTET STRING,
+        ipPoolTftpServerName  DisplayString,
+        ipPoolBootfileName  DisplayString,
+        ipPoolTftpServerIpFirst	IpAddress,
+        ipPoolTftpServerIpSecond	IpAddress,	
+        ipPoolTftpServerIpThird	IpAddress,		
+        ipPoolTftpServerIpFourth	IpAddress,
+		ipPoolFtpServerUser	DisplayString,
+		ipPoolFtpServerPassword DisplayString,
+		ipPoolFtpServerIpaddress IpAddress,
+		ipPoolOption145Hostname DisplayString,
+		ipPoolOption145Hostver DisplayString
+      }
+
+    ipPoolIndex    OBJECT-TYPE
+        SYNTAX INTEGER(1..12) 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Pool ID"
+        ::= { ipPoolEntry 1 }
+        
+    ipPoolName    OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Pool Name ;
+            It can be made up of only  numbers and English letters,
+            and must begin with a letter."
+        ::= { ipPoolEntry 2 }    
+        
+    ipPoolGatewayIp    OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "Gateway IP Address of the Pool"
+        ::= { ipPoolEntry 3 }   
+
+    ipPoolSubnetMask    OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "SubnetMask of the Pool"
+        ::= { ipPoolEntry 4 }        
+       
+    ipPoolPrimaryDNSIp    OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            " IP Address of Primary DNS Server "
+        ::= { ipPoolEntry 5 }                 
+                                                        
+    ipPoolSecondDNSIp    OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            " IP Address of second DNS server "
+        ::= { ipPoolEntry 6 }    
+
+    ipPoolThirdDNSIp    OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            " IP Address of second DNS server "
+        ::= { ipPoolEntry 7 }    
+
+    ipPoolFourthDNSIp    OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            " IP Address of second DNS server "
+        ::= { ipPoolEntry 8 }    
+        
+        
+    ipPoolPrimaryNBNSIp    OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            " IP Address of primary NetBios name server "
+        ::= { ipPoolEntry 9 }            
+        
+    ipPoolSecondNBNSIp    OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            " IP Address of second NetBios name server "
+        ::= { ipPoolEntry 10 }            
+    
+    
+        
+     ipPoolLeaseTime    OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Lease time of ip pool"
+        ::= { ipPoolEntry 11 }    
+
+    ipPoolDnsSuffixName  OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Pool Dns suffix Name ;"
+        ::= { ipPoolEntry 12 }    
+        
+        
+    ipPoolRowStatus    OBJECT-TYPE       
+    SYNTAX RowStatus 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Row status"
+        ::= { ipPoolEntry 13 }        
+
+    ipPoolRouterIp    OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "Router IP Address of the Pool"
+        ::= { ipPoolEntry 14 }   
+
+    ipPoolOption43Format    OBJECT-TYPE
+        SYNTAX INTEGER {
+               ascii(1),
+               hex(2)
+               }
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "format value of dhcp option 43 of the Pool.need to set this first,then set ipPoolOption43Value"
+        ::= { ipPoolEntry 15 }   
+
+    ipPoolOption43Value    OBJECT-TYPE
+        SYNTAX OCTET STRING 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "value of dhcp option 43 of the Pool.max length is 64, when length is 0, means delete"
+        ::= { ipPoolEntry 16 }   
+
+    ipPoolTftpServerName  OBJECT-TYPE
+        SYNTAX   DisplayString(SIZE(1..32))
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp option 66: tftp-server name"
+        ::= { ipPoolEntry 17 }
+
+		ipPoolBootfileName    OBJECT-TYPE
+        SYNTAX   DisplayString(SIZE(1..32))
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp option 67: bootfile name"
+        ::= { ipPoolEntry 18 }
+        
+	ipPoolTftpServerIpFirst    OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp option 150: tftp-server first ipaddress"
+        ::= { ipPoolEntry 19 }
+	ipPoolTftpServerIpSecond    OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp option 150: tftp-server second ipaddress"
+        ::= { ipPoolEntry 20 }
+	ipPoolTftpServerIpThird   OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp option 150: tftp-server third ipaddress"
+        ::= { ipPoolEntry 21 }	
+	ipPoolTftpServerIpFourth   OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp option 150: tftp-server fourth ipaddress"
+        ::= { ipPoolEntry 22 }	
+	ipPoolFtpServerUser   OBJECT-TYPE
+        SYNTAX   DisplayString(SIZE(1..32))
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp option 141: FTP/SFTP user name"
+        ::= { ipPoolEntry 23 }
+	ipPoolFtpServerPassword   OBJECT-TYPE
+        SYNTAX   DisplayString(SIZE(1..32))
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp option 142: FTP/SFTP user password"
+        ::= { ipPoolEntry 24 }
+	ipPoolFtpServerIpaddress   OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp option 143: ftp-server ipaddress"
+        ::= { ipPoolEntry 25 }	
+	ipPoolOption145Hostname   OBJECT-TYPE
+        SYNTAX   DisplayString(SIZE(1..32))
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp option 145: host name"
+        ::= { ipPoolEntry 26 }
+	ipPoolOption145Hostver   OBJECT-TYPE
+        SYNTAX   DisplayString(SIZE(1..32))
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            "dhcp option 145: host version"
+        ::= { ipPoolEntry 27 }
+    ipSectionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ipSectionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of switch interfaces and associated properties."
+        ::= { ipPool 2 }        
+
+    ipSectionEntry  OBJECT-TYPE
+        SYNTAX ipSectionEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for switch interface control and status information."
+        INDEX { ipPoolID,ipSectionID }
+        ::= { ipSectionTable 1 }
+
+    ipSectionEntry ::= SEQUENCE {
+        ipPoolID               INTEGER(1..12),   
+        ipSectionID            INTEGER(1..8),   
+        ipSectionStartIp       IpAddress,
+        ipSectionEndIp         IpAddress,        
+        ipSectionIpCount      Integer32,
+        ipSectionRowStatus   RowStatus
+        }
+    
+    ipPoolID    OBJECT-TYPE
+        SYNTAX INTEGER(1..12) 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Pool ID"
+        ::= { ipSectionEntry 1 }
+            
+
+    ipSectionID    OBJECT-TYPE
+        SYNTAX INTEGER(1..8) 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "section ID"
+        ::= { ipSectionEntry 2 }
+        
+    ipSectionStartIp    OBJECT-TYPE
+        SYNTAX       IpAddress 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            " The start IP Address of a section in the specified pool "
+        ::= { ipSectionEntry 3 }   
+    
+    ipSectionEndIp    OBJECT-TYPE
+        SYNTAX       IpAddress 
+        MAX-ACCESS   read-write
+        STATUS current
+        DESCRIPTION
+            " The end IP Address of a section "
+        ::= { ipSectionEntry 4 }   
+        
+    ipSectionIpCount   OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of ip address in this section"
+        ::= { ipSectionEntry 5 }
+
+    ipSectionRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Row status of Entry"
+        ::= { ipSectionEntry 6 }
+    
+--  
+-- END of ipSectionTable                
+--
+
+    ipDisableTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ipDisableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of disabled ip."
+        ::= { ipPool 3 }
+
+
+    ipDisableEntry  OBJECT-TYPE
+        SYNTAX ipDisableEntry 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry of disabled ip ."
+        INDEX {ipDisableAddr}
+        ::= { ipDisableTable 1 }
+
+    ipDisableEntry ::= SEQUENCE {
+        ipDisableAddr          IpAddress,
+        ipDisablePoolId        INTEGER(1..12),
+        ipDisableStatus     INTEGER   
+      }
+
+    ipDisableAddr    OBJECT-TYPE
+        SYNTAX       IpAddress 
+        MAX-ACCESS   read-only
+        STATUS current
+        DESCRIPTION
+            " Disabled IP Address"
+        ::= { ipDisableEntry 1 }   
+          
+    ipDisablePoolId    OBJECT-TYPE
+        SYNTAX INTEGER(1..12) 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Pool ID of a disabled IP"
+        ::= { ipDisableEntry 2 }
+
+    ipDisableStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+               True(1),
+               False(2)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "status of Entry"
+        ::= { ipDisableEntry 3 }                
+        
+--  
+-- END of gbnL3IPPool-MIB                
+--
+
+END
