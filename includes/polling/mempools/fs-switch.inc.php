@@ -1,9 +1,7 @@
 <?php
 //
-// Polling for "fs-mibswitch" mempool_type, which belongs to Fiberstore devices, using
+// Polling for "fs-switch" mempool_type, which belongs to Fiberstore devices, using
 // SWITCH mib
-//
-// other Fiberstore devices might be handled by fs.inc.php
 //
 $oid = $mempool['mempool_index'];
 
