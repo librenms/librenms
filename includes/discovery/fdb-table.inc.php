@@ -39,15 +39,20 @@ if (!empty($insert)) {
 
                 if ($existing_fdbs[$vlan_id][$mac_address_entry]['port_id'] != $new_port) {
                     $port_fdb_id = $existing_fdbs[$vlan_id][$mac_address_entry]['ports_fdb_id'];
-
                     dbUpdate(
-                        array('port_id' => $new_port),
+                        array('port_id' => $new_port, 'date_last_seen' => array('NOW()'),),
                         'ports_fdb',
                         '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?',
                         array($device['device_id'], $vlan_id, $mac_address_entry)
                     );
                     echo 'U';
                 } else {
+                    dbUpdate(
+                        array('date_last_seen' => array('NOW()'),),
+                        'ports_fdb',
+                        '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?',
+                        array($device['device_id'], $vlan_id, $mac_address_entry)
+                    );
                     echo '.';
                 }
                 unset($existing_fdbs[$vlan_id][$mac_address_entry]);
@@ -57,6 +62,7 @@ if (!empty($insert)) {
                     'mac_address' => $mac_address_entry,
                     'vlan_id' => $vlan_id,
                     'device_id' => $device['device_id'],
+                    'date_discovered' => array('NOW()'),
                 );
 
                 dbInsert($new_entry, 'ports_fdb');
@@ -72,7 +78,7 @@ if (!empty($insert)) {
         foreach ($entries as $entry) {
             dbDelete(
                 'ports_fdb',
-                '`port_id` = ? AND `mac_address` = ? AND `vlan_id` = ? and `device_id` = ?',
+                '`port_id` = ? AND `mac_address` = ? AND `vlan_id` = ? and `device_id` = ? and `date_last_seen` < (NOW() - INTERVAL 5 DAY)',
                 array($entry['port_id'], $entry['mac_address'], $entry['vlan_id'], $entry['device_id'])
             );
             d_echo("Deleting: {$entry['mac_address']}\n", '-');
