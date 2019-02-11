@@ -11,10 +11,11 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     - sysDescr: NOKIA ISAM
-    - sysObjectID:
+    -
+      sysObjectID:
         - .1.3.6.1.4.1.637.61
         - .1.3.6.1.4.1.6527
-    - sysObjectID_except:
+      sysObjectID_except:
        - .1.3.6.1.4.1.6527.1 #exclude the TiMOS Routing Plattform.
 mib_dir:
     - nokia
