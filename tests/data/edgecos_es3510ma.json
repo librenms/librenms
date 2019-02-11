@@ -3354,11 +3354,15 @@
             "ports_fdb": [
                 {
                     "mac_address": "001cf0bb8374",
+                    "date_discovered": "2019-02-11 21:44:39",
+                    "date_last_seen": "2019-02-11 21:44:39",
                     "ifIndex": 9,
                     "vlan_vlan": 200
                 },
                 {
                     "mac_address": "001b382a7bc6",
+                    "date_discovered": "2019-02-11 21:44:39",
+                    "date_last_seen": "2019-02-11 21:44:39",
                     "ifIndex": 9,
                     "vlan_vlan": 1170
                 }
