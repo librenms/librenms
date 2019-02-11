@@ -24,6 +24,11 @@ To include users that have `Global-Read`, `Administrator` or `Normal-User` permi
 ## Using a Proxy?
 [Proxy Configuration](../Support/Configuration.md#proxy-support)
 
+## Using a AMQP based Transport?
+
+You need to install an additional php module : `bcmath` (eg `php72w-bcmath` for
+Centos 7)
+
 ## Alertmanager
 Alertmanager is an alert handling software, initially developed for alert processing sent by Prometheus. 
 
@@ -74,7 +79,7 @@ Copy your access token from the Boxcar app or from the Boxcar.io website and set
 ## Canopsis
 Canopsis is a hypervision tool. LibreNMS can send alerts to Canopsis which are then converted to canopsis events. 
 
-[Canopsis Docs](http://www.canopsis.org/wp-content/themes/canopsis/doc/sakura/user-guide/event-spec.html)
+[Canopsis Docs](https://doc.canopsis.net/guide-developpement/struct-event/)
 
 **Example:**
 
