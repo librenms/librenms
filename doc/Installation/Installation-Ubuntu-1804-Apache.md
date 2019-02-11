@@ -99,7 +99,8 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 ### Cron job
 
     cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
-> NOTE: Ensure necessary environment variables, like proxy settings, are properly read when cron triggers to job.
+
+> NOTE: Keep in mind  that cron, by default, only uses a very limited set of environment variables. You may need to configure proxy variables for the cron invocation. Alternatively adding the proxy settings in config.php is possible too. Read more on that here: https://docs.librenms.org/Support/Configuration/#proxy-support
 
 #### Copy logrotate config
 
