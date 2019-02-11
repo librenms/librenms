@@ -5,6 +5,7 @@ from os.path import dirname, abspath
 
 raw_input = getattr(__builtins__, 'raw_input', input)
 
+
 def confirm(question):
     valid = {"yes":True, "y":True, "ye":True, "no":False, "n":False}
     while 1:
@@ -67,3 +68,6 @@ elif args.restore:
         call(["git", "stash", "pop"], cwd=librenms_dir)
     else:
         print("Last stash was not created by " + __file__ + ". Aborting.")
+
+check_output(['rm', '-f', 'cache/os_defs.cache'])
+
