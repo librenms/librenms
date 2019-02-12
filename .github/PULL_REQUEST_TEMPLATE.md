@@ -8,5 +8,5 @@ DO NOT DELETE THIS TEXT
 
 #### Testers
 
-If you would like to test this pull request then please run: `./scripts/github-apply <pr_id>`, i.e `./scripts/github-apply 5926`
-After you are done testing, you can remove the changes with `./scripts/github-remove`.  If there are schema changes, you can ask on discord how to revert.
+If you would like to test this pull request then please run: `./lnms test:pull-request <pr_id>`, i.e `./scripts/github-apply 5926`
+After you are done testing, you can remove the changes with `./lnms test:pull-request <pr_id> --remove`.  If there are schema changes, you can ask on discord how to revert.
