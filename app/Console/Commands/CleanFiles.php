@@ -7,6 +7,7 @@ use LibreNMS\ComposerHelper;
 use LibreNMS\Config;
 use LibreNMS\Util\OSDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 class CleanFiles extends Command
@@ -69,8 +70,8 @@ class CleanFiles extends Command
         if ($this->confirm(__('commands.clean:files.confirm'))) {
             $commands = [
                 ["git", "reset"],
-                ["git", "clean", "-d", "-f"] + $this->dirs,
-                ["git", "checkout"] + $this->gitignores, //fix messed up gitignore file modes
+                array_merge(["git", "clean", "-d", "-f"], $this->dirs),
+                array_merge(["git", "checkout"], $this->gitignores), //fix messed up gitignore file modes
             ];
 
             if ($this->option('vendor')) {
@@ -79,6 +80,7 @@ class CleanFiles extends Command
 
             foreach ($commands as $command) {
                 $process = new Process($command, Config::installDir());
+                $this->line($process->getCommandLine(), null, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
                 if ($this->getOutput()->isVerbose()) {
                     $process->setTty(true);
