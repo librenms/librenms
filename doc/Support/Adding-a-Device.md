@@ -43,6 +43,6 @@ Device will be added into LibreNMS as Ping Only Device and will show ICMP Respon
 
 ![Ping Only](/img/add-ping-only.png)
 
-If you would like to add devices automatically then you will probably want to read the [Auto-discovery Setup](/Extensions/Auto-Discovery.md) guide.
+If you would like to add devices automatically then you will probably want to read the [Auto-discovery Setup](../Extensions/Auto-Discovery.md) guide.
 
-You may also want to add devices programatically, if so, take a look at our [API documentation](/API/index.md)
+You may also want to add devices programatically, if so, take a look at our [API documentation](../API/index.md)
