@@ -20,7 +20,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
     $device = device_by_id_cache($vars['device']);
     $attribs = get_dev_attribs($device['device_id']);
     $device['attribs'] = $attribs;
-    load_os($device);
+    \LibreNMS\Util\OSDefinition::populate($device);
 
     $entity_state = get_dev_entity_state($device['device_id']);
 

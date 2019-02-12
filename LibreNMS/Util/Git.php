@@ -25,7 +25,9 @@
 
 namespace LibreNMS\Util;
 
+use const false;
 use LibreNMS\Config;
+use Symfony\Component\Process\Process;
 
 class Git
 {
@@ -39,5 +41,23 @@ class Git
     {
         exec('git > /dev/null 2>&1', $response, $exit_code);
         return $exit_code === 1;
+    }
+
+    public static function applyPatch($number)
+    {
+        $number = (int)$number; // make sure $number is an integer
+        $url = "https://patch-diff.githubusercontent.com/raw/librenms/librenms/pull/$number.diff";
+        $process = new Process('curl -s "$url" | git apply --exclude=*.png -v');
+        $process->setTty(true);
+        $process->run(['url' => $url]);
+//    *) curl -s https://patch-diff.githubusercontent.com/raw/librenms/librenms/pull/${1}.diff | git apply --exclude=*.png -v ${2}
+//       rm -f cache/os_defs.cache 2> /dev/null;;
+//esac
+
+    }
+
+    private static function postPatch()
+    {
+        OSDefinition::updateCache(false);
     }
 }

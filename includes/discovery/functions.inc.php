@@ -19,6 +19,7 @@ use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Util\OSDefinition;
 
 function discover_new_device($hostname, $device = '', $method = '', $interface = '')
 {
@@ -101,14 +102,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
  */
 function load_discovery(&$device)
 {
-    $yaml_discovery = Config::get('install_dir') . '/includes/definitions/discovery/' . $device['os'] . '.yaml';
-    if (file_exists($yaml_discovery)) {
-        $device['dynamic_discovery'] = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($yaml_discovery)
-        );
-    } else {
-        unset($device['dynamic_discovery']);
-    }
+    $device['dynamic_discovery'] = OSDefinition::make($device['os'])->discovery();
 }
 
 /**
@@ -150,7 +144,7 @@ function discover_device(&$device, $force_module = false)
         }
     }
 
-    load_os($device);
+    OSDefinition::populate($device);
     load_discovery($device);
     register_mibs($device, Config::getOsSetting($device['os'], 'register_mibs', array()), 'includes/discovery/os/' . $device['os'] . '.inc.php');
 

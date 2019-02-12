@@ -282,7 +282,7 @@ class ModuleTestHelper
 
         if (!str_contains($full_name, '_')) {
             return [$full_name, ''];
-        } elseif (is_file(Config::get('install_dir') . "/includes/definitions/$full_name.yaml")) {
+        } elseif (is_file(OSDefinition::make($full_name)->getYamlFile())) {
             return [$full_name, ''];
         } else {
             list($rvar, $ros) = explode('_', strrev($full_name), 2);

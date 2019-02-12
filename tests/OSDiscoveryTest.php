@@ -25,8 +25,11 @@
 
 namespace LibreNMS\Tests;
 
+use const false;
 use LibreNMS\Config;
+use LibreNMS\Util\OSDefinition;
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
+use const true;
 
 class OSDiscoveryTest extends TestCase
 {
@@ -143,8 +146,8 @@ class OSDiscoveryTest extends TestCase
     {
         // make sure all OS are loaded
         $config_os = array_keys(Config::get('os'));
-        if (count($config_os) < count(glob(Config::get('install_dir').'/includes/definitions/*.yaml'))) {
-            load_all_os();
+        if (count($config_os) < count(glob(OSDefinition::make('*')->getYamlFile()))) {
+            OSDefinition::loadAll(false, true);
             $config_os = array_keys(Config::get('os'));
         }
 

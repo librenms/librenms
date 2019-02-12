@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use LibreNMS\Util\OSDefinition;
+
 $filename = basename(__FILE__);
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -206,7 +208,7 @@ function os_from_php($php_file)
 {
     $os = basename($php_file, '.inc.php');
 
-    if (file_exists("includes/definitions/$os.yaml")) {
+    if (file_exists(OSDefinition::make($os)->getYamlFile())) {
         return $os;
     }
 

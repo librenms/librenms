@@ -260,7 +260,7 @@ if ($format == "graph") {
     $os_selected = '""';
     if (isset($vars['os'])) {
         $device = ['os' => $vars['os']];
-        load_os($device);
+        \LibreNMS\Util\OSDefinition::populate($device);
         $os_selected = json_encode(['id' => $vars['os'], 'text' => \LibreNMS\Config::getOsSetting($vars['os'], 'text', $vars['os'])]);
     }
 

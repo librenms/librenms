@@ -28,6 +28,7 @@ namespace LibreNMS\Tests;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
 use LibreNMS\Config;
+use LibreNMS\Util\OSDefinition;
 use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -39,7 +40,7 @@ class YamlTest extends TestCase
      */
     public function testOSDefinitionSchema()
     {
-        $this->validateYamlFilesAgainstSchema('/includes/definitions', '/misc/os_schema.json');
+        $this->validateYamlFilesAgainstSchema(OSDefinition::$def_dir, '/misc/os_schema.json');
     }
 
     /**
@@ -47,7 +48,7 @@ class YamlTest extends TestCase
      */
     public function testDiscoveryDefinitionSchema()
     {
-        $this->validateYamlFilesAgainstSchema('/includes/definitions/discovery', '/misc/discovery_schema.json');
+        $this->validateYamlFilesAgainstSchema(OSDefinition::$discovery_dir, '/misc/discovery_schema.json');
     }
 
     private function validateYamlFilesAgainstSchema($dir, $schema_file)
@@ -87,12 +88,12 @@ class YamlTest extends TestCase
 
     public function listOsDefinitionFiles()
     {
-        return $this->listFiles('/includes/definitions/*.yaml');
+        return $this->listFiles(OSDefinition::make('*')->getYamlFile());
     }
 
     public function listDiscoveryFiles()
     {
-        return $this->listFiles('/includes/definitions/discovery/*.yaml');
+        return $this->listFiles(OSDefinition::make('*')->getDiscoveryYamlFile());
     }
 
     private function listFiles($pattern)

@@ -50,7 +50,7 @@ chdir($install_dir);
 ini_set('display_errors', 1);
 //error_reporting(E_ALL & ~E_WARNING);
 
-update_os_cache(true); // Force update of OS Cache
+\LibreNMS\Util\OSDefinition::updateCache(true); // Force update of OS Cache
 
 $snmpsim = new Snmpsim('127.1.6.2', 1162, null);
 if (getenv('SNMPSIM')) {
@@ -82,7 +82,7 @@ if (getenv('DBTEST')) {
     exec($cmd, $schema);
 
     Config::load(); // reload the config including database config
-    load_all_os();
+    \LibreNMS\Util\OSDefinition::loadAll(false, true);
 
     register_shutdown_function(function () use ($empty_db, $sql_mode) {
         global $config;

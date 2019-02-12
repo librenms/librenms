@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use LibreNMS\Util\OSDefinition;
+
 $init_modules = array('');
 require __DIR__ . '/../includes/init.php';
 
@@ -13,8 +15,9 @@ if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
 
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
     $device = device_by_id_cache($device_id);
-    $definition_file = $config['install_dir'] . "/includes/definitions/{$options['o']}.yaml";
-    $discovery_file  = $config['install_dir'] . "/includes/definitions/discovery/{$options['o']}.yaml";
+    $os_def = new OSDefinition($options['o']);
+    $definition_file = $os_def->getYamlFile();
+    $discovery_file  = $os_def->getDiscoveryYamlFile();
     $test_file       = $config['install_dir'] . "/tests/snmpsim/{$options['o']}.snmprec";
     if (file_exists($definition_file)) {
         c_echo("The OS {$options['o']} appears to exist already, skipping to sensors support\n");

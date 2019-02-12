@@ -98,7 +98,7 @@ EOH;
     if (isset($options['v'])) {
         $vdebug = true;
     }
-    update_os_cache(true); // Force update of OS Cache
+    \LibreNMS\Util\OSDefinition::updateCache(true); // Force update of OS Cache
 }
 
 if (isset($options['r'])) {

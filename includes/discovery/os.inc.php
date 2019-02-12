@@ -10,7 +10,7 @@ if ($os_name != $device['os']) {
     $device['os'] = $os_name;
     $sql = dbUpdate(array('os' => $os_name), 'devices', 'device_id=?', array($device['device_id']));
 
-    load_os($device);
+    \LibreNMS\Util\OSDefinition::populate($device);
     load_discovery($device);
     $os = OS::make($device);
 

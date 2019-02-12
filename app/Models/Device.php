@@ -11,6 +11,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\OSDefinition;
 
 class Device extends BaseModel
 {
@@ -20,6 +21,7 @@ class Device extends BaseModel
     protected $primaryKey = 'device_id';
     protected $fillable = ['hostname', 'ip', 'status', 'status_reason'];
     protected $casts = ['status' => 'boolean'];
+    protected $appends = ['os_group'];
 
     /**
      * Initialize this class
@@ -184,22 +186,17 @@ class Device extends BaseModel
         return $query->exists();
     }
 
-    public function loadOs($force = false)
+    /**
+     * Helper to load the os def
+     */
+    public function loadOs()
     {
-        global $config;
+        OSDefinition::make($this->os)->load();
 
-        $yaml_file = base_path('/includes/definitions/' . $this->os . '.yaml');
-
-        if ((empty($config['os'][$this->os]['definition_loaded']) || $force) && file_exists($yaml_file)) {
-            $os = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($yaml_file));
-
-            if (isset($config['os'][$this->os])) {
-                $config['os'][$this->os] = array_replace_recursive($os, $config['os'][$this->os]);
-            } else {
-                $config['os'][$this->os] = $os;
-            }
-
-            $config['os'][$this->os]['definition_loaded'] = true;
+        $this->type = \LibreNMS\Config::getOsSetting($this->os, 'type');
+        if ($this->isDirty('type')) {
+            Eventlog::log('Device type changed ' . $this->getOriginal('type') . ' => ' . $this->type, $this, 'system', 3);
+            $this->save();
         }
     }
 
@@ -404,6 +401,11 @@ class Device extends BaseModel
     public function setIpAttribute($ip)
     {
         $this->attributes['ip'] = inet_pton($ip);
+    }
+
+    public function getOsGroupAttribute()
+    {
+        return \LibreNMS\Config::getOsSetting($this->os, 'group');
     }
 
     public function setStatusAttribute($status)
