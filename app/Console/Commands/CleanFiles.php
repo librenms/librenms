@@ -84,10 +84,10 @@ class CleanFiles extends Command
                     $process->setTty(true);
                 }
                 $process->run();
-
-                ComposerHelper::install(!$this->getOutput()->isVerbose());
-                OSDefinition::updateCache(true);
             }
+
+            ComposerHelper::install(!$this->getOutput()->isVerbose());
+            OSDefinition::updateCache(true);
 
             $this->info(__('commands.clean:files.done'));
             return 0;
