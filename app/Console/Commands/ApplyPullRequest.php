@@ -37,19 +37,19 @@ class ApplyPullRequest extends Command
     {
         parent::__construct();
 
-        $this->setDescription(__('Apply or remove a GitHub pull request so you can test it locally'));
+        $this->setDescription(__('commands.pull-request.description'));
 
         $this->addArgument(
             'pull-request',
             InputArgument::REQUIRED,
-            __('The pull request number, PRs can be found here :url', ['url' => 'https://github.com/librenms/librenms/pull/'])
+            __('commands.pull-request.arguments.pull-request', ['url' => 'https://github.com/librenms/librenms/pull/'])
         );
 
         $this->addOption(
             'remove',
             'r',
             InputOption::VALUE_NONE,
-            __('Remove the pull request via reverse patch')
+            __('commands.pull-request.options.remove')
         );
     }
 
@@ -61,15 +61,18 @@ class ApplyPullRequest extends Command
     public function handle()
     {
         $number = $this->argument('pull-request');
-        $process = \LibreNMS\Util\Git::applyPullRequest($number);
+        $remove = $this->option('remove');
+        $process = \LibreNMS\Util\Git::applyPullRequest($number, $remove);
+
+        $key = $remove ? 'remove' : 'apply';
 
         if ($process->getExitCode() == 0) {
-            $this->info(__("Pull request :number applied", ['number', $number]));
+            $this->info(__("commands.pull-request.success.$key", ['number' => $number]));
         } elseif (str_contains($process->getErrorOutput(), 'error: unrecognized input')) {
-            $this->error(__("Could not download from GitHub or invalid PR number."));
+            $this->error(__('commands.pull-request.download_failed'));
         } else {
-            $this->error(__("An error occurred applying :number", ['number', $number]));
             $this->line($process->getErrorOutput());
+            $this->error(__("commands.pull-request.failed.$key", ['number' => $number]));
         }
 
         return $process->getExitCode();
