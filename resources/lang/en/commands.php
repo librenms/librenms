@@ -1,7 +1,14 @@
 <?php
 
 return [
-    'pull-request' => [
+    'clean:files' => [
+        'description' => 'Clean modified and untracked files, helpful to remove files after testing a PR or to just clean up',
+        'options' => [
+            'vendor' => 'Clean the vendor folder in addition to standard directories',
+        ],
+        'confirm' => 'Are you sure you want to delete all modified and untracked files?',
+    ],
+    'test:pull-request' => [
         'description' => 'Apply or remove a GitHub pull request so you can test it locally',
         'arguments' => [
             'pull-request' => 'The pull request number, PRs can be found here :url',

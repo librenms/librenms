@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use LibreNMS\Util\Git;
+use Symfony\Component\Console\Input\InputOption;
 
 class CleanFiles extends Command
 {
@@ -17,7 +19,8 @@ class CleanFiles extends Command
     {
         parent::__construct();
 
-        $this->setDescription(__('Clean modified and untracked files, helpful to remove files after testing PR or just clean up'));
+        $this->setDescription(__('commands.clean:files.description'));
+        $this->addOption('vendor', null, InputOption::VALUE_NONE, __('commands.clean:files.options.vendor'));
     }
 
     /**
@@ -27,8 +30,8 @@ class CleanFiles extends Command
      */
     public function handle()
     {
-        if ($this->confirm(__('Are you sure you want to delete all modified and untracked files?'))) {
-
+        if ($this->confirm(__('commands.clean:files.confirm'))) {
+            Git::clean($this->option('vendor'));
         }
 
         return 0;

@@ -37,19 +37,19 @@ class ApplyPullRequest extends Command
     {
         parent::__construct();
 
-        $this->setDescription(__('commands.pull-request.description'));
+        $this->setDescription(__('commands.test:pull-request.description'));
 
         $this->addArgument(
             'pull-request',
             InputArgument::REQUIRED,
-            __('commands.pull-request.arguments.pull-request', ['url' => 'https://github.com/librenms/librenms/pull/'])
+            __('commands.test:pull-request.arguments.pull-request', ['url' => 'https://github.com/librenms/librenms/pull/'])
         );
 
         $this->addOption(
             'remove',
             'r',
             InputOption::VALUE_NONE,
-            __('commands.pull-request.options.remove')
+            __('commands.test:pull-request.options.remove')
         );
     }
 
@@ -67,12 +67,12 @@ class ApplyPullRequest extends Command
         $key = $remove ? 'remove' : 'apply';
 
         if ($process->getExitCode() == 0) {
-            $this->info(__("commands.pull-request.success.$key", ['number' => $number]));
+            $this->info(__("commands.test:pull-request.success.$key", ['number' => $number]));
         } elseif (str_contains($process->getErrorOutput(), 'error: unrecognized input')) {
-            $this->error(__('commands.pull-request.download_failed'));
+            $this->error(__('commands.test:pull-request.download_failed'));
         } else {
             $this->line($process->getErrorOutput());
-            $this->error(__("commands.pull-request.failed.$key", ['number' => $number]));
+            $this->error(__("commands.test:pull-request.failed.$key", ['number' => $number]));
         }
 
         return $process->getExitCode();
