@@ -31,43 +31,9 @@ class AppServiceProvider extends ServiceProvider
         // load config
         Config::load();
 
-        // replace early boot logging redirect log to config location, unless APP_LOG is set
-        Log::getMonolog()->popHandler(); // remove existing errorlog logger
-        Log::useFiles(config('app.log') ?: Config::get('log_file', base_path('logs/librenms.log')), 'error');
-
-        // Blade directives (Yucky because of < L5.5)
-        Blade::directive('config', function ($key) {
-            return "<?php if (\LibreNMS\Config::get(($key))): ?>";
-        });
-        Blade::directive('notconfig', function ($key) {
-            return "<?php if (!\LibreNMS\Config::get(($key))): ?>";
-        });
-        Blade::directive('endconfig', function () {
-            return "<?php endif; ?>";
-        });
-        Blade::directive('admin', function () {
-            return "<?php if (auth()->check() && auth()->user()->isAdmin()): ?>";
-        });
-        Blade::directive('endadmin', function () {
-            return "<?php endif; ?>";
-        });
-
+        $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();
-
-        // Development service providers
-        if ($this->app->environment() !== 'production') {
-            if (class_exists(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class)) {
-                $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
-            }
-
-            if (config('app.debug') && class_exists(\Barryvdh\Debugbar\ServiceProvider::class)) {
-                // disable debugbar for api routes
-                if (!Request::is('api/*')) {
-                    $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
-                }
-            }
-        }
     }
 
     /**
@@ -78,6 +44,19 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerGeocoder();
+    }
+
+    private function bootCustomBladeDirectives()
+    {
+        Blade::if('config', function ($key) {
+            return \LibreNMS\Config::get($key);
+        });
+        Blade::if('notconfig', function ($key) {
+            return !\LibreNMS\Config::get($key);
+        });
+        Blade::if('admin', function () {
+            return auth()->check() && auth()->user()->isAdmin();
+        });
     }
 
     private function configureMorphAliases()
