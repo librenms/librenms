@@ -26,8 +26,12 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use LibreNMS\ComposerHelper;
+use LibreNMS\Config;
+use LibreNMS\Util\OSDefinition;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Process\Process;
 
 class ApplyPullRequest extends Command
 {
@@ -60,9 +64,22 @@ class ApplyPullRequest extends Command
      */
     public function handle()
     {
-        $number = $this->argument('pull-request');
+        $number = (int)$this->argument('pull-request'); // make sure pull-request is an integer
         $remove = $this->option('remove');
-        $process = \LibreNMS\Util\Git::applyPullRequest($number, $remove);
+        $url = $this->getPatchUrl($number);
+        $command = 'curl -s "$URL" | git apply --exclude=*.png --verbose';
+
+        if ($remove) {
+            $command .= ' --reverse';
+        }
+
+        $process = new Process($command, Config::installDir(), ['URL' => $url]);
+        $process->run();
+
+        if ($process->getExitCode() == 0) {
+            ComposerHelper::install(false);
+            OSDefinition::updateCache(true);
+        }
 
         $key = $remove ? 'remove' : 'apply';
 
@@ -76,5 +93,10 @@ class ApplyPullRequest extends Command
         }
 
         return $process->getExitCode();
+    }
+
+    private function getPatchUrl($number)
+    {
+        return "https://patch-diff.githubusercontent.com/raw/librenms/librenms/pull/$number.diff";
     }
 }
