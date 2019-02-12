@@ -111,14 +111,14 @@ class Git
             'storage/logs/.gitignore'
         ];
 
-        (new Process(["git", "reset", "-q"], Config::installDir()))->run();
-        (new Process(["git", "clean", "-d", "-f"] + $dirs, Config::installDir()))->run();
+        (new Process(["git", "reset", "-q"], Config::installDir()))->setTty(true)->run();
+        (new Process(["git", "clean", "-d", "-f"] + $dirs, Config::installDir()))->setTty(true)->run();
 
         //fix messed up gitignore file modes
-        (new Process(["git", "checkout"] + $gitignores, Config::installDir()))->run();
+        (new Process(["git", "checkout"] + $gitignores, Config::installDir()))->setTty(true)->run();
 
         if ($vendor) {
-            (new Process(["git", "clean",  "-x",  "-d",  "-f",  "vendor/"], Config::installDir()))->run();
+            (new Process(["git", "clean",  "-x",  "-d",  "-f",  "vendor/"], Config::installDir()))->setTty(true)->run();
         }
 
         self::postPatch();

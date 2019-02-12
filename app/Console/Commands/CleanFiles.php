@@ -32,6 +32,8 @@ class CleanFiles extends Command
     {
         if ($this->confirm(__('commands.clean:files.confirm'))) {
             Git::clean($this->option('vendor'));
+
+            $this->info(__('commands.clean:files.done'));
         }
 
         return 0;

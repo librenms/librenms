@@ -7,6 +7,7 @@ return [
             'vendor' => 'Clean the vendor folder in addition to standard directories',
         ],
         'confirm' => 'Are you sure you want to delete all modified and untracked files?',
+        'done' => 'Files have been cleaned',
     ],
     'test:pull-request' => [
         'description' => 'Apply or remove a GitHub pull request so you can test it locally',
