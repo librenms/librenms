@@ -1,6 +1,8 @@
 <?php
 
-foreach ($pre_cache['nokiaIsamEqpBoardTable'] as $index => $data) {
+$snmp_data['nokiaIsamEqpBoardTable'] = snmpwalk_cache_oid($device, 'eqptBoardTable', [], 'ASAM-EQUIP-MIB', 'nokia', '-OQUse');
+
+foreach ($snmp_data['nokiaIsamEqpBoardTable'] as $index => $data) {
     if (is_array($data)) {
         $oid = '.1.3.6.1.4.1.637.61.1.23.3.1.7.' . $index;
         $state_name = 'eqptBoardOperError';

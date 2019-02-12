@@ -1,9 +1,10 @@
 <?php
-echo 'NOKIA-ISAM ';
+
+$snmp_data['nokiaIsamSlotTemperature'] = snmpwalk_cache_twopart_oid($device, 'eqptBoardThermalSensorTable', [], 'ASAM-EQUIP-MIB', 'nokia');
 
 $multiplier = 1;
 $divisor    = 1;
-foreach ($pre_cache['nokiaIsamSlotTemperature'] as $slotId => $slot) {
+foreach ($snmp_data['nokiaIsamSlotTemperature'] as $slotId => $slot) {
     $slotName = $pre_cache['nokiaIsamSlot'][$slotId]['numBasedSlot'];
     foreach ($slot as $sensorId => $sensor) {
         if (is_numeric($sensor['eqptBoardThermalSensorActualTemperature'])) {

@@ -66,9 +66,3 @@ foreach ($pre_cache['nokiaIsamSfpPort'] as $slotId => $slot) {
         }
     }
 }
-
-// temperature pre cache
-$pre_cache['nokiaIsamSlotTemperature'] = snmpwalk_cache_twopart_oid($device, 'eqptBoardThermalSensorTable', [], 'ASAM-EQUIP-MIB', 'nokia');
-
-// state pre cache
-$pre_cache['nokiaIsamEqpBoardTable'] = snmpwalk_cache_oid($device, 'eqptBoardTable', [], 'ASAM-EQUIP-MIB', 'nokia', '-OQUse');

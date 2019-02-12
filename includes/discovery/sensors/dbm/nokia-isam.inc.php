@@ -1,5 +1,4 @@
 <?php
-echo 'NOKIA-ISAM ';
 
 $multiplier = 1;
 $divisor    = 1;
