@@ -25,8 +25,6 @@
 
 namespace LibreNMS\Util;
 
-use Composer\Composer;
-use const false;
 use LibreNMS\ComposerHelper;
 use LibreNMS\Config;
 use Symfony\Component\Process\Process;
@@ -46,26 +44,84 @@ class Git
     }
 
     /**
-     * Apply a pull request patch directly from github
+     * Apply a pull request patch directly from GitHub
      *
-     * @param int $number
+     * @param int $number The PR number from GitHub
+     * @param bool $reverse Reverse the patch
+     * @return Process
      */
-    public static function applyPatch($number)
+    public static function applyPullRequest($number, $reverse = false)
     {
         $number = (int)$number; // make sure $number is an integer
         $url = "https://patch-diff.githubusercontent.com/raw/librenms/librenms/pull/$number.diff";
-        $process = new Process('curl -s "$url" | git apply --exclude=*.png -v', Config::installDir(), ['url' => $url]);
-        $process->setTty(true);
+        $command = 'curl -s "$URL" | git apply --exclude=*.png --verbose';
+
+        if ($reverse) {
+            $command .= ' --reverse';
+        }
+
+        $process = new Process($command, Config::installDir(), ['URL' => $url]);
         $process->run();
 
         if ($process->getExitCode() == 0) {
             self::postPatch();
         }
+
+        return $process;
     }
 
-    public static function removePatch()
+    /**
+     * Clean files and try to reset LibreNMS back to a pristine state
+     *
+     * @param bool $vendor
+     */
+    public static function clean($vendor = false)
     {
 
+        $dirs = [
+            "app/",
+            "bootstrap/",
+            "contrib/",
+            "database/",
+            "doc/",
+            "html/",
+            "includes/",
+            "LibreNMS/",
+            "licenses/",
+            "mibs/",
+            "misc/",
+            "resources/",
+            "routes",
+            "scripts/",
+            "sql-schema/",
+            "tests/"
+        ];
+        $gitignores = [
+            '.gitignore',
+            'bootstrap/cache/.gitignore',
+            'logs/.gitignore',
+            'rrd/.gitignore',
+            'storage/app/.gitignore',
+            'storage/app/public/.gitignore',
+            'storage/debugbar/.gitignore',
+            'storage/framework/cache/.gitignore',
+            'storage/framework/sessions/.gitignore',
+            'storage/framework/testing/.gitignore',
+            'storage/framework/views/.gitignore',
+            'storage/logs/.gitignore'
+        ];
+
+        (new Process(["git", "reset", "-q"], Config::installDir()))->run();
+        (new Process(["git", "clean", "-d", "-f"] + $dirs, Config::installDir()))->run();
+
+        //fix messed up gitignore file modes
+        (new Process(["git", "checkout"] + $gitignores, Config::installDir()))->run();
+
+        if ($vendor) {
+            (new Process(["git", "clean",  "-x",  "-d",  "-f",  "vendor/"], Config::installDir()))->run();
+        }
+
+        self::postPatch();
     }
 
     private static function postPatch()

@@ -1,6 +1,6 @@
-#!/usr/bin/env php
-<?php
+#!/bin/sh
 
-require __DIR__.'/../bootstrap/autoload.php';
+LIBRENMS_DIR=`dirname "$(readlink -f "$0/..")"`
+cd $LIBRENMS_DIR
 
-\LibreNMS\Util\Git::applyPatch($argv[1]);
+./lnms test:pull-request "$@"

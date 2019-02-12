@@ -320,10 +320,3 @@ Artisan::command('scan
 
     (new Process($command))->setTty(true)->run();
 })->describe(__('Scan the network for hosts and try to add them to LibreNMS'));
-
-Artisan::command('test:pull-request
-    {pr : ' . __('The pull request number, PRs can be found here :url', ['url' => 'https://github.com/librenms/librenms/pull/']) . '}
-', function () {
-    /** @var \Illuminate\Console\Command $this */
-    \LibreNMS\Util\Git::applyPatch($this->argument('pr'));
-})->describe(__('Test a GitHub pull request by applying it locally'));
