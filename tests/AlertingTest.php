@@ -35,9 +35,9 @@ class AlertTest extends TestCase
     public function testJsonAlertCollection()
     {
         $rules = get_rules_from_json();
-        $this->assertInternalType('array', $rules);
+        $this->assertIsArray($rules);
         foreach ($rules as $rule) {
-            $this->assertInternalType('array', $rule);
+            $this->assertIsArray($rule);
         }
     }
 
@@ -58,6 +58,8 @@ class AlertTest extends TestCase
                 }
             }
         }
+
+        $this->expectNotToPerformAssertions();
     }
 
     private function getTransportFiles()

@@ -27,11 +27,6 @@ class Handler extends ExceptionHandler
 
     public function render($request, Exception $exception)
     {
-        // emulate Laravel 5.5 renderable exceptions
-        if (method_exists($exception, 'render')) {
-            return $exception->render($request);
-        }
-
         return parent::render($request, $exception);
     }
 

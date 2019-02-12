@@ -17,7 +17,7 @@ of the transport config to get it ready for use.
  actually interacts with the 3rd party API, invokes the mail command or whatever you want your alert to do.
  
 `configTemplate()` - This is used to define the form that will accept the transport config in the webui and then what 
-data should be validated and how. Validation is done using [Laravel validation](https://laravel.com/docs/5.4/validation)
+data should be validated and how. Validation is done using [Laravel validation](https://laravel.com/docs/5.7/validation)
 
 The following function is __not__ required for new Transports and is for legacy reasons only. `deliverAlertOld()`.
 
