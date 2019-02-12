@@ -58,7 +58,9 @@ class Git
         $process->setTty(true);
         $process->run();
 
-        self::postPatch();
+        if ($process->getExitCode() == 0) {
+            self::postPatch();
+        }
     }
 
     public static function removePatch()
