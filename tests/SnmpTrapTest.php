@@ -33,8 +33,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 
-include '/opt/librenms/includes/functions.inc.php';
-include '/opt/librenms/includes/alerts.inc.php';
+include_once __DIR__ . '/includes/alerts.inc.php';
 
 class SnmpTrapTest extends LaravelTestCase
 {
