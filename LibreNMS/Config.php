@@ -72,7 +72,7 @@ class Config
 
         $config = []; // start fresh
 
-        $install_dir = realpath(__DIR__ . '/../');
+        $install_dir = self::installDir();
         $config['install_dir'] = $install_dir;
 
         // load defaults
@@ -557,5 +557,11 @@ class Config
             }
         }
         return $binary;
+    }
+
+    public static function installDir()
+    {
+        global $config;
+        return isset($config['install_dir']) ? $config['install_dir'] : realpath(__DIR__ . '/..');
     }
 }

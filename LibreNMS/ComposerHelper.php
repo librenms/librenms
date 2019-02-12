@@ -27,6 +27,7 @@ namespace LibreNMS;
 
 use Composer\Installer\PackageEvent;
 use Composer\Script\Event;
+use Symfony\Component\Process\Process;
 
 class ComposerHelper
 {
@@ -72,6 +73,25 @@ class ComposerHelper
         }
     }
 
+    /**
+     * Call composer install.
+     * Check if developer dependencies are installed and call appropriately.
+     *
+     * @param bool $quiet hide output
+     */
+    public static function install($quiet = false)
+    {
+        $install_dir = Config::installDir();
+
+        $command = ['./scripts/composer_wrapper.php', 'install'];
+        if (!self::isDevInstall()) {
+            $command[] = '--no-dev';
+        };
+
+        $process = new Process($command, $install_dir);
+        $process->setTty(!$quiet);
+        $process->run();
+    }
 
     /**
      * Initially populate .env file
@@ -171,5 +191,15 @@ class ComposerHelper
     {
         $cmd = "set -v\n" . implode(PHP_EOL, (array)$cmds);
         passthru($cmd);
+    }
+
+    /**
+     * Check if this install has developer dependencies installed
+     *
+     * @return bool
+     */
+    private static function isDevInstall()
+    {
+        return file_exists(Config::installDir() . '/vendor/phpunit');
     }
 }

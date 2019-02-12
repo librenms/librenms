@@ -161,7 +161,7 @@ class OSDefinition
 
             // remove previously cached os settings and replace with user settings
             $config = ['os' => []]; // local $config variable, not global
-            include Config::get('install_dir') . "/config.php";
+            include Config::installDir() . "/config.php";
             Config::set('os', $config['os']);
 
             // load the os defs fresh from cache (merges with existing OS settings)
@@ -182,7 +182,7 @@ class OSDefinition
      */
     public static function getCacheFile()
     {
-        return Config::get('install_dir') . "/cache/os_defs.cache";
+        return Config::installDir() . "/cache/os_defs.cache";
     }
 
     /**
@@ -192,7 +192,7 @@ class OSDefinition
      */
     public function getYamlFile()
     {
-        return Config::get('install_dir') . self::$def_dir . $this->os . '.yaml';
+        return Config::installDir() . self::$def_dir . $this->os . '.yaml';
     }
 
     /**
@@ -202,7 +202,7 @@ class OSDefinition
      */
     public function getDiscoveryYamlFile()
     {
-        return Config::get('install_dir') . self::$discovery_dir . $this->os . '.yaml';
+        return Config::installDir() . self::$discovery_dir . $this->os . '.yaml';
     }
 
     private static function cacheIsValid()
