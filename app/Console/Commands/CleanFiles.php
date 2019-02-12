@@ -69,13 +69,14 @@ class CleanFiles extends Command
     {
         if ($this->confirm(__('commands.clean:files.confirm'))) {
             $commands = [
-                ["git", "reset"],
-                array_merge(["git", "clean", "-d", "-f"], $this->dirs),
-                array_merge(["git", "checkout"], $this->gitignores), //fix messed up gitignore file modes
+                ['git', 'reset'],
+                ['git', 'checkout', '.'],
+                array_merge(['git', 'clean', '-d', '-f'], $this->dirs),
+                array_merge(['git', 'checkout'], $this->gitignores), //fix messed up gitignore file modes
             ];
 
             if ($this->option('vendor')) {
-                $commands[] = ["git", "clean", "-x", "-d", "-f", "vendor/"];
+                $commands[] = ['git', 'clean', '-x', '-d', '-f', 'vendor/'];
             }
 
             foreach ($commands as $command) {
