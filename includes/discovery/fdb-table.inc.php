@@ -74,18 +74,9 @@ if (!empty($insert)) {
         echo PHP_EOL;
     }
 
+    //We do not delete anything here, as daily.sh will take care of the cleaning. 
+
     // Delete old entries from the database
-    foreach ($existing_fdbs as $vlan_id => $entries) {
-        foreach ($entries as $entry) {
-            //only for testing purposes, will move to ./daily.sh
-            dbDelete(
-                'ports_fdb',
-                '`port_id` = ? AND `mac_address` = ? AND `vlan_id` = ? and `device_id` = ? and `updated_at` < (NOW() - INTERVAL 5 DAY)',
-                array($entry['port_id'], $entry['mac_address'], $entry['vlan_id'], $entry['device_id'])
-            );
-            d_echo("Deleting: {$entry['mac_address']}\n", '-');
-        }
-    }
 }
 
 unset(

@@ -273,6 +273,7 @@ main () {
                                "bill_data"
                                "alert_log"
                                "rrd_purge"
+                               "ports_fdb"
                                "ports_purge");
                 call_daily_php "${options[@]}";
             ;;
