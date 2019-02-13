@@ -48,7 +48,7 @@ if (!empty($insert)) {
                     echo 'U';
                 } else {
                     dbUpdate(
-                        array('updated_at' => array('NOW()'),),//we need to do this unless we use Eloquent "update" method
+                        array('updated_at' => array('NOW()'),), //we need to do this unless we use Eloquent "update" method
                         'ports_fdb',
                         '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?',
                         array($device['device_id'], $vlan_id, $mac_address_entry)
@@ -74,7 +74,7 @@ if (!empty($insert)) {
         echo PHP_EOL;
     }
 
-    //We do not delete anything here, as daily.sh will take care of the cleaning. 
+    //We do not delete anything here, as daily.sh will take care of the cleaning.
 
     // Delete old entries from the database
 }
