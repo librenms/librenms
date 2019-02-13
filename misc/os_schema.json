@@ -366,6 +366,12 @@
                 "type": "string"
             }
         },
+        "bad_iftype": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
         "processor_stacked": {
             "type": "boolean"
         },
