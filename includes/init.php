@@ -101,6 +101,12 @@ if (!module_selected('nodb', $init_modules)) {
 
     if (!\LibreNMS\DB\Eloquent::isConnected()) {
         echo "Could not connect to database, check logs/librenms.log.\n";
+
+        if (!extension_loaded('mysqlnd') || !extension_loaded('pdo_mysql')) {
+            echo "\nYour PHP is missing required mysql extension(s), please install and enable.\n";
+            echo "Check the install docs for more info: https://docs.librenms.org/Installation/\n";
+        }
+
         exit;
     }
 }
