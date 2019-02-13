@@ -38,9 +38,7 @@ class Ruckuswireless extends OS implements
 
 // Do not get total client count if only 1 SSID
         if (count($total_oids) > 1) {
-
 // Find Total Client Count
-
             $oid = '.1.3.6.1.4.1.25053.1.2.1.1.1.15.2.0'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
             array_push($sensors, new WirelessSensor('clients', $this->getDeviceId(), $oid, 'ruckuswireless', ($index + 1), 'System Total:'));
         }
