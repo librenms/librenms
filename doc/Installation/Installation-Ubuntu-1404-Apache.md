@@ -203,6 +203,8 @@ LibreNMS uses Job Snijders' [poller-wrapper.py][1].  By default, the cron job ru
 Create the cronjob
 
     cp librenms.nonroot.cron /etc/cron.d/librenms
+    
+> NOTE: Keep in mind  that cron, by default, only uses a very limited set of environment variables. You may need to configure proxy variables for the cron invocation. Alternatively adding the proxy settings in config.php is possible too. The config.php file will be created in the upcoming steps. Review the following URL after you finished librenms install steps: https://docs.librenms.org/Support/Configuration/#proxy-support
 
 ### Copy logrotate config ###
 
