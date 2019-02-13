@@ -41,8 +41,8 @@ class Ruckuswireless extends OS implements
 
 // Find Total Client Count
 
-        $oid = '.1.3.6.1.4.1.25053.1.2.1.1.1.15.2.0'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
-        array_push($sensors, new WirelessSensor('clients', $this->getDeviceId(), $oid, 'ruckuswireless', ($index + 1), 'System Total:'));
+            $oid = '.1.3.6.1.4.1.25053.1.2.1.1.1.15.2.0'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
+            array_push($sensors, new WirelessSensor('clients', $this->getDeviceId(), $oid, 'ruckuswireless', ($index + 1), 'System Total:'));
         }
         return $sensors;
     }
@@ -55,14 +55,14 @@ class Ruckuswireless extends OS implements
         $oidtotal = '.1.3.6.1.4.1.25053.1.2.1.1.1.15.15.0'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumRegisteredAP.0
         $sensorindex = 0;
                 $sensors[] = new WirelessSensor(
-                'ap-count',
-                $this->getDeviceId(),
-                $oidconnected,
-                'ruckuswireless',
-                ++$sensorindex,
-                'Connected APs',
-                $count
-            );
+                    'ap-count',
+                    $this->getDeviceId(),
+                    $oidconnected,
+                    'ruckuswireless',
+                    ++$sensorindex,
+                    'Connected APs',
+                    $count
+                );
 
          array_push($sensors, new WirelessSensor('ap-count', $this->getDeviceId(), $oidtotal, 'ruckuswireless', ++$sensorindex, 'Total APs'));
         return $sensors;
