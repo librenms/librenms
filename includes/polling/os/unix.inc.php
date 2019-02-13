@@ -23,18 +23,7 @@ if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "p
         $hardware = "Generic ARM";
     }
 
-    # Distro "extend" support
-
-    # NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"distro\"
-    $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.8072.1.3.2.3.1.1.6.100.105.115.116.114.111", "-Oqv", "NET-SNMP-EXTEND-MIB"));
-
-    if (!$features) { # No "extend" support, try legacy UCD-MIB shell support
-        $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB"));
-    }
-
-    if (!$features) { # No "extend" support, try "exec" support
-        $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB"));
-    }
+    $features = snmp_get($device, 'nsExtendOutput1Line."distro"', '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
     # Detect Dell hardware via OpenManage SNMP
     $hw = snmp_get($device, ".1.3.6.1.4.1.674.10892.1.300.10.1.9.1", "-Oqv", "MIB-Dell-10892");
@@ -48,35 +37,8 @@ if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "p
         }
     }
 
-    if (empty($hw)) {
-    # Try detect using the extended option (dmidecode)
-        $version_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.4.1.2.8.104.97.114.100.119.97.114.101.1", "-Oqv"));
-        if (!$version_dmide) { # No "extend" support, try "exec" support
-            $version_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.101.1", "-Oqv"));
-        }
-        $version_dmide = trim(str_replace("\"", "", $version_dmide));
-
-        $hardware_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.4.1.2.12.109.97.110.117.102.97.99.116.117.114.101.114.1", "-Oqv"));
-        if (!$hardware_dmide) { # No "extend" support, try "exec" support
-            $hardware_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.101.1", "-Oqv"));
-        }
-        $hardware_dmide = trim(str_replace("\"", "", $hardware_dmide));
-        if ($hardware_dmide) {
-            $hardware = $hardware_dmide;
-            if ($version_dmide) {
-                $hardware = $hardware . " [" . $version_dmide . "]";
-            }
-        }
-    }
-
     $serial = snmp_get($device, ".1.3.6.1.4.1.674.10892.1.300.10.1.11.1", "-Oqv", "MIB-Dell-10892");
     $serial = trim(str_replace("\"", "", $serial));
-
-    # Try detect using the SNMP Extend option (dmidecode)
-    if (!$serial) {
-        $serial = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.4.4.1.2.6.115.101.114.105.97.108.1", "-Oqv"));
-        $serial = trim(str_replace("\"", "", $serial));
-    }
 
     # Use agent DMI data if available
     if (isset($agent_data['dmi'])) {
@@ -103,17 +65,7 @@ if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "p
     }
 
     # Distro "extend" support
-
-    # NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"distro\"
-    $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.8072.1.3.2.3.1.1.6.100.105.115.116.114.111", "-Oqv", "NET-SNMP-EXTEND-MIB"));
-
-    if (!$features) { # No "extend" support, try legacy UCD-MIB shell support
-        $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB"));
-    }
-
-    if (!$features) { # No "extend" support, try "exec" support
-        $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB"));
-    }
+    $features = snmp_get($device, 'nsExtendOutput1Line."distro"', '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
     if (!$features) {
         $features = 'GENERIC';
@@ -159,4 +111,19 @@ if ($device['os'] == "linux" || $device['os'] == "endian" || $device['os'] == "p
     $output = preg_split("/ /", $device['sysDescr']);
     $version = $output[2];
     $hardware = $output[6];
+}
+
+// snmp extend scripts
+if (empty($hardware) || starts_with($hardware, 'Generic')) {
+    # Try detect using the snmp extend option (dmidecode or /sys/devices/virtual/dmi)
+    $hw = snmp_get($device, 'nsExtendOutput1Line."hardware"', '-Oqv', 'NET-SNMP-EXTEND-MIB');
+
+    if ($hw) {
+        $mfg = snmp_get($device, 'nsExtendOutput1Line."manufacturer"', '-Oqv', 'NET-SNMP-EXTEND-MIB');
+        $hardware = trim("$mfg $hw");
+    }
+}
+
+if (empty($serial)) {
+    $serial = snmp_get($device, 'nsExtendOutput1Line."serial"', '-Oqv', 'NET-SNMP-EXTEND-MIB');
 }
