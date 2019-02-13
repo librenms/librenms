@@ -2454,18 +2454,20 @@ function dump_db_schema()
             }
         }
 
-        $create = dbFetchRow("SHOW CREATE TABLE `$table`")['Create Table'];
-        $constraint_regex = '/CONSTRAINT `(?<name>[A-Za-z_0-9]+)` FOREIGN KEY \(`(?<foreign_key>[A-Za-z_0-9]+)`\) REFERENCES `(?<table>[A-Za-z_0-9]+)` \(`(?<key>[A-Za-z_0-9]+)`\) ?(?<extra>[ A-Z]+)?/';
-        $constraint_count = preg_match_all($constraint_regex, $create, $constraints);
-        for ($i = 0; $i < $constraint_count; $i++) {
-            $constraint_name = $constraints['name'][$i];
-            $output[$table]['Constraints'][$constraint_name] = [
-                'name' => $constraint_name,
-                'foreign_key' => $constraints['foreign_key'][$i],
-                'table' => $constraints['table'][$i],
-                'key' => $constraints['key'][$i],
-                'extra' => $constraints['extra'][$i],
-            ];
+        $create = dbFetchRow("SHOW CREATE TABLE `$table`");
+        if (isset($create['Create Table'])) {
+            $constraint_regex = '/CONSTRAINT `(?<name>[A-Za-z_0-9]+)` FOREIGN KEY \(`(?<foreign_key>[A-Za-z_0-9]+)`\) REFERENCES `(?<table>[A-Za-z_0-9]+)` \(`(?<key>[A-Za-z_0-9]+)`\) ?(?<extra>[ A-Z]+)?/';
+            $constraint_count = preg_match_all($constraint_regex, $create['Create Table'], $constraints);
+            for ($i = 0; $i < $constraint_count; $i++) {
+                $constraint_name = $constraints['name'][$i];
+                $output[$table]['Constraints'][$constraint_name] = [
+                    'name' => $constraint_name,
+                    'foreign_key' => $constraints['foreign_key'][$i],
+                    'table' => $constraints['table'][$i],
+                    'key' => $constraints['key'][$i],
+                    'extra' => $constraints['extra'][$i],
+                ];
+            }
         }
     }
 
