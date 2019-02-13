@@ -38,6 +38,7 @@ class Mattermost extends Transport
             'username' => $this->config['mattermost-username'],
             'icon' => $this->config['mattermost-icon'],
             'channel' => $this->config['mattermost-channel'],
+            'author_name' => $this->config['mattermost-author_name'],
         ];
 
         return $this->contactMattermost($obj, $mattermost_opts);
@@ -65,7 +66,7 @@ class Mattermost extends Transport
                     'title' => $obj['title'],
                     'text' => $obj['msg'],
                     'mrkdwn_in' => ['text', 'fallback'],
-                    'author_name' => $obj['hostname'],
+                    'author_name' => $api['author_name'],
                 ],
             ],
             'channel' => $api['channel'],
@@ -123,6 +124,12 @@ class Mattermost extends Transport
                     'title' => 'Icon',
                     'name' => 'mattermost-icon',
                     'descr' => 'Icon URL',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Author_name',
+                    'name' => 'mattermost-author_name',
+                    'descr' => 'Optional name used to identify the author',
                     'type' => 'text',
                 ],
             ],
