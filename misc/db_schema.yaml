@@ -1241,8 +1241,8 @@ ports_fdb:
     - { Field: mac_address, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: vlan_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-    - { Field: date_discovered, Type: timestamp, 'Null': true, Extra: '' }
-    - { Field: date_last_seen, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ports_fdb_id], Unique: true, Type: BTREE }
     mac_address: { Name: mac_address, Columns: [mac_address], Unique: false, Type: BTREE }
