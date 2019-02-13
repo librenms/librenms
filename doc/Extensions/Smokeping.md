@@ -16,6 +16,7 @@ For new installations, we can use the included `scripts/gen_smokeping.php` scrip
 
 This guide assumes you have already [installed librenms](http://docs.librenms.org/Installation/Installing-LibreNMS/), and is working with either **Apache** or **nginx**.
 
+Note: You may need to install `fcgiwrap` as well (at least with `nginx`).
 
 ### Install Smokeping
 
@@ -53,7 +54,7 @@ LibreNMS comes equipped with a script which exports our list of nodes from Libre
 To generate the config file once: 
 
 ```bash
-php /opt/librenms/scripts/gen_smokeping.php > /opt/smokeping/etc/librenms.conf
+(echo "+ LibreNMS"; php -f /opt/librenms/scripts/gen_smokeping.php) | sudo tee /etc/smokeping/config.d/librenms.conf
 ```
 
 **However**, it is more desirable to set up a cron job which regenerates our list of nodes and adds these into Smokeping. You can add the following to the end of your librenms cron job, e.g. `nano /etc/cron.d/librenms` 
@@ -79,7 +80,7 @@ menu = Top
 title = Network Latency Grapher
 ```
 
-Which can cause Smokeping to not start. `echo "+ LibreNMS"` appends this in our smokeping config file. We could remove the above from the gen_smokeping script, however this may cause issues with LibreNMS failing to update with `daily.sh` due config files being modified. 
+Which can cause Smokeping to not start. `echo "+ LibreNMS"` prepends this in our smokeping config file. We could remove the above from the gen_smokeping script, however this may cause issues with LibreNMS failing to update with `daily.sh` due config files being modified. 
 
 
 ## Configure LibreNMS
