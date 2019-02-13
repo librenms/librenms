@@ -17,19 +17,19 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
     protected $ldap_connection;
     protected $is_bound = false; // this variable tracks if bind has been called so we don't call it multiple times
 
-    public function authenticate($username, $password)
+    public function authenticate($credentials)
     {
         $this->connect();
 
         if ($this->ldap_connection) {
             // bind with sAMAccountName instead of full LDAP DN
-            if ($username && $password && ldap_bind($this->ldap_connection, $username . '@' . Config::get('auth_ad_domain'), $password)) {
+            if (!empty($credentials['username']) && !empty($credentials['password']) && ldap_bind($this->ldap_connection, $credentials['username'] . '@' . Config::get('auth_ad_domain'), $credentials['password'])) {
                 $this->is_bound = true;
                 // group membership in one of the configured groups is required
                 if (Config::get('auth_ad_require_groupmembership', true)) {
                     // cycle through defined groups, test for memberOf-ship
                     foreach (Config::get('auth_ad_groups', array()) as $group => $level) {
-                        if ($this->userInGroup($username, $group)) {
+                        if ($this->userInGroup($credentials['username'], $group)) {
                             return true;
                         }
                     }
@@ -47,7 +47,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             }
         }
 
-        if (!isset($password) || $password == '') {
+        if (empty($credentials['password'])) {
             throw new AuthenticationException('A password is required');
         } elseif (Config::get('auth_ad_debug', false)) {
             ldap_get_option($this->ldap_connection, LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error);
@@ -208,11 +208,14 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
     }
 
-    public function bind($username = null, $password = null)
+    public function bind($credentials)
     {
         if (!$this->ldap_connection) {
             $this->connect();
         }
+
+        $username = $credentials['username'] ?? null;
+        $password = $credentials['password'] ?? null;
 
         if (Config::has('auth_ad_binduser') && Config::has('auth_ad_bindpassword')) {
             $username = Config::get('auth_ad_binduser');

@@ -15,9 +15,12 @@ class MysqlAuthorizer extends AuthorizerBase
     protected static $CAN_UPDATE_USER = 1;
     protected static $CAN_UPDATE_PASSWORDS = 1;
 
-    public function authenticate($username, $password)
+    public function authenticate($credentials)
     {
-        $hash = User::thisAuth()->where('username', $username)->value('password');
+        $username = $credentials['username'] ?? null;
+        $password = $credentials['password'] ?? null;
+
+        $hash = User::thisAuth()->where(['username' => $username])->value('password');
 
         // check for old passwords
         if (strlen($hash) == 32) {

@@ -68,7 +68,8 @@
     "suggest": {
         "ext-memcached": "Required if you utilize distributed polling",
         "ext-posix": "Allows for additional validation tests",
-        "ext-mysqlnd": "*"
+        "ext-mysqlnd": "*",
+        "ext-ldap": "*"
     },
     "autoload": {
         "exclude-from-classmap": [
