@@ -100,7 +100,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 
     cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
 
-> NOTE: Keep in mind  that cron, by default, only uses a very limited set of environment variables. You may need to configure proxy variables for the cron invocation. Alternatively adding the proxy settings in config.php is possible too. Read more on that here: https://docs.librenms.org/Support/Configuration/#proxy-support
+> NOTE: Keep in mind  that cron, by default, only uses a very limited set of environment variables. You may need to configure proxy variables for the cron invocation. Alternatively adding the proxy settings in config.php is possible too. The config.php will be created in the upcoming steps, review the following URL after you finished librenms install steps: https://docs.librenms.org/Support/Configuration/#proxy-support
 
 #### Copy logrotate config
 
