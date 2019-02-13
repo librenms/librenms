@@ -60,10 +60,11 @@ if (is_file($install_dir . '/composer.phar')) {
     // self-update
     passthru("$exec self-update -q" . $extra_args);
 } else {
+    $stream_default_opts = null;
     if ($proxy) {
         $stream_default_opts = array(
             ($use_https ? 'https' : 'http') => array(
-                'proxy' => str_replace(array('http://', 'https://'), 'tcp://', $proxy),
+                'proxy' => 'tcp://' . str_replace(array('http://', 'https://'), '', $proxy),
                 'request_fulluri' => true,
             )
         );
@@ -71,9 +72,11 @@ if (is_file($install_dir . '/composer.phar')) {
         stream_context_set_default($stream_default_opts);
     }
 
+    echo "Using proxy: " . var_export($stream_default_opts, 1) . PHP_EOL;
+
     // Download installer signature from github
     $sig_url = ($use_https ? 'https' : 'http') . '://composer.github.io/installer.sig';
-    $good_sha = trim(@file_get_contents($sig_url));
+    $good_sha = trim(@file_get_contents($sig_url, false, $stream_default_opts));
 
     if (empty($good_sha)) {
         echo "Error: Failed to download installer signature from $sig_url\n";
