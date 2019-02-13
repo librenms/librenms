@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "edgecos",
                     "type": "network",
                     "serial": null,
-                    "icon": "edge-core.png"
+                    "icon": "edge-core.png",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": " ",
                     "hardware": null,
                     "features": null,
-                    "location": "<private>",
                     "os": "edgecos",
                     "type": "network",
                     "serial": null,
-                    "icon": "edge-core.png"
+                    "icon": "edge-core.png",
+                    "location": "<private>"
                 }
             ]
         }
