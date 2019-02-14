@@ -50,20 +50,20 @@ return [
 
         'console' => [
             'driver' => 'stack',
-            'channels' => ['daily', 'stderr'],
+            'channels' => ['single', 'stderr'],
             'ignore_exceptions' => false,
         ],
 
         'single' => [
             'driver' => 'single',
             'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
-            'level' => 'debug',
+            'level' => 'error',
         ],
 
         'daily' => [
             'driver' => 'daily',
             'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
-            'level' => 'debug',
+            'level' => 'error',
             'days' => 14,
         ],
 
@@ -92,6 +92,7 @@ return [
             'with' => [
                 'stream' => 'php://stderr',
             ],
+            'level' => 'debug',
         ],
 
         'syslog' => [
