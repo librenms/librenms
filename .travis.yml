@@ -30,11 +30,16 @@ before_install:
   - cp tests/config/config.test.php config.php
 
 install:
-  - composer install --prefer-dist --no-interaction
-  - pip install --user snmpsim pylint mysql-python
+  - travis_retry composer install --no-interaction --prefer-dist --no-suggest
+  - pip3 install --user snmpsim pylint
+  - pip install --user mysql-python
 
 after_failure:
   - tail /tmp/snmpsimd.log
+
+before_script:
+  - test -z "$BROWSER_TEST" || google-chrome-stable --headless --disable-gpu --remote-debugging-port=9515 http://localhost &
+  - test -z "$BROWSER_TEST" || php artisan serve &
 
 script:
   - set -e
@@ -42,7 +47,7 @@ script:
   - php scripts/pre-commit.php -q -l
   - php scripts/pre-commit.php -q -s
   - php scripts/pre-commit.php -u --db --snmpsim --fail-fast
-  - test -z "$BROWSER_TEST" || ((php artisan serve --env=dusk.testing 2>/dev/null &)&& php artisan dusk:update && php artisan dusk)
+  - test -z "$BROWSER_TEST" || php artisan dusk
   - bash -n daily.sh
   - pylint -E poller-wrapper.py discovery-wrapper.py
   - bash scripts/deploy-docs.sh

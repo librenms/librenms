@@ -3,9 +3,9 @@
 namespace LibreNMS\Tests;
 
 use Facebook\WebDriver\Chrome\ChromeOptions;
-use Laravel\Dusk\TestCase as BaseTestCase;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Laravel\Dusk\TestCase as BaseTestCase;
 
 abstract class DuskTestCase extends BaseTestCase
 {
@@ -29,14 +29,12 @@ abstract class DuskTestCase extends BaseTestCase
      */
     protected function driver()
     {
-        $capability = DesiredCapabilities::chrome()->setCapability(
+        return RemoteWebDriver::create('http://localhost:9515', DesiredCapabilities::chrome()->setCapability(
             ChromeOptions::CAPABILITY,
             (new ChromeOptions)->addArguments([
                 '--disable-gpu',
                 '--headless'
             ])
-        );
-
-        return RemoteWebDriver::create('http://localhost:9515', $capability);
+        ));
     }
 }

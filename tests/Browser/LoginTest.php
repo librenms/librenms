@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Browser;
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use LibreNMS\Tests\Browser\Pages\LoginPage;
 use LibreNMS\Tests\DuskTestCase;
@@ -14,6 +15,8 @@ use LibreNMS\Tests\DuskTestCase;
  */
 class LoginTest extends DuskTestCase
 {
+    use DatabaseMigrations;
+
     /**
      * @throws \Throwable
      */
