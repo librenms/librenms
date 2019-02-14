@@ -31,8 +31,8 @@ before_install:
 
 install:
   - travis_retry composer install --no-interaction --prefer-dist --no-suggest
-  - pip3 install --user snmpsim pylint
-  - pip install --user mysql-python
+  - pip3 install --user snmpsim
+  - pip install --user mysql-python pylint
 
 after_failure:
   - tail /tmp/snmpsimd.log
