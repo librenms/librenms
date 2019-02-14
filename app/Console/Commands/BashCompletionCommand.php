@@ -54,7 +54,7 @@ class BashCompletionCommand extends Command
                     if (!starts_with($previous, '-')) {
                         $completions = $this->completeArguments($command, $current, end($words));
                     }
-                    $completions = $completions->merge($this->completeOption($command_def, $current));
+                    $completions = $completions->merge($this->completeOption($command_def, $current, $this->getPreviousOptions($words)));
                 }
             }
         }
@@ -110,9 +110,10 @@ class BashCompletionCommand extends Command
      *
      * @param InputDefinition $command
      * @param string $partial
+     * @param array $prev_options Previous words in the command
      * @return \Illuminate\Support\Collection
      */
-    private function completeOption($command, $partial)
+    private function completeOption($command, $partial, $prev_options)
     {
         // default options
         $options = collect([
@@ -132,14 +133,30 @@ class BashCompletionCommand extends Command
 
         if ($command) {
             $options = collect($command->getOptions())
-                ->flatMap(function ($option) {
-                    return $this->parseOption($option);
+                ->flatMap(function ($option) use ($prev_options) {
+                    $option_flags = $this->parseOption($option);
+                    // don't return previously specified options
+                    if (array_intersect($option_flags, $prev_options)) {
+                        return [];
+                    }
+                    return $option_flags;
                 })->merge($options);
         }
 
         return $options->filter(function ($option) use ($partial) {
             return empty($partial) || starts_with($option, $partial);
         });
+    }
+
+    private function getPreviousOptions($words)
+    {
+        return array_reduce($words, function ($result, $word) {
+            if (starts_with($word, '-')) {
+                $split = explode('=', $word, 2); // users may use equals for values
+                $result[] = reset($split);
+            }
+            return $result;
+        }, []);
     }
 
     /**
