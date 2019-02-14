@@ -75,7 +75,7 @@ class MysqlAuthorizer extends AuthorizerBase
         $user = User::thisAuth()->where('username', $username)->first();
 
         if ($user) {
-            $user->password = password_hash($password, PASSWORD_DEFAULT);
+            $user->password = $password;
 
             return $user->save();
         }
@@ -97,7 +97,7 @@ class MysqlAuthorizer extends AuthorizerBase
         // only update new users
         if (!$new_user->user_id) {
             $new_user->auth_type = LegacyAuth::getType();
-            $new_user->password = password_hash($password, PASSWORD_DEFAULT);
+            $new_user->password = $password;
             $new_user->email = (string)$new_user->email;
 
             $new_user->save();
@@ -108,21 +108,6 @@ class MysqlAuthorizer extends AuthorizerBase
             $new_user->save();
 
             if ($user_id) {
-                // mark pre-existing notifications as read
-                Notification::whereNotExists(function ($query) use ($user_id) {
-                    return $query->select(Eloquent::DB()->raw(1))
-                        ->from('notifications_attribs')
-                        ->whereRaw('notifications.notifications_id = notifications_attribs.notifications_id')
-                        ->where('notifications_attribs.user_id', $user_id);
-                })->get()->each(function ($notif) use ($user_id) {
-                    NotificationAttrib::create([
-                        'notifications_id' => $notif->notifications_id,
-                        'user_id' => $user_id,
-                        'key' => 'read',
-                        'value' => 1
-                    ]);
-                });
-
                 return $user_id;
             }
         }
