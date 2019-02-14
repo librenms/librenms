@@ -39,7 +39,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-md-12">
-                        <button type="submit" class="btn btn-primary btn-block" name="submit" type="submit">
+                        <button type="submit" id="login" class="btn btn-primary btn-block" name="submit" type="submit">
                             <i class="fa fa-btn fa-sign-in"></i> @lang('Login')
                         </button>
                     </div>
