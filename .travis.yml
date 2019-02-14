@@ -38,7 +38,6 @@ after_failure:
   - tail /tmp/snmpsimd.log
 
 before_script:
-  - test -z "$BROWSER_TEST" || google-chrome-stable --headless --disable-gpu --remote-debugging-port=9515 http://localhost &
   - test -z "$BROWSER_TEST" || php artisan serve --env=dusk.testing &
 
 script:
