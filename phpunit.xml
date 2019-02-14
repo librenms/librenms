@@ -23,6 +23,7 @@
     </testsuites>
     <groups>
         <exclude>
+            <group>browser</group>
             <group>mibs</group>
         </exclude>
     </groups>
