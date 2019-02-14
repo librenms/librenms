@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ca417c593571b7efac33dea16ca73558",
+    "content-hash": "e914d23478621df28362563f06165c49",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -7099,51 +7099,6 @@
                 "standards"
             ],
             "time": "2018-11-07T22:31:41+00:00"
-        },
-        {
-            "name": "staudenmeir/dusk-updater",
-            "version": "v1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/staudenmeir/dusk-updater.git",
-                "reference": "c9b09a8f374703acc536d3399758c5f21d471c30"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/staudenmeir/dusk-updater/zipball/c9b09a8f374703acc536d3399758c5f21d471c30",
-                "reference": "c9b09a8f374703acc536d3399758c5f21d471c30",
-                "shasum": ""
-            },
-            "require": {
-                "ext-openssl": "*",
-                "ext-zip": "*",
-                "php": ">=5.6.4"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Staudenmeir\\DuskUpdater\\DuskServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Staudenmeir\\DuskUpdater\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jonas Staudenmeir",
-                    "email": "mail@jonas-staudenmeir.de"
-                }
-            ],
-            "description": "Updater for Laravel Dusk ChromeDriver binaries",
-            "time": "2018-05-01T22:29:00+00:00"
         },
         {
             "name": "symfony/filesystem",
