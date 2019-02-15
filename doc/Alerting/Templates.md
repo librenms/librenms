@@ -98,7 +98,7 @@ You can use plain text or html as per Alert templates and this will form the bas
 In your alert template just use
 
 ```
-@extends('alerts.templates.default');
+@extends('alerts.templates.default')
 
 @section('content')
   {{ $alert->title }}
