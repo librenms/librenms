@@ -25,6 +25,7 @@ use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\MemcacheLock;
 use Symfony\Component\Process\Process;
+use PHPMailer\PHPMailer\PHPMailer;
 
 if (!function_exists('set_debug')) {
     /**
