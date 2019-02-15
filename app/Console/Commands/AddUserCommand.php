@@ -29,6 +29,7 @@ use App\Console\LnmsCommand;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use LibreNMS\Config;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Validator;
@@ -63,6 +64,10 @@ class AddUserCommand extends LnmsCommand
      */
     public function handle()
     {
+        if (Config::get('auth_mechanism') != 'mysql') {
+            $this->warn(__('commands.user:add.wrong-auth'));
+        }
+
         $roles = [
             'normal' => 1,
             'global-read' => 5,

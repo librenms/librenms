@@ -13,9 +13,8 @@ return [
             'full-name' => 'Full name for the user',
             'role' => 'Set the user to the desired role :roles',
         ],
-        'invalid-role' => 'Invalid user role',
         'password-request' => "Please enter the user's password",
         'success' => 'Successfully added user: :username',
-        'user-exists' => 'The user :username already exists',
+        'wrong-auth' => 'Warning! You will not be able to log in with this user because you are not using MySQL auth',
     ],
 ];
