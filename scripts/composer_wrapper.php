@@ -111,7 +111,6 @@ function curl_fetch($url, $proxy, $use_https, $output = false)
         curl_setopt($curl, CURLOPT_FILE, $fp);
     }
 
-    $stream_default_opts = null;
     if ($proxy) {
         curl_setopt($curl, CURLOPT_PROXY, rtrim(str_replace(['http://', 'https://'], '', $proxy), '/'));
         if ($use_https) {
