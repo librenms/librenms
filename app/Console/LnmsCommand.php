@@ -26,8 +26,9 @@
 namespace App\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
-class LibreNMSCommand extends Command
+class LnmsCommand extends Command
 {
     protected $developer = false;
 
@@ -56,7 +57,9 @@ class LibreNMSCommand extends Command
             $description = __('commands.' . $this->getName() . '.arguments.' . $name);
         }
 
-        return parent::addArgument($name, $mode, $description, $default);
+        parent::addArgument($name, $mode, $description, $default);
+
+        return $this;
     }
 
     /**
@@ -80,6 +83,8 @@ class LibreNMSCommand extends Command
             $description = __('commands.' . $this->getName() . '.options.' . $name);
         }
 
-        return parent::addOption($name, $shortcut, $mode, $description, $default);
+        parent::addOption($name, $shortcut, $mode, $description, $default);
+
+        return $this;
     }
 }

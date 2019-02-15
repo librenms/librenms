@@ -25,12 +25,15 @@
 
 namespace App\Console\Commands;
 
-use App\Console\LibreNMSCommand;
+use App\Console\LnmsCommand;
 use App\Models\User;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Validator;
 
-class AddUserCommand extends LibreNMSCommand
+class AddUserCommand extends LnmsCommand
 {
     protected $name = 'user:add';
 
@@ -60,25 +63,24 @@ class AddUserCommand extends LibreNMSCommand
      */
     public function handle()
     {
-        $username = $this->argument('username');
-        if (User::query()->where(['auth_type' => 'mysql', 'username' => $username])->exists()) {
-            $this->error(__('commands.user:add.user-exists', ['username' => $username]));
-            return 1;
-        }
-
-        $user = new User(['username' => $username]);
-
-        // set role/level
         $roles = [
             'normal' => 1,
             'global-read' => 5,
             'admin' => 10
         ];
-        $role = $this->option('role');
-        if (isset($roles[$role])) {
-            $user->level = $roles[$role];
-        } else {
-            $this->error(__('commands.user:add.invalid-role'));
+
+        $validator = Validator::make($this->arguments() + $this->options(), [
+            'username' => ['required', Rule::unique('users', 'username')->where('auth_type', 'mysql')],
+            'email' => 'email',
+            'role' => Rule::in(array_keys($roles))
+        ]);
+
+        try {
+            $validator->validate();
+        } catch (ValidationException $e) {
+            collect($validator->getMessageBag()->all())->each(function ($message) {
+                $this->error($message);
+            });
             return 1;
         }
 
@@ -87,14 +89,19 @@ class AddUserCommand extends LibreNMSCommand
         if (!$password) {
             $password = $this->secret(__('commands.user:add.password-request'));
         }
+
+        $user = new User([
+            'username' => $this->argument('username'),
+            'level' => $roles[$this->option('role')],
+            'descr' => (string)$this->option('descr'),
+            'email' => (string)$this->option('email'),
+            'realname' => (string)$this->option('full-name'),
+            'auth_type' => 'mysql',
+        ]);
         $user->password = $password;
-
-        $user->descr = (string)$this->option('descr');
-        $user->realname = (string)$this->option('full-name');
-        $user->auth_type = 'mysql';
-
         $user->save();
 
-        $this->info(__('commands.user:add.success', ['username' => $username]));
+        $this->info(__('commands.user:add.success', ['username' => $user->username]));
+        return 0;
     }
 }
