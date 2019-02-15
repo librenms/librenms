@@ -48,5 +48,10 @@
    enable this. Please note that the default is off to match with the other default contact settings. If you expect normal users to receive alerts then you should enable this new option.</description>
    <pubDate>Mon, 15 May 2017 23:00:00 +0000</pubDate>
  </item>
+  <item>
+    <title>Legacy Alert Templates and Transports removed</title>
+    <description>As described previously, Legacy Alert Templates and Transports have been removed.  You can find more info here: https://community.librenms.org/t/deprecation-notice-alerting-legacy-transports-and-templates/5915</description>
+    <pubDate>Fri, 15 Feb 2017 23:00:00 +0000</pubDate>
+  </item>
 </channel>
 </rss>
