@@ -26,7 +26,9 @@
 namespace App\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Validator;
 
 abstract class LnmsCommand extends Command
 {
@@ -86,5 +88,26 @@ abstract class LnmsCommand extends Command
         parent::addOption($name, $shortcut, $mode, $description, $default);
 
         return $this;
+    }
+
+    /**
+     * Validate the input of this command.  Uses Laravel input validation
+     * merging the arguments and options together to check.
+     *
+     * @param array $rules
+     * @param array $messages
+     */
+    protected function validate($rules, $messages = [])
+    {
+        $validator = Validator::make($this->arguments() + $this->options(), $rules, $messages);
+
+        try {
+            $validator->validate();
+        } catch (ValidationException $e) {
+            collect($validator->getMessageBag()->all())->each(function ($message) {
+                $this->error($message);
+            });
+            exit(1);
+        }
     }
 }

@@ -28,11 +28,9 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Models\User;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use LibreNMS\Config;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Validator;
 
 class AddUserCommand extends LnmsCommand
 {
@@ -74,20 +72,11 @@ class AddUserCommand extends LnmsCommand
             'admin' => 10
         ];
 
-        $validator = Validator::make($this->arguments() + $this->options(), [
+        $this->validate([
             'username' => ['required', Rule::unique('users', 'username')->where('auth_type', 'mysql')],
             'email' => 'email',
             'role' => Rule::in(array_keys($roles))
         ]);
-
-        try {
-            $validator->validate();
-        } catch (ValidationException $e) {
-            collect($validator->getMessageBag()->all())->each(function ($message) {
-                $this->error($message);
-            });
-            return 1;
-        }
 
         // set get password
         $password = $this->option('password');
