@@ -29,6 +29,7 @@ use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
+use PHPMailer\PHPMailer\PHPMailer;
 
 /**
  * @param $rule

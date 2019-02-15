@@ -31,7 +31,7 @@
         "ext-mbstring": "*",
         "laravel/laravel": "5.7.*",
         "ezyang/htmlpurifier": "^4.8",
-        "phpmailer/phpmailer": "^5.2.21",
+        "phpmailer/phpmailer": "~6.0",
         "slim/slim": "^2.6",
         "easybook/geshi": "^1.0.8",
         "amenadiel/jpgraph": "^3.6",
