@@ -294,6 +294,10 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                 ';
             }
 
+            echo '<form class="form-horizontal" action="/download.php" method="post">
+                      <button type="submit" class="btn btn-primary btn-sm" name="download">Download config</button>
+                      <input type="hidden" name="config" value=\''.$text.'\' />
+                  </form>';
             echo '</div>';
         } else {
             echo '<br />';
