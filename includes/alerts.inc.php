@@ -253,7 +253,7 @@ function RunRules($device_id)
  */
 function GetContacts($results)
 {
-    global $config, $authorizer;
+    global $config;
 
     if (sizeof($results) == 0) {
         return array();
@@ -821,8 +821,6 @@ function RunAlerts()
  */
 function ExtTransports($obj)
 {
-    global $config;
-    $tmp = false;
     $type  = new Template;
 
     // If alert transport mapping exists, override the default transports
@@ -830,28 +828,15 @@ function ExtTransports($obj)
 
     if (!$transport_maps) {
         $transport_maps = AlertUtil::getDefaultAlertTransports();
-        $legacy_transports = array_unique(array_map(function ($transports) {
-            return $transports['transport_type'];
-        }, $transport_maps));
-        foreach ($config['alert']['transports'] as $transport => $opts) {
-            if (in_array($transport, $legacy_transports)) {
-                // If it is a default transport type, then the alert has already been sent out, so skip
-                continue;
-            }
-            if (is_array($opts)) {
-                $opts = array_filter($opts);
-            }
-            $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
-            if (($opts === true || !empty($opts)) && $opts != false && class_exists($class)) {
-                $transport_maps[] = [
-                    'transport_id' => null,
-                    'transport_type' => $transport,
-                    'opts' => $opts,
-                    'legacy' => true,
-                ];
-            }
-        }
-        unset($legacy_transports);
+    }
+
+    // alerting for default contacts, etc
+    if (\LibreNMS\Config::get('alert.transports.mail') === true) {
+        $transport_maps[] = [
+            'transport_id' => null,
+            'transport_type' => 'mail',
+            'opts' => $obj,
+        ];
     }
 
     foreach ($transport_maps as $item) {
