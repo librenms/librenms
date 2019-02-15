@@ -389,20 +389,6 @@ function populate($txt, $wrap = true)
 }//end populate()
 
 /**
- * "Safely" run eval
- * @param string $code Code to run
- * @param array  $obj  Object with variables
- * @return string|mixed
- */
-function RunJail($code, $obj)
-{
-    $ret = '';
-    @eval($code);
-    return $ret;
-}//end RunJail()
-
-
-/**
  * Describe Alert
  * @param array $alert Alert-Result from DB
  * @return array|boolean
