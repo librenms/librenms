@@ -13,7 +13,7 @@
                     "os": "pfsense",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "pfsense.png",
+                    "icon": "pfsense.svg",
                     "location": null
                 }
             ]
@@ -31,7 +31,7 @@
                     "os": "pfsense",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "pfsense.png",
+                    "icon": "pfsense.svg",
                     "location": "<private>"
                 }
             ]
