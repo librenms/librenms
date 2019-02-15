@@ -75,8 +75,7 @@ class MysqlAuthorizer extends AuthorizerBase
         $user = User::thisAuth()->where('username', $username)->first();
 
         if ($user) {
-            $user->password = $password;
-
+            $user->setPassword($password);
             return $user->save();
         }
 
@@ -97,7 +96,7 @@ class MysqlAuthorizer extends AuthorizerBase
         // only update new users
         if (!$new_user->user_id) {
             $new_user->auth_type = LegacyAuth::getType();
-            $new_user->password = $password;
+            $new_user->setPassword($password);
             $new_user->email = (string)$new_user->email;
 
             $new_user->save();

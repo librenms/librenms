@@ -80,9 +80,12 @@ class User extends Authenticatable
         return $this->hasGlobalRead() || $this->devices->contains($device);
     }
 
-    // ---- Accessors/Mutators ----
-
-    public function setPasswordAttribute($password)
+    /**
+     * Helper function to hash passwords before setting
+     *
+     * @param string $password
+     */
+    public function setPassword($password)
     {
         $this->attributes['password'] = $password ? password_hash($password, PASSWORD_DEFAULT) : null;
     }

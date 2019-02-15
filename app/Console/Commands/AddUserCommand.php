@@ -103,7 +103,7 @@ class AddUserCommand extends LnmsCommand
             'realname' => (string)$this->option('full-name'),
             'auth_type' => 'mysql',
         ]);
-        $user->password = $password;
+        $user->setPassword($password);
         $user->save();
 
         $this->info(__('commands.user:add.success', ['username' => $user->username]));
