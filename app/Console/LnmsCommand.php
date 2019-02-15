@@ -1,8 +1,8 @@
 <?php
 /**
- * LibreNMSCommand.php
+ * LnmsCommand.php
  *
- * -Description-
+ * Convenience class for common command code
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ namespace App\Console;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
-class LnmsCommand extends Command
+abstract class LnmsCommand extends Command
 {
     protected $developer = false;
 
