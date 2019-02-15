@@ -28,6 +28,7 @@ use LibreNMS\Alert\AlertData;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Config;
 
 /**
  * @param $rule
@@ -255,11 +256,12 @@ function GetContacts($results)
 {
     global $config;
 
-    if (sizeof($results) == 0) {
-        return array();
+    if (empty($results)) {
+        return [];
     }
-    if ($config['alert']['default_only'] === true || $config['alerts']['email']['default_only'] === true) {
-        return array(''.($config['alert']['default_mail'] ? $config['alert']['default_mail'] : $config['alerts']['email']['default']) => '');
+    if (Config::get('alert.default_only') === true || Config::get('alerts.email.default_only') === true) {
+        $email = Config::get('alert.default_mail', Config::get('alerts.email.default'));
+        return $email ? [$email => ''] : [];
     }
     $users = LegacyAuth::get()->getUserlist();
     $contacts = array();
@@ -831,7 +833,7 @@ function ExtTransports($obj)
     }
 
     // alerting for default contacts, etc
-    if (\LibreNMS\Config::get('alert.transports.mail') === true) {
+    if (Config::get('alert.transports.mail') === true && !empty($obj['contacts'])) {
         $transport_maps[] = [
             'transport_id' => null,
             'transport_type' => 'mail',
