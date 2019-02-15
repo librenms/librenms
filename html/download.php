@@ -6,4 +6,3 @@ header("Content-Length: " . strlen($_POST['config']));
 header("Connection: close");
 echo $_POST['config'];
 exit();
-?>
