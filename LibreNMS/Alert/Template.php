@@ -55,16 +55,12 @@ class Template
 
     public function getTitle($data)
     {
-        $data['parsed_title'] = $this->bladeTitle($data);
-        //FIXME remove Deprecated template
-        return $this->legacyTitle($data);
+        return $this->bladeTitle($data);
     }
 
     public function getBody($data)
     {
-        $data['template']['parsed_template'] = $this->bladeBody($data);
-        //FIXME remove Deprecated template
-        return $this->legacyBody($data);
+        return $this->bladeBody($data);
     }
 
     /**
@@ -98,99 +94,6 @@ class Template
             return view(['template' => $data['title']], $alert)->__toString();
         } catch (\Exception $e) {
             return $data['title'] ?: view(['template' => "Template " . $data['name']], $alert)->__toString();
-        }
-    }
-
-    /**
-     *
-     * Parse legacy body
-     *
-     * @param $data
-     * @return mixed|string
-     */
-    public function legacyBody($data)
-    {
-        //FIXME remove Deprecated template
-        $tpl    = $data['template']->parsed_template;
-        $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
-        $parsed = $msg;
-        $s      = strlen($msg);
-        $x      = $pos = -1;
-        $buff   = '';
-        $if     = $for = $calc = false;
-        while (++$x < $s) {
-            if ($msg[$x] == '{' && $buff == '') {
-                $buff .= $msg[$x];
-            } elseif ($buff == '{ ') {
-                $buff = '';
-            } elseif ($buff != '') {
-                $buff .= $msg[$x];
-            }
-
-            if ($buff == '{if') {
-                $pos = $x;
-                $if  = true;
-            } elseif ($buff == '{foreach') {
-                $pos = $x;
-                $for = true;
-            } elseif ($buff == '{calc') {
-                $pos  = $x;
-                $calc = true;
-            }
-
-            if ($pos != -1 && $msg[$x] == '}') {
-                $orig = $buff;
-                $buff = '';
-                $pos  = -1;
-                if ($if) {
-                    $if     = false;
-                    $o      = 3;
-                    $native = array(
-                        '"; if( ',
-                        ' ) { $ret .= "',
-                    );
-                } elseif ($for) {
-                    $for    = false;
-                    $o      = 8;
-                    $native = array(
-                        '"; foreach( ',
-                        ' as $key=>$value) { $ret .= "',
-                    );
-                } elseif ($calc) {
-                    $calc   = false;
-                    $o      = 5;
-                    $native = array(
-                        '"; $ret .= (float) (0+(',
-                        ')); $ret .= "',
-                    );
-                } else {
-                    continue;
-                }
-
-                $cond   = trim(populate(substr($orig, $o, -1), false));
-                $native = $native[0].$cond.$native[1];
-                $parsed = str_replace($orig, $native, $parsed);
-                unset($cond, $o, $orig, $native);
-            }//end if
-        }//end while
-        $parsed = populate($parsed);
-        return RunJail($parsed, $data);
-    }
-
-    /**
-     *
-     * Parse legacy title
-     *
-     * @param $data
-     * @return mixed|string
-     */
-    public function legacyTitle($data)
-    {
-        //FIXME remove Deprecated template
-        if (strstr($data['parsed_title'], '%')) {
-            return RunJail('$ret = "'.populate(addslashes($data['parsed_title'])).'";', $data);
-        } else {
-            return $data['parsed_title'];
         }
     }
 
