@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\UserCreated;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -19,6 +20,9 @@ class User extends Authenticatable
         'realname' => '',
         'email' => '',
         'can_modify_passwd' => 0,
+    ];
+    protected $dispatchesEvents = [
+        'created' => UserCreated::class,
     ];
 
     // ---- Helper Functions ----
@@ -74,6 +78,16 @@ class User extends Authenticatable
     public function canAccessDevice($device)
     {
         return $this->hasGlobalRead() || $this->devices->contains($device);
+    }
+
+    /**
+     * Helper function to hash passwords before setting
+     *
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->attributes['password'] = $password ? password_hash($password, PASSWORD_DEFAULT) : null;
     }
 
     // ---- Query scopes ----
