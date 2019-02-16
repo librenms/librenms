@@ -1,0 +1,540 @@
+--*******************************************************************
+--*    SAGEM, IONOS					 							    *
+--*******************************************************************
+--*******************************************************************
+
+--
+--  Filename: perf
+--
+--  File type: .mib    
+-- 
+--
+--  Description:	SNMP source Mib file.
+--
+--			Describes performance records.
+--             
+--
+--  Version:  19 11 2002
+--	
+--  Date(DD MM YYYY): 15 11 02 last update for IONOS NMS 
+--     
+--  Contact: D. Mobuchon, F. Bonnevialle
+--
+--  History: 
+--		Version: 			Date: 25 10 1999
+--		Version: MIB-P0-301199	Date: 30 11 1999 
+-- 
+--		Name: F.Bonnevialle 	
+--		Date: 15 11 2002 		
+--		Desc: Modification for SilverCreek Compiler
+--*******************************************************************
+--*******************************************************************
+--*   Copyright (c) 2002, SAGEM , All rights reserved.              *
+--*******************************************************************
+
+
+
+
+--*******************************************************************
+-- MIB: PERFORMANCE-MIB
+--*******************************************************************
+PERFORMANCE-MIB DEFINITIONS ::= BEGIN
+ 
+
+--*******************************************************************
+-- IMPORTS
+--*******************************************************************
+   IMPORTS
+   sagemDr						FROM SAGEM-DR-MIB 
+   IntDateTime						FROM EQUIPMENT-MIB
+   MODULE-IDENTITY,OBJECT-TYPE,Gauge32,
+   		NOTIFICATION-TYPE			FROM SNMPv2-SMI
+   TimeTicks						FROM RFC1155-SMI
+   DisplayString					FROM SNMPv2-TC ;
+--   TRAP-TYPE						FROM RFC-1215;
+
+ 
+   performance	MODULE-IDENTITY
+      LAST-UPDATED "0211150000Z"
+      ORGANIZATION "SAGEM/DR Tolbiac Centre"
+      CONTACT-INFO
+	" "
+      DESCRIPTION 
+	"     
+	Modification: 
+			Date: 15 11 2002
+			Description: 
+			sagemDr replace sagem-dr
+			NOTIFICATION-TYPE replace TRAP-TYPE
+	
+	Modification: 
+			Date: 20 12 1999	 
+			Description: modification of comments
+	Modification: 
+			Date: 25 11 1999	 
+			Name: thresholdUas,thresholdSes,thresholdEs,thresholdBbe
+			Description: read-write instead of read-only
+	Modification:
+			Date: 19 11 1999
+			Name: 
+			Description: modification of comments		 
+	Creation: 
+			Date: 25 10 1999 
+			Description: 
+			The MIB module describes performance records.
+			It also describes the traps that could be sent 
+			either to notify a threshold or a non null quality 
+			record, for the devices that support that feature.
+	"
+      ::= { sagemDr 102 }
+
+--*******************************************************************
+
+   NearFar     ::= INTEGER { near (1), far(2) }
+   
+   perfClear   OBJECT-TYPE
+      SYNTAX       OBJECT IDENTIFIER
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When a set command is issued on this variable, this clears a 
+	part of the performance record depending on the value of the oid:
+	performance	: all the performance records
+	cptTable	: all the counter table
+	uasTable	: all the unavailable periods table
+	oid		: the counter and uas records of this object
+	An equipment may implement only a subset of these commands."  
+      ::= { performance 1 }
+ 
+--*******************************************************************
+-- Performance over the ports
+-- This table contains the history of the quality counters 
+-- When a Date is used as index the index value is MAXDate-Date 
+-- to keep a lexicographic order.
+   
+   cptNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of used records (rows) in 'cptTable'."  
+      ::= { performance 2 } 
+
+  
+   cptTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF CptEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of cpt in equipment."  
+      ::= { performance 3 } 
+   
+   cptEntry   OBJECT-TYPE
+      SYNTAX       CptEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular cpt of the equipment." 
+      INDEX        { cptObject, cptNearFar, cptDuration, cptDate } 
+      ::= { cptTable 1 } 
+
+   CptEntry ::= SEQUENCE {
+        cptObject   OBJECT IDENTIFIER,
+	cptName     DisplayString,
+        cptNearFar  NearFar,
+        cptDuration TimeTicks,
+        cptDate     IntDateTime,
+        cptUAS      Gauge32,
+        cptSES      Gauge32,
+        cptES       Gauge32,
+        cptBBE      Gauge32
+      }
+   
+   
+   cptObject   OBJECT-TYPE
+      SYNTAX       OBJECT IDENTIFIER
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the function/interface from which this reccord
+	was taken"  
+      ::= { cptEntry 1 } 
+   
+   cptName   OBJECT-TYPE
+      SYNTAX       DisplayString (SIZE (0..40))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the object localisation. For the 
+	structure of this string, see 'logName' in the log MIB "  
+      ::= { cptEntry 2 } 
+   
+   cptNearFar   OBJECT-TYPE
+      SYNTAX       NearFar
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Indicates near or far performance record"  
+      ::= { cptEntry 3 } 
+   
+   cptDuration   OBJECT-TYPE
+      SYNTAX       TimeTicks
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The full duration of measurement for the record.
+	This table contains either logged entries and current ones.
+	For curent performance counters, it is not the actual mesured
+	duration, but the duration from start to normal end.
+	The standard durations are 15 minutes and 24 hours; the value 
+	can be coded in TimeTicks or  in minute (see the variable
+	'perfDurationUnit')"  
+      ::= { cptEntry 4 } 
+
+   cptDate   OBJECT-TYPE
+      SYNTAX       IntDateTime
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"When the record had started."  
+      ::= { cptEntry 5 } 
+   
+   cptUAS   OBJECT-TYPE
+      SYNTAX       Gauge32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of UnAvailable Seconds mesured."  
+      ::= { cptEntry 6 } 
+   
+   cptSES   OBJECT-TYPE
+      SYNTAX       Gauge32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of Severely Errored Seconds mesured."  
+      ::= { cptEntry 7 } 
+   
+   cptES   OBJECT-TYPE
+      SYNTAX       Gauge32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of Errored Seconds mesured."  
+      ::= { cptEntry 8 } 
+   
+   cptBBE   OBJECT-TYPE
+      SYNTAX       Gauge32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of Background Errors Blocks mesured."  
+      ::= { cptEntry 9 }    
+
+
+--*******************************************************************
+-- Unavailable periods (uap)
+-- This table contains the unavailable period records logged 
+--by the system 
+   
+   
+   uapNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of unavailable period records stored in the 'uapTable'."  
+      ::= { performance 4 } 
+   
+   uapTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF UapEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of unavailable period records in equipment."  
+      ::= { performance 5 } 
+   
+   uapEntry   OBJECT-TYPE
+      SYNTAX       UapEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular unavailable period of the equipment." 
+      INDEX        { uapObject, uapNearFar, uapBegin } 
+      ::= { uapTable 1 } 
+
+   UapEntry ::=
+      SEQUENCE {
+        uapObject   OBJECT IDENTIFIER,
+	uapName     DisplayString,
+        uapNearFar  NearFar,
+        uapBegin    IntDateTime,
+        uapEnd      IntDateTime
+      }
+   
+   
+   uapObject   OBJECT-TYPE
+      SYNTAX       OBJECT IDENTIFIER
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the function/interface from witch this reccord
+	was taken."  
+      ::= { uapEntry 1 } 
+   
+   uapName   OBJECT-TYPE
+      SYNTAX       DisplayString (SIZE (0..40))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the object localisation. For the 
+	structure of this string, see 'logName' in the log MIB "  
+      ::= { uapEntry 2 } 
+   
+   uapNearFar   OBJECT-TYPE
+      SYNTAX       NearFar
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Indicates near or far performance record"  
+      ::= { uapEntry 3 } 
+   
+   uapBegin   OBJECT-TYPE
+      SYNTAX       IntDateTime
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"When the unavailable period has started."  
+      ::= { uapEntry 4 } 
+   
+   uapEnd   OBJECT-TYPE
+      SYNTAX       IntDateTime
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"When the unavailable period has finished."  
+      ::= { uapEntry 5 }    
+
+
+
+--*******************************************************************
+-- Threshold values for performance threshold configuration
+-- A record on this table contains the confuguration the threshold 
+--    for a interface or a interface type 
+-- This table must be initialized by the equipment during its restart
+-- The write access authorization of this table is optional
+   
+   thresholdNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of threshold in equipment."  
+      ::= { performance 6 } 
+   
+   thresholdTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF ThresholdEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of threshold in equipment."  
+      ::= { performance 7 } 
+   
+   thresholdEntry   OBJECT-TYPE
+      SYNTAX       ThresholdEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular threshold of the equipment." 
+      INDEX        { thresholdObject, thresholdNearFar, 
+				thresholdDuration, thresholdType } 
+      ::= { thresholdTable 1 } 
+
+   ThresholdEntry ::= SEQUENCE {
+	thresholdObject   OBJECT IDENTIFIER,
+	thresholdName     DisplayString,
+        thresholdNearFar  NearFar,
+        thresholdDuration TimeTicks,
+        thresholdType   INTEGER,
+	thresholdUas	INTEGER,
+	thresholdSes	INTEGER,
+	thresholdEs	INTEGER,
+	thresholdBbe	INTEGER
+   }
+   
+   
+   thresholdObject   OBJECT-TYPE
+      SYNTAX       OBJECT IDENTIFIER
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the interface or the interface type to which
+	these parameters apply."  
+      ::= { thresholdEntry 1 } 
+   
+   thresholdName   OBJECT-TYPE
+      SYNTAX       DisplayString (SIZE (0..40))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the interface localisation. 
+	For the structure of this string, see 'logName' in the 
+	log MIB "  
+      ::= { thresholdEntry 2 } 
+   
+   thresholdNearFar   OBJECT-TYPE
+      SYNTAX       NearFar
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Indicates near or far performance threshold.
+	Equipment may or may not implement far threshold."  
+      ::= { thresholdEntry 3 } 
+   
+   thresholdDuration   OBJECT-TYPE
+      SYNTAX       TimeTicks
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The normal duration of the counter with which the threshold
+	is associed. 
+	The standard durations are 15 minutes and 24 hours; 
+	"
+      ::= { thresholdEntry 4 } 
+   
+   thresholdType   OBJECT-TYPE
+      SYNTAX       INTEGER { raise(1), clear(2) }
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"When set to `raise' the event threshold exceded is generated 
+	when one of the corresponding counter cross its theshold.
+	When set to `clear', the event threshold exceded is cleared 
+	when there is no counters above of its corresponding threshold.
+	The `clear'thresholds are optionnal(the standard value is zero)
+	"  
+      ::= { thresholdEntry 5 } 
+   
+
+   thresholdUas   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+      "The number of unavailable seconds within a counting 
+	period above which a performance event is issued 
+	for the interface/function"  
+      ::= { thresholdEntry 6 } 
+   
+   thresholdSes   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The number of severely errored seconds within a 
+	counting period above which a performance event 
+	is issued for the interface/function"  
+      ::= { thresholdEntry 7 } 
+   
+   thresholdEs   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+      "The number of errored seconds within a counting
+	 period above which a performance event is issued 
+	for the interface/function"  
+      ::= { thresholdEntry 8 } 
+   
+   thresholdBbe   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+      "The number of background block errors within a
+	counting period above which a performance event is
+	issued for the interface/function"  
+      ::= { thresholdEntry 9 }  
+
+
+--   ***************************************************************
+--   perfDurationUnit   OBJECT-TYPE
+--      SYNTAX       INTEGER {timeTicks (1), minutes (2)}
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"Unit of the performance duration used in this MIB."  
+--      ::= { performance 8 }  
+--
+--   *************************************************************** 
+--   Performance enable variables 
+--
+--	The performance enables port by port are not in this MIB
+--    The equipment can implement them in its proprietary MIB the 
+--	performance .
+--	Also the transmission quality status port by port are not 
+--	in this MIb 
+--    The equipment must implement them in its proprietary MIB 
+--	the performance 
+
+
+--   performanceEnable   OBJECT-TYPE
+--      SYNTAX       SagemBoolean
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"
+--	It is a global enable of the performance in the equipment
+--	The default value of this variable is 'false'
+--	"  
+--      ::= { performance 9 }    
+
+ 
+--   perfTrapEnable   OBJECT-TYPE
+--      SYNTAX       SagemBoolean
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"
+--	It is a global enable of the performance trap sending 
+--	The default value of this variable is 'true'
+--	"  
+--     ::= { performance 10 }  
+
+--   perfThresholdTrapEnable   OBJECT-TYPE
+--      SYNTAX       SagemBoolean
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"
+--	It is a global enable of the performance threshold overflow 
+--	trap sending 
+--	The default value of this variable is 'true'
+--	"  
+--      ::= { performance 11 }  
+
+
+	  
+--   ***************************************************************
+   
+--   qualityTrap TRAP-TYPE
+--      ENTERPRISE  performance
+--      VARIABLES   { cptObject, cptName, cptNearFar, 
+--			cptDuration, cptDate, cptUAS, 
+--			cptSES, cptES, cptBBE }
+--      DESCRIPTION
+--	" This trap allows the equipment to notify its quality records "
+--	::= 2         
+	
+  perfTraps OBJECT IDENTIFIER ::= { performance 0 }
+     
+  qualityTrap NOTIFICATION-TYPE
+          OBJECTS     { cptObject, cptName, cptNearFar, 
+			cptDuration, cptDate, cptUAS, 
+			cptSES, cptES, cptBBE }
+          STATUS      current
+          DESCRIPTION "This trap allows the equipment to notify its quality records"
+          REFERENCE   ""
+          ::= { perfTraps 2 }
+
+END

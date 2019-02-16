@@ -1,0 +1,113 @@
+--  Version:  19 11 2002
+
+   IANAifType-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, mib-2              FROM SNMPv2-SMI
+       TEXTUAL-CONVENTION                  FROM SNMPv2-TC;
+
+   ianaifType MODULE-IDENTITY
+       LAST-UPDATED "9311082155Z"
+       ORGANIZATION "IANA"
+       CONTACT-INFO
+
+                  "        Internet Assigned Numbers Authority
+
+                   Postal: USC/Information Sciences Institute
+                           4676 Admiralty Way, Marina del Rey, CA 90292
+
+                   Tel:    +1  310 822 1511
+                   E-Mail: iana@isi.edu"
+       DESCRIPTION
+               "The MIB module which defines the IANAifType textual
+               convention, and thus the enumerated values of the
+               ifType object defined in MIB-II's ifTable."
+       ::= { mib-2 30 }
+
+
+   IANAifType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "This data type is used as the syntax of the ifType
+               object in the (updated) definition of MIB-II's
+               ifTable.
+               The definition of this textual convention with the
+               addition of newly assigned values is published
+               periodically by the IANA, in either the Assigned
+               Numbers RFC, or some derivative of it specific to
+               Internet Network Management number assignments.  (The
+               latest arrangements can be obtained by contacting the
+               IANA.)
+
+               Requests for new values should be made to IANA via
+               email (iana@isi.edu).
+
+               The relationship between the assignment of ifType
+               values and of OIDs to particular media-specific MIBs
+               is solely the purview of IANA and is subject to change
+               without notice.  Quite often, a media-specific MIB's
+               OID-subtree assignment within MIB-II's 'transmission'
+               subtree will be the same as its ifType value.
+               However, in some circumstances this will not be the
+               case, and implementors must not pre-assume any
+               specific relationship between ifType values and
+               transmission subtree OIDs."
+       SYNTAX  INTEGER {
+                   other(1),          -- none of the following
+                   regular1822(2),
+                   hdh1822(3),
+                   ddnX25(4),
+                   rfc877x25(5),
+                   ethernetCsmacd(6),
+                   iso88023Csmacd(7),
+                   iso88024TokenBus(8),
+                   iso88025TokenRing(9),
+                   iso88026Man(10),
+                   starLan(11),
+                   proteon10Mbit(12),
+                   proteon80Mbit(13),
+                   hyperchannel(14),
+                   fddi(15),
+                   lapb(16),
+                   sdlc(17),
+                   ds1(18),           -- DS1/E1 (RFC 1406)
+                   e1(19),            -- obsolete
+                   basicISDN(20),
+                   primaryISDN(21),
+                   propPointToPointSerial(22), -- proprietary serial
+                   ppp(23),
+                   softwareLoopback(24),
+                   eon(25),            -- CLNP over IP (RFC 1070)
+                   ethernet3Mbit(26),
+                   nsip(27),           -- XNS over IP
+                   slip(28),           -- generic SLIP
+                   ultra(29),          -- ULTRA technologies
+                   ds3(30),            -- T-3
+                   sip(31),            -- SMDS
+                   frameRelay(32),    -- DTE only
+                   rs232(33),
+                   para(34),           -- parallel-port
+                   arcnet(35),         -- arcnet
+                   arcnetPlus(36),     -- arcnet plus
+                   atm(37),            -- ATM cells
+                   miox25(38),
+                   sonet(39),          -- SONET or SDH
+                   x25ple(40),
+                   iso88022llc(41),
+                   localTalk(42),
+                   smdsDxi(43),
+                   frameRelayService(44),  -- Frame relay DCE
+                   v35(45),
+                   hssi(46),
+                   hippi(47),
+                   modem(48),          -- Generic modem
+                   aal5(49),           -- AAL5 over ATM
+                   sonetPath(50),
+                   sonetVT(51),
+                   smdsIcip(52),       -- SMDS InterCarrier Interface
+                   propVirtual(53),    -- proprietary virtual/internal
+                   propMultiplexor(54) -- proprietary multiplexing
+               }
+
+   END
+

@@ -17,5 +17,7 @@ return [
         'IF-MIB::linkDown' => \LibreNMS\Snmptrap\Handlers\LinkDown::class,
         'MG-SNMP-UPS-MIB::upsmgUtilityFailure' => \LibreNMS\Snmptrap\Handlers\UpsmgUtilityFailure::class,
         'MG-SNMP-UPS-MIB::upsmgUtilityRestored' => \LibreNMS\Snmptrap\Handlers\UpsmgUtilityRestored::class,
+        'EQUIPMENT-MIB::equipStatusTrap' => \LibreNMS\Snmptrap\Handlers\EquipStatusTrap::class,
+        'LOG-MIB::logTrap' => \LibreNMS\Snmptrap\Handlers\LogTrap::class,
     ]
 ];
