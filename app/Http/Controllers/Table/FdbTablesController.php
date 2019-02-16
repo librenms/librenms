@@ -163,7 +163,8 @@ class FdbTablesController extends TableController
             'first_seen' => 'unknown',
             'last_seen' => 'unknown'
         ];
-
+        
+        // diffForHumans and doDateTimeString are not safe
         if ($fdb_entry->updated_at) {
             $item['last_seen'] = $fdb_entry->updated_at->diffForHumans();
         }
