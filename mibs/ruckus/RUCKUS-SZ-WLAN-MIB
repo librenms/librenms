@@ -1,0 +1,513 @@
+--
+-- Copyright 2010-2014 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-SZ-WLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusSZWLANModule
+        FROM RUCKUS-ROOT-MIB
+    RuckusAdminStatus,
+    RuckusRadioMode,
+    RuckusSSID,
+    RuckusdB,
+    RuckusRateLimiting
+        FROM RUCKUS-TC-MIB
+    DisplayString,
+    MacAddress,
+    RowStatus,
+    PhysAddress,
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    IANAifType
+        FROM IANAifType-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI;
+
+ruckusSZWLANMIB MODULE-IDENTITY
+    LAST-UPDATED "201405191100Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        T: +1 (650) 265-4200
+        F: +1 (408) 738-2065
+        EMail: info@ruckuswireless.com
+        Web: www.ruckuswireless.com"
+    DESCRIPTION
+        "Ruckus SZ WLAN MIB"
+    ::= { ruckusSZWLANModule 1 }
+
+ruckusSZWLANObjects OBJECT IDENTIFIER ::= { ruckusSZWLANMIB 1 }
+
+ruckusSZWLANInfo OBJECT IDENTIFIER    ::= { ruckusSZWLANObjects 1 }
+
+ruckusSZWLANAPInfo OBJECT IDENTIFIER  ::= { ruckusSZWLANObjects 2 }
+
+
+ruckusSZWLANTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RuckusSZWLANEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "SZ WLAN table."
+    ::= { ruckusSZWLANInfo 2 }
+
+ruckusSZWLANEntry OBJECT-TYPE
+    SYNTAX RuckusSZWLANEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each SZ WLAN entry."
+    INDEX {
+       ruckusSZWLANIndex }
+    ::= { ruckusSZWLANTable 1 }
+
+RuckusSZWLANEntry ::= SEQUENCE {
+  ruckusSZWLANSSID			RuckusSSID,
+--  ruckusSZWLANZone			DisplayString,
+--  ruckusSZWLANDomain			DisplayString,
+--  ruckusWLANEncryption                DisplayString,
+--  ruckusWLANIsGuest                   TruthValue,
+--  ruckusWLANSSIDBcastDisable          TruthValue,
+--  ruckusWLANVlanID                    INTEGER,
+--  ruckusWLANRateLimitingUp            OCTET STRING,
+--  ruckusWLANRateLimitingDown          OCTET STRING,
+--  ruckusWLANTunnelWLAN                TruthValue,
+--  ruckusWLANNumVAP                    Unsigned32,
+  ruckusSZWLANNumSta			Unsigned32,
+--  ruckusWLANRxPkts                    Counter64,
+  ruckusSZWLANRxBytes			Counter64,
+--  ruckusWLANTxPkts                    Counter64,
+  ruckusSZWLANTxBytes			Counter64,
+--  ruckusWLANAuthTotal                 Counter64, 
+--  ruckusWLANAuthResp                  Counter64, 
+--  ruckusWLANAuthSuccessTotal          Counter64, 
+--  ruckusWLANAuthFail                  Counter64, 
+--  ruckusWLANAssocTotal                Counter64, 
+--  ruckusWLANAssocResp                 Counter64, 
+--  ruckusWLANReassocReq                Counter64, 
+--  ruckusWLANReassocResp               Counter64, 
+--  ruckusWLANAssocSuccess              Counter64, 
+--  ruckusWLANAssocFail                 Counter64, 
+--  ruckusWLANAssocDenied               Counter64, 
+--  ruckusWLANDiassocAbnormal           Counter64, 
+--  ruckusWLANDiassocCapacity           Counter64, 
+--  ruckusWLANDiassocLeave              Counter64, 
+--  ruckusWLANDiassocMisc               Counter64,
+--  ruckusWLANRxByteRate                Unsigned32,
+--  ruckusWLANTxByteRate                Unsigned32,
+--  ruckusWLANRxDataFrameOnLan          Counter64,
+--  ruckusWLANRxByteOnLan               Counter64,
+--  ruckusWLANTxByteOnLan               Counter64,
+--  ruckusWLANDownDropFrame             Counter64,
+--  ruckusWLANDownRetxFrame             Counter64,
+--  ruckusWLANDownTotalFrame            Counter64,
+--  ruckusWLANDownTotalErrFrame         Counter64,
+--  ruckusWLANUpTotalFrame              Counter64,
+--  ruckusWLANUpDropFrame               Counter64,
+--  ruckusWLANUpRetxFrame               Counter64,
+--  ruckusWLANNAME                      RuckusSSID,
+  ruckusSZWLANAuthType			DisplayString,
+  ruckusSZWLANIndex			Integer32
+}
+
+ruckusSZWLANSSID OBJECT-TYPE
+    SYNTAX RuckusSSID
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SSID assciated with each WLAN and this represents the SSID belongs to WLAN."
+    ::= { ruckusSZWLANEntry 1 }
+
+ruckusSZWLANNumSta OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This represents number of client devices connected on each SSID & WLAN."
+    ::= { ruckusSZWLANEntry 12 }
+
+ruckusSZWLANRxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of bytes received during the period."
+    ::= { ruckusSZWLANEntry 14 }
+
+ruckusSZWLANTxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of bytes transmitted during the period."
+    ::= { ruckusSZWLANEntry 16 }
+
+ruckusSZWLANAuthType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication Type of WLAN device."
+    ::= { ruckusSZWLANEntry 17 }
+
+    
+ruckusSZWLANIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Identifies the specific WLAN ID in the SCG system."
+    ::= { ruckusSZWLANEntry 99 }
+
+
+ruckusSZAPTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RuckusSZAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table records the AP information entries."
+    ::= { ruckusSZWLANAPInfo 2 }
+
+ruckusSZAPEntry OBJECT-TYPE
+    SYNTAX RuckusSZAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies the information of AP."
+    INDEX {
+        ruckusSZAPMac }
+    ::= { ruckusSZAPTable 1 }
+
+RuckusSZAPEntry ::= SEQUENCE {
+  ruckusSZAPMac				MacAddress,
+  ruckusSZAPGroup			DisplayString,
+--  ruckusSZAPZone                   	DisplayString,
+--  ruckusSZAPDomain                 	DisplayString,
+  ruckusSZAPName			DisplayString,
+  ruckusSZAPUptime			TimeTicks,
+  ruckusSZAPFWversion			DisplayString,
+  ruckusSZAPModel			DisplayString,
+  ruckusSZAPSerial			DisplayString,
+--  ruckusWLANAPHWversion		DisplayString,
+  ruckusSZAPIp				IpAddress,
+  ruckusSZAPIPType			DisplayString,
+  ruckusSZAPExtIp			IpAddress,
+  ruckusSZAPExtPort			Unsigned32,
+  ruckusSZAPNumSta			Unsigned32,
+  ruckusSZAPConnStatus			DisplayString,
+  ruckusSZAPRegStatus			DisplayString,
+  ruckusSZAPConfigStatus		DisplayString,
+  ruckusSZAPLocation			DisplayString,
+  ruckusSZAPGPSInfo			DisplayString,
+  ruckusSZAPMeshRole			DisplayString,
+  ruckusSZAPDescription			DisplayString,
+  ruckusSZAPRXBytes			Counter64,
+  ruckusSZAPTXBytes			Counter64,
+  ruckusSZAPIpsecSessionTime			Unsigned32,
+  ruckusSZAPIpsecTXPkts			Counter64,
+  ruckusSZAPIpsecRXPkts			Counter64,
+  ruckusSZAPIpsecTXBytes			Counter64,
+  ruckusSZAPIpsecRXBytes			Counter64,
+  ruckusSZAPIpsecTXPktsDropped			Counter64,
+  ruckusSZAPIpsecRXPktsDropped			Counter64,
+  ruckusSZAPIpsecTXIdleTime			Unsigned32,
+  ruckusSZAPIpsecRXIdleTime			Unsigned32
+--  ruckusWLANAPNumRogues		Unsigned32,
+--  ruckusWLANAPConnectionMode		INTEGER,
+--  ruckusWLANAPMeshEnable		TruthValue,
+--  ruckusWLANAPMeshHops		Unsigned32,
+--  ruckusWLANAPMeshType		INTEGER,
+--  ruckusWLANAPLANStatsRXByte		Counter32,
+--  ruckusWLANAPLANStatsRXPkt		Counter32,
+--  ruckusWLANAPLANStatsRXPktErr	Counter32,
+--  ruckusWLANAPLANStatsRXPKTSucc	Counter32,
+--  ruckusWLANAPLANStatsTXByte		Counter32,
+--  ruckusWLANAPLANStatsTXPkt		Counter32,
+--  ruckusWLANAPMemUtil			INTEGER,
+--  ruckusWLANAPMemTotal		Unsigned32,
+--  ruckusWLANAPCPUUtil			INTEGER,
+--  ruckusWLANAPFWSize			Unsigned32,
+--  ruckusWLANAPFWAvail			Unsigned32,
+--  ruckusWLANAPEthStatus		INTEGER,
+--  ruckusWLANAPLANStatsRXPKTBcast      Counter32,
+--  ruckusWLANAPLANStatsRXPKTMcast      Counter32,
+--  ruckusWLANAPLANStatsRXPKTUcast      Counter32,
+--  ruckusWLANAPLANStatsTXPKTBcast      Counter32,
+--  ruckusWLANAPLANStatsTXPKTMcast      Counter32,
+--  ruckusWLANAPLANStatsTXPKTUcast      Counter32,
+--  ruckusWLANAPLANStatsDropped         Counter32,
+--  ruckusWLANAPMeshUpPortCntUpdown     Counter32,
+--  ruckusWLANAPMeshDownPortCntUpdown   Counter32,
+--  ruckusWLANAPTxFrameDropped		Counter32,
+--  ruckusWLANAPTxFrameError		Counter32,
+--  ruckusWLANAPCoverageTech		INTEGER,
+--  ruckusWLANAPStaTxBytes		Counter32,
+--  ruckusWLANAPStaRxBytes		Counter32,
+--  ruckusWLANAPNetmask			IpAddress,
+--  ruckusWLANAPGateway			IpAddress,
+--  ruckusWLANAPDNS1			IpAddress,
+--  ruckusWLANAPDNS2			IpAddress,
+--  ruckusWLANAPTotalUser		Unsigned32,
+--  ruckusWLANAPLANStatsRXByteRate	Counter32,
+--  ruckusWLANAPLANStatsTXByteRate	Counter32,
+}
+
+ruckusSZAPMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC address."
+    ::= { ruckusSZAPEntry 1 }
+
+ruckusSZAPGroup OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The WLAN Group of this AP."
+    ::= { ruckusSZAPEntry 2 }
+
+ruckusSZAPName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Identify Name of this AP."
+    ::= { ruckusSZAPEntry 5 }
+
+ruckusSZAPUptime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The time during which the AP was up during the period."
+    ::= { ruckusSZAPEntry 6 }
+
+ruckusSZAPFWversion OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current firmware version of this AP."
+    ::= { ruckusSZAPEntry 7 }
+
+ruckusSZAPModel OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Model name of this AP."
+    ::= { ruckusSZAPEntry 8 }
+
+ruckusSZAPSerial OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number of this AP."
+    ::= { ruckusSZAPEntry 9 }
+
+ruckusSZAPIp OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address assigned to the AP."
+    ::= { ruckusSZAPEntry 10 }
+
+ruckusSZAPIPType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address type of this AP."
+    ::= { ruckusSZAPEntry 11 }
+
+ruckusSZAPExtIp OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "External IP address of this AP."
+    ::= { ruckusSZAPEntry 12 }
+
+ruckusSZAPExtPort OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "External Port."
+    ::= { ruckusSZAPEntry 13 }
+
+ruckusSZAPNumSta OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of concurrently connected clients on this AP."
+    ::= { ruckusSZAPEntry 15 }
+
+ruckusSZAPConnStatus OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current connection Status of this AP."
+    ::= { ruckusSZAPEntry 16 }
+
+ruckusSZAPRegStatus OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current registration Status of this AP."
+    ::= { ruckusSZAPEntry 17 }
+
+ruckusSZAPConfigStatus OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Configuration Status of this AP."
+    ::= { ruckusSZAPEntry 18 }
+
+ruckusSZAPLocation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "AP location info."
+    ::= { ruckusSZAPEntry 19 }
+
+ruckusSZAPGPSInfo OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "GPS Information of this AP."
+    ::= { ruckusSZAPEntry 20 }
+
+ruckusSZAPMeshRole OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Mesh Role assigned to the AP."
+    ::= { ruckusSZAPEntry 21 }
+
+ruckusSZAPDescription OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Description of this AP."
+    ::= { ruckusSZAPEntry 22 }
+
+ruckusSZAPRXBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of bytes received during the period."
+    ::= { ruckusSZAPEntry 30 }
+
+ruckusSZAPTXBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of bytes transmitted during the period."
+    ::= { ruckusSZAPEntry 31 }
+
+ruckusSZAPIpsecSessionTime OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec session time lasting, unit: seconds."
+    ::= { ruckusSZAPEntry 50 }  
+    
+ruckusSZAPIpsecTXPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec transmitted packet counts."
+    ::= { ruckusSZAPEntry 55 }
+    
+ruckusSZAPIpsecRXPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec received packet counts."
+    ::= { ruckusSZAPEntry 56 }
+    
+ruckusSZAPIpsecTXBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec transmitted byte counts."
+    ::= { ruckusSZAPEntry 57 }
+    
+ruckusSZAPIpsecRXBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec received byte counts."
+    ::= { ruckusSZAPEntry 58 }
+    
+ruckusSZAPIpsecTXPktsDropped OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec transmitted dropped packet counts."
+    ::= { ruckusSZAPEntry 59 }
+    
+ruckusSZAPIpsecRXPktsDropped OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "ipsec received dropped packet counts."
+    ::= { ruckusSZAPEntry 60 }   
+    
+ruckusSZAPIpsecTXIdleTime OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "In seconds since last seen transmitted packet."
+    ::= { ruckusSZAPEntry 65 }  
+    
+ruckusSZAPIpsecRXIdleTime OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "In seconds since last seen received packet."
+    ::= { ruckusSZAPEntry 66 }    
+END
