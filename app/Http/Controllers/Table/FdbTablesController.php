@@ -160,8 +160,8 @@ class FdbTablesController extends TableController
             'vlan' => $fdb_entry->vlan ? $fdb_entry->vlan->vlan_vlan : '',
             'description' => '',
             'dnsname' => $ip_info['dns'],
-            'first_seen' => strval($fdb_entry->created_at),
-            'last_seen' => strval($fdb_entry->updated_at),
+            'first_seen' => $fdb_entry->created_at->toDateTimeString(),
+            'last_seen' => $fdb_entry->updated_at->diffForHumans(),
         ];
 
         if ($fdb_entry->port) {
