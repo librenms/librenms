@@ -53,13 +53,13 @@ class LogTrap implements SnmptrapHandler
         $logAI = $trap->getOidData('LOG-MIB::logAI.'.$index);
         $state = $trap->getOidData('LOG-MIB::logEquipStatusV2.'.$index);
 
-        if ($state == 'warning' or $state == 'major' or $state == '5' or $state == '3') {
+        if ($state == 'warning' || $state == 'major' || $state == '5' || $state == '3') {
             $severity = 4;
-        } elseif ($state == 'critical' or $state == '4') {
+        } elseif ($state == 'critical' || $state == '4') {
             $severity = 5;
-        } elseif ($state == 'minor' or $state == '2') {
+        } elseif ($state == 'minor' || $state == '2') {
             $severity = 3;
-        } elseif ($state == 'nonAlarmed' or $state == '1') {
+        } elseif ($state == 'nonAlarmed' || $state == '1') {
             $severity = 1;
         } else {
             $severity = 0;
