@@ -40,7 +40,7 @@ class YamlTest extends TestCase
      */
     public function testOSDefinitionSchema()
     {
-        $this->validateYamlFilesAgainstSchema(OSDefinition::$def_dir, '/misc/os_schema.json');
+        $this->validateYamlFilesAgainstSchema(OSDefinition::$defDir, '/misc/os_schema.json');
     }
 
     /**
@@ -48,7 +48,7 @@ class YamlTest extends TestCase
      */
     public function testDiscoveryDefinitionSchema()
     {
-        $this->validateYamlFilesAgainstSchema(OSDefinition::$discovery_dir, '/misc/discovery_schema.json');
+        $this->validateYamlFilesAgainstSchema(OSDefinition::$discoveryDir, '/misc/discovery_schema.json');
     }
 
     private function validateYamlFilesAgainstSchema($dir, $schema_file)
