@@ -95,7 +95,7 @@ class OSDefinition
 
             if ($existing) {
                 // remove unneeded os
-                $os_defs = array_diff_key($os_defs, Device::query()->distinct()->value('os'));
+                $os_defs = array_diff_key($os_defs, array_flip(Device::query()->distinct()->value('os')));
             }
 
             Config::set('os', array_replace_recursive($os_defs, Config::get('os', [])));
