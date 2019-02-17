@@ -113,7 +113,7 @@ class CleanFiles extends LnmsCommand
         OSDefinition::updateCache(true);
 
         // remove patch files
-        foreach (glob(ApplyPullRequest::PATCH_SAVE_DIR . '/*.diff') as $file) {
+        foreach (glob(ApplyPullRequest::getPatchSaveDir('/*.diff')) as $file) {
             if (is_file($file)) {
                 unlink($file);
             }

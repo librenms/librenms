@@ -38,8 +38,6 @@ use Symfony\Component\Process\Process;
 
 class ApplyPullRequest extends LnmsCommand
 {
-    const PATCH_SAVE_DIR = '/tmp/librenms_patches';
-
     protected $name = 'test:pull-request';
     private $prNumber;
 
@@ -80,6 +78,17 @@ class ApplyPullRequest extends LnmsCommand
 
         $this->error(__("commands.test:pull-request.failed.$type", ['number' => $this->prNumber]));
         return 1;
+    }
+
+    /**
+     * Get the patch save directory
+     *
+     * @param string $extra string to append to path (should not include leading slash)
+     * @return string
+     */
+    public static function getPatchSaveDir($extra = '')
+    {
+        return Config::installDir() . '/storage/framework/testing/' . $extra;
     }
 
     private function applyPatch()
@@ -127,7 +136,7 @@ class ApplyPullRequest extends LnmsCommand
 
     private function getPatchPath()
     {
-        return self::PATCH_SAVE_DIR . "/$this->prNumber.diff";
+        return self::getPatchSaveDir("/$this->prNumber.diff");
     }
 
     private function deletePatch(): void
@@ -139,8 +148,8 @@ class ApplyPullRequest extends LnmsCommand
 
     private function downloadPatch()
     {
-        if (!is_dir(self::PATCH_SAVE_DIR)) {
-            mkdir(self::PATCH_SAVE_DIR, 0777, true);
+        if (!is_dir(self::getPatchSaveDir())) {
+            mkdir(self::getPatchSaveDir(), 0777, true);
         }
 
         $path = $this->getPatchPath();
