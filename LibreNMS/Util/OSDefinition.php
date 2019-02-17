@@ -32,8 +32,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class OSDefinition
 {
-    public static $defDir = '/includes/definitions/';
-    public static $discoveryDir = '/includes/definitions/discovery/';
+    const DEFINITIONS_DIR = '/includes/definitions/';
+    const DISCOVERY_DIR = '/includes/definitions/discovery/';
 
     private $os;
     private $discovery = null;
@@ -192,7 +192,7 @@ class OSDefinition
      */
     public function getYamlFile()
     {
-        return Config::installDir() . self::$defDir . $this->os . '.yaml';
+        return Config::installDir() . self::DEFINITIONS_DIR. $this->os . '.yaml';
     }
 
     /**
@@ -202,7 +202,7 @@ class OSDefinition
      */
     public function getDiscoveryYamlFile()
     {
-        return Config::installDir() . self::$discoveryDir . $this->os . '.yaml';
+        return Config::installDir() . self::DISCOVERY_DIR . $this->os . '.yaml';
     }
 
     private static function cacheIsValid()
