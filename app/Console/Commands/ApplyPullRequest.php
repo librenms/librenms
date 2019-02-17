@@ -25,17 +25,22 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
+use App\Console\LnmsCommand;
+use GuzzleHttp\Exception\TransferException;
 use LibreNMS\ComposerHelper;
 use LibreNMS\Config;
+use LibreNMS\Util\Git;
 use LibreNMS\Util\OSDefinition;
+use Log;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Process;
 
-class ApplyPullRequest extends Command
+class ApplyPullRequest extends LnmsCommand
 {
     protected $name = 'test:pull-request';
+    private $patchSaveDir = '/tmp/librenms_patches';
+    private $prNumber;
 
     public function __construct()
     {
@@ -49,12 +54,7 @@ class ApplyPullRequest extends Command
             __('commands.test:pull-request.arguments.pull-request', ['url' => 'https://github.com/librenms/librenms/pull/'])
         );
 
-        $this->addOption(
-            'remove',
-            'r',
-            InputOption::VALUE_NONE,
-            __('commands.test:pull-request.options.remove')
-        );
+        $this->addOption('remove', 'r', InputOption::VALUE_NONE);
     }
 
     /**
@@ -64,39 +64,120 @@ class ApplyPullRequest extends Command
      */
     public function handle()
     {
-        $number = (int)$this->argument('pull-request'); // make sure pull-request is an integer
+        $this->prNumber = (int)$this->argument('pull-request'); // make sure pull-request is an integer
         $remove = $this->option('remove');
-        $url = $this->getPatchUrl($number);
-        $command = 'curl -s "$URL" | git apply --exclude=*.png --verbose';
+        $type = $remove ? 'remove' : 'apply';
 
-        if ($remove) {
-            $command .= ' --reverse';
-        }
+        $success = $remove ? $this->removePatch() : $this->applyPatch();
 
-        $process = new Process($command, Config::installDir(), ['URL' => $url]);
-        $process->run();
-
-        if ($process->getExitCode() == 0) {
-            ComposerHelper::install(false);
+        if ($success) {
+            ComposerHelper::install(!$this->getOutput()->isVerbose());
             OSDefinition::updateCache(true);
+            $this->info(__("commands.test:pull-request.success.$type", ['number' => $this->prNumber]));
+            return 0;
         }
 
-        $key = $remove ? 'remove' : 'apply';
-
-        if ($process->getExitCode() == 0) {
-            $this->info(__("commands.test:pull-request.success.$key", ['number' => $number]));
-        } elseif (str_contains($process->getErrorOutput(), 'error: unrecognized input')) {
-            $this->error(__('commands.test:pull-request.download_failed'));
-        } else {
-            $this->line($process->getErrorOutput());
-            $this->error(__("commands.test:pull-request.failed.$key", ['number' => $number]));
-        }
-
-        return $process->getExitCode();
+        $this->error(__("commands.test:pull-request.failed.$type", ['number' => $this->prNumber]));
+        return 1;
     }
 
-    private function getPatchUrl($number)
+    private function applyPatch()
     {
-        return "https://patch-diff.githubusercontent.com/raw/librenms/librenms/pull/$number.diff";
+        $patch_exists = file_exists($this->getPatchPath());
+        if ($patch_exists || $this->downloadPatch()) {
+            $path = $this->getPatchPath();
+            $process = new Process(['git', 'apply', $path], Config::installDir());
+            $process->run();
+
+            if ($process->isSuccessful()) {
+                return true;
+            }
+
+            if ($patch_exists && Git::hasModifiedFiles()) {
+                // patch may already be applied
+                $this->warn(__('commands.test:pull-request.already-applied'));
+                return false;
+            }
+
+            $this->deletePatch();
+            return $this->handleError($process->getErrorOutput());
+        }
+
+        $this->error(__('commands.test:pull-request.download_failed'));
+        return false;
+    }
+
+    private function removePatch()
+    {
+        if (file_exists($this->getPatchPath()) || $this->downloadPatch()) {
+            $process = new Process(['git', 'apply', '--reverse', $this->getPatchPath()], Config::installDir());
+            $process->run();
+            Log::debug('Remove: ' . $process->getExitCode() . ' ' . $process->getOutput() . PHP_EOL . $process->getErrorOutput());
+            $this->deletePatch();
+
+            if ($process->isSuccessful()) {
+                return true;
+            }
+
+            return $this->handleError($process->getErrorOutput());
+        }
+
+        $this->error(__('commands.test:pull-request.download_failed'));
+        return false;
+    }
+
+    private function getPatchUrl()
+    {
+        return "https://patch-diff.githubusercontent.com/raw/librenms/librenms/pull/$this->prNumber.diff";
+    }
+
+    private function getPatchPath()
+    {
+        return $this->patchSaveDir . "/$this->prNumber.diff";
+    }
+
+    private function deletePatch(): void
+    {
+        if (file_exists($this->getPatchPath())) {
+            unlink($this->getPatchPath());
+        }
+    }
+
+    private function downloadPatch()
+    {
+        if (!is_dir($this->patchSaveDir)) {
+            mkdir($this->patchSaveDir, 0777, true);
+        }
+
+        $path = $this->getPatchPath();
+        $uri = $this->getPatchUrl();
+
+        try {
+            $client = new \GuzzleHttp\Client();
+            $response = $client->get($uri, ['sink' => $path]);
+        } catch (TransferException $e) {
+            Log::error('Error downloading: ' . $e->getMessage());
+            $this->deletePatch();
+            return false;
+        }
+
+        if ($this->getOutput()->isVerbose()) {
+            \Log::debug("Downloaded $path from $uri, code: " . $response->getStatusCode());
+            \Log::debug(file_get_contents(file_get_contents($this->getPatchPath())));
+        }
+
+        return $response->getStatusCode() == 200;
+    }
+
+    private function handleError($errorOutput)
+    {
+        if (str_contains($errorOutput, 'error: unrecognized input')) {
+            $this->error(__('commands.test:pull-request.download_failed'));
+            $this->deletePatch();
+        } else {
+            $this->line($errorOutput);
+        }
+
+        return false;
     }
 }

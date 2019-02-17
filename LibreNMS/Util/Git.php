@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use LibreNMS\Config;
+use Symfony\Component\Process\Process;
 
 class Git
 {
@@ -39,5 +40,18 @@ class Git
     {
         exec('git > /dev/null 2>&1', $response, $exit_code);
         return $exit_code === 1;
+    }
+
+    /**
+     * Check if there are any modified files.
+     * Does not include un-indexed files.
+     *
+     * @return bool
+     */
+    public static function hasModifiedFiles()
+    {
+        $process = new Process(['git', 'diff-index', '--quiet', 'HEAD', '--']);
+        $process->run();
+        return !$process->isSuccessful();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
+use App\Console\LnmsCommand;
 use LibreNMS\ComposerHelper;
 use LibreNMS\Config;
 use LibreNMS\Util\OSDefinition;
@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
-class CleanFiles extends Command
+class CleanFiles extends LnmsCommand
 {
     protected $name = 'clean:files';
 
@@ -57,7 +57,7 @@ class CleanFiles extends Command
         parent::__construct();
 
         $this->setDescription(__('commands.clean:files.description'));
-        $this->addOption('vendor', null, InputOption::VALUE_NONE, __('commands.clean:files.options.vendor'));
+        $this->addOption('vendor', null, InputOption::VALUE_NONE);
     }
 
     /**
