@@ -46,7 +46,6 @@ class LogTrap implements SnmptrapHandler
         $index = $trap->findOid('LOG-MIB::logIndex');
         $index = $trap->getOidData($index);
 
-        $logObject = $trap->getOidData('LOG-MIB::logObject.'.$index);
         $logName = $trap->getOidData('LOG-MIB::logName.'.$index);
         $logEvent = $trap->getOidData('LOG-MIB::logEvent.'.$index);
         $logPC = $trap->getOidData('LOG-MIB::logPC.'.$index);
