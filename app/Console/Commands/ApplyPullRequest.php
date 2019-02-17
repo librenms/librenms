@@ -38,8 +38,9 @@ use Symfony\Component\Process\Process;
 
 class ApplyPullRequest extends LnmsCommand
 {
+    const PATCH_SAVE_DIR = '/tmp/librenms_patches';
+
     protected $name = 'test:pull-request';
-    private $patchSaveDir = '/tmp/librenms_patches';
     private $prNumber;
 
     public function __construct()
@@ -126,7 +127,7 @@ class ApplyPullRequest extends LnmsCommand
 
     private function getPatchPath()
     {
-        return $this->patchSaveDir . "/$this->prNumber.diff";
+        return self::PATCH_SAVE_DIR . "/$this->prNumber.diff";
     }
 
     private function deletePatch(): void
@@ -138,8 +139,8 @@ class ApplyPullRequest extends LnmsCommand
 
     private function downloadPatch()
     {
-        if (!is_dir($this->patchSaveDir)) {
-            mkdir($this->patchSaveDir, 0777, true);
+        if (!is_dir(self::PATCH_SAVE_DIR)) {
+            mkdir(self::PATCH_SAVE_DIR, 0777, true);
         }
 
         $path = $this->getPatchPath();

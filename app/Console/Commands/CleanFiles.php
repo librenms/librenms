@@ -41,6 +41,7 @@ class CleanFiles extends LnmsCommand
         'storage/app/public/.gitignore',
         'storage/debugbar/.gitignore',
         'storage/framework/cache/.gitignore',
+        'storage/framework/cache/data/.gitignore',
         'storage/framework/sessions/.gitignore',
         'storage/framework/testing/.gitignore',
         'storage/framework/views/.gitignore',
@@ -68,18 +69,7 @@ class CleanFiles extends LnmsCommand
     public function handle()
     {
         if ($this->confirm(__('commands.clean:files.confirm'))) {
-            $commands = [
-                ['git', 'reset'],
-                ['git', 'checkout', '.'],
-                array_merge(['git', 'clean', '-d', '-f'], $this->dirs),
-                array_merge(['git', 'checkout'], $this->gitignores), //fix messed up gitignore file modes
-            ];
-
-            if ($this->option('vendor')) {
-                $commands[] = ['git', 'clean', '-x', '-d', '-f', 'vendor/'];
-            }
-
-            foreach ($commands as $command) {
+            foreach ($this->getCommands() as $command) {
                 $process = new Process($command, Config::installDir());
                 $this->line($process->getCommandLine(), null, OutputInterface::VERBOSITY_VERY_VERBOSE);
 
@@ -89,12 +79,44 @@ class CleanFiles extends LnmsCommand
                 $process->run();
             }
 
-            ComposerHelper::install(!$this->getOutput()->isVerbose());
-            OSDefinition::updateCache(true);
+            $this->postCleanup();
 
             $this->info(__('commands.clean:files.done'));
             return 0;
         }
         return 1;
+    }
+
+    /**
+     * Build the list of commands to clean
+     *
+     * @return array
+     */
+    private function getCommands(): array
+    {
+        $commands = [
+            ['git', 'reset'],
+            ['git', 'checkout', '.'],
+            array_merge(['git', 'clean', '-d', '-f'], $this->dirs),
+            array_merge(['git', 'checkout'], $this->gitignores), // fix gitignore missing or messed up file modes
+        ];
+
+        if ($this->option('vendor')) {
+            $commands[] = ['git', 'clean', '-x', '-d', '-f', 'vendor/'];
+        }
+        return $commands;
+    }
+
+    private function postCleanup(): void
+    {
+        ComposerHelper::install(!$this->getOutput()->isVerbose());
+        OSDefinition::updateCache(true);
+
+        // remove patch files
+        foreach (glob(ApplyPullRequest::PATCH_SAVE_DIR . '/*.diff') as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
     }
 }
