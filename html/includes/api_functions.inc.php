@@ -2027,6 +2027,42 @@ function get_link()
 }
 
 
+function list_sensors()
+{
+    $app        = \Slim\Slim::getInstance();
+    $router     = $app->router()->getCurrentRoute()->getParams();
+    $sql        = '';
+    $sql_params = array();
+    $hostname   = $router['hostname'];
+    $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        check_device_permission($device_id);
+        $sql        = " AND `sensors`.`device_id`=?";
+        $sql_params = array($device_id);
+    }
+    if (!LegacyAuth::user()->hasGlobalRead()) {
+        $sql .= " AND `sensors`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)";
+        $sql_params[] = LegacyAuth::id();
+    }
+
+    $sensors       = array();
+    foreach (dbFetchRows("SELECT `sensors`.* FROM `sensors` LEFT JOIN `devices` ON `sensors`.`device_id` = `devices`.`device_id` WHERE `sensors`.`sensor_id` IS NOT NULL $sql", $sql_params) as $sensor) {
+        $host_id = get_vm_parent_id($device);
+        $device['ip'] = inet6_ntop($device['ip']);
+        if (is_numeric($host_id)) {
+            $device['parent_id'] = $host_id;
+        }
+        $sensors[] = $sensor;
+    }
+    $total_sensors = count($sensors);
+    if ($total_sensors == 0) {
+        api_error(404, 'Sensors do not exist');
+    }
+
+    api_success($sensors, 'sensors');
+}
+
+
 function list_ip_addresses()
 {
     check_is_read();
