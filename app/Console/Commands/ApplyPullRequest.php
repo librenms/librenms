@@ -85,9 +85,7 @@ class ApplyPullRequest extends LnmsCommand
     {
         $patch_exists = file_exists($this->getPatchPath());
         if ($patch_exists || $this->downloadPatch()) {
-            $path = $this->getPatchPath();
-            $process = new Process(['git', 'apply', $path], Config::installDir());
-            $process->run();
+            $process = $this->runGitApply();
 
             if ($process->isSuccessful()) {
                 return true;
@@ -110,16 +108,11 @@ class ApplyPullRequest extends LnmsCommand
     private function removePatch()
     {
         if (file_exists($this->getPatchPath()) || $this->downloadPatch()) {
-            $process = new Process(['git', 'apply', '--reverse', $this->getPatchPath()], Config::installDir());
-            $process->run();
+            $process = $this->runGitApply(['--reverse']);
             Log::debug('Remove: ' . $process->getExitCode() . ' ' . $process->getOutput() . PHP_EOL . $process->getErrorOutput());
-            $this->deletePatch();
+            $this->deletePatch(); // always delete the patch, if we fail to remove it, we will suggest lnms clean:files
 
-            if ($process->isSuccessful()) {
-                return true;
-            }
-
-            return $this->handleError($process->getErrorOutput());
+            return $process->isSuccessful() || $this->handleError($process->getErrorOutput());
         }
 
         $this->error(__('commands.test:pull-request.download_failed'));
@@ -161,9 +154,9 @@ class ApplyPullRequest extends LnmsCommand
             return false;
         }
 
-        if ($this->getOutput()->isVerbose()) {
-            \Log::debug("Downloaded $path from $uri, code: " . $response->getStatusCode());
-            \Log::debug(file_get_contents(file_get_contents($this->getPatchPath())));
+        \Log::debug("Downloaded $path from $uri, code: " . $response->getStatusCode());
+        if ($this->getOutput()->isDebug()) {
+            \Log::debug(file_get_contents($this->getPatchPath()));
         }
 
         return $response->getStatusCode() == 200;
@@ -179,5 +172,14 @@ class ApplyPullRequest extends LnmsCommand
         }
 
         return false;
+    }
+
+    private function runGitApply($extra = [])
+    {
+        $verbose = $this->getOutput()->isVeryVerbose() ? ['--verbose'] : [];
+        $command = array_merge(['git', 'apply'], $extra, $verbose, [$this->getPatchPath()]);
+        $process = new Process($command, Config::installDir());
+        $process->run();
+        return $process;
     }
 }
