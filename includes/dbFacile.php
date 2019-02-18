@@ -464,9 +464,7 @@ function dbHandleException(QueryException $exception)
         }
     }
 
-    foreach ($exception->getTrace() as $trace) {
-        $message .= "\n  " . $trace['file'] . ':' . $trace['line'];
-    }
+    $message .= $exception->getTraceAsString();
 
     if (Laravel::isBooted()) {
         Log::error($message);

@@ -25,9 +25,11 @@
 
 namespace LibreNMS\DB;
 
+use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Events\Dispatcher;
+use LibreNMS\Config;
 use LibreNMS\Util\Laravel;
 
 class Eloquent
@@ -41,6 +43,8 @@ class Eloquent
         // boot Eloquent outside of Laravel
         if (!Laravel::isBooted() && is_null(self::$capsule)) {
             $install_dir = realpath(__DIR__ . '/../../');
+
+            (new Dotenv(Config::get('install_dir')))->load();
 
             $db_config = include($install_dir . '/config/database.php');
             $settings = $db_config['connections'][$db_config['default']];
