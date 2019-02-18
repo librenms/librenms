@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use Artisan;
 use LibreNMS\ComposerHelper;
 use LibreNMS\Config;
 use LibreNMS\Util\OSDefinition;
@@ -107,7 +108,7 @@ class CleanFiles extends LnmsCommand
         return $commands;
     }
 
-    private function postCleanup(): void
+    private function postCleanup()
     {
         ComposerHelper::install(!$this->getOutput()->isVerbose());
         OSDefinition::updateCache(true);
@@ -118,5 +119,10 @@ class CleanFiles extends LnmsCommand
                 unlink($file);
             }
         }
+
+        Artisan::call('route:clear');
+        Artisan::call('config:clear');
+        Artisan::call('view:clear');
+        Artisan::call('cache:clear');
     }
 }
