@@ -3,12 +3,10 @@
 namespace App\Exceptions;
 
 use App\Checks;
-use App\Providers\ViewServiceProvider;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Translation\TranslationServiceProvider;
 use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Exceptions\DuskUnsafeException;
 
@@ -30,12 +28,11 @@ class Handler extends ExceptionHandler
 
     public function render($request, Exception $exception)
     {
-        // If for some reason Blade hasn't been booted, try it now
+        // If for some reason Blade hasn't been registered, try it now
         try {
-            $app = app();
-            if (!$app->bound('view')) {
-                (new ViewServiceProvider($app))->register();
-                (new TranslationServiceProvider($app))->register();
+            if (!app()->bound('view')) {
+                app()->register(\App\Providers\ViewServiceProvider::class);
+                app()->register(\Illuminate\Translation\TranslationServiceProvider::class);
             }
         } catch (\Exception $e) {
             // continue without view
