@@ -7,6 +7,7 @@ namespace LibreNMS\Authentication;
 
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
+use LibreNMS\Exceptions\LdapMissingException;
 
 class ActiveDirectoryAuthorizer extends AuthorizerBase
 {
@@ -189,7 +190,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         }
 
         if (!function_exists('ldap_connect')) {
-            throw new AuthenticationException("PHP does not support LDAP, please install or enable the PHP LDAP extension.");
+            throw new LdapMissingException();
         }
 
         if (Config::has('auth_ad_check_certificates') &&
