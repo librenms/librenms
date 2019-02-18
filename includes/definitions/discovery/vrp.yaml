@@ -135,7 +135,7 @@ modules:
                     descr: 'Average Power Consumption'
                     index: 0
                     divisor: 1000
-
+                -
                     oid: hwCurrentPower
                     num_oid: '.1.3.6.1.4.1.2011.6.157.1.6.{{ $index }}'
                     descr: 'Current Power Consumption'
@@ -151,4 +151,3 @@ modules:
                      states:
                          - { descr: Normal, graph: 1, value: 1, generic: 0 }
                          - { descr: Abnormal, graph: 1, value: 2, generic: 2 }
-
