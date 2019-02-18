@@ -44,21 +44,11 @@ class Handler extends ExceptionHandler
             // handle database exceptions
             $exception = $dbe;
         } elseif ($exception->getMessage() == 'It is unsafe to run Dusk in production.') {
-            // dusk running
+            // dusk in production
             $exception = new DuskUnsafeException($exception->getMessage(), $exception->getCode(), $exception);
         }
 
         return parent::render($request, $exception);
-    }
-
-    protected function convertExceptionToResponse(Exception $e)
-    {
-        // show helpful response if debugging, otherwise print generic error so we don't leak information
-        if (config('app.debug')) {
-            return parent::convertExceptionToResponse($e);
-        }
-
-        return response()->view('errors.generic', ['exception' => $e]);
     }
 
     /**

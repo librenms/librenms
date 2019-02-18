@@ -35,16 +35,14 @@ class DatabaseConnectException extends \Exception
      */
     public function render(\Illuminate\Http\Request $request)
     {
-        if ($request->wantsJson()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Error connecting to database: ' . $this->getMessage(),
-            ]);
-        } else {
-            return response()->view('errors.generic', [
-                'title' => 'Error connecting to database.',
-                'content' => $this->getMessage(),
-            ]);
-        }
+        $title = __('Error connecting to database');
+
+        return $request->wantsJson() ? response()->json([
+            'status' => 'error',
+            'message' => "$title: " . $this->getMessage(),
+        ]) : response()->view('errors.generic', [
+            'title' => $title,
+            'content' => $this->getMessage(),
+        ]);
     }
 }

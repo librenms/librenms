@@ -35,17 +35,13 @@ class DuskUnsafeException extends \Exception
      */
     public function render(\Illuminate\Http\Request $request)
     {
-        $title = 'It is unsafe to run Dusk in production';
-        $message = 'Run ./scripts/composer_wrapper.php install --no-dev to remove Dusk or if you are a developer set the appropriate APP_ENV';
+        $title = __('It is unsafe to run Dusk in production');
+        $message = __('Run ":command" to remove Dusk or if you are a developer set the appropriate APP_ENV', ['command' => './scripts/composer_wrapper.php install --no-dev']);
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => "$title: $message",
-            ]);
-        }
-
-        return response()->view('errors.generic', [
+        return $request->wantsJson() ? response()->json([
+            'status' => 'error',
+            'message' => "$title: $message",
+        ]) : response()->view('errors.generic', [
             'title' => $title,
             'content' => $message,
         ]);
