@@ -27,7 +27,7 @@ if (file_exists($config['install_dir'] . '/config.php')) {
     echo("This should only be called during install");
     exit;
 }
-$init_modules = ['laravel', 'nodb'];
+$init_modules = ['nodb'];
 require $config['install_dir'] . '/includes/init.php';
 
 header("Content-type: text/plain");
