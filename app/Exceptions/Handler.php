@@ -3,11 +3,14 @@
 namespace App\Exceptions;
 
 use App\Checks;
+use App\Providers\ViewServiceProvider;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Translation\TranslationServiceProvider;
 use LibreNMS\Exceptions\DatabaseConnectException;
+use LibreNMS\Exceptions\DuskUnsafeException;
 
 class Handler extends ExceptionHandler
 {
@@ -27,21 +30,32 @@ class Handler extends ExceptionHandler
 
     public function render($request, Exception $exception)
     {
+        // If for some reason Blade hasn't been booted, try it now
+        try {
+            $app = app();
+            if (!$app->bound('view')) {
+                (new ViewServiceProvider($app))->register();
+                (new TranslationServiceProvider($app))->register();
+            }
+        } catch (\Exception $e) {
+            // continue without view
+        }
+
+        if ($fpe = Checks::filePermissionsException($exception)) {
+            $exception = $fpe;
+        } elseif ($dbe = $this->checkDatabaseException($exception)) {
+            // handle database exceptions
+            $exception = $dbe;
+        } elseif ($exception->getMessage() == 'It is unsafe to run Dusk in production.') {
+            // dusk running
+            $exception = new DuskUnsafeException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
         return parent::render($request, $exception);
     }
 
     protected function convertExceptionToResponse(Exception $e)
     {
-        // handle database exceptions
-        if ($db_response = $this->dbExceptionToResponse($e)) {
-            return $db_response;
-        }
-
-        // check for exceptions relating to not being able to write to the filesystem
-        if ($fs_response = Checks::filePermissionsException($e)) {
-            return $fs_response;
-        }
-
         // show helpful response if debugging, otherwise print generic error so we don't leak information
         if (config('app.debug')) {
             return parent::convertExceptionToResponse($e);
@@ -66,7 +80,7 @@ class Handler extends ExceptionHandler
         return redirect()->guest(route('login'));
     }
 
-    protected function dbExceptionToResponse(Exception $e)
+    protected function checkDatabaseException(Exception $e)
     {
         if ($e instanceof QueryException) {
             // connect exception, convert to our standard connection exception
@@ -79,12 +93,8 @@ class Handler extends ExceptionHandler
 
             if (in_array($e->getCode(), [1044, 1045, 2002])) {
                 // this Exception has it's own render function
-                throw new DatabaseConnectException($message, $e->getCode(), $e);
+                return new DatabaseConnectException($message, $e->getCode(), $e);
             }
-            return response()->view('errors.generic', [
-                'title' => 'Unhandled MySQL Error [' . $e->getCode() . ']',
-                'content' => $message
-            ]);
         }
 
         return false;
