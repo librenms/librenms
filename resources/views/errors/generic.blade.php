@@ -5,5 +5,5 @@
 @endsection
 
 @section('content')
-    {{ isset($content) ? $content : '' }}
+    {{ isset($content) ? $content : (isset($exception) ? $exception->getMessage() : '') }}
 @endsection
