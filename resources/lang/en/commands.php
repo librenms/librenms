@@ -26,7 +26,9 @@ return [
             'apply' => 'An error occurred applying PR :number',
             'remove' => 'An error occurred removing PR :number.  You may need to clean your LibreNMS install with lnms clean:files',
         ],
-        'already-applied' => 'Patch already applied? If you want to apply a new version, remove the old first with -r'
+        'already-applied' => 'Patch already applied? If you want to apply a new version, remove the old first with -r',
+        'pr-required' => 'Pull Request Number is required',
+        'none-to-remove' => 'No pull request to remove.  Try specifying a PR number.',
     ],
     'user:add' => [
         'description' => 'Add a local user, you can only log in with this user if auth is set to mysql',
