@@ -29,11 +29,10 @@ class LdapMissingException extends AuthenticationException
 {
     public function __construct(
         string $message = 'PHP does not support LDAP, please install or enable the PHP LDAP extension',
-        bool $hide_message = false,
         int $code = 0,
         \Exception $previous = null
     ) {
-        parent::__construct($message, $hide_message, $code, $previous);
+        parent::__construct($message, false, $code, $previous);
     }
 
     /**

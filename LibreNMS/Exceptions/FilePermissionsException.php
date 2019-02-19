@@ -34,30 +34,26 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     /**
      * Try to convert the given Exception to a FilePermissionsException
      *
-     * @param \Exception $e
+     * @param \Exception $exception
      * @return static
      */
-    public static function upgrade($e)
+    public static function upgrade($exception)
     {
-        if ($e instanceof \ErrorException) {
-            // cannot write to storage directory
-            if (starts_with($e->getMessage(), 'file_put_contents(') && str_contains($e->getMessage(), '/storage/')) {
-                return new static();
-            }
+        // cannot write to storage directory
+        if ($exception instanceof \ErrorException &&
+            starts_with($exception->getMessage(), 'file_put_contents(') &&
+            str_contains($exception->getMessage(), '/storage/')) {
+            return new static();
         }
 
-        if ($e instanceof \Exception) {
             // cannot write to bootstrap directory
-            if ($e->getMessage() == 'The bootstrap/cache directory must be present and writable.') {
-                return new static();
-            }
+        if ($exception instanceof \Exception && $exception->getMessage() == 'The bootstrap/cache directory must be present and writable.') {
+                return new static ();
         }
 
-        if ($e instanceof \UnexpectedValueException) {
             // monolog cannot init log file
-            if (str_contains($e->getFile(), 'Monolog/Handler/StreamHandler.php')) {
+        if ($exception instanceof \UnexpectedValueException && str_contains($exception->getFile(), 'Monolog/Handler/StreamHandler.php')) {
                 return new static();
-            }
         }
 
         return null;
@@ -70,6 +66,25 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render(\Illuminate\Http\Request $request)
+    {
+        $log_file = config('app.log') ?: Config::get('log_file', base_path('logs/librenms.log'));
+        $commands = $this->generateCommands($log_file);
+
+        // use pre-compiled template because we probably can't compile it.
+        $template = file_get_contents(base_path('resources/views/errors/static/file_permissions.html'));
+        $content = str_replace('!!!!CONTENT!!!!', '<p>' . implode('</p><p>', $commands) . '</p>', $template);
+        $content = str_replace('!!!!LOG_FILE!!!!', $log_file, $content);
+
+        return SymfonyResponse::create($content);
+    }
+
+    /**
+     * @param \Illuminate\Config\Repository $user
+     * @param \Illuminate\Config\Repository $group
+     * @param $log_file
+     * @return array
+     */
+    private function generateCommands($log_file): array
     {
         $user = config('librenms.user');
         $group = config('librenms.group');
@@ -113,7 +128,6 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
         }
 
         // check for invalid log setting
-        $log_file = config('app.log') ?: Config::get('log_file', base_path('logs/librenms.log'));
         if (!is_file($log_file) || !is_writable($log_file)) {
             // override for proper error output
             $dirs = [$log_file];
@@ -130,12 +144,6 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
             $commands[] = "semanage fcontext -a -t httpd_sys_rw_content_t '$dir(/.*)?'";
         }
         $commands[] = "restorecon -RFv $install_dir";
-
-        // use pre-compiled template because we probably can't compile it.
-        $template = file_get_contents(base_path('resources/views/errors/static/file_permissions.html'));
-        $content = str_replace('!!!!CONTENT!!!!', '<p>' . implode('</p><p>', $commands) . '</p>', $template);
-        $content = str_replace('!!!!LOG_FILE!!!!', $log_file, $content);
-
-        return SymfonyResponse::create($content);
+        return $commands;
     }
 }

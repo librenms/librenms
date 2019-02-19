@@ -33,27 +33,20 @@ class DatabaseConnectException extends \Exception implements UpgradeableExceptio
     /**
      * Try to convert the given Exception to a DatabaseConnectException
      *
-     * @param \Exception $e
-     * @return static
+     * @param \Exception $exception
+     * @return static|null
      */
-    public static function upgrade($e)
+    public static function upgrade($exception)
     {
-        if ($e instanceof QueryException) {
-            // connect exception, convert to our standard connection exception
-            if (config('app.debug')) {
-                // get message form PDO exception, it doesn't contain the query
-                $message = $e->getMessage();
-            } else {
-                $message = $e->getPrevious()->getMessage();
-            }
+        // connect exception, convert to our standard connection exception
+        return $exception instanceof QueryException && in_array($exception->getCode(), [1044, 1045, 2002]) ?
+            new static(
+                config('app.debug') ? $exception->getMessage() : $exception->getPrevious()->getMessage(),
+                $exception->getCode(),
+                $exception
+            ) :
+            null;
 
-            if (in_array($e->getCode(), [1044, 1045, 2002])) {
-                // this Exception has it's own render function
-                return new static($message, $e->getCode(), $e);
-            }
-        }
-
-        return null;
     }
 
     /**
