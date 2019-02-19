@@ -42,7 +42,6 @@ class LogTrap implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $severity = 0;
         $index = $trap->findOid('LOG-MIB::logIndex');
         $index = $trap->getOidData($index);
 
@@ -51,18 +50,25 @@ class LogTrap implements SnmptrapHandler
         $logPC = $trap->getOidData('LOG-MIB::logPC.'.$index);
         $logAI = $trap->getOidData('LOG-MIB::logAI.'.$index);
         $state = $trap->getOidData('LOG-MIB::logEquipStatusV2.'.$index);
+        
+        $severity = $this->getSeverity($state);
+        log_event('SNMP Trap: Log '.$logName.' '.$logEvent.' '.$logPC.' '.$logAI.' '.$state, $device->toArray(), 'log', $severity);
+    }
 
-        if ($state == 'warning' || $state == 'major' || $state == '5' || $state == '3') {
-            $severity = 4;
-        } elseif ($state == 'critical' || $state == '4') {
-            $severity = 5;
-        } elseif ($state == 'minor' || $state == '2') {
-            $severity = 3;
-        } elseif ($state == 'nonAlarmed' || $state == '1') {
-            $severity = 1;
-        } else {
-            $severity = 0;
-        }
-        log_event('SNMP Trap: Log '.$logName.' '.$logEvent.' '.$logPC.' '.$logAI.' '.$state, $device->toArray(), 'log', $severity, $device->hostname);
+    private function getSeverity($state)
+    {
+        $severity_map = [
+            'warning' => 4,
+            'major' => 4,
+            '5' => 4,
+            '3' => 4,
+            'critical' => 5,
+            '4' => 5,
+            'minor' => 3,
+            '2' => 3,
+            'nonAlarmed' => 1,
+            '1' => 1,
+        ];
+        return $severity_map[$state] ?? 0;
     }
 }
