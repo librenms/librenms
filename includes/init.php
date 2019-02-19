@@ -95,6 +95,8 @@ if (module_selected('alerts', $init_modules)) {
 // Boot Laravel
 \LibreNMS\Util\Laravel::bootCli();
 
+set_debug(false); // disable debug initially (hides legacy errors too)
+
 if (!module_selected('nodb', $init_modules)) {
     \LibreNMS\DB\Eloquent::boot();
 
