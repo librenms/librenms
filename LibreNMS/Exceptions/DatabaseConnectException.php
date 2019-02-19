@@ -25,8 +25,37 @@
 
 namespace LibreNMS\Exceptions;
 
-class DatabaseConnectException extends \Exception
+use Illuminate\Database\QueryException;
+use LibreNMS\Interfaces\Exceptions\UpgradeableException;
+
+class DatabaseConnectException extends \Exception implements UpgradeableException
 {
+    /**
+     * Try to convert the given Exception to a DatabaseConnectException
+     *
+     * @param \Exception $e
+     * @return static
+     */
+    public static function upgrade($e)
+    {
+        if ($e instanceof QueryException) {
+            // connect exception, convert to our standard connection exception
+            if (config('app.debug')) {
+                // get message form PDO exception, it doesn't contain the query
+                $message = $e->getMessage();
+            } else {
+                $message = $e->getPrevious()->getMessage();
+            }
+
+            if (in_array($e->getCode(), [1044, 1045, 2002])) {
+                // this Exception has it's own render function
+                return new static($message, $e->getCode(), $e);
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Render the exception into an HTTP or JSON response.
      *

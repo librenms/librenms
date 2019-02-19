@@ -26,10 +26,43 @@
 namespace LibreNMS\Exceptions;
 
 use LibreNMS\Config;
+use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-class FilePermissionsException extends \Exception
+class FilePermissionsException extends \Exception implements UpgradeableException
 {
+    /**
+     * Try to convert the given Exception to a FilePermissionsException
+     *
+     * @param \Exception $e
+     * @return static
+     */
+    public static function upgrade($e)
+    {
+        if ($e instanceof \ErrorException) {
+            // cannot write to storage directory
+            if (starts_with($e->getMessage(), 'file_put_contents(') && str_contains($e->getMessage(), '/storage/')) {
+                return new static();
+            }
+        }
+
+        if ($e instanceof \Exception) {
+            // cannot write to bootstrap directory
+            if ($e->getMessage() == 'The bootstrap/cache directory must be present and writable.') {
+                return new static();
+            }
+        }
+
+        if ($e instanceof \UnexpectedValueException) {
+            // monolog cannot init log file
+            if (str_contains($e->getFile(), 'Monolog/Handler/StreamHandler.php')) {
+                return new static();
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Render the exception into an HTTP or JSON response.
      *

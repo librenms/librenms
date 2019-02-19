@@ -139,36 +139,4 @@ class Checks
             return !extension_loaded($module);
         });
     }
-
-    /**
-     * Upgrade Exception to a renderable exception
-     *
-     * @param \Exception $e
-     * @return \Exception|false
-     */
-    public static function filePermissionsException($e)
-    {
-        if ($e instanceof \ErrorException) {
-            // cannot write to storage directory
-            if (starts_with($e->getMessage(), 'file_put_contents(') && str_contains($e->getMessage(), '/storage/')) {
-                return new FilePermissionsException();
-            }
-        }
-
-        if ($e instanceof \Exception) {
-            // cannot write to bootstrap directory
-            if ($e->getMessage() == 'The bootstrap/cache directory must be present and writable.') {
-                return new FilePermissionsException();
-            }
-        }
-
-        if ($e instanceof \UnexpectedValueException) {
-            // monolog cannot init log file
-            if (str_contains($e->getFile(), 'Monolog/Handler/StreamHandler.php')) {
-                return new FilePermissionsException();
-            }
-        }
-
-        return false;
-    }
 }
