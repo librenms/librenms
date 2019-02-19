@@ -8,13 +8,13 @@ if (is_numeric($state)) {
     $state_name = 'hrDeviceStatus';
     create_state_index(
         $state_name,
-        array(
-            array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'),
-            array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Running'),
-            array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'Warning'),
-            array('value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'Testing'),
-            array('value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Down'),
-        )
+        [
+            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
+            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Running'],
+            ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'Warning'],
+            ['value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'Testing'],
+            ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Down'],
+        ]
     );
 
     $sensor_index = 0;
@@ -47,19 +47,19 @@ if ($state) {
     // https://www.ietf.org/rfc/rfc1759.txt hrPrinterDetectedErrorState
     //Create State Index
     $printer_states =
-        array(
-            array('value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'),
-            array('value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Paper Low'),
-            array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'No Paper'),
-            array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'Toner Low'),
-            array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'No Toner'),
-            array('value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Door Open'),
-            array('value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'Jammed'),
-            array('value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'Offline'),
-            array('value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'Service Needed'),
-            array('value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'Warning, multiple issues'),
-            array('value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'Critical, multiple issues'),
-        );
+        [
+            ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'],
+            ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Paper Low'],
+            ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'No Paper'],
+            ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'Toner Low'],
+            ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'No Toner'],
+            ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Door Open'],
+            ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'Jammed'],
+            ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'Offline'],
+            ['value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'Service Needed'],
+            ['value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'Warning, multiple issues'],
+            ['value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'Critical, multiple issues'],
+        ];
     $bit_flags = q_bridge_bits2indices($state);
     $is_critical = false;
     if (count($bit_flags) == 0) {
