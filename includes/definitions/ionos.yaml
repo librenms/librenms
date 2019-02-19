@@ -5,45 +5,24 @@ icon: sagemcom
 group: sagemcom
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_processor, text: 'CPU Usage' }
-    - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.1038
 poller_modules:
-            entity-physical: false
-            cisco-vrf-lite: false
-            storage: false
-            hr-mib: false
-            ucd-mib: false
-            arp-table: false
-            bgp-peers: false
-            vlans: false
-            ucd-diskio: false
-            services: false
-            stp: false
-            wireless: false
-            fdb-table: false
-            ntp: false
-            ipmi: false
-            ipSystemStats: false
-            ospf: false
-            applications: false
+    hr-mib: false
+    ucd-mib: false
+    stp: false
+    ospf: false
 discovery_modules:
-            entity-physical: false
-            cisco-vrf-lite: false
-            storage: false
-            hr-device: false
-            discovery-protocols: false
-            arp-table: false
-            bgp-peers: false
-            ports-stack: false
-            vlans: false
-            ucd-diskio: false
-            services: false
-            stp: false
-            wireless: false
-            fdb-table: false
-            ipv4-addresses: false
-            ipv6-addresses: false
-            ntp: false
+    processors: false
+    mempools: false
+    entity-physical: false
+    storage: false
+    hr-device: false
+    discovery-protocols: false
+    bgp-peers: false
+    ports-stack: false
+    vlans: false
+    ucd-diskio: false
+    stp: false
+    fdb-table: false
