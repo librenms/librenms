@@ -474,6 +474,11 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\Application', 'device_id');
     }
 
+    public function attribs()
+    {
+        $this->hasMany('App\Models\DeviceAttrib', 'device_id');
+    }
+
     public function bgppeers()
     {
         return $this->hasMany('App\Models\BgpPeer', 'device_id');

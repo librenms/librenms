@@ -820,38 +820,42 @@ function ExtTransports($obj)
         $transport_maps = AlertUtil::getDefaultAlertTransports();
     }
 
-    // alerting for default contacts, etc
-    if (Config::get('alert.transports.mail') === true && !empty($obj['contacts'])) {
-        $transport_maps[] = [
-            'transport_id' => null,
-            'transport_type' => 'mail',
-            'opts' => $obj,
-        ];
+    if (count($transport_maps) === 0) {
+        echo 'No configured transports';
     }
 
-    foreach ($transport_maps as $item) {
-        $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($item['transport_type']);
+    // collect all the mail transports
+    list($mail_transports, $other_transports) = collect($transport_maps)->partition('transport_type', '=', 'mail');
+
+    foreach ($other_transports as $transport) {
+        $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($transport['transport_type']);
         if (class_exists($class)) {
             //FIXME remove Deprecated transport
-            $transport_title = "Transport {$item['transport_type']}";
-            $obj['transport'] = $item['transport_type'];
-            $obj['transport_name'] = $item['transport_name'];
+            $transport_title = "Transport {$transport['transport_type']}";
+            $obj['transport'] = $transport['transport_type'];
+            $obj['transport_name'] = $transport['transport_name'];
             $obj['alert']     = new AlertData($obj);
             $obj['title']     = $type->getTitle($obj);
             $obj['alert']['title'] = $obj['title'];
             $obj['msg']       = $type->getBody($obj);
             c_echo(" :: $transport_title => ");
-            $instance = new $class($item['transport_id']);
-            $tmp = $instance->deliverAlert($obj, $item['opts']);
+            $instance = new $class($transport['transport_id']);
+            $tmp = $instance->deliverAlert($obj, $transport['opts']);
             AlertLog($tmp, $obj, $obj['transport']);
             unset($instance);
             echo PHP_EOL;
         }
     }
 
-    if (count($transport_maps) === 0) {
-        echo 'No configured transports';
-    }
+    // do mail transport now. handling multiple alert transports and default options with one instance
+    $obj['transport'] = 'mail';
+    $obj['transport_name'] = 'Mail';
+    $obj['alert']     = new AlertData($obj);
+    $obj['title']     = $type->getTitle($obj);
+    $obj['alert']['title'] = $obj['title'];
+    $obj['msg']       = $type->getBody($obj);
+    $mail_transport = new LibreNMS\Alert\Transport\Mail();
+    $mail_transport->deliverAlert($obj, ['transports' => $mail_transports]);
 }//end ExtTransports()
 
 // Log alert event
