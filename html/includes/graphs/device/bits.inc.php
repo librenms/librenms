@@ -9,7 +9,7 @@ foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled`
     if (is_array($config['device_traffic_iftype'])) {
         foreach ($config['device_traffic_iftype'] as $iftype) {
             if ($iftype == '/l2vlan/' && $device['os']=='asa') {
-                // ASA (at least in multicontext) reports all interfaces as l2vlan even if they are l3 
+                // ASA (at least in multicontext) reports all interfaces as l2vlan even if they are l3
                 // so every context has no graph displayed unless l2vlan are accepted for all.
                 // This patch will ignore l2vlan for ASA.
                 continue;
