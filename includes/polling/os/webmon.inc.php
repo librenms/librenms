@@ -14,4 +14,4 @@
  * @author     Mike Williams <mike@mgww.net>
  */
 
-$version = trim(snmp_get($device, '.1.3.6.1.4.1.994.3.4.7.1.82.0.0', '-OQv', 'WEBMON-EDGE-MATRIX-MIB'), '"');
+$version = snmp_get($device, '.1.3.6.1.4.1.994.3.4.7.1.82.0.0', '-OQv', 'WEBMON-EDGE-MATRIX-MIB');

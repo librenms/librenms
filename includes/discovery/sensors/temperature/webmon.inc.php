@@ -17,7 +17,7 @@
 
 $env = snmpwalk_group($device, 'pSlot1Table', 'WEBMON-EDGE-MATRIX-MIB');
 
-if (is_array($env)) {
+if (!empty($env)) {
     $oid = '.1.3.6.1.4.1.994.3.4.7.18.1.66.2.0';
     $index = '2';
     
