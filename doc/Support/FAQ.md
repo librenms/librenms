@@ -231,13 +231,15 @@ If you are moving from one CPU architecture to another then you will need to dum
 this scenario then you can use [Dan Brown's migration scripts](https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/).    
     
 If you are just moving to another server with the same CPU architecture then the following steps should be all that's needed:   
-    
-    - Install LibreNMS as per our normal documentation, you don't need to run through the web installer or building the sql schema.   
-    - Stop cron by commenting out all lines in `/etc/cron.d/librenms`
-    - Dump the MySQL database `librenms` and import this into your new server.
-    - Copy the `rrd/` folder to the new server.
-    - Copy the `config.php` file to the new server.
-    - Renable cron by uncommenting all lines in `/etc/cron.d/librenms`
+  
+  * Install LibreNMS as per our normal documentation; you don't need to run through the web installer or building the sql schema.   
+  * Stop cron by commenting out all lines in `/etc/cron.d/librenms`
+  * Dump the MySQL database `librenms` from your old server (`mysqldump librenms -u root -p > librenms.sql`)...
+  * and import it into your new server (`mysql -u root -p < librenms.sql`).
+  * Copy the `rrd/` folder to the new server.
+  * Copy the `config.php` file to the new server.
+  * Ensure ownership of the copied files and folders (substitute your user if necessary) - `chown -R librenms:librenms rrd/; chown librenms:librenms config.php`
+  * Re-enable cron by uncommenting all lines in `/etc/cron.d/librenms`
 
 #### <a name="faq25"> Why is my EdgeRouter device not detected?</a>
 
