@@ -629,9 +629,11 @@ $config['eventlog_purge']                                 = 30;
 $config['authlog_purge']                                  = 30;
 $config['perf_times_purge']                               = 30;
 $config['device_perf_purge']                              = 7;
+$config['alert_log_purge']                                = 365;
+$config['port_fdb_purge']                                 = 10;
 $config['rrd_purge']                                      = 90;// Not set by default
 ```
-These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually,
+These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually.
 values are in days.
 
 > NOTE: Please be aware that `$config['rrd_purge']` is _NOT_ set by default. This option will remove any old data within 
