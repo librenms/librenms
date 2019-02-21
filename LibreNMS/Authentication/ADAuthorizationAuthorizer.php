@@ -4,6 +4,7 @@ namespace LibreNMS\Authentication;
 
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
+use LibreNMS\Exceptions\LdapMissingException;
 
 class ADAuthorizationAuthorizer extends MysqlAuthorizer
 {
@@ -18,7 +19,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
     public function __construct()
     {
         if (!function_exists('ldap_connect')) {
-            throw new AuthenticationException("PHP does not support LDAP, please install or enable the PHP LDAP extension.");
+            throw new LdapMissingException();
         }
 
         // Disable certificate checking before connect if required
