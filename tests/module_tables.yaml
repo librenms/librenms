@@ -21,7 +21,7 @@ bgp-peers:
         excluded_fields: [device_id]
 fdb-table:
     ports_fdb:
-        excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id]
+        excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id, created_at, updated_at]
         joins:
             - { left: ports_fdb.port_id, right: ports.port_id, select: [ifIndex] }
             - { left: ports_fdb.vlan_id, right: vlans.vlan_id, select: [vlan_vlan] }

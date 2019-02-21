@@ -45,7 +45,7 @@ class FdbTablesController extends TableController
         return [
             'port_id' => 'nullable|integer',
             'device_id' => 'nullable|integer',
-            'serachby' => 'in:mac,vlan,dnsname,ip,description',
+            'serachby' => 'in:mac,vlan,dnsname,ip,description,first_seen,last_seen',
             'dns' => 'nullable|in:true,false',
         ];
     }
@@ -137,6 +137,14 @@ class FdbTablesController extends TableController
                 ->orderBy('ports.ifDescr', $sort['description']);
         }
 
+        if (isset($sort['last_seen'])) {
+            $query->orderBy('updated_at', $sort['last_seen']);
+        }
+
+        if (isset($sort['first_seen'])) {
+            $query->orderBy('created_at', $sort['first_seen']);
+        }
+
         return $query;
     }
 
@@ -152,7 +160,17 @@ class FdbTablesController extends TableController
             'vlan' => $fdb_entry->vlan ? $fdb_entry->vlan->vlan_vlan : '',
             'description' => '',
             'dnsname' => $ip_info['dns'],
+            'first_seen' => 'unknown',
+            'last_seen' => 'unknown'
         ];
+        
+        // diffForHumans and doDateTimeString are not safe
+        if ($fdb_entry->updated_at) {
+            $item['last_seen'] = $fdb_entry->updated_at->diffForHumans();
+        }
+        if ($fdb_entry->created_at) {
+            $item['first_seen'] = $fdb_entry->created_at->toDateTimeString();
+        }
 
         if ($fdb_entry->port) {
             $item['interface'] = Url::portLink($fdb_entry->port, $fdb_entry->port->getShortLabel());
