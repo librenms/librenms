@@ -74,7 +74,7 @@ class AddUserCommand extends LnmsCommand
 
         $this->validate([
             'username' => ['required', Rule::unique('users', 'username')->where('auth_type', 'mysql')],
-            'email' => 'email',
+            'email' => 'nullable|email',
             'role' => Rule::in(array_keys($roles))
         ]);
 
