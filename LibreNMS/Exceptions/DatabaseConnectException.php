@@ -46,7 +46,6 @@ class DatabaseConnectException extends \Exception implements UpgradeableExceptio
                 $exception
             ) :
             null;
-
     }
 
     /**
