@@ -116,6 +116,16 @@ class Mail extends Transport
         }
     }
 
+    private function getPermittedFaults($faults)
+    {
+        $permitted = [];
+        foreach ($faults as $index => $fault) {
+            if (!empty($fault['bill_id'])) {
+
+            }
+        }
+    }
+
     private function getUserContacts($faults)
     {
         $query = User::thisAuth()->select('users.*');
