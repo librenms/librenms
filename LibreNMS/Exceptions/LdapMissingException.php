@@ -1,6 +1,6 @@
 <?php
 /**
- * DatabaseConnectException.php
+ * LdapMissingException.php
  *
  * -Description-
  *
@@ -19,33 +19,20 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 Tony Murray
+ * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Exceptions;
 
-use Illuminate\Database\QueryException;
-use LibreNMS\Interfaces\Exceptions\UpgradeableException;
-
-class DatabaseConnectException extends \Exception implements UpgradeableException
+class LdapMissingException extends AuthenticationException
 {
-    /**
-     * Try to convert the given Exception to a DatabaseConnectException
-     *
-     * @param \Exception $exception
-     * @return static|null
-     */
-    public static function upgrade($exception)
-    {
-        // connect exception, convert to our standard connection exception
-        return $exception instanceof QueryException && in_array($exception->getCode(), [1044, 1045, 2002]) ?
-            new static(
-                config('app.debug') ? $exception->getMessage() : $exception->getPrevious()->getMessage(),
-                $exception->getCode(),
-                $exception
-            ) :
-            null;
+    public function __construct(
+        string $message = 'PHP does not support LDAP, please install or enable the PHP LDAP extension',
+        int $code = 0,
+        \Exception $previous = null
+    ) {
+        parent::__construct($message, false, $code, $previous);
     }
 
     /**
@@ -56,14 +43,15 @@ class DatabaseConnectException extends \Exception implements UpgradeableExceptio
      */
     public function render(\Illuminate\Http\Request $request)
     {
-        $title = __('Error connecting to database');
+        $title = __('PHP LDAP support missing');
+        $message = __($this->getMessage());
 
         return $request->wantsJson() ? response()->json([
             'status' => 'error',
-            'message' => "$title: " . $this->getMessage(),
+            'message' => "$title: $message",
         ]) : response()->view('errors.generic', [
             'title' => $title,
-            'content' => $this->getMessage(),
+            'content' => $message,
         ]);
     }
 }

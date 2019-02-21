@@ -1,8 +1,8 @@
 <?php
 /**
- * DatabaseConnectException.php
+ * DuskUnsafeException.php
  *
- * -Description-
+ * Dusk is installed and the application is in production
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,32 +19,26 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 Tony Murray
+ * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Exceptions;
 
-use Illuminate\Database\QueryException;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 
-class DatabaseConnectException extends \Exception implements UpgradeableException
+class DuskUnsafeException extends \Exception implements UpgradeableException
 {
     /**
-     * Try to convert the given Exception to a DatabaseConnectException
+     * Try to convert the given Exception to this exception
      *
      * @param \Exception $exception
-     * @return static|null
+     * @return static
      */
     public static function upgrade($exception)
     {
-        // connect exception, convert to our standard connection exception
-        return $exception instanceof QueryException && in_array($exception->getCode(), [1044, 1045, 2002]) ?
-            new static(
-                config('app.debug') ? $exception->getMessage() : $exception->getPrevious()->getMessage(),
-                $exception->getCode(),
-                $exception
-            ) :
+        return $exception->getMessage() == 'It is unsafe to run Dusk in production.' ?
+            new static($exception->getMessage(), $exception->getCode(), $exception) :
             null;
     }
 
@@ -52,18 +46,19 @@ class DatabaseConnectException extends \Exception implements UpgradeableExceptio
      * Render the exception into an HTTP or JSON response.
      *
      * @param  \Illuminate\Http\Request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render(\Illuminate\Http\Request $request)
     {
-        $title = __('Error connecting to database');
+        $title = __('It is unsafe to run Dusk in production');
+        $message = __('Run ":command" to remove Dusk or if you are a developer set the appropriate APP_ENV', ['command' => './scripts/composer_wrapper.php install --no-dev']);
 
         return $request->wantsJson() ? response()->json([
             'status' => 'error',
-            'message' => "$title: " . $this->getMessage(),
+            'message' => "$title: $message",
         ]) : response()->view('errors.generic', [
             'title' => $title,
-            'content' => $this->getMessage(),
+            'content' => $message,
         ]);
     }
 }
