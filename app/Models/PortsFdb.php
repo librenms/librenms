@@ -6,7 +6,7 @@ class PortsFdb extends PortRelatedModel
 {
     protected $table = 'ports_fdb';
     protected $primaryKey = 'ports_fdb_id';
-    public $timestamps = false;
+    public $timestamps = true;
 
     // ---- Define Relationships ----
 

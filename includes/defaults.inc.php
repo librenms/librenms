@@ -852,6 +852,8 @@ $config['device_perf_purge'] = 7;
 // Number in days of how long to keep device performance data for.
 $config['alert_log_purge'] = 365;
 // Number in days of how long to keep alert log data for.
+$config['ports_fdb_purge'] = 10;
+// Number in days of how long to keep fdb table data for.
 
 // Date format for PHP date()s
 $config['dateformat']['long'] = 'r';
