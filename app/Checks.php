@@ -31,6 +31,7 @@ use Auth;
 use Cache;
 use Carbon\Carbon;
 use LibreNMS\Config;
+use LibreNMS\Exceptions\FilePermissionsException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Toastr;
 
@@ -137,113 +138,5 @@ class Checks
         return array_filter($required_modules, function ($module) {
             return !extension_loaded($module);
         });
-    }
-
-    /**
-     * Check exception for errors related to not being able to write to the filesystem
-     *
-     * @param \Exception $e
-     * @return bool|SymfonyResponse
-     */
-    public static function filePermissionsException($e)
-    {
-        if ($e instanceof \ErrorException) {
-            // cannot write to storage directory
-            if (starts_with($e->getMessage(), 'file_put_contents(') && str_contains($e->getMessage(), '/storage/')) {
-                return self::filePermissionsResponse();
-            }
-        }
-
-        if ($e instanceof \Exception) {
-            // cannot write to bootstrap directory
-            if ($e->getMessage() == 'The bootstrap/cache directory must be present and writable.') {
-                return self::filePermissionsResponse();
-            }
-        }
-
-        if ($e instanceof \UnexpectedValueException) {
-            // monolog cannot init log file
-            if (str_contains($e->getFile(), 'Monolog/Handler/StreamHandler.php')) {
-                return self::filePermissionsResponse();
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Generate a semi generic list of commands for the user to run to fix file permissions
-     * and render it to a nice html response
-     *
-     * @return SymfonyResponse
-     */
-    private static function filePermissionsResponse()
-    {
-        $user = config('librenms.user');
-        $group = config('librenms.group');
-        $install_dir = base_path();
-        $commands = [];
-        $dirs = [
-            base_path('bootstrap/cache'),
-            base_path('storage'),
-            Config::get('log_dir', base_path('logs')),
-            Config::get('rrd_dir', base_path('rrd')),
-        ];
-
-        // check if folders are missing
-        $mkdirs = [
-            base_path('bootstrap/cache'),
-            base_path('storage/framework/sessions'),
-            base_path('storage/framework/views'),
-            base_path('storage/framework/cache'),
-            Config::get('log_dir', base_path('logs')),
-            Config::get('rrd_dir', base_path('rrd')),
-        ];
-
-        $mk_dirs = array_filter($mkdirs, function ($file) {
-            return !file_exists($file);
-        });
-
-        if (!empty($mk_dirs)) {
-            $commands[] = 'sudo mkdir -p ' . implode(' ', $mk_dirs);
-        }
-
-        // always print chwon/setfacl/chmod commands
-        $commands[] = "sudo chown -R $user:$group $install_dir";
-        $commands[] = 'sudo setfacl -d -m g::rwx ' . implode(' ', $dirs);
-        $commands[] = 'sudo chmod -R ug=rwX ' . implode(' ', $dirs);
-
-        // check if webserver is in the librenms group
-        $current_groups = explode(' ', trim(exec('groups')));
-        if (!in_array($group, $current_groups)) {
-            $current_user = trim(exec('whoami'));
-            $commands[] = "usermod -a -G $group $current_user";
-        }
-
-        // check for invalid log setting
-        $log_file = config('app.log') ?: Config::get('log_file', base_path('logs/librenms.log'));
-        if (!is_file($log_file) || !is_writable($log_file)) {
-            // override for proper error output
-            $dirs = [$log_file];
-            $install_dir = $log_file;
-            $commands = [
-                '<h3>Cannot write to log file: &quot;' . $log_file . '&quot;</h3>',
-                'Make sure it exists and is writable, or change your LOG_DIR setting.'
-            ];
-        }
-
-        // selinux:
-        $commands[] = '<h4>If using SELinux you may also need:</h4>';
-        foreach ($dirs as $dir) {
-            $commands[] = "semanage fcontext -a -t httpd_sys_rw_content_t '$dir(/.*)?'";
-        }
-        $commands[] = "restorecon -RFv $install_dir";
-
-        // use pre-compiled template because we probably can't compile it.
-        $template = file_get_contents(base_path('resources/views/errors/static/file_permissions.html'));
-        $content = str_replace('!!!!CONTENT!!!!', '<p>' . implode('</p><p>', $commands) . '</p>', $template);
-        $content = str_replace('!!!!LOG_FILE!!!!', $log_file, $content);
-
-        return SymfonyResponse::create($content);
     }
 }
