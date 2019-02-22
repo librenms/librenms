@@ -46,7 +46,7 @@ class Alertmanager extends Transport
             $alertmanager_status = 'startsAt';
         }
         $gen_url          = (Config::get('base_url') . 'device/device=' . $obj['device_id']);
-        $host             = ($api['url'] . '/api/v22/alerts');
+        $host             = ($api['url'] . '/api/v2/alerts');
         $curl             = curl_init();
         $alertmanager_msg = strip_tags($obj['msg']);
         $data             = [[
