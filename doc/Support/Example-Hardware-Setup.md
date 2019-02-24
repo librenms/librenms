@@ -99,3 +99,20 @@ Running in Proxmox.
 | Ports          | 228                 |                     |
 | Health sensors | 117                 |                     |
 | Load           | < 0.92              |                     |
+
+#### [SirMaple](https://github.com/sirmaple)
+
+> Home
+
+|                | LibreNMS            | MariaDB             |
+| -------------- | ------------------- | ------------------- |
+| Type           | VM                  | Same Server         |
+| OS             | Ubuntu 18.04 LTS    |                     |
+| CPU            | 2 vCore             |                     |
+| Memory         | 1GB                 |                     |
+| Disk Type      | Raid 1, SSD         |                     |
+| Disk Space     | 25 GB               |                     |
+| Devices        | 30                  |                     |
+| Ports          | 196                 |                     |
+| Health sensors | 207                 |                     |
+| Load           | < 3.65              |                     |
