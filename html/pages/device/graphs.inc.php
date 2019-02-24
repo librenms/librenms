@@ -12,7 +12,6 @@ $bg = '#ffffff';
 echo '<div style="clear: both;">';
 
 print_optionbar_start();
-
 echo "<span style='font-weight: bold;'>Graphs</span> &#187; ";
 
 foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', array($device['device_id'])) as $graph) {

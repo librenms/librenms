@@ -53,17 +53,21 @@ foreach ($mempools as $mempool) {
     $graph_array[$id] = $val;
     $graph_array['type'] = $graph_type;
 
-    echo "<div class='panel panel-default'>
-            <div class='panel-heading'>";
+    print_optionbar_start();
+
     if ($mempool['percentage'] === true) {
-        echo "                <h3 class='panel-title'>$text_descr <div class='pull-right'>$perc% used</div></h3>";
+        echo "<span style='font-weight: bold;'>".$text_descr."</span>";
+        echo "<div class='pull-right'>".$perc."% used</div>";
     } else {
-        echo "                <h3 class='panel-title'>$text_descr <div class='pull-right'>$used/$total - $perc% used</div></h3>";
+        echo "<span style='font-weight: bold;'>".$text_descr."</span>";
+        echo "<div class='pull-right'>".$used."/".$total." - ".$perc."% used</div>";
     }
-    echo "            </div>";
+
+    print_optionbar_end();
+
     echo "<div class='panel-body'>";
     include 'includes/print-graphrow.inc.php';
-    echo "</div></div>";
+    echo "</div>";
 
     $i++;
 }//end foreach

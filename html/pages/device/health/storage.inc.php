@@ -30,10 +30,11 @@ foreach (dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY stora
     $graph_array['id']   = $drive['storage_id'];
     $graph_array['type'] = $graph_type;
 
-    echo "<div class='panel panel-default'>
-            <div class='panel-heading'>
-                <h3 class='panel-title'>$storage_descr <div class='pull-right'>$used/$total - $perc% used</div></h3>
-            </div>";
+    print_optionbar_start();
+    echo "<span style='font-weight: bold;'>".$storage_descr."</span>";
+    echo "<div class='pull-right'>".$used."/".$total." - ".$perc."% used</div>";
+    print_optionbar_end();
+
     echo "<div class='panel-body'>";
     include 'includes/print-graphrow.inc.php';
     echo "</div></div>";

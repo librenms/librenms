@@ -1,6 +1,7 @@
 <?php
-echo '<h3>Inventory</h3>';
-echo '<hr>';
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Device inventory</span>";
+print_optionbar_end();
 echo '<table class="table table-condensed">';
 
 // FIXME missing heading

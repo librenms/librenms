@@ -33,11 +33,13 @@ foreach ($processors as $proc) {
     $graph_array[$id] = $val;
     $graph_array['type'] = $graph_type;
 
-    echo "<div class='panel panel-default'>
-            <div class='panel-heading'>
-                <h3 class='panel-title'>$text_descr <div class='pull-right'>$percent% used</div></h3>
-            </div>";
+    print_optionbar_start();
+    echo "<span style='font-weight: bold;'>".$text_descr."</span>";
+    echo "<div class='pull-right'>".$percent."% used</div>";
+    print_optionbar_end();
+
     echo "<div class='panel-body'>";
     include 'includes/print-graphrow.inc.php';
     echo "</div></div>";
+
 }//end foreach

@@ -21,18 +21,20 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
     $disabled = 'disabled';
 }
 
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Device notes</span>";
+print_optionbar_end();
 ?>
 
 <form class="form-horizontal" action="" method="post">
-    <h3>Device Notes</h3>
-    <hr>
     <div class="form-group">
         <div class="col-sm-12">
             <textarea class="form-control" rows="6" name="notes" id="device-notes" <?php echo $disabled; ?>><?php echo htmlentities(urldecode($data['notes'])); ?></textarea>
         </div>
     </div>
+
     <div class="row">
-        <div class="col-md-1 col-md-offset-5">
+        <div style="text-align: center;margin-bottom: 14px;">
             <?php
             echo '
                 <button type="submit" name="btn-update-notes" id="btn-update-notes" class="btn btn-default ' . $disabled . '" data-device_id="' . $device['device_id'] . '"><i class="fa fa-check"></i> Save</button>

@@ -34,11 +34,8 @@ $menu_options = array(
     'details' => 'Details',
 );
 
-echo '<br>';
-echo '<div class="panel panel-default">';
-echo '<div class="panel-heading">';
-echo '<span style="font-weight: bold;">Services</span> &#187; ';
-
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Services &#187; </span>";
 $sep = '';
 foreach ($menu_options as $option => $text) {
     if (empty($vars['view'])) {
@@ -63,6 +60,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
     echo '<div class="pull-right"><a data-toggle="modal" href="#create-service"><i class="fa fa-cog" style="color:green" aria-hidden="true"></i> Add Service</a></div>';
 }
 
+print_optionbar_end();
 echo '</div><div>';
 
 if (count($services) > '0') {
