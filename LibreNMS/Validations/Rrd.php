@@ -63,7 +63,7 @@ class Rrd extends BaseValidation
             }
 
             if (substr(sprintf('%o', fileperms($rrd_dir)), -3) != 775) {
-                $validator->warn('Your RRD directory is not set to 0775', "chmod 775 $rrd_dir}");
+                $validator->warn('Your RRD directory is not set to 0775', "chmod 775 $rrd_dir");
             }
         }
     }
