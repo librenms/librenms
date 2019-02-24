@@ -2,7 +2,7 @@
 
 // Version is second word in sysDescr
 list(, $version) = explode(' ', $device['sysDescr']);
-preg_match('/v[0-9]+.[0-9]+.[0-9]/', $version, $matches);
+preg_match('/v[0-9]+.[0-9]+.[0-9]+/', $version, $matches);
 $version = $matches[0];
 
 // fix for hardware missing info
