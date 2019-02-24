@@ -35,13 +35,14 @@ foreach (get_disks($device['device_id']) as $drive) {
         if ($graph_array['type']=="diskio_bits") {
             $graph_type_title="bps";
         }
-        echo "<div class='panel panel-default'>
-                <div class='panel-heading'>
-                <h3 class='panel-title'>$overlib_link - $graph_type_title</h3>
-            </div>";
+
+        print_optionbar_start();
+        echo "<span style='font-weight: bold;'>".$overlib_link." - ".$graph_type_title."</span>";
+        print_optionbar_end();
+
         echo "<div class='panel-body'>";
             include 'includes/print-graphrow.inc.php';
-        echo '</div></div>';
+        echo '</div>';
     }
 
     $row++;

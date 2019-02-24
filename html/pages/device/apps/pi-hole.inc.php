@@ -31,6 +31,7 @@ foreach ($graphs as $key => $text) {
     $graph_array['id']     = $app['app_id'];
     $graph_array['type']   = 'application_'.$key;
 
+    /*
     echo '<div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">'.$text.'</h3>
@@ -40,5 +41,13 @@ foreach ($graphs as $key => $text) {
     include 'includes/print-graphrow.inc.php';
     echo '</div>';
     echo '</div>';
+    echo '</div>';
+    */
+    print_optionbar_start();
+    echo "<span style='font-weight: bold;'>".$text."</span>";
+    print_optionbar_end();
+
+    echo '<div class="row">';
+    include 'includes/print-graphrow.inc.php';
     echo '</div>';
 }

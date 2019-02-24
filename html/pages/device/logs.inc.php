@@ -11,7 +11,7 @@
  * @package    LibreNMS
  * @subpackage webui
  * @link       http://librenms.org
- * @copyright  2017 LibreNMS
+ * @copyright  2019 LibreNMS
  * @author     LibreNMS Contributors
 */
 
@@ -19,10 +19,8 @@ if (!isset($vars['section'])) {
     $vars['section'] = 'eventlog';
 }
 
-echo '<br>';
-echo '<div class="panel panel-default">';
-echo '<div class="panel-heading">';
-echo '<strong>Logging</strong>  &#187; ';
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Logging &#187; </span>";
 
 if ($vars['section'] == 'eventlog') {
     echo '<span class="pagemenu-selected">';
@@ -57,7 +55,8 @@ if (isset($config['graylog']['server']) && isset($config['graylog']['port'])) {
     }
 }
 
-echo '</div><br>';
+print_optionbar_end();
+
 echo '<div style="width:99%;margin:0 auto;">';
 
 switch ($vars['section']) {

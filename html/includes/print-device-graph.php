@@ -11,15 +11,10 @@ if (!is_integer($g_i / 2)) {
 } else {
     $row_colour = $config['list_colour']['odd'];
 }
-echo '<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">'.$graph_title.'</h3>
-    </div>
-    <div class="panel-body">
-';
+
+echo "<div style='width:100%;background-color:#F5F5F5;padding:10px;margin:2px 0 4px 0;'><h3 class='panel-title'>" . $graph_title . "</h3></div><div class='panel-body'>";
 echo "<div class='row'>";
 require 'includes/print-graphrow.inc.php';
-echo '</div>';
 echo '</div>';
 echo '</div>';
 $g_i++;

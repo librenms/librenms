@@ -127,10 +127,20 @@ function printEntPhysical($device, $ent, $level, $class)
 }//end printEntPhysical()
 
 
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Device inventory</span>";
+echo '<div class="pull-right">';
+echo "<a href='#' onClick=\"expandTree('enttree');return false;\"><i class='fa fa-plus' style='color:green' aria-hidden='true'></i> Expand All Nodes</a>&nbsp;";
+echo "<a href='#' onClick=\"collapseTree('enttree');return false;\"><i class='fa fa-minus' style='color:red' aria-hidden='true'></i> Collapse All Nodes</a>";
+echo '</div>';
+print_optionbar_end();
+
+/*
 echo "<div style='float: right;'>
        <a href='#' class='button' onClick=\"expandTree('enttree');return false;\"><i class='fa fa-plus fa-lg icon-theme'  aria-hidden='true'></i>Expand All Nodes</a>
        <a href='#' class='button' onClick=\"collapseTree('enttree');return false;\"><i class='fa fa-minus fa-lg icon-theme'  aria-hidden='true'></i>Collapse All Nodes</a>
      </div>";
+*/
 
 echo "<div style='clear: both;'><UL CLASS='mktree' id='enttree'>";
 $level                   = '0';

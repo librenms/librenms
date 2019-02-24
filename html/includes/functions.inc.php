@@ -9,7 +9,7 @@
  * @subpackage functions
  * @author     LibreNMS Contributors <librenms-project@google.groups.com>
  * @copyright  (C) 2006 - 2012 Adam Armstrong (as Observium)
- * @copyright  (C) 2013 LibreNMS Group
+ * @copyright  (C) 2019 LibreNMS Group
  */
 
 use LibreNMS\Authentication\LegacyAuth;
@@ -686,19 +686,13 @@ function print_port_thumbnail($args)
 
 function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)
 {
-    echo '
-        <div class="panel panel-default">
-        <div class="panel-heading">
-        ';
+    echo "<div style='width:100%;background-color: #F5F5F5;padding:10px;margin-bottom: 10px;border-bottom: 1px solid #DDDDDD'>";
 }//end print_optionbar_start()
 
 
 function print_optionbar_end()
 {
-    echo '
-        </div>
-        </div>
-        ';
+    echo "</div>";
 }//end print_optionbar_end()
 
 

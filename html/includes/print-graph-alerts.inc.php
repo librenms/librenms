@@ -37,17 +37,15 @@ if (!LegacyAuth::user()->hasGlobalRead()) {
     $query = "SELECT DATE_FORMAT(time_logged, '".$config['alert_graph_date_format']."') Date, COUNT(alert_log.device_id) totalCount, alert_rules.severity Severity FROM alert_log,alert_rules,devices_perms WHERE alert_log.rule_id=alert_rules.id AND `alert_log`.`state` != 0 $sql AND alert_log.device_id = devices_perms.device_id AND devices_perms.user_id = " . LegacyAuth::id() . " GROUP BY DATE_FORMAT(time_logged, '".$config['alert_graph_date_format']."'),alert_rules.severity";
 }
 
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Device alerts</span>";
+print_optionbar_end();
 ?>
-<br>
-<div class="panel panel-default">
-    <div class="panel-heading">
-        Device alerts
-    </div>
-    <br>
-    <div style="margin:0 auto;width:99%;">
 
 <script src="js/vis.min.js"></script>
-<div id="visualization" style="margin-bottom: -120px;"></div>
+<div style="margin-bottom: -136px;">
+<div id="visualization" style="margin:0 auto;width: 99%;"></div>
+</div>
 <script type="text/javascript">
 
     var container = document.getElementById('visualization');

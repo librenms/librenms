@@ -45,7 +45,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
         echo '<div class="panel-body '.$alert_class.'">';
         require 'includes/device-header.inc.php';
         echo '</div>';
-    echo '</div>';
+    //echo '</div>';
 
 
     if (device_permitted($device['device_id'])) {
@@ -460,7 +460,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
         }
 
             echo '<div class="dropdown pull-right">
-                  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-cog fa-lg icon-theme"  aria-hidden="true"></i>
+                  <button class="btn btn-default dropdown-toggle" style="margin-right:4px" type="button" data-toggle="dropdown"><i class="fa fa-cog fa-lg icon-theme"  aria-hidden="true"></i>
                   <span class="caret"></span></button>
                   <ul class="dropdown-menu">
                     <li><a href="https://'.$device['hostname'].'" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme"  aria-hidden="true"></i> Web</a></li>';
@@ -500,3 +500,5 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
     // no device permissions
     require 'includes/error-no-perm.inc.php';
 }
+
+echo '</div>';
