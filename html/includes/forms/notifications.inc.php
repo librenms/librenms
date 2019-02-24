@@ -33,7 +33,7 @@ if (isset($_REQUEST['notification_id']) && isset($_REQUEST['action'])) {
         $status  = 'ok';
         $message = 'Set as Read';
     } elseif (LegacyAuth::user()->hasGlobalAdmin() || LegacyAuth::user()->isDemoUser()) {
-        if( $_REQUEST['action'] == 'stick' && dbInsert(array('notifications_id'=>$_REQUEST['notification_id'],'user_id'=>LegacyAuth::id(),'key'=>'sticky','value'=>1), 'notifications_attribs')) {
+        if ($_REQUEST['action'] == 'stick' && dbInsert(array('notifications_id'=>$_REQUEST['notification_id'],'user_id'=>LegacyAuth::id(),'key'=>'sticky','value'=>1), 'notifications_attribs')) {
             $status  = 'ok';
             $message = 'Set as Sticky';
         } elseif ($_REQUEST['action'] == 'unstick' && dbDelete('notifications_attribs', "notifications_id = ? && user_id = ? AND `key`='sticky'", array($_REQUEST['notification_id'],LegacyAuth::id()))) {
