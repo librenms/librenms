@@ -105,7 +105,6 @@ function GenGroupSQL($pattern, $search = '', $extra = 0)
     }
 
     $pattern = rtrim($pattern, '&|');
-
     if ($tables[0] != 'devices' && dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', array($tables[0],'device_id')) != 1) {
         //Our first table has no valid glue, prepend the 'devices' table to it!
         array_unshift($tables, 'devices');
@@ -153,7 +152,13 @@ function GenGroupSQL($pattern, $search = '', $extra = 0)
     if (!empty($join)) {
         $join = '('.rtrim($join, '& ').') &&';
     }
+//patch sql error adding extra devices table in query
+    $pos=array_search('devices',$tables);
+    if (count($tables)==3) {
+    array_pop($tables);
+    }
     $sql = 'SELECT DISTINCT('.str_replace('(', '', $tables[0]).'.device_id)'.$sql_extra.' FROM '.implode(',', $tables).' WHERE '.$join.' '.$search.' ('.str_replace(array('%', '@', '!~', '~'), array('', '.*', 'NOT REGEXP', 'REGEXP'), $pattern).')';
+   // print_r($tables);
     return $sql;
 }//end GenGroupSQL()
 
