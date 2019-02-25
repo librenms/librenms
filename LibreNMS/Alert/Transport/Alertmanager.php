@@ -65,7 +65,7 @@ class Alertmanager extends Transport
         ]];
 
         unset($api['url']);
-        foreach($api as $label => $value){
+        foreach ($api as $label => $value) {
             $data[0]['labels'][$label] = $value;
         };
 
