@@ -27,7 +27,7 @@ if (is_array($fan)) {
         $state = current($array);
         $split_oid = explode('.', $oid);
         $index = $split_oid[(count($split_oid) - 1)];
-        $current_oid = "$fan_oper_status.$index";
+        $current_oid = ".1.3.6.1.4.1.2272.1.4.8.1.1.$index";
         $descr =  "Fan $index";
 
         $state_name = 'rcChasFanOperStatus';
@@ -70,7 +70,7 @@ if (is_array($power_supply)) {
         $state = current($array);
         $split_oid = explode('.', $oid);
         $index = $split_oid[(count($split_oid) - 1)];
-        $current_oid = "$power_supply_oper_status.$index";
+        $current_oid = ".1.3.6.1.4.1.2272.1.4.8.1.1.$index";
         $descr =  "Power Supply $index";
 
         $state_name = 'rcChasPowerSupplyOperStatus';
