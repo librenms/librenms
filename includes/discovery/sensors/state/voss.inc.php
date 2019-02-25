@@ -20,8 +20,7 @@
  *  down(3),
 */
 
-$fan_oper_status = '.1.3.6.1.4.1.2272.1.4.7.1.1.2';
-$fan = snmpwalk_cache_oid_num($device, $fan_oper_status, array());
+$fan = snmpwalk_cache_multi_oid($device, 'rcChasFanOperStatus', array(), 'RAPID-CITY');
 
 if (is_array($fan)) {
     foreach ($fan as $oid => $array) {
@@ -64,8 +63,7 @@ if (is_array($fan)) {
  *  down(4)
 */
 
-$power_supply_oper_status = '.1.3.6.1.4.1.2272.1.4.8.1.1.2';
-$power_supply = snmpwalk_cache_oid_num($device, $power_supply_oper_status, array());
+$power_supply = snmpwalk_cache_multi_oid($device, 'rcChasPowerSupplyOperStatus', array(), 'RAPID-CITY');
 
 if (is_array($power_supply)) {
     foreach ($power_supply as $oid => $array) {
