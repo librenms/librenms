@@ -54,55 +54,22 @@ foreach ($count as &$countValue) {
         }
 
         $state_name = 'batteryBanksSymmetry'.$countValue.'status.0';
-        $state_index_id = create_state_index($state_name);
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'ok',0,0,0) ,
-                array($state_index_id,'minorAlarm',0,1,1) ,
-                array($state_index_id,'majorAlarm',0,2,2) ,
-                array($state_index_id,'disabled',0,3,3) ,
-                array($state_index_id,'error',0,4,2)
-            );
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'),
+            array('value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'minorAlarm'),
+            array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'majorAlarm'),
+            array('value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'disabled'),
+            array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'error'),
+        );
+        create_state_index($state_name, $states);
+
         $index          = 0;
         $limit          = 10;
-        $warnlimit      = null;
-        $lowlimit       = null;
-        $lowwarnlimit   = null;
         $divisor        = 1;
         $num_oid        = $symmetry_oid[$countValue-1];
         $state          = $state_numeric / $divisor;
         $descr          = 'Battery banks symmetry '.$countValue;
-        discover_sensor(
-            $valid['sensor'],
-            'state',
-            $device,
-            $num_oid,
-            $index,
-            $state_name,
-            $descr,
-            $divisor,
-            '1',
-            $lowlimit,
-            $lowwarnlimit,
-            $warnlimit,
-            $limit,
-            $state
-        );
-        create_sensor_to_state_index(
-            $device,
-            $state_name,
-            $index
-        );
+        discover_sensor($valid['sensor'], 'state', $device, $num_oid, $index, $state_name, $descr, $divisor, '1', null, null, null, $limit, $state);
+        create_sensor_to_state_index($device, $state_name, $index);
     }
 }

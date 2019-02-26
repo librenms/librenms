@@ -22,33 +22,19 @@ foreach ($tables as $tablevalue) {
 
     if (is_array($temp)) {
         $state_name = $tablevalue[2];
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id !== null) {
-            if ($state_name == 'quantaPowerSupplyStatus') {
-                $states = array(
-                    array($state_index_id, 'other',        0, 0, 3),
-                    array($state_index_id, 'notpresent',   0, 1, 3),
-                    array($state_index_id, 'operational',  1, 2, 0),
-                    array($state_index_id, 'failed',       0, 3, 2),
-                    array($state_index_id, 'powering',     1, 4, 0),
-                    array($state_index_id, 'nopower',      0, 5, 1),
-                    array($state_index_id, 'notpowering',  0, 6, 1),
-                    array($state_index_id, 'incompatible', 0, 7, 2),
-                );
-            }
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
+        if ($state_name == 'quantaPowerSupplyStatus') {
+            $states = array(
+                array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'other'),
+                array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'notpresent'),
+                array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'operational'),
+                array('value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'),
+                array('value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'powering'),
+                array('value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'nopower'),
+                array('value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'notpowering'),
+                array('value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'incompatible'),
+            );
         }
+        create_state_index($state_name, $states);
 
         foreach ($temp as $index => $entry) {
             $descr = $tablevalue[3] . $index;

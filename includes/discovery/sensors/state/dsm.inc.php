@@ -10,25 +10,11 @@ $index = '0';
 if (is_numeric($state)) {
     //Create State Index
     $state_name = 'systemStatusState';
-    $state_index_id = create_state_index($state_name);
-
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-             array($state_index_id,'Normal',0,1,0) ,
-             array($state_index_id,'Failed',0,2,2) ,
-         );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'),
+        array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed'),
+    );
+    create_state_index($state_name, $states);
 
     //Discover Sensors
     discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'System Status', '1', '1', null, null, null, null, $state, 'snmp', $index);
@@ -45,25 +31,11 @@ $index = '0';
 if (is_numeric($state)) {
     //Create State Index
     $state_name = 'powerStatusState';
-    $state_index_id = create_state_index($state_name);
-
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-             array($state_index_id,'Normal',0,1,0) ,
-             array($state_index_id,'Failed',0,2,2) ,
-         );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'),
+        array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed'),
+    );
+    create_state_index($state_name, $states);
 
     //Discover Sensors
     discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'Power Status', '1', '1', null, null, null, null, $state, 'snmp', $index);
@@ -80,25 +52,11 @@ $index = '0';
 if (is_numeric($state)) {
     //Create State Index
     $state_name = 'systemFanStatusState';
-    $state_index_id = create_state_index($state_name);
-
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-             array($state_index_id,'Normal',0,1,0) ,
-             array($state_index_id,'Failed',0,2,2) ,
-         );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'),
+        array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed'),
+    );
+    create_state_index($state_name, $states);
 
 
     //Discover Sensors
@@ -116,25 +74,11 @@ $index = '0';
 if (is_numeric($state)) {
     //Create State Index
     $state_name = 'cpuFanStatusState';
-    $state_index_id = create_state_index($state_name);
-
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-             array($state_index_id,'Normal',0,1,0) ,
-             array($state_index_id,'Failed',0,2,2) ,
-         );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'),
+        array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed'),
+    );
+    create_state_index($state_name, $states);
 
     //Discover Sensors
     discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'CPU Fan Status', '1', '1', null, null, null, null, $state, 'snmp', $index);
@@ -151,27 +95,14 @@ $index = '0';
 if (is_numeric($state)) {
     //Create State Index
     $state_name = 'upgradeAvailableState';
-    $state_index_id = create_state_index($state_name);
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-             array($state_index_id,'Available',0,1,1) ,
-             array($state_index_id,'Unavailable',0,2,0) ,
-             array($state_index_id,'Connecting',0,3,3) ,
-             array($state_index_id,'Disconnected',0,4,3) ,
-             array($state_index_id,'Others',0,5,3) ,
-         );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Available'),
+        array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Unavailable'),
+        array('value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'Connecting'),
+        array('value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'Disconnected'),
+        array('value' => 5, 'generic' => 3, 'graph' => 0, 'descr' => 'Others'),
+    );
+    create_state_index($state_name, $states);
 
     //Discover Sensors
     discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'Upgrade Availability', '1', '1', null, null, null, null, $state, 'snmp', $index);
@@ -187,35 +118,22 @@ $cur_oid = '.1.3.6.1.4.1.6574.3.1.1.3.';
 if (is_array($oids)) {
     //Create State Index
     $state_name = 'raidStatusState';
-    $state_index_id = create_state_index($state_name);
+    $states = array(
+        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'),
+        array('value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Repairing'),
+        array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'Migrating'),
+        array('value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'Expanding'),
+        array('value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'Deleting'),
+        array('value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'Creating'),
+        array('value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'RaidSyncing'),
+        array('value' => 8, 'generic' => 1, 'graph' => 0, 'descr' => 'RaidParityChecking'),
+        array('value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'RaidAssembling'),
+        array('value' => 10, 'generic' => 1, 'graph' => 0, 'descr' => 'Canceling'),
+        array('value' => 11, 'generic' => 2, 'graph' => 0, 'descr' => 'Degrade'),
+        array('value' => 12, 'generic' => 2, 'graph' => 0, 'descr' => 'Crashed'),
+    );
+    create_state_index($state_name, $states);
 
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-             array($state_index_id,'Normal',0,1,0) ,
-             array($state_index_id,'Repairing',0,2,1) ,
-             array($state_index_id,'Migrating',0,3,1) ,
-             array($state_index_id,'Expanding',0,4,1) ,
-             array($state_index_id,'Deleting',0,5,1) ,
-             array($state_index_id,'Creating',0,6,1) ,
-             array($state_index_id,'RaidSyncing',0,7,1) ,
-             array($state_index_id,'RaidParityChecking',0,8,1) ,
-             array($state_index_id,'RaidAssembling',0,9,1) ,
-             array($state_index_id,'Canceling',0,10,1) ,
-             array($state_index_id,'Degrade',0,11,2) ,
-             array($state_index_id,'Crashed',0,12,2) ,
-         );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
     foreach ($oids as $index => $entry) {
         //Discover Sensors
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, 'RAID Status', '1', '1', null, null, null, null, $entry['raidStatus'], 'snmp', $index);
@@ -232,28 +150,15 @@ $cur_oid = '.1.3.6.1.4.1.6574.2.1.1.5.';
 if (is_array($oids)) {
     //Create State Index
     $state_name = 'diskStatusState';
-    $state_index_id = create_state_index($state_name);
-
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-             array($state_index_id,'Normal',0,1,0) ,
-             array($state_index_id,'Initialized',0,2,1) ,
-             array($state_index_id,'Not Initialized',0,3,1) ,
-             array($state_index_id,'System Partition Failed',0,4,2) ,
-             array($state_index_id,'Crashed',0,5,2) ,
-         );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'),
+        array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'Initialized'),
+        array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'Not Initialized'),
+        array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'System Partition Failed'),
+        array('value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Crashed'),
+    );
+    create_state_index($state_name, $states);
+        
     foreach ($oids as $index => $entry) {
         //Discover Sensors
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, 'Disk Status '.$index, '1', '1', null, null, null, null, $entry['diskStatus'], 'snmp', $index);

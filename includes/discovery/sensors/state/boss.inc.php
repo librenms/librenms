@@ -12,35 +12,21 @@ if ($device['os'] === 'boss') {
     if (is_array($oid)) {
         //get states
         $state_name = 's5ChasComOperState';
-        $state_index_id = create_state_index($state_name);
-
-        //Create State Translation
-        if ($state_index_id) {
-            $states = array(
-            array($state_index_id,'other'      ,0,1,3) ,
-            array($state_index_id,'notAvail'   ,0,2,3) ,
-            array($state_index_id,'removed'    ,0,3,3) ,
-            array($state_index_id,'disabled'   ,0,4,3) ,
-            array($state_index_id,'normal'     ,0,5,0) ,
-            array($state_index_id,'resetInProg',0,6,1) ,
-            array($state_index_id,'testing'    ,0,7,1) ,
-            array($state_index_id,'warning'    ,0,8,1) ,
-            array($state_index_id,'nonFatalErr',0,9,1) ,
-            array($state_index_id,'fatalErr'   ,0,10,2) ,
-            array($state_index_id,'notConfig'  ,0,11,3) ,
-            array($state_index_id,'obsoleted'  ,0,12,3)
-            );
-        }
-        foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-        }
+        $states = array(
+            array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'),
+            array('value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'notAvail'),
+            array('value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'removed'),
+            array('value' => 4, 'generic' =>3, 'graph' => 0, 'descr' => 'disabled'),
+            array('value' => 5, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'),
+            array('value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'resetInProg'),
+            array('value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'testing'),
+            array('value' => 8, 'generic' => 1, 'graph' => 0, 'descr' => 'warning'),
+            array('value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'nonFatalErr'),
+            array('value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'fatalErr'),
+            array('value' => 11, 'generic' => 3, 'graph' => 0, 'descr' => 'notConfig'),
+            array('value' => 12, 'generic' => 3, 'graph' => 0, 'descr' => 'obsoleted'),
+        );
+        create_state_index($state_name, $states);
 
         // get fans (6) and temp (5) sensor only from walk
         $ers_sensors = array();

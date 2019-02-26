@@ -32,34 +32,20 @@ $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
 if (!empty($ups_state) || $ups_state == 0) {
     // UPS state OID (Value : 0-1 Unknown, 2 On Line, 3 On Battery, 4 On Boost, 5 Sleeping, 6 On Bypass, 7 Rebooting, 8 Standby, 9 On Buck )
     $state_name = 'netagent2upsstate';
-    $state_index_id = create_state_index($state_name);
+    $states = array(
+        array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
+        array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
+        array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'OnLine'),
+        array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'OnBattery'),
+        array('value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'OnBoost'),
+        array('value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'Sleeping'),
+        array('value' => 6, 'generic' => 0, 'graph' => 0, 'descr' => 'OnBypass'),
+        array('value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'Rebooting'),
+        array('value' => 8, 'generic' => 0, 'graph' => 0, 'descr' => 'Standby'),
+        array('value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'OnBuck'),
+    );
+    create_state_index($state_name, $states);
 
-    if ($state_index_id !== null) {
-        $states = array(
-            array($state_index_id,'unknown',0,0,3) ,
-            array($state_index_id,'unknown',0,1,3) ,
-            array($state_index_id,'OnLine',0,2,0) ,
-            array($state_index_id,'OnBattery',0,3,1) ,
-            array($state_index_id,'OnBoost',0,4,0) ,
-            array($state_index_id,'Sleeping',0,4,1) ,
-            array($state_index_id,'OnBypass',0,6,0) ,
-            array($state_index_id,'Rebooting',0,7,1) ,
-            array($state_index_id,'Standby',0,8,0) ,
-            array($state_index_id,'OnBuck',0,9,0)
-        );
-
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
-    
     $index          = 0;
     $limit          = 10;
     $warnlimit      = null;
@@ -105,25 +91,11 @@ if ($in_phaseNum == '3') {
 
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseUPSStatusInverterOperating';
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'yes',0,14,0) ,
-                array($state_index_id,'no',0,16,2)
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 14, 'generic' => 2, 'graph' => 0, 'descr' => 'yes'),
+            array('value' => 16, 'generic' => 0, 'graph' => 0, 'descr' => 'no'),
+        );
+        create_state_index($state_name, $states);
         
         $index          = 0;
         $limit          = 10;
@@ -162,25 +134,11 @@ if ($in_phaseNum == '3') {
 
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseUPSStatusACStatus';
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'normal',0,10,0) ,
-                array($state_index_id,'abnormal',0,11,2)
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 10, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'),
+            array('value' => 11, 'generic' => 2, 'graph' => 0, 'descr' => 'abnormal'),
+        );
+        create_state_index($state_name, $states);
         
         $index          = 0;
         $limit          = 10;
@@ -219,25 +177,11 @@ if ($in_phaseNum == '3') {
 
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseUPSStatusManualBypassBreaker';
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'close',0,8,1) ,
-                array($state_index_id,'open',0,9,)
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 8, 'generic' => 1, 'graph' => 0, 'descr' => 'close'),
+            array('value' => 9, 'generic' => 0, 'graph' => 0, 'descr' => 'open'),
+        );
+        create_state_index($state_name, $states);
         
         $index          = 0;
         $limit          = 10;
@@ -276,25 +220,11 @@ if ($in_phaseNum == '3') {
 
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseDCandRectifierStatusRecOperating';
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'yes',0,14,0) ,
-                array($state_index_id,'no',0,16,2)
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 14, 'generic' => 2, 'graph' => 0, 'descr' => 'yes'),
+            array('value' => 16, 'generic' => 0, 'graph' => 0, 'descr' => 'no'),
+        );
+        create_state_index($state_name, $states);
         
         $index          = 0;
         $limit          = 10;
@@ -333,27 +263,13 @@ if ($in_phaseNum == '3') {
 
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseDCandRectifierStatusChargeStatus';
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'boost',0,6,0) ,
-                array($state_index_id,'float',0,7,0) ,
-                array($state_index_id,'no',0,16,2)
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
-        
+        $states = array(
+            array('value' => 6, 'generic' => 0, 'graph' => 0, 'descr' => 'boost'),
+            array('value' => 7, 'generic' => 0, 'graph' => 0, 'descr' => 'float'),
+            array('value' => 16, 'generic' => 2, 'graph' => 0, 'descr' => 'no'),
+        );
+        create_state_index($state_name, $states);
+                
         $index          = 0;
         $limit          = 10;
         $warnlimit      = null;
@@ -391,26 +307,12 @@ if ($in_phaseNum == '3') {
 
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseDCandRectifierStatusBatteryStatus';
-        $state_index_id = create_state_index($state_name);
+        $states = array(
+            array('value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'backup'),
+            array('value' => 5, 'generic' => 0, 'graph' => 0, 'descr' => 'acnormal'),
+        );
+        create_state_index($state_name, $states);
 
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'backup',0,4,1) ,
-                array($state_index_id,'acnormal',0,5,0)
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
-        
         $index          = 0;
         $limit          = 10;
         $warnlimit      = null;
@@ -448,25 +350,11 @@ if ($in_phaseNum == '3') {
 
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseDCandRectifierStatusInAndOut';
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'threeInOneOut',0,2,3) ,
-                array($state_index_id,'threeInThreeOut',0,3,3)
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'threeInOneOut'),
+            array('value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'threeInThreeOut'),
+        );
+        create_state_index($state_name, $states);
         
         $index          = 0;
         $limit          = 10;
@@ -505,25 +393,11 @@ if ($in_phaseNum == '3') {
 
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseDCandRectifierStatusRecRotError';
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'yes',0,14,2) ,
-                array($state_index_id,'no',0,16,0)
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 14, 'generic' => 2, 'graph' => 0, 'descr' => 'yes'),
+            array('value' => 16, 'generic' => 0, 'graph' => 0, 'descr' => 'no'),
+        );
+        create_state_index($state_name, $states);
         
         $index          = 0;
         $limit          = 10;
@@ -562,25 +436,11 @@ if ($in_phaseNum == '3') {
 
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseFaultStatusShortCircuit';
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'yes',0,14,2) ,
-                array($state_index_id,'no',0,16,0)
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 14, 'generic' => 2, 'graph' => 0, 'descr' => 'yes'),
+            array('value' => 16, 'generic' => 0, 'graph' => 0, 'descr' => 'no'),
+        );
+        create_state_index($state_name, $states);
         
         $index          = 0;
         $limit          = 10;
@@ -619,25 +479,11 @@ if ($in_phaseNum == '3') {
 
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseUPSStaticSwitchMode';
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'invermode',0,12,0) ,
-                array($state_index_id,'bypassmode',0,13,1)
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 12, 'generic' => 0, 'graph' => 0, 'descr' => 'invermode'),
+            array('value' => 13, 'generic' => 1, 'graph' => 0, 'descr' => 'bypassmode'),
+        );
+        create_state_index($state_name, $states);
         
         $index          = 0;
         $limit          = 10;
@@ -676,25 +522,11 @@ if ($in_phaseNum == '3') {
 
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseUPSStatusBypassFreqFail';
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'yes',0,14,2) ,
-                array($state_index_id,'no',0,16,0)
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 14, 'generic' => 2, 'graph' => 0, 'descr' => 'yes'),
+            array('value' => 16, 'generic' => 0, 'graph' => 0, 'descr' => 'no'),
+        );
+        create_state_index($state_name, $states);
         
         $index          = 0;
         $limit          = 10;

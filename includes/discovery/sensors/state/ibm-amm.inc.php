@@ -31,27 +31,13 @@ foreach ($oids as $oid) {
     $descr = $state_descr . $index;
 
     if (!empty($state)) {
-        $state_index_id = create_state_index($state_name);
-            
-        if ($state_index_id) {
-            $states = array(
-                array($state_index_id, 'unknown', 0, 0, 3),
-                array($state_index_id, 'good', 1, 1, 0),
-                array($state_index_id, 'warning', 1, 2, 1),
-                array($state_index_id, 'bad', 1, 3, 2),
-            );
- 
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }//end foreach
-        }//end if
+        $states = array(
+            array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
+            array('value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'good'),
+            array('value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'),
+            array('value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'bad'),
+        );
+        create_state_index($state_name, $states);
 
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $state, 'snmp', $index);
         //Create Sensor To State Index
@@ -82,28 +68,14 @@ foreach ($oids as $oid) {
     $descr = $state_descr . $index;
 
     if (is_numeric($state) && $state != 2) {
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id) {
-            $states = array(
-                array($state_index_id, 'operational', 1, 0, 0),
-                array($state_index_id, 'flashing', 1, 1, 1),
-                array($state_index_id, 'notPresent', 1, 2, -1),
-                array($state_index_id, 'communicationError', 1, 3, 2),
-                array($state_index_id, 'unknown', 0, 255, 3),
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }//end foreach
-        }//end if
+        $states = array(
+            array('value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'operational'),
+            array('value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'flashing'),
+            array('value' => 2, 'generic' => -1, 'graph' => 1, 'descr' => 'notPresent'),
+            array('value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'communicationError'),
+            array('value' => 255, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
+        );
+        create_state_index($state_name, $states);
 
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $state, 'snmp', $index);
         //Create Sensor To State Index
@@ -130,28 +102,14 @@ foreach ($data as $oid => $array) {
     $descr = $state_descr . $index;
 
     if (is_numeric($state) && $state != 3) {
-        $state_index_id = create_state_index($state_name);
-
-        if ($state_index_id) {
-            $states = array(
-                array($state_index_id, 'unknown', 0, 0, 3),
-                array($state_index_id, 'good', 1, 1, 0),
-                array($state_index_id, 'warning', 1, 2, 1),
-                array($state_index_id, 'notAvailable', 1, 3, -1),
-                array($state_index_id, 'critical', 1, 4, 2),
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }//end foreach
-        }//end if
+        $states = array(
+            array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
+            array('value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'good'),
+            array('value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'),
+            array('value' => 3, 'generic' => -1, 'graph' => 1, 'descr' => 'notAvailable'),
+            array('value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'critical'),
+        );
+        create_state_index($state_name, $states);
 
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $state, 'snmp', $index);
         //Create Sensor To State Index

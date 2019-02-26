@@ -16,25 +16,11 @@ $cur_oid = '.1.3.6.1.4.1.9.6.1.101.43.1.1.24.';
 if (is_array($temp)) {
     //Create State Index
     $state_name = 'swIfOperSuspendedStatus';
-    $state_index_id = create_state_index($state_name);
-
-    //Create State Translation
-    if ($state_index_id !== null) {
-        $states = array(
-            array($state_index_id, 'true', 0, 1, 2),
-            array($state_index_id, 'false', 0, 2, 0),
-        );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'true'),
+        array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'false'),
+    );
+    create_state_index($state_name, $states);
 
     foreach ($temp as $index => $entry) {
         $port_descr = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));

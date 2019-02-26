@@ -17,33 +17,19 @@ if (is_array($temp)) {
     //Create State Index
     if (strstr($temp['netInterface']['cfwHardwareStatusDetail'], 'not Configured') == false) {
         $state_name = 'cfwHardwareStatus';
-        $state_index_id = create_state_index($state_name);
-
-        //Create State Translation
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'other',0,1,2) ,
-                array($state_index_id,'up',0,2,0) ,
-                array($state_index_id,'down',0,3,2) ,
-                array($state_index_id,'error',0,4,2) ,
-                array($state_index_id,'overTemp',0,5,2) ,
-                array($state_index_id,'busy',0,6,2) ,
-                array($state_index_id,'noMedia',0,7,2) ,
-                array($state_index_id,'backup',0,8,2) ,
-                array($state_index_id,'active',0,9,0) ,
-                array($state_index_id,'standby',0,10,0)
-            );
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'other'),
+            array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'up'),
+            array('value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'down'),
+            array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'error'),
+            array('value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'overTemp'),
+            array('value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'busy'),
+            array('value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'noMedia'),
+            array('value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'backup'),
+            array('value' => 9, 'generic' => 0, 'graph' => 0, 'descr' => 'active'),
+            array('value' => 10, 'generic' => 0, 'graph' => 0, 'descr' => 'standby'),
+        );
+        create_state_index($state_name, $states);
 
         foreach ($temp as $index => $entry) {
             $descr = ucwords(trim(preg_replace('/\s*\([^\s)]*\)/', '', $temp[$index]['cfwHardwareInformation'])));

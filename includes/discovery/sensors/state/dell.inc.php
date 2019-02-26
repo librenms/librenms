@@ -29,97 +29,82 @@ foreach ($tables as $tablevalue) {
     if (is_array($temp)) {
         //Create State Index
         $state_name = $tablevalue[2];
-        $state_index_id = create_state_index($state_name);
-
-        //Create State Translation
-        if ($state_index_id !== null) {
-            if ($state_name == 'processorDeviceStatusStatus' || $state_name == 'memoryDeviceStatus' || $state_name == 'powerSupplyStatus' || $state_name == 'intrusionStatus') {
-                $states = array(
-                    array($state_index_id,'other',0,1,3) ,
-                    array($state_index_id,'unknown',0,2,3) ,
-                    array($state_index_id,'ok',0,3,0) ,
-                    array($state_index_id,'nonCritical',0,4,1) ,
-                    array($state_index_id,'critical',0,5,2) ,
-                    array($state_index_id,'nonRecoverable',0,6,2)
-                );
-            } elseif ($state_name == 'controllerState') {
-                $states = array(
-                    array($state_index_id,'ready',0,1,0) ,
-                    array($state_index_id,'failed',0,2,2) ,
-                    array($state_index_id,'online',0,3,0) ,
-                    array($state_index_id,'offline',0,4,1) ,
-                    array($state_index_id,'degraded',0,6,2)
-                );
-            } elseif ($state_name == 'arrayDiskState') {
-                $states = array(
-                    array($state_index_id,'ready',0,1,0) ,
-                    array($state_index_id,'failed',0,2,2) ,
-                    array($state_index_id,'online',0,3,0) ,
-                    array($state_index_id,'offline',0,4,2) ,
-                    array($state_index_id,'degraded',0,5,2) ,
-                    array($state_index_id,'recovering',0,6,1) ,
-                    array($state_index_id,'removed',0,7,1) ,
-                    array($state_index_id,'non-raid',0,8,3) ,
-                    array($state_index_id,'notReady',0,9,1) ,
-                    array($state_index_id,'resynching',0,10,1) ,
-                    array($state_index_id,'replacing',0,11,1) ,
-                    array($state_index_id,'spinningDown',0,12,1) ,
-                    array($state_index_id,'rebuild',0,13,1) ,
-                    array($state_index_id,'noMedia',0,14,1) ,
-                    array($state_index_id,'formatting',0,15,1) ,
-                    array($state_index_id,'diagnostics',0,16,1) ,
-                    array($state_index_id,'predictiveFailure',0,17,2) ,
-                    array($state_index_id,'initializing',0,18,1) ,
-                    array($state_index_id,'foreign',0,19,1) ,
-                    array($state_index_id,'clear',0,20,1) ,
-                    array($state_index_id,'unsupported',0,21,2) ,
-                    array($state_index_id,'incompatible',0,22,2) ,
-                    array($state_index_id,'readOnly',0,23,2)
-                );
-            } elseif ($state_name == 'virtualDiskState') {
-                $states = array(
-                    array($state_index_id,'unknown',0,0,3) ,
-                    array($state_index_id,'ready',1,1,0) ,
-                    array($state_index_id,'failed',1,2,2) ,
-                    array($state_index_id,'online',1,3,1) ,
-                    array($state_index_id,'offline',1,4,2) ,
-                    array($state_index_id,'degraded',1,6,2) ,
-                    array($state_index_id,'verifying',1,7,1) ,
-                    array($state_index_id,'resynching',1,15,1) ,
-                    array($state_index_id,'regenerating',1,16,1) ,
-                    array($state_index_id,'failedRedundancy',1,18,2) ,
-                    array($state_index_id,'rebuilding',1,24,1) ,
-                    array($state_index_id,'formatting',1,26,1) ,
-                    array($state_index_id,'reconstructing',1,32,1) ,
-                    array($state_index_id,'initializing',1,35,1) ,
-                    array($state_index_id,'backgroundInit',1,36,1) ,
-                    array($state_index_id,'permanentlyDegraded',1,52,2)
-                );
-            } elseif ($state_name == 'batteryState') {
-                $states = array(
-                    array($state_index_id,'ready',0,1,0) ,
-                    array($state_index_id,'failed',1,2,2) ,
-                    array($state_index_id,'degraded',1,6,2) ,
-                    array($state_index_id,'reconditioning',1,7,1) ,
-                    array($state_index_id,'high',1,9,1) ,
-                    array($state_index_id,'low',1,10,1) ,
-                    array($state_index_id,'charging',1,12,1) ,
-                    array($state_index_id,'missing',1,21,2) ,
-                    array($state_index_id,'learning',1,36,1)
-                );
-            }
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
+        if ($state_name == 'processorDeviceStatusStatus' || $state_name == 'memoryDeviceStatus' || $state_name == 'powerSupplyStatus' || $state_name == 'intrusionStatus') {
+            $states = array(
+                array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'),
+                array('value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
+                array('value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'),
+                array('value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'nonCritical'),
+                array('value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'critical'),
+                array('value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'nonRecoverable'),
+            );
+        } elseif ($state_name == 'controllerState') {
+            $states = array(
+                array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'ready'),
+                array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'),
+                array('value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'online'),
+                array('value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'offline'),
+                array('value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'degraded'),
+            );
+        } elseif ($state_name == 'arrayDiskState') {
+            $states = array(
+                array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'ready'),
+                array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'),
+                array('value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'online'),
+                array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'offline'),
+                array('value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'degraded'),
+                array('value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'recovering'),
+                array('value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'removed'),
+                array('value' => 8, 'generic' => 3, 'graph' => 0, 'descr' => 'non-raid'),
+                array('value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'notReady'),
+                array('value' => 10, 'generic' => 1, 'graph' => 0, 'descr' => 'resynching'),
+                array('value' => 11, 'generic' => 1, 'graph' => 0, 'descr' => 'replacing'),
+                array('value' => 12, 'generic' => 1, 'graph' => 0, 'descr' => 'spinningDown'),
+                array('value' => 13, 'generic' => 1, 'graph' => 0, 'descr' => 'rebuild'),
+                array('value' => 14, 'generic' => 1, 'graph' => 0, 'descr' => 'noMedia'),
+                array('value' => 15, 'generic' => 1, 'graph' => 0, 'descr' => 'formatting'),
+                array('value' => 16, 'generic' => 1, 'graph' => 0, 'descr' => 'diagnostics'),
+                array('value' => 17, 'generic' => 2, 'graph' => 0, 'descr' => 'predictiveFailure'),
+                array('value' => 18, 'generic' => 1, 'graph' => 0, 'descr' => 'initializing'),
+                array('value' => 19, 'generic' => 1, 'graph' => 0, 'descr' => 'foreign'),
+                array('value' => 20, 'generic' => 1, 'graph' => 0, 'descr' => 'clear'),
+                array('value' => 21, 'generic' => 2, 'graph' => 0, 'descr' => 'unsupported'),
+                array('value' => 22, 'generic' => 2, 'graph' => 0, 'descr' => 'incompatible'),
+                array('value' => 23, 'generic' => 2, 'graph' => 0, 'descr' => 'readOnly'),
+            );
+        } elseif ($state_name == 'virtualDiskState') {
+            $states = array(
+                array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
+                array('value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'ready'),
+                array('value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'failed'),
+                array('value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'online'),
+                array('value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'offline'),
+                array('value' => 6, 'generic' => 2, 'graph' => 1, 'descr' => 'degraded'),
+                array('value' => 7, 'generic' => 1, 'graph' => 1, 'descr' => 'verifying'),
+                array('value' => 15, 'generic' => 1, 'graph' => 1, 'descr' => 'resynching'),
+                array('value' => 16, 'generic' => 1, 'graph' => 1, 'descr' => 'regenerating'),
+                array('value' => 18, 'generic' => 2, 'graph' => 1, 'descr' => 'failedRedundancy'),
+                array('value' => 24, 'generic' => 1, 'graph' => 1, 'descr' => 'rebuilding'),
+                array('value' => 26, 'generic' => 1, 'graph' => 1, 'descr' => 'formatting'),
+                array('value' => 32, 'generic' => 1, 'graph' => 1, 'descr' => 'reconstructing'),
+                array('value' => 35, 'generic' => 1, 'graph' => 1, 'descr' => 'initializing'),
+                array('value' => 36, 'generic' => 1, 'graph' => 1, 'descr' => 'backgroundInit'),
+                array('value' => 52, 'generic' => 2, 'graph' => 1, 'descr' => 'permanentlyDegraded'),
+            );
+        } elseif ($state_name == 'batteryState') {
+            $states = array(
+                array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'ready'),
+                array('value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'failed'),
+                array('value' => 6, 'generic' => 2, 'graph' => 1, 'descr' => 'degraded'),
+                array('value' => 7, 'generic' => 1, 'graph' => 1, 'descr' => 'reconditioning'),
+                array('value' => 9, 'generic' => 1, 'graph' => 1, 'descr' => 'high'),
+                array('value' => 10, 'generic' => 1, 'graph' => 1, 'descr' => 'low'),
+                array('value' => 12, 'generic' => 1, 'graph' => 1, 'descr' => 'charging'),
+                array('value' => 21, 'generic' => 2, 'graph' => 1, 'descr' => 'missing'),
+                array('value' => 36, 'generic' => 1, 'graph' => 1, 'descr' => 'learning'),
+            );
         }
+        create_state_index($state_name, $states);
 
         foreach ($temp as $index => $entry) {
             if (strpos($index, '54.') === false) { //Because Dell is buggy

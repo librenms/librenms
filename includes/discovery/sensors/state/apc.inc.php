@@ -17,25 +17,11 @@ $index = '0';
 if (is_numeric($temp)) {
     //Create State Index
     $state_name = 'upsAdvBatteryReplaceIndicator';
-    $state_index_id = create_state_index($state_name);
-
-    //Create State Translation
-    if ($state_index_id !== null) {
-        $states = array(
-            array($state_index_id,'noBatteryNeedsReplacing',0,1,0) ,
-            array($state_index_id,'batteryNeedsReplacing',0,2,2)
-        );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'noBatteryNeedsReplacing'),
+        array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'batteryNeedsReplacing'),
+    );
+    create_state_index($state_name, $states);
 
     $descr = 'UPS Battery Replacement Status';
     //Discover Sensors
@@ -98,7 +84,7 @@ foreach ($cooling_unit as $index => $data) {
                 'state_value' => $value[3],
                 'state_generic_value' => $value[4]
             );
-            dbInsert($insert, 'state_translations');
+            dbInsert($insert, 'state_translations'); // FIXME - Last dbInsert in sensor states
         }
     }
     discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, '1', '1', null, null, null, null, $data['coolingUnitExtendedDiscreteValueAsInteger']);
@@ -111,24 +97,12 @@ $relays = snmpwalk_cache_oid($device, 'emsOutputRelayControlEntry', array(), 'Po
 foreach ($relays as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.2.1.1.3.' . $index;
     $state_name = $data['emsOutputRelayControlOutputRelayName'];
-    $state_index_id = create_state_index($state_name);
+    $states = array(
+        array('value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'immediateCloseEMS'),
+        array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'immediateOpenEMS'),
+    );
+    create_state_index($state_name, $states);
 
-    if ($state_index_id !== null) {
-        $states = array(
-            array($state_index_id,'immediateCloseEMS',0,1,2) ,
-            array($state_index_id,'immediateOpenEMS',0,2,0)
-        );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
     $current = apc_relay_state($data['emsOutputRelayControlOutputRelayCommand']);
     if (is_numeric($current)) {
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, '1', '1', null, null, null, null, $current);
@@ -145,24 +119,12 @@ $switched = snmpwalk_cache_oid($device, 'emsOutletControlEntry', array(), 'Power
 foreach ($switched as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.3.1.1.3.' . $index;
     $state_name = $data['emsOutletControlOutletName'];
-    $state_index_id = create_state_index($state_name);
+    $states = array(
+        array('value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'immediateOnEMS'),
+        array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'immediateOffEMS'),
+    );
+    create_state_index($state_name, $states);
 
-    if ($state_index_id !== null) {
-        $states = array(
-            array($state_index_id,'immediateOnEMS',0,1,2) ,
-            array($state_index_id,'immediateOffEMS',0,2,0)
-        );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
     $current = apc_relay_state($data['emsOutletControlOutletCommand']);
     if (is_numeric($current)) {
         discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, '1', '1', null, null, null, null, $current);
@@ -179,24 +141,13 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     if ($data['memSensorsCommStatus']) {
         $cur_oid        = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.7.' . $index;
         $state_name     = 'memSensorsCommStatus';
-        $state_index_id = create_state_index($state_name);
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'notInstalled',0,1,1),
-                array($state_index_id,'commsOK',0,2,0),
-                array($state_index_id,'commsLost',0,3,2),
-            );
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'notInstalled'),
+            array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'commsOK'),
+            array('value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'commsLost'),
+        );
+        create_state_index($state_name, $states);
+
         $current = $data['memSensorsCommStatus'];
     }
     $descr      = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
@@ -210,24 +161,13 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     if ($data['memSensorsAlarmStatus']) {
         $cur_oid        = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.8.' . $index;
         $state_name     = 'memSensorsAlarmStatus';
-        $state_index_id = create_state_index($state_name);
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'memNormal',0,1,0),
-                array($state_index_id,'memWarning',0,2,1),
-                array($state_index_id,'memCritical',0,3,2),
-            );
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'memNormal'),
+            array('value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'memWarning'),
+            array('value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'memCritical'),
+        );
+        create_state_index($state_name, $states);
+
         $current = $data['memSensorsAlarmStatus'];
     }
     $descr      = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];

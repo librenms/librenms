@@ -27,24 +27,11 @@ $oids = snmpwalk_cache_oid($device, 'outputEntry', array(), 'ICT-DISTRIBUTION-PA
 
 if (is_array($oids)) {
     $state_name = 'outputFuseStatus';
-    $state_index_id = create_state_index($state_name);
-
-    if ($state_index_id) {
-        $states = array(
-            array($state_index_id, 'OK', 0, 1, 0) ,
-            array($state_index_id, 'OPEN', 0, 2, 2)
-        );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'),
+        array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'OPEN'),
+    );
+    create_state_index($state_name, $states);
 
     foreach ($oids as $index => $entry) {
         $fuse_state_oid = '.1.3.6.1.4.1.39145.10.8.1.4.' . $index;

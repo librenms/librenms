@@ -10,27 +10,13 @@ if ($device['os'] == 'hirschmann') {
     if (is_array($oid)) {
         //Create State Index
         $state_name = 'hmPowerSupplyStatus';
-        $state_index_id = create_state_index($state_name);
-
-        //Create State Translation
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'ok',0,1,0) ,
-                array($state_index_id,'failed',0,2,2) ,
-                array($state_index_id,'notInstalled',0,3,1) ,
-                array($state_index_id,'unknown',0,4,3)
-            );
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'),
+            array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'),
+            array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'notInstalled'),
+            array('value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
+        );
+        create_state_index($state_name, $states);
 
         foreach ($oid as $index => $entry) {
             //Discover Sensors
@@ -51,27 +37,13 @@ if ($device['os'] == 'hirschmann') {
     if (is_numeric($temp)) {
        //Create State Index
         $state_name = 'hmLEDRSPowerSupply';
-        $state_index_id = create_state_index($state_name);
-
-       //Create State Translation
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'off',0,1,0) ,
-                array($state_index_id,'green',0,2,0) ,
-                array($state_index_id,'yellow',0,3,1) ,
-                array($state_index_id,'red',0,4,2)
-            );
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'off'),
+            array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'green'),
+            array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'yellow'),
+            array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'red'),
+        );
+        create_state_index($state_name, $states);
 
         $descr = 'LED Status Power Supply';
     //Discover Sensors
@@ -91,27 +63,13 @@ if ($device['os'] == 'hirschmann') {
     if (is_numeric($temp)) {
         //Create State Index
         $state_name = 'hmLEDRStandby';
-        $state_index_id = create_state_index($state_name);
-
-       //Create State Translation
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'off',0,1,0) ,
-                array($state_index_id,'green',0,2,0) ,
-                array($state_index_id,'yellow',0,3,1) ,
-                array($state_index_id,'red',0,4,2)
-            );
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'off'),
+            array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'green'),
+            array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'yellow'),
+            array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'red'),
+        );
+        create_state_index($state_name, $states);
  
         $descr = 'LED Status Standby';
         //Discover Sensors
@@ -131,27 +89,13 @@ if ($device['os'] == 'hirschmann') {
     if (is_numeric($temp)) {
         //Create State Index
         $state_name = 'hmLEDRSRedundancyManager';
-        $state_index_id = create_state_index($state_name);
-
-        //Create State Translation
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'off',0,1,0) ,
-                array($state_index_id,'green',0,2,0) ,
-                array($state_index_id,'yellow',0,3,1) ,
-                array($state_index_id,'red',0,4,2)
-            );
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'off'),
+            array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'green'),
+            array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'yellow'),
+            array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'red'),
+        );
+        create_state_index($state_name, $states);
 
         $descr = 'LED Status Redundancy Manager';
         //Discover Sensors
@@ -171,27 +115,13 @@ if ($device['os'] == 'hirschmann') {
     if (is_numeric($temp)) {
         //Create State Index
         $state_name = 'hmLEDRSFault';
-        $state_index_id = create_state_index($state_name);
-
-        //Create State Translation
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'off',0,1,0) ,
-                array($state_index_id,'green',0,2,0) ,
-                array($state_index_id,'yellow',0,3,1) ,
-                array($state_index_id,'red',0,4,2)
-            );
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = array(
+            array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'off'),
+            array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'green'),
+            array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'yellow'),
+            array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'red'),
+        );
+        create_state_index($state_name, $states);
 
         $descr = 'LED Status Fault';
         //Discover Sensors

@@ -7,26 +7,12 @@ if (is_array($temp)) {
     echo 'F5 power supply: ';
     //Create State Index
     $state_name = 'sysChassisPowerSupplyStatus';
-    $state_index_id = create_state_index($state_name);
-
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-            array($state_index_id,'Bad',0,0,2) ,
-            array($state_index_id,'Good',0,1,0) ,
-            array($state_index_id,'NotPresent',0,2,3),
-        );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],         // Value polled from device
-                'state_generic_value' => $value[4],  // Set value based on the Nagios standard 0=OK, 1=Warning, 2=Critical, 3=Unknown
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'Bad'),
+        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Good'),
+        array('value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'NotPresent'),
+    );
+    create_state_index($state_name, $states);
 
     foreach ($temp as $index => $data) {
         $descr      = "sysChassisPowerSupplyStatus.".$temp[$index]['sysChassisPowerSupplyIndex'];
@@ -46,28 +32,14 @@ if (is_array($temp1)) {
     echo 'F5 FailOver State: ';
     //Create State Index
     $state_name = 'sysCmFailoverStatusId';
-    $state_index_id = create_state_index($state_name);
-
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-            array($state_index_id,'Unknown',0,0,3),
-            array($state_index_id,'OffLine',0,1,2),
-            array($state_index_id,'ForcedOffline',0,2,2),
-            array($state_index_id,'Standby',0,3,1),
-            array($state_index_id,'Active',0,4,0),
-        );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],         // Value polled from device
-                'state_generic_value' => $value[4],  // Set value based on the Nagios standard 0=OK, 1=Warning, 2=Critical, 3=Unknown
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'),
+        array('value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'OffLine'),
+        array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'ForcedOffline'),
+        array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'Standby'),
+        array('value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'Active'),
+    );
+    create_state_index($state_name, $states);
 
     foreach (array_keys($temp1) as $index) {
         $descr      = "sysCmFailoverStatusId.".$temp1[$index]['sysCmFailoverStatusId'];
@@ -87,33 +59,19 @@ if (is_array($temp1)) {
     echo 'F5 Sync State: ';
     //Create State Index
     $state_name = 'sysCmSyncStatusId';
-    $state_index_id = create_state_index($state_name);
-
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-            array($state_index_id,'unknown',0,0,3),
-            array($state_index_id,'syncing',0,1,0),
-            array($state_index_id,'needManualSync',0,2,1),
-            array($state_index_id,'inSync',0,3,0),
-            array($state_index_id,'syncFailed',0,4,1),
-            array($state_index_id,'syncDisconnected',0,5,2),
-            array($state_index_id,'standalone',0,6,0),
-            array($state_index_id,'awaitingInitialSync',0,7,1),
-            array($state_index_id,'incompatibleVersion',0,8,2),
-            array($state_index_id,'partialSync',0,8,2),
-        );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],         // Value polled from device
-                'state_generic_value' => $value[4],  // Set value based on the Nagios standard 0=OK, 1=Warning, 2=Critical, 3=Unknown
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
+        array('value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'syncing'),
+        array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'needManualSync'),
+        array('value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'inSync'),
+        array('value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'syncFailed'),
+        array('value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'syncDisconnected'),
+        array('value' => 6, 'generic' => 0, 'graph' => 0, 'descr' => 'standalone'),
+        array('value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'awaitingInitialSync'),
+        array('value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'incompatibleVersion'), // FIX-ME - value 8 - Which is is incompatibleVersion or partialSync?
+        array('value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'partialSync'),
+    );
+    create_state_index($state_name, $states);
 
     foreach (array_keys($temp1) as $index) {
         $descr      = "sysCmSyncStatusId.".$index;
@@ -133,29 +91,15 @@ if (is_array($temp1)) {
     echo 'F5 FailOver State Color: ';
     //Create State Index
     $state_name = 'sysCmFailoverStatusColor';
-    $state_index_id = create_state_index($state_name);
-
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-            array($state_index_id,'Green: functioning correctly',0,0,0),
-            array($state_index_id,'Yellow: functioning suboptimally',0,1,1),
-            array($state_index_id,'Red: requires attention to function correctly',0,2,2),
-            array($state_index_id,'Blue: status is unknown',0,3,3),
-            array($state_index_id,'Gray: intentionally not functioning',0,4,0),
-            array($state_index_id,'Black: not connected to any peers',0,5,2),
-        );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],         // Value polled from device
-                'state_generic_value' => $value[4],  // Set value based on the Nagios standard 0=OK, 1=Warning, 2=Critical, 3=Unknown
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Green: functioning correctly'),
+        array('value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Yellow: functioning suboptimally'),
+        array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Red: requires attention to function correctly'),
+        array('value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'Blue: status is unknown'),
+        array('value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'Gray: intentionally not functioning'),
+        array('value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Black: not connected to any peers'),
+    );
+    create_state_index($state_name, $states);
 
     foreach (array_keys($temp1) as $index) {
         $descr      = "sysCmFailoverStatusColor.".$index;
@@ -175,26 +119,12 @@ if (is_array($temp3)) {
     echo 'F5 FanSpeed State: ';
     //Create State Index
     $state_name = 'sysChassisFanStatus';
-    $state_index_id = create_state_index($state_name);
-
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-            array($state_index_id,'Bad',0,0,2),
-            array($state_index_id,'Good',0,1,0),
-            array($state_index_id,'NotPresent',0,2,3),
-        );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],         // Value polled from device
-                'state_generic_value' => $value[4],  // Set value based on the Nagios standard 0=OK, 1=Warning, 2=Critical, 3=Unknown
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = array(
+        array('value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'Bad'),
+        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Good'),
+        array('value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'NotPresent'),
+    );
+    create_state_index($state_name, $states);
 
     foreach (array_keys($temp3) as $index) {
         $descr      = "Fan Speed Status ".$index;
