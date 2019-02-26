@@ -92,8 +92,8 @@ if ($in_phaseNum == '3') {
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseUPSStatusInverterOperating';
         $states = array(
-            array('value' => 14, 'generic' => 2, 'graph' => 0, 'descr' => 'yes'),
-            array('value' => 16, 'generic' => 0, 'graph' => 0, 'descr' => 'no'),
+            array('value' => 14, 'generic' => 0, 'graph' => 0, 'descr' => 'yes'),
+            array('value' => 16, 'generic' => 2, 'graph' => 0, 'descr' => 'no'),
         );
         create_state_index($state_name, $states);
         
