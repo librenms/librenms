@@ -42,7 +42,7 @@ if (!empty($ups_state) || $ups_state == 0) {
         array('value' => 6, 'generic' => 0, 'graph' => 0, 'descr' => 'OnBypass'),
         array('value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'Rebooting'),
         array('value' => 8, 'generic' => 0, 'graph' => 0, 'descr' => 'Standby'),
-        array('value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'OnBuck'),
+        array('value' => 9, 'generic' => 0, 'graph' => 0, 'descr' => 'OnBuck'),
     );
     create_state_index($state_name, $states);
 
@@ -221,8 +221,8 @@ if ($in_phaseNum == '3') {
     if (!empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseDCandRectifierStatusRecOperating';
         $states = array(
-            array('value' => 14, 'generic' => 2, 'graph' => 0, 'descr' => 'yes'),
-            array('value' => 16, 'generic' => 0, 'graph' => 0, 'descr' => 'no'),
+            array('value' => 14, 'generic' => 0, 'graph' => 0, 'descr' => 'yes'),
+            array('value' => 16, 'generic' => 2, 'graph' => 0, 'descr' => 'no'),
         );
         create_state_index($state_name, $states);
         
