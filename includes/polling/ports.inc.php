@@ -312,6 +312,10 @@ if ($device['os'] == 'timos') {
     require_once 'ports/timos.inc.php';
 }
 
+if ($device['os'] == 'junos') {
+    require_once 'ports/junos-vcp.inc.php';
+}
+
 if ($config['enable_ports_adsl']) {
     $device['xdsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` in ('adsl','vdsl')", [$device['device_id']]);
 }
