@@ -39,7 +39,7 @@ if (is_numeric($sysClientsslStatTotNativeConns) && is_numeric($sysClientsslStatT
 
 
 $sysStatClientTotConns = snmp_get($device, 'sysStatClientTotConns.0', '-OQv', 'F5-BIGIP-SYSTEM-MIB');
-if(is_numeric($sysStatClientTotConns)) {
+if (is_numeric($sysStatClientTotConns)) {
     $rrd_def = RrdDefinition::make()->addDataset('ClientTotConns', 'COUNTER', 0);
     $fields = array(
             'ClientTotConns' => $sysStatClientTotConns,
@@ -50,7 +50,7 @@ if(is_numeric($sysStatClientTotConns)) {
 }
 
 $sysStatServerTotConns = snmp_get($device, 'sysStatServerTotConns.0', '-OQv', 'F5-BIGIP-SYSTEM-MIB');
-if(is_numeric($sysStatServerTotConns)) {
+if (is_numeric($sysStatServerTotConns)) {
     $rrd_def = RrdDefinition::make()->addDataset('ServerTotConns', 'COUNTER', 0);
     $fields = array(
             'ServerTotConns' => $sysStatServerTotConns,
@@ -61,7 +61,7 @@ if(is_numeric($sysStatServerTotConns)) {
 }
 
 $sysStatClientCurConns = snmp_get($device, 'sysStatClientCurConns.0', '-OQv', 'F5-BIGIP-SYSTEM-MIB');
-if(is_numeric($sysStatClientCurConns)) {
+if (is_numeric($sysStatClientCurConns)) {
     $rrd_def = RrdDefinition::make()->addDataset('ClientCurConns', 'GAUGE', 0);
     $fields = array(
             'ClientCurConns' => $sysStatClientCurConns,
@@ -72,7 +72,7 @@ if(is_numeric($sysStatClientCurConns)) {
 }
 
 $sysStatServerCurConns = snmp_get($device, 'sysStatServerCurConns.0', '-OQv', 'F5-BIGIP-SYSTEM-MIB');
-if(is_numeric($sysStatServerTotConns)) {
+if (is_numeric($sysStatServerTotConns)) {
     $rrd_def = RrdDefinition::make()->addDataset('ServerCurConns', 'GAUGE', 0);
     $fields = array(
             'ServerCurConns' => $sysStatServerCurConns,
