@@ -270,35 +270,35 @@
                     "state_descr": "Success",
                     "state_draw_graph": 0,
                     "state_value": 1,
-                    "state_generic_value": 2
+                    "state_generic_value": 0
                 },
                 {
                     "state_name": "es1dc1DataBatBatTestState",
                     "state_descr": "On Going",
                     "state_draw_graph": 0,
                     "state_value": 2,
-                    "state_generic_value": 2
+                    "state_generic_value": 1
                 },
                 {
                     "state_name": "es1dc1DataBatBatTestState",
                     "state_descr": "Failed: Timeout",
                     "state_draw_graph": 0,
                     "state_value": 3,
-                    "state_generic_value": 2
+                    "state_generic_value": 1
                 },
                 {
                     "state_name": "es1dc1DataBatBatTestState",
                     "state_descr": "Failed: Vbus Too Low",
                     "state_draw_graph": 0,
                     "state_value": 4,
-                    "state_generic_value": 2
+                    "state_generic_value": 1
                 },
                 {
                     "state_name": "es1dc1DataBatBatTestState",
                     "state_descr": "Failed: Load Too Low",
                     "state_draw_graph": 0,
                     "state_value": 5,
-                    "state_generic_value": 2
+                    "state_generic_value": 1
                 },
                 {
                     "state_name": "es1dc1DataBatBatTestState",
@@ -312,21 +312,21 @@
                     "state_descr": "Failed: Canceled",
                     "state_draw_graph": 0,
                     "state_value": 7,
-                    "state_generic_value": 2
+                    "state_generic_value": 1
                 },
                 {
                     "state_name": "es1dc1DataBatBatTestState",
                     "state_descr": "Failed: LVD Opened",
                     "state_draw_graph": 0,
                     "state_value": 8,
-                    "state_generic_value": 2
+                    "state_generic_value": 1
                 },
                 {
                     "state_name": "es1dc1DataBatBatTestState",
                     "state_descr": "Failed: No Battery",
                     "state_draw_graph": 0,
                     "state_value": 9,
-                    "state_generic_value": 2
+                    "state_generic_value": 1
                 },
                 {
                     "state_name": "es1dc1DataSystemDCMode",
