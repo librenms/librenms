@@ -68,8 +68,8 @@ if (is_array($temp1)) {
         array('value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'syncDisconnected'),
         array('value' => 6, 'generic' => 0, 'graph' => 0, 'descr' => 'standalone'),
         array('value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'awaitingInitialSync'),
-        array('value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'incompatibleVersion'), // FIX-ME - value 8 - Which is is incompatibleVersion or partialSync?
-        array('value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'partialSync'),
+        array('value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'incompatibleVersion'),
+        array('value' => 9, 'generic' => 2, 'graph' => 0, 'descr' => 'partialSync'),
     );
     create_state_index($state_name, $states);
 
