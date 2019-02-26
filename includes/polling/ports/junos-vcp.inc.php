@@ -5,24 +5,22 @@ $junos_vcp_stats = snmpwalk_cache_oid($device, 'jnxVirtualChassisPortTable', arr
 d_echo($junos_vcp_stats);
 
 foreach ($junos_vcp_stats as $index => $vcp_stats) {
-
     // VirtuallChassis MIB uses string indexes so dummy integer indexes for
     // VC ports need to be created.
 
     // Check if index string has expected format and decompose it to form
     // dummy integer index of it.
 
-    if(preg_match('#^(\d{1,2})\.vcp-255/(\d)/(\d{1,2})$#', $index, $matches)) {
-
-        if(strlen($matches[1]) == 1) {
+    if (preg_match('#^(\d{1,2})\.vcp-255/(\d)/(\d{1,2})$#', $index, $matches)) {
+        if (strlen($matches[1]) == 1) {
             $fpc = '0' . $matches[1];
         } else {
             $fpc = $matches[1];
-        } 
+        }
 
         $pic = $matches[2];
 
-        if(strlen($matches[3]) == 1) {
+        if (strlen($matches[3]) == 1) {
             $port = '0' . $matches[3];
         } else {
             $port = $matches[3];
@@ -45,6 +43,5 @@ foreach ($junos_vcp_stats as $index => $vcp_stats) {
         $port_stats[$nms_index]['ifInErrors'] = $vcp_stats['jnxVirtualChassisPortInCRCAlignErrors'];
         $port_stats[$nms_index]['ifAdminStatus'] = $vcp_stats['jnxVirtualChassisPortAdminStatus'];
         $port_stats[$nms_index]['ifOperStatus']  = $vcp_stats['jnxVirtualChassisPortOperStatus'];
-
     }
 }
