@@ -50,4 +50,10 @@ class Bill extends Model
     {
         return $this->belongsToMany('App\Models\Port', 'bill_ports', 'bill_id', 'bill_id');
     }
+
+    public function users()
+    {
+        // FIXME does not include global read
+        return $this->belongsToMany('App\Models\User', 'bill_perms', 'bill_id', 'user_id');
+    }
 }

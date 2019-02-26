@@ -888,81 +888,12 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
 // Parse string with emails. Return array with email (as key) and name (as value)
 function parse_email($emails)
 {
-    $result = array();
-    $regex = '/^[\"\']?([^\"\']+)[\"\']?\s{0,}<([^@]+@[^>]+)>$/';
-    if (is_string($emails)) {
-        $emails = preg_split('/[,;]\s{0,}/', $emails);
-        foreach ($emails as $email) {
-            if (preg_match($regex, $email, $out, PREG_OFFSET_CAPTURE)) {
-                $result[$out[2][0]] = $out[1][0];
-            } else {
-                if (strpos($email, "@")) {
-                    $from_name = Config::get('email_user');
-                    $result[$email] = $from_name;
-                }
-            }
-        }
-    } else {
-        // Return FALSE if input not string
-        return false;
-    }
-    return $result;
+    return \LibreNMS\Alert\Transport\Mail::parseEmail($emails);
 }
 
 function send_mail($emails, $subject, $message, $html = false)
 {
-    global $config;
-    if (is_array($emails) || ($emails = parse_email($emails))) {
-        d_echo("Attempting to email $subject to: " . implode('; ', array_keys($emails)) . PHP_EOL);
-        $mail = new PHPMailer(true);
-        try {
-            $mail->Hostname = php_uname('n');
-
-            foreach (parse_email($config['email_from']) as $from => $from_name) {
-                $mail->setFrom($from, $from_name);
-            }
-            foreach ($emails as $email => $email_name) {
-                $mail->addAddress($email, $email_name);
-            }
-            $mail->Subject = $subject;
-            $mail->XMailer = $config['project_name_version'];
-            $mail->CharSet = 'utf-8';
-            $mail->WordWrap = 76;
-            $mail->Body = $message;
-            if ($html) {
-                $mail->isHTML(true);
-            }
-            switch (strtolower(trim($config['email_backend']))) {
-                case 'sendmail':
-                    $mail->Mailer = 'sendmail';
-                    $mail->Sendmail = $config['email_sendmail_path'];
-                    break;
-                case 'smtp':
-                    $mail->isSMTP();
-                    $mail->Host       = $config['email_smtp_host'];
-                    $mail->Timeout    = $config['email_smtp_timeout'];
-                    $mail->SMTPAuth   = $config['email_smtp_auth'];
-                    $mail->SMTPSecure = $config['email_smtp_secure'];
-                    $mail->Port       = $config['email_smtp_port'];
-                    $mail->Username   = $config['email_smtp_username'];
-                    $mail->Password   = $config['email_smtp_password'];
-                    $mail->SMTPAutoTLS= $config['email_auto_tls'];
-                    $mail->SMTPDebug  = false;
-                    break;
-                default:
-                    $mail->Mailer = 'mail';
-                    break;
-            }
-            $mail->send();
-            return true;
-        } catch (\PHPMailer\PHPMailer\Exception $e) {
-            return $e->errorMessage();
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
-    return "No contacts found";
+    return (new \LibreNMS\Alert\Transport\Mail())->sendMail($emails, $subject, $message, $html);
 }
 
 function formatCiscoHardware(&$device, $short = false)
