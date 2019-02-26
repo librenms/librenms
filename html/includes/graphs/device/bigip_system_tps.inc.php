@@ -22,6 +22,4 @@ if (rrdtool_check_rrd_exists($rrd)) {
     $rrd_options .= ' GPRINT:cdefi:LAST:"Last\:%8.2lf %s"';
     $rrd_options .= ' GPRINT:cdefi:AVERAGE:"Avg\:%8.2lf %s"';
     $rrd_options .= ' GPRINT:cdefi:MAX:"Max\:%8.2lf %s\n"';
-
-
 }
