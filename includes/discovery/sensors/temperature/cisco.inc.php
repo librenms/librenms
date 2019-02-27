@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-$temp = snmpwalk_cache_multi_oid($device, 'ciscoEnvMonTemperatureStatusTable', array(), 'CISCO-ENVMON-MIB');
+$temp = snmpwalk_cache_multi_oid($device, 'ciscoEnvMonTemperatureStatusTable', [], 'CISCO-ENVMON-MIB');
 if (is_array($temp)) {
     $cur_oid = '.1.3.6.1.4.1.9.9.13.1.3.1.3.';
     foreach ($temp as $index => $entry) {

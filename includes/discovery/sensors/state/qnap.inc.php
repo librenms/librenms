@@ -24,16 +24,16 @@ for ($i = 1; $i <= $total_disks; $i++) {
     $status_name = 'qnap_hdd_status_' . $i;
     $status_descr = 'HDD ' . $i . ' status';
     if (is_numeric($state)) {
-        $states = array(
-            array('value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'ready'),
-            array('value' => -4, 'generic' => 1, 'graph' => 0, 'descr' => 'unknown'),
-            array('value' => -5, 'generic' => 1, 'graph' => 0, 'descr' => 'no disk'),
-            array('value' => -6, 'generic' => 1, 'graph' => 0, 'descr' => 'invalid'),
-            array('value' => -9, 'generic' => 2, 'graph' => 2, 'descr' => 'rw Error'),
-        );
+        $states = [
+            ['value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'ready'],
+            ['value' => -4, 'generic' => 1, 'graph' => 0, 'descr' => 'unknown'],
+            ['value' => -5, 'generic' => 1, 'graph' => 0, 'descr' => 'no disk'],
+            ['value' => -6, 'generic' => 1, 'graph' => 0, 'descr' => 'invalid'],
+            ['value' => -9, 'generic' => 2, 'graph' => 2, 'descr' => 'rw Error'],
+        ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $status_oid . $i, 1, $status_name, $status_descr, '1', '1', null, null, null, null, $state, 'snmp', 1);
+        discover_sensor($valid['sensor'], 'state', $device, $status_oid . $i, 1, $status_name, $status_descr, 1, 1, null, null, null, null, $state, 'snmp', 1);
         create_sensor_to_state_index($device, $status_name, 1);
     }
 }
@@ -57,14 +57,14 @@ for ($i = 1; $i <= $total_disks; $i++) {
     }
 
     if (is_numeric($state)) {
-        $states = array(
-            array('value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'normal'),
-            array('value' => 0, 'generic' => 1, 'graph' => 0, 'descr' => 'no disk'),
-            array('value' => 2, 'generic' => 2, 'graph' => 2, 'descr' => 'warning'),
-        );
+        $states = [
+            ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'normal'],
+            ['value' => 0, 'generic' => 1, 'graph' => 0, 'descr' => 'no disk'],
+            ['value' => 2, 'generic' => 2, 'graph' => 2, 'descr' => 'warning'],
+        ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $smart_oid . $i, 1, $smart_name, $smart_descr, '1', '1', null, null, null, null, $state, 'snmp', 1);
+        discover_sensor($valid['sensor'], 'state', $device, $smart_oid . $i, 1, $smart_name, $smart_descr, 1, 1, null, null, null, null, $state, 'snmp', 1);
         create_sensor_to_state_index($device, $smart_name, 1);
     }
 }

@@ -32,7 +32,7 @@ $serverscheck_oids = [
 ];
  
 foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
-    if ((str_contains($oid_name, 'name')) && (str_contains($oid_value, array('Flooding', 'Leckage')))) {
+    if ((str_contains($oid_name, 'name')) && (str_contains($oid_value, ['Flooding', 'Leckage']))) {
         preg_match("/(\d+)/", $oid_name, $temp_x);
         $tmp_oid = 'sensor' . $temp_x[0] . 'Value.0';
         $current = $pre_cache['serverscheck_control'][$tmp_oid];
@@ -40,11 +40,11 @@ foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
         if ($current) {
             $index = str_replace('.0', '', $oid_name);
             $descr = $oid_value;
-            $states = array(
-                array('value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => '-'),
-                array('value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'DRY'),
-                array('value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'WET'),
-            );
+            $states = [
+                ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => '-'],
+                ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'DRY'],
+                ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'WET'],
+            ];
             create_state_index($state_name, $states);
 
             discover_sensor($valid['sensor'], 'state', $device, $serverscheck_oids[$tmp_oid], $index, $state, $descr, 1, 1, null, null, null, null, 1);

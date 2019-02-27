@@ -20,18 +20,18 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
         $cur_oid = '.1.3.6.1.4.1.20992.1.2.2.1.5.';
         //Create State Index
         $state_name = 'mdmStatus';
-        $states = array(
-            array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'established'),
-            array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'establishing'),
-            array('value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'ready'),
-            array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'error'),
-            array('value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'disconnected'),
-            array('value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'disconnecting'),
-            array('value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'suspended'),
-            array('value' => 8, 'generic' => 3, 'graph' => 0, 'descr' => 'empty'),
-            array('value' => 9, 'generic' => 3, 'graph' => 0, 'descr' => 'notconfigured'),
-            array('value' => 10, 'generic' => 1, 'graph' => 0, 'descr' => 'userstopped'),
-        );
+        $states = [
+            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'established'],
+            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'establishing'],
+            ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'ready'],
+            ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'error'],
+            ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'disconnected'],
+            ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'disconnecting'],
+            ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'suspended'],
+            ['value' => 8, 'generic' => 3, 'graph' => 0, 'descr' => 'empty'],
+            ['value' => 9, 'generic' => 3, 'graph' => 0, 'descr' => 'notconfigured'],
+            ['value' => 10, 'generic' => 1, 'graph' => 0, 'descr' => 'userstopped'],
+        ];
         create_state_index($state_name, $states);
         
         // Get Modem Model & Phone Number for description
@@ -39,29 +39,29 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
         $modemmdn = $entry['mdmMDN'];
         $descr = "mdmStatus - " . $modemdesc . " - " . $modemmdn;
         //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $entry['mdmStatus'], 'snmp', $index);
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry['mdmStatus'], 'snmp', $index);
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
     }
 }
 // Device Firmware Upgrade Status
-$upgradestatus = snmpwalk_cache_oid($device, 'devFWUpgradeStatus', array(), 'WIPIPE-MIB');
+$upgradestatus = snmpwalk_cache_oid($device, 'devFWUpgradeStatus', [], 'WIPIPE-MIB');
 foreach ($upgradestatus as $index => $entry) {
     $cur_oid = '.1.3.6.1.4.1.20992.1.1.4.';
     //Create State Index
     $state_name = 'devFWUpgradeStatus';
-    $states = array(
-        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'idle'),
-        array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'upgrading'),
-        array('value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'uptodate'),
-        array('value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'updateAvail'),
-        array('value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'failure'),
-    );
+    $states = [
+        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'idle'],
+        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'upgrading'],
+        ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'uptodate'],
+        ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'updateAvail'],
+        ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'failure'],
+    ];
     create_state_index($state_name, $states);
 
     $descr = "Firmware Upgrade Status";
     //Discover Sensors
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $entry['devFWUpgradeStatus'], 'snmp', $index);
+    discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry['devFWUpgradeStatus'], 'snmp', $index);
     //Create Sensor To State Index
     create_sensor_to_state_index($device, $state_name, $index);
 }

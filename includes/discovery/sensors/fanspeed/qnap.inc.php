@@ -15,8 +15,8 @@ echo 'QNAP: ';
 $fan_descr_oid = '.1.3.6.1.4.1.24681.1.2.15.1.2';
 $fan_speed_oid = '.1.3.6.1.4.1.24681.1.2.15.1.3';
 
-$fans_descr = snmpwalk_cache_numerical_oid($device, $fan_descr_oid, array(), null, null, '-OQUsn');
-$fans_speed = snmpwalk_cache_numerical_oid($device, $fan_speed_oid, array(), null, null, '-OQUsn');
+$fans_descr = snmpwalk_cache_numerical_oid($device, $fan_descr_oid, [], null, null, '-OQUsn');
+$fans_speed = snmpwalk_cache_numerical_oid($device, $fan_speed_oid, [], null, null, '-OQUsn');
 
 if (is_array($fans_speed) && !empty($fans_speed)) {
     foreach ($fans_speed as $index => $entry) {

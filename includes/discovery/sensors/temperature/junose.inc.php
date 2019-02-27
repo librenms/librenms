@@ -1,7 +1,7 @@
 <?php
 
 echo 'JunOSe: ';
-$oids = snmpwalk_cache_multi_oid($device, 'juniSystemTempValue', array(), 'Juniper-System-MIB', 'junose');
+$oids = snmpwalk_cache_multi_oid($device, 'juniSystemTempValue', [], 'Juniper-System-MIB', 'junose');
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
         if (is_numeric($entry['juniSystemTempValue']) && is_numeric($index) && $entry['juniSystemTempValue'] > '0') {

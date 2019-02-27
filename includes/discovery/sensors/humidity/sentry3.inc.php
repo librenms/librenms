@@ -1,6 +1,6 @@
 <?php
 
-$oids = snmpwalk_cache_oid($device, 'tempHumidSensorEntry', array(), 'Sentry3-MIB');
+$oids = snmpwalk_cache_oid($device, 'tempHumidSensorEntry', [], 'Sentry3-MIB');
 $divisor    = '1';
 $multiplier = '1';
 d_echo($oids);

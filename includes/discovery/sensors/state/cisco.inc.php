@@ -10,23 +10,23 @@
  * the source code distribution for details.
  */
 
-$role_data = snmpwalk_cache_oid($device, 'cswSwitchRole', array(), 'CISCO-STACKWISE-MIB');
+$role_data = snmpwalk_cache_oid($device, 'cswSwitchRole', [], 'CISCO-STACKWISE-MIB');
 $redundant_data = snmp_get($device, "cswRingRedundant.0", "-OQv", "CISCO-STACKWISE-MIB");
 
-$tables = array(
-    array('ciscoEnvMonVoltageStatusTable','.1.3.6.1.4.1.9.9.13.1.2.1.7.','ciscoEnvMonVoltageState','ciscoEnvMonVoltageStatusDescr', 'CISCO-ENVMON-MIB') ,
-    array('ciscoEnvMonTemperatureStatusTable','.1.3.6.1.4.1.9.9.13.1.3.1.6.','ciscoEnvMonTemperatureState','ciscoEnvMonTemperatureStatusDescr', 'CISCO-ENVMON-MIB') ,
-    array('ciscoEnvMonFanStatusTable','.1.3.6.1.4.1.9.9.13.1.4.1.3.','ciscoEnvMonFanState','ciscoEnvMonFanStatusDescr', 'CISCO-ENVMON-MIB') ,
-    array('ciscoEnvMonSupplyStatusTable','.1.3.6.1.4.1.9.9.13.1.5.1.3.','ciscoEnvMonSupplyState','ciscoEnvMonSupplyStatusDescr', 'CISCO-ENVMON-MIB') ,
-    array('cefcFRUPowerStatusTable','.1.3.6.1.4.1.9.9.117.1.1.2.1.2.','cefcFRUPowerOperStatus','Sensor Name', 'CISCO-ENTITY-FRU-CONTROL-MIB') ,
-    array('cswGlobals','.1.3.6.1.4.1.9.9.500.1.1.3.','cswRingRedundant','Stack Ring - Redundant', 'CISCO-STACKWISE-MIB') ,
-    array('cswSwitchRole','.1.3.6.1.4.1.9.9.500.1.2.1.1.3.','cswSwitchRole','Stack Role - Switch#', 'CISCO-STACKWISE-MIB') ,
-    array('cswSwitchState','.1.3.6.1.4.1.9.9.500.1.2.1.1.6.','cswSwitchState','Stack State - Switch#', 'CISCO-STACKWISE-MIB') ,
-    array('cswStackPortOperStatus','.1.3.6.1.4.1.9.9.500.1.2.2.1.1.','cswStackPortOperStatus','Stack Port Status - ', 'CISCO-STACKWISE-MIB') ,
-    array('cRFCfgRedundancyOperMode','.1.3.6.1.4.1.9.9.176.1.2.14.','cRFCfgRedundancyOperMode','VSS Mode', 'CISCO-RF-MIB') ,
-    array('cRFStatusUnitState','.1.3.6.1.4.1.9.9.176.1.1.2.','cRFStatusUnitState','VSS Device State', 'CISCO-RF-MIB') ,
-    array('cRFStatusPeerUnitState','.1.3.6.1.4.1.9.9.176.1.1.4.','cRFStatusPeerUnitState','VSS Peer State', 'CISCO-RF-MIB')
-);
+$tables = [
+    ['ciscoEnvMonVoltageStatusTable','.1.3.6.1.4.1.9.9.13.1.2.1.7.','ciscoEnvMonVoltageState','ciscoEnvMonVoltageStatusDescr', 'CISCO-ENVMON-MIB'] ,
+    ['ciscoEnvMonTemperatureStatusTable','.1.3.6.1.4.1.9.9.13.1.3.1.6.','ciscoEnvMonTemperatureState','ciscoEnvMonTemperatureStatusDescr', 'CISCO-ENVMON-MIB'] ,
+    ['ciscoEnvMonFanStatusTable','.1.3.6.1.4.1.9.9.13.1.4.1.3.','ciscoEnvMonFanState','ciscoEnvMonFanStatusDescr', 'CISCO-ENVMON-MIB'] ,
+    ['ciscoEnvMonSupplyStatusTable','.1.3.6.1.4.1.9.9.13.1.5.1.3.','ciscoEnvMonSupplyState','ciscoEnvMonSupplyStatusDescr', 'CISCO-ENVMON-MIB'] ,
+    ['cefcFRUPowerStatusTable','.1.3.6.1.4.1.9.9.117.1.1.2.1.2.','cefcFRUPowerOperStatus','Sensor Name', 'CISCO-ENTITY-FRU-CONTROL-MIB'] ,
+    ['cswGlobals','.1.3.6.1.4.1.9.9.500.1.1.3.','cswRingRedundant','Stack Ring - Redundant', 'CISCO-STACKWISE-MIB'] ,
+    ['cswSwitchRole','.1.3.6.1.4.1.9.9.500.1.2.1.1.3.','cswSwitchRole','Stack Role - Switch#', 'CISCO-STACKWISE-MIB'] ,
+    ['cswSwitchState','.1.3.6.1.4.1.9.9.500.1.2.1.1.6.','cswSwitchState','Stack State - Switch#', 'CISCO-STACKWISE-MIB'] ,
+    ['cswStackPortOperStatus','.1.3.6.1.4.1.9.9.500.1.2.2.1.1.','cswStackPortOperStatus','Stack Port Status - ', 'CISCO-STACKWISE-MIB'] ,
+    ['cRFCfgRedundancyOperMode','.1.3.6.1.4.1.9.9.176.1.2.14.','cRFCfgRedundancyOperMode','VSS Mode', 'CISCO-RF-MIB'] ,
+    ['cRFStatusUnitState','.1.3.6.1.4.1.9.9.176.1.1.2.','cRFStatusUnitState','VSS Device State', 'CISCO-RF-MIB'] ,
+    ['cRFStatusPeerUnitState','.1.3.6.1.4.1.9.9.176.1.1.4.','cRFStatusPeerUnitState','VSS Peer State', 'CISCO-RF-MIB']
+];
 
 foreach ($tables as $tablevalue) {
     //Some switches on 15.x expose this information regardless if they are stacked or not, we try to mitigate that by doing the following.
@@ -34,7 +34,7 @@ foreach ($tables as $tablevalue) {
         continue;
     }
 
-    $temp = snmpwalk_cache_multi_oid($device, $tablevalue[0], array(), $tablevalue[4]);
+    $temp = snmpwalk_cache_multi_oid($device, $tablevalue[0], [], $tablevalue[4]);
     $cur_oid = $tablevalue[1];
 
     if (is_array($temp)) {
@@ -152,7 +152,7 @@ foreach ($tables as $tablevalue) {
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
                     $descr = snmp_get($device, 'entPhysicalName.'.$index, '-Oqv', 'ENTITY-MIB');
                 }
-                discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
+                discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
 
                 //Create Sensor To State Index
                 create_sensor_to_state_index($device, $state_name, $index);

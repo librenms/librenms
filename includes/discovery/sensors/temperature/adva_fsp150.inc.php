@@ -20,56 +20,26 @@
 // ***** Temperature Sensors for ADVA FSP150CC Series
 // *************************************************************
 
-    $sensors_adva = array
-                (
-                array(
-                        'sensor_name'     => 'ethernetNTEGE114CardTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.6'),
-                array(
-                        'sensor_name'     => 'ethernetNTEGE114SCardTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.6'),
-                array(
-                        'sensor_name'     => 'ethernetNTEXG210CardTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.6'),
-                array(
-                        'sensor_name'     => 'ethernetXG1XCCCardTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.6'),
-                array(
-                        'sensor_name'     => 'ethernet10x1GHighPerCardTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.37.1.5'),
-                array(
-                        'sensor_name'     => 'ethernet1x10GHighPerCardTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.36.1.5'),
-                array(
-                        'sensor_name'     => 'ethernetSWFCardTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.20.1.5'),
-                array(
-                        'sensor_name'     => 'psuTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.7'),
-                array(
-                        'sensor_name'     => 'scuTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.6.1.6'),
-                array(
-                        'sensor_name'     => 'nemiTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.7.1.6'),
-                array(
-                        'sensor_name'     => 'amiTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.22.1.5'),
-                array(
-                        'sensor_name'     => 'ethernetGE8SCCCardTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.41.1.6'),
-                array(
-                        'sensor_name'     => 'stuHighPerCardTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.47.1.5'),
-                array(
-                        'sensor_name'     => 'stiHighPerTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.48.1.5'),
-                array(
-                        'sensor_name'     => 'ethernetGE8ECCCardTemperature',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.49.1.6'));
+    $sensors_adva = [
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.6', 'sensor_name' => 'ethernetNTEGE114CardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.6', 'sensor_name' => 'ethernetNTEGE114SCardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.6', 'sensor_name' => 'ethernetNTEXG210CardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.6', 'sensor_name' => 'ethernetXG1XCCCardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.37.1.5', 'sensor_name' => 'ethernet10x1GHighPerCardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.36.1.5', 'sensor_name' => 'ethernet1x10GHighPerCardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.20.1.5', 'sensor_name' => 'ethernetSWFCardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.7', 'sensor_name' => 'psuTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.6.1.6', 'sensor_name' => 'scuTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.7.1.6', 'sensor_name' => 'nemiTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.22.1.5', 'sensor_name' => 'amiTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.41.1.6', 'sensor_name' => 'ethernetGE8SCCCardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.47.1.5', 'sensor_name' => 'stuHighPerCardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.48.1.5', 'sensor_name' => 'stiHighPerTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.49.1.6', 'sensor_name' => 'ethernetGE8ECCCardTemperature'],
+    ];
 
-                $multiplier = 1;
-                $divisor    = 1;
+    $multiplier = 1;
+    $divisor    = 1;
   
     foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
         foreach ($sensors_adva as $entry) {

@@ -3,7 +3,7 @@
 echo 'AXIS Temperatures ';
 
 // Temp Sensor Status
-$oids_tmp = snmpwalk_cache_multi_oid($device, 'tempSensorTable', array(), 'AXIS-VIDEO-MIB');
+$oids_tmp = snmpwalk_cache_multi_oid($device, 'tempSensorTable', [], 'AXIS-VIDEO-MIB');
 $cur_oid = '.1.3.6.1.4.1.368.4.1.3.1.4.1.';
 
 // Exclude from $oids content .common string

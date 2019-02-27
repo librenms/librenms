@@ -29,15 +29,15 @@ foreach ($pre_cache['procurve_hpicfSensorTable'] as $index => $data) {
     $status_descr   = $data['hpicfSensorDescr'];
     $state          = $data['hpicfSensorStatus'];
     $tmp_index      = $status_name . '.' . $index;
-    $states = array(
-        array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
-        array('value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'unbadknown'),
-        array('value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'),
-        array('value' => 4, 'generic' => 0, 'graph' => 1, 'descr' => 'good'),
-        array('value' => 5, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'),
-    );
+    $states = [
+        ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+        ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'unbadknown'],
+        ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
+        ['value' => 4, 'generic' => 0, 'graph' => 1, 'descr' => 'good'],
+        ['value' => 5, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
+    ];
     create_state_index($state_name, $states);
 
-    discover_sensor($valid['sensor'], 'state', $device, $status_oid . $index, $tmp_index, $status_name, $status_descr, '1', '1', null, null, null, null, $state);
+    discover_sensor($valid['sensor'], 'state', $device, $status_oid . $index, $tmp_index, $status_name, $status_descr, 1, 1, null, null, null, null, $state);
     create_sensor_to_state_index($device, $status_name, $tmp_index);
 }

@@ -11,7 +11,7 @@
  */
 
 $fan_tray_oid = '.1.3.6.1.4.1.9.9.117.1.4.1.1.1';
-$fan_trays = snmpwalk_cache_oid_num($device, $fan_tray_oid, array());
+$fan_trays = snmpwalk_cache_oid_num($device, $fan_tray_oid, []);
 
 /* CISCO-ENTITY-FRU-CONTROL-MIB cefcFanTrayOperStatus
  *  unknown(1),
@@ -31,12 +31,12 @@ if (is_array($fan_trays)) {
         $descr = trim(snmp_get($device, "$entity_oid.$index", '-Ovq'), '"');
 
         $state_name = "cefcFanTrayOperStatus";
-        $states = array(
-            array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
-            array('value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'up'),
-            array('value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'down'),
-            array('value' => 4, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'),
-        );
+        $states = [
+            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'up'],
+            ['value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'down'],
+            ['value' => 4, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
+        ];
         create_state_index($state_name, $states);
 
         discover_sensor($valid['sensor'], 'state', $device, $current_oid, $index, $state_name, $descr, 1, 1);

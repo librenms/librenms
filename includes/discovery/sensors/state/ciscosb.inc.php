@@ -10,16 +10,16 @@
  * the source code distribution for details.
  */
 
-$temp = snmpwalk_cache_multi_oid($device, 'swIfOperSuspendedStatus', array(), 'CISCOSB-rlInterfaces');
+$temp = snmpwalk_cache_multi_oid($device, 'swIfOperSuspendedStatus', [], 'CISCOSB-rlInterfaces');
 $cur_oid = '.1.3.6.1.4.1.9.6.1.101.43.1.1.24.';
 
 if (is_array($temp)) {
     //Create State Index
     $state_name = 'swIfOperSuspendedStatus';
-    $states = array(
-        array('value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'true'),
-        array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'false'),
-    );
+    $states = [
+        ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'true'],
+        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'false'],
+    ];
     create_state_index($state_name, $states);
 
     foreach ($temp as $index => $entry) {
@@ -27,7 +27,7 @@ if (is_array($temp)) {
         $descr = $port_descr['ifDescr'] . ' Suspended Status';
         if (str_contains($descr, ['ethernet','Ethernet'])) {
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index]['swIfOperSuspendedStatus'], 'snmp', $index);
+            discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index]['swIfOperSuspendedStatus'], 'snmp', $index);
 
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $index);

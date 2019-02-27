@@ -13,12 +13,12 @@
 $index = 1;
 $state_name = 'ibm-amm_BlowerState';
 $state_descr = 'Blower ';
-$oids = array(
+$oids = [
     '.1.3.6.1.4.1.2.3.51.2.2.3.10.0', // BLADE-MIB::blower1State.0
     '.1.3.6.1.4.1.2.3.51.2.2.3.11.0', // BLADE-MIB::blower2State.0
     '.1.3.6.1.4.1.2.3.51.2.2.3.12.0', // BLADE-MIB::blower3State.0
     '.1.3.6.1.4.1.2.3.51.2.2.3.13.0', // BLADE-MIB::blower4State.0
-);
+];
 /* BLADE-MIB: blower1State
  *  unknown(0),
  *  good(1),
@@ -31,15 +31,15 @@ foreach ($oids as $oid) {
     $descr = $state_descr . $index;
 
     if (!empty($state)) {
-        $states = array(
-            array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
-            array('value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'good'),
-            array('value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'),
-            array('value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'bad'),
-        );
+        $states = [
+            ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+            ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'good'],
+            ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
+            ['value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'bad'],
+        ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $state, 'snmp', $index);
+        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $index);
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
         $index++;
@@ -49,12 +49,12 @@ foreach ($oids as $oid) {
 $index = 1;
 $state_name = 'ibm-amm_BlowerControllerState';
 $state_descr = 'Blower Controller ';
-$oids = array(
+$oids = [
     '.1.3.6.1.4.1.2.3.51.2.2.3.30.0', // BLADE-MIB::blower1ControllerState.0
     '.1.3.6.1.4.1.2.3.51.2.2.3.31.0', // BLADE-MIB::blower2ControllerState.0
     '.1.3.6.1.4.1.2.3.51.2.2.3.32.0', // BLADE-MIB::blower3ControllerState.0
     '.1.3.6.1.4.1.2.3.51.2.2.3.33.0', // BLADE-MIB::blower4ControllerState.0
-);
+];
 
 /* BLADE-MIB: blower1ControllerState
  *  operational(0),
@@ -68,16 +68,16 @@ foreach ($oids as $oid) {
     $descr = $state_descr . $index;
 
     if (is_numeric($state) && $state != 2) {
-        $states = array(
-            array('value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'operational'),
-            array('value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'flashing'),
-            array('value' => 2, 'generic' => -1, 'graph' => 1, 'descr' => 'notPresent'),
-            array('value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'communicationError'),
-            array('value' => 255, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
-        );
+        $states = [
+            ['value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'operational'],
+            ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'flashing'],
+            ['value' => 2, 'generic' => -1, 'graph' => 1, 'descr' => 'notPresent'],
+            ['value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'communicationError'],
+            ['value' => 255, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+        ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $state, 'snmp', $index);
+        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $index);
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
         $index++;
@@ -88,7 +88,7 @@ $index = 1;
 $state_name = 'ibm-amm_PowerModuleState';
 $state_descr = 'Power Module ';
 $powerModuleStateOid= '.1.3.6.1.4.1.2.3.51.2.2.4.1.1.3'; // BLADE-MIB::powerModuleState
-$data = snmpwalk_cache_oid_num($device, $powerModuleStateOid, array());
+$data = snmpwalk_cache_oid_num($device, $powerModuleStateOid, []);
 
 /*  BLADE-MIB: powerModuleState
  *   unknown(0),
@@ -102,16 +102,16 @@ foreach ($data as $oid => $array) {
     $descr = $state_descr . $index;
 
     if (is_numeric($state) && $state != 3) {
-        $states = array(
-            array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
-            array('value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'good'),
-            array('value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'),
-            array('value' => 3, 'generic' => -1, 'graph' => 1, 'descr' => 'notAvailable'),
-            array('value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'critical'),
-        );
+        $states = [
+            ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+            ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'good'],
+            ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
+            ['value' => 3, 'generic' => -1, 'graph' => 1, 'descr' => 'notAvailable'],
+            ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'critical'],
+        ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $state, 'snmp', $index);
+        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $index);
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
         $index++;

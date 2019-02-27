@@ -23,14 +23,14 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
-$oids = snmpwalk_cache_oid($device, 'outputEntry', array(), 'ICT-DISTRIBUTION-PANEL-MIB');
+$oids = snmpwalk_cache_oid($device, 'outputEntry', [], 'ICT-DISTRIBUTION-PANEL-MIB');
 
 if (is_array($oids)) {
     $state_name = 'outputFuseStatus';
-    $states = array(
-        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'),
-        array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'OPEN'),
-    );
+    $states = [
+        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
+        ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'OPEN'],
+    ];
     create_state_index($state_name, $states);
 
     foreach ($oids as $index => $entry) {
@@ -45,7 +45,7 @@ if (is_array($oids)) {
             $current_value = 2;
         }
 
-        discover_sensor($valid['sensor'], 'state', $device, $fuse_state_oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $current_value, 'snmp', $index);
+        discover_sensor($valid['sensor'], 'state', $device, $fuse_state_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value, 'snmp', $index);
 
         create_sensor_to_state_index($device, $state_name, $index);
     }

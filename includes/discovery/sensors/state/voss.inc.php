@@ -21,7 +21,7 @@
 */
 
 $fan_oper_status = '.1.3.6.1.4.1.2272.1.4.7.1.1.2';
-$fan = snmpwalk_cache_oid_num($device, $fan_oper_status, array());
+$fan = snmpwalk_cache_oid_num($device, $fan_oper_status, []);
 
 if (is_array($fan)) {
     foreach ($fan as $oid => $array) {
@@ -32,14 +32,14 @@ if (is_array($fan)) {
         $descr =  "Fan $index";
 
         $state_name = 'rcChasFanOperStatus';
-        $states = array(
-            array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
-            array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'up'),
-            array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'down'),
-        );
+        $states = [
+            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
+            ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
+        ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $current_oid, "rcChasFanOperStatus.$index", $state_name, $descr, '1', '1', null, null, '3', '3', $state);
+        discover_sensor($valid['sensor'], 'state', $device, $current_oid, "rcChasFanOperStatus.$index", $state_name, $descr, 1, 1, null, null, '3', '3', $state);
         create_sensor_to_state_index($device, $state_name, "rcChasFanOperStatus.$index");
     }
 }
@@ -52,7 +52,7 @@ if (is_array($fan)) {
 */
 
 $power_supply_oper_status = '.1.3.6.1.4.1.2272.1.4.8.1.1.2';
-$power_supply = snmpwalk_cache_oid_num($device, $power_supply_oper_status, array());
+$power_supply = snmpwalk_cache_oid_num($device, $power_supply_oper_status, []);
 
 if (is_array($power_supply)) {
     foreach ($power_supply as $oid => $array) {
@@ -63,15 +63,15 @@ if (is_array($power_supply)) {
         $descr =  "Power Supply $index";
 
         $state_name = 'rcChasPowerSupplyOperStatus';
-        $states = array(
-            array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'),
-            array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'empty'),
-            array('value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'up'),
-            array('value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'down'),
-        );
+        $states = [
+            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'empty'],
+            ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
+            ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
+        ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $current_oid, "rcChasPowerSupplyOperStatus.$index", $state_name, $descr, '1', '1', null, null, '4', '4', $state);
+        discover_sensor($valid['sensor'], 'state', $device, $current_oid, "rcChasPowerSupplyOperStatus.$index", $state_name, $descr, 1, 1, null, null, '4', '4', $state);
         create_sensor_to_state_index($device, $state_name, "rcChasPowerSupplyOperStatus.$index");
     }
 }

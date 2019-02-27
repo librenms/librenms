@@ -30,18 +30,18 @@ foreach ($pre_cache['enlogic_pdu_status'] as $index => $data) {
         $current = $data['pduUnitStatusLoadState'];
 
         //Create State Translation
-        $states = array(
-            array('value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'upperCritical'),
-            array('value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'upperWarning'),
-            array('value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'lowerWarning'),
-            array('value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'lowerCritical'),
-            array('value' => 5, 'generic' => 0, 'graph' => 1, 'descr' => 'normal'),
-        );
+        $states = [
+            ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'upperCritical'],
+            ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'upperWarning'],
+            ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'lowerWarning'],
+            ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'lowerCritical'],
+            ['value' => 5, 'generic' => 0, 'graph' => 1, 'descr' => 'normal'],
+        ];
         create_state_index($state_name, $states);
 
         $descr = "Load state #$index";
         //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
     }
@@ -55,17 +55,17 @@ foreach ($pre_cache['enlogic_pdu_input'] as $index => $data) {
         $current = $data['pduInputPhaseStatusCurrentState'];
         $descr = "Current state #$index";
         if (!is_numeric($current)) {
-            $states = array(
-                array('value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'upperCritical'),
-                array('value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'upperWarning'),
-                array('value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'lowerWarning'),
-                array('value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'lowerCritical'),
-                array('value' => 5, 'generic' => 0, 'graph' => 1, 'descr' => 'normal'),
-            );
+            $states = [
+                ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'upperCritical'],
+                ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'upperWarning'],
+                ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'lowerWarning'],
+                ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'lowerCritical'],
+                ['value' => 5, 'generic' => 0, 'graph' => 1, 'descr' => 'normal'],
+            ];
             create_state_index($state_name, $states);
 
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $oid, $tmp_index, $state_name, $descr, '1', '1', null, null, null, null, $current);
+            discover_sensor($valid['sensor'], 'state', $device, $oid, $tmp_index, $state_name, $descr, 1, 1, null, null, null, null, $current);
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $tmp_index);
         }
@@ -76,17 +76,17 @@ foreach ($pre_cache['enlogic_pdu_input'] as $index => $data) {
         $current = $data['pduInputPhaseStatusVoltageState'];
         $descr = "Voltage state #$index";
         if (!is_numeric($current)) {
-            $states = array(
-                array('value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'upperCritical'),
-                array('value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'upperWarning'),
-                array('value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'lowerWarning'),
-                array('value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'lowerCritical'),
-                array('value' => 5, 'generic' => 0, 'graph' => 1, 'descr' => 'normal'),
-            );
+            $states = [
+                ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'upperCritical'],
+                ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'upperWarning'],
+                ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'lowerWarning'],
+                ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'lowerCritical'],
+                ['value' => 5, 'generic' => 0, 'graph' => 1, 'descr' => 'normal'],
+            ];
             create_state_index($state_name, $states);
 
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $oid, $tmp_index, $state_name, $descr, '1', '1', null, null, null, null, $current);
+            discover_sensor($valid['sensor'], 'state', $device, $oid, $tmp_index, $state_name, $descr, 1, 1, null, null, null, null, $current);
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $tmp_index);
         }
@@ -101,18 +101,18 @@ foreach ($pre_cache['enlogic_pdu_circuit'] as $index => $data) {
 
         if (!is_numeric($current)) {
             //Create State Translation
-            $states = array(
-                array('value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'upperCritical'),
-                array('value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'upperWarning'),
-                array('value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'lowerWarning'),
-                array('value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'lowerCritical'),
-                array('value' => 5, 'generic' => 0, 'graph' => 1, 'descr' => 'normal'),
-            );
+            $states = [
+                ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'upperCritical'],
+                ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'upperWarning'],
+                ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'lowerWarning'],
+                ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'lowerCritical'],
+                ['value' => 5, 'generic' => 0, 'graph' => 1, 'descr' => 'normal'],
+            ];
             create_state_index($state_name, $states);
 
             $descr = "Circuit breaker state {$data['pduCircuitBreakerLabel']}";
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $current);
+            discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $index);
         }

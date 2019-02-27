@@ -17,21 +17,21 @@ $index = '0';
 if (is_numeric($temp)) {
     //Create State Index
     $state_name = 'upsAdvBatteryReplaceIndicator';
-    $states = array(
-        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'noBatteryNeedsReplacing'),
-        array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'batteryNeedsReplacing'),
-    );
+    $states = [
+        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'noBatteryNeedsReplacing'],
+        ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'batteryNeedsReplacing'],
+    ];
     create_state_index($state_name, $states);
 
     $descr = 'UPS Battery Replacement Status';
     //Discover Sensors
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp, 'snmp', $index);
+    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp, 'snmp', $index);
 
     //Create Sensor To State Index
     create_sensor_to_state_index($device, $state_name, $index);
 }
 
-$cooling_status = snmpwalk_cache_oid($device, 'coolingUnitStatusDiscreteEntry', array(), 'PowerNet-MIB');
+$cooling_status = snmpwalk_cache_oid($device, 'coolingUnitStatusDiscreteEntry', [], 'PowerNet-MIB');
 foreach ($cooling_status as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.4.2.2.1.4.' . $index;
     $state_name = $data['coolingUnitStatusDiscreteDescription'];
@@ -39,30 +39,30 @@ foreach ($cooling_status as $index => $data) {
 
     if ($state_index_id !== null) {
         $tmp_states = explode(',', $data['coolingUnitStatusDiscreteIntegerReferenceKey']);
-        $states = array();
+        $states = [];
         foreach ($tmp_states as $k => $ref) {
             preg_match('/([\w]+)\\(([\d]+)\\)/', $ref, $matches);
             $nagios_state = get_nagios_state($matches[1]);
-            $states[] = array($state_index_id, $matches[1], 0, $matches[2], $nagios_state);
+            $states[] = [$state_index_id, $matches[1], 0, $matches[2], $nagios_state];
         }
         foreach ($states as $value) {
-            $insert = array(
+            $insert = [
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
                 'state_draw_graph' => $value[2],
                 'state_value' => $value[3],
                 'state_generic_value' => $value[4]
-            );
+            ];
             dbInsert($insert, 'state_translations');
         }
     }
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, '1', '1', null, null, null, null, $data['coolingUnitStatusDiscreteValueAsInteger']);
+    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitStatusDiscreteValueAsInteger']);
     create_sensor_to_state_index($device, $state_name, $index);
 }
 
 unset($cooling_status);
 
-$cooling_unit = snmpwalk_cache_oid($device, 'coolingUnitExtendedDiscreteEntry', array(), 'PowerNet-MIB');
+$cooling_unit = snmpwalk_cache_oid($device, 'coolingUnitExtendedDiscreteEntry', [], 'PowerNet-MIB');
 foreach ($cooling_unit as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.6.2.2.1.4.' . $index;
     $state_name = $data['coolingUnitExtendedDiscreteDescription'];
@@ -70,42 +70,42 @@ foreach ($cooling_unit as $index => $data) {
 
     if ($state_index_id !== null) {
         $tmp_states = explode(',', $data['coolingUnitExtendedDiscreteIntegerReferenceKey']);
-        $states = array();
+        $states = [];
         foreach ($tmp_states as $k => $ref) {
             preg_match('/([\w]+)\\(([\d]+)\\)/', $ref, $matches);
             $nagios_state = get_nagios_state($matches[1]);
-            $states[] = array($state_index_id, $matches[1], 0, $matches[2], $nagios_state);
+            $states[] = [$state_index_id, $matches[1], 0, $matches[2], $nagios_state];
         }
         foreach ($states as $value) {
-            $insert = array(
+            $insert = [
                 'state_index_id' => $value[0],
                 'state_descr' => $value[1],
                 'state_draw_graph' => $value[2],
                 'state_value' => $value[3],
                 'state_generic_value' => $value[4]
-            );
+            ];
             dbInsert($insert, 'state_translations'); // FIXME - Last dbInsert in sensor states
         }
     }
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, '1', '1', null, null, null, null, $data['coolingUnitExtendedDiscreteValueAsInteger']);
+    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitExtendedDiscreteValueAsInteger']);
     create_sensor_to_state_index($device, $state_name, $index);
 }
 
 unset($cooling_unit);
 
-$relays = snmpwalk_cache_oid($device, 'emsOutputRelayControlEntry', array(), 'PowerNet-MIB');
+$relays = snmpwalk_cache_oid($device, 'emsOutputRelayControlEntry', [], 'PowerNet-MIB');
 foreach ($relays as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.2.1.1.3.' . $index;
     $state_name = $data['emsOutputRelayControlOutputRelayName'];
-    $states = array(
-        array('value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'immediateCloseEMS'),
-        array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'immediateOpenEMS'),
-    );
+    $states = [
+        ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'immediateCloseEMS'],
+        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'immediateOpenEMS'],
+    ];
     create_state_index($state_name, $states);
 
     $current = apc_relay_state($data['emsOutputRelayControlOutputRelayCommand']);
     if (is_numeric($current)) {
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, '1', '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $current);
         create_sensor_to_state_index($device, $state_name, $cur_oid);
     }
 }
@@ -115,19 +115,19 @@ unset(
     $data
 );
 
-$switched = snmpwalk_cache_oid($device, 'emsOutletControlEntry', array(), 'PowerNet-MIB');
+$switched = snmpwalk_cache_oid($device, 'emsOutletControlEntry', [], 'PowerNet-MIB');
 foreach ($switched as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.3.1.1.3.' . $index;
     $state_name = $data['emsOutletControlOutletName'];
-    $states = array(
-        array('value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'immediateOnEMS'),
-        array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'immediateOffEMS'),
-    );
+    $states = [
+        ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'immediateOnEMS'],
+        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'immediateOffEMS'],
+    ];
     create_state_index($state_name, $states);
 
     $current = apc_relay_state($data['emsOutletControlOutletCommand']);
     if (is_numeric($current)) {
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, '1', '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $current);
         create_sensor_to_state_index($device, $state_name, $cur_oid);
     }
 }
@@ -141,11 +141,11 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     if ($data['memSensorsCommStatus']) {
         $cur_oid        = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.7.' . $index;
         $state_name     = 'memSensorsCommStatus';
-        $states = array(
-            array('value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'notInstalled'),
-            array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'commsOK'),
-            array('value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'commsLost'),
-        );
+        $states = [
+            ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'notInstalled'],
+            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'commsOK'],
+            ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'commsLost'],
+        ];
         create_state_index($state_name, $states);
 
         $current = $data['memSensorsCommStatus'];
@@ -154,18 +154,18 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     $divisor    = 1;
     $multiplier = 1;
     if (is_numeric($current)) {
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, '1', '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
         create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
     }
 
     if ($data['memSensorsAlarmStatus']) {
         $cur_oid        = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.8.' . $index;
         $state_name     = 'memSensorsAlarmStatus';
-        $states = array(
-            array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'memNormal'),
-            array('value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'memWarning'),
-            array('value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'memCritical'),
-        );
+        $states = [
+            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'memNormal'],
+            ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'memWarning'],
+            ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'memCritical'],
+        ];
         create_state_index($state_name, $states);
 
         $current = $data['memSensorsAlarmStatus'];
@@ -174,7 +174,7 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     $divisor    = 1;
     $multiplier = 1;
     if (is_numeric($current)) {
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, '1', '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
         create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
     }
 }
