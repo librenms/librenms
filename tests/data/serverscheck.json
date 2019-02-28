@@ -14,7 +14,7 @@
                     "os": "serverscheck",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "serverscheck.svg"
                 }
             ]
         },
@@ -32,7 +32,7 @@
                     "os": "serverscheck",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "serverscheck.svg"
                 }
             ]
         }
