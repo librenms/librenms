@@ -224,13 +224,13 @@ class AuthSSOTest extends DBTestCase
         unset($_SERVER['displayName']);
         unset($_SERVER['mail']);
 
-        $this->assertTrue($a->authenticate($this->makeBreakUser(), null));
+        $this->assertTrue($a->authenticate(['username' => $this->makeBreakUser()]));
 
         $this->basicEnvironmentHeader();
         unset($_SERVER['HTTP_DISPLAYNAME']);
         unset($_SERVER['HTTP_MAIL']);
 
-        $this->assertTrue($a->authenticate($this->makeBreakUser(), null));
+        $this->assertTrue($a->authenticate(['username' => $this->makeBreakUser()]));
     }
 
     // Document the modules current behaviour, so that changes trigger test failures
