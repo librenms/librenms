@@ -34,30 +34,38 @@ class PermissionsUtilTest extends LaravelTestCase
 {
     public function testGetPermissions()
     {
-        $expected = new Collection([
-            'devices' => new Collection([
-                new Collection(['user_id' => 3, 'device_id' => 2]),
-                new Collection(['user_id' => 4, 'device_id' => 5]),
-                new Collection(['user_id' => 99, 'device_id' => 5]),
-            ]),
-            'ports' => new Collection([
-                new Collection(['user_id' => 3, 'port_id' => 2]),
-                new Collection(['user_id' => 3, 'port_id' => 3]),
-                new Collection(['user_id' => 6, 'port_id' => 7]),
-            ]),
-            'bills' => new Collection([
-                new Collection(['user_id' => 3, 'bill_id' => 2]),
-                new Collection(['user_id' => 53, 'bill_id' => 4]),
-                new Collection(['user_id' => 2, 'bill_id' => 6]),
-                new Collection(['user_id' => 5, 'bill_id' => 2]),
-            ]),
-        ]);
-        \DB::table('devices_perms')->insert($expected->get('devices')->toArray());
-        \DB::table('ports_perms')->insert($expected->get('ports')->toArray());
-        \DB::table('bill_perms')->insert($expected->get('bills')->toArray());
+        $expected = [
+            'devices' => [
+                ['user_id' => 3, 'device_id' => 2],
+                ['user_id' => 4, 'device_id' => 5],
+                ['user_id' => 99, 'device_id' => 5],
+            ],
+            'ports' => [
+                ['user_id' => 3, 'port_id' => 2],
+                ['user_id' => 3, 'port_id' => 3],
+                ['user_id' => 6, 'port_id' => 7],
+            ],
+            'bills' => [
+                ['user_id' => 3, 'bill_id' => 2],
+                ['user_id' => 53, 'bill_id' => 4],
+                ['user_id' => 2, 'bill_id' => 6],
+                ['user_id' => 5, 'bill_id' => 2],
+            ],
+        ];
+        \DB::table('devices_perms')->insert($expected['devices']);
+        \DB::table('ports_perms')->insert($expected['ports']);
+        \DB::table('bill_perms')->insert($expected['bills']);
 
         $permissions = new Permissions();
+        $result = json_decode($permissions->getPermissions()->toJson(), true);
 
-        $this->assertEquals($expected, $permissions->getPermissions());
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testPermissionsByUser()
+    {
+        $mock = \Mockery::mock('\LibreNMS\Util\Permissions[getPermissions,getUsersForFaults,sendMail]');
+        $mock->shouldReceive('getPermissions')->andReturn([]);
+
     }
 }
