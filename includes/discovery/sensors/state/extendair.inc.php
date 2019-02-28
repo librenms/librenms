@@ -34,122 +34,31 @@ $states = [
     ['value' => 6, 'generic' => 1, 'graph' => 1, 'descr' => 'almNonOccupant'],
 ];
 
-$temp = snmp_get($device, 'remLinkState.0', "-Ovqe", "ExaltComProducts");
-$cur_oid = '.1.3.6.1.4.1.25651.1.2.4.2.4.1.1.0';
+$sensors = [
+    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.1.0', 'state_name' => 'remLinkState', 'descr' => 'Link status (far end radio)'],
+    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.3.1.1.0', 'state_name' => 'locLinkState', 'descr' => 'Link status (local radio)'],
+    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.3.1.2.0', 'state_name' => 'locTempAlarm', 'descr' => 'Temperature status (local radio)'],
+    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.2.0', 'state_name' => 'remTempAlarm', 'descr' => 'Temperature status (far end radio)'],
+    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.9.0', 'state_name' => 'remLinkSecMismatch', 'descr' => 'Link security status'],
+    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.3.1.15.0', 'state_name' => 'locLinkStateV', 'descr' => 'Vertial link status (local radio)'],
+    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.3.1.16.0', 'state_name' => 'locLinkStateH', 'descr' => 'Horizontal link status (local radio)'],
+    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.15.0', 'state_name' => 'remLinkStateV', 'descr' => 'Vertial link status (far end radio)'],
+    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.16.0', 'state_name' => 'remLinkStateH', 'descr' => 'Horizontal link status (far end radio)'],
+];
 
-if (is_numeric($temp)) {
-    $state_name = 'remLinkState';
-    $index      = $state_name;
-    create_state_index($state_name, $states);
+foreach ($sensors as $sensor) {
+    $temp = snmp_get($device, $sensor['state_name'].'.0', "-Ovqe", "ExaltComProducts");
+    $cur_oid = $sensor['oid'];
 
-    $descr = 'Link status (far end radio)';
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
-    create_sensor_to_state_index($device, $state_name, $index);
-}
+    if (is_numeric($temp)) {
+        $state_name = $sensor['state_name'];
+        $index      = $state_name;
+        create_state_index($state_name, $states);
 
-$temp = snmp_get($device, 'locLinkState.0', "-Ovqe", "ExaltComProducts");
-$cur_oid = '.1.3.6.1.4.1.25651.1.2.4.2.3.1.1.0';
-
-if (is_numeric($temp)) {
-    $state_name = 'locLinkState';
-    $index      = $state_name;
-    create_state_index($state_name, $states);
-
-    $descr = 'Link status (local radio)';
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
-    create_sensor_to_state_index($device, $state_name, $index);
-}
-
-$temp = snmp_get($device, 'locTempAlarm.0', "-Ovqe", "ExaltComProducts");
-$cur_oid = '.1.3.6.1.4.1.25651.1.2.4.2.3.1.2.0';
-
-if (is_numeric($temp)) {
-    $state_name = 'locTempAlarm';
-    $index = $state_name;
-    create_state_index($state_name, $states);
-
-    $descr = 'Temperature status (local radio)';
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
-    create_sensor_to_state_index($device, $state_name, $index);
-}
-
-
-$temp = snmp_get($device, 'remTempAlarm.0', "-Ovqe", "ExaltComProducts");
-$cur_oid = '.1.3.6.1.4.1.25651.1.2.4.2.4.1.2.0';
-
-if (is_numeric($temp)) {
-    $state_name = 'remTempAlarm';
-    $index = $state_name;
-    create_state_index($state_name, $states);
-
-    $descr = 'Temperature status (far end radio)';
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
-    create_sensor_to_state_index($device, $state_name, $index);
-}
-
-$temp = snmp_get($device, 'remLinkSecMismatch.0', "-Ovqe", "ExaltComProducts");
-$cur_oid = '.1.3.6.1.4.1.25651.1.2.4.2.4.1.9.0';
-
-if (is_numeric($temp)) {
-    $state_name = 'remLinkSecMismatch';
-    $index = $state_name;
-    create_state_index($state_name, $states);
-
-    $descr = 'Link security status';
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
-    create_sensor_to_state_index($device, $state_name, $index);
-}
-
-$temp = snmp_get($device, 'locLinkStateV.0', "-Ovqe", "ExaltComProducts");
-$cur_oid = '.1.3.6.1.4.1.25651.1.2.4.2.3.1.15.0';
-
-if (is_numeric($temp)) {
-    $state_name = 'locLinkStateV';
-    $index = $state_name;
-    create_state_index($state_name, $states);
-
-    $descr = 'Vertial link status (local radio)';
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
-    create_sensor_to_state_index($device, $state_name, $index);
-}
-
-$temp = snmp_get($device, 'locLinkStateH.0', "-Ovqe", "ExaltComProducts");
-$cur_oid = '.1.3.6.1.4.1.25651.1.2.4.2.3.1.16.0';
-
-if (is_numeric($temp)) {
-    $state_name = 'locLinkStateH';
-    $index = $state_name;
-    create_state_index($state_name, $states);
-
-    $descr = 'Horizontal link status (local radio)';
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
-    create_sensor_to_state_index($device, $state_name, $index);
-}
-
-$temp = snmp_get($device, 'remLinkStateV.0', "-Ovqe", "ExaltComProducts");
-$cur_oid = '.1.3.6.1.4.1.25651.1.2.4.2.4.1.15.0';
-
-if (is_numeric($temp)) {
-    $state_name = 'remLinkStateV';
-    $index = $state_name;
-    create_state_index($state_name, $states);
-
-    $descr = 'Vertial link status (far end radio)';
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
-    create_sensor_to_state_index($device, $state_name, $index);
-}
-
-$temp = snmp_get($device, 'remLinkStateH.0', "-Ovqe", "ExaltComProducts");
-$cur_oid = '.1.3.6.1.4.1.25651.1.2.4.2.4.1.16.0';
-
-if (is_numeric($temp)) {
-    $state_name = 'remLinkStateH';
-    $index = $state_name;
-    create_state_index($state_name, $states);
-
-    $descr = 'Horizontal link status (far end radio)';
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
-    create_sensor_to_state_index($device, $state_name, $index);
+        $descr = $sensor['descr'];
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
+        create_sensor_to_state_index($device, $state_name, $index);
+    }
 }
 
 unset(

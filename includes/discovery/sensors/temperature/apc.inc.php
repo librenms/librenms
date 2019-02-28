@@ -55,11 +55,11 @@ $oids = snmp_get($device, 'airIRRCGroupSetpointsCoolMetric.0', '-OsqnU', 'PowerN
 if ($oids) {
     echo 'APC InRow Chiller ';
     $temps = [];
-    $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.7']            = 'Rack Inlet'; //airIRRCUnitStatusRackInletTempMetric
-    $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.9']            = 'Supply Air'; //airIRRCUnitStatusSupplyAirTempMetric
-    $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.11']            = 'Return Air'; //airIRRCUnitStatusReturnAirTempMetric
+    $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.7'] = 'Rack Inlet'; //airIRRCUnitStatusRackInletTempMetric
+    $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.9'] = 'Supply Air'; //airIRRCUnitStatusSupplyAirTempMetric
+    $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.11'] = 'Return Air'; //airIRRCUnitStatusReturnAirTempMetric
     $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.24'] = 'Entering Fluid'; //airIRRCUnitStatusEnteringFluidTemperatureMetric
-    $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.26']  = 'Leaving Fluid'; //airIRRCUnitStatusLeavingFluidTemperatureMetric
+    $temps['.1.3.6.1.4.1.318.1.1.13.3.2.2.2.26'] = 'Leaving Fluid'; //airIRRCUnitStatusLeavingFluidTemperatureMetric
     foreach ($temps as $obj => $descr) {
         $oids                   = snmp_get($device, $obj.'.0', '-OsqnU', 'PowerNet-MIB');
         list($oid,$current) = explode(' ', $oids);
