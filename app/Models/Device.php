@@ -7,10 +7,12 @@ use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\Url;
 
 class Device extends BaseModel
 {
@@ -387,11 +389,10 @@ class Device extends BaseModel
 
     public function getIconAttribute($icon)
     {
-        if (isset($icon)) {
-            return "images/os/$icon";
-        }
-        return 'images/os/generic.svg';
+        $this->loadOs();
+        return Str::start(Url::findOsImage($this->os, $this->features, $icon), 'images/os/');
     }
+
     public function getIpAttribute($ip)
     {
         if (empty($ip)) {
