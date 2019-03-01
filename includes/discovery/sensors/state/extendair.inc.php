@@ -35,20 +35,20 @@ $states = [
 ];
 
 $sensors = [
-    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.1.0', 'state_name' => 'remLinkState', 'descr' => 'Link status (far end radio)'],
-    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.3.1.1.0', 'state_name' => 'locLinkState', 'descr' => 'Link status (local radio)'],
-    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.3.1.2.0', 'state_name' => 'locTempAlarm', 'descr' => 'Temperature status (local radio)'],
-    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.2.0', 'state_name' => 'remTempAlarm', 'descr' => 'Temperature status (far end radio)'],
-    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.9.0', 'state_name' => 'remLinkSecMismatch', 'descr' => 'Link security status'],
-    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.3.1.15.0', 'state_name' => 'locLinkStateV', 'descr' => 'Vertial link status (local radio)'],
-    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.3.1.16.0', 'state_name' => 'locLinkStateH', 'descr' => 'Horizontal link status (local radio)'],
-    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.15.0', 'state_name' => 'remLinkStateV', 'descr' => 'Vertial link status (far end radio)'],
-    ['oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.16.0', 'state_name' => 'remLinkStateH', 'descr' => 'Horizontal link status (far end radio)'],
+    ['num_oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.1.0', 'state_name' => 'remLinkState', 'descr' => 'Link status (far end radio)'],
+    ['num_oid' => '.1.3.6.1.4.1.25651.1.2.4.2.3.1.1.0', 'state_name' => 'locLinkState', 'descr' => 'Link status (local radio)'],
+    ['num_oid' => '.1.3.6.1.4.1.25651.1.2.4.2.3.1.2.0', 'state_name' => 'locTempAlarm', 'descr' => 'Temperature status (local radio)'],
+    ['num_oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.2.0', 'state_name' => 'remTempAlarm', 'descr' => 'Temperature status (far end radio)'],
+    ['num_oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.9.0', 'state_name' => 'remLinkSecMismatch', 'descr' => 'Link security status'],
+    ['num_oid' => '.1.3.6.1.4.1.25651.1.2.4.2.3.1.15.0', 'state_name' => 'locLinkStateV', 'descr' => 'Vertial link status (local radio)'],
+    ['num_oid' => '.1.3.6.1.4.1.25651.1.2.4.2.3.1.16.0', 'state_name' => 'locLinkStateH', 'descr' => 'Horizontal link status (local radio)'],
+    ['num_oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.15.0', 'state_name' => 'remLinkStateV', 'descr' => 'Vertial link status (far end radio)'],
+    ['num_oid' => '.1.3.6.1.4.1.25651.1.2.4.2.4.1.16.0', 'state_name' => 'remLinkStateH', 'descr' => 'Horizontal link status (far end radio)'],
 ];
 
 foreach ($sensors as $sensor) {
     $temp = snmp_get($device, $sensor['state_name'].'.0', "-Ovqe", "ExaltComProducts");
-    $cur_oid = $sensor['oid'];
+    $cur_oid = $sensor['num_oid'];
 
     if (is_numeric($temp)) {
         $state_name = $sensor['state_name'];

@@ -67,10 +67,10 @@ foreach ($pre_cache['mrv-od_chassis-entry'] as $index => $entry) {
     ];
 
     $powerSupplies = [
-        ['entity' => 'nbsCmmcChassisPS1Status', 'oid' => '.1.3.6.1.4.1.629.200.6.1.1.7.1', 'descr' => 'Power Supply 1'],
-        ['entity' => 'nbsCmmcChassisPS2Status', 'oid' => '.1.3.6.1.4.1.629.200.6.1.1.8.1', 'descr' => 'Power Supply 2'],
-        ['entity' => 'nbsCmmcChassisPS3Status', 'oid' => '.1.3.6.1.4.1.629.200.6.1.1.9.1', 'descr' => 'Power Supply 3'],
-        ['entity' => 'nbsCmmcChassisPS4Status', 'oid' => '.1.3.6.1.4.1.629.200.6.1.1.10.1', 'descr' => 'Power Supply 4'],
+        ['entity' => 'nbsCmmcChassisPS1Status', 'num_oid' => '.1.3.6.1.4.1.629.200.6.1.1.7.1', 'descr' => 'Power Supply 1'],
+        ['entity' => 'nbsCmmcChassisPS2Status', 'num_oid' => '.1.3.6.1.4.1.629.200.6.1.1.8.1', 'descr' => 'Power Supply 2'],
+        ['entity' => 'nbsCmmcChassisPS3Status', 'num_oid' => '.1.3.6.1.4.1.629.200.6.1.1.9.1', 'descr' => 'Power Supply 3'],
+        ['entity' => 'nbsCmmcChassisPS4Status', 'num_oid' => '.1.3.6.1.4.1.629.200.6.1.1.10.1', 'descr' => 'Power Supply 4'],
     ];
 
     foreach ($powerSupplies as $psu) {
@@ -79,7 +79,7 @@ foreach ($pre_cache['mrv-od_chassis-entry'] as $index => $entry) {
             $state_name = $psu['entity'];
             create_state_index($state_name, $states);
 
-            $cur_oid    = $psu['oid'];
+            $cur_oid    = $psu['num_oid'];
             $descr      = $psu['descr'];
 
             //Discover Sensors
@@ -90,10 +90,10 @@ foreach ($pre_cache['mrv-od_chassis-entry'] as $index => $entry) {
     }
 
     $fans = [
-        ['entity' => 'nbsCmmcChassisFan1Status', 'oid' => '.1.3.6.1.4.1.629.200.6.1.1.11.1', 'descr' => 'Fan 1'],
-        ['entity' => 'nbsCmmcChassisFan2Status', 'oid' => '.1.3.6.1.4.1.629.200.6.1.1.12.1', 'descr' => 'Fan 2'],
-        ['entity' => 'nbsCmmcChassisFan3Status', 'oid' => '.1.3.6.1.4.1.629.200.6.1.1.13.1', 'descr' => 'Fan 3'],
-        ['entity' => 'nbsCmmcChassisFan4Status', 'oid' => '.1.3.6.1.4.1.629.200.6.1.1.14.1', 'descr' => 'Fan 4'],
+        ['entity' => 'nbsCmmcChassisFan1Status', 'num_oid' => '.1.3.6.1.4.1.629.200.6.1.1.11.1', 'descr' => 'Fan 1'],
+        ['entity' => 'nbsCmmcChassisFan2Status', 'num_oid' => '.1.3.6.1.4.1.629.200.6.1.1.12.1', 'descr' => 'Fan 2'],
+        ['entity' => 'nbsCmmcChassisFan3Status', 'num_oid' => '.1.3.6.1.4.1.629.200.6.1.1.13.1', 'descr' => 'Fan 3'],
+        ['entity' => 'nbsCmmcChassisFan4Status', 'num_oid' => '.1.3.6.1.4.1.629.200.6.1.1.14.1', 'descr' => 'Fan 4'],
     ];
 
     foreach ($fans as $fan) {
@@ -102,7 +102,7 @@ foreach ($pre_cache['mrv-od_chassis-entry'] as $index => $entry) {
             $state_name = $fan['entity'];
             create_state_index($state_name, $states);
 
-            $cur_oid    = $fan['oid'];
+            $cur_oid    = $fan['num_oid'];
             $descr      = $fan['descr'];
 
             //Discover Sensors
