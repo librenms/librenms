@@ -1,0 +1,886 @@
+--*******************************************************************
+--*    SAGEM, IONOS 											    *
+--*******************************************************************
+--*******************************************************************
+--
+--  Filename: equip
+--
+--  File type: .mib    
+-- 
+--  Description:	SNMP source Mib file.
+--
+--			Contains general description and operation for
+--			equipent level.
+--             
+--
+--  Version:  19 11 2002
+--	
+--  Date(DD MM YYYY): 15 11 2002 last update for IONOS NMS 
+--     
+--  Contact: D. Mobuchon, F. Bonnevialle
+--
+--  History: 
+--		Version: 			Date: 04 08 98
+--		Version: MIB-P0-301199	Date: 30 11 1999
+--      Version: MIB-P0-05092000 Date: 05 09 2000
+--      Modification de la table des managers  
+--
+--		Name: S.LAURENT 	
+--		Date: 25 04 2001 
+--		Desc: * Add 7 equipment modification counters
+--			   
+--		Name: S.LAURENT 	
+--		Date: 14 06 2002 
+--		Desc: * DisplayString is imported from SNMPv2-TC instead of RFC1213
+--          
+--		Name: F.Bonnevialle 	
+--		Date: 15 11 2002 		
+--		Desc: Modification for SilverCreek Compiler
+--*******************************************************************
+--*******************************************************************
+--*   Copyright (c) 2002, SAGEM , All rights reserved.              *
+--*******************************************************************
+
+
+
+
+--*******************************************************************
+-- MIB: EQUIPMENT-MIB
+--*******************************************************************
+EQUIPMENT-MIB DEFINITIONS ::= BEGIN
+ 
+
+--*******************************************************************
+-- IMPORTS
+--*******************************************************************
+
+   IMPORTS
+   sagemDr							FROM SAGEM-DR-MIB 
+   MODULE-IDENTITY,
+   		OBJECT-TYPE,
+   		NOTIFICATION-TYPE,
+		IpAddress,Counter32    		FROM SNMPv2-SMI
+   DisplayString					FROM SNMPv2-TC;
+--   TRAP-TYPE						FROM RFC-1215;
+   
+
+
+
+--*******************************************************************
+-- OBJECTS
+--*******************************************************************
+
+--*******************************************************************
+
+   equip	MODULE-IDENTITY
+      LAST-UPDATED "0211150000Z"
+      ORGANIZATION "SAGEM/DR Tolbiac Centre"
+      CONTACT-INFO " "
+      DESCRIPTION 
+	"  
+	Modification: 
+			Date: 15 11 2002
+			Description: 
+			sagemDr replace sagem-dr
+			NOTIFICATION-TYPE replace TRAP-TYPE
+						
+	Modification:
+			Date: 14 06 2002
+			Description: Modification of Imports
+				DisplayString is imported from SNMPv2-TC instead of RFC1213				
+
+	Modification:
+			Date: 20 12 1999
+			Description: Modification of comments
+				Modification of bugs				
+ 
+	Modification: 
+			Date: 19 11 1999
+			Name: sagem-dr, SagemBoolean
+			Description: Definition of OID sagem-dr instead of sat      
+				Definition of data SagemBoolean instead of Boolean 
+	
+			Name: communityString
+			Description: SIZE(0..20) replaced by SIZE (0..50)
+
+
+	New Object: 
+			Date: 19 11 1999
+		
+			Name: All *Manager* are new objects
+			Description: Manager list that recieves the traps.
+
+			Name: equipCptModif
+	 		Description: Incremental counter used to manage 
+				the modifications	on the equipment.
+
+	 		Name: communityAcces
+	 		Description: new names used
+				iONNOS-ANM-Supervisor instead of Set ...	
+
+			Name: trapCommunity
+			Description:SIZE(0..20) replaced by SIZE (0..50)
+
+			Name: equipLoad
+	 		Description: Object is simplified to an OID 
+   
+			Name: equipLoadDiagnostic
+	 		Description: A string to help in case of problem  
+
+			Name: transferedItemTable,transferedItem,
+				TransferedItem,transferedItemIndex
+				transferedItemType,transferedItemVersion
+				transferedItemComments
+	 		Description:
+			These object are used to manage the download 
+			and upload of some part of the data; the data
+			can be a part of a program, a complete program,
+			or a config.
+			The transferedItemType is reused in equipLocalFile
+
+	 		Name: equipStatusV2
+			Description: used by IONOS ANM V2      
+
+	"
+      REVISION "9808040000Z"
+      DESCRIPTION 
+	"
+	Creation : this MIB module describes equipment level operation such as
+	date and time set, restart, reset, community and trap  
+	management.
+	"	
+	      ::= { sagemDr 107 }
+
+--*******************************************************************
+
+SagemBoolean  ::= INTEGER { true(1), false(2) }
+IntDateTime ::= INTEGER (0..2147483647) 
+Severity    ::= INTEGER
+      { 
+		nonAlarmed (1), 
+		minor (2), 
+		major (3), 
+		critical (4), 
+		warning (5),
+		invNonAlarmed (6),
+		invMinor(7),
+    	invMajor(8),
+    	invCritical(9),
+    	invWarning(10) 
+	}
+
+
+--*******************************************************************
+   equipDateTime   OBJECT-TYPE
+      SYNTAX       IntDateTime
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+      "The value of this field is the date and time of the equipment.
+	It is the number of seconds since 1st January 1970."  
+      ::= { equip 1 } 
+   
+   equipLastModif   OBJECT-TYPE
+      SYNTAX       IntDateTime
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The date and time when the equipment was last modified."           
+      ::= { equip 2 } 
+
+   equipWarmStart   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The equipment make a hot start if this field is set to `true'.
+	This operation can only be done by the iONOSANMsupervisor
+	or dIRECTACCESSsupervisor. 
+	The value returns to `false' after the restart."  
+      ::= { equip 3 } 
+   
+   equipClearConf   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The equipment resets all its parameters, including those 
+	stored in non-volatile media storage, if this field is set 
+	to `true'.
+	This command does not apply to mib-2 parameters, like @ip, 
+	routing table, etc ...
+	This operation can only be done by the iONOSANMsupervisor
+	or dIRECTACCESSsupervisor. 
+	The value returns to `false' after the reset.
+	This operation is optionnal."  
+      ::= { equip 4 } 
+   
+ 
+--*******************************************************************
+-- Description:
+--		Community 
+--		 The "communityTable" is used for the habilitation.
+--		It contains a sequense of "CommunityEntry" 
+-- 		The size for the habilitation table is 10 elements for ADR equipement.
+--		 A "CommunityEntry" is a sequence:
+--		(communityIndex,communityString,communityAccess)
+--		 The different kind of habilitation are:
+--		iONOSANMobserver,
+--		iONOSANMoperator,
+--		iONOSANMsupervisor,
+--		dIRECTACCESSobserver,
+--		dIRECTACCESSoperator,
+--		dIRECTACCESSsupervisor,
+-- The 4 last one are used for the "Add Drop for IP" IPA.
+--		iONOSANMclientobserver,
+--		iONOSANMclientoperator,
+--		dIRECTACCESSclientobserver,
+--		dIRECTACCESSclientoperator.
+
+   communityNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of community in equipment."  
+      ::= { equip 5 } 
+   
+   communityTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF CommunityEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of community in equipment."  
+      ::= { equip 6 } 
+   
+   communityEntry   OBJECT-TYPE
+      SYNTAX       CommunityEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular community of the equipment." 
+      INDEX        { communityIndex } 
+      ::= { communityTable 1 } 
+
+   CommunityEntry ::=
+      SEQUENCE {
+        communityIndex         INTEGER,
+        communityString        DisplayString,
+        communityAcces         INTEGER
+      }
+   
+   communityIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	community."
+      ::= { communityEntry 1 } 
+
+ 
+  communityString   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A unique textual string that can be used by a SNMP manager as
+	community string. It can be also used as password for other
+	configuration like http, not only snmp.
+	The table must have at least two entries associated with 
+	the iONOSANMsupervisor access right (this entry is created by 
+	equipement at startup with value `secret') and 
+	dIRECTACCESSsupervisor access right (this entry is 	
+	created by equipement	at startup  with value 'supervisor') . 
+	According to equipment implementation, it is possible to 
+	create other entries associed with lower rights that PDU 
+	community string can afford (actualy equal if 
+	IONOSANMsupervisor status is granted).
+	If the other access rights are created at startup by the equipment,
+	 its must use the following values : 'private' for 
+	'iONOSANMoperator, 'public' for 'iONOSANMobserver', 
+	 'operator' for dIRECTACCESSoperator, 'observer' for 
+	dIRECTACCESSobserver, and 'client' for the others.
+	
+	All community string can be modified only by 
+	IONOSANMsupervisor.
+	A dIRECTACCESS community string can be modified by 
+	dIRECTACCESSsupervisor.
+	
+	The reading of a community string gives *** for all 
+	access rights .
+	
+	An entry may be discarded by setting its community string to 
+	void string. This should not be used by the administrator or 
+	he could discard himself "  
+
+      ::= { communityEntry 2 }
+
+
+   communityAcces   OBJECT-TYPE
+      SYNTAX        INTEGER {iONOSANMobserver (1), 
+                             iONOSANMoperator(2), 
+                             iONOSANMsupervisor(3), 
+				     		 dIRECTACCESSobserver (4),
+                             dIRECTACCESSoperator(5), 
+                             dIRECTACCESSsupervisor(6), 
+                             iONOSANMclientobserver(7),
+                             iONOSANMclientoperator(8),
+                             dIRECTACCESSclientobserver(9),
+                             dIRECTACCESSclientoperator(10)
+				    }
+
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"
+	iONOSANMsupervisor(3) access :
+		allows all operations including community string
+		(community string = password)
+	iONOSANMoperator(2) access :
+		allows all set operations except write community
+	   	string read or write and also some special operations.
+	iONOSANMobserver (1) access : 
+		allows only get and get_next requests.
+	dIRECTACCESSsupervisor(6) access : 
+		allows all operations EXcluding IONOS ANM community string
+	dIRECTACCESSoperator(5) access :
+		allows all set operations except write community
+	   	string read or write and also some special operations.
+	dIRECTACCESSobserver (4) access :
+		allows only get and get_next requests.		
+      iONOSANMclientoperator(8) access :                      
+		allows only set some special operations 
+      iONOSANMclientobserver(7) access :
+		allows only get and get_next requests for special operations 
+      dIRECTACCESSclientoperator(10) access :                      
+		allows only set some special operations 
+	dIRECTACCESSclientobserver(9) access :
+		allows only get and get_next requests for special operations 
+      "
+     ::= { communityEntry 3 }    
+
+
+--*******************************************************************
+-- Description:
+--		"trapTable": trap's receiver table  	
+
+   trapNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of trap receivers description in equipment."  
+      ::= { equip 7 } 
+   
+   trapTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF TrapEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of trap receivers in equipment."  
+      ::= { equip 8 } 
+   
+   trapEntry   OBJECT-TYPE
+      SYNTAX       TrapEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular trap of the equipment." 
+      INDEX        { trapIndex } 
+      ::= { trapTable 1 } 
+  
+  TrapEntry ::=
+      SEQUENCE {
+	  trapIndex              INTEGER,
+        trapDestination        IpAddress,
+        trapCommunity          DisplayString
+      }
+   
+  trapIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	trap receiver.
+	The value of index is a constant assigned to an entry at
+	equipment design time. "  
+      ::= { trapEntry 1 } 
+   
+   trapDestination   OBJECT-TYPE
+      SYNTAX       IpAddress
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The ip address to which the equipment will send the traps. 
+	Note that the value must be unique along this table.
+	An entry may be discarded by setting the IP address to 0.0.0.0
+	" 
+      ::= { trapEntry 2 } 
+   
+     
+   trapCommunity   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+--	It is better to use a size value lower than 10.
+--	The size value 50 is used for the BMX
+	"The community string to use when a trap is sent to 
+	this address. "  
+      ::= { trapEntry 3 }    
+
+
+
+--*******************************************************************
+
+-- Description: 
+--		Up and download for the software and configuration
+-- 
+   equipLoad   OBJECT IDENTIFIER ::= { equip 9 }
+      
+   equipLocalFile   OBJECT-TYPE
+      SYNTAX       DisplayString       
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The file path suitable for the equipment."  
+      ::= { equipLoad 1 } 
+   
+   equipServerAddress   OBJECT-TYPE
+      SYNTAX       IpAddress
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The ip adress of tftp serveur from which is read/write 
+	the file `equipRemoteFile'."  
+      ::= { equipLoad 2 } 
+   
+   equipRemoteFile   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The file path to be loaded on/from the equipement."  
+      ::= { equipLoad 3 } 
+   
+   equipDirection   OBJECT-TYPE
+      SYNTAX       INTEGER { download (0), upload(1)
+			, backupDownload (2), switching (3)
+	}
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"This field selects the direction of data stream.
+	When it is set to `backupDownload', only the transfert is done.
+	When it is set to `download' the transfert is done and then the 
+	information transfert is switched in the operational state.
+	When it is set to `switching', there is no transfert; 
+	there is only  a switching. "     
+      ::= { equipLoad 4 } 
+
+   equipLoadProceed   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"
+	This entry is use to start (set to `true') loading a file 
+	on/from a equipment which has a tftp client.
+	The value of the field remains to `true' until load is 
+	completed or has been aborted.
+	This operation can only be done by the iONOSANMsupervisor
+	or dIRECTACCESSsupervisor.
+	It may be possible to abort the loading by setting it 
+	to false.
+	After the switching of a new configuration, the equipment
+	must increase the value of the variable 'equipCptModif' 
+	"  
+      ::= { equipLoad 5 } 
+   
+   equipLoadDiagnostic   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A string used to help in case of trouble."  
+      ::= { equipLoad 6 }  
+   
+   equipLoadProtocole   OBJECT-TYPE
+      SYNTAX       INTEGER { ftp (1), tftp (2), 
+						http (3), telnet (4)}
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Protocole used by the equipment for the download"  
+      ::= { equipLoad 7 }  
+
+
+--*******************************************************************
+-- Description: 
+--		Delayed up and download for the software and configuration
+--
+--   equipLoadState   OBJECT-TYPE
+--      SYNTAX       INTEGER { delayedLoad (1), loadRunning (2), 
+--					delayedSwitching (3), switchingRunning (4),
+--					loadOK (5), loadNOK (6) ,aborted (7)}
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"This field indicates the status of the current load processes valided 
+--	by 'equipLoadProceed'.
+--      Remark : a download includes a data transfer (load) from the 
+--	server to the equipment and a switching for using the data or the 
+--	software transfered . A upload includes only a data transfer from 
+--	the equipment to the server
+--	It's optional for the equipment which doesn't realise delayed download "
+--	::= { equipLoad 8 } 
+--
+--	equipLoadDateTime   OBJECT-TYPE
+--      SYNTAX       IntDateTime
+--      MAX-ACCESS   read-write
+--      STATUS       current
+--      DESCRIPTION 
+--      "The value of this field is the date and time of the equipment 
+--	at which the load processes valided by 
+--	'equipLoadProceed' must begin .
+--	If this value if equal at 0 or < at the current
+--	time, the load starts immediately.
+--	It is the number of seconds since 1st January 1970."  
+--	::= { equipLoad 9 }
+--
+--	equipSwitchingDateTime   OBJECT-TYPE
+--      SYNTAX       IntDateTime
+--      MAX-ACCESS   read-write
+--      STATUS       current
+--      DESCRIPTION 
+--      "
+--	The value of this field is the date and time of the equipment
+--	at which the switching processes valided by 
+--	'equipLoadProceed' must begin .If this value if equal at
+--	0 or < at the current time, the switching starts immediately 
+--	(if there isn't load)or immediately after the load (if there is a load).
+--	It is the number of seconds since 1st January 1970.
+--	After the switching of a new configuration, the equipment
+--	must increase the value of the variable 'equipCptModif' 
+--	"  
+--	::= { equipLoad 10 } 
+--
+
+
+--*******************************************************************
+-- Description:
+--		These object are used to manage the download 
+--		and upload of some part of the data; the data
+--		can be a part of a program, a complete program,
+--		or a config.
+--			
+--		The transferedItemType can be:
+--			inactive programName 
+--			active programName 
+--			inactive"Config"
+--			active"Config"
+--			ALL Program
+--			ALL
+--
+--		The transferedItemType is reused in equipLocalFile   
+
+
+  transferedItemTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF TransferedItemEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of uploaded or downloaded Item from the 
+	equipment."  
+      ::= { equip 30 } 
+   
+   transferedItemEntry   OBJECT-TYPE
+      SYNTAX       TransferedItemEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular Item transferd from/to the equipment." 
+      INDEX        { transferedItemIndex } 
+      ::= { transferedItemTable 1 } 
+
+   TransferedItemEntry ::=
+      SEQUENCE {
+        transferedItemIndex         INTEGER,
+        transferedItemType          DisplayString,
+	  transferedItemVersion       DisplayString,
+	  transferedItemComment       DisplayString  	
+      }
+   
+   transferedItemIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { transferedItemEntry 1 } 
+   
+   transferedItemType   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"used to know what kind of data to transferate,
+	mainly programName or config"
+      ::= { transferedItemEntry 2 }
+
+   transferedItemVersion   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"for a program, return the software version;
+	for a config return the associated software version"
+      ::= { transferedItemEntry 3 }
+
+   transferedItemComment   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"give additional information about the tranfered data"
+      ::= { transferedItemEntry 4 }
+
+--*******************************************************************
+-- Description:
+
+   equipStatus   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"This field summerizes the status of all equipment objects 
+	(port, card, ...)
+	This variable is polled by IONOS ANM V1
+	The 'equipmentStatusTrap' is sent after a GET on this variable.
+	equipStatus and equipStatusTrap are only used with V1. 
+	"
+      ::= { equip 10 } 
+
+   equipStatusV2   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Replace equipStatus for the v2. For the v1, equipStatus 
+	in EQUIPMENT-MIB send a trap after been polled; 
+	For the v2, equipStatus is polled."  
+      ::= { equip 11 } 
+
+--*******************************************************************
+--*   modification counters
+--*******************************************************************
+-- Description:
+--		"equipCptModif":
+--			Incremental counter used to manage the modifications
+--			on the equipment.
+-- Warning:
+--		Replace equipLastModif for the new equipment ADR155c and 
+--		the next generation of equipment. 
+
+   equipCptModif   OBJECT-TYPE
+      SYNTAX       Counter32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The counter for all equipments modifications. It represents
+        the sum of the 7 other counters"  
+      ::= { equip 12 } 
+ 
+   -- Modification counters
+  cptModif	 		OBJECT IDENTIFIER ::= { equip 14 }
+ 
+    cptSNC   OBJECT-TYPE
+      SYNTAX       Counter32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The counter version for the SNC modifications."  
+      ::= { cptModif 1 } 
+     
+      
+    cptCnx   OBJECT-TYPE
+      SYNTAX       Counter32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The counter version for the Connexion modifications."  
+      ::= { cptModif 2 } 
+ 
+    cptMSP   OBJECT-TYPE
+      SYNTAX       Counter32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The counter version for the MSP modifications."  
+      ::= { cptModif 3 } 
+
+    cptMsSpring   OBJECT-TYPE
+      SYNTAX       Counter32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The counter version for the MS-SPRING modifications."  
+      ::= { cptModif 4 } 
+
+    cptSynchro   OBJECT-TYPE
+      SYNTAX       Counter32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The counter version for the Synchro modifications."  
+      ::= { cptModif 5 } 
+
+    cptMngt  OBJECT-TYPE
+      SYNTAX       Counter32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The counter version for the MNGT modifications (mngt list, password, trap, ...)."  
+      ::= { cptModif 6 } 
+
+    cptNet   OBJECT-TYPE
+      SYNTAX       Counter32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The counter version for the Network modifications."  
+      ::= { cptModif 7 } 
+     
+
+-- equipConfSaveStatus   OBJECT-TYPE
+--      SYNTAX       SagemBoolean
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"If 'true', this variable indicates that all configuration
+-- 	modifications are saved in flash memory. 
+--	If false, this variable indicates that configuration 
+--	modifications are not saved in flash memory. "  
+--      ::= { equip 13 }
+
+
+--*******************************************************************
+--
+-- Description:
+-- 			ACCESS TABLE FILTER
+--		The table is a access filter table that ckeck the IP address of 
+--		the SNMP managers.
+
+
+   equipManagerNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of manager = number of IP addresses in the table"  
+      ::= { equip 20 } 
+
+   equipManagerTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EquipManagerEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+	"Table containing Ip Addresses and maximum authorized level"
+	::= { equip 21 }
+	
+   equipManagerEntry OBJECT-TYPE
+	SYNTAX  EquipManagerEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+	"Entry containing IP addresses of managers allowed in R/W."
+	INDEX   {equipManagerIndex}
+	::= {equipManagerTable 1}
+	
+   EquipManagerEntry ::=
+	SEQUENCE        
+		{
+			equipManagerIndex INTEGER,        
+			equipManagerAddress IpAddress,
+			equipManagerADM SagemBoolean,
+			equipManagerOPR SagemBoolean,
+			equipManagerOBS SagemBoolean
+		}
+	
+   equipManagerIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..2147483647) 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+	"Index of equipManagerTable
+	There's only 10 values in this table"
+	::= {equipManagerEntry 1}
+	
+   equipManagerAddress OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"The IP address of one of the allowed managers.
+   	If the table contains only address values which are equal
+  	 to 0.0.0.0, no access filter are done.
+   	Write the IP address 0.0.0.0 to remove a manager.
+	This operation can only be done by the iONOSANMsupervisor.
+	" 
+	::= {equipManagerEntry 2}
+
+   equipManagerADM   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"If 'true', this variable indicates that the manager defined by 
+	its address can have  the Supervisor rigth as maximum level
+	The value 'false' is set by the equipment when another level 
+	is choosen"  
+      ::= {equipManagerEntry 3}
+ 	
+   equipManagerOPR   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"If 'true', this variable indicates that the manager defined by 
+	its address can have  the Operator rigth as maximum level
+	The value 'false' is set by the equipment when another level 
+	is choosen"  
+      ::= {equipManagerEntry 4}
+
+  equipManagerOBS   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"If 'true', this variable indicates that the manager defined by 
+	its address can have the Observer rigth as maximum level
+	The value 'false' is set by the equipment when another level 
+	is choosen"  
+      ::= {equipManagerEntry 5}
+
+--*******************************************************************
+-- Warning: This Trap is only used for V1
+--  equipStatusTrap  TRAP-TYPE
+--   	ENTERPRISE  equip
+--  	VARIABLES   { equipStatus }
+--  	DESCRIPTION
+--	"This trap indicates the alarm status of the equipment.
+--	Only sent with IONOS ANM V1"
+--      ::= 1
+  
+  equipTraps OBJECT IDENTIFIER ::= { equip 0 }
+     
+  equipStatusTrap NOTIFICATION-TYPE
+          OBJECTS     { equipStatus }
+          STATUS      current
+          DESCRIPTION "This trap indicates the alarm status of the equipment.
+						Only sent with IONOS ANM V1"
+          REFERENCE   ""
+          ::= { equipTraps 1 }
+END
