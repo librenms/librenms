@@ -28,18 +28,18 @@ $index = 'es1dc1DataBatBatTestState';
 if (is_numeric($batteryTestState)) {
     //Create State Index
     $state_name = 'es1dc1DataBatBatTestState';
-    $states = array(
-        array('value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Never Tested'),
-        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Success'),
-        array('value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'On Going'),
-        array('value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'Failed: Timeout'),
-        array('value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'Failed: Vbus Too Low'),
-        array('value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'Failed: Load Too Low'),
-        array('value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed: AC Failure'),
-        array('value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'Failed: Canceled'),
-        array('value' => 8, 'generic' => 1, 'graph' => 0, 'descr' => 'Failed: LVD Opened'),
-        array('value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'Failed: No Battery'),
-    );
+    $states = [
+        ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Never Tested'],
+        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Success'],
+        ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'On Going'],
+        ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'Failed: Timeout'],
+        ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'Failed: Vbus Too Low'],
+        ['value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'Failed: Load Too Low'],
+        ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed: AC Failure'],
+        ['value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'Failed: Canceled'],
+        ['value' => 8, 'generic' => 1, 'graph' => 0, 'descr' => 'Failed: LVD Opened'],
+        ['value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'Failed: No Battery'],
+    ];
     create_state_index($state_name, $states);
 
     $descr = 'Battery Test Status';
@@ -54,13 +54,13 @@ $index = 'es1dc1DataSystemDCMode';
 if (is_numeric($dcMode)) {
     //Create State Index
     $state_name = 'es1dc1DataSystemDCMode';
-    $states = array(
-        array('value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Float'),
-        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Equalize'),
-        array('value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Battery Test'),
-        array('value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'AC Failure'),
-        array('value' => 5, 'generic' => 0, 'graph' => 0, 'descr' => 'Safe'),
-    );
+    $states = [
+        ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Float'],
+        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Equalize'],
+        ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Battery Test'],
+        ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'AC Failure'],
+        ['value' => 5, 'generic' => 0, 'graph' => 0, 'descr' => 'Safe'],
+    ];
     create_state_index($state_name, $states);
 
     $descr = 'System DC Mode';
