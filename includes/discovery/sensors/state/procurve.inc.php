@@ -31,7 +31,7 @@ foreach ($pre_cache['procurve_hpicfSensorTable'] as $index => $data) {
     $tmp_index      = $status_name . '.' . $index;
     $states = [
         ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-        ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'unbadknown'],
+        ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'bad'],
         ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
         ['value' => 4, 'generic' => 0, 'graph' => 1, 'descr' => 'good'],
         ['value' => 5, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
