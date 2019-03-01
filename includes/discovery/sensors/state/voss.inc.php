@@ -20,15 +20,14 @@
  *  down(3),
 */
 
-$fan_oper_status = '.1.3.6.1.4.1.2272.1.4.7.1.1.2';
-$fan = snmpwalk_cache_oid_num($device, $fan_oper_status, []);
+$fan = snmpwalk_cache_multi_oid($device, 'rcChasFanOperStatus', [], 'RAPID-CITY');
 
 if (is_array($fan)) {
     foreach ($fan as $oid => $array) {
         $state = current($array);
         $split_oid = explode('.', $oid);
         $index = $split_oid[(count($split_oid) - 1)];
-        $current_oid = "$fan_oper_status.$index";
+        $current_oid = ".1.3.6.1.4.1.2272.1.4.7.1.1.2.$index";
         $descr =  "Fan $index";
 
         $state_name = 'rcChasFanOperStatus';
@@ -39,7 +38,7 @@ if (is_array($fan)) {
         ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $current_oid, "rcChasFanOperStatus.$index", $state_name, $descr, 1, 1, null, null, '3', '3', $state);
+        discover_sensor($valid['sensor'], 'state', $device, $current_oid, "rcChasFanOperStatus.$index", $state_name, $descr, 1, 1, null, null, 3, 3, $state);
         create_sensor_to_state_index($device, $state_name, "rcChasFanOperStatus.$index");
     }
 }
@@ -51,15 +50,14 @@ if (is_array($fan)) {
  *  down(4)
 */
 
-$power_supply_oper_status = '.1.3.6.1.4.1.2272.1.4.8.1.1.2';
-$power_supply = snmpwalk_cache_oid_num($device, $power_supply_oper_status, []);
+$power_supply = snmpwalk_cache_multi_oid($device, 'rcChasPowerSupplyOperStatus', [], 'RAPID-CITY');
 
 if (is_array($power_supply)) {
     foreach ($power_supply as $oid => $array) {
         $state = current($array);
         $split_oid = explode('.', $oid);
         $index = $split_oid[(count($split_oid) - 1)];
-        $current_oid = "$power_supply_oper_status.$index";
+        $current_oid = ".1.3.6.1.4.1.2272.1.4.8.1.1.2.$index";
         $descr =  "Power Supply $index";
 
         $state_name = 'rcChasPowerSupplyOperStatus';
@@ -71,7 +69,7 @@ if (is_array($power_supply)) {
         ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $current_oid, "rcChasPowerSupplyOperStatus.$index", $state_name, $descr, 1, 1, null, null, '4', '4', $state);
+        discover_sensor($valid['sensor'], 'state', $device, $current_oid, "rcChasPowerSupplyOperStatus.$index", $state_name, $descr, 1, 1, null, null, 4, 4, $state);
         create_sensor_to_state_index($device, $state_name, "rcChasPowerSupplyOperStatus.$index");
     }
 }
