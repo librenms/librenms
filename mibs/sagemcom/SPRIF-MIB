@@ -1,0 +1,557 @@
+--*******************************************************************
+--*    SAGEM SA			 							  				*
+--*******************************************************************
+--*******************************************************************
+
+--  Filename: sprIF
+--  File type: .mib    
+-- 
+--  Description:	SNMPc source Mib file.         
+--
+--  Version:  19 11 2002
+--	
+--  Date(DD MM YYYY): 15 11 02 last update for IONOS NMS 
+--     
+--  Contact: D. Mobuchon, F. Bonnevialle
+--
+--  History: 
+--
+--		Name: F.Bonnevialle	
+--		Date: 06 04 2001 
+--		Desc: original     
+--
+--		Name: F.Bonnevialle 	
+--		Date: 15 11 2002 		
+--		Desc: Modification for SilverCreek Compiler
+--*******************************************************************
+--*******************************************************************
+--*   Copyright (c) 2002, SAGEM , All rights reserved.              *
+--*******************************************************************
+                                                                     
+                                                                     
+--*******************************************************************
+-- MIB: SPRIF-MIB
+--*******************************************************************
+SPRIF-MIB DEFINITIONS ::= BEGIN
+
+--*******************************************************************
+-- IMPORTS
+--*******************************************************************
+
+   IMPORTS
+   sagemDr								FROM SAGEM-DR-MIB
+   SagemBoolean							FROM EQUIPMENT-MIB
+   MODULE-IDENTITY,OBJECT-TYPE      	FROM SNMPv2-SMI;
+
+   
+   sprif	MODULE-IDENTITY
+      LAST-UPDATED "0012120000Z"
+      ORGANIZATION "SAGEM-Tolbiac drd/ddp/tmhd"
+      CONTACT-INFO
+	"    "
+      DESCRIPTION 
+	"Debug interface for MS-SPRing module"
+      ::= { sagemDr 180}
+     
+   -- DebugTable
+   debug		  	OBJECT IDENTIFIER ::= { sprif 10 } 
+--   debug2		  	OBJECT IDENTIFIER ::= { sprif 20 }  
+   debug3		  	OBJECT IDENTIFIER ::= { sprif 30 } 
+   
+   -- Request vector
+--   k1k2request			OBJECT IDENTIFIER ::= { sprif 60 }   
+--   oprequest 			OBJECT IDENTIFIER ::= { sprif 70 }
+--   sdsfrequest  		OBJECT IDENTIFIER ::= { sprif 80 }
+--   timerrqst         	OBJECT IDENTIFIER ::= { sprif 90 }
+
+--*******************************************************************
+-- 
+--*******************************************************************  
+
+	NodeId ::= INTEGER
+   	{   
+   	node0 		(0),
+	node1 		(1),
+	node2 		(2),
+	node3		(3),
+	node4 		(4), 
+	node5 		(5),
+	node6 		(6), 
+	node7 		(7),
+	node8 		(8), 
+	node9 		(9),
+	node10		(10), 
+	node11		(11),
+	node12		(12), 
+	node13		(13),
+	node14		(14), 
+	node15		(15), 
+	nodeUNK		(255) 
+   	} 
+	
+	
+	STATE   ::= INTEGER
+	{
+	off   			(0),
+	idle	 		(1), 
+	pass	 		(2), 	
+	switch 			(3), 	
+	unknown			(4) 
+	}
+	
+	SWITCHSTATUS ::= INTEGER
+	{
+	notSw					(0), 
+	br						(1), 
+	sw						(2), 
+	brsw					(3),
+	unknown					(4)
+	}         
+	
+    
+    K1ASK ::= INTEGER
+	{
+	lps			(15),-- Lockout Protection	
+	fsr			(13),-- Forced Switch
+	sfr			(11),-- Signal Fail
+	sdr			(8), -- Signal Degrade
+	msr			(6), -- Manual Switch
+	wtr			(5), -- Wait To Restore
+	exerr		(3), -- Exercise
+	rr			(1), -- Reverse Request
+	nr			(0)  -- No Request
+	}
+    
+    LOGTYPE ::= INTEGER
+	{
+	receiveK				(0), 
+	transmitK				(1), 
+	opCmd					(2), 
+	failure					(3),
+	timer					(4),
+	unknown					(5)
+	}     	
+
+
+	LOCALCOMMAND ::= INTEGER
+	{
+	on				(20), 	-- switch ON  MS-Spring
+	off				(19), 	-- switch OFF MS-Spring
+	lopas			(18), 	-- Lockout Of Protection All Span
+	lowr			(17), 	-- Lockout Of Working - Ring
+	clear			(16), 	-- Clear
+	lps				(15), 	-- Lockout Protection
+	fsr				(13), 	-- Forced Switch
+	msr				(6), 	-- Manual Switch
+	wtr				(5), 	-- Wait To Restore
+	exerr			(3),  	-- Exercise
+	none			(0)  	--
+	}  
+	
+	
+	LOCALFAIL ::= INTEGER
+	{
+	endsf			(27), 	-- end Signal Fail
+	endsd			(24), 	-- end Signal Degrade
+	sf				(11), 	-- Signal Fail
+	sd				(8), 	-- Signal Degrade
+	none			(0)  	--
+	}
+	
+	K2STAT ::= INTEGER
+	{
+	msais				(7), 	-- MS-AIS
+	msrdi				(6), 	-- MS-RDI
+	extra				(3), 	-- Extra Traffic
+	brsw				(2), 	-- Bridged & Switched
+	br					(1), 	-- Bridged
+	idle				(0)  	-- Idle
+	} 
+
+	K2PATH ::= INTEGER
+	{
+	short				(0), 	-- short path
+	long				(1) 	-- long path
+	}
+
+	
+    TrafficStatus ::= INTEGER
+    { 
+   	unknown(0),              
+   	working(1),
+   	protection(2)
+    }     
+
+	LINE ::= INTEGER
+	{
+	west				(0), 
+	east				(1), 
+	unknown				(2) 
+	}   
+	   
+ 	TIMER ::= INTEGER
+	{
+	stop				(0), 
+	start				(1), 
+	restart				(2) 
+	}      
+  
+  
+   debugNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of line in debug table."  
+      ::= { debug 1 } 
+   
+   debugTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF DebugEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	""
+      ::= { debug 2 } 
+
+    debugEntry   OBJECT-TYPE
+      SYNTAX       DebugEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"" 
+      INDEX        { debugIndex } 
+      ::= { debugTable 1 } 
+   
+   DebugEntry ::= SEQUENCE 
+   {
+      	debugIndex 				INTEGER,
+      	debugDate 				INTEGER, ---
+	  	debugNodeID 			NodeId,				
+	  	debugLogType 			LOGTYPE,
+		debugLine               LINE,
+		debugNodeState			STATE,
+		debugTrafficStatus 		TrafficStatus,
+		debugSwitchingState 	SWITCHSTATUS,	
+		debugTxK1Ask      	   	K1ASK,
+		debugTxK1Dst 			NodeId,		
+		debugTxK2Src            NodeId,
+		debugTxK2Path 			K2PATH,
+		debugTxK2Stat    		K2STAT,
+		debugRxK1Ask    		K1ASK,
+		debugRxK1Dst			NodeId,		
+		debugRxK2Src            NodeId,
+		debugRxK2Path        	K2PATH,
+		debugRxK2Stat           K2STAT,
+		debugWtr 					INTEGER,
+		debugLastDistantCommand		K1ASK,
+		debugLastDetectedFailure    LOCALFAIL,
+		debugLastLocalCommand       LOCALCOMMAND,
+		debugTimerAction			TIMER
+   }
+   
+   	debugIndex OBJECT-TYPE
+      SYNTAX 	    INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 1 } 
+   
+    debugDate OBJECT-TYPE
+      SYNTAX 	    INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 2 } 
+
+	debugNodeID OBJECT-TYPE
+      SYNTAX 	   NodeId
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 3 } 
+
+	debugLogType OBJECT-TYPE
+      SYNTAX 	   LOGTYPE
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 4 } 
+
+	debugLine OBJECT-TYPE
+      SYNTAX 	   LINE
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 5 } 
+
+	debugNodeState OBJECT-TYPE
+      SYNTAX 	   STATE 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 6 } 
+
+	debugTrafficStatus OBJECT-TYPE
+      SYNTAX 	   TrafficStatus 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 7 } 
+
+	debugSwitchingState OBJECT-TYPE
+      SYNTAX 	   SWITCHSTATUS 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 8 } 
+
+	debugTxK1Ask OBJECT-TYPE
+      SYNTAX 	   K1ASK 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 9 } 
+
+	debugTxK1Dst OBJECT-TYPE
+      SYNTAX 	   NodeId 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 10 } 
+
+	debugTxK2Src OBJECT-TYPE
+      SYNTAX 	   NodeId
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 11 } 
+
+	debugTxK2Path OBJECT-TYPE
+      SYNTAX 	   K2PATH 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 12 } 
+
+	debugTxK2Stat OBJECT-TYPE
+      SYNTAX 	   K2STAT 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 13 } 
+
+	debugRxK1Ask  OBJECT-TYPE
+      SYNTAX 	   K1ASK 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 14 } 
+
+	debugRxK1Dst OBJECT-TYPE
+      SYNTAX 	   NodeId 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 15 } 
+
+	debugRxK2Src OBJECT-TYPE
+      SYNTAX 	   NodeId 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 16 } 
+
+	debugRxK2Path OBJECT-TYPE
+      SYNTAX 	   K2PATH 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 17 } 
+
+		           
+	debugRxK2Stat OBJECT-TYPE
+      SYNTAX 	   K2STAT 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 18 } 
+
+		 			
+	debugWtr OBJECT-TYPE
+      SYNTAX 	    INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 19 } 
+
+				
+	debugLastDistantCommand OBJECT-TYPE
+      SYNTAX 	   K1ASK 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 20 } 
+
+		  
+	debugLastDetectedFailure OBJECT-TYPE
+      SYNTAX 	   LOCALFAIL 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 21 } 
+
+		 
+	debugLastLocalCommand OBJECT-TYPE
+      SYNTAX 	    LOCALCOMMAND
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 22 } 
+
+	debugTimerAction OBJECT-TYPE
+      SYNTAX 	    TIMER
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debugEntry 23 } 
+
+
+
+   debugActivated OBJECT-TYPE
+      SYNTAX 	   INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	" Positive value activate Debug"  
+      ::= { debug 3 } 
+		
+  --******************************************************************		
+  --******************************************************************		          
+  --******************************************************************		          
+   debug3Table   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF Debug3Entry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	""
+      ::= { debug3 2 } 
+
+    debug3Entry   OBJECT-TYPE
+      SYNTAX       Debug3Entry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"" 
+      INDEX        { debugIndex } 
+      ::= { debug3Table 1 } 
+   
+   Debug3Entry ::= SEQUENCE 
+   {
+		debug3Date 				INTEGER,
+		debug3Line              LINE,
+		debug3arv				SagemBoolean,
+		debug3ato 				SagemBoolean,
+		debug3aun 				SagemBoolean,
+		debug3ptm   			SagemBoolean,
+		debug3mms  				SagemBoolean,
+		debug3exr   			SagemBoolean
+   }
+	          
+    debug3Date OBJECT-TYPE
+      SYNTAX 	    INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+     STATUS       current
+      DESCRIPTION 
+	""  
+     ::= { debug3Entry 2 }  
+      
+	debug3Line OBJECT-TYPE
+      SYNTAX 	   LINE
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debug3Entry 5 } 
+
+		
+	debug3arv OBJECT-TYPE
+      SYNTAX 	   SagemBoolean 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debug3Entry 23 } 
+       
+       
+	debug3ato OBJECT-TYPE
+      SYNTAX 	   SagemBoolean 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debug3Entry 24 } 
+
+
+	debug3aun OBJECT-TYPE
+      SYNTAX 	   SagemBoolean 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debug3Entry 25 } 
+
+		   		
+	debug3ptm OBJECT-TYPE
+      SYNTAX 	   SagemBoolean
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debug3Entry 26 } 
+
+		  		
+	debug3mms OBJECT-TYPE
+      SYNTAX 	   SagemBoolean
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debug3Entry 27 } 
+
+		   	
+	debug3exr OBJECT-TYPE
+      SYNTAX 	   SagemBoolean
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	""  
+      ::= { debug3Entry 28 } 
+
+  
+  --******************************************************************
+  --******************************************************************
+  --*******************************************************************           
+END
