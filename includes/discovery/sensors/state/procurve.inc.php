@@ -29,15 +29,30 @@ foreach ($pre_cache['procurve_hpicfSensorTable'] as $index => $data) {
     $status_descr   = $data['hpicfSensorDescr'];
     $state          = $data['hpicfSensorStatus'];
     $tmp_index      = $status_name . '.' . $index;
-    $states = [
-        ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-        ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'bad'],
-        ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
-        ['value' => 4, 'generic' => 0, 'graph' => 1, 'descr' => 'good'],
-        ['value' => 5, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
-    ];
-    create_state_index($state_name, $states);
 
-    discover_sensor($valid['sensor'], 'state', $device, $status_oid . $index, $tmp_index, $status_name, $status_descr, 1, 1, null, null, null, null, $state);
+    $state_index_id = create_state_index($status_name);
+    if ($state_index_id !== null) {
+        $states = [
+            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'bad'],
+            ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
+            ['value' => 4, 'generic' => 0, 'graph' => 1, 'descr' => 'good'],
+            ['value' => 5, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
+        ];
+        /* FIXME - Something is causing the tests to fail when using this command
+        create_state_index($state_name, $states);
+        */
+        foreach ($states as $value) {
+            $insert = array(
+                'state_index_id' => $state_index_id,
+                'state_descr' => $value['descr'],
+                'state_draw_graph' => $value['graph'],
+                'state_value' => $value['value'],
+                'state_generic_value' => $value['generic']
+            );
+            dbInsert($insert, 'state_translations');
+        }
+    }
+    discover_sensor($valid['sensor'], 'state', $device, $status_oid . $index, $tmp_index, $status_name, $status_descr, '1', '1', null, null, null, null, $state);
     create_sensor_to_state_index($device, $status_name, $tmp_index);
 }

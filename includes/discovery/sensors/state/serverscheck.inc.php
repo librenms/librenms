@@ -40,12 +40,27 @@ foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
         if ($current) {
             $index = str_replace('.0', '', $oid_name);
             $descr = $oid_value;
-            $states = [
-                ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => '-'],
-                ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'DRY'],
-                ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'WET'],
-            ];
+            $state_index_id = create_state_index($state);
+            if ($state_index_id) {
+                $states = [
+                    ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => '-'],
+                    ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'DRY'],
+                    ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'WET'],
+                ];
+                foreach ($states as $value) {
+                    $insert = [
+                        'state_index_id' => $state_index_id,
+                        'state_descr' => $value['descr'],
+                        'state_draw_graph' => $value['graph'],
+                        'state_value' => $value['value'],
+                        'state_generic_value' => $value['generic']
+                    ];
+                    dbInsert($insert, 'state_translations');
+                }
+            }
+            /* FIXME - Something is causing the tests to fail when using this command
             create_state_index($state_name, $states);
+            */
 
             discover_sensor($valid['sensor'], 'state', $device, $serverscheck_oids[$tmp_oid], $index, $state, $descr, 1, 1, null, null, null, null, 1);
             create_sensor_to_state_index($device, $state, $index);
