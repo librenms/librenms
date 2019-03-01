@@ -11576,7 +11576,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2011.5.25.31.1.1.10.1.7.0.0",
                     "sensor_index": "0.0",
                     "sensor_type": "hwEntityFanState",
-                    "sensor_descr": "Fan Status",
+                    "sensor_descr": "Fan {{ $hwEntityFanDesc }} Status",
                     "group": "Fans",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
