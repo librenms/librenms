@@ -101,7 +101,10 @@ For `options:` you have the following available:
   - `skip_value_lt`: If sensor value is less than this, skip the discovery.
   - `skip_value_gt`: If sensor value is greater than this, skip the discovery.
 
-Multiple variables can be used in the sensors definition. The syntax is `{{ $variable }}`. Any oid in the current table can be used, as well as pre_cached data. The index ($index) and the sub_indexes (in case the oid is indexed multiple times) are also available: if $index="1.20", then $subindex0="1" and $subindex1="20".
+Multiple variables can be used in the sensors definition. The syntax is `{{ $variable }}`. Any oid in the current
+table can be used, as well as pre_cached data. The index ($index) and the sub_indexes
+(in case the oid is indexed multiple times) are also available: if $index="1.20", then
+$subindex0="1" and $subindex1="20".
 
 > `skip_values` can also compare items within the OID table against values. One example of this is:
 

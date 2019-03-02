@@ -113,7 +113,7 @@ class YamlDiscovery
             // built in replacements
             // prepare the $subindexX match variable replacement
             $subindexes = explode('.', $index);
-            foreach ($subindexes as $pos => $subindex) {
+            foreach (array_keys($subindexes) as $pos) {
                 $subindexStr[$pos] = '{{ $subindex' . $pos . ' }}';
             }
             $value = str_replace(array('{{ $index }}', '{{ $count }}'), array($index, $count), $data[$name]);
