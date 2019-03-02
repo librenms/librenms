@@ -36,7 +36,7 @@ It has built-in functionality for deduplicating, grouping and routing alerts bas
 
 LibreNMS uses alert grouping by alert rule, which can produce an array of alerts of similar content for an array of hosts, whereas Alertmanager can group them by alert meta, ideally producing one single notice in case an issue occurs. 
 
-The one and only possible parameter to be passed is `source` - this is required to distinguish LibreNMS alerts from alerts coming from different sources. 
+It is possible to configure as much label values as required in Alertmanager Options section. Every label and it's value should be entered as a new line.
 
 [Alertmanager Docs](https://prometheus.io/docs/alerting/alertmanager/)
 
@@ -46,6 +46,7 @@ The one and only possible parameter to be passed is `source` - this is required 
 | ------ | ------- |
 | Alertmanager URL      | http://alertmanager.example.com |
 | Alertmanager Options: | source=librenms |
+| | customlabel=value |
 
 ## API
 API transports definitions are a bit more complex than the E-Mail configuration.
