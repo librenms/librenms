@@ -1060,12 +1060,13 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                 d_echo("Final sensor value: $value\n");
 
                 if (YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache) === false && is_numeric($value)) {
-                    // process the index and sub_indexes
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
-                    $subindexes = explode('.', $index);
-                    foreach ($subindexes as $pos => $subindex) {
-                        $oid = str_replace('{{ $subindex' . $pos . ' }}', $subindex, $data['num_oid']);
-                    }
+
+                    //$subindexes = explode('.', $index);
+                    //foreach ($subindexes as $pos => $subindex) {
+                    //    $pre_cache['librenmsSubIndexes'][$index]['subindex' . $pos]=$subindex[$pos];
+                    //}
+                    //d_echo( $pre_cache); 
 
                     // process the description
                     $descr = YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache);

@@ -83,7 +83,8 @@ The only sensor we have defined here is airflow. The available options are as fo
   - `low_warn_limit` (optional): This is the warning low threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
   - `warn_limit` (optional): This is the warning high threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
   - `high_limit` (optional): This is the critical high threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
-  - `descr` (required): The visible label for this sensor. It can be a key with in the table or a static string, optionally using `{{ index }}`
+  - `descr` (required): The visible label for this sensor. It can be a key with in the table or a static string, optionally using `{{ index }}` or `{{ $subindex0 }}`, `{{ $subindex1 }}` etc. in case the table has more than one index
+   - $index = '1.20' -> $subindex0 = '1' and $subindex1 = '20'.
   - `group` (optional): Groups sensors together under in the webui, displaying this text. Not specifying this will put the sensors in the default group.
   - `index` (optional): This is the index value we use to uniquely identify this sensor. `{{ $index }}` will be replaced by the `index` from the snmp walk.
   - `skip_values` (optional): This is an array of values we should skip over (see note below).
