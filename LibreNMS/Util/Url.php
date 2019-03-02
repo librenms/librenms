@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Port;
 use Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
 class Url
@@ -362,6 +363,38 @@ class Url
         }
 
         return "interface-upup";
+    }
+
+    /**
+     * @param string $os
+     * @param string $feature
+     * @param string $icon
+     * @param string $dir directory to search in (images/os/ or images/logos)
+     * @return string
+     */
+    public static function findOsImage($os, $feature, $icon = null, $dir = 'images/os/')
+    {
+        $possibilities = [$icon];
+
+        if ($os) {
+            if ($os == "linux") {
+                $distro = Str::before(strtolower(trim($feature)), ' ');
+                $possibilities[] = "$distro.svg";
+                $possibilities[] = "$distro.png";
+            }
+            $os_icon = Config::getOsSetting($os, 'icon', $os);
+            $possibilities[] = "$os_icon.svg";
+            $possibilities[] = "$os_icon.png";
+        }
+
+        foreach ($possibilities as $file) {
+            if (is_file(Config::get('html_dir') . "/$dir" . $file)) {
+                return $file;
+            }
+        }
+
+        // fallback to the generic icon
+        return 'generic.svg';
     }
 
     private static function escapeBothQuotes($string)
