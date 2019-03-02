@@ -1,7 +1,6 @@
 os: marathonups
 text: 'Marathon UPS'
 type: power
-icon: marathon
 rfc1628_compat: true
 over:
     - { graph: device_load, text: Load }
