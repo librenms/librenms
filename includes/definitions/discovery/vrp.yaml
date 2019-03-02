@@ -139,7 +139,7 @@ modules:
                      oid: hwFanStatusTable
                      value: hwEntityFanState
                      num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.10.1.7.{{ $index }}'
-                     descr: 'Fan {{ $hwEntityFanDesc }} Status {{ $index }} {{ $subindex0 }} {{ $subindex1 }}'
+                     descr: 'Slot {{ $subindex0 }} Fan {{ $subindex1 }} Status'
                      group: Fans
                      state_name: hwEntityFanState
                      states:
