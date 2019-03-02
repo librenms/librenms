@@ -258,12 +258,12 @@ syslocation Rack, Room, Building, City, Country [GPSX,Y]
 syscontact Your Name <your@email.address>
 
 #Distro Detection
-extend .1.3.6.1.4.1.2021.7890.1 distro /usr/bin/distro
+extend distro /usr/bin/distro
 
 #Hardware Detection (uncomment to enable)
-#extend .1.3.6.1.4.1.2021.7890.2 hardware '/bin/cat /sys/devices/virtual/dmi/id/product_name'
-#extend .1.3.6.1.4.1.2021.7890.3 manufacturer '/bin/cat /sys/devices/virtual/dmi/id/sys_vendor'
-#extend .1.3.6.1.4.1.2021.7890.4 serial '/bin/cat /sys/devices/virtual/dmi/id/product_serial'
+#extend hardware '/bin/cat /sys/devices/virtual/dmi/id/product_name'
+#extend manufacturer '/bin/cat /sys/devices/virtual/dmi/id/sys_vendor'
+#extend serial '/bin/cat /sys/devices/virtual/dmi/id/product_serial'
 ```
 
 **NOTE**: On some systems the snmpd is running as its own user, which means it can't read `/sys/devices/virtual/dmi/id/product_serial` which is mode 0400. One solution is to `chmod 444 /sys/devices/virtual/dmi/id/product_serial` in `/etc/rc.local` or equivalent.
