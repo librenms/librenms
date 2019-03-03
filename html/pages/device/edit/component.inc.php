@@ -1,5 +1,28 @@
-<span id="message"><small><div class="alert alert-danger">n.b For the first time, please click any button twice.</div></small></span>
+<?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Components settings</span>";
+echo '<div class="pull-right">';
+echo '<span class="label label-danger">For the first time, please click any button twice.</span>';
+echo '</div>';
+print_optionbar_end();
+?>
+<span id="message"></span>
 <form id='components' class='form-inline' method='POST'>
     <table id='table' class='table table-condensed table-responsive table-striped'>
         <thead>

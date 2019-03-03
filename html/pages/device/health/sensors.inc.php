@@ -20,20 +20,21 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
     }
 
     if (($graph_type == 'sensor_state') && !empty($state_translation['0']['state_descr'])) {
-        $sensor_current = get_state_label($sensor['state_generic_value'], $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")");
+        $sensor_current = get_state_label($sensor['state_generic_value'], $state_translation[0]['state_descr'] . " (" . $sensor['sensor_current'] . ")");
     } else {
         $current_label = get_sensor_label_color($sensor);
-        $sensor_current = "<span class='label $current_label'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
+        $sensor_current = "<span class='label $current_label'>" . trim(format_si($sensor['sensor_current']) . $unit) . "</span>";
     }
 
-    $sensor_limit = trim(format_si($sensor['sensor_limit']).$unit);
-    $sensor_limit_low = trim(format_si($sensor['sensor_limit_low']).$unit);
-    $sensor_limit_warn = trim(format_si($sensor['sensor_limit_warn']).$unit);
-    $sensor_limit_low_warn = trim(format_si($sensor['sensor_limit_low_warn']).$unit);
+    $sensor_limit = trim(format_si($sensor['sensor_limit']) . $unit);
+    $sensor_limit_low = trim(format_si($sensor['sensor_limit_low']) . $unit);
+    $sensor_limit_warn = trim(format_si($sensor['sensor_limit_warn']) . $unit);
+    $sensor_limit_low_warn = trim(format_si($sensor['sensor_limit_low_warn']) . $unit);
 
-    echo "<div class='panel panel-default'>
-        <div class='panel-heading'>
-        <h3 class='panel-title'>$sensor_descr <div class='pull-right'>$sensor_current";
+    print_optionbar_start();
+
+    echo "<span style='font-weight: bold;'>" . $sensor_descr . "</span>";
+    echo "<div class='pull-right'>" . $sensor_current;
 
     //Display low and high limit if they are not null (format_si() is changing null to '0')
     if (!is_null($sensor['sensor_limit_low'])) {
@@ -49,16 +50,16 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
         echo " <span class='label label-default'>high: $sensor_limit</span>";
     }
 
-    echo "</div></div>
-        </div>";
-    echo "<div class='panel-body'>";
+    echo "</div>";
+    print_optionbar_end();
 
-    $graph_array['id']   = $sensor['sensor_id'];
+    echo "<div class='row'>";
+    $graph_array['id'] = $sensor['sensor_id'];
     $graph_array['type'] = $graph_type;
 
     include 'includes/print-graphrow.inc.php';
 
-    echo '</div></div>';
+    echo '</div>';
 
     $row++;
 }

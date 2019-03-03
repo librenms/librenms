@@ -1,4 +1,19 @@
 <?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
 use LibreNMS\Authentication\LegacyAuth;
 
@@ -33,17 +48,24 @@ if ($_POST['editing']) {
     }//end if
 }//end if
 
+$override_sysContact_bool   = get_dev_attrib($device, 'override_sysContact_bool');
+$override_sysContact_string = get_dev_attrib($device, 'override_sysContact_string');
+$disable_notify             = get_dev_attrib($device, 'disable_notify');
+
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Alert settings</span>";
+echo "<div class='pull-right'>";
+echo '<button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
+echo "</div>";
+print_optionbar_end();
+
 if ($updated && $update_message) {
     print_message($update_message);
 } elseif ($update_message) {
     print_error($update_message);
 }
-
-$override_sysContact_bool   = get_dev_attrib($device, 'override_sysContact_bool');
-$override_sysContact_string = get_dev_attrib($device, 'override_sysContact_string');
-$disable_notify             = get_dev_attrib($device, 'disable_notify');
 ?>
-<h3>Alert settings</h3>
+
 
 <div class="row">
     <div class="col-md-12">
@@ -94,17 +116,13 @@ if ($disable_notify) {
   </div>
 <div class="row">
     <div class="col-md-1 col-md-offset-3">
-        <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+        <button type="submit" name="Submit" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
     </div>
 </div>
+<br>
 </form>
 
 <?php
 require_once 'includes/modal/new_alert_rule.inc.php';
 ?>
-<br>
-<div class="row">
-    <div class="col-md-1 col-md-offset-3">
-        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="<?php echo $device['device_id']; ?>"><i class="fa fa-plus"></i> Create new alert rule</button>
-    </div>
-</div>
+

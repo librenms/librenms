@@ -1,7 +1,25 @@
-<h3> Applications </h3>
 <?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
 use LibreNMS\Config;
+
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Applications</span>";
+print_optionbar_end();
 
 // Load our list of available applications
 $applications = array();
@@ -19,29 +37,24 @@ $enabled_apps = array_reduce(dbFetchRows(
     return $result;
 }, array());
 
-
-echo '<ul class="list-group row">';
+echo '<ul style="margin:0 1em;display: inline-block;">';
 foreach ($applications as $app) {
     $modifiers = '';
     $app_text = nicecase($app);
     // check if the app exists in the enable apps array and check if it was automatically enabled
     if (isset($enabled_apps[$app])) {
         $modifiers = ' checked';
-        if ($enabled_apps[$app]
-            && is_dev_attrib_enabled($device, "poll_applications", Config::getOsSetting($device['os'], "poller_modules.applications"))
-        ) {
-            $app_text .= '<span class="text-success"> (Discovered)</span>';
+        if ($enabled_apps[$app] && is_dev_attrib_enabled($device, "poll_applications", Config::getOsSetting($device['os'], "poller_modules.applications"))) {
+            $app_text .= '<div class="pull-right"><span class="label label-success">(Discovered)</span></div>';
             $modifiers .= ' disabled';
         }
     }
 
     echo '<li class="list-group-item col-xs-12 col-md-6 col-lg-4">';
-    echo "<input style='visibility:hidden;width:100px;' type='checkbox' name='application' data-size='small'";
-    echo " data-application='$app' data-device_id='{$device['device_id']}'$modifiers>";
+    echo "<input style='visibility:hidden;width:100px;' type='checkbox' name='application' data-size='small' data-application='$app' data-device_id='{$device['device_id']}'$modifiers>";
     echo '<span style="font-size:medium;padding-left:5px;"> ' . $app_text . '</span>';
     echo '</li>';
 }
-
 echo '</ul>';
 ?>
 

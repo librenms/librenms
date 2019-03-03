@@ -1,21 +1,27 @@
 <?php
-
 /*
  * LibreNMS
- *
- * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk>
- * Copyright (c) 2017 Tony Murray <https://github.com/murrant>
- * Copyright (c) 2018 TheGreatDoc <https://github.com/TheGreatDoc>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
- */
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
-// FUA
-echo "<h3>$title</h3>";
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>" . $title . "</span>";
+echo '<div class="pull-right">';
+echo '<button id="newThread" class="btn btn-primary btn-xs" type="submit">Reset values</button>';
+echo '</div>';
+print_optionbar_end();
+
 ?>
 
 <form class="form-inline">
@@ -107,7 +113,6 @@ foreach ($rollback as $reset_data) {
 }
 ?>
 <input type="hidden" name="type" value="sensor-alert-reset">
-<button id = "newThread" class="btn btn-primary btn-sm" type="submit">Reset values</button>
 </form>
 <script>
 $('#newThread').on('click', function(e){

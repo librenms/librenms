@@ -1,4 +1,19 @@
 <?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
 use App\Models\Device;
 use App\Models\Location;
@@ -70,26 +85,18 @@ if ($_POST['editing']) {
     }
 }
 
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Device Settings</span>";
+echo "<div class='pull-right'>";
+echo '<form id="delete_host" name="delete_host" method="post" action="delhost/" role="form" class="pull-left"><input type="hidden" name="id" value="'.$device['device_id'].'"><button type="submit" class="btn btn-xs btn-danger" name="Submit"><i class="fa fa-trash"></i> Delete device</button></form>';
+if ($config['enable_clear_discovery'] == 1  && !$device['snmp_disable']) {
+    echo '&nbsp;<button type="submit" id="rediscover" data-device_id="'.$device['device_id'].'" class="btn btn-xs btn-primary" name="rediscover"><i class="fa fa-retweet"></i> Rediscover device</button>';
+}
+echo "</div>";
+
+print_optionbar_end();
 ?>
-<h3> Device Settings </h3>
-<div class="row">
-    <div class="col-md-1 col-md-offset-2">
-        <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form">
-            <input type="hidden" name="id" value="<?php echo($device['device_id']); ?>">
-            <button type="submit" class="btn btn-danger" name="Submit"><i class="fa fa-trash"></i> Delete device</button>
-        </form>
-    </div>
-    <div class="col-md-1 col-md-offset-2">
-        <?php
-        if ($config['enable_clear_discovery'] == 1  && !$device['snmp_disable']) {
-        ?>
-            <button type="submit" id="rediscover" data-device_id="<?php echo($device['device_id']); ?>" class="btn btn-primary" name="rediscover"><i class="fa fa-retweet"></i> Rediscover device</button>
-        <?php
-        }
-        ?>
-    </div>
-</div>
-<br>
+
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
 <input type=hidden name="editing" value="yes">
     <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
@@ -202,7 +209,7 @@ if ($_POST['editing']) {
     </div>
     <div class="row">
         <div class="col-md-1 col-md-offset-2">
-            <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+            <button type="submit" name="Submit" class="btn btn-success"><i class="fa fa-check"></i> Save</button>
         </div>
     </div>
 </form>
