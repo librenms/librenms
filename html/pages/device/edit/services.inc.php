@@ -1,4 +1,23 @@
 <?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     LibreNMS Contributors
+*/
+
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Services</span>";
+print_optionbar_end();
 
 use LibreNMS\Authentication\LegacyAuth;
 
@@ -29,8 +48,6 @@ if (LegacyAuth::user()->hasGlobalRead()) {
     if ($updated) {
         print_message('Device Settings Saved');
     }
-
-    echo '<div class="col-sm-6">';
 
     include_once 'includes/print-service-add.inc.php';
 } else {

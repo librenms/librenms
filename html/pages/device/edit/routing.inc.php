@@ -1,32 +1,35 @@
 <?php
-
 /*
  * LibreNMS
- *
- * Copyright (c) 2018 TheGreatDoc
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
- */
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Routing settings</span>";
+print_optionbar_end();
 ?>
-<h3>Routing settings</h3>
 
-<div class="table-responsive">
-    <table id="routing" class="table table-hover table-condensed routing">
-        <thead>
-        <tr>
-            <th data-column-id="hostname">Device</th>
-            <th data-column-id="bgpPeerIdentifier">Peer address</th>
-            <th data-column-id="bgpPeerRemoteAs">Remote AS</th>
-            <th data-column-id="bgpPeerDescr" data-formatter="descr_update" data-header-css-class="edit-routing-input">Description</th>
-        </tr>
-        </thead>
-    </table>
-</div>
+<table id="routing" class="table table-striped table-hover table-condensed routing">
+    <thead>
+    <tr>
+        <th data-column-id="hostname">Device</th>
+        <th data-column-id="bgpPeerIdentifier">Peer address</th>
+        <th data-column-id="bgpPeerRemoteAs">Remote AS</th>
+        <th data-column-id="bgpPeerDescr" data-formatter="descr_update" data-header-css-class="edit-routing-input">Description</th>
+    </tr>
+    </thead>
+</table>
 
 <script>
     var grid = $("#routing").bootgrid({

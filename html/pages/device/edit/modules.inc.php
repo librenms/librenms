@@ -1,240 +1,227 @@
-<h3> Modules </h3>
-<div class="row">
-  <div class="col-sm-6">
-    <strong>Poller Modules</strong>
-  </div>
-  <div class="col-sm-6">
-    <strong>Discovery Modules</strong>
-  </div>
-</div>
-<div class="row">
-  <div class="col-sm-6">
-    <table class="table table-striped">
-      <tr>
-        <th>Module</th>
-        <th>Global</th>
-        <th>OS</th>
-        <th>Device</th>
-        <th></th>
-      </tr>
 <?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     LibreNMS Contributors
+*/
+
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Modules</span>";
+print_optionbar_end();
+
+echo '<div class="row">';
+echo '<div class="col-sm-6">';
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Poller</span>";
+print_optionbar_end();
+
+echo '<table class="table table-striped table-condensed">';
+echo '<thead>';
+echo '<th>Module</th>';
+echo '<th>Global</th>';
+echo '<th>OS</th>';
+echo '<th>Device</th>';
+echo '<th>Action</th>';
+echo '</thead>';
+echo '<tbody>';
 
 $poller_modules = $config['poller_modules'];
 ksort($poller_modules);
 foreach ($poller_modules as $module => $module_status) {
-    echo('
-      <tr>
-        <td><strong>'.$module.'</strong></td>
-        <td>
-        ');
+    echo '<tr>';
+    echo '<td><strong>' . $module . '</strong></td>';
 
+    echo '<td>';
     if ($module_status == 1) {
-        echo('<span class="text-success">Enabled</span>');
+        echo '<span class="label label-success">Enabled</span>';
     } else {
-        echo('<span class="text-danger">Disabled</span>');
+        echo '<span class="label label-danger">Disabled</span>';
     }
+    echo '</td>';
 
-    echo('
-        </td>
-        <td>');
-
+    echo '<td>';
     if (isset($config['os'][$device['os']]['poller_modules'][$module])) {
         if ($config['os'][$device['os']]['poller_modules'][$module]) {
-            echo('<span class="text-success">Enabled</span>');
+            echo '<span class="label label-success">Enabled</span>';
             $module_status = 1;
         } else {
-            echo('<span class="text-danger">Disabled</span>');
+            echo '<span class="label label-danger">Disabled</span>';
             $module_status = 0;
         }
     } else {
-        echo('<span>Unset</span>');
+        echo '<span class="label label-default">Unset</span>';
     }
+    echo '</td>';
 
-    echo('
-        </td>
-        <td>
-        ');
-
-    if (isset($attribs['poll_'.$module])) {
-        if ($attribs['poll_'.$module]) {
-            echo('<span id="poller-module-'.$module.'" class="text-success">Enabled</span>');
+    echo '<td>';
+    if (isset($attribs['poll_' . $module])) {
+        if ($attribs['poll_' . $module]) {
+            echo '<span id="poller-module-' . $module . '" class="label label-success">Enabled</span>';
             $module_checked = 'checked';
         } else {
-            echo('<span id="poller-module-'.$module.'"class="text-danger">Disabled</span>');
+            echo '<span id="poller-module-' . $module . '" class="label label-danger">Disabled</span>';
             $module_checked = '';
         }
     } else {
-        echo('<span id="poller-module-'.$module.'">Unset</span>');
+        echo '<span id="poller-module-' . $module . '" class="label label-default">Unset</span>';
         if ($module_status == 1) {
             $module_checked = 'checked';
         } else {
             $module_checked = '';
         }
     }
+    echo '</td>';
 
-    echo('
-       </td>
-       <td>
-       ');
-
-    echo '<input type="checkbox" style="visibility:hidden;width:100px;" name="poller-module" data-poller_module="'
-        .$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>';
-
-    echo('
-       </td>
-     </tr>
-     ');
+    echo '<td><input type="checkbox" style="visibility:hidden;width:100px;" name="poller-module" data-poller_module="' . $module . '" data-device_id="' . $device['device_id'] . '" ' . $module_checked . '></td>';
+    echo '</tr>';
 }
 
-?>
+echo '</tbody>';
+echo '</table>';
+echo '</div>';
 
-    </table>
-  </div>
-  <div class="col-sm-6">
-    <table class="table table-striped">
-      <tr>
-        <th>Module</th>
-        <th>Global</th>
-        <th>OS</th>
-        <th>Device</th>
-        <th></th>
-      </tr>
+echo '<div class="col-sm-6">';
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Discovery</span>";
+print_optionbar_end();
 
-<?php
+echo '<table class="table table-striped table-condensed">';
+echo '<thead>';
+echo '<th>Module</th>';
+echo '<th>Global</th>';
+echo '<th>OS</th>';
+echo '<th>Device</th>';
+echo '<th>Action</th>';
+echo '</thead>';
+echo '<tbody>';
 
 $discovery_modules = $config['discovery_modules'];
 ksort($discovery_modules);
 foreach ($discovery_modules as $module => $module_status) {
-    echo('
-      <tr>
-        <td>
-          <strong>'.$module.'</strong>
-        </td>
-        <td>
-        ');
+    echo '<tr>';
+    echo '<td><strong>' . $module . '</strong></td>';
 
+    echo '<td>';
     if ($module_status == 1) {
-        echo('<span class="text-success">Enabled</span>');
+        echo '<span class="label label-success">Enabled</span>';
     } else {
-        echo('<span class="text-danger">Disabled</span>');
+        echo '<span class="label label-danger">Disabled</span>';
     }
+    echo '</td>';
 
-    echo('
-        </td>
-        <td>');
-
+    echo '<td>';
     if (isset($config['os'][$device['os']]['discovery_modules'][$module])) {
         if ($config['os'][$device['os']]['discovery_modules'][$module]) {
-            echo('<span class="text-success">Enabled</span>');
+            echo '<span class="label label-success">Enabled</span>';
             $module_status = 1;
         } else {
-            echo('<span class="text-danger">Disabled</span>');
+            echo '<span class="label label-danger">Disabled</span>';
             $module_status = 0;
         }
     } else {
-        echo('<span>Unset</span>');
+        echo '<span class="label label-default">Unset</span>';
     }
+    echo '</td>';
 
-    echo('
-        </td>
-        <td>');
-
-    if (isset($attribs['discover_'.$module])) {
-        if ($attribs['discover_'.$module]) {
-            echo('<span id="discovery-module-'.$module.'" class="text-success">Enabled</span>');
+    echo '<td>';
+    if (isset($attribs['discover_' . $module])) {
+        if ($attribs['discover_' . $module]) {
+            echo '<span id="discovery-module-' . $module . '" class="label label-success">Enabled</span>';
             $module_checked = 'checked';
         } else {
-            echo('<span id="discovery-module-'.$module.'" class="text-danger">Disabled</span>');
+            echo '<span id="discovery-module-' . $module . '" class="label label-danger">Disabled</span>';
             $module_checked = '';
         }
     } else {
-        echo('<span id="discovery-module-'.$module.'">Unset</span>');
+        echo '<span id="discovery-module-' . $module . '" class="label label-default">Unset</span>';
         if ($module_status == 1) {
             $module_checked = 'checked';
         } else {
             $module_checked = '';
         }
     }
+    echo '</td>';
 
-    echo('
-        </td>
-        <td>');
-
-    echo '<input type="checkbox" style="visibility:hidden;width:100px;" name="discovery-module" data-discovery_module="'
-        .$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>';
-
-    echo('
-        </td>
-      </tr>');
+    echo '<td><input type="checkbox" style="visibility:hidden;width:100px;" name="discovery-module" data-discovery_module="' . $module . '" data-device_id="' . $device['device_id'] . '" ' . $module_checked . '></td>';
+    echo '</tr>';
 }
-echo('
-    </table>
-  </div>
-');
+echo '</tbody>';
+echo '</table>';
 
+echo '</div>';
 ?>
 
+
 <script>
-  $("[name='poller-module']").bootstrapSwitch('offColor','danger');
-  $('input[name="poller-module"]').on('switchChange.bootstrapSwitch',  function(event, state) {
-    event.preventDefault();
-    var $this = $(this);
-    var poller_module = $(this).data("poller_module");
-    var device_id = $(this).data("device_id");
-    $.ajax({
-      type: 'POST',
-      url: 'ajax_form.php',
-      data: { type: "poller-module-update", poller_module: poller_module, device_id: device_id, state: state},
-      dataType: "html",
-      success: function(data){
-        //alert('good');
-        if(state)
-        {
-          $('#poller-module-'+poller_module).removeClass('text-danger');
-          $('#poller-module-'+poller_module).addClass('text-success');
-          $('#poller-module-'+poller_module).html('Enabled');
-        }
-        else
-        {
-          $('#poller-module-'+poller_module).removeClass('text-success');
-          $('#poller-module-'+poller_module).addClass('text-danger');
-          $('#poller-module-'+poller_module).html('Disabled');
-        }
-      },
-      error:function(){
-        //alert('bad');
-      }
+    $("[name='poller-module']").bootstrapSwitch('offColor', 'danger');
+    $('input[name="poller-module"]').on('switchChange.bootstrapSwitch', function (event, state) {
+        event.preventDefault();
+        var $this = $(this);
+        var poller_module = $(this).data("poller_module");
+        var device_id = $(this).data("device_id");
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {type: "poller-module-update", poller_module: poller_module, device_id: device_id, state: state},
+            dataType: "html",
+            success: function (data) {
+                //alert('good');
+                if (state) {
+                    $('#poller-module-' + poller_module).removeClass('text-danger');
+                    $('#poller-module-' + poller_module).addClass('text-success');
+                    $('#poller-module-' + poller_module).html('Enabled');
+                } else {
+                    $('#poller-module-' + poller_module).removeClass('text-success');
+                    $('#poller-module-' + poller_module).addClass('text-danger');
+                    $('#poller-module-' + poller_module).html('Disabled');
+                }
+            },
+            error: function () {
+                //alert('bad');
+            }
+        });
     });
-  });
-  $("[name='discovery-module']").bootstrapSwitch('offColor','danger');
-  $('input[name="discovery-module"]').on('switchChange.bootstrapSwitch',  function(event, state) {
-    event.preventDefault();
-    var $this = $(this);
-    var discovery_module = $(this).data("discovery_module");
-    var device_id = $(this).data("device_id");
-    $.ajax({
-      type: 'POST',
-      url: 'ajax_form.php',
-      data: { type: "discovery-module-update", discovery_module: discovery_module, device_id: device_id, state: state},
-      dataType: "html",
-      success: function(data){
-        //alert('good');
-        if(state)
-        {
-          $('#discovery-module-'+discovery_module).removeClass('text-danger');
-          $('#discovery-module-'+discovery_module).addClass('text-success');
-          $('#discovery-module-'+discovery_module).html('Enabled');
-        }
-        else
-        {
-          $('#discovery-module-'+discovery_module).removeClass('text-success');
-          $('#discovery-module-'+discovery_module).addClass('text-danger');
-          $('#discovery-module-'+discovery_module).html('Disabled');
-        }
-      },
-      error:function(){
-        //alert('bad');
-      }
+    $("[name='discovery-module']").bootstrapSwitch('offColor', 'danger');
+    $('input[name="discovery-module"]').on('switchChange.bootstrapSwitch', function (event, state) {
+        event.preventDefault();
+        var $this = $(this);
+        var discovery_module = $(this).data("discovery_module");
+        var device_id = $(this).data("device_id");
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {
+                type: "discovery-module-update",
+                discovery_module: discovery_module,
+                device_id: device_id,
+                state: state
+            },
+            dataType: "html",
+            success: function (data) {
+                //alert('good');
+                if (state) {
+                    $('#discovery-module-' + discovery_module).removeClass('text-danger');
+                    $('#discovery-module-' + discovery_module).addClass('text-success');
+                    $('#discovery-module-' + discovery_module).html('Enabled');
+                } else {
+                    $('#discovery-module-' + discovery_module).removeClass('text-success');
+                    $('#discovery-module-' + discovery_module).addClass('text-danger');
+                    $('#discovery-module-' + discovery_module).html('Disabled');
+                }
+            },
+            error: function () {
+                //alert('bad');
+            }
+        });
     });
-  });
 </script>

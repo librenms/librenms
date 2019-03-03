@@ -1,33 +1,37 @@
 <?php
-
 /*
  * LibreNMS
- *
- * Copyright (c) 2015 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
- */
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Storage settings</span>";
+print_optionbar_end();
 ?>
 
-<h3>Storage settings</h3>
-
-<div class="table-responsive">
-    <table id="storage" class="table table-hover table-condensed storage">
-        <thead>
-        <tr>
-            <th data-column-id="hostname">Device</th>
-            <th data-column-id="storage_descr">Storage</th>
-            <th data-column-id="storage_perc">%</th>
-            <th data-column-id="storage_perc_warn" data-formatter="perc_update" data-header-css-class="edit-storage-input">% Warn</th>
-        </tr>
-        </thead>
-    </table>
-</div>
+<table id="storage" class="table table-striped table-hover table-condensed storage">
+    <thead>
+    <tr>
+        <th data-column-id="hostname">Device</th>
+        <th data-column-id="storage_descr">Storage</th>
+        <th data-column-id="storage_perc">%</th>
+        <th data-column-id="storage_perc_warn" data-formatter="perc_update" data-header-css-class="edit-storage-input">%
+            Warn
+        </th>
+    </tr>
+    </thead>
+</table>
 
 <script>
     var grid = $("#storage").bootgrid({

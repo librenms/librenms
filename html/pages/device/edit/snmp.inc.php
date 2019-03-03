@@ -1,4 +1,19 @@
 <?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
 use LibreNMS\Authentication\LegacyAuth;
 
@@ -103,15 +118,19 @@ if ($_POST['editing']) {
 $device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($device['device_id']));
 $descr  = $device['purpose'];
 
+$max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
+$max_oid = get_dev_attrib($device, 'snmp_max_oid');
+
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>SNMP settings</span>";
+print_optionbar_end();
+
 if (isset($update_message)) {
     print_message(join("<br />", $update_message));
 }
 if (isset($update_failed_message)) {
     print_error(join("<br />", $update_failed_message));
 }
-
-$max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
-$max_oid = get_dev_attrib($device, 'snmp_max_oid');
 
 echo "
     <form id='edit' name='edit' method='post' action='' role='form' class='form-horizontal'>
@@ -319,6 +338,7 @@ echo '
             <button type="submit" name="Submit"  class="btn btn-success"><i class="fa fa-check"></i> Save</button>
         </div>
     </div>
+    <br>
     </form>
     ';
 

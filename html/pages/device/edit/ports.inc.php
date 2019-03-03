@@ -1,7 +1,13 @@
 </form>
-<h3> Port Settings </h3>
-<span id="message"><small><div class="alert alert-danger">n.b For the first time, please click any button twice.</div></small></span>
 
+<?php
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>Port settings</span>";
+echo "<div class='pull-right'><span class='label label-danger'>n.b For the first time, please click any button twice.</span></div>";
+print_optionbar_end();
+?>
+
+<span id="message"></span>
 <form id='ignoreport' name='ignoreport' method='post' action='' role='form' class='form-inline'>
     <input type='hidden' name='ignoreport' value='yes'>
     <input type='hidden' name='type' value='update-ports'>
