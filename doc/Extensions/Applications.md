@@ -1144,7 +1144,7 @@ The application should be auto-discovered as described at the top of the page. I
 A small shell script that exports apcacess ups status.
 
 ##### SNMP Extend
-1. Copy the [ups apcups](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-apcups to `/etc/snmp/` on your host.
+1. Copy the [ups apcups](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-apcups) to `/etc/snmp/` on your host.
 
 2. Run `chmod +x /etc/snmp/ups-apcups`
 
