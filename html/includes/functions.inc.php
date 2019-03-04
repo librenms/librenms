@@ -695,6 +695,15 @@ function print_optionbar_end()
     echo "</div>";
 }//end print_optionbar_end()
 
+function apps_default_graphs_value($key, $app_id, $time)
+{
+    $graph_array['height'] = '100';
+    $graph_array['width'] = '215';
+    $graph_array['to'] = $time;
+    $graph_array['id'] = $app_id;
+    $graph_array['type'] = 'application_' . $key;
+    return $graph_array;
+}
 
 function overlibprint($text)
 {

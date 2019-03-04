@@ -1,20 +1,31 @@
 <?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     LibreNMS Contributors
+*/
+
 if (empty($graph_array['type'])) {
     $graph_array['type'] = $graph_type;
 }
 if (empty($graph_array['device'])) {
     $graph_array['device'] = $device['device_id'];
 }
-// FIXME not css alternating yet
-if (!is_integer($g_i / 2)) {
-    $row_colour = $config['list_colour']['even'];
-} else {
-    $row_colour = $config['list_colour']['odd'];
-}
 
-echo "<div style='width:100%;background-color:#F5F5F5;padding:10px;margin:2px 0 4px 0;'><h3 class='panel-title'>" . $graph_title . "</h3></div><div class='panel-body'>";
-echo "<div class='row'>";
+print_optionbar_start();
+echo "<span style='font-weight: bold;'>" . $graph_title . "</span>";
+print_optionbar_end();
+
+echo "<div class='panel-body'>";
 require 'includes/print-graphrow.inc.php';
 echo '</div>';
-echo '</div>';
-$g_i++;

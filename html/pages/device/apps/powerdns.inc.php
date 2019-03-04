@@ -1,8 +1,23 @@
 <?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       http://librenms.org
+ * @copyright  2019 LibreNMS
+ * @author     LibreNMS Contributors
+*/
 
 global $config;
 
-$graphs = array(
+$graphs = [
     'powerdns_latency'     => 'PowerDNS - Latency',
     'powerdns_fail'        => 'PowerDNS - Corrupt / Failed / Timed out',
     'powerdns_packetcache' => 'PowerDNS - Packet Cache',
@@ -10,24 +25,6 @@ $graphs = array(
     'powerdns_recursing'   => 'PowerDNS - Recursing Queries and Answers',
     'powerdns_queries'     => 'PowerDNS - Total UDP/TCP Queries and Answers',
     'powerdns_queries_udp' => 'PowerDNS - Detail UDP IPv4/IPv6 Queries and Answers',
-);
+];
 
-foreach ($graphs as $key => $text) {
-    $graph_type            = $key;
-    $graph_array['height'] = '100';
-    $graph_array['width']  = '215';
-    $graph_array['to']     = $config['time']['now'];
-    $graph_array['id']     = $app['app_id'];
-    $graph_array['type']   = 'application_'.$key;
-
-    echo '<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">'.$text.'</h3>
-    </div>
-    <div class="panel-body">
-    <div class="row">';
-    include 'includes/print-graphrow.inc.php';
-    echo '</div>';
-    echo '</div>';
-    echo '</div>';
-}
+include 'app.bootstrap.inc.php';
