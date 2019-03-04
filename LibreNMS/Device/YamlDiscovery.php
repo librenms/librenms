@@ -111,15 +111,22 @@ class YamlDiscovery
         $value = dynamic_discovery_get_value($name, $index, $data, $pre_cache);
         if (is_null($value)) {
             // built in replacements
+            $search = [
+                '{{ $index }}',
+                '{{ $count }}',
+            ];
+            $replace = [
+                $index,
+                $count,
+            ];
 
             // prepare the $subindexX match variable replacement
-            $subindexes = explode('.', $index);  //split the index
-            $subindexStr = [];                   //init array of variable names
-            foreach (array_keys($subindexes) as $pos) {
-                $subindexStr[$pos] = '{{ $subindex' . $pos . ' }}';
+            foreach (explode('.', $index) as $pos => $subindex) {
+                $search[] = '{{ $subindex' . $pos . ' }}';
+                $replace[] = $subindex;
             }
-            $value = str_replace(array('{{ $index }}', '{{ $count }}'), array($index, $count), $data[$name]);
-            $value = str_replace($subindexStr, $subindexes, $value);
+
+            $value = str_replace($search, $replace, $data[$name]);
 
             // search discovery data for values
             $value = preg_replace_callback('/{{ \$([a-zA-Z0-9.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
