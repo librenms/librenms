@@ -42,7 +42,7 @@ if ($device['os'] === 'boss') {
                 dbInsert($insert, 'state_translations');
         }
 
-        //Get power supply (4), temp (5), and fans (6) sensor only from walk
+        //Get power supply(4), temp(5), and fans(6) sensor only from walk
         $ers_sensors = array();
         foreach ($oid as $key => $value) {
             if ($key['s5ChasComGrpIndx'] == 4 || $key['s5ChasComGrpIndx'] == 5 || $key['s5ChasComGrpIndx'] == 6) {
@@ -54,7 +54,7 @@ if ($device['os'] === 'boss') {
             //Get unit number
             $unit_array = explode(".", $index);
             $unit = floor($unit_array[1]/10);
-            //Set description power supply
+            //Set description with Power Supply number
             if ($unit_array[0] == 4) {
                 if ($unit != $temp_unit) {
                     $ps_num = 1;
