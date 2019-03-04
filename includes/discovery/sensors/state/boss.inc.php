@@ -61,9 +61,9 @@ if ($device['os'] === 'boss') {
                 } else {
                     $ps_num++;
                 }
-                $descr = "Unit $unit: Power Supply $ps_num";
+                $descr = "BOSS Unit $unit: Power Supply $ps_num";
             } else {
-                $descr = "Unit $unit: $entry[s5ChasComDescr]";
+                $descr = "BOSS Unit $unit: $entry[s5ChasComDescr]";
             }
             //Discover Sensors
             discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, "s5ChasComOperState.$index", $state_name, $descr, '1', '1', null, null, null, null, $entry['s5ChasComOperState']);
