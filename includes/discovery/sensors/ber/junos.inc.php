@@ -18,7 +18,7 @@ foreach ($pre_cache['junos_ifotn_oids'] as $index => $entry) {
     if (is_numeric($entry['jnxoptIfOTNPMCurrentFECBERMantissa'])) {
         $index = substr_replace($index, '', -2);
         $oid = '.1.3.6.1.4.1.2636.3.73.1.3.3.8.1.5.'.$index.'.1';
-        $interface = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id']));
+        $interface = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]);
         $descr = $interface . ' preFEC BER';
         
         $limit_low = null;

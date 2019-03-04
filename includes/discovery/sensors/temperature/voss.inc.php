@@ -13,7 +13,7 @@
  * the source code distribution for details.
  */
 
-$rcChasFan = snmpwalk_cache_multi_oid($device, 'rcChasFanAmbientTemperature', array(), 'RAPID-CITY');
+$rcChasFan = snmpwalk_cache_multi_oid($device, 'rcChasFanAmbientTemperature', [], 'RAPID-CITY');
 if (is_array($rcChasFan)) {
     foreach (array_keys($rcChasFan) as $index) {
         $descr = "Fan ".$index." temperature";
