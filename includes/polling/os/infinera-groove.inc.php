@@ -23,13 +23,16 @@
  * @author     Nick Hilliard <nick@foobar.org>
  */
 
-echo 'CORIANT-GROOVE-MIB: ';
+echo 'infinera-groove: ';
 
-// CORIANT-GROOVE-MIB::neType.0
-$hardware = snmp_get($device, '.1.3.6.1.4.1.42229.1.2.2.1.3.0', '-OQv', '+CORIANT-GROOVE-MIB', 'infinera-groove');
+$oid_list = [
+    'neType.0',
+    'softwareloadSwloadVersion.1',
+    'inventoryManufacturerNumber.shelf.1.0.0.0',
+];
 
-// CORIANT-GROOVE-MIB::softwareloadSwloadVersion.1
-$version  = snmp_get($device, '.1.3.6.1.4.1.42229.1.2.9.2.1.1.3.1', '-OQv', '+CORIANT-GROOVE-MIB', 'infinera-groove');
+$data = snmp_get_multi($device, $oid_list, '-OUQs', 'CORIANT-GROOVE-MIB');
 
-// CORIANT-GROOVE-MIB::inventoryManufacturerNumber.shelf.1.0.0.0
-$serial = snmp_get($device, '.1.3.6.1.4.1.42229.1.2.3.12.1.1.16.1.1.0.0.0', '-OQv', '+CORIANT-GROOVE-MIB', 'infinera-groove');
+$version    = $data[1]['softwareloadSwloadVersion'];
+$hardware   = $data[0]['neType'];
+$serial     = $data['shelf.1.0.0.0']['inventoryManufacturerNumber'];
