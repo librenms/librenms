@@ -49,7 +49,6 @@ if ($device['os'] === 'boss') {
                 $ers_sensors[$key] = $value;
             }
         }
-        
         $ps_num = 1;
         foreach ($ers_sensors as $index => $entry) {
             //Get unit number
