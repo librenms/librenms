@@ -111,7 +111,7 @@ if (is_numeric($state)) {
     create_sensor_to_state_index($device, $state_name, $index);
 }
 
-// RAID Status OID (Value : 1 Normal, 2 Repairing, 3 Migrating, 4 Expanding, 5 Deleting, 6 Creating, 7 RaidSyncing, 8 RaidParityChecking, 9 RaidAssembling, 10 Canceling, 11 Degrade, 12 Crashed)
+// RAID Status OID (Value : 1 Normal, 2 Repairing, 3 Migrating, 4 Expanding, 5 Deleting, 6 Creating, 7 RaidSyncing, 8 RaidParityChecking, 9 RaidAssembling, 10 Canceling, 11 Degrade, 12 Crashed, 13 DataScrubbing)
 $oids = snmpwalk_cache_multi_oid($device, 'raidTable', [], 'SYNOLOGY-RAID-MIB');
 $cur_oid = '.1.3.6.1.4.1.6574.3.1.1.3.';
 
@@ -131,6 +131,7 @@ if (is_array($oids)) {
         ['value' => 10, 'generic' => 1, 'graph' => 0, 'descr' => 'Canceling'],
         ['value' => 11, 'generic' => 2, 'graph' => 0, 'descr' => 'Degrade'],
         ['value' => 12, 'generic' => 2, 'graph' => 0, 'descr' => 'Crashed'],
+        ['value' => 13, 'generic' => 1, 'graph' => 0, 'descr' => 'DataScrubbing'],
     ];
     create_state_index($state_name, $states);
 
