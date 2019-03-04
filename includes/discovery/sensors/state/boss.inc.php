@@ -45,7 +45,7 @@ if ($device['os'] === 'boss') {
         // get fans (6) and temp (5) sensor only from walk
         $ers_sensors = array();
         foreach ($oid as $key => $value) {
-            if ($key['s5ChasComGrpIndx'] == 5 || $key['s5ChasComGrpIndx'] == 6) {
+            if ($key['s5ChasComGrpIndx'] == 4 || $key['s5ChasComGrpIndx'] == 5 || $key['s5ChasComGrpIndx'] == 6) {
                 $ers_sensors[$key] = $value;
             }
         }
@@ -54,7 +54,13 @@ if ($device['os'] === 'boss') {
             //Get unit number
             $unit_array = explode(".", $index);
             $unit = floor($unit_array[1]/10);
-            $descr = "Unit $unit: $entry[s5ChasComDescr]";
+            //Set description Power Supply
+            if ($unit_array[0] == 4) {
+                 $ps_num++;
+                 $descr = "Unit $unit: Power Supply $ps_num";
+            } else {
+                 $descr = "Unit $unit: $entry[s5ChasComDescr]";
+            }
             //Discover Sensors
             discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, "s5ChasComOperState.$index", $state_name, $descr, '1', '1', null, null, null, null, $entry['s5ChasComOperState']);
             //Create Sensor To State Index
