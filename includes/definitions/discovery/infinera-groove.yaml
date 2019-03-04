@@ -1,0 +1,32 @@
+mib: CORIANT-GROOVE-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - portId
+
+        power:
+            data:
+                -
+                    oid: shelfTable
+                    descr: 'Chassis Power Consumption'
+                    value: systemPowerConsumptionCurrent
+                    num_oid: '.1.3.6.1.4.1.42229.1.2.2.2.2.{{ $index }}'
+
+        temperature:
+            data:
+                -
+                    oid: shelfTable
+                    descr: 'Chassis Inlet'
+                    value: shelfInletTemperature
+                    num_oid: '.1.3.6.1.4.1.42229.1.2.3.1.1.1.3.{{ $index }}'
+                    index: 'shelfInletTemperature.{{ $index }}'
+                    skip_values: -99
+                -
+                    oid: shelfTable
+                    descr: 'Chassis Outlet'
+                    value: shelfOutletTemperature
+                    num_oid: '.1.3.6.1.4.1.42229.1.2.3.1.1.1.4.{{ $index }}'
+                    index: 'shelfOutletTemperature.{{ $index }}'
+                    skip_values: -99
