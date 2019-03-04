@@ -24,4 +24,4 @@
  */
 
 echo 'ctrl3ChIECTable ';
-$pre_cache['geist_pdu_iec'] = snmpwalk_cache_oid($device, 'ctrl3ChIECTable', array(), 'GEIST-MIB-V3');
+$pre_cache['geist_pdu_iec'] = snmpwalk_cache_oid($device, 'ctrl3ChIECTable', [], 'GEIST-MIB-V3');
