@@ -68,7 +68,8 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
                 '.1.3.6.1.4.1.1429.2.2.5.5.3.1.1.5.' . $index,
                 'ciscosat',
                 ++$dbindex,
-                'C/N Ratio ' .$index)
+                'C/N Ratio ' .$index,
+                 $entry)
             );
         }
         return $snrstatus;
