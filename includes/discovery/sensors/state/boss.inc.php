@@ -49,7 +49,7 @@ if ($device['os'] === 'boss') {
                 $ers_sensors[$key] = $value;
             }
         }
-        $ps_num = 1;
+        $ps_num = 0;
         foreach ($ers_sensors as $index => $entry) {
             //Get unit number
             $unit_array = explode(".", $index);
@@ -58,15 +58,18 @@ if ($device['os'] === 'boss') {
             if ($unit_array[0] == 4) {
                 if ($unit != $temp_unit) {
                     $ps_num = 1;
+                } else {
+                    $ps_num++;
                 }
                 $descr = "Unit $unit: Power Supply $ps_num";
             } else {
-                 $descr = "Unit $unit: $entry[s5ChasComDescr]";
+                $descr = "Unit $unit: $entry[s5ChasComDescr]";
             }
             //Discover Sensors
             discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, "s5ChasComOperState.$index", $state_name, $descr, '1', '1', null, null, null, null, $entry['s5ChasComOperState']);
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, "s5ChasComOperState.$index");
+            $temp_unit = $unit;
         }
     }
 }
