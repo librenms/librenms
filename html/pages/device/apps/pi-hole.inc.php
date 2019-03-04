@@ -9,33 +9,18 @@
  * @package    LibreNMS
  * @subpackage pi-hole
  * @link       http://librenms.org
- * @copyright  2017 LibreNMS
+ * @copyright  2019 LibreNMS
  * @author     crcro <crc@nuamchefazi.ro>
 */
 
 global $config;
 
-$graphs = array(
+$graphs = [
     'pi-hole_query_types' => 'Query Types',
     'pi-hole_destinations' => 'Destinations',
     'pi-hole_query_results' => 'Query Results',
     'pi-hole_block_percent' => 'Block Percentage',
     'pi-hole_blocklist' => 'Blocklist Domains'
-);
+];
 
-foreach ($graphs as $key => $text) {
-    $graph_type = $key;
-    $graph_array['height'] = '100';
-    $graph_array['width'] = '215';
-    $graph_array['to'] = $config['time']['now'];
-    $graph_array['id'] = $app['app_id'];
-    $graph_array['type'] = 'application_' . $key;
-
-    print_optionbar_start();
-    echo "<span style='font-weight: bold;'>" . $text . "</span>";
-    print_optionbar_end();
-
-    echo '<div class="row">';
-    include 'includes/print-graphrow.inc.php';
-    echo '</div>';
-}
+include 'app.bootstrap.inc.php';

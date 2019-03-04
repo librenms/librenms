@@ -1,5 +1,7 @@
 <?php
 /*
+ * LibreNMS
+ *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -13,17 +15,15 @@
  * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
 
-global $config;
+foreach ($graphs as $key => $text) {
+    $graph_type = $key;
+    $custom_values = [];
+    $graph_array = array_merge(apps_default_graphs_value($key, $app['app_id'], $config['time']['now']), $custom_values);
 
-$graphs = [
-    'powerdns-dnsdist_latency' => 'Latency',
-    'powerdns-dnsdist_cache' => 'Cache',
-    'powerdns-dnsdist_downstream' => 'Downstream servers',
-    'powerdns-dnsdist_dynamic_blocks' => 'Dynamic blocks',
-    'powerdns-dnsdist_rules_stats' => 'Rules stats',
-    'powerdns-dnsdist_queries_stats' => 'Queries stats',
-    'powerdns-dnsdist_queries_latency' => 'Queries latency',
-    'powerdns-dnsdist_queries_drop' => 'Queries drop',
-];
-
-include 'app.bootstrap.inc.php';
+    print_optionbar_start();
+    echo "<span class='devices-font-bold'>" . $text . "</span>";
+    print_optionbar_end();
+    echo '<div class="row">';
+    require 'includes/print-graphrow.inc.php';
+    echo '</div>';
+}

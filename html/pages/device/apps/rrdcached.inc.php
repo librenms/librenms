@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * rrdcached.inc.php
  *
  * Shows the graphs for rrdcached apps
@@ -18,35 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @package    LibreNMS
+ * @subpackage webui
  * @link       http://librenms.org
- * @copyright  2016 Tony Murray
+ * @copyright  2019 LibreNMS
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 global $config;
 
-$graphs = array(
+$graphs = [
     'rrdcached_queue_length' => 'Queue Length',
     'rrdcached_events'       => 'Events',
     'rrdcached_tree'         => 'Tree',
     'rrdcached_journal'      => 'Journal',
-);
+];
 
-foreach ($graphs as $key => $text) {
-    $graph_array['height'] = '100';
-    $graph_array['width']  = '215';
-    $graph_array['to']     = $config['time']['now'];
-    $graph_array['id']     = $app['app_id'];
-    $graph_array['type']   = 'application_'.$key;
-
-    echo '<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">'.$text.'</h3>
-    </div>
-    <div class="panel-body">
-    <div class="row">';
-    include 'includes/print-graphrow.inc.php';
-    echo '</div>';
-    echo '</div>';
-    echo '</div>';
-}
+include 'app.bootstrap.inc.php';

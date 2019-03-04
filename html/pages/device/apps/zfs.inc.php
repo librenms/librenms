@@ -1,43 +1,63 @@
 <?php
+/*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+* @package    LibreNMS
+* @subpackage webui
+* @link       http://librenms.org
+* @copyright  2019 LibreNMS
+* @author     LibreNMS Contributors
+*/
 
 global $config;
 
-$pools=get_zfs_pools($device['device_id']);
+$pools = get_zfs_pools($device['device_id']);
 
-$link_array = array(
-    'page'   => 'device',
+$link_array = [
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'zfs',
-);
+    'tab' => 'apps',
+    'app' => 'zfs',
+];
 
 print_optionbar_start();
 
 echo generate_link('ARC', $link_array);
 echo '| Pools:';
-$pool_int=0;
+$pool_int = 0;
 while (isset($pools[$pool_int])) {
-    $pool=$pools[$pool_int];
-    $label=$pool;
+    $pool = $pools[$pool_int];
+    $label = $pool;
 
     if ($vars['pool'] == $pool) {
-        $label='>>'.$pool.'<<';
+        $label = '>>' . $pool . '<<';
     }
 
     $pool_int++;
 
-    $append='';
+    $append = '';
     if (isset($pools[$pool_int])) {
-        $append=', ';
+        $append = ', ';
     }
 
-    echo generate_link($label, $link_array, array('pool'=>$pool)).$append;
+    echo generate_link($label, $link_array, array('pool' => $pool)) . $append;
 }
 
 print_optionbar_end();
 
 if (!isset($vars['pool'])) {
-    $graphs = array(
+    $graphs = [
         'zfs_arc_misc' => 'ARC misc',
         'zfs_arc_size' => 'ARC size in bytes',
         'zfs_arc_size_per' => 'ARC size, percent of max size',
@@ -48,36 +68,13 @@ if (!isset($vars['pool'])) {
         'zfs_arc_cache_misses_by_type' => 'ARC cache misses by type',
         'zfs_arc_cache_hits' => 'ARC cache hits',
         'zfs_arc_cache_miss' => 'ARC cache misses',
-    );
+    ];
 } else {
-    $graphs = array(
-        'zfs_pool_space'=>'Pool Space',
-        'zfs_pool_cap'=>'Pool Capcity',
-        'zfs_pool_frag'=>'Pool Fragmentation',
-    );
+    $graphs = [
+        'zfs_pool_space' => 'Pool Space',
+        'zfs_pool_cap' => 'Pool Capcity',
+        'zfs_pool_frag' => 'Pool Fragmentation',
+    ];
 }
 
-foreach ($graphs as $key => $text) {
-    $graph_type            = $key;
-    $graph_array['height'] = '100';
-    $graph_array['width']  = '215';
-    $graph_array['to']     = $config['time']['now'];
-    $graph_array['id']     = $app['app_id'];
-    $graph_array['type']   = 'application_'.$key;
-
-    if (isset($vars['pool'])) {
-        $graph_array['pool']=$vars['pool'];
-    }
-
-
-    echo '<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">'.$text.'</h3>
-    </div>
-    <div class="panel-body">
-    <div class="row">';
-    include 'includes/print-graphrow.inc.php';
-    echo '</div>';
-    echo '</div>';
-    echo '</div>';
-}
+include "app.bootstrap.inc.php";
