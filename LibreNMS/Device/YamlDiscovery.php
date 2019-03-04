@@ -111,8 +111,10 @@ class YamlDiscovery
         $value = dynamic_discovery_get_value($name, $index, $data, $pre_cache);
         if (is_null($value)) {
             // built in replacements
+
             // prepare the $subindexX match variable replacement
-            $subindexes = explode('.', $index);
+            $subindexes = explode('.', $index);  //split the index
+            $subindexStr = [];                   //init array of variable names
             foreach (array_keys($subindexes) as $pos) {
                 $subindexStr[$pos] = '{{ $subindex' . $pos . ' }}';
             }
