@@ -64,7 +64,7 @@ function data_uri($file, $mime)
 function nicecase($item)
 {
     return \LibreNMS\Util\StringHelpers::niceCase($item);
-}//end nicecase()
+}
 
 
 function toner2colour($descr, $percent)
@@ -1223,12 +1223,6 @@ function generate_dynamic_config_panel($title, $config_groups, $items = array(),
     }
     return $output;
 }//end generate_dynamic_config_panel()
-
-function get_ripe_api_whois_data_json($ripe_data_param, $ripe_query_param)
-{
-    $ripe_whois_url = 'https://stat.ripe.net/data/' . $ripe_data_param . '/data.json?resource=' . $ripe_query_param;
-    return json_decode(file_get_contents($ripe_whois_url), true);
-}//end get_ripe_api_whois_data_json()
 
 /**
  * Return the rows from 'ports' for all ports of a certain type as parsed by port_descr_parser.

@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Util\Snmpsim;
 
-abstract class TestCase extends \PHPUnit_Framework_TestCase
+abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
     use SnmpsimHelpers;
 

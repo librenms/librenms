@@ -1,0 +1,276 @@
+<?php
+/**
+ * DeviceController.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2019 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
+namespace App\Http\Controllers\Table;
+
+use App\Models\Device;
+use App\Models\Location;
+use Illuminate\Database\Eloquent\Builder;
+use LibreNMS\Config;
+use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
+
+class DeviceController extends TableController
+{
+    private $detailed; // display format is detailed
+
+    protected function rules()
+    {
+        return [
+            'format' => 'nullable|in:list_basic,list_detail',
+            'os' => 'nullable|string',
+            'version' => 'nullable|string',
+            'hardware' => 'nullable|string',
+            'features' => 'nullable|string',
+            'location' => 'nullable|string',
+            'type' => 'nullable|string',
+            'state' => 'nullable|in:0,1,up,down',
+            'disabled' => 'nullable|in:0,1',
+            'ignore' => 'nullable|in:0,1',
+            'group' => 'nullable|int',
+        ];
+    }
+
+    protected function filterFields($request)
+    {
+        return ['os', 'version', 'hardware', 'features', 'type', 'status' => 'state', 'disabled', 'ignore', 'location_id' => 'location'];
+    }
+
+    protected function searchFields($request)
+    {
+        return ['sysName', 'hostname', 'hardware', 'os', 'locations.location'];
+    }
+
+    /**
+     * Defines the base query for this resource
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+     */
+    protected function baseQuery($request)
+    {
+        /** @var Builder $query */
+        $query = Device::hasAccess($request->user())->with('location')->select('devices.*');
+
+        // if searching or sorting the location field, join the locations table
+        if ($request->get('searchPhrase') || in_array('location', array_keys($request->get('sort', [])))) {
+            $query->leftJoin('locations', 'locations.id', 'devices.location_id');
+        }
+
+        // filter device group, not sure this is the most efficient query
+        if ($group = $request->get('group')) {
+            $query->whereHas('groups', function ($query) use ($group) {
+                $query->where('id', $group);
+            });
+        }
+
+        return $query;
+    }
+
+    protected function adjustFilterValue($field, $value)
+    {
+        if ($field == 'location' && !is_numeric($value)) {
+            return Location::query()->where('location', $value)->value('id');
+        }
+
+        if ($field == 'state' && !is_numeric($value)) {
+            return str_replace(['up', 'down'], [1, 0], $value);
+        }
+
+        return $value;
+    }
+
+    private function isDetailed()
+    {
+        if (is_null($this->detailed)) {
+            $this->detailed = \Request::get('format', 'list_detail') == 'list_detail';
+        }
+
+        return $this->detailed;
+    }
+
+    /**
+     * @param Device $device
+     * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection
+     */
+    public function formatItem($device)
+    {
+        return [
+            'extra' => $this->getLabel($device),
+            'status' => $device->statusName(),
+            'icon' => '<img src="' . $device->icon . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
+            'hostname' => $this->getHostname($device),
+            'metrics' => $this->getMetrics($device),
+            'hardware' => Rewrite::ciscoHardware($device),
+            'os' => $this->getOsText($device),
+            'uptime' => $device->formatUptime(true),
+            'location' => $this->getLocation($device),
+            'actions' => $this->getActions($device),
+        ];
+    }
+
+    /**
+     * Get the status label class
+     * @param Device $device
+     * @return string
+     */
+    private function getLabel($device)
+    {
+        if ($device->disabled) {
+            return 'label-default';
+        }
+
+        if ($device->ignore) {
+            return $device->status ? 'label-warning' : 'label-default';
+        }
+
+        return $device->status ? 'label-success' : 'label-danger';
+    }
+
+    /**
+     * @param Device $device
+     * @return string
+     */
+    private function getHostname($device)
+    {
+        $hostname = Url::deviceLink($device);
+
+        if ($this->isDetailed()) {
+            $hostname .= '<br />' . $device->name();
+        }
+
+        return $hostname;
+    }
+
+    /**
+     * @param Device $device
+     * @return string
+     */
+    private function getOsText($device)
+    {
+        $device->loadOs();
+        $os_text = Config::getOsSetting($device->os, 'text');
+
+        if ($this->isDetailed()) {
+            $os_text .= '<br />' . $device->version . ($device->features ? " ($device->features)" : '');
+        }
+
+        return $os_text;
+    }
+
+    /**
+     * @param Device $device
+     * @return string
+     */
+    private function getMetrics($device)
+    {
+        $port_count = $device->ports()->count();
+        $sensor_count = $device->sensors()->count();
+        $wireless_count = $device->wirelessSensors()->count();
+
+        $metrics = [];
+        if ($port_count) {
+            $metrics[] = $this->formatMetric($device, $port_count, 'ports', 'fa-link');
+        }
+
+        if ($sensor_count) {
+            $metrics[] = $this->formatMetric($device, $sensor_count, 'health', 'fa-dashboard');
+        }
+
+        if ($wireless_count) {
+            $metrics[] = $this->formatMetric($device, $wireless_count, 'wireless', 'fa-wifi');
+        }
+
+        $glue = $this->isDetailed() ? '<br />' : ' ';
+        $metrics_content = implode(count($metrics) == 2 ? $glue : '', $metrics);
+        return '<div class="device-table-metrics">' . $metrics_content . '</div>';
+    }
+
+    /**
+     * @param $device
+     * @param $count
+     * @return string
+     */
+    private function formatMetric($device, $count, $tab, $icon)
+    {
+        $html = '<a href="' . Url::deviceUrl($device, ['tab' => $tab]) . '">';
+        $html .= '<span><i class="fa ' . $icon . ' fa-lg icon-theme"></i> ' . $count;
+        $html .= '</span></a> ';
+        return $html;
+    }
+
+    /**
+     * @param Device $device
+     * @return string
+     */
+    private function getLocation($device)
+    {
+        if ($device->location) {
+            if (extension_loaded('mbstring')) {
+                return mb_substr($device->location->location, 0, 32, 'utf8');
+            } else {
+                return substr($device->location->location, 0, 32);
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * @param Device $device
+     * @return string
+     */
+    private function getActions($device)
+    {
+        $actions = '<div class="container-fluid"><div class="row">';
+        $actions .= '<div class="col-xs-1"><a href="' . Url::deviceUrl($device) . '"> <i class="fa fa-id-card fa-lg icon-theme" title="View device"></i></a></div>';
+        $actions .= '<div class="col-xs-1"><a href="' . Url::deviceUrl($device, ['tab' => 'alerts']) . '"> <i class="fa fa-exclamation-circle fa-lg icon-theme" title="View alerts"></i></a></div>';
+
+        if (\Auth::user()->hasGlobalAdmin()) {
+            $actions .= '<div class="col-xs-1"><a href="' . Url::deviceUrl($device, ['tab' => 'edit']) . '"> <i class="fa fa-pencil fa-lg icon-theme" title="Edit device"></i></a></div>';
+        }
+
+        if ($this->isDetailed()) {
+            $actions .= '</div><div class="row">';
+        }
+
+        $actions .= '<div class="col-xs-1"><a href="telnet://' . $device->hostname . '"><i class="fa fa-terminal fa-lg icon-theme" title="Telnet to ' . $device->hostname . '"></i></a></div>';
+
+        if ($server = Config::get('gateone.server')) {
+            if (Config::get('gateone.use_librenms_user')) {
+                $actions .= '<div class="col-xs-1"><a href="' . $server . '?ssh=ssh://' . \Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
+            } else {
+                $actions .= '<div class="col-xs-1"><a href="' . $server . '?ssh=ssh://' . $device->hostname . '&location=' . $device->hostname . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
+            }
+        } else {
+            $actions .= '<div class="col-xs-1"><a href="ssh://' . $device->hostname . '"><i class="fa fa-lock fa-lg icon-theme" title="SSH to ' . $device->hostname . '"></i></a></div>';
+        }
+
+        $actions .= '<div class="col-xs-1"><a href="https://' . $device->hostname . '" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" title="Launch browser https://' . $device->hostname . '"></i></a></div>';
+        $actions .= '</div></div>';
+
+        return $actions;
+    }
+}

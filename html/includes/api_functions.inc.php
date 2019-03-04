@@ -2206,6 +2206,12 @@ function list_logs()
     $full_query = $full_query . $query . " ORDER BY $timestamp ASC LIMIT $start,$limit";
     $logs = dbFetchRows($full_query, $param);
 
+    if ($type === 'list_alertlog') {
+        foreach ($logs as $index => $log) {
+            $logs[$index]['details'] = json_decode(gzuncompress($log['details']), true);
+        }
+    }
+
     api_success($logs, 'logs', null, 200, null, array('total' => $count));
 }
 

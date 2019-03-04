@@ -39,12 +39,13 @@ modules:
                     descr: 'Processor {{ $cpuFamily }} @{{ $cpuClockRate }} #{{ $cpuIndex }}'
                     index: 'cpuStatus.{{ $index }}'
                     state_name: cpuStatus
+                    group: 'CPU'
                     states:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                         - { descr: minor, graph: 0, value: 2, generic: 1 }
                         - { descr: major, graph: 0, value: 3, generic: 2 }
                         - { descr: critical, graph: 0, value: 4, generic: 2 }
-                        - { descr: absent, graph: 0, value: 5, generic: 0 }
+                        - { descr: absent, graph: 0, value: 5, generic: 3 }
                         - { descr: unknown, graph: 0, value: 6, generic: 3 }
                 -
                     oid: hardDiskDescriptionEntry
@@ -53,12 +54,13 @@ modules:
                     descr: 'Drive Bay {{ $index }} {{ $hardDiskDevicename }}'
                     index: 'hardDiskStatus.{{ $index }}'
                     state_name: hardDiskStatus
+                    group: 'Drive Bays'
                     states:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                         - { descr: minor, graph: 0, value: 2, generic: 1 }
                         - { descr: major, graph: 0, value: 3, generic: 2 }
                         - { descr: critical, graph: 0, value: 4, generic: 2 }
-                        - { descr: absent, graph: 0, value: 5, generic: 0 }
+                        - { descr: absent, graph: 0, value: 5, generic: 3 }
                         - { descr: unknown, graph: 0, value: 6, generic: 3 }
                 -
                     oid: fanDescriptionEntry
@@ -67,12 +69,13 @@ modules:
                     descr: 'fanDevicename'
                     index: 'fanSpeed.{{ $index }}'
                     state_name: fanStatus
+                    group: 'Fans'
                     states:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                         - { descr: minor, graph: 0, value: 2, generic: 1 }
                         - { descr: major, graph: 0, value: 3, generic: 2 }
                         - { descr: critical, graph: 0, value: 4, generic: 2 }
-                        - { descr: absent, graph: 0, value: 5, generic: 0 }
+                        - { descr: absent, graph: 0, value: 5, generic: 3 }
                         - { descr: unknown, graph: 0, value: 6, generic: 3 }
                 -
                     oid: memoryEntireStatus
@@ -81,12 +84,13 @@ modules:
                     descr: 'Memory Status'
                     index: 'memoryEntireStatus.{{ $index }}'
                     state_name: memoryEntireStatus
+                    group: 'RAM'
                     states:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                         - { descr: minor, graph: 0, value: 2, generic: 1 }
                         - { descr: major, graph: 0, value: 3, generic: 2 }
                         - { descr: critical, graph: 0, value: 4, generic: 2 }
-                        - { descr: absent, graph: 0, value: 5, generic: 0 }
+                        - { descr: absent, graph: 0, value: 5, generic: 3 }
                         - { descr: unknown, graph: 0, value: 6, generic: 3 }
                 -
                     oid: memoryDescriptionEntry
@@ -95,12 +99,13 @@ modules:
                     descr: '{{ $memoryLogic }} {{ $memoryManufacturer }} {{ $memorySize }} {{ $memoryClockRate }}'
                     index: 'memoryStatus.{{ $index }}'
                     state_name: memoryStatus
+                    group: 'RAM'
                     states:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                         - { descr: minor, graph: 0, value: 2, generic: 1 }
                         - { descr: major, graph: 0, value: 3, generic: 2 }
                         - { descr: critical, graph: 0, value: 4, generic: 2 }
-                        - { descr: absent, graph: 0, value: 5, generic: 0 }
+                        - { descr: absent, graph: 0, value: 5, generic: 3 }
                         - { descr: unknown, graph: 0, value: 6, generic: 3 }
                     skip_values:
                         -

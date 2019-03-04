@@ -31,14 +31,26 @@ args = parser.parse_args()
 
 if args.discard:
     if confirm("Are you sure you want to delete all modified and untracked files?"):
-        dirs = ["app/", "bootstrap/", "contrib/", "databases/", "doc/", "html/", "includes/", "LibreNMS/",
-        "licenses/", "mibs/", "misc/", "resources/", "routes", "scripts/", "sql-schema/", "tests/"]
+        dirs = ["app/", "bootstrap/", "contrib/", "database/", "doc/", "html/", "includes/", "LibreNMS/",
+                "licenses/", "mibs/", "misc/", "resources/", "routes", "scripts/", "sql-schema/", "tests/"]
+        gitignores = ['.gitignore',
+                      'bootstrap/cache/.gitignore',
+                      'logs/.gitignore',
+                      'rrd/.gitignore',
+                      'storage/app/.gitignore',
+                      'storage/app/public/.gitignore',
+                      'storage/debugbar/.gitignore',
+                      'storage/framework/cache/.gitignore',
+                      'storage/framework/sessions/.gitignore',
+                      'storage/framework/testing/.gitignore',
+                      'storage/framework/views/.gitignore',
+                      'storage/logs/.gitignore']
 
         call(["git", "reset", "-q"], cwd=librenms_dir)
         call(["git", "checkout", "."], cwd=librenms_dir)
         call(["git", "clean", "-d", "-f"] + dirs, cwd=librenms_dir)
         # fix messed up gitignore file modes
-        call(["git", "checkout", "bootstrap/cache/.gitignore", "storage/app/.gitignore", "storage/app/public/.gitignore", "storage/debugbar/.gitignore", "storage/framework/cache/.gitignore", "storage/framework/sessions/.gitignore", "storage/framework/testing/.gitignore", "storage/framework/views/.gitignore", "storage/logs/.gitignore"])
+        call(["git", "checkout"] + gitignores, cwd=librenms_dir)
 
         if args.vendor:
             call(["git", "clean",  "-x",  "-d",  "-f",  "vendor/"], cwd=librenms_dir)

@@ -468,7 +468,7 @@ function http_fallback(link) {
     return false;
 }
 
-function init_select2(selector, type, data, selected) {
+function init_select2(selector, type, data, selected, placeholder) {
     var $select = $(selector);
 
     // allow function to be assigned to pass data
@@ -485,6 +485,7 @@ function init_select2(selector, type, data, selected) {
         theme: "bootstrap",
         dropdownAutoWidth : true,
         width: "auto",
+        placeholder: placeholder,
         allowClear: true,
         ajax: {
             url: 'ajax/select/' + type,
@@ -494,7 +495,41 @@ function init_select2(selector, type, data, selected) {
     });
 
     if (selected) {
-        $select.val(selected);
-        $select.trigger('change');
+        console.log(selected);
+        if (typeof selected !== 'object') {
+            selected = {id: selected, text: selected};
+        }
+
+        var newOption = new Option(selected.text, selected.id, true, true);
+        $select.append(newOption).trigger('change');
     }
+}
+
+function humanize_duration(seconds) {
+    // transform xxx seconds into yy years MM months dd days hh hours mm:ss
+    
+    var duration = moment.duration(Number(seconds), 's');
+    var years = duration.years(),
+        months = duration.months(),
+        days = duration.days(),
+        hrs = duration.hours(),
+        mins = duration.minutes(),
+        secs = duration.seconds();
+    var res = '';
+
+    if (years) {
+        res += years + 'y ';
+    }
+    if (months) {
+        res += months + 'm ';
+    }
+    if (days) {
+        res += days + 'd ';
+    }
+    if (hrs) {
+        res += hrs + 'h ';
+    }
+    res += mins + 'm ' + secs + 's ';
+
+    return res;
 }

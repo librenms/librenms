@@ -1,23 +1,21 @@
 sudo: required
 language: php
+addons:
+  chrome: stable
 services:
   - mysql
+env:
+  global:
+    APP_ENV=testing
 matrix:
   fast_finish: true
   include:
-  - php: 7.2
+  - php: 7.3
     env: SKIP_STYLE_CHECK=1
+  - php: 7.2
+    env: SKIP_UNIT_CHECK=1 BROWSER_TEST=1
   - php: 7.1
-    env: SKIP_UNIT_CHECK=1
-  - php: 7.0
-    env: SKIP_STYLE_CHECK=1 SKIP_UNIT_CHECK=1
-  - php: 5.6
     env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
-#  - php: hhvm
-#    env: SKIP_STYLE_CHECK=1
-
-  allow_failures:
-  - php: hhvm
 
 cache:
   directories:
@@ -28,15 +26,19 @@ cache:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y snmp fping python3-pip
-  - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh;'
+  - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
   - cp tests/config/config.test.php config.php
 
 install:
-  - composer install --prefer-dist --no-interaction
-  - pip install --user snmpsim pylint mysql-python
+  - travis_retry composer install --no-interaction --prefer-dist --no-suggest
+  - pip3 install --user snmpsim
+  - pip install --user mysql-python pylint
 
 after_failure:
   - tail /tmp/snmpsimd.log
+
+before_script:
+  - test -z "$BROWSER_TEST" || php artisan serve --env=dusk.testing  2>/dev/null &
 
 script:
   - set -e
@@ -44,6 +46,7 @@ script:
   - php scripts/pre-commit.php -q -l
   - php scripts/pre-commit.php -q -s
   - php scripts/pre-commit.php -u --db --snmpsim --fail-fast
+  - test -z "$BROWSER_TEST" || php artisan dusk
   - bash -n daily.sh
   - pylint -E poller-wrapper.py discovery-wrapper.py
   - bash scripts/deploy-docs.sh

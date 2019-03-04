@@ -149,6 +149,7 @@ if (Config::get('enable_vrfs')) {
         foreach ($vrtr as $vrf_oid => $vr) {
             $vrf_name = $vr['vRtrName'];
             $vrf_desc = $vr['vRtrName'];
+            $vrf_as = $vr['vRtrAS4Byte'];
             $vrf_rd = $vr['vRtrRouteDistinguisher'];
             // Nokia, The VPRN route distinguisher is a 8-octet object.
             // It contains a 2-octet type field followed by a 6-octet value field. The type field specify how to interpret the value field.
@@ -169,10 +170,19 @@ if (Config::get('enable_vrfs')) {
             echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
             echo "\n  [VRF $vrf_name] DESC  - $vrf_desc";
 
+            $vrfs = [
+                'vrf_oid' => $vrf_oid,
+                'vrf_name' => $vrf_name,
+                'bgpLocalAs' => $vrf_as,
+                'mplsVpnVrfRouteDistinguisher' => $vrf_rd,
+                'mplsVpnVrfDescription' => $$vrf_desc,
+                'device_id' => $device['device_id'],
+            ];
+
             if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
-                dbUpdate(['mplsVpnVrfDescription' => $vrf_desc, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
+                dbUpdate(['vrf_name' => $vrf_name, 'bgpLocalAs' => $vrf_as, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $vrf_desc], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
             } else {
-                dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $$vrf_desc, 'device_id' => $device['device_id']], 'vrfs');
+                dbInsert($vrfs, 'vrfs');
             }
 
             $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);

@@ -1,7 +1,6 @@
 os: serverscheck
 text: ServersCheck
 type: network
-icon: serverscheck
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.17095

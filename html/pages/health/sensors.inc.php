@@ -58,6 +58,9 @@ switch ($class) {
     case 'state':
         $pagetitle[] = "Health :: State";
         break;
+    case 'count':
+        $pagetitle[] = "Health :: Count";
+        break;
     case 'temperature':
         $pagetitle[] = "Health :: Temperature";
         break;

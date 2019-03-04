@@ -304,8 +304,16 @@ if ($device['os'] == 'cmm') {
     require_once 'ports/cmm.inc.php';
 }
 
+if ($device['os'] == 'nokia-isam') {
+    require_once 'ports/nokia-isam.inc.php';
+}
+
 if ($device['os'] == 'timos') {
     require_once 'ports/timos.inc.php';
+}
+
+if ($device['os'] == 'infinera-groove') {
+    require_once 'ports/infinera-groove.inc.php';
 }
 
 if ($config['enable_ports_adsl']) {
@@ -624,22 +632,9 @@ foreach ($ports as $port) {
         // FIXME use $q_bridge_mib[$this_port['ifIndex']] to see if it is a trunk (>1 array count)
         echo "VLAN = {$this_port['ifVlan']} ";
 
-        // When devices do not provide ifDescr data, populate with ifName data if available
-        if ($this_port['ifDescr'] == '' || $this_port['ifDescr'] == null) {
-            $this_port['ifDescr'] = $this_port['ifName'];
-            d_echo('Using ifName as ifDescr');
-        }
+        // attempt to fill missing fields
+        port_fill_missing($this_port, $device);
 
-        // When devices do not provide ifAlias data, populate with ifDescr data if configured
-        if ($this_port['ifAlias'] == '' || $this_port['ifAlias'] == null) {
-            $this_port['ifAlias'] = $this_port['ifDescr'];
-            d_echo('Using ifDescr as ifAlias');
-        }
-
-        if ($this_port['ifName'] == '' || $this_port['ifName'] == null) {
-            $this_port['ifName'] = $this_port['ifDescr'];
-            d_echo('Using ifDescr as ifName');
-        }
 
         // Update IF-MIB data
         $tune_port = false;

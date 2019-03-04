@@ -2,7 +2,7 @@
 echo ' ENTITY-SENSOR: ';
 echo 'Caching OIDs:';
 if (empty($entity_array)) {
-    $entity_array = array();
+    $entity_array = [];
     echo ' entPhysicalDescr';
     $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalDescr', $entity_array, 'ENTITY-MIB');
     if (!empty($entity_array)) {
@@ -28,7 +28,7 @@ if (!empty($entity_array)) {
 }
 
 if (!empty($entity_oids)) {
-    $entitysensor = array(
+    $entitysensor = [
         'voltsDC'   => 'voltage',
         'voltsAC'   => 'voltage',
         'amperes'   => 'current',
@@ -38,7 +38,7 @@ if (!empty($entity_oids)) {
         'rpm'       => 'fanspeed',
         'celsius'   => 'temperature',
         'dBm'       => 'dbm',
-    );
+    ];
 
     foreach ($entity_oids as $index => $entry) {
         $low_limit      = null;
@@ -47,7 +47,7 @@ if (!empty($entity_oids)) {
         $high_limit     = null;
 
         // Fix for Cisco ASR920, 15.5(2)S
-        if ($entry['entPhySensorType'] == 'other' && str_contains($entity_array[$index]['entPhysicalName'], array('Rx Power Sensor', 'Tx Power Sensor'))) {
+        if ($entry['entPhySensorType'] == 'other' && str_contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
             $entitysensor['other'] = 'dbm';
         }
         if ($entitysensor[$entry['entPhySensorType']] && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
@@ -110,13 +110,6 @@ if (!empty($entity_oids)) {
                 $divisor = $divisor.str_pad('', $entry['entPhySensorPrecision'], '0');
             }
 
-            if ($device['os'] === 'arista_eos') {
-                if ($entry['entPhySensorScale'] == 'milli' && $entry['entPhySensorType'] == 'amperes') {
-                    $divisor = '1';
-                    $multiplier = '1';
-                }
-            }
-
             $current = ($current * $multiplier / $divisor);
             if ($type == 'temperature') {
                 if ($current > '200') {
@@ -145,7 +138,7 @@ if (!empty($entity_oids)) {
             if ($entry['entPhySensorOperStatus'] === 'unavailable') {
                 $valid_sensor = false;
             }
-            if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", array($device['device_id'], $type, $index)) == '0') {
+            if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", [$device['device_id'], $type, $index]) == '0') {
                 // Check to make sure we've not already seen this sensor via cisco's entity sensor mib
                 if ($type == "power" && $device['os'] == "arista_eos" && preg_match("/DOM (R|T)x Power/i", $descr)) {
                     $type = "dbm";

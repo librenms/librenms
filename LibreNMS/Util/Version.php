@@ -25,10 +25,12 @@
 
 namespace LibreNMS\Util;
 
+use LibreNMS\DB\Eloquent;
+
 class Version
 {
     // Update this on release
-    const VERSION = '1.47';
+    const VERSION = '1.49';
 
     protected $is_git_install = false;
 
@@ -49,5 +51,22 @@ class Version
         }
 
         return self::VERSION;
+    }
+
+    public function database()
+    {
+        if (Eloquent::isConnected()) {
+            try {
+                $query = Eloquent::DB()->table('migrations');
+                return [
+                    'last' => $query->orderBy('id', 'desc')->value('migration'),
+                    'total' => $query->count(),
+                ];
+            } catch (\Exception $e) {
+                return ['last' => 'No Schema', 'total' => 0];
+            }
+        }
+
+        return ['last' => 'Not Connected', 'total' => 0];
     }
 }

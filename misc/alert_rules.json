@@ -11,7 +11,7 @@
     "default": true
   },
   {
-    "rule": "bgpPeers.bgpPeerState != \"established\" && macros.device_up = \"1\"",
+    "rule": "bgpPeers.bgpPeerState != \"established\" && macros.device_up = \"1\" && bgpPeers.bgpPeerAdminStatus != \"stop\"",
     "name": "BGP Session down",
     "extra": "{\"count\": 1}",
     "default": true
@@ -59,12 +59,12 @@
     "default": true
   },
   {
-    "rule": "macros.state_sensor_critical",
+    "rule": "macros.state_sensor_critical && sensors.sensor_alert = 1",
     "name": "State Sensor Critical",
     "default": true
   },
   {
-    "rule": "macros.state_sensor_warning",
+    "rule": "macros.state_sensor_warning && sensors.sensor_alert = 1",
     "name": "State Sensor Warning",
     "default": false
   },

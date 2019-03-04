@@ -266,6 +266,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             'entPhysicalIndex' => $entPhysicalIndex,
             'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
             'user_func' => $user_func,
+            'group' => $group,
         );
 
         foreach ($insert as $key => $val_check) {
@@ -391,6 +392,7 @@ function sensor_low_limit($class, $current)
         case 'humidity':
             $limit = 30;
             break;
+        case 'count':
         case 'current':
             $limit = null;
             break;
@@ -399,6 +401,10 @@ function sensor_low_limit($class, $current)
             break;
         case 'power':
             $limit = null;
+            break;
+        case 'power_consumed':
+        case 'power_factor':
+            $limit = -1;
             break;
         case 'signal':
             $limit = -80;
@@ -442,9 +448,14 @@ function sensor_limit($class, $current)
         case 'humidity':
             $limit = 70;
             break;
+        case 'count':
         case 'current':
         case 'power':
             $limit = $current * 1.50;
+            break;
+        case 'power_consumed':
+        case 'power_factor':
+            $limit = 1;
             break;
         case 'fanspeed':
             $limit = $current * 1.80;
@@ -740,6 +751,66 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
 
 //end discover_toner()
 
+function discover_entity_physical(&$valid, $device, $entPhysicalIndex, $entPhysicalDescr, $entPhysicalClass, $entPhysicalName, $entPhysicalModelName, $entPhysicalSerialNum, $entPhysicalContainedIn, $entPhysicalMfgName, $entPhysicalParentRelPos, $entPhysicalVendorType, $entPhysicalHardwareRev, $entPhysicalFirmwareRev, $entPhysicalSoftwareRev, $entPhysicalIsFRU, $entPhysicalAlias, $entPhysicalAssetID, $ifIndex)
+{
+    d_echo("Discover Inventory Item: $entPhysicalIndex, $entPhysicalDescr, $entPhysicalClass, $entPhysicalName, $entPhysicalModelName, $entPhysicalSerialNum, $entPhysicalContainedIn, $entPhysicalMfgName, $entPhysicalParentRelPos, $entPhysicalVendorType, $entPhysicalHardwareRev, $entPhysicalFirmwareRev, $entPhysicalSoftwareRev, $entPhysicalIsFRU, $entPhysicalAlias, $entPhysicalAssetID, $ifIndex\n");
+
+    if ($entPhysicalDescr || $entPhysicalName) {
+        if (dbFetchCell('SELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ?', array($device['device_id'], $entPhysicalIndex)) == '0') {
+            $insert_data = array(
+                'device_id'               => $device['device_id'],
+                'entPhysicalIndex'        => $entPhysicalIndex,
+                'entPhysicalDescr'        => $entPhysicalDescr,
+                'entPhysicalClass'        => $entPhysicalClass,
+                'entPhysicalName'         => $entPhysicalName,
+                'entPhysicalModelName'    => $entPhysicalModelName,
+                'entPhysicalSerialNum'    => $entPhysicalSerialNum,
+                'entPhysicalContainedIn'  => $entPhysicalContainedIn,
+                'entPhysicalMfgName'      => $entPhysicalMfgName,
+                'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
+                'entPhysicalVendorType'   => $entPhysicalVendorType,
+                'entPhysicalHardwareRev'  => $entPhysicalHardwareRev,
+                'entPhysicalFirmwareRev'  => $entPhysicalFirmwareRev,
+                'entPhysicalSoftwareRev'  => $entPhysicalSoftwareRev,
+                'entPhysicalIsFRU'        => $entPhysicalIsFRU,
+                'entPhysicalAlias'        => $entPhysicalAlias,
+                'entPhysicalAssetID'      => $entPhysicalAssetID,
+            );
+            if (!empty($ifIndex)) {
+                $insert_data['ifIndex'] = $ifIndex;
+            }
+
+            $inserted = dbInsert($insert_data, 'entPhysical');
+            echo '+';
+            log_event('Inventory Item added: index ' . $entPhysicalIndex . ' descr ' . $entPhysicalDescr, $device, 'entity-physical', 3, $inserted);
+        } else {
+            echo '.';
+            $update_data = array(
+                'entPhysicalIndex'        => $entPhysicalIndex,
+                'entPhysicalDescr'        => $entPhysicalDescr,
+                'entPhysicalClass'        => $entPhysicalClass,
+                'entPhysicalName'         => $entPhysicalName,
+                'entPhysicalModelName'    => $entPhysicalModelName,
+                'entPhysicalSerialNum'    => $entPhysicalSerialNum,
+                'entPhysicalContainedIn'  => $entPhysicalContainedIn,
+                'entPhysicalMfgName'      => $entPhysicalMfgName,
+                'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
+                'entPhysicalVendorType'   => $entPhysicalVendorType,
+                'entPhysicalHardwareRev'  => $entPhysicalHardwareRev,
+                'entPhysicalFirmwareRev'  => $entPhysicalFirmwareRev,
+                'entPhysicalSoftwareRev'  => $entPhysicalSoftwareRev,
+                'entPhysicalIsFRU'        => $entPhysicalIsFRU,
+                'entPhysicalAlias'        => $entPhysicalAlias,
+                'entPhysicalAssetID'      => $entPhysicalAssetID,
+            );
+            dbUpdate($update_data, 'entPhysical', '`device_id`=? AND `entPhysicalIndex`=?', array($device['device_id'], $entPhysicalIndex));
+        }//end if
+        $valid[$entPhysicalIndex] = 1;
+    }//end if
+}
+
+//end discover_entity_physical()
+
 function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin, $context_name = '')
 {
     global $device;
@@ -992,17 +1063,10 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
 
                     // process the description
-                    $descr = dynamic_discovery_get_value('descr', $index, $data, $pre_cache);
-                    if (is_null($descr)) {
-                        $descr = str_replace('{{ $index }}', $index, $data['descr']);
-                        preg_match_all('/{{ \$([a-zA-Z0-9.]+) }}/', $descr, $matches);
-                        foreach ($matches[1] as $tmp_var) {
-                            $replace = dynamic_discovery_get_value($tmp_var, $index, $data, $pre_cache, null);
-                            if (!is_null($replace)) {
-                                $descr = str_replace("{{ \$$tmp_var }}", $replace, $descr);
-                            }
-                        }
-                    }
+                    $descr = YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache);
+
+                    // process the group
+                    $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache);
 
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
@@ -1033,12 +1097,12 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $sensor_name = $data['state_name'] ?: $data['oid'];
                         create_state_index($sensor_name, $data['states']);
                     } else {
-                        // We default to 1 for both divisors / multipler so it should be safe to do the calculation using both.
+                        // We default to 1 for both divisors / multipliers so it should be safe to do the calculation using both.
                         $value = ($value / $divisor) * $multiplier;
                     }
 
                     $uindex = str_replace('{{ $index }}', $index, isset($data['index']) ? $data['index'] : $index);
-                    discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, isset($data['group']) ? $data['group'] : null);
+                    discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group);
 
                     if ($sensor_type === 'state') {
                         create_sensor_to_state_index($device, $sensor_name, $uindex);

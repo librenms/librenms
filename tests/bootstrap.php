@@ -70,7 +70,7 @@ if (getenv('DBTEST')) {
     $db_name = $db_config['db_name'];
 
     $connection = new PDO("mysql:host={$db_config['db_host']}", $db_config['db_user'], $db_config['db_pass']);
-    $connection->query("CREATE DATABASE IF NOT EXISTS $db_name");
+    $connection->query("CREATE DATABASE IF NOT EXISTS $db_name CHARACTER SET utf8 COLLATE utf8_unicode_ci");
     unset($connection); // close connection
 
     \LibreNMS\DB\Eloquent::boot();
@@ -101,6 +101,7 @@ if (getenv('DBTEST')) {
                 'alert_templates',
                 'config', // not sure about this one
                 'dbSchema',
+                'migrations',
                 'widgets',
             );
             $truncate = array_diff($tables, $excluded);

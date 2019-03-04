@@ -65,7 +65,7 @@ abstract class PaginatedAjaxController extends Controller
     }
 
     /**
-     * Defines search fields will be searched in order
+     * Defines search fields. They will be searched in order.
      *
      * @param \Illuminate\Http\Request $request
      * @return array
@@ -77,18 +77,30 @@ abstract class PaginatedAjaxController extends Controller
     }
 
     /**
+     * Defines filter fields.  Request and table fields must match.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected function filterFields($request)
+    {
+        return [];
+    }
+
+    /**
      * Format an item for display.  Default is pass-through
      *
      * @param Model $model
      * @return array|Collection|Model
      */
-    protected function formatItem($model)
+    public function formatItem($model)
     {
         return $model;
     }
 
     /**
-     * @param string
+     * @param string $search
      * @param Builder $query
      * @param array $fields
      * @return Builder
@@ -107,6 +119,42 @@ abstract class PaginatedAjaxController extends Controller
         return $query;
     }
 
+    /**
+     * @param Request $request
+     * @param Builder $query
+     * @param array $fields
+     * @return Builder
+     */
+    protected function filter($request, $query, $fields)
+    {
+        foreach ($fields as $target => $field) {
+            if ($value = $request->get($field)) {
+                $value = $this->adjustFilterValue($field, $value);
+                if (is_string($target)) {
+                    $query->where($target, $value);
+                } else {
+                    $query->where($field, $value);
+                }
+            }
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param Request $request
+     * @param Builder $query
+     * @return Builder
+     */
+    protected function sort($request, $query)
+    {
+        $sort = $request->get('sort', []);
+        foreach ($sort as $column => $direction) {
+            $query->orderBy($column, $direction);
+        }
+
+        return $query;
+    }
 
     /**
      * Validate the given request with the given rules.
@@ -122,5 +170,18 @@ abstract class PaginatedAjaxController extends Controller
         $full_rules = array_replace($this->baseRules(), $rules);
 
         parent::validate($request, $full_rules, $messages, $customAttributes);
+    }
+
+    /**
+     * Sometimes filter values need to be modified to work
+     * For example if the filter value is a string, when it needs to be an id
+     *
+     * @param string $field The field being filtered
+     * @param mixed $value The current value
+     * @return mixed
+     */
+    protected function adjustFilterValue($field, $value)
+    {
+        return $value;
     }
 }

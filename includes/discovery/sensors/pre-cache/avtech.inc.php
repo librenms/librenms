@@ -25,13 +25,13 @@
 
 
 // table name => regex (first group is index, second group is id)
-$virtual_tables = array(
+$virtual_tables = [
     'ra32-analog' => '/\.1\.3\.6\.1\.4\.1\.20916\.1\.8\.1\.1\.5\.((\d+)\.0)/',
     'ra32-relay' => '/\.1\.3\.6\.1\.4\.1\.20916\.1\.8\.1\.1\.6\.((\d+)\.0)/',
     'ra32-ext-temp' => '/\.1\.3\.6\.1\.4\.1\.20916\.1\.8\.1\.2\.((\d+)\.1\.0)/',
     'ra32-switch' => '/\.1\.3\.6\.1\.4\.1\.20916\.1\.8\.1\.3\.((\d+)\.0)/',
     'ra32-wish-temp' => '/\.1\.3\.6\.1\.4\.1\.20916\.1\.8\.1\.4\.((\d+)\.4\.1\.2\.0)/',
-);
+];
 
 $data = snmp_walk($device, '.1.3.6.1.4.1.20916.1', '-OQn');
 foreach (explode(PHP_EOL, $data) as $line) {
@@ -43,10 +43,7 @@ foreach (explode(PHP_EOL, $data) as $line) {
             $index = $matches[1];
             $id = $matches[2];
 
-            $pre_cache[$vt_name][$index] = array(
-                'value' => $value,
-                'id' => $id,
-            );
+            $pre_cache[$vt_name][$index] = ['value' => $value, 'id' => $id];
 
             $processed = true;
             break;  // skip rest
@@ -54,7 +51,7 @@ foreach (explode(PHP_EOL, $data) as $line) {
     }
 
     if (!$processed) {
-        $pre_cache[$oid] = array($value);
+        $pre_cache[$oid] = [$value];
     }
 }
 

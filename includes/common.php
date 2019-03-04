@@ -86,27 +86,27 @@ function external_exec($command)
     global $debug, $vdebug;
 
     $proc = new \Symfony\Component\Process\Process($command);
-    $proc->setTimeout(600);
+    $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
     if ($debug && !$vdebug) {
         $patterns = [
-            '/-c\' \'[\S]+/',
-            '/-u\' \'[\S]+/',
-            '/-U\' \'[\S]+/',
-            '/-A\' \'[\S]+/',
-            '/-X\' \'[\S]+/',
-            '/-P\' \'[\S]+/',
-            '/-H\' \'[\S]+/',
+            '/-c\' \'[\S]+\'/',
+            '/-u\' \'[\S]+\'/',
+            '/-U\' \'[\S]+\'/',
+            '/-A\' \'[\S]+\'/',
+            '/-X\' \'[\S]+\'/',
+            '/-P\' \'[\S]+\'/',
+            '/-H\' \'[\S]+\'/',
             '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
         ];
         $replacements = [
-            '-c\' \'COMMUNITY',
-            '-u\' \'USER',
-            '-u\' \'USER',
-            '-A\' \'PASSWORD',
-            '-X\' \'PASSWORD',
-            '-P\' \'PASSWORD',
-            '-H\' \'HOSTNAME',
+            '-c\' \'COMMUNITY\'',
+            '-u\' \'USER\'',
+            '-U\' \'USER\'',
+            '-A\' \'PASSWORD\'',
+            '-X\' \'PASSWORD\'',
+            '-P\' \'PASSWORD\'',
+            '-H\' \'HOSTNAME\'',
             '\1:HOSTNAME:\3',
         ];
 
@@ -651,22 +651,7 @@ function format_number($value, $base = '1000', $round = 2, $sf = 3)
 
 function is_valid_hostname($hostname)
 {
-    // The Internet standards (Request for Comments) for protocols mandate that
-    // component hostname labels may contain only the ASCII letters 'a' through 'z'
-    // (in a case-insensitive manner), the digits '0' through '9', and the hyphen
-    // ('-'). The original specification of hostnames in RFC 952, mandated that
-    // labels could not start with a digit or with a hyphen, and must not end with
-    // a hyphen. However, a subsequent specification (RFC 1123) permitted hostname
-    // labels to start with digits. No other symbols, punctuation characters, or
-    // white space are permitted. While a hostname may not contain other characters,
-    // such as the underscore character (_), other DNS names may contain the underscore
-    // maximum length is 253 characters, maximum segment size is 63
-
-    return (
-        preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*\.?$/i", $hostname) //valid chars check
-        && preg_match("/^.{1,253}$/", $hostname) //overall length check
-        && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*\.?$/", $hostname)
-    );
+    return \LibreNMS\Util\Validate::hostname($hostname);
 }
 
 /*
@@ -1149,8 +1134,9 @@ function parse_location($location)
 function version_info($remote = false)
 {
     global $config;
+    $version = \LibreNMS\Util\Version::get();
     $output = [
-        'local_ver' => \LibreNMS\Util\Version::get()->local(),
+        'local_ver' => $version->local(),
     ];
     if (Git::repoPresent() && Git::binaryExists()) {
         if ($remote === true && $config['update_channel'] == 'master') {
@@ -1169,7 +1155,7 @@ function version_info($remote = false)
         $output['local_date']   = $local_date;
         $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
     }
-    $output['db_schema']   = dbIsConnected() ? get_db_schema() : '?';
+    $output['db_schema']   = vsprintf('%s (%s)', $version->database());
     $output['php_ver']     = phpversion();
     $output['mysql_ver']   = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
     $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
@@ -1549,18 +1535,20 @@ function load_os(&$device)
     global $config;
 
     if (!isset($device['os'])) {
-        d_echo('No OS to load');
+        d_echo("No OS to load\n");
         return;
     }
 
-    $tmp_os = Symfony\Component\Yaml\Yaml::parse(
-        file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
-    );
+    if (!isset($config['os'][$device['os']]['definition_loaded'])) {
+        $tmp_os = Symfony\Component\Yaml\Yaml::parse(
+            file_get_contents($config['install_dir'] . '/includes/definitions/' . $device['os'] . '.yaml')
+        );
 
-    if (isset($config['os'][$device['os']])) {
-        $config['os'][$device['os']] = array_replace_recursive($tmp_os, $config['os'][$device['os']]);
-    } else {
-        $config['os'][$device['os']] = $tmp_os;
+        if (isset($config['os'][$device['os']])) {
+            $config['os'][$device['os']] = array_replace_recursive($tmp_os, $config['os'][$device['os']]);
+        } else {
+            $config['os'][$device['os']] = $tmp_os;
+        }
     }
 
     // Set type to a predefined type for the OS if it's not already set
@@ -1576,6 +1564,8 @@ function load_os(&$device)
     } else {
         unset($device['os_group']);
     }
+
+    $config['os'][$device['os']]['definition_loaded'] = true;
 }
 
 /**
@@ -1611,12 +1601,14 @@ function load_all_os($existing = false, $cached = true)
         }
 
         foreach ($os_list as $file) {
-            $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+            if (is_readable($file)) {
+                $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
 
-            if (isset($config['os'][$tmp['os']])) {
-                $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
-            } else {
-                $config['os'][$tmp['os']] = $tmp;
+                if (isset($config['os'][$tmp['os']])) {
+                    $config['os'][$tmp['os']] = array_replace_recursive($tmp, $config['os'][$tmp['os']]);
+                } else {
+                    $config['os'][$tmp['os']] = $tmp;
+                }
             }
         }
     }

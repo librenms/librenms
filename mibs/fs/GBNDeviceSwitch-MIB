@@ -1,0 +1,2796 @@
+    GBNDeviceSwitch-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, IpAddress,
+        NOTIFICATION-TYPE                       FROM SNMPv2-SMI
+
+        DisplayString, MacAddress,
+        RowStatus, TruthValue,DateAndTime       FROM SNMPv2-TC
+
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+
+        gbnDevice                               FROM ADMIN-MASTER-MIB
+
+        SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+
+        VlanIndex                               FROM Q-BRIDGE-MIB
+
+        PortList, dot1qStaticMulticastEntry     FROM Q-BRIDGE-MIB;
+
+    gbnDeviceSwitch MODULE-IDENTITY
+        LAST-UPDATED    "0011020000Z"  -- November 2, 2000
+        ORGANIZATION    "Admin Co., Ltd."
+        CONTACT-INFO    "Admin Co., Ltd.
+                         E-mail: support@admin.com"
+
+        DESCRIPTION     "ADMIN Common Enterprise MIB definition."
+
+        REVISION        "0011020000Z"  -- November 2, 2000
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnDevice 1 }
+
+MirrorMacType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "null、destination、source"
+    SYNTAX      INTEGER { null(0), destination (1), source(2) }  
+    
+------------------------------------------------------------------------------
+--  define groups in gbnDeviceSwitch-MIB
+------------------------------------------------------------------------------
+    gbnDeviceSwitchMirror          OBJECT IDENTIFIER ::= { gbnDeviceSwitch 1 }
+    gbnDeviceSwitchPort            OBJECT IDENTIFIER ::= { gbnDeviceSwitch 2 }
+    gbnDeviceSwitchAggregation     OBJECT IDENTIFIER ::= { gbnDeviceSwitch 3 }
+    gbnDeviceSwitchL3              OBJECT IDENTIFIER ::= { gbnDeviceSwitch 4 }
+    gbnDeviceSwitchLoopTest        OBJECT IDENTIFIER ::= { gbnDeviceSwitch 5 }
+    gbnDeviceSwitchSRM             OBJECT IDENTIFIER ::= { gbnDeviceSwitch 6 }
+    gbnDeviceSwitchFlowAlarm       OBJECT IDENTIFIER ::= { gbnDeviceSwitch 7 }
+    gbnDeviceSwitchQueneScheduer   OBJECT IDENTIFIER ::= { gbnDeviceSwitch 8 }
+    gbnDeviceSwitchLineRate        OBJECT IDENTIFIER ::= { gbnDeviceSwitch 9 }
+    gbnDeviceSwitchPortIsolation   OBJECT IDENTIFIER ::= { gbnDeviceSwitch 10 }
+    gbnDeviceSwitchStormControl    OBJECT IDENTIFIER ::= { gbnDeviceSwitch 11 }
+    gbnDeviceSwitchAntiDos         OBJECT IDENTIFIER ::= { gbnDeviceSwitch 12 }
+    gbnDeviceSwitchBandWidth       OBJECT IDENTIFIER ::= { gbnDeviceSwitch 13 }
+    gbnDeviceSwitchHigigStatistics OBJECT IDENTIFIER ::= { gbnDeviceSwitch 14 }
+    gbnDeviceSwitchChannelStats    OBJECT IDENTIFIER ::= { gbnDeviceSwitch 15 }
+    gbnDeviceSwitchRmoteMirror     OBJECT IDENTIFIER ::= { gbnDeviceSwitch 16 }
+    gbnDeviceSwitchPortSFPInfo     OBJECT IDENTIFIER ::= { gbnDeviceSwitch 17 }
+    gbnDeviceSwitchPortAvgRate     OBJECT IDENTIFIER ::= { gbnDeviceSwitch 18 }
+    gbnDeviceSwitchPortbandwidthUtilization     OBJECT IDENTIFIER ::= { gbnDeviceSwitch 19 }
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchMirror - Mirror Group
+--
+------------------------------------------------------------------------------
+    mirroringPort OBJECT-TYPE
+        SYNTAX INTEGER (0..26)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This port which all packets send to."
+        ::= { gbnDeviceSwitchMirror 1 }
+
+    mirroredEgrPort OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+             "The egress ports which need to monitor."
+        ::= { gbnDeviceSwitchMirror 2 }
+
+    mirroredIgrPort OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The ingress ports which need to monitor."
+            ::= { gbnDeviceSwitchMirror 3 }
+
+    ingressMirrorMac OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The MAC address which will be compared with the ingress frame, Only the matched frame will be mirrored"
+            --用于匹配ingress报文的MAC地址
+        ::= { gbnDeviceSwitchMirror 4 }
+
+    egressMirrorMac OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The MAC address which will be compared with the egress frame, Only the matched frame will be mirrored"
+            --用于匹配egress报文的MAC地址
+        ::= { gbnDeviceSwitchMirror 5 }
+
+    ingressMirrorMacType OBJECT-TYPE
+        SYNTAX      MirrorMacType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The destination or source MAC address which will be compared with the ingress frame"
+            --指定用于匹配ingress报文的是目的还是源MAC地址
+        ::= { gbnDeviceSwitchMirror 6 }    
+
+    egressMirrorMacType OBJECT-TYPE
+        SYNTAX      MirrorMacType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The destination or source MAC address which will be compared with the egress frame"
+            --指定用于匹配egress报文的是目的还是源MAC地址
+        ::= { gbnDeviceSwitchMirror 7 }     
+
+    ingressMirrorDivider OBJECT-TYPE
+        SYNTAX      INTEGER(0..1023)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "the mirror sampling divider"
+            --ingress报文的采样值
+        ::= { gbnDeviceSwitchMirror 8 }        
+
+    egressMirrorDivider OBJECT-TYPE
+        SYNTAX      INTEGER(0..1023)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "the mirror sampling divider"
+            --egress报文的采样值
+        ::= { gbnDeviceSwitchMirror 9 }
+                  
+ 
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchPort - Port Group
+--
+------------------------------------------------------------------------------
+    portTypeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PortTypeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of switch interfaces and associated properties."
+        ::= { gbnDeviceSwitchPort 1 }
+
+    portTypeEntry OBJECT-TYPE
+        SYNTAX PortTypeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for switch interface control and status information."
+        INDEX { portNumber }
+        ::= { portTypeTable 1 }
+
+    PortTypeEntry ::= SEQUENCE {
+        portNumber                INTEGER,
+        portType                INTEGER
+
+      }
+
+    portNumber OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "the index of port."
+        ::= { portTypeEntry 1 }
+
+    portType OBJECT-TYPE
+        SYNTAX INTEGER {
+             blank(1),
+             FE(2),
+             single100FX(3),
+             double100FX(4),
+             single1000FX(5),
+             double1000FX(6),
+             fE1000(7),
+             cpu(8),
+             FX10000(9)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "端口类型:1为不存在；2为10/100M电口；3为100M单模光口；
+            4为100M多模光口；5为1000M光口；6为1000M光口；
+            7为1000M电口; 8为CPU接口;9为10000M光口"
+        ::= { portTypeEntry 2 }
+
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchAggregation - Port Trunk Group
+--
+------------------------------------------------------------------------------
+    aggTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AggEntry
+        MAX-ACCESS  not-accessible
+        STATUS      obsolete
+        DESCRIPTION
+            "A table that contains information about every
+            Aggregator that is associated with this System."
+        ::= { gbnDeviceSwitchAggregation 1 }
+
+    aggEntry OBJECT-TYPE
+        SYNTAX      AggEntry
+        MAX-ACCESS  not-accessible
+        STATUS      obsolete
+        DESCRIPTION
+            "A list of the Aggregator parameters. This is indexed
+            by the ifIndex of the Aggregator."
+        INDEX { aggUnit, aggPort }
+        ::= { aggTable 1 }
+
+       AggEntry ::=
+        SEQUENCE {
+            aggUnit
+               INTEGER,
+            aggPort
+               INTEGER,
+            aggPortListPorts
+               PortList,
+            aggRule
+               INTEGER,
+            aggRowstatus
+               RowStatus
+        }
+
+    aggUnit OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   read-only
+        STATUS       obsolete
+        DESCRIPTION
+            "The Interface Unit of the Aggregation."
+        ::= { aggEntry 1 }
+
+    aggPort OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   read-only
+        STATUS       obsolete
+        DESCRIPTION
+            "The MasterPort of the Aggregation."
+        ::= { aggEntry 2 }
+
+    aggPortListPorts OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-write
+        STATUS      obsolete
+        DESCRIPTION
+            "The complete set of ports currently associated with
+             this Aggregator.  Each bit set in this list represents
+             an Actor Port member of this Link Aggregation."
+        ::= { aggEntry 3 }
+
+    aggRule OBJECT-TYPE
+    SYNTAX INTEGER {
+        srcMAC(1),
+        destMAC(2),
+        srcXORDestMAC(3),
+        srcIP(4),
+        destIP(5),
+        srcXORDestIP(6)
+    }
+    ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION
+        " The Rule to be applied to this Link Aggregator's Trunk Group
+        Table. The rules are based on the following selections SrcMAC (1),
+        means that the last three bits of the Source MAC Address are used to
+        index the Trunk Group to get the destination port. DestMAC (2), means
+        the last three bits of the Destination MAC Address are used to index
+        into the Trunk Group to get the destination port. SrcXORDestMAC (3),
+        means that the last three bits of the Source MAC Address are logically
+        XORed with the last three bits of the Destination MAC Address and used
+        to index into the Trunk Group to get the destination port. SrcIP (4),
+        means the last three bits of the Source IP Address are used to index
+        into the Trunk Group to get the destination port. DestIP (5), means
+        the last three bits of the Destination IP Address are used to index
+        into the Trunk Group to get the destination port. SrcXORDestIP (6),
+        means the last three bits of the Source IP Address are logically XORed
+        with the last three bits of the Destination IP Address and used to
+        index into the Trunk Group to get the destination port. This rule
+        defines the distribution algorithm applied to the aggregated link."
+    ::= { aggEntry 4 }
+
+    aggRowstatus OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       obsolete
+        DESCRIPTION
+            "rowstatus of trunk."
+        ::= { aggEntry 5 }
+
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchL3 - L3 Group
+--
+------------------------------------------------------------------------------
+    l3Table OBJECT-TYPE
+        SYNTAX      SEQUENCE OF L3Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "此表为交换芯片的L3表项内容。"
+        ::= { gbnDeviceSwitchL3 1 }
+
+    l3Entry OBJECT-TYPE
+        SYNTAX      L3Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "交换芯片的L3表项，此表为只读。"
+        INDEX   { l3IpAddress }
+        ::= { l3Table 1 }
+
+    L3Entry ::=
+        SEQUENCE {
+            l3IpAddress          IpAddress,
+            l3NextHopMacAddress  MacAddress,
+            l3Vlan               VlanIndex,
+            l3Port               INTEGER,
+            l3CreateTime         DateAndTime,
+            l3UpdateTime         DateAndTime
+        }
+
+    l3IpAddress OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION "目的IP地址，作为索引。"
+        ::= { l3Entry 1 }
+
+    l3NextHopMacAddress OBJECT-TYPE
+        SYNTAX       MacAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION "下一跳IP的MAC地址。"
+        ::= { l3Entry 2 }
+
+    l3Vlan OBJECT-TYPE
+        SYNTAX       VlanIndex
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION "下一跳IP所在的VLAN。"
+        ::= { l3Entry 3 }
+
+    l3Port OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION "报文的出端口。"
+        ::= { l3Entry 4 }
+
+    l3CreateTime OBJECT-TYPE
+        SYNTAX       DateAndTime
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION "Create Time,such as 2004-07-29,13:30:15.0"
+        ::= { l3Entry 5 }
+
+    l3UpdateTime OBJECT-TYPE
+        SYNTAX       DateAndTime
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION "Update Time,such as 2004-07-29,13:30:15.0"
+        ::= { l3Entry 6 }
+
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchLoopTest - Loop Test Group
+--
+------------------------------------------------------------------------------
+   loopTestPortno  OBJECT-TYPE
+        SYNTAX     PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "port bitmap:Numbers of the port to be tested.
+            The highest bit is port 1, the second bit is port 2, and so on."
+        ::= { gbnDeviceSwitchLoopTest 1 }
+
+     loopTestType  OBJECT-TYPE
+        SYNTAX INTEGER {
+               noop(1),    -- no operation
+               local(2),   -- for both vdsl and ethernet port
+               remote(3),   -- for both vdsl and ethernet port
+               other(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { 4 }
+             Setting this object to 2-4 enables loop back test.
+             Setting it to 1 disables loop back test."
+        ::= { gbnDeviceSwitchLoopTest 2 }
+
+   loopTestSuccess  OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "if the highest bit is
+             0:the port 1 loop fail,
+             1,the port 1 loop success,
+             and so on.
+             "
+        ::= { gbnDeviceSwitchLoopTest 3 }
+
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchSRM - SRM Group
+--
+------------------------------------------------------------------------------
+    srmHardwareEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+              enabled(1),
+              disabled(2)
+          }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Add network routes to hardware table or not.Default is enable."
+        -- "是否下发网段路由到硬件表中。默认为下发。"
+        ::= { gbnDeviceSwitchSRM 1 }
+
+   srmHardwareDEFCPU OBJECT-TYPE
+        SYNTAX  INTEGER {
+              enabled(1),
+              disabled(2)
+          }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The DEF routes goes to CPU."
+        -- "硬件查找失败的路由发送到CPU，此功能只有TiNet S3750支持，默认为disable"
+        ::= { gbnDeviceSwitchSRM 2 }
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchFlowAlarm - Port Flow Alarm Group
+--
+------------------------------------------------------------------------------
+    portFlowAlarmTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PortFlowAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of port flow alarm."
+            --端口流量告警表
+        ::= { gbnDeviceSwitchFlowAlarm 1 }
+
+    portFlowAlarmEntry OBJECT-TYPE
+        SYNTAX PortFlowAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of port flow alarm."
+            --端口流量告警列表
+        INDEX { portFlowAlarmPort }
+        ::= { portFlowAlarmTable 1 }
+
+    PortFlowAlarmEntry ::= SEQUENCE {
+            portFlowAlarmPort            Integer32,
+            portFlowAlarmEnable          TruthValue,
+            portFlowAlarmExceedStatus  TruthValue,
+            portFlowAlarmExceedThreshold  Integer32,
+            portFlowAlarmNormalThreshold  Integer32
+        }
+
+    portFlowAlarmPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "The port number."
+            --端口号，端口流量告警表的索引值
+        ::= { portFlowAlarmEntry 1 }
+
+    portFlowAlarmEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The enable status of the port flow alarm"
+            --端口流量告警开启/关闭状态
+        ::= { portFlowAlarmEntry 2 }
+
+    portFlowAlarmExceedStatus OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The exceed status of the port flow alarm"
+            --端口流量告警流量状态
+        ::= { portFlowAlarmEntry 3 }
+
+    portFlowAlarmExceedThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS  read-write
+        STATUS current
+        DESCRIPTION
+            "The exceed threshold of port flow alarm."
+            --端口流量过大的阈值
+        ::= { portFlowAlarmEntry 4 }
+
+    portFlowAlarmNormalThreshold OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The normal threshold of port flow alarm."
+            --端口流量正常的阈值
+        ::= { portFlowAlarmEntry 5 }
+
+    portFlowAlarmGlobalEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The global enable status of port flow alarm."
+            --全局端口流量告警开启/关闭状态
+        ::= { gbnDeviceSwitchFlowAlarm 2 }
+
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchTrap - gbn device switch TRAP
+--
+------------------------------------------------------------------------------
+    portFlowAlarmTrap      OBJECT IDENTIFIER ::= { gbnDeviceSwitchFlowAlarm 5 }
+
+    portFlowAlarmExceedTrap NOTIFICATION-TYPE
+        OBJECTS { portFlowAlarmPort }
+        STATUS  current
+        DESCRIPTION
+               "Port ingress packet rate become too big, port flow exceed alarm happen."
+        ::= { portFlowAlarmTrap 1 }
+
+    portFlowAlarmNormalTrap NOTIFICATION-TYPE
+        OBJECTS { portFlowAlarmPort }
+        STATUS  current
+        DESCRIPTION
+               "Port ingress packet rate become normal, port flow normal alarm happen."
+               --如果端口进来的报文速率恢复正常，则发出端口速率正常的trap
+        ::= { portFlowAlarmTrap 2 }
+
+-- the quene-scheduer QOS
+
+   qosQueueSchedulerGroup  OBJECT IDENTIFIER ::= { gbnDeviceSwitchQueneScheduer 1 }
+
+   qosWrrQueue1Weight OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "Weight of 1th queue(%). for 3650, the range is 1 to 255, for 3750-24/48,the range is 1 to 15."
+               --队列1的权重。对于3650，范围为1到255，对于3750-24/48，范围为1到15
+       ::= { qosQueueSchedulerGroup 1 }
+
+   qosWrrQueue2Weight OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "Weight of 2th queue(%). for 3650, the range is 0 to 255, for 3750-24/48,the range is 1 to 15."
+               --队列2的权重。对于3650，范围为0到255，对于3750-24/48，范围为1到15
+       ::= { qosQueueSchedulerGroup 2 }
+
+
+   qosWrrQueue3Weight OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "Weight of 3th queue(%). for 3650, the range is 0 to 255, for 3750-24/48,the range is 1 to 15."
+               --队列3的权重。对于3650，范围为0到255，对于3750-24/48，范围为1到15
+       ::= { qosQueueSchedulerGroup 3 }
+
+
+   qosWrrQueue4Weight OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "Weight of 4th queue(%). for 3650, the range is 0 to 255, for 3750-24/48,the range is 1 to 15."
+               --队列4的权重。对于3650，范围为0到255，对于3750-24/48，范围为1到15
+       ::= { qosQueueSchedulerGroup 4 }
+
+   qosWrrMaxDelayValue OBJECT-TYPE
+       SYNTAX  INTEGER (1..255)
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "the maximum allowable latency for packet transmission on the priorest COS"
+               --队列调度时最高优先级的队列最长等待时间
+       ::= { qosQueueSchedulerGroup 5 }
+
+   qosQueueSchedulerMode OBJECT-TYPE
+       SYNTAX  INTEGER  {
+                        strictPriority (1),
+                        wrr(2),
+                        sp-wrr(3) }                        
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "queue scheduler mode: strict priority, weighted round robin, strict priority+weighted round robin" 
+               --队列调度模式:绝对优先级、加权轮循调度
+       DEFVAL  { strictPriority }
+       ::= { qosQueueSchedulerGroup 6 }
+
+   qosWrrQueue5Weight OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "Weight of 5th queue(%). for 3650, the range is 0 to 255, for 3750-24/48,the range is 1 to 15."
+               --队列5的权重。对于3650，范围为0到255，对于3750-24/48，范围为1到15
+       ::= { qosQueueSchedulerGroup 7 }
+
+   qosWrrQueue6Weight OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "Weight of 6th queue(%). for 3650, the range is 0 to 255, for 3750-24/48,the range is 1 to 15."
+               --队列6的权重。对于3650，范围为0到255，对于3750-24/48，范围为1到15
+       ::= { qosQueueSchedulerGroup 8 }
+
+
+   qosWrrQueue7Weight OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "Weight of 7th queue(%). for 3650, the range is 0 to 255, for 3750-24/48,the range is 1 to 15."
+               --队列7的权重。对于3650，范围为0到255，对于3750-24/48，范围为1到15
+       ::= { qosQueueSchedulerGroup 9 }
+
+
+   qosWrrQueue8Weight OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "Weight of 8th queue(%). for 3650, the range is 0 to 255, for 3750-24/48,the range is 1 to 15."
+               --队列8的权重。对于3650，范围为0到255，对于3750-24/48，范围为1到15
+       ::= { qosQueueSchedulerGroup 10 }
+
+   qosLineRateTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF QosLineRateEntry
+       ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "A list of line-rate QOS entries. "
+               --端口限速入口表
+       ::= { gbnDeviceSwitchLineRate 1 }
+
+   qosLineRateEntry OBJECT-TYPE
+       SYNTAX  QosLineRateEntry
+       ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "A list of line-rate QOS entries. "
+               --端口限速入口
+       INDEX   { qosLineRateInterface }
+       ::= { qosLineRateTable 1 }
+
+   QosLineRateEntry ::=
+       SEQUENCE {
+           qosLineRateInterface
+               INTEGER,
+           qosLineRateTargetRate
+               INTEGER,
+           qosLineRateTargetBurst
+               INTEGER,
+           qosLineRateTargetRateIngress
+               INTEGER,               
+           qosLineRateRowStatus
+               RowStatus
+       }
+
+   qosLineRateInterface OBJECT-TYPE
+       SYNTAX  INTEGER (1..26)
+       ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "the line rate interface.  "
+               --端口限速端口
+       ::= { qosLineRateEntry 1 }
+
+   qosLineRateTargetRate OBJECT-TYPE
+       SYNTAX  INTEGER (64..1000000)
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "The target rate(Kbps) of the line-rate QOS. Must be a multiple of 64Kbps "
+               --端口限速目标速率(Kbps),必须是64Kbps的倍数
+       ::= { qosLineRateEntry 2 }
+
+   qosLineRateTargetBurst OBJECT-TYPE
+       SYNTAX  INTEGER (64..1000000)
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "The target burst(Kbps) of the line-rate QOS. Must be a multiple of 64Kbps "
+               --端口限速允许突发速率(Kbps),必须是64Kbps的倍数
+       ::= { qosLineRateEntry 3 }
+
+   qosLineRateTargetRateIngress OBJECT-TYPE
+       SYNTAX  INTEGER (0..1024000)
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "The ingress target rate(Kbps) of the line-rate QOS.0 means disable"
+               --入口端口限速目标速率(Kbps)
+       ::= { qosLineRateEntry 4 }  
+       
+   portIsolationGroup  OBJECT IDENTIFIER ::= { gbnDeviceSwitchPortIsolation 1 }
+
+   portIsolationDownLinkPorts OBJECT-TYPE
+       SYNTAX  PortList
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "port isolation down link portlist"
+               -- 端口隔离的下行端口列表 --
+       ::= { portIsolationGroup 1 }
+
+   portIsolationUpLinkTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF PortIsolationUpLinkEntry
+       ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "A list of uplink-ports of portisolation entries. conflict with portIsolationDownLinkPorts."
+               --基于端口的端口隔离上行口列表，不能够跟portIsolationDownLinkPorts同时使用
+       ::= { portIsolationGroup 2 }
+ 
+   portIsolationUpLinkEntry OBJECT-TYPE
+       SYNTAX  PortIsolationUpLinkEntry
+       ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "A list of uplink-ports of portisolation entries. "
+               --基于端口的端口隔离上行口列表
+       INDEX   { portisolationInterface }
+       ::= { portIsolationUpLinkTable 1 }
+ 
+   PortIsolationUpLinkEntry ::=
+       SEQUENCE {
+           portisolationInterface
+               INTEGER,  
+           portisolationUplinkList             
+               PortList             
+       }
+
+   portisolationInterface OBJECT-TYPE
+       SYNTAX  INTEGER 
+       ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "port index, start from 1. "
+               --端口索引
+       ::= { portIsolationUpLinkEntry 1 }
+
+   portisolationUplinkList OBJECT-TYPE
+       SYNTAX  PortList 
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "portlist of uplink ports,when configured , a port can only communicate with it's uplink ports. "
+               --上行口列表，当配置后，端口只允许跟它的上行口通信
+       ::= { portIsolationUpLinkEntry 2 }
+
+
+   stormControlTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF StormControlEntry
+       ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "A list of storm control entries. "
+               --风暴控制入口表
+       ::= { gbnDeviceSwitchStormControl 1 }
+
+   stormControlEntry OBJECT-TYPE
+       SYNTAX  StormControlEntry
+       ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "A list of storm control entries. "
+               --风暴控制入口
+       INDEX   { stormControlInterface, stormControlType }
+       ::= { stormControlTable 1 }
+
+   StormControlEntry ::=
+       SEQUENCE {
+           stormControlInterface
+               INTEGER,
+           stormControlType
+               INTEGER,
+           stormControlTargetRate
+               INTEGER,
+           stormControlRowStatus
+               RowStatus,
+           stormControlMode
+               INTEGER
+       }
+
+   stormControlInterface OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "the storm control interface. "
+               --风暴控制端口
+       ::= { stormControlEntry 1 }
+
+   stormControlType OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "the pack flow type of the storm control. "
+               --风暴控制报文流类型
+       ::= { stormControlEntry 2 }
+
+   stormControlTargetRate OBJECT-TYPE
+       SYNTAX  INTEGER (1..1000)   
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "the target rate of the storm control. "
+               --风暴控制目标速率
+       ::= { stormControlEntry 3 }
+
+   stormControlRowStatus OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+                "row status of the storm control"
+                --风暴控制行状态
+        ::= { stormControlEntry 4 }
+
+   stormControlMode OBJECT-TYPE
+       SYNTAX  INTEGER  {
+                        pps(0),
+                        bps(1) }
+       ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "the mode of the storm control. "
+       ::= { stormControlEntry 5 }
+       
+    ipfragmnetnumber OBJECT-TYPE
+        SYNTAX INTEGER (0..800)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The ip fragment number."
+        ::= { gbnDeviceSwitchAntiDos 1 }  
+        
+    ipTTL  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+           "Control IP with TTL=0 packet,default is not traffic  to the  CPU."
+         --控制TTL=0的报文是否送往CPU,默认情况是关闭上报CPU.
+         ::= { gbnDeviceSwitchAntiDos 2 } 
+
+   bandwidthcontrolTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF BandwidthcontrolEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of switch interfaces and associated properties."
+        ::= { gbnDeviceSwitchBandWidth 1 }
+
+    bandwidthcontrolEntry OBJECT-TYPE
+        SYNTAX BandwidthcontrolEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for switch interface control and status information."
+        INDEX { controlPort }
+        ::= { bandwidthcontrolTable 1 }
+
+    BandwidthcontrolEntry ::= SEQUENCE {
+        controlPort                             INTEGER,
+        portEgressBandwidthcontrol     INTEGER,
+        portIngressBandwidthcontrol    INTEGER
+      }
+
+    controlPort OBJECT-TYPE
+        SYNTAX INTEGER (1..26)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "the index of port."
+        ::= { bandwidthcontrolEntry 1 }
+
+    portEgressBandwidthcontrol OBJECT-TYPE
+        SYNTAX INTEGER (0..1024000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Egress Speed Value of port, bandwidth control ."
+        ::= { bandwidthcontrolEntry 2 }
+
+    portIngressBandwidthcontrol OBJECT-TYPE
+        SYNTAX INTEGER (0..1024000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Ingress Speed Value of port, bandwidth control ."
+        ::= { bandwidthcontrolEntry 3 }
+
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchHigigStatistics - Higig Statistics Info                   
+--
+------------------------------------------------------------------------------
+    higigStatisticsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HigigStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of Higig Statistics Info."
+        ::= { gbnDeviceSwitchHigigStatistics 1 }
+
+    higigStatisticsEntry OBJECT-TYPE
+        SYNTAX HigigStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for Higig Statistics information."
+        INDEX { unit , higig }
+        ::= { higigStatisticsTable 1 }
+
+    HigigStatisticsEntry ::= SEQUENCE {
+      unit                                 INTEGER,
+      higig                                INTEGER,
+      snEtherStatsPkts64Octets             Counter64,
+      snEtherStatsPkts65to127Octets        Counter64,
+      snEtherStatsPkts128to255Octets       Counter64,
+      snEtherStatsPkts256to511Octets       Counter64,
+      snEtherStatsPkts512to1023Octets      Counter64,
+      snEtherStatsPkts1024to1518Octets     Counter64,
+      sndot1dTpPortInFrames                Counter64,
+      snifInOctets                         Counter64,
+      snifInDiscards                       Counter64,
+      snifInUcastPkts                      Counter64,
+      snifInMulticastPkts                  Counter64,
+      snifInBroadcastPkts                  Counter64,
+      snifInErrors                         Counter64,
+      snDot3StatsFCSErrors                 Counter64,
+      snDot3StatsSymbolErrors              Counter64,
+      snDot3StatsCarrierSenseErrors        Counter64,
+      snEtherStatsUndersizePkts            Counter64,
+      snEtherStatsOversizePkts             Counter64,
+      snEtherStatsFragments                Counter64,
+      snEtherStatsJabbers                  Counter64,
+      sndot1dTpPortOutFrames               Counter64,
+      snifOutOctets                        Counter64,
+      snifOutDiscards                      Counter64,
+      snifOutUcastPkts                     Counter64,
+      snifOutMulticastPkts                 Counter64,
+      snifOutBroadcastPkts                 Counter64,
+      snifOutErrors                        Counter64,
+      snDot3StatsDeferredTransmissions     Counter64,
+      snEtherStatsCollisions               Counter64,
+      snDot3StatsLateCollisions            Counter64
+      }
+      
+    unit OBJECT-TYPE
+      SYNTAX INTEGER (0..1)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "unit number."
+      ::= { higigStatisticsEntry 1 }
+
+    higig OBJECT-TYPE
+      SYNTAX INTEGER (1..2)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "higig number."
+      ::= { higigStatisticsEntry 2 }
+
+    snEtherStatsPkts64Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets (including bad
+          packets) received that were 64 octets in length
+          (excluding framing bits but including FCS octets)."
+      ::= { higigStatisticsEntry 3 }
+
+    snEtherStatsPkts65to127Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets (including bad
+          packets) received that were between
+          65 and 127 octets in length inclusive
+          (excluding framing bits but including FCS octets)."
+      ::= { higigStatisticsEntry 4 }
+
+    snEtherStatsPkts128to255Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets (including bad
+          packets) received that were between
+          128 and 255 octets in length inclusive
+          (excluding framing bits but including FCS octets)."
+      ::= { higigStatisticsEntry 5 }
+
+    snEtherStatsPkts256to511Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets (including bad
+          packets) received that were between
+          256 and 511 octets in length inclusive
+          (excluding framing bits but including FCS octets)."
+      ::= { higigStatisticsEntry 6 }
+
+    snEtherStatsPkts512to1023Octets OBJECT-TYPE
+       SYNTAX Counter64
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+          "The total number of packets (including bad
+          packets) received that were between
+          512 and 1023 octets in length inclusive
+          (excluding framing bits but including FCS octets)."
+      ::= { higigStatisticsEntry 7 }
+
+    snEtherStatsPkts1024to1518Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets (including bad
+          packets) received that were between
+          1024 and 1518 octets in length inclusive
+          (excluding framing bits but including FCS octets)."
+      ::= { higigStatisticsEntry 8 }
+      
+    sndot1dTpPortInFrames OBJECT-TYPE
+      SYNTAX  Counter64
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+              "The number of frames that have been received by
+              this port from its segment. Note that a frame
+              received on the interface corresponding to this
+              port is only counted by this object if and only if
+              it is for a protocol being processed by the local
+              bridging function, including bridge management
+              frames."
+      REFERENCE
+              "IEEE 802.1D-1990: Section 6.6.1.1.3"
+      ::= { higigStatisticsEntry 9 }
+      
+   snifInOctets OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of octets received on the interface,
+               including framing characters.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { higigStatisticsEntry 10 }
+
+   snifInDiscards OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of inbound packets which were chosen to be
+               discarded even though no errors had been detected to
+               prevent their being deliverable to a higher-layer
+               protocol.  One possible reason for discarding such a
+               packet could be to free up buffer space.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { higigStatisticsEntry 11 }
+
+   snifInUcastPkts OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of packets, delivered by this sub-layer to
+               a higher (sub-)layer, which were not addressed to a
+               multicast or broadcast address at this sub-layer.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { higigStatisticsEntry 12 }
+
+   snifInMulticastPkts OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of packets, delivered by this sub-layer to
+               a higher (sub-)layer, which were addressed to a
+               multicast address at this sub-layer.  For a MAC layer
+               protocol, this includes both Group and Functional
+               addresses.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { higigStatisticsEntry 13 }
+
+   snifInBroadcastPkts OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of packets, delivered by this sub-layer to
+               a higher (sub-)layer, which were addressed to a
+               broadcast address at this sub-layer.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { higigStatisticsEntry 14 }
+
+   snifInErrors OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "For packet-oriented interfaces, the number of inbound
+               packets that contained errors preventing them from
+               being deliverable to a higher-layer protocol.  For
+               character-oriented or fixed-length interfaces, the
+               number of inbound transmission units that contained
+               errors preventing them from being deliverable to a
+               higher-layer protocol.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { higigStatisticsEntry 15 }
+       
+    snDot3StatsFCSErrors   OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "A count of frames received on a particular
+        interface that are an integral number of octets
+        in length but do not pass the FCS check.
+
+        The count represented by an instance of this
+        object is incremented when the frameCheckError
+        status is returned by the MAC service to the
+        LLC (or other MAC user). Received frames for
+        which multiple error conditions obtain are,
+        according to the conventions of IEEE 802.3
+        Layer Management, counted exclusively according
+        to the error status presented to the LLC."
+        REFERENCE
+        "IEEE 802.3 Layer Management"
+        ::= { higigStatisticsEntry 16 }
+
+    snDot3StatsSymbolErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        "For an interface operating at 100 Mb/s, the
+        number of times there was an invalid data symbol
+        when a valid carrier was present.
+
+        For an interface operating in half-duplex mode
+        at 1000 Mb/s, the number of times the receiving
+        media is non-idle (a carrier event) for a period
+        of time equal to or greater than slotTime, and
+        during which there was at least one occurrence
+        of an event that causes the PHY to indicate
+        'Data reception error' or 'carrier extend error'
+        on the GMII.
+
+        For an interface operating in full-duplex mode
+        at 1000 Mb/s, the number of times the receiving
+        media is non-idle a carrier event) for a period
+        of time equal to or greater than minFrameSize,
+        and during which there was at least one
+        occurrence of an event that causes the PHY to
+        indicate 'Data reception error' on the GMII.
+
+        The count represented by an instance of this
+        object is incremented at most once per carrier
+        event, even if multiple symbol errors occur
+        during the carrier event.  This count does
+        not increment if a collision is present.
+
+        Discontinuities in the value of this counter can
+        occur at re-initialization of the management
+        system, and at other times as indicated by the
+        value of ifCounterDiscontinuityTime."
+        REFERENCE   
+        "[IEEE 802.3 Std.], 30.3.2.1.5,
+                       aSymbolErrorDuringCarrier."
+        ::= { higigStatisticsEntry 17 }
+
+    snDot3StatsCarrierSenseErrors   OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+        "The number of times that the carrier sense
+        condition was lost or never asserted when
+        attempting to transmit a frame on a particular
+        interface.
+
+        The count represented by an instance of this
+        object is incremented at most once per
+        transmission attempt, even if the carrier sense
+        condition fluctuates during a transmission
+        attempt."
+        REFERENCE
+        "IEEE 802.3 Layer Management"
+        ::= { higigStatisticsEntry 18 }
+
+    snEtherStatsUndersizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets received that were
+          less than 64 octets long (excluding framing bits,
+          but including FCS octets) and were otherwise well
+          formed."
+      ::= { higigStatisticsEntry 19 }
+
+    snEtherStatsOversizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets received that were
+          longer than 1518 octets (excluding framing bits,
+          but including FCS octets) and were otherwise
+          well formed."
+      ::= { higigStatisticsEntry 20 }
+
+    snEtherStatsFragments OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets received that were less
+          than 64 octets in length (excluding framing bits but
+          including FCS octets) and had either a bad Frame
+          Check Sequence (FCS) with an integral number of
+          octets (FCS Error) or a bad FCS with a non-integral
+          number of octets (Alignment Error).
+
+          Note that it is entirely normal for
+          etherStatsFragments to increment.  This is because
+          it counts both runts (which are normal occurrences
+          due to collisions) and noise hits."
+      ::= { higigStatisticsEntry 21 }
+
+    snEtherStatsJabbers OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets received that were
+          longer than 1518 octets (excluding framing bits,
+          but including FCS octets), and had either a bad
+          Frame Check Sequence (FCS) with an integral number
+          of octets (FCS Error) or a bad FCS with a
+          non-integral number of octets (Alignment Error).
+
+          Note that this definition of jabber is different
+          than the definition in IEEE-802.3 section 8.2.1.5
+          (10BASE5) and section 10.3.1.4 (10BASE2).  These
+          documents define jabber as the condition where any
+          packet exceeds 20 ms.  The allowed range to detect
+          jabber is between 20 ms and 150 ms."
+      ::= { higigStatisticsEntry 22 }
+
+    sndot1dTpPortOutFrames OBJECT-TYPE
+      SYNTAX  Counter64
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+              "The number of frames that have been transmitted
+              by this port to its segment.  Note that a frame
+              transmitted on the interface corresponding to this
+              port is only counted by this object if and only if
+              it is for a protocol being processed by the local
+              bridging function, including bridge management
+              frames."
+      REFERENCE
+              "IEEE 802.1D-1990: Section 6.6.1.1.3"
+      ::= { higigStatisticsEntry 23 }
+
+     snifOutOctets OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of octets transmitted out of the
+               interface, including framing characters.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { higigStatisticsEntry 24 }
+
+     snifOutDiscards OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of outbound packets which were chosen to
+               be discarded even though no errors had been detected
+               to prevent their being transmitted.  One possible
+               reason for discarding such a packet could be to free
+               up buffer space.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { higigStatisticsEntry 25 }
+       
+     snifOutUcastPkts OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of packets that higher-level
+               protocols requested be transmitted, and which were not
+               addressed to a multicast or broadcast address at this
+               sub-layer, including those that were discarded or not
+               sent.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { higigStatisticsEntry 26 }
+
+     snifOutMulticastPkts OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of packets that higher-level
+               protocols requested be transmitted, and which were
+               addressed to a multicast address at this sub-layer,
+               including those that were discarded or not sent.  For
+               a MAC layer protocol, this includes both Group and
+               Functional addresses.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { higigStatisticsEntry 27 }
+
+     snifOutBroadcastPkts OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of packets that higher-level
+               protocols requested be transmitted, and which were
+               addressed to a broadcast address at this sub-layer,
+               including those that were discarded or not sent.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { higigStatisticsEntry 28 }
+       
+     snifOutErrors OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "For packet-oriented interfaces, the number of
+               outbound packets that could not be transmitted because
+               of errors.  For character-oriented or fixed-length
+               interfaces, the number of outbound transmission units
+               that could not be transmitted because of errors.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { higigStatisticsEntry 29 }
+
+      snDot3StatsDeferredTransmissions   OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "A count of frames for which the first
+        transmission attempt on a particular interface
+        is delayed because the medium is busy.
+
+        The count represented by an instance of this
+        object does not include frames involved in
+        collisions."
+        REFERENCE
+        "IEEE 802.3 Layer Management"
+        ::= { higigStatisticsEntry 30 }
+
+    snEtherStatsCollisions OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The best estimate of the total number of collisions
+          on this Ethernet segment.
+
+          The value returned will depend on the location of
+          the RMON probe. Section 8.2.1.3 (10BASE-5) and
+          section 10.3.1.3 (10BASE-2) of IEEE standard 802.3
+          states that a station must detect a collision, in
+          the receive mode, if three or more stations are
+          transmitting simultaneously.  A repeater port must
+          detect a collision when two or more stations are
+          transmitting simultaneously.  Thus a probe placed on
+          a repeater port could record more collisions than a
+          probe connected to a station on the same segment
+          would.
+
+          Probe location plays a much smaller role when
+          considering 10BASE-T.  14.2.1.4 (10BASE-T) of IEEE
+          standard 802.3 defines a collision as the
+          simultaneous presence of signals on the DO and RD
+          circuits (transmitting and receiving at the same
+          time).  A 10BASE-T station can only detect
+          collisions when it is transmitting.  Thus probes
+          placed on a station and a repeater, should report
+          the same number of collisions.
+
+          Note also that an RMON probe inside a repeater
+          should ideally report collisions between the
+          repeater and one or more other hosts (transmit
+          collisions as defined by IEEE 802.3k) plus receiver
+          collisions observed on any coax segments to which
+          the repeater is connected."
+      ::= { higigStatisticsEntry 31 }
+
+    snDot3StatsLateCollisions   OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The number of times that a collision is
+        detected on a particular interface later than
+        512 bit-times into the transmission of a
+        packet.
+
+        Five hundred and twelve bit-times corresponds
+        to 51.2 microseconds on a 10 Mbit/s system. A
+        (late) collision included in a count
+        represented by an instance of this object is
+        also considered as a (generic) collision for
+        purposes of other collision-related
+        statistics."
+        REFERENCE
+        "IEEE 802.3 Layer Management"
+        ::= { higigStatisticsEntry 32 }
+
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchChannelStats - Channel group Sttatistics Info
+--
+------------------------------------------------------------------------------
+    channelStatsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ChannelStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of Channel group Statistics Info(32)."
+        ::= { gbnDeviceSwitchChannelStats 1 }
+
+--  The channelStatsEntry
+    channelStatsEntry OBJECT-TYPE
+        SYNTAX ChannelStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for Channel Statistics information(32)."
+        INDEX { channelGroupIndex }
+        ::= { channelStatsTable 1 }
+
+    ChannelStatsEntry ::= SEQUENCE {
+      channelGroupIndex                      INTEGER,
+      channelInOctetRate                     Counter32,
+      channelInFrameRate                     Counter32,
+      channelOutOctetRate                    Counter32,
+      channelOutFrameRate                    Counter32,
+      channelPkts64Octets                    Counter32,
+      channelPkts65to127Octets               Counter32,
+      channelPkts128to255Octets              Counter32,
+      channelPkts256to511Octets              Counter32,
+      channelPkts512to1023Octets             Counter32,
+      channelPkts1024to1518Octets            Counter32,
+      channelInFrames                        Counter32,
+      channelInOctets                        Counter32,
+      channelInDiscards                      Counter32,
+      channelInUcastPkts                     Counter32,
+      channelInMulticastPkts                 Counter32,
+      channelInBroadcastPkts                 Counter32,
+      channelInErrors                        Counter32,
+      channelFCSErrors                       Counter32,
+      channelSymbolErrors                    Counter32,
+      channelCarrierSenseErrors              Counter32,
+      channelUndersizePkts                   Counter32,
+      channelOversizePkts                    Counter32,
+      channelFragments                       Counter32,
+      channelJabbers                         Counter32,
+      channelOutFrames                       Counter32,
+      channelOutOctets                       Counter32,
+      channelOutDiscards                     Counter32,
+      channelOutUcastPkts                    Counter32,
+      channelOutMulticastPkts                Counter32,
+      channelOutBroadcastPkts                Counter32,
+      channelOutErrors                       Counter32,
+      channelDeferredTransmissions           Counter32,
+      channelCollisions                      Counter32,
+      channelLateCollisions                  Counter32
+      }
+    
+    channelGroupIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The configed channel-group index list."
+          --已配置的汇聚组索引列表
+      ::= { channelStatsEntry 1 }
+    
+    channelInOctetRate OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The ingress octet rate of this channel-group."
+          --该汇聚组接收报文字节的速率
+      ::= { channelStatsEntry 2 }
+      
+    channelInFrameRate OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The ingress packet rate of this channel-group."
+          --该汇聚组接收报文的速率
+      ::= { channelStatsEntry 3 }
+
+    channelOutOctetRate OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The egress octet rate of this channel-group."
+          --该汇聚组发送报文字节的速率
+      ::= { channelStatsEntry 4 }
+
+    channelOutFrameRate OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The egress packet rate of this channel-group."
+          --该汇聚组发送报文的速率
+      ::= { channelStatsEntry 5 }
+
+    channelPkts64Octets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets (including bad
+          packets) received that were 64 octets in length
+          (excluding framing bits but including FCS octets)
+          in this channel-group."
+      ::= { channelStatsEntry 6 }
+
+    channelPkts65to127Octets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets (including bad
+          packets) received that were between
+          65 and 127 octets in length inclusive
+          (excluding framing bits but including FCS octets)
+          in this channel-group."
+      ::= { channelStatsEntry 7 }
+
+    channelPkts128to255Octets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets (including bad
+          packets) received that were between
+          128 and 255 octets in length inclusive
+          (excluding framing bits but including FCS octets).
+          in this channel-group."
+      ::= { channelStatsEntry 8 }
+
+    channelPkts256to511Octets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets (including bad
+          packets) received that were between
+          256 and 511 octets in length inclusive
+          (excluding framing bits but including FCS octets)
+          in this channel-group."
+      ::= { channelStatsEntry 9 }
+
+    channelPkts512to1023Octets OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+          "The total number of packets (including bad
+          packets) received that were between
+          512 and 1023 octets in length inclusive
+          (excluding framing bits but including FCS octets)
+          in this channel-group."
+      ::= { channelStatsEntry 10 }
+
+    channelPkts1024to1518Octets OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets (including bad
+          packets) received that were between
+          1024 and 1518 octets in length inclusive
+          (excluding framing bits but including FCS octets)
+          in this channel-group."
+      ::= { channelStatsEntry 11 }
+      
+    channelInFrames OBJECT-TYPE
+      SYNTAX  Counter32
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+              "The number of frames that have been received by
+              this channel-group from its segment. Note that a frame
+              received on the interface corresponding to this
+              channel-group is only counted by this object if and 
+              only if it is for a protocol being processed by the
+              local bridging function, including bridge management
+              frames."
+      REFERENCE
+              "IEEE 802.1D-1990: Section 6.6.1.1.3"
+      ::= { channelStatsEntry 12 }
+      
+   channelInOctets OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of octets received on the channel-group,
+               including framing characters.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsEntry 13 }
+
+   channelInDiscards OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of inbound packets which were chosen to be
+               discarded even though no errors had been detected to
+               prevent their being deliverable to a higher-layer
+               protocol.  One possible reason for discarding such a
+               packet could be to free up buffer space.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsEntry 14 }
+
+   channelInUcastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of packets, delivered by this sub-layer to
+               a higher (sub-)layer, which were not addressed to a
+               multicast or broadcast address at this sub-layer.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsEntry 15 }
+
+   channelInMulticastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of packets, delivered by this sub-layer to
+               a higher (sub-)layer, which were addressed to a
+               multicast address at this sub-layer.  For a MAC layer
+               protocol, this includes both Group and Functional
+               addresses.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsEntry 16 }
+
+   channelInBroadcastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of packets, delivered by this sub-layer to
+               a higher (sub-)layer, which were addressed to a
+               broadcast address at this sub-layer.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsEntry 17 }
+
+   channelInErrors OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "For packet-oriented interfaces, the number of inbound
+               packets that contained errors preventing them from
+               being deliverable to a higher-layer protocol.  For
+               character-oriented or fixed-length interfaces, the
+               number of inbound transmission units that contained
+               errors preventing them from being deliverable to a
+               higher-layer protocol.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsEntry 18 }
+       
+    channelFCSErrors   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "A count of frames received on a particular
+        interface that are an integral number of octets
+        in length but do not pass the FCS check.
+
+        The count represented by an instance of this
+        object is incremented when the frameCheckError
+        status is returned by the MAC service to the
+        LLC (or other MAC user). Received frames for
+        which multiple error conditions obtain are,
+        according to the conventions of IEEE 802.3
+        Layer Management, counted exclusively according
+        to the error status presented to the LLC."
+        REFERENCE
+        "IEEE 802.3 Layer Management"
+        ::= { channelStatsEntry 19 }
+
+    channelSymbolErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        "For an interface operating at 100 Mb/s, the
+        number of times there was an invalid data symbol
+        when a valid carrier was present.
+
+        For an interface operating in half-duplex mode
+        at 1000 Mb/s, the number of times the receiving
+        media is non-idle (a carrier event) for a period
+        of time equal to or greater than slotTime, and
+        during which there was at least one occurrence
+        of an event that causes the PHY to indicate
+        'Data reception error' or 'carrier extend error'
+        on the GMII.
+
+        For an interface operating in full-duplex mode
+        at 1000 Mb/s, the number of times the receiving
+        media is non-idle a carrier event) for a period
+        of time equal to or greater than minFrameSize,
+        and during which there was at least one
+        occurrence of an event that causes the PHY to
+        indicate 'Data reception error' on the GMII.
+
+        The count represented by an instance of this
+        object is incremented at most once per carrier
+        event, even if multiple symbol errors occur
+        during the carrier event.  This count does
+        not increment if a collision is present.
+
+        Discontinuities in the value of this counter can
+        occur at re-initialization of the management
+        system, and at other times as indicated by the
+        value of ifCounterDiscontinuityTime."
+        REFERENCE   
+        "[IEEE 802.3 Std.], 30.3.2.1.5,
+                       aSymbolErrorDuringCarrier."
+        ::= { channelStatsEntry 20 }
+
+    channelCarrierSenseErrors   OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+        "The number of times that the carrier sense
+        condition was lost or never asserted when
+        attempting to transmit a frame on a particular
+        interface.
+
+        The count represented by an instance of this
+        object is incremented at most once per
+        transmission attempt, even if the carrier sense
+        condition fluctuates during a transmission
+        attempt."
+        REFERENCE
+        "IEEE 802.3 Layer Management"
+        ::= { channelStatsEntry 21 }
+
+    channelUndersizePkts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets received that were
+          less than 64 octets long (excluding framing bits,
+          but including FCS octets) and were otherwise well
+          formed."
+      ::= { channelStatsEntry 22 }
+
+    channelOversizePkts OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets received that were
+          longer than 1518 octets (excluding framing bits,
+          but including FCS octets) and were otherwise
+          well formed."
+      ::= { channelStatsEntry 23 }
+
+    channelFragments OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets received that were less
+          than 64 octets in length (excluding framing bits but
+          including FCS octets) and had either a bad Frame
+          Check Sequence (FCS) with an integral number of
+          octets (FCS Error) or a bad FCS with a non-integral
+          number of octets (Alignment Error).
+
+          Note that it is entirely normal for
+          etherStatsFragments to increment.  This is because
+          it counts both runts (which are normal occurrences
+          due to collisions) and noise hits."
+      ::= { channelStatsEntry 24 }
+
+    channelJabbers OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The total number of packets received that were
+          longer than 1518 octets (excluding framing bits,
+          but including FCS octets), and had either a bad
+          Frame Check Sequence (FCS) with an integral number
+          of octets (FCS Error) or a bad FCS with a
+          non-integral number of octets (Alignment Error).
+
+          Note that this definition of jabber is different
+          than the definition in IEEE-802.3 section 8.2.1.5
+          (10BASE5) and section 10.3.1.4 (10BASE2).  These
+          documents define jabber as the condition where any
+          packet exceeds 20 ms.  The allowed range to detect
+          jabber is between 20 ms and 150 ms."
+      ::= { channelStatsEntry 25 }
+
+    channelOutFrames OBJECT-TYPE
+      SYNTAX  Counter32
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+              "The number of frames that have been transmitted
+              by this channel-group to its segment.  Note that a
+              frame transmitted on the interface corresponding 
+              to this port is only counted by this object if and 
+              only if it is for a protocol being processed by the
+              local bridging function, including bridge management
+              frames."
+      REFERENCE
+              "IEEE 802.1D-1990: Section 6.6.1.1.3"
+      ::= { channelStatsEntry 26 }
+
+     channelOutOctets OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of octets transmitted out of the
+               channel-group, including framing characters.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsEntry 27 }
+
+     channelOutDiscards OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of outbound packets which were chosen to
+               be discarded even though no errors had been detected
+               to prevent their being transmitted.  One possible
+               reason for discarding such a packet could be to free
+               up buffer space.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsEntry 28 }
+       
+     channelOutUcastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of packets that higher-level
+               protocols requested be transmitted, and which were not
+               addressed to a multicast or broadcast address at this
+               sub-layer, including those that were discarded or not
+               sent.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsEntry 29 }
+
+     channelOutMulticastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of packets that higher-level
+               protocols requested be transmitted, and which were
+               addressed to a multicast address at this sub-layer,
+               including those that were discarded or not sent.  For
+               a MAC layer protocol, this includes both Group and
+               Functional addresses.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsEntry 30 }
+
+     channelOutBroadcastPkts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of packets that higher-level
+               protocols requested be transmitted, and which were
+               addressed to a broadcast address at this sub-layer,
+               including those that were discarded or not sent.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsEntry 31 }
+       
+     channelOutErrors OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "For packet-oriented interfaces, the number of
+               outbound packets that could not be transmitted because
+               of errors.  For character-oriented or fixed-length
+               interfaces, the number of outbound transmission units
+               that could not be transmitted because of errors.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsEntry 32 }
+
+      channelDeferredTransmissions   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "A count of frames for which the first
+        transmission attempt on a particular interface
+        is delayed because the medium is busy.
+
+        The count represented by an instance of this
+        object does not include frames involved in
+        collisions."
+        REFERENCE
+        "IEEE 802.3 Layer Management"
+        ::= { channelStatsEntry 33 }
+
+    channelCollisions OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The best estimate of the total number of collisions
+          on this Ethernet segment.
+
+          The value returned will depend on the location of
+          the RMON probe. Section 8.2.1.3 (10BASE-5) and
+          section 10.3.1.3 (10BASE-2) of IEEE standard 802.3
+          states that a station must detect a collision, in
+          the receive mode, if three or more stations are
+          transmitting simultaneously.  A repeater port must
+          detect a collision when two or more stations are
+          transmitting simultaneously.  Thus a probe placed on
+          a repeater port could record more collisions than a
+          probe connected to a station on the same segment
+          would.
+
+          Probe location plays a much smaller role when
+          considering 10BASE-T.  14.2.1.4 (10BASE-T) of IEEE
+          standard 802.3 defines a collision as the
+          simultaneous presence of signals on the DO and RD
+          circuits (transmitting and receiving at the same
+          time).  A 10BASE-T station can only detect
+          collisions when it is transmitting.  Thus probes
+          placed on a station and a repeater, should report
+          the same number of collisions.
+
+          Note also that an RMON probe inside a repeater
+          should ideally report collisions between the
+          repeater and one or more other hosts (transmit
+          collisions as defined by IEEE 802.3k) plus receiver
+          collisions observed on any coax segments to which
+          the repeater is connected."
+      ::= { channelStatsEntry 34 }
+
+    channelLateCollisions   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The number of times that a collision is
+        detected on a particular interface later than
+        512 bit-times into the transmission of a
+        packet.
+
+        Five hundred and twelve bit-times corresponds
+        to 51.2 microseconds on a 10 Mbit/s system. A
+        (late) collision included in a count
+        represented by an instance of this object is
+        also considered as a (generic) collision for
+        purposes of other collision-related
+        statistics."
+        REFERENCE
+        "IEEE 802.3 Layer Management"
+        ::= { channelStatsEntry 35 }
+
+--  The channelStatsXEntry
+    channelStatsXTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ChannelStatsXEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of Channel group Statistics Info(64)."
+        ::= { gbnDeviceSwitchChannelStats 2 }
+        
+    channelStatsXEntry OBJECT-TYPE
+        SYNTAX ChannelStatsXEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for Channel Statistics information(64)."
+        AUGMENTS    { channelStatsEntry }
+        ::= { channelStatsXTable 1 }
+    
+    ChannelStatsXEntry ::= SEQUENCE {
+      channelHCInFrames                        Counter64,
+      channelHCInOctets                        Counter64,
+      channelHCInUcastPkts                     Counter64,
+      channelHCInMulticastPkts                 Counter64,
+      channelHCInBroadcastPkts                 Counter64,
+      channelHCInDiscards                      Counter64,
+      channelHCOutFrames                       Counter64,
+      channelHCOutOctets                       Counter64,
+      channelHCOutUcastPkts                    Counter64,
+      channelHCOutMulticastPkts                Counter64,
+      channelHCOutBroadcastPkts                Counter64
+      }
+      
+    channelHCInFrames OBJECT-TYPE
+      SYNTAX  Counter64
+      ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+              "The number of frames that have been received by
+              this channel-group from its segment. Note that a 
+              frame received on the interface corresponding to
+              this channel-group is only counted by this object
+              if and only if it is for a protocol being processed
+              by the local bridging function, including bridge 
+              management frames.
+              
+              This object is a 64-bit version of channelInFrames."
+      REFERENCE
+              "ISO/IEC 15802-3 Section 14.6.1.1.3"
+      ::= { channelStatsXEntry 1 }
+      
+   channelHCInOctets OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of octets received on the channel-group,
+               including framing characters. This object is a 64-bit
+               version of channelInOctets.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsXEntry 2 }
+
+   channelHCInUcastPkts OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of packets, delivered by this sub-layer to
+               a higher (sub-)layer, which were not addressed to a
+               multicast or broadcast address at this sub-layer.
+               This object is a 64-bit version of channelInUcastPkts.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsXEntry 3 }
+
+   channelHCInMulticastPkts OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of packets, delivered by this sub-layer to
+               a higher (sub-)layer, which were addressed to a
+               multicast address at this sub-layer.  For a MAC layer
+               protocol, this includes both Group and Functional
+               addresses.  This object is a 64-bit version of
+               channelInMulticastPkts.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsXEntry 4 }
+
+   channelHCInBroadcastPkts OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of packets, delivered by this sub-layer to
+               a higher (sub-)layer, which were addressed to a
+               broadcast address at this sub-layer.  This object is a
+               64-bit version of channelInBroadcastPkts.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsXEntry 5 }
+       
+   channelHCInDiscards OBJECT-TYPE
+		    SYNTAX      Counter64
+		    MAX-ACCESS  read-only
+		    STATUS      current
+		    DESCRIPTION
+		        "Count of valid frames that have been received by this
+		        channel-group from its segment which were discarded (i.e.,
+		        filtered) by the Forwarding Process."
+		    REFERENCE
+		        "ISO/IEC 15802-3 Section 14.6.1.1.3"
+		    ::= { channelStatsXEntry 6 }
+    
+   channelHCOutFrames OBJECT-TYPE
+      SYNTAX  Counter64
+      ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+              "The number of frames that have been transmitted
+              by this channel-group to its segment.  Note that a
+              frame transmitted on the interface corresponding 
+              to this channel-group is only counted by this 
+              object if and only if it is for a protocol being
+              processed by the local bridging function, including 
+              bridge management frames.
+              
+              This object is a 64-bit version of channelOutFrames."
+      REFERENCE
+              "ISO/IEC 15802-3 Section 14.6.1.1.3"
+      ::= { channelStatsXEntry 7 }
+
+     channelHCOutOctets OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of octets transmitted out of the
+               channel-group, including framing characters.  This
+               object is a 64-bit version of channelOutOctets.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsXEntry 8 }
+       
+     channelHCOutUcastPkts OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of packets that higher-level
+               protocols requested be transmitted, and which were not
+               addressed to a multicast or broadcast address at this
+               sub-layer, including those that were discarded or not
+               sent.  This object is a 64-bit version of channelOutUcastPkts.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsXEntry 9 }
+
+     channelHCOutMulticastPkts OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of packets that higher-level
+               protocols requested be transmitted, and which were
+               addressed to a multicast address at this sub-layer,
+               including those that were discarded or not sent.  For
+               a MAC layer protocol, this includes both Group and
+               Functional addresses.  This object is a 64-bit version
+               of channelOutMulticastPkts.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsXEntry 10 }
+
+     channelHCOutBroadcastPkts OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The total number of packets that higher-level
+               protocols requested be transmitted, and which were
+               addressed to a broadcast address at this sub-layer,
+               including those that were discarded or not sent.  This
+               object is a 64-bit version of channelOutBroadcastPkts.
+
+               Discontinuities in the value of this counter can occur
+               at re-initialization of the management system, and at
+               other times as indicated by the value of
+               ifCounterDiscontinuityTime."
+       ::= { channelStatsXEntry 11 }
+
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchRemoteMirror - Mirror Group                    
+--
+------------------------------------------------------------------------------
+    remoteMirrorVlanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RemoteMirrorVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of switch interfaces and associated properties."
+        ::= { gbnDeviceSwitchRmoteMirror 1 }
+
+    remoteMirrorVlanEntry OBJECT-TYPE
+        SYNTAX RemoteMirrorVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for switch interface control and status information."
+        INDEX { remoteMirrorVlanIndex }
+        ::= { remoteMirrorVlanTable 1 }
+
+    RemoteMirrorVlanEntry ::= SEQUENCE {
+        remoteMirrorVlanIndex                INTEGER,
+        remoteMirrorVlanEnable                TruthValue
+
+      }
+
+    remoteMirrorVlanIndex OBJECT-TYPE
+        SYNTAX INTEGER (2..4094)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "the index of remote mirror vlan."
+        ::= { remoteMirrorVlanEntry 1 }
+        
+    remoteMirrorVlanEnable OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "1:enable. 2 disable"
+        ::= { remoteMirrorVlanEntry 2 }
+          
+    remoteMirrorRspanVlanSet OBJECT-TYPE
+        SYNTAX INTEGER (0..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "set rspan vlan on src-switch,
+            0:means no rspan vlan;don't set vlan 1 to be rspan vlan"
+        ::= { gbnDeviceSwitchRmoteMirror 2 }
+        
+    remoteMirrorEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "enable remote mirror on src-switch"
+        ::= { gbnDeviceSwitchRmoteMirror 3 }
+
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchPortSFPInfo - Port SFP Information                    
+--
+------------------------------------------------------------------------------
+    portSFPInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PortSFPInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of switch interfaces and associated properties."
+        ::= { gbnDeviceSwitchPortSFPInfo 1 }
+
+    portSFPInfoEntry OBJECT-TYPE
+        SYNTAX PortSFPInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for switch interface control and status information."
+        INDEX { portSFPNumber }
+        ::= { portSFPInfoTable 1 }
+
+    PortSFPInfoEntry ::= SEQUENCE {
+        portSFPNumber             INTEGER,
+        transceiverType           INTEGER,
+        compliance                DisplayString,
+        connectorType             INTEGER,
+        waveLength                INTEGER,
+        transferDistance          INTEGER,
+        digitalDiagnosticMonitor  INTEGER,
+        vendorName                DisplayString,
+        manuSerialNumber          DisplayString,
+        manufacturingDate         DisplayString,
+        temperature               INTEGER,
+        voltage                   DisplayString,
+        biasCurrent               DisplayString,
+        biasHighThreshold         DisplayString,
+        biasLowThreshold          DisplayString,
+        rxPower                   DisplayString,
+        rxPowerHighThreshold      DisplayString,
+        rxPowerLowThreshold       DisplayString,
+        txPower                   DisplayString,
+        txPowerHighThreshold      DisplayString,
+        txPowerLowThreshold       DisplayString
+      }
+
+    portSFPNumber OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of port."
+        ::= { portSFPInfoEntry 1 }
+
+    transceiverType OBJECT-TYPE
+        SYNTAX INTEGER {
+            SFPNotExist(0),
+            GBIC(1), 
+            SFF(2),   
+            SFP(3),  
+            XBI(4),
+            Xenpak(5),
+            XFP(6), 
+            XFF(7), 
+            XFP-E(8), 
+            XPak(9), 
+            X2(10),  
+            DWDM-SFP(11),
+            QSFP(12),
+            Unknown(99)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver type"
+        ::= { portSFPInfoEntry 2 }
+        
+    compliance OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Compliance type"
+        ::= { portSFPInfoEntry 3 }
+
+    connectorType OBJECT-TYPE
+        SYNTAX INTEGER {
+            SFPNotExist(0),
+            SC(1),
+            FibreChannelStyle1CopperConnector(2),
+            FibreChannelStyle2CopperConnector(3),
+            BNCTNC(4),
+            FibreChannelCoaxialHeaders(5),
+            FiberJack(6),
+            LC(7),
+            MT-RJ(8),
+            MU(9),
+            SG(10),
+            OpticalPigtail(11),
+            MPOParallelOptic(12),
+            HSSDCII(32),
+            CopperPigtail(33),
+            RJ45(34),
+            Electrical-Mode(35),
+            Unknown(99)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Connector type"
+        ::= { portSFPInfoEntry 4 }
+        
+    waveLength OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Wave length."
+        ::= { portSFPInfoEntry 5 }
+        
+    transferDistance OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transfer distance."
+        ::= { portSFPInfoEntry 6 }
+
+    digitalDiagnosticMonitor OBJECT-TYPE
+        SYNTAX INTEGER {
+            SFPNotExist(0),
+            NotSupported(1),
+            Supported(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Digital Diagnostic Monitor."
+        ::= { portSFPInfoEntry 7 }
+
+    vendorName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Vendor Name."
+        ::= { portSFPInfoEntry 8 }
+
+    manuSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Manufacture Serial Number."
+        ::= { portSFPInfoEntry 9 }
+
+    manufacturingDate OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Manufacturing Date."
+        ::= { portSFPInfoEntry 10 }
+
+    temperature OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Temperature of sfp."
+        ::= { portSFPInfoEntry 11 }
+
+    voltage OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Voltage of sfp."
+        ::= { portSFPInfoEntry 12 }
+
+    biasCurrent OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "bias Current."
+        ::= { portSFPInfoEntry 13 }
+
+    biasHighThreshold OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "bias Current High Threshold."
+        ::= { portSFPInfoEntry 14 }
+
+    biasLowThreshold OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "bias Current Low Threshold."
+        ::= { portSFPInfoEntry 15 }
+
+    rxPower OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RX Power."
+        ::= { portSFPInfoEntry 16 }
+
+    rxPowerHighThreshold OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RX Power High Threshold."
+        ::= { portSFPInfoEntry 17 }
+        
+    rxPowerLowThreshold OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "RX Power Low Threshold."
+        ::= { portSFPInfoEntry 18 }
+
+    txPower OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "TX Power."
+        ::= { portSFPInfoEntry 19 }
+
+    txPowerHighThreshold OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "TX Power High Threshold."
+        ::= { portSFPInfoEntry 20 }
+        
+    txPowerLowThreshold OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "TX Power Low Threshold."
+        ::= { portSFPInfoEntry 21 }
+
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchPortAvgRate - Port Average Rate Statistics Info
+--
+------------------------------------------------------------------------------
+    portRateStatisticsInterval OBJECT-TYPE
+        SYNTAX Integer32 (1..5)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "port average rate statistics time interval, unit is minute, default is 5 minutes."
+        ::= { gbnDeviceSwitchPortAvgRate 1 }
+    
+    portAvgRateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PortAvgRateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of port average rate statistics info(32)."
+        ::= { gbnDeviceSwitchPortAvgRate 2 }
+
+    portAvgRateEntry OBJECT-TYPE
+        SYNTAX PortAvgRateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for port average rate statistics information(32)."
+        INDEX { portIndex }
+        ::= { portAvgRateTable 1 }
+
+    PortAvgRateEntry ::= SEQUENCE {
+        portIndex           INTEGER,
+        portInOctetRate     Counter32,
+        portInFrameRate     Counter32,
+        portOutOctetRate    Counter32,
+        portOutFrameRate    Counter32
+      }
+    
+    portIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The port index list."
+      ::= { portAvgRateEntry 1 }
+    
+    portInOctetRate OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The ingress octet rate of this port."
+      ::= { portAvgRateEntry 2 }
+      
+    portInFrameRate OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The ingress packet rate of this port."
+      ::= { portAvgRateEntry 3 }
+
+    portOutOctetRate OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The egress octet rate of this port."
+      ::= { portAvgRateEntry 4 }
+
+    portOutFrameRate OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The egress packet rate of this port."
+      ::= { portAvgRateEntry 5 }
+------------------------------------------------------------------------------
+--
+--  gbnDeviceSwitchPortbandwidthUtilization     - Port Average bandwidth utilization Info
+--
+------------------------------------------------------------------------------
+   portBandwidthUtilizationEnable OBJECT-TYPE
+        SYNTAX TruthValue
+      {
+              enable(1),
+              disable(2)
+          }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+          "The port bandwidth switch."
+        ::= { gbnDeviceSwitchPortbandwidthUtilization 1 }
+  
+    portBandwidthUtilizationTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PortBandwidthUtilizationEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of port bandwidth utilization info(32)."
+        ::= { gbnDeviceSwitchPortbandwidthUtilization 2 }
+                
+    portBandwidthUtilizationEntry OBJECT-TYPE
+        SYNTAX PortBandwidthUtilizationEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for port bandwidth utilization information(32)."
+        INDEX { portBandIndex }
+        ::= { portBandwidthUtilizationTable 2 }
+
+    PortBandwidthUtilizationEntry ::= SEQUENCE {
+        portBandIndex           INTEGER,
+        portInBandwidthUtilization     Counter32,
+        portOutBandwidthUtilization     Counter32
+      }
+    
+    portBandIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The port index list."
+      ::= { portBandwidthUtilizationEntry 1 }
+          
+    portInBandwidthUtilization     OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The ingress bandwidth utilization of this port."
+      ::= { portBandwidthUtilizationEntry 2 }
+      
+    portOutBandwidthUtilization     OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The egress bandwidth utilization of this port."
+      ::= { portBandwidthUtilizationEntry 3 }
+--
+-- END of gbnDeviceSwitch-MIB
+--
+
+END

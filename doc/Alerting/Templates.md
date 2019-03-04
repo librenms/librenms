@@ -9,7 +9,7 @@ Templates can be assigned to a single or a group of rules and can contain any ki
 
 To attach a template to a rule just open the `Alert Templates` settings page, choose the template to assign and click the yellow button in the `Actions` column. In the appearing popupbox select the rule(s) you want the template to be assigned to and click the `Attach` button. You might hold down the CTRL key to select multiple rules at once.
 
-The templating engine in use is Laravel Blade. We will cover some of the basics here, however the official Laravel docs will have more information [here](https://laravel.com/docs/5.4/blade) 
+The templating engine in use is Laravel Blade. We will cover some of the basics here, however the official Laravel docs will have more information [here](https://laravel.com/docs/5.7/blade) 
 
 ## Syntax
 
@@ -98,7 +98,7 @@ You can use plain text or html as per Alert templates and this will form the bas
 In your alert template just use
 
 ```
-@extends('alerts.templates.default');
+@extends('alerts.templates.default')
 
 @section('content')
   {{ $alert->title }}
@@ -107,7 +107,7 @@ In your alert template just use
 @endsection
 ```
 
-More info: https://laravel.com/docs/5.4/blade#extending-a-layout
+More info: https://laravel.com/docs/5.7/blade#extending-a-layout
 
 ## Examples
 

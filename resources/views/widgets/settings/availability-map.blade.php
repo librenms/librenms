@@ -47,6 +47,14 @@
     </div>
 
     <div class="form-group">
+        <label for="order_by-{{ $id }}" class="control-label">@lang('Order By')</label>
+        <select class="form-control" name="order_by" id="order_by-{{ $id }}">
+            <option value="hostname" @if($order_by == 'hostname') selected @endif>@lang('Hostname')</option>
+            <option value="status" @if($order_by == 'status') selected @endif>@lang('Status')</option>
+        </select>
+    </div>
+
+    <div class="form-group">
         <label for="device_group-{{ $id }}" class="control-label">@lang('Device group')</label>
         <select class="form-control" name="device_group" id="device_group-{{ $id }}"  data-placeholder="@lang('All Devices')">
             @if($device_group)

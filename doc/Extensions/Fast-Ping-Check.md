@@ -27,7 +27,7 @@ to run ping checks as quickly as possible without increasing snmp load on your d
     ./scripts/rrdstep.php -h all
     ```
 
-3. Add the following line to /etc/cron.d/librenms.nonroot.cron to allow 1 minute ping checks
+3. Add the following line to /etc/cron.d/librenms to allow 1 minute ping checks
 
 ```
 *    *    * * *   librenms    /opt/librenms/ping.php >> /dev/null 2>&1

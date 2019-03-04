@@ -36,9 +36,7 @@ function rewrite_location($location)
 
 function formatMac($mac)
 {
-    $mac = preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', $mac);
-
-    return $mac;
+    return \LibreNMS\Util\Rewrite::readableMac($mac);
 }
 
 
@@ -1699,6 +1697,8 @@ function get_units_from_sensor($sensor)
         case 'cooling':
         case 'power':
             return 'W';
+        case 'power_consumed':
+            return 'kWh';
         case 'pressure':
             return 'kPa';
         case 'runtime':

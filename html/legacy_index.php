@@ -76,6 +76,7 @@ if (empty($config['favicon'])) {
   <link rel="manifest" href="images/manifest.json">
   <link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#5bbad5">
   <link rel="shortcut icon" href="images/favicon.ico">
+  <meta name="csrf-token" content="<?php echo csrf_token(); ?>">
   <meta name="msapplication-config" content="images/browserconfig.xml">
   <meta name="theme-color" content="#ffffff">
 <?php
@@ -102,7 +103,7 @@ if (empty($config['favicon'])) {
   <link href="css/select2.min.css" rel="stylesheet" type="text/css" />
   <link href="css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
   <link href="css/query-builder.default.min.css" rel="stylesheet" type="text/css" />
-  <link href="<?php echo($config['stylesheet']);  ?>?ver=20181201" rel="stylesheet" type="text/css" />
+  <link href="<?php echo($config['stylesheet']);  ?>?ver=20190123" rel="stylesheet" type="text/css" />
   <link href="css/<?php echo $config['site_style']; ?>.css?ver=632417642" rel="stylesheet" type="text/css" />
 <?php
 
@@ -137,7 +138,7 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
     }
     ?>
   <script src="js/select2.min.js"></script>
-  <script src="js/librenms.js?ver=20181221"></script>
+  <script src="js/librenms.js?ver=20190123"></script>
   <script type="text/javascript">
 
     <!-- Begin
@@ -148,6 +149,12 @@ foreach ((array)$config['webui']['custom_css'] as $custom_css) {
       eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=1,width=550,height=600');");
     }
     // End -->
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
   </script>
   <script type="text/javascript" src="js/overlib_mini.js"></script>
   <script type="text/javascript" src="js/toastr.min.js"></script>

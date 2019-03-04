@@ -27,7 +27,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 
-class Eventlog extends BaseModel
+class Eventlog extends DeviceRelatedModel
 {
     protected $table = 'eventlog';
     protected $primaryKey = 'event_id';
@@ -63,23 +63,7 @@ class Eventlog extends BaseModel
         }
     }
 
-    // ---- Query scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
     // ---- Define Relationships ----
-
-    /**
-     * Returns the device this entry belongs to.
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id');
-    }
 
     public function related()
     {

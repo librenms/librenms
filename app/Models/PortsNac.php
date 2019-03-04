@@ -25,7 +25,7 @@
 
 namespace App\Models;
 
-class PortsNac extends BaseModel
+class PortsNac extends PortRelatedModel
 {
     protected $table = 'ports_nac';
     protected $primaryKey = 'ports_nac_id';
@@ -38,6 +38,7 @@ class PortsNac extends BaseModel
         'username',
         'mac_address',
         'ip_address',
+        'vlan',
         'host_mode',
         'authz_status',
         'authz_by',
@@ -45,23 +46,13 @@ class PortsNac extends BaseModel
         'method',
         'timeout',
         'time_left',
+        'time_elapsed',
     ];
-
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasPortAccess($query, $user);
-    }
 
     // ---- Define Relationships ----
 
     public function device()
     {
         return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
-    }
-
-    public function port()
-    {
-        return $this->belongsTo('App\Models\Port', 'port_id', 'port_id');
     }
 }

@@ -385,32 +385,8 @@ if ($menu_sensors) {
     echo('            <li role="presentation" class="divider"></li>');
 }
 
-$icons = array(
-    'fanspeed' => 'tachometer',
-    'humidity' => 'tint',
-    'temperature' => 'thermometer-full',
-    'current' => 'bolt',
-    'frequency' => 'line-chart',
-    'power' => 'power-off',
-    'voltage' => 'bolt',
-    'charge' => 'battery-half',
-    'dbm' => 'sun-o',
-    'load' => 'percent',
-    'runtime' => 'hourglass-half',
-    'state' => 'bullseye',
-    'signal' => 'wifi',
-    'snr' => 'signal',
-    'pressure' => 'thermometer-empty',
-    'cooling' => 'thermometer-full',
-    'airflow' => 'angle-double-right',
-    'delay' => 'clock-o',
-    'chromatic_dispersion' => 'indent',
-    'ber' => 'sort-amount-desc',
-    'quality_factor' => 'arrows',
-    'eer' => 'snowflake-o',
-    'waterflow' => 'tint',
+$icons = \App\Models\Sensor::getIconMap();
 
-);
 foreach (array('fanspeed','humidity','temperature','signal') as $item) {
     if (isset($menu_sensors[$item])) {
         echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg" aria-hidden="true"></i> '.nicecase($item).'</a></li>');
@@ -424,7 +400,7 @@ if ($sep && array_keys($menu_sensors)) {
     $sep = 0;
 }
 
-foreach (array('current','frequency','power','voltage') as $item) {
+foreach (array('current','frequency','power','voltage','power_consumed','power_factor') as $item) {
     if (isset($menu_sensors[$item])) {
         echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg" aria-hidden="true"></i> '.nicecase($item).'</a></li>');
         unset($menu_sensors[$item]);

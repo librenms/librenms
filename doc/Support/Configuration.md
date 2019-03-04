@@ -365,19 +365,25 @@ $config['poller_modules']['bgp-peers'] = false;
 
 ### SNMP Settings
 
-```php
-$config['snmp']['timeout'] = 1;            # timeout in seconds
-$config['snmp']['retries'] = 5;            # how many times to retry the query
-$config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
-$config['snmp']['version'] = ['v2c', 'v3', 'v1'];         # Default versions to use
-$config['snmp']['port'] = 161;
-```
 Default SNMP options including retry and timeout settings and also default version and port.
+
+```php
+$config['snmp']['timeout'] = 1;            				# timeout in seconds
+$config['snmp']['retries'] = 5;            				# how many times to retry the query
+$config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');	# Transports to use
+$config['snmp']['version'] = ['v2c', 'v3', 'v1'];         		# Default versions to use
+$config['snmp']['port'] = 161;						# Default port
+$config['snmp']['exec_timeout'] = 1200;					# execution time limit in seconds
+```
+>NOTE: `timeout` is the time to wait for an answer and `exec_timeout` is the max time to run a query. 
+
+The default v1/v2c snmp community to use, you can expand this array with `[1]`, `[2]`, `[3]`, etc.
 
 ```php
 $config['snmp']['community'][0] = "public";
 ```
-The default v1/v2c snmp community to use, you can expand this array with `[1]`, `[2]`, `[3]`, etc.
+
+The default v3 snmp details to use, you can expand this array with `[1]`, `[2]`, `[3]`, etc.
 
 ```php
 $config['snmp']['v3'][0]['authlevel'] = "noAuthNoPriv";  # noAuthNoPriv | authNoPriv | authPriv
@@ -387,7 +393,6 @@ $config['snmp']['v3'][0]['authalgo'] = "MD5";            # MD5 | SHA
 $config['snmp']['v3'][0]['cryptopass'] = "";             # Privacy (Encryption) Passphrase
 $config['snmp']['v3'][0]['cryptoalgo'] = "AES";          # AES | DES
 ```
-The default v3 snmp details to use, you can expand this array with `[1]`, `[2]`, `[3]`, etc.
 
 ### Auto discovery settings
 
@@ -501,6 +506,8 @@ Specify the location of the collectd unix socket. Using a socket allows the coll
 [NFSen](../Extensions/NFSen.md)
 
 ### Location mapping
+
+If you just want to set GPS coordinates on a location, you should visit Devices > Geo Locations > All Locations and edit the coordinates there.
 
 Exact Matching:
 ```php
@@ -622,9 +629,11 @@ $config['eventlog_purge']                                 = 30;
 $config['authlog_purge']                                  = 30;
 $config['perf_times_purge']                               = 30;
 $config['device_perf_purge']                              = 7;
+$config['alert_log_purge']                                = 365;
+$config['port_fdb_purge']                                 = 10;
 $config['rrd_purge']                                      = 90;// Not set by default
 ```
-These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually,
+These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually.
 values are in days.
 
 > NOTE: Please be aware that `$config['rrd_purge']` is _NOT_ set by default. This option will remove any old data within 

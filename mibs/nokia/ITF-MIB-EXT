@@ -1,0 +1,1703 @@
+ITF-MIB-EXT DEFINITIONS ::= BEGIN
+
+-- ===========================================================================
+--  This specification is published by Alcatel under Non-Disclosure
+--  Agreement(s) (NDA) with specific parties and has to be considered as
+--  Confidential Information as defined in such NDA.
+--  Alcatel reserves the right to revise this document for any reason,
+--  including but not limited to conformity with standards promulgated by
+--  various agencies, utilisation of advances in the state of the technical
+--  areas, or the reflection of changes in the design of any equipment,
+--  techniques, or procedures described or referred to herein.
+--  The product specifications and other technical or performance information
+--  contained herein are subject to change without notice.
+--  Updates of this document will be issued under the above NDA's.
+--  Alcatel makes no representation or warranty, expressed or implied, with
+--  respect to the sufficiency, accuracy, or utility of any information or
+--  opinion contained herein. Alcatel expressly advises that any use of for 
+--  any purpose or reliance upon this technical reference is at the risk of
+--  the user and that Alcatel shall not be liable for any damage or injury
+--  incurred by any person arising out of the sufficiency, accuracy, or
+--  utility of any information or opinion contained herein.
+--  This document is not to be construed as a suggestion to any manufacturer
+--  to modify or change any of its products, nor does this document represent
+--  any commitment by Alcatel to sell or purchase any product.
+--  Nothing contained herein shall be construed as conferring by implication,
+--  estoppel, or otherwise any license or right under any patent, whether or
+--  not the use of any information herein necessarily employs an invention of
+--  any existing or later issued patent.
+--  Alcatel reserves the right not to offer any or all of these products and
+--  to withdraw any or all of them at any future time.
+-- Copyright (C) 2004, Alcatel. All Rights Reserved.
+-- ===========================================================================
+
+--  MODULE IDENTITY
+--  LAST-UPDATED "201609160000Z"
+--  ORGANIZATION "Alcatel-Lucent"
+--  CONTACT-INFO "email:asam.mibsupport@alcatel-lucent.com"
+--  DESCRIPTION
+--     "Alcatel proprietary extensions to the Interface MIB."
+--
+--  REVISION "201709210000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Reason for change: RCR ALU02361918 - BT - timer on the relay of the RFLT-E
+--      Change:
+--      asamLluRelayActionTimer: must have range 0..864000
+--
+--
+--  REVISION "201709130000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Reason for change: RCR ALU02361918 - BT - timer on the relay of the RFLT-E
+--      Change:
+--      1. asamLluRelayActionTime: must have range 0..864000, and default 50
+--
+--  REVISION "201708180000Z"
+--  DESCRIPTION
+--      Editor: Alfredo Alvarez
+--      Reason for change: RCR ALU02361918 - BT - timer on the relay of the RFLT-E
+--      Change:
+--      1. Added asamLluRelayActionTimer
+--
+--  REVISION "201707200000Z"
+--  DESCRIPTION
+--      Editor: Alfredo Alvarez
+--      Reason for change: RCR ALU02361918 - BT - timer on the relay of the RFLT-E
+--      Change:
+--      1. Added 'disconnectTimed' to the list of possible relay status
+--      2. Added asamLluRelayOperStatus and asamLluRelayActionTime
+--
+--  REVISION "201609160000Z"
+--  DESCRIPTION
+--      Version: 3EC36485EDAA_V5.6.0.0.0
+--      Editor : Ravichandran P
+--      Reason for Change: RCR ALU02254841- NNI support on NDLT-G
+--      Change : Added New Table asamIfPortTypeTable. 
+--
+--  REVISION "201510150000Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EDAA_V5.3.0.0.0
+--      Editor: Rommy Volders 
+--      Reason for change: ALU02136586
+--      Change: Add extra value for asamLluRelayStatus.
+--
+--  REVISION "201410080000Z"
+--  DESCRIPTION
+--      Editor: Siva Sankar 
+--      Reason for change: Updated based on review comments for REVISION "201410030000Z"
+--      Change: 1. Changed the order of new tables asamIfIndexToExtIfIndexMappingTable
+--		and asamExtIfIndexToIfIndexMappingTable.
+--		2. Gauge type is used instead of INTEGER for ExtIfIndex identifiers.
+--
+--  REVISION "201410030000Z"
+--  DESCRIPTION
+--      Editor: Siva Sankar 
+--      Reason for change: 3HH-11754-AGAB-DFZZA, Extended Inteface Index Support 
+--      Change: Added new Tables asamIfIndexToExtIfIndexMappingTable
+--		and asamExtIfIndexToIfIndexMappingTable 
+--
+--  REVISION "201304250000Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EDAA_V4.6.0.0.0
+--      Editor: Balagopal Velusamy 
+--      Reason for change: ALU00204502, EFM Inteface Counter Support 
+--      Change: Added new Table asamIfExtCounterSupportTable 
+--              Indicates supported  counters for an Interface.
+--
+--  REVISION "201304250000Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EDAA_V4.6.0.0.0
+--      Editor:  Karel Meijfroidt
+--      Reason for change: ALU01815260, Alarm Mechanism Improvement
+--      Change: change the RANGE in the description of
+--              the asamIfExtAlmReportingSeverityDefault.
+--
+--  REVISION "2012101111200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA_V4.5.0.0.0
+--     Editor: Ludwig Pauwels
+--     Changes:
+--     * Remove LLU Relay Status Table.
+--
+--  REVISION "201206071200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA_V4.4.4.0.0
+--     Editor: Ludwig Pauwels
+--     Changes:
+--     * Addition of LLU Relay Status Table.
+--
+--  REVISION "20080108200Z"
+--  DESCRIPTION
+--     "Version: 3EC15506EAAA_V3.5.0.0.0
+--     Editor: Xia Hui
+--     Changes: Add one values for asamItfMetallicTestTypes and four values for asamItfMetallicTestCodes
+--     *asamItfMetallicTestResetTimer 
+--     *asamItfLineAdminOperAbnormal 
+--     *asamItfLineAnotherLineTestInProgress 
+--     *asamItfTestNotPossible
+--     *asamItfLineBusy
+--
+--  REVISION "20060621200Z"
+--  DESCRIPTION
+--     "Version: 3EC15506EAAA_V3.5.0.0.0
+--     Editor: Liu Jie
+--     Changes: Add two values for asamItfMetallicTestTypes 
+--         * asamItfMetallicTestInwardOnly 
+--         * asamItfMetallicTestOutwardOnly 
+--
+--  REVISION "20060529200Z"
+--  DESCRIPTION
+--     "Version: 3EC15506EAAA_V3.2.0.0.0
+--     Editor: Sven Dhuyvetter
+--     Changes: BDFhw36810: Open SNMP
+--
+--  REVISION "20060323200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA_V3.1.0.0.0
+--     Editor: Ma liya
+--     Changes:
+--     * Extend Customer Id length to support a maximum of 64 characters."
+--
+--  REVISION "200601231200Z"
+--  DESCRIPTION
+--     "Version: 3EC15506EAAA_V2.4.0.0.0
+--      Editor: Bart Bogaert
+--      Changes: Implemented BDFhw70643: strict syntax checks (smilint)"
+--
+--  REVISION "200506151200Z"
+--  DESCRIPTION
+--     "Version: 3EC15505EAAA_V2.3.1.0.0
+--     Editor: Pradeep Hosaritthi
+--     Changes:
+--     * Addition of LLU Relay Status Table."
+--
+--  REVISION "200404081200Z"
+--  DESCRIPTION
+--     "Version: 3EC15506EAAA_E1.1.0.0 
+--      Editor: Rafael Van Driessche 
+--      Changes: addition of asamIfExtIfSpecific."
+--
+--  REVISION "200401121200Z"
+--  DESCRIPTION
+--     "Version: 3EC15506EAAA_E1.0.0.0 
+--      Editor: Rafael Van Driessche 
+--      Changes: revision for iSAM with only editorial changes."
+--
+--  REVISION "200205131200Z"
+--  DESCRIPTION
+--     "Version: 3EC15506AAAA_E5.0.0.1
+--      Editor: Frank Devolder
+--      Changes:
+--      * object asamPhyItfChangeOccurredTrapEnable obsoleted (BDFaa44804)."
+--
+--  REVISION "200106031200Z"
+--  DESCRIPTION
+--     "Version: 3EC15506AAAA_E5.0.0.0
+--      Editor: Frank Devolder
+--      Changes:
+--      * add asamShelfPhyItfSummaryTable to support hierarchical summary
+--        bitmaps for physical interfaces and make ASAM-level interface
+--        bitmaps obsolete."
+--
+--  REVISION "200011161200Z"
+--  DESCRIPTION
+--     "Version 3EC15506AAAA_E4.2.0.0
+--      Editor: Dominic Chorafakis
+--      Changes:
+--      * Documenting MAX_PIF size for R4.2: 24 line boards with IMA."
+--
+--  REVISION "200007111200Z"
+--  DESCRIPTION
+--     "Version: TBC
+--      Editor: H. Dedecker
+--      Changes:
+--      * ITF_MIB_EXT extended with line test (BDFaa26075)."
+--
+--  REVISION "199907081200Z"
+--  DESCRIPTION
+--     "Version: 3EC15506AAAA_R2.0.1
+--      Editor: K. Van Eynde
+--      Changes:
+--      * AsamItfSeverityFilterType extended with noAlarms (BDFaa18947)."
+--
+--  REVISION "199904301200Z"
+--  DESCRIPTION
+--     "Version: 3EC15506AAAA_R2.0.0
+--      Editor: K. Van Eynde
+--      Changes: updates to supporte severity per line feature:
+--      * define new type AsamItfSeverityFilterType
+--      * extend AsamIfExtEntry with new column asamIfExtAlmReportingSeverity
+--      * add table asamIfExtAlmReportingSeverityDefaultTable for default
+--        severity per interface type."
+
+-- ===========================================================================
+
+   IMPORTS OBJECT-TYPE               FROM RFC-1212
+           DisplayString             FROM RFC1213-MIB
+           Counter, Gauge            FROM RFC1155-SMI
+           asam                      FROM SYSTEM-MIB
+           ifIndex, InterfaceIndex   FROM ITF-MIB
+           IANAifType                FROM IANAifType-MIB
+           AsamAlarmSeverityType     FROM ASAM-ALARM-MIB
+           eqptHolderId              FROM ASAM-EQUIP-MIB;
+
+ 
+   AsamItfSeverityFilterType ::= INTEGER {
+         indeterminate (1), -- Not a definite known severity
+         warning (2),       -- Just to inform as a warning
+         minor (3),         -- Not service affecting
+         major (4),         -- Service affecting
+         critical (5),      -- Service breaking
+         noAlarms (254),    -- do not report alarm
+         default (255)      -- take default as specified in 
+                            -- asamIfExtAlmReportingSeverityDefaultTable
+      }
+
+   asamItfMIB OBJECT IDENTIFIER ::= { asam 6 }  -- Extensions to MIB-II
+   
+   asamPhyItfOperStatus OBJECT-TYPE
+      SYNTAX OCTET STRING
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "The bitmap for the operational status of the physical interfaces.
+
+          MAX_PIF: the maximum number of interface per board
+          SLOTS: the number of slots in the system
+
+          Layout: 1..MAX_PIF 1..MAX_PIF ... 1..MAX_PIF
+                  ========== ==========     ==========
+                       0          1     ...   SLOTS-1
+
+          Up = 1, Down = 0
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NA           INSRVMOD:    NA
+              RANGE:       NA           DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       This object is not supported."
+      ::= {asamItfMIB 1}
+
+   asamPhyItfBitmap OBJECT-TYPE
+      SYNTAX OCTET STRING
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "The bitmap for the physical interfaces.
+
+          MAX_PIF: the maximum number of interface per board
+          SLOTS: the number of slots in the system
+
+          Layout: 1..MAX_PIF 1..MAX_PIF ... 1..MAX_PIF
+                  ========== ==========     ==========
+                       0          1     ...   SLOTS-1
+
+          Present = 1, Not present = 0
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NA           INSRVMOD:    NA
+              RANGE:       NA           DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       This object is not supported."
+      ::= {asamItfMIB 2}
+
+   asamPhyItfChangeOccurredTrapEnable OBJECT-TYPE
+      SYNTAX INTEGER {
+                enabled(1),
+                disabled(2)
+             }
+      ACCESS read-write
+      STATUS obsolete
+      DESCRIPTION
+         "Boolean indicating wether the changeOccurredTrap should be sent
+          or not. The trap will not be sent if the linkUpDownTrap was already
+          sent (regardless of the value asamChangeOccurredTrapEnable).
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NA           INSRVMOD:    NA
+              RANGE:       NA           DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       This object is not supported."
+      ::= {asamItfMIB 3}
+
+   asamPhyItfNumberChangeOccurred OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This is a counter indicating the number of state changes of the
+          physical line.
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       NA           DEFVALUE:    0
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= {asamItfMIB 4}
+   
+   asamIfExtTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamIfExtEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An extension to the ifTable defined in ITF-MIB.
+
+          ALCATEL NOTE:
+             TABLESIZE: DEP same size as the ifTable."
+      ::= {asamItfMIB 5}
+   
+   asamIfExtEntry OBJECT-TYPE
+      SYNTAX AsamIfExtEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry containing management information applicable to a
+          particular interface."
+      INDEX { ifIndex }
+      ::= {asamIfExtTable 1}
+   
+   AsamIfExtEntry ::= SEQUENCE {
+      asamIfExtCustomerId             DisplayString,
+      asamIfExtAlmReportingSeverity   AsamItfSeverityFilterType,
+      asamIfExtIfSpecific             OBJECT IDENTIFIER
+   }
+   
+   asamIfExtCustomerId OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..64))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "A textual string identifying the customer assigned to this
+          interface.  Following strings have a special meaning:
+             'reserved' : the interface is reserved by an operator;
+             'faulty'   : the interface is indicated by an operator
+                          as being faulty;
+             'available': the interface has no customer assigned to it.
+          This object is only supported for physical interfaces.
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     YES          INSRVMOD:    YES
+              RANGE:       NA           DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      DEFVAL {"available"}
+      ::= {asamIfExtEntry 1}
+   
+   asamIfExtAlmReportingSeverity OBJECT-TYPE
+      SYNTAX AsamItfSeverityFilterType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This objects specifies for a certain physical interface and all
+          interface above in the interface hierarchy the minimal severity for
+          an alarm to be reported.  If no value is provided for this object,
+          it will obtain the value 'default', which means the actual value is
+          as specified in the asamIfExtAlmReportingSeverityDefaultTable.
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     YES          INSRVMOD:    YES
+              RANGE:       NA           DEFVALUE:    'default'
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= {asamIfExtEntry 2}
+
+   asamIfExtIfSpecific OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "A reference to MIB definitions specific to the particular media
+          being used to realize the interface.
+          If no MIB definitions specific to the particular media are
+          available, the value should be set to the OBJECT IDENTIFIER { 0 0 }.
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       NA           DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= {asamIfExtEntry 3}
+   
+   asamNextAvailablePortType OBJECT-TYPE
+      SYNTAX IANAifType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object contains the ifType for which the next available
+          physical interface can be retrieved.  Only values of ifType that
+          represent physical interfaces are allowed.
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    YES
+              RANGE:       NA           DEFVALUE:    xdslLine
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= {asamItfMIB 6}
+   
+   asamNextAvailablePort OBJECT-TYPE
+      SYNTAX InterfaceIndex
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the next available physical interface for which
+          the ifType is as specified in asamNextAvailablePortType. A physical
+          interface is considered available if its asamIfExtCustomerId has
+          the value 'available' and its internal ASAM state is 'reachable'.
+          If no interface of the desired type is available an error (genErr)
+          is returned when a get-request is issued for this object.
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       NA           DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= {asamItfMIB 7}
+   
+   asamIfExtAlmReportingSeverityDefaultTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamIfExtAlmReportingSeverityDefaultEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A table specifying for each of the supported interface types
+          for asamIfExtAlmReportingSeverity its default minimal severity.
+
+          ALCATEL NOTE:
+             TABLESIZE: DEP number of supported interface types."
+      ::= {asamItfMIB 8}
+   
+   asamIfExtAlmReportingSeverityDefaultEntry OBJECT-TYPE
+      SYNTAX AsamIfExtAlmReportingSeverityDefaultEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry of the asamIfExtAlmReportingSeverityDefaultTable.
+         "
+      INDEX { asamIfExtIfType }
+      ::= {asamIfExtAlmReportingSeverityDefaultTable  1}
+   
+   AsamIfExtAlmReportingSeverityDefaultEntry ::= SEQUENCE {
+      asamIfExtIfType                         IANAifType,
+      asamIfExtAlmReportingSeverityDefault    AsamAlarmSeverityType
+   }
+   
+   asamIfExtIfType OBJECT-TYPE
+      SYNTAX IANAifType 
+      ACCESS read-only  
+      STATUS mandatory  
+      DESCRIPTION
+         "The type of the interface.
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       NA           DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtAlmReportingSeverityDefaultEntry  1 }
+                   
+   asamIfExtAlmReportingSeverityDefault OBJECT-TYPE
+      SYNTAX AsamAlarmSeverityType
+      ACCESS read-write
+      STATUS mandatory 
+      DESCRIPTION
+         "The default minimal severity for an alarm to be reported that will
+          be used for interfaces of the type specified in asamIfExtIfType.
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    YES
+              RANGE:       1-5          DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      DEFVAL {major}
+      ::= { asamIfExtAlmReportingSeverityDefaultEntry  2 }
+   
+   asamItfTest OBJECT IDENTIFIER ::= {asamItfMIB 9}
+   -- Extension to EXT MIB-II for line test
+   
+   asamItfMetallicTestGroup OBJECT IDENTIFIER ::= {asamItfTest 1}
+   -- First subgroup identifying metallic test group
+   
+   asamItfMetallicTestTypes OBJECT IDENTIFIER ::= {asamItfMetallicTestGroup 1}
+   -- First subgroup identifying metallic test types
+   
+   asamItfMetallicTestLimited OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestTypes 1}
+   
+   asamItfMetallicTestTapLooped OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestTypes 2}
+   
+   asamItfMetallicTestMonitor OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestTypes 3}
+   
+   asamItfMetallicTestSplitAccess OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestTypes 4}
+
+   asamItfMetallicTestInwardOnly OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestTypes 5}
+
+   asamItfMetallicTestOutwardOnly OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestTypes 6}
+
+   asamItfMetallicTestResetTimer OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestTypes 7}
+
+   
+   asamItfMetallicTestCodes OBJECT IDENTIFIER ::= {asamItfMetallicTestGroup 2}
+   -- Second subgroup identifying metallic test codes
+   
+   asamItfLineNotReachable OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestCodes 1}
+   
+   asamItfPreparingMetallicTest OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestCodes 2}
+   
+   asamItfAnotherMetallicTestInProgress OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestCodes 3}
+   
+   asamItfTestAppliqueNotReachable OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestCodes 4}
+   
+   asamItfPotsSplitterNotReachable OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestCodes 5}
+
+   asamItfWcapNotReachable OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestCodes 6}
+-- reserved for ASAM
+
+   asamItfLineBusy OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestCodes 7}
+-- To indicate the line status is not in either idle or power down or parking mode. Currently only for narrowband MTA
+
+   asamItfLineAdminOperAbnormal OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestCodes 8}
+-- To indicate the line is either admin lock or oper disable
+-- Crrently only for narrowband MTA
+
+   asamItfLineAnotherLineTestInProgress OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestCodes 9}
+   -- To indicate another line test is in progress. Currently only for NB MTA
+
+   asamItfTestNotPossible OBJECT IDENTIFIER ::=
+      {asamItfMetallicTestCodes 10}
+
+
+   
+   asamShelfPhyItfSummaryTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamShelfPhyItfSummaryEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Shelf summary table, summarizing status information of physical
+          interfaces of boards which can be equipped within the
+          corresponding shelf.
+
+          ALCATEL NOTE:
+             TABLESIZE: DEP number of shelves."
+      ::= { asamItfMIB 10 }
+   
+   asamShelfPhyItfSummaryEntry OBJECT-TYPE
+      SYNTAX AsamShelfPhyItfSummaryEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry of the shelf physical interface summary table.
+         "
+      INDEX { eqptHolderId }
+      ::= { asamShelfPhyItfSummaryTable 1 }
+   
+   AsamShelfPhyItfSummaryEntry ::= SEQUENCE {
+      asamShelfPhyItfNumberChangeOccurred Counter,
+      asamShelfPhyItfOperStatus           OCTET STRING,
+      asamShelfPhyItfBitmap               OCTET STRING
+   }
+   
+   asamShelfPhyItfNumberChangeOccurred OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This is a counter indicating the number of state changes
+          of physical lines, equipped on boards within this shelf.
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       NA           DEFVALUE:    0
+              UNITS:       state change SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamShelfPhyItfSummaryEntry 1 }
+   
+   asamShelfPhyItfOperStatus OBJECT-TYPE
+      SYNTAX OCTET STRING
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The bitmap for the operational status of the physical interfaces
+          of boards which can be equipped within this shelf.
+
+          MAX_PIF: the maximum number of physical interfaces per board
+                   (lines + IMA).
+          SLOTS: the maximum number of slots within a shelf
+
+          Layout: 1..MAX_PIF 1..MAX_PIF ... 1..MAX_PIF
+                  ========== ==========     ==========
+                       0          1     ...   SLOTS-1
+
+          Up = 1, Down = 0.
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       DEP: #slots*#interfaces per board
+              DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamShelfPhyItfSummaryEntry 2 }
+   
+   asamShelfPhyItfBitmap OBJECT-TYPE
+      SYNTAX OCTET STRING
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The bitmap for the presence of the physical interfaces of boards
+          which can be equipped within this shelf.
+
+          MAX_PIF: the maximum number of physical interfaces per board
+                   (lines + IMA).
+          SLOTS: the maximum number of slots within a shelf
+
+          Layout: 1..MAX_PIF 1..MAX_PIF ... 1..MAX_PIF
+                  ========== ==========     ==========
+                       0          1     ...   SLOTS-1
+
+          Present = 1, Not present = 0.
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       DEP: #slots*#interfaces per board
+              DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamShelfPhyItfSummaryEntry 3 }
+
+-- =========================================================
+-- the following table is supported from R5.3 onwards (e.g. 7367 ISAM SX-16P)
+-- =========================================================
+
+   asamLluTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamLluEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION  
+         "The Local Loop Unbundling Table.
+
+          ALCATEL NOTE:
+              TABLESIZE: DEP same size as the ifTable"
+     ::= {asamItfMIB 11}
+
+   asamLluEntry OBJECT-TYPE
+      SYNTAX AsamLluEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION  
+            "An entry in the asamLluTable. There will be an entry
+             for each physical interface line (xdslLine) if the corresponding 
+             board is configured/planned and if the corresponding board 
+             supports LLU, i.e. no entries are auto-created in the MIB
+              - for boards that are not planned,
+              - for boards that are planned but for which the HW does 
+                not support LLU.
+             the operator cannot create an entry nor delete an entry in this 
+	     table"
+
+      INDEX { ifIndex }
+      ::= { asamLluTable 1}
+
+   AsamLluEntry ::= SEQUENCE {
+            asamLluRelayStatus AsamLluRelayStatus,
+            asamLluRelayActionTime Gauge,
+            asamLluRelayOperStatus AsamLluRelayStatus,
+            asamLluRelayActionTimer Gauge
+   }
+
+   AsamLluRelayStatus ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+           " Handling of relay for Local Loop Unbundling.
+              unbundle (1),-- unbundling LLU relay on the particular physical line 
+	                     mentioned by a valid physical interface ifIndex.
+                             If LLURelay is unbundled, then the line is 
+			     throughconnected to an external connector allowing 
+			     to connect the line to another exchange.
+              connect(2), -- connecting LLU relay on the particular physical line 
+	                     mentioned by a valid physical interface ifIndex.
+                             If LLURelay  state of a particular line is connected 
+			     then the line is served by the LT.
+			     For a DSL line this means it will pass to the card 
+			     its low and high pass filter. The effect is that 
+			     DSL signal is supported by the card, the POTS/ISDN signal is 
+			     brought to an external connector.
+              connectForMelt(3), -- connecting LLU relay for Melt on the particular 
+                             physical line mentioned by a valid physical interface ifIndex.
+                             If LLURelay  state of a particular line is connected 
+                             with Melt then the line is served by the LT and the MELT test block can be used.
+                             For a DSL line this means it will pass to the card 
+                             its low and high pass filter and a MELT measurement can be performed. The effect is that 
+                             DSL signal is supported by the card, the POTS/ISDN signal is 
+                             not connected.
+              disconnect(4), -- disconnecting LLU relay on the particular physical line
+                             mentioned by a valid physical interface ifIndex.
+                             If LLURelay state of a particular line is disconnected:
+                             -the line is open ended at the LT side
+                             -the MELT test block(if present) on LT is throughconnected to an external connector
+                             This particular state allows for two types of testing:
+                             -an open ended measurement can be performed at end user side
+                             -future: a MELT measurement can be performed for the external link
+                             towards another exchange(if MELT test block present)
+              disconnectTimed(5), --  Temporarily disconnect LLU relay. After a timeout specified by
+                              asamLluRelayActionTime, the relay goes back to 'connect'"
+      SYNTAX INTEGER {
+            unbundle (1),
+            connect (2),
+            connectForMelt (3),
+            disconnect (4),
+            disconnectTimed (5)
+      }
+
+   asamLluRelayStatus  OBJECT-TYPE
+      SYNTAX AsamLluRelayStatus
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+           "Configured administrative status of the relay. This value is kept persistent
+            ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     YES          INSRVMOD:    NA
+              RANGE:       NA           DEFVALUE:    unbundle
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+	  ::= {asamLluEntry 1}
+
+   asamLluRelayActionTime   OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The delay in tenths of seconds during which the relay will be in disconnected state before
+           switching to connected state after asamLluRelayStatus is configured to 'disconnectTimed'
+           ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..864000    DEFVALUE:    50
+              UNITS:       s/10         SPARSE:      NA
+              DESCR:       NA"
+     ::= {asamLluEntry 2}
+
+   asamLluRelayOperStatus   OBJECT-TYPE
+      SYNTAX AsamLluRelayStatus
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Operational status of the relay. This represents the actual status of the relay at
+           any time. The value 'disconnectTimed' does not apply in this context
+           ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       NA           DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+       ::= {asamLluEntry 3}
+
+   asamLluRelayActionTimer   OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Time in tenths of seconds remaining before switching to connected state after
+           asamLluRelayStatus is configured to 'disconnectTimed'. 0 means that the
+           timer associated with disconnectTimed is not active. This can happen when:
+            - asamLluRelayStatus has never been configured to 'disconnectTimed'
+            - The timer has been configured with asamLluRelayActionTime = 0
+            - The timer has expired
+           ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..864000    DEFVALUE:    0
+              UNITS:       s/10         SPARSE:      NA
+              DESCR:       NA"
+     ::= {asamLluEntry 4}
+
+   asamIfExtCounterSupportTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamIfExtCounterSupportEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A Table listing the supported counters for a particular interface .
+
+          ALCATEL NOTE:
+             TABLESIZE: DEP number of supported interface types."
+      ::= {asamItfMIB 12 }
+
+   asamIfExtCounterSupportEntry OBJECT-TYPE
+      SYNTAX AsamIfExtCounterSupportEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry containing list of supported counter information applicable to a
+          particular interface."
+      INDEX { asamIfExtCounterIndex }
+      ::= {asamIfExtCounterSupportTable 1}
+
+   AsamIfExtCounterSupportEntry ::= SEQUENCE {
+      asamIfExtCounterIndex                IANAifType, 
+      asamifTblifDescr                     INTEGER,
+      asamifTblifMtu                       INTEGER,
+      asamifTblifSpeed                     INTEGER,
+      asamifTblifPhysAddress               INTEGER, 
+      asamifTblifAdminStatus               INTEGER,
+      asamifTblifOperStatus                INTEGER,
+      asamifTblifLastChange                INTEGER, 
+      asamifTblifInOctets                  INTEGER,
+      asamifTblifInUcastPkts               INTEGER,
+      asamifTblifInNUcastPkts              INTEGER,
+      asamifTblifInDiscards                INTEGER,
+      asamifTblifInErrors                  INTEGER,
+      asamifTblifInUbknownProtos           INTEGER,
+      asamifTblifOutOctets                 INTEGER,
+      asamifTblifOutUcastPkts              INTEGER,
+      asamifTblifOutNUcastPkts             INTEGER,
+      asamifTblifOutDiscards               INTEGER,
+      asamifTblifOutErrors                 INTEGER,
+      asamifxTblifName                     INTEGER,
+      asamifxTblifInMulticastPkts          INTEGER,
+      asamifxTblifInBroadcastPkts          INTEGER,
+      asamifxTblifOutMulticastPkts         INTEGER,
+      asamifxTblifOutBroadcastPkts         INTEGER,
+      asamifxTblifHCInOctets               INTEGER,
+      asamifxTblifHCInUcastPkts            INTEGER,
+      asamifxTblifHCInMulticastPkts        INTEGER,
+      asamifxTblifHCInBroadcastPkts        INTEGER,
+      asamifxTblifHCOutOctets              INTEGER,
+      asamifxTblifHCOutUcastPkts           INTEGER,
+      asamifxTblifHCOutMulticastPkts       INTEGER,
+      asamifxTblifHCOutBroadcastPkts       INTEGER,
+      asamifxTblifLinkUpDownTrapEnable     INTEGER,
+      asamifxTblifHighSpeed                INTEGER,
+      asamifxTblifPromiscuousMode          INTEGER,
+      asamifxTblifConnectorPresent         INTEGER,
+      asamifxTblifAlias                    INTEGER,
+      asamifxTblifCounterDiscontinuityTime INTEGER
+   }
+   asamIfExtCounterIndex  OBJECT-TYPE
+      SYNTAX IANAifType  
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "A unique non-zero value representing an interface .
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       NA           DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+
+      ::= { asamIfExtCounterSupportEntry  1 }
+
+   asamifTblifDescr       OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  2 }
+  asamifTblifMtu       OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  3 }
+  asamifTblifSpeed        OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  4 }
+
+  asamifTblifPhysAddress   OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  5 }
+ 
+  asamifTblifAdminStatus   OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  6 }
+ asamifTblifOperStatus   OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  7 }
+ asamifTblifLastChange   OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  8 }
+
+ 
+ asamifTblifInOctets       OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  9 }
+  asamifTblifInUcastPkts       OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  10 }
+  asamifTblifInNUcastPkts       OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  11 }
+  asamifTblifInDiscards       OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  12 }
+  asamifTblifInErrors       OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  13 }
+  asamifTblifInUbknownProtos       OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  14 }
+  asamifTblifOutOctets       OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  15 }
+
+  asamifTblifOutUcastPkts     OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  16 }
+
+  asamifTblifOutNUcastPkts       OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  17 }
+
+   asamifTblifOutDiscards     OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  18 }
+
+  asamifTblifOutErrors        OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  19 }
+
+   asamifxTblifName        OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  20 }
+
+   asamifxTblifInMulticastPkts     OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  21 }
+
+   asamifxTblifInBroadcastPkts     OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  22 }
+
+   asamifxTblifOutMulticastPkts     OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  23 }
+
+    asamifxTblifOutBroadcastPkts    OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  24 }
+
+    asamifxTblifHCInOctets    OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  25 }
+
+    asamifxTblifHCInUcastPkts    OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  26 }
+
+     asamifxTblifHCInMulticastPkts   OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  27 }
+
+   asamifxTblifHCInBroadcastPkts     OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  28 }
+
+  asamifxTblifHCOutOctets       OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  29 }
+
+    asamifxTblifHCOutUcastPkts    OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  30 }
+
+
+  asamifxTblifHCOutMulticastPkts     OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  31 }
+
+   asamifxTblifHCOutBroadcastPkts  OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  32 }
+
+   asamifxTblifLinkUpDownTrapEnable  OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  33 }
+  asamifxTblifHighSpeed    OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  34 }
+   asamifxTblifPromiscuousMode   OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  35 }
+   asamifxTblifConnectorPresent  OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  36 }
+    asamifxTblifAlias  OBJECT-TYPE
+      SYNTAX INTEGER 
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface  
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  37 }
+
+   asamifxTblifCounterDiscontinuityTime   OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+
+         " A value of 1 indicates that this parameter is supported for the specified interface
+           A value of 0 indicates that this parameter is not supported for the specified interface  .
+          ALCATEL NOTE:
+              ACCESS:      NA           USAGE:       NA
+              PERSIST:     NO           INSRVMOD:    NA
+              RANGE:       0..1         DEFVALUE:    NA
+              UNITS:       NA           SPARSE:      NA
+              DESCR:       NA"
+      ::= { asamIfExtCounterSupportEntry  38 }
+
+-- *********************************************
+--
+-- IF-INDEX TO EXTENDED IF-INDEX MAPPING TABLE
+--
+-- This table is a helper table.
+--
+-- It contains the mapping of the ifIndex to extended ifIndex
+-- of all interfaces that have a linear value
+--
+-- *********************************************
+   
+   asamIfIndexToExtIfIndexMappingTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamIfIndexToExtIfIndexMappingEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "ifIndex to extended ifIndex Mapping Table.
+
+          ALCATEL NOTE:
+             TABLESIZE: DEP same size as the ifTable."
+      ::= { asamItfMIB 13 }
+   
+   asamIfIndexToExtIfIndexMappingEntry OBJECT-TYPE
+      SYNTAX AsamIfIndexToExtIfIndexMappingEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry containing mapping from ifIndex to extended 
+          ifIndex of interfaces."
+
+      INDEX { ifIndex }
+      ::= { asamIfIndexToExtIfIndexMappingTable 1 }
+   
+   AsamIfIndexToExtIfIndexMappingEntry ::= SEQUENCE {
+  			asamExtIfIndexId1   Gauge,
+  			asamExtIfIndexId2   Gauge,
+  			asamExtIfIndexId3   Gauge
+   }
+
+   asamExtIfIndexId1   OBJECT-TYPE
+        SYNTAX  Gauge (0..4294967295)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+           "Indicates the first indentifier of the extended-ifIndex
+	    INTEGER.xxxx.xxxx.		
+
+           ALCATEL NOTE:
+               ACCESS:      NA           USAGE:       NA
+               PERSIST:     NO           INSRVMOD:    NA
+               RANGE:       Gauge   	 DEFVALUE:    NA
+               UNITS:       NA           SPARSE:      NA
+               DESCR:       NA"
+        ::= { asamIfIndexToExtIfIndexMappingEntry 1 }
+
+   asamExtIfIndexId2   OBJECT-TYPE
+        SYNTAX  Gauge (0..4294967295)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+           "Indicates the second indentifier of the extended-ifIndex
+	    xxxx.INTEGER.xxxx.
+
+           ALCATEL NOTE:
+               ACCESS:      NA           USAGE:       NA
+               PERSIST:     NO           INSRVMOD:    NA
+               RANGE:       Gauge   	 DEFVALUE:    NA
+               UNITS:       NA           SPARSE:      NA
+               DESCR:       NA"
+        ::= { asamIfIndexToExtIfIndexMappingEntry 2 }
+
+   asamExtIfIndexId3   OBJECT-TYPE
+        SYNTAX  Gauge (0..4294967295)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+           "Indicates the third indentifier of the extended-ifIndex
+	    xxxx.xxxx.INTEGER.
+
+           ALCATEL NOTE:
+               ACCESS:      NA           USAGE:       NA
+               PERSIST:     NO           INSRVMOD:    NA
+               RANGE:       Gauge   	 DEFVALUE:    NA
+               UNITS:       NA           SPARSE:      NA
+               DESCR:       NA"
+        ::= { asamIfIndexToExtIfIndexMappingEntry 3 }
+
+-- *********************************************
+--
+-- EXTENDED IF-INDEX TO IF-INDEX MAPPING TABLE
+--
+-- This table is a helper table.
+--
+-- It contains the mapping of the extended-ifIndex to ifIndex
+-- of all interfaces that have a linear value
+--
+-- *********************************************
+   
+   asamExtIfIndexToIfIndexMappingTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamExtIfIndexToIfIndexMappingEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Extended-ifIndex to ifIndex Mapping Table.
+
+          ALCATEL NOTE:
+             TABLESIZE: DEP same size as the ifTable."
+      ::= { asamItfMIB 14 }
+   
+   asamExtIfIndexToIfIndexMappingEntry OBJECT-TYPE
+      SYNTAX AsamExtIfIndexToIfIndexMappingEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry containing mapping from extended-ifIndex to ifIndex 
+          of interfaces."
+
+-- Type : INTEGER.INTEGER.INTEGER (total 96 bit)
+-- asamExtIfIndexId1 -> INTEGER.xxxx.xxxx
+-- asamExtIfIndexId2 -> xxxx.INTEGER.xxxx
+-- asamExtIfIndexId3 -> xxxx.xxxx.INTEGER
+      INDEX { asamExtIfIndexId1, asamExtIfIndexId2, asamExtIfIndexId3 }
+
+      ::= { asamExtIfIndexToIfIndexMappingTable 1 }
+   
+   AsamExtIfIndexToIfIndexMappingEntry ::= SEQUENCE {
+      			asamIfIndex	InterfaceIndex
+   }
+
+   asamIfIndex   OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+           "Indicates the ifIndex of the interface.
+
+           ALCATEL NOTE:
+               ACCESS:      NA           USAGE:       NA
+               PERSIST:     NO           INSRVMOD:    NA
+               RANGE:       ifIndex      DEFVALUE:    NA
+               UNITS:       NA           SPARSE:      NA
+               DESCR:       NA"
+        ::= { asamExtIfIndexToIfIndexMappingEntry 1 }
+
+   asamIfPortTypeTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamIfPortTypeEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "EFM Interface PortType Table.
+
+          ALCATEL NOTE:
+             TABLESIZE: Entry will be equivalent to number of EFM interfaces exist."
+      ::= { asamItfMIB 15 }
+
+    asamIfPortTypeEntry OBJECT-TYPE
+       SYNTAX AsamIfPortTypeEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION
+          "An entry appears in this table for each EFM interface exist in the system." 
+       INDEX { ifIndex }
+       ::= { asamIfPortTypeTable 1 }
+
+    AsamIfPortTypeEntry ::= SEQUENCE {
+         asamIfPortType  INTEGER
+   }
+
+    asamIfPortType   OBJECT-TYPE
+       SYNTAX   INTEGER {
+                    uni(1),
+                    nni(2),
+                    huni(3),
+                    uplink(4),
+                    lemi(5)
+                    
+                }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "This object identifies the whole network service model based
+         on this interface.
+         User Network Interface (UNI) is an interface which
+         specifies one untrust subscriber is connected.
+         Network to Network Interface (NNI) is an interface which
+         specifies one trust networks in connected.
+         Hicap User Network Interface (HUNI) is an interface which
+         specifies one untrust subscriber is connected, but with hicapacity
+         services.
+         Uplink specifies the interface is at the upside of the ISAM, i.e.
+         connecting the ISAM to the network.
+         Lemi is a local ethernet management interface. It is supported only
+         on a restricted set of systems/cards.
+
+         ALCATEL NOTE:
+             ACCESS : NA                   USAGE   : NA
+             PERSIST: YES                  INSRVMOD: NA
+             RANGE  : NA                   DEFVALUE: uni 
+             UNITS  : NA                   SPARSE  : NA
+             DESCR  : This Object is supported only for few LTs.Setting of portType is not allowed for native ethernet interfaces.Setting portType as UNI is allowed                       for all interfaces except native ethernet.Setting portType as NNI is allowed only for EFM intefaces on supported LTs.For ethernet interfaces                         (native Ethernet) get command will display the portType from extendEtherPortCtrlTable"                       
+        ::= { asamIfPortTypeEntry 1 }
+
+END

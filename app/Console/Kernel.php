@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
      *
      * @var array
      */
-    protected $commands = [];
+    protected $commands = [
+        //
+    ];
 
     /**
      * Define the application's command schedule.
@@ -28,12 +30,14 @@ class Kernel extends ConsoleKernel
     }
 
     /**
-     * Register the Closure based commands for the application.
+     * Register the commands for the application.
      *
      * @return void
      */
     protected function commands()
     {
+        $this->load(__DIR__.'/Commands');
+
         require base_path('routes/console.php');
 
         if ($this->app->environment() !== 'production') {
@@ -41,7 +45,7 @@ class Kernel extends ConsoleKernel
         }
     }
 
-    protected function getArtisan()
+    public function getArtisan()
     {
         if (is_null($this->artisan)) {
             parent::getArtisan();

@@ -27,43 +27,51 @@ if (file_exists($config['install_dir'] . '/config.php')) {
     echo("This should only be called during install");
     exit;
 }
+$init_modules = ['laravel', 'nodb'];
+require $config['install_dir'] . '/includes/init.php';
 
 header("Content-type: text/plain");
 header('X-Accel-Buffering: no');
 
 $db_vars = array(
-    'dbhost' => 'h',
-    'dbuser' => 'u',
-    'dbpass' => 'p',
-    'dbname' => 'n',
-    'dbport' => 't',
-    'dbsocket' => 's',
+    'dbhost' => 'host',
+    'dbuser' => 'username',
+    'dbpass' => 'password',
+    'dbname' => 'database',
+    'dbport' => 'port',
+    'dbsocket' => 'unix_socket',
 );
 
-$cmd = $config['install_dir'] . '/build-base.php -l';
+\Config::set('database.connections.setup', [
+    "driver" => "mysql",
+    "host" => $_SESSION['dbhost'] ?: 'localhost',
+    "port" => $_SESSION['dbhost'] ?: 3306,
+    "database" => $_SESSION['dbname'] ?: 'librenms',
+    "username" => $_SESSION['dbuser'] ?: 'librenms',
+    "password" => $_SESSION['dbpass'] ?: '',
+    "charset" => "utf8",
+    "collation" => "utf8_unicode_ci",
+    "prefix" => "",
+    "strict" => true,
+    "engine" => null
+]);
 
-foreach ($db_vars as $var => $opt) {
-    if ($_SESSION[$var]) {
-        $cmd .= " -$opt " . escapeshellarg($_SESSION[$var]);
-    }
-}
 
 echo "Starting Update...\n";
+try {
+    $ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true, '--database' => 'setup']);
 
-if (($fp = popen($cmd . ' 2>&1', "r"))) {
-    while (!feof($fp)) {
-        $line = stream_get_line($fp, 1024, "\n");
-        echo preg_replace('/\033\[[\d;]+m/', '', $line) . PHP_EOL;
-        ob_flush();
-        flush(); // you have to flush the buffer
-    }
+    echo \Artisan::output();
 
-    if (pclose($fp) === 0) {
-        echo "Database is up to date!";
-        $_SESSION['build-ok'] = true;
+    if ($ret == 0 && \LibreNMS\DB\Schema::isCurrent()) {
+        echo "\n\nSuccess!";
     } else {
-        echo "Database schema update failed!";
+        echo "\n\nError!";
+        http_response_code(500);
     }
+} catch (Exception $e) {
+    echo $e->getMessage() . "\n\nError!";
+    http_response_code(500);
 }
 
 ob_end_flush();

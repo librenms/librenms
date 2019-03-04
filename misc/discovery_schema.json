@@ -118,8 +118,7 @@
                                                 "type": "string"
                                             },
                                             "group": {
-                                                "type": "string",
-                                                "pattern": "^[A-Z]"
+                                                "type": "string"
                                             },
                                             "low_limit": {
                                                 "type": ["number", "string"]
@@ -141,7 +140,7 @@
                                             },
                                             "num_oid": {
                                                 "type": "string",
-                                                "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
+                                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$index \\}\\})?(\\.\\d+)*$"
                                             },
                                             "descr": {
                                                 "type": "string"
@@ -216,6 +215,12 @@
                                                     "string",
                                                     "array"
                                                 ]
+                                            },
+                                            "entPhysicalIndex": {
+                                                "type": ["integer", "string"]
+                                            },
+                                            "entPhysicalIndex_measured": {
+                                                "type": "string"
                                             }
                                         },
                                         "additionalProperties": false,
@@ -333,8 +338,7 @@
                         "type": "string"
                     },
                     "group": {
-                        "type": "string",
-                        "pattern": "^[A-Z]"
+                        "type": "string"
                     },
                     "low_limit": {
                         "type": ["number", "string"]
@@ -384,7 +388,7 @@
                         ]
                     },
                     "entPhysicalIndex": {
-                        "type": "string"
+                        "type": ["integer", "string"]
                     },
                     "entPhysicalIndex_measured": {
                         "type": "string"

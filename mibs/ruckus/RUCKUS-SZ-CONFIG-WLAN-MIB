@@ -1,0 +1,291 @@
+--
+-- Copyright 2010-2014 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-SZ-CONFIG-WLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusSZWLANModule
+        FROM RUCKUS-ROOT-MIB
+    RuckusAdminStatus,
+    RuckusRadioMode,
+    RuckusSSID,
+    RuckusdB,
+    RuckusRateLimiting
+        FROM RUCKUS-TC-MIB
+    DisplayString,
+    MacAddress,
+    RowStatus,
+    PhysAddress,
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    IANAifType
+        FROM IANAifType-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC;
+
+ruckusSZConfigWLANMIB MODULE-IDENTITY
+    LAST-UPDATED "201503191100Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        T: +1 (650) 265-4200
+        F: +1 (408) 738-2065
+        EMail: info@ruckuswireless.com
+        Web: www.ruckuswireless.com"
+    DESCRIPTION
+        "Ruckus WLAN mib"
+    ::= { ruckusSZWLANModule 2 }
+
+ruckusSZConfigWLANObjects OBJECT IDENTIFIER     ::= { ruckusSZConfigWLANMIB 1 }
+
+ruckusSZConfigWLAN OBJECT IDENTIFIER    ::= { ruckusSZConfigWLANObjects 1 }
+
+
+ruckusSZConfigWLANTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusSZConfigWLANEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "SZ WLAN table."
+    ::= { ruckusSZConfigWLAN 1 }
+
+ruckusSZConfigWLANEntry OBJECT-TYPE
+    SYNTAX  RuckusSZConfigWLANEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each SZ WLAN configuration entry."
+    INDEX {
+        ruckusSZConfigWLANID }
+    ::= { ruckusSZConfigWLANTable 1 }
+
+RuckusSZConfigWLANEntry ::= SEQUENCE {
+	ruckusSZConfigWLANID                INTEGER,
+	ruckusSZConfigWLANSSID              OCTET STRING,  
+  ruckusSZConfigWLANDescription       DisplayString,
+  ruckusSZConfigWLANName              OCTET STRING,  
+	ruckusSZConfigWLANWLANServiceType   INTEGER,
+	ruckusSZConfigWLANAuthentication    INTEGER,
+	ruckusSZConfigWLANEncryption        INTEGER,
+	ruckusSZConfigWLANWEPKeyIndex       INTEGER,
+	ruckusSZConfigWLANWEPKey            OCTET STRING,
+  ruckusSZConfigWLANWPACipherType		 INTEGER,	
+	ruckusSZConfigWLANWPAKey            OCTET STRING,
+  ruckusSZConfigWLANWirelessClientIsolation  INTEGER,
+	ruckusSZConfigWLANZeroITActivation  INTEGER,
+  ruckusSZConfigWLANServicePriority   INTEGER,
+	ruckusSZConfigWLANAccountingUpdateInterval    INTEGER,
+  ruckusSZConfigWLANVlanID             INTEGER,
+	ruckusSZConfigWLANHideSSID           INTEGER, 
+	ruckusSZConfigWLANMaxClientsPerAP    INTEGER
+}
+
+ruckusSZConfigWLANID OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "this Wireless LAN(WLAN) ID "
+    ::= { ruckusSZConfigWLANEntry 1 }
+
+ruckusSZConfigWLANSSID OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (2..32)) 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SSID for this Wireless LAN."
+    ::= { ruckusSZConfigWLANEntry 2 }
+
+ruckusSZConfigWLANDescription OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Description for this Wireless LAN."
+    ::= { ruckusSZConfigWLANEntry 3 }
+    
+ruckusSZConfigWLANName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (2..32)) 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name for this Wireless LAN"
+    ::= { ruckusSZConfigWLANEntry 4 }      
+
+ruckusSZConfigWLANWLANServiceType OBJECT-TYPE
+    SYNTAX  INTEGER {
+            standardUsage(1),
+            hotspot(2),
+            guest(3),
+            webauth(4),
+            hotspot20(5),
+            hotspot20-osen(6) } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The the Service type for the Wireless LAN."
+        DEFVAL {standardUsage}
+    ::= { ruckusSZConfigWLANEntry 8 }
+
+ruckusSZConfigWLANAuthentication OBJECT-TYPE
+    SYNTAX  INTEGER {
+            open(1),
+            eap(2),
+            mac-address(3) } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication method choosen for this Wireless LAN."
+        DEFVAL {open}
+    ::= { ruckusSZConfigWLANEntry 10 }
+
+ruckusSZConfigWLANEncryption OBJECT-TYPE
+    SYNTAX  INTEGER {
+            wpa2(1),
+            wpa-Mixed(2),
+            wep-64(3),
+            wep-128(4),
+            none-enc(5) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Encryption method choosen for this Wireless LAN."
+        DEFVAL {none-enc}
+    ::= { ruckusSZConfigWLANEntry 12 }
+
+ruckusSZConfigWLANWEPKeyIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..4)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select the WEP key index for the WEP encryption."
+        DEFVAL {1}
+    ::= { ruckusSZConfigWLANEntry 15 }
+
+ruckusSZConfigWLANWEPKey OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (10 | 26)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enter the Pass-phrase for the WEP encryption method.
+        Only 10 or 26 Hex character.such as: 1122334455"
+    ::= { ruckusSZConfigWLANEntry 16 }
+    
+ruckusSZConfigWLANWPACipherType OBJECT-TYPE
+    SYNTAX  INTEGER {            
+            aes(1),
+            tkipaes(2),
+            null(3)} 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enter the encryption cipher method for the WPA encryption.
+        fpr WPA2,aes is only supported.null is only for read."
+        DEFVAL {aes}
+    ::= { ruckusSZConfigWLANEntry 20 }    
+
+ruckusSZConfigWLANWPAKey OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (8..63 | 64)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enter the Pass-phrase for the WPA encryption.
+        Specifies the WPA PSK (Wi-Fi Protected Access
+        Pre Shared key)
+        If the key length is 64 then all 64 characters should be in hex,
+        otherwise the key assumed to be ascii."
+    ::= { ruckusSZConfigWLANEntry 21 }
+
+ruckusSZConfigWLANWirelessClientIsolation OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "set Wireless Client Isolation, clients will be unable to communicate with each other, or access any of the restricted subnet.
+        for Guest and webauth WLAN type, it must be 'enable'."
+    	  DEFVAL{2}
+    ::= { ruckusSZConfigWLANEntry 28 }
+
+ruckusSZConfigWLANZeroITActivation OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable the Zero IT Activation Service of the Wireless LAN or not."
+        DEFVAL{disable}
+    ::= { ruckusSZConfigWLANEntry 30 }
+
+ruckusSZConfigWLANServicePriority OBJECT-TYPE
+    SYNTAX  INTEGER {
+            high(1),
+            low(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select the QOS service priority for the Wireless LAN."
+        DEFVAL{high}
+    ::= { ruckusSZConfigWLANEntry 32 }
+
+ruckusSZConfigWLANAccountingUpdateInterval OBJECT-TYPE
+    SYNTAX  INTEGER (1..60)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enter interval in minutes to update Accounting Server."
+    ::= { ruckusSZConfigWLANEntry 36 }
+
+ruckusSZConfigWLANVlanID OBJECT-TYPE
+    SYNTAX  INTEGER  ( 1..4094 )
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the VLAN ID of the WLAN.  If VLAN ID is 1, packets from this WLAN will be untagged."
+        DEFVAL{1}
+    ::= { ruckusSZConfigWLANEntry 45 }
+
+ruckusSZConfigWLANHideSSID OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Hide SSID, not to broadcast it SSID."
+        DEFVAL{disable}
+    ::= { ruckusSZConfigWLANEntry 50 }
+
+ruckusSZConfigWLANMaxClientsPerAP OBJECT-TYPE
+    SYNTAX  INTEGER (1..512)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select the Number of client devices the AP can service for the Wireless LAN."
+        DEFVAL{100}
+    ::= { ruckusSZConfigWLANEntry 55 }
+
+END

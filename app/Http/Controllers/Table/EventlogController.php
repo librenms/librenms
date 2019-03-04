@@ -45,6 +45,14 @@ class EventlogController extends TableController
         return ['message'];
     }
 
+    protected function filterFields($request)
+    {
+        return [
+            'device_id' => 'device',
+            'type' => 'eventtype',
+        ];
+    }
+
     /**
      * Defines the base query for this resource
      *
@@ -53,17 +61,7 @@ class EventlogController extends TableController
      */
     public function baseQuery($request)
     {
-        $query = Eventlog::hasAccess($request->user())->with('device');
-
-        if ($device_id = $request->get('device')) {
-            $query->where('device_id', $device_id);
-        }
-
-        if ($type = $request->get('eventtype')) {
-            $query->where('type', $type);
-        }
-
-        return $query;
+        return Eventlog::hasAccess($request->user())->with('device');
     }
 
     public function formatItem($eventlog)
@@ -82,7 +80,9 @@ class EventlogController extends TableController
         if ($eventlog->type == 'interface') {
             if (is_numeric($eventlog->reference)) {
                 $port = $eventlog->related;
-                return '<b>' . Url::portLink($port, $port->getShortLabel()) . '</b>';
+                if (isset($port)) {
+                    return '<b>' . Url::portLink($port, $port->getShortLabel()) . '</b>';
+                }
             }
         }
 

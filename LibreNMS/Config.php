@@ -522,12 +522,15 @@ class Config
         // Check for testing database
         if (getenv('DBTEST')) {
             if (isset($config['test_db_name'])) {
+                putenv('DB_DATABASE=' . $config['test_db_name']);
                 $config['db_name'] = $config['test_db_name'];
             }
             if (isset($config['test_db_user'])) {
+                putenv('DB_USERNAME=' . $config['test_db_user']);
                 $config['db_user'] = $config['test_db_user'];
             }
             if (isset($config['test_db_pass'])) {
+                putenv('DB_PASSWORD=' . $config['test_db_pass']);
                 $config['db_pass'] = $config['test_db_pass'];
             }
         }

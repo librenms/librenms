@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit
+<phpunit backupGlobals="true"
+         backupStaticAttributes="false"
          bootstrap="tests/bootstrap.php"
          colors="true"
          convertErrorsToExceptions="true"
@@ -22,6 +23,7 @@
     </testsuites>
     <groups>
         <exclude>
+            <group>browser</group>
             <group>mibs</group>
         </exclude>
     </groups>
@@ -32,8 +34,10 @@
     </filter>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_DRIVER" value="array"/>
+        <env name="MAIL_DRIVER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
-        <env name="QUEUE_DRIVER" value="sync"/>
     </php>
 </phpunit>

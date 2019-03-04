@@ -6,9 +6,13 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rule;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\DatabaseConnectException;
+use LibreNMS\Util\IP;
+use LibreNMS\Util\Validate;
 use Request;
+use Validator;
 
 include_once __DIR__ . '/../../includes/dbFacile.php';
 
@@ -27,42 +31,9 @@ class AppServiceProvider extends ServiceProvider
         // load config
         Config::load();
 
-        // replace early boot logging redirect log to config location, unless APP_LOG is set
-        Log::getMonolog()->popHandler(); // remove existing errorlog logger
-        Log::useFiles(config('app.log') ?: Config::get('log_file', base_path('logs/librenms.log')), 'error');
-
-        // Blade directives (Yucky because of < L5.5)
-        Blade::directive('config', function ($key) {
-            return "<?php if (\LibreNMS\Config::get(($key))): ?>";
-        });
-        Blade::directive('notconfig', function ($key) {
-            return "<?php if (!\LibreNMS\Config::get(($key))): ?>";
-        });
-        Blade::directive('endconfig', function () {
-            return "<?php endif; ?>";
-        });
-        Blade::directive('admin', function () {
-            return "<?php if (auth()->check() && auth()->user()->isAdmin()): ?>";
-        });
-        Blade::directive('endadmin', function () {
-            return "<?php endif; ?>";
-        });
-
+        $this->bootCustomBladeDirectives();
+        $this->bootCustomValidators();
         $this->configureMorphAliases();
-
-        // Development service providers
-        if ($this->app->environment() !== 'production') {
-            if (class_exists(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class)) {
-                $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
-            }
-
-            if (config('app.debug') && class_exists(\Barryvdh\Debugbar\ServiceProvider::class)) {
-                // disable debugbar for api routes
-                if (!Request::is('api/*')) {
-                    $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
-                }
-            }
-        }
     }
 
     /**
@@ -73,6 +44,19 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerGeocoder();
+    }
+
+    private function bootCustomBladeDirectives()
+    {
+        Blade::if('config', function ($key) {
+            return \LibreNMS\Config::get($key);
+        });
+        Blade::if('notconfig', function ($key) {
+            return !\LibreNMS\Config::get($key);
+        });
+        Blade::if('admin', function () {
+            return auth()->check() && auth()->user()->isAdmin();
+        });
     }
 
     private function configureMorphAliases()
@@ -107,5 +91,13 @@ class AppServiceProvider extends ServiceProvider
                     return $app->make(\App\ApiClients\GoogleMapsApi::class);
             }
         });
+    }
+
+    private function bootCustomValidators()
+    {
+        Validator::extend('ip_or_hostname', function ($attribute, $value, $parameters, $validator) {
+            $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too
+            return IP::isValid($ip) || Validate::hostname($value);
+        }, __('The :attribute must a valid IP address/network or hostname.'));
     }
 }

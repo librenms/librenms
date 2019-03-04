@@ -21,12 +21,11 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         return view('laravel');
     });
 
+    // pages
     Route::get('locations', 'LocationController@index');
 
     // old route redirects
-    Route::get('poll-log', function () {
-        return redirect('pollers/tab=log/');
-    });
+    Route::permanentRedirect('poll-log', 'pollers/tab=log/');
 
     // Two Factor Auth
     Route::get('2fa', 'TwoFactorController@showTwoFactorForm')->name('2fa.form');
@@ -37,37 +36,52 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // Ajax routes
     Route::group(['prefix' => 'ajax'], function () {
-        Route::post('set_resolution', 'ResolutionController@set');
+        // page ajax controllers
         Route::resource('location', 'LocationController', ['only' => ['update', 'destroy']]);
 
+        // misc ajax controllers
+        Route::group(['namespace' => 'Ajax'], function () {
+            Route::post('set_resolution', 'ResolutionController@set');
+            Route::get('netcmd', 'NetCommand@run');
+            Route::post('ripe/raw', 'RipeNccApiController@raw');
+        });
+
+        // form ajax handlers, perhaps should just be page controllers
         Route::group(['prefix' => 'form', 'namespace' => 'Form'], function () {
             Route::resource('widget-settings', 'WidgetSettingsController');
         });
 
+        // js select2 data controllers
         Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
             Route::get('application', 'ApplicationController');
             Route::get('bill', 'BillController');
             Route::get('device', 'DeviceController');
+            Route::get('device-field', 'DeviceFieldController');
             Route::get('device-group', 'DeviceGroupController');
             Route::get('eventlog', 'EventlogController');
             Route::get('graph', 'GraphController');
             Route::get('graph-aggregate', 'GraphAggregateController');
             Route::get('graylog-streams', 'GraylogStreamsController');
             Route::get('syslog', 'SyslogController');
+            Route::get('location', 'LocationController');
             Route::get('munin', 'MuninPluginController');
             Route::get('port', 'PortController');
             Route::get('port-field', 'PortFieldController');
         });
 
+        // jquery bootgrid data controllers
         Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
             Route::post('customers', 'CustomersController');
+            Route::post('device', 'DeviceController');
             Route::post('eventlog', 'EventlogController');
+            Route::post('fdb-tables', 'FdbTablesController');
+            Route::post('graylog', 'GraylogController');
             Route::post('location', 'LocationController');
             Route::post('port-nac', 'PortNacController');
-            Route::post('graylog', 'GraylogController');
             Route::post('syslog', 'SyslogController');
         });
 
+        // dashboard widgets
         Route::group(['prefix' => 'dash', 'namespace' => 'Widgets'], function () {
             Route::post('alerts', 'AlertsController');
             Route::post('availability-map', 'AvailabilityMapController');
@@ -89,29 +103,10 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         });
     });
 
-    // Debugbar routes need to be here because of catch-all
-    if (config('app.env') !== 'production' && config('app.debug') && config('debugbar.enabled') !== false) {
-        Route::get('/_debugbar/assets/stylesheets', [
-            'as' => 'debugbar-css',
-            'uses' => '\Barryvdh\Debugbar\Controllers\AssetController@css'
-        ]);
-
-        Route::get('/_debugbar/assets/javascript', [
-            'as' => 'debugbar-js',
-            'uses' => '\Barryvdh\Debugbar\Controllers\AssetController@js'
-        ]);
-
-        Route::get('/_debugbar/open', [
-            'as' => 'debugbar-open',
-            'uses' => '\Barryvdh\Debugbar\Controllers\OpenController@handler'
-        ]);
-    }
-
     // demo helper
-    Route::get('demo', function () {
-        return redirect('/');
-    });
+    Route::permanentRedirect('demo', '/');
 
     // Legacy routes
-    Route::any('/{path?}', 'LegacyController@index')->where('path', '.*');
+    Route::any('/{path?}', 'LegacyController@index')
+        ->where('path', '^((?!_debugbar).)*');
 });
