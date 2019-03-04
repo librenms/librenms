@@ -30,7 +30,7 @@
                     "features": null,
                     "os": "ciscosat",
                     "type": "network",
-                    "serial": "361356018144",
+                    "serial": "<private>",
                     "icon": "cisco.svg",
                     "location": "<private>"
                 }
