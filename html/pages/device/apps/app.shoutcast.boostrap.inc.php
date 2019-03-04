@@ -15,12 +15,16 @@
  * @author     LibreNMS Contributors
 */
 
-global $config;
-$graphs = [
-    'fail2ban_banned' => 'Total Banned',
-];
+foreach ($graphs as $key => $text) {
+    $graph_type = $key;
+    $custom_values = [];
+    $custom_values['hostname'] = $hostname;
+    $graph_array = array_merge(apps_default_graphs_value($key, $app['app_id'], $config['time']['now']), $custom_values);
 
-include "app.bootstrap.inc.php";
-
-$jails = get_fail2ban_jails($device['device_id']);
-include "app.fail2ban.bootstrap.inc.php";
+    print_optionbar_start();
+    echo "<span class='devices-font-bold'>" . $text . "</span>";
+    print_optionbar_end();
+    echo '<div class="row">';
+    require 'includes/print-graphrow.inc.php';
+    echo '</div>';
+}
