@@ -9,12 +9,12 @@ if ($state) {
     $state_name = 'systemStatus';
     create_state_index(
         $state_name,
-        array(
-            array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'),
-            array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Ok'),
-            array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Warning'),
-            array('value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'Alarm'),
-        )
+        [
+            ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
+            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Ok'],
+            ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Warning'],
+            ['value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'Alarm'],
+        ]
     );
 
     $sensor_index = 0;
@@ -48,13 +48,13 @@ if ($state) {
     $state_name = 'lineStatus';
     create_state_index(
         $state_name,
-        array(
-            array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'),
-            array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Ok'),
-            array('value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Analyzer'),
-            array('value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'Connecting'),
-            array('value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'Searching'),
-        )
+        [
+            ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
+            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Ok'],
+            ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Analyzer'],
+            ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'Connecting'],
+            ['value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'Searching'],
+        ]
     );
 
     $sensor_index = 1;
@@ -88,11 +88,11 @@ if ($state) {
     $state_name = 'rfPowerStatus';
     create_state_index(
         $state_name,
-        array(
-            array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'),
-            array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Ok'),
-            array('value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'Failure'),
-        )
+        [
+            ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
+            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Ok'],
+            ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'Failure'],
+        ]
     );
 
     $sensor_index = 2;
@@ -126,11 +126,11 @@ if ($state) {
     $state_name = 'ethPeer';
     create_state_index(
         $state_name,
-        array(
-            array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'),
-            array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Up'),
-            array('value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'Down'),
-        )
+        [
+            ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
+            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Up'],
+            ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'Down'],
+        ]
     );
 
     $sensor_index = 3;

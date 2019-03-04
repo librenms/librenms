@@ -174,14 +174,14 @@ unset($num_oid, $value, $divisor, $descr, $low_limit, $low_warn, $high_warn, $se
 
 echo 'GW EYDFA PSU State ';
 
-$oids = array('.1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.100.0.2', '.1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.101.0.2');
+$oids = ['.1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.100.0.2', '.1.3.6.1.4.1.17409.1.1.2.1.4.11.1.3.6.1.4.1.17409.1.11.101.0.2'];
 
 $state_name = 'PowerSupplyState';
-$states = array(
-    array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'),
-    array('value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'warning'),
-    array('value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'critical'),
-);
+$states = [
+    ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
+    ['value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'warning'],
+    ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'critical'],
+];
 create_state_index($state_name, $states);
 $n = 1;
 foreach ($oids as $oid) {

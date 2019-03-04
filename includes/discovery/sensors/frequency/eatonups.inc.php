@@ -3,7 +3,7 @@
 echo 'XUPS-MIB ';
 
 // XUPS-MIB::xupsInputFrequency.0 = INTEGER: 500
-$oids = snmpwalk_cache_oid($device, 'xupsInputFrequency', array(), 'XUPS-MIB');
+$oids = snmpwalk_cache_oid($device, 'xupsInputFrequency', [], 'XUPS-MIB');
 
 foreach ($oids as $freq_id => $data) {
     $freq_oid = ".1.3.6.1.4.1.534.1.3.1.$freq_id";
@@ -20,7 +20,7 @@ foreach ($oids as $freq_id => $data) {
 }
 
 // XUPS-MIB::xupsOutputFrequency.0 = INTEGER: 500
-$oids = snmpwalk_cache_oid($device, 'xupsOutputFrequency', array(), 'XUPS-MIB');
+$oids = snmpwalk_cache_oid($device, 'xupsOutputFrequency', [], 'XUPS-MIB');
 
 foreach ($oids as $freq_id => $data) {
     $freq_oid = ".1.3.6.1.4.1.534.1.4.2.$freq_id";
@@ -36,7 +36,7 @@ foreach ($oids as $freq_id => $data) {
 }
 
 // XUPS-MIB::xupsBypassFrequency.0 = INTEGER: 500
-$oids = snmpwalk_cache_oid($device, 'xupsBypassFrequency', array(), 'XUPS-MIB');
+$oids = snmpwalk_cache_oid($device, 'xupsBypassFrequency', [], 'XUPS-MIB');
 
 foreach ($oids as $freq_id => $data) {
     $freq_oid = ".1.3.6.1.4.1.534.1.5.1.$freq_id";

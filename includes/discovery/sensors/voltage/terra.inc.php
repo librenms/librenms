@@ -1,10 +1,10 @@
 <?php
 
 if ($device["os"] === "terra") {
-    $query = array(
-        array("sti410C", ".1.3.6.1.4.1.30631.1.9.1.1.5.0"),
-        array("sti440",  ".1.3.6.1.4.1.30631.1.18.1.326.5.0")
-    );
+    $query = [
+        ["sti410C", ".1.3.6.1.4.1.30631.1.9.1.1.5.0"],
+        ["sti440",  ".1.3.6.1.4.1.30631.1.18.1.326.5.0"]
+    ];
 
     foreach ($query as $row) {
         if (strpos($device["sysDescr"], $row[0]) !== false) {

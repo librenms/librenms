@@ -2,7 +2,7 @@
 
 // Environmental monitoring on UPSes etc
 // FIXME emConfigProbesTable may also be used? But not filled out on my device...
-$apc_env_data = snmpwalk_cache_oid($device, 'iemConfigProbesTable', array(), 'PowerNet-MIB');
+$apc_env_data = snmpwalk_cache_oid($device, 'iemConfigProbesTable', [], 'PowerNet-MIB');
 $apc_env_data = snmpwalk_cache_oid($device, 'iemStatusProbesTable', $apc_env_data, 'PowerNet-MIB');
 
 foreach (array_keys($apc_env_data) as $index) {
@@ -21,7 +21,7 @@ foreach (array_keys($apc_env_data) as $index) {
     }
 }
 
-$apc_env_data = snmpwalk_cache_oid($device, 'emsProbeStatus', array(), 'PowerNet-MIB');
+$apc_env_data = snmpwalk_cache_oid($device, 'emsProbeStatus', [], 'PowerNet-MIB');
 
 foreach (array_keys($apc_env_data) as $index) {
     if ($apc_env_data[$index]['emsProbeStatusProbeCommStatus'] != 'commsNeverDiscovered') {

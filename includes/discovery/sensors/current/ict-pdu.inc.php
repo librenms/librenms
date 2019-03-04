@@ -24,7 +24,7 @@
  */
 
 // Output Current
-$oids = snmpwalk_cache_oid($device, 'outputEntry', array(), 'ICT-DISTRIBUTION-PANEL-MIB');
+$oids = snmpwalk_cache_oid($device, 'outputEntry', [], 'ICT-DISTRIBUTION-PANEL-MIB');
 
 foreach ($oids as $index => $entry) {
     $output_number = (int)$entry['outputNumber'] + 1;

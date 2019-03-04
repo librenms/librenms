@@ -121,14 +121,14 @@ $oids = snmpwalk_group($device, 'ciscoEnvMonSupplyStatusTable', 'CISCO-ENVMON-MI
 if (!empty($oids)) {
     //Create State Index
     $state_name = 'ciscoEnvMonSupplyState';
-    $states = array(
-         array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'),
-         array('value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'warning'),
-         array('value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'critical'),
-         array('value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'shutdown'),
-         array('value' => 5, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'),
-         array('value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'notFunctioning'),
-     );
+    $states = [
+        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
+        ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'warning'],
+        ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'critical'],
+        ['value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'shutdown'],
+        ['value' => 5, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
+        ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'notFunctioning'],
+    ];
     create_state_index($state_name, $states);
 
     $num_oid = '.1.3.6.1.4.1.9.9.13.1.5.1.3.';
