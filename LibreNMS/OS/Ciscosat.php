@@ -64,11 +64,11 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
         foreach ($cnratio as $index => $entry) {
         array_push($snrstatus, new WirelessSensor(
                 'snr',
-	        $this->getDeviceId(),
-		'.1.3.6.1.4.1.1429.2.2.5.5.3.1.1.5.' . $index,
-		'ciscosat',
-	        ++$dbindex,
-		'C/N Ratio ' .$index));
+	            $this->getDeviceId(),
+		        '.1.3.6.1.4.1.1429.2.2.5.5.3.1.1.5.' . $index,
+		        'ciscosat',
+	            ++$dbindex,
+		        'C/N Ratio ' .$index));
         }
         return $snrstatus;
     }
