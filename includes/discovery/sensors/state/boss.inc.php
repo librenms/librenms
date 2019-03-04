@@ -16,7 +16,7 @@ if ($device['os'] === 'boss') {
             ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
             ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'notAvail'],
             ['value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'removed'],
-            ['value' => 4, 'generic' =>3, 'graph' => 0, 'descr' => 'disabled'],
+            ['value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'disabled'],
             ['value' => 5, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
             ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'resetInProg'],
             ['value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'testing'],
