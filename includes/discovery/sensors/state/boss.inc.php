@@ -55,6 +55,12 @@ if ($device['os'] === 'boss') {
             //Get unit number
             $unit_array = explode(".", $index);
             $unit = floor($unit_array[1]/10);
+            //reset power supply number when going to new switch in stack
+            if ($ps_unit != $unit ) {
+                $ps_num = 0;
+            } else {
+                $ps_unit == $unit;
+            }
             //Set description power supply
             if ($unit_array[0] == 4) {
                  $ps_num++;
