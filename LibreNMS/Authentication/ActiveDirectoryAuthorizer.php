@@ -209,7 +209,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
     }
 
-    public function bind($credentials)
+    public function bind($credentials = [])
     {
         if (!$this->ldap_connection) {
             $this->connect();

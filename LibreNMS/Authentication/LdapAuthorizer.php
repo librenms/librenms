@@ -322,7 +322,7 @@ class LdapAuthorizer extends AuthorizerBase
         }
     }
 
-    public function bind($credentials)
+    public function bind($credentials = [])
     {
         if (Config::get('auth_ldap_debug')) {
             ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
