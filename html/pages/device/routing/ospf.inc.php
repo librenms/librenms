@@ -27,7 +27,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', arr
     $nbr_count          = dbFetchCell('SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = ?', array($device['device_id']));
 
     $status_color = $abr_status_color = $asbr_status_color = 'default';
-    
+
     if ($instance['ospfAdminStat'] == 'enabled') {
         $status_color = 'success';
     }
@@ -39,7 +39,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', arr
     if ($instance['ospfASBdrRtrStatus'] == 'true') {
         $asbr_status_color = 'success';
     }
-    
+
     echo '
         <tbody>
           <tr data-toggle="collapse" data-target="#ospf-panel' . $i . '" class="accordion-toggle">
@@ -70,7 +70,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', arr
     foreach (dbFetchRows('SELECT * FROM `ospf_areas` WHERE `device_id` = ?', array($device['device_id'])) as $area) {
         $area_port_count         = dbFetchCell('SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = ? AND `ospfIfAreaId` = ?', array($device['device_id'], $area['ospfAreaId']));
         $area_port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = ? AND `ospfIfAreaId` = ?", array($device['device_id'], $area['ospfAreaId']));
-    
+
         echo '
                       <tbody>
                         <tr>
@@ -94,17 +94,18 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', arr
                           <th>Port Type</th>
                           <th>Port State</th>
                           <th>Status</th>
+                          <th>Area ID</th>
                         </tr>
                       </thead>
                   </div>';
-    foreach (dbFetchRows("SELECT * FROM `ospf_ports` AS O, `ports` AS P WHERE O.`ospfIfAdminStat` = 'enabled' AND O.`device_id` = ? AND O.`ospfIfAreaId` = ? AND P.port_id = O.port_id", array($device['device_id'], $area['ospfAreaId'])) as $ospfport) {
+    foreach (dbFetchRows("SELECT * FROM `ospf_ports` AS O, `ports` AS P WHERE O.`ospfIfAdminStat` = 'enabled' AND O.`device_id` = ? AND P.port_id = O.port_id ORDER BY O.`ospfIfAreaId`", array($device['device_id'])) as $ospfport) {
         $ospfport = cleanPort($ospfport);
         $port_status_color = 'default';
 
         if ($ospfport['ospfIfAdminStat'] == 'enabled') {
             $port_status_color = 'success';
         }
-            
+
         echo '
                   <tbody>
                     <tr>
@@ -112,6 +113,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', arr
                       <td>' . $ospfport['ospfIfType'] . '</td>
                       <td>' . $ospfport['ospfIfState'] . '</td>
                       <td><span class="label label-' . $port_status_color . '">' . $ospfport['ospfIfAdminStat'] . '</span></td>
+                      <td>' . $ospfport['ospfIfAreaId'] . '</td>
                     </tr>
                   </tbody>';
     }
@@ -133,10 +135,10 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', arr
                       </thead>';
     foreach (dbFetchRows('SELECT * FROM `ospf_nbrs` WHERE `device_id` = ?', array($device['device_id'])) as $nbr) {
         $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', array($nbr['ospfNbrRtrId']));
-    
+
         $rtr_id = 'unknown';
         $ospfnbr_status_color = 'default';
-    
+
         if (is_array($host)) {
             $rtr_id = generate_device_link($host);
         }
