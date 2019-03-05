@@ -14,5 +14,5 @@ if (empty($hardware)) {
     $hardware = $device['sysDescr'];
 }
 // ENTITY-MIB::entPhysicalSerialNum
-$serial = snmp_get($device, '.1.3.6.1.2.1.47.1.1.1.1.11.1', '-Oqv', 'ENTITY-MIB');
+$serial = snmp_getnext($device, '.1.3.6.1.2.1.47.1.1.1.1.11', '-Oqv', 'ENTITY-MIB');
 
