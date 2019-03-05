@@ -135,3 +135,16 @@ Then install and configure the runtime and service:
 ```
 
 If you want to use another version of python 3, change `rh-python36` in the unit file and the commands above to match the name of the replacement scl.
+
+### Debian/Ubuntu
+
+#### Debian 9 (stretch)
+
+install python3 and python-mysqldb. python-dotenv is not yes available, but the testing package is working fine, you can grab it on https://packages.debian.org/fr/buster/all/python3-dotenv/download (the package may be updated and have a new version number).
+
+```
+apt install python3 python-mysqldb
+cd /tmp
+wget http://ftp.fr.debian.org/debian/pool/main/p/python-dotenv/python3-dotenv_0.9.1-1_all.deb
+dpkg -i python3-dotenv_0.9.1-1_all.deb
+```
