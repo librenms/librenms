@@ -10,12 +10,11 @@ interface Authorizer
      * Authenticate the user and password.
      * Some Authorizer methods may only check username.
      *
-     * @param $username
-     * @param $password
+     * @param array $credentials
      * @return true throws an Exception on failure
      * @throws AuthenticationException thrown if the username or password is invalid
      */
-    public function authenticate($username, $password);
+    public function authenticate($credentials);
 
     /**
      * Check if a $username exists.
