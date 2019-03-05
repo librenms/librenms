@@ -29,20 +29,24 @@ header('Content-type: application/json');
 $status    = 'error';
 $message   = 'unknown error';
 if (isset($_REQUEST['notification_id']) && isset($_REQUEST['action'])) {
-    if ($_REQUEST['action'] == 'read' && dbInsert(array('notifications_id'=>$_REQUEST['notification_id'],'user_id'=>LegacyAuth::id(),'key'=>'read','value'=>1), 'notifications_attribs')) {
+    if ($_REQUEST['action'] == 'read' && dbInsert(['notifications_id'=>$_REQUEST['notification_id'],'user_id'=>LegacyAuth::id(),'key'=>'read','value'=>1], 'notifications_attribs')) {
         $status  = 'ok';
         $message = 'Set as Read';
-    } elseif ((!LegacyAuth::user()->hasGlobalAdmin() || LegacyAuth::user()->isDemoUser()) && $_REQUEST['action'] == 'stick' && dbInsert(array('notifications_id'=>$_REQUEST['notification_id'],'user_id'=>LegacyAuth::id(),'key'=>'sticky','value'=>1), 'notifications_attribs')) {
-        $status  = 'ok';
-        $message = 'Set as Sticky';
-    } elseif ((!LegacyAuth::user()->hasGlobalAdmin() || LegacyAuth::user()->isDemoUser()) && $_REQUEST['action'] == 'unstick' && dbDelete('notifications_attribs', "notifications_id = ? && user_id = ? AND `key`='sticky'", array($_REQUEST['notification_id'],LegacyAuth::id()))) {
-        $status  = 'ok';
-        $message = 'Removed Sticky';
-    }
-} elseif ($_REQUEST['action'] == 'create' && (!LegacyAuth::user()->hasGlobalAdmin() || LegacyAuth::user()->isDemoUser()) && (isset($_REQUEST['title']) && isset($_REQUEST['body']))) {
-    if (dbInsert(array('title'=>$_REQUEST['title'],'body'=>$_REQUEST['body'],'checksum'=>hash('sha512', LegacyAuth::id().'.LOCAL.'.$_REQUEST['title']),'source'=>LegacyAuth::id()), 'notifications')) {
-        $status  = 'ok';
-        $message = 'Created';
+    } elseif (LegacyAuth::user()->hasGlobalAdmin()) {
+        if ($_REQUEST['action'] == 'stick' && dbInsert(['notifications_id'=>$_REQUEST['notification_id'],'user_id'=>LegacyAuth::id(),'key'=>'sticky','value'=>1], 'notifications_attribs')) {
+            $status  = 'ok';
+            $message = 'Set as Sticky';
+        } elseif ($_REQUEST['action'] == 'unstick' && dbDelete('notifications_attribs', "notifications_id = ? && user_id = ? AND `key`='sticky'", [$_REQUEST['notification_id'],LegacyAuth::id()])) {
+            $status  = 'ok';
+            $message = 'Removed Sticky';
+        } elseif ($_REQUEST['action'] == 'create' && (isset($_REQUEST['title']) && isset($_REQUEST['body']))) {
+            if (dbInsert(['title'=>$_REQUEST['title'],'body'=>$_REQUEST['body'],'checksum'=>hash('sha512', LegacyAuth::id().'.LOCAL.'.$_REQUEST['title']),'source'=>LegacyAuth::id()], 'notifications')) {
+                $status  = 'ok';
+                $message = 'Created';
+            }
+        }
+    } else {
+        $message = 'ERROR: Need to be GlobalAdmin or DemoUser';
     }
 } elseif (isset($_REQUEST['action']) && $_REQUEST['action'] == 'read-all-notif') {
     $unread = dbFetchColumn("SELECT `notifications_id` FROM `notifications` AS N WHERE NOT EXISTS ( SELECT 1 FROM `notifications_attribs` WHERE `notifications_id` = N.`notifications_id` AND `user_id`=? AND `key`='read' AND `value`=1)", array(LegacyAuth::id()));
