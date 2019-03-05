@@ -42,9 +42,9 @@ class SSOAuthorizer extends MysqlAuthorizer
     protected static $CAN_UPDATE_PASSWORDS = 0;
     protected static $AUTH_IS_EXTERNAL = 1;
 
-    public function authenticate($username, $password)
+    public function authenticate($credentials)
     {
-        if (empty($username)) {
+        if (empty($credentials['username'])) {
             throw new AuthenticationException('$config[\'sso\'][\'user_attr\'] was not found or was empty');
         }
 
@@ -57,10 +57,10 @@ class SSOAuthorizer extends MysqlAuthorizer
         $level = $this->authSSOCalculateLevel();
 
         // User has already been approved by the authenicator so if automatic user create/update is enabled, do it
-        if (Config::get('sso.create_users') && !$this->userExists($username)) {
-            $this->addUser($username, null, $level, $email, $realname, $can_modify_passwd, $description ? $description : 'SSO User');
-        } elseif (Config::get('sso.update_users') && $this->userExists($username)) {
-            $this->updateUser($this->getUserid($username), $realname, $level, $can_modify_passwd, $email);
+        if (Config::get('sso.create_users') && !$this->userExists($credentials['username'])) {
+            $this->addUser($credentials['username'], null, $level, $email, $realname, $can_modify_passwd, $description ? $description : 'SSO User');
+        } elseif (Config::get('sso.update_users') && $this->userExists($credentials['username'])) {
+            $this->updateUser($this->getUserid($credentials['username']), $realname, $level, $can_modify_passwd, $email);
         }
 
         return true;
