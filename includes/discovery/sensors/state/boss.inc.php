@@ -42,8 +42,9 @@ if ($device['os'] === 'boss') {
                 dbInsert($insert, 'state_translations');
         }
 
-        //Get power supply(4), temp(5), and fans(6) sensor only from walk
+        
         $ers_sensors = [];
+        //Get power supply(4), temp(5), and fans(6) sensor only from walk
         foreach ($oid as $key => $value) {
             if ($key['s5ChasComGrpIndx'] == 4 || $key['s5ChasComGrpIndx'] == 5 || $key['s5ChasComGrpIndx'] == 6) {
                 $ers_sensors[$key] = $value;
