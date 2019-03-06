@@ -50,7 +50,7 @@ if ($device['os'] === 'boss') {
             }
         }
         
-        //loop through and find power supplies
+        //loop through sensors
         $ps_num = 0;
         foreach ($ers_sensors as $index => $entry) {
             //Get unit number
