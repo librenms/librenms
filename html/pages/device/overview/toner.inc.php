@@ -53,8 +53,7 @@ foreach ($supplies as $type => $supply) {
             echo '<tr>
             <td class="col-md-4">' . overlib_link($link, $toner['toner_descr'], $overlib_content) . '</td>
             <td class="col-md-4">' . overlib_link($link, $minigraph, $overlib_content) . '</td>
-            <td class="col-md-4">' . overlib_link($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']),
-                    $overlib_content) . '
+            <td class="col-md-4">' . overlib_link($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']), $overlib_content) . '
            </a></td>
          </tr>';
         }//end foreach
