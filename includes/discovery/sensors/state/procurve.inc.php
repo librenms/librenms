@@ -24,32 +24,21 @@
  */
 
 foreach ($pre_cache['procurve_hpicfSensorTable'] as $index => $data) {
-    $status_name    = $data['hpicfSensorObjectId'];
-    $status_oid     = '.1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.';
-    $status_descr   = $data['hpicfSensorDescr'];
+    $state_name    = $data['hpicfSensorObjectId'];
+    $state_oid     = '.1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.';
+    $state_descr   = $data['hpicfSensorDescr'];
     $state          = $data['hpicfSensorStatus'];
-    $tmp_index      = $status_name . '.' . $index;
-    $state_index_id = create_state_index($status_name);
-    if ($state_index_id !== null) {
-        $states = array(
-            array($state_index_id, 'unknown', 0, 1, 3),
-            array($state_index_id, 'bad', 1, 2, 2),
-            array($state_index_id, 'warning', 1, 3, 1),
-            array($state_index_id, 'good', 1, 4, 0),
-            array($state_index_id, 'notPresent', 0, 5, 3),
-        );
+    $state_index      = $state_name . '.' . $index;
 
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
-    discover_sensor($valid['sensor'], 'state', $device, $status_oid . $index, $tmp_index, $status_name, $status_descr, '1', '1', null, null, null, null, $state);
-    create_sensor_to_state_index($device, $status_name, $tmp_index);
+    $states = [
+        ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+        ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'bad'],
+        ['value' => 3, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
+        ['value' => 4, 'generic' => 0, 'graph' => 1, 'descr' => 'good'],
+        ['value' => 5, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
+    ];
+    create_state_index($state_name, $states);
+
+    discover_sensor($valid['sensor'], 'state', $device, $state_oid . $index, $state_index, $state_name, $state_descr, '1', '1', null, null, null, null, $state);
+    create_sensor_to_state_index($device, $state_name, $state_index);
 }

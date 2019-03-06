@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$lib_data = snmpwalk_cache_oid($device, 'lgpEnvHumidityEntryRel', array(), 'LIEBERT-GP-ENVIRONMENTAL-MIB');
+$lib_data = snmpwalk_cache_oid($device, 'lgpEnvHumidityEntryRel', [], 'LIEBERT-GP-ENVIRONMENTAL-MIB');
 
 foreach ($lib_data as $index => $data) {
     if (is_numeric($data['lgpEnvHumidityMeasurementRelTenths'])) {

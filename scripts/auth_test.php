@@ -101,7 +101,7 @@ try {
     echo PHP_EOL;
 
     echo "Authenticate user $test_username: \n";
-    $auth = $authorizer->authenticate($test_username, $test_password);
+    $auth = $authorizer->authenticate(['username' => $test_username, 'password' => $test_password]);
     unset($test_password);
 
     if ($auth) {

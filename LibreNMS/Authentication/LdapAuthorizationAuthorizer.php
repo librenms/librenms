@@ -76,9 +76,9 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         }
     }
 
-    public function authenticate($username, $password)
+    public function authenticate($credentials)
     {
-        if ($this->userExists($username)) {
+        if (isset($credentials['username']) && $this->userExists($credentials['username'])) {
             return true;
         }
 

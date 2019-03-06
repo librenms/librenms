@@ -3,7 +3,7 @@
 echo 'XUPS-MIB ';
 
 // XUPS-MIB::xupsBatVoltage.0 = INTEGER: 51
-$oids = snmpwalk_cache_oid($device, 'xupsBatVoltage', array(), 'XUPS-MIB');
+$oids = snmpwalk_cache_oid($device, 'xupsBatVoltage', [], 'XUPS-MIB');
 
 foreach ($oids as $volt_id => $data) {
     $volt_oid         = ".1.3.6.1.4.1.534.1.2.2.$volt_id";
@@ -17,7 +17,7 @@ foreach ($oids as $volt_id => $data) {
 }
 
 // XUPS-MIB::xupsInputVoltage.1 = INTEGER: 228
-$oids = snmpwalk_cache_oid($device, 'xupsInputVoltage', array(), 'XUPS-MIB');
+$oids = snmpwalk_cache_oid($device, 'xupsInputVoltage', [], 'XUPS-MIB');
 
 foreach ($oids as $volt_id => $data) {
     $volt_oid = ".1.3.6.1.4.1.534.1.3.4.1.2.$volt_id";
@@ -34,7 +34,7 @@ foreach ($oids as $volt_id => $data) {
 }
 
 // XUPS-MIB::xupsOutputVoltage.1 = INTEGER: 228
-$oids = snmpwalk_cache_oid($device, 'xupsOutputVoltage', array(), 'XUPS-MIB');
+$oids = snmpwalk_cache_oid($device, 'xupsOutputVoltage', [], 'XUPS-MIB');
 
 foreach ($oids as $volt_id => $data) {
     $volt_oid = ".1.3.6.1.4.1.534.1.4.4.1.2.$volt_id";
@@ -52,7 +52,7 @@ foreach ($oids as $volt_id => $data) {
 }
 
 // XUPS-MIB::xupsBypassNumPhases.0 = INTEGER: 1
-$oids = snmpwalk_cache_oid($device, 'xupsBypassVoltage', array(), 'XUPS-MIB');
+$oids = snmpwalk_cache_oid($device, 'xupsBypassVoltage', [], 'XUPS-MIB');
 
 foreach ($oids as $volt_id => $data) {
     $volt_oid = ".1.3.6.1.4.1.534.1.5.3.1.2.$volt_id";

@@ -19,6 +19,10 @@ if ($device['os'] == 'moxa-etherdevice') {
         $mibmod = 'MOXA-IKS6726A-MIB';
     } elseif ($device['sysDescr'] == 'EDS-G508E-T') {
         $mibmod = 'MOXA-EDSG508E-MIB';
+    } elseif ($device['sysDescr'] == 'EDS-P510A-8PoE-2GTXSFP-T') {
+        $mibmod = 'MOXA-EDSP510A8POE-MIB';
+    } elseif ($device['sysDescr'] == 'EDS-G512E-8PoE-T') {
+        $mibmod = 'MOXA-EDSG512E8POE-MIB';
     }
 
     $mem_res = snmp_get_multi_oid($device, ['totalMemory.0', 'freeMemory.0'], '-OQUs', $mibmod);

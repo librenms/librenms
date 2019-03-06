@@ -27,6 +27,7 @@ namespace LibreNMS;
 
 use App\Models\GraphType;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
 
 class Config
@@ -128,6 +129,18 @@ class Config
         }
 
         return $curr;
+    }
+
+    /**
+     * Unset a config setting
+     * or multiple
+     *
+     * @param string|array $key
+     */
+    public static function forget($key)
+    {
+        global $config;
+        Arr::forget($config, $key);
     }
 
     /**

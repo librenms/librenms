@@ -21,32 +21,18 @@
 // ******************************************
 
     // Define Sensors
-    $sensors_adva = array
-                (
-                array(
-                        'sensor_name'     => 'psuOutputVoltage',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.6'),
-                array(
-                        'sensor_name'     => 'nemiVoltage',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.7.1.5'),
-                array(
-                        'sensor_name'     => 'ethernetNTEGE114CardVoltage',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.5'),
-                array(
-                        'sensor_name'     => 'ethernetNTEGE114SCardVoltage',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.5'),
-                array(
-                        'sensor_name'     => 'ethernetNTEXG210CardVoltage',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.5'),
-                array(
-                        'sensor_name'     => 'ethernetGE8SCCCardVoltage',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.41.1.5'),
-                array(
-                        'sensor_name'     => 'ethernetXG1XCCCardVoltage',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.5'));
+    $sensors_adva = [
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.6', 'sensor_name' => 'psuOutputVoltage'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.7.1.5', 'sensor_name' => 'nemiVoltage'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.5', 'sensor_name' => 'ethernetNTEGE114CardVoltage'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.5', 'sensor_name' => 'ethernetNTEGE114SCardVoltage'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.5', 'sensor_name' => 'ethernetNTEXG210CardVoltage'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.41.1.5', 'sensor_name' => 'ethernetGE8SCCCardVoltage'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.5', 'sensor_name' => 'ethernetXG1XCCCardVoltage'],
+    ];
 
-                $multiplier = 1;
-                $divisor    = 1000;
+    $multiplier = 1;
+    $divisor    = 1000;
 
     foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
         foreach ($sensors_adva as $entry) {

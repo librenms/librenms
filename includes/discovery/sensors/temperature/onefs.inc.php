@@ -24,7 +24,7 @@
  */
 
 echo 'OneFS: ';
-$oids = snmpwalk_cache_multi_oid($device, 'tempSensorTable', array(), 'ISILON-MIB');
+$oids = snmpwalk_cache_multi_oid($device, 'tempSensorTable', [], 'ISILON-MIB');
 
 foreach ($oids as $index => $entry) {
     if (is_numeric($entry['tempSensorValue']) && is_numeric($index)) {

@@ -9,12 +9,12 @@ if (is_numeric($state)) {
     $state_name = 'upsBatteryStatusState';
     create_state_index(
         $state_name,
-        array(
-            array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'),
-            array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'),
-            array('value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'Low'),
-            array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'Depleted'),
-        )
+        [
+            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
+            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'],
+            ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'Low'],
+            ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'Depleted'],
+        ]
     );
 
     $sensor_index = 0;
@@ -48,15 +48,15 @@ if (is_numeric($state)) {
     $state_name = 'upsOutputSourceState';
     create_state_index(
         $state_name,
-        array(
-            array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Other'),
-            array('value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'None'),
-            array('value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'),
-            array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'Bypass'),
-            array('value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Battery'),
-            array('value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'Booster'),
-            array('value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'Reducer'),
-        )
+        [
+            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Other'],
+            ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'None'],
+            ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'],
+            ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'Bypass'],
+            ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Battery'],
+            ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'Booster'],
+            ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'Reducer'],
+        ]
     );
 
     $sensor_index = 0;
