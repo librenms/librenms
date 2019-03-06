@@ -313,7 +313,7 @@ if ($device['os'] == 'timos') {
 }
 
 if ($device['os'] == 'junos') {
-    require_once 'ports/junos-vcp.inc.php';
+    require 'ports/junos-vcp.inc.php';
 }
 
 if ($config['enable_ports_adsl']) {
