@@ -15,12 +15,3 @@ discovery:
       snmpget:
         oid: .1.3.6.1.4.1.9193.1.0
         value: '2.000000'
-          
-#poller_modules:
-#    ports: false
-#discovery_modules:
-#    ports: false
-#bad_if:
-#    - 'LAG Interface Link'
-#    - 'Bridge'
-#    - 'VlanPort'
