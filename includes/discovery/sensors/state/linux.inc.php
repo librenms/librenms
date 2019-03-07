@@ -29,25 +29,13 @@ if (!empty($pre_cache['raspberry_pi_sensors'])) {
         }
         $value = current($pre_cache['raspberry_pi_sensors']["raspberry." . $codec]);
         if (stripos($value, 'abled') !== false) {
-            $state_index_id = create_state_index($state);
-            if ($state_index_id) {
-                $states = [
-                    [$state_index_id, 'enabled', 1, 2, 0],
-                    [$state_index_id, 'disabled', 1, 3, 2],
-                ];
-            }
+            $states = [
+                ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'enabled'],
+                ['value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'disabled'],
+            ];
+            create_state_index($state_name, $states);
 
-            foreach ($states as $value) {
-                $insert = [
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                ];
-                dbInsert($insert, 'state_translations');
-            }
-            discover_sensor($valid['sensor'], 'state', $device, $oid . $codec, $codec, $state, $descr, '1', '1', null, null, null, null, $value, 'snmp', $codec);
+            discover_sensor($valid['sensor'], 'state', $device, $oid . $codec, $codec, $state, $descr, 1, 1, null, null, null, null, $value, 'snmp', $codec);
             create_sensor_to_state_index($device, $state, $codec);
         } else {
             break;

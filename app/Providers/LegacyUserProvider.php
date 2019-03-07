@@ -62,7 +62,7 @@ class LegacyUserProvider implements UserProvider
         $legacy_user = LegacyAuth::get()->getUser($identifier);
         error_reporting(-1);
 
-        return $this->fetchUserByName($legacy_user['username']);
+        return $this->retrieveByCredentials(['username' => $legacy_user['username']]);
     }
 
     /**
@@ -108,17 +108,6 @@ class LegacyUserProvider implements UserProvider
     }
 
     /**
-     * Retrieve a user by the given credentials.
-     *
-     * @param  array $credentials
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
-     */
-    public function retrieveByCredentials(array $credentials)
-    {
-        return $this->fetchUserByName($credentials['username'], $credentials['password']);
-    }
-
-    /**
      * Validate a user against the given credentials.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable $user
@@ -133,16 +122,11 @@ class LegacyUserProvider implements UserProvider
 
         try {
             // try authentication methods
-            // collect username and password
-            $password = null;
-            if (isset($credentials['username']) && isset($credentials['password'])) {
-                $username = $credentials['username'];
-                $password = $credentials['password'];
-            } elseif ($authorizer->authIsExternal()) {
-                $username = $authorizer->getExternalUsername();
+            if ($authorizer->authIsExternal()) {
+                $credentials['username'] = $authorizer->getExternalUsername();
             }
 
-            if (!isset($username) || !$authorizer->authenticate($username, $password)) {
+            if (empty($credentials['username']) || !$authorizer->authenticate($credentials)) {
                 throw new AuthenticationException('Invalid Credentials');
             }
 
@@ -168,13 +152,12 @@ class LegacyUserProvider implements UserProvider
     }
 
     /**
-     * Fetch user by username from legacy auth, update it or add it to the db then return it.
+     * Retrieve a user by the given credentials.
      *
-     * @param string $username
-     * @param string $password
-     * @return User|null
+     * @param  array $credentials
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    protected function fetchUserByName($username, $password = null)
+    public function retrieveByCredentials(array $credentials)
     {
         error_reporting(0);
 
@@ -183,9 +166,10 @@ class LegacyUserProvider implements UserProvider
 
         // ldap based auth we should bind before using, otherwise searches may fail due to anonymous bind
         if (method_exists($auth, 'bind')) {
-            $auth->bind($username, $password);
+            $auth->bind($credentials);
         }
 
+        $username = $credentials['username'] ?? null;
         $auth_id = $auth->getUserid($username);
         $new_user = $auth->getUser($auth_id);
 
@@ -196,7 +180,7 @@ class LegacyUserProvider implements UserProvider
             try {
                 error_reporting(0);
 
-                $auth->authenticate($username, $password);
+                $auth->authenticate($credentials);
                 $auth_id = $auth->getUserid($username);
                 $new_user = $auth->getUser($auth_id);
 

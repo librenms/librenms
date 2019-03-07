@@ -1,0 +1,1286 @@
+TIMETRA-TC-MG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, MODULE-IDENTITY, Unsigned32
+                                                         FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+                                                         FROM SNMPv2-TC
+    TNamedItem, TNamedItemOrEmpty,
+    timetraTCMIBModule
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraTCMGMIBModule             MODULE-IDENTITY
+    LAST-UPDATED "201701010000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module for the SNMP Textual Conventions
+         (TCs) used in the Nokia SROS manageability instrumentation.
+
+         Copyright 2003-2017 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied `as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201701010000Z"
+    DESCRIPTION
+        "Rev 15.0               01 Jan 2017 00:00
+         15.0 release of the TIMETRA-TC-MG-MIB."
+
+    REVISION    "201311080000Z"
+    DESCRIPTION
+        "Rev 1.0                08 Nov 2013 00:00
+         1.0 Release of the TIMETRA-TC-MG-MIB."
+
+    ::= { timetraTCMIBModule 1 }
+
+TmnxMobProfName                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobProfName describes the name of a profile used by
+         mobile gateways."
+    SYNTAX      TNamedItem
+
+TmnxMobProfNameOrEmpty           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobProfNameOrEmpty describes the name of a profile
+         used by mobile gateways."
+    SYNTAX      TNamedItemOrEmpty
+
+TmnxMobProfIpTtl                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobProfIpTtl describes the Time-To-Live (TTL) value."
+    SYNTAX      Unsigned32 (1..255)
+
+TmnxMobProfMsgReTxTimeout        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobProfMsgReTxTimeout describes the message
+         retransmit timeout value in seconds."
+    SYNTAX      Unsigned32 (1..30)
+
+TmnxMobProfMsgReTxRetryCount     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobProfMsgReTxRetryCount describes the message
+         retransmit retry count value."
+    SYNTAX      Unsigned32 (1..8)
+
+TmnxMobProfKeepAliveTimeout      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobProfKeepAliveTimeout describes the keep-alive
+         timeout value in seconds."
+    SYNTAX      Unsigned32 (0 | 60..180)
+
+TmnxMobProfKeepAliveRetryCount   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobProfKeepAliveRetryCount describes the keep-alive
+         retry count value."
+    SYNTAX      Unsigned32 (1..15)
+
+TmnxMobProfKeepAliveResponse     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobProfKeepAliveResponse describes the keep-alive T3
+         response value in seconds."
+    SYNTAX      Unsigned32 (1..20)
+
+TmnxMobProfKeepAliveInterval     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobProfKeepAliveInterval describes the intervals
+         between heartbeat messages"
+    SYNTAX      Unsigned32 (0 | 60..180)
+
+TmnxMobDiaTransTimer             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobDiaTransTimer describes the diameter peer
+         transaction timer value in seconds."
+    SYNTAX      Unsigned32 (1..180)
+
+TmnxMobDiaRetryCount             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobDiaRetryCount describes the diameter peer retry
+         count value."
+    SYNTAX      Unsigned32 (0..8)
+
+TmnxMobDiaPeerHost               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobDiaPeerHost describes the name of a destination
+         realm, originating realm and originating host."
+    SYNTAX      DisplayString (SIZE (0..80))
+
+TmnxMobGwId                      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobGwId identifies mobile gateways."
+    SYNTAX      Unsigned32 (1..8)
+
+TmnxMobNode                      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobNode describes the name of a mobile gateway which
+         consists of Mobile Country Code (MCC), Mobile Network Code (MNC),
+         Region string, Group Id, Node Id.
+
+         A mobile gateway name can be described as follows:
+
+         <MCC>.<MNC>.<SGW|PGW>.<Region String>.<Group Id>.<Node Id>
+
+         MCC : 3 digits (000-999)
+         MNC : 2 or 3 digits
+         Application Type : SGW or PGW (3 characters)
+         Region String : 10 characters
+         Group Id : 3 characters
+         Node Id : 3 characters"
+    SYNTAX      DisplayString (SIZE (0..30))
+
+TmnxMobBufferLimit               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobBufferLimit describes the buffer limit in bytes."
+    SYNTAX      Unsigned32 (1000..12000)
+
+TmnxMobQueueLimit                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobQueueLimit describes the queue limit in bytes."
+    SYNTAX      Unsigned32 (1000..12000)
+
+TmnxMobRtrAdvtInterval           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobRtrAdvtInterval describes the router
+         advertisement interval in minutes."
+    SYNTAX      Unsigned32 (1..60)
+
+TmnxMobRtrAdvtLifeTime           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobRtrAdvtLifeTime describes the router
+         advertisement life time in hours."
+    SYNTAX      Unsigned32 (1..24)
+
+TmnxMobAddrScheme                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobAddrScheme describes the addressing scheme. If
+         the value is set to 'stateful', User Equipment (UE) uses DHCPv6 to get
+         IPv6 address. If the value is set to 'stateless', UE uses ICMPv6 to
+         get IPv6 address."
+    SYNTAX      INTEGER {
+        stateful  (1),
+        stateless (2)
+    }
+
+TmnxMobQciValue                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobQciValue describes the QoS Class Identifier (QCI)
+         value."
+    SYNTAX      Unsigned32 (1..9)
+
+TmnxMobQciValueOrZero            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobQciValueOrZero describes the QoS Class Identifier
+         (QCI) value."
+    SYNTAX      Unsigned32 (0..9)
+
+TmnxMobArpValue                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobArpValue describes the Allocation and Retention
+         Priority (ARP) value."
+    SYNTAX      Unsigned32 (1..15)
+
+TmnxMobArpValueOrZero            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobArpValueOrZero describes the Allocation and
+         Retention Priority (ARP) value."
+    SYNTAX      Unsigned32 (0..15)
+
+TmnxMobApn                       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobApn describes the Access Point Name (APN)
+         associated with an User Equipment (UE)."
+    REFERENCE
+        "3GPP TS 23.003 Section 9.1"
+    SYNTAX      DisplayString (SIZE (1..100))
+
+TmnxMobApnOrZero                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobApnOrZero describes the Access Point Name (APN)
+         associated with an User Equipment (UE)."
+    SYNTAX      DisplayString (SIZE (0..100))
+
+TmnxMobApnDomainName             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobApnDomainName holds a DNS Domain Name derived
+         from an Access Point Name (APN).
+
+         The maximum size is arbitrarily chosen in order to be large enough to
+         hold a Network Identifier of length 63, and small enough to be used as
+         index in a table."
+    SYNTAX      DisplayString (SIZE (1..108))
+
+TmnxMobImsi                      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobImsi describes the International Mobile
+         Subscriber Identity (IMSI) of an User Equipment (UE).
+
+         IMSI is defined as a number consisting of up to 15 BCD digits. The
+         first 3 digits are the Mobile Country Code (MCC). The next 2 or 3
+         digits are the Mobile Network Code (MNC). The value of MCC determines
+         whether the MNC is 2 digits or 3 digits. The remaining digits are the
+         Mobile Subscriber Identification Number (MSIN). The internal
+         representation of the IMSI is as follows:
+
+         Bits 63-62 are reserved.
+
+         Bits 61-60 indicate the length of the MNC field: 10 indicates a
+         2-digit MNC while 11 indicates a 3-digit MNC.
+
+         Bits 59-0 hold the 15 IMSI BCD digits D1-15.
+
+         When the total number of digits in the IMSI is less than 15, the
+         nibble 0xf is used a filler.
+
+
+         IMSI encoding for a 2-digit MNC:
+
+         63          55         47          39                         0
+
+         +-----------+-----------+-----------+-------------------------+
+
+         | 0010| MCC1| MCC2| MCC3| MNC1| MNC2| MSIN (up to 10 digits)
+
+         +-----------+-----------+-----------+-------------------------+
+
+
+         IMSI encoding for a 3-digit MNC:
+
+         63          55         47          39     35                  0
+
+         +-----------+-----------+-----------+-------------------------+
+
+         | 0011| MCC1| MCC2| MCC3| MNC1| MNC2| MNC3| MSIN (up to 9 digits)
+
+         +-----------+-----------+-----------+-------------------------+
+
+         Bits 63-56 of the IMSI are carried in octet number 1 of the octet
+         string and bits 7-0 are carried in octet number 8 of the octet string."
+    SYNTAX      OCTET STRING (SIZE (8))
+
+TmnxMobMsisdn                    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobMsisdn describes the Mobile Subscriber Integrated
+         Services Digital Network (MSISDN) number of an User Equipment (UE)."
+    SYNTAX      DisplayString (SIZE (0..15))
+
+TmnxMobImei                      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobImei describes the International Mobile Equipment
+         Identity (IMEI) of an User Equipment (UE)."
+    SYNTAX      DisplayString (SIZE (0|16))
+
+TmnxMobNai                       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobNai describes the Network Address Identifier
+         (NAI) of an User Equipment (UE)."
+    SYNTAX      DisplayString (SIZE (0..72))
+
+TmnxMobMcc                       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobMcc describes the Mobile Country Code (MCC) of an
+         User Equipment (UE)."
+    SYNTAX      DisplayString (SIZE (3))
+
+TmnxMobMnc                       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobMnc describes the Mobile Network Code (MNC) of an
+         User Equipment (UE)."
+    SYNTAX      DisplayString (SIZE (2|3))
+
+TmnxMobMccOrEmpty                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobMccOrEmpty describes the Mobile Country Code
+         (MCC) of an User Equipment (UE)."
+    SYNTAX      DisplayString (SIZE (0|3))
+
+TmnxMobMncOrEmpty                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobMncOrEmpty describes the Mobile Network Code
+         (MNC) of an User Equipment (UE)."
+    SYNTAX      DisplayString (SIZE (0|2|3))
+
+TmnxMobUeState                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobUeState describes the state of an User Equipment
+         (UE)."
+    SYNTAX      INTEGER {
+        idle    (1),
+        active  (2),
+        paging  (3),
+        init    (4),
+        suspend (5),
+        ddnDamp (6)
+    }
+
+TmnxMobUeRat                     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobUeRat describes the Radio Access Type (RAT) of an
+         User Equipment (UE)."
+    SYNTAX      INTEGER {
+        utran   (1),
+        geran   (2),
+        wlan    (3),
+        gan     (4),
+        hspa    (5),
+        eutran  (6),
+        ehrpd   (7),
+        hrpd    (8),
+        oneXrtt (9),
+        umb     (10)
+    }
+
+TmnxMobUeSubType                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobUeSubType describes the subscription type of User
+         Equipment (UE)."
+    SYNTAX      INTEGER {
+        homer   (1),
+        roamer  (2),
+        visitor (3)
+    }
+
+TmnxMobPdnType                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobPdnType describes the type of a Packet Data
+         Network (PDN)."
+    SYNTAX      INTEGER {
+        ipv4   (1),
+        ipv6   (2),
+        ipv4v6 (3)
+    }
+
+TmnxMobPgwSigProtocol            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobPgwSigProtocol describes the signaling protocol
+         used on S5 or S8 reference point."
+    SYNTAX      INTEGER {
+        gtp  (1),
+        pmip (2)
+    }
+
+TmnxMobPdnSessionState           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobPdnSessionState describes the feedback signaling
+         message (FSM) state of a Packet Data Network (PDN) session."
+    SYNTAX      INTEGER {
+        invalid          (0),
+        init             (1),
+        waitPcrfResponse (2),
+        waitPgwResponse  (3),
+        waitEnodebUpdate (4),
+        connected        (5),
+        ulDelPending     (6),
+        dlDelPending     (7),
+        idleMode         (8),
+        pageMode         (9),
+        dlHandover       (10),
+        incomingHandover (11),
+        outgoingHandover (12),
+        stateMax         (13)
+    }
+
+TmnxMobPdnSessionEvent           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobPdnSessionEvent describes the feedback signaling
+         message (FSM) event of a Packet Data Network (PDN) session."
+    SYNTAX      INTEGER {
+        sessionInvalid            (0),
+        gtpCreateSessReq          (1),
+        gtpUpdateBearerReq        (2),
+        gtpDeleteSessReq          (3),
+        gtpDeleteBearerResp       (4),
+        gtpUpdateBearerResp       (5),
+        gtpModifyActiveToIdle     (6),
+        gtpResrcAllocCmd          (7),
+        gtpModifyQosCmd           (8),
+        gtpX1eNodeBTeidUpdate     (9),
+        gtpX2SrcSgwDeleteSessReq  (10),
+        gtpS1CreateIndirectTunnel (11),
+        dlPktRecvIndication       (12),
+        dlPktNotificationAck      (13),
+        dlPktNotificationFail     (14),
+        pcrfSessEstResp           (15),
+        pcrfSessTerminateRsp      (16),
+        pcrfProvQosRules          (17),
+        pmipSessResp              (18),
+        pmipSessUpdate            (19),
+        pmipSessDeleteRsp         (20),
+        pmipSessDeleteReq         (21),
+        eventMax                  (22)
+    }
+
+TmnxMobBearerId                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobBearerId describes the bearer identifier."
+    SYNTAX      Unsigned32 (1..15)
+
+TmnxMobBearerType                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobBearerType describes the type of a bearer."
+    SYNTAX      INTEGER {
+        default   (1),
+        dedicated (2)
+    }
+
+TmnxMobQci                       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobQci describes the QoS Class Identifier."
+    SYNTAX      Unsigned32 (0..9)
+
+TmnxMobArp                       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobArp describes the QoS parameter, Allocation and
+         Retention Priority (ARP)."
+    SYNTAX      Unsigned32 (0..15)
+
+TmnxMobSdf                       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobSdf describes the number of Service Data Flows
+         (SDFs)."
+    SYNTAX      Unsigned32 (0..255)
+
+TmnxMobSdfFilter                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobSdfFilter describes a IP filter in a Service Data
+         Flow (SDF) or Traffic Flow Template (TFT)."
+    SYNTAX      Unsigned32 (0..16)
+
+TmnxMobSdfFilterNum              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobSdfFilterNum describes the number of IP filters."
+    SYNTAX      Unsigned32 (0..16)
+
+TmnxMobSdfRuleName               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobSdfRuleName describes the policy rule name of a
+         Service Data Flow (SDF)."
+    SYNTAX      DisplayString (SIZE (1..64))
+
+TmnxMobSdfFilterDirection        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobSdfFilterDirection describes the direction on
+         which a Service Data Flow (SDF) filter rule is valid."
+    SYNTAX      INTEGER {
+        preRel7  (0),
+        downLink (1),
+        upLink   (2),
+        biDir    (3)
+    }
+
+TmnxMobSdfFilterProtocol         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobSdfFilterProtocol describes IPv4 protocol or IPv6
+         next header on which Service Data Flow (SDF) filter matches."
+    SYNTAX      INTEGER {
+        any            (-1),
+        ipv6HopByOpOpt (0),
+        icmp           (1),
+        igmp           (2),
+        ggp            (3),
+        ip             (4),
+        st             (5),
+        tcp            (6),
+        cbt            (7),
+        egp            (8),
+        igp            (9),
+        bbnRccMon      (10),
+        nvp2           (11),
+        pup            (12),
+        argus          (13),
+        emcon          (14),
+        xnet           (15),
+        chaos          (16),
+        udp            (17),
+        mux            (18),
+        dcnMeas        (19),
+        hmp            (20),
+        prm            (21),
+        xnsIdp         (22),
+        trunk1         (23),
+        trunk2         (24),
+        leaf1          (25),
+        leaf2          (26),
+        rdp            (27),
+        irdp           (28),
+        isoTp4         (29),
+        netblt         (30),
+        mfeNsp         (31),
+        meritInp       (32),
+        dccp           (33),
+        pc3            (34),
+        idpr           (35),
+        xtp            (36),
+        ddp            (37),
+        idprCmtp       (38),
+        tpplusplus     (39),
+        il             (40),
+        ipv6           (41),
+        sdrp           (42),
+        ipv6Route      (43),
+        ipv6Frag       (44),
+        idrp           (45),
+        rsvp           (46),
+        gre            (47),
+        dsr            (48),
+        bna            (49),
+        esp            (50),
+        ah             (51),
+        iNlsp          (52),
+        swipe          (53),
+        narp           (54),
+        mobile         (55),
+        tlsp           (56),
+        skip           (57),
+        ipv6Icmp       (58),
+        ipv6NoNxt      (59),
+        ipv6Opts       (60),
+        anyHostIntl    (61),
+        cftp           (62),
+        anyLocalNet    (63),
+        satExpak       (64),
+        kryptolan      (65),
+        rvd            (66),
+        ippc           (67),
+        anyDFS         (68),
+        satMon         (69),
+        visa           (70),
+        ipcv           (71),
+        cpnx           (72),
+        cphb           (73),
+        wsn            (74),
+        pvp            (75),
+        brSatMon       (76),
+        sunNd          (77),
+        wbMon          (78),
+        wbExpak        (79),
+        isoIp          (80),
+        vmtp           (81),
+        secureVmpt     (82),
+        vines          (83),
+        ttp            (84),
+        nsfnetIgp      (85),
+        dgp            (86),
+        tcf            (87),
+        eiGrp          (88),
+        ospfIgp        (89),
+        spriteRpc      (90),
+        larp           (91),
+        mtp            (92),
+        ax25           (93),
+        ipip           (94),
+        micp           (95),
+        sccSp          (96),
+        etherIp        (97),
+        encap          (98),
+        anyPEC         (99),
+        gmtp           (100),
+        ifmp           (101),
+        pnni           (102),
+        pim            (103),
+        aris           (104),
+        scps           (105),
+        qnx            (106),
+        activeNet      (107),
+        ipComp         (108),
+        snp            (109),
+        compaqPeer     (110),
+        ipxInIp        (111),
+        vrrp           (112),
+        pgm            (113),
+        any0hop        (114),
+        l2tp           (115),
+        ddx            (116),
+        iatp           (117),
+        stp            (118),
+        srp            (119),
+        uti            (120),
+        smp            (121),
+        sm             (122),
+        ptp            (123),
+        isis           (124),
+        fire           (125),
+        crtp           (126),
+        crudp          (127),
+        sscopmce       (128),
+        iplt           (129),
+        sps            (130),
+        pipe           (131),
+        sctp           (132),
+        fc             (133),
+        rsvpE2eIgnore  (134),
+        mobHeader      (135),
+        udpLite        (136),
+        mplsInIp       (137),
+        manet          (138),
+        hip            (139),
+        shim6          (140)
+    }
+
+TmnxMobPathMgmtState             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobPathMgmtState describes the state of a path for a
+         reference point. A value of 'reqTimeOut' indicates that the peer is
+         not replying to the Echo Request messages the SGW is sending out."
+    SYNTAX      INTEGER {
+        disabled   (0),
+        up         (1),
+        reqTimeOut (2),
+        fault      (3),
+        idle       (4),
+        restart    (5)
+    }
+
+TmnxMobDiaPathMgmtState          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobDiaPathMgmtState describes the state of a path
+         for a diameter connection."
+    SYNTAX      INTEGER {
+        shutDown     (0),
+        shuttingDown (1),
+        inactive     (2),
+        active       (3)
+    }
+
+TmnxMobDiaDetailPathMgmtState    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobDiaDetailPathMgmtState describes the detail state
+         of a path for a diameter connection."
+    SYNTAX      INTEGER {
+        error           (0),
+        idle            (1),
+        closed          (2),
+        localShutdown   (3),
+        remoteClosing   (4),
+        waitConnAck     (5),
+        waitCea         (6),
+        open            (7),
+        openCoolingDown (8),
+        waitDns         (9)
+    }
+
+TmnxMobGwType                    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobGwType describes the mobile gateway type."
+    SYNTAX      INTEGER {
+        sgw    (1),
+        pgw    (2),
+        wlanGw (3)
+    }
+
+TmnxMobChargingProfile           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobChargingProfile describes the charging trigger
+         rules applied for generating Charging Data Records (CDR) for
+         subscribers."
+    SYNTAX      Unsigned32 (0..255)
+
+TmnxMobChargingProfileOrInherit  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobChargingProfileOrInherit describes the charging
+         trigger rules applied for generating Charging Data Records (CDR) for
+         subscribers. A value of '-1' indicates that identifier will be
+         inherited from another object that is usually in another mib table."
+    SYNTAX      Integer32 (-1 | 0..255)
+
+TmnxMobAuthType                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobAuthType describes the authentication type used
+         by mobile gateways."
+    SYNTAX      INTEGER {
+        radius   (1),
+        diameter (2)
+    }
+
+TmnxMobAuthUserName              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobAuthUserName describes the user name used in
+         authentication requests by mobile gateways."
+    SYNTAX      INTEGER {
+        imsi   (1),
+        msisdn (2),
+        pco    (3)
+    }
+
+TmnxMobProfGbrRate               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobProfGbrRate describes the Guaranteed Bit Rate
+         (GBR) value in kilobits per second(kbps)."
+    SYNTAX      Unsigned32 (0..100000)
+
+TmnxMobProfMbrRate               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobProfMbrRate describes the Maximum Bit Rate (MBR)
+         value in kilobits per second(kbps)."
+    SYNTAX      Unsigned32 (0..100000)
+
+TmnxMobPeerType                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobPeerType describes the type of the mobile gateway
+         peer as Serving Gateway (SGW), Packet Data Network Gateway (PGW) or
+         High Rate Packet Data (HRPD) Serving Gateway (HSGW)."
+    SYNTAX      INTEGER {
+        sgw  (1),
+        pgw  (2),
+        hsgw (3)
+    }
+
+TmnxMobRfAcctLevel               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxMobRfAcctLevel data type is an enumerated integer that describes
+         the accounting level."
+    SYNTAX      INTEGER {
+        pdnLevel (1),
+        qciLevel (2)
+    }
+
+TmnxMobProfPolReportingLevel     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxMobProfPolReportingLevel data type is an enumerated integer that
+         describes the Reporting level for the Policy and Charging Control
+         (PCC) rule."
+    SYNTAX      INTEGER {
+        servId    (1),
+        ratingGrp (2)
+    }
+
+TmnxMobProfPolChargingMethod     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxMobProfPolChargingMethod data type is an enumerated integer that
+         describes the Charging Method for the Policy and Charging Control
+         (PCC) rule. A variable of this type could be set to 'online' charging
+         method, 'offline' charging method or 'both'.
+
+         If the variable is set to 'profChargingMtd' the charging method is set
+         to 'offline' if 'tmnxMobProfPgwChrgOffLineState' is set to 'enabled',
+         the charging method is set to 'online' if 'tmnxMobProfPgwChrgGyState'
+         is set to 'enabled' and the charging method is set to 'both' if both
+         'tmnxMobProfPgwChrgOffLineState' and 'tmnxMobProfPgwChrgGyState' are
+         set to 'enabled'."
+    SYNTAX      INTEGER {
+        profChargingMtd (0),
+        online          (1),
+        offline         (2),
+        both            (3)
+    }
+
+TmnxMobProfPolMeteringMethod     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxMobProfPolMeteringMethod data type is an enumerated integer that
+         describes the Metering Method for the Policy and Charging Control
+         (PCC) rule."
+    SYNTAX      INTEGER {
+        timeBased (1),
+        volBased  (2),
+        both      (3)
+    }
+
+TmnxMobServerState               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobServerState describes the state of a server
+         connected with a mobile gateway."
+    SYNTAX      INTEGER {
+        na   (0),
+        up   (1),
+        down (2)
+    }
+
+TmnxMobChargingBearerType        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobChargingBearerType describes the type of a bearer
+         context used in charging applications."
+    SYNTAX      INTEGER {
+        home     (1),
+        visiting (2),
+        roaming  (3)
+    }
+
+TmnxMobChargingLevel             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobChargingLevel describes the level where the
+         charging is done."
+    SYNTAX      INTEGER {
+        pdn    (1),
+        bearer (2)
+    }
+
+TmnxMobIpCanType                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobIpCanType describes the type of Internet Protocol
+         Connectivity Access Network (IP-CAN) session as Evolved Packet Core
+         (epc3gpp) or GPRS (gprs3gpp)."
+    SYNTAX      INTEGER {
+        epc3gpp  (1),
+        gprs3gpp (2)
+    }
+
+TmnxMobStaticPolPrecedence       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobStaticPolPrecedence describes the precedence
+         value for a static policy configured in the system."
+    SYNTAX      Unsigned32 (1..65536)
+
+TmnxMobStaticPolPrecedenceOrZero ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobStaticPolPrecedence describes the precedence
+         value for a static policy configured in the system."
+    SYNTAX      Unsigned32 (0..65535)
+
+TmnxMobDualStackPref             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobDualStackPref describes the preference in a dual
+         IP stack.
+
+         The value 'useCplane' specifies that the value is inherited from the
+         preference in a dual IP stack on control plane."
+    SYNTAX      INTEGER {
+        ipv4      (1),
+        ipv6      (2),
+        useCplane (3)
+    }
+
+TmnxMobDfPeerId                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobDfPeerId identifies Delivery Function (DF) peer
+         for the mobile gateways."
+    SYNTAX      Unsigned32 (1..16)
+
+TmnxMobLiTarget                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobLiTarget describes the target for the
+         interception.
+
+         The target can be of type International Mobile Subscriber Identity
+         (IMSI), Mobile Subscriber Integrated Services Digital Network (MSISDN)
+         or International Mobile Equipment Identity (IMEI).
+
+         IMSI is defined as a number consisting of up to 15 BCD digits. The
+         first 3 digits are the Mobile Country Code (MCC). The next 2 or 3
+         digits are the Mobile Network Code (MNC). The value of MCC determines
+         whether the MNC is 2 digits or 3 digits. The remaining digits are the
+         Mobile Subscriber Identification Number (MSIN). The internal
+         representation of the IMSI is as follows:
+
+         Bits 63-62 are reserved.
+
+         Bits 61-60 indicate the length of the MNC field: 10 indicates a
+         2-digit MNC while 11 indicates a 3-digit MNC.
+
+         Bits 59-0 hold the 15 IMSI BCD digits D1-15.
+
+         When the total number of digits in the IMSI is less than 15, the
+         nibble 0xf is used a filler.
+
+         IMSI encoding for a 2-digit MNC:
+
+         63          55         47          39                         0
+
+         +-----------+-----------+-----------+-------------------------+
+
+         | 0010| MCC1| MCC2| MCC3| MNC1| MNC2| MSIN (up to 10 digits)
+
+         +-----------+-----------+-----------+-------------------------+
+
+
+         IMSI encoding for a 3-digit MNC:
+
+         63          55         47          39     35                  0
+
+         +-----------+-----------+-----------+-------------------------+
+
+         | 0011| MCC1| MCC2| MCC3| MNC1| MNC2| MNC3| MSIN (up to 9 digits)
+
+         +-----------+-----------+-----------+-------------------------+
+
+         Bits 63-56 of the IMSI are carried in octet number 1 of the octet
+         string and bits 7-0 are carried in octet number 8 of the octet string."
+    SYNTAX      OCTET STRING (SIZE (8))
+
+TmnxMobLiTargetType              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobLiTargetType describes the types of target in
+         Lawful Interception (LI)."
+    SYNTAX      INTEGER {
+        imsi   (1),
+        msisdn (2),
+        imei   (3)
+    }
+
+TmnxMobUeId                      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobUeId describes the identity of an User Equipment.
+         TmnxMobUeId can be of the following types: International Mobile
+         Subscriber Identity (IMSI), International Mobile station Equipment
+         Identity (IMEI), Mobile Subscriber Integrated Services Digital network
+         Number (MSISDN). IMSI, IMEI, MSISDN are defined in 3GPP TS 23.003.
+
+         IMSI is defined as a number consisting of up to 15 BCD digits. The
+         first 3 digits are the Mobile Country Code (MCC). The next 2 or 3
+         digits are the Mobile Network Code (MNC). The value of MCC determines
+         whether the MNC is 2 digits or 3 digits. The remaining digits are the
+         Mobile Subscriber Identification Number (MSIN).
+
+         IMEI is defined as a number consisting of up to 16 BCD digits. The
+         first 8 digits consists of Type Allocation Code (TAC). The next 6
+         digits consist of Serial Number (SNR) which could be followed by a
+         Check Digit (CD) or Spare Digit (SD) of size 1 digit or by a Software
+         Version Number (SVN) of size 2 digits.
+
+         MSISDN is defined as a number consisting of 9 to 15 BCD digits. MSISDN
+         consists of Country Code (CC) followed by National Destination Code
+         (NDC) and Subscriber Number (SN).
+
+         Bits 63-56 of the IMSI or IMEI or MSISDN are carried in octet number 1
+         of the octet string and bits 7-0 are carried in octet number 8 of the
+         octet string.
+
+         The internal representation of the IMSI is as follows:
+
+         Bits 63-62 are reserved.
+
+         Bits 61-60 indicate the length of the MNC field: 10 indicates a
+         2-digit MNC while 11 indicates a 3-digit MNC.
+
+         Bits 59-0 hold the 15 IMSI BCD digits D1-15.
+
+         When the total number of digits in the IMSI is less than 15, the
+         nibble 0xf is used a filler.
+
+         IMSI encoding for a 2-digit MNC:
+
+
+         63          55         47          39                         0
+
+         +-----------+-----------+-----------+-------------------------+
+
+         | 0010| MCC1| MCC2| MCC3| MNC1| MNC2| MSIN (up to 10 digits)
+
+         +-----------+-----------+-----------+-------------------------+
+
+
+         IMSI encoding for a 3-digit MNC:
+
+
+         63          55         47          39     35                  0
+
+         +-----------+-----------+-----------+-------------------------+
+
+         | 0011| MCC1| MCC2| MCC3| MNC1| MNC2| MNC3| MSIN (up to 9 digits)
+
+         +-----------+-----------+-----------+-------------------------+
+
+
+         The internal representation of the IMEI and MSISDN is as follows:
+
+         IMEI encoding:
+
+
+         63          55         31                      7       0
+
+         +-----------+-----------+----------------------+-------+
+
+         |          TAC          |         SNR          |  SNV  |
+         |N2|N1|N4|N3|N6|N5|N8|N7|N10|N9|N12|N11|N14|N13|N16|N15|
+
+         +-----------+-----------+-----------+------------------+
+
+
+         MSISDN encoding:
+
+         63          55         31                      7       0
+
+         +-----------+-----------+----------------------+-------+
+
+         |   CC   |   NDC  |                  SN                |
+         |N2|N1|N4|N3|N6|N5|N8|N7|N10|N9|N12|N11|N14|N13|N16|N15|
+
+         +-----------+-----------+-----------+------------------+
+
+         When the total number of digits in the IMEI or MSISDN is less than 15,
+         the nibble 0x0 is used a filler.
+
+         In each byte both nibbles are swapped and it is stored as shown in the
+         above format. For example, in the format N3 & N4 present the nibble
+         number 3 and 4 respectively and they are stored in reverse order.
+
+         When the total number of digits are odd in IMEI and MSISDB, the last
+         digit will be paired with nibble 0xf."
+    SYNTAX      OCTET STRING (SIZE (8))
+
+TmnxMobUeIdType                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobUeIdType describes the types of identification
+         for User Equipment (UE)."
+    SYNTAX      INTEGER {
+        imsi   (0),
+        imei   (1),
+        msisdn (2)
+    }
+
+TmnxMobImsiStr                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobImsiStr describes the International Mobile
+         Subscriber Identity (IMSI) of a User Equipment (UE)."
+    REFERENCE
+        "3GPP TS 23.003 Numbering, addressing and identification,
+         section 2.2 Composition of IMSI."
+    SYNTAX      DisplayString (SIZE (0|9..15))
+
+TmnxMobRatingGrpState            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobRatingGrpState describes the state of a rating
+         group.
+
+         allowFlow - Allow the traffic to flow disallowFlow - Disallow the
+         traffic to Flow redWebPortal - Redirect the traffic to web portal
+         allowResRules - Allow restricted rules iom1stPktTrigger - Get the
+         trigger from on IOM on arrival of 1st packet dis1stPktTrigger -
+         Disable 1st packet trigger and allow the traffic creditsToppedUp -
+         Credits topped up waitForFpt - Unblocked and waiting for First Packet
+         Trigger (FPT)"
+    SYNTAX      INTEGER {
+        allowFlow        (1),
+        disallowFlow     (2),
+        redWebPortal     (3),
+        allowResRules    (4),
+        iom1stPktTrigger (5),
+        dis1stPktTrigger (6),
+        creditsToppedUp  (7),
+        waitForFpt       (8)
+    }
+
+TmnxMobPresenceState             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobPresenceState describes the whether the given
+         field is present."
+    SYNTAX      INTEGER {
+        absent  (0),
+        present (1)
+    }
+
+TmnxMobPdnGyChrgTriggerType      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobPdnGyChrgTriggerType describes type of the
+         trigger activated by the Online Charging System (OCS).
+
+         sgsnIpAddrRecvd       - Change in Serving GPRS Support Node (SGSN) IP
+                                 address
+         qosRecvd              - Change in Quality of Service (QoS)
+         locRecvd              - Location Change
+         ratRecvd              - Router Advertisement Trigger (RAT) Change
+         qosTrfClsRecvd        - Change in QoS Traffic class
+         qosRlbClsRecvd        - Change in QoS Reliability class
+         qosDlyClsRecvd        - Change in QoS Delay class
+         qosPeakThrptRecvd     - Change in QoS Peak Throughput
+         qosPrcClsRecvd        - Change in QoS Precedence class
+         qosMeanTrptRecvd      - Change in QoS Mean Throughput
+         qosMxBtRtUplnkRecvd   - Change in QoS MBR for Uplink
+         qosMxBtRtDllnkRecvd   - Change in QoS MBR for Downlink
+         qosResBerRecvd        - Change in QoS Residual Bit Error Rate (BER)
+         qosSduErrRatRecvd     - Change in QoS Service Data Unit (SDU) Error
+                                 Ratio class
+         qosTransDelayRecvd    - Change in QoS Transfer Delay
+         qosTrfHndPriRecvd     - Change in QoS Traffic Handling Priority
+         qosGrtBtRtUplnkRecvd  - Change in QoS Guaranteed Bit Rate (GBR) for
+                                 Uplink
+         qosGrtBtRtDllnkRecvd  - Change in QoS GBR for Downlink
+         locMccRecvd           - Change in Location Mobile Country Code (MCC)
+         locMncRecvd           - Change in Location Mobile Network Code (MNC)
+         locRacRecvd           - Change in Location Routing Area Code (RAC)
+         locLacRecvd           - Change in Location Location Area Code (LAC)
+         locCellIdRecvd        - Change in Location Cell ID
+         medCompRecvd          - Change in Media Composition
+         partcNmbRecvd         - Change in Participants' number
+         thrldPartcNmbRecvd    - Change in Threshold of Participants' number
+         usrPartcTypeRecvd     - Change in User Participating Type
+         servCondRecvd         - Change in Service Condition
+         servNodeRecvd         - Change in Service Node
+         usrCsgInfoRecvd       - Change in User Closed Subscription Group (CSG)
+                                 Information"
+    SYNTAX      INTEGER {
+        sgsnIpAddrRecvd      (0),
+        qosRecvd             (1),
+        locRecvd             (2),
+        ratRecvd             (3),
+        qosTrfClsRecvd       (4),
+        qosRlbClsRecvd       (5),
+        qosDlyClsRecvd       (6),
+        qosPeakThrptRecvd    (7),
+        qosPrcClsRecvd       (8),
+        qosMeanTrptRecvd     (9),
+        qosMxBtRtUplnkRecvd  (10),
+        qosMxBtRtDllnkRecvd  (11),
+        qosResBerRecvd       (12),
+        qosSduErrRatRecvd    (13),
+        qosTransDelayRecvd   (14),
+        qosTrfHndPriRecvd    (15),
+        qosGrtBtRtUplnkRecvd (16),
+        qosGrtBtRtDllnkRecvd (17),
+        locMccRecvd          (18),
+        locMncRecvd          (19),
+        locRacRecvd          (20),
+        locLacRecvd          (21),
+        locCellIdRecvd       (22),
+        medCompRecvd         (23),
+        partcNmbRecvd        (24),
+        thrldPartcNmbRecvd   (25),
+        usrPartcTypeRecvd    (26),
+        servCondRecvd        (27),
+        servNodeRecvd        (28),
+        usrCsgInfoRecvd      (29)
+    }
+
+TmnxMobPdnRefPointType           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobPdnRefPointType describes the types of reference
+         point."
+    SYNTAX      INTEGER {
+        s5  (1),
+        s8  (2),
+        gn  (3),
+        s2a (4),
+        gp  (5)
+    }
+
+TmnxMobService                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobService describes the Service and Protocol
+         service names for 3GPP."
+    REFERENCE
+        "3GPP TS 23.003 Section 19.4.3"
+    SYNTAX      DisplayString (SIZE (0..80))
+
+TmnxMobServRefPointType          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobServRefPointType describes the types of reference
+         point."
+    SYNTAX      INTEGER {
+        s5  (1),
+        s8  (2),
+        s2a (4)
+    }
+
+TmnxMobAccessType                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobAccessType describes the various access types.
+         eps     - evolved packet system.
+         gprs    - general packet radio services.
+         non3gpp - trusted non-3gpp network such as evolved High Rate
+                   Packet Data (eHRPD) and untrusted non-3gpp network."
+    SYNTAX      INTEGER {
+        eps     (1),
+        gprs    (2),
+        non3gpp (3)
+    }
+
+TmnxMobUeStrPrefix               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobUeStrPrefix describes the prefix for
+         International Mobile Subscriber Identity (IMSI) or Mobile Subscriber
+         Integrated Services Digital Network (MSISDN) of an User Equipment
+         (UE)."
+    SYNTAX      DisplayString (SIZE (4..15))
+
+END

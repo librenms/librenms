@@ -11,7 +11,7 @@
  */
 
 echo 'CiscoSB: ';
-$temp = snmpwalk_cache_multi_oid($device, 'rlPethPsePortEntry', array(), 'CISCOSB-POE-MIB');
+$temp = snmpwalk_cache_multi_oid($device, 'rlPethPsePortEntry', [], 'CISCOSB-POE-MIB');
 if (is_array($temp)) {
     $cur_oid = '.1.3.6.1.4.1.9.6.1.101.108.1.1.5.';
     $divisor = '1000';

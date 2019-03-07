@@ -86,7 +86,7 @@ LibreNMS does not parse MIBs to discover sensors for devices.  LibreNMS uses sta
 
 #### <a name="faq6"> Why do I get blank pages sometimes in the WebUI?</a>
 
-The first thing to do is to add /debug=yes/ to the end of the URI (I.e /devices/debug=yes/).
+You can enable debug information by setting `APP_DEBUG=true` in your .env. (Do not leave this enabled, it could leak private data)
 
 If the page you are trying to load has a substantial amount of data in it then it could be that the php memory limit needs to be increased in [config.php](Configuration.md#core).
 
@@ -101,9 +101,9 @@ the [included snmpd.conf](https://raw.githubusercontent.com/librenms/librenms/ma
 
 A debug system is in place which enables you to see the output from php errors, warnings and notices along with the MySQL queries that have been run for that page.
 
-To enable the debug option, add /debug=yes/ to the end of any URI (I.e /devices/debug=yes/) or ?debug=yes if you are debugging a graph directly.
-
-You will then have a two options in the footer of the website - Show SQL Debug and Show PHP Debug. These will both popup that pages debug window for you to view. If the page itself has generated a fatal error then this will be displayed directly on the page.
+You can enable debug information by setting `APP_DEBUG=true` in your .env. (Do not leave this enabled, it could leak private data)
+To see additional information, run `./scripts/composer_wrapper.php install`, to install additional debug tools.
+This will add a debug bar at the bottom of every page that will show you detailed debug information.
 
 #### <a name="faq11"> How do I debug the discovery process?</a>
 

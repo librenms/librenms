@@ -1,0 +1,212 @@
+--*******************************************************************
+--*    SAGEM, IONOS													*
+--*******************************************************************
+--*******************************************************************
+
+--  Filename: session
+--
+--  File type: .mib    
+-- 
+--  Description:	SNMP source Mib file.
+--
+--			Gives information about a way to handle access 
+--			conflicts between several applications 
+--			(SNMP, HTTP, CLI, vt100) that could try to modify 
+--			the equipment configuration at the same time and 
+--			session inactivity.
+--             
+--
+--  Version:  19 11 2002
+--	
+--  Date(DD MM YYYY): 15 11 02 last update for IONOS NMS 
+--     
+--  Contact: D. Mobuchon, F. Bonnevialle
+--
+--  History: 
+--		Version: MIB-P0-301199	Date: 30 11 1999 
+--      
+--		Name: F.Bonnevialle	
+--		Date: 30 11 1999 
+--		Desc: original
+--
+--		Name: F.Bonnevialle 	
+--		Date: 11 06 2002
+--		Desc: New variable: savePending
+--  
+--		Name: F.Bonnevialle 	
+--		Date: 15 11 2002 		
+--		Desc: Modification for SilverCreek Compiler
+--*******************************************************************
+--*******************************************************************
+--*   Copyright (c) 2002, SAGEM , All rights reserved.              *
+--*******************************************************************
+
+
+
+
+--*******************************************************************
+-- MIB: SESSION-MIB
+--*******************************************************************
+SESSION-MIB DEFINITIONS ::= BEGIN
+
+
+--*******************************************************************
+-- IMPORTS
+--*******************************************************************
+IMPORTS
+   sagemDr							FROM SAGEM-DR-MIB
+-- CommunityAccessList					FROM SAGEM-DR-MIB     
+   SagemBoolean						FROM EQUIPMENT-MIB
+   MODULE-IDENTITY,OBJECT-TYPE,IpAddress        FROM SNMPv2-SMI;
+--   DisplayString                              FROM RFC1213-MIB;
+
+
+--*******************************************************************
+-- OBJECTS
+--*******************************************************************
+   session	MODULE-IDENTITY
+      LAST-UPDATED "0206110000Z"
+      ORGANIZATION "SAGEM/DR Tolbiac Centre"
+      CONTACT-INFO
+	""
+      DESCRIPTION 
+	"
+	Modification:
+			Date: 20 12 1999
+			Description: modification of comments
+
+			Name: sessionTrap
+			Description: sessionTrap and sessionReason are 
+				no more used in SESSION-MIB. They have been 
+				replaced by a logTrap (see LOG-MIB)
+	New Object:
+			Date: 19 11 1999 
+			Name: tInactivity
+			Description: 
+			Name: sessionType
+			Description: Add of tpiEmulated
+
+	Creation: 
+			Description:
+			This MIB module gives information about a way to 
+			handle access conflicts between several 
+			applications (SNMP, HTTP, CLI, vt100) 
+			that could try to modify the equipment 
+			configuration at the same time
+	"
+      ::= { sagemDr 201 }
+
+
+--*******************************************************************
+-- Description:
+--
+--     Manager or Configurator write session (1 session max at 
+--	 the same time)
+   
+   tLock   OBJECT-TYPE
+      SYNTAX       INTEGER (0..30)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+      "	
+	Number of minutes for which a write session is active on 
+	the equipment.
+	When the value of this variable is 0, the equipment is not 
+	locked.	
+	When a SNMP manager (iONOSANMSupervisor and Operator) start 
+	a write session, tLock can be set to a value by the manager 
+	(up to 30 minutes, so it has time to configure the equipment).	
+	Each time an action is done under the equipment tLock is set 
+	again to its value.
+	tLock is a decremental counter; when the value of tLock return 
+	to 0, the write session is ended and the equipment is unlocked.
+	The SNMP manager can choose to unlock the equipment by setting 
+	the value of tLock to 0 before it reach this value itself.
+	"  
+      ::= { session 1 } 
+   
+
+   sessionIp   OBJECT-TYPE
+      SYNTAX       IpAddress 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+      "IP address of the application that holds the session"  
+      ::= { session 2 } 
+
+   sessionType   OBJECT-TYPE
+      SYNTAX       INTEGER { none (0),snmp (1), http (2), telnet (3), 
+						vt100 (4), tpiEmulated (5) }
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	  "Type of the application protocol that holds the session"
+      ::= { session 3 }
+
+
+   tLockDefault   OBJECT-TYPE
+      SYNTAX       INTEGER (0..20)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+      "
+	tLockDefault is used to define initial value of tLock.
+	tLockDefault can be changed only by iONOSANMSupervisor or 
+      by dIRECTACCESSsupervisor.
+	The normal value is 10 minutes"	
+      ::= { session 5 } 
+
+
+--*******************************************************************
+-- Description:
+-- 	Manager or Configurator read/write inactivity 
+--	(n session at the same time)
+
+   tInactivity   OBJECT-TYPE
+      SYNTAX       INTEGER (0..60)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+      "
+	The normal configuration is tInactivity > tLock; 
+	tInactivityDefault is about 30 min.
+	The session with a manager is closed by the equipment if there
+	is no activity during tInactivity min.
+	It is not used with SNMP.
+	This is used to protect the acces to the manager when the 
+	operator is not there during a long time.
+	"  
+     ::= { session 6 } 
+
+-- P0: sessionName,sessionCommunity not used.
+--   sessionName   OBJECT-TYPE
+--    SYNTAX       DisplayString (SIZE (0..20))
+--    MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"Login name used for the session"  
+--     ::= { session 10 }    
+
+--   sessionCommunity   OBJECT-TYPE
+--      SYNTAX       CommunityAccessList
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"Access community (User rights) used for the session"  
+--      ::= { session 11 }  
+  
+   savePending   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+      "
+	  Return TRUE if the write session is unlocked for more than 30 seconds
+	  "  
+     ::= { session 20 } 
+
+--*******************************************************************
+
+	  
+END
+   

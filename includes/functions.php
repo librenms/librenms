@@ -409,39 +409,7 @@ function getImageTitle($device)
 
 function getImageName($device, $use_database = true, $dir = 'images/os/')
 {
-    global $config;
-
-    $os = strtolower($device['os']);
-
-    // fetch from the database
-    if ($use_database && is_file($config['html_dir'] . "/$dir" . $device['icon'])) {
-        return $device['icon'];
-    }
-
-    // linux specific handling, distro icons
-    $distro = null;
-    if ($os == "linux") {
-        $features = strtolower(trim($device['features']));
-        list($distro) = explode(" ", $features);
-    }
-
-    $possibilities = array(
-        $distro,
-        $config['os'][$os]['icon'],
-        $os,
-    );
-
-    foreach ($possibilities as $basename) {
-        foreach (array('.svg', '.png') as $ext) {
-            $name = $basename . $ext;
-            if (is_file($config['html_dir'] . "/$dir" . $name)) {
-                return $name;
-            }
-        }
-    }
-
-    // fallback to the generic icon
-    return 'generic.svg';
+    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'], $use_database ? $device['icon'] : null, $dir);
 }
 
 function renamehost($id, $new, $source = 'console')
