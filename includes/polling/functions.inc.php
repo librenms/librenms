@@ -72,6 +72,8 @@ function poll_sensor($device, $class)
 
             if (file_exists('includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php')) {
                 require 'includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php';
+            } elseif (file_exists('includes/polling/sensors/'. $class .'/'. $device['os_group'] .'.inc.php')) {
+                require 'includes/polling/sensors/'. $class .'/'. $device['os_group'] .'.inc.php';
             }
 
             if ($class == 'temperature') {
