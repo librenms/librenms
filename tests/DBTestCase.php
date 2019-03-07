@@ -33,7 +33,6 @@ abstract class DBTestCase extends TestCase
     {
         parent::setUp();
         $this->dbSetUp();
-        $this->db_name = dbFetchCell('SELECT DATABASE()');
     }
 
     public function tearDown()
