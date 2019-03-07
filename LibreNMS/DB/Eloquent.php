@@ -112,8 +112,7 @@ class Eloquent
         try {
             $conn = self::DB();
             if ($conn) {
-                $conn->getPdo();
-                return true;
+                return !is_null($conn->getPdo());
             }
         } catch (\PDOException $e) {
             return false;
