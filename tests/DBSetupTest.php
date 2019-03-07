@@ -29,6 +29,8 @@ use \PHPUnit\Framework\ExpectationFailedException as PHPUnitException;
 
 class DBSetupTest extends DBTestCase
 {
+    protected $db_name;
+
     public function setUp()
     {
         parent::setUp();

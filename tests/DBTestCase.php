@@ -27,8 +27,6 @@ namespace LibreNMS\Tests;
 
 abstract class DBTestCase extends TestCase
 {
-    protected $db_name;
-
     public function setUp()
     {
         parent::setUp();
