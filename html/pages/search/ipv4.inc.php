@@ -30,7 +30,7 @@ var grid = $("#ipv4-search").bootgrid({
 
 use LibreNMS\Authentication\LegacyAuth;
 
-$sql = 'SELECT `devices`.`device_id`,`hostname`,`sysName` FROM `devices`';
+$sql = 'SELECT `devices`.`device_id`,`hostname`,replace(`sysName`,`\n`,``) FROM `devices`';
 
 if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
