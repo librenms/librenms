@@ -20,22 +20,27 @@ if (is_numeric($sessions)) {
 }
 
 
+# SSL TPS
+$mibs = 'F5-BIGIP-SYSTEM-MIB';
+$oids = [
+    'sysClientsslStatTotNativeConns.0',
+    'sysClientsslStatTotCompatConns.0',
+];
 
-$sysClientsslStatTotNativeConns = snmp_get($device, 'sysClientsslStatTotNativeConns.0', '-OQv', 'F5-BIGIP-SYSTEM-MIB');
-$sysClientsslStatTotCompatConns = snmp_get($device, 'sysClientsslStatTotCompatConns.0', '-OQv', 'F5-BIGIP-SYSTEM-MIB');
-if (is_numeric($sysClientsslStatTotNativeConns) && is_numeric($sysClientsslStatTotCompatConns)) {
+$data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
+
+if (is_numeric($data[0]['sysClientsslStatTotNativeConns']) && is_numeric($data[0]['sysClientsslStatTotCompatConns'])) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('TotNativeConns', 'COUNTER', 0)
         ->addDataset('TotCompatConns', 'COUNTER', 0);
     $fields = array(
-            'TotNativeConns' => $sysClientsslStatTotNativeConns,
-            'TotCompatConns' => $sysClientsslStatTotCompatConns,
+            'TotNativeConns' => $data[0]['sysClientsslStatTotNativeConns'],
+            'TotCompatConns' => $data[0]['sysClientsslStatTotCompatConns'],
     );
     $tags = compact('rrd_def');
     data_update($device, 'bigip_system_tps', $tags, $fields);
     $graphs['bigip_system_tps'] = true;
 }
-
 
 
 $sysStatClientTotConns = snmp_get($device, 'sysStatClientTotConns.0', '-OQv', 'F5-BIGIP-SYSTEM-MIB');
