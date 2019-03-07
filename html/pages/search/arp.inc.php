@@ -33,7 +33,7 @@ var grid = $("#arp-search").bootgrid({
 use LibreNMS\Authentication\LegacyAuth;
 
 // Select the devices only with ARP tables
-$sql = 'SELECT D.device_id AS device_id, `hostname`, `D`.`sysName` AS `sysName` FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D';
+$sql = 'SELECT D.device_id AS device_id, `hostname`, replace(`D`.`sysName`,`\n`,``) AS `sysName` FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D';
 
 if (!LegacyAuth::user()->hasGlobalRead()) {
     $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
