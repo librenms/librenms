@@ -94,9 +94,9 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<option value=''>All Devices</option>";
 
     if (LegacyAuth::user()->hasGlobalRead()) {
-        $results = dbFetchRows("SELECT `device_id`,`hostname`, `sysName` FROM `devices` ORDER BY `hostname`");
+        $results = dbFetchRows("SELECT `device_id`,`hostname`, replace(`sysName`,`\n`,``) FROM `devices` ORDER BY `hostname`");
     } else {
-        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`", array(LegacyAuth::id()));
+        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, replace(`D`.`sysname`,`\n`,``) FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`", array(LegacyAuth::id()));
     }
     foreach ($results as $data) {
         if ($data['device_id'] == $vars['device_id']) {
@@ -109,7 +109,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     }
 
     if (!LegacyAuth::user()->hasGlobalRead()) {
-        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysName` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`", array(LegacyAuth::id()));
+        $results = dbFetchRows("SELECT `D`.`device_id`,`D`.`hostname`, replace(`D`.`sysName`,`\n`,``) FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`", array(LegacyAuth::id()));
     } else {
         $results = array();
     }
