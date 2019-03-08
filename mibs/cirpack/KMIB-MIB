@@ -1,0 +1,774 @@
+KMIB DEFINITIONS ::= BEGIN
+
+--  KMIB-MIB:
+--    A private enterprise mib (cirpack #9193)
+--
+--  MIB Cirpack, basee sur la MIB extensible de ucd-snmp .1.3.6.1.4.1.9193
+--  (utilise la commande 'pass' permettant de traiter une partie de la
+--  MIB par un programme externe)
+
+--   31/08/98	Creation, voir kmib.h
+--   05/10/98	Ajout des Acces
+--   18/01/01	Legeres modifications pour l'integration HPOV
+--   23/04/01	On a enfin un vrai enterprise number 9193
+--   08/02/02   Integration des descriptifs de Trap
+--   22/11/02	Integration modifications OMT sur le format de trap
+--   17/03/04	On fait des corrections (novaxess)
+--   09/05/05	Ajout du trap 0
+--   29/05/18	Add new trap definition for Scripts Object
+
+IMPORTS	  	
+	enterprises, OBJECT-TYPE, MODULE-IDENTITY,
+	NOTIFICATION-TYPE		FROM SNMPv2-SMI; 	
+
+-- La tete de notre arbre
+
+-- cirpack		OBJECT IDENTIFIER ::= { enterprises 9193 } 
+	
+cirpack MODULE-IDENTITY
+    LAST-UPDATED "200505090000Z"
+    ORGANIZATION "CIRPACK SAS
+                  E-mail: support@cirpack.com"
+    CONTACT-INFO "CIRPACK SAS FRANCE"
+    DESCRIPTION  "This example MIB module defines ..."
+
+    REVISION "200505090000Z"
+    DESCRIPTION
+        "Initial version of CIRPACK MIB."
+    ::= { enterprises 9193 }
+
+	
+
+
+-- ### Change all "ACCESS" by "MAX-ACCESS". It's due to SNMPv2-SMI  ###
+-- ### Change all "STATUS	mandatory" by "STATUS	current". It's due to SNMPv2-SMI ###
+-- ### Add a description for all OBJECT-TYPE ###
+	
+-- Version de la MIB : 9193.1
+
+kVersion	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Version de la MIB "
+		::= { cirpack 1 }
+    
+
+-- Nombre de devices : 9193.2
+
+kDeviceNb	OBJECT-TYPE
+		SYNTAX	INTEGER
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Nombre de Devices "
+		::= { cirpack 2 }
+
+
+
+-- La table des devices : 9193.3
+kDevTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF KDevice
+        MAX-ACCESS  not-accessible  
+        STATUS  current
+		DESCRIPTION
+		" Table des devices "
+        ::= { cirpack 3 }
+
+
+
+-- Definition d'un type device (structure KDevice) : 9193.3.1
+kDevice		OBJECT-TYPE
+		SYNTAX	KDevice
+		MAX-ACCESS	not-accessible 
+		STATUS	current
+		DESCRIPTION
+		" Differents devices "
+		INDEX { kKey,kName,kDesc,
+			kContact,kLocation,kStartTime,kStatus,
+			kActivity,kLastPoll,kLog }
+		::= { kDevTable 1 }
+
+
+
+-- Definition des elements d'un device
+
+KDevice		::= SEQUENCE {
+		kKey		OCTET STRING,   
+		kName		OCTET STRING,	
+		kDesc		OCTET STRING,	
+		kContact	OCTET STRING,	
+		kLocation	OCTET STRING,	
+		kStartTime	INTEGER,
+		kStatus		INTEGER,
+		kActivity	INTEGER,
+		kLastPoll	INTEGER,
+		kLog		OCTET STRING	
+	}
+
+
+-- 9193.3.1.1
+kKey	OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Identifiant du device "
+		::= { kDevice 1 }
+
+
+-- 9193.3.1.2
+kName		OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Nom du device "
+		::= { kDevice 2 }
+
+
+-- 9193.3.1.3
+kDesc		OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Description du device "
+		::= { kDevice 3 }
+
+
+-- 9193.3.1.4
+kContact	OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Contact associe au device "
+		::= { kDevice 4 }
+
+
+-- 9193.3.1.5
+kLocation	OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Localisation du device "
+		::= { kDevice 5 }
+
+
+-- 9193.3.1.6
+kStartTime	OBJECT-TYPE
+		SYNTAX	INTEGER (10) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Temps de debut "
+		::= { kDevice 6 }
+
+
+-- 9193.3.1.7
+kStatus		OBJECT-TYPE
+		SYNTAX	INTEGER {
+--			unknown(0),    ### Part 3.2.1.1 of RFC1155. value O is not valid ###
+			starting(1),
+			ok(2),
+			aborting(3),
+			misbehav(4),
+			down(5),
+			nopoll(6),
+			testing(7)
+		}
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Status du device "
+		::= { kDevice 7 }
+
+
+-- 9193.3.1.8
+kActivity	OBJECT-TYPE
+		SYNTAX	INTEGER (0..255)  
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Description du status "
+		::= { kDevice 8 }
+
+
+-- 9193.3.1.9
+kLastPoll	OBJECT-TYPE
+		SYNTAX	INTEGER (10) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Temps de la derniere occurrence "
+		::= { kDevice 9 }
+
+
+-- 9193.3.1.10
+kLog		OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		" Logs du device "
+		::= { kDevice 10 }
+
+
+
+-- Nombre de processus : 9193.4
+kProcessNb	OBJECT-TYPE
+		SYNTAX	INTEGER
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Nombre de processus "
+		::= { cirpack 4 }
+
+
+
+-- La table des processus : 9193.5
+kProcTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF KProcess      
+                MAX-ACCESS  not-accessible 
+                STATUS  current
+				DESCRIPTION
+				" Table des processus "
+                ::= { cirpack 5 }
+
+
+-- Definition d'un type Process (structure KProcess) : 9193.5.1
+
+kProcess	OBJECT-TYPE
+		SYNTAX	KProcess         
+		MAX-ACCESS  not-accessible   
+		STATUS	current
+		DESCRIPTION
+		" Differents processus "
+		INDEX { kKeyProc,kDescProc,kContactProc,kPidProc,kStatusProc,		
+			kLastPollProc,kMaxPollProc,kPcpuProc,kStartTimeProc,kLogProc }   
+		::= { kProcTable 1 }
+
+-- Definition des elements d'un process
+
+KProcess	::= SEQUENCE {    
+		kKeyProc		OCTET STRING,
+		kDescProc		OCTET STRING,
+		kContactProc	OCTET STRING,
+		kPidProc		INTEGER,
+		kStatusProc		INTEGER,
+		kLastPollProc	INTEGER,
+		kMaxPollProc	INTEGER,
+		kPcpuProc		INTEGER,
+		kStartTimeProc	INTEGER,
+		kLogProc		OCTET STRING
+	}
+
+
+-- 9193.5.1.1
+kKeyProc		OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Identifiant du processus "
+		::= { kProcess 1 }
+
+
+-- 9193.5.1.2
+kDescProc		OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Description du processus "
+		::= { kProcess 2 }
+
+
+-- 9193.5.1.3
+kContactProc	OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Contact associe "
+		::= { kProcess 3 }
+
+
+-- 9193.5.1.4
+kPidProc		OBJECT-TYPE
+		SYNTAX	INTEGER (0..32768)  
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" PID du processus "
+		::= { kProcess 4 }
+
+
+-- 9193.5.1.5
+kStatusProc		OBJECT-TYPE
+		SYNTAX	INTEGER {
+--			unknown(0),    ### Part 3.2.1.1 of RFC1155. value O is not valid ###
+			starting(1),
+			ok(2),
+			aborting(3),
+			misbehav(4),
+			down(5),
+			nopoll(6),
+			testing(7)
+		}
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Status du processus "
+		::= { kProcess 5 }
+
+
+-- 9193.5.1.6
+kLastPollProc	OBJECT-TYPE
+		SYNTAX	INTEGER (10) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Heure de la derniere occurrence "
+		::= { kProcess 6 }
+
+
+-- 9193.5.1.7
+kMaxPollProc	OBJECT-TYPE
+		SYNTAX	INTEGER (10) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Maxpoll "
+		::= { kProcess 7 }
+
+
+-- 9193.5.1.8
+kPcpuProc		OBJECT-TYPE
+		SYNTAX	INTEGER (0..255)  
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Utilisation du cpu "
+		::= { kProcess 8 }
+
+
+-- 9193.5.1.9
+kStartTimeProc	OBJECT-TYPE
+		SYNTAX	INTEGER (10) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Heure de debut "
+		::= { kProcess 9 }
+
+
+-- 9193.5.1.10
+kLogProc		OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		" Log du processus "
+		::= { kProcess 10 }
+
+
+
+-- Nombre d'acces : 9193.6
+
+kAccesNb	OBJECT-TYPE
+		SYNTAX	INTEGER
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Nombre total acces "
+		::= { cirpack 6 }
+
+
+-- La table des acces : 9193.7
+kAccesTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF KAcces			-- 
+                MAX-ACCESS  not-accessible 
+                STATUS  current
+				DESCRIPTION
+				" Table des acces "
+                ::= { cirpack 7 }
+
+
+-- Definition d'un type acces (structure kAcces) : 9193.7.1
+
+kAcces	OBJECT-TYPE
+		SYNTAX	KAcces				
+		MAX-ACCESS  not-accessible  
+		STATUS	current
+		DESCRIPTION
+		" Differents acces "
+		INDEX { kKeyAcc,kNameAcc,kTypeAcc,kStatusAcc,kSpecInAcc,kSpecOutAcc,
+			kSpecMixAcc,kNtteAcc,kProtAcc,kNbInAcc,kNbOutAcc,kNbInHourAcc,
+			kNbOutHourAcc,kNbInDayAcc,kNbOutDayAcc,kNbInAbsAcc,kNbOutAbsAcc,
+			kLogAcc }                              
+		    ::= { kAccesTable 1 }
+
+
+-- Definition des elements d'un acces
+
+KAcces		::= SEQUENCE {
+		kKeyAcc			OCTET STRING,
+		kNameAcc		OCTET STRING,
+		kTypeAcc		INTEGER,   
+		kStatusAcc		INTEGER,
+		kSpecInAcc		INTEGER,
+		kSpecOutAcc		INTEGER,
+		kSpecMixAcc		INTEGER,
+		kNtteAcc		INTEGER,
+		kProtAcc		INTEGER,
+		kNbInAcc		INTEGER,
+		kNbOutAcc		INTEGER,
+		kNbInHourAcc	INTEGER,
+		kNbOutHourAcc	INTEGER,
+		kNbInDayAcc		INTEGER,
+		kNbOutDayAcc	INTEGER,
+		kNbInAbsAcc		INTEGER,
+		kNbOutAbsAcc	INTEGER,
+		kLogAcc			OCTET STRING
+	}
+
+
+-- 9193.7.1.1
+kKeyAcc		OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Identifiant acces "
+		::= { kAcces 1 }
+
+
+-- 9193.7.1.2
+kNameAcc		OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Nom acces "
+		::= { kAcces 2 }
+
+
+-- 9193.7.1.3
+kTypeAcc		OBJECT-TYPE
+		SYNTAX	INTEGER {   
+			t0(0),	
+			t2(1)
+		} 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Type acces "
+		::= { kAcces 3 }
+
+
+-- 9193.7.1.4
+kStatusAcc		OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        unknown(0),
+                        starting(1),
+                        ok(2),
+                        aborting(3),
+                        misbehav(4),
+                        down(5),
+                        nopoll(6),
+                        testing(7),
+			sigoff(8),
+			syncoff(9),
+			errfunc(10)
+		}
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Status acces "
+		::= { kAcces 4 }
+
+
+-- 9193.7.1.5
+kSpecInAcc		OBJECT-TYPE
+		SYNTAX	INTEGER (0..255)  
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Specification entrante acces "
+		::= { kAcces 5 }
+
+
+-- 9193.7.1.6
+kSpecOutAcc		OBJECT-TYPE
+		SYNTAX	INTEGER (0..255)  
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Specification sortante acces "
+		::= { kAcces 6 }
+
+
+-- 9193.7.1.7
+kSpecMixAcc		OBJECT-TYPE
+		SYNTAX	INTEGER (0..255)  
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Specification mixte acces "
+		::= { kAcces 7 }
+
+
+-- 9193.7.1.8
+kNtteAcc		OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        te(0), 
+                        nt(1)	
+                }
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Acces NTTE "
+		::= { kAcces 8 }
+
+
+-- 9193.7.1.9
+kProtAcc		OBJECT-TYPE
+		SYNTAX	INTEGER (0..255)  
+		MAX-ACCESS	read-write 
+		STATUS	current
+		DESCRIPTION
+		" Acces prot "
+		::= { kAcces 9 }
+
+
+-- 9193.7.1.10
+kNbInAcc		OBJECT-TYPE
+		SYNTAX	INTEGER (0..255)  
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Nombre entrant acces "
+		::= { kAcces 10 }
+
+-- 9193.7.1.11
+kNbOutAcc		OBJECT-TYPE
+		SYNTAX	INTEGER (0..255)  
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		" Nombre sortrant acces "
+		::= { kAcces 11 }
+
+
+-- 9193.7.1.12
+kNbInHourAcc	OBJECT-TYPE
+                SYNTAX  INTEGER (0..255)  
+                MAX-ACCESS  read-write
+                STATUS  current
+				DESCRIPTION
+				" Nombre entrant acces par heure  "
+                ::= { kAcces 12 }
+
+-- 9193.7.1.13
+kNbOutHourAcc	OBJECT-TYPE
+                SYNTAX  INTEGER (0..255)  
+                MAX-ACCESS  read-write
+                STATUS  current
+				DESCRIPTION
+				" Nombre sortrant acces par heure "
+                ::= { kAcces 13 }
+
+
+-- 9193.7.1.14
+kNbInDayAcc		OBJECT-TYPE
+                SYNTAX  INTEGER (0..255)  
+                MAX-ACCESS  read-write
+                STATUS  current
+				DESCRIPTION
+				" Nombre entrant acces par jour "
+                ::= { kAcces 14 }
+
+-- 9193.7.1.15
+kNbOutDayAcc	OBJECT-TYPE
+                SYNTAX  INTEGER (0..255)  
+                MAX-ACCESS  read-write
+                STATUS  current
+				DESCRIPTION
+				" Nombre sortrant acces par jour "
+                ::= { kAcces 15 }
+
+
+-- 9193.7.1.16
+kNbInAbsAcc     OBJECT-TYPE
+                SYNTAX  INTEGER (0..255)  
+                MAX-ACCESS  read-write
+                STATUS  current
+				DESCRIPTION
+				" NbAbs entrant acces "
+                ::= { kAcces 16 }
+
+-- 9193.7.1.17
+kNbOutAbsAcc    OBJECT-TYPE
+                SYNTAX  INTEGER (0..255)  
+                MAX-ACCESS  read-write
+                STATUS  current
+				DESCRIPTION
+				" NbAbs sortrant acces "
+                ::= { kAcces 17 }
+
+
+-- 9193.7.1.18
+kLogAcc		OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE(0..255)) 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		" Logs acces "
+		::= { kAcces 18 }
+
+-- Number of scripts : 9193.8
+kScriptNb    OBJECT-TYPE
+        SYNTAX    INTEGER
+        MAX-ACCESS    read-write
+        STATUS    current
+        DESCRIPTION
+        " Number of Scripts "
+        ::= { cirpack 8 }
+ 
+-- Table of script : 9193.9
+kScriptTable    OBJECT-TYPE
+        SYNTAX    SEQUENCE OF KScript
+        MAX-ACCESS  not-accessible  
+        STATUS  current
+        DESCRIPTION
+        " Table of script "
+        ::= { cirpack 9 }
+ 
+-- Definition of script type (structure KScript) : 9193.9.1
+kScript        OBJECT-TYPE
+        SYNTAX    KScript
+        MAX-ACCESS    not-accessible 
+        STATUS    current
+        DESCRIPTION
+        " Differents scripts "
+        INDEX { kKey,kName,kStatus,kLog }
+        ::= { kScriptTable 1 }
+ 
+-- Definition of script element:
+KScript        ::= SEQUENCE {
+        kKey        OCTET STRING,   
+        kName        OCTET STRING,   
+        kStatus        INTEGER,   
+        kLog        OCTET STRING   
+    }
+
+-- 9193.9.1.1
+kKey     OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..255)) 
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        " Identify script "
+        ::= { kScript 1 }
+
+-- 9193.9.1.2
+kName     OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..255)) 
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        " Name script "
+        ::= { kScript 2 }
+
+-- 9193.9.1.3
+kStatus     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        ok(2),
+                        nok(5)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        " Status script "
+        ::= { kScript 3 }
+        
+-- 9193.9.1.4
+kLog        OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..255)) 
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        " Log script "
+        ::= { kScript 4 }
+
+
+cirpackTraps OBJECT IDENTIFIER ::= { cirpack 0 }  
+
+cirpackUnknown NOTIFICATION-TYPE
+    OBJECTS {kName,kLog}
+    STATUS	current
+    DESCRIPTION
+	"Object is not supervised (normal)"
+    ::= { cirpackTraps 8 }
+
+cirpackstarting NOTIFICATION-TYPE
+    OBJECTS {kName,kLog}
+    STATUS	current
+    DESCRIPTION
+	"Object is starting (Warning)"
+    ::= { cirpackTraps 1 }
+
+ cirpackOk NOTIFICATION-TYPE
+    OBJECTS {kName,kLog}
+    STATUS	current
+    DESCRIPTION
+	"Object is OK (normal)"
+    ::= { cirpackTraps 2 }
+
+ cirpackabort NOTIFICATION-TYPE
+    OBJECTS {kName,kLog}
+    STATUS	current
+    DESCRIPTION
+	"Object is aborting (Major)"
+    ::= { cirpackTraps 3 }
+
+cirpackmisbehave NOTIFICATION-TYPE
+    OBJECTS {kName,kLog}
+    STATUS	current
+    DESCRIPTION
+	"Object misbehave (Minor)"
+    ::= { cirpackTraps 4 }
+
+cirpackdown NOTIFICATION-TYPE
+    OBJECTS {kName,kLog} 
+    STATUS	current
+    DESCRIPTION
+	"Object is down (Critical)"
+    ::= { cirpackTraps 5 }
+
+ cirpackcritical NOTIFICATION-TYPE
+    OBJECTS {kName,kLog}
+    STATUS	current
+    DESCRIPTION
+	"Object is not polling (Critical)"
+    ::= { cirpackTraps 6 }
+
+cirpacktestingw NOTIFICATION-TYPE
+    OBJECTS {kName,kLog}
+    STATUS	current
+    DESCRIPTION
+	"Object self-test (Warning)"
+    ::= { cirpackTraps 7 }
+
+cirpacklog NOTIFICATION-TYPE
+    OBJECTS {kName,kLog}
+    STATUS	current
+    DESCRIPTION
+	"Information log (Normal)"
+    ::= { cirpackTraps 10 }
+    
+END
