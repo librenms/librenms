@@ -18,9 +18,9 @@ use LibreNMS\RRD\RrdDefinition;
 $snmpdata = snmp_get_multi_oid($device, ['sysUpTime.0', 'sysLocation.0', 'sysContact.0', 'sysName.0', 'sysObjectID.0', 'sysDescr.0'], '-OQnUt', 'SNMPv2-MIB');
 
 $poll_device['sysUptime']   = $snmpdata['.1.3.6.1.2.1.1.3.0'];
-$poll_device['sysLocation'] = $snmpdata['.1.3.6.1.2.1.1.6.0'];
-$poll_device['sysContact']  = $snmpdata['.1.3.6.1.2.1.1.4.0'];
-$poll_device['sysName']     = strtolower($snmpdata['.1.3.6.1.2.1.1.5.0']);
+$poll_device['sysLocation'] = str_replace("\n", '', $snmpdata['.1.3.6.1.2.1.1.6.0']);
+$poll_device['sysContact']  = str_replace("\n", '', $snmpdata['.1.3.6.1.2.1.1.4.0']);
+$poll_device['sysName']     = str_replace("\n", '', strtolower($snmpdata['.1.3.6.1.2.1.1.5.0']));
 $poll_device['sysObjectID'] = $snmpdata['.1.3.6.1.2.1.1.2.0'];
 $poll_device['sysDescr']    = $snmpdata['.1.3.6.1.2.1.1.1.0'];
 
