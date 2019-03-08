@@ -15,6 +15,10 @@ access_points:
     - { Field: numactbssid, Type: tinyint(4), 'Null': false, Extra: '', Default: '0' }
     - { Field: nummonbssid, Type: tinyint(4), 'Null': false, Extra: '', Default: '0' }
     - { Field: interference, Type: 'tinyint(3) unsigned', 'Null': false, Extra: '' }
+    - { Field: extchannel, Type: varchar(24), 'Null': false, Extra: '' }
+    - { Field: htchannel, Type: varchar(6), 'Null': false, Extra: '' }
+    - { Field: htmode, Type: varchar(16), 'Null': false, Extra: '' }
+    - { Field: mode, Type: varchar(32), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [accesspoint_id], Unique: true, Type: BTREE }
     deleted: { Name: deleted, Columns: [deleted], Unique: false, Type: BTREE }
