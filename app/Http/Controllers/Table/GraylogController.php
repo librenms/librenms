@@ -105,13 +105,14 @@ class GraylogController extends SimpleTableController
             $displayTime = $message['message']['timestamp'];
         }
 
+        $level = isset($message['message']['level']) ? $message['message']['level'] : '';
         return [
-            'severity'  => $this->severityLabel($message['message']['level']),
+            'severity'  => $this->severityLabel($level),
             'timestamp' => $displayTime,
             'source'    => '<a href="'.Url::generate(['page'=>'device', 'device'=>$message['message']['source']]).'">'.$message['message']['source'].'</a>',
-            'message'   => $message['message']['message'],
+            'message'   => isset($message['message']['message']) ? $message['message']['message'] : '',
             'facility'  => isset($message['message']['facility']) ? $message['message']['facility'] : '',
-            'level'     => $message['message']['level'],
+            'level'     => $level,
         ];
     }
 
