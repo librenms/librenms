@@ -79,7 +79,7 @@ if ($device['os_group'] == 'printer') {
             continue;
         } elseif ($current == -3) {
             // at least one piece of paper in tray
-            $current = $capacity;
+            $current = 50;
         } else {
             $current = $current / $capacity * 100;
         }
