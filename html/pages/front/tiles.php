@@ -74,7 +74,7 @@ if ($default_dash == 0 && empty($user_dashboards)) {
 }
 
 $data = dbFetchRows(
-    'SELECT user_widget_id,users_widgets.widget_id,title,widget,col,row,size_x,size_y,refresh FROM `users_widgets`
+    'SELECT `user_widget_id`,`users_widgets`.`widget_id`,`title`,`widget`,`col`,`row`,`size_x`,`size_y`,`refresh` FROM `users_widgets`
     LEFT JOIN `widgets` ON `widgets`.`widget_id`=`users_widgets`.`widget_id` WHERE `dashboard_id`=?',
     array($vars['dashboard']['dashboard_id'])
 );
