@@ -25,4 +25,3 @@ $mempool['free']  = $entry['memFreeBytes'];
 $perc             = $entry['used']/$entry['total'] * 100;
 
 d_echo($mempool);
-
