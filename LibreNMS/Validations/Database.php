@@ -184,6 +184,12 @@ class Database extends BaseValidation
 
                 foreach ($data['Columns'] as $index => $cdata) {
                     $column = $cdata['Field'];
+
+                    // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
+                    if ($cdata['Type'] == 'timestamp') {
+                         $current_columns[$column]['Extra'] = preg_replace("/DEFAULT_GENERATED[ ]*/", '', $current_columns[$column]['Extra']);
+                    }
+
                     if (empty($current_columns[$column])) {
                         $validator->fail("Database: missing column ($table/$column)");
                         $primary = false;
