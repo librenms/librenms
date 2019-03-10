@@ -36,8 +36,8 @@ $oid_list = [
 
 $data = snmp_get_multi($device, $oid_list, '-OUQs', 'CORIANT-GROOVE-MIB');
 
-foreach (array_keys ($data) as $dkey) {
-    if (isset ($data[$dkey]['softwareloadSwloadState']) && $data[$dkey]['softwareloadSwloadState'] == 'active') {
+foreach (array_keys($data) as $dkey) {
+    if (isset($data[$dkey]['softwareloadSwloadState']) && $data[$dkey]['softwareloadSwloadState'] == 'active') {
         $version = $data[$dkey]['softwareloadSwloadVersion'];
         break;
     }
