@@ -212,8 +212,6 @@ class AuthSSOTest extends DBTestCase
 
         $this->expectException('LibreNMS\Exceptions\AuthenticationException');
         $a->authenticate([]);
-
-        $_SERVER = $this->server;
     }
 
     // Test some missing attributes
