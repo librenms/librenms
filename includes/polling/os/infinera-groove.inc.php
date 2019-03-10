@@ -27,12 +27,20 @@ echo 'infinera-groove: ';
 
 $oid_list = [
     'neType.0',
+    'softwareloadSwloadState.1',
+    'softwareloadSwloadState.2',
     'softwareloadSwloadVersion.1',
+    'softwareloadSwloadVersion.2',
     'inventoryManufacturerNumber.shelf.1.0.0.0',
 ];
 
 $data = snmp_get_multi($device, $oid_list, '-OUQs', 'CORIANT-GROOVE-MIB');
 
-$version    = $data[1]['softwareloadSwloadVersion'];
+foreach (array_keys($data) as $dkey) {
+    if (isset($data[$dkey]['softwareloadSwloadState']) && $data[$dkey]['softwareloadSwloadState'] == 'active') {
+        $version = $data[$dkey]['softwareloadSwloadVersion'];
+        break;
+    }
+}
 $hardware   = $data[0]['neType'];
 $serial     = $data['shelf.1.0.0.0']['inventoryManufacturerNumber'];

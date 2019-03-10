@@ -26,41 +26,46 @@
 
 echo 'Port types:';
 
-foreach (array ('100', '40', '10') as $infineratype) {
-    if (!is_array($cg_stats)) {
-        echo ' eth'.$infineratype.'g';
-        $cg_stats = snmpwalk_cache_multi_oid($device, 'eth'.$infineratype.'gEntry', $cg_stats, 'CORIANT-GROOVE-MIB');
-        $cg_stats = snmpwalk_cache_multi_oid($device, 'eth'.$infineratype.'gStatistics', $cg_stats, 'CORIANT-GROOVE-MIB');
-    }
+foreach (array ('eth100g', 'eth40g', 'eth10g', 'fc16g', 'fc8g') as $infineratype) {
+    echo ' '.$infineratype;
+    preg_match('/[a-z]+(\d+)g/i', $infineratype, $matches);
+    $infspeed = $matches[1];
+
+    $cg_stats = snmpwalk_cache_multi_oid($device, $infineratype.'Entry', $cg_stats, 'CORIANT-GROOVE-MIB');
+    $cg_stats = snmpwalk_cache_multi_oid($device, $infineratype.'Statistics', $cg_stats, 'CORIANT-GROOVE-MIB');
 
     $required = array(
-        'ifAlias'               => 'eth'.$infineratype.'gAliasName',
-        'ifAdminStatus'         => 'eth'.$infineratype.'gAdminStatus',
-        'ifOperStatus'          => 'eth'.$infineratype.'gOperStatus',
+        'ifAlias'               => $infineratype.'AliasName',
+        'ifAdminStatus'         => $infineratype.'AdminStatus',
+        'ifOperStatus'          => $infineratype.'OperStatus',
         'ifType'                => 'Ethernet',
-        'ifHCInBroadcastPkts'   => 'eth'.$infineratype.'gStatisticsEntryInBroadcastPackets',
-        'ifHCInMulticastPkts'   => 'eth'.$infineratype.'gStatisticsEntryInMulticastPackets',
-        'ifHCInOctets'          => 'eth'.$infineratype.'gStatisticsEntryInOctets',
-        'ifHCInUcastPkts'       => 'eth'.$infineratype.'gStatisticsEntryInPackets',
-        'ifHCOutBroadcastPkts'  => 'eth'.$infineratype.'gStatisticsEntryOutBroadcastPackets',
-        'ifHCOutMulticastPkts'  => 'eth'.$infineratype.'gStatisticsEntryOutMulticastPackets',
-        'ifHCOutOctets'         => 'eth'.$infineratype.'gStatisticsEntryOutOctets',
-        'ifHCOutUcastPkts'      => 'eth'.$infineratype.'gStatisticsEntryOutPackets',
-        'ifHighSpeed'           => $infineratype*1000,
+        'ifHCInBroadcastPkts'   => $infineratype.'StatisticsEntryInBroadcastPackets',
+        'ifHCInMulticastPkts'   => $infineratype.'StatisticsEntryInMulticastPackets',
+        'ifHCInOctets'          => $infineratype.'StatisticsEntryInOctets',
+        'ifHCInUcastPkts'       => $infineratype.'StatisticsEntryInPackets',
+        'ifHCOutBroadcastPkts'  => $infineratype.'StatisticsEntryOutBroadcastPackets',
+        'ifHCOutMulticastPkts'  => $infineratype.'StatisticsEntryOutMulticastPackets',
+        'ifHCOutOctets'         => $infineratype.'StatisticsEntryOutOctets',
+        'ifHCOutUcastPkts'      => $infineratype.'StatisticsEntryOutPackets',
+        'ifHighSpeed'           => $infspeed * 1000,
     );
 
     foreach ($cg_stats as $index => $tmp_stats) {
         $indexids = explode('.', $index);
 
-        if (!isset($cg_stats[$index]['eth'.$infineratype.'gAdminStatus'])) {
+        if (!isset($cg_stats[$index][$infineratype.'AdminStatus'])) {
             continue;
         }
 
-        // 100g ports use shelfId, slotId, portId
-        // 40g and 10g ports use shelfId, slotId, portId, subportId
-        $descr = $infineratype.'gbe-'.$indexids[0].'/'.$indexids[1].'/'.$indexids[3];
-        if ($infineratype != 100) {
-            $descr .= '/'.$indexids[4];
+        // The CLI port name is not available in SNMP
+        $descr = ( strpos($infineratype, 'eth') === false ) ? $infineratype : $infspeed.'gbe';
+
+        // 100g and 40g ports use shelfId, slotId, portId
+        // 10g, fc16g and fc8g ports append the subportId with '.'
+        $descr .= '-'.$indexids[0].'/'.$indexids[1].'/'.$indexids[3];
+
+        if ($infspeed < 40) {
+            $descr .= '.'.$indexids[4];
         }
 
         // librenms expects the index to be bigint(20) => we grab 3 decimal
@@ -78,7 +83,7 @@ foreach (array ('100', '40', '10') as $infineratype) {
 
         foreach ($required as $normaloid => $infineraoid) {
             // this is a bit hacky
-            if (preg_match('/^eth/', $required[$normaloid])) {
+            if (preg_match('/^(eth|fc)\d+/i', $required[$normaloid])) {
                 $port_stats[$lindex][$normaloid] = $cg_stats[$index][$infineraoid];
             } else {
                 $port_stats[$lindex][$normaloid] = $required[$normaloid];
