@@ -3,6 +3,8 @@ group: grandstream
 text: 'Grandstream HT'
 type: network
 icon: grandstream
+over:
+    - { graph: device_ping_perf, text: 'Ping Response' }
 mib_dir:
     - grandstream
 discovery:
