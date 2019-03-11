@@ -62,6 +62,7 @@ $config['ipmitool']       = '/usr/bin/ipmitool';
 $config['virsh']          = '/usr/bin/virsh';
 $config['dot']            = '/usr/bin/dot';
 $config['sfdp']           = '/usr/bin/sfdp';
+$config['nfdump']         = '/usr/bin/nfdump';
 
 $config['slow_statistics'] = true;
 // THIS WILL CHANGE TO FALSE IN FUTURE
@@ -534,6 +535,7 @@ $config['nfsen_enable'] = 0;
 // $config['nfsen_rrds']   = "/var/nfsen/profiles-stat/live/";
 // $config['nfsen_suffix']   = "_yourdomain_com";
 $config['nfsen_subdirlayout'] = 1;
+$config['nfsen_last_max'] = 153600; // 48 hours ago in seconds
 // Location Mapping
 // Use this feature to map ugly locations to pretty locations
 // config['location_map']['Under the Sink'] = "Under The Sink, The Office, London, UK";
