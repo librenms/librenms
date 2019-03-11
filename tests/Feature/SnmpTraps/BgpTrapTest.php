@@ -27,12 +27,15 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\BgpPeer;
 use App\Models\Device;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\LaravelTestCase;
 
-class BgpTrapTest extends TrapTestCase
+class BgpTrapTest extends LaravelTestCase
 {
+    use DatabaseTransactions;
+
     public function testBgpUp()
     {
         $device = factory(Device::class)->create();

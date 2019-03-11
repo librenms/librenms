@@ -28,13 +28,16 @@ namespace LibreNMS\Tests;
 use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Port;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\Feature\SnmpTraps\TrapTestCase;
 use Log;
 
-class CommonTrapTest extends TrapTestCase
+class CommonTrapTest extends LaravelTestCase
 {
+    use DatabaseTransactions;
+
     public function testGarbage()
     {
         $trapText = "Garbage\n";
