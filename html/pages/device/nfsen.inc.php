@@ -9,6 +9,8 @@ $link_array = array(
     );
 
 echo generate_link('General', $link_array, array('nfsen' => 'general'));
+echo '|';
+echo generate_link('Stats', $link_array, array('nfsen' => 'stats'));
 
 $printedChannel=false;
 $nfsenHostname=str_replace('.', $config['nfsen_split_char'], $device['hostname']);
