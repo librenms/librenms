@@ -50,6 +50,9 @@ class Rocket extends Transport
 
     public static function contactRocket($obj, $api)
     {
+	//fix trail /r and /n in channel and emoji
+	 $api['icon_emoji']= str_replace(array("\n", "\r"),'', $api['icon_emoji']);
+	$api['channel']= str_replace(array("\n", "\r"),'', $api['channel']);
         $host          = $api['url'];
         $curl          = curl_init();
         $rocket_msg    = strip_tags($obj['msg']);
