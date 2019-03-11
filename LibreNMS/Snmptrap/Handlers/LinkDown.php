@@ -57,11 +57,11 @@ class LinkDown implements SnmptrapHandler
         Log::event("SNMP Trap: linkDown $port->ifAdminStatus/$port->ifOperStatus " . $port->ifDescr, $device->device_id, 'interface', 5, $port->port_id);
 
         if ($port->isDirty('ifAdminStatus')) {
-            Log::event("Interface Disabled : " . $port['ifDescr'] . " (TRAP)", $device->device_id, "interface", 3, $port['port_id']);
+            Log::event("Interface Disabled : $port->ifDescr (TRAP)", $device->device_id, "interface", 3, $port->port_id);
         }
 
         if ($port->isDirty('ifOperStatus')) {
-            Log::event("Interface went Down : " . $port['ifDescr'] . " (TRAP)", $device->device_id, "interface", 5, $port['port_id']);
+            Log::event("Interface went Down : $port->ifDescr (TRAP)", $device->device_id, "interface", 5, $port->port_id);
         }
 
         $port->save();
