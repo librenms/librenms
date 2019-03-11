@@ -1699,3 +1699,48 @@ function lowest_five( $number ){
 function lowest_five_minutes( $time ){
     return $time - ($time % 300);
 }
+
+/**
+ * This returns the subpath for working with nfdump.
+ *
+ * 1 value is taken and that is a unix time stamp. It will be then be rounded
+ * off to the lowest five minutes earlier.
+ *
+ * The return string will be a path partial you can use with nfdump to tell it what
+ * file or range of files to use.
+ *
+ * Below ie a explanation of the layouts as taken from the NfSen config file.
+ *  0             no hierachy levels - flat layout - compatible with pre NfSen version
+ *  1 %Y/%m/%d    year/month/day
+ *  2 %Y/%m/%d/%H year/month/day/hour
+ *  3 %Y/%W/%u    year/week_of_year/day_of_week
+ *  4 %Y/%W/%u/%H year/week_of_year/day_of_week/hour
+ *  5 %Y/%j       year/day-of-year
+ *  6 %Y/%j/%H    year/day-of-year/hour
+ *  7 %Y-%m-%d    year-month-day
+ *  8 %Y-%m-%d/%H year-month-day/hour
+ */
+function time_to_nfsen_subpath( $time ){
+    $time=lowest_five_minutes( $time );
+    $layout=$config['nfsen_subdirlayout'];
+
+    if ( $layout == 0 ){
+        return 'nfcapd.'.date('YmdHi', $time);
+    } elseif ( $layout == 1 ){
+        return date('Y\/m\/d\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ( $layout == 2 ){
+        return date('Y\/m\/d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ( $layout == 3 ){
+        return date('Y\/W\/w\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ( $layout == 4 ){
+        return date('Y\/W\/w\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ( $layout == 5 ){
+        return date('Y\/z\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ( $layout == 6 ){
+        return date('Y\/z\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ( $layout == 7 ){
+        return date('Y\-m\-d\/\n\f\c\a\p\d\.YmdHi', $time);
+    } elseif ( $layout == 8 ){
+        return date('Y\-m\-d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
+    }
+}
