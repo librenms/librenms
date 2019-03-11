@@ -1,0 +1,645 @@
+--
+-- CIENA-WS-NOTIFICATION-MIB.my
+--
+
+CIENA-WS-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    cienaWsNotifications
+        FROM CIENA-WS-MIB
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+cienaWsNotificationMIB MODULE-IDENTITY
+	LAST-UPDATED	"201611140000Z"
+	ORGANIZATION	"Ciena Corporation"
+	CONTACT-INFO
+      "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+	DESCRIPTION
+		"Notification definitions for Waveserver. Contains alarm notifications and link
+state defects."
+	REVISION		"201611140000Z"
+	DESCRIPTION		"Added MODULE-IDENTITY statements."
+	::= { cienaWsNotifications 3 }
+
+-- Textual conventions
+DisplayString32 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32t"
+    STATUS       current
+    DESCRIPTION
+        "A UTF-8 string with a max length of 32 characters"
+    SYNTAX       OCTET STRING(SIZE(1..32))
+
+
+-- Alarm Notifications
+
+wsAlarmNotification NOTIFICATION-TYPE
+    OBJECTS {
+        wsAlarmNotificationSiteId,
+        wsAlarmNotificationGroupId,
+        wsAlarmNotificationMemberId,
+        wsAlarmNotificationInstanceId,
+        wsAlarmNotificationDateAndTime,
+        wsAlarmNotificationTableId,
+        wsAlarmNotificationSeverity,
+        wsAlarmNotificationInstance,
+        wsAlarmNotificationDescription,
+        wsAlarmNotificationActiveStatus,
+        wsAlarmNotificationEntityType
+    }
+    STATUS      current
+    DESCRIPTION
+            "Ciena Wavesever notification for an alarm raising or clearing"
+    ::= { cienaWsNotifications 11 }
+
+wsAlarmNotificationSiteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system Site ID."
+    ::= { wsAlarmNotification 1 }
+
+wsAlarmNotificationGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system Group ID."
+    ::= { wsAlarmNotification 2 }
+
+wsAlarmNotificationMemberId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system Member ID."
+    ::= { wsAlarmNotification 3 }
+
+wsAlarmNotificationInstanceId OBJECT-TYPE
+    SYNTAX      Unsigned32(1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm Instance ID."
+    ::= { wsAlarmNotification 4 }
+
+wsAlarmNotificationDateAndTime OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local date and time when alarm was raised."
+    ::= { wsAlarmNotification 5 }
+
+wsAlarmNotificationTableId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The alarm table ID."
+    ::= { wsAlarmNotification 6 }
+
+wsAlarmNotificationSeverity OBJECT-TYPE
+    SYNTAX      INTEGER {
+        cleared(1),
+        critical(3),
+        major(4),
+        minor(5),
+        warning(6),
+        info(8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm severity."
+    ::= { wsAlarmNotification 7 }
+
+wsAlarmNotificationInstance OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object instance the alarm is raised against."
+    ::= { wsAlarmNotification 8 }
+
+wsAlarmNotificationDescription OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm description."
+    ::= { wsAlarmNotification 9 }
+
+wsAlarmNotificationActiveStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm active status."
+    ::= { wsAlarmNotification 10 }
+
+    -- Port Type
+wsAlarmNotificationEntityType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable(0),
+        other(1),
+        clientPort(2),
+        linePort(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm source entity type if applicable."
+    ::= { wsAlarmNotification 11 }
+
+-- Link state notifications
+-- The following notification communicates the state of a link. This includes
+-- detailed information about the current health of the link.
+wsLinkStateAlarmNotification NOTIFICATION-TYPE
+    OBJECTS {
+        wsLinkStateAlarmNotificationSiteId,
+        wsLinkStateAlarmNotificationGroupId,
+        wsLinkStateAlarmNotificationMemberId,
+        wsLinkStateAlarmNotificationInstanceId,
+        wsLinkStateAlarmNotificationDateAndTime,
+        wsLinkStateAlarmNotificationSeverity,
+        wsLinkStateAlarmNotificationInstance,
+        wsLinkStateAlarmNotificationDescription,
+        wsLinkStateAlarmNotificationPtpRxLos,
+        wsLinkStateAlarmNotificationPtpRxLol,
+        wsLinkStateAlarmNotificationPtpTxLos,
+        wsLinkStateAlarmNotificationPtpTxLol,
+        wsLinkStateAlarmNotificationEthFecLossSync,
+        wsLinkStateAlarmNotificationEthEBer,
+        wsLinkStateAlarmNotificationEthRsLf,
+        wsLinkStateAlarmNotificationEthRsRf,
+        wsLinkStateAlarmNotificationEthPcsLobl,
+        wsLinkStateAlarmNotificationEthPcsLoam,
+        wsLinkStateAlarmNotificationEthPcsLol,
+        wsLinkStateAlarmNotificationEthRsLinkDown,
+        wsLinkStateAlarmNotificationOtuLoc,
+        wsLinkStateAlarmNotificationOtuFreqOor,
+        wsLinkStateAlarmNotificationOtuLof,
+        wsLinkStateAlarmNotificationOtuPreFecSf,
+        wsLinkStateAlarmNotificationOtuPreFecSd,
+        wsLinkStateAlarmNotificationOtuLom,
+        wsLinkStateAlarmNotificationOtuBdi,
+        wsLinkStateAlarmNotificationOtuTtiMismatch,
+        wsLinkStateAlarmNotificationOduOci,
+        wsLinkStateAlarmNotificationOduAis,
+        wsLinkStateAlarmNotificationOduLck,
+        wsLinkStateAlarmNotificationOduSf,
+        wsLinkStateAlarmNotificationOduSd,
+        wsLinkStateAlarmNotificationOduTtiMismatch,
+        wsLinkStateAlarmNotificationOduBdi,
+        wsLinkStateAlarmNotificationOduPtiMismatch,
+        wsLinkStateAlarmNotificationOduFeClientSf,
+        wsLinkStateAlarmNotificationOduSkewOor,
+        wsLinkStateAlarmNotificationEntityType
+    }
+    STATUS        current
+    DESCRIPTION
+        "Ciena Waveserver notification for line faults."
+    ::= { cienaWsNotifications 12 }
+
+wsLinkStateAlarmNotificationSiteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The line fault site ID."
+    ::= { wsLinkStateAlarmNotification 1 }
+
+wsLinkStateAlarmNotificationGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system Group ID."
+    ::= { wsLinkStateAlarmNotification 2 }
+
+wsLinkStateAlarmNotificationMemberId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system Member ID."
+    ::= { wsLinkStateAlarmNotification 3 }
+
+wsLinkStateAlarmNotificationInstanceId OBJECT-TYPE
+    SYNTAX      Unsigned32(1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The line fault instance ID."
+    ::= { wsLinkStateAlarmNotification 4 }
+
+wsLinkStateAlarmNotificationDateAndTime OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local date and time when alarm was raised."
+    ::= { wsLinkStateAlarmNotification 5 }
+
+wsLinkStateAlarmNotificationSeverity OBJECT-TYPE
+    SYNTAX      INTEGER {
+        cleared(1),
+        critical(3),
+        major(4),
+        minor(5),
+        warning(6),
+        info(8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm severity."
+    ::= { wsLinkStateAlarmNotification 7 }
+
+wsLinkStateAlarmNotificationInstance OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object instance the alarm is raised against."
+    ::= { wsLinkStateAlarmNotification 8 }
+
+wsLinkStateAlarmNotificationDescription OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm description."
+    ::= { wsLinkStateAlarmNotification 9 }
+
+
+    -- PTP
+wsLinkStateAlarmNotificationPtpDefects OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Defects related to the physical termination point."
+    ::= { wsLinkStateAlarmNotification 10 }
+
+
+wsLinkStateAlarmNotificationPtpRxLos OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP alarms for the link."
+    ::= { wsLinkStateAlarmNotificationPtpDefects 1 }
+
+wsLinkStateAlarmNotificationPtpRxLol OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP alarms for the link."
+    ::= { wsLinkStateAlarmNotificationPtpDefects 2 }
+
+wsLinkStateAlarmNotificationPtpTxLos OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP alarms for the link."
+    ::= { wsLinkStateAlarmNotificationPtpDefects 3 }
+
+wsLinkStateAlarmNotificationPtpTxLol OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP alarms for the link."
+    ::= { wsLinkStateAlarmNotificationPtpDefects 4 }
+
+-- Ethernet alarms
+wsLinkStateAlarmNotificationEthDefects OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Ethernet defects."
+    ::= { wsLinkStateAlarmNotification 11 }
+
+wsLinkStateAlarmNotificationEthPcsHighBer OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Ethernet PCS high bit error rate."
+    ::= { wsLinkStateAlarmNotificationEthDefects 1 }
+
+wsLinkStateAlarmNotificationEthPcsLoam OBJECT-TYPE
+    SYNTAX      INTEGER { inactive(0), active(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Ethernet PCS loss of alignment marker."
+    ::= { wsLinkStateAlarmNotificationEthDefects 2 }
+
+wsLinkStateAlarmNotificationEthPcsLobl OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Ethernet PCS loss of block lock."
+    ::= { wsLinkStateAlarmNotificationEthDefects 3 }
+
+wsLinkStateAlarmNotificationEthRsLinkDown OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Ethernet RS link down."
+    ::= { wsLinkStateAlarmNotificationEthDefects 4 }
+
+wsLinkStateAlarmNotificationEthRsLf OBJECT-TYPE
+    SYNTAX      INTEGER { inactive(0), active(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Ethernet RS local fault."
+    ::= { wsLinkStateAlarmNotificationEthDefects 5 }
+
+wsLinkStateAlarmNotificationEthRsRf OBJECT-TYPE
+    SYNTAX      INTEGER { inactive(0), active(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Ethernet RS remote fault."
+    ::= { wsLinkStateAlarmNotificationEthDefects 6 }
+
+wsLinkStateAlarmNotificationEthFecLossSync OBJECT-TYPE
+    SYNTAX      INTEGER { inactive(0), active(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Ethernet FEC loss of alignment marker."
+    ::= { wsLinkStateAlarmNotificationEthDefects 7 }
+
+wsLinkStateAlarmNotificationEthPmaSool OBJECT-TYPE
+    SYNTAX      INTEGER { inactive(0), active(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Ethernet PMA serdes out of lock."
+    ::= { wsLinkStateAlarmNotificationEthDefects 8 }
+
+
+-- OTU Alarms
+
+wsLinkStateAlarmNotificationOtuDefects OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "OTU layer defects."
+    ::= { wsLinkStateAlarmNotification 12 }
+
+
+wsLinkStateAlarmNotificationOtuLoc OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OTU loss of clock."
+    ::= { wsLinkStateAlarmNotificationOtuDefects 1}
+
+wsLinkStateAlarmNotificationOtuFreqOor OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OTU frequency out of range."
+    ::= { wsLinkStateAlarmNotificationOtuDefects 2 }
+
+wsLinkStateAlarmNotificationOtuLof OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OTU loss of frame."
+    ::= { wsLinkStateAlarmNotificationOtuDefects 3 }
+
+wsLinkStateAlarmNotificationOtuPreFecSf OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OTU pre-FEC signal fail."
+    ::= { wsLinkStateAlarmNotificationOtuDefects 4 }
+
+wsLinkStateAlarmNotificationOtuPreFecSd OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OTU pre-FEC signal degrade."
+    ::= { wsLinkStateAlarmNotificationOtuDefects 5 }
+
+wsLinkStateAlarmNotificationOtuLom OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OTU loss of multi-frame."
+    ::= { wsLinkStateAlarmNotificationOtuDefects 6 }
+
+wsLinkStateAlarmNotificationOtuBdi OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OTU backwards defect indicator."
+    ::= { wsLinkStateAlarmNotificationOtuDefects 7 }
+
+wsLinkStateAlarmNotificationOtuTtiMismatch OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OTU TTI mismatch."
+    ::= { wsLinkStateAlarmNotificationOtuDefects 8 }
+
+-- ODU
+wsLinkStateAlarmNotificationOduDefects OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "ODU layer defects."
+    ::= { wsLinkStateAlarmNotification 13 }
+
+wsLinkStateAlarmNotificationOduOci OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ODU open connection indication."
+    ::= { wsLinkStateAlarmNotificationOduDefects 1 }
+
+wsLinkStateAlarmNotificationOduAis OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ODU alarm indicating signal."
+    ::= { wsLinkStateAlarmNotificationOduDefects 2 }
+
+wsLinkStateAlarmNotificationOduLck OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ODU locked."
+    ::= { wsLinkStateAlarmNotificationOduDefects 3 }
+
+wsLinkStateAlarmNotificationOduSf OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ODU signal fail."
+    ::= { wsLinkStateAlarmNotificationOduDefects 4 }
+
+wsLinkStateAlarmNotificationOduSd OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ODU signal degrade."
+    ::= { wsLinkStateAlarmNotificationOduDefects 5 }
+
+wsLinkStateAlarmNotificationOduTtiMismatch OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ODU TTI mismatch."
+    ::= { wsLinkStateAlarmNotificationOduDefects 6 }
+
+wsLinkStateAlarmNotificationOduBdi OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ODU backwards defect indicator."
+    ::= { wsLinkStateAlarmNotificationOduDefects 7 }
+
+wsLinkStateAlarmNotificationOduPtiMismatch OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ODU payload type indicator mismatch."
+    ::= { wsLinkStateAlarmNotificationOduDefects 8 }
+
+wsLinkStateAlarmNotificationOduFeClientSf OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ODU far-end client signal fail."
+    ::= { wsLinkStateAlarmNotificationOduDefects 9 }
+
+wsLinkStateAlarmNotificationOduSkewOor OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ODU skew out of range."
+    ::= { wsLinkStateAlarmNotificationOduDefects 10 }
+
+wsLinkStateAlarmNotificationEntityType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable(0),
+        other(1),
+        clientPort(2),
+        linePort(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm source entity type if applicable."
+    ::= { wsLinkStateAlarmNotification 14 }
+
+END

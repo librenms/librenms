@@ -1,0 +1,2018 @@
+-- This file was automatically generated from ciena-ws-port.yang. Do not edit.
+
+CIENA-WS-PORT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    Decimal1Dig, DescriptionString, EnabledDisabledEnum, MacString, PortId, PortName, ServiceDomainIdx, ServiceIdx, XcvrType
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter64, Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+cienaWsPortMIB MODULE-IDENTITY
+    LAST-UPDATED "201707070000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This module defines port data for the Waveserver. Ports are related to both client and line and represent the port through which the line or client signal travels. They are automatically created by the system. By default, line ports are automatically mapped to client ports via services and service-domains."
+    REVISION "201707070000Z"
+    DESCRIPTION "Waveserver Release 1.5
+Added ncx:user-write to 'ports'."
+    REVISION "201703020000Z"
+    DESCRIPTION "Waveserver Rel 1.4 revision.  
+Obsolete: mac-layer container and its sub node unavailable-seconds leaf.
+Added: unavailable-seconds leaf to container pcs-layer.
+Added: odu-layer container which contains errored-seconds, severely-errored-seconds, unavailable-seconds leaves.
+Added: average-link-utilization leaf to container interface-counts/rx and interface-counts/tx respectively. 
+Added: xcvr-type leaf to properties container.
+New ciena-ws-encryption.yang now contains augments for the ports properties container.
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revised.  
+Added: errored-seconds, severely-errored-seconds to the pcs-layer container,
+Added: mac-layer container and unavailable-seconds leaf."
+    REVISION "201605300000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.  
+Major restructuring of this YANG module."
+    REVISION "201602230000Z"
+    DESCRIPTION "Waveserver Rel 1.1 revised.
+leaf 'speed' changed to be 'config false'.
+leaf 'tunability-supported' type updated. 
+leaf 'port-speeds' type definition updated.  
+removed 'rpc ws-port-clear-total-statistics'.
+leaf 'max-frame-size' range modified. 
+leaf loopback enum values updated.
+"
+    REVISION "201509300000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 7 }
+
+PortOperationalState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(-1), invalid(0), up(1), down(2), notauthenticated(3), loopbacktx(4), loopbackrx(5), unequipped(6) }
+
+PortSpeed ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { speedauto(-1), speed10gig(10000000), speed40gig(40000000), speed100gig(100000000) }
+
+PortTypeEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(5), ethernet10gig(6), ethernet40gig(7), ethernet100gig(8) }
+
+cwsPortPortsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortPortsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Configuration and operational data for the port."
+    ::= { cienaWsPortMIB 3 }
+
+cwsPortPortsEntry OBJECT-TYPE
+    SYNTAX CwsPortPortsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortPortsTable."
+    INDEX { cwsPortPortsPortId }
+    ::= { cwsPortPortsTable 1 }
+
+CwsPortPortsEntry ::= SEQUENCE { 
+    cwsPortPortsPortId Integer32 
+}
+
+cwsPortPortsPortId OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Unique, logical ID of the port."
+    ::= { cwsPortPortsEntry 1 }
+
+cwsPortIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Port identification."
+    ::= { cienaWsPortMIB 4 }
+
+cwsPortIdEntry OBJECT-TYPE
+    SYNTAX CwsPortIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortIdTable."
+    INDEX { cwsPortPortsPortId, cwsPortIdTableSnmpKey }
+    ::= { cwsPortIdTable 1 }
+
+CwsPortIdEntry ::= SEQUENCE { 
+    cwsPortIdTableSnmpKey Integer32,
+    cwsPortIdName PortName,
+    cwsPortIdDescription DescriptionString,
+    cwsPortIdPortType PortTypeEnum,
+    cwsPortIdMacAddress MacString,
+    cwsPortIdInterfaceType INTEGER 
+}
+
+cwsPortIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortId"
+    ::= { cwsPortIdEntry 1 }
+
+cwsPortIdName OBJECT-TYPE
+    SYNTAX PortName
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Name of the port interface. Format is: port# or majorport#.minorport# "
+    ::= { cwsPortIdEntry 2 }
+
+cwsPortIdDescription OBJECT-TYPE
+    SYNTAX DescriptionString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Description of the port interface."
+    ::= { cwsPortIdEntry 3 }
+
+cwsPortIdPortType OBJECT-TYPE
+    SYNTAX PortTypeEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The port interface type."
+    ::= { cwsPortIdEntry 4 }
+
+cwsPortIdMacAddress OBJECT-TYPE
+    SYNTAX MacString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The MAC address of the port."
+    ::= { cwsPortIdEntry 5 }
+
+cwsPortIdInterfaceType OBJECT-TYPE
+    SYNTAX INTEGER { inni(0), uni(1), enni(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The configured port interface type."
+    ::= { cwsPortIdEntry 6 }
+
+cwsPortStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Port administrative and operational states."
+    ::= { cienaWsPortMIB 5 }
+
+cwsPortStateEntry OBJECT-TYPE
+    SYNTAX CwsPortStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortStateTable."
+    INDEX { cwsPortPortsPortId, cwsPortStateTableSnmpKey }
+    ::= { cwsPortStateTable 1 }
+
+CwsPortStateEntry ::= SEQUENCE { 
+    cwsPortStateTableSnmpKey Integer32,
+    cwsPortStateAdminState INTEGER,
+    cwsPortStateOperationalState PortOperationalState,
+    cwsPortStateOperationalStateDuration OCTET STRING 
+}
+
+cwsPortStateTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortState"
+    ::= { cwsPortStateEntry 1 }
+
+cwsPortStateAdminState OBJECT-TYPE
+    SYNTAX INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The configured administrative state of the port."
+    ::= { cwsPortStateEntry 2 }
+
+cwsPortStateOperationalState OBJECT-TYPE
+    SYNTAX PortOperationalState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The operational state of the port."
+    ::= { cwsPortStateEntry 3 }
+
+cwsPortStateOperationalStateDuration OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Amount of time since last state transition."
+    ::= { cwsPortStateEntry 4 }
+
+cwsPortCapabilitiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortCapabilitiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Port capabilities."
+    ::= { cienaWsPortMIB 6 }
+
+cwsPortCapabilitiesEntry OBJECT-TYPE
+    SYNTAX CwsPortCapabilitiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortCapabilitiesTable."
+    INDEX { cwsPortPortsPortId, cwsPortCapabilitiesTableSnmpKey }
+    ::= { cwsPortCapabilitiesTable 1 }
+
+CwsPortCapabilitiesEntry ::= SEQUENCE { 
+    cwsPortCapabilitiesTableSnmpKey Integer32,
+    cwsPortCapabilitiesPortSpeeds BITS,
+    cwsPortCapabilitiesDuplex BITS,
+    cwsPortCapabilitiesAutoNegotiation BITS,
+    cwsPortCapabilitiesFlowControl BITS,
+    cwsPortCapabilitiesFecSupport EnabledDisabledEnum 
+}
+
+cwsPortCapabilitiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortCapabilities"
+    ::= { cwsPortCapabilitiesEntry 1 }
+
+cwsPortCapabilitiesPortSpeeds OBJECT-TYPE
+    SYNTAX BITS { ethernet10gig(3), ethernet40gig(4), ethernet100gig(5) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The speeds that the port can support."
+    ::= { cwsPortCapabilitiesEntry 2 }
+
+cwsPortCapabilitiesDuplex OBJECT-TYPE
+    SYNTAX BITS { half(0), full(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Port duplex setting. The default setting is full."
+    ::= { cwsPortCapabilitiesEntry 3 }
+
+cwsPortCapabilitiesAutoNegotiation OBJECT-TYPE
+    SYNTAX BITS { off(0), on(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Port auto-negotiation setting. The default setting is off."
+    ::= { cwsPortCapabilitiesEntry 4 }
+
+cwsPortCapabilitiesFlowControl OBJECT-TYPE
+    SYNTAX BITS { off(0), atx(1), arx(2), symmetric(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The default setting is off."
+    ::= { cwsPortCapabilitiesEntry 5 }
+
+cwsPortCapabilitiesFecSupport OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Forward error correction"
+    ::= { cwsPortCapabilitiesEntry 6 }
+
+cwsPortPropertiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortPropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Port properties."
+    ::= { cienaWsPortMIB 7 }
+
+cwsPortPropertiesEntry OBJECT-TYPE
+    SYNTAX CwsPortPropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortPropertiesTable."
+    INDEX { cwsPortPortsPortId, cwsPortPropertiesTableSnmpKey }
+    ::= { cwsPortPropertiesTable 1 }
+
+CwsPortPropertiesEntry ::= SEQUENCE { 
+    cwsPortPropertiesTableSnmpKey Integer32,
+    cwsPortPropertiesXcvrType XcvrType,
+    cwsPortPropertiesLoopback INTEGER,
+    cwsPortPropertiesServiceIndex ServiceIdx,
+    cwsPortPropertiesServiceDomainIndex ServiceDomainIdx 
+}
+
+cwsPortPropertiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortProperties"
+    ::= { cwsPortPropertiesEntry 1 }
+
+cwsPortPropertiesXcvrType OBJECT-TYPE
+    SYNTAX XcvrType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Transceiver type of the xcvr that's associated with this port. Type depends on what is physically plugged in. Read only attribute."
+    ::= { cwsPortPropertiesEntry 5 }
+
+cwsPortPropertiesLoopback OBJECT-TYPE
+    SYNTAX INTEGER { disabled(0), rx(1), tx(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Port PHY layer loopback.  RX loopback is a loopback forwarding ingress traffic from RX port directly to TX port.  TX loopback is a loopback forwarding egress traffic from TX port directly to RX port, TX loopback is not supported in I-NNI ports.  The RX/TX loopback can only be enabled when the port admin-state is disabled. Enable an RX/TX loopback shall fail when the port has its admin-state enabled. Users shall be able to disable the xcvr/ptp when its child port loopback enabled. Enable xcvr/ptp shall not enable its child port with loopback enabled.  A port shall has its operational state rx loopback when rx loopback is enabled, and tx loopback when tx loopback is enabled."
+    ::= { cwsPortPropertiesEntry 2 }
+
+cwsPortPropertiesServiceIndex OBJECT-TYPE
+    SYNTAX ServiceIdx
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The index number of the service the port is attached to. Only applies to UNI interface type."
+    ::= { cwsPortPropertiesEntry 3 }
+
+cwsPortPropertiesServiceDomainIndex OBJECT-TYPE
+    SYNTAX ServiceDomainIdx
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The index number of the service domain the port is attached to. Only applies to I-NNI interface type."
+    ::= { cwsPortPropertiesEntry 4 }
+
+cwsPortEthernetTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortEthernetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Ethernet properties."
+    ::= { cienaWsPortMIB 8 }
+
+cwsPortEthernetEntry OBJECT-TYPE
+    SYNTAX CwsPortEthernetEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortEthernetTable."
+    INDEX { cwsPortPortsPortId, cwsPortEthernetTableSnmpKey }
+    ::= { cwsPortEthernetTable 1 }
+
+CwsPortEthernetEntry ::= SEQUENCE { 
+    cwsPortEthernetTableSnmpKey Integer32,
+    cwsPortEthernetSpeed PortSpeed,
+    cwsPortEthernetMaxFrameSize Unsigned32,
+    cwsPortEthernetPauseProfile INTEGER,
+    cwsPortEthernetForwardErrorCorrection EnabledDisabledEnum 
+}
+
+cwsPortEthernetTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortEthernet"
+    ::= { cwsPortEthernetEntry 1 }
+
+cwsPortEthernetSpeed OBJECT-TYPE
+    SYNTAX PortSpeed
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The configured port speed."
+    ::= { cwsPortEthernetEntry 2 }
+
+cwsPortEthernetMaxFrameSize OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The maximum transmission unit value (bytes)."
+    ::= { cwsPortEthernetEntry 3 }
+
+cwsPortEthernetPauseProfile OBJECT-TYPE
+    SYNTAX INTEGER { discard(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Port handling of ingress flow control"
+    ::= { cwsPortEthernetEntry 4 }
+
+cwsPortEthernetForwardErrorCorrection OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Forward error correction"
+    ::= { cwsPortEthernetEntry 5 }
+
+cwsPortConditioningTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortConditioningEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Conditioning."
+    ::= { cienaWsPortMIB 9 }
+
+cwsPortConditioningEntry OBJECT-TYPE
+    SYNTAX CwsPortConditioningEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortConditioningTable."
+    INDEX { cwsPortPortsPortId, cwsPortConditioningTableSnmpKey }
+    ::= { cwsPortConditioningTable 1 }
+
+CwsPortConditioningEntry ::= SEQUENCE { 
+    cwsPortConditioningTableSnmpKey Integer32,
+    cwsPortConditioningType INTEGER,
+    cwsPortConditioningHoldoff INTEGER 
+}
+
+cwsPortConditioningTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortConditioning"
+    ::= { cwsPortConditioningEntry 1 }
+
+cwsPortConditioningType OBJECT-TYPE
+    SYNTAX INTEGER { none(0), laseroff(1), ethernet(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Egress UNI port consequent action for an EPL service to be applied on a far-end ingress UNI failure or network failure."
+    ::= { cwsPortConditioningEntry 2 }
+
+cwsPortConditioningHoldoff OBJECT-TYPE
+    SYNTAX INTEGER { ms0(0), ms100(100), ms200(200), ms300(300), ms400(400), ms500(500), ms600(600), ms700(700), ms800(800), ms900(900), ms1000(1000) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of milliseconds to delay Egress UNI port consequent action for an EPL service."
+    ::= { cwsPortConditioningEntry 3 }
+
+cwsPortCurrentTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortCurrentEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current statistics data."
+    ::= { cienaWsPortMIB 10 }
+
+cwsPortCurrentEntry OBJECT-TYPE
+    SYNTAX CwsPortCurrentEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortCurrentTable."
+    INDEX { cwsPortPortsPortId, cwsPortCurrentTableSnmpKey }
+    ::= { cwsPortCurrentTable 1 }
+
+CwsPortCurrentEntry ::= SEQUENCE { 
+    cwsPortCurrentTableSnmpKey Integer32,
+    cwsPortCurrentFrameErrorRatio Counter64 
+}
+
+cwsPortCurrentTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortCurrent"
+    ::= { cwsPortCurrentEntry 1 }
+
+cwsPortCurrentFrameErrorRatio OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "RMON frame error ratio."
+    ::= { cwsPortCurrentEntry 2 }
+
+cwsPortCurrentRxCountsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortCurrentRxCountsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Rx counts."
+    ::= { cienaWsPortMIB 11 }
+
+cwsPortCurrentRxCountsEntry OBJECT-TYPE
+    SYNTAX CwsPortCurrentRxCountsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortCurrentRxCountsTable."
+    INDEX { cwsPortPortsPortId, cwsPortCurrentRxCountsTableSnmpKey }
+    ::= { cwsPortCurrentRxCountsTable 1 }
+
+CwsPortCurrentRxCountsEntry ::= SEQUENCE { 
+    cwsPortCurrentRxCountsTableSnmpKey Integer32,
+    cwsPortCurrentRxCountsBytes Counter64,
+    cwsPortCurrentRxCountsPackets Counter64,
+    cwsPortCurrentRxCountsAverageLinkUtilization Decimal1Dig,
+    cwsPortCurrentRxCountsCrcErroredPackets Counter64,
+    cwsPortCurrentRxCountsMulticastPackets Counter64,
+    cwsPortCurrentRxCountsBroadcastPackets Counter64,
+    cwsPortCurrentRxCountsPausePackets Counter64,
+    cwsPortCurrentRxCountsUndersizedPackets Counter64,
+    cwsPortCurrentRxCountsOversizedPackets Counter64,
+    cwsPortCurrentRxCountsFragmentPackets Counter64,
+    cwsPortCurrentRxCountsJabberPackets Counter64,
+    cwsPortCurrentRxCountsLengthOutRangePackets Counter64,
+    cwsPortCurrentRxCountsPackets64Octet Counter64,
+    cwsPortCurrentRxCountsPackets65127Octet Counter64,
+    cwsPortCurrentRxCountsPackets128255Octet Counter64,
+    cwsPortCurrentRxCountsPackets256511Octet Counter64,
+    cwsPortCurrentRxCountsPackets5121023Octet Counter64,
+    cwsPortCurrentRxCountsPackets10241518Octet Counter64 
+}
+
+cwsPortCurrentRxCountsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortCurrentRxCounts"
+    ::= { cwsPortCurrentRxCountsEntry 1 }
+
+cwsPortCurrentRxCountsBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of bytes received including good and bad packets. This includes FCS bytes, but excludes framing bits."
+    ::= { cwsPortCurrentRxCountsEntry 2 }
+
+cwsPortCurrentRxCountsPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received, including all unicast, multicast, broadcast, MAC control, and bad packets"
+    ::= { cwsPortCurrentRxCountsEntry 3 }
+
+cwsPortCurrentRxCountsAverageLinkUtilization OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Average percent utilization derived from Rx bytes and port speed."
+    ::= { cwsPortCurrentRxCountsEntry 19 }
+
+cwsPortCurrentRxCountsCrcErroredPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received which contained an FCS error and were between 64 and 1518 bytes in length."
+    ::= { cwsPortCurrentRxCountsEntry 4 }
+
+cwsPortCurrentRxCountsMulticastPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good multicast packets received that were between 64 and 1518 bytes in length. Excludes MAC control frames"
+    ::= { cwsPortCurrentRxCountsEntry 5 }
+
+cwsPortCurrentRxCountsBroadcastPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good broadcast packets received that were between 64 and 1518 bytes in length. Excludes MAC control frames"
+    ::= { cwsPortCurrentRxCountsEntry 6 }
+
+cwsPortCurrentRxCountsPausePackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of received valid pause packets that were between 64 and 1518 bytes in length"
+    ::= { cwsPortCurrentRxCountsEntry 7 }
+
+cwsPortCurrentRxCountsUndersizedPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received that were less than 64 bytes (excluding framing bits but including FCS bytes) and were otherwise well formed. This counter also includes the number of packets discarded because of Ethernet length check errors. Undersize packets are discarded."
+    ::= { cwsPortCurrentRxCountsEntry 8 }
+
+cwsPortCurrentRxCountsOversizedPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received (including unicast, multicast, and broadcast packets) that were longer than 1518 bytes up to the configured maximum frame size, that contained a valid FCS (excluding framing bits but including FCS bytes), and that were otherwise well formed"
+    ::= { cwsPortCurrentRxCountsEntry 9 }
+
+cwsPortCurrentRxCountsFragmentPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received between 10 and 63 bytes in length (excluding framing bits but including FCS bytes) that had either a bad FCS with an integral number of bytes (FCS Error) or a bad FCS with a non-integral number of bytes (Alignment Error). Fragment packets are discarded."
+    ::= { cwsPortCurrentRxCountsEntry 10 }
+
+cwsPortCurrentRxCountsJabberPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received that were longer than 1518 bytes up to the configured maximum frame size (excluding framing bits, but including FCS bytes), and had either a bad FCS with an integral number of bytes (FCS Error) or a bad FCS with a non-integral number of bytes (Alignment Error). Jabber packets are discarded"
+    ::= { cwsPortCurrentRxCountsEntry 11 }
+
+cwsPortCurrentRxCountsLengthOutRangePackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received that exceeded the maximum frame size and contained a valid or invalid FCS"
+    ::= { cwsPortCurrentRxCountsEntry 12 }
+
+cwsPortCurrentRxCountsPackets64Octet OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets (including bad packets) received that were 64 bytes in length (excluding framing bits but including FCS bytes)."
+    ::= { cwsPortCurrentRxCountsEntry 13 }
+
+cwsPortCurrentRxCountsPackets65127Octet OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good and bad packets received that were between 65 and 127 bytes in length (excluding framing bits but including FCS bytes)."
+    ::= { cwsPortCurrentRxCountsEntry 14 }
+
+cwsPortCurrentRxCountsPackets128255Octet OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good and bad packets received that were between 128 and 255 bytes in length inclusive (excluding framing bits but including FCS bytes)."
+    ::= { cwsPortCurrentRxCountsEntry 15 }
+
+cwsPortCurrentRxCountsPackets256511Octet OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good and bad packets received that were between 256 and 511 bytes in length inclusive (excluding framing bits but including FCS bytes)."
+    ::= { cwsPortCurrentRxCountsEntry 16 }
+
+cwsPortCurrentRxCountsPackets5121023Octet OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good and bad packets received that were between 512 and 1023 bytes in length inclusive (excluding framing bits but including FCS bytes)."
+    ::= { cwsPortCurrentRxCountsEntry 17 }
+
+cwsPortCurrentRxCountsPackets10241518Octet OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good and bad packets received that were between 1024 and 1518 bytes in length inclusive (excluding framing bits but including FCS bytes)."
+    ::= { cwsPortCurrentRxCountsEntry 18 }
+
+cwsPortCurrentTxCountsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortCurrentTxCountsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Tx counts."
+    ::= { cienaWsPortMIB 12 }
+
+cwsPortCurrentTxCountsEntry OBJECT-TYPE
+    SYNTAX CwsPortCurrentTxCountsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortCurrentTxCountsTable."
+    INDEX { cwsPortPortsPortId, cwsPortCurrentTxCountsTableSnmpKey }
+    ::= { cwsPortCurrentTxCountsTable 1 }
+
+CwsPortCurrentTxCountsEntry ::= SEQUENCE { 
+    cwsPortCurrentTxCountsTableSnmpKey Integer32,
+    cwsPortCurrentTxCountsBytes Counter64,
+    cwsPortCurrentTxCountsPackets Counter64,
+    cwsPortCurrentTxCountsAverageLinkUtilization Decimal1Dig,
+    cwsPortCurrentTxCountsCrcErroredPackets Counter64,
+    cwsPortCurrentTxCountsMulticastPackets Counter64,
+    cwsPortCurrentTxCountsBroadcastPackets Counter64,
+    cwsPortCurrentTxCountsPausePackets Counter64,
+    cwsPortCurrentTxCountsExcessiveDeferredPackets Counter64,
+    cwsPortCurrentTxCountsGiantPackets Counter64,
+    cwsPortCurrentTxCountsUnderrunPackets Counter64,
+    cwsPortCurrentTxCountsLengthCheckErrorPackets Counter64,
+    cwsPortCurrentTxCountsLengthOutRangePackets Counter64 
+}
+
+cwsPortCurrentTxCountsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortCurrentTxCounts"
+    ::= { cwsPortCurrentTxCountsEntry 1 }
+
+cwsPortCurrentTxCountsBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of transmitted bytes in good and bad packets including FCS bytes and excluding frame bits."
+    ::= { cwsPortCurrentTxCountsEntry 2 }
+
+cwsPortCurrentTxCountsPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of transmitted packets, including all unicast, multicast, broadcast, MAC control, and bad packets"
+    ::= { cwsPortCurrentTxCountsEntry 3 }
+
+cwsPortCurrentTxCountsAverageLinkUtilization OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Average percent utilization derived from Tx bytes and port speed."
+    ::= { cwsPortCurrentTxCountsEntry 13 }
+
+cwsPortCurrentTxCountsCrcErroredPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of transmitted packets with an FCS error"
+    ::= { cwsPortCurrentTxCountsEntry 4 }
+
+cwsPortCurrentTxCountsMulticastPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good multicast packets transmitted"
+    ::= { cwsPortCurrentTxCountsEntry 5 }
+
+cwsPortCurrentTxCountsBroadcastPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good broadcast packets transmitted"
+    ::= { cwsPortCurrentTxCountsEntry 6 }
+
+cwsPortCurrentTxCountsPausePackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of pause packets transmitted"
+    ::= { cwsPortCurrentTxCountsEntry 7 }
+
+cwsPortCurrentTxCountsExcessiveDeferredPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of transmitted packets experiencing two or more deferrals. Applicable to copper ports only"
+    ::= { cwsPortCurrentTxCountsEntry 8 }
+
+cwsPortCurrentTxCountsGiantPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of well-formed packets larger than 1518 bytes, including FCS bytes but excluding framing bits."
+    ::= { cwsPortCurrentTxCountsEntry 9 }
+
+cwsPortCurrentTxCountsUnderrunPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of underrun packets transmitted"
+    ::= { cwsPortCurrentTxCountsEntry 10 }
+
+cwsPortCurrentTxCountsLengthCheckErrorPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of length check packets transmitted"
+    ::= { cwsPortCurrentTxCountsEntry 11 }
+
+cwsPortCurrentTxCountsLengthOutRangePackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of length out-of-range packets transmitted"
+    ::= { cwsPortCurrentTxCountsEntry 12 }
+
+cwsPortCurrentTxQueueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortCurrentTxQueueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Tx queue."
+    ::= { cienaWsPortMIB 13 }
+
+cwsPortCurrentTxQueueEntry OBJECT-TYPE
+    SYNTAX CwsPortCurrentTxQueueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortCurrentTxQueueTable."
+    INDEX { cwsPortPortsPortId, cwsPortCurrentTxQueueTableSnmpKey }
+    ::= { cwsPortCurrentTxQueueTable 1 }
+
+CwsPortCurrentTxQueueEntry ::= SEQUENCE { 
+    cwsPortCurrentTxQueueTableSnmpKey Integer32,
+    cwsPortCurrentTxQueuePacketDropCountSummary Counter64,
+    cwsPortCurrentTxQueueQ0PacketDropCount Counter64,
+    cwsPortCurrentTxQueueQ1PacketDropCount Counter64,
+    cwsPortCurrentTxQueueQ2PacketDropCount Counter64,
+    cwsPortCurrentTxQueueQ3PacketDropCount Counter64,
+    cwsPortCurrentTxQueueQ4PacketDropCount Counter64,
+    cwsPortCurrentTxQueueQ5PacketDropCount Counter64,
+    cwsPortCurrentTxQueueQ6PacketDropCount Counter64,
+    cwsPortCurrentTxQueueQ7PacketDropCount Counter64 
+}
+
+cwsPortCurrentTxQueueTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortCurrentTxQueue"
+    ::= { cwsPortCurrentTxQueueEntry 1 }
+
+cwsPortCurrentTxQueuePacketDropCountSummary OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Summary of the number of bytes dropped from queues 0 to 3 (Q0, Q1, Q2, and Q3)"
+    ::= { cwsPortCurrentTxQueueEntry 2 }
+
+cwsPortCurrentTxQueueQ0PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 0 (Q0)"
+    ::= { cwsPortCurrentTxQueueEntry 3 }
+
+cwsPortCurrentTxQueueQ1PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 1 (Q1)"
+    ::= { cwsPortCurrentTxQueueEntry 4 }
+
+cwsPortCurrentTxQueueQ2PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 2 (Q2)"
+    ::= { cwsPortCurrentTxQueueEntry 5 }
+
+cwsPortCurrentTxQueueQ3PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 3 (Q3)"
+    ::= { cwsPortCurrentTxQueueEntry 6 }
+
+cwsPortCurrentTxQueueQ4PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 4 (Q4)"
+    ::= { cwsPortCurrentTxQueueEntry 7 }
+
+cwsPortCurrentTxQueueQ5PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 5 (Q5)"
+    ::= { cwsPortCurrentTxQueueEntry 8 }
+
+cwsPortCurrentTxQueueQ6PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 6 (Q6)"
+    ::= { cwsPortCurrentTxQueueEntry 9 }
+
+cwsPortCurrentTxQueueQ7PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 7 (Q7)"
+    ::= { cwsPortCurrentTxQueueEntry 10 }
+
+cwsPortCurrentMacTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortCurrentMacEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 14 }
+
+cwsPortCurrentMacEntry OBJECT-TYPE
+    SYNTAX CwsPortCurrentMacEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION "Entry for cwsPortCurrentMacTable."
+    INDEX { cwsPortPortsPortId, cwsPortCurrentMacTableSnmpKey }
+    ::= { cwsPortCurrentMacTable 1 }
+
+CwsPortCurrentMacEntry ::= SEQUENCE { 
+    cwsPortCurrentMacTableSnmpKey Integer32,
+    cwsPortCurrentMacUnavailableSeconds Counter64 
+}
+
+cwsPortCurrentMacTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortCurrentMac"
+    ::= { cwsPortCurrentMacEntry 1 }
+
+cwsPortCurrentMacUnavailableSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION "The number of seconds that the interface was unavailable."
+    ::= { cwsPortCurrentMacEntry 2 }
+
+cwsPortPcsCurrentTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortPcsCurrentEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 15 }
+
+cwsPortPcsCurrentEntry OBJECT-TYPE
+    SYNTAX CwsPortPcsCurrentEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortPcsCurrentTable."
+    INDEX { cwsPortPortsPortId, cwsPortPcsCurrentTableSnmpKey }
+    ::= { cwsPortPcsCurrentTable 1 }
+
+CwsPortPcsCurrentEntry ::= SEQUENCE { 
+    cwsPortPcsCurrentTableSnmpKey Integer32,
+    cwsPortPcsCurrentErroredSeconds Counter64,
+    cwsPortPcsCurrentSeverelyErroredSeconds Counter64,
+    cwsPortPcsCurrentUnavailableSeconds Counter64 
+}
+
+cwsPortPcsCurrentTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortPcsCurrent"
+    ::= { cwsPortPcsCurrentEntry 1 }
+
+cwsPortPcsCurrentErroredSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of seconds that error happened."
+    ::= { cwsPortPcsCurrentEntry 2 }
+
+cwsPortPcsCurrentSeverelyErroredSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of seconds that severe error happened."
+    ::= { cwsPortPcsCurrentEntry 3 }
+
+cwsPortPcsCurrentUnavailableSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of seconds that the interface was unavailable."
+    ::= { cwsPortPcsCurrentEntry 4 }
+
+cwsPortCurrentPcsSyncHeaderErrorsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortCurrentPcsSyncHeaderErrorsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 16 }
+
+cwsPortCurrentPcsSyncHeaderErrorsEntry OBJECT-TYPE
+    SYNTAX CwsPortCurrentPcsSyncHeaderErrorsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortCurrentPcsSyncHeaderErrorsTable."
+    INDEX { cwsPortPortsPortId, cwsPortCurrentPcsSyncHeaderErrorsTableSnmpKey }
+    ::= { cwsPortCurrentPcsSyncHeaderErrorsTable 1 }
+
+CwsPortCurrentPcsSyncHeaderErrorsEntry ::= SEQUENCE { 
+    cwsPortCurrentPcsSyncHeaderErrorsTableSnmpKey Integer32,
+    cwsPortCurrentPcsSyncHeaderErrorsCount Counter64 
+}
+
+cwsPortCurrentPcsSyncHeaderErrorsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortCurrentPcsSyncHeaderErrors"
+    ::= { cwsPortCurrentPcsSyncHeaderErrorsEntry 1 }
+
+cwsPortCurrentPcsSyncHeaderErrorsCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sync header errors count value."
+    ::= { cwsPortCurrentPcsSyncHeaderErrorsEntry 2 }
+
+cwsPortCurrentPcsBlockErrorsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortCurrentPcsBlockErrorsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 17 }
+
+cwsPortCurrentPcsBlockErrorsEntry OBJECT-TYPE
+    SYNTAX CwsPortCurrentPcsBlockErrorsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortCurrentPcsBlockErrorsTable."
+    INDEX { cwsPortPortsPortId, cwsPortCurrentPcsBlockErrorsTableSnmpKey }
+    ::= { cwsPortCurrentPcsBlockErrorsTable 1 }
+
+CwsPortCurrentPcsBlockErrorsEntry ::= SEQUENCE { 
+    cwsPortCurrentPcsBlockErrorsTableSnmpKey Integer32,
+    cwsPortCurrentPcsBlockErrorsCount Counter64 
+}
+
+cwsPortCurrentPcsBlockErrorsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortCurrentPcsBlockErrors"
+    ::= { cwsPortCurrentPcsBlockErrorsEntry 1 }
+
+cwsPortCurrentPcsBlockErrorsCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Block errors count value."
+    ::= { cwsPortCurrentPcsBlockErrorsEntry 2 }
+
+cwsPortCurrentPcsMultilaneBipErrorsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortCurrentPcsMultilaneBipErrorsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 18 }
+
+cwsPortCurrentPcsMultilaneBipErrorsEntry OBJECT-TYPE
+    SYNTAX CwsPortCurrentPcsMultilaneBipErrorsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortCurrentPcsMultilaneBipErrorsTable."
+    INDEX { cwsPortPortsPortId, cwsPortCurrentPcsMultilaneBipErrorsTableSnmpKey }
+    ::= { cwsPortCurrentPcsMultilaneBipErrorsTable 1 }
+
+CwsPortCurrentPcsMultilaneBipErrorsEntry ::= SEQUENCE { 
+    cwsPortCurrentPcsMultilaneBipErrorsTableSnmpKey Integer32,
+    cwsPortCurrentPcsMultilaneBipErrorsCount Counter64 
+}
+
+cwsPortCurrentPcsMultilaneBipErrorsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortCurrentPcsMultilaneBipErrors"
+    ::= { cwsPortCurrentPcsMultilaneBipErrorsEntry 1 }
+
+cwsPortCurrentPcsMultilaneBipErrorsCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Multilane bip errors count value."
+    ::= { cwsPortCurrentPcsMultilaneBipErrorsEntry 2 }
+
+cwsPortCurrentOduTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortCurrentOduEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 30 }
+
+cwsPortCurrentOduEntry OBJECT-TYPE
+    SYNTAX CwsPortCurrentOduEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortCurrentOduTable."
+    INDEX { cwsPortPortsPortId, cwsPortCurrentOduTableSnmpKey }
+    ::= { cwsPortCurrentOduTable 1 }
+
+CwsPortCurrentOduEntry ::= SEQUENCE { 
+    cwsPortCurrentOduTableSnmpKey Integer32,
+    cwsPortCurrentOduErroredSeconds Counter64,
+    cwsPortCurrentOduSeverelyErroredSeconds Counter64,
+    cwsPortCurrentOduUnavailableSeconds Counter64 
+}
+
+cwsPortCurrentOduTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortCurrentOdu"
+    ::= { cwsPortCurrentOduEntry 1 }
+
+cwsPortCurrentOduErroredSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of seconds that error happened."
+    ::= { cwsPortCurrentOduEntry 2 }
+
+cwsPortCurrentOduSeverelyErroredSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of seconds that severe error happened."
+    ::= { cwsPortCurrentOduEntry 3 }
+
+cwsPortCurrentOduUnavailableSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of seconds that the interface was unavailable."
+    ::= { cwsPortCurrentOduEntry 4 }
+
+cwsPortCurrentFecTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortCurrentFecEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 19 }
+
+cwsPortCurrentFecEntry OBJECT-TYPE
+    SYNTAX CwsPortCurrentFecEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortCurrentFecTable."
+    INDEX { cwsPortPortsPortId, cwsPortCurrentFecTableSnmpKey }
+    ::= { cwsPortCurrentFecTable 1 }
+
+CwsPortCurrentFecEntry ::= SEQUENCE { 
+    cwsPortCurrentFecTableSnmpKey Integer32,
+    cwsPortCurrentFecCorrectedBlockCount Counter64,
+    cwsPortCurrentFecUncorrectedBlockCount Counter64,
+    cwsPortCurrentFecSymbolErrorCount Counter64 
+}
+
+cwsPortCurrentFecTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortCurrentFec"
+    ::= { cwsPortCurrentFecEntry 1 }
+
+cwsPortCurrentFecCorrectedBlockCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Fec layer corrected block count"
+    ::= { cwsPortCurrentFecEntry 2 }
+
+cwsPortCurrentFecUncorrectedBlockCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Fec layer uncorrected block count"
+    ::= { cwsPortCurrentFecEntry 3 }
+
+cwsPortCurrentFecSymbolErrorCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Fec layer symbol error count"
+    ::= { cwsPortCurrentFecEntry 4 }
+
+cwsPortTotalTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Total statistics data."
+    ::= { cienaWsPortMIB 20 }
+
+cwsPortTotalEntry OBJECT-TYPE
+    SYNTAX CwsPortTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortTotalTable."
+    INDEX { cwsPortPortsPortId, cwsPortTotalTableSnmpKey }
+    ::= { cwsPortTotalTable 1 }
+
+CwsPortTotalEntry ::= SEQUENCE { 
+    cwsPortTotalTableSnmpKey Integer32,
+    cwsPortTotalFrameErrorRatio Counter64 
+}
+
+cwsPortTotalTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortTotal"
+    ::= { cwsPortTotalEntry 1 }
+
+cwsPortTotalFrameErrorRatio OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "RMON frame error ratio."
+    ::= { cwsPortTotalEntry 2 }
+
+cwsPortTotalRxCountsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortTotalRxCountsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Rx counts."
+    ::= { cienaWsPortMIB 21 }
+
+cwsPortTotalRxCountsEntry OBJECT-TYPE
+    SYNTAX CwsPortTotalRxCountsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortTotalRxCountsTable."
+    INDEX { cwsPortPortsPortId, cwsPortTotalRxCountsTableSnmpKey }
+    ::= { cwsPortTotalRxCountsTable 1 }
+
+CwsPortTotalRxCountsEntry ::= SEQUENCE { 
+    cwsPortTotalRxCountsTableSnmpKey Integer32,
+    cwsPortTotalRxCountsBytes Counter64,
+    cwsPortTotalRxCountsPackets Counter64,
+    cwsPortTotalRxCountsAverageLinkUtilization Decimal1Dig,
+    cwsPortTotalRxCountsCrcErroredPackets Counter64,
+    cwsPortTotalRxCountsMulticastPackets Counter64,
+    cwsPortTotalRxCountsBroadcastPackets Counter64,
+    cwsPortTotalRxCountsPausePackets Counter64,
+    cwsPortTotalRxCountsUndersizedPackets Counter64,
+    cwsPortTotalRxCountsOversizedPackets Counter64,
+    cwsPortTotalRxCountsFragmentPackets Counter64,
+    cwsPortTotalRxCountsJabberPackets Counter64,
+    cwsPortTotalRxCountsLengthOutRangePackets Counter64,
+    cwsPortTotalRxCountsPackets64Octet Counter64,
+    cwsPortTotalRxCountsPackets65127Octet Counter64,
+    cwsPortTotalRxCountsPackets128255Octet Counter64,
+    cwsPortTotalRxCountsPackets256511Octet Counter64,
+    cwsPortTotalRxCountsPackets5121023Octet Counter64,
+    cwsPortTotalRxCountsPackets10241518Octet Counter64 
+}
+
+cwsPortTotalRxCountsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortTotalRxCounts"
+    ::= { cwsPortTotalRxCountsEntry 1 }
+
+cwsPortTotalRxCountsBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of bytes received including good and bad packets. This includes FCS bytes, but excludes framing bits."
+    ::= { cwsPortTotalRxCountsEntry 2 }
+
+cwsPortTotalRxCountsPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received, including all unicast, multicast, broadcast, MAC control, and bad packets"
+    ::= { cwsPortTotalRxCountsEntry 3 }
+
+cwsPortTotalRxCountsAverageLinkUtilization OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Average percent utilization derived from Rx bytes and port speed."
+    ::= { cwsPortTotalRxCountsEntry 19 }
+
+cwsPortTotalRxCountsCrcErroredPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received which contained an FCS error and were between 64 and 1518 bytes in length."
+    ::= { cwsPortTotalRxCountsEntry 4 }
+
+cwsPortTotalRxCountsMulticastPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good multicast packets received that were between 64 and 1518 bytes in length. Excludes MAC control frames"
+    ::= { cwsPortTotalRxCountsEntry 5 }
+
+cwsPortTotalRxCountsBroadcastPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good broadcast packets received that were between 64 and 1518 bytes in length. Excludes MAC control frames"
+    ::= { cwsPortTotalRxCountsEntry 6 }
+
+cwsPortTotalRxCountsPausePackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of received valid pause packets that were between 64 and 1518 bytes in length"
+    ::= { cwsPortTotalRxCountsEntry 7 }
+
+cwsPortTotalRxCountsUndersizedPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received that were less than 64 bytes (excluding framing bits but including FCS bytes) and were otherwise well formed. This counter also includes the number of packets discarded because of Ethernet length check errors. Undersize packets are discarded."
+    ::= { cwsPortTotalRxCountsEntry 8 }
+
+cwsPortTotalRxCountsOversizedPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received (including unicast, multicast, and broadcast packets) that were longer than 1518 bytes up to the configured maximum frame size, that contained a valid FCS (excluding framing bits but including FCS bytes), and that were otherwise well formed"
+    ::= { cwsPortTotalRxCountsEntry 9 }
+
+cwsPortTotalRxCountsFragmentPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received between 10 and 63 bytes in length (excluding framing bits but including FCS bytes) that had either a bad FCS with an integral number of bytes (FCS Error) or a bad FCS with a non-integral number of bytes (Alignment Error). Fragment packets are discarded."
+    ::= { cwsPortTotalRxCountsEntry 10 }
+
+cwsPortTotalRxCountsJabberPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received that were longer than 1518 bytes up to the configured maximum frame size (excluding framing bits, but including FCS bytes), and had either a bad FCS with an integral number of bytes (FCS Error) or a bad FCS with a non-integral number of bytes (Alignment Error). Jabber packets are discarded"
+    ::= { cwsPortTotalRxCountsEntry 11 }
+
+cwsPortTotalRxCountsLengthOutRangePackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets received that exceeded the maximum frame size and contained a valid or invalid FCS"
+    ::= { cwsPortTotalRxCountsEntry 12 }
+
+cwsPortTotalRxCountsPackets64Octet OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of packets (including bad packets) received that were 64 bytes in length (excluding framing bits but including FCS bytes)."
+    ::= { cwsPortTotalRxCountsEntry 13 }
+
+cwsPortTotalRxCountsPackets65127Octet OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good and bad packets received that were between 65 and 127 bytes in length (excluding framing bits but including FCS bytes)."
+    ::= { cwsPortTotalRxCountsEntry 14 }
+
+cwsPortTotalRxCountsPackets128255Octet OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good and bad packets received that were between 128 and 255 bytes in length inclusive (excluding framing bits but including FCS bytes)."
+    ::= { cwsPortTotalRxCountsEntry 15 }
+
+cwsPortTotalRxCountsPackets256511Octet OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good and bad packets received that were between 256 and 511 bytes in length inclusive (excluding framing bits but including FCS bytes)."
+    ::= { cwsPortTotalRxCountsEntry 16 }
+
+cwsPortTotalRxCountsPackets5121023Octet OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good and bad packets received that were between 512 and 1023 bytes in length inclusive (excluding framing bits but including FCS bytes)."
+    ::= { cwsPortTotalRxCountsEntry 17 }
+
+cwsPortTotalRxCountsPackets10241518Octet OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good and bad packets received that were between 1024 and 1518 bytes in length inclusive (excluding framing bits but including FCS bytes)."
+    ::= { cwsPortTotalRxCountsEntry 18 }
+
+cwsPortTotalTxCountsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortTotalTxCountsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Tx counts."
+    ::= { cienaWsPortMIB 22 }
+
+cwsPortTotalTxCountsEntry OBJECT-TYPE
+    SYNTAX CwsPortTotalTxCountsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortTotalTxCountsTable."
+    INDEX { cwsPortPortsPortId, cwsPortTotalTxCountsTableSnmpKey }
+    ::= { cwsPortTotalTxCountsTable 1 }
+
+CwsPortTotalTxCountsEntry ::= SEQUENCE { 
+    cwsPortTotalTxCountsTableSnmpKey Integer32,
+    cwsPortTotalTxCountsBytes Counter64,
+    cwsPortTotalTxCountsPackets Counter64,
+    cwsPortTotalTxCountsAverageLinkUtilization Decimal1Dig,
+    cwsPortTotalTxCountsCrcErroredPackets Counter64,
+    cwsPortTotalTxCountsMulticastPackets Counter64,
+    cwsPortTotalTxCountsBroadcastPackets Counter64,
+    cwsPortTotalTxCountsPausePackets Counter64,
+    cwsPortTotalTxCountsExcessiveDeferredPackets Counter64,
+    cwsPortTotalTxCountsGiantPackets Counter64,
+    cwsPortTotalTxCountsUnderrunPackets Counter64,
+    cwsPortTotalTxCountsLengthCheckErrorPackets Counter64,
+    cwsPortTotalTxCountsLengthOutRangePackets Counter64 
+}
+
+cwsPortTotalTxCountsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortTotalTxCounts"
+    ::= { cwsPortTotalTxCountsEntry 1 }
+
+cwsPortTotalTxCountsBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of transmitted bytes in good and bad packets including FCS bytes and excluding frame bits."
+    ::= { cwsPortTotalTxCountsEntry 2 }
+
+cwsPortTotalTxCountsPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of transmitted packets, including all unicast, multicast, broadcast, MAC control, and bad packets"
+    ::= { cwsPortTotalTxCountsEntry 3 }
+
+cwsPortTotalTxCountsAverageLinkUtilization OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Average percent utilization derived from Tx bytes and port speed."
+    ::= { cwsPortTotalTxCountsEntry 13 }
+
+cwsPortTotalTxCountsCrcErroredPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of transmitted packets with an FCS error"
+    ::= { cwsPortTotalTxCountsEntry 4 }
+
+cwsPortTotalTxCountsMulticastPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good multicast packets transmitted"
+    ::= { cwsPortTotalTxCountsEntry 5 }
+
+cwsPortTotalTxCountsBroadcastPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of good broadcast packets transmitted"
+    ::= { cwsPortTotalTxCountsEntry 6 }
+
+cwsPortTotalTxCountsPausePackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of pause packets transmitted"
+    ::= { cwsPortTotalTxCountsEntry 7 }
+
+cwsPortTotalTxCountsExcessiveDeferredPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of transmitted packets experiencing two or more deferrals. Applicable to copper ports only"
+    ::= { cwsPortTotalTxCountsEntry 8 }
+
+cwsPortTotalTxCountsGiantPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of well-formed packets larger than 1518 bytes, including FCS bytes but excluding framing bits."
+    ::= { cwsPortTotalTxCountsEntry 9 }
+
+cwsPortTotalTxCountsUnderrunPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of underrun packets transmitted"
+    ::= { cwsPortTotalTxCountsEntry 10 }
+
+cwsPortTotalTxCountsLengthCheckErrorPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of length check packets transmitted"
+    ::= { cwsPortTotalTxCountsEntry 11 }
+
+cwsPortTotalTxCountsLengthOutRangePackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of length out-of-range packets transmitted"
+    ::= { cwsPortTotalTxCountsEntry 12 }
+
+cwsPortTotalTxQueueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortTotalTxQueueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Tx queue."
+    ::= { cienaWsPortMIB 23 }
+
+cwsPortTotalTxQueueEntry OBJECT-TYPE
+    SYNTAX CwsPortTotalTxQueueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortTotalTxQueueTable."
+    INDEX { cwsPortPortsPortId, cwsPortTotalTxQueueTableSnmpKey }
+    ::= { cwsPortTotalTxQueueTable 1 }
+
+CwsPortTotalTxQueueEntry ::= SEQUENCE { 
+    cwsPortTotalTxQueueTableSnmpKey Integer32,
+    cwsPortTotalTxQueuePacketDropCountSummary Counter64,
+    cwsPortTotalTxQueueQ0PacketDropCount Counter64,
+    cwsPortTotalTxQueueQ1PacketDropCount Counter64,
+    cwsPortTotalTxQueueQ2PacketDropCount Counter64,
+    cwsPortTotalTxQueueQ3PacketDropCount Counter64,
+    cwsPortTotalTxQueueQ4PacketDropCount Counter64,
+    cwsPortTotalTxQueueQ5PacketDropCount Counter64,
+    cwsPortTotalTxQueueQ6PacketDropCount Counter64,
+    cwsPortTotalTxQueueQ7PacketDropCount Counter64 
+}
+
+cwsPortTotalTxQueueTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortTotalTxQueue"
+    ::= { cwsPortTotalTxQueueEntry 1 }
+
+cwsPortTotalTxQueuePacketDropCountSummary OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Summary of the number of bytes dropped from queues 0 to 3 (Q0, Q1, Q2, and Q3)"
+    ::= { cwsPortTotalTxQueueEntry 2 }
+
+cwsPortTotalTxQueueQ0PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 0 (Q0)"
+    ::= { cwsPortTotalTxQueueEntry 3 }
+
+cwsPortTotalTxQueueQ1PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 1 (Q1)"
+    ::= { cwsPortTotalTxQueueEntry 4 }
+
+cwsPortTotalTxQueueQ2PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 2 (Q2)"
+    ::= { cwsPortTotalTxQueueEntry 5 }
+
+cwsPortTotalTxQueueQ3PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 3 (Q3)"
+    ::= { cwsPortTotalTxQueueEntry 6 }
+
+cwsPortTotalTxQueueQ4PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 4 (Q4)"
+    ::= { cwsPortTotalTxQueueEntry 7 }
+
+cwsPortTotalTxQueueQ5PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 5 (Q5)"
+    ::= { cwsPortTotalTxQueueEntry 8 }
+
+cwsPortTotalTxQueueQ6PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 6 (Q6)"
+    ::= { cwsPortTotalTxQueueEntry 9 }
+
+cwsPortTotalTxQueueQ7PacketDropCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of bytes dropped from queue 7 (Q7)"
+    ::= { cwsPortTotalTxQueueEntry 10 }
+
+cwsPortTotalMacTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortTotalMacEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 24 }
+
+cwsPortTotalMacEntry OBJECT-TYPE
+    SYNTAX CwsPortTotalMacEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION "Entry for cwsPortTotalMacTable."
+    INDEX { cwsPortPortsPortId, cwsPortTotalMacTableSnmpKey }
+    ::= { cwsPortTotalMacTable 1 }
+
+CwsPortTotalMacEntry ::= SEQUENCE { 
+    cwsPortTotalMacTableSnmpKey Integer32,
+    cwsPortTotalMacUnavailableSeconds Counter64 
+}
+
+cwsPortTotalMacTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortTotalMac"
+    ::= { cwsPortTotalMacEntry 1 }
+
+cwsPortTotalMacUnavailableSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION "The number of seconds that the interface was unavailable."
+    ::= { cwsPortTotalMacEntry 2 }
+
+cwsPortTotalPcsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortTotalPcsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 25 }
+
+cwsPortTotalPcsEntry OBJECT-TYPE
+    SYNTAX CwsPortTotalPcsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortTotalPcsTable."
+    INDEX { cwsPortPortsPortId, cwsPortTotalPcsTableSnmpKey }
+    ::= { cwsPortTotalPcsTable 1 }
+
+CwsPortTotalPcsEntry ::= SEQUENCE { 
+    cwsPortTotalPcsTableSnmpKey Integer32,
+    cwsPortTotalPcsErroredSeconds Counter64,
+    cwsPortTotalPcsSeverelyErroredSeconds Counter64,
+    cwsPortTotalPcsUnavailableSeconds Counter64 
+}
+
+cwsPortTotalPcsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortTotalPcs"
+    ::= { cwsPortTotalPcsEntry 1 }
+
+cwsPortTotalPcsErroredSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of seconds that error happened."
+    ::= { cwsPortTotalPcsEntry 2 }
+
+cwsPortTotalPcsSeverelyErroredSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of seconds that severe error happened."
+    ::= { cwsPortTotalPcsEntry 3 }
+
+cwsPortTotalPcsUnavailableSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of seconds that the interface was unavailable."
+    ::= { cwsPortTotalPcsEntry 4 }
+
+cwsPortTotalPcsSyncHeaderErrorsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortTotalPcsSyncHeaderErrorsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 26 }
+
+cwsPortTotalPcsSyncHeaderErrorsEntry OBJECT-TYPE
+    SYNTAX CwsPortTotalPcsSyncHeaderErrorsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortTotalPcsSyncHeaderErrorsTable."
+    INDEX { cwsPortPortsPortId, cwsPortTotalPcsSyncHeaderErrorsTableSnmpKey }
+    ::= { cwsPortTotalPcsSyncHeaderErrorsTable 1 }
+
+CwsPortTotalPcsSyncHeaderErrorsEntry ::= SEQUENCE { 
+    cwsPortTotalPcsSyncHeaderErrorsTableSnmpKey Integer32,
+    cwsPortTotalPcsSyncHeaderErrorsCount Counter64 
+}
+
+cwsPortTotalPcsSyncHeaderErrorsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortTotalPcsSyncHeaderErrors"
+    ::= { cwsPortTotalPcsSyncHeaderErrorsEntry 1 }
+
+cwsPortTotalPcsSyncHeaderErrorsCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Sync header errors count value."
+    ::= { cwsPortTotalPcsSyncHeaderErrorsEntry 2 }
+
+cwsPortTotalPcsBlockErrorsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortTotalPcsBlockErrorsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 27 }
+
+cwsPortTotalPcsBlockErrorsEntry OBJECT-TYPE
+    SYNTAX CwsPortTotalPcsBlockErrorsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortTotalPcsBlockErrorsTable."
+    INDEX { cwsPortPortsPortId, cwsPortTotalPcsBlockErrorsTableSnmpKey }
+    ::= { cwsPortTotalPcsBlockErrorsTable 1 }
+
+CwsPortTotalPcsBlockErrorsEntry ::= SEQUENCE { 
+    cwsPortTotalPcsBlockErrorsTableSnmpKey Integer32,
+    cwsPortTotalPcsBlockErrorsCount Counter64 
+}
+
+cwsPortTotalPcsBlockErrorsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortTotalPcsBlockErrors"
+    ::= { cwsPortTotalPcsBlockErrorsEntry 1 }
+
+cwsPortTotalPcsBlockErrorsCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Block errors count value."
+    ::= { cwsPortTotalPcsBlockErrorsEntry 2 }
+
+cwsPortTotalPcsMultilaneBipErrorsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortTotalPcsMultilaneBipErrorsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 28 }
+
+cwsPortTotalPcsMultilaneBipErrorsEntry OBJECT-TYPE
+    SYNTAX CwsPortTotalPcsMultilaneBipErrorsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortTotalPcsMultilaneBipErrorsTable."
+    INDEX { cwsPortPortsPortId, cwsPortTotalPcsMultilaneBipErrorsTableSnmpKey }
+    ::= { cwsPortTotalPcsMultilaneBipErrorsTable 1 }
+
+CwsPortTotalPcsMultilaneBipErrorsEntry ::= SEQUENCE { 
+    cwsPortTotalPcsMultilaneBipErrorsTableSnmpKey Integer32,
+    cwsPortTotalPcsMultilaneBipErrorsCount Counter64 
+}
+
+cwsPortTotalPcsMultilaneBipErrorsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortTotalPcsMultilaneBipErrors"
+    ::= { cwsPortTotalPcsMultilaneBipErrorsEntry 1 }
+
+cwsPortTotalPcsMultilaneBipErrorsCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Multilane bip errors count value."
+    ::= { cwsPortTotalPcsMultilaneBipErrorsEntry 2 }
+
+cwsPortTotalOduTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortTotalOduEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 31 }
+
+cwsPortTotalOduEntry OBJECT-TYPE
+    SYNTAX CwsPortTotalOduEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortTotalOduTable."
+    INDEX { cwsPortPortsPortId, cwsPortTotalOduTableSnmpKey }
+    ::= { cwsPortTotalOduTable 1 }
+
+CwsPortTotalOduEntry ::= SEQUENCE { 
+    cwsPortTotalOduTableSnmpKey Integer32,
+    cwsPortTotalOduErroredSeconds Counter64,
+    cwsPortTotalOduSeverelyErroredSeconds Counter64,
+    cwsPortTotalOduUnavailableSeconds Counter64 
+}
+
+cwsPortTotalOduTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortTotalOdu"
+    ::= { cwsPortTotalOduEntry 1 }
+
+cwsPortTotalOduErroredSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of seconds that error happened."
+    ::= { cwsPortTotalOduEntry 2 }
+
+cwsPortTotalOduSeverelyErroredSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of seconds that severe error happened."
+    ::= { cwsPortTotalOduEntry 3 }
+
+cwsPortTotalOduUnavailableSeconds OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of seconds that the interface was unavailable."
+    ::= { cwsPortTotalOduEntry 4 }
+
+cwsPortTotalFecTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPortTotalFecEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPortMIB 29 }
+
+cwsPortTotalFecEntry OBJECT-TYPE
+    SYNTAX CwsPortTotalFecEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPortTotalFecTable."
+    INDEX { cwsPortPortsPortId, cwsPortTotalFecTableSnmpKey }
+    ::= { cwsPortTotalFecTable 1 }
+
+CwsPortTotalFecEntry ::= SEQUENCE { 
+    cwsPortTotalFecTableSnmpKey Integer32,
+    cwsPortTotalFecCorrectedBlockCount Counter64,
+    cwsPortTotalFecUncorrectedBlockCount Counter64,
+    cwsPortTotalFecSymbolErrorCount Counter64 
+}
+
+cwsPortTotalFecTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPortTotalFec"
+    ::= { cwsPortTotalFecEntry 1 }
+
+cwsPortTotalFecCorrectedBlockCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Fec layer corrected block count"
+    ::= { cwsPortTotalFecEntry 2 }
+
+cwsPortTotalFecUncorrectedBlockCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Fec layer uncorrected block count"
+    ::= { cwsPortTotalFecEntry 3 }
+
+cwsPortTotalFecSymbolErrorCount OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Fec layer symbol error count"
+    ::= { cwsPortTotalFecEntry 4 }
+
+
+
+-- Conformance statements
+cienaWsPortObjects OBJECT IDENTIFIER
+    ::= { cienaWsPortMIB 1 }
+
+cienaWsPortConformance OBJECT IDENTIFIER
+    ::= { cienaWsPortMIB 2 }
+
+cienaWsPortGroups OBJECT IDENTIFIER
+    ::= { cienaWsPortConformance 1 }
+
+cienaWsPortGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsPortPortsPortId,
+        cwsPortIdName,
+        cwsPortIdDescription,
+        cwsPortIdPortType,
+        cwsPortIdMacAddress,
+        cwsPortIdInterfaceType,
+        cwsPortStateAdminState,
+        cwsPortStateOperationalState,
+        cwsPortStateOperationalStateDuration,
+        cwsPortCapabilitiesPortSpeeds,
+        cwsPortCapabilitiesDuplex,
+        cwsPortCapabilitiesAutoNegotiation,
+        cwsPortCapabilitiesFlowControl,
+        cwsPortCapabilitiesFecSupport,
+        cwsPortPropertiesXcvrType,
+        cwsPortPropertiesLoopback,
+        cwsPortPropertiesServiceIndex,
+        cwsPortPropertiesServiceDomainIndex,
+        cwsPortEthernetSpeed,
+        cwsPortEthernetMaxFrameSize,
+        cwsPortEthernetPauseProfile,
+        cwsPortEthernetForwardErrorCorrection,
+        cwsPortConditioningType,
+        cwsPortConditioningHoldoff,
+        cwsPortCurrentFrameErrorRatio,
+        cwsPortCurrentRxCountsBytes,
+        cwsPortCurrentRxCountsPackets,
+        cwsPortCurrentRxCountsAverageLinkUtilization,
+        cwsPortCurrentRxCountsCrcErroredPackets,
+        cwsPortCurrentRxCountsMulticastPackets,
+        cwsPortCurrentRxCountsBroadcastPackets,
+        cwsPortCurrentRxCountsPausePackets,
+        cwsPortCurrentRxCountsUndersizedPackets,
+        cwsPortCurrentRxCountsOversizedPackets,
+        cwsPortCurrentRxCountsFragmentPackets,
+        cwsPortCurrentRxCountsJabberPackets,
+        cwsPortCurrentRxCountsLengthOutRangePackets,
+        cwsPortCurrentRxCountsPackets64Octet,
+        cwsPortCurrentRxCountsPackets65127Octet,
+        cwsPortCurrentRxCountsPackets128255Octet,
+        cwsPortCurrentRxCountsPackets256511Octet,
+        cwsPortCurrentRxCountsPackets5121023Octet,
+        cwsPortCurrentRxCountsPackets10241518Octet,
+        cwsPortCurrentTxCountsBytes,
+        cwsPortCurrentTxCountsPackets,
+        cwsPortCurrentTxCountsAverageLinkUtilization,
+        cwsPortCurrentTxCountsCrcErroredPackets,
+        cwsPortCurrentTxCountsMulticastPackets,
+        cwsPortCurrentTxCountsBroadcastPackets,
+        cwsPortCurrentTxCountsPausePackets,
+        cwsPortCurrentTxCountsExcessiveDeferredPackets,
+        cwsPortCurrentTxCountsGiantPackets,
+        cwsPortCurrentTxCountsUnderrunPackets,
+        cwsPortCurrentTxCountsLengthCheckErrorPackets,
+        cwsPortCurrentTxCountsLengthOutRangePackets,
+        cwsPortCurrentTxQueuePacketDropCountSummary,
+        cwsPortCurrentTxQueueQ0PacketDropCount,
+        cwsPortCurrentTxQueueQ1PacketDropCount,
+        cwsPortCurrentTxQueueQ2PacketDropCount,
+        cwsPortCurrentTxQueueQ3PacketDropCount,
+        cwsPortCurrentTxQueueQ4PacketDropCount,
+        cwsPortCurrentTxQueueQ5PacketDropCount,
+        cwsPortCurrentTxQueueQ6PacketDropCount,
+        cwsPortCurrentTxQueueQ7PacketDropCount,
+        cwsPortCurrentMacUnavailableSeconds,
+        cwsPortPcsCurrentErroredSeconds,
+        cwsPortPcsCurrentSeverelyErroredSeconds,
+        cwsPortPcsCurrentUnavailableSeconds,
+        cwsPortCurrentPcsSyncHeaderErrorsCount,
+        cwsPortCurrentPcsBlockErrorsCount,
+        cwsPortCurrentPcsMultilaneBipErrorsCount,
+        cwsPortCurrentOduErroredSeconds,
+        cwsPortCurrentOduSeverelyErroredSeconds,
+        cwsPortCurrentOduUnavailableSeconds,
+        cwsPortCurrentFecCorrectedBlockCount,
+        cwsPortCurrentFecUncorrectedBlockCount,
+        cwsPortCurrentFecSymbolErrorCount,
+        cwsPortTotalFrameErrorRatio,
+        cwsPortTotalRxCountsBytes,
+        cwsPortTotalRxCountsPackets,
+        cwsPortTotalRxCountsAverageLinkUtilization,
+        cwsPortTotalRxCountsCrcErroredPackets,
+        cwsPortTotalRxCountsMulticastPackets,
+        cwsPortTotalRxCountsBroadcastPackets,
+        cwsPortTotalRxCountsPausePackets,
+        cwsPortTotalRxCountsUndersizedPackets,
+        cwsPortTotalRxCountsOversizedPackets,
+        cwsPortTotalRxCountsFragmentPackets,
+        cwsPortTotalRxCountsJabberPackets,
+        cwsPortTotalRxCountsLengthOutRangePackets,
+        cwsPortTotalRxCountsPackets64Octet,
+        cwsPortTotalRxCountsPackets65127Octet,
+        cwsPortTotalRxCountsPackets128255Octet,
+        cwsPortTotalRxCountsPackets256511Octet,
+        cwsPortTotalRxCountsPackets5121023Octet,
+        cwsPortTotalRxCountsPackets10241518Octet,
+        cwsPortTotalTxCountsBytes,
+        cwsPortTotalTxCountsPackets,
+        cwsPortTotalTxCountsAverageLinkUtilization,
+        cwsPortTotalTxCountsCrcErroredPackets,
+        cwsPortTotalTxCountsMulticastPackets,
+        cwsPortTotalTxCountsBroadcastPackets,
+        cwsPortTotalTxCountsPausePackets,
+        cwsPortTotalTxCountsExcessiveDeferredPackets,
+        cwsPortTotalTxCountsGiantPackets,
+        cwsPortTotalTxCountsUnderrunPackets,
+        cwsPortTotalTxCountsLengthCheckErrorPackets,
+        cwsPortTotalTxCountsLengthOutRangePackets,
+        cwsPortTotalTxQueuePacketDropCountSummary,
+        cwsPortTotalTxQueueQ0PacketDropCount,
+        cwsPortTotalTxQueueQ1PacketDropCount,
+        cwsPortTotalTxQueueQ2PacketDropCount,
+        cwsPortTotalTxQueueQ3PacketDropCount,
+        cwsPortTotalTxQueueQ4PacketDropCount,
+        cwsPortTotalTxQueueQ5PacketDropCount,
+        cwsPortTotalTxQueueQ6PacketDropCount,
+        cwsPortTotalTxQueueQ7PacketDropCount,
+        cwsPortTotalMacUnavailableSeconds,
+        cwsPortTotalPcsErroredSeconds,
+        cwsPortTotalPcsSeverelyErroredSeconds,
+        cwsPortTotalPcsUnavailableSeconds,
+        cwsPortTotalPcsSyncHeaderErrorsCount,
+        cwsPortTotalPcsBlockErrorsCount,
+        cwsPortTotalPcsMultilaneBipErrorsCount,
+        cwsPortTotalOduErroredSeconds,
+        cwsPortTotalOduSeverelyErroredSeconds,
+        cwsPortTotalOduUnavailableSeconds,
+        cwsPortTotalFecCorrectedBlockCount,
+        cwsPortTotalFecUncorrectedBlockCount,
+        cwsPortTotalFecSymbolErrorCount
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsPortGroups 1 }
+
+cienaWsPortCompliances OBJECT IDENTIFIER
+    ::= { cienaWsPortConformance 2 }
+
+cienaWsPortCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsPortGroup }
+    ::= { cienaWsPortCompliances 1 }
+
+END -- End module

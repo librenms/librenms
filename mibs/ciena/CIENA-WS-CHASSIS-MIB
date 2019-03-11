@@ -1,0 +1,1678 @@
+-- This file was automatically generated from ciena-ws-chassis.yang. Do not edit.
+
+CIENA-WS-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    EnabledDisabledEnum, LineModuleTypeBits, MacString, ModuleTypeBits, StringMaxl16, StringMaxl254, StringMaxl32, StringMaxl50, UpDownEnum, YesNoEnum
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+cienaWsChassisMIB MODULE-IDENTITY
+    LAST-UPDATED "201707070000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This module defines Chassis data for the Waveserver."
+    REVISION "201707070000Z"
+    DESCRIPTION "Waveserver Release 1.5
+Added ncx:user-write to 'power-supply-units', 'cooling-fan-units', and 'management-port'."
+    REVISION "201703020000Z"
+    DESCRIPTION "Waveserver Rel 1.4 revision.
+New ciena-ws-encryption.yang now contains augments for the chassis container.
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revised.
+      
+Added leaf 'package-serial-number', 'package-part-number, and 'leaf package-revision'
+to 'device-id' container."
+    REVISION "201606140000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.
+Major restructuring of this YANG module."
+    REVISION "201511290000Z"
+    DESCRIPTION "Waveserver Rel 1.1 revised.  
+ Added 'management-port' container and related leafs.
+ Deleted the 'temperature-sensor-status' list."
+    REVISION "201506230000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 6 }
+
+ChassisOperationState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { uninstalled(0), normal(1), faulted(2) }
+
+MacBlockSize ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX Unsigned32
+
+cwsChassisChassisidentificationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisChassisidentificationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver chassis identification attributes."
+    ::= { cienaWsChassisMIB 3 }
+
+cwsChassisChassisidentificationEntry OBJECT-TYPE
+    SYNTAX CwsChassisChassisidentificationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisChassisidentificationTable."
+    INDEX { cwsChassisChassisidentificationTableSnmpKey }
+    ::= { cwsChassisChassisidentificationTable 1 }
+
+CwsChassisChassisidentificationEntry ::= SEQUENCE { 
+    cwsChassisChassisidentificationTableSnmpKey Integer32,
+    cwsChassisChassisidentificationModel StringMaxl32,
+    cwsChassisChassisidentificationDescription StringMaxl254,
+    cwsChassisChassisidentificationType INTEGER 
+}
+
+cwsChassisChassisidentificationTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisChassisidentification"
+    ::= { cwsChassisChassisidentificationEntry 1 }
+
+cwsChassisChassisidentificationModel OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "String description of the Chassis device model."
+    ::= { cwsChassisChassisidentificationEntry 2 }
+
+cwsChassisChassisidentificationDescription OBJECT-TYPE
+    SYNTAX StringMaxl254
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "String description of the Chassis."
+    ::= { cwsChassisChassisidentificationEntry 3 }
+
+cwsChassisChassisidentificationType OBJECT-TYPE
+    SYNTAX INTEGER { unknownchassis(0), waveserverchassis(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Type enum value of the Chassis."
+    ::= { cwsChassisChassisidentificationEntry 4 }
+
+cwsChassisChassiscapabilitiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisChassiscapabilitiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver chassis capabilities attributes."
+    ::= { cienaWsChassisMIB 4 }
+
+cwsChassisChassiscapabilitiesEntry OBJECT-TYPE
+    SYNTAX CwsChassisChassiscapabilitiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisChassiscapabilitiesTable."
+    INDEX { cwsChassisChassiscapabilitiesTableSnmpKey }
+    ::= { cwsChassisChassiscapabilitiesTable 1 }
+
+CwsChassisChassiscapabilitiesEntry ::= SEQUENCE { 
+    cwsChassisChassiscapabilitiesTableSnmpKey Integer32,
+    cwsChassisChassiscapabilitiesNumOfSlots Unsigned32 
+}
+
+cwsChassisChassiscapabilitiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisChassiscapabilities"
+    ::= { cwsChassisChassiscapabilitiesEntry 1 }
+
+cwsChassisChassiscapabilitiesNumOfSlots OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Slots available to the waveserver chassis."
+    ::= { cwsChassisChassiscapabilitiesEntry 2 }
+
+cwsChassisControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 5 }
+
+cwsChassisControlEntry OBJECT-TYPE
+    SYNTAX CwsChassisControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisControlTable."
+    INDEX { cwsChassisControlTableSnmpKey }
+    ::= { cwsChassisControlTable 1 }
+
+CwsChassisControlEntry ::= SEQUENCE { 
+    cwsChassisControlTableSnmpKey Integer32,
+    cwsChassisControlCount Unsigned32,
+    cwsChassisControlType ModuleTypeBits 
+}
+
+cwsChassisControlTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisControl"
+    ::= { cwsChassisControlEntry 1 }
+
+cwsChassisControlCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of control modules available to the waveserver chassis."
+    ::= { cwsChassisControlEntry 2 }
+
+cwsChassisControlType OBJECT-TYPE
+    SYNTAX ModuleTypeBits
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Chassis control module type. Can be integrated or field-replaceable."
+    ::= { cwsChassisControlEntry 3 }
+
+cwsChassisSwitchTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisSwitchEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 6 }
+
+cwsChassisSwitchEntry OBJECT-TYPE
+    SYNTAX CwsChassisSwitchEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisSwitchTable."
+    INDEX { cwsChassisSwitchTableSnmpKey }
+    ::= { cwsChassisSwitchTable 1 }
+
+CwsChassisSwitchEntry ::= SEQUENCE { 
+    cwsChassisSwitchTableSnmpKey Integer32,
+    cwsChassisSwitchCount Unsigned32,
+    cwsChassisSwitchType ModuleTypeBits 
+}
+
+cwsChassisSwitchTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisSwitch"
+    ::= { cwsChassisSwitchEntry 1 }
+
+cwsChassisSwitchCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of switch modules available to the waveserver chassis."
+    ::= { cwsChassisSwitchEntry 2 }
+
+cwsChassisSwitchType OBJECT-TYPE
+    SYNTAX ModuleTypeBits
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Chassis switch module type. Can be integrated or field-replaceable."
+    ::= { cwsChassisSwitchEntry 3 }
+
+cwsChassisIntegratedTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisIntegratedEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 7 }
+
+cwsChassisIntegratedEntry OBJECT-TYPE
+    SYNTAX CwsChassisIntegratedEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisIntegratedTable."
+    INDEX { cwsChassisIntegratedTableSnmpKey }
+    ::= { cwsChassisIntegratedTable 1 }
+
+CwsChassisIntegratedEntry ::= SEQUENCE { 
+    cwsChassisIntegratedTableSnmpKey Integer32,
+    cwsChassisIntegratedCount Unsigned32,
+    cwsChassisIntegratedType LineModuleTypeBits 
+}
+
+cwsChassisIntegratedTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisIntegrated"
+    ::= { cwsChassisIntegratedEntry 1 }
+
+cwsChassisIntegratedCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of integrated line modules available to the waveserver chassis."
+    ::= { cwsChassisIntegratedEntry 2 }
+
+cwsChassisIntegratedType OBJECT-TYPE
+    SYNTAX LineModuleTypeBits
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The type of integrated line module of this Waverserver chassis."
+    ::= { cwsChassisIntegratedEntry 3 }
+
+cwsChassisRemovableTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisRemovableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 8 }
+
+cwsChassisRemovableEntry OBJECT-TYPE
+    SYNTAX CwsChassisRemovableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisRemovableTable."
+    INDEX { cwsChassisRemovableTableSnmpKey }
+    ::= { cwsChassisRemovableTable 1 }
+
+CwsChassisRemovableEntry ::= SEQUENCE { 
+    cwsChassisRemovableTableSnmpKey Integer32,
+    cwsChassisRemovableCount Unsigned32,
+    cwsChassisRemovableType LineModuleTypeBits 
+}
+
+cwsChassisRemovableTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisRemovable"
+    ::= { cwsChassisRemovableEntry 1 }
+
+cwsChassisRemovableCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of removable line modules available to the waveserver chassis."
+    ::= { cwsChassisRemovableEntry 2 }
+
+cwsChassisRemovableType OBJECT-TYPE
+    SYNTAX LineModuleTypeBits
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The type of removable module of this Waverserver chassis."
+    ::= { cwsChassisRemovableEntry 3 }
+
+cwsChassisFanTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisFanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 9 }
+
+cwsChassisFanEntry OBJECT-TYPE
+    SYNTAX CwsChassisFanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisFanTable."
+    INDEX { cwsChassisFanTableSnmpKey }
+    ::= { cwsChassisFanTable 1 }
+
+CwsChassisFanEntry ::= SEQUENCE { 
+    cwsChassisFanTableSnmpKey Integer32,
+    cwsChassisFanCount Unsigned32,
+    cwsChassisFanType ModuleTypeBits 
+}
+
+cwsChassisFanTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisFan"
+    ::= { cwsChassisFanEntry 1 }
+
+cwsChassisFanCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of fan units available to the waveserver chassis."
+    ::= { cwsChassisFanEntry 2 }
+
+cwsChassisFanType OBJECT-TYPE
+    SYNTAX ModuleTypeBits
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Chassis fan unit type. Can be integrated or field-replaceable."
+    ::= { cwsChassisFanEntry 3 }
+
+cwsChassisAirFilterTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisAirFilterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 10 }
+
+cwsChassisAirFilterEntry OBJECT-TYPE
+    SYNTAX CwsChassisAirFilterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisAirFilterTable."
+    INDEX { cwsChassisAirFilterTableSnmpKey }
+    ::= { cwsChassisAirFilterTable 1 }
+
+CwsChassisAirFilterEntry ::= SEQUENCE { 
+    cwsChassisAirFilterTableSnmpKey Integer32,
+    cwsChassisAirFilterSupported YesNoEnum,
+    cwsChassisAirFilterType ModuleTypeBits,
+    cwsChassisAirFilterActive YesNoEnum 
+}
+
+cwsChassisAirFilterTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisAirFilter"
+    ::= { cwsChassisAirFilterEntry 1 }
+
+cwsChassisAirFilterSupported OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Is the air filter supported on the waveserver chassis."
+    ::= { cwsChassisAirFilterEntry 2 }
+
+cwsChassisAirFilterType OBJECT-TYPE
+    SYNTAX ModuleTypeBits
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Chassis air filter type. Can be integrated or field-replaceable."
+    ::= { cwsChassisAirFilterEntry 3 }
+
+cwsChassisAirFilterActive OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Is the air filter active on the waveserver chassis."
+    ::= { cwsChassisAirFilterEntry 4 }
+
+cwsChassisPowerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 11 }
+
+cwsChassisPowerEntry OBJECT-TYPE
+    SYNTAX CwsChassisPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisPowerTable."
+    INDEX { cwsChassisPowerTableSnmpKey }
+    ::= { cwsChassisPowerTable 1 }
+
+CwsChassisPowerEntry ::= SEQUENCE { 
+    cwsChassisPowerTableSnmpKey Integer32,
+    cwsChassisPowerCount Unsigned32,
+    cwsChassisPowerType ModuleTypeBits,
+    cwsChassisPowerRedundant YesNoEnum,
+    cwsChassisPowerDcSupport YesNoEnum 
+}
+
+cwsChassisPowerTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisPower"
+    ::= { cwsChassisPowerEntry 1 }
+
+cwsChassisPowerCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of power supply units available to the waveserver chassis."
+    ::= { cwsChassisPowerEntry 2 }
+
+cwsChassisPowerType OBJECT-TYPE
+    SYNTAX ModuleTypeBits
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Power supply unit type. Can be integrated or field-replaceable."
+    ::= { cwsChassisPowerEntry 3 }
+
+cwsChassisPowerRedundant OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Is redundant power present for the waveserver chassis."
+    ::= { cwsChassisPowerEntry 4 }
+
+cwsChassisPowerDcSupport OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether or not DC power is supported."
+    ::= { cwsChassisPowerEntry 5 }
+
+cwsChassisChassisTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisChassisEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 12 }
+
+cwsChassisChassisEntry OBJECT-TYPE
+    SYNTAX CwsChassisChassisEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisChassisTable."
+    INDEX { cwsChassisChassisTableSnmpKey }
+    ::= { cwsChassisChassisTable 1 }
+
+CwsChassisChassisEntry ::= SEQUENCE { 
+    cwsChassisChassisTableSnmpKey Integer32,
+    cwsChassisChassisBase MacString,
+    cwsChassisChassisBlockSize MacBlockSize 
+}
+
+cwsChassisChassisTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisChassis"
+    ::= { cwsChassisChassisEntry 1 }
+
+cwsChassisChassisBase OBJECT-TYPE
+    SYNTAX MacString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Chassis Base MAC address. All MACs used in shelf offset from this."
+    ::= { cwsChassisChassisEntry 2 }
+
+cwsChassisChassisBlockSize OBJECT-TYPE
+    SYNTAX MacBlockSize
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of MACs allocated by manufacturing."
+    ::= { cwsChassisChassisEntry 3 }
+
+cwsChassisLocalManagementTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisLocalManagementEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 13 }
+
+cwsChassisLocalManagementEntry OBJECT-TYPE
+    SYNTAX CwsChassisLocalManagementEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisLocalManagementTable."
+    INDEX { cwsChassisLocalManagementTableSnmpKey }
+    ::= { cwsChassisLocalManagementTable 1 }
+
+CwsChassisLocalManagementEntry ::= SEQUENCE { 
+    cwsChassisLocalManagementTableSnmpKey Integer32,
+    cwsChassisLocalManagementBase MacString,
+    cwsChassisLocalManagementBlockSize MacBlockSize 
+}
+
+cwsChassisLocalManagementTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisLocalManagement"
+    ::= { cwsChassisLocalManagementEntry 1 }
+
+cwsChassisLocalManagementBase OBJECT-TYPE
+    SYNTAX MacString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Local Management MAC address."
+    ::= { cwsChassisLocalManagementEntry 2 }
+
+cwsChassisLocalManagementBlockSize OBJECT-TYPE
+    SYNTAX MacBlockSize
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Local Management MAC Block Size."
+    ::= { cwsChassisLocalManagementEntry 3 }
+
+cwsChassisRemoteManagementTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisRemoteManagementEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 14 }
+
+cwsChassisRemoteManagementEntry OBJECT-TYPE
+    SYNTAX CwsChassisRemoteManagementEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisRemoteManagementTable."
+    INDEX { cwsChassisRemoteManagementTableSnmpKey }
+    ::= { cwsChassisRemoteManagementTable 1 }
+
+CwsChassisRemoteManagementEntry ::= SEQUENCE { 
+    cwsChassisRemoteManagementTableSnmpKey Integer32,
+    cwsChassisRemoteManagementBase MacString,
+    cwsChassisRemoteManagementBlockSize MacBlockSize 
+}
+
+cwsChassisRemoteManagementTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisRemoteManagement"
+    ::= { cwsChassisRemoteManagementEntry 1 }
+
+cwsChassisRemoteManagementBase OBJECT-TYPE
+    SYNTAX MacString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Remote Management MAC address."
+    ::= { cwsChassisRemoteManagementEntry 2 }
+
+cwsChassisRemoteManagementBlockSize OBJECT-TYPE
+    SYNTAX MacBlockSize
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Remote Management MAC address Block Size."
+    ::= { cwsChassisRemoteManagementEntry 3 }
+
+cwsChassisDcnTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisDcnEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 15 }
+
+cwsChassisDcnEntry OBJECT-TYPE
+    SYNTAX CwsChassisDcnEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisDcnTable."
+    INDEX { cwsChassisDcnTableSnmpKey }
+    ::= { cwsChassisDcnTable 1 }
+
+CwsChassisDcnEntry ::= SEQUENCE { 
+    cwsChassisDcnTableSnmpKey Integer32,
+    cwsChassisDcnBase MacString,
+    cwsChassisDcnBlockSize MacBlockSize 
+}
+
+cwsChassisDcnTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisDcn"
+    ::= { cwsChassisDcnEntry 1 }
+
+cwsChassisDcnBase OBJECT-TYPE
+    SYNTAX MacString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "DCN MAC address."
+    ::= { cwsChassisDcnEntry 2 }
+
+cwsChassisDcnBlockSize OBJECT-TYPE
+    SYNTAX MacBlockSize
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "DCN MAC address Block Size."
+    ::= { cwsChassisDcnEntry 3 }
+
+cwsChassisIlan1Table OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisIlan1Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 16 }
+
+cwsChassisIlan1Entry OBJECT-TYPE
+    SYNTAX CwsChassisIlan1Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisIlan1Table."
+    INDEX { cwsChassisIlan1TableSnmpKey }
+    ::= { cwsChassisIlan1Table 1 }
+
+CwsChassisIlan1Entry ::= SEQUENCE { 
+    cwsChassisIlan1TableSnmpKey Integer32,
+    cwsChassisIlan1Base MacString,
+    cwsChassisIlan1BlockSize MacBlockSize 
+}
+
+cwsChassisIlan1TableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisIlan1"
+    ::= { cwsChassisIlan1Entry 1 }
+
+cwsChassisIlan1Base OBJECT-TYPE
+    SYNTAX MacString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "I-LAN-1 MAC address."
+    ::= { cwsChassisIlan1Entry 2 }
+
+cwsChassisIlan1BlockSize OBJECT-TYPE
+    SYNTAX MacBlockSize
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "I-LAN-1 MAC address Block Size."
+    ::= { cwsChassisIlan1Entry 3 }
+
+cwsChassisIlan2Table OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisIlan2Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 17 }
+
+cwsChassisIlan2Entry OBJECT-TYPE
+    SYNTAX CwsChassisIlan2Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisIlan2Table."
+    INDEX { cwsChassisIlan2TableSnmpKey }
+    ::= { cwsChassisIlan2Table 1 }
+
+CwsChassisIlan2Entry ::= SEQUENCE { 
+    cwsChassisIlan2TableSnmpKey Integer32,
+    cwsChassisIlan2Base MacString,
+    cwsChassisIlan2BlockSize MacBlockSize 
+}
+
+cwsChassisIlan2TableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisIlan2"
+    ::= { cwsChassisIlan2Entry 1 }
+
+cwsChassisIlan2Base OBJECT-TYPE
+    SYNTAX MacString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "I-LAN-2 MAC address."
+    ::= { cwsChassisIlan2Entry 2 }
+
+cwsChassisIlan2BlockSize OBJECT-TYPE
+    SYNTAX MacBlockSize
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "I-LAN-2 MAC address Block Size."
+    ::= { cwsChassisIlan2Entry 3 }
+
+cwsChassisPortsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisPortsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 18 }
+
+cwsChassisPortsEntry OBJECT-TYPE
+    SYNTAX CwsChassisPortsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisPortsTable."
+    INDEX { cwsChassisPortsTableSnmpKey }
+    ::= { cwsChassisPortsTable 1 }
+
+CwsChassisPortsEntry ::= SEQUENCE { 
+    cwsChassisPortsTableSnmpKey Integer32,
+    cwsChassisPortsBase MacString,
+    cwsChassisPortsBlockSize MacBlockSize 
+}
+
+cwsChassisPortsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisPorts"
+    ::= { cwsChassisPortsEntry 1 }
+
+cwsChassisPortsBase OBJECT-TYPE
+    SYNTAX MacString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Port Base MAC address."
+    ::= { cwsChassisPortsEntry 2 }
+
+cwsChassisPortsBlockSize OBJECT-TYPE
+    SYNTAX MacBlockSize
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Port Base MAC address Block Size."
+    ::= { cwsChassisPortsEntry 3 }
+
+cwsChassisReservedTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisReservedEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 19 }
+
+cwsChassisReservedEntry OBJECT-TYPE
+    SYNTAX CwsChassisReservedEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisReservedTable."
+    INDEX { cwsChassisReservedTableSnmpKey }
+    ::= { cwsChassisReservedTable 1 }
+
+CwsChassisReservedEntry ::= SEQUENCE { 
+    cwsChassisReservedTableSnmpKey Integer32,
+    cwsChassisReservedBase MacString,
+    cwsChassisReservedBlockSize MacBlockSize 
+}
+
+cwsChassisReservedTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisReserved"
+    ::= { cwsChassisReservedEntry 1 }
+
+cwsChassisReservedBase OBJECT-TYPE
+    SYNTAX MacString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Reserved MAC address."
+    ::= { cwsChassisReservedEntry 2 }
+
+cwsChassisReservedBlockSize OBJECT-TYPE
+    SYNTAX MacBlockSize
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Reserved MAC address Block Size."
+    ::= { cwsChassisReservedEntry 3 }
+
+cwsChassisPowerSupplyUnitsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisPowerSupplyUnitsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Power Supply Unit Status."
+    ::= { cienaWsChassisMIB 20 }
+
+cwsChassisPowerSupplyUnitsEntry OBJECT-TYPE
+    SYNTAX CwsChassisPowerSupplyUnitsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisPowerSupplyUnitsTable."
+    INDEX { cwsChassisPowerSupplyUnitsPsuNumber }
+    ::= { cwsChassisPowerSupplyUnitsTable 1 }
+
+CwsChassisPowerSupplyUnitsEntry ::= SEQUENCE { 
+    cwsChassisPowerSupplyUnitsPsuNumber Integer32,
+    cwsChassisPowerSupplyUnitsName StringMaxl16 
+}
+
+cwsChassisPowerSupplyUnitsPsuNumber OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cwsChassisPowerSupplyUnitsEntry 1 }
+
+cwsChassisPowerSupplyUnitsName OBJECT-TYPE
+    SYNTAX StringMaxl16
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Name of the power supply unit. In the format of PSU-<slot #>. Contains the slot number of the power supply unit."
+    ::= { cwsChassisPowerSupplyUnitsEntry 2 }
+
+cwsChassisPsuStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisPsuStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 21 }
+
+cwsChassisPsuStateEntry OBJECT-TYPE
+    SYNTAX CwsChassisPsuStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisPsuStateTable."
+    INDEX { cwsChassisPowerSupplyUnitsPsuNumber, cwsChassisPsuStateTableSnmpKey }
+    ::= { cwsChassisPsuStateTable 1 }
+
+CwsChassisPsuStateEntry ::= SEQUENCE { 
+    cwsChassisPsuStateTableSnmpKey Integer32,
+    cwsChassisPsuStateAdminState EnabledDisabledEnum,
+    cwsChassisPsuStateOperationalState ChassisOperationState 
+}
+
+cwsChassisPsuStateTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisPsuState"
+    ::= { cwsChassisPsuStateEntry 1 }
+
+cwsChassisPsuStateAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Whether admin state of the Power Supply unit is enabled or disabled. Disabled state masks the alarms only."
+    ::= { cwsChassisPsuStateEntry 2 }
+
+cwsChassisPsuStateOperationalState OBJECT-TYPE
+    SYNTAX ChassisOperationState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "operational state of the Power Supply unit."
+    ::= { cwsChassisPsuStateEntry 3 }
+
+cwsChassisPsuPropertiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisPsuPropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 22 }
+
+cwsChassisPsuPropertiesEntry OBJECT-TYPE
+    SYNTAX CwsChassisPsuPropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisPsuPropertiesTable."
+    INDEX { cwsChassisPowerSupplyUnitsPsuNumber, cwsChassisPsuPropertiesTableSnmpKey }
+    ::= { cwsChassisPsuPropertiesTable 1 }
+
+CwsChassisPsuPropertiesEntry ::= SEQUENCE { 
+    cwsChassisPsuPropertiesTableSnmpKey Integer32,
+    cwsChassisPsuPropertiesType INTEGER 
+}
+
+cwsChassisPsuPropertiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisPsuProperties"
+    ::= { cwsChassisPsuPropertiesEntry 1 }
+
+cwsChassisPsuPropertiesType OBJECT-TYPE
+    SYNTAX INTEGER { ac(0), dc(1), unequipped(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Power Supply unit type."
+    ::= { cwsChassisPsuPropertiesEntry 2 }
+
+cwsChassisPsuDeviceIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisPsuDeviceIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Device identification information of this Power Supply Unit."
+    ::= { cienaWsChassisMIB 23 }
+
+cwsChassisPsuDeviceIdEntry OBJECT-TYPE
+    SYNTAX CwsChassisPsuDeviceIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisPsuDeviceIdTable."
+    INDEX { cwsChassisPowerSupplyUnitsPsuNumber, cwsChassisPsuDeviceIdTableSnmpKey }
+    ::= { cwsChassisPsuDeviceIdTable 1 }
+
+CwsChassisPsuDeviceIdEntry ::= SEQUENCE { 
+    cwsChassisPsuDeviceIdTableSnmpKey Integer32,
+    cwsChassisPsuDeviceIdModel StringMaxl50,
+    cwsChassisPsuDeviceIdSerialNumber StringMaxl50,
+    cwsChassisPsuDeviceIdPartNumber StringMaxl50,
+    cwsChassisPsuDeviceIdRevision StringMaxl50,
+    cwsChassisPsuDeviceIdManufactureDate StringMaxl50,
+    cwsChassisPsuDeviceIdManufactureLocation StringMaxl50 
+}
+
+cwsChassisPsuDeviceIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisPsuDeviceId"
+    ::= { cwsChassisPsuDeviceIdEntry 1 }
+
+cwsChassisPsuDeviceIdModel OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Power Supply Unit product model information."
+    ::= { cwsChassisPsuDeviceIdEntry 2 }
+
+cwsChassisPsuDeviceIdSerialNumber OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Power Supply Unit serial number information."
+    ::= { cwsChassisPsuDeviceIdEntry 3 }
+
+cwsChassisPsuDeviceIdPartNumber OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Power Supply Unit part number information."
+    ::= { cwsChassisPsuDeviceIdEntry 4 }
+
+cwsChassisPsuDeviceIdRevision OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Power Supply Unit revision information."
+    ::= { cwsChassisPsuDeviceIdEntry 5 }
+
+cwsChassisPsuDeviceIdManufactureDate OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Device Manufacture Date, in string format. Max length of 32 characters."
+    ::= { cwsChassisPsuDeviceIdEntry 6 }
+
+cwsChassisPsuDeviceIdManufactureLocation OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Device Manufacture Location, in string format. Max length of 32 characters."
+    ::= { cwsChassisPsuDeviceIdEntry 7 }
+
+cwsChassisCoolingFanUnitsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisCoolingFanUnitsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Cooling Fan Unit Status."
+    ::= { cienaWsChassisMIB 24 }
+
+cwsChassisCoolingFanUnitsEntry OBJECT-TYPE
+    SYNTAX CwsChassisCoolingFanUnitsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisCoolingFanUnitsTable."
+    INDEX { cwsChassisCoolingFanUnitsCfuNumber }
+    ::= { cwsChassisCoolingFanUnitsTable 1 }
+
+CwsChassisCoolingFanUnitsEntry ::= SEQUENCE { 
+    cwsChassisCoolingFanUnitsCfuNumber Integer32,
+    cwsChassisCoolingFanUnitsName StringMaxl16 
+}
+
+cwsChassisCoolingFanUnitsCfuNumber OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cwsChassisCoolingFanUnitsEntry 1 }
+
+cwsChassisCoolingFanUnitsName OBJECT-TYPE
+    SYNTAX StringMaxl16
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Name of the cooling fan unit. In the format of CFU-<slot #>. Contains the slot number of the cooling fan unit."
+    ::= { cwsChassisCoolingFanUnitsEntry 2 }
+
+cwsChassisFanStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisFanStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 25 }
+
+cwsChassisFanStateEntry OBJECT-TYPE
+    SYNTAX CwsChassisFanStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisFanStateTable."
+    INDEX { cwsChassisCoolingFanUnitsCfuNumber, cwsChassisFanStateTableSnmpKey }
+    ::= { cwsChassisFanStateTable 1 }
+
+CwsChassisFanStateEntry ::= SEQUENCE { 
+    cwsChassisFanStateTableSnmpKey Integer32,
+    cwsChassisFanStateAdminState EnabledDisabledEnum,
+    cwsChassisFanStateOperationalState ChassisOperationState 
+}
+
+cwsChassisFanStateTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisFanState"
+    ::= { cwsChassisFanStateEntry 1 }
+
+cwsChassisFanStateAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Whether Admin State of the cooling fan unit is enabled or disabled. Disabled state masks the alarms only."
+    ::= { cwsChassisFanStateEntry 2 }
+
+cwsChassisFanStateOperationalState OBJECT-TYPE
+    SYNTAX ChassisOperationState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "operational state of the Cooling Fan unit."
+    ::= { cwsChassisFanStateEntry 3 }
+
+cwsChassisFanPropertiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisFanPropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "All the operational data fields of this Cooling Fan Unit."
+    ::= { cienaWsChassisMIB 26 }
+
+cwsChassisFanPropertiesEntry OBJECT-TYPE
+    SYNTAX CwsChassisFanPropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisFanPropertiesTable."
+    INDEX { cwsChassisCoolingFanUnitsCfuNumber, cwsChassisFanPropertiesTableSnmpKey }
+    ::= { cwsChassisFanPropertiesTable 1 }
+
+CwsChassisFanPropertiesEntry ::= SEQUENCE { 
+    cwsChassisFanPropertiesTableSnmpKey Integer32,
+    cwsChassisFanPropertiesAutomaticControl EnabledDisabledEnum,
+    cwsChassisFanPropertiesNumberOfTemperatureSensors Unsigned32,
+    cwsChassisFanPropertiesNumberOfFans Unsigned32 
+}
+
+cwsChassisFanPropertiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisFanProperties"
+    ::= { cwsChassisFanPropertiesEntry 1 }
+
+cwsChassisFanPropertiesAutomaticControl OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether Automatic Control of the cooling fan unit is enabled or disabled."
+    ::= { cwsChassisFanPropertiesEntry 2 }
+
+cwsChassisFanPropertiesNumberOfTemperatureSensors OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Temperature Sensors on the cooling fan unit."
+    ::= { cwsChassisFanPropertiesEntry 3 }
+
+cwsChassisFanPropertiesNumberOfFans OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Fans on the cooling fan unit."
+    ::= { cwsChassisFanPropertiesEntry 4 }
+
+cwsChassisStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 27 }
+
+cwsChassisStatusEntry OBJECT-TYPE
+    SYNTAX CwsChassisStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisStatusTable."
+    INDEX { cwsChassisCoolingFanUnitsCfuNumber, cwsChassisStatusFanId }
+    ::= { cwsChassisStatusTable 1 }
+
+CwsChassisStatusEntry ::= SEQUENCE { 
+    cwsChassisStatusFanId Integer32,
+    cwsChassisStatusCurrentRpm Unsigned32,
+    cwsChassisStatusAverageRpm Unsigned32,
+    cwsChassisStatusMinimumRpm Unsigned32,
+    cwsChassisStatusMaximumRpm Unsigned32 
+}
+
+cwsChassisStatusFanId OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Fan ID value."
+    ::= { cwsChassisStatusEntry 1 }
+
+cwsChassisStatusCurrentRpm OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Current Speed of the fan, in RPM."
+    ::= { cwsChassisStatusEntry 2 }
+
+cwsChassisStatusAverageRpm OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Average Speed of the fan, in RPM."
+    ::= { cwsChassisStatusEntry 3 }
+
+cwsChassisStatusMinimumRpm OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Minimum Speed of the fan, in RPM."
+    ::= { cwsChassisStatusEntry 4 }
+
+cwsChassisStatusMaximumRpm OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Maximum Speed of the fan, in RPM."
+    ::= { cwsChassisStatusEntry 5 }
+
+cwsChassisFanDeviceIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisFanDeviceIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Device Identification information of this Cooling Fan Unit."
+    ::= { cienaWsChassisMIB 28 }
+
+cwsChassisFanDeviceIdEntry OBJECT-TYPE
+    SYNTAX CwsChassisFanDeviceIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisFanDeviceIdTable."
+    INDEX { cwsChassisCoolingFanUnitsCfuNumber, cwsChassisFanDeviceIdTableSnmpKey }
+    ::= { cwsChassisFanDeviceIdTable 1 }
+
+CwsChassisFanDeviceIdEntry ::= SEQUENCE { 
+    cwsChassisFanDeviceIdTableSnmpKey Integer32,
+    cwsChassisFanDeviceIdModel StringMaxl50,
+    cwsChassisFanDeviceIdSerialNumber StringMaxl50,
+    cwsChassisFanDeviceIdPartNumber StringMaxl50,
+    cwsChassisFanDeviceIdRevision StringMaxl50,
+    cwsChassisFanDeviceIdManufactureDate StringMaxl50,
+    cwsChassisFanDeviceIdManufactureLocation StringMaxl50 
+}
+
+cwsChassisFanDeviceIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisFanDeviceId"
+    ::= { cwsChassisFanDeviceIdEntry 1 }
+
+cwsChassisFanDeviceIdModel OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Cooling Fan Unit product model information."
+    ::= { cwsChassisFanDeviceIdEntry 2 }
+
+cwsChassisFanDeviceIdSerialNumber OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Cooling Fan Unit serial number information."
+    ::= { cwsChassisFanDeviceIdEntry 3 }
+
+cwsChassisFanDeviceIdPartNumber OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Cooling Fan Unit part number information."
+    ::= { cwsChassisFanDeviceIdEntry 4 }
+
+cwsChassisFanDeviceIdRevision OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Cooling Fan Unit revision information."
+    ::= { cwsChassisFanDeviceIdEntry 5 }
+
+cwsChassisFanDeviceIdManufactureDate OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Device Manufacture Date, in string format. Max length of 32 characters."
+    ::= { cwsChassisFanDeviceIdEntry 6 }
+
+cwsChassisFanDeviceIdManufactureLocation OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Device Manufacture Location, in string format. Max length of 32 characters."
+    ::= { cwsChassisFanDeviceIdEntry 7 }
+
+cwsChassisDeviceIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisDeviceIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Device Identification information of the blade."
+    ::= { cienaWsChassisMIB 29 }
+
+cwsChassisDeviceIdEntry OBJECT-TYPE
+    SYNTAX CwsChassisDeviceIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisDeviceIdTable."
+    INDEX { cwsChassisDeviceIdTableSnmpKey }
+    ::= { cwsChassisDeviceIdTable 1 }
+
+CwsChassisDeviceIdEntry ::= SEQUENCE { 
+    cwsChassisDeviceIdTableSnmpKey Integer32,
+    cwsChassisDeviceIdModuleSerialNumber StringMaxl50,
+    cwsChassisDeviceIdModelPartNumber StringMaxl50,
+    cwsChassisDeviceIdModelRevision StringMaxl50,
+    cwsChassisDeviceIdProductId StringMaxl50,
+    cwsChassisDeviceIdManufactureDate StringMaxl50,
+    cwsChassisDeviceIdManufactureLocation StringMaxl50,
+    cwsChassisDeviceIdBarCode StringMaxl50,
+    cwsChassisDeviceIdBoardSerialNumber StringMaxl50,
+    cwsChassisDeviceIdBoardPartNumber StringMaxl50,
+    cwsChassisDeviceIdBoardRevision StringMaxl50,
+    cwsChassisDeviceIdEthernetBaseAddress StringMaxl50,
+    cwsChassisDeviceIdEthernetAddressBlockSize StringMaxl50,
+    cwsChassisDeviceIdSoftwareCompatibility StringMaxl50,
+    cwsChassisDeviceIdFunctionalTestCount StringMaxl50,
+    cwsChassisDeviceIdFaultCard StringMaxl50,
+    cwsChassisDeviceIdPackageSerialNumber StringMaxl50,
+    cwsChassisDeviceIdPackagePartNumber StringMaxl50,
+    cwsChassisDeviceIdPackageRevision StringMaxl50 
+}
+
+cwsChassisDeviceIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisDeviceId"
+    ::= { cwsChassisDeviceIdEntry 1 }
+
+cwsChassisDeviceIdModuleSerialNumber OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Module Serial Number."
+    ::= { cwsChassisDeviceIdEntry 2 }
+
+cwsChassisDeviceIdModelPartNumber OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Device Model Part number"
+    ::= { cwsChassisDeviceIdEntry 3 }
+
+cwsChassisDeviceIdModelRevision OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Device Revision, in string format. Max length of 32 characters."
+    ::= { cwsChassisDeviceIdEntry 4 }
+
+cwsChassisDeviceIdProductId OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade product ID, in string format. Max length of 32 characters."
+    ::= { cwsChassisDeviceIdEntry 5 }
+
+cwsChassisDeviceIdManufactureDate OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Device Manufacture Date."
+    ::= { cwsChassisDeviceIdEntry 6 }
+
+cwsChassisDeviceIdManufactureLocation OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Device Manufacture Location."
+    ::= { cwsChassisDeviceIdEntry 7 }
+
+cwsChassisDeviceIdBarCode OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Device Bar Code."
+    ::= { cwsChassisDeviceIdEntry 8 }
+
+cwsChassisDeviceIdBoardSerialNumber OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Board Serial Number, in string format. Max length of 32 characters."
+    ::= { cwsChassisDeviceIdEntry 9 }
+
+cwsChassisDeviceIdBoardPartNumber OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Board Part Number, in string format. Max length of 32 characters."
+    ::= { cwsChassisDeviceIdEntry 10 }
+
+cwsChassisDeviceIdBoardRevision OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Board Revision, in string format. Max length of 32 characters."
+    ::= { cwsChassisDeviceIdEntry 11 }
+
+cwsChassisDeviceIdEthernetBaseAddress OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Ethernet Base Address."
+    ::= { cwsChassisDeviceIdEntry 12 }
+
+cwsChassisDeviceIdEthernetAddressBlockSize OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Ethernet Address Block Size."
+    ::= { cwsChassisDeviceIdEntry 13 }
+
+cwsChassisDeviceIdSoftwareCompatibility OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Software Compatibility."
+    ::= { cwsChassisDeviceIdEntry 14 }
+
+cwsChassisDeviceIdFunctionalTestCount OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Functional Test Count."
+    ::= { cwsChassisDeviceIdEntry 15 }
+
+cwsChassisDeviceIdFaultCard OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Fault Card."
+    ::= { cwsChassisDeviceIdEntry 16 }
+
+cwsChassisDeviceIdPackageSerialNumber OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Package Serial Number."
+    ::= { cwsChassisDeviceIdEntry 17 }
+
+cwsChassisDeviceIdPackagePartNumber OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Package Model Part number"
+    ::= { cwsChassisDeviceIdEntry 18 }
+
+cwsChassisDeviceIdPackageRevision OBJECT-TYPE
+    SYNTAX StringMaxl50
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Package Revision, in string format. Max length of 32 characters."
+    ::= { cwsChassisDeviceIdEntry 19 }
+
+cwsChassisManagementPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisManagementPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "A list to manage Chassis ports."
+    ::= { cienaWsChassisMIB 30 }
+
+cwsChassisManagementPortEntry OBJECT-TYPE
+    SYNTAX CwsChassisManagementPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisManagementPortTable."
+    INDEX { cwsChassisManagementPortIndex }
+    ::= { cwsChassisManagementPortTable 1 }
+
+CwsChassisManagementPortEntry ::= SEQUENCE { 
+    cwsChassisManagementPortIndex Integer32 
+}
+
+cwsChassisManagementPortIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Index value of the management port."
+    ::= { cwsChassisManagementPortEntry 1 }
+
+cwsChassisIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Identification information of this management port."
+    ::= { cienaWsChassisMIB 31 }
+
+cwsChassisIdEntry OBJECT-TYPE
+    SYNTAX CwsChassisIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisIdTable."
+    INDEX { cwsChassisManagementPortIndex, cwsChassisIdTableSnmpKey }
+    ::= { cwsChassisIdTable 1 }
+
+CwsChassisIdEntry ::= SEQUENCE { 
+    cwsChassisIdTableSnmpKey Integer32,
+    cwsChassisIdName StringMaxl16 
+}
+
+cwsChassisIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisId"
+    ::= { cwsChassisIdEntry 1 }
+
+cwsChassisIdName OBJECT-TYPE
+    SYNTAX StringMaxl16
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Name of the Port. The names are predefined."
+    ::= { cwsChassisIdEntry 2 }
+
+cwsChassisStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsChassisMIB 32 }
+
+cwsChassisStateEntry OBJECT-TYPE
+    SYNTAX CwsChassisStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisStateTable."
+    INDEX { cwsChassisManagementPortIndex, cwsChassisStateTableSnmpKey }
+    ::= { cwsChassisStateTable 1 }
+
+CwsChassisStateEntry ::= SEQUENCE { 
+    cwsChassisStateTableSnmpKey Integer32,
+    cwsChassisStateAdminState EnabledDisabledEnum,
+    cwsChassisStateOperationalState UpDownEnum 
+}
+
+cwsChassisStateTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisState"
+    ::= { cwsChassisStateEntry 1 }
+
+cwsChassisStateAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Whether Admin State is enabled or disabled for this management port."
+    ::= { cwsChassisStateEntry 2 }
+
+cwsChassisStateOperationalState OBJECT-TYPE
+    SYNTAX UpDownEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Operational state of this management port."
+    ::= { cwsChassisStateEntry 3 }
+
+cwsChassisPropertiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsChassisPropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "All the operational data of this management port."
+    ::= { cienaWsChassisMIB 33 }
+
+cwsChassisPropertiesEntry OBJECT-TYPE
+    SYNTAX CwsChassisPropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsChassisPropertiesTable."
+    INDEX { cwsChassisManagementPortIndex, cwsChassisPropertiesTableSnmpKey }
+    ::= { cwsChassisPropertiesTable 1 }
+
+CwsChassisPropertiesEntry ::= SEQUENCE { 
+    cwsChassisPropertiesTableSnmpKey Integer32,
+    cwsChassisPropertiesType INTEGER,
+    cwsChassisPropertiesMacAddress MacString,
+    cwsChassisPropertiesMaxFrameSize Unsigned32 
+}
+
+cwsChassisPropertiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsChassisProperties"
+    ::= { cwsChassisPropertiesEntry 1 }
+
+cwsChassisPropertiesType OBJECT-TYPE
+    SYNTAX INTEGER { ethernet(0), serial(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Management port type. If the port is DCN, ilan-1, or ilan-2, the port type will be Ethernet. If the port is Console, the port type will be Serial."
+    ::= { cwsChassisPropertiesEntry 2 }
+
+cwsChassisPropertiesMacAddress OBJECT-TYPE
+    SYNTAX MacString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "MAC Address of the management port."
+    ::= { cwsChassisPropertiesEntry 3 }
+
+cwsChassisPropertiesMaxFrameSize OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Max Frame Size of the management port."
+    ::= { cwsChassisPropertiesEntry 4 }
+
+
+
+-- Conformance statements
+cienaWsChassisObjects OBJECT IDENTIFIER
+    ::= { cienaWsChassisMIB 1 }
+
+cienaWsChassisConformance OBJECT IDENTIFIER
+    ::= { cienaWsChassisMIB 2 }
+
+cienaWsChassisGroups OBJECT IDENTIFIER
+    ::= { cienaWsChassisConformance 1 }
+
+cienaWsChassisGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsChassisChassisidentificationModel,
+        cwsChassisChassisidentificationDescription,
+        cwsChassisChassisidentificationType,
+        cwsChassisChassiscapabilitiesNumOfSlots,
+        cwsChassisControlCount,
+        cwsChassisControlType,
+        cwsChassisSwitchCount,
+        cwsChassisSwitchType,
+        cwsChassisIntegratedCount,
+        cwsChassisIntegratedType,
+        cwsChassisRemovableCount,
+        cwsChassisRemovableType,
+        cwsChassisFanCount,
+        cwsChassisFanType,
+        cwsChassisAirFilterSupported,
+        cwsChassisAirFilterType,
+        cwsChassisAirFilterActive,
+        cwsChassisPowerCount,
+        cwsChassisPowerType,
+        cwsChassisPowerRedundant,
+        cwsChassisPowerDcSupport,
+        cwsChassisChassisBase,
+        cwsChassisChassisBlockSize,
+        cwsChassisLocalManagementBase,
+        cwsChassisLocalManagementBlockSize,
+        cwsChassisRemoteManagementBase,
+        cwsChassisRemoteManagementBlockSize,
+        cwsChassisDcnBase,
+        cwsChassisDcnBlockSize,
+        cwsChassisIlan1Base,
+        cwsChassisIlan1BlockSize,
+        cwsChassisIlan2Base,
+        cwsChassisIlan2BlockSize,
+        cwsChassisPortsBase,
+        cwsChassisPortsBlockSize,
+        cwsChassisReservedBase,
+        cwsChassisReservedBlockSize,
+        cwsChassisPowerSupplyUnitsName,
+        cwsChassisPsuStateAdminState,
+        cwsChassisPsuStateOperationalState,
+        cwsChassisPsuPropertiesType,
+        cwsChassisPsuDeviceIdModel,
+        cwsChassisPsuDeviceIdSerialNumber,
+        cwsChassisPsuDeviceIdPartNumber,
+        cwsChassisPsuDeviceIdRevision,
+        cwsChassisPsuDeviceIdManufactureDate,
+        cwsChassisPsuDeviceIdManufactureLocation,
+        cwsChassisCoolingFanUnitsName,
+        cwsChassisFanStateAdminState,
+        cwsChassisFanStateOperationalState,
+        cwsChassisFanPropertiesAutomaticControl,
+        cwsChassisFanPropertiesNumberOfTemperatureSensors,
+        cwsChassisFanPropertiesNumberOfFans,
+        cwsChassisStatusCurrentRpm,
+        cwsChassisStatusAverageRpm,
+        cwsChassisStatusMinimumRpm,
+        cwsChassisStatusMaximumRpm,
+        cwsChassisFanDeviceIdModel,
+        cwsChassisFanDeviceIdSerialNumber,
+        cwsChassisFanDeviceIdPartNumber,
+        cwsChassisFanDeviceIdRevision,
+        cwsChassisFanDeviceIdManufactureDate,
+        cwsChassisFanDeviceIdManufactureLocation,
+        cwsChassisDeviceIdModuleSerialNumber,
+        cwsChassisDeviceIdModelPartNumber,
+        cwsChassisDeviceIdModelRevision,
+        cwsChassisDeviceIdProductId,
+        cwsChassisDeviceIdManufactureDate,
+        cwsChassisDeviceIdManufactureLocation,
+        cwsChassisDeviceIdBarCode,
+        cwsChassisDeviceIdBoardSerialNumber,
+        cwsChassisDeviceIdBoardPartNumber,
+        cwsChassisDeviceIdBoardRevision,
+        cwsChassisDeviceIdEthernetBaseAddress,
+        cwsChassisDeviceIdEthernetAddressBlockSize,
+        cwsChassisDeviceIdSoftwareCompatibility,
+        cwsChassisDeviceIdFunctionalTestCount,
+        cwsChassisDeviceIdFaultCard,
+        cwsChassisDeviceIdPackageSerialNumber,
+        cwsChassisDeviceIdPackagePartNumber,
+        cwsChassisDeviceIdPackageRevision,
+        cwsChassisManagementPortIndex,
+        cwsChassisIdName,
+        cwsChassisStateAdminState,
+        cwsChassisStateOperationalState,
+        cwsChassisPropertiesType,
+        cwsChassisPropertiesMacAddress,
+        cwsChassisPropertiesMaxFrameSize
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsChassisGroups 1 }
+
+cienaWsChassisCompliances OBJECT IDENTIFIER
+    ::= { cienaWsChassisConformance 2 }
+
+cienaWsChassisCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsChassisGroup }
+    ::= { cienaWsChassisCompliances 1 }
+
+END -- End module
