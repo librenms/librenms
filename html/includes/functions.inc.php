@@ -1685,3 +1685,17 @@ function get_sensor_label_color($sensor)
 
     return $current_label_color;
 }
+
+/**
+ * Rounds down to the closest number divisible by 5.
+ */
+function lowest_five( $number ){
+    return floor( $number / 5 ) * 5;
+}
+
+/**
+ * Rounds down to the nearest 5 minutes if using seconds.
+ */
+function lowest_five_minutes( $time ){
+    return $time - ($time % 300);
+}
