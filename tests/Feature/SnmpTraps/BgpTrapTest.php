@@ -29,8 +29,9 @@ use App\Models\BgpPeer;
 use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Tests\LaravelTestCase;
 
-class BgpTrapTest extends TrapTestCase
+class BgpTrapTest extends LaravelTestCase
 {
     public function testBgpUp()
     {
@@ -45,12 +46,14 @@ SNMPv2-MIB::snmpTrapOID.0 BGP4-MIB::bgpEstablished
 BGP4-MIB::bgpPeerLastError.$bgppeer->bgpPeerIdentifier \"04 00 \"
 BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier established\n";
 
+        $message = "SNMP Trap: BGP Up $bgppeer->bgpPeerIdentifier " . get_astext($bgppeer->bgpPeerRemoteAs) . " is now established";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'bgpPeer', 1, $bgppeer->bgpPeerIdentifier);
+
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle bgpEstablished');
 
         $bgppeer = $bgppeer->fresh(); // refresh from database
         $this->assertEquals($bgppeer->bgpPeerState, 'established');
-        $this->assertEquals("SNMP Trap: BGP Up $bgppeer->bgpPeerIdentifier " . get_astext($bgppeer->bgpPeerRemoteAs) .  " is now established", $this->lastEventlogMessage());
     }
 
     public function testBgpDown()
@@ -66,11 +69,13 @@ SNMPv2-MIB::snmpTrapOID.0 BGP4-MIB::bgpBackwardTransition
 BGP4-MIB::bgpPeerLastError.$bgppeer->bgpPeerIdentifier \"04 00 \"
 BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier idle\n";
 
+        $message = "SNMP Trap: BGP Down $bgppeer->bgpPeerIdentifier " . get_astext($bgppeer->bgpPeerRemoteAs) . " is now idle";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'bgpPeer', 5, $bgppeer->bgpPeerIdentifier);
+
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle bgpBackwardTransition');
 
         $bgppeer = $bgppeer->fresh(); // refresh from database
         $this->assertEquals($bgppeer->bgpPeerState, 'idle');
-        $this->assertEquals("SNMP Trap: BGP Down $bgppeer->bgpPeerIdentifier " . get_astext($bgppeer->bgpPeerRemoteAs) .  " is now idle", $this->lastEventlogMessage());
     }
 }
