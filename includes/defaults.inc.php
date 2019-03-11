@@ -533,6 +533,7 @@ $config['nfsen_enable'] = 0;
 // $config['nfsen_split_char']   = "_";
 // $config['nfsen_rrds']   = "/var/nfsen/profiles-stat/live/";
 // $config['nfsen_suffix']   = "_yourdomain_com";
+$config['nfsen_subdirlayout'] = 1;
 // Location Mapping
 // Use this feature to map ugly locations to pretty locations
 // config['location_map']['Under the Sink'] = "Under The Sink, The Office, London, UK";
