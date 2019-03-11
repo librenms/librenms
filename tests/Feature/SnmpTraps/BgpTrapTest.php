@@ -31,7 +31,7 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\LaravelTestCase;
 
-class BgpTrapTest extends LaravelTestCase
+class BgpTrapTest extends TrapTestCase
 {
     public function testBgpUp()
     {

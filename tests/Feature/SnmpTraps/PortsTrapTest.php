@@ -33,7 +33,7 @@ use LibreNMS\Tests\DBTestCase;
 use Log;
 use Mockery\Mock;
 
-class PortsTrapTest extends DBTestCase
+class PortsTrapTest extends TrapTestCase
 {
     public function testLinkDown()
     {

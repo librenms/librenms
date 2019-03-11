@@ -31,6 +31,7 @@ use App\Models\Port;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\Feature\SnmpTraps\TrapTestCase;
+use Log;
 
 class CommonTrapTest extends TrapTestCase
 {
@@ -70,11 +71,12 @@ UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::authenticationFailure\n";
 
+        Log::shouldReceive('event')->once()->with('SNMP Trap: Authentication Failure: ' . $device->displayName(), $device->device_id, 'auth', 3);
+
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap));
 
         // check that the device was found
         $this->assertEquals($device->hostname, $trap->getDevice()->hostname);
-        $this->assertEquals("SNMP Trap: Authentication Failure: $device->hostname", $this->lastEventlogMessage());
     }
 }

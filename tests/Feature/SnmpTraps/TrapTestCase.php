@@ -25,16 +25,10 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Eventlog;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\LaravelTestCase;
 
 abstract class TrapTestCase extends LaravelTestCase
 {
     use DatabaseTransactions;
-
-    protected function lastEventlogMessage()
-    {
-        return Eventlog::orderBy('datetime', 'DESC')->first()->message;
-    }
 }
