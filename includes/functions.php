@@ -11,7 +11,6 @@
  *
  */
 
-use Illuminate\Database\Events\QueryExecuted;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
@@ -24,9 +23,8 @@ use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\MemcacheLock;
-use Symfony\Component\Process\Process;
-use PHPMailer\PHPMailer\PHPMailer;
 use LibreNMS\Util\Time;
+use Symfony\Component\Process\Process;
 
 if (!function_exists('set_debug')) {
     /**
