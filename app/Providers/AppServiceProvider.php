@@ -43,7 +43,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerFacades();
         $this->registerGeocoder();
     }
 
@@ -68,14 +67,6 @@ class AppServiceProvider extends ServiceProvider
             'device' => \App\Models\Device::class,
             'device_group' => \App\Models\DeviceGroup::class,
         ]);
-    }
-
-    private function registerFacades()
-    {
-        // replace log manager so we can add the event function
-        $this->app->bind('log', function ($app) {
-            return new \App\Facades\LogManager($app);
-        });
     }
 
     private function registerGeocoder()

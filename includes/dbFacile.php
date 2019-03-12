@@ -21,7 +21,6 @@ use Illuminate\Database\QueryException;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\DB\Eloquent;
-use LibreNMS\Util\Laravel;
 
 function dbIsConnected()
 {
@@ -464,9 +463,11 @@ function dbHandleException(QueryException $exception)
         }
     }
 
-    $message .= $exception->getTraceAsString();
+    foreach ($exception->getTrace() as $trace) {
+        $message .= "\n  " . $trace['file'] . ':' . $trace['line'];
+    }
 
-    if (Laravel::isBooted()) {
+    if (class_exists('Log')) {
         Log::error($message);
     } else {
         c_echo("%rSQL Error!%n ");

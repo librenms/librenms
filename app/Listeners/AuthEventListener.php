@@ -2,12 +2,15 @@
 
 namespace App\Listeners;
 
+use App\Checks;
+use App\Events\Event;
 use App\Models\User;
 use DB;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use LibreNMS\Authentication\LegacyAuth;
 use Request;
+use Session;
 use Toastr;
 
 class AuthEventListener
