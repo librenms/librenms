@@ -28,7 +28,7 @@ namespace LibreNMS\Tests;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
 use LibreNMS\Config;
-use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
+use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -60,7 +60,7 @@ class YamlTest extends TestCase
             try {
                 $data = Yaml::parse(file_get_contents($path));
             } catch (ParseException $e) {
-                throw new PHPUnitException("$path Could not be parsed", null, $e);
+                throw new ExpectationFailedException("$path Could not be parsed", null, $e);
             }
 
             try {

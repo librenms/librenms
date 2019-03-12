@@ -55,7 +55,7 @@ class BgpEstablished implements SnmptrapHandler
         $bgpPeer->bgpPeerState = $trap->getOidData($state_oid);
 
         if ($bgpPeer->isDirty('bgpPeerState')) {
-            log_event('SNMP Trap: BGP Up ' . $bgpPeer->bgpPeerIdentifier . ' ' . get_astext($bgpPeer->bgpPeerRemoteAs) . ' is now ' . $bgpPeer->bgpPeerState, $device->toArray(), 'bgpPeer', 1, $bgpPeerIp);
+            Log::event('SNMP Trap: BGP Up ' . $bgpPeer->bgpPeerIdentifier . ' ' . get_astext($bgpPeer->bgpPeerRemoteAs) . ' is now ' . $bgpPeer->bgpPeerState, $device->device_id, 'bgpPeer', 1, $bgpPeerIp);
         }
 
         $bgpPeer->save();
