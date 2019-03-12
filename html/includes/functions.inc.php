@@ -1770,7 +1770,24 @@ function nfsen_channel_rrds( $hostname ){
     // Turn the hostname into the one used in nfsen.
     $nfsen_hostname=str_replace('.', $config['nfsen_split_char'], $hostname);
 
-    foreach ($config['nfsen_rrds'] as $nfsen_dir) {
+    // If there is no nfsen_rrds set, check to see if nfsen_base
+    // is set and built the path off of that.
+    if (isset($config['nfsen_rrds'])){
+        $nfsen_rrd_dirs=$config['nfsen_rrds'];
+    }else{
+        // If we don't have this, then return a empty array as it
+        // obviously is not in use and does not have any.
+        if (isset($config['nfsen_base'])){
+            $nfsen_rrds_dirs=array(
+                              $config['nfsen_base'].'/profiles-stat/live/',
+                              $config['nfsen_base'].'/profiles-stat/'
+                              );
+        }else{
+            return $channels;
+        }
+    }
+
+    foreach ($nfsen_rrd_dirs as $nfsen_dir) {
         $host_dir=$nfsen_dir.'/'.$nfsen_hostname.'/';
 
         if (is_dir($host_dir)) {
