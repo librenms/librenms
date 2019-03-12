@@ -998,7 +998,7 @@ function send_mail($emails, $subject, $message, $html = false)
             }
             $mail->send();
             return true;
-        } catch (phpmailerException $e) {
+        } catch (\PHPMailer\PHPMailer\Exception $e) {
             return $e->errorMessage();
         } catch (Exception $e) {
             return $e->getMessage();

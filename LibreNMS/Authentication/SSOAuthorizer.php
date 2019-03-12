@@ -26,9 +26,9 @@
 namespace LibreNMS\Authentication;
 
 use LibreNMS\Config;
-use LibreNMS\Util\IP;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IP;
 
 /**
  * Some functionality in this mechanism is inspired by confluence_http_authenticator (@chauth) and graylog-plugin-auth-sso (@Graylog)
