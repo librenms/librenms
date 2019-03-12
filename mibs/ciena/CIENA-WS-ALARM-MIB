@@ -1,0 +1,461 @@
+-- This file was automatically generated from ciena-ws-alarm.yang. Do not edit.
+
+CIENA-WS-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    StringMaxl16, StringMaxl32, StringMaxl44
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+cienaWsAlarmMIB MODULE-IDENTITY
+    LAST-UPDATED "201703140000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This module defines alarm data for the Waveserver."
+    REVISION "201703140000Z"
+    DESCRIPTION "Waveserver Release 1.4
+Changed the maximum length of alarm description to 44.
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revision"
+    REVISION "201606270000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.  
+Restructuring of the module."
+    REVISION "201505200000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 4 }
+
+AlarmReason ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { reset(1), set(2), acknowledge(5), clear(6), delete(7), config(9) }
+
+AlarmSeverity ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { cleared(1), critical(3), major(4), minor(5), warning(6), info(8) }
+
+cwsAlarmActiveTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsAlarmActiveEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Active alarms"
+    ::= { cienaWsAlarmMIB 3 }
+
+cwsAlarmActiveEntry OBJECT-TYPE
+    SYNTAX CwsAlarmActiveEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsAlarmActiveTable."
+    INDEX { cwsAlarmActiveAlarmInstanceId }
+    ::= { cwsAlarmActiveTable 1 }
+
+CwsAlarmActiveEntry ::= SEQUENCE { 
+    cwsAlarmActiveAlarmInstanceId Integer32,
+    cwsAlarmActiveAcknowledged TruthValue,
+    cwsAlarmActiveAlarmTableId Unsigned32,
+    cwsAlarmActiveSeverity AlarmSeverity,
+    cwsAlarmActiveLocalDateTime StringMaxl32,
+    cwsAlarmActiveInstance StringMaxl32,
+    cwsAlarmActiveDescription StringMaxl44,
+    cwsAlarmActiveSiteIdentifier Unsigned32,
+    cwsAlarmActiveGroupIdentifier Unsigned32,
+    cwsAlarmActiveMemberIdentifier Unsigned32 
+}
+
+cwsAlarmActiveAlarmInstanceId OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "The alarm Instance ID"
+    ::= { cwsAlarmActiveEntry 1 }
+
+cwsAlarmActiveAcknowledged OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Alarm has been acknowledged."
+    ::= { cwsAlarmActiveEntry 2 }
+
+cwsAlarmActiveAlarmTableId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The alarm table ID."
+    ::= { cwsAlarmActiveEntry 3 }
+
+cwsAlarmActiveSeverity OBJECT-TYPE
+    SYNTAX AlarmSeverity
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The alarm severity."
+    ::= { cwsAlarmActiveEntry 4 }
+
+cwsAlarmActiveLocalDateTime OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The local date and time when alarm was raised."
+    ::= { cwsAlarmActiveEntry 5 }
+
+cwsAlarmActiveInstance OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The object instance the alarm is raised against."
+    ::= { cwsAlarmActiveEntry 6 }
+
+cwsAlarmActiveDescription OBJECT-TYPE
+    SYNTAX StringMaxl44
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The alarm description."
+    ::= { cwsAlarmActiveEntry 7 }
+
+cwsAlarmActiveSiteIdentifier OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "An integer to uniquely identify the site where this Waveserver is located."
+    ::= { cwsAlarmActiveEntry 8 }
+
+cwsAlarmActiveGroupIdentifier OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "An integer to uniquely identify a group of Waveservers within a site."
+    ::= { cwsAlarmActiveEntry 9 }
+
+cwsAlarmActiveMemberIdentifier OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "An integer to uniquely identify a Waveserver chassis within a group of Waveservers. Initial configuration of this identifier automatically assigns 2 specific wavelengths for the Ciena wavelength grid to the Wavelogic 3 Extreme ports 1 and 12. Wavelengths can also be manually assigned independently."
+    ::= { cwsAlarmActiveEntry 10 }
+
+cwsAlarmHistoryTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsAlarmHistoryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Alarm history"
+    ::= { cienaWsAlarmMIB 4 }
+
+cwsAlarmHistoryEntry OBJECT-TYPE
+    SYNTAX CwsAlarmHistoryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsAlarmHistoryTable."
+    INDEX { cwsAlarmHistoryHistoryId }
+    ::= { cwsAlarmHistoryTable 1 }
+
+CwsAlarmHistoryEntry ::= SEQUENCE { 
+    cwsAlarmHistoryHistoryId Integer32,
+    cwsAlarmHistoryReason AlarmReason,
+    cwsAlarmHistoryAlarmInstanceId Unsigned32,
+    cwsAlarmHistoryAlarmTableId Unsigned32,
+    cwsAlarmHistorySeverity AlarmSeverity,
+    cwsAlarmHistoryLocalDateTime StringMaxl32,
+    cwsAlarmHistoryInstance StringMaxl32,
+    cwsAlarmHistoryDescription StringMaxl44,
+    cwsAlarmHistorySiteIdentifier Unsigned32,
+    cwsAlarmHistoryGroupIdentifier Unsigned32,
+    cwsAlarmHistoryMemberIdentifier Unsigned32 
+}
+
+cwsAlarmHistoryHistoryId OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "The alarm history ID"
+    ::= { cwsAlarmHistoryEntry 1 }
+
+cwsAlarmHistoryReason OBJECT-TYPE
+    SYNTAX AlarmReason
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The reason for the alarm condition."
+    ::= { cwsAlarmHistoryEntry 2 }
+
+cwsAlarmHistoryAlarmInstanceId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The alarm instance ID."
+    ::= { cwsAlarmHistoryEntry 3 }
+
+cwsAlarmHistoryAlarmTableId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The alarm table ID."
+    ::= { cwsAlarmHistoryEntry 4 }
+
+cwsAlarmHistorySeverity OBJECT-TYPE
+    SYNTAX AlarmSeverity
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The alarm severity."
+    ::= { cwsAlarmHistoryEntry 5 }
+
+cwsAlarmHistoryLocalDateTime OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The local date and time when alarm was raised."
+    ::= { cwsAlarmHistoryEntry 6 }
+
+cwsAlarmHistoryInstance OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The object instance the alarm is raised against."
+    ::= { cwsAlarmHistoryEntry 7 }
+
+cwsAlarmHistoryDescription OBJECT-TYPE
+    SYNTAX StringMaxl44
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The alarm description."
+    ::= { cwsAlarmHistoryEntry 8 }
+
+cwsAlarmHistorySiteIdentifier OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "An integer to uniquely identify the site where this Waveserver is located."
+    ::= { cwsAlarmHistoryEntry 9 }
+
+cwsAlarmHistoryGroupIdentifier OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "An integer to uniquely identify a group of Waveservers within a site."
+    ::= { cwsAlarmHistoryEntry 10 }
+
+cwsAlarmHistoryMemberIdentifier OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "An integer to uniquely identify a Waveserver chassis within a group of Waveservers. Initial configuration of this identifier automatically assigns 2 specific wavelengths for the Ciena wavelength grid to the Wavelogic 3 Extreme ports 1 and 12. Wavelengths can also be manually assigned independently."
+    ::= { cwsAlarmHistoryEntry 11 }
+
+cwsAlarmDefinedTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsAlarmDefinedEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Defined Alarm Table"
+    ::= { cienaWsAlarmMIB 5 }
+
+cwsAlarmDefinedEntry OBJECT-TYPE
+    SYNTAX CwsAlarmDefinedEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsAlarmDefinedTable."
+    INDEX { cwsAlarmDefinedAlarmTableId }
+    ::= { cwsAlarmDefinedTable 1 }
+
+CwsAlarmDefinedEntry ::= SEQUENCE { 
+    cwsAlarmDefinedAlarmTableId Integer32,
+    cwsAlarmDefinedEnabled TruthValue,
+    cwsAlarmDefinedActive TruthValue,
+    cwsAlarmDefinedThreshold Unsigned32,
+    cwsAlarmDefinedCap Unsigned32,
+    cwsAlarmDefinedSeverity AlarmSeverity,
+    cwsAlarmDefinedInstance StringMaxl16,
+    cwsAlarmDefinedDescription StringMaxl44 
+}
+
+cwsAlarmDefinedAlarmTableId OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "The alarm table ID."
+    ::= { cwsAlarmDefinedEntry 1 }
+
+cwsAlarmDefinedEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Alarm is enabled."
+    ::= { cwsAlarmDefinedEntry 2 }
+
+cwsAlarmDefinedActive OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Alarm is active."
+    ::= { cwsAlarmDefinedEntry 3 }
+
+cwsAlarmDefinedThreshold OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The alarm threshold."
+    ::= { cwsAlarmDefinedEntry 4 }
+
+cwsAlarmDefinedCap OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The alarm cap."
+    ::= { cwsAlarmDefinedEntry 5 }
+
+cwsAlarmDefinedSeverity OBJECT-TYPE
+    SYNTAX AlarmSeverity
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The alarm severity."
+    ::= { cwsAlarmDefinedEntry 6 }
+
+cwsAlarmDefinedInstance OBJECT-TYPE
+    SYNTAX StringMaxl16
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The object instance the alarm is raised against."
+    ::= { cwsAlarmDefinedEntry 7 }
+
+cwsAlarmDefinedDescription OBJECT-TYPE
+    SYNTAX StringMaxl44
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The alarm description."
+    ::= { cwsAlarmDefinedEntry 8 }
+
+cwsAlarmStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsAlarmStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver Alarm Statistics."
+    ::= { cienaWsAlarmMIB 6 }
+
+cwsAlarmStatisticsEntry OBJECT-TYPE
+    SYNTAX CwsAlarmStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsAlarmStatisticsTable."
+    INDEX { cwsAlarmStatisticsIndex }
+    ::= { cwsAlarmStatisticsTable 1 }
+
+CwsAlarmStatisticsEntry ::= SEQUENCE { 
+    cwsAlarmStatisticsIndex Integer32,
+    cwsAlarmStatisticsActive TruthValue,
+    cwsAlarmStatisticsDisabled TruthValue,
+    cwsAlarmStatisticsCount Unsigned32,
+    cwsAlarmStatisticsCumulative Unsigned32,
+    cwsAlarmStatisticsType StringMaxl32 
+}
+
+cwsAlarmStatisticsIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "The alarm statistics table index."
+    ::= { cwsAlarmStatisticsEntry 1 }
+
+cwsAlarmStatisticsActive OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "There is alarm active for the alarm type"
+    ::= { cwsAlarmStatisticsEntry 2 }
+
+cwsAlarmStatisticsDisabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "There is alarm disabled for the alarm type"
+    ::= { cwsAlarmStatisticsEntry 3 }
+
+cwsAlarmStatisticsCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The count of active alarms for the alarm type"
+    ::= { cwsAlarmStatisticsEntry 4 }
+
+cwsAlarmStatisticsCumulative OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The cumulative count of active alarms for the alarm type "
+    ::= { cwsAlarmStatisticsEntry 5 }
+
+cwsAlarmStatisticsType OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The alarm type."
+    ::= { cwsAlarmStatisticsEntry 6 }
+
+
+
+-- Conformance statements
+cienaWsAlarmObjects OBJECT IDENTIFIER
+    ::= { cienaWsAlarmMIB 1 }
+
+cienaWsAlarmConformance OBJECT IDENTIFIER
+    ::= { cienaWsAlarmMIB 2 }
+
+cienaWsAlarmGroups OBJECT IDENTIFIER
+    ::= { cienaWsAlarmConformance 1 }
+
+cienaWsAlarmGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsAlarmActiveAcknowledged,
+        cwsAlarmActiveAlarmTableId,
+        cwsAlarmActiveSeverity,
+        cwsAlarmActiveLocalDateTime,
+        cwsAlarmActiveInstance,
+        cwsAlarmActiveDescription,
+        cwsAlarmActiveSiteIdentifier,
+        cwsAlarmActiveGroupIdentifier,
+        cwsAlarmActiveMemberIdentifier,
+        cwsAlarmHistoryReason,
+        cwsAlarmHistoryAlarmInstanceId,
+        cwsAlarmHistoryAlarmTableId,
+        cwsAlarmHistorySeverity,
+        cwsAlarmHistoryLocalDateTime,
+        cwsAlarmHistoryInstance,
+        cwsAlarmHistoryDescription,
+        cwsAlarmHistorySiteIdentifier,
+        cwsAlarmHistoryGroupIdentifier,
+        cwsAlarmHistoryMemberIdentifier,
+        cwsAlarmDefinedEnabled,
+        cwsAlarmDefinedActive,
+        cwsAlarmDefinedThreshold,
+        cwsAlarmDefinedCap,
+        cwsAlarmDefinedSeverity,
+        cwsAlarmDefinedInstance,
+        cwsAlarmDefinedDescription,
+        cwsAlarmStatisticsActive,
+        cwsAlarmStatisticsDisabled,
+        cwsAlarmStatisticsCount,
+        cwsAlarmStatisticsCumulative,
+        cwsAlarmStatisticsType
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsAlarmGroups 1 }
+
+cienaWsAlarmCompliances OBJECT IDENTIFIER
+    ::= { cienaWsAlarmConformance 2 }
+
+cienaWsAlarmCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsAlarmGroup }
+    ::= { cienaWsAlarmCompliances 1 }
+
+END -- End module
