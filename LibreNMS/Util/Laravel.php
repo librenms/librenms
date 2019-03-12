@@ -27,7 +27,6 @@ namespace LibreNMS\Util;
 
 use App;
 use Illuminate\Database\Events\QueryExecuted;
-use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use Log;
 
