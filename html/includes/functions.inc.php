@@ -1700,7 +1700,10 @@ function lowest_five_minutes( $time ){
     return $time - ($time % 300);
 }
 
-/**
+/*
+ * @params int
+ * @return string
+ *
  * This returns the subpath for working with nfdump.
  *
  * 1 value is taken and that is a unix time stamp. It will be then be rounded
@@ -1743,4 +1746,42 @@ function time_to_nfsen_subpath( $time ){
     } elseif ( $layout == 8 ){
         return date('Y\-m\-d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
     }
+}
+
+/*
+ * @params string hostname
+ * @return array
+ *
+ * Returns a list of channels/rrds for a specified hostname. The
+ * keys for the string are channel names and the values are is the
+ * path to the RRD for the channel.
+*/
+
+function nfsen_channel_rrds( $hostname ){
+    global $config;
+
+    $channels=array();
+
+    // If we don't have a hostname, return a empty array... nothing has no rrds
+    if (!isset($hostname)){
+        return $channels;
+    }
+
+    // Turn the hostname into the one used in nfsen.
+    $nfsen_hostname=str_replace('.', $config['nfsen_split_char'], $hostname);
+
+    foreach ($config['nfsen_rrds'] as $nfsen_dir) {
+        $host_dir=$nfsen_dir.'/'.$nfsen_hostname.'/';
+
+        if (is_dir($host_dir)) {
+            $nfsen_RRD_channel_glob=$host_dir.'*.rrd';
+            foreach (glob($nfsen_RRD_channel_glob) as $nfsen_RRD) {
+                $channel = str_replace(array($hostDir, '.rrd'), '', $nfsen_RRD);
+
+                $channels[$channel]=$nfsen_dir.$channels.'.rrd';
+            }
+        }
+    }
+
+    return $channels;
 }
