@@ -85,6 +85,6 @@ class AlertRule extends BaseModel
 
     public function devices()
     {
-        return $this->belongsToMany('App\Models\Device', 'alert_device_map', 'device_id', 'device_id', 'devices');
+        return $this->belongsToMany('App\Models\Device', 'alert_device_map', 'device_id', 'device_id');
     }
 }
