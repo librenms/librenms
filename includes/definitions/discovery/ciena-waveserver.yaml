@@ -4,9 +4,9 @@ modules:
         pre-cache:
             data:
                 - oid:
+                    - cwsXcvrTemperatureThresholdLowAlarmThreshold
                     - cwsXcvrTemperatureThresholdHighAlarmThreshold
                     - cwsXcvrCienaIdDescription
-                    - cwsXcvrCienaIdCienaItemNumber
         temperature:
             data:
                 -
@@ -16,6 +16,8 @@ modules:
                     descr: 'Module {{ $subindex0 }} - {{ $cwsXcvrCienaIdDescription }}'
                     index: 'cwsXcvrTemperatureTable.{{ $index }}'
                     group: 'Modules'
+                    low_limit: cwsXcvrTemperatureThresholdLowAlarmThreshold
+                    high_limit: cwsXcvrTemperatureThresholdHighAlarmThreshold 
                     skip_values:
                         -
                             oid: cwsXcvrTemperatureThresholdHighAlarmThreshold
