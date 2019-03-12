@@ -28,7 +28,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class LogTrap implements SnmptrapHandler
 {
@@ -53,7 +52,7 @@ class LogTrap implements SnmptrapHandler
         $state = $trap->getOidData('LOG-MIB::logEquipStatusV2.'.$index);
         
         $severity = $this->getSeverity($state);
-        Log::event('SNMP Trap: Log '.$logName.' '.$logEvent.' '.$logPC.' '.$logAI.' '.$state, $device->device_id, 'log', $severity);
+        log_event('SNMP Trap: Log '.$logName.' '.$logEvent.' '.$logPC.' '.$logAI.' '.$state, $device->toArray(), 'log', $severity);
     }
 
     private function getSeverity($state)

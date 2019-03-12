@@ -25,7 +25,9 @@
 
 namespace App\Models;
 
+use App\Util;
 use DB;
+use Settings;
 
 class DeviceGroup extends BaseModel
 {
@@ -114,7 +116,7 @@ class DeviceGroup extends BaseModel
             return $pattern;
         }
 
-        foreach (\LibreNMS\Config::get('alert.macros.group', []) as $macro => $value) {
+        foreach (Settings::get('alert.macros.group', []) as $macro => $value) {
             $value = str_replace(['%', '&&', '||'], ['', 'AND', 'OR'], $value);  // this might need something more complex
             if (!str_contains($macro, ' ')) {
                 $pattern = str_replace('macros.'.$macro, '('.$value.')', $pattern);
@@ -256,14 +258,14 @@ class DeviceGroup extends BaseModel
      *
      * @param array|string $params
      */
-//    public function setParamsAttribute($params)
-//    {
-//        if (!Util::isJson($params)) {
-//            $params = json_encode($params);
-//        }
-//
-//        $this->attributes['params'] = $params;
-//    }
+    public function setParamsAttribute($params)
+    {
+        if (!Util::isJson($params)) {
+            $params = json_encode($params);
+        }
+
+        $this->attributes['params'] = $params;
+    }
 
     /**
      * Check if the stored pattern is v1

@@ -26,6 +26,7 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Config;
+use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
 
 class OSDiscoveryTest extends TestCase
 {
@@ -68,7 +69,7 @@ class OSDiscoveryTest extends TestCase
         });
 
         if (empty($files)) {
-            $this->fail("No snmprec files found for $os_name!");
+            throw new PHPUnitException("No snmprec files found for $os_name!");
         }
 
         foreach ($files as $file) {

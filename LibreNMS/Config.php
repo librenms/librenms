@@ -533,14 +533,19 @@ class Config
         }
 
         // Check for testing database
-        if (isset($config['test_db_name'])) {
-            putenv('DB_TEST_DATABASE=' . $config['test_db_name']);
-        }
-        if (isset($config['test_db_user'])) {
-            putenv('DB_TEST_USERNAME=' . $config['test_db_user']);
-        }
-        if (isset($config['test_db_pass'])) {
-            putenv('DB_TEST_PASSWORD=' . $config['test_db_pass']);
+        if (getenv('DBTEST')) {
+            if (isset($config['test_db_name'])) {
+                putenv('DB_DATABASE=' . $config['test_db_name']);
+                $config['db_name'] = $config['test_db_name'];
+            }
+            if (isset($config['test_db_user'])) {
+                putenv('DB_USERNAME=' . $config['test_db_user']);
+                $config['db_user'] = $config['test_db_user'];
+            }
+            if (isset($config['test_db_pass'])) {
+                putenv('DB_PASSWORD=' . $config['test_db_pass']);
+                $config['db_pass'] = $config['test_db_pass'];
+            }
         }
 
         return array_intersect_key($config, $keys); // return only the db settings
