@@ -35,19 +35,9 @@ foreach ($junos_vcp_stats as $index => $vcp_stats) {
     // dummy integer index of it.
 
     if (preg_match('#^(\d{1,2})\.vcp-255/(\d)/(\d{1,2})$#', $index, $matches)) {
-        if (strlen($matches[1]) == 1) {
-            $fpc = '0' . $matches[1];
-        } else {
-            $fpc = $matches[1];
-        }
-
+        $fpc = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
         $pic = $matches[2];
-
-        if (strlen($matches[3]) == 1) {
-            $port = '0' . $matches[3];
-        } else {
-            $port = $matches[3];
-        }
+        $port = str_pad($matches[3], 2, '0', STR_PAD_LEFT);
 
         // The concatenation below starts VC port dummy indexes from 1000000
         // to protect against overlapping with IF-MIB.
