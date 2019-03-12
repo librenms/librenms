@@ -39,7 +39,7 @@ class AlertRule extends BaseModel
      */
     public function scopeEnabled($query)
     {
-        return $query->where('disabled', 0);
+        return $query->where('alert_rules.disabled', 0);
     }
 
     /**

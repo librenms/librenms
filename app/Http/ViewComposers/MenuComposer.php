@@ -223,6 +223,10 @@ class MenuComposer
             ->isActive()
             ->hasAccess($user)
             ->groupBy('severity')
+            ->leftJoin('devices', 'alerts.device_id', '=', 'devices.device_id')
+            ->where('devices.disabled', '=', '0')
+            ->where('devices.ignore', '=', '0')
+            ->groupBy('severity')
             ->pluck('severity');
 
         if ($alert_status->contains('critical')) {
