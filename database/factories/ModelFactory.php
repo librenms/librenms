@@ -53,7 +53,6 @@ $factory->define(\App\Models\Port::class, function (Faker\Generator $faker) {
     return [
         'ifIndex'      => $faker->unique()->numberBetween(),
         'ifName'       => $faker->text(20),
-        'ifDescr'      => $faker->text(255),
         'ifLastChange' => $faker->unixTime(),
     ];
 });

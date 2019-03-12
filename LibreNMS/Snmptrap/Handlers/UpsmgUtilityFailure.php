@@ -49,6 +49,7 @@ class UpsmgUtilityFailure implements SnmptrapHandler
         }
         $sensor->sensor_current = 1;
         $sensor->save();
-        Log::event("UPS power failed, state sensor " . $sensor->sensor_descr . " has changed to ".$sensor->sensor_current . ".", $device->device_id, "Power", 5);
+        $device_array = $device->toArray();
+        log_event("UPS power failed, state sensor " . $sensor->sensor_descr . " has changed to ".$sensor->sensor_current . ".", $device_array, "Power", 5);
     }
 }

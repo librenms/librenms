@@ -60,7 +60,6 @@ class OSModulesTest extends DBTestCase
     {
         $this->requireSnmpsim();  // require snmpsim for tests
         global $snmpsim;
-        load_all_os(); // wiped out by application refresh
 
         try {
             $helper = new ModuleTestHelper($modules, $os, $variant);
@@ -112,6 +111,7 @@ class OSModulesTest extends DBTestCase
             );
         }
     }
+
 
     public function dumpedDataProvider()
     {

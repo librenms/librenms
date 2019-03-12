@@ -472,10 +472,11 @@ class AuthSSOTest extends DBTestCase
 
     public function tearDown()
     {
+        parent::tearDown();
         Config::set('auth_mechanism', $this->original_auth_mech);
         Config::forget('sso');
         $this->breakUser();
+
         $_SERVER = $this->server;
-        parent::tearDown();
     }
 }
