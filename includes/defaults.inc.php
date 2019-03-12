@@ -532,7 +532,8 @@ $config['smokeping']['pings']             = 20;
 // NFSen RRD dir.
 $config['nfsen_enable'] = 0;
 // $config['nfsen_split_char']   = "_";
-// $config['nfsen_rrds']   = "/var/nfsen/profiles-stat/live/";
+// $config['nfsen_rrds'][]   = "/var/nfsen/profiles-stat/live/";
+// $config['nfsen_bases'][]   = "/var/nfsen/";
 // $config['nfsen_suffix']   = "_yourdomain_com";
 $config['nfsen_subdirlayout'] = 1;
 $config['nfsen_last_max'] = 153600; // 48 hours ago in seconds
