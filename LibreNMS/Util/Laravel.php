@@ -36,7 +36,7 @@ class Laravel
     public static function bootCli()
     {
         // make sure Laravel isn't already booted
-        if (class_exists('App') && App::isBooted()) {
+        if (self::isBooted()) {
             return;
         }
 
@@ -45,6 +45,11 @@ class Laravel
         $app = require_once $install_dir . '/bootstrap/app.php';
         $kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
         $kernel->bootstrap();
+    }
+
+    public static function isBooted()
+    {
+        return !empty(app()->isAlias('Illuminate\Foundation\Application')) && app()->isBooted();
     }
 
     public static function enableQueryDebug()
@@ -62,7 +67,7 @@ class Laravel
                     return $item;
                 })->toJson();
 
-                if (class_exists('Log')) {
+                if (self::isBooted()) {
                     Log::debug("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n", ['color' => true]);
                 } else {
                     c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
@@ -83,14 +88,14 @@ class Laravel
 
     public static function enableCliDebugOutput()
     {
-        if (class_exists('\Log') && App::runningInConsole()) {
+        if (self::isBooted() && App::runningInConsole()) {
             Log::setDefaultDriver('console');
         }
     }
 
     public static function disableCliDebugOutput()
     {
-        if (class_exists('Log')) {
+        if (self::isBooted()) {
             Log::setDefaultDriver('logfile');
         }
     }
