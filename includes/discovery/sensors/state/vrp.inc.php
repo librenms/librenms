@@ -23,10 +23,6 @@
  * @author     PipoCanaja
  */
 
-//d_echo($pre_cache);
-
-//exit;
-
 $stacked_device = count(array_keys($pre_cache['hwStackMemberInfoTable']));
 // If we have more than 1 device in the stack, then we should alert on stack ports not up
 
