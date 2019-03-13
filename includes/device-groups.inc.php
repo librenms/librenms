@@ -103,6 +103,7 @@ function GenGroupSQL($pattern, $search = '', $extra = 0)
         // v2 pattern
         $tables = getTablesFromPattern($pattern);
     }
+    $tables = array_unique($tables);
 
     $pattern = rtrim($pattern, '&|');
     if ($tables[0] != 'devices' && dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', array($tables[0],'device_id')) != 1) {
@@ -151,11 +152,6 @@ function GenGroupSQL($pattern, $search = '', $extra = 0)
     }
     if (!empty($join)) {
         $join = '('.rtrim($join, '& ').') &&';
-    }
-  //patch sql error adding extra devices table in query when it has 3 elements 
-    $pos=array_search('devices',$tables);
-    if (count($tables)==3) {
-    array_pop($tables);
     }
     $sql = 'SELECT DISTINCT('.str_replace('(', '', $tables[0]).'.device_id)'.$sql_extra.' FROM '.implode(',', $tables).' WHERE '.$join.' '.$search.' ('.str_replace(array('%', '@', '!~', '~'), array('', '.*', 'NOT REGEXP', 'REGEXP'), $pattern).')';
     return $sql;
