@@ -147,7 +147,28 @@ class Proc
 
             stream_select($pipes, $w, $x, $timeout);
         }
-        return array(stream_get_contents($this->_pipes[1]), stream_get_contents($this->_pipes[2]));
+
+        $stdout = '';
+        $stderr = '';
+        $do_get = true;
+        $stream_start = microtime(true);
+        $delay = 10000; // 0.01 ms
+        while ($do_get) {
+            $stdout_buf = stream_get_contents($this->_pipes[1]);
+            $stdout .= $stdout_buf;
+            $stderr_buf = stream_get_contents($this->_pipes[2]);
+            $stderr .= $stderr_buf;
+            if (empty($stdout_buf) && empty($stderr_buf)) {
+                break;
+            }
+            $stream_end = microtime(true);
+            $stream_time = round(($stream_end - $stream_start) * 1000);
+            if ($stream_time>$timeout) {
+                break;
+            }
+            usleep($delay);
+        }
+        return [$stdout, $stderr];
     }
 
     /**
