@@ -42,6 +42,12 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         $this->snmpsim = $snmpsim;
     }
 
+    public function setUp()
+    {
+        parent::setUp();
+        set_debug(false); // prevent warnings from stopping execution for legacy code
+    }
+
     public function dbSetUp()
     {
         if (getenv('DBTEST')) {
