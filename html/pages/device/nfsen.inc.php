@@ -13,9 +13,9 @@ echo '|';
 echo generate_link('Stats', $link_array, array('nfsen' => 'stats'));
 
 $printedChannel=false;
-$nfsenHostname=str_replace('.', $config['nfsen_split_char'], $device['hostname']);
+$nfsen_hostname=nfsen_hostname($device['hostname']);
 foreach ($config['nfsen_rrds'] as $nfsenDir) {
-    $hostDir=$nfsenDir.'/'.$nfsenHostname.'/';
+    $hostDir=$nfsenDir.'/'.$nfsen_hostname.'/';
     if (is_dir($hostDir)) {
         $nfsenRRDchannelGlob=$hostDir.'*.rrd';
         foreach (glob($nfsenRRDchannelGlob) as $nfsenRRD) {

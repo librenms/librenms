@@ -537,6 +537,7 @@ $config['nfsen_enable'] = 0;
 // $config['nfsen_suffix']   = "_yourdomain_com";
 $config['nfsen_subdirlayout'] = 1;
 $config['nfsen_last_max'] = 153600; // 48 hours ago in seconds
+$config['nfsen_top_max'] = 500; // max topN value for stats
 // $config['nfsen_timezone'] = 'America/Chicago'; set a override timezone incase LibreNMS and NfSen are different
 // Location Mapping
 // Use this feature to map ugly locations to pretty locations

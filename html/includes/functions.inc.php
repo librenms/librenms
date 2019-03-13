@@ -1729,21 +1729,21 @@ function time_to_nfsen_subpath( $time ){
 
     if ( $layout == 0 ){
         return 'nfcapd.'.date('YmdHi', $time);
-    } elseif ( $layout == 1 ){
+    } elseif ( $layout == 1 ) {
         return date('Y\/m\/d\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 2 ){
+    } elseif ( $layout == 2 ) {
         return date('Y\/m\/d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 3 ){
+    } elseif ( $layout == 3 ) {
         return date('Y\/W\/w\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 4 ){
+    } elseif ( $layout == 4 ) {
         return date('Y\/W\/w\/H\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 5 ){
+    } elseif ( $layout == 5 ) {
         return date('Y\/z\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 6 ){
+    } elseif ( $layout == 6 ) {
         return date('Y\/z\/H\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 7 ){
+    } elseif ( $layout == 7 ) {
         return date('Y\-m\-d\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 8 ){
+    } elseif ( $layout == 8 ) {
         return date('Y\-m\-d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
     }
 }
@@ -1763,7 +1763,7 @@ function nfsen_channel_rrds( $hostname ){
     $channels=array();
 
     // If we don't have a hostname, return a empty array... nothing has no rrds
-    if (!isset($hostname)){
+    if (!isset($hostname)) {
         return $channels;
     }
 
@@ -1772,17 +1772,17 @@ function nfsen_channel_rrds( $hostname ){
 
     // If there is no nfsen_rrds set, check to see if nfsen_base
     // is set and built the path off of that.
-    if (isset($config['nfsen_rrds'])){
+    if (isset($config['nfsen_rrds'])) {
         $nfsen_rrd_dirs=$config['nfsen_rrds'];
-    }else{
+    } else {
         // If we don't have this, then return a empty array as it
         // obviously is not in use and does not have any.
-        if (isset($config['nfsen_base'])){
+        if (isset($config['nfsen_base'])) {
             $nfsen_rrds_dirs=array(
                               $config['nfsen_base'].'/profiles-stat/live/',
                               $config['nfsen_base'].'/profiles-stat/'
                               );
-        }else{
+        } else {
             return $channels;
         }
     }
@@ -1801,4 +1801,23 @@ function nfsen_channel_rrds( $hostname ){
     }
 
     return $channels;
+}
+
+/*
+ * @params string hostname
+ * @return string
+ *
+ * Takes a hostname and transforms it to the name
+ * used by nfsen.
+*/
+
+function nfsen_hostname( $hostname ) {
+    global $config;
+
+    $nfsen_hostname=str_replace('.', $config['nfsen_split_char'], $hostname);
+
+    if (isset($config['nfsen_suffix']) {
+        $nfsen_hostname=str_replace('', $config['nfsen_suffix'], $hostname);
+    }
+    return $nfsen_hostname;
 }
