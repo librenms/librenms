@@ -9,12 +9,7 @@ if (!is_array($config['nfsen_rrds'])) {
 foreach ($config['nfsen_rrds'] as $nfsenrrds) {
     $nfsenrrds = rtrim($nfsenrrds, '/') . '/';
 
-    if ($config['nfsen_split_char']) {
-        $nfsenHostname=str_replace('.', $config['nfsen_split_char'], $device['hostname']);
-    } else {
-        $nfsenHostname=$device['hostname'];
-    }
-    $rrd_filename=$nfsenrrds.$nfsenHostname.'/'.$vars['channel'].'.rrd';
+    $rrd_filename=$nfsenrrds.nfsen_hostname($device['hostname']).'/'.$vars['channel'].'.rrd';
 
     if (is_file($rrd_filename)) {
         $colours   = 'blues';
