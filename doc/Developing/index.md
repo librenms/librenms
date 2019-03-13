@@ -46,4 +46,4 @@ be delayed or brief, please be patient or ask for clarification if needed. Thank
   - [The PHP Practitioner](https://laracasts.com/series/php-for-beginners)
   - [Object-Oriented Bootcamp](https://laracasts.com/series/object-oriented-bootcamp-in-php)
   - [Simple Rules for Simpler Code](https://laracasts.com/series/simple-rules-for-simpler-code)
-- [Laravel Documentation](https://laravel.com/docs/)
+  - [Laravel Documentation](https://laravel.com/docs/)
