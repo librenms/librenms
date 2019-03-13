@@ -1816,7 +1816,7 @@ function nfsen_hostname( $hostname ) {
 
     $nfsen_hostname=str_replace('.', $config['nfsen_split_char'], $hostname);
 
-    if (isset($config['nfsen_suffix']) {
+    if (isset($config['nfsen_suffix'])) {
         $nfsen_hostname=str_replace('', $config['nfsen_suffix'], $hostname);
     }
     return $nfsen_hostname;
