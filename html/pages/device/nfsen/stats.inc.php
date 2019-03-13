@@ -78,18 +78,18 @@ if (isset($vars['process'])){
 
     // Handle the stat order.
     $stat_order='pps'; // The default if not set or something invalid is set
-    if (isset($vars['stattype'])){
-        if (strcmp($vars['stattype'], '0') ==0 ){
+    if (isset($vars['statorder'])){
+        if (strcmp($vars['statorder'], '0') ==0 ){
             $stat_order='flows';
-        }elseif(strcmp($vars['stattype'], '1') ==0 ){
+        }elseif(strcmp($vars['statorder'], '1') ==0 ){
             $stat_order='packets';
-        }elseif(strcmp($vars['stattype'], '2') ==0 ){
+        }elseif(strcmp($vars['statorder'], '2') ==0 ){
             $stat_order='bytes';
-        }elseif(strcmp($vars['stattype'], '3') ==0 ){
+        }elseif(strcmp($vars['statorder'], '3') ==0 ){
             $stat_order='pps';
-        }elseif(strcmp($vars['stattype'], '4') ==0 ){
+        }elseif(strcmp($vars['statorder'], '4') ==0 ){
             $stat_order='bps';
-        }elseif(strcmp($vars['stattype'], '5') ==0 ){
+        }elseif(strcmp($vars['statorder'], '5') ==0 ){
             $stat_order='bpp';
         }
     }
@@ -120,10 +120,15 @@ if (isset($vars['process'])){
         }
     }
 
+    $current_time=lowest_five_minutes(time() - 300);
+    $last_time=lowest_five_minutes($current_time - $lastN - 300);
 
+    $command=$config['nfdump'].' -M '.$config['nfsen_base'][0].'/profiles-data/live/'.$nfsen_hostname.' -T -R '.
+             time_to_nfsen_subpath($last_time).':'.time_to_nfsen_subpath($current_time).
+             ' -n '.$topN.' -s '.$stat_type.'/'.$stat_order;
 
-    echo '<tt>';
-echo $stat_type."\n".$stat_order."\n".$topN."\n".$lastN;
-    echo '</tt>';
+    echo '<pre>';
+    system($command);
+    echo '</pre>';
 
 }
