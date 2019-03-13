@@ -251,10 +251,15 @@ class Device extends BaseModel
             ->where('device_id', $this->device_id)->exists();
     }
 
-    public function formatUptime($short = false)
+    public function formatUptime($short = false, $downtime = false)
     {
         $result = '';
-        $interval = $this->uptime;
+        if ($downtime) {
+            $interval = time() - strtotime($this->last_polled); //xxx$this->uptime;
+        } else {
+            $interval = $this->uptime;
+        }
+        
         $data = [
             'years' => 31536000,
             'days' => 86400,
@@ -386,6 +391,11 @@ class Device extends BaseModel
     }
 
     // ---- Accessors/Mutators ----
+
+    public function getStatus()
+    {
+        return $this->status;
+    }
 
     public function getIconAttribute($icon)
     {
