@@ -222,7 +222,6 @@ class MenuComposer
         $alert_status = AlertRule::select('severity')
             ->isActive()
             ->hasAccess($user)
-            ->groupBy('severity')
             ->leftJoin('devices', 'alerts.device_id', '=', 'devices.device_id')
             ->where('devices.disabled', '=', '0')
             ->where('devices.ignore', '=', '0')

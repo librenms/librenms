@@ -52,7 +52,7 @@ class AlertRule extends BaseModel
     {
         return $query->enabled()
             ->join('alerts', 'alerts.rule_id', 'alert_rules.id')
-            ->whereIn('alerts.state', [1, 3, 4]);
+            ->whereNotIn('alerts.state', [0, 2]);
     }
 
     /**
