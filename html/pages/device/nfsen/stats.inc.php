@@ -2,52 +2,120 @@
 
 print_optionbar_start();
 
-echo '<form action="'.generate_url( $link_array, array('nfsen' => 'stats')).'" id="FlowStats" method="POST">';
+echo '<form action="'.generate_url( $link_array, array('nfsen' => 'stats')).'" id="FlowStats" method="SUBMIT">';
 
 echo 'Top N:
 <select name="topN" id="topN" size=1>
-    <OPTION value="0" >10</OPTION>
-    <OPTION value="1" selected>20</OPTION>
-    <OPTION value="2" >50</OPTION>
-    <OPTION value="3" >100</OPTION>
-    <OPTION value="4" >200</OPTION>
-    <OPTION value="5" >500</OPTION>
+';
+
+$option_default=$config['nfsen_top_default'];
+if (isset($vars['topN'])) {
+    $option_default=$vars['topN'];
+}
+
+$option_int=0;
+foreach ($config['nfsen_top_N'] as $option) {
+    if (strcmp($option_default, $option) == 0) {
+        echo '<OPTION value="'.$option.'" selected>'.$option.'</OPTION>';
+    } else {
+        echo '<OPTION value="'.$option.'">'.$option.'</OPTION>';
+    }
+}
+
+echo '
 </select>
 During the last:
 <select name="lastN" id="lastN" size=1>
-    <OPTION value="300" >5 minutes</OPTION>
-    <OPTION value="500" >10 minutes</OPTION>
-    <OPTION value="900" selected>15 minutes</OPTION>
-    <OPTION value="1800" >30 minutes</OPTION>
-    <OPTION value="3200" >hour</OPTION>
-    <OPTION value="9600" >3 hours</OPTION>
-    <OPTION value="19200" >6 hours</OPTION>
-    <OPTION value="38400" >12 hours</OPTION>
-    <OPTION value="76800" >24 hours</OPTION>
-    <OPTION value="115200" >36 hours</OPTION>
-    <OPTION value="153600" >48 hours</OPTION>
+';
+
+$option_default=$config['nfsen_last_default'];
+if (isset($vars['lastN'])) {
+    $option_default=$vars['lastN'];
+}
+
+$option_keys=array_keys($config['nfsen_lasts']);
+foreach ( $option_keys as $option ) {
+    if (strcmp($option_default, $option) == 0) {
+        echo '<OPTION value="'.$option.'" selected>'.$config['nfsen_lasts'][$option].'</OPTION>';
+    } else {
+        echo '<OPTION value="'.$option.'">'.$config['nfsen_lasts'][$option].'</OPTION>';
+    }
+}
+
+echo '
 </select>
 , Stat Type:
 <select name="stattype" id="StatTypeSelector" size=1>
-    <OPTION value="0" >Flow Records</OPTION>
-    <OPTION value="1" >Any IP Address</OPTION>
-    <OPTION value="2" selected>SRC IP Address</OPTION>
-    <OPTION value="3" >DST IP Address</OPTION>
-    <OPTION value="4" >Any Port</OPTION>
-    <OPTION value="5" >SRC Port</OPTION>
-    <OPTION value="6" >DST Port</OPTION>
-    <OPTION value="7" >SRC TOS</OPTION>
-    <OPTION value="8" >DST TOS</OPTION>
-    <OPTION value="9" >TOS</OPTION>
+';
+
+$option_default=$config['nfsen_stat_default'];
+if (isset($vars['stattype'])) {
+    $option_default=$vars['stattype'];
+}
+
+// WARNING: order is relevant as it has to match the
+// check later in the process part of this page.
+$stat_types=array(
+    'Flow Records',
+    'Any IP Address',
+    'SRC IP Address',
+    'DST IP Address',
+    'Any Port',
+    'SRC Port',
+    'DST Port',
+    'SRC TOS',
+    'DST TOS',
+    'TOS',
+);
+
+// puts together the drop down options
+$options_int=0;
+foreach ($stat_types as $option) {
+    if (strcmp($option_default, $options_int) == 0) {
+        echo '<OPTION value="'.$options_int.'" selected>'.$option."</OPTION>\n";
+    } else {
+        echo '<OPTION value="'.$options_int.'">'.$option."</OPTION>\n";
+    }
+
+    $options_int++;
+}
+
+echo '
 </select>
 , Order By:
 <select name="statorder" id="statorder" size=1>
-    <OPTION value="0" >flows</OPTION>
-    <OPTION value="1" >packets</OPTION>
-    <OPTION value="2" >bytes</OPTION>
-    <OPTION value="3" selected>pps</OPTION>
-    <OPTION value="4" >bps</OPTION>
-    <OPTION value="5" >bpp</OPTION>
+';
+
+$option_default=$config['nfsen_order_default'];
+if (isset($vars['statorder'])) {
+    $option_default=$vars['statorder'];
+}
+
+
+// WARNING: order is relevant as it has to match the
+// check later in the process part of this page.
+$order_types=array(
+    'flows',
+    'packets',
+    'bytes',
+    'pps',
+    'bps',
+    'bpp',
+);
+
+// puts together the drop down options
+$options_int=0;
+foreach ($order_types as $option) {
+    if (strcmp($option_default, $options_int) == 0) {
+        echo '<OPTION value="'.$options_int.'" selected>'.$option."</OPTION>\n";
+    } else {
+        echo '<OPTION value="'.$options_int.'">'.$option."</OPTION>\n";
+    }
+
+    $options_int++;
+}
+
+echo '
 </select>
 <input type="submit" name="process" value="process" size="1">
 ';
@@ -61,7 +129,7 @@ if (isset($vars['process'])){
     // Make sure we have a sane value for lastN
     $lastN=900;
     if (isset($vars['lastN']) &&
-         is_int($vars['lastN']) &&
+         is_numeric($vars['lastN']) &&
          ($vars['lastN'] <= $config['nfsen_last_max'])
         ){
         $lastN=$vars['lastN'];
@@ -70,7 +138,7 @@ if (isset($vars['process'])){
     // Make sure we have a sane value for lastN
     $topN=20;
     if (isset($vars['topN']) &&
-         is_int($vars['topN']) &&
+         is_numeric($vars['topN']) &&
          ($vars['topN'] <= $config['nfsen_top_max'])
         ){
         $topN=$vars['topN'];
