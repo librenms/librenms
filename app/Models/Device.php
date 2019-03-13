@@ -594,7 +594,7 @@ class Device extends BaseModel
 
     public function syslogs()
     {
-        return $this->hasMany('App\Models\General\Syslog', 'device_id', 'device_id');
+        return $this->hasMany('App\Models\Syslog', 'device_id', 'device_id');
     }
 
     public function users()
