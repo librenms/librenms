@@ -255,11 +255,10 @@ class Device extends BaseModel
     {
         $result = '';
         if ($downtime) {
-            $interval = time() - strtotime($this->last_polled); //xxx$this->uptime;
+            $interval = time() - strtotime($this->last_polled);
         } else {
             $interval = $this->uptime;
         }
-        
         $data = [
             'years' => 31536000,
             'days' => 86400,
