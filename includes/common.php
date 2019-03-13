@@ -22,6 +22,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Laravel;
 
 function generate_priority_label($priority)
 {
@@ -663,7 +664,7 @@ if (!function_exists('d_echo')) {
     {
         global $debug;
 
-        if (class_exists('\Log')) {
+        if (Laravel::isBooted()) {
             \Log::debug(is_string($text) ? rtrim($text) : $text);
         } elseif ($debug) {
             print_r($text);
