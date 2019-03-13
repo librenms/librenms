@@ -320,6 +320,7 @@
                         <li><a href="{{ url('alert-rules') }}"><i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> Alert Rules</a></li>
                         <li><a href="{{ url('alert-schedule') }}"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Scheduled Maintenance</a></li>
                         <li><a href="{{ url('templates') }}"><i class="fa fa-file fa-fw fa-lg" aria-hidden="true"></i> Alert Templates</a></li>
+                        <li><a href="{{ url('alert-transports') }}"><i class="fa fa-bus fa-fw fa-lg" aria-hidden="true"></i> Alert Transports</a></li>
                         @endadmin
                     </ul>
                 </li>
