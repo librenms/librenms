@@ -23,6 +23,8 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Util\Laravel;
+
 if (!function_exists('d_echo')) {
     /**
      * Legacy convenience function - please use this instead of 'if ($debug) { echo ...; }'
@@ -35,7 +37,7 @@ if (!function_exists('d_echo')) {
     {
         global $debug;
 
-        if (class_exists('\Log')) {
+        if (Laravel::isBooted()) {
             \Log::debug(is_string($text) ? rtrim($text) : $text);
         } elseif ($debug) {
             print_r($text);

@@ -6,15 +6,10 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Validation\Rule;
 use LibreNMS\Config;
-use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
-use Request;
 use Validator;
-
-include_once __DIR__ . '/../../includes/dbFacile.php';
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,11 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Install legacy dbFacile fetch mode listener
-        \LibreNMS\DB\Eloquent::initLegacyListeners();
-
-        // load config
-        Config::load();
+        $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
+        $this->app->booted('\LibreNMS\Config::load');
 
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
@@ -43,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->registerFacades();
         $this->registerGeocoder();
     }
 
@@ -67,6 +60,14 @@ class AppServiceProvider extends ServiceProvider
             'device' => \App\Models\Device::class,
             'device_group' => \App\Models\DeviceGroup::class,
         ]);
+    }
+
+    private function registerFacades()
+    {
+        // replace log manager so we can add the event function
+        $this->app->bind('log', function ($app) {
+            return new \App\Facades\LogManager($app);
+        });
     }
 
     private function registerGeocoder()
