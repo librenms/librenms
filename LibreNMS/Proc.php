@@ -159,14 +159,16 @@ class Proc
             $stderr_buf = stream_get_contents($this->_pipes[2]);
             $stderr .= $stderr_buf;
             if (empty($stdout_buf) && empty($stderr_buf)) {
-                break;
+                $do_get = false;
+            } else {
+                $stream_end = microtime(true);
+                $stream_time = round(($stream_end - $stream_start) * 1000);
+                if ($stream_time>$timeout) {
+                    $do_get = false;
+                } else {
+                    usleep($delay);
+                }
             }
-            $stream_end = microtime(true);
-            $stream_time = round(($stream_end - $stream_start) * 1000);
-            if ($stream_time>$timeout) {
-                break;
-            }
-            usleep($delay);
         }
         return [$stdout, $stderr];
     }
