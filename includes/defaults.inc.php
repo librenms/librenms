@@ -538,6 +538,22 @@ $config['nfsen_enable'] = 0;
 $config['nfsen_subdirlayout'] = 1;
 $config['nfsen_last_max'] = 153600; // 48 hours ago in seconds
 $config['nfsen_top_max'] = 500; // max topN value for stats
+$config['nfsen_top_N']=array( 10, 20, 50, 100, 200, 500 );
+$config['nfsen_top_default']=20;
+$config['nfsen_stat_default']=2;
+$config['nfsen_order_default']=3;
+$cpmfog['nfsen_lasts']=array(
+                            '300'=>'5 minutes',
+                            '600'=>'10 minutes',
+                            '900'=>'15 minutes',
+                            '1800'=>'30 minutes',
+                            '3600'=>'1 hour',
+                            '9600'=>'3 hours',
+                            '38400'=>'12 hours',
+                            '76800'=>'24 hours',
+                            '115200'=>'36 hours',
+                            '153600'=>'48 hours',
+                            );
 // $config['nfsen_timezone'] = 'America/Chicago'; set a override timezone incase LibreNMS and NfSen are different
 // Location Mapping
 // Use this feature to map ugly locations to pretty locations
