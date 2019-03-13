@@ -11,8 +11,6 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use Validator;
 
-include_once __DIR__ . '/../../includes/dbFacile.php';
-
 class AppServiceProvider extends ServiceProvider
 {
     /**
