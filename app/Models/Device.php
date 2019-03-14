@@ -251,14 +251,10 @@ class Device extends BaseModel
             ->where('device_id', $this->device_id)->exists();
     }
 
-    public function formatUptime($short = false, $downtime = false)
+    public function formatUptime($short = false)
     {
         $result = '';
-        if ($downtime) {
-            $interval = time() - strtotime($this->last_polled);
-        } else {
-            $interval = $this->uptime;
-        }
+        $interval = $this->uptime;
         $data = [
             'years' => 31536000,
             'days' => 86400,
