@@ -396,6 +396,11 @@ class Device extends BaseModel
         return $this->status;
     }
 
+    public function getLastPolled()
+    {
+        return strtotime($this->last_polled);
+    }
+
     public function getIconAttribute($icon)
     {
         $this->loadOs();
