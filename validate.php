@@ -130,7 +130,7 @@ if ($pre_checks_failed) {
     exit;
 }
 
-$init_modules = ['laravel'];
+$init_modules = [];
 require 'includes/init.php';
 
 // make sure install_dir is set correctly, or the next includes will fail
