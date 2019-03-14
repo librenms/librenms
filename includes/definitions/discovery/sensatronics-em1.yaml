@@ -1,0 +1,51 @@
+mib: SENSATRONICS-EM1:SENSATRONICS-ITTM:SENSATRONICS-SMI
+modules:
+   sensors:
+      temperature:
+         data:
+             -
+                 oid: group1TempDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.1.3.{{ $index }}'
+                 index: 'group1TempDataStr.{{ $index }}'
+                 descr: Temp 1 
+             -
+                 oid: group2TempDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.2.3.{{ $index }}'
+                 index: 'group2TempDataStr.{{ $index }}'
+                 descr: Temp 2
+             -
+                 oid: group3TempDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.3.3.{{ $index }}'
+                 index: 'group3TempDataStr.{{ $index }}'
+                 descr: Temp 3
+             -
+                 oid: group4TempDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.4.3.{{ $index }}'
+                 index: 'group4TempDataStr.{{ $index }}'
+                 descr: Temp 4
+      humidity:
+         data:
+             -
+                 oid: group1HumidDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.1.7.{{ $index }}'
+                 index: 'group1HumidDataStr.{{ $index }}'
+                 descr: Humid 1
+                 skip_values: -999.9
+             -
+                 oid: group2HumidDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.2.7.{{ $index }}'
+                 index: 'group2HumidDataStr.{{ $index }}'
+                 descr: Humid 2
+                 skip_values: -999.9
+             -
+                 oid: group3HumidDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.3.7.{{ $index }}'
+                 index: 'group3HumidDataStr.{{ $index }}'
+                 descr: Humid 3
+                 skip_values: -999.9
+             -
+                 oid: group4HumidDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.4.7.{{ $index }}'
+                 index: 'group4HumidDataStr.{{ $index }}'
+                 descr: Humid 4
+                 skip_values: -999.9

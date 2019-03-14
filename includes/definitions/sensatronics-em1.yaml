@@ -1,0 +1,12 @@
+os: sensatronics-em1
+text: 'Sensatronics EM1'
+type: sensor
+icon: generic
+over:
+    - { graph: sensor_temperature, text: 'Temperature 1' }
+    - { graph: sensor_temperature, text: 'Temperature 2' }
+mib_dir: 
+   - sensatronics
+discovery:
+   - sysObjectID:
+      - .1.3.6.1.4.1.16174.1.1
