@@ -32,7 +32,7 @@ use LibreNMS\Util\MemcacheLock;
 
 if (!isset($init_modules) && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
-    $init_modules = ['laravel'];
+    $init_modules = [];
     require realpath(__DIR__ . '/../..') . '/includes/init.php';
 }
 

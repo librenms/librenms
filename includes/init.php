@@ -92,9 +92,10 @@ if (module_selected('alerts', $init_modules)) {
     require_once $install_dir . '/includes/alerts.inc.php';
 }
 
-if (module_selected('laravel', $init_modules)) {
-    \LibreNMS\Util\Laravel::bootCli();
-}
+// Boot Laravel
+\LibreNMS\Util\Laravel::bootCli();
+
+set_debug(false); // disable debug initially (hides legacy errors too)
 
 if (!module_selected('nodb', $init_modules)) {
     \LibreNMS\DB\Eloquent::boot();
