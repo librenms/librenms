@@ -450,13 +450,13 @@
                     "sysDescr": "Dell UPS Rack 3750W High Efficiency Online HV",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "dell-ups",
                     "type": "power",
                     "serial": null,
-                    "icon": "dell.svg"
+                    "icon": "dell.svg",
+                    "location": null
                 }
             ]
         },
@@ -470,11 +470,11 @@
                     "version": "01.08.0004",
                     "hardware": "Dell UPS Rack 3750W High Efficiency Online HV",
                     "features": null,
-                    "location": "<private>",
                     "os": "dell-ups",
                     "type": "power",
                     "serial": "CN-0K804N-75162-2CH-0081-A03",
-                    "icon": "dell.svg"
+                    "icon": "dell.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -544,7 +544,7 @@
                     "sensor_index": "0",
                     "sensor_type": "productStatusGlobalStatus",
                     "sensor_descr": "Current Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
