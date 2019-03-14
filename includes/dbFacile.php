@@ -47,8 +47,8 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
         return Eloquent::DB();
     }
 
-    if (!function_exists('mysqli_connect')) {
-        throw new DatabaseConnectException("mysqli extension not loaded!");
+    if (!extension_loaded('pdo_mysql')) {
+        throw new DatabaseConnectException("PHP pdo_mysql extension not loaded!");
     }
 
     try {
