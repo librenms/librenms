@@ -1,0 +1,34 @@
+-- RPS S.p.A enterprise MIB definition
+
+-- Copyright (c) RPS S.p.A.
+-- Version: 1.0 by Michele Marcon
+-- Date: 1.04.2016
+
+-- Title: RIELLO MIB
+
+-- ************************************************************************
+-- ************************************************************************
+
+-- RIELLO-MIB { iso org(3) dod(6) internet(1) private(4)
+-- enterprises(1) riello(5491) }
+
+
+
+RIELLO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises, MODULE-IDENTITY  FROM SNMPv2-SMI;
+
+rielloMIB MODULE-IDENTITY
+    LAST-UPDATED "201602230000Z"
+    ORGANIZATION "RPS S.p.A"
+    CONTACT-INFO
+           "        Michele Marcon
+             E-mail: info@riello-ups.com"
+    DESCRIPTION
+            "The MIB module to describe Riello devices."
+    
+    REVISION      "201602230000Z"
+    DESCRIPTION "Latest avaialble" ::= { enterprises 5491 }
+
+END
