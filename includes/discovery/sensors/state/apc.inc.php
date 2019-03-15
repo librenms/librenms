@@ -174,7 +174,7 @@ foreach (array_keys($apcContactData) as $index) {
         $faultGeneric = 1;
         if ($severity == 1) {
             $faultGeneric = 2;
-        } else if ($severity == 2) {
+        } elseif ($severity == 2) {
             $faultGeneric = 1;
         }
 
