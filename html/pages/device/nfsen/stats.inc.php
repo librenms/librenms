@@ -53,31 +53,26 @@ if (isset($vars['stattype'])) {
     $option_default=$vars['stattype'];
 }
 
-// WARNING: order is relevant as it has to match the
-// check later in the process part of this page.
 $stat_types=array(
-    'Flow Records',
-    'Any IP Address',
-    'SRC IP Address',
-    'DST IP Address',
-    'Any Port',
-    'SRC Port',
-    'DST Port',
-    'SRC TOS',
-    'DST TOS',
-    'TOS',
+    'record'=>'Flow Records',
+    'ip'=>'Any IP Address',
+    'srcip'=>'SRC IP Address',
+    'dstip'=>'DST IP Address',
+    'port'=>'Any Port',
+    'srcport'=>'SRC Port',
+    'dstport'=>'DST Port',
+    'srctos'=>'SRC TOS',
+    'dsttos'=>'DST TOS',
+    'tos'=>'TOS',
 );
 
 // puts together the drop down options
-$options_int=0;
-foreach ($stat_types as $option) {
-    if (strcmp($option_default, $options_int) == 0) {
-        echo '<OPTION value="'.$options_int.'" selected>'.$option."</OPTION>\n";
+foreach ($stat_types as $option => $descr) {
+    if (strcmp($option_default, $option) == 0) {
+        echo '<OPTION value="'.$option.'" selected>'.$descr."</OPTION>\n";
     } else {
-        echo '<OPTION value="'.$options_int.'">'.$option."</OPTION>\n";
+        echo '<OPTION value="'.$option.'">'.$descr."</OPTION>\n";
     }
-
-    $options_int++;
 }
 
 echo '
@@ -95,24 +90,21 @@ if (isset($vars['statorder'])) {
 // WARNING: order is relevant as it has to match the
 // check later in the process part of this page.
 $order_types=array(
-    'flows',
-    'packets',
-    'bytes',
-    'pps',
-    'bps',
-    'bpp',
+    'flows'=>1,
+    'packets'=>1,
+    'bytes'=>1,
+    'pps'=>1,
+    'bps'=>1,
+    'bpp'=>1,
 );
 
 // puts together the drop down options
-$options_int=0;
-foreach ($order_types as $option) {
-    if (strcmp($option_default, $options_int) == 0) {
-        echo '<OPTION value="'.$options_int.'" selected>'.$option."</OPTION>\n";
+foreach ($order_types as $option => $descr) {
+    if (strcmp($option_default, $option) == 0) {
+        echo '<OPTION value="'.$option.'" selected>'.$option."</OPTION>\n";
     } else {
-        echo '<OPTION value="'.$options_int.'">'.$option."</OPTION>\n";
+        echo '<OPTION value="'.$option.'">'.$option."</OPTION>\n";
     }
-
-    $options_int++;
 }
 
 echo '
@@ -136,7 +128,7 @@ if (isset($vars['process'])){
     }
 
     // Make sure we have a sane value for lastN
-    $topN=20;
+    $topN=20; // The default if not set or something invalid is set
     if (isset($vars['topN']) &&
          is_numeric($vars['topN']) &&
          ($vars['topN'] <= $config['nfsen_top_max'])
@@ -146,46 +138,14 @@ if (isset($vars['process'])){
 
     // Handle the stat order.
     $stat_order='pps'; // The default if not set or something invalid is set
-    if (isset($vars['statorder'])){
-        if (strcmp($vars['statorder'], '0') ==0 ){
-            $stat_order='flows';
-        }elseif(strcmp($vars['statorder'], '1') ==0 ){
-            $stat_order='packets';
-        }elseif(strcmp($vars['statorder'], '2') ==0 ){
-            $stat_order='bytes';
-        }elseif(strcmp($vars['statorder'], '3') ==0 ){
-            $stat_order='pps';
-        }elseif(strcmp($vars['statorder'], '4') ==0 ){
-            $stat_order='bps';
-        }elseif(strcmp($vars['statorder'], '5') ==0 ){
-            $stat_order='bpp';
-        }
+    if (isset($vars['statorder']) && isset($order_types[$vars['statorder']])){
+        $stat_order=$vars['statorder'];
     }
 
     // Handle the stat type.
     $stat_type='srcip'; // The default if not set or something invalid is set
-    if (isset($vars['stattype'])){
-        if (strcmp($vars['stattype'], '0') == 0){
-            $stat_type='record';
-        }elseif(strcmp($vars['stattype'], '1') == 0){
-            $stat_type='ip';
-        }elseif(strcmp($vars['stattype'], '2') == 0){
-            $stat_type='srcip';
-        }elseif(strcmp($vars['stattype'], '3') == 0){
-            $stat_type='dstip';
-        }elseif(strcmp($vars['stattype'], '4') == 0){
-            $stat_type='port';
-        }elseif(strcmp($vars['stattype'], '5') == 0){
-            $stat_type='srcport';
-        }elseif(strcmp($vars['stattype'], '6') == 0){
-            $stat_type='dstport';
-        }elseif(strcmp($vars['stattype'], '7') == 0){
-            $stat_type='srctos';
-        }elseif(strcmp($vars['stattype'], '8') == 0){
-            $stat_type='dsttos';
-        }elseif(strcmp($vars['stattype'], '9') == 0){
-            $stat_type='tos';
-        }
+    if (isset($vars['stattype']) && isset($stat_types[$vars['stattype']])){
+        $stat_type=$vars['stattype'];
     }
 
     $current_time=lowest_five_minutes(time() - 300);
