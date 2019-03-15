@@ -443,7 +443,7 @@ class Config
         }
 
         if (self::get('secure_cookies')) {
-            ini_set('session.cookie_secure', 1);
+            @ini_set('session.cookie_secure', 1);
         }
 
         // If we're on SSL, let's properly detect it
