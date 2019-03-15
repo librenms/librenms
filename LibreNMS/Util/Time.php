@@ -49,7 +49,7 @@ class Time
         return isset($conversion[$description]) ? $conversion[$description] : 0;
     }
 
-    public static function formatInterval($interval, $short = false)
+    public static function formatInterval($interval, $format = 'long')
     {
         $result = '';
         $data = [
@@ -65,10 +65,10 @@ class Time
                 $diff = floor($interval / $v);
 
                 $result .= " $diff";
-                if ($short) {
+                if ($format == 'short') {
                     $result .= substr($k, 0, 1);
                 } elseif ($diff > 1) {
-                    $result .= $k;
+                    $result .= ' ' . $k;
                 } else {
                     $result .= substr($k, 0, -1);
                 }

@@ -13,6 +13,7 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Url;
+use LibreNMS\Util\Time;
 
 class Device extends BaseModel
 {
@@ -256,34 +257,7 @@ class Device extends BaseModel
 
     public function formatUptime($short = false)
     {
-        $result = '';
-        $interval = $this->uptime;
-        $data = [
-            'years' => 31536000,
-            'days' => 86400,
-            'hours' => 3600,
-            'minutes' => 60,
-            'seconds' => 1,
-        ];
-
-        foreach ($data as $k => $v) {
-            if ($interval >= $v) {
-                $diff = floor($interval / $v);
-
-                $result .= " $diff";
-                if ($short) {
-                    $result .= substr($k, 0, 1);
-                } elseif ($diff > 1) {
-                    $result .= $k;
-                } else {
-                    $result .= substr($k, 0, -1);
-                }
-
-                $interval -= $v * $diff;
-            }
-        }
-
-        return $result;
+        return Time::formatInterval($this->uptime, $short);
     }
 
     /**
