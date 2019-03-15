@@ -64,6 +64,9 @@ $stat_types=array(
     'srctos'=>'SRC TOS',
     'dsttos'=>'DST TOS',
     'tos'=>'TOS',
+    'as'=>'AS',
+    'srcas'=>'SRC AS',
+    'dstas'=>'DST AS',
 );
 
 // puts together the drop down options
