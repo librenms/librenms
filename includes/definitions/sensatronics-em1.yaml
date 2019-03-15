@@ -1,7 +1,7 @@
 os: sensatronics-em1
 text: 'Sensatronics EM1'
 type: sensor
-icon: generic
+icon: sensatronics
 over:
     - { graph: sensor_temperature, text: 'Temperature 1' }
     - { graph: sensor_temperature, text: 'Temperature 2' }

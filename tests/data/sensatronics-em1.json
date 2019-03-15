@@ -13,7 +13,7 @@
                     "os": "sensatronics-em1",
                     "type": "sensor",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "sensatronics.png",
                     "location": null
                 }
             ]
@@ -31,7 +31,7 @@
                     "os": "sensatronics-em1",
                     "type": "sensor",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "sensatronics.png",
                     "location": "<private>"
                 }
             ]
