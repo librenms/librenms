@@ -1,9 +1,11 @@
 <?php
 
 use App\Models\Location;
+use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Time;
 
 echo "<div class='row'>
       <div class='col-md-12'>
@@ -21,13 +23,8 @@ echo '</div><div class="panel-body">';
 echo '<script src="js/leaflet.js"></script>';
 echo '<script src="js/L.Control.Locate.min.js"></script>';
 
-$uptime = formatUptime($device['uptime']);
-$uptime_text = 'Uptime';
-if ($device['status'] == 0) {
-    // Rewrite $uptime to be downtime if device is down
-    $uptime = formatUptime(time() - strtotime($device['last_polled']));
-    $uptime_text = 'Downtime';
-}
+$uptime = (Time::formatInterval($device['status'] ? $device['uptime'] : time() - $device['last_polled']));
+$uptime_text = ($device['status'] ? 'Uptime' : 'Downtime');
 
 if ($device['os'] == 'ios') {
     formatCiscoHardware($device);
