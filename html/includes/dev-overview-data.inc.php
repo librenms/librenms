@@ -23,7 +23,7 @@ echo '</div><div class="panel-body">';
 echo '<script src="js/leaflet.js"></script>';
 echo '<script src="js/L.Control.Locate.min.js"></script>';
 
-$uptime = (Time::formatInterval($device['status'] ? $device['uptime'] : time() - $device['last_polled']));
+$uptime = (Time::formatInterval($device['status'] ? $device['uptime'] : time() - strotime($device['last_polled'])));
 $uptime_text = ($device['status'] ? 'Uptime' : 'Downtime');
 
 if ($device['os'] == 'ios') {
