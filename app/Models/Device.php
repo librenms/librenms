@@ -21,7 +21,10 @@ class Device extends BaseModel
     public $timestamps = false;
     protected $primaryKey = 'device_id';
     protected $fillable = ['hostname', 'ip', 'status', 'status_reason'];
-    protected $casts = ['status' => 'boolean'];
+    protected $casts = [
+        'last_polled' => 'datetime',
+        'status' => 'boolean',
+    ];
 
     /**
      * Initialize this class
