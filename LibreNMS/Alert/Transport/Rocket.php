@@ -63,10 +63,10 @@ class Rocket extends Transport
                     'text' => $rocket_msg,
                 )
             ),
-            'channel' => $api['channel'],
-            'username' => $api['username'],
-            'icon_url' => $api['icon_url'],
-            'icon_emoji' => $api['icon_emoji'],
+	   'channel' => str_replace(array("\n", "\r"),'', $api['channel']),
+           'username' => str_replace(array("\n", "\r"),'',$api['username']),
+           'icon_url' => str_replace(array("\n", "\r"),'', $api['icon_url']),
+           'icon_emoji' => str_replace(array("\n", "\r"),'', $api['icon_emoji']),
         );
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
