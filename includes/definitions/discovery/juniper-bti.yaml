@@ -1,0 +1,35 @@
+mib: BTI-MIB:BTI-TC-MIB:BTI-7000-MIB:BTI-OL-MIB:PACKET-VX-BRIDGE-MIB:DEBUG-MIB
+modules:
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: EthL1IFCrntPMEntry
+                    value: ethL1IFCrntPMSupplyVoltageValue
+                    num_oid: '.1.3.6.1.4.1.18070.2.2.1.6.26.1.15.{{ $index }}'
+                    descr: ' Volt {{ $index }} and {{ $ethL1IFCrntPMSupplyVoltageValue }} foo'
+                    divisor: 100
+        temperature:
+            data:
+                -
+                    oid: EthL1IFCrntPMEntry
+                    value: ethL1IFCrntPMTempValue
+                    num_oid: '.1.3.6.1.4.1.18070.2.2.1.6.26.1.12.{{ $index }}'
+                    #index: ethL1IFCrntPMTempValue.ethL1IFCrntPMPortTypeIdx
+                    descr: 'count {{ $count }} Temp {{ $index }} and {{ $ethL1IFCrntPMTempValue }} foo'
+        state:
+            data:
+                -
+                    oid: EthL1IFCrntPMEntry
+                    value: pvxL2IntfAdminStatus
+                    num_oid: '.1.3.6.1.4.1.18070.2.2.1.14.1.3.1.6.{{ $index }}'
+                    #index: 'pvxL2IntfAdminStatus.{{ $index }}'
+                    descr: 'data {{ $index }} status {{ $pvxL2IntfAdminStatus }}'
+                    state_name: pvxL2IntfAdminStatus
+                    states:
+                        - { descr: Unknown, graph: 0, value: 0, generic: 3 }
+                        - { descr: Normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: Change, graph: 0, value: 2, generic: 1 }
+                        - { descr: Alarm, graph: 0, value: 3, generic: 2 }
+                        - { descr: Menu, graph: 0, value: 4, generic: 1 }
+                        - { descr: IrActive, graph: 0, value: 5, generic: 1 }

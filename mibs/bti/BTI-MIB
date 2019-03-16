@@ -1,0 +1,104 @@
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+--
+-- Copyright (C) BTI Systems Inc. 2003-2010. All Rights Reserved.
+--
+-- The information contained herein is the property of BTI Systems Inc.
+-- and is strictly confidential. Except as expressly authorized in
+-- writing by BTI Systems Inc., the holder shall keep all information
+-- contained herein confidential, shall disclose the information only
+-- to its employees with a need to know, and shall protect the
+-- information, in whole or in part, from disclosure and dissemination
+-- to third parties with the same degree of care it uses to protect
+-- its own confidential information, but with no less than reasonable
+-- care. Except as expressly authorized in writing by BTI Systems Inc.,
+-- the holder is granted no rights to use the information contained
+-- herein.
+--
+-- Unpublished. All rights reserved under the copyright laws of
+-- Canada.
+--
+-- OSS Integration 
+-- BTI Systems Inc. can provide customers with direct access to 
+-- network element SNMP MIBs for use for integration to OSS systems. 
+-- Customers must note the following caveats:
+--
+-- 1) Performance: The BTI Systems Inc. MIBS are performance tested for
+-- use with the BTI Systems proNX 900 Node Controller and proNX 9000 
+-- Network Manager. Customers are responsible for conducting their 
+-- own testing to ensure that the BTI Systems Inc. NE interfaces meet 
+-- the needs of their proposed usage. BTI Systems Inc. makes no
+-- guarantees that any proposed usage will meet customer requirements.
+--
+-- 2) Changes between releases: BTI Systems Inc. SNMP MIBs are subject 
+-- to change as support for new functionality is introduced. BTI  
+-- Systems Inc. strives to maintain backward compatibility of MIBs 
+-- across releases but this is not guaranteed and BTI Systems Inc. 
+-- reserves the right to deprecate or remove support for obsolete 
+-- MIB elements. OSS integrators must be careful not to rely on 
+-- functionality that is marked as deprecated as it may be unsupported 
+-- in a subsequent release. Customers that integrate directly to BTI 
+-- Systems Inc. MIBs are responsible for all OSS development and 
+-- integration testing that may arise from MIB changes between releases 
+-- of BTI Systems Inc. software.
+--
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+BTI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+btiMib MODULE-IDENTITY
+    LAST-UPDATED "201211301200Z"  -- Friday, November 30, 12:00:00 EST 2012
+    ORGANIZATION "BTI Systems Inc."
+    CONTACT-INFO "Technical Support
+                  BTI Systems Inc.
+                  200-1000 Innovation Dr.
+                  Kanata, Ontario, Canada  K2K 3E7
+                  (613) 287-1700
+                  support@btisystems.com"
+    DESCRIPTION  "This is a top-level MIB for BTI whose purpose is to lay out
+                  the top-level objects in the OID hierarchy"
+    REVISION     "201211301200Z"  -- Friday, November 30, 12:00:00 EST 2012
+    DESCRIPTION  "Added identifier for the bti7800 product."
+    REVISION     "201203091200Z"  -- Friday, March 9, 12:00:00 EST 2012
+    DESCRIPTION  "Added identifiers for btiHoard, bti800 branches."
+    REVISION     "201202101200Z"  -- Friday, February 10, 12:00:00 EST 2012
+    DESCRIPTION  "Moved PSM to btiProducts 6, to avoid PVX overlap."
+    REVISION     "201109261200Z"  -- Monday, September 26, 12:00:00 EST 2011
+    DESCRIPTION  "Added btiPSM node."
+    REVISION     "200805301200Z"  -- Friday, May 30, 12:00:00 EST 2008
+    DESCRIPTION  "Changed name of netstender node to bti7000.
+    			  Removed obsolete ols node."
+    REVISION     "200708271200Z"  -- Monday, August 27, 12:00:00 EST 2007
+    DESCRIPTION  "Added btiems node."
+    REVISION     "200507251200Z"  -- Monday, July 25, 12:00:00 EST 2005
+    DESCRIPTION  "Updated Contact Info in Module Identity"
+    REVISION     "200409231200Z"  -- Thursday, September 23, 12:00:00 EST 2004
+    DESCRIPTION  "MIB Updated for Netstender Rel 3.0: Updated object hierarchy
+                  to support Netstender 1030 - name of object identifier
+                  netstender2060 generalized to netstender"
+    REVISION     "200312011200Z" -- Monday, December 1, 12:00:00 EST 2003
+    DESCRIPTION  "The initial version of this MIB module."
+
+    ::= { btiModules 1 }
+
+
+btiSystems           OBJECT IDENTIFIER ::= { enterprises 18070 }
+
+btiModules           OBJECT IDENTIFIER ::= { btiSystems 1 }
+btiProducts          OBJECT IDENTIFIER ::= { btiSystems 2 }
+
+bti7000              OBJECT IDENTIFIER ::= { btiProducts 2 }
+btiems               OBJECT IDENTIFIER ::= { btiProducts 4 }
+btiPSM               OBJECT IDENTIFIER ::= { btiProducts 6 }
+widecastCache        OBJECT IDENTIFIER ::= { btiProducts 7 }
+bti800               OBJECT IDENTIFIER ::= { btiProducts 8 }
+bti7800              OBJECT IDENTIFIER ::= { btiProducts 9 }
+
+END  -- BTI TOP LEVEL OID REGISTRATION MODULE
+

@@ -1,0 +1,2278 @@
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+--
+-- Copyright (C) BTI Systems Inc. 2003-2007. All Rights Reserved.
+--
+-- The information contained herein is the property of BTI Systems Inc.
+-- and is strictly confidential. Except as expressly authorized in
+-- writing by BTI Systems Inc., the holder shall keep all information
+-- contained herein confidential, shall disclose the information only
+-- to its employees with a need to know, and shall protect the
+-- information, in whole or in part, from disclosure and dissemination
+-- to third parties with the same degree of care it uses to protect
+-- its own confidential information, but with no less than reasonable
+-- care. Except as expressly authorized in writing by BTI Systems Inc.,
+-- the holder is granted no rights to use the information contained
+-- herein.
+--
+-- Unpublished. All rights reserved under the copyright laws of
+-- Canada.
+-- 
+-- OSS Integration 
+-- BTI Systems Inc. can provide customers with direct access to 
+-- network element SNMP MIBs for use for integration to OSS systems. 
+-- Customers must note the following caveats:
+--
+-- 1) Performance: The BTI Systems Inc. MIBS are performance tested for
+-- use with the BTI Systems proNX 900 Node Controller and proNX 9000 
+-- Network Manager. Customers are responsible for conducting their 
+-- own testing to ensure that the BTI Systems Inc. NE interfaces meet 
+-- the needs of their proposed usage. BTI Systems Inc. makes no
+-- guarantees that any proposed usage will meet customer requirements.
+--
+-- 2) Changes between releases: BTI Systems Inc. SNMP MIBs are subject 
+-- to change as support for new functionality is introduced. BTI  
+-- Systems Inc. strives to maintain backward compatibility of MIBs 
+-- across releases but this is not guaranteed and BTI Systems Inc. 
+-- reserves the right to deprecate or remove support for obsolete 
+-- MIB elements. OSS integrators must be careful not to rely on 
+-- functionality that is marked as deprecated as it may be unsupported 
+-- in a subsequent release. Customers that integrate directly to BTI 
+-- Systems Inc. MIBs are responsible for all OSS development and 
+-- integration testing that may arise from MIB changes between releases 
+-- of BTI Systems Inc. software.
+--
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+
+BTI-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, Integer32, Counter64, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    btiModules
+        FROM BTI-MIB;
+
+
+btiTcMib MODULE-IDENTITY
+    LAST-UPDATED "201205021200Z"  -- Wednesday, May 2, 12:00:00 EST 2012
+    ORGANIZATION "BTI Systems Inc."
+    CONTACT-INFO "Technical Support
+                  BTI Systems Inc.
+                  50 Northside Road
+                  Ottawa, Ontario, Canada  K2H 5Z6
+                  (613) 248-9154
+                  support@btisystems.com"
+    DESCRIPTION  "Textual conventions defined for BTI Systems MIBs."
+    REVISION     "201206011200Z"  -- Friday, June 1, 12:00:00 EST 2012
+    DESCRIPTION  "Updated for BTI 7000 Rel 10.2.0:
+                  - added new textual convention MirrorConfigType"
+    REVISION     "201205021200Z"  -- Wednesday, May 2, 12:00:00 EST 2012
+    DESCRIPTION  "Updated for BTI 7000 Rel 9.3.0:
+                  - added new XcvrProtocolType values: tenGeLanFecEPCMF,
+                    tenGeLanEFecEPCMF, otu2eFec, otu2eEFec"
+    REVISION     "201202101200Z"  -- Friday, February 10, 12:00:00 EST 2012
+    DESCRIPTION  "Updated for BTI 7000 Rel 9.2.0:
+                  - added value lf to NotifCodeType TC
+                  - added new textual convention LoopbackType"
+    REVISION     "201109261200Z"  -- Monday, September 26, 12:00:00 EST 2011
+    DESCRIPTION  "Updated for BTI 7000 Rel 9.1.0:
+                  - added values dla, rob, dcm and d40md to CpType TC
+                  - added values lolightRx to replUnitDegrade to NotifCodeType TC
+                  - added values osc, odcc, wdm and wch to NotifObjectType TC"
+    REVISION     "201008061200Z"  -- Friday, August 6, 12:00:00 EST 2010
+    DESCRIPTION  "Updated for BTI 7000 Rel 8.1.0:
+                  - changed status of ShelfConfigType TC to deprecated
+                  - added value ccm to CpType TC
+                  - added value mgmtVLan to PvxPortType TC"
+    REVISION     "201006181200Z"  -- Friday, June 18, 12:00:00 EST 2010
+    DESCRIPTION  "Updated for BTI 7000 Rel 7.3.2:
+                  - added EnvNotifCodeType TC
+                  - added environmental condition types unassigned through
+                    unsupported to NotifCodeType TC
+                  - added value env (environmental) to NotifObjectType TC"
+    REVISION     "201002121200Z"  -- Friday, February 12, 12:00:00 EST 2010
+    DESCRIPTION  "Updated for BTI 7000 Rel 7.3.0:
+                  - added values sts6c through sts72c to StsnType TC
+                  - added values vc3c and vc5c to VcnType TC
+                  - added values lockProg through tBdwUtlz to NotifCodeType TC
+                  - added values vc43c through pereCoS to NotifObjectType TC
+                  - added SyncSwEvtType textual convention used by new SONET
+                    synchronization event messages
+                  - added values gccOtu2 and generic to PvxPortType TC
+                  - added AreaID and DesignatedRouterPriority textual
+                    conventions to support OSPF feature
+                  - inserted copies of InetAddressType, InetAddress,
+                    InetAddressIPv4, InetAddressIPv6, InetAddressIPv4z,
+                    InetAddressIPv6z and InetAddressDNS TCs from RFC 4001"
+    REVISION     "200901191200Z"  -- Friday, June 19, 12:00:00 EST 2009
+    DESCRIPTION  "Updated for BTI 7000 Rel 7.2.0:
+                  - added values vc24c and vc2c to vcnType TC
+                  - renamed subOdu1Mbps155 value to subOdu1, removed unused
+                    subOdu1Mbps622 value for OdunType TC
+                  - added values default and critical-major to CondSeverity TC
+                  - added new TCs NotifCodeType and NotifObjectType to support
+                    Enhanced Trap Info and Configurable Alarm Severity features
+                  - added values testing, unknown, dormant, notPresent and
+                    lowerLayerDown to OperStatus TC
+                  - added value wideband1310 to PassivePortType TC
+                  - added value odu1otu2Fec to XcvrProtocolType TC
+                  - added new ProfileNameType TC for PVX configuration profiles"
+    REVISION     "200812191200Z"  -- Friday, December 19, 12:00:00 EST 2008
+    DESCRIPTION  "Updated for BTI 7000 Rel 7.1.2:
+                  - added new values for ProtSwEvtType TC
+                  - removed unused TC OtunType"
+    REVISION     "200810101200Z"  -- Friday, October 10, 12:00:00 EST 2008
+    DESCRIPTION  "Updated for BTI 7000 Rel 7.1.1:
+                  - spelling corrections made to TimeZone value identifiers
+                  - added textual conventions SwitchIdxType, ProtocolActionType,
+                    PvxPortType, PvxL1PortType, PowerFeedModeType"
+    REVISION     "200805301200Z"  -- Friday, May 30, 12:00:00 EST 2008
+    DESCRIPTION  "Updated for BTI 7000 Rel 7.1.0:
+    			  - replaced references to Netstender with BTI 7000
+    			  - added tpr and pvx CP types
+    			  - added tpr XCVR type
+    			  - added new TCs FCType, OdunType, OtunType
+    			  - added new values to XcvrProtocolType, BERType and PMMontype"
+    REVISION     "200709141200Z"  -- Friday, September 14, 12:00:00 EST 2007
+    DESCRIPTION  "Added a number of textual conventions: Unsigned64,
+                  InitializeCmd, OcnType, StsnType, StmnType, VcnType,
+                  MediaRateType, DuplexModeType, UpgradeCompleteStage, XCType,
+                  ProtSwOpCmd, ProtectionStatusType and PMMontype. Added new 10G
+                  protocols to XcvrProtocolType."
+    REVISION     "200707161200Z"  -- Tuesday, July 16, 12:00:00 EST 2007
+    DESCRIPTION  "Defined new textual conventions BERType and ProtSwEvtType"
+    REVISION     "200703091200Z"  -- Friday, March 9, 12:00:00 EST 2007
+    DESCRIPTION  "Added a number of textual conventions: FixedX100, ShelfType,
+                  FiberType, WDMGrid, TimeZone, AdminStatus, OperStatus,
+                  OperStatQlfr, HoursAndMinutes, PassivePortType,
+                  XcvrProtocolType, PMIntervalType, and PMValidity."
+    REVISION     "200512051200Z"  -- Monday, December 5, 12:00:00 EST 2005
+    DESCRIPTION  "Updated for Netstender Rel 4.1:
+                  - added new d32amd, wlm circuit packs
+                  - added new wm transceiver type"
+    REVISION     "200507251200Z"  -- Monday, July 25, 12:00:00 EST 2005
+    DESCRIPTION  "Updated Contact Info in Module Identity"
+    REVISION     "200502071200Z"  -- Monday, February 7, 12:00:00 EST 2005
+    DESCRIPTION  "Updated for Netstender Rel. 3.1:
+                  - added new SMF, NF, CS, WT and WR circuit packs,
+                  - added XcvrType textual convention."
+    REVISION     "200409231200Z"  -- Thursday, September 23, 12:00:00 EST 2004
+    DESCRIPTION  "Updated for Netstender Rel. 3.0:
+                  - Added new textual conventions relocated from NETSTENDER-MIB,
+                  - removed obsolete textual conventions; added new pack types"
+    REVISION     "200401291821Z"  -- Thursday, January 29, 18:21:00 EST 2004
+    DESCRIPTION  "Updated for Netstender 2060 Rel. 2.1.3:
+                  - Added display hint for FixedX10 textual convention"
+    REVISION     "200312011200Z"  -- Monday, December 1, 12:00:00 EST 2003
+    DESCRIPTION  "The initial version of this MIB module."
+    ::= { btiModules 2 }
+
+
+FixedX10 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION  "This represents a fixed point number with a single digit after
+                  the decimal point. However, because SNMP does not support
+                  floats, the value represented is the actual value multiplied
+                  by 10. To derive the actual value, divide by 10 and keep the
+                  remainder as the value after the decimal point."
+    SYNTAX       Integer32
+    
+
+FixedX100 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION  "This represents a fixed point number with two digits after the
+                  decimal point. However, because SNMP does not support floats,
+                  the value represented is the actual value multiplied by 100.
+                  To derive the actual value, divide by 100 and keep the
+                  remainder as the value after the decimal point."
+    SYNTAX       Integer32
+    
+FixedX1000 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS       current
+    DESCRIPTION  "This represents a fixed point number with 3 digits after the
+                  decimal point. However, because SNMP does not support floats,
+                  the value represented is the actual value multiplied by 1000.
+                  To derive the actual value, divide by 1000 and keep the
+                  remainder as the value after the decimal point."
+    SYNTAX       Integer32
+
+
+Unsigned64 ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Used for the transfer of 64-bit unsigned integral values. The
+                  value is based on the Counter64 type, but unlike the
+                  Counter64, it has 0-based semantics."
+    SYNTAX       Counter64
+                  
+
+InitializeCmd ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Used to initialize an integral-valued object to 0. An object
+                  defined of this type must have an access of read-write. When
+                  read, the object will return the value 'idle'. When the object
+                  is set, the only allowable value is 'initialize'. Setting the
+                  value to initialize will result in the initialization of an
+                  associated integral-valued object."
+    SYNTAX       INTEGER { idle       (1),
+                           initialize (2) }
+                  
+
+ShelfType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "An identifier that indicates if a shelf functions as a main
+                  shelf or as an expansion shelf."
+    SYNTAX       INTEGER { main      (1),
+                           expansion (2) }
+
+
+ShelfConfigType ::= TEXTUAL-CONVENTION
+    STATUS       deprecated
+    DESCRIPTION  "Identifies the configuration for a shelf based on the mix and
+                  number of single width and double width slots."
+    SYNTAX       INTEGER { twoSlot    (1),
+                           threeSlot  (2),
+                           fourSlot   (3),
+                           fiveSlot   (4),
+                           sixSlot    (5),
+                           fourSlotB  (6),
+                           fourSlotC  (7),
+                           fiveSlotB  (8),
+                           fiveSlotC  (9),
+                           unknown    (10) }
+
+
+SlotType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "An identifier that is used to indicate a type of slot on a
+                  network element shelf. The slots are differentiated based on the
+                  type of replaceable unit they accomodate. Regular slots are
+                  where most circuit packs are installed. The other types of
+                  slots are the dedicated locations for the shelf interface card
+                  and for the cooling unit."
+    SYNTAX       INTEGER { regular        (1),
+                           shelfInterface (2),
+                           coolingUnit    (3),
+                           acPowerUnit    (4) }
+
+
+CpType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A categorization of types of circuit packs available for BTI
+                  Systems equipment based on functionality provided."
+    SYNTAX       INTEGER { scp      (1),   -- Shelf Control Processor
+                           oba      (2),   -- Optical Booster Amplifier
+                           ola      (3),   -- Optical Line Amplifier
+                           olam     (4),   -- Optical Line Amplifier Midstage-access
+                           opa      (5),   -- Optical Pre-Amplifier
+                           smf60    (6),   -- 60-km SMF Dispersion Compensation Module
+                           smf80    (7),   -- 80-km SMF Dispersion Compensation Module
+                           pmt1     (12),  -- 1% Power Monitor Tap
+                           pmt2     (13),  -- 2% Power Monitor Tap
+                           msi      (14),  -- Main Shelf Interface
+                           esi      (15),  -- Extension Shelf Interface
+                           cu       (16),  -- Cooling Unit
+                           fllr     (17),  -- Filler Card
+                           smf40    (18),  -- 40-km SMF Dispersion Compensation Module
+                           osc      (20),  -- Optical Service Channel Pack
+                           c8md     (25),  -- CWDM Multiplexer-Demultiplexer
+                           c1adm    (29),  -- CWDM 1-channel Add-Drop Multiplexer
+                           cdsc     (32),  -- CDWM-DWDM Splitter-Combiner
+                           d32md1   (33),  -- DWDM Multiplexer-Demultiplexer Module 1
+                           d32md2   (34),  -- DWDM Multiplexer-Demultiplexer Module 2
+                           d32md3   (35),  -- DWDM Multiplexer-Demultiplexer Module 3
+                           d32md4   (36),  -- DWDM Multiplexer-Demultiplexer Module 4
+                           d1adm    (37),  -- DWDM 1-channel Add-Drop Multiplexer
+                           d2adm    (38),  -- DWDM 2-channel Add-Drop Multiplexer
+                           d4adm    (39),  -- DWDM 4-channel Add-Drop Multiplexer
+                           spa      (41),  -- Single Channel Pre-Amplifier
+                           oct      (43),  -- Optical Carrier Tray
+                           sba      (44),  -- Single Channel Booster Amplifier
+                           smf30    (45),  -- 30-km SMF Dispersion Compensation Module
+                           nf       (46),  -- Noise Filter
+                           wt       (47),  -- Wavelength Translator
+                           wr       (48),  -- Wavelength Regenerator
+                           cs       (49),  -- Coupler-Splitter
+                           smf5     (50),  -- 5-km SMF Dispersion Compensation Module
+                           smf10    (51),  -- 10-km SMF Dispersion Compensation Module
+                           smf15    (52),  -- 15-km SMF Dispersion Compensation Module
+                           smf20    (53),  -- 20-km SMF Dispersion Compensation Module
+                           d32amd1  (54),  -- DWDM Active Mux-Demux Module 1
+                           d32amd2  (55),  -- DWDM Active Mux-Demux Module 2
+                           d32amd3  (56),  -- DWDM Active Mux-Demux Module 3
+                           d32amd4  (57),  -- DWDM Active Mux-Demux Module 4
+                           wm       (58),  -- Wavelength Manager
+                           c8md1    (59),  -- CWDM Mux-Demux Module 1
+                           c8md2    (60),  -- CWDM Mux-Demux Module 2
+                           mxp      (61),  -- Muxponder
+                           c4md     (62),  -- CWDM 4-channel Multiplexer-Demultiplexer
+                           c2adm    (63),  -- CWDM 2-channel Add-Drop Multiplexer
+                           tpr      (64),  -- Transponder   
+                           pvx      (65),  -- Packet Vx
+                           ccm      (66),  -- CCM
+                           wc200    (67),  -- Widecast 200
+                           dla      (68),  -- DWDM Line Amplifier
+                           rob      (69),  -- ROADM on a Blade
+                           dcm      (70),  -- Dispersion Compensation Module
+                           d40md    (71),  -- DWDM 40-channel Multiplexer-Demultiplexer
+                           d96md    (72),  -- DWDM 96-channel Multiplexer-Demultiplexer
+                           lga      (73),  -- Low Gain Optical Line Amplifier
+                           mga      (74),  -- Mid Gain Optical Line Amplifier
+                           mgm      (75) } -- Mid Gain Optical Line Amplifier Midstage-access
+
+
+OaType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A categorization of types of optical amplifiers available for
+                  the BTI Systems equipment based on amplification application."
+    SYNTAX       INTEGER { oba   (1),   -- Optical Booster Amplifier
+                           ola   (2),   -- Optical Line Amplifier
+                           opa   (3),   -- Optical Pre-Amplifier
+                           olam  (4),   -- Optical Line Amplifier Midstage-access
+                           spa   (10),  -- Single Channel Pre-Amplifier
+                           sba   (11),  -- Single Channel Booster Amplifier
+                           lga   (12),  -- Low Gain Optical Line Amplifier
+                           mga   (13),  -- Mid Gain Optical Line Amplifier
+                           mgm   (14) } -- Mid Gain Optical Line Amplifier Midstage-access
+
+
+XcvrType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A categorization of types of transceiver ports on wavelength
+                  translator, regenerator or manager cards based on wavelength
+                  management application."
+    SYNTAX       INTEGER { wt   (1),   -- Wavelength Translator
+                           wr   (2),   -- Wavelength Regenerator
+                           wm   (3),   -- Wavelength Manager
+                           tpr  (4) }  -- Transponder
+
+
+AmdType ::= TEXTUAL-CONVENTION
+    STATUS       obsolete
+    DESCRIPTION  "A categorization of types of Active Multiplexer-Demultiplexer
+                  facilities, based on type of AMD module type."
+    SYNTAX       INTEGER { d32amd1   (1),   -- DWDM Active Mux-Demux Module 1
+                           d32amd2   (2),   -- DWDM Active Mux-Demux Module 2
+                           d32amd3   (3),   -- DWDM Active Mux-Demux Module 3
+                           d32amd4   (4) }  -- DWDM Active Mux-Demux Module 4
+
+
+AmdPortType ::= TEXTUAL-CONVENTION
+    STATUS       obsolete
+    DESCRIPTION  "A categorization of types of ports on an Active
+                  Multiplexer-Demultiplexer circuit pack."
+    SYNTAX       INTEGER { line       (1),    -- DWDM Active Mux-Demux Line port
+                           channel1   (2),    -- DWDM Active Mux-Demux Channel 1 port
+                           channel2   (3),    -- DWDM Active Mux-Demux Channel 2 port
+                           channel3   (4),    -- DWDM Active Mux-Demux Channel 3 port
+                           channel4   (5),    -- DWDM Active Mux-Demux Channel 4 port
+                           channel5   (6),    -- DWDM Active Mux-Demux Channel 5 port
+                           channel6   (7),    -- DWDM Active Mux-Demux Channel 6 port
+                           channel7   (8),    -- DWDM Active Mux-Demux Channel 7 port
+                           channel8   (9),    -- DWDM Active Mux-Demux Channel 8 port
+                           channel9   (10),   -- DWDM Active Mux-Demux Channel 9 port
+                           channel10  (11),   -- DWDM Active Mux-Demux Channel 10 port
+                           channel11  (12),   -- DWDM Active Mux-Demux Channel 11 port
+                           channel12  (13),   -- DWDM Active Mux-Demux Channel 12 port
+                           channel13  (14),   -- DWDM Active Mux-Demux Channel 13 port
+                           channel14  (15),   -- DWDM Active Mux-Demux Channel 14 port
+                           channel15  (16),   -- DWDM Active Mux-Demux Channel 15 port
+                           channel16  (17),   -- DWDM Active Mux-Demux Channel 16 port
+                           channel17  (18),   -- DWDM Active Mux-Demux Channel 17 port
+                           channel18  (19),   -- DWDM Active Mux-Demux Channel 18 port
+                           channel19  (20),   -- DWDM Active Mux-Demux Channel 19 port
+                           channel20  (21),   -- DWDM Active Mux-Demux Channel 20 port
+                           channel21  (22),   -- DWDM Active Mux-Demux Channel 21 port
+                           channel22  (23),   -- DWDM Active Mux-Demux Channel 22 port
+                           channel23  (24),   -- DWDM Active Mux-Demux Channel 23 port
+                           channel24  (25),   -- DWDM Active Mux-Demux Channel 24 port
+                           channel25  (26),   -- DWDM Active Mux-Demux Channel 25 port
+                           channel26  (27),   -- DWDM Active Mux-Demux Channel 26 port
+                           channel27  (28),   -- DWDM Active Mux-Demux Channel 27 port
+                           channel28  (29),   -- DWDM Active Mux-Demux Channel 28 port
+                           channel29  (30),   -- DWDM Active Mux-Demux Channel 29 port
+                           channel30  (31),   -- DWDM Active Mux-Demux Channel 30 port
+                           channel31  (32),   -- DWDM Active Mux-Demux Channel 31 port
+                           channel32  (33),   -- DWDM Active Mux-Demux Channel 32 port
+                           expansion  (34) }  -- DWDM Active Mux-Demux Expansion port
+
+
+OcnType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A categorization of types of SONET OC-N facility ports based
+                  on signal rate."
+    SYNTAX       INTEGER { oc1   (1),
+                           oc3   (2),
+                           oc12  (3),
+                           oc48  (4),
+                           oc192 (5),
+                           oc768 (6) }
+
+
+StsnType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A categorization of types of SONET STS-N facilities based on
+                  signal rate."
+    SYNTAX       INTEGER { sts1    (1),
+                           sts3c   (2),
+                           sts12c  (3),
+                           sts48c  (4),
+                           sts192c (5),
+                           sts768c (6),
+                           sts6c   (7),
+                           sts9c   (8),
+                           sts15c  (9),
+                           sts18c  (10),
+                           sts21c  (11),
+                           sts24c  (12),
+                           sts30c  (13),
+                           sts36c  (14),
+                           sts72c  (15) }
+
+
+StmnType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A categorization of types of SDH STM-N facility ports based on
+                  signal rate."
+    SYNTAX       INTEGER { stm1   (1),
+                           stm4   (2),
+                           stm16  (3),
+                           stm64  (4),
+                           stm246 (5) }
+
+
+VcnType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A categorization of types of SDH VC-N facilities based on
+                  signal rate."
+    SYNTAX       INTEGER { vc2   (1),
+                           vc3   (2),
+                           vc4   (3),
+                           vc11  (4),
+                           vc12  (5),
+                           vc4c  (6),
+                           vc6c  (7),
+                           vc7c  (8),
+                           vc8c  (9),
+                           vc12c (10),
+                           vc16c (11),
+                           vc24c (12),
+                           vc2c  (13),
+                           vc10c (14),
+                           vc3c  (15),
+                           vc5c  (16) }
+
+
+FcType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A categorization of types of Fiber Channel facility ports based on
+                  signal rate."
+    SYNTAX       INTEGER { fc1g (1),
+                           fc2g (2),
+                           fc4g (3) }
+
+
+OdunType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A categorization of types of OTN ODU-N facility ports based on
+                  signal rate."
+    SYNTAX       INTEGER { odu1             (1),
+                           odu2             (2),
+                           odu3             (3),
+                           subOdu1          (4) }
+
+
+CondReportType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "An object of this type is associated with active conditions
+                  reported in Trap messages. The condition report type is a
+                  coarse qualifier of the significance of the event that is
+                  being reported. The values defined are:
+                  - 'condition': reports non-alarmed conditions: events that are
+                  of general interest, and do not require immediate attention by
+                  an operator.
+                  - 'alarm': alarmed-conditions generally report a fault
+                  condition detected on the NE. Such events generally require
+                  immediate attention by an apropriate operator."
+    SYNTAX       INTEGER { condition (1),
+                           alarm     (2) }
+
+
+CondSeverity ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "An object of this type is associated with active conditions
+                  reported in Trap messages. The condition severity is a more
+                  specific qualifier of the urgency of the event that is being
+                  reported. The values defined are:
+                  - 'minor': attributed to the least severe alarm conditions
+                  reported
+                  - 'major': attributed to somewhat more severe alarms
+                  - 'critical': attributed to the most severe alarm conditions
+                  - 'notAlarmed': for conditions that are of significance, but
+                  do not require follow-up action
+                  - 'notReported': for conditions that are of note, but are not
+                  reported by way of notification, and are only viewable as
+                  entries in the actCondTable
+                  - 'default': used only for setting the severity of a
+                  trap back to its original value.
+                  - 'critical-major': visible only when retrieving the current
+                  setting for severity. It indicates that the severity 
+                  changes. If the corresponding entity is provisioned then
+                  the trap will be raised as critical otherwise it will be
+                  raised as major. This severity may not be set directly only
+                  by resetting a alarm to its default value."
+    SYNTAX       INTEGER { minor         (2),
+                           major         (3),
+                           critical      (4),
+                           notAlarmed    (5),
+                           notReported   (6),
+                           default       (7),
+                           critical-major(8) }
+
+
+CondServiceAffecting ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "An object of this type is associated with active conditions
+                  reported bin Trap messages. A service affecting indicator
+                  provides a clear indication of whether or not the condition
+                  being reported has impacted the system's ability to continue
+                  to carry traffic."
+    SYNTAX       INTEGER { nonServiceAffecting (1),
+                           serviceAffecting    (2) }
+
+
+NotifCodeType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A list of the types of conditions, alarms and events that may
+    			  be raised on the system."
+    SYNTAX       INTEGER { acpuFail          (1), -- AC power unit failure.
+                           acpuMiss          (2), -- AC power unit missing.
+                           acpuPlugin        (3), -- AC power unit plugged in.
+                           acpuUnk           (4), -- AC power unit unknown.
+                           acpuUnplug        (5), -- AC power unit unplugged.
+                           actLpbkF          (6), -- Facility loopback active.
+                           actLpbkT          (7), -- Terminal loopback active.
+                           ais               (8), -- Alarm indication signal.
+                           aisL              (9), -- Alarm indication signal, line layer.
+                           aisP             (10), -- Alarm indication signal, path layer.
+                           ampCond          (11), -- Amplifier conditioning.
+                           ampTrans         (12), -- Amplifier transient.
+                           applDbRstPass    (13), -- Apply DB restore passed.
+                           autoProvFail     (14), -- Auto-provisioning failed.
+                           bwMism           (15), -- Bandwidth mismatch.
+                           cMism            (16), -- Receive concatenation mismatch.
+                           cmmtUpgrdPass    (17), -- Commit upgrade passed.
+                           connMea          (18), -- Connector mismatch.
+                           contBus          (19), -- Control bus failure.
+                           contCom          (20), -- Control communications failure.
+                           cuFail           (21), -- Cooling unit failure.
+                           cuFail1uMj       (22), -- Cooling unit failure, major.
+                           cuFail1uMn       (23), -- Cooling unit failure, minor.
+                           cuFeedFailMj     (24), -- Cooling unit feed failure, major. 
+                           cuFeedFailMn     (25), -- Cooling unit feed failure, minor.
+                           cuMiss           (26), -- Cooling unit missing.
+                           cuPlugin         (27), -- Cooling unit plugged in.
+                           cuUnk            (28), -- Cooling unit unknown.
+                           cuUnplug         (29), -- Cooling unit unplugged.
+                           dbBkupFail       (30), -- Database backup failed.
+                           dbBkupPass       (31), -- Database backup passed.
+                           dbBkupProg       (32), -- Database backup in progress.
+                           dbDltProg        (33), -- Database delete in progress.
+                           dbLoadFail       (34), -- Database load failed.
+                           dbLoadPass       (35), -- Database load passed.
+                           dbRecvryFail     (36), -- Database recovery failed.
+                           dbRstProg        (37), -- Database restore in progress.
+                           dspCommFail      (38), -- DSP communications failure.
+                           eol              (39), -- End of life.
+                           esiMiss          (40), -- Expansion shelf interface missing.
+                           expShComDevUns   (41), -- Expansion shelf communications failure, device unsupported.
+                           expShComLnkDwn   (42), -- Expansion shelf communications failure, link down.
+                           expShComLos      (43), -- Expansion shelf communications failure, loss of signal.
+                           feedAFail        (44), -- Power feed A failure.
+                           feedBFail        (45), -- Power feed B failure.
+                           frcdWkSwBk       (46), -- Working forced switch back.
+                           frcdWkSwPr       (47), -- Working forced switch to protection.
+                           fuseAlarm        (48), -- Fuse alarm.
+                           gfpPlm           (49), -- Generic framing procedure payload mismatch.
+                           hiTemp           (50), -- High Temperature.
+                           invkDbDltFail    (51), -- Invoke database delete failed.
+                           invkDbDltPass    (52), -- Invoke database delete passed.
+                           invkDbRstFail    (53), -- Invoke database restore failed.
+                           invkDbRstPass    (54), -- Invoke database restore passed.
+                           invProv          (55), -- Invalid provisioning.
+                           ipLckOut         (56), -- IP locked out.
+                           linkDown         (57), -- Link down.
+                           litChn           (58), -- Lit Channel.
+                           loa              (59), -- Loss of alignment.
+                           lockoutOfPr      (60), -- Locked out of protection.
+                           lockoutOfWk      (61), -- Locked out of working.
+                           lof              (62), -- Loss of frame.
+                           lol              (63), -- Loss of lock.
+                           lom              (64), -- Loss of multiframe.
+                           lopP             (65), -- Loss of pointer, path layer.
+                           los              (66), -- Loss of signal.
+                           loSync           (67), -- Loss of synchronization.
+                           loTmRef          (68), -- Loss of timing reference.
+                           lpbk             (69), -- Loopback.
+                           manWkSwBk        (70), -- Working manual switch back.
+                           manWkSwPr        (71), -- Working manual switch to protection.
+                           normal           (72), -- Normal.
+                           obrhtso          (73), -- Optical back reflection safety override.
+                           oscLos           (74), -- OSC Loss of signal.
+                           otnPlm           (75), -- OTN payload mismatch.
+                           packUpgrdFail    (76), -- Circuit pack upgrade failure.
+                           portMea          (77), -- Port Mismatch.
+                           powerFail        (78), -- Power failure.
+                           pwrBrwnt         (79), -- Shelf power brownout.
+                           release          (80), -- Release of protection switch.
+                           relNumMea        (81), -- Release number mismatch.
+                           replUnitFail     (82), -- Replaceable unit failure.
+                           replUnitIdMea    (83), -- Replaceable unit Id mismatch.
+                           replUnitMea      (84), -- Replaceable unit mismatch.
+                           replUnitMiss     (85), -- Replaceable unit missing.
+                           replUnitPlugin   (86), -- Replaceable unit plugged in.
+                           replUnitUnk      (87), -- Replaceable unit unknown.
+                           replUnitUnplug   (88), -- Replaceable unit unplugged.
+                           replUnitUns      (89), -- Replaceable unit unsupported.
+                           rfi              (90), -- Remote failure indication.
+                           rpf              (91), -- Remote path failure.
+                           scpRestart       (92), -- SCP circuit pack restarted.
+                           scpRNChgFail     (93), -- SCP release number change failed.
+                           scpRNChgPass     (94), -- SCP release number change passed.
+                           scpRNChgProg     (95), -- SCP release number change in progress.
+                           sd               (96), -- Signal degrade.
+                           siFail           (97), -- Shelf interconnect unit failure.
+                           siMiss           (98), -- Shelf interconnect unit missing.
+                           siPlugin         (99), -- Shelf interconnect unit plugged in.
+                           siUnk           (100), -- Shelf interconnect unit unknown.
+                           siUnplug        (101), -- Shelf interconnect unit unplugged.
+                           sqm             (102), -- Loss of sequence.
+                           swBnkAFail      (103), -- Software bank A failure.
+                           swBnkBFail      (104), -- Software bank B failure.
+                           syncPri         (105), -- Synchronization, loss of primary timing reference.
+                           syncSec         (106), -- Synchronization, loss of secondary timing reference.
+                           sysChkFail      (107), -- Check upgrade failed.
+                           sysChkPass      (108), -- Check upgrade passed.
+                           sysCom          (109), -- System communications failure.
+                           sysLoadFail     (110), -- Software load failed.
+                           sysLoadPass     (111), -- Software load passed.
+                           sysUpgrdFail    (112), -- System upgrade failed.
+                           sysUpgrdPass    (113), -- System upgrade passed.
+                           sysUpgrdProg    (114), -- System upgrade in progress.
+                           tCv             (115), -- Coding violations threshold exceeded.
+                           tCvL            (116), -- Line layer coding violations threshold exceeded.
+                           tCvOtu          (117), -- OTU layer coding violations threshold exceeded.
+                           tCvP            (118), -- Path layer coding violations threshold exceeded.
+                           tCvS            (119), -- Section layer coding violations threshold exceeded.
+                           tEb             (120), -- Errored blocks threshold exceeded.
+                           tEs             (121), -- Errored seconds threshold exceeded.
+                           tEsL            (122), -- Line layer errored seconds threshold exceeded.
+                           tEsP            (123), -- Path layer errored seconds threshold exceeded.
+                           tEsS            (124), -- Section layer errored seconds threshold exceeded.
+                           tFcP            (125), -- Path layer failure count threshold exceeded.
+                           tFcseRx         (126), -- Received FCS errors threshold exceeded.
+                           tFrdr           (127), -- Dropped frames threshold exceeded.
+                           tFrer           (128), -- Frame errors threshold exceeded.
+                           tFrgt           (129), -- Fragments threshold exceeded.
+                           tHpBbe          (130), -- High order path background block errors threshold exceeded.
+                           tHpEb           (131), -- High order path errored blocks threshold exceeded.
+                           tHpEs           (132), -- High order path errored seconds threshold exceeded.
+                           tHpSes          (133), -- High order path severely errored seconds threshold exceeded.
+                           tHpUas          (134), -- High order path unavailable seconds threshold exceeded.
+                           tInvBlk         (135), -- High order path invalid blocks threshold exceeded.
+                           tJabr           (136), -- Jabbers threshold exceeded.
+                           tMsBbe          (137), -- Multiplex section background block errors threshold exceeded.
+                           tMsEb           (138), -- Multiplex section errored blocks threshold exceeded.
+                           tMsEs           (139), -- Multiplex section errored seconds threshold exceeded.
+                           tMsSes          (140), -- Multiplex section severely errored seconds threshold exceeded.
+                           tMsUas          (141), -- Multiplex section unavailable seconds threshold exceeded.
+                           tNumBitsCr      (142), -- Number of bits corrected threshold exceeded.
+                           tNumBytesCr     (143), -- Number of bytes corrected threshold exceeded.
+                        --   tObrHt          (144), Optical back reflection high threshold.
+                           tOsize          (145), -- Oversize threshold exceeded.
+                           tOtuBbe         (146), -- OTU layer background block errors threshold exceeded.
+                           tOtuEb          (147), -- OTU layer errored blocks threshold exceeded.
+                           tOtuEs          (148), -- OTU layer errored seconds threshold exceeded.
+                           tOtuOfs         (149), -- OTU layer out-of-frame seconds threshold exceeded.
+                           tOtuSes         (150), -- OTU layer severely errored seconds threshold exceeded.
+                           tOtuUas         (151), -- OTU layer unavailable seconds threshold exceeded.
+                           tRsBbe          (152), -- Regenerator section background block errors threshold exceeded.
+                           tRsEb           (153), -- Regenerator section errored blocks threshold exceeded.
+                           tRsEs           (154), -- Regenerator section errored seconds threshold exceeded.
+                           tRsOfs          (155), -- Regenerator section out-of-frame seconds threshold exceeded.
+                           tRsSes          (156), -- Regenerator section severely errored seconds threshold exceeded.
+                           tRsUas          (157), -- Regenerator section unavailable seconds threshold exceeded.
+                           tSefs           (158), -- Severely errored frame seconds threshold exceeded.
+                           tSefsOtu        (159), -- OTU layer severely errored frame seconds threshold exceeded.
+                           tSefsS          (160), -- Section layer severely errored frame seconds threshold exceeded.
+                           tSemOtu         (161), -- OTU layer severely errored multiframe seconds threshold exceeded.
+                           tSes            (162), -- Severely errored seconds threshold exceeded.
+                           tSesL           (163), -- Line layer severely errored seconds threshold exceeded.
+                           tSesP           (164), -- Path layer severely errored seconds threshold exceeded.
+                           tSesS           (165), -- Section layer severely errored seconds threshold exceeded.
+                           tTfrcRx         (166), -- Total frame count received threshold exceeded.
+                           tTfrcTx         (167), -- Total frame count transmitted threshold exceeded.
+                           tUas            (168), -- Unavailable seconds threshold exceeded.
+                           tUasL           (169), -- Line layer unavailable seconds threshold exceeded.
+                           tUasS           (170), -- Section layer unavailable seconds threshold exceeded.
+                           tUasP           (171), -- Path layer unavailable seconds threshold exceeded.
+                           tUncrCdWrd      (172), -- Uncorrectable codewords threshold exceeded.
+                           tUsize          (173), -- Undersize threshold exceeded.
+                           tWavelength     (174), -- Wavelength tolerance threshold exceeded.
+                           talna           (175), -- Target attenuation level not achieved.
+                           tCtempHt        (176), -- Case temperature high threshold exceeded.
+                           tCtempHts       (177), -- Case temperature shutdown threshold exceeded.
+                           tim             (178), -- Trace input mismatch.
+                           tLtempHts       (179), -- Laser temperature high shutdown threshold exceeded.
+                           tLtempLts       (180), -- Laser temperature low shutdown threshold exceeded.
+                           tMsLossHt       (181), -- Mid-stage insertion loss high threshold exceeded.
+                           tObrHt          (182), -- Optical back reflection high threshold exceeded.
+                           tObrHts         (183), -- Optical back reflection safety threshold exceeded.
+                           tOprBht         (184), -- Blue optical power received high threshold exceeded.
+                           tOprHt          (185), -- Optical power received high threshold exceeded.
+                           tOprLt          (186), -- Optical power received low threshold exceeded.
+                           tOprRht         (187), -- Red optical power received high threshold exceeded.
+                           tOptBht         (188), -- Blue optical power transmitted high threshold exceeded.
+                           tOptBlt         (189), -- Blue optical power transmitted low threshold exceeded.
+                           tOptHt          (190), -- Optical power transmitted high threshold exceeded.
+                           tOptLt          (191), -- Optical power transmitted low threshold exceeded.
+                           tOptRht         (192), -- Red optical power transmitted high threshold exceeded.
+                           tOptRlt         (193), -- Red optical power transmitted low threshold exceeded.
+                           tplna           (194), -- Target power level not achieved.
+                           tSSIOprHt       (195), -- Second stage input optical power received high threshold exceeded.
+                           tTempHt         (196), -- Temperature high threshold exceeded.
+                           uneqP           (197), -- Receive unequipped, path layer.
+                           upgrdProg       (198), -- Circuit pack upgrade in progress.
+                           usrLckout       (199), -- User locked out.
+                           wkSwBk          (200), -- Working switched back.
+                           wkSwPr          (201), -- Working switched to protection.
+                           wna             (202), -- Wavelength not achievable.
+                           oduPlm          (203), -- ODU payload mismatch.
+                           oci             (204), -- ODU Open Connection Indication
+                           srvrUnReachable (205), -- NTP server not reachable
+                           srvrUnRspsive   (206), -- NTP server not responsive
+                           authenFailed    (207), -- NTP authentication failed 
+                           otuTti          (208), -- OTU Trail Trace Indicator Mismatch
+                           bdi             (209), -- Backward Defect Indicator
+                           lockProg        (210), -- Locking on signal in progress.
+                           syncSwitchPri   (211), -- Synchronization, timing reference switch to primary.
+                           syncSwitchSec   (212), -- Synchronization, timing reference switch to secondary.
+                           syncSwitchInt   (213), -- Synchronization, timing reference switch to internal.
+                           tBdwUtlz        (214), -- Bandwidth utilization threshold exceeded.
+                           unassigned      (215), -- Unassigned - applies to unconfigured environmental alarms.
+                           airCompr        (216), -- Air compressor failure
+                           airCond         (217), -- Air conditioning failure
+                           airDryr         (218), -- Air dryer failure
+                           batDschrd       (219), -- Battery discharging
+                           battery         (220), -- Battery failure
+                           clFan           (221), -- Cooling fan failure
+                           cpMajor         (222), -- Centralized Power Major Environmental Alarm
+                           cpMinor         (223), -- Centralized Power Minor Environmental Alarm
+                           doorOpen        (224), -- Door Open
+                           engine          (225), -- Engine failure
+                           engOprg         (226), -- Engine operating
+                           explGs          (227), -- Explosive gas
+                           firDetr         (228), -- Fire detector failure
+                           fire            (229), -- Fire
+                           flood           (230), -- Flood
+                           fuse            (231), -- Fuse failure
+                           gen             (232), -- Generator failure
+                           generic         (233), -- Generic condition
+                           hiAir           (234), -- High airflow
+                           hiHum           (235), -- High humidity
+                           hiWind          (236), -- High Wind
+                           hiWtr           (237), -- High water
+                           iceBuildup      (238), -- Ice buildup
+                           intruder        (239), -- Intrusion
+                           lwBatvg         (240), -- Low battery voltage
+                           lwFuel          (241), -- Low fuel
+                           lwHum           (242), -- Low humidity
+                           lwPres          (243), -- Low cable pressure
+                           lwTemp          (244), -- Low temperature
+                           lwWtr           (245), -- Low water
+                           misc            (246), -- Miscellaneous
+                           openDr          (247), -- Open door
+                           power           (248), -- Commercial power failure
+                           pump            (249), -- Pump failure
+                           rect            (250), -- Rectifier failure
+                           rectHi          (251), -- Rectifier high voltage
+                           rectLo          (252), -- Rectifier low voltage
+                           smoke           (253), -- Smoke
+                           toxicGas        (254), -- Toxic gas
+                           ventn           (255), -- Ventilation system failure
+                           unsupported     (256), -- Housekeeping input unsupported
+                           flFarEnd        (257), -- far end frame loss exceeds threshold
+                           flNearEnd       (258), -- near end frame loss enceeds threshold
+                           delayMax        (259), -- 2 way delay maximum exceeds threshold
+                           delayAvg        (260), -- 2 way delay average exceeds threshold
+                           delayVarMax     (261), -- 2 way delay variation maximum exceeds threshold
+                           delayVarAvg     (262), -- 2 way dealy variation average exceeds threshold
+                           lolightRx       (263), -- Loss of light, receive
+                           lolightTx       (264), -- Loss of light, transmit
+                           feim            (265), -- Far-end node identification mismatch
+                           feci            (266), -- Far-end node configuration mismatch
+                           contComS        (267), -- Control comms failure, span section
+                           contComE        (268), -- Control comms failure, eqlz. section
+                           loSpecRx        (269), -- Loss out of specification, receive
+                           tLossRxHt       (270), -- Loss high threshold exceeded, receive
+                           iaocp           (271), -- Invalid amplifier operating cfg., Pre-amp
+                           iaocm           (272), -- Invalid amplifier operating cfg., Mid-amp
+                           iaocb           (273), -- Invalid amplifier operating cfg., Boost-amp
+                           apsd            (274), -- Automatic power shutdown
+                           pmi             (275), -- Payload missing indication
+                           uneqO           (276), -- Optical channel unequipped
+                           aisO            (277), -- Alarm indication signal, optical
+                           posRx           (278), -- Power out of specification, receive
+                           posTx           (279), -- Power out of specification, transmit
+                           tObros          (280), -- Optical back reflection out of specification.
+                           chnDfc          (281), -- Channel count deficiency
+                           replUnitDegrade (282), -- Replaceable unit degrade
+                           lf              (283), -- local failure
+                           cnxMea          (284), -- Connection Mismatch
+                           cnxVldTmout     (285), -- Connection Validation Timeout
+                           posRxHigh       (286), -- Receive power out of specification, High
+                           posRxLow        (287), -- Receive power out of specification, Low
+                           oprHighFail     (288), -- Optical Power Received High Fail
+                           feedAFuseFail   (289), -- Power feed A fuse failure.
+                           feedBFuseFail   (290), -- Power feed B fuse failure.
+                           packPowerFail   (291), -- Pack Power failure.
+                           hts             (292), -- High temperature shutdown.
+                           htThreshExceeded(293), -- High temperature threshold exceeded.
+                           htsThreshExceeded(294), -- High temperature shutdown threshold exceeded.
+                           htasUnsupported (295), -- High temperature auto shutdown unsupported.
+                           rcvdLockout     (296), -- Received Lockout Cond
+						   lsrManOff       (297), -- Laser Manual Off Cond
+                           tSSIOprLt       (298), -- Second stage input optical power received low threshold exceeded.
+                           tFSOOptHt       (299), -- First stage output optical power transmitted high threshold exceeded.
+                           tFSOOptLt       (300), -- First stage output optical power transmitted low threshold exceeded.
+                           ssiLoLightRx    (301), -- Second stage input Loss of light, receive
+                           ssiPosRxHigh    (302), -- Second stage input Receive power out of specification, High
+                           ssiPosRxLow     (303), -- Second stage input Receive power out of specification, Low
+                           pwrnaTx         (304), -- Power not achievable, transmit.
+                           gainnaTx        (305), -- Gain not achievable, transmit.
+                           tiltnaTx        (306), -- Tilt not achievable, transmit.
+                           rdi             (307), -- remote defect indication
+                           plm             (308), -- payload mismatch
+                           prdi            (309), -- path remote defect indication
+                           oduAis          (310)} -- ODU alarm indication signal  
+
+
+
+EnvNotifCodeType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A list of the types of environmental conditions and alarms that may
+    			  be raised on the system. It is a subset of the list of all alarms,
+    			  conditions and event types identified in the NotifCodeType textual
+    			  convention."
+    SYNTAX       INTEGER { hiTemp          (50), -- High Temperature
+                           unassigned     (215), -- Unassigned - applies to unconfigured environmental alarms.
+                           airCompr       (216), -- Air compressor failure
+                           airCond        (217), -- Air conditioning failure
+                           airDryr        (218), -- Air dryer failure
+                           batDschrd      (219), -- Battery discharging
+                           battery        (220), -- Battery failure
+                           clFan          (221), -- Cooling fan failure
+                           cpMajor        (222), -- Centralized Power Major Environmental Alarm
+                           cpMinor        (223), -- Centralized Power Minor Environmental Alarm
+                           doorOpen       (224), -- Door Open
+                           engine         (225), -- Engine failure
+                           engOprg        (226), -- Engine operating
+                           explGs         (227), -- Explosive gas
+                           firDetr        (228), -- Fire detector failure
+                           fire           (229), -- Fire
+                           flood          (230), -- Flood
+                           fuse           (231), -- Fuse failure
+                           gen            (232), -- Generator failure
+                           generic        (233), -- Generic condition
+                           hiAir          (234), -- High airflow
+                           hiHum          (235), -- High humidity
+                           hiWind         (236), -- High Wind
+                           hiWtr          (237), -- High water
+                           iceBuildup     (238), -- Ice buildup
+                           intruder       (239), -- Intrusion
+                           lwBatvg        (240), -- Low battery voltage
+                           lwFuel         (241), -- Low fuel
+                           lwHum          (242), -- Low humidity
+                           lwPres         (243), -- Low cable pressure
+                           lwTemp         (244), -- Low temperature
+                           lwWtr          (245), -- Low water
+                           misc           (246), -- Miscellaneous
+                           openDr         (247), -- Open door
+                           power          (248), -- Commercial power failure
+                           pump           (249), -- Pump failure
+                           rect           (250), -- Rectifier failure
+                           rectHi         (251), -- Rectifier high voltage
+                           rectLo         (252), -- Rectifier low voltage
+                           smoke          (253), -- Smoke
+                           toxicGas       (254), -- Toxic gas
+                           ventn          (255)} -- Ventilation system failure
+
+
+
+NotifObjectType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A list of the types of objects on the system against which
+                  conditions, alarms and events may be raised."
+    SYNTAX       INTEGER { amd     (1),
+                           eqpt    (2),
+                           fc      (3),
+                           fe      (4),
+                           ge      (5),
+                           ip      (6),
+                           oc12    (7),
+                           oc192   (8),
+                           oc3     (9),
+                           oc48    (10),
+                           oa      (11),
+                           ospf    (12),
+                           port    (13),
+                           stm1    (14),
+                           stm16   (15),
+                           stm4    (16),
+                           stm64   (17),
+                           sts1    (18),
+                           sts12c  (19),
+                           sts3c   (20),
+                           sts48c  (21),
+                           vc4     (22),
+                           vc412c  (23),
+                           vc416c  (24),
+                           vc424c  (25),
+                           vc44c   (26),
+                           vc46c   (27),
+                           vc47c   (28),
+                           vc48c   (29),
+                           xcvr    (30),
+                           lag     (31),
+                           secu    (32),
+                           xge     (33),
+                           bri     (34),
+                           odu1    (35),
+                           subodu1 (36),
+                           vc42c   (37),
+                           vc410c  (38),
+                           vc43c   (39),
+                           vc45c   (40),
+                           sts6c   (41),
+                           sts9c   (42),
+                           sts15c  (43),
+                           sts18c  (44),
+                           sts21c  (45),
+                           sts24c  (46),
+                           sts30c  (47),
+                           sts36c  (48),
+                           sts72c  (49),
+                           perEvc  (50),
+                           perCos  (51),
+                           env     (52),
+                           slaMsmt (53),
+                           osc     (54),
+                           odcc    (55),
+                           wdm     (56),
+                           wch     (57),
+                           ntpassoc(58)}
+    
+    
+FiberType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "The types of optical fiber that may be used in fiber optic
+                  system networks."
+    SYNTAX       INTEGER { none      (1),
+                           dsf       (2),
+                           ndsf      (3),
+                           nzdsf     (4),
+                           multimode (5) }
+
+
+WDMGrid ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "The types of optical grid schemes that may be in use for
+                  wavelength division multiplexing according to spacing of
+                  optical wavelengths."
+    SYNTAX       INTEGER { none   (1),
+                           ghz50  (2),  -- 50 GHz spacing
+                           ghz100 (3),  -- 100 GHz spacing
+                           ghz200 (4),  -- 200 GHz spacing
+                           nm20   (5) } -- 20 nm spacing
+
+
+TimeZone ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A list of world time zones based on geo-political
+                  identifiers."
+    SYNTAX       INTEGER { afghanistan                             (1),
+                           albania                                 (2),
+                           algeria                                 (3),
+                           americanSamoa                           (4),
+                           andorra                                 (5),
+                           argentina                               (6),
+                           argentinaWesternProv                    (7),
+                           anguilla                                (8),
+                           antarctica                              (9),
+                           antarcticaDavis                         (10),
+                           antarcticaDumontDurville                (11),
+                           antarcticaMawson                        (12),
+                           antigua                                 (13),
+                           armenia                                 (14),
+                           aruba                                   (15),
+                           ascension                               (16),
+                           australiaAustralianCapitalTerritory     (17),
+                           australiaLordHoweIsland                 (18),
+                           australiaNewSouthWales                  (19),
+                           australiaNorthernTerritory              (20),
+                           australiaQueensland                     (21),
+                           australiaSouth                          (22),
+                           australiaTasmania                       (23),
+                           australiaVictoria                       (24),
+                           australiaWestern                        (25),
+                           austria                                 (26),
+                           azerbaijan                             (27),
+                           azores                                  (28),
+                           bahamas                                 (29),
+                           bahrain                                 (30),
+                           balearicIslands                         (31),
+                           bangladesh                              (32),
+                           barbados                                (33),
+                           belarus                                 (34),
+                           belgium                                 (35),
+                           belize                                  (36),
+                           benin                                   (37),
+                           bermuda                                 (38),
+                           bhutan                                  (39),
+                           bolivia                                 (40),
+                           bonaire                                 (41),
+                           bosniaHercegovina                       (42),
+                           botswana                                (43),
+                           brazilAcre                              (44),
+                           brazilAtlanticIslands                   (45),
+                           brazilEast                              (46),
+                           brazilWest                              (47),
+                           britishIndianOceanTerritoryChagos       (48),
+                           britishVirginIslands                    (49),
+                           brunei                                  (50),
+                           bulgaria                                (51),
+                           burkinaFaso                             (52),
+                           burundi                                 (53),
+                           cambodia                                (54),
+                           cameroon                                (55),
+                           canadaAtlantic                          (56),
+                           canadaCentral                           (57),
+                           canadaEastern                           (58),
+                           canadaMountain                          (59),
+                           canadaNewfoundland                      (60),
+                           canadaPacificYukon                      (61),
+                           canadaSaskatchewan                      (62),
+                           canaryIslands                           (63),
+                           cantonEnderburyIslands                  (64),
+                           capeVerde                               (65),
+                           carolineIslands                         (66),
+                           caymanIslands                           (67),
+                           centralAfricanRepublic                  (68),
+                           chad                                    (69),
+                           channelIslands                          (70),
+                           chathamIsland                           (71),
+                           chile                                   (72),
+                           chinaPeoplesRepublic                    (73),
+                           christmasIslands                        (74),
+                           cocosIslands                            (75),
+                           colombia                                (76),
+                           congo                                   (77),
+                           cookIslands                             (78),
+                           costaRica                               (79),
+                           coteDivoire                             (80),
+                           croatia                                 (81),
+                           cuba                                    (82),
+                           curacao                                 (83),
+                           cyprus                                  (84),
+                           czechRepublic                           (85),
+                           denmark                                 (86),
+                           djibouti                                (87),
+                           dominica                                (88),
+                           dominicanRepublic                       (89),
+                           easterIsland                            (90),
+                           ecuador                                 (91),
+                           egypt                                   (92),
+                           elSalvador                              (93),
+                           england                                 (94),
+                           equatorialGuinea                        (95),
+                           eritrea                                 (96),
+                           estonia                                 (97),
+                           ethiopia                                (98),
+                           falklandIslands                         (99),
+                           faroeIsland                             (100),
+                           fiji                                    (101),
+                           finland                                 (102),
+                           france                                  (103),
+                           francePierreMiquelon                    (104),
+                           frenchGuiana                            (105),
+                           frenchPolynesia                         (106),
+                           gabon                                   (107),
+                           galapagos                               (108),
+                           gambia                                  (109),
+                           gambierIsland                           (110),
+                           georgia                                 (111),
+                           germany                                 (112),
+                           ghana                                   (113),
+                           gibraltar                               (114),
+                           greece                                  (115),
+                           greenland                               (116),
+                           greenlandScoresbysun                    (117),
+                           greenlandThule                          (118),
+                           greenwichMeanTimeUtc                    (119),
+                           grenada                                 (120),
+                           grenadines                              (121),
+                           guadeloupe                              (122),
+                           guam                                    (123),
+                           guatemala                               (124),
+                           guinea                                  (125),
+                           guineaBissau                            (126),
+                           guyana                                  (127),
+                           haiti                                   (128),
+                           honduras                                (129),
+                           hongKong                                (130),
+                           hungary                                 (131),
+                           iceland                                 (132),
+                           india                                   (133),
+                           indonesiaCentral                        (134),
+                           indonesiaEast                           (135),
+                           indonesiaWest                           (136),
+                           iraq                                   (137),
+                           iran                                    (138),
+                           irelandRepublicOf                       (139),
+                           israel                                  (140),
+                           italy                                   (141),
+                           jamaica                                 (142),
+                           japan                                   (143),
+                           johnstonIsland                          (144),
+                           jordan                                  (145),
+                           kazakhstan                              (146),
+                           kenya                                   (147),
+                           kiribati                                (148),
+                           kiribatiPhoenixIslands                  (149),
+                           koreaDemRepublicOf                      (150),
+                           koreaRepublicOf                         (151),
+                           kosrae                                  (152),
+                           kuwait                                  (153),
+                           kwajalein                               (154),
+                           kyrgyzstan                              (155),
+                           laos                                    (156),
+                           latvia                                  (157),
+                           lebanon                                 (158),
+                           leewardIslands                          (159),
+                           lesotho                                 (160),
+                           liberia                                 (161),
+                           libya                                   (162),
+                           liechtenstein                           (163),
+                           lithuania                               (164),
+                           luxembourg                              (165),
+                           macedonia                               (166),
+                           madagascar                              (167),
+                           madeira                                 (168),
+                           malawi                                  (169),
+                           malaysia                                (170),
+                           maldives                                (171),
+                           mali                                    (172),
+                           mallorcaIsland                          (173),
+                           malta                                   (174),
+                           marianaIsland                           (175),
+                           marquesasIslands                        (176),
+                           marshallIsland                          (177),
+                           martinique                              (178),
+                           mauritania                              (179),
+                           mauritius                               (180),
+                           mayotte                                 (181),
+                           melilla                                 (182),
+                           mexico                                  (183),
+                           mexicoBajaCalifnorte                    (184),
+                           mexicoNayarit                           (185),
+                           mexicoSinaloa                           (186),
+                           mexicoSonora                            (187),
+                           midwayIsland                            (188),
+                           moldova                                 (189),
+                           moldovianreppridnestrovye               (190),
+                           moluccas                                (191),
+                           monaco                                  (192),
+                           mongolia                                (193),
+                           morocco                                 (194),
+                           mozambique                              (195),
+                           myanmar                                 (196),
+                           namibia                                 (197),
+                           nauruRepublicOf                         (198),
+                           nepal                                   (199),
+                           netherlands                             (200),
+                           netherlandsAntilles                     (201),
+                           nevisMontserrat                         (202),
+                           newCaledonia                            (203),
+                           newHebrides                             (204),
+                           newZealand                              (205),
+                           newZealandTokelauIslands                (206),
+                           nicaragua                               (207),
+                           niger                                   (208),
+                           nigeria                                 (209),
+                           niueIsland                              (210),
+                           norfolkIsland                           (211),
+                           northernIreland                         (212),
+                           northernMarianaIslands                  (213),
+                           northSumatra                            (214),
+                           norway                                  (215),
+                           oman                                    (216),
+                           pakistan                                (217),
+                           palau                                   (218),
+                           panama                                  (219),
+                           papuaNewGuinea                          (220),
+                           paraguay                                (221),
+                           peru                                    (222),
+                           philippines                             (223),
+                           pingelap                                (224),
+                           poland                                  (225),
+                           ponapeIsland                            (226),
+                           portugal                                (227),
+                           principeIsland                          (228),
+                           puertoRico                              (229),
+                           qatar                                   (230),
+                           reunion                                 (231),
+                           romania                                 (232),
+                           russianFederationChitayakutsk           (233),
+                           russianFederationIrkutskulanude         (234),
+                           russianFederationKaliningrad            (235),
+                           russianFederationKamchatkaanadyr        (236),
+                           russianFederationKrasnoyarsktomsk       (237),
+                           russianFederationMagadankolyma          (238),
+                           russianFederationMoscowStPetersburg     (239),
+                           russianFederationNovosibirskomsk        (240),
+                           russianFederationSamaraizhevsk          (241),
+                           russianFederationVladivostokkhabarovsk  (242),
+                           russianFederationYekaterinburgperm      (243),
+                           rwanda                                  (244),
+                           saba                                    (245),
+                           samoa                                   (246),
+                           sanMarino                               (247),
+                           saotomePrincipe                         (248),
+                           saudiArabia                             (249),
+                           scotland                                (250),
+                           senegal                                 (251),
+                           seychelles                              (252),
+                           sierraLeone                             (253),
+                           singapore                               (254),
+                           slovakia                                (255),
+                           slovenia                                (256),
+                           societyIsland                           (257),
+                           solomonIslands                          (258),
+                           somalia                                 (259),
+                           southAfrica                             (260),
+                           southSumatra                           (261),
+                           spain                                   (262),
+                           sriLanka                                (263),
+                           stChristopher                           (264),
+                           stCroix                                 (265),
+                           stHelena                                (266),
+                           stJohn                                  (267),
+                           stKittsNevis                            (268),
+                           stLucia                                 (269),
+                           stMaarten                               (270),
+                           stPierreMiquelon                        (271),
+                           stThomas                                (272),
+                           stVincent                               (273),
+                           sudan                                   (274),
+                           suriname                                (275),
+                           swaziland                               (276),
+                           sweden                                  (277),
+                           switzerland                             (278),
+                           syria                                   (279),
+                           tahiti                                  (280),
+                           taiwan                                  (281),
+                           tajikistan                              (282),
+                           tanzania                                (283),
+                           thailand                                (284),
+                           togo                                    (285),
+                           tonga                                   (286),
+                           trinidadAndTobago                       (287),
+                           tuamotuIsland                           (288),
+                           tubuaiIsland                            (289),
+                           tunisia                                 (290),
+                           turkey                                  (291),
+                           turkmenistan                            (292),
+                           turksAndCaicosIslands                   (293),
+                           tuvalu                                  (294),
+                           uganda                                  (295),
+                           ukraine                                 (296),
+                           unitedArabEmirates                      (297),
+                           unitedKingdom                           (298),
+                           uruguay                                 (299),
+                           usaAlaska                               (300),
+                           usaAleutian                             (301),
+                           usaArizona                              (302),
+                           usaCentral                              (303),
+                           usaEastern                              (304),
+                           usaHawaii                               (305),
+                           usaIndianaEast                          (306),
+                           usaMountain                             (307),
+                           usaPacific                              (308),
+                           uzbekistan                              (309),
+                           vanuatu                                 (310),
+                           vaticanCity                             (311),
+                           venezuela                               (312),
+                           vietnam                                 (313),
+                           virginIslands                           (314),
+                           wakeIsland                              (315),
+                           wales                                   (316),
+                           wallisAndFutunaIslands                  (317),
+                           westernSahara                           (318),
+                           windwardIslands                         (319),
+                           yemen                                   (320),
+                           yugoslavia                              (321),
+                           zaireHautZaire                          (322),
+                           zaireKasai                              (323),
+                           zaireKinshasaMbandaka                   (324),
+                           zaireKivu                               (325),
+                           zaireShaba                              (326),
+                           zambia                                  (327),
+                           zimbabwe                                (328) }
+
+
+AdminStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "An indicator of the status of a resource according to whether
+                  or not the resource has been administratively enabled or
+                  disabled to perform its provisioned function."
+    SYNTAX       INTEGER { enabled     (1),
+                           disabled    (2),
+                           autoEnabled (3) }
+
+
+OperStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "An indicator of the status of a resource according to whether
+                  or not it is both enabled to perform its function and capable
+                  of performing its function."
+    SYNTAX       INTEGER { up   (1),
+                           down (2),
+                           testing(3),   -- in some test mode
+                           unknown(4),   -- status can not be determined
+                                         -- for some reason.
+                           dormant(5),
+                           notPresent(6),    -- some component is missing
+                           lowerLayerDown(7) -- down due to state of
+                                             -- lower-layer interface(s)
+                         }
+
+
+OperStatQlfr ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A qualification of the operational status of a resource. The
+                  information is in the form of a textual display string, which
+                  lists 0 or more comma-delimited qualification identifiers. The
+                  set of qualifiers includes:
+                  - nr: Normal
+                  - anr: Abnormal
+                  - au: Autonomous
+                  - auma: Autonomous Management
+                  - ma: Management
+                  - maanr: Management Abnormal
+                  - ains: Auto In-service (Auto-enabled)
+                  - flt: Fault
+                  - mea: Mismatch
+                  - swdl: Software Download
+                  - mt: Maintenance
+                  - sgeo: Supporting Entity Outage
+                  - ueq: Unequipped
+                  - wrk: Working
+                  - comm: Communication Failure
+                  - lpbk: Loopback
+                  - stdby: Standby
+                  - frcd: Forced
+                  - lkdo: Locked Out"
+    SYNTAX       OCTET STRING (SIZE (1..65))
+
+
+HoursAndMinutes ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "7a"
+    STATUS       current
+    DESCRIPTION  "A textual string representation of a time duration value
+                  expressed as the number of hours and minutes. The format of
+                  the string is to be HHH-MM, where
+                  - HHH is the number of hours and can be 0 to 999
+                  - MM is the number of minutes and can be 0 to 59.
+                  
+                  The '-' character must be used to separate the hours and
+                  minutes values, and the string is expected to be
+                  NULL-terminated."
+    SYNTAX       OCTET STRING (SIZE (0..7))
+
+
+PassivePortType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A listing of port types found on passive circuit packs."
+    SYNTAX       INTEGER { channel1      (1),
+                           channel2      (2),
+                           channel3      (3),
+                           channel4      (4),
+                           channel5      (5),
+                           channel6      (6),
+                           channel7      (7),
+                           channel8      (8),
+                           channel9      (9),
+                           channel10     (10),
+                           channel11     (11),
+                           channel12     (12),
+                           channel13     (13),
+                           channel14     (14),
+                           channel15     (15),
+                           channel16     (16),
+                           channel17     (17),
+                           channel18     (18),
+                           channel19     (19),
+                           channel20     (20),
+                           channel21     (21),
+                           channel22     (22),
+                           channel23     (23),
+                           channel24     (24),
+                           channel25     (25),
+                           channel26     (26),
+                           channel27     (27),
+                           channel28     (28),
+                           channel29     (29),
+                           channel30     (30),
+                           channel31     (31),
+                           channel32     (32),
+                           line          (33),
+                           cband         (34),
+                           passthru      (35),
+                           upgrade       (36),
+                           cwdm          (37),
+                           dwdm          (38),
+                           blue          (39),
+                           red           (40),
+                           channel53     (41),
+                           channel55     (42),
+                           channel57     (43),
+                           channel59     (44),
+                           wideband1310  (45) }
+
+
+XcvrProtocolType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A listing of the types of communication protocols that a
+                  optical transceiver port can be configured to carry."
+    SYNTAX       INTEGER { none         (1), 
+                           autodetect   (2),   -- Auto Detection mode
+                           escon        (3),   -- IBM Enterprise System Connection
+                           fc100        (4),   -- 100 MBps Fiber Channel
+                           fc200        (5),   -- 200 MBps Fiber Channel
+                           fddi         (6),   -- Fiber Distributed Data Interface
+                           fe           (7),   -- 100 Mbps Ethernet
+                           ge           (8),   -- Gigabit Ethernet
+                           oc3          (9),   -- SONET OC-3
+                           oc12         (10),  -- SONET OC-12
+                           oc48         (11),  -- SONET OC-48
+                           oc48fec      (12),  -- SONET OC-48 w/ Forward Error Correction
+                           smpte259     (13),  -- 270 Mbps Digital Video (SDI)
+                           smpte344     (14),  -- 540 Mbps Digital Video (SDI)
+                           smpte292     (15),  -- 1.485 Gbps HDTV
+                           stm1         (16),  -- SDH STM-1
+                           stm4         (17),  -- SDH STM-4
+                           stm16        (18),  -- SDH STM-16
+                           tenGeLan     (19),  -- 10 Gigabit Ethernet LAN
+                           tenGeLanFec  (20),  -- 10 GE LAN w/ Forward Error Correction
+                           oc192        (21),  -- SONET OC-192
+                           oc192Fec     (22),  -- SONET OC-192 w/ Forward Error Correction
+                           stm64        (23),  -- SDH STM-64
+                           stm64Fec     (24),  -- SDH STM-64 w/ Forward Error Correction
+                           fc400        (25),  -- 400 MBps Fiber Channel
+                           fc1200       (26),  -- 1200 MBps Fiber Channel
+                           tenGeLanEFec (27),  -- 10 GE LAN w/ Enhanced Forward Error Correction
+                           oc192EFec    (28),  -- SONET OC-192 w/ Enhanced Forward Error Correction
+                           stm64EFec    (29),  -- SDH STM-64 w/ Enhanced Forward Error Correction
+                           odu1otu2Fec  (30),  -- OTU Transparency
+                           tenGeLanFecEPCMF  (31),   -- 10 GE LAN FEC Extended Payload w/ Client Management Frame Fault Forwarding  
+                           tenGeLanEFecEPCMF (32),   -- 10 GE LAN EFEC Extended Payload w/ Client Management Frame Fault Forwarding
+                           otu2eFec          (33),   -- OTU2 11.1 G w/ Forward Error Correction
+                           otu2eEFec         (34),  -- OTU2 11.1 G w/ Enhanced Forward Error Correction  
+                           tenGeLanFecEPV3   (35),  -- 10 GE LAN FEC Extended Payload Mapped to GFP-F  
+                           tenGeLanEFecEPV3  (36) } -- 10 GE LAN EFEC Extended Payload Mapped to GFP-F  
+
+PMIntervalType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "The type of time interval used to collect performance
+                  monitoring statistics."
+    SYNTAX       INTEGER { min15   (1),  -- 15-minute
+                           day1    (2),  -- 1-day
+                           untimed (3) } -- untimed
+
+
+PMValidity ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "An indicator of the degree of validity attributed to a
+                  reported performance monitoring value."
+    SYNTAX       INTEGER { complete     (1),  -- The value returned is valid
+                           notAvailable (2),  -- The value returned in invalid or no value is available
+                           partialCount (3) } -- The value returned is a partial count
+
+
+BERType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A measure of the bit error rate in a received signal,
+                  expressed as an exponential."
+    SYNTAX       INTEGER { none          (1),   -- No bit errors detected, or threshold disabled
+                           tenExpMinus9  (2),   -- A bit error rate of 10^-9
+                           tenExpMinus8  (3),   -- A bit error rate of 10^-8
+                           tenExpMinus7  (4),   -- A bit error rate of 10^-7
+                           tenExpMinus6  (5),   -- A bit error rate of 10^-6
+                           tenExpMinus5  (6),   -- A bit error rate of 10^-5
+                           tenExpMinus4  (7),   -- A bit error rate of 10^-4
+                           tenExpMinus3  (8),   -- A bit error rate of 10^-3
+                           tenExpMinus10 (9),   -- A bit error rate of 10^-10
+                           tenExpMinus11 (10),  -- A bit error rate of 10^-11
+                           tenExpMinus12 (11) } -- A bit error rate of 10^-12
+
+
+ProtSwEvtType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "When a notification is generated to signal that a protection
+                  switching event occurred, an object of this type is used to
+                  indicate which type of protection switching event occurred."
+    SYNTAX       INTEGER { autoWorkSwProt (1),
+                           autoWorkSwBack (2),
+                           manWorkSwProt  (3),
+                           manWorkSwBack  (4),
+                           frcdWorkSwProt (5),
+                           frcdWorkSwBack (6),
+                           lockoutOfWork  (7),
+                           lockoutOfProt  (8),
+                           releaseProtSw  (9) }
+  
+                         
+SyncSwEvtType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "When a notification is generated to signal that a synchronization
+                  switching event occurred, an object of this type is used to
+                  indicate which type of switching event occurred."
+    SYNTAX       INTEGER { syncSwToPrimaryRef   (1),
+                           syncSwToSecondaryRef (2),
+                           syncSwToInternal     (3) }
+                           
+
+MediaRateType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "The media rate for a data interface."
+    SYNTAX       INTEGER { unknown        (1),
+                           autoNegotiated (2),
+                           fd100          (3),
+                           hd100          (4),
+                           fd10           (5),
+                           hd10           (6),
+                           fd1000         (7),
+                           hd1000         (8) }
+
+
+DuplexModeType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "The duplex operational mode for a data interface."
+    SYNTAX       INTEGER { halfDuplex (1),
+                           fullDuplex (2) }
+
+MirrorConfigType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Mirror configuration as applied on a physical ethernet interface"
+    SYNTAX       INTEGER { none         (1),    -- No Mirror configuration
+                           mtp          (2),    -- Mirror To Port
+                           mfp-ingress  (3),    -- Mirror ingress traffic to MTP
+                           mfp-egress   (4),    -- Mirror egress traffic to MTP
+                           mfp-both     (5) }   -- Mirror both ingress and egress traffic to MTP
+
+
+UpgradeCompleteStage ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A list of stages involved in the software upgrade procedure
+                  used on the network element. Notifications are provided
+                  during the course of a software upgrade, making reference to
+                  one of the values in this list to indicate the progress of
+                  upgrade."
+    SYNTAX       INTEGER { inactive    (1),
+                           started     (2),
+                           loadStarted (3),
+                           loadDone    (4),
+                           reboot      (5),
+                           done        (6),
+                           systemDone  (7),
+                           autoNr      (8) }
+
+
+XCType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "The types of cross connections that can be provisioned."
+    SYNTAX       INTEGER { oneWay   (1),
+                           twoWay   (2),
+                           oneWayPr (3),  -- 1-WAY protected connection, not currently supported
+                           twoWayPr (4),  -- 2-WAY protected connection
+                           oneWayBr (5),  -- 1-WAY bridged connection, not currently supported
+                           twoWayBr (6) } -- 2-WAY bridged connection, not currently supported
+
+
+ProtSwOpCmd ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Used to perform a protection switch operation on a facility
+                  configured as part of a protection group or pairing."
+    SYNTAX       INTEGER { noOp       (1),  -- returned when this value is read
+                           manProtSw  (2),  -- operates a manual protection switch
+                           frcdProtSw (3),  -- operates a forced protection switch
+                           lockout    (4),  -- operates a protection switch lockout
+                           release    (5) } -- releases a previously invoked protection switch
+
+
+ProtectionStatusType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A status indicator for a facility involved in a protection
+                  switching grouping."
+    SYNTAX       INTEGER { none       (1),  -- not configured for protection
+                           active     (2),  -- the active member of the protection group
+                           standby    (3),  -- the standby member of the protection group
+                           forced     (4),  -- a forced protection switch is in effect
+                           lockout    (5) } -- a protection switching lockout is in effect
+
+
+PMMontype ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "A list of performance monitoring monitored types supported for
+                  various monitored entites on the system."
+    SYNTAX       INTEGER { caseTemp      (1),   -- Case Temperature
+                           laser1Temp    (2),   -- Laser 1 Temperature
+                           laser2Temp    (3),   -- Laser 2 Temperature
+                           opr           (4),   -- Optical Power Received
+                           ssiopr        (5),   -- Second Stage Input Optical Power Received
+                           opt           (6),   -- Optical Power Transmitted
+                           msInsLoss     (7),   -- Midstage Insertion Loss
+                           effectiveGain (8),   -- Effective Gain
+                           fsoopt        (9),   -- First Stage Output Optical Power Transmitted
+                           laser1Current (10),  -- Laser 1 Current
+                           laser2Current (11),  -- Laser 2 Current
+                           laser1Power   (12),  -- Laser 1 Power
+                           laser2Power   (13),  -- Laser 2 Power
+                           obr           (14),  -- Optical Back Reflection
+                           voa           (15),  -- Variable Optical Attenuation
+                           temp          (16),  -- Temperature
+                           supplyVoltage (17),  -- Supply Voltage
+                           lbc           (18),  -- Laser Bias Current
+                           cvs           (19),  -- Coding Violations Section Layer
+                           ess           (20),  -- Errored Seconds Section Layer
+                           sess          (21),  -- Severely Errored Seconds Section Layer
+                           sefss         (22),  -- Severely Errored Framing Seconds Section Layer
+                           rseb          (23),  -- Regenerator Section Errored Blocks
+                           rsbbe         (24),  -- Regenerator Section Background Block Errors
+                           rses          (25),  -- Regenerator Section Errored Seconds
+                           rsses         (26),  -- Regenerator Section Severely Errored Seconds
+                           rsofs         (27),  -- Regenerator Section Out of Frame Seconds
+                           cv            (28),  -- Coding Violations
+                           es            (29),  -- Errored Seconds
+                           ses           (30),  -- Severely Errored Seconds
+                           invblk        (31),  -- Invalid Blocks
+                           nbitcr        (32),  -- Number of Bits Corrected
+                           nbytcr        (33),  -- Number of Bytes Corrected
+                           uncrcdw       (34),  -- Uncorrectable Codewords
+                           cvp           (35),  -- Coding Violations Path Layer
+                           esp           (36),  -- Errored Seconds Path Layer
+                           sesp          (37),  -- Severely Errored Seconds Path Layer
+                           uasp          (38),  -- Unavailable Seconds Path Layer
+                           fcp           (39),  -- Failure Count Path Layer
+                           hpeb          (40),  -- High Order Path Errored Blocks
+                           hpbbe         (41),  -- High Order Path Background Block Errors
+                           hpes          (42),  -- High Order Path Errored Seconds
+                           hpses         (43),  -- High Order Path Severely Errored Seconds
+                           hpuas         (44),  -- High Order Path Unavailable Seconds
+                           tfrcrx        (45),  -- Total number of frames received
+                           tfrctx        (46),  -- Total number of frames transmitted
+                           frdr          (47),  -- Frames Discarded
+                           fcse          (48),  -- Frame Checksum Errors
+                           usize         (49),  -- Undersized Frames 
+                           osize         (50),  -- Oversized Frames
+                           frgt          (51),  -- Fragmented Frames
+                           jabr          (52),  -- Jabbers
+                           cvl           (53),  -- Coding Violations Line Layer
+                           esl           (54),  -- Errored Seconds Line Layer
+                           sesl          (55),  -- Severely Errored Seconds Line Layer
+                           uasl          (56),  -- Unavailable Seconds Line Layer
+                           mseb          (57),  -- Multiplex Section Errored Blocks
+                           msbbe         (58),  -- Multiplex Section Background Block Errors
+                           mses          (59),  -- Multiplex Section Errored Seconds
+                           msses         (60),  -- Multiplex Section Severely Errored Seconds
+                           msuas         (61),  -- Multiplex Section Unavailable Seconds
+                           otueb         (62),  -- OTN Digital Wrapper Errored Blocks
+                           otubbe        (63),  -- OTN Digital Wrapper Background Block Errors
+                           otues         (64),  -- OTN Digital Wrapper Errored Seconds
+                           otuses        (65),  -- OTN Digital Wrapper Severely Errored Seconds
+                           otuofs        (66),  -- OTN Digital Wrapper Out of Frame Seconds
+                           uass          (67),  -- Unavailable Seconds Section Layer
+                           rsuas         (68),  -- Regenerator Section Unavailable Seconds
+                           uas           (69),  -- Unavailable Seconds
+                           otuuas        (70),
+                           farEndFL      (71),  -- Far end frame loss ratio
+                           nearEndFL     (72),  -- Near end frame loss ratio
+                           delayMax      (73),  -- Delay maximum
+                           delayAvg      (74),  -- Delay average
+                           delayVarMax   (75),  -- Delay variation maximum
+                           delayVarAvg   (76)   -- Delay variation average
+                            } -- OTN Digital Wrapper Unavailable Seconds
+
+
+SwitchIdxType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "An object of this type is associated with the index range
+                  of switch module. Switch module is a logical entity 
+                  which can contail multiple circuit packs."
+    SYNTAX       INTEGER (1..12)
+
+
+ProtocolActionType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "This it behavior of the packets on the switch"
+    SYNTAX       INTEGER { discard  (1),  -- it is used to discard
+                           peer     (2),  -- profile action is peer
+                           tunnel   (3) } -- profile action is tunnel
+                           
+PvxPortType ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "The identifying characteristic of the port. Ports are
+                   numbers sequentially for each port type."
+    SYNTAX  INTEGER { unknown(0), 
+                      gigE(1), 
+                      xGigE(2), 
+                      lag(3), 
+                      gccOtu2(4), 
+                      generic(5), 
+                      mgmtVLan(6) }
+    
+PvxL1PortType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "L2 port type: gigbit ethernet or 10 gigbit ethernet"
+    SYNTAX  INTEGER { gigE(1), xGigE(2)} 
+    
+MonitorPeriodType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "SLA measurement monitor period type."
+    SYNTAX  INTEGER { min15(1), -- 15 minutes 
+                      hour24(2) -- 24 hours
+                    } 
+                    
+CommandStateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "SLA measurement command state type."
+    SYNTAX  INTEGER { ready(1),  -- test is completed, result is ready to read.
+                                 -- The card is also ready for a new throughput test.
+                      start(2),  -- kick off the test
+                      inProgress(3), -- test is in progress
+                      testFailed(4), -- test failed due to software error or h/w failure
+                      stop(5), -- cancel the test
+                      notSet(6), -- command is not set
+                      rmepNotReady(7) -- RMEP not discovered
+                    }
+
+SlaTestRole ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "SLA measurement test role."
+    SYNTAX  INTEGER { initiator(1), 
+                      responder(2)
+                    }                    
+
+PmTestCmdState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "SLA measurement test command state."
+    SYNTAX  INTEGER { enable(1), -- enable PM collection
+                      pmSetupInProgress(2), -- transmit/responder is in setup stage,
+                                            -- h/w is not ready for pm collection.
+                      pmSetupFailed(3), -- failed to set up the test due to s/w or h/w failure
+                      pmIsRunning(4), -- h/w is collecting PM data
+                      disable(5) -- disable the PM collection
+                    }                    
+
+CirTestResult ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "CIR test result."
+    SYNTAX  INTEGER { pass(1), -- 100% CIR has been met
+                      fail(2) 
+                    }                                                                         
+
+PowerFeedModeType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "This determines the power feed mode for a given shelf."
+    SYNTAX       INTEGER { ac(1),    -- AC Power Feed
+                           dc(2),    -- DC Power Feed
+                           none(3),  -- No power on this rail
+			   both(4) } -- Rail is fed by both AC and DC feeds
+			   
+ProfileNameType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "Profile Names are restricted to the character set of upper case ASCII characters, 
+                  the digits 0-9 and the '_' (underscore) character, e.g. [A-Z0-9_]. Any row creation 
+                  operation for a profile name containing any character outside this set will be 
+                  rejected with a 'noCreation' error code."
+    SYNTAX       OCTET STRING (SIZE(1..32))
+
+AreaID ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "An OSPF Area Identifier."
+    SYNTAX      IpAddress
+
+DesignatedRouterPriority ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The values defined for the priority of a system for
+       becoming the designated router."
+    SYNTAX      Integer32 (0..'FF'h)
+
+LoopbackType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "The type of loopback on a port"
+    SYNTAX  INTEGER { noLoopback   ( 0 ),
+                      facilityLpbk ( 1 ),
+                      terminalLpbk ( 2 ) }
+
+--
+-- The following InetAddressTypes are copied in from RFC 4001
+-- (the INET-ADDRESS-MIB)
+-- If we include that MIB in our standard set, we should remove
+-- them from here.
+-- 
+InetAddressType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value that represents a type of Internet address.
+
+         unknown(0)  An unknown address type.  This value MUST
+                     be used if the value of the corresponding
+                     InetAddress object is a zero-length string.
+                     It may also be used to indicate an IP address
+                     that is not in one of the formats defined
+                     below.
+
+         ipv4(1)     An IPv4 address as defined by the
+                     InetAddressIPv4 textual convention.
+
+         ipv6(2)     An IPv6 address as defined by the
+                     InetAddressIPv6 textual convention.
+
+         ipv4z(3)    A non-global IPv4 address including a zone
+                     index as defined by the InetAddressIPv4z
+                     textual convention.
+
+         ipv6z(4)    A non-global IPv6 address including a zone
+                     index as defined by the InetAddressIPv6z
+                     textual convention.
+
+         dns(16)     A DNS domain name as defined by the
+                     InetAddressDNS textual convention.
+
+         Each definition of a concrete InetAddressType value must be
+         accompanied by a definition of a textual convention for use
+         with that InetAddressType.
+
+         To support future extensions, the InetAddressType textual
+         convention SHOULD NOT be sub-typed in object type definitions.
+         It MAY be sub-typed in compliance statements in order to
+         require only a subset of these address types for a compliant
+         implementation.
+
+         Implementations must ensure that InetAddressType objects
+         and any dependent objects (e.g., InetAddress objects) are
+         consistent.  An inconsistentValue error must be generated
+         if an attempt to change an InetAddressType object would,
+         for example, lead to an undefined InetAddress value.  In
+
+         particular, InetAddressType/InetAddress pairs must be
+         changed together if the address type changes (e.g., from
+         ipv6(2) to ipv4(1))."
+    SYNTAX       INTEGER {
+                     unknown(0),
+                     ipv4(1),
+                     ipv6(2),
+                     ipv4z(3),
+                     ipv6z(4),
+                     dns(16)
+                 }
+
+InetAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Denotes a generic Internet address.
+
+         An InetAddress value is always interpreted within the context
+         of an InetAddressType value.  Every usage of the InetAddress
+         textual convention is required to specify the InetAddressType
+         object that provides the context.  It is suggested that the
+         InetAddressType object be logically registered before the
+         object(s) that use the InetAddress textual convention, if
+         they appear in the same logical row.
+
+         The value of an InetAddress object must always be
+         consistent with the value of the associated InetAddressType
+         object.  Attempts to set an InetAddress object to a value
+         inconsistent with the associated InetAddressType
+         must fail with an inconsistentValue error.
+
+         When this textual convention is used as the syntax of an
+         index object, there may be issues with the limit of 128
+         sub-identifiers specified in SMIv2, STD 58.  In this case,
+         the object definition MUST include a 'SIZE' clause to
+         limit the number of potential instance sub-identifiers;
+         otherwise the applicable constraints MUST be stated in
+         the appropriate conceptual row DESCRIPTION clauses, or
+         in the surrounding documentation if there is no single
+         DESCRIPTION clause that is appropriate."
+    SYNTAX       OCTET STRING (SIZE (0..255))
+
+InetAddressIPv4 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d"
+    STATUS       current
+    DESCRIPTION
+        "Represents an IPv4 network address:
+
+           Octets   Contents         Encoding
+            1-4     IPv4 address     network-byte order
+
+         The corresponding InetAddressType value is ipv4(1).
+
+         This textual convention SHOULD NOT be used directly in object
+         definitions, as it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType, as a pair."
+    SYNTAX       OCTET STRING (SIZE (4))
+
+InetAddressIPv6 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x"
+    STATUS       current
+    DESCRIPTION
+        "Represents an IPv6 network address:
+
+           Octets   Contents         Encoding
+            1-16    IPv6 address     network-byte order
+
+         The corresponding InetAddressType value is ipv6(2).
+
+         This textual convention SHOULD NOT be used directly in object
+         definitions, as it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType, as a pair."
+    SYNTAX       OCTET STRING (SIZE (16))
+
+InetAddressIPv4z ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d%4d"
+    STATUS       current
+    DESCRIPTION
+        "Represents a non-global IPv4 network address, together
+         with its zone index:
+
+           Octets   Contents         Encoding
+            1-4     IPv4 address     network-byte order
+            5-8     zone index       network-byte order
+
+         The corresponding InetAddressType value is ipv4z(3).
+
+         The zone index (bytes 5-8) is used to disambiguate identical
+         address values on nodes that have interfaces attached to
+         different zones of the same scope.  The zone index may contain
+         the special value 0, which refers to the default zone for each
+         scope.
+
+         This textual convention SHOULD NOT be used directly in object
+
+         definitions, as it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType, as a pair."
+    SYNTAX       OCTET STRING (SIZE (8))
+
+InetAddressIPv6z ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x%4d"
+    STATUS       current
+    DESCRIPTION
+        "Represents a non-global IPv6 network address, together
+         with its zone index:
+
+           Octets   Contents         Encoding
+            1-16    IPv6 address     network-byte order
+           17-20    zone index       network-byte order
+
+         The corresponding InetAddressType value is ipv6z(4).
+
+         The zone index (bytes 17-20) is used to disambiguate
+         identical address values on nodes that have interfaces
+         attached to different zones of the same scope.  The zone index
+         may contain the special value 0, which refers to the default
+         zone for each scope.
+
+         This textual convention SHOULD NOT be used directly in object
+         definitions, as it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType, as a pair."
+    SYNTAX       OCTET STRING (SIZE (20))
+
+InetAddressDNS ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "Represents a DNS domain name.  The name SHOULD be fully
+         qualified whenever possible.
+
+         The corresponding InetAddressType is dns(16).
+
+         The DESCRIPTION clause of InetAddress objects that may have
+         InetAddressDNS values MUST fully describe how (and when)
+         these names are to be resolved to IP addresses.
+
+         The resolution of an InetAddressDNS value may require to
+         query multiple DNS records (e.g., A for IPv4 and AAAA for
+         IPv6).  The order of the resolution process and which DNS
+         record takes precedence depends on the configuration of the
+         resolver.
+
+         This textual convention SHOULD NOT be used directly in object
+         definitions, as it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType, as a pair."
+    SYNTAX       OCTET STRING (SIZE (1..255))
+
+--
+-- End copied from RFC 4001
+--
+
+--
+-- The following textual convetions are copied from RMON2-MIB
+-- 
+ZeroBasedCounter32 ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "This TC describes an object that counts events with the
+        following semantics: objects of this type will be set to
+        zero(0) on creation and will thereafter count appropriate
+        events, wrapping back to zero(0) when the value 2^32 is
+        reached.
+
+        Provided that an application discovers the new object within
+        the minimum time to wrap, it can use the initial value as a
+        delta since it last polled the table of which this object is
+        part.  It is important for a management station to be aware of
+        this minimum time and the actual time between polls, and to
+        discard data if the actual time is too long or there is no
+        defined minimum time.
+
+        Typically, this TC is used in tables where the INDEX space is
+        constantly changing and/or the TimeFilter mechanism is in use."
+    SYNTAX Gauge32
+
+-- 
+-- The following LLDP textual conventions are copied from IEEE 802.1AB-2005.
+-- 
+LldpChassisIdSubtype ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "This TC describes the source of a chassis identifier.
+
+            The enumeration 'chassisComponent(1)' represents a chassis
+            identifier based on the value of entPhysicalAlias object
+            (defined in IETF RFC 2737) for a chassis component (i.e.,
+            an entPhysicalClass value of 'chassis(3)').
+
+            The enumeration 'interfaceAlias(2)' represents a chassis
+            identifier based on the value of ifAlias object (defined in
+            IETF RFC 2863) for an interface on the containing chassis.
+
+            The enumeration 'portComponent(3)' represents a chassis
+            identifier based on the value of entPhysicalAlias object
+            (defined in IETF RFC 2737) for a port or backplane
+            component (i.e., entPhysicalClass value of 'port(10)' or
+            'backplane(4)'), within the containing chassis.
+
+            The enumeration 'macAddress(4)' represents a chassis
+            identifier based on the value of a unicast source address
+            (encoded in network byte order and IEEE 802.3 canonical bit
+            order), of a port on the containing chassis as defined in
+            IEEE Std 802-2001.
+
+            The enumeration 'networkAddress(5)' represents a chassis
+            identifier based on a network address, associated with
+            a particular chassis.  The encoded address is actually
+            composed of two fields.  The first field is a single octet,
+            representing the IANA AddressFamilyNumbers value for the
+            specific address type, and the second field is the network
+            address value.
+
+            The enumeration 'interfaceName(6)' represents a chassis
+            identifier based on the value of ifName object (defined in
+            IETF RFC 2863) for an interface on the containing chassis.
+
+            The enumeration 'local(7)' represents a chassis identifier
+            based on a locally defined value."
+    SYNTAX  INTEGER {
+            chassisComponent(1),
+            interfaceAlias(2),
+            portComponent(3),
+            macAddress(4),
+            networkAddress(5),
+            interfaceName(6),
+            local(7),
+            notPresent(8)
+    }
+
+LldpChassisId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x"
+    STATUS      current
+    DESCRIPTION
+            "This TC describes the format of a chassis identifier string.
+            Objects of this type are always used with an associated
+            LldpChassisIdSubtype object, which identifies the format of
+            the particular LldpChassisId object instance.
+
+            If the associated LldpChassisIdSubtype object has a value of
+            'chassisComponent(1)', then the octet string identifies
+            a particular instance of the entPhysicalAlias object
+            (defined in IETF RFC 2737) for a chassis component (i.e.,
+            an entPhysicalClass value of 'chassis(3)').
+
+            If the associated LldpChassisIdSubtype object has a value
+            of 'interfaceAlias(2)', then the octet string identifies
+            a particular instance of the ifAlias object (defined in
+            IETF RFC 2863) for an interface on the containing chassis.
+            If the particular ifAlias object does not contain any values,
+            another chassis identifier type should be used.
+
+            If the associated LldpChassisIdSubtype object has a value
+            of 'portComponent(3)', then the octet string identifies a
+            particular instance of the entPhysicalAlias object (defined
+            in IETF RFC 2737) for a port or backplane component within
+            the containing chassis.
+
+            If the associated LldpChassisIdSubtype object has a value of
+            'macAddress(4)', then this string identifies a particular
+            unicast source address (encoded in network byte order and
+            IEEE 802.3 canonical bit order), of a port on the containing
+            chassis as defined in IEEE Std 802-2001.
+
+            If the associated LldpChassisIdSubtype object has a value of
+            'networkAddress(5)', then this string identifies a particular
+            network address, encoded in network byte order, associated
+            with one or more ports on the containing chassis.  The first
+            octet contains the IANA Address Family Numbers enumeration
+            value for the specific address type, and octets 2 through
+            N contain the network address value in network byte order.
+
+            If the associated LldpChassisIdSubtype object has a value
+            of 'interfaceName(6)', then the octet string identifies
+            a particular instance of the ifName object (defined in
+            IETF RFC 2863) for an interface on the containing chassis.
+            If the particular ifName object does not contain any values,
+            another chassis identifier type should be used.
+
+            If the associated LldpChassisIdSubtype object has a value of
+            'local(7)', then this string identifies a locally assigned
+            Chassis ID."
+    SYNTAX      OCTET STRING (SIZE (1..32))
+
+LldpPortIdSubtype ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "This TC describes the source of a particular type of port
+            identifier used in the LLDP MIB.
+
+            The enumeration 'interfaceAlias(1)' represents a port
+            identifier based on the ifAlias MIB object, defined in IETF
+            RFC 2863.
+
+            The enumeration 'portComponent(2)' represents a port
+            identifier based on the value of entPhysicalAlias (defined in
+            IETF RFC 2737) for a port component (i.e., entPhysicalClass
+            value of 'port(10)'), within the containing chassis.
+
+            The enumeration 'macAddress(3)' represents a port identifier
+            based on a unicast source address (encoded in network
+            byte order and IEEE 802.3 canonical bit order), which has
+            been detected by the agent and associated with a particular
+            port (IEEE Std 802-2001).
+
+            The enumeration 'networkAddress(4)' represents a port
+            identifier based on a network address, detected by the agent
+            and associated with a particular port.
+
+            The enumeration 'interfaceName(5)' represents a port
+            identifier based on the ifName MIB object, defined in IETF
+            RFC 2863.
+
+            The enumeration 'agentCircuitId(6)' represents a port
+            identifier based on the agent-local identifier of the circuit
+            (defined in RFC 3046), detected by the agent and associated
+            with a particular port.
+
+            The enumeration 'local(7)' represents a port identifier
+            based on a value locally assigned."
+
+    SYNTAX  INTEGER {
+            interfaceAlias(1),
+            portComponent(2),
+            macAddress(3),
+            networkAddress(4),
+            interfaceName(5),
+            agentCircuitId(6),
+            local(7),
+            notPresent(8)
+    }
+
+LldpPortId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x:2x"
+    STATUS      current
+    DESCRIPTION
+            "This TC describes the format of a port identifier string.
+            Objects of this type are always used with an associated
+            LldpPortIdSubtype object, which identifies the format of the
+            particular LldpPortId object instance.
+
+            If the associated LldpPortIdSubtype object has a value of
+            'interfaceAlias(1)', then the octet string identifies a
+            particular instance of the ifAlias object (defined in IETF
+            RFC 2863).  If the particular ifAlias object does not contain
+            any values, another port identifier type should be used.
+
+            If the associated LldpPortIdSubtype object has a value of
+            'portComponent(2)', then the octet string identifies a
+            particular instance of the entPhysicalAlias object (defined
+            in IETF RFC 2737) for a port or backplane component.
+
+            If the associated LldpPortIdSubtype object has a value of
+            'macAddress(3)', then this string identifies a particular
+            unicast source address (encoded in network byte order
+            and IEEE 802.3 canonical bit order) associated with the port
+            (IEEE Std 802-2001).
+
+            If the associated LldpPortIdSubtype object has a value of
+            'networkAddress(4)', then this string identifies a network
+            address associated with the port.  The first octet contains
+            the IANA AddressFamilyNumbers enumeration value for the
+            specific address type, and octets 2 through N contain the
+            networkAddress address value in network byte order.
+
+            If the associated LldpPortIdSubtype object has a value of
+            'interfaceName(5)', then the octet string identifies a
+            particular instance of the ifName object (defined in IETF
+            RFC 2863).  If the particular ifName object does not contain
+            any values, another port identifier type should be used.
+
+            If the associated LldpPortIdSubtype object has a value of
+            'agentCircuitId(6)', then this string identifies a agent-local
+            identifier of the circuit (defined in RFC 3046).
+
+            If the associated LldpPortIdSubtype object has a value of
+            'local(7)', then this string identifies a locally
+            assigned port ID."
+    SYNTAX      OCTET STRING (SIZE (1..32))
+
+PsDirn ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "The types of protection switch direction."
+    SYNTAX       INTEGER { uni  (1),
+                           bi   (2)
+                         }
+
+END -- BTI TEXTUAL CONVENTION MIB

@@ -1,0 +1,16 @@
+os: juniper-bti
+text: 'Juniper BTI'
+type: network
+icon: bti
+group: bti
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_temperature, text: 'Temperature' }
+discovery:
+   - sysObjectID:
+      - .1.3.6.1.4.1.18070.2.2
+mib_dir:
+    - bti
+discovery_modules:
+    ucd-mib: false
+    wireless: false

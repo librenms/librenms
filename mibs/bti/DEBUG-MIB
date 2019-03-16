@@ -1,0 +1,477 @@
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+--
+-- Copyright (C) BTI Photonics Inc. 2003-2008. All Rights Reserved.
+--
+-- The information contained herein is the property of BTI Photonics
+-- Inc. and is strictly confidential. Except as expressly authorized
+-- in writing by BTI Photonics Inc., the holder shall keep all
+-- information contained herein confidential, shall disclose the
+-- information only to its employees with a need to know, and shall
+-- protect the information, in whole or in part, from disclosure and
+-- dissemination to third parties with the same degree of care it uses
+-- to protect its own confidential information, but with no less than
+-- reasonable care. Except as expressly authorized in writing by BTI
+-- Photonics Inc., the holder is granted no rights to use the
+-- information contained herein.
+--
+-- Unpublished. All rights reserved under the copyright laws of
+-- Canada.
+-- 
+-- OSS Integration 
+-- BTI Systems Inc. can provide customers with direct access to 
+-- network element SNMP MIBs for use for integration to OSS systems. 
+-- Customers must note the following caveats:
+--
+-- 1) Performance: The BTI Systems Inc. MIBS are performance tested for
+-- use with the BTI Systems proNX 900 Node Controller and proNX 9000 
+-- Network Manager. Customers are responsible for conducting their 
+-- own testing to ensure that the BTI Systems Inc. NE interfaces meet 
+-- the needs of their proposed usage. BTI Systems Inc. makes no
+-- guarantees that any proposed usage will meet customer requirements.
+--
+-- 2) Changes between releases: BTI Systems Inc. SNMP MIBs are subject 
+-- to change as support for new functionality is introduced. BTI  
+-- Systems Inc. strives to maintain backward compatibility of MIBs 
+-- across releases but this is not guaranteed and BTI Systems Inc. 
+-- reserves the right to deprecate or remove support for obsolete 
+-- MIB elements. OSS integrators must be careful not to rely on 
+-- functionality that is marked as deprecated as it may be unsupported 
+-- in a subsequent release. Customers that integrate directly to BTI 
+-- Systems Inc. MIBs are responsible for all OSS development and 
+-- integration testing that may arise from MIB changes between releases 
+-- of BTI Systems Inc. software.
+--
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+DEBUG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, DateAndTime
+        FROM SNMPv2-TC
+    btiModules, bti7000
+        FROM BTI-MIB
+    evtDescription, slotInvShelfIdx, slotInvSlotIdx
+        FROM BTI-7000-MIB;
+
+
+debugMib MODULE-IDENTITY
+    LAST-UPDATED "200806201200Z"  -- Friday, June 20, 12:00:00 EST 2007
+    ORGANIZATION "BTI Photonic Systems Inc."
+    CONTACT-INFO "Technical Support
+                  BTI Photonic Systems Inc.
+                  50 Northside Road
+                  Ottawa, Ontario, Canada  K2H 5Z6
+                  (613) 248-9154
+                  support@btiphotonics.com"
+    DESCRIPTION  "Contains various objects used to perform debugging
+    		      functions on the system."
+    REVISION     "200806201200Z"  -- Friday, June 20, 12:00:00 EST 2007
+    DESCRIPTION  "Initial version of the module."
+    ::= { btiModules 7000 }
+
+debugObjects    OBJECT IDENTIFIER       ::= { bti7000 7000 }
+memoryDebug     OBJECT IDENTIFIER       ::= { debugObjects 1 }
+debugOperations OBJECT IDENTIFIER       ::= { debugObjects 2 }
+debugEvtNotifications OBJECT IDENTIFIER ::= { debugObjects 3 }
+
+-----------------------------------------------------------------------
+-- Memory Info Objects
+-----------------------------------------------------------------------
+
+
+totalSCPMemory OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "MBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The total amount of memory on the SCP."
+    ::= { memoryDebug 1 }
+
+
+freeSCPMemory OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The amount of free memory available on the SCP
+    			  that is not yet used."
+    ::= { memoryDebug 2 }
+
+
+genMemReport OBJECT-TYPE
+    SYNTAX       INTEGER { idle    (1),
+    					   genRprt (2) }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION  "When this object is set to genRprt (2), the SCP
+    			  will generate a set of reports that can be used
+    			  to identify memory leaks. The reports can be
+    			  found on the SCP in the /ffs/logs directory."
+    ::= { memoryDebug 3 }
+
+
+cpMemStatsTable OBJECT-TYPE  
+    SYNTAX       SEQUENCE OF CpMemStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "The Circuit Pack Memory Table provides the current memory diagnostics for
+                 all intelligent circuit packs."
+       ::= { memoryDebug 4 }
+
+cpMemStatsEntry OBJECT-TYPE
+     SYNTAX       CpMemStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION  "The Circuit Pack Memory Entry includes the current 
+                   diagnostics for a single circuit pack."
+     INDEX { slotInvShelfIdx,
+             slotInvSlotIdx }
+     ::= { cpMemStatsTable 1 }
+
+CpMemStatsEntry ::=  SEQUENCE { 
+                                cpMemStatsTotalMem       Unsigned32,
+                                cpMemStatsFreeMem        Unsigned32,
+                                cpMemStatsApp1Name       DisplayString,
+                                cpMemStatsApp1Mem        Unsigned32,
+                                cpMemStatsApp2Name       DisplayString,
+                                cpMemStatsApp2Mem        Unsigned32,
+                                cpMemStatsApp3Name       DisplayString,
+                                cpMemStatsApp3Mem        Unsigned32,
+                                cpMemStatsApp4Name       DisplayString,
+                                cpMemStatsApp4Mem        Unsigned32,
+                                cpMemStatsApp5Name       DisplayString,
+                                cpMemStatsApp5Mem        Unsigned32,
+                                cpMemStatsApp6Name       DisplayString,
+                                cpMemStatsApp6Mem        Unsigned32,
+                                cpMemStatsApp7Name       DisplayString,
+                                cpMemStatsApp7Mem        Unsigned32,
+                                cpMemStatsApp8Name       DisplayString,
+                                cpMemStatsApp8Mem        Unsigned32,
+                                cpMemStatsApp9Name       DisplayString,
+                                cpMemStatsApp9Mem        Unsigned32,
+                                cpMemStatsApp10Name      DisplayString,
+                                cpMemStatsApp10Mem       Unsigned32
+                              }
+
+
+cpMemStatsTotalMem    OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The total memory on the circuit pack in kbytes."
+    ::= { cpMemStatsEntry 1 }
+
+cpMemStatsFreeMem    OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The total free memory still available on the circuit pack in kbytes."
+    ::= { cpMemStatsEntry 2 }
+
+cpMemStatsApp1Name   OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..256))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The 1st customer application nameapplication ID. The part on the left of
+                  hyphen is application name, the part on the right of hyphen is application ID.
+                  For example, ISS.exe-1437734, ISS.exe is the application name, 1437734 is the application ID."
+    ::= { cpMemStatsEntry 3 }
+cpMemStatsApp1Mem   OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The memory allocated by the 1st application."
+    ::= { cpMemStatsEntry 4 }
+cpMemStatsApp2Name   OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..256))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The 2nd customer application name and application ID. The part on the left of
+                  hyphen is application name, the part on the right of hyphen is application ID."
+    ::= { cpMemStatsEntry 5 }
+cpMemStatsApp2Mem   OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The memory allocated by the 2nd application."
+    ::= { cpMemStatsEntry 6 }
+cpMemStatsApp3Name   OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..256))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The 3rd customer application name and application ID. The part on the left of
+                  hyphen is application name, the part on the right of hyphen is application ID."
+    ::= { cpMemStatsEntry 7 }
+cpMemStatsApp3Mem   OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The memory allocated by the 3rd application."
+    ::= { cpMemStatsEntry 8 }
+cpMemStatsApp4Name   OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..256))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The 4th customer application name and application ID. The part on the left of
+                  hyphen is application name, the part on the right of hyphen is application ID."
+    ::= { cpMemStatsEntry 9 }
+cpMemStatsApp4Mem   OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The memory allocated by the 4th application."
+    ::= { cpMemStatsEntry 10 }
+cpMemStatsApp5Name   OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..256))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The 5th customer application name and application ID. The part on the left of
+                  hyphen is application name, the part on the right of hyphen is application ID."
+    ::= { cpMemStatsEntry 11 }
+cpMemStatsApp5Mem   OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The memory allocated by the 5th application."
+    ::= { cpMemStatsEntry 12 }
+cpMemStatsApp6Name   OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..256))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The 6th customer application name and application ID. The part on the left of
+                  hyphen is application name, the part on the right of hyphen is application ID."
+    ::= { cpMemStatsEntry 13 }
+cpMemStatsApp6Mem   OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The memory allocated by the 6th application."
+    ::= { cpMemStatsEntry 14 }
+cpMemStatsApp7Name   OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..256))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The 7th customer application name and application ID. The part on the left of
+                  hyphen is application name, the part on the right of hyphen is application ID."
+    ::= { cpMemStatsEntry 15 }
+cpMemStatsApp7Mem   OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The memory allocated by the 7th application."
+    ::= { cpMemStatsEntry 16 }
+cpMemStatsApp8Name   OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..256))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The 8th customer application name and application ID. The part on the left of
+                  hyphen is application name, the part on the right of hyphen is application ID."
+    ::= { cpMemStatsEntry 17 }
+cpMemStatsApp8Mem   OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The memory allocated by the 8th application."
+    ::= { cpMemStatsEntry 18 }
+cpMemStatsApp9Name   OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..256))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The 9th customer application name and application ID. The part on the left of
+                  hyphen is application name, the part on the right of hyphen is application ID."
+    ::= { cpMemStatsEntry 19 }
+cpMemStatsApp9Mem   OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The memory allocated by the 9th application."
+    ::= { cpMemStatsEntry 20 }
+cpMemStatsApp10Name   OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..256))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The 10th customer application name and application ID. The part on the left of
+                  hyphen is application name, the part on the right of hyphen is application ID."
+    ::= { cpMemStatsEntry 21 }
+cpMemStatsApp10Mem   OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The memory allocated by the 10th application."
+    ::= { cpMemStatsEntry 22 }
+
+cpHistMemStatsTable OBJECT-TYPE  
+    SYNTAX       SEQUENCE OF CpHistMemStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "The circuit pack memory Table provides historical memory diagnostics for
+                 circuit packs.
+                 There are a total of 101 table entries per circuit pack. The first entry represents the
+                 lowest memory value retrieved since the circuit pack was last restarted."
+       ::= { memoryDebug 5 }
+
+cpHistMemStatsEntry OBJECT-TYPE
+     SYNTAX       CpHistMemStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION  "The Circuit Pack Historical Memory Statics entry includes the 
+                   memory diagnostics for one retrieval interval for a circuit pack."
+     INDEX { slotInvShelfIdx,
+             slotInvSlotIdx,
+             cpHistMemStatsIntervalIdx   }
+     ::= { cpHistMemStatsTable 1 }
+
+CpHistMemStatsEntry ::=  SEQUENCE { 
+                                    cpHistMemStatsIntervalIdx    INTEGER,
+                                    cpHistMemStatsFreeMem        Unsigned32,
+                                    cpHistMemStatsPercentFreeMem INTEGER,
+                                    cpHistMemStatsDateAndTime    DateAndTime 
+                                  }
+
+cpHistMemStatsIntervalIdx    OBJECT-TYPE
+    SYNTAX       INTEGER (0..100)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "The specific interval for which to retrieve the historical
+                  memory diagnostics. 
+                  NOTE: the first entry (index 0) is the low memory watermark and
+                  the remaining entries 1 to 100 appear as most recent first and oldest 
+                  last."
+    ::= { cpHistMemStatsEntry 1 }
+
+cpHistMemStatsFreeMem    OBJECT-TYPE
+    SYNTAX       Unsigned32
+    UNITS        "kBytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The total free memory available on the circuit pack in kbytes."
+    ::= { cpHistMemStatsEntry 2 }
+
+cpHistMemStatsPercentFreeMem    OBJECT-TYPE
+    SYNTAX       INTEGER(0..100)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The total free memory available on the circuit pack as a percentage
+                  of the total."
+    ::= { cpHistMemStatsEntry 3 }
+
+cpHistMemStatsDateAndTime   OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The Date and time of the retrieval interval."
+    ::= { cpHistMemStatsEntry 4 }
+
+-----------------------------------------------------------------------
+-- Debug Operations
+-----------------------------------------------------------------------
+
+
+retrieveCpFilesOpTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF RetrieveCpFilesOpEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Used to retrieve the corresponding information from all or one of the
+                  intelligent circuit packs and store them on the SCP in the /ffs/logs/slots directory.
+                  The following commands are available:
+                      traceLogs - retrieves all Trace Logs Files found in the /ffs/logs/ 
+                                  directory from all circuit packs.
+                      coreFiles - retrieves all core files found in the /ffs/logs/dumplogs/ directory
+                                  from all circuit packs.
+                      mqueue    - performs an 'ls -l ' command on the /dev/mqueue directory.
+                      pidinMem  - performs an 'pidin mem' command
+                      hogs      - runs the hogs command.
+                      allInfo   - performs all commands.
+                 "
+    ::= { debugOperations 1 }
+
+retrieveCpFilesOpEntry OBJECT-TYPE
+    SYNTAX       RetrieveCpFilesOpEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "The conceptual row object of the retrieveCpFiles operation
+                  table."
+    INDEX        { allOrSingleShelfIdx,
+                   allOrSingleSlotIdx }
+    ::= { retrieveCpFilesOpTable 1 }
+
+
+RetrieveCpFilesOpEntry ::= SEQUENCE {   allOrSingleShelfIdx  INTEGER,
+                                        allOrSingleSlotIdx   INTEGER,
+                                        retrieveCpFilesOpCmd INTEGER }
+
+
+allOrSingleShelfIdx OBJECT-TYPE
+    SYNTAX       INTEGER (0|1|11|21|31)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "The number of the shelf to retrieve the files for.  If zero, all
+                  shelves are retrieved.
+                "
+    ::= { retrieveCpFilesOpEntry 1 }
+
+
+allOrSingleSlotIdx OBJECT-TYPE
+    SYNTAX       INTEGER (0..20)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "The number of the shelf to retrieve the files for, If zero all
+                  slots are returned."
+
+    ::= { retrieveCpFilesOpEntry 2 }
+
+
+retrieveCpFilesOpCmd OBJECT-TYPE
+
+
+    SYNTAX       INTEGER {  noOp       (1),
+                            traceLogs  (2),
+                            coreFiles  (3),
+                            mqueue     (4),
+                            pidinMem   (5),
+                            hogs       (6),
+                            allInfo    (255)
+                             }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION  "Used to retrieve the corresponding information from all intelligent circuit 
+                  packs and store them on the SCP in the /ffs/logs/slots directory.
+                  The following commands are available:
+                      traceLogs - retrieves all Trace Logs Files found in the /ffs/logs/ 
+                                  directory from all circuit packs.
+                      coreFiles - retrieves all core files found in the /ffs/logs/dumplogs/ directory
+                                  from all circuit packs.
+                      mqueue    - performs an 'ls -l ' command on the /dev/mqueue directory.
+                      pidinMem  - performs an 'pidin mem' command
+                      hogs      - runs a special version hogs program for one interation.
+                      allInfo   - performs all commands.
+                 "
+    ::= { retrieveCpFilesOpEntry 3 }
+
+
+retrieveCpFilesComplNotif NOTIFICATION-TYPE
+    OBJECTS      { 
+                   evtDescription
+                 }
+    STATUS       current
+    DESCRIPTION  "Indicates that the previous retrieveCpFiles operation has completed."
+    ::= { debugEvtNotifications 1 }
+
+END
