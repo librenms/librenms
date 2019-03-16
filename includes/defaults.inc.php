@@ -841,7 +841,7 @@ $config['discovery_modules']['fdb-table']            = true;
 $config['update'] = 1;
 
 // Sets automatic sensor limits when no values are returned by the device.
-$config['discovery']['sensors']['autolimit']         = true;
+$config['sensors']['guess_limits']                   = true;
 
 // Purge syslog and eventlog
 $config['syslog_purge'] = 30;
