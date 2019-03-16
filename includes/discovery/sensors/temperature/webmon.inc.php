@@ -31,12 +31,9 @@ foreach ($prefixes as $prefix => $numOidPrefix) {
 
     foreach ($walk as $index => $oid) {
         $user_function = null;
-        if ($oid[$prefix . 'Configured'] != '0' && $oid[$prefix . 'SensorType'] != 'humidity' && $oid[$prefix . 'SensorType'] != 'temperature' && $oid[$prefix . 'LiveRaw']) {
+        if ($oid[$prefix . 'Configured'] != '0' && ($oid[$prefix . 'SensorType'] == '1' || $oid[$prefix . 'SensorType'] == 'temperature') && $oid[$prefix . 'LiveRaw']) {
             $num_oid = $numOidPrefix . $index;
             $descr = $oid[$prefix . 'Description'];
-            if ($oid[$prefix . 'Units']) {
-                $descr .= '(' . $oid[$prefix . 'Units'] . ')';
-            }
             $group = $prefix;
             $value = $oid[$prefix . 'LiveRaw'];
             $lowLimit = $oid[$prefix . 'Thresh4'];
@@ -51,7 +48,7 @@ foreach ($prefixes as $prefix => $numOidPrefix) {
                 $highLimit = fahrenheit_to_celsius($highLimit);
                 $highWarnLimit = fahrenheit_to_celsius($highWarnLimit);
             }
-            discover_sensor($valid['sensor'], 'count', $device, $num_oid, $prefix . 'LiveRaw' . $index, 'webmon', $descr, '1', '1', $lowLimit, $lowWarnLimit, $highWarnlimit, $highLimit, $value, 'snmp', null, null, $user_function, $group);
+            discover_sensor($valid['sensor'], 'temperature', $device, $num_oid, $prefix . 'LiveRaw.' . $index, 'webmon', $descr, '1', '1', $lowLimit, $lowWarnLimit, $highWarnLimit, $highLimit, $value, 'snmp', null, null, $user_function, $group);
         }
     }
 }
