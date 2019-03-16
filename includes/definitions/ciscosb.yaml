@@ -1,4 +1,5 @@
 os: ciscosb
+#os: ciscosb_wap371-a-k9
 text: 'Cisco Small Business'
 ifname: true
 type: network
@@ -54,5 +55,6 @@ discovery:
             - .1.3.6.1.4.1.9.6.1.97
             - .1.3.6.1.4.1.9.6.1.98
             - .1.3.6.1.4.1.3955.6.
+            - .1.3.6.1.4.1.9.6.1.34.371.1
     - sysDescr_regex:
             - '/^Linksys SLM/'
