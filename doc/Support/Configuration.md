@@ -593,6 +593,7 @@ $config['sensors']['guess_limits'] = false;
 
 ### Storage configuration
 
+Mounted storage / mount points to ignore in discovery and polling.
 ```php
 $config['ignore_mount_removable']  = 1;
 $config['ignore_mount_network']    = 1;
@@ -620,7 +621,12 @@ $config['ignore_mount_regexp'][] = "/^\/dev\/md0/";
 $config['ignore_mount_regexp'][] = "/^\/var\/dhcpd\/dev,/";
 $config['ignore_mount_regexp'][] = "/UMA/";
 ```
-Mounted storage / mount points to ignore in discovery and polling.
+
+Custom storage warning percentage
+```php
+$config['storage_perc_warn'] = 60;
+$config['os']['linux']['storage_perc_warn'] = 60;
+```
 
 ### IRC Bot
 
