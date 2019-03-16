@@ -2029,7 +2029,7 @@ function get_link()
 
 function list_sensors()
 {
-    check_is_read()
+    check_is_read();
 
     $app        = \Slim\Slim::getInstance();
     $router     = $app->router()->getCurrentRoute()->getParams();
