@@ -19,8 +19,6 @@ Possible options:
  ```dotenv
 APP_ENV=local
 APP_DEBUG=true
-...
-
 ```
  4. Start a development webserver `./lnms serve`
  5. Access the Web UI at http://localhost:8000
