@@ -2034,7 +2034,7 @@ function list_sensors()
     $app        = \Slim\Slim::getInstance();
     $router     = $app->router()->getCurrentRoute()->getParams();
 
-    $sensors       = dbFetchRows("SELECT `sensors`.* FROM `sensors` WHERE `sensors`.`sensor_id` IS NOT NULL);
+    $sensors       = dbFetchRows("SELECT `sensors`.* FROM `sensors` WHERE `sensors`.`sensor_id` IS NOT NULL");
     $total_sensors = count($sensors);
     if ($total_sensors == 0) {
         api_error(404, 'Sensors do not exist');
