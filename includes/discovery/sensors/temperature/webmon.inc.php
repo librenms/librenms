@@ -46,6 +46,10 @@ foreach ($prefixes as $prefix => $numOidPrefix) {
             if ($oid[$prefix . 'Units'] == "Fahrenheit") {
                 $user_function = 'fahrenheit_to_celsius';
                 $value = fahrenheit_to_celsius($value);
+                $lowLimit = fahrenheit_to_celsius($lowLimit);
+                $lowWarnLimit = fahrenheit_to_celsius($lowWarnLimit);
+                $highLimit = fahrenheit_to_celsius($highLimit);
+                $highWarnLimit = fahrenheit_to_celsius($highWarnLimit);
             }
             discover_sensor($valid['sensor'], 'count', $device, $num_oid, $prefix . 'LiveRaw' . $index, 'webmon', $descr, '1', '1', $lowLimit, $lowWarnLimit, $highWarnlimit, $highLimit, $value, 'snmp', null, null, $user_function, $group);
         }
