@@ -604,7 +604,12 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
     if ($descr && $size > '0') {
         $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', array($index, $device['device_id'], $mib));
         if ($storage === false || !count($storage)) {
-            $perc_warn = Config::getOsSetting($device['os'],storage_perc_warn, 60);
+            if(Config::getOsSetting($device['os'],'storage_perc_warn')){
+                $perc_warn = Config::getOsSetting($device['os'],'storage_perc_warn');
+            } else {
+                $perc_warn = Config::get('storage_perc_warn', 60);
+            }
+
             $insert = dbInsert(
                 array(
                     'device_id' => $device['device_id'],
