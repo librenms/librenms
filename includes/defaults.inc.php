@@ -840,6 +840,9 @@ $config['discovery_modules']['fdb-table']            = true;
 // Enable daily updates
 $config['update'] = 1;
 
+// Sets automatic sensor limits when no values are returned by the device.
+$config['sensors']['guess_limits']                   = true;
+
 // Purge syslog and eventlog
 $config['syslog_purge'] = 30;
 // Number in days of how long to keep syslog entries for.
