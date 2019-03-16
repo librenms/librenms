@@ -1,5 +1,4 @@
 os: ciscosb
-#os: ciscosb_wap371-a-k9
 text: 'Cisco Small Business'
 ifname: true
 type: network
