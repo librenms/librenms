@@ -32,7 +32,6 @@ use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\TrapTestCase;
 use Log;
 
 class CommonTrapTest extends LaravelTestCase
@@ -60,7 +59,11 @@ UDP: [$ipv4->ipv4_address]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91\n";
 
         Log::shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => null]);
-        Log::shouldReceive('event')->once()->with("SNMP trap received: ", $device, 'trap');
+        Log::shouldReceive('event')->once()->withArgs(function ($e_message, $e_device, $e_type) use ($device) {
+            return $e_message == 'SNMP trap received: ' &&
+                $device->is($e_device) &&
+                $e_type == 'trap';
+        });
 
         $trap = new Trap($trapText);
         $this->assertFalse(Dispatcher::handle($trap), 'Found handler for trap with no snmpTrapOID');
