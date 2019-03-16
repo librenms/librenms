@@ -585,6 +585,9 @@ $config['bad_if_regexp'][] = '/^sl[0-9]/';
 // Rewrite Interfaces
 $config['rewrite_if_regexp']['/^cpu interface/'] = 'Mgmt';
 
+// Storage default warning percentage
+$config['storage_perc_warn'] = 60;
+
 $config['ignore_mount_removable'] = 1;
 // Ignore removable disk storage
 $config['ignore_mount_network'] = 1;
