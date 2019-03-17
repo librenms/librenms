@@ -1699,7 +1699,7 @@ function get_unit_for_sensor_class($class)
         'chromatic_dispersion' => 'ps/nm',
         'cooling'              => 'W',
         'count'                => '',
-        'current'              => '',
+        'current'              => 'A',
         'dbm'                  => 'dBm',
         'delay'                => 's',
         'eer'                  => '',
