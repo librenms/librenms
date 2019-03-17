@@ -3,7 +3,7 @@
 $sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND entPhysicalIndex_measured = 'ports' ORDER BY `sensor_type` ASC", array($device['device_id'],$port['ifIndex']));
 
 foreach ($sensors as $sensor) {
-    if ($sensor['poller_type'] == "ipmi") {
+    if ($sensor['poller_type'] == 'ipmi') {
         $sensor_descr = ipmiSensorName($device['hardware'], $sensor['sensor_descr']);
     } else {
         $sensor_descr = $sensor['sensor_descr'];
@@ -19,7 +19,7 @@ foreach ($sensors as $sensor) {
     echo "<div class='panel-body'>";
 
     $graph_array['id']   = $sensor['sensor_id'];
-    $graph_array['type'] = "sensor_" . $sensor['sensor_class'];
+    $graph_array['type'] = 'sensor_' . $sensor['sensor_class'];
 
     include 'includes/print-graphrow.inc.php';
     echo '</div></div>';
