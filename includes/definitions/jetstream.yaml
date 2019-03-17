@@ -6,7 +6,23 @@ mib_dir:
     - tplink
 discovery:
     - sysObjectID:
-        - .1.3.6.1.4.1.11863.5.28
-        - .1.3.6.1.4.1.11863.5.31
-        - .1.3.6.1.4.1.11863.5.34
-        - .1.3.6.1.4.1.11863.5.86
+        - .1.3.6.1.4.1.11863.5
+    - sysDescr:
+        - JetStream
+
+# we are missing TPLINK-PRODUCTS-MIB
+#        tplink                  OBJECT IDENTIFIER ::= { enterprises 11863 }
+#
+#        switch                  OBJECT IDENTIFIER ::= { tplink 1 }
+#        router                  OBJECT IDENTIFIER ::= { tplink 2 }
+#        wireless                OBJECT IDENTIFIER ::= { tplink 3 }
+#        adsl                    OBJECT IDENTIFIER ::= { tplink 4 }
+#        
+#        
+#        tplinkProducts  OBJECT-IDENTITY
+#                STATUS          current
+#                DESCRIPTION
+#                        "tplinkProducts is the root OBJECT IDENTIFIER from
+#                        which sysObjectID values are assigned.  Actual
+#                        values are defined in TPLINK-PRODUCTS-MIB."
+#                ::= { tplink 5 }
