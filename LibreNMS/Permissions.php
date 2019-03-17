@@ -98,21 +98,21 @@ class Permissions
             ->pluck('user_id');
     }
 
-    public function devicesForUser($user)
+    public function devicesForUser($user = null)
     {
         return $this->getDevicePermissions()
             ->where('user_id', $this->getUserId($user))
             ->pluck('device_id');
     }
 
-    public function portsForUser($user)
+    public function portsForUser($user = null)
     {
         return $this->getPortPermissions()
             ->where('user_id', $this->getUserId($user))
             ->pluck('port_id');
     }
 
-    public function billsForUser($user)
+    public function billsForUser($user = null)
     {
         return $this->getBillPermissions()
             ->where('user_id', $this->getUserId($user))
