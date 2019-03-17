@@ -25,7 +25,34 @@
 
 namespace LibreNMS\Tests\Unit;
 
-class PermissionsTest
-{
+use App\Models\Device;
+use App\Models\User;
+use LibreNMS\Tests\LaravelTestCase;
+use Mockery\Mock;
 
+class PermissionsTest extends LaravelTestCase
+{
+    public function testUserCanAccessDevice()
+    {
+        $perms = \Mockery::mock(\LibreNMS\Permissions::class)->makePartial();
+        $perms->shouldReceive('getDevicePermissions')->andReturn(collect([(object)['user_id' => 43, 'device_id' => 54]]));
+
+        $device = new Device();
+        $device->device_id = 54;
+        $user = new User();
+        $user->user_id = 43;
+        $this->assertTrue($perms->canAccessDevice($device, 43));
+        $this->assertTrue($perms->canAccessDevice($device, $user));
+        $this->assertTrue($perms->canAccessDevice(54, $user));
+        $this->assertTrue($perms->canAccessDevice(54, 43));
+        $this->assertTrue($perms->canAccessDevice(54, 43));
+        $this->assertFalse($perms->canAccessDevice(54, 23));
+        $this->assertFalse($perms->canAccessDevice(23, 43));
+        $this->assertFalse($perms->canAccessDevice(54));
+
+        \Auth::shouldReceive('id')->once()->andReturn(43);
+        $this->assertTrue($perms->canAccessDevice(54));
+        \Auth::shouldReceive('id')->once()->andReturn(23);
+        $this->assertFalse($perms->canAccessDevice(54));
+    }
 }
