@@ -16,11 +16,10 @@ Possible options:
  1. Follow the [documentation on using git](Using-Git.md)
  2. Install development dependencies `./composer_wrapper.php install`
  3. Set variables in .env, including database settings.  Which could be a local or remote MySQL server including your production DB.
- ```dotenv
+```dotenv
 APP_ENV=local
 APP_DEBUG=true
 ...
-
 ```
  4. Start a development webserver `./lnms serve`
  5. Access the Web UI at http://localhost:8000
