@@ -52,11 +52,26 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
     }
 
     try {
-        if (is_null($db_host) && empty($db_name)) {
-            Eloquent::boot();
-        } else {
-            Eloquent::boot(get_defined_vars());
+        if (!is_null($db_host) || !empty($db_name)) {
+            // legacy connection override
+            \Config::set('database.connections.setup', [
+                "driver" => "mysql",
+                "host" => $db_host,
+                "port" => $db_port,
+                "database" => $db_name,
+                "username" => $db_user,
+                "password" => $db_pass,
+                "unix_socket" => $db_socket,
+                "charset" => "utf8",
+                "collation" => "utf8_unicode_ci",
+                "prefix" => "",
+                "strict" => true,
+                "engine" => null
+            ]);
+            \Config::set('database.default', 'setup');
         }
+
+        Eloquent::boot();
     } catch (PDOException $e) {
         throw new DatabaseConnectException($e->getMessage(), $e->getCode(), $e);
     }
