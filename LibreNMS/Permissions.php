@@ -38,11 +38,6 @@ class Permissions
     private $portPermissions;
     private $billPermissions;
 
-    public function __construct()
-    {
-
-    }
-
     /**
      * @param Device|int $device
      * @param User|int $user
@@ -82,40 +77,46 @@ class Permissions
             ->isNotEmpty();
     }
 
-    public function usersFromDevice($device)
+    public function usersForDevice($device)
     {
         return $this->getDevicePermissions()
-            ->where('device_id', $this->getDeviceId($device));
+            ->where('device_id', $this->getDeviceId($device))
+            ->pluck('user_id');
     }
 
-    public function usersFromPort($port)
+    public function usersForPort($port)
     {
         return $this->getPortPermissions()
-            ->where('port_id', $this->getPortId($port));
+            ->where('port_id', $this->getPortId($port))
+            ->pluck('user_id');
     }
 
-    public function usersFromBill($bill)
+    public function usersForBill($bill)
     {
         return $this->getBillPermissions()
-            ->where('bill_id', $this->getBillId($bill));
+            ->where('bill_id', $this->getBillId($bill))
+            ->pluck('user_id');
     }
 
-    public function devicesFromUser($user)
+    public function devicesForUser($user)
     {
         return $this->getDevicePermissions()
-            ->where('user_id', $this->getUserId($user));
+            ->where('user_id', $this->getUserId($user))
+            ->pluck('device_id');
     }
 
-    public function portsFromUser($user)
+    public function portsForUser($user)
     {
         return $this->getPortPermissions()
-            ->where('user_id', $this->getUserId($user));
+            ->where('user_id', $this->getUserId($user))
+            ->pluck('port_id');
     }
 
-    public function billsFromUser($user)
+    public function billsForUser($user)
     {
         return $this->getBillPermissions()
-            ->where('user_id', $this->getUserId($user));
+            ->where('user_id', $this->getUserId($user))
+            ->pluck('bill_id');
     }
 
     /**

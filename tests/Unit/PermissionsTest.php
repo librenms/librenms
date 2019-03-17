@@ -35,12 +35,12 @@ class PermissionsTest extends LaravelTestCase
     public function testUserCanAccessDevice()
     {
         $perms = \Mockery::mock(\LibreNMS\Permissions::class)->makePartial();
-        $perms->shouldReceive('getDevicePermissions')->andReturn(collect([(object)['user_id' => 43, 'device_id' => 54]]));
+        $perms->shouldReceive('getDevicePermissions')->andReturn(collect([
+            (object)['user_id' => 43, 'device_id' => 54],
+        ]));
 
-        $device = new Device();
-        $device->device_id = 54;
-        $user = new User();
-        $user->user_id = 43;
+        $device = factory(Device::class)->make(['device_id', 54]);
+        $user = factory(User::class)->make(['user_id', 43]);
         $this->assertTrue($perms->canAccessDevice($device, 43));
         $this->assertTrue($perms->canAccessDevice($device, $user));
         $this->assertTrue($perms->canAccessDevice(54, $user));
@@ -54,5 +54,19 @@ class PermissionsTest extends LaravelTestCase
         $this->assertTrue($perms->canAccessDevice(54));
         \Auth::shouldReceive('id')->once()->andReturn(23);
         $this->assertFalse($perms->canAccessDevice(54));
+    }
+
+    public function testDevicesForUser()
+    {
+        $perms = \Mockery::mock(\LibreNMS\Permissions::class)->makePartial();
+        $perms->shouldReceive('getDevicePermissions')->andReturn(collect([
+            (object)['user_id' => 3, 'device_id' => 7],
+            (object)['user_id' => 3, 'device_id' => 2],
+            (object)['user_id' => 4, 'device_id' => 5],
+        ]));
+
+        $this->assertEquals([7,2], $perms->devicesForUser(3));
+        $user = factory(User::class)->make(['user_id' => 3]);
+        $this->assertEquals([7,2], $perms->devicesForUser($user));
     }
 }
