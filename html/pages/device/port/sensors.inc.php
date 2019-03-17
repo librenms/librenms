@@ -2,14 +2,7 @@
 
 $sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND entPhysicalIndex_measured = 'ports' ORDER BY `sensor_type` ASC", array($device['device_id'],$port['ifIndex']));
 
-$row = 0;
 foreach ($sensors as $sensor) {
-    if (!is_integer($row / 2)) {
-        $row_colour = $config['list_colour']['even'];
-    } else {
-        $row_colour = $config['list_colour']['odd'];
-    }
-
     if ($sensor['poller_type'] == "ipmi") {
         $sensor_descr = ipmiSensorName($device['hardware'], $sensor['sensor_descr']);
     } else {
@@ -30,7 +23,4 @@ foreach ($sensors as $sensor) {
 
     include 'includes/print-graphrow.inc.php';
     echo '</div></div>';
-
-    $row++;
 }
-unset($row);
