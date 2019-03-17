@@ -442,8 +442,8 @@ class Config
             self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
         }
 
-        if (self::get('secure_cookies')) {
-            @ini_set('session.cookie_secure', 1);
+        if (self::get('secure_cookies') && isset($_SERVER["HTTPS"])) {
+            ini_set('session.cookie_secure', 1);
         }
 
         // If we're on SSL, let's properly detect it
