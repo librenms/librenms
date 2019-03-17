@@ -12,15 +12,18 @@ foreach ($sensors as $sensor) {
     $sensor_current = format_si($sensor['sensor_current']) . $unit;
     $sensor_limit = format_si($sensor['sensor_limit']) . $unit;
     $sensor_limit_low = format_si($sensor['sensor_limit_low']) . $unit;
-    echo "<div class='panel panel-default'>
-            <div class='panel-heading'>
-                <h3 class='panel-title'>$sensor_descr <div class='pull-right'>$sensor_current | $sensor_limit_low <> $sensor_limit</div></h3>
-            </div>";
-    echo "<div class='panel-body'>";
+
+    echo "<div class='panel panel-default'>\n" .
+         "    <div class='panel-heading'>\n" .
+         "        <h3 class='panel-title'>$sensor_descr <div class='pull-right'>$sensor_current | $sensor_limit_low <> $sensor_limit</div></h3>" .
+         "    </div>\n" .
+         "    <div class='panel-body'>\n";
 
     $graph_array['id']   = $sensor['sensor_id'];
     $graph_array['type'] = 'sensor_' . $sensor['sensor_class'];
 
     include 'includes/print-graphrow.inc.php';
-    echo '</div></div>';
+
+    echo "    </div>\n" .
+         "</div>\n";
 }
