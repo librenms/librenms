@@ -29,9 +29,10 @@ use App\Models\Device;
 use App\Models\User;
 use LibreNMS\Alert\Transport\Mail;
 use LibreNMS\Config;
+use LibreNMS\Tests\LaravelTestCase;
 use LibreNMS\Tests\TestCase;
 
-class MailTransportTest extends TestCase
+class MailTransportTest extends LaravelTestCase
 {
     public function testUsersForFaults()
     {
@@ -41,15 +42,34 @@ class MailTransportTest extends TestCase
 
         $devices = factory(Device::class, 5)->create();
 
-
         $mail = new Mail(null);
+        $faults = collect($devices);
 
         Config::set('alert.admins', true);
         Config::set('alert.globals', false);
         Config::set('alert.users', false);
 
-        $faults = collect($devices);
-        $contacts = $mail->getUsersForFaults();
+        $contacts = $mail->getUsersForFaults($faults);
+
+        $this->assertNotEmpty($contacts);
+        $this->assertEquals(collect([$admin->user_id]), $contacts->pluck('user_id'), 'admins only');
+
+        Config::set('alert.admins', true);
+        Config::set('alert.globals', true);
+        Config::set('alert.users', false);
+
+        $contacts = $mail->getUsersForFaults($faults);
+        $this->assertNotEmpty($contacts);
+        $this->assertEquals(collect([$admin->user_id, $read->user_id]), $contacts->pluck('user_id'), 'admins only');
+
+        Config::set('alert.admins', false);
+        Config::set('alert.globals', false);
+        Config::set('alert.users', true);
+
+        $contacts = $mail->getUsersForFaults($faults);
+        $this->assertNotEmpty($contacts);
+        $this->assertEquals(collect([]), $contacts->pluck('user_id'), 'admins only');
+
     }
 
     public function testsSendsToAdmin()
