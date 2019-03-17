@@ -55,7 +55,7 @@
   </item>
     <item>
       <title>Cisco Temperature Sensor Threshold Values Stored as High Limits</title>
-      <description>During discovery, some temperature sensors discovered on Cisco devices had their highest temperature value stored as warning high limit. For new discovered devices, this value is now stored as high limit.
+      <description>During discovery, some temperature sensors discovered on Cisco devices had their highest temperature value stored as warning high limit. For new discovered devices, this value is now stored as high limit.</description>
       <pubDate>Sun, 17 Mar 2019 21:00:00 +0100</pubDate>
     </item>
 </channel>
