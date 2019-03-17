@@ -3,6 +3,8 @@
 $sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND entPhysicalIndex_measured = 'ports' ORDER BY `sensor_type` ASC", array($device['device_id'],$port['ifIndex']));
 
 foreach ($sensors as $sensor) {
+    $unit = get_unit_for_sensor_class($sensor['sensor_class']);
+
     $state_translation = array();
     if (($graph_type == 'sensor_state')) {
         $state_translation = dbFetchRows('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', array($sensor['sensor_id'], $sensor['sensor_current']));
