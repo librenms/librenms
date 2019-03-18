@@ -15,21 +15,6 @@ use Validator;
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
-        $this->app->booted('\LibreNMS\Config::load');
-
-        $this->bootCustomBladeDirectives();
-        $this->bootCustomValidators();
-        $this->configureMorphAliases();
-    }
-
-    /**
      * Register any application services.
      *
      * @return void
@@ -42,6 +27,21 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('permissions', function($app) {
             return new Permissions();
         });
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
+        $this->app->booted('\LibreNMS\Config::load');
+
+        $this->bootCustomBladeDirectives();
+        $this->bootCustomValidators();
+        $this->configureMorphAliases();
     }
 
     private function bootCustomBladeDirectives()
