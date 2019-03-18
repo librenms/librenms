@@ -14,6 +14,7 @@
 use App\Models\Location;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Time;
 
 $snmpdata = snmp_get_multi_oid($device, ['sysUpTime.0', 'sysLocation.0', 'sysContact.0', 'sysName.0', 'sysObjectID.0', 'sysDescr.0'], '-OQnUt', 'SNMPv2-MIB');
 
@@ -41,7 +42,7 @@ if (!empty($agent_data['uptime'])) {
 
 if ($uptime != 0 && $config['os'][$device['os']]['bad_uptime'] !== true) {
     if ($uptime < $device['uptime']) {
-        log_event('Device rebooted after ' . formatUptime($device['uptime']) . " -> {$uptime}s", $device, 'reboot', 4, $device['uptime']);
+        log_event('Device rebooted after ' . Time::formatInterval($device['uptime']) . " -> {$uptime}s", $device, 'reboot', 4, $device['uptime']);
     }
 
     $tags = array(
@@ -51,7 +52,7 @@ if ($uptime != 0 && $config['os'][$device['os']]['bad_uptime'] !== true) {
 
     $graphs['uptime'] = true;
 
-    echo 'Uptime: ' . formatUptime($uptime) . PHP_EOL;
+    echo 'Uptime: ' . Time::formatInterval($uptime) . PHP_EOL;
 
     $update_array['uptime'] = $uptime;
     $device['uptime']       = $uptime;
