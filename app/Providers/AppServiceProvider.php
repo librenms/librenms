@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Config;
+use LibreNMS\Permissions;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use Validator;
@@ -37,6 +38,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->registerFacades();
         $this->registerGeocoder();
+
+        $this->app->singleton('permissions', function($app) {
+            return new Permissions();
+        });
     }
 
     private function bootCustomBladeDirectives()

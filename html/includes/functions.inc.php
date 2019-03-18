@@ -292,105 +292,48 @@ function print_graph_popup($graph_array)
     echo generate_graph_popup($graph_array);
 }//end print_graph_popup()
 
-
-function permissions_cache($user_id)
-{
-    $permissions = array();
-    foreach (dbFetchRows("SELECT * FROM devices_perms WHERE user_id = '" . $user_id . "'") as $device) {
-        $permissions['device'][$device['device_id']] = 1;
-    }
-
-    foreach (dbFetchRows("SELECT * FROM ports_perms WHERE user_id = '" . $user_id . "'") as $port) {
-        $permissions['port'][$port['port_id']] = 1;
-    }
-
-    foreach (dbFetchRows("SELECT * FROM bill_perms WHERE user_id = '" . $user_id . "'") as $bill) {
-        $permissions['bill'][$bill['bill_id']] = 1;
-    }
-
-    return $permissions;
-}//end permissions_cache()
-
-
 function bill_permitted($bill_id)
 {
-    global $permissions;
-
     if (LegacyAuth::user()->hasGlobalRead()) {
-        $allowed = true;
-    } elseif ($permissions['bill'][$bill_id]) {
-        $allowed = true;
-    } else {
-        $allowed = false;
+        return true;
     }
 
-    return $allowed;
-}//end bill_permitted()
-
+    return \Permissions::canAccessBill($bill_id, LegacyAuth::id());
+}
 
 function port_permitted($port_id, $device_id = null)
 {
-    global $permissions;
-
     if (!is_numeric($device_id)) {
         $device_id = get_device_id_by_port_id($port_id);
     }
 
-    if (LegacyAuth::user()->hasGlobalRead()) {
-        $allowed = true;
-    } elseif (device_permitted($device_id)) {
-        $allowed = true;
-    } elseif ($permissions['port'][$port_id]) {
-        $allowed = true;
-    } else {
-        $allowed = false;
+    if (device_permitted($device_id)) {
+        return true;
     }
 
-    return $allowed;
-}//end port_permitted()
-
+    return \Permissions::canAccessPort($port_id, LegacyAuth::id());
+}
 
 function application_permitted($app_id, $device_id = null)
 {
-    global $permissions;
-
-    if (is_numeric($app_id)) {
-        if (!$device_id) {
-            $device_id = get_device_id_by_app_id($app_id);
-        }
-
-        if (LegacyAuth::user()->hasGlobalRead()) {
-            $allowed = true;
-        } elseif (device_permitted($device_id)) {
-            $allowed = true;
-        } elseif ($permissions['application'][$app_id]) {
-            $allowed = true;
-        } else {
-            $allowed = false;
-        }
-    } else {
-        $allowed = false;
+    if (!is_numeric($app_id)) {
+        return false;
     }
 
-    return $allowed;
-}//end application_permitted()
+    if (!$device_id) {
+        $device_id = get_device_id_by_app_id($app_id);
+    }
 
+    return device_permitted($device_id);
+}
 
 function device_permitted($device_id)
 {
-    global $permissions;
-
     if (LegacyAuth::user()->hasGlobalRead()) {
-        $allowed = true;
-    } elseif ($permissions['device'][$device_id]) {
-        $allowed = true;
-    } else {
-        $allowed = false;
+        return true;
     }
-
-    return $allowed;
-}//end device_permitted()
-
+    return \Permissions::canAccessDevice($device_id, LegacyAuth::id());
+}
 
 function print_graph_tag($args)
 {
