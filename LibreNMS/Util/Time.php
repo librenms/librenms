@@ -48,4 +48,35 @@ class Time
 
         return isset($conversion[$description]) ? $conversion[$description] : 0;
     }
+
+    public static function formatInterval($interval, $format = 'long')
+    {
+        $result = '';
+        $data = [
+            'years' => 31536000,
+            'days' => 86400,
+            'hours' => 3600,
+            'minutes' => 60,
+            'seconds' => 1,
+        ];
+
+        foreach ($data as $k => $v) {
+            if ($interval >= $v) {
+                $diff = floor($interval / $v);
+
+                $result .= " $diff";
+                if ($format == 'short') {
+                    $result .= substr($k, 0, 1);
+                } elseif ($diff > 1) {
+                    $result .= ' ' . $k;
+                } else {
+                    $result .= substr($k, 0, -1);
+                }
+
+                $interval -= $v * $diff;
+            }
+        }
+
+        return $result;
+    }
 }
