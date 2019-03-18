@@ -1821,3 +1821,23 @@ function nfsen_hostname( $hostname ) {
     }
     return $nfsen_hostname;
 }
+
+/*
+ * @params string hostname
+ * @return string
+ *
+ * Takes a hostname and returns the path to the nfsen
+ * live dir.
+*/
+
+function nfsen_live_dir( $hostname ) {
+    global $config;
+
+    $hostname=nfsen_hostname($hostname);
+
+    foreach ($config['nfsen_base'] as $base_dir) {
+        if (file_exists($base_dir) && is_dir($base_dir)) {
+            return $base_dir.'/profiles-data/live/'.$hostname;
+        }
+    }
+}

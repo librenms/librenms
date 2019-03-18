@@ -154,7 +154,7 @@ if (isset($vars['process'])){
     $current_time=lowest_five_minutes(time() - 300);
     $last_time=lowest_five_minutes($current_time - $lastN - 300);
 
-    $command=$config['nfdump'].' -M '.$config['nfsen_base'][0].'/profiles-data/live/'.$nfsen_hostname.' -T -R '.
+    $command=$config['nfdump'].' -M '.nfsen_live_dir($device['hostname']).' -T -R '.
              time_to_nfsen_subpath($last_time).':'.time_to_nfsen_subpath($current_time).
              ' -n '.$topN.' -s '.$stat_type.'/'.$stat_order;
 
