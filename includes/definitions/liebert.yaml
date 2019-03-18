@@ -2,7 +2,9 @@ os: liebert
 text: Liebert
 type: power
 icon: vertiv
-rfc1628_compat: true
+mib_dir:
+    - liebert
+rfc1628_compat: false
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.476.1.42

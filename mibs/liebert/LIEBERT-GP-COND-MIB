@@ -34,8 +34,8 @@ liebertGlobalProductsConditionsModule MODULE-IDENTITY
 
       Tel: +1 (800) 222-5877
 
-      E-mail: liebert.monitoring@emerson.com
-      Web:    www.liebert.com
+      E-mail: liebert.monitoring@vertivco.com
+      Web:    www.vertivco.com
 
       Author:  Gregory M. Hoge"
 
@@ -689,6 +689,18 @@ lgpConditionCompressorOverload  OBJECT-IDENTITY
             "The system has detected an overload condition on compressor 2."
         ::= { lgpConditionCompressorOverload 2 }
 
+    lgpConditionCompressor3Overload OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an overload condition on compressor 3."
+        ::= { lgpConditionCompressorOverload 3 }
+
+    lgpConditionCompressor4Overload OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an overload condition on compressor 4."
+        ::= { lgpConditionCompressorOverload 4 }
+
 lgpConditionCompressorShortCycle  OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -744,6 +756,22 @@ lgpConditionCompressorShortCycle  OBJECT-IDENTITY
               specified amount of time."
           ::= { lgpConditionCompressor2ShortCycle 2 }
 
+    lgpConditionCompressor3ShortCycle OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a short cycle event on compressor 3.
+            The compressor has exceeded the maximum number of starts for
+            specified amount of time."
+        ::= { lgpConditionCompressorShortCycle 3 }
+
+    lgpConditionCompressor4ShortCycle OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a short cycle event on compressor 4.
+            The compressor has exceeded the maximum number of starts for
+            specified amount of time."
+        ::= { lgpConditionCompressorShortCycle 4 }
+
 lgpConditionCompressorLowSuctionPressure  OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -764,6 +792,20 @@ lgpConditionCompressorLowSuctionPressure  OBJECT-IDENTITY
             "The pressure at compressor 2 inlet has dropped below the
             minimum setting."
         ::= { lgpConditionCompressorLowSuctionPressure 2 }
+
+    lgpConditionCompressor3LowSuctionPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The pressure at compressor 3 inlet has dropped below the
+            minimum setting."
+        ::= { lgpConditionCompressorLowSuctionPressure 3 }
+
+    lgpConditionCompressor4LowSuctionPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The pressure at compressor 4 inlet has dropped below the
+            minimum setting."
+        ::= { lgpConditionCompressorLowSuctionPressure 4 }
 
 lgpConditionMainFanOverLoad  OBJECT-IDENTITY
     STATUS current
@@ -2243,6 +2285,28 @@ lgpConditionSensorFailure OBJECT-IDENTITY
             transducer is disconnected or the signal is out of range."
         ::= { lgpConditionSensorFailure 27 }
 
+        lgpConditionCompressor2HighPressureSensorFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected that compressor 2 high pressure
+                transducer is disconnected or the signal is out of range."
+            ::= { lgpConditionCompressorHighPressureSensorFailure 2 }
+
+        lgpConditionCompressor3HighPressureSensorFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected that compressor 3 high pressure
+                transducer is disconnected or the signal is out of range."
+            ::= { lgpConditionCompressorHighPressureSensorFailure 3 }
+
+        lgpConditionCompressor4HighPressureSensorFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected that compressor 4 high pressure
+                transducer is disconnected or the signal is out of range."
+            ::= { lgpConditionCompressorHighPressureSensorFailure 4 }
+
+
 lgpConditionInternalCommunicationFailure OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -3087,6 +3151,20 @@ lgpConditionCompPumpDownFailure OBJECT-IDENTITY
             "The system has detected that compressor 2 has failed to pump
             down."
         ::= { lgpConditionCompPumpDownFailure 2 }
+
+    lgpConditionComp3PumpDownFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that compressor 3 has failed to pump
+            down."
+        ::= { lgpConditionCompPumpDownFailure 3 }
+
+    lgpConditionComp4PumpDownFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that compressor 4 has failed to pump
+            down."
+        ::= { lgpConditionCompPumpDownFailure 4 }
 
 lgpConditionChilledWaterLowWaterFlow OBJECT-IDENTITY
     STATUS current
