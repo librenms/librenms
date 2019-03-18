@@ -2,7 +2,7 @@
 /**
  * Permissions.php
  *
- * -Description-
+ * Class to check the direct permissions on devices, ports, and bills for normal users (not global read only and admin)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
