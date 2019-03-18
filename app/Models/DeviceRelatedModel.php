@@ -25,8 +25,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
-
 class DeviceRelatedModel extends BaseModel
 {
     // ---- Query Scopes ----
