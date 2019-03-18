@@ -126,7 +126,7 @@ class DeviceController extends TableController
             'metrics' => $this->getMetrics($device),
             'hardware' => Rewrite::ciscoHardware($device),
             'os' => $this->getOsText($device),
-            'uptime' => Time::formatInterval($device->status ? $device->uptime : ($device->last_polled ? $device->last_polled->diffInSeconds() : null), 'short'),
+            'uptime' => $device->status ? Time::formatInterval($device->uptime, 'short') : ($device->last_polled ? Time::formatInterval($device->last_polled->diffInSeconds(), 'short') : 'Never'),
             'location' => $this->getLocation($device),
             'actions' => $this->getActions($device),
         ];
