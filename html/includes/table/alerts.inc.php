@@ -92,6 +92,8 @@ if (!LegacyAuth::user()->hasGlobalRead()) {
     $param[] = LegacyAuth::id();
 }
 
+$sql .= " LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id`";
+
 $sql .= "  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE $where";
 
 $count_sql = "SELECT COUNT(`alerts`.`id`) $sql";
@@ -117,7 +119,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`hardware`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
+$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
 
 $rulei = 0;
 $format = $vars['format'];
