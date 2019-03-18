@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerFacades();
         $this->registerGeocoder();
 
-        $this->app->singleton('permissions', function($app) {
+        $this->app->singleton('permissions', function ($app) {
             return new Permissions();
         });
     }
