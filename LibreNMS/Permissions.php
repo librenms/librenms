@@ -39,6 +39,9 @@ class Permissions
     private $billPermissions;
 
     /**
+     * Check if a device can be accessed by user (non-global read/admin)
+     * If no user is given, use the logged in user
+     *
      * @param Device|int $device
      * @param User|int $user
      * @return boolean
@@ -52,6 +55,9 @@ class Permissions
     }
 
     /**
+     * Check if a access can be accessed by user (non-global read/admin)
+     * If no user is given, use the logged in user
+     *
      * @param Port|int $port
      * @param User|int $user
      * @return boolean
@@ -65,6 +71,9 @@ class Permissions
     }
 
     /**
+     * Check if a bill can be accessed by user (non-global read/admin)
+     * If no user is given, use the logged in user
+     *
      * @param Bill|int $bill
      * @param User|int $user
      * @return boolean
@@ -77,6 +86,12 @@ class Permissions
             ->isNotEmpty();
     }
 
+    /**
+     * Get the user_id of users that have been granted access to device
+     *
+     * @param Device|int $device
+     * @return \Illuminate\Support\Collection
+     */
     public function usersForDevice($device)
     {
         return $this->getDevicePermissions()
@@ -84,6 +99,12 @@ class Permissions
             ->pluck('user_id');
     }
 
+    /**
+     * Get the user_id of users that have been granted access to port
+     *
+     * @param Port|int $port
+     * @return \Illuminate\Support\Collection
+     */
     public function usersForPort($port)
     {
         return $this->getPortPermissions()
@@ -91,6 +112,12 @@ class Permissions
             ->pluck('user_id');
     }
 
+    /**
+     * Get the user_id of users that have been granted access to bill
+     *
+     * @param Bill|int $bill
+     * @return \Illuminate\Support\Collection
+     */
     public function usersForBill($bill)
     {
         return $this->getBillPermissions()
@@ -98,6 +125,12 @@ class Permissions
             ->pluck('user_id');
     }
 
+    /**
+     * Get a list of device_id of all devices the user can access
+     *
+     * @param User|int $user
+     * @return \Illuminate\Support\Collection
+     */
     public function devicesForUser($user = null)
     {
         return $this->getDevicePermissions()
@@ -105,6 +138,12 @@ class Permissions
             ->pluck('device_id');
     }
 
+    /**
+     * Get a list of port_id of all ports the user can access
+     *
+     * @param User|int $user
+     * @return \Illuminate\Support\Collection
+     */
     public function portsForUser($user = null)
     {
         return $this->getPortPermissions()
@@ -112,6 +151,12 @@ class Permissions
             ->pluck('port_id');
     }
 
+    /**
+     * Get a list of bill_id of all bills the user can access
+     *
+     * @param User|int $user
+     * @return \Illuminate\Support\Collection
+     */
     public function billsForUser($user = null)
     {
         return $this->getBillPermissions()
@@ -120,6 +165,8 @@ class Permissions
     }
 
     /**
+     * Get the cached data for device permissions.  Use helpers instead.
+     *
      * @return \Illuminate\Support\Collection
      */
     public function getDevicePermissions()
@@ -132,6 +179,8 @@ class Permissions
     }
 
     /**
+     * Get the cached data for port permissions.  Use helpers instead.
+     *
      * @return \Illuminate\Support\Collection
      */
     public function getPortPermissions()
@@ -144,6 +193,8 @@ class Permissions
     }
 
     /**
+     * Get the cached data for bill permissions.  Use helpers instead.
+     *
      * @return \Illuminate\Support\Collection
      */
     public function getBillPermissions()
