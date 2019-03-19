@@ -1,6 +1,6 @@
 <?php
 /**
- * DeviceRelatedModel.php
+ * Permissions.php
  *
  * -Description-
  *
@@ -23,27 +23,14 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Models;
+namespace App\Facades;
 
-class DeviceRelatedModel extends BaseModel
+use Illuminate\Support\Facades\Facade;
+
+class Permissions extends Facade
 {
-    // ---- Query Scopes ----
-
-    public function scopeHasAccess($query, User $user)
+    protected static function getFacadeAccessor()
     {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
-    public function scopeInDeviceGroup($query, $deviceGroup)
-    {
-        $groups = $deviceGroup instanceof DeviceGroup ? $deviceGroup->devices()->pluck('devices.device_id') : [];
-        return $query->whereIn($this->getTable() . '.device_id', $groups);
-    }
-
-    // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
+        return 'permissions';
     }
 }

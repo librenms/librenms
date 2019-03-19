@@ -18,8 +18,6 @@ use LibreNMS\Config;
 
 function authToken(\Slim\Route $route)
 {
-    global $permissions;
-
     if (Auth::check()) {
         $user = Auth::user();
 
@@ -29,7 +27,6 @@ function authToken(\Slim\Route $route)
             'user_id' => $user->user_id,
             'userlevel' => $user->level
         ];
-        $permissions = permissions_cache($user->user_id);
 
         return;
     }
