@@ -140,6 +140,10 @@ function GenGroupSQL($pattern, $search = '', $extra = 0)
                     $tables[] = $tmp;
                 }
             }
+              // patch  if  first table is locations
+               if ($tables[0]=='locations') {
+                $tables=array_reverse($tables);
+               }
             $join .= "( ".$qry.$tables[0].".device_id ) && ";
         }
         $i++;
