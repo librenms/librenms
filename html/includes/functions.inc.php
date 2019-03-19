@@ -1689,14 +1689,17 @@ function get_sensor_label_color($sensor)
 /**
  * Rounds down to the closest number divisible by 5.
  */
-function lowest_five($number){
-    return floor( $number / 5 ) * 5;
+
+function lowest_five($number)
+{
+    return floor($number / 5) * 5;
 }
 
 /**
  * Rounds down to the nearest 5 minutes if using seconds.
  */
-function lowest_five_minutes($time) {
+function lowest_five_minutes($time)
+{
     return $time - ($time % 300);
 }
 
@@ -1723,7 +1726,8 @@ function lowest_five_minutes($time) {
  *  7 %Y-%m-%d    year-month-day
  *  8 %Y-%m-%d/%H year-month-day/hour
  */
-function time_to_nfsen_subpath($time) {
+function time_to_nfsen_subpath($time)
+{
     $time=lowest_five_minutes($time);
     $layout=$config['nfsen_subdirlayout'];
 
@@ -1757,7 +1761,8 @@ function time_to_nfsen_subpath($time) {
  * path to the RRD for the channel.
 */
 
-function nfsen_channel_rrds($hostname) {
+function nfsen_channel_rrds($hostname)
+{
     global $config;
 
     $channels=array();
@@ -1811,7 +1816,8 @@ function nfsen_channel_rrds($hostname) {
  * used by nfsen.
 */
 
-function nfsen_hostname($hostname) {
+function nfsen_hostname($hostname)
+{
     global $config;
 
     $nfsen_hostname=str_replace('.', $config['nfsen_split_char'], $hostname);
@@ -1830,7 +1836,8 @@ function nfsen_hostname($hostname) {
  * live dir.
 */
 
-function nfsen_live_dir($hostname) {
+function nfsen_live_dir($hostname)
+{
     global $config;
 
     $hostname=nfsen_hostname($hostname);
