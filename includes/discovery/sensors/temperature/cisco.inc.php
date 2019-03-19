@@ -16,7 +16,7 @@ if (is_array($temp)) {
     foreach ($temp as $index => $entry) {
         if ($temp[$index]['ciscoEnvMonTemperatureState'] != 'notPresent' && !empty($temp[$index]['ciscoEnvMonTemperatureStatusDescr'])) {
             $descr = ucwords($temp[$index]['ciscoEnvMonTemperatureStatusDescr']);
-            discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid.$index, $index, 'cisco', $descr, '1', '1', null, null, $temp[$index]['ciscoEnvMonTemperatureThreshold'], null, $temp[$index]['ciscoEnvMonTemperatureStatusValue'], 'snmp', $index);
+            discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid . $index, $index, 'cisco', $descr, '1', '1', null, null, null, $temp[$index]['ciscoEnvMonTemperatureThreshold'], $temp[$index]['ciscoEnvMonTemperatureStatusValue'], 'snmp', $index);
         }
     }
 }
