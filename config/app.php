@@ -237,7 +237,7 @@ return [
         'Toastr' => Kamaln7\Toastr\Facades\Toastr::class,
 
         // LibreNMS
-//        'LibreConfig' => \LibreNMS\Config::class,
+        'Permissions' => \App\Facades\Permissions::class,
     ],
 
 ];
