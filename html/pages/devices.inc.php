@@ -315,7 +315,9 @@ if ($format == "graph") {
                     return "<span>" + row.hostname + "</span>";
                 },
                 "uptime": function (column, row) {
-                    if (row.status == 'down') {
+                    if (isNaN(row.uptime.charAt(0))) {
+                        return row.uptime;
+                    } else if (row.status == 'down') {
                         return "<span class='alert-status-small label-danger'></span><span>" + row.uptime + "</span>";
                     } else {
                         return "<span class='alert-status-small label-success'></span><span>" + row.uptime + "</span>";
