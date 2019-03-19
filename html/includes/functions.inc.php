@@ -1798,7 +1798,7 @@ function nfsen_channel_rrds($hostname)
         if (is_dir($host_dir)) {
             $nfsen_RRD_channel_glob=$host_dir.'*.rrd';
             foreach (glob($nfsen_RRD_channel_glob) as $nfsen_RRD) {
-                $channel = str_replace(array($hostDir, '.rrd'), '', $nfsen_RRD);
+                $channel = str_replace(array($host_dir, '.rrd'), '', $nfsen_RRD);
 
                 $channels[$channel]=$nfsen_dir.$channels.'.rrd';
             }
