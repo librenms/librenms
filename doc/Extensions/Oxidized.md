@@ -108,6 +108,8 @@ To match on a device os of edgeos then please use the following:
 $config['oxidized']['maps']['group']['os'][] = array('match' => 'edgeos', 'group' => 'wireless');
 ```
 
+Matching on OS requires system name of the OS. For example, 'match' => 'RouterOS' will not work, while 'match' => 'routeros' will.
+
 To override the IP Oxidized uses to poll the device, you can add the following within config.php:
 
 ```php
