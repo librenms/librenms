@@ -106,9 +106,10 @@ function GenGroupSQL($pattern, $search = '', $extra = 0)
 
     $pattern = rtrim($pattern, '&|');
 
-    if (!in_array('devices', $tables) && dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', array($tables[0],'device_id')) != 1) {
+    if ($tables[0] != 'devices' && dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', array($tables[0],'device_id')) != 1) {
         //Our first table has no valid glue, prepend the 'devices' table to it!
         array_unshift($tables, 'devices');
+        $tables = array_unique($tables); // remove devices from later in the array if it exists
     }
     $x = sizeof($tables)-1;
     $i = 0;
