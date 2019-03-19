@@ -40,6 +40,12 @@ $factory->state(App\Models\User::class, 'read', function ($faker) {
     ];
 });
 
+$factory->define(\App\Models\Bill::class, function (Faker\Generator $faker) {
+    return [
+        'bill_name' => $faker->text
+    ];
+});
+
 $factory->define(\App\Models\Device::class, function (Faker\Generator $faker) {
     return [
         'hostname'      => $faker->domainWord.'.'.$faker->domainName,

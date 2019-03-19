@@ -30,7 +30,7 @@
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
-global $config, $permissions, $vars, $console_color;
+global $config, $vars, $console_color;
 
 error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
 ini_set('display_errors', 1);
@@ -153,28 +153,3 @@ if (module_selected('web', $init_modules)) {
 }
 
 $console_color = new Console_Color2();
-
-if (module_selected('auth', $init_modules) ||
-    (
-        module_selected('graphs', $init_modules) &&
-        isset($config['allow_unauth_graphs']) &&
-        $config['allow_unauth_graphs'] != true
-    )
-) {
-    // populate the permissions cache TODO: remove?
-    $permissions = [];
-
-    $user_id = LegacyAuth::id();
-    foreach (dbFetchColumn('SELECT device_id FROM devices_perms WHERE user_id=?', [$user_id]) as $device_id) {
-        $permissions['device'][$device_id] = 1;
-    }
-
-    foreach (dbFetchColumn('SELECT port_id FROM ports_perms WHERE user_id=?', [$user_id]) as $port_id) {
-        $permissions['port'][$port_id] = 1;
-    }
-
-    foreach (dbFetchColumn('SELECT bill_id FROM bill_perms WHERE user_id=?', [$user_id]) as $bill_id) {
-        $permissions['bill'][$bill_id] = 1;
-    }
-    unset($user_id, $device_id, $port_id, $bill_id);
-}
