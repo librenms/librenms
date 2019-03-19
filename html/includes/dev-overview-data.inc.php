@@ -113,7 +113,7 @@ if ($device['location_id']) {
     $maps_engine = $maps_api ? Config::get('geoloc.engine') : '';
 
     $location = Location::find($device['location_id']);
-    $location_valid = $location && $location->coordinatesValid();
+    $location_valid = ($location && $location->coordinatesValid());
     $location_coords = $location_valid ? $location->lat . ', ' . $location->lng : 'N/A';
 
     echo '
