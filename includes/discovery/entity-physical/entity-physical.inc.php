@@ -6,6 +6,36 @@ if ($device['os'] == 'junos') {
     $entity_array = array();
     echo ' jnxBoxAnatomy';
     $entity_array = snmpwalk_cache_oid($device, 'jnxBoxAnatomy', $entity_array, 'JUNIPER-MIB');
+} elseif ($device['os'] == 'aruba-instant') {
+    $entity_array = array();
+    echo 'aruba-instant';
+
+    $ai_mib = 'AI-AP-MIB';
+    $ai_ig_data = snmpwalk_group($device, 'aiInfoGroup', $ai_mib);
+     discover_entity_physical(
+         $valid,
+         $device,
+         1,                                              // entPhysicalIndex
+         $ai_ig_data['aiVirtualControllerIPAddress.0'],  // entPhysicalDescr
+         'chassis',                                      // entPhysicalClass
+         $ai_ig_data['aiVirtualControllerName.0'],       // entPhysicalName
+         'Instant Virutal Controller Cluster',           // entPhysicalModelName
+         $ai_ig_data['aiVirtualControllerKey.0'],        // entPhysicalSerialNum
+         '0',                                            // entPhysicalContainedIn
+         'Aruba',                                        // entPhysicalMfgName
+         '-1',                                           // entPhysicalParentRelPos
+         'Aruba',                                        // entPhysicalVendorType
+         null,                                           // entPhysicalHardwareRev
+         null,                                           // entPhysicalFirmwareRev
+         null,                                           // entPhysicalSoftwareRev
+         null,                                           // entPhysicalIsFRU
+         null,                                           // entPhysicalAlias
+         null,                                           // entPhysicalAssetID
+         null                                            // ifIndex
+     );
+
+    $entity_array = snmpwalk_group($device, 'aiAccessPointEntry', $ai_mib);
+    $instant_index = 2;
 } elseif ($device['os'] == 'timos') {
     $entity_array = array();
     echo 'tmnxHwObjs';
@@ -108,6 +138,24 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         // fix for issue 1865, $entPhysicalIndex, as it contains a quad dotted number on newer Junipers
         // using str_replace to remove all dots should fix this even if it changes in future
         $entPhysicalIndex = str_replace('.', '', $entPhysicalIndex);
+    } elseif ($device['os'] == 'aruba-instant') {
+        $entPhysicalDescr        = $entry['aiAPMACAddress'];
+        $entPhysicalContainedIn  = 1;
+        $entPhysicalSerialNum    = $entry['aiAPSerialNum'];
+        $entPhysicalModelName    = $entry['aiAPModel'];
+        $entPhysicalMfgName      = 'Aruba';
+        $entPhysicalVendorType   = 'Aruba';
+        $entPhysicalParentRelPos = -1;
+        $entPhysicalSoftwareRev  = $device['version'];
+        $entPhysicalIndex        = $instant_index;
+
+        if ($entry['aiAPIPAddress'] == $ai_ig_data['aiMasterIPAddress.0']) {
+            $entPhysicalName = sprintf('%s %s Cluster Master', $entry['aiAPName'], $entry['aiAPIPAddress']);
+        } else {
+            $entPhysicalName = sprintf('%s %s Cluster Member', $entry['aiAPName'], $entry['aiAPIPAddress']);
+        }
+
+        $instant_index += 1;
     } elseif ($device['os'] == 'timos') {
         $entPhysicalDescr        = $entry['tmnxCardTypeDescription'];
         $entPhysicalContainedIn  = $entry['tmnxHwContainedIn'];
