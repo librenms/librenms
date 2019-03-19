@@ -158,7 +158,7 @@ class Pmp extends OS implements
                 $lowdownlink,
                 'pmp-downlink',
                 0,
-                'Downlink Utilization',
+                '1m Downlink Utilization',
                 null
             ),
             new WirelessSensor(
@@ -167,7 +167,7 @@ class Pmp extends OS implements
                 $lowuplink,
                 'pmp-uplink',
                 0,
-                'Uplink Utilization',
+                '1m Uplink Utilization',
                 null
             ),
             new WirelessSensor(
