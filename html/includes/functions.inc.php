@@ -1782,14 +1782,13 @@ function nfsen_channel_rrds($hostname)
     } else {
         // If we don't have this, then return a empty array as it
         // obviously is not in use and does not have any.
-        if (isset($config['nfsen_base'])) {
-            $nfsen_rrd_dirs=array(
+        if (!isset($config['nfsen_base'])) {
+            return $channels;
+        }
+        $nfsen_rrd_dirs=array(
                               $config['nfsen_base'].'/profiles-stat/live/',
                               $config['nfsen_base'].'/profiles-stat/'
                               );
-        } else {
-            return $channels;
-        }
     }
 
     foreach ($nfsen_rrd_dirs as $nfsen_dir) {
