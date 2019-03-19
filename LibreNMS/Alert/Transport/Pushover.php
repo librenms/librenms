@@ -47,11 +47,8 @@ class Pushover extends Transport
             return $this->deliverAlertOld($obj, $opts);
         }
         $pushover_opts = $this->config;
-        unset($pushover_opts['options']);
-        foreach (explode(PHP_EOL, $this->config['options']) as $option) {
-            list($k,$v) = explode('=', $option);
-            $pushover_opts['options'][$k] = trim($v);
-        }
+        $pushover_opts['options'] = $this->parseUserOptions($this->config['options']);
+
         return $this->contactPushover($obj, $pushover_opts);
     }
 

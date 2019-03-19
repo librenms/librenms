@@ -32,13 +32,11 @@ class Hipchat extends Transport
         if (empty($this->config)) {
             return $this->deliverAlertOld($obj, $opts);
         }
+        $hipchat_opts = $this->parseUserOptions($this->config['hipchat-options']);
         $hipchat_opts['url'] = $this->config['hipchat-url'];
         $hipchat_opts['room_id'] = $this->config['hipchat-room-id'];
         $hipchat_opts['from'] = $this->config['hipchat-from-name'];
-        foreach (explode(PHP_EOL, $this->config['hipchat-options']) as $option) {
-            list($k,$v) = explode('=', $option);
-            $hipchat_opts[$k] = $v;
-        }
+
         return $this->contactHipchat($obj, $hipchat_opts);
     }
 
