@@ -164,7 +164,7 @@ class ArubaInstant extends OS implements
                     $index = sprintf('%s.%s', $this->encodeMacToHex($ai_ap), $ai_ap_radio);
                     $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $value);
                 } // end foreach
-            }
+            } // end if
         } // end foreach
         return $sensors;
     }
