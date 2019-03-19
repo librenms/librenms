@@ -1689,14 +1689,14 @@ function get_sensor_label_color($sensor)
 /**
  * Rounds down to the closest number divisible by 5.
  */
-function lowest_five( $number ){
+function lowest_five($number){
     return floor( $number / 5 ) * 5;
 }
 
 /**
  * Rounds down to the nearest 5 minutes if using seconds.
  */
-function lowest_five_minutes( $time ){
+function lowest_five_minutes($time) {
     return $time - ($time % 300);
 }
 
@@ -1723,27 +1723,27 @@ function lowest_five_minutes( $time ){
  *  7 %Y-%m-%d    year-month-day
  *  8 %Y-%m-%d/%H year-month-day/hour
  */
-function time_to_nfsen_subpath( $time ){
-    $time=lowest_five_minutes( $time );
+function time_to_nfsen_subpath($time) {
+    $time=lowest_five_minutes($time);
     $layout=$config['nfsen_subdirlayout'];
 
-    if ( $layout == 0 ){
+    if ($layout == 0) {
         return 'nfcapd.'.date('YmdHi', $time);
-    } elseif ( $layout == 1 ) {
+    } elseif ($layout == 1) {
         return date('Y\/m\/d\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 2 ) {
+    } elseif ($layout == 2) {
         return date('Y\/m\/d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 3 ) {
+    } elseif ($layout == 3) {
         return date('Y\/W\/w\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 4 ) {
+    } elseif ($layout == 4) {
         return date('Y\/W\/w\/H\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 5 ) {
+    } elseif ($layout == 5) {
         return date('Y\/z\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 6 ) {
+    } elseif ($layout == 6) {
         return date('Y\/z\/H\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 7 ) {
+    } elseif ($layout == 7) {
         return date('Y\-m\-d\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ( $layout == 8 ) {
+    } elseif ($layout == 8) {
         return date('Y\-m\-d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
     }
 }
@@ -1757,7 +1757,7 @@ function time_to_nfsen_subpath( $time ){
  * path to the RRD for the channel.
 */
 
-function nfsen_channel_rrds( $hostname ){
+function nfsen_channel_rrds($hostname) {
     global $config;
 
     $channels=array();
@@ -1811,7 +1811,7 @@ function nfsen_channel_rrds( $hostname ){
  * used by nfsen.
 */
 
-function nfsen_hostname( $hostname ) {
+function nfsen_hostname($hostname) {
     global $config;
 
     $nfsen_hostname=str_replace('.', $config['nfsen_split_char'], $hostname);
@@ -1830,7 +1830,7 @@ function nfsen_hostname( $hostname ) {
  * live dir.
 */
 
-function nfsen_live_dir( $hostname ) {
+function nfsen_live_dir($hostname) {
     global $config;
 
     $hostname=nfsen_hostname($hostname);

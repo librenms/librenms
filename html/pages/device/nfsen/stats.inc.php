@@ -2,7 +2,7 @@
 
 print_optionbar_start();
 
-echo '<form action="'.generate_url( $link_array, array('nfsen' => 'stats')).'" id="FlowStats" method="SUBMIT">';
+echo '<form action="'.generate_url($link_array, array('nfsen' => 'stats')).'" id="FlowStats" method="SUBMIT">';
 
 echo 'Top N:
 <select name="topN" id="topN" size=1>
@@ -34,7 +34,7 @@ if (isset($vars['lastN'])) {
 }
 
 $option_keys=array_keys($config['nfsen_lasts']);
-foreach ( $option_keys as $option ) {
+foreach ($option_keys as $option) {
     if (strcmp($option_default, $option) == 0) {
         echo '<OPTION value="'.$option.'" selected>'.$config['nfsen_lasts'][$option].'</OPTION>';
     } else {
@@ -119,14 +119,13 @@ echo '</form>';
 print_optionbar_end();
 
 // process stuff now if we the button was clicked on
-if (isset($vars['process'])){
-
+if (isset($vars['process'])) {
     // Make sure we have a sane value for lastN
     $lastN=900;
     if (isset($vars['lastN']) &&
          is_numeric($vars['lastN']) &&
          ($vars['lastN'] <= $config['nfsen_last_max'])
-        ){
+        ) {
         $lastN=$vars['lastN'];
     }
 
@@ -135,19 +134,19 @@ if (isset($vars['process'])){
     if (isset($vars['topN']) &&
          is_numeric($vars['topN']) &&
          ($vars['topN'] <= $config['nfsen_top_max'])
-        ){
+        ) {
         $topN=$vars['topN'];
     }
 
     // Handle the stat order.
     $stat_order='pps'; // The default if not set or something invalid is set
-    if (isset($vars['statorder']) && isset($order_types[$vars['statorder']])){
+    if (isset($vars['statorder']) && isset($order_types[$vars['statorder']])) {
         $stat_order=$vars['statorder'];
     }
 
     // Handle the stat type.
     $stat_type='srcip'; // The default if not set or something invalid is set
-    if (isset($vars['stattype']) && isset($stat_types[$vars['stattype']])){
+    if (isset($vars['stattype']) && isset($stat_types[$vars['stattype']])) {
         $stat_type=$vars['stattype'];
     }
 
@@ -161,5 +160,4 @@ if (isset($vars['process'])){
     echo '<pre>';
     system($command);
     echo '</pre>';
-
 }
