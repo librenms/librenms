@@ -212,6 +212,8 @@ class DeviceController extends TableController
     /**
      * @param $device
      * @param $count
+     * @param $tab
+     * @param $icon
      * @return string
      */
     private function formatMetric($device, $count, $tab, $icon)
