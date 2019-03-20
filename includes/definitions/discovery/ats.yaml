@@ -4,8 +4,6 @@ modules:
     pre-cache:
       data:
       - oid:
-        - emdConfigTempHighSetPoint.0
-        - emdConfigTempLowSetPoint.0
         - atsMiscellaneousGroupSystemMaxCurrent
         - atsInputGroupSourceAvoltageUpperLimit
         - atsInputGroupSourceAvoltageLowerLimit
@@ -15,16 +13,6 @@ modules:
         - atsInputGroupSourceAfrequencyLowerLimit
         - atsInputGroupSourceBfrequencyUpperLimit
         - atsInputGroupSourceBfrequencyLowerLimit
-    temperature:
-      data:
-        -
-          oid: atsMiscellaneousGroupAtsSystemTemperture
-          value: atsMiscellaneousGroupAtsSystemTemperture
-          num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.5.1.{{ $index }}'
-          index: 'atsMiscellaneousGroupAtsSystemTemperture.{{ $index }}'
-          descr: 'System'
-          high_limit: 'emdConfigTempHighSetPoint.0'
-          low_limit: 'emdConfigTempLowSetPoint.0'
     current:
       data:
       -
