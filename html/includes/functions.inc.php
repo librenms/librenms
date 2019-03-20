@@ -1628,3 +1628,44 @@ function get_sensor_label_color($sensor)
 
     return $current_label_color;
 }
+
+/**
+ * Get the unit for the sensor class given as parameter
+ * @param $class
+ * @return string The unit
+ */
+function get_unit_for_sensor_class($class)
+{
+    $units_by_classes = array(
+        'ber'                  => '',
+        'charge'               => '%',
+        'chromatic_dispersion' => 'ps/nm',
+        'cooling'              => 'W',
+        'count'                => '',
+        'current'              => 'A',
+        'dbm'                  => 'dBm',
+        'delay'                => 's',
+        'eer'                  => '',
+        'fanspeed'             => 'rpm',
+        'frequency'            => 'Hz',
+        'humidity'             => '%',
+        'load'                 => '%',
+        'power'                => 'W',
+        'power_consumed'       => 'kWh',
+        'power_factor'         => '',
+        'pressure'             => 'kPa',
+        'quality_factor'       => 'dB',
+        'signal'               => 'dBm',
+        'snr'                  => 'dB',
+        'state'                => '',
+        'temperature'          => '&deg;C',
+        'voltage'              => 'V',
+        'waterflow'            => 'l/m',
+    );
+
+    if (!array_key_exists($class, $units_by_classes)) {
+        return '';
+    }
+
+    return $units_by_classes[$class];
+}
