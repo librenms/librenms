@@ -32,6 +32,5 @@ if ($device['os'] === 'hikvision-nvr') {
     $type = 'hikvision-nvr';
     $descr = 'Storage';
     $mib = 'HIKVISION-MIB';
-    //discover_storage($valid_storage, $device, $index, $type, null, $descr, $size, $used);
     discover_storage($valid_storage, $device, $index, $type, $mib, $descr, 0, size, null);
 }
