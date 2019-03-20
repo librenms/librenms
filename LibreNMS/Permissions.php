@@ -200,7 +200,7 @@ class Permissions
     public function getBillPermissions()
     {
         if (is_null($this->billPermissions)) {
-            $this->billPermissions = DB::table('bill_ports')->get();
+            $this->billPermissions = DB::table('bill_perms')->get();
         }
 
         return $this->billPermissions;
