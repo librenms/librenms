@@ -142,6 +142,17 @@ if (!LegacyAuth::user()->hasGlobalRead()) {
         echo '</span>';
     }
 
+    echo '|';
+
+    if ($vars['graph'] == 'prefixes_ipv6vpn') {
+        echo "<span class='pagemenu-selected'>";
+    }
+
+    echo generate_link('VPNv6', $vars, array('view' => 'graphs', 'graph' => 'prefixes_ipv6vpn'));
+    if ($vars['graph'] == 'prefixes_ipv6vpn') {
+        echo '</span>';
+    }
+
     echo ')';
 
     echo ' | Multicast (';

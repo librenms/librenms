@@ -7,26 +7,6 @@ use LibreNMS\Util\IP;
 if (Config::get('enable_bgp')) {
 
 
-    if ($device['os'] == 'vrp') {
-        d_echo("VRP:");
-        $hwBgpPeers = snmpwalk_group($device, 'hwBgpPeers', 'HUAWEI-BGP-VPN-MIB', 6, $hwBgpPeers);
-        d_echo($hwBgpPeers);
-
-        foreach ($hwBgpPeers as $hwInstance => $hwBgpPeersInst) {
-            foreach ($hwBgpPeersInst as $hwAfi => $hwBgpPeersAfi) {
-                foreach ($hwBgpPeersAfi as $hwSafi1 => $hwBgpPeersType) {
-                    foreach ($hwBgpPeersType as $hwPeerType => $hwBgpPeersIP) {
-                        foreach ($hwBgpPeersIP as $hwPeer => $hwPeerValues) {
-                        $peer['ip']=$hwPeer;
-                        add_cbgp_peer($device, $peer, $hwAfi, $hwSafi1);
-                        unset($peer);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     if ($device['os'] == 'timos') {
         $bgpPeersCache =snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
         foreach ($bgpPeersCache as $key => $value) {
@@ -162,6 +142,11 @@ if (Config::get('enable_bgp')) {
 
                 // build the list
                 if (!empty($af_data)) {
+                    $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
+                }
+                if ($device['os'] == 'vrp') {
+                    d_echo("VRP:");
+                    $af_data = snmpwalk_cache_oid($device, 'hwBgpPeers', $af_data, 'HUAWEI-BGP-VPN-MIB');
                     $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
                 }
 

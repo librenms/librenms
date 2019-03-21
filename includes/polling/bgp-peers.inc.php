@@ -257,7 +257,7 @@ if ($config['enable_bgp']) {
             }
 
             // --- Populate cbgp data ---
-            if ($device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os_group'] === 'arista') {
+            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os_group'] === 'arista') {
                 // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
                 $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
                 foreach ($peer_afis as $peer_afi) {
@@ -387,6 +387,20 @@ if ($config['enable_bgp']) {
                         $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixInPrefixesAccepted'];
                     }
 
+
+                    if ($device['os_group'] === 'vrp') {
+                        $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixRcvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
+                        //$vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixActiveCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
+                        $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixAdvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
+                        
+                        d_echo($vrpPrefixes);
+                        $key = '0.'.$afi.'.'.$safi.'.ipv4.'.$peer['bgpPeerIdentifier'];
+                        d_echo($key);
+                        $cbgpPeerAcceptedPrefixes = $vrpPrefixes[$key]['hwBgpPeerPrefixRcvCounter'];
+                        $cbgpPeerAdvertisedPrefixes  = $vrpPrefixes[$key]['hwBgpPeerPrefixAdvCounter'];
+                        
+                    }
+
                     // Validate data
                     $cbgpPeerAcceptedPrefixes     = set_numeric($cbgpPeerAcceptedPrefixes);
                     $cbgpPeerDeniedPrefixes       = set_numeric($cbgpPeerDeniedPrefixes);
@@ -465,6 +479,7 @@ if ($config['enable_bgp']) {
                         'rrd_name' => $cbgp_rrd_name,
                         'rrd_def' => $cbgp_rrd_def
                     );
+                    d_echo($fields);
                     data_update($device, 'cbgp', $tags, $fields);
                 } //end foreach
             } //end if
