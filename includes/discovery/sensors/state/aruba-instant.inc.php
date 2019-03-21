@@ -45,13 +45,13 @@ if (!empty($oids)) {
 
     foreach ($oids as $ap_index => $ap_entry) {
         $ap_state_index = '';
-        $macparts = explode(':', $mac);
+        $macparts = explode(':', $ap_index);
         foreach ($macparts as $part) {
             $ap_state_index .= hexdec($part).'.';
         }
-        $combined_oid = rtrim(sprintf('%s::%s.%s%s', $mib, $oid, $ap_state_index, $index), '.');
+        $combined_oid = rtrim(sprintf('%s::%s.%s', $ai_mib, 'aiAPStatus', $ap_state_index), '.');
         $ap_state_oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
-        $ap_state_index = rtrim($ap_state_index.$index, '.');
+        $ap_state_index = rtrim($ap_state_index, '.');
 
         discover_sensor($valid['sensor'], 'state', $device, $ap_state_oid, $ap_state_index, $ap_state_name, $ap_entry['aiAPSerialNum'], '1', '1', null, null, null, null, $ap_entry[$ap_state_name], 'snmp', null, null, null, 'Cluster APs');
 
@@ -60,13 +60,13 @@ if (!empty($oids)) {
 
         foreach ($ap_entry['aiRadioStatus'] as $radio_index => $radio_status) {
             $radio_state_index = '';
-            $macparts = explode(':', $mac);
+            $macparts = explode(':', $ap_index);
             foreach ($macparts as $part) {
                 $radio_state_index .= hexdec($part).'.';
             }
-            $combined_oid = rtrim(sprintf('%s::%s.%s%s', $mib, $oid, $radio_state_index, $index), '.');
+            $combined_oid = rtrim(sprintf('%s::%s.%s%s', $ai_mib, 'aiRadioStatus', $radio_state_index, $radio_index), '.');
             $radio_state_oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
-            $radio_state_index = rtrim($radio_state_index.$index, '.');
+            $radio_state_index = rtrim($radio_state_index.$radio_index, '.');
 
             discover_sensor($valid['sensor'], 'state', $device, $radio_state_oid, $radio_state_index, $radio_state_name, $ap_entry['aiAPSerialNum'].' Radio '.$radio_index, '1', '1', null, null, null, null, $radio_status, 'snmp', null, null, null, 'Cluster Radios');
 
