@@ -5,8 +5,6 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
 if (Config::get('enable_bgp')) {
-
-
     if ($device['os'] == 'timos') {
         $bgpPeersCache =snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
         foreach ($bgpPeersCache as $key => $value) {

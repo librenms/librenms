@@ -390,12 +390,9 @@ if ($config['enable_bgp']) {
 
                     if ($device['os_group'] === 'vrp') {
                         $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixRcvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
-                        //$vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixActiveCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
                         $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixAdvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
                         
-                        d_echo($vrpPrefixes);
                         $key = '0.'.$afi.'.'.$safi.'.ipv4.'.$peer['bgpPeerIdentifier'];
-                        d_echo($key);
                         $cbgpPeerAcceptedPrefixes = $vrpPrefixes[$key]['hwBgpPeerPrefixRcvCounter'];
                         $cbgpPeerAdvertisedPrefixes  = $vrpPrefixes[$key]['hwBgpPeerPrefixAdvCounter'];
                         
@@ -479,7 +476,6 @@ if ($config['enable_bgp']) {
                         'rrd_name' => $cbgp_rrd_name,
                         'rrd_def' => $cbgp_rrd_def
                     );
-                    d_echo($fields);
                     data_update($device, 'cbgp', $tags, $fields);
                 } //end foreach
             } //end if
