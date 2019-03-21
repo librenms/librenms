@@ -156,3 +156,37 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
         create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
     }
 }
+
+// Monitor contact switches via the UIO ports.
+$apcContactData = snmpwalk_cache_oid($device, 'iemConfigContactsTable', [], 'PowerNet-MIB', null, '-OQUse');
+$apcContactData = snmpwalk_cache_oid($device, 'iemStatusContactsTable', $apcContactData, 'PowerNet-MIB', null, '-OQUse');
+
+foreach (array_keys($apcContactData) as $index) {
+    // APC disabled (1), enabled (2)
+    if ($apcContactData[$index]['iemConfigContactEnable'] == 2) {
+        $current        = $apcContactData[$index]['iemStatusContactStatus'];
+        $sensorType     = 'apc';
+        $cur_oid = '.1.3.6.1.4.1.318.1.1.10.2.3.4.1.3.' . $index;
+        $severity = $apcContactData[$index]['iemConfigContactSeverity'];
+
+        // APC critical (1), warning (2)
+        // LibreNMS warning (1), critical (2)
+        $faultGeneric = 1;
+        if ($severity == 1) {
+            $faultGeneric = 2;
+        } elseif ($severity == 2) {
+            $faultGeneric = 1;
+        }
+
+        $state_name = $apcContactData[$index]['iemConfigContactName'];
+        $states = [
+            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'noFault'],
+            ['value' => 2, 'generic' => $faultGeneric, 'graph' => 1, 'descr' => 'fault'],
+            ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'disabled'],
+        ];
+        create_state_index($state_name, $states);
+
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name.'.'.$index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
+    }
+}
