@@ -1729,7 +1729,7 @@ function lowest_five_minutes($time)
 function time_to_nfsen_subpath($time)
 {
     $time=lowest_five_minutes($time);
-    $layout=$config['nfsen_subdirlayout'];
+    $layout=Config::get('nfsen_subdirlayout');
 
     if ($layout == 0) {
         return 'nfcapd.'.date('YmdHi', $time);
@@ -1763,8 +1763,6 @@ function time_to_nfsen_subpath($time)
 
 function nfsen_channel_rrds($hostname)
 {
-    global $config;
-
     $channels=array();
 
     // If we don't have a hostname, return a empty array... nothing has no rrds
@@ -1773,21 +1771,21 @@ function nfsen_channel_rrds($hostname)
     }
 
     // Turn the hostname into the one used in nfsen.
-    $nfsen_hostname=str_replace('.', $config['nfsen_split_char'], $hostname);
+    $nfsen_hostname=str_replace('.', Config::get('nfsen_split_char'), $hostname);
 
     // If there is no nfsen_rrds set, check to see if nfsen_base
     // is set and built the path off of that.
-    if (isset($config['nfsen_rrds'])) {
-        $nfsen_rrd_dirs=$config['nfsen_rrds'];
+    if (is_null(Config::get('nfsen_rrds'))) {
+        $nfsen_rrd_dirs=Config::get('nfsen_rrds');
     } else {
         // If we don't have this, then return a empty array as it
         // obviously is not in use and does not have any.
-        if (!isset($config['nfsen_base'])) {
+        if (!is_null(Config::get('nfsen_base'))) {
             return $channels;
         }
         $nfsen_rrd_dirs=array(
-                              $config['nfsen_base'].'/profiles-stat/live/',
-                              $config['nfsen_base'].'/profiles-stat/'
+                              Config::get('nfsen_base').'/profiles-stat/live/',
+                              Config::get('nfsen_base').'/profiles-stat/'
                               );
     }
 
@@ -1799,7 +1797,7 @@ function nfsen_channel_rrds($hostname)
             foreach (glob($nfsen_RRD_channel_glob) as $nfsen_RRD) {
                 $channel = str_replace(array($host_dir, '.rrd'), '', $nfsen_RRD);
 
-                $channels[$channel]=$nfsen_dir.$channels.'.rrd';
+                $channels[$channel]=$nfsen_dir.$channel.'.rrd';
             }
         }
     }
@@ -1817,12 +1815,10 @@ function nfsen_channel_rrds($hostname)
 
 function nfsen_hostname($hostname)
 {
-    global $config;
+    $nfsen_hostname=str_replace('.', Config::get('nfsen_split_char'), $hostname);
 
-    $nfsen_hostname=str_replace('.', $config['nfsen_split_char'], $hostname);
-
-    if (isset($config['nfsen_suffix'])) {
-        $nfsen_hostname=str_replace($config['nfsen_suffix'], '', $nfsen_hostname);
+    if (!is_null(Config::get('nfsen_suffix'))) {
+        $nfsen_hostname=str_replace(Config::get('nfsen_suffix'), '', $nfsen_hostname);
     }
     return $nfsen_hostname;
 }
@@ -1837,11 +1833,9 @@ function nfsen_hostname($hostname)
 
 function nfsen_live_dir($hostname)
 {
-    global $config;
-
     $hostname=nfsen_hostname($hostname);
 
-    foreach ($config['nfsen_base'] as $base_dir) {
+    foreach (Config::get('nfsen_base') as $base_dir) {
         if (file_exists($base_dir) && is_dir($base_dir)) {
             return $base_dir.'/profiles-data/live/'.$hostname;
         }
