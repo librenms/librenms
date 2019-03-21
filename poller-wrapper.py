@@ -25,24 +25,27 @@ try:
 
     import json
     import os
-    import Queue
+    import six.moves.queue
     import subprocess
     import sys
     import threading
     import time
+    from __future__ import absolute_import
+    from __future__ import print_function
+    from six.moves import range
     from optparse import OptionParser
 
 except:
-    print "ERROR: missing one or more of the following python modules:"
-    print "threading, Queue, sys, subprocess, time, os, json"
+    print("ERROR: missing one or more of the following python modules:")
+    print("threading, Queue, sys, subprocess, time, os, json")
     sys.exit(2)
 
 try:
     import MySQLdb
 except:
-    print "ERROR: missing the mysql python module:"
-    print "On ubuntu: apt-get install python-mysqldb"
-    print "On FreeBSD: cd /usr/ports/*/py-MySQLdb && make install clean"
+    print("ERROR: missing the mysql python module:")
+    print("On ubuntu: apt-get install python-mysqldb")
+    print("On FreeBSD: cd /usr/ports/*/py-MySQLdb && make install clean")
     sys.exit(2)
 
 """
@@ -58,7 +61,7 @@ def get_config_data():
     try:
         proc = subprocess.Popen(config_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
     except:
-        print "ERROR: Could not execute: %s" % config_cmd
+        print("ERROR: Could not execute: %s" % config_cmd)
         sys.exit(2)
     return proc.communicate()[0]
 
@@ -66,13 +69,13 @@ try:
     with open(config_file) as f:
         pass
 except IOError as e:
-    print "ERROR: Oh dear... %s does not seem readable" % config_file
+    print("ERROR: Oh dear... %s does not seem readable" % config_file)
     sys.exit(2)
 
 try:
     config = json.loads(get_config_data())
 except:
-    print "ERROR: Could not load or parse configuration, are PATHs correct?"
+    print("ERROR: Could not load or parse configuration, are PATHs correct?")
     sys.exit(2)
 
 poller_path = config['install_dir'] + '/poller.php'
@@ -99,7 +102,7 @@ def db_open():
             db = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
         return db
     except:
-        print "ERROR: Could not connect to MySQL database!"
+        print("ERROR: Could not connect to MySQL database!")
         sys.exit(2)
 
 
@@ -158,30 +161,30 @@ if ('distributed_poller' in config and
         memc = memcache.Client([config['distributed_poller_memcached_host'] + ':' +
             str(config['distributed_poller_memcached_port'])])
         if str(memc.get(master_tag)) == config['distributed_poller_name']:
-            print "This system is already joined as the poller master."
+            print("This system is already joined as the poller master.")
             sys.exit(2)
         if memc_alive():
             if memc.get(master_tag) is None:
-                print "Registered as Master"
+                print("Registered as Master")
                 memc.set(master_tag, config['distributed_poller_name'], 10)
                 memc.set(nodes_tag, 0, step)
                 IsNode = False
             else:
-                print "Registered as Node joining Master %s" % memc.get(master_tag)
+                print("Registered as Node joining Master %s" % memc.get(master_tag))
                 IsNode = True
                 memc.incr(nodes_tag)
             distpoll = True
         else:
-            print "Could not connect to memcached, disabling distributed poller."
+            print("Could not connect to memcached, disabling distributed poller.")
             distpoll = False
             IsNode = False
     except SystemExit:
         raise
     except ImportError:
-        print "ERROR: missing memcache python module:"
-        print "On deb systems: apt-get install python-memcache"
-        print "On other systems: easy_install python-memcached"
-        print "Disabling distributed poller."
+        print("ERROR: missing memcache python module:")
+        print("On deb systems: apt-get install python-memcache")
+        print("On other systems: easy_install python-memcached")
+        print("Disabling distributed poller.")
         distpoll = False
 else:
     distpoll = False
@@ -261,11 +264,11 @@ def printworker():
                 memc_touch(master_tag, 10)
                 nodes = memc.get(nodes_tag)
                 if nodes is None and not memc_alive():
-                    print "WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly."
+                    print("WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly.")
                     distpoll = False
                     nodes = nodeso
                 if nodes is not nodeso:
-                    print "INFO: %s Node(s) Total" % (nodes)
+                    print("INFO: %s Node(s) Total" % (nodes))
                     nodeso = nodes
             else:
                 memc_touch(nodes_tag, 10)
@@ -288,9 +291,9 @@ def printworker():
         per_device_duration[device_id] = elapsed_time
         polled_devices += 1
         if elapsed_time < step:
-            print "INFO: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time)
+            print("INFO: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time))
         else:
-            print "WARNING: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time)
+            print("WARNING: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time))
         print_queue.task_done()
 
 """
@@ -307,11 +310,11 @@ def poll_worker():
             if distpoll:
                 result = memc.add('poller.device.%s.%s'% (device_id, time_tag), config['distributed_poller_name'], step)
                 if not result:
-                    print "This device (%s) appears to be being polled by another poller" % (device_id)
+                    print("This device (%s) appears to be being polled by another poller" % (device_id))
                     poll_queue.task_done()
                     continue
                 if not memc_alive() and IsNode:
-                    print "Lost Memcached, Not polling Device %s as Node. Master will poll it." % device_id
+                    print("Lost Memcached, Not polling Device %s as Node. Master will poll it." % device_id)
                     poll_queue.task_done()
                     continue
 # EOC5
@@ -330,11 +333,11 @@ def poll_worker():
                 pass
         poll_queue.task_done()
 
-poll_queue = Queue.Queue()
-print_queue = Queue.Queue()
+poll_queue = six.moves.queue.Queue()
+print_queue = six.moves.queue.Queue()
 
-print "INFO: starting the poller at %s with %s threads, slowest devices first" % (time.strftime("%Y-%m-%d %H:%M:%S"),
-        amount_of_workers)
+print("INFO: starting the poller at %s with %s threads, slowest devices first" % (time.strftime("%Y-%m-%d %H:%M:%S"),
+        amount_of_workers))
 
 for device_id in devices_list:
     poll_queue.put(device_id)
@@ -356,13 +359,13 @@ except (KeyboardInterrupt, SystemExit):
 
 total_time = int(time.time() - s_time)
 
-print "INFO: poller-wrapper polled %s devices in %s seconds with %s workers" % (polled_devices, total_time, amount_of_workers)
+print("INFO: poller-wrapper polled %s devices in %s seconds with %s workers" % (polled_devices, total_time, amount_of_workers))
 
 # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC6
 if distpoll or memc_alive():
     master = memc.get(master_tag)
     if master == config['distributed_poller_name'] and not IsNode:
-        print "Wait for all poller-nodes to finish"
+        print("Wait for all poller-nodes to finish")
         nodes = memc.get(nodes_tag)
         while nodes > 0 and nodes is not None:
             try:
@@ -370,18 +373,18 @@ if distpoll or memc_alive():
                 nodes = memc.get(nodes_tag)
             except:
                 pass
-        print "Clearing Locks for %s" % time_tag
+        print("Clearing Locks for %s" % time_tag)
         x = minlocks
         while x <= maxlocks:
             res = memc.delete('poller.device.%s.%s' % (x, time_tag))
             x += 1
-        print "%s Locks Cleared" % x
-        print "Clearing Nodes"
+        print("%s Locks Cleared" % x)
+        print("Clearing Nodes")
         memc.delete(master_tag)
         memc.delete(nodes_tag)
     else:
         memc.decr(nodes_tag)
-    print "Finished %.3fs after interval start." % (time.time() - int(time_tag))
+    print("Finished %.3fs after interval start." % (time.time() - int(time_tag)))
 # EOC6
 
 show_stopper = False
@@ -402,16 +405,16 @@ db.close()
 
 
 if total_time > step:
-    print "WARNING: the process took more than %s seconds to finish, you need faster hardware or more threads" % step
-    print "INFO: in sequential style polling the elapsed time would have been: %s seconds" % real_duration
+    print("WARNING: the process took more than %s seconds to finish, you need faster hardware or more threads" % step)
+    print("INFO: in sequential style polling the elapsed time would have been: %s seconds" % real_duration)
     for device in per_device_duration:
         if per_device_duration[device] > step:
-            print "WARNING: device %s is taking too long: %s seconds" % (device, per_device_duration[device])
+            print("WARNING: device %s is taking too long: %s seconds" % (device, per_device_duration[device]))
             show_stopper = True
     if show_stopper:
-        print "ERROR: Some devices are taking more than %s seconds, the script cannot recommend you what to do." % step
+        print("ERROR: Some devices are taking more than %s seconds, the script cannot recommend you what to do." % step)
     else:
         recommend = int(total_time / step * amount_of_workers + 1)
-        print "WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)" % recommend
+        print("WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)" % recommend)
 
     sys.exit(2)
