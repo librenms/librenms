@@ -1350,6 +1350,9 @@ function get_oxidized_nodes_list()
         echo "
         </td>
         <td>
+        " . $device['sysName'] . "
+        </td>
+        <td>
         <i class='fa fa-square text-" . $fa_color . "'></i>
         </td>
         <td>
