@@ -1,0 +1,14 @@
+os: dell-os10
+text: 'Dell EMC Networking OS10 Enterprise'
+type: network
+icon: dell
+mib_dir:
+    - dell
+    - dell-os10
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.674.11000.5000.100.2.
