@@ -293,7 +293,7 @@ function getBillingBitsGraphData($bill_id, $from, $to, $reducefactor)
         }
     }//end foreach
 
-    if (isset($iter_in)) {  // Write last element
+    if (!empty($iter_in)) {  // Write last element
         $out_data[$i] = round(($iter_out / $iter_period), 2);
         $in_data[$i]  = round(($iter_in / $iter_period), 2);
         $tot_data[$i] = ($out_data[$i] + $in_data[$i]);
