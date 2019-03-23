@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\Rewrite;
 
 class ArubaInstant extends OS implements
     ProcessorDiscovery,
@@ -71,10 +72,10 @@ class ArubaInstant extends OS implements
         $processors = [];
         foreach ($ai_sg_data as $ai_ap => $ai_ap_oid) {
             $value = $ai_ap_oid[$mib];
-            $combined_oid = sprintf('%s::%s.%s', $ai_mib, $mib, $this->encodeMacToOid($ai_ap));
+            $combined_oid = sprintf('%s::%s.%s', $ai_mib, $mib, Rewrite::oidMac($ai_ap));
             $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
             $description = $ai_sg_data[$ai_ap]['aiAPSerialNum'];
-            $processors[] = Processor::discover('aruba-instant', $this->getDeviceId(), $oid, $this->encodeMacToHex($ai_ap), $description, 1, $value);
+            $processors[] = Processor::discover('aruba-instant', $this->getDeviceId(), $oid, Rewrite::macToHex($ai_ap), $description, 1, $value);
             d_echo('Processor Array:'.PHP_EOL);
             d_echo($processors);
         }
@@ -158,10 +159,10 @@ class ArubaInstant extends OS implements
                     if ($type == 'frequency') {
                         $value = WirelessSensor::channelToFrequency($this->decodeChannel($value));
                     }
-                    $combined_oid = sprintf('%s::%s.%s.%s', $ai_mib, $mib, $this->encodeMacToOid($ai_ap), $ai_ap_radio);
+                    $combined_oid = sprintf('%s::%s.%s.%s', $ai_mib, $mib, Rewrite::oidMac($ai_ap), $ai_ap_radio);
                     $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
                     $description = sprintf($desc, $ai_sg_data[$ai_ap]['aiAPSerialNum'], $ai_ap_radio);
-                    $index = sprintf('%s.%s', $this->encodeMacToHex($ai_ap), $ai_ap_radio);
+                    $index = sprintf('%s.%s', Rewrite::macToHex($ai_ap), $ai_ap_radio);
                     $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $value);
                 } // end foreach
             } // end if
@@ -172,42 +173,6 @@ class ArubaInstant extends OS implements
     protected function decodeChannel($channel)
     {
         return $channel & 255; // mask off the channel width information
-    }
-
-    /**
-     * Convert Hex MAC to oid MAC
-     * 00:12:34:AB:CD:EF becomes 0.18.52.171.205.239
-     *
-     * @param string $mac hexadecimal MAC address with or without standard delimiters
-     * @return string oid representation of a MAC address
-     */
-    protected function encodeMacToOid($mac)
-    {
-        $oid = '';
-        $macparts = explode(':', $mac);
-        foreach ($macparts as $part) {
-            $oid .= hexdec($part).'.';
-        }
-        return rtrim($oid, '.');
-    }
-
-    /**
-     * Convert Hex MAC to Hex String without delimiters
-     * 00:12:34:AB:CD:EF becomes 001234ABCDEF
-     * 0:12:34:AB:CD:EF  becomes 001234ABCDEF
-     * 0:2:4:B:D:F       becomes 0002040B0D0F
-     *
-     * @param string $mac hexadecimal MAC address with or without standard delimiters
-     * @return string oid representation of a MAC address
-     */
-    protected function encodeMacToHex($mac)
-    {
-        $hex = '';
-        $macparts = explode(':', $mac);
-        foreach ($macparts as $part) {
-            $hex .= strtoupper(sprintf('%02s', $part));
-        }
-        return $hex;
     }
 
     /**
