@@ -58,10 +58,5 @@
       <description>During discovery, some temperature sensors discovered on Cisco devices had their highest temperature value stored as warning high limit. For new discovered devices, this value is now stored as high limit.</description>
       <pubDate>Sun, 17 Mar 2019 21:00:00 +0100</pubDate>
     </item>
-    <item>
-      <title>RouterOS "Station Connected" metric historical data</title>
-      <description>A naming typo was corrected for RouterOS "Station connected" metric. This will lead to a loss of historical data display.</description>
-      <pubDate>Sun, 20 Mar 2019 00:00:00 +0100</pubDate>
-    </item>
 </channel>
 </rss>
