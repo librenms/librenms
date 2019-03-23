@@ -1252,10 +1252,10 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
 
         $afisafi_tmp = explode('.', $k);
         if ($device['os_group'] === 'vrp') {
-            array_shift($afisafi_tmp); //remove 1st value
+            array_shift($afisafi_tmp); //remove 1st value, always 0 so far
             $afi         = array_shift($afisafi_tmp);
             $safi        = array_shift($afisafi_tmp);
-            array_shift($afisafi_tmp); //type 
+            array_shift($afisafi_tmp); //type, always ipv4 so far
             $bgp_ip      = implode('.', $afisafi_tmp);
         } else {
             $safi        = array_pop($afisafi_tmp);
