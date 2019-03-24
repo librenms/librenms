@@ -2057,13 +2057,17 @@ function list_fdb()
 
     $app        = \Slim\Slim::getInstance();
     $router     = $app->router()->getCurrentRoute()->getParams();
+    $mac        = $router['mac'];
 
-    $fdb = \App\Models\PortsFdb::hasAccess(Auth::user())->get();
-    $total_fdb = $fdb->count();
-    if ($total_fdb == 0) {
-        api_error(404, 'Fdb do not exist');
+    if (empty($mac)) {
+            $fdb = \App\Models\PortsFdb::hasAccess(Auth::user())->get();
+            $total_fdb = $fdb->count();
+            if ($total_fdb == 0) {
+                api_error(404, 'Fdb do not exist');
+            }
+    } else {
+            $fdb = \App\Models\PortsFdb::find($mac);
     }
-
     api_success($fdb, 'ports_fdb');
 }
 

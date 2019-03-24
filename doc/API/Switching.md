@@ -192,7 +192,9 @@ Output:
 
 Get a list of all ports FDB.
 
-Route: `/api/v0/resources/fdb`
+Route: `/api/v0/resources/fdb/:mac`
+
+  - mac is the specific MAC address you would like to query
 
 Input:
 
@@ -201,6 +203,7 @@ Input:
 Example:
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/fdb
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/fdb/1aaa2bbb3ccc
 ```
 
 Output:
