@@ -142,7 +142,7 @@ class Rewrite
      * Reformat Hex MAC with delimiters to Hex String without delimiters
      *
      * Assumes the MAC address is well-formed and in a common format.
-     * 00:12:34:ab:cd:ef becomes 001234ABCDEF
+     * 00:12:34:ab:cd:ef becomes 001234abcdef
      * 00:12:34:AB:CD:EF becomes 001234ABCDEF
      * 0:12:34:AB:CD:EF  becomes 001234ABCDEF
      * 00-12-34-AB-CD-EF becomes 001234ABCDEF
@@ -159,7 +159,7 @@ class Rewrite
         $mac_array = explode(':', str_replace(['-','.'], ':', $mac));
         $mac_padding = array_fill(0, count($mac_array), 12/count($mac_array));
 
-        return strtoupper(implode(array_map('zeropad', $mac_array, $mac_padding)));
+        return implode(array_map('zeropad', $mac_array, $mac_padding));
     }
 
     /**
