@@ -5,38 +5,26 @@ modules:
             -
                 snmp_flags: ['-ObsQ']
                 oid: dellNetCpuUtilTable
-                value: dellNetCpuUtil5Sec
-                num_oid: '.1.3.6.1.4.1.6027.3.26.1.4.4.1.1.{{ $index }}'
-                descr: '5s Utilization'
-                index: 'a_dellNetCpuUtil5Sec.{{ $index }}'
-            -
-                snmp_flags: ['-ObsQ']
-                oid: dellNetCpuUtilTable
                 value: dellNetCpuUtil1Min
                 num_oid: '.1.3.6.1.4.1.6027.3.26.1.4.4.1.4.{{ $index }}'
                 descr: '1m Utilization'
-                index: 'b_dellNetCpuUtil1Min.{{ $index }}'
+                index: 'dellNetCpuUtil1Min.{{ $index }}'
             -
                 snmp_flags: ['-ObsQ']
                 oid: dellNetCpuUtilTable
                 value: dellNetCpuUtil5Min
                 num_oid: '.1.3.6.1.4.1.6027.3.26.1.4.4.1.5.{{ $index }}'
                 descr: '5m Utilization'
-                index: 'c_dellNetCpuUtil5Min.{{ $index }}'
-            -
-                snmp_flags: ['-ObsQ']
-                oid: dellNetCpuUtilTable
-                value: dellNetCpuUtilMemUsage
-                num_oid: '.1.3.6.1.4.1.6027.3.26.1.4.4.1.6.{{ $index }}'
-                descr: 'Memory'
-                index: 'd_dellNetCpuUtilMemUsage.{{ $index }}'
+                index: 'dellNetCpuUtil5Min.{{ $index }}'
+    storage:
+        data:
             -
                 snmp_flags: ['-ObsQ']
                 oid: dellNetCpuUtilTable
                 value: dellNetCpuFlashUsageUtil
                 num_oid: '.1.3.6.1.4.1.6027.3.26.1.4.4.1.7.{{ $index }}'
-                descr: 'Flash Memory'
-                index: 'e_dellNetCpuFlashUsageUtil.{{ $index }}'
+                descr: 'Flash Storage'
+                index: 'dellNetCpuFlashUsageUtil.{{ $index }}'
     sensors:
         temperature:
             data:

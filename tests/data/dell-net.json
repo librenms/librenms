@@ -14333,19 +14333,8 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.1.2.1.1",
-                    "processor_index": "a_dellNetCpuUtil5Sec.2.1.1",
-                    "processor_type": "dell-net",
-                    "processor_usage": 11,
-                    "processor_descr": "5s Utilization",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.4.2.1.1",
-                    "processor_index": "b_dellNetCpuUtil1Min.2.1.1",
+                    "processor_index": "dellNetCpuUtil1Min.2.1.1",
                     "processor_type": "dell-net",
                     "processor_usage": 12,
                     "processor_descr": "1m Utilization",
@@ -14356,32 +14345,10 @@
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.5.2.1.1",
-                    "processor_index": "c_dellNetCpuUtil5Min.2.1.1",
+                    "processor_index": "dellNetCpuUtil5Min.2.1.1",
                     "processor_type": "dell-net",
                     "processor_usage": 8,
                     "processor_descr": "5m Utilization",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.6.2.1.1",
-                    "processor_index": "d_dellNetCpuUtilMemUsage.2.1.1",
-                    "processor_type": "dell-net",
-                    "processor_usage": 28,
-                    "processor_descr": "Memory",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.7.2.1.1",
-                    "processor_index": "e_dellNetCpuFlashUsageUtil.2.1.1",
-                    "processor_type": "dell-net",
-                    "processor_usage": 4,
-                    "processor_descr": "Flash Memory",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
@@ -14729,6 +14696,48 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 1
+                }
+            ]
+        }
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "stack.1.1",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "dell-net",
+                    "mempool_precision": 0,
+                    "mempool_descr": "Memorystack.1.1",
+                    "mempool_perc": 0,
+                    "mempool_used": 0,
+                    "mempool_free": 0,
+                    "mempool_total": 0,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
+                }
+            ]
+        },
+        "poller": {
+            "mempools": [
+                {
+                    "mempool_index": "stack.1.1",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "dell-net",
+                    "mempool_precision": 0,
+                    "mempool_descr": "Memorystack.1.1",
+                    "mempool_perc": 28,
+                    "mempool_used": 848,
+                    "mempool_free": 2921,
+                    "mempool_total": 3029,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 75
                 }
             ]
         }
