@@ -1,0 +1,19 @@
+os: dell-net
+text: 'Dell Networking OS'
+type: network
+icon: dell
+group: dell
+mib_dir:
+    - dell
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        # DELL-NETWORKING-PRODUCTS-MIB::dellNetESeriesProducts = .1.3.6.1.4.1.6027.1.1
+        # DELL-NETWORKING-PRODUCTS-MIB::dellNetCSeriesProducts = .1.3.6.1.4.1.6027.1.2
+        # DELL-NETWORKING-PRODUCTS-MIB::dellNetSSeriesProducts = .1.3.6.1.4.1.6027.1.3
+        # DELL-NETWORKING-PRODUCTS-MIB::dellNetMSeriesProducts = .1.3.6.1.4.1.6027.1.4
+        # DELL-NETWORKING-PRODUCTS-MIB::dellNetZSeriesProducts = .1.3.6.1.4.1.6027.1.5
+        - .1.3.6.1.4.1.6027.1.

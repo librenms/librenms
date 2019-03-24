@@ -1,0 +1,161 @@
+DELL-NETWORKING-MAC-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
+--  This module provides authoritative definitions for Dell Networking OS
+--  mac learn/move notification MIB.
+--
+--  This module will be extended, as needed.
+--
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, TimeTicks
+                FROM SNMPv2-SMI
+    
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP 
+                FROM SNMPv2-CONF
+
+        DisplayString
+                FROM RFC1213-MIB
+
+        dellNetMgmt
+                FROM DELL-NETWORKING-SMI
+
+        ifIndex
+                FROM IF-MIB
+        
+        VlanId
+                FROM Q-BRIDGE-MIB
+
+        MacAddress
+                FROM SNMPv2-TC;
+
+
+dellNetMacNotifMib MODULE-IDENTITY
+        LAST-UPDATED "201701011200Z" -- Jan 01,2017 12:00:00 GMT
+        ORGANIZATION
+                "Dell Inc"
+        CONTACT-INFO
+                "support.dell.com"
+
+        DESCRIPTION
+                "Dell Networking OS mac learn/move notification mib."
+
+        REVISION     "201701011200Z"
+        DESCRIPTION
+                "Initial draft version of mac notification mib."
+
+        ::= { dellNetMgmt 28 }
+
+dellNetMacNotificationObjects      OBJECT IDENTIFIER ::= { dellNetMacNotifMib 1 }
+dellNetMacNotificationTraps        OBJECT IDENTIFIER ::= { dellNetMacNotificationObjects 1 }
+
+--
+-- Mac Notification objects
+--
+    macAddress OBJECT-TYPE
+        SYNTAX       MacAddress
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "The associated mac address in the TRAP object"
+        ::= { dellNetMacNotificationObjects 2 } 
+    
+    vlanId OBJECT-TYPE
+        SYNTAX       VlanId
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "The associated vlan id in the TRAP object"
+        ::= { dellNetMacNotificationObjects 3 } 
+    
+    portId OBJECT-TYPE
+        SYNTAX       Integer32 (0..65535)
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "The associated port id in the TRAP object"
+        ::= { dellNetMacNotificationObjects 4 } 
+    
+    newPortId OBJECT-TYPE                     
+        SYNTAX       Integer32 (0..65535)
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "The associated new port id in the TRAP object on detecting mac move"
+        ::= { dellNetMacNotificationObjects 5 } 
+    
+    timeStamp OBJECT-TYPE
+        SYNTAX       TimeTicks
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "The value of sysUpTime when this mac learn/move happened."
+        ::= { dellNetMacNotificationObjects 6 }
+
+     message OBJECT-TYPE
+         SYNTAX       OCTET STRING
+         MAX-ACCESS   accessible-for-notify
+         STATUS       current
+         DESCRIPTION
+             "The log message for TRAP object"
+         ::= { dellNetMacNotificationObjects 7 }
+
+
+--
+-- MAC Notification TRAP
+--
+    macLearnNotification NOTIFICATION-TYPE
+    OBJECTS              { macAddress,
+                           vlanId,
+                           portId,
+                           timeStamp,
+                           message
+                         }
+    STATUS               current
+    DESCRIPTION
+        "The agent generate this trap when a
+         mac adress is learnt very first time in the device."
+    ::= { dellNetMacNotificationTraps 1 }      
+    
+    macMoveNotification NOTIFICATION-TYPE
+    OBJECTS              { macAddress,
+                           vlanId,
+                           portId,
+                           newPortId,
+                           timeStamp,
+                           message
+                         }
+    STATUS               current
+    DESCRIPTION
+        "The agent generate this trap when a
+         mac move is detected with in 3 seconds duration."
+    ::= { dellNetMacNotificationTraps 2 }  
+
+    -- ### conformance information ###
+    dellNetMacMibConformance    OBJECT IDENTIFIER ::= { dellNetMacNotifMib 2 }
+    dellNetMacMibCompliances    OBJECT IDENTIFIER ::= { dellNetMacMibConformance 1 }
+    dellNetMacMibGroups         OBJECT IDENTIFIER ::= { dellNetMacMibConformance 2 }
+
+    -- ## compliance statements
+    dellNetMacMibCompliance MODULE-COMPLIANCE
+        STATUS                  current
+        DESCRIPTION
+            "The compliance statement for Dell Networking OS
+            product which implement the Dell Networking
+            MAC Notification MIB."
+        MODULE    -- this module
+        MANDATORY-GROUPS {
+            dellNetMacNotificationGroup
+        }
+        ::= { dellNetMacMibCompliances 1 }
+
+    -- ## units of conformance
+    dellNetMacNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       macLearnNotification,
+       macMoveNotification
+       }
+
+       STATUS    current
+       DESCRIPTION
+           "Notifications for MAC learn/move events."
+       ::= { dellNetMacMibGroups 1}
+END
