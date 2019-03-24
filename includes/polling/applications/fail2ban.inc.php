@@ -77,7 +77,7 @@ $component = new LibreNMS\Component();
 $f2b_components = $component->getComponents($device_id, $options);
 
 // if no jails, delete fail2ban components
-if (empty($jails)) {
+if (empty($f2b['jails'])) {
     if (isset($f2b_components[$device_id])) {
         foreach ($f2b_components[$device_id] as $component_id => $_unused) {
             $component->deleteComponent($component_id);
