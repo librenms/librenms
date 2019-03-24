@@ -2,6 +2,7 @@ os: dell-os10
 text: 'Dell EMC Networking OS10 Enterprise'
 type: network
 icon: dell
+group: dell
 mib_dir:
     - dell
     - dell-os10
