@@ -25,32 +25,26 @@
 if ($device['os'] === 'aruba-instant') {
     echo 'aruba-instant-MEMORY-POOL: ';
 
-    $memory_pool_total = snmpwalk_group($device, 'aiAPTotalMemory', 'AI-AP-MIB');
-    $memory_pool_free  = snmpwalk_group($device, 'aiAPMemoryFree', 'AI-AP-MIB');
-    $ap_serial_numbers = snmpwalk_group($device, 'aiAPSerialNum', 'AI-AP-MIB');
+    $ap_data = snmpwalk_group($device, 'aiAPTotalMemory', 'AI-AP-MIB', 1);
+    $ap_data = snmpwalk_group($device, 'aiAPMemoryFree', 'AI-AP-MIB', 1, $ap_data);
+    $ap_data = snmpwalk_group($device, 'aiAPSerialNum', 'AI-AP-MIB', 1, $ap_data);
 
-    foreach ($memory_pool_total as $index => $entry) {
+    d_echo('$ap_data:'.var_export($ap_data, 1).PHP_EOL);
+
+
+    foreach ($ap_data as $index => $entry) {
         if ($entry['aiAPTotalMemory']) {
-            d_echo($ap_serial_numbers[$index]['aiAPSerialNum'].' '.$entry['aiAPTotalMemory'].' / '.$memory_pool_free[$index]['aiAPMemoryFree'].PHP_EOL);
+            d_echo($entry['aiAPSerialNum'].' '.$entry['aiAPTotalMemory'].' / '.$entry['aiAPMemoryFree'].PHP_EOL);
 
-            $oid_index = '';
-            $macparts = explode(':', $index);
-            foreach ($macparts as $part) {
-                $oid_index .= hexdec($part).'.';
-            }
-            $oid_index = rtrim($oid_index, '.');
+            $oid_index = implode('.', array_map('hexdec', explode(':', $index)));
 
-            $combined_oid = sprintf(
-                '%s::%s.%s',
-                'AI-AP-MIB',
-                'aiAPTotalMemory',
-                $oid_index
-            );
+            $combined_oid = sprintf('%s::%s.%s', 'AI-AP-MIB', 'aiAPTotalMemory', $oid_index);
+
             $usage_oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
 
-            $descr     = $ap_serial_numbers[$index]['aiAPSerialNum'];
+            $descr     = $entry['aiAPSerialNum'];
             $total     = $entry['aiAPTotalMemory'];
-            $free      = $memory_pool_free[$index]['aiAPMemoryFree'];
+            $free      = $entry['aiAPMemoryFree'];
             $used      = $total - $free;
             $perc      = ($used / $total * 100);
 
