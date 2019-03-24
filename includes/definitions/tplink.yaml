@@ -7,6 +7,3 @@ over:
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.11863.
-# 11863 is the enterprise OID for tplink. see TPLINK-PRODUCTS-MIB for hints on all sysObjectID's
-# this is a very generic catch all at the moment
-# see jetstream.yaml for more specifics
