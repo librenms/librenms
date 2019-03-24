@@ -2024,6 +2024,23 @@ function get_link()
 }
 
 
+function list_fdb()
+{
+    check_is_read();
+
+    $app        = \Slim\Slim::getInstance();
+    $router     = $app->router()->getCurrentRoute()->getParams();
+
+    $fdb = \App\Models\PortsFdb::hasAccess(Auth::user())->get();
+    $total_fdb = $fdb->count();
+    if ($total_fdb == 0) {
+        api_error(404, 'Fdb do not exist');
+    }
+
+    api_success($fdb, 'ports_fdb');
+}
+
+
 function list_sensors()
 {
     check_is_read();
