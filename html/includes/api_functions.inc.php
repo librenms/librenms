@@ -2024,6 +2024,33 @@ function get_link()
 }
 
 
+function get_fdb()
+{
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+
+    if (empty($hostname)) {
+        api_error(500, 'No hostname has been provided');
+    }
+
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device    = null;
+    if ($device_id) {
+        // save the current details for returning to the client on successful delete
+        $device = device_by_id_cache($device_id);
+    }
+
+    if (!$device) {
+        api_error(404, "Device $hostname not found");
+    }
+    check_device_permission($device_id);
+
+    $fdb = \App\Models\PortsFdb::find($device_id);
+    api_success($fdb, 'ports_fdb');
+}
+
+
 function list_fdb()
 {
     check_is_read();
