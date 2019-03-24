@@ -25,12 +25,12 @@
                     "sysObjectID": ".0.0",
                     "sysDescr": "RTCS version 03.02.00",
                     "sysContact": "<private>",
-                    "version": null,
-                    "hardware": null,
+                    "version": "VERFW:01428.1100",
+                    "hardware": "G2-6KL",
                     "features": null,
                     "os": "orvaldi-ups",
                     "type": "power",
-                    "serial": null,
+                    "serial": "11112222333344",
                     "icon": "orvaldi.png",
                     "location": "<private>"
                 }
