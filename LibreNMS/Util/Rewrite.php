@@ -144,7 +144,6 @@ class Rewrite
      * Assumes the MAC address is well-formed and in a common format.
      * 00:12:34:ab:cd:ef becomes 001234ABCDEF
      * 00:12:34:AB:CD:EF becomes 001234ABCDEF
-     * 00:12:34:AB:CD:EF becomes 001234ABCDEF
      * 0:12:34:AB:CD:EF  becomes 001234ABCDEF
      * 00-12-34-AB-CD-EF becomes 001234ABCDEF
      * 001234-ABCDEF     becomes 001234ABCDEF
