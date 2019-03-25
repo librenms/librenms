@@ -106,6 +106,11 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     // demo helper
     Route::permanentRedirect('demo', '/');
 
+    // blank page, dummy page for external code using Laravel::bootWeb()
+    Route::any('/blank', function () {
+        return '';
+    });
+
     // Legacy routes
     Route::any('/{path?}', 'LegacyController@index')
         ->where('path', '^((?!_debugbar).)*');
