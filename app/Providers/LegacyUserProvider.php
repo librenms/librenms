@@ -62,7 +62,7 @@ class LegacyUserProvider implements UserProvider
         $legacy_user = LegacyAuth::get()->getUser($identifier);
         error_reporting(-1);
 
-        return $this->retrieveByCredentials(['username' => $legacy_user['username']]);
+        return $this->retrieveByCredentials(['username' => $legacy_user['username'] ?? null]);
     }
 
     /**
