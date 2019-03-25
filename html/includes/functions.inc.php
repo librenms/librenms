@@ -1349,9 +1349,15 @@ function get_oxidized_nodes_list()
         }
         echo "
         </td>
+        ";
+        if ($config['force_ip_to_sysname'] === false) {
+        echo "
         <td>
         " . $device['sysName'] . "
         </td>
+        ";
+        }
+        echo "
         <td>
         <i class='fa fa-square text-" . $fa_color . "'></i>
         </td>
