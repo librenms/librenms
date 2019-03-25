@@ -1350,7 +1350,7 @@ function get_oxidized_nodes_list()
         echo "
         </td>
         ";
-        if (Config::get('force_ip_to_sysname') === false) {
+        if (!Config::get('force_ip_to_sysname')) {
         echo "
         <td>
         " . $device['sysName'] . "
