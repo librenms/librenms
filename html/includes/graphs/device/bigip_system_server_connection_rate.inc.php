@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'bigip_system_server_connections');
+$rrd_filename = rrd_name($device['hostname'], 'bigip_system_server_connection_rate');
 
 require 'includes/graphs/common.inc.php';
 
