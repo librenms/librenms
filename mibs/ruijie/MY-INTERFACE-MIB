@@ -1,0 +1,649 @@
+-- *****************************************************************
+-- MY-INTERFACE-MIB.mib:  My interface MIB file
+--
+-- $Copyright$
+-- 
+-- *****************************************************************
+--
+
+MY-INTERFACE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        Counter32,
+        IpAddress
+                FROM SNMPv2-SMI
+        VlanId
+                FROM Q-BRIDGE-MIB
+        TruthValue,
+        DisplayString,
+        RowStatus,
+        MacAddress
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        ConfigStatus,
+        MemberMap,
+        IfIndex
+                FROM MY-TC
+        EnabledStatus 
+                FROM P-BRIDGE-MIB
+        myMgmt
+                FROM MY-SMI;
+
+myInterfaceMIB MODULE-IDENTITY
+        LAST-UPDATED "200203200000Z"
+        ORGANIZATION "$Company$"
+        CONTACT-INFO
+                " 
+                Tel: $Telephone$ 
+
+                E-mail: $E-mail$"
+        DESCRIPTION
+                "This module defines my interface mibs."
+        REVISION      "200203200000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { myMgmt 10}
+
+myIfConfigMIBObjects OBJECT IDENTIFIER ::= { myInterfaceMIB 1 }
+
+
+myIfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MyIfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "list of interface basic configuration objects."
+        ::= { myIfConfigMIBObjects 1 }
+    
+myIfEntry OBJECT-TYPE
+        SYNTAX MyIfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry contains interface basic configurations."
+        INDEX { myIfIndex }
+        ::= { myIfTable 1 }
+
+MyIfEntry ::=
+        SEQUENCE {
+            myIfIndex IfIndex,
+            myIfPortType INTEGER,
+            myIfFlowControlAdminStatus INTEGER,
+            myIfFlowControlOperStatus EnabledStatus,
+            myIfAdminSpeed INTEGER,
+            myIfAdminDuplex INTEGER,
+            myIfOperSpeed INTEGER,
+            myIfOperDuplex INTEGER,
+            myIfManageStatus EnabledStatus,
+            myIfIpBroadcast  IpAddress,            
+            myIfLayer INTEGER,
+            myIfMode  INTEGER,
+            myIfCounterClear Integer32,
+            myIfEntryStatus ConfigStatus
+        }
+
+myIfIndex OBJECT-TYPE
+        SYNTAX IfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " "
+        ::= { myIfEntry 1 }
+
+myIfPortType OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            port10M100MBASETX(2),
+            port100MBASEFXL(3),        
+            port100MBASEFXS(4),
+            port1000MBASESX(5),   
+            port1000MBASELX(6),
+            port1000MBASETX(7),
+            portGBIC(8),
+            port100MBASEFX(9),
+            port1000MBASEFX(10),
+            portSFP(11),
+				port10GBASESR(12),
+				port10GBASELR(13),
+				port10GBASEER(14),
+				port10GBASELX4(15),
+				port10GBASESW(16),
+				port10GBASELW(17),
+				port10GBASEEW(18)
+         }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port type of this port, list as above.
+             port100MBASEFX indicates that port is port100MBASEFXL or port100MBASEFXS,
+             and system doesn't distinguish.
+             port1000MBASEFX indicates that port is port1000MBASEFLX or port1000MBASEFSX,
+             and system doesn't distinguish.
+             
+             This attribute apply physical port"
+        ::= { myIfEntry 2 }
+           
+myIfFlowControlAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            enabled(1),
+            disabled(2),
+            autonego(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Flow control of a port management status.
+            
+            This attribute apply physical port and aggreate port"
+        ::= { myIfEntry 3 }
+    
+myIfFlowControlOperStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Oper status: after the negotiation between two ports connetted 
+            the flow contrl status.
+            
+            This attribute apply physical port and aggreate port"
+        ::= { myIfEntry 4 }
+                     
+myIfAdminSpeed OBJECT-TYPE
+        SYNTAX INTEGER {
+            speed10Mb(1),
+            speed100Mb(2),
+            speed1000Mb(3),
+            autonego(4),
+            speed10Gb(5)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "port speed settings.
+            
+            This attribute apply physical port and aggreate port"
+        ::= { myIfEntry 5 }
+        
+myIfAdminDuplex OBJECT-TYPE
+        SYNTAX INTEGER {
+            full(1),
+            half(2),
+            autonego(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "port duplex settings.
+            
+            This attribute apply physical port and aggreate port"
+        ::= { myIfEntry 6 }        
+    
+myIfOperSpeed OBJECT-TYPE
+        SYNTAX INTEGER {
+            speed10Mb(1),
+            speed100Mb(2),
+            speed1000Mb(3),
+            unknown(4),
+            speed10Gb(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "After two port have negotiated the speed status,and this object 
+            is the working speed status. while the port link status is down ,
+            then the speed status is unknown(4).
+            
+            This attribute apply physical port and aggreate port"
+        ::= { myIfEntry 7 }
+
+myIfOperDuplex OBJECT-TYPE
+        SYNTAX INTEGER {
+            full(1),
+            half(2),
+            unknown(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "After two port have negotiated the duplex status, and this object 
+            is the working duplex status. while the port link status is down ,
+            then the speed status is unknown(3).
+            
+            This attribute apply physical port and aggreate port"
+        ::= { myIfEntry 8 }
+
+myIfManageStatus OBJECT-TYPE
+        SYNTAX EnabledStatus 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Management status of the interface."
+        DEFVAL { enabled }
+        ::={myIfEntry 9}
+
+myIfIpBroadcast OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Broadcast address of the interface ."
+       ::= { myIfEntry 10 }
+                      
+
+myIfLayer OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  layer-2(1), -- the interface is a interface of L2
+                  layer-3(2)  -- the interface is a interface of L3
+              }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+              ""
+        ::= { myIfEntry 11 }
+        
+myIfMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  access(1), -- the mode of interface is access port
+                  trunk(2),  -- the mode of interface is trunk port
+                  dot1q-tunnel(3),   --  the mode of interface is 802.1q tunnel port
+                  hybrid(4), -- the mode of interface is hybrid port
+		  other(5)   
+              }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+              "This value is meaning for only physical port and aggreate port"
+        ::= { myIfEntry 12 }
+
+myIfCounterClear OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Setting its to any value but 0, will clear counters of this interface. 
+             Setting its value to 0 will cause no action of the agent. and when
+             query will always return 0.            "
+        ::= { myIfEntry 13 } 
+        
+myIfEntryStatus OBJECT-TYPE
+        SYNTAX ConfigStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Status of this entry, set this object to valid will create a interface, 
+             and set its value to invalid will delete the interface of this entry."
+        ::= { myIfEntry 14 }
+                       
+                       
+myIfIpTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF MyIfIpEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A list of interface ip configuration entries."
+       ::= { myIfConfigMIBObjects 2}
+
+myIfIpEntry OBJECT-TYPE
+       SYNTAX      MyIfIpEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "An entry containing configuration information applicable
+               to a Layer3 interface."
+       INDEX   { myIfIpIfIndex, myIfIpId, myIfIp}
+       ::= { myIfIpTable 1 }
+
+MyIfIpEntry ::=
+       SEQUENCE {
+          myIfIpIfIndex         IfIndex,
+          myIfIpId              INTEGER,
+          myIfIp                IpAddress,
+          myIfIpMask            IpAddress,
+          myIfIpEntryStatus     RowStatus
+        }
+myIfIpIfIndex OBJECT-TYPE
+       SYNTAX      IfIndex
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "A unique value, for each Layer3 interface."
+       ::= { myIfIpEntry 1 }       
+       
+myIfIpId OBJECT-TYPE
+       SYNTAX      INTEGER{
+                       primary(1),    -- primary ip address of Layer3 interface
+                       secondary(2)   -- secondary ip address of Layer3 interface
+                   }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Type of interface ip address."
+       ::= { myIfIpEntry 2 }              
+
+myIfIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ip address of the interface myIfIndex refer to."
+        ::= { myIfIpEntry 3 }       
+        
+myIfIpMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Ip mask of the interface ip address."
+        ::= { myIfIpEntry 4 }       
+            
+myIfIpEntryStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "entry status of this entry. and the means in this enviraments can
+            reffer to the text-convention definition of the RowStatus."
+        ::= { myIfIpEntry 5 } 
+
+
+myIfStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MyIfStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "list of interface status. Status information include some error state and
+             result of examining to the interface,etc."
+        ::= { myIfConfigMIBObjects 3 }
+    
+myIfStatusEntry OBJECT-TYPE
+        SYNTAX MyIfStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry contains interface status information."
+        INDEX { myIfStatusIndex }
+        ::= { myIfStatusTable 1 }
+
+MyIfStatusEntry ::=
+        SEQUENCE {
+            myIfStatusIndex IfIndex,
+            myIfStatusLoopBackExamine Integer32,
+            myIfErrorStatus           INTEGER,
+            myIfLineDetect            Integer32
+        }
+
+myIfStatusIndex OBJECT-TYPE
+        SYNTAX IfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " "
+        ::= { myIfStatusEntry 1 }
+
+myIfStatusLoopBackExamine OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Setting its to any value but 0, will Checking whether this port or aggreate can
+              receive and send packets normally, It indicates that port or aggreate is normal
+              if opertion is success. 
+                  Setting its value to 0 will cause no action of the agent. and when
+             query will always return 0.
+            
+            This attribute apply physical port and aggreate port"
+        ::= { myIfStatusEntry  2 } 
+        
+myIfErrorStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            no-error(1),               -- port is enabled normal
+            err-disable-bpduguard(2),  -- port is disabled by port receive BPDU packet when port
+                                       -- enable BPDU guard             
+            err-disable-ptsecurity(3)  -- port is disabled by port security is violatd
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port's error status information"
+        ::= { myIfStatusEntry 3 }
+           
+           
+myIfLineDetect OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myIfStatusEntry  4 }
+           
+myGlobalIfDisableRecovery OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Setting its to any value but 0, the interfaces  which is shutted down by
+             some error happened will recovery from disabled status . 
+                  Setting its value to 0 will cause no action of the agent. and when
+             query will always return 0.
+            
+            This attribute apply physical port and aggreate port"
+        ::= { myIfConfigMIBObjects  4 } 
+                               
+--
+-- portType Choose
+--
+myPortTypeChooseTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MyPortTypeChooseEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myIfConfigMIBObjects 5 }
+    
+myPortTypeChooseEntry OBJECT-TYPE
+        SYNTAX MyPortTypeChooseEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        INDEX { myPortTypeChooseIndex }
+        ::= { myPortTypeChooseTable 1 }
+
+MyPortTypeChooseEntry ::=
+        SEQUENCE {
+            myPortTypeChooseIndex IfIndex,
+      	    myPortTypeChooseType INTEGER
+        }
+
+myPortTypeChooseIndex OBJECT-TYPE
+        SYNTAX IfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myPortTypeChooseEntry 1 }
+
+myPortTypeChooseType OBJECT-TYPE
+        SYNTAX INTEGER {
+		fiber(1),       --
+      		copper(2)       --
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myPortTypeChooseEntry 2 }
+
+--
+-- mtu
+--
+myIfMTUTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MyIfMTUEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myIfConfigMIBObjects 6 }
+    
+myIfMTUEntry OBJECT-TYPE
+        SYNTAX MyIfMTUEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        INDEX { myIfMTUIndex }
+        ::= { myIfMTUTable 1 }
+
+MyIfMTUEntry ::=
+        SEQUENCE {
+            myIfMTUIndex IfIndex,
+      	    myIfMTU Integer32
+        }
+
+myIfMTUIndex OBJECT-TYPE
+        SYNTAX IfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myIfMTUEntry 1 }
+
+myIfMTU OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myIfMTUEntry 2 }
+
+-- Notification
+myInterfaceTraps      OBJECT IDENTIFIER ::= { myInterfaceMIB 2 }
+                                 
+lineDetectStatus OBJECT-TYPE
+        SYNTAX INTEGER{
+            ok(1),       -- 
+            open(2),     -- 
+            short(3)     --            
+        }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The type of storm of interface"
+        ::= { myInterfaceTraps 1 }
+        
+lineDetectPosition OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          ""
+        ::= { myInterfaceTraps 2 }        
+        
+lineQualityDetect NOTIFICATION-TYPE
+    OBJECTS {ifIndex, lineDetectStatus,lineDetectPosition}
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { myInterfaceTraps 3 }        
+                                     
+myInterfaceMIBConformance OBJECT IDENTIFIER ::= { myInterfaceMIB 3 }
+myInterfaceMIBCompliances OBJECT IDENTIFIER ::= { myInterfaceMIBConformance 1 }
+myInterfaceMIBGroups      OBJECT IDENTIFIER ::= { myInterfaceMIBConformance 2 }
+
+
+-- compliance statements
+
+myInterfaceMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the My Interface MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { myInterfaceMIBGroup
+                 }
+
+		GROUP myPortTypeChooseMibGroup
+		DESCRIPTION  
+                     ""   
+
+                GROUP myIfMTUMibGroup
+		DESCRIPTION  
+                     ""   
+
+      GROUP myIfLineDetectGroup
+		DESCRIPTION  
+                     ""                   
+        ::= { myInterfaceMIBCompliances 1 }
+                
+-- units of conformance
+
+myInterfaceMIBGroup OBJECT-GROUP
+        OBJECTS {
+            myIfIndex,
+            myIfPortType,
+            myIfFlowControlAdminStatus,
+            myIfFlowControlOperStatus,
+            myIfAdminSpeed,
+            myIfAdminDuplex,
+            myIfOperSpeed,
+            myIfOperDuplex,
+            myIfManageStatus,
+            myIfIpBroadcast,
+            myIfLayer,
+            myIfMode,
+            myIfCounterClear,
+            myIfEntryStatus,
+            myIfIpIfIndex,
+            myIfIpId,
+            myIfIp,
+            myIfIpMask,
+            myIfIpEntryStatus,
+            myIfStatusIndex,
+            myIfStatusLoopBackExamine,
+            myIfErrorStatus,
+            myGlobalIfDisableRecovery
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing interface basic configure ."
+        ::= { myInterfaceMIBGroups 1 }         
+                
+myPortTypeChooseMibGroup OBJECT-GROUP
+        OBJECTS {
+            myPortTypeChooseIndex,
+            myPortTypeChooseType
+        }
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { myInterfaceMIBGroups 2 }         
+                
+
+myIfMTUMibGroup OBJECT-GROUP
+        OBJECTS {
+            myIfMTUIndex,
+            myIfMTU
+        }
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { myInterfaceMIBGroups 3 }         
+                
+myIfLineDetectGroup OBJECT-GROUP
+        OBJECTS {
+            myIfLineDetect,
+            lineQualityDetect
+        }
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { myInterfaceMIBGroups 4 }           
+                
+END
