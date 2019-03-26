@@ -883,12 +883,6 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
     ], 'eventlog');
 }
 
-// Parse string with emails. Return array with email (as key) and name (as value)
-function parse_email($emails)
-{
-    return \LibreNMS\Alert\Transport\Mail::parseEmail($emails);
-}
-
 function send_mail($emails, $subject, $message, $html = false)
 {
     return (new \LibreNMS\Alert\Transport\Mail())->sendMail($emails, $subject, $message, $html);

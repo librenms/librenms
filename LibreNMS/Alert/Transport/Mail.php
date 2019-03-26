@@ -28,34 +28,13 @@ use App\Models\Device;
 use App\Models\User;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
+use Permissions;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class Mail extends Transport
 {
-    private $permissions;
-
-    public function deliverAlert($obj, $opts)
-    {
-        $contacts = $this->buildContacts($obj, $opts['transports']);
-        dd($contacts);
-
-        return $this->contactMail($obj);
-    }
-
-
-    public function contactMail($obj)
-    {
-        if (empty($this->config['email'])) {
-            $email = $obj['contacts'];
-        } else {
-            $email = $this->config['email'];
-        }
-        return send_mail($email, $obj['title'], $obj['msg'], (Config::get('email_html') == 'true') ? true : false);
-    }
-
     public static function configTemplate()
     {
         return [
@@ -73,112 +52,63 @@ class Mail extends Transport
         ];
     }
 
-    private function buildContacts($obj, $transports)
-    {
-        if (Config::get('alert.default_only')) {
-            $default_email = Config::get('alert.default_mail');
-            $contacts = $default_email ? [$default_email => ''] : [];
-        } else {
-            $device = Device::find($obj['device_id']);
-            $contacts = $this->getSystemContacts($device) + $this->getUserContacts($obj['faults']);
-        }
-
-
-        // Always add transport contacts
-        $transport_mails = \App\Models\AlertTransport::findMany($transports->pluck('transport_id'));
-        $contacts = $transport_mails->reduce(function ($output, $transport) {
-            if (isset($transport->transport_config['email'])) {
-                $output[$transport->transport_config['email']] = '';
-            }
-            return $output;
-        }, $contacts);
-
-
-        return $contacts;
-    }
-
     /**
-     * @param Device $device
+     * Extracts one or more emails from a string.
+     *
+     * @param string $emails
+     * @param string $name_fallback The name to put for emails that don't have a descriptive name
+     * @return array|bool Array will be keyed by email with the value being the friendly name
      */
-    private function getSystemContacts($device)
+    public static function parseEmail($emails, $name_fallback = '')
     {
-        $contacts = [];
-
-        // sysContact
-        if ($device) {
-            $attribs = $device->attribs()->whereIn('attrib_type', ['override_sysContact_bool', 'override_sysContact_string'])->get()->keyBy('attrib_type');
-            if ($attribs->has('override_sysContact_bool')) {
-                if ($sysContactAttrib = $attribs->get('override_sysContact_string')) {
-                    $sysContact = $sysContactAttrib->attrib_value;
-                }
-            } else {
-                $sysContact = $device->sysContact;
-            }
-
-            if (!empty($sysContact)) {
-                $contacts[$sysContact] = '';
-            }
+        $result = [];
+        $regex = '/^[\"\']?([^\"\']+)[\"\']?\s{0,}<([^@]+@[^>]+)>$/';
+        if (!is_string($emails)) {
+            return false;
         }
-    }
 
-    public function getPermittedFaults($faults)
-    {
-
-
-        $user_map = User::query()
-//            ->where('level', '<', 5)
-            ->leftJoin('bill_perms', 'users.user_id', 'bill_perms.user_id')
-            ->leftJoin('ports_perms', 'users.user_id', 'ports_perms.user_id')
-            ->leftJoin('devices_perms', 'users.user_id', 'devices_perms.user_id')
-            ->select(['users.user_id', 'bill_id', 'port_id', 'device_id'])
-            ->get()->groupBy('user_id');
-
-        return $user_map->toArray();
-
-        $types = ['bill_id', 'port_id', 'device_id'];
-        $ids = [];
-        foreach ($faults as $index => $fault) {
-            foreach ($types as $id) {
-                if (!empty($fault[$id])) {
-                    $ids[$id][] = $fault[$id];
-                }
+        $emails = preg_split('/[,;]\s{0,}/', $emails);
+        foreach ($emails as $email) {
+            if (preg_match($regex, $email, $out, PREG_OFFSET_CAPTURE)) {
+                $result[$out[2][0]] = $out[1][0];
+            } elseif (str_contains($email, '@')) {
+                $result[$email] = $name_fallback;
             }
         }
 
-        $maps = [];
-        if (!empty($ids['bill_id'])) {
-            $maps['bills'] = 1;
-        }
-
-
-        $result = ['user_id' => 'faults_array'];
-
-        return $permitted;
+        return $result;
     }
 
-    private function canAccessFault(User $user, $fault)
+    public function deliverAlert($obj, $opts)
     {
-        $permissions = $this->getPermissions();
+        $contacts = $this->buildContacts($obj, $opts['transports']);
+        dd($contacts);
 
-        if (!empty($fault['device_id']) && $permissions->get('devices')->get($user->user_id, new Collection())->contains($fault['device_id'])) {
-            return true;
-        }
-
-        if (!empty($fault['port_id']) && $permissions->get('ports')->get($user->user_id, new Collection())->contains($fault['port_id'])) {
-            return true;
-        }
-
-        return !empty($fault['bill_id']) && $permissions->get('bills')->get($user->user_id, new Collection())->contains($fault['bill_id']);
+        return $this->contactMail($obj);
     }
 
+    public function contactMail($obj)
+    {
+        if (empty($this->config['email'])) {
+            $email = $obj['contacts'];
+        } else {
+            $email = $this->config['email'];
+        }
+        return send_mail($email, $obj['title'], $obj['msg'], (Config::get('email_html') == 'true') ? true : false);
+    }
 
+    public function getPermittedFaults($faults, $user)
+    {
+        return array_filter($faults, function ($fault) use ($user) {
+            return (!empty($fault['device_id']) && Permissions::canAccessDevice($fault['device_id'], $user)) ||
+                (!empty($fault['port_id']) && Permissions::canAccessPort($fault['port_id'], $user)) ||
+                (!empty($fault['bill_id']) && Permissions::canAccessBill($fault['bill_id'], $user));
+        });
+    }
 
-    public function getUsersForFaults($faults) {
-        $fields = ['users.user_id', 'users.username', 'users.realname', 'users.email', 'users.descr', 'users.level'];
-        /** @var Builder $query */
-        $query = User::thisAuth();
-
-        $query->where(function ($sub_query) use ($faults, $query) {
+    public function getUsersForFaults($faults)
+    {
+        return User::thisAuth()->where(function ($sub_query) use ($faults) {
             /** @var Builder $sub_query */
             if (Config::get('alert.admins')) {
                 $sub_query->orWhere('level', 10);
@@ -187,114 +117,25 @@ class Mail extends Transport
                 $sub_query->orWhere('level', 5);
             }
             if (Config::get('alert.users')) {
-                $fault_ids = $this->getFaultIds($faults);
+                $user_ids = collect();
 
-                if ($fault_ids->get('devices')->isNotEmpty()) {
-                    $query->leftJoin('devices_perms', 'users.user_id', 'devices_perms.user_id');
-                    $sub_query->orWhereIn('devices_perms.device_id', $fault_ids->get('devices'));
-                }
-
-                if ($fault_ids->get('ports')->isNotEmpty()) {
-                    $query->leftJoin('ports_perms', 'users.user_id', 'ports_perms.user_id');
-                    $sub_query->orWhereIn('ports_perms.device_id', $fault_ids->get('ports'));
-                }
-
-                if ($fault_ids->get('bills')->isNotEmpty()) {
-                    $query->leftJoin('bill_perms', 'users.user_id', 'bill_perms.user_id');
-                    $sub_query->orWhereIn('bill_perms.device_id', $fault_ids->get('bills'));
-                }
-            }
-        });
-
-        return $query->select($fields)->groupBy($fields)->get();
-    }
-
-    private function getFaultIds($faults) {
-        $devices = new Collection();
-        $ports = new Collection();
-        $bills = new Collection();
-
-        foreach ($faults as $fault) {
-            if (!empty($fault['device_id'])) {
-                $devices->push($fault['device_id']);
-            }
-            if (!empty($fault['port_id'])) {
-                $ports->push($fault['port_id']);
-            }
-            if (!empty($fault['bill_id'])) {
-                $bills->push($fault['bill_id']);
-            }
-        }
-
-        return new Collection([
-            'devices' => $devices->unique(),
-            'ports' => $ports->unique(),
-            'bills' => $bills->unique(),
-        ]);
-    }
-
-    private function getUserContacts($faults)
-    {
-        $users = $this->getUsersForFaults($faults);
-
-        $users = LegacyAuth::get()->getUserlist();
-        $contacts = [];
-        $uids = [];
-
-        foreach ($users as $user) {
-            if (empty($user['email'])) {
-                continue; // no email, skip this user
-            }
-            if (empty($user['realname'])) {
-                $user['realname'] = $user['username'];
-            }
-            if (empty($user['level'])) {
-                $user['level'] = LegacyAuth::get()->getUserlevel($user['username']);
-            }
-            if ($config['alert']['globals'] && ($user['level'] >= 5 && $user['level'] < 10)) {
-                $contacts[$user['email']] = $user['realname'];
-            } elseif ($config['alert']['admins'] && $user['level'] == 10) {
-                $contacts[$user['email']] = $user['realname'];
-            } elseif ($config['alert']['users'] == true && in_array($user['user_id'], $uids)) {
-                $contacts[$user['email']] = $user['realname'];
-            }
-        }
-
-        $tmp_contacts = [];
-        foreach ($contacts as $email => $name) {
-            if (strstr($email, ',')) {
-                $split_contacts = preg_split('/[,\s]+/', $email);
-                foreach ($split_contacts as $split_email) {
-                    if (!empty($split_email)) {
-                        $tmp_contacts[$split_email] = $name;
+                foreach ($faults as $fault) {
+                    if (!empty($fault['device_id'])) {
+                        $user_ids->merge(Permissions::usersForDevice($fault['device_id']));
+                    }
+                    if (!empty($fault['port_id'])) {
+                        $user_ids->merge(Permissions::usersForPort($fault['port_id']));
+                    }
+                    if (!empty($fault['bill_id'])) {
+                        $user_ids->merge(Permissions::usersForBill($fault['bill_id']));
                     }
                 }
-            } else {
-                $tmp_contacts[$email] = $name;
-            }
-        }
 
-        if (!empty($tmp_contacts)) {
-            // Validate contacts so we can fall back to default if configured.
-            $mail = new PHPMailer();
-            foreach ($tmp_contacts as $tmp_email => $tmp_name) {
-                if ($mail->validateAddress($tmp_email) != true) {
-                    unset($tmp_contacts[$tmp_email]);
+                if ($user_ids->isNotEmpty()) {
+                    $sub_query->orWhereIn('user_id', $user_ids->unique());
                 }
             }
-        }
-
-        # Copy all email alerts to default contact if configured.
-        if (!isset($tmp_contacts[$config['alert']['default_mail']]) && ($config['alert']['default_copy'])) {
-            $tmp_contacts[$config['alert']['default_mail']] = '';
-        }
-
-        # Send email to default contact if no other contact found
-        if ((count($tmp_contacts) == 0) && ($config['alert']['default_if_none']) && (!empty($config['alert']['default_mail']))) {
-            $tmp_contacts[$config['alert']['default_mail']] = '';
-        }
-
-        return $tmp_contacts;
+        })->get();
     }
 
     public function sendMail($emails, $subject, $message, $html = false)
@@ -305,7 +146,7 @@ class Mail extends Transport
             try {
                 $mail->Hostname = php_uname('n');
 
-                foreach (self::parseEmail(Config::get('email_from')) as $from => $from_name) {
+                foreach (self::parseEmail(Config::get('email_from'), Config::get('email_user')) as $from => $from_name) {
                     $mail->setFrom($from, $from_name);
                 }
                 foreach ($emails as $email => $email_name) {
@@ -352,29 +193,90 @@ class Mail extends Transport
         return "No contacts found";
     }
 
-    /**
-     * Extracts one or more emails from a string.
-     *
-     * @param string $emails
-     * @return array|bool Array will be keyed by email with the value being the friendly name
-     */
-    public static function parseEmail($emails)
+    private function buildContacts($obj, $transports)
     {
-        $result = [];
-        $regex = '/^[\"\']?([^\"\']+)[\"\']?\s{0,}<([^@]+@[^>]+)>$/';
-        if (!is_string($emails)) {
-            return false;
+        if (Config::get('alert.default_only')) {
+            $default_email = Config::get('alert.default_mail');
+            $contacts = $default_email ? [$default_email => ''] : [];
+        } else {
+            $device = Device::find($obj['device_id']);
+            $contacts = $this->getSystemContacts($device) + $this->getUserContacts($obj['faults']);
         }
 
-        $emails = preg_split('/[,;]\s{0,}/', $emails);
-        foreach ($emails as $email) {
-            if (preg_match($regex, $email, $out, PREG_OFFSET_CAPTURE)) {
-                $result[$out[2][0]] = $out[1][0];
-            } elseif (str_contains($email, '@')) {
-                $result[$email] = Config::get('email_user');
+        // Always add transport contacts
+        $transport_mails = \App\Models\AlertTransport::findMany($transports->pluck('transport_id'));
+        $contacts = $transport_mails->reduce(function ($output, $transport) {
+            if (isset($transport->transport_config['email'])) {
+                $output[$transport->transport_config['email']] = '';
+            }
+            return $output;
+        }, $contacts);
+
+
+        return $contacts;
+    }
+
+    /**
+     * @param Device $device
+     */
+    private function getSystemContacts($device)
+    {
+        $contacts = [];
+
+        // sysContact
+        if ($device) {
+            $attribs = $device->attribs()->whereIn('attrib_type', ['override_sysContact_bool', 'override_sysContact_string'])->get()->keyBy('attrib_type');
+            if ($attribs->has('override_sysContact_bool')) {
+                if ($sysContactAttrib = $attribs->get('override_sysContact_string')) {
+                    $sysContact = $sysContactAttrib->attrib_value;
+                }
+            } else {
+                $sysContact = $device->sysContact;
+            }
+
+            if (!empty($sysContact)) {
+                $contacts[$sysContact] = '';
+            }
+        }
+    }
+
+
+    private function getUserContacts($faults)
+    {
+        $contacts = [];
+        $users = $this->getUsersForFaults($faults);
+        foreach ($users as $user) {
+            if ($email = self::parseEmail($user->email, $user->realname)) {
+                $contacts = array_merge($contacts, $email);
             }
         }
 
-        return $result;
+        return $contacts;
+
+        $users = LegacyAuth::get()->getUserlist();
+        $contacts = [];
+        $uids = [];
+
+        if (!empty($tmp_contacts)) {
+            // Validate contacts so we can fall back to default if configured.
+            $mail = new PHPMailer();
+            foreach ($tmp_contacts as $tmp_email => $tmp_name) {
+                if ($mail->validateAddress($tmp_email) != true) {
+                    unset($tmp_contacts[$tmp_email]);
+                }
+            }
+        }
+
+        # Copy all email alerts to default contact if configured.
+        if (!isset($tmp_contacts[$config['alert']['default_mail']]) && ($config['alert']['default_copy'])) {
+            $tmp_contacts[$config['alert']['default_mail']] = '';
+        }
+
+        # Send email to default contact if no other contact found
+        if ((count($tmp_contacts) == 0) && ($config['alert']['default_if_none']) && (!empty($config['alert']['default_mail']))) {
+            $tmp_contacts[$config['alert']['default_mail']] = '';
+        }
+
+        return $tmp_contacts;
     }
 }

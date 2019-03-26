@@ -11,6 +11,7 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use Config;
 use LibreNMS\Alert\Transport;
 
 class Osticket extends Transport
@@ -26,12 +27,10 @@ class Osticket extends Transport
 
     public function contactOsticket($obj, $opts)
     {
-        global $config;
-
         $url   = $opts['url'];
         $token = $opts['token'];
 
-        foreach (parse_email($config['email_from']) as $from => $from_name) {
+        foreach (Mail::parseEmail(Config::get('email_from'), Config::get('email_user')) as $from => $from_name) {
             $email = $from_name . ' <' . $from . '>';
             break;
         }
