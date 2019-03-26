@@ -1351,11 +1351,11 @@ function get_oxidized_nodes_list()
         </td>
         ";
         if (!Config::get('force_ip_to_sysname')) {
-        echo "
-        <td>
-        " . $device['sysName'] . "
-        </td>
-        ";
+            echo "
+            <td>
+            " . $device['sysName'] . "
+            </td>
+            ";
         }
         echo "
         <td>
