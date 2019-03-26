@@ -24,23 +24,20 @@ class DeviceLocationController extends WidgetController
 
         $data = $this->getSettings();
 
-        $data['locations'] = DB::select("select 
-            loc.id, 
-            loc.location, 
-            (SELECT count(*) FROM devices d WHERE d.location_id=loc.id) AS 'total', 
-            (SELECT count(*) from devices d WHERE d.location_id=loc.id and d.`status`='1') AS 'up',
-            (SELECT count(*) from devices d WHERE d.location_id=loc.id and d.`status`='0') AS 'down',
-            (SELECT count(*) from devices d WHERE d.location_id=loc.id and d.`ignore`='1') AS 'ignore',
-            (SELECT count(*) from devices d WHERE d.location_id=loc.id and d.`disabled`='1') AS 'disabled'
-            FROM locations loc 
-            ORDER BY loc.location ASC");
+	$data['locations'] = Location::orderBy('location')->get()->map(function ($location) {
+ 		/** @var Location $location */
+		return [
+			'id' => $location->id,
+	        	'location' => $location->location,
+                	'total' => $location->devices()->count(),
+			'up' => $location->devices()->isUp()->count(),
+			'down' => $location->devices()->isDown()->count(),
+			'ignored' => $location->devices()->isIgnored()->count(),
+			'disabled' => $location->devices()->isDisabled()->count(),
+		];
+	});
 
-        $data["summary"] = DB::select("select 
-            (SELECT count(*) FROM devices d) AS 'total', 
-            (SELECT count(*) from devices d WHERE d.`status`='1') AS 'up',
-            (SELECT count(*) from devices d WHERE d.`status`='0') AS 'down',
-            (SELECT count(*) from devices d WHERE d.`ignore`='1') AS 'ignore',
-            (SELECT count(*) from devices d WHERE d.`disabled`='1') AS 'disabled'");
+
 
         return view('widgets.device-location', $data);
     }

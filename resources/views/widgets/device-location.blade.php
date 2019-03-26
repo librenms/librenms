@@ -13,24 +13,14 @@
 	<tbody>
 	    @foreach ($locations as $location)
             <tr>
-                <td><a href="{{ url('devices/location='.$location->id)}}">{{ $location->id }}: {{ $location->location }}</a></td>
-                <td><a href="{{ url('devices/location='.$location->id) }}"><span>{{ $location->total }}</span></a></td>
-                <td><a href="{{ url('devices/location='.$location->id.'/state=up/format=list_detail') }}"><span class="green">{{ $location->up }}</span></a></td>
-                <td><a href="{{ url('devices/location='.$location->id.'/state=down/format=list_detail') }}"><span class="red">{{ $location->down }}</span></a></td>
-                <td><a href="{{ url('devices/location='.$location->id.'/ignore=1/format=list_detail') }}"><span class="grey">{{ $location->ignore }}</span></a></td>
-                <td><a href="{{ url('devices/location='.$location->id.'/disabled=1/format=list_detail') }}"><span class="black">{{ $location->disabled }}</span></a></td>
+                <td><a href="{{ url('devices/location='.$location['id']) }}">{{ $location['location'] }}</a></td>
+                <td><a href="{{ url('devices/location='.$location['id']) }}"><span>{{ $location['total'] }}</span></a></td>
+                <td><a href="{{ url('devices/location='.$location['id'].'/state=up/format=list_detail') }}"><span class="green">{{ $location['up'] }}</span></a></td>
+                <td><a href="{{ url('devices/location='.$location['id'].'/state=down/format=list_detail') }}"><span class="red">{{ $location['down'] }}</span></a></td>
+                <td><a href="{{ url('devices/location='.$location['id'].'/ignore=1/format=list_detail') }}"><span class="grey">{{ $location['ignored'] }}</span></a></td>
+                <td><a href="{{ url('devices/location='.$location['id'].'/disabled=1/format=list_detail') }}"><span class="black">{{ $location['disabled'] }}</span></a></td>
 	    </tr>
 	    @endforeach
 	</tbody>
-	  @foreach ($summary as $sum)
-  	  <tr>
-		<td>Totals</td>
-		<td><span class="black">{{ $sum->total }}</span></td>
-                <td><span class="green">{{ $sum->up }}</span></td>
-                <td><span class="red">{{ $sum->down }}</span></td>
-                <td><span class="grey">{{ $sum->ignore }}</span></td>
-                <td><span class="black">{{ $sum->disabled }}</span></td>
-	    </tr>
-          @endforeach
     </table>
 </div>
