@@ -44,7 +44,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.18.{{ $index }}'
                     descr: '{{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitBiasCurrentLane1.{{ $index }}'
-                    group: 'Lane 1'
+                    group: Lane 1
                 -
                     snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
@@ -52,7 +52,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.19.{{ $index }}'
                     descr: '{{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitBiasCurrentLane2.{{ $index }}'
-                    group: 'Lane 2'
+                    group: Lane 2
                 -
                     snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
@@ -60,7 +60,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.20.{{ $index }}'
                     descr: '{{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitBiasCurrentLane3.{{ $index }}'
-                    group: 'Lane 3'
+                    group: Lane 3
                 -
                     snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
@@ -68,7 +68,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.21.{{ $index }}'
                     descr: '{{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitBiasCurrentLane4.{{ $index }}'
-                    group: 'Lane 4'
+                    group: Lane 4
         dbm:
             data:
                 -
@@ -78,7 +78,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.8.{{ $index }}'
                     descr: 'Tx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitPowerLane1.{{ $index }}'
-                    group: 'Lane 1'
+                    group: Lane 1
                 -
                     snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
@@ -86,7 +86,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.12.{{ $index }}'
                     descr: 'Rx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransReceivePowerLane1.{{ $index }}'
-                    group: 'Lane 1'
+                    group: Lane 1
                 -
                     snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
@@ -94,7 +94,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.9.{{ $index }}'
                     descr: 'Tx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitPowerLane2.{{ $index }}'
-                    group: 'Lane 2'
+                    group: Lane 2
                 -
                     snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
@@ -102,7 +102,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.13.{{ $index }}'
                     descr: 'Rx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransReceivePowerLane1.{{ $index }}'
-                    group: 'Lane 2'
+                    group: Lane 2
                 -
                     snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
@@ -110,7 +110,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.10.{{ $index }}'
                     descr: 'Tx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitPowerLane3.{{ $index }}'
-                    group: 'Lane 3'
+                    group: Lane 3
                 -
                     snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
@@ -118,7 +118,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.14.{{ $index }}'
                     descr: 'Rx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransReceivePowerLane3.{{ $index }}'
-                    group: 'Lane 3'
+                    group: Lane 3
                 -
                     snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
@@ -126,7 +126,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.11.{{ $index }}'
                     descr: 'Tx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitPowerLane4.{{ $index }}'
-                    group: 'Lane 4'
+                    group: Lane 4
                 -
                     snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
@@ -134,7 +134,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.15.{{ $index }}'
                     descr: 'Rx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransReceivePowerLane4.{{ $index }}'
-                    group: 'Lane 4'
+                    group: Lane 4
         temperature:
             data:
                 -
