@@ -26,13 +26,12 @@
 $mem_data = snmpwalk_cache_oid($device, 'dellNetCpuUtilTable', [], 'DELL-NETWORKING-CHASSIS-MIB', 'dell', '-OUseQ');
 $mem_data = snmpwalk_cache_oid($device, 'DellNetProcessorEntry', $mem_data, 'DELL-NETWORKING-CHASSIS-MIB', 'dell', '-OUseQ');
 
-
 if (is_array($mem_data)) {
     foreach ($mem_data as $index => $data) {
         $size = $data['dellNetProcessorMemSize'];
         if (preg_match('/stack/', $index) && isset($size)) {
             $type = 'dell-net';
-            $descr = 'Memory' . $index;
+            $descr = 'Memory Usage';
             discover_mempool($valid_mempool, $device, $index, $type, $descr, null, null, null);
         }
     }

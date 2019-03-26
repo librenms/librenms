@@ -31,8 +31,9 @@ if (is_array($mem_data)) {
         $size = $data['dellNetProcessorMemSize'];
 
         if (preg_match('/stack/', $index) && isset($size)) {
-            $perc = $data['dellNetCpuUtilMemUsage'];
-            $total = $data['dellNetProcessorMemSize'];
+            $units            = 1024*1024;
+            $perc             = $data['dellNetCpuUtilMemUsage'];
+            $total            = $data['dellNetProcessorMemSize']*$units;
             $mempool['total'] = $total;
             $mempool['used']  = $perc/100 * $total;
             $mempool['free']  = $total - $total/$perc;
