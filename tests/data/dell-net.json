@@ -15092,7 +15092,7 @@
                     "mempool_descr": "Memory Usage",
                     "mempool_perc": 28,
                     "mempool_used": 889318277,
-                    "mempool_free": 3062703250,
+                    "mempool_free": 2286818427,
                     "mempool_total": 3176136704,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,

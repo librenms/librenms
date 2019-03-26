@@ -36,7 +36,7 @@ if (is_array($mem_data)) {
             $total            = $data['dellNetProcessorMemSize']*$units;
             $mempool['total'] = $total;
             $mempool['used']  = $perc/100 * $total;
-            $mempool['free']  = $total - $total/$perc;
+            $mempool['free']  = $mempool['total'] - $mempool['used'];
         }
     }
 }
