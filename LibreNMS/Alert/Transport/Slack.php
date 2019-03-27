@@ -32,11 +32,9 @@ class Slack extends Transport
         if (empty($this->config)) {
             return $this->deliverAlertOld($obj, $opts);
         }
+        $slack_opts = $this->parseUserOptions($this->config['slack-options']);
         $slack_opts['url'] = $this->config['slack-url'];
-        foreach (explode(PHP_EOL, $this->config['slack-options']) as $option) {
-            list($k,$v) = explode('=', $option);
-            $slack_opts[$k] = $v;
-        }
+
         return $this->contactSlack($obj, $slack_opts);
     }
 

@@ -29,12 +29,9 @@ class Alertmanager extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $alertmanager_opts = [];
+        $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options']);
         $alertmanager_opts['url'] = $this->config['alertmanager-url'];
-        foreach (explode(PHP_EOL, $this->config['alertmanager-options']) as $option) {
-            list($k,$v) = explode('=', $option);
-            $alertmanager_opts[$k] = $v;
-        }
+
         return $this->contactAlertmanager($obj, $alertmanager_opts);
     }
 

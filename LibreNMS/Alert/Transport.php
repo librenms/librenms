@@ -19,4 +19,22 @@ abstract class Transport implements TransportInterface
             $this->config = json_decode(dbFetchCell($sql, [$transport_id]), true);
         }
     }
+
+    /**
+     * Helper function to parse free form text box defined in ini style to key value pairs
+     *
+     * @param string $input
+     * @return array
+     */
+    protected function parseUserOptions($input)
+    {
+        $options = [];
+        foreach (explode(PHP_EOL, $input) as $option) {
+            if (str_contains($option, '=')) {
+                list($k,$v) = explode('=', $option, 2);
+                $options[$k] = trim($v);
+            }
+        }
+        return $options;
+    }
 }
