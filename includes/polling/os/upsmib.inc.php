@@ -23,7 +23,7 @@
  * @author     Spencer Butler <github@crooked.app>
  */
 
-$temp_data = snmp_getnext_multi($device, ['upsIdentManufacturer', 'upsIdentModel', 'upsIdentUPSSoftwareVersion', 'upsIdentAgentSoftwareVersion', 'upsIdentAttachedDevices'], '-OQUs', 'UPS-MIB');
+$temp_data = snmp_getnext_multi($device, 'upsIdentManufacturer upsIdentModel upsIdentUPSSoftwareVersion upsIdentAgentSoftwareVersion upsIdentAttachedDevices', '-OQUs', 'UPS-MIB');
 
 foreach ($tempdata as $index => $data) {
     $hardware = $data['upsIdentManufacturer'] . $data['upsIdentModel'];
