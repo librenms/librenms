@@ -26,7 +26,7 @@
                     "sysDescr": "Dell EMC Networking OS",
                     "sysContact": "<private>",
                     "version": "9.14(0.1)",
-                    "hardware": "48x10G, 6x40G TE/FO G (S4048T-ON)",
+                    "hardware": "S4048T-ON 48 x 10Gbe,6 x 40Gbe QSFP+ Interface module",
                     "features": "FXXXXX2/343 407 254 42",
                     "os": "dell-net",
                     "type": "network",

@@ -25,7 +25,7 @@
 
 $temp_data = snmpwalk_group($device, 'dellNetStackUnitTable', 'DELL-NETWORKING-CHASSIS-MIB');
 
-    $hardware = $temp_data[1]['dellNetStackUnitDescription'];
+    $hardware = snmp_get($device, 'entPhysicalDescr.4', '-Ovq', 'ENTITY-MIB');
     $version  = $temp_data[1]['dellNetStackUnitCodeVersion'];
     $features = $temp_data[1]['dellNetStackUnitServiceTag'] . '/' .  $temp_data[1]['dellNetStackUnitExpServiceCode'];
 unset($temp_data);
