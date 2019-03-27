@@ -82,19 +82,8 @@ class Mail extends Transport
     public function deliverAlert($obj, $opts)
     {
         $contacts = $this->buildContacts($obj, $opts['transports']);
-        dd($contacts);
 
-        return $this->contactMail($obj);
-    }
-
-    public function contactMail($obj)
-    {
-        if (empty($this->config['email'])) {
-            $email = $obj['contacts'];
-        } else {
-            $email = $this->config['email'];
-        }
-        return send_mail($email, $obj['title'], $obj['msg'], (Config::get('email_html') == 'true') ? true : false);
+        return send_mail($contacts, $obj['title'], $obj['msg'], (Config::get('email_html') == 'true') ? true : false);
     }
 
     public function getPermittedFaults($faults, $user)
@@ -150,7 +139,11 @@ class Mail extends Transport
                     $mail->setFrom($from, $from_name);
                 }
                 foreach ($emails as $email => $email_name) {
-                    $mail->addAddress($email, $email_name);
+                    if (Config::get('email_use_bcc')) {
+                        $mail->addBCC($email, $email_name);
+                    } else {
+                        $mail->addAddress($email, $email_name);
+                    }
                 }
                 $mail->Subject = $subject;
                 $mail->XMailer = Config::get('project_name_version');
@@ -207,7 +200,7 @@ class Mail extends Transport
         $transport_mails = \App\Models\AlertTransport::findMany($transports->pluck('transport_id'));
         $contacts = $transport_mails->reduce(function ($output, $transport) {
             if (isset($transport->transport_config['email'])) {
-                $output[$transport->transport_config['email']] = '';
+                $output[$transport->transport_config['email']] = $transport->transport_name != $transport->transport_config['email'] ? $transport->transport_name : '';
             }
             return $output;
         }, $contacts);
