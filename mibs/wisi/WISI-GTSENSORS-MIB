@@ -1,0 +1,592 @@
+
+WISI-GTSENSORS-MIB DEFINITIONS ::= BEGIN
+--============================================================================--
+
+IMPORTS
+	MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+		FROM SNMPv2-CONF
+
+	MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+	Counter32, Integer32, Unsigned32
+		FROM SNMPv2-SMI
+
+	DisplayString
+		FROM SNMPv2-TC
+
+	gtModule
+		FROM WISI-GTMODULES-MIB
+
+	gtUnit
+		FROM WISI-TANGRAM-MIB;
+
+--------------------------------------------------------------------------------
+
+gtSensorsMIB MODULE-IDENTITY
+	LAST-UPDATED "201609080000Z"
+	ORGANIZATION "WISI Communications GmbH & Co. KG"
+	CONTACT-INFO
+		"https://wisiconnect.tv/"
+	DESCRIPTION
+		"This MIB module represents the various sensors that are
+		installed in a system or standalone unit, such as temperature
+		sensors, power supply voltage/current measurements and fan RPM
+		sensors."
+
+	REVISION "201609080000Z"
+	DESCRIPTION
+		"Made the fan control object read-only. Update contact
+		information and module description."
+	REVISION "201307011400Z"
+	DESCRIPTION
+		"Trap for PSU failure added."
+	REVISION "201306271400Z"
+	DESCRIPTION
+		"Descriptions added."
+	REVISION "201306261400Z"
+	DESCRIPTION
+		"Clear Traps added."
+	REVISION "201212121320Z"
+	DESCRIPTION
+		"Updated contact details."
+	REVISION "201112151200Z"
+	DESCRIPTION
+		"Initial version."
+::= { gtUnit 3 }
+
+--------------------------------------------------------------------------------
+
+gtSensorsNotifications OBJECT IDENTIFIER ::= { gtSensorsMIB 0 }
+gtSensorsObjects OBJECT IDENTIFIER ::= { gtSensorsMIB 1 }
+gtSensorsConformance OBJECT IDENTIFIER ::= { gtSensorsMIB 2 }
+gtSensorsCompliances OBJECT IDENTIFIER ::= { gtSensorsConformance 1 }
+gtSensorsGroups OBJECT IDENTIFIER ::= { gtSensorsConformance 2 }
+
+--============================================================================--
+
+gtSensorsNotifyFanPlugin NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyFanPlugin notification indicates that
+	    a new fan unit has been plugged-in."
+::= { gtSensorsNotifications 1 }
+
+gtSensorsNotifyFanPlugout NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyFanPlugout notification indicates that
+	    a fan unit has been plugged-out."
+::= { gtSensorsNotifications 2 }
+
+gtSensorsNotifyPSUPlugin NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyPSUPlugin notification indicates that
+	    a new PSU (Power Supply Unit) has been plugged-in."
+::= { gtSensorsNotifications 3 }
+
+gtSensorsNotifyPSUPlugout NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyPSUPlugout notification indicates that
+	    a PSU (Power Supply Unit) has been plugged-out."
+::= { gtSensorsNotifications 4 }
+
+gtSensorsNotifyTemperature NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyTemperature notification indicates that
+	    temperature on GT11 board is above upper limit."
+::= { gtSensorsNotifications 5 }
+
+gtSensorsNotifyFanSpeed NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyFanSpeed notification indicates that
+	    at least one of the fans RPM on fanbay is below lower limit."
+::= { gtSensorsNotifications 6 }
+
+gtSensorsNotifyPSUCurrent NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyPSUCurrent notification indicates that
+	    a PSU (Power Supply Unit) output current is out of range limit."
+::= { gtSensorsNotifications 7 }
+
+gtSensorsNotifyPSUVoltage NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyPSUVoltage notification indicates that
+	    a PSU (Power Supply Unit) output voltage is out of range limit."
+::= { gtSensorsNotifications 8 }
+
+gtSensorsNotifyPSUTemperature NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyPSUTemperature notification indicates that
+	    a PSU (Power Supply Unit) temperature is above upper limit."
+::= { gtSensorsNotifications 9 }
+
+gtSensorsNotifyPSUTemperatureClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyPSUTempHighClear notification indicates that
+	    a PSU (Power Supply Unit) temperature has decreased below upper limit."
+::= { gtSensorsNotifications 10 }
+
+
+gtSensorsNotifyBOARDTemperatureClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyBOARDTempHighClear notification indicates that
+	    temperature on GT11 board has decreased below upper limit"
+::= { gtSensorsNotifications 11 }
+
+
+gtSensorsNotifyPSUFailure NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyPSUFailure notification indicates that
+	    a PSU (Power Supply Unit) internal voltage dropped below limit."
+::= { gtSensorsNotifications 12 }
+
+
+gtSensorsNotifyPSUFailureClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtSensorsNotifyPSUFailureClear notification indicates that
+	    a PSU (Power Supply Unit) internal voltage has increased above lower limit."
+::= { gtSensorsNotifications 13 }
+
+
+--============================================================================--
+
+gtNumTemps OBJECT-TYPE
+	SYNTAX Unsigned32 (0..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtNumTemps entity represents the number of
+		temperature sensors within the GT01/GN50 rack unit.
+		The related entries are provided by gtTempsTable."
+::= { gtSensorsObjects 1 }
+
+--------------------------------------------------------------------------------
+
+gtTempsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtTempsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtTempsTable table contains a list of all
+		temperature sensors within the GT01/GN50 rack unit.
+		The number of entries is provided by gtNumTemps."
+::= { gtSensorsObjects 2 }
+
+gtTempsEntry OBJECT-TYPE
+	SYNTAX GtTempsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtTempsEntry table entry represents a
+		temperature sensors within the GT01/GN50 rack unit.
+		The number of entries is provided by gtNumTemps."
+	INDEX {
+		gtModule,
+		gtTemp
+	}
+::= { gtTempsTable 1 }
+
+GtTempsEntry ::= SEQUENCE {
+	gtTemp Unsigned32,
+	gtTempName DisplayString,
+	gtTempValue Integer32
+}
+
+gtTemp OBJECT-TYPE
+	SYNTAX Unsigned32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtTemp entity represents the numeric index of a
+		temperature sensors within the GT01/GN50 rack unit."
+::= { gtTempsEntry 1 }
+
+gtTempName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (16))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtTempName entity represents the symbolic name of a
+		temperature sensors within the GT01/GN50 rack unit."
+::= { gtTempsEntry 2 }
+
+gtTempValue OBJECT-TYPE
+	SYNTAX Integer32 (-60..195)
+	UNITS "'C"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtTempValue entity represents the measured value of a
+		temperature sensors within the GT01/GN50 rack unit."
+::= { gtTempsEntry 3 }
+
+--------------------------------------------------------------------------------
+
+gtNumFans OBJECT-TYPE
+	SYNTAX Unsigned32 (0..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtNumFans entity represents the number of
+		cooling fans within the GT01/GN50 rack unit.
+		The related entries are provided by gtFansTable."
+::= { gtSensorsObjects 3 }
+
+--------------------------------------------------------------------------------
+
+gtFansTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtFansEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtFansTable table contains a list of all
+		cooling fans within the GT01/GN50 rack unit.
+		The number of entries is provided by gtNumFans."
+::= { gtSensorsObjects 4 }
+
+gtFansEntry OBJECT-TYPE
+	SYNTAX GtFansEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtFansEntry table entry represents an
+		cooling fan within the GT01/GN50 rack unit.
+		The number of entries is provided by gtNumFans."
+	INDEX {
+		gtFan
+	}
+::= { gtFansTable 1 }
+
+GtFansEntry ::= SEQUENCE {
+	gtFan Unsigned32,
+	gtFanName DisplayString,
+	gtFanControl Unsigned32,
+	gtFanSpeed Unsigned32,
+	gtFanUptime Counter32,
+	gtFanLifetime Counter32
+}
+
+gtFan OBJECT-TYPE
+	SYNTAX Unsigned32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtFan entity represents the numeric index
+		of a cooling fan within the GT01/GN50 rack unit."
+::= { gtFansEntry 1 }
+
+gtFanName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (16))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtFanName entity represents the symbolic name
+		of a cooling fan within the GT01/GN50 rack unit."
+::= { gtFansEntry 2 }
+
+gtFanControl OBJECT-TYPE
+	SYNTAX Unsigned32 (0..15000)
+	UNITS "rpm"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtFanControl entity represents the RPM setting
+		of a cooling fan within the GT01/GN50 rack unit."
+::= { gtFansEntry 3 }
+
+gtFanSpeed OBJECT-TYPE
+	SYNTAX Unsigned32 (0..15000)
+	UNITS "rpm"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtFanSpeed entity represents the revolutions per minute
+		of a cooling fan within the GT01/GN50 rack unit."
+::= { gtFansEntry 4 }
+
+gtFanUptime OBJECT-TYPE
+	SYNTAX Counter32
+	UNITS "s"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtFanUptime entity represents the current uptime
+		of a cooling fan within the GT01/GN50 rack unit."
+::= { gtFansEntry 5 }
+
+gtFanLifetime OBJECT-TYPE
+	SYNTAX Counter32
+	UNITS "s"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtFanLifetime entity represents the accumulated lifetime
+		of a cooling fan within the GT01/GN50 rack unit."
+::= { gtFansEntry 6 }
+
+--------------------------------------------------------------------------------
+
+gtNumPSUs OBJECT-TYPE
+	SYNTAX Unsigned32 (0..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtNumPSUs entity represents the number of
+		power supply units within the GT01/GN50 rack unit.
+		The related entries are provided by gtPSUsTable."
+::= { gtSensorsObjects 5 }
+
+--------------------------------------------------------------------------------
+
+gtPSUsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF GtPSUsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtPSUsTable table contains a list of all
+		power supply units within the GT01/GN50 rack unit.
+		The number of entries is provided by gtNumPSUs."
+::= { gtSensorsObjects 6 }
+
+gtPSUsEntry OBJECT-TYPE
+	SYNTAX GtPSUsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtPSUsEntry table entry represents a
+		power supply unit within the GT01/GN50 rack unit.
+		The number of entries is provided by gtNumPSUs."
+	INDEX {
+		gtPSU
+	}
+::= { gtPSUsTable 1 }
+
+GtPSUsEntry ::= SEQUENCE {
+	gtPSU Unsigned32,
+	gtPSUName DisplayString,
+	gtPSUPower Unsigned32,
+	gtPSUCurrent Unsigned32,
+	gtPSUVoltageInt Unsigned32,
+	gtPSUVoltageOR Unsigned32,
+	gtPSUVoltageExt Unsigned32,
+	gtPSUTemperature Integer32
+}
+
+gtPSU OBJECT-TYPE
+	SYNTAX Unsigned32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtPSU entity represents the numeric index
+		of a power supply unit within the GT01/GN50 rack unit."
+::= { gtPSUsEntry 1 }
+
+gtPSUName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (16))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtPSUName entity represents the symbolic name
+		of a power supply unit within the GT01/GN50 rack unit."
+::= { gtPSUsEntry 2 }
+
+gtPSUPower OBJECT-TYPE
+	SYNTAX Unsigned32 (0..300000)
+	UNITS "mW"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtPSUPower entity represents the maximum output
+		of a power supply unit within the GT01/GN50 rack unit."
+::= { gtPSUsEntry 3 }
+
+gtPSUCurrent OBJECT-TYPE
+	SYNTAX Unsigned32 (0..25000)
+	UNITS "mA"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtPSUCurrent entity represents the output current
+		of a power supply unit within the GT01/GN50 rack unit."
+::= { gtPSUsEntry 4 }
+
+gtPSUVoltageInt OBJECT-TYPE
+	SYNTAX Unsigned32 (0..16000)
+	UNITS "mV"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtPSUVoltageInt entity represents the internal voltage
+		of a power supply unit within the GT01/GN50 rack unit."
+::= { gtPSUsEntry 5 }
+
+gtPSUVoltageOR OBJECT-TYPE
+	SYNTAX Unsigned32 (0..16000)
+	UNITS "mV"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtPSUVoltageOR entity represents the OR voltage drop
+		of a power supply unit within the GT01/GN50 rack unit."
+::= { gtPSUsEntry 6 }
+
+gtPSUVoltageExt OBJECT-TYPE
+	SYNTAX Unsigned32 (0..16000)
+	UNITS "mV"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtPSUVoltageExt entity represents the external voltage
+		of a power supply unit within the GT01/GN50 rack unit."
+::= { gtPSUsEntry 7 }
+
+gtPSUTemperature OBJECT-TYPE
+	SYNTAX Integer32 (-60..195)
+	UNITS "'C"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtPSUTemperature entity represents the temperature 
+		of a power supply unit within the GT01/GN50 rack unit."
+::= { gtPSUsEntry 8 }
+
+--============================================================================--
+
+gtSensorsMIBCompliance MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION
+		"The compliance statement for GTSENSORSv2 entities
+		which implement the GTSENSORSv2 MIB."
+	MODULE
+	MANDATORY-GROUPS {
+		gtSensorsV1Group,
+		gtSensorsSystemGroup,
+		gtSensorsStatsGroup,
+		gtSensorsTrapGroup,
+		gtSensorsSetGroup,
+		gtSensorsBasicNotificationsGroup
+	}
+::= { gtSensorsCompliances 1 }
+
+--------------------------------------------------------------------------------
+
+gtSensorsV1Group OBJECT-GROUP
+	OBJECTS {
+		gtTempName,
+		gtTempValue,
+		gtFanName,
+		gtFanControl,
+		gtFanSpeed,
+		gtPSUName,
+		gtPSUPower,
+		gtPSUCurrent,
+		gtPSUVoltageInt,
+		gtPSUVoltageOR,
+		gtPSUVoltageExt,
+                gtPSUTemperature        
+	}
+	STATUS current
+	DESCRIPTION
+		"The gtSensorsV1Group group is mandatory only for those
+		GTSENSORSv2 entities which also implement GTSENSORSv1."
+::= { gtSensorsGroups 1 }
+
+--------------------------------------------------------------------------------
+
+gtSensorsSystemGroup OBJECT-GROUP
+	OBJECTS {
+		gtTempName,
+		gtTempValue,
+		gtFanName,
+		gtFanSpeed,
+		gtPSUName,
+		gtPSUPower,
+		gtPSUCurrent,
+		gtPSUVoltageInt,
+		gtPSUVoltageOR,
+		gtPSUVoltageExt,
+                gtPSUTemperature
+	}
+	STATUS current
+	DESCRIPTION
+		"The gtSensorsSystemGroup group defines GTSENSORSv2 entities
+		which are mandatory."
+::= { gtSensorsGroups 2 }
+
+--------------------------------------------------------------------------------
+
+gtSensorsStatsGroup OBJECT-GROUP
+	OBJECTS {
+		gtNumTemps,
+		gtNumFans,
+		gtFanUptime,
+		gtFanLifetime,
+		gtNumPSUs
+	}
+	STATUS current
+	DESCRIPTION
+		"The gtSensorsStatsGroup group defines GTSENSORSv2 entities
+		which provide statistical information."
+::= { gtSensorsGroups 3 }
+
+--------------------------------------------------------------------------------
+
+gtSensorsTrapGroup OBJECT-GROUP
+	OBJECTS {
+		gtTempValue,
+		gtFanControl,
+		gtFanSpeed,
+		gtPSUCurrent,
+		gtPSUVoltageInt
+	}
+	STATUS current
+	DESCRIPTION
+		"The gtSensorsTrapGroup group defines GTSENSORSv2 trap objects
+		which are mandatory."
+::= { gtSensorsGroups 4 }
+
+--------------------------------------------------------------------------------
+
+gtSensorsSetGroup OBJECT-GROUP
+	OBJECTS {
+		gtFanControl
+	}
+	STATUS current
+	DESCRIPTION
+		"The gtSensorsSetGroup group defines GTSENSORSv2 entities
+		which can be set the manager."
+::= { gtSensorsGroups 5 }
+
+--------------------------------------------------------------------------------
+
+gtSensorsBasicNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		gtSensorsNotifyFanPlugin,
+		gtSensorsNotifyFanPlugout,
+		gtSensorsNotifyPSUPlugin,
+		gtSensorsNotifyPSUPlugout,
+                gtSensorsNotifyTemperature,
+                gtSensorsNotifyFanSpeed,
+                gtSensorsNotifyPSUCurrent,
+                gtSensorsNotifyPSUVoltage,
+                gtSensorsNotifyPSUTemperature
+	}
+	STATUS current
+	DESCRIPTION
+		"The gtSensorsBasicNotificationsGroup group defines
+		GTSENSORSv2 notification objects which are mandatory."
+::= { gtSensorsGroups 6 }
+
+--============================================================================--
+END
+
