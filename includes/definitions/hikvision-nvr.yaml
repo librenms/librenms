@@ -1,0 +1,14 @@
+os: hikvision-nvr
+text: 'Hikvision NVR'
+type: network
+icon: hikvision
+mib_dir:
+  - hikvision
+over:
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_uptime, text: 'Device Uptime' }
+discovery:
+    - sysObjectID:
+          - .1.3.6.1.4.1.50001
+    - sysDescr:
+          - 'Hikvision company products'
