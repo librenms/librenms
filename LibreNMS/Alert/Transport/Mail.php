@@ -81,9 +81,9 @@ class Mail extends Transport
 
     public function deliverAlert($obj, $opts)
     {
-        $contacts = $this->buildContacts($obj, $opts['transports']);
+        $contacts = $this->buildContacts($obj['device_id'], $obj['faults'], $opts['transports']);
 
-        return send_mail($contacts, $obj['title'], $obj['msg'], (Config::get('email_html') == 'true') ? true : false);
+        return $this->sendMail($contacts, $obj['title'], $obj['msg'], (Config::get('email_html') == 'true') ? true : false);
     }
 
     public function getPermittedFaults($faults, $user)
@@ -186,14 +186,20 @@ class Mail extends Transport
         return "No contacts found";
     }
 
-    private function buildContacts($obj, $transports)
+    /**
+     * @param int $device_id
+     * @param array $faults
+     * @param \Illuminate\Support\Collection $transports
+     * @return array
+     */
+    private function buildContacts($device_id, $faults, $transports)
     {
         if (Config::get('alert.default_only')) {
             $default_email = Config::get('alert.default_mail');
             $contacts = $default_email ? [$default_email => ''] : [];
         } else {
-            $device = Device::find($obj['device_id']);
-            $contacts = $this->getSystemContacts($device) + $this->getUserContacts($obj['faults']);
+            $device = Device::find($device_id);
+            $contacts = $this->getSystemContacts($device) + $this->getUserContacts($faults);
         }
 
         // Always add transport contacts
