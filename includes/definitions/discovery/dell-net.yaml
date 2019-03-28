@@ -27,6 +27,8 @@ modules:
                 index: 'dellNetCpuFlashUsageUtil.{{ $index }}'
     sensors:
         voltage:
+            options:
+                skip_values: 0
             data:
                 -
                     snmp_flags: ['-ObsQ']
@@ -36,6 +38,8 @@ modules:
                     descr: '{{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransVoltage.{{ $index }}'
         current:
+            options:
+                skip_values: 0
             data:
                 -
                     snmp_flags: ['-ObsQ']
@@ -70,6 +74,8 @@ modules:
                     index: 'dellNetIfTransTransmitBiasCurrentLane4.{{ $index }}'
                     group: Lane 4
         dbm:
+            options:
+                skip_values: 0
             data:
                 -
                     snmp_flags: ['-ObsQ']
