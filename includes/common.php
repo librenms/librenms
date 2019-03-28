@@ -1673,6 +1673,24 @@ function uw_to_dbm($value)
 }
 
 /**
+ * Substract 30 (for yaml user_func)
+ *
+ */
+function substract_30($value)
+{
+    return ($value - 30);
+}
+
+/**
+ * Substract 128 (for yaml user_func)
+ *
+ */
+function substract_128($value)
+{
+    return ($value - 128);
+}
+
+/**
  * @param $value
  * @param null $default
  * @param int $min
