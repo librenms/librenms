@@ -42,7 +42,7 @@ cgiurl   = http://yourlibrenms/cgi-bin/smokeping.cgi
 Add the following line to `/etc/smokeping/config` config file:
 
 ```bash
-@include /opt/smokeping/etc/librenms.conf
+@include /etc/smokeping/config.d/librenms.conf
 ```
 
 We will generate the conf file in the next step. 
