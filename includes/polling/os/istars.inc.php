@@ -1,8 +1,8 @@
 <?php
 /**
- * upsmib.inc.php
+ * istars.inc.php
  *
- * LibreNMS os poller module for Generic UPS-MIB Devices
+ * LibreNMS os poller module for East iStars UPS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
