@@ -1,0 +1,388 @@
+-- *****************************************************************
+-- OTN Module MIB
+-- *****************************************************************
+
+SL-OTN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+	NOTIFICATION-TYPE, Gauge32, 
+	Counter64     	                    FROM SNMPv2-SMI
+	DisplayString, TruthValue,
+	DateAndTime							FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	slService				      		FROM SL-NE-MIB;
+
+slOTN MODULE-IDENTITY
+	LAST-UPDATED "0508171200Z"   -- 17 Jan. 2005  12:00:00 EST
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the OTN"
+	::= { slService 15 }
+
+-- The OTN MIB consists of the following groups:
+--    Configuration
+--    Pm
+--    Traps
+
+slOTNConfig		OBJECT IDENTIFIER ::= { slOTN 1 }
+slOTNPm	 		OBJECT IDENTIFIER ::= { slOTN 2 }
+slOTNTraps 		OBJECT IDENTIFIER ::= { slOTN 3 }
+
+-- Textual Conventions  
+
+OTNTraceMessage ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION
+		"The Access Point Identifier, SAPI or DAPI."
+	SYNTAX  OCTET STRING (SIZE(16))
+    
+OTNTrafficRate ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION
+		"The Host or Line bit rates."
+	SYNTAX  INTEGER {
+		sonetSdh10G(1),     -- 9.95328 Gbps (SONET/SDH)
+		gbe10GLan(2),     	-- 10.3125 Gbps (10GE LAN)
+		fc10G(3) , 			-- 10.5187 Gbps (10G FC)
+		otu2(4),            -- 10.7092 Gbps (G.709; G.Supp43 6.1; OTU2)
+		otu2eLan(5),        -- 11.0491 Gbps [= 255/238 × 10.3125] (G.Supp43 7.2; OTU2e LAN w/o stuffing)
+		otu2eLanStuff(6),   -- 11.0957 Gbps [= 255/237 × 10.3125] (G.Supp43 7.1; OTU2e LAN /w stuffing)
+		otu2eFc(7),       	-- 11.2701 Gbps [= 255/238 × 10.5187] (G.sup43 7.2 of 10G FC; OTU2e 10GFC w/o stuffing)    
+		otu2FcStuff(8)		-- 11.3176 Gbps [= 255/237 × 10.5187] (G.sup43 7.1 of 10G FC; OTU2 10G FC /w stuffing) 
+	}
+
+OTNOperationMode ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION
+		"Indicates the operation mode of the OTN interface
+		Detection function."
+	SYNTAX  INTEGER {
+    	async(1),			-- OTN G.709 Async mapping with FEC
+    	sync(2),      		-- OTN G.709 Sync mapping with FEC
+    	bypass(3)     		-- OTN Bypass (Transparent Passthru)
+	}
+
+--
+-- The OTN Configuration Table
+--
+
+slOTNConfigTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SlOTNConfigEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The OTN Configuration table."
+	::= { slOTNConfig 1 }
+
+slOTNConfigEntry OBJECT-TYPE
+	SYNTAX  SlOTNConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the OTN Configuration table."
+	INDEX   { slOTNConfigLineIndex }
+	::= { slOTNConfigTable 1 }
+
+SlOTNConfigEntry ::=
+	SEQUENCE {
+		slOTNConfigLineIndex			InterfaceIndex,
+		slOTNConfigOperationMode		OTNOperationMode,      		
+        slOTNConfigFECEnabled			INTEGER,   		
+		slOTNConfigStuffingEnabled		TruthValue,           
+        -- OTU
+        slOTNConfigOTUkTIMDetEnabled	TruthValue,    		
+        slOTNConfigOTUkDAPIToTransmit   OTNTraceMessage,    
+        slOTNConfigOTUkSAPIToTransmit   OTNTraceMessage,    
+        slOTNConfigOTUkDAPIToExpect		OTNTraceMessage,    
+        slOTNConfigOTUkSAPIToExpect		OTNTraceMessage,    
+        slOTNConfigOTUkDAPIReceived		OTNTraceMessage,    
+        slOTNConfigOTUkSAPIReceived		OTNTraceMessage,    
+        -- ODU
+        slOTNConfigODUkTIMDetEnabled	TruthValue,    
+        slOTNConfigODUkDAPIToTransmit   OTNTraceMessage,    
+        slOTNConfigODUkSAPIToTransmit   OTNTraceMessage,    
+        slOTNConfigODUkDAPIToExpect		OTNTraceMessage,    
+        slOTNConfigODUkSAPIToExpect		OTNTraceMessage,    
+        slOTNConfigODUkDAPIReceived		OTNTraceMessage,    
+        slOTNConfigODUkSAPIReceived		OTNTraceMessage     
+	}
+
+slOTNConfigLineIndex OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The ifIndex of the XFP."
+	::= { slOTNConfigEntry 1 }
+
+slOTNConfigOperationMode OBJECT-TYPE
+	SYNTAX      OTNOperationMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"The OTN operation mode configuration
+    	async(1)   - OTN G.709 Async mapping with FEC
+    	sync(2)    - OTN G.709 Sync mapping with FEC
+    	bypass(3)  - OTN Bypass (Transparent Passthru)" 
+    ::= { slOTNConfigEntry 2 }
+
+slOTNConfigFECEnabled OBJECT-TYPE
+	SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"FEC configuration
+		0 - disable
+		1 - G.709 FEC 
+		2 - disable
+		3 - I.4
+		4 - I.7"
+    ::= { slOTNConfigEntry 3 }
+
+slOTNConfigStuffingEnabled OBJECT-TYPE
+	SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"Byte stuffing configuration 
+    	true(1)  - Enable OTN Byte Stuffing (255/237)
+		false(2) - Disable OTN Byte Stuffing (255/238)"
+    ::= { slOTNConfigEntry 4 }
+
+-- OTU Configuration
+
+slOTNConfigOTUkTIMDetEnabled                OBJECT-TYPE
+	SYNTAX          TruthValue
+	MAX-ACCESS  	read-write
+	STATUS          current
+	DESCRIPTION
+		"TIM Detection Enabled."
+	::= { slOTNConfigEntry 5 }
+
+slOTNConfigOTUkDAPIToTransmit OBJECT-TYPE
+	SYNTAX      OTNTraceMessage
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"The Destination Access Point Identifier to transmit."
+    ::= { slOTNConfigEntry 6 }
+
+slOTNConfigOTUkSAPIToTransmit OBJECT-TYPE
+	SYNTAX      OTNTraceMessage
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"The Source Access Point Identifier to transmit."
+    ::= { slOTNConfigEntry 7 }
+
+slOTNConfigOTUkDAPIToExpect OBJECT-TYPE
+	SYNTAX      OTNTraceMessage
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"The Destination Access Point Identifier to expect."
+    ::= { slOTNConfigEntry 8 }
+
+slOTNConfigOTUkSAPIToExpect OBJECT-TYPE
+	SYNTAX      OTNTraceMessage
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"The Source Access Point Identifier to expect."
+    ::= { slOTNConfigEntry 9 }
+
+slOTNConfigOTUkDAPIReceived OBJECT-TYPE
+	SYNTAX      OTNTraceMessage
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+    	"The received Destination Access Point Identifier."
+    ::= { slOTNConfigEntry 10 }
+
+slOTNConfigOTUkSAPIReceived OBJECT-TYPE
+	SYNTAX      OTNTraceMessage
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+    	"The received Source Access Point Identifier."
+    ::= { slOTNConfigEntry 11 }
+
+-- ODU Configuration
+
+slOTNConfigODUkTIMDetEnabled                OBJECT-TYPE
+	SYNTAX          TruthValue
+	MAX-ACCESS  	read-write
+	STATUS          current
+	DESCRIPTION
+		"TIM Detection Enabled."
+	::= { slOTNConfigEntry 12 }
+
+slOTNConfigODUkDAPIToTransmit OBJECT-TYPE
+	SYNTAX      OTNTraceMessage
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"The Destination Access Point Identifier to transmit."
+    ::= { slOTNConfigEntry 13 }
+
+slOTNConfigODUkSAPIToTransmit OBJECT-TYPE
+	SYNTAX      OTNTraceMessage
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"The Source Access Point Identifier to transmit."
+    ::= { slOTNConfigEntry 14 }
+
+slOTNConfigODUkDAPIToExpect OBJECT-TYPE
+	SYNTAX      OTNTraceMessage
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"The Destination Access Point Identifier to expect."
+    ::= { slOTNConfigEntry 15 }
+
+slOTNConfigODUkSAPIToExpect OBJECT-TYPE
+	SYNTAX      OTNTraceMessage
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"The Source Access Point Identifier to expect."
+    ::= { slOTNConfigEntry 16 }
+
+slOTNConfigODUkDAPIReceived OBJECT-TYPE
+	SYNTAX      OTNTraceMessage
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+    	"The received Destination Access Point Identifier."
+    ::= { slOTNConfigEntry 17 }
+
+slOTNConfigODUkSAPIReceived OBJECT-TYPE
+	SYNTAX      OTNTraceMessage
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+    	"The received Source Access Point Identifier."
+    ::= { slOTNConfigEntry 18 }
+
+
+
+--
+-- The PM Table
+--
+
+
+slOTNCurrentPmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SlOTNCurrentPmEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The OTN current table contains various OTN PM statistics."
+	::= { slOTNPm 1 }
+
+slOTNCurrentPmEntry OBJECT-TYPE
+	SYNTAX  		SlOTNCurrentPmEntry
+	MAX-ACCESS  	not-accessible
+	STATUS  		current
+	DESCRIPTION
+		"An entry in the OTN Current table."
+	INDEX   { slOTNCurrentPmIndex }
+	::= { slOTNCurrentPmTable 1 }
+
+SlOTNCurrentPmEntry ::=
+	SEQUENCE {
+		slOTNCurrentPmIndex			InterfaceIndex,
+		slOTNCurrentPmFecCe			INTEGER,         
+		slOTNCurrentPmFecCerMant	INTEGER,
+		slOTNCurrentPmFecCerExp		INTEGER,
+		slOTNCurrentPmFecCerValid	TruthValue,
+		slOTNCurrentPmFecCerMantFE	INTEGER,
+		slOTNCurrentPmFecCerExpFE	INTEGER,
+		slOTNCurrentPmFecCerValidFE	TruthValue,
+		slOTNCurrentPmReset			INTEGER         
+	}
+
+slOTNCurrentPmIndex OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The ifIndex of the XFP."
+	::= { slOTNCurrentPmEntry 1 }
+
+slOTNCurrentPmFecCe            OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"FEC Corrected Errors. Increment for each FEC corrected error."
+	::= { slOTNCurrentPmEntry 2 }
+
+slOTNCurrentPmFecCerMant               OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"FEC Corrected Error Ratio - The mantissa value."
+	::= { slOTNCurrentPmEntry 3 }
+
+slOTNCurrentPmFecCerExp                OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"FEC Corrected Error Ratio - The exponent value."
+	::= { slOTNCurrentPmEntry 4 }
+
+slOTNCurrentPmFecCerValid                OBJECT-TYPE
+	SYNTAX  	TruthValue
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"FEC Corrected Error Ratio - Validity flag."
+	::= { slOTNCurrentPmEntry 5 }
+
+slOTNCurrentPmFecCerMantFE               OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Far End FEC Corrected Error Ratio - The mantissa value."
+	::= { slOTNCurrentPmEntry 6 }
+
+slOTNCurrentPmFecCerExpFE                OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Far End FEC Corrected Error Ratio - The exponent value."
+	::= { slOTNCurrentPmEntry 7 }
+
+slOTNCurrentPmFecCerValidFE                OBJECT-TYPE
+	SYNTAX  	TruthValue
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Far End FEC Corrected Error Ratio - Validity flag."
+	::= { slOTNCurrentPmEntry 8 }
+
+slOTNCurrentPmReset                OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"Writing this object reset the FEC PM."
+	::= { slOTNCurrentPmEntry 9 }
+
+
+-- 
+-- OTN Traps
+-- 
+
+
+END
