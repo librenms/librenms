@@ -1,4 +1,4 @@
-mib: IF-MIB:IONODES-IONSERIES-MIB
+mib: IONODES-IONSERIES-MIB
 modules:
     processors:
         data:
