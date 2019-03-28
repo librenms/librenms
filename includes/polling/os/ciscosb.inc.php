@@ -10,14 +10,19 @@
  * the source code distribution for details.
  */
 
+$hwversion = snmp_get($device, 'genGroupHWVersion.0', '-Ovq', 'CISCOSB-DEVICEPARAMS-MIB');
 if ($device['sysObjectID'] == '.1.3.6.1.4.1.9.6.1.89.26.1') {
     $hardware = 'SG220-26';
 } else {
     $hardware = str_replace(' ', '', snmp_get($device, 'rlPhdUnitGenParamModelName.1', '-Ovq', 'CISCOSB-Physicaldescription-MIB'));
 }
+if ($hwversion) {
+    $hardware .= " " . $hwversion;
+}
 
 $version  = snmp_get($device, 'rlPhdUnitGenParamSoftwareVersion.1', '-Ovq', 'CISCOSB-Physicaldescription-MIB');
 $boot = snmp_get($device, 'rndBaseBootVersion.0', '-Ovq', 'CISCOSB-DEVICEPARAMS-MIB');
+
 if ($boot) {
     $version = "Firmware $version, Bootldr $boot";
 }
