@@ -17,5 +17,9 @@ if ($device['sysObjectID'] == '.1.3.6.1.4.1.9.6.1.89.26.1') {
 }
 
 $version  = snmp_get($device, 'rlPhdUnitGenParamSoftwareVersion.1', '-Ovq', 'CISCOSB-Physicaldescription-MIB');
+$boot = snmp_get($device, '.1.3.6.1.4.1.9.6.1.101.2.10.0', '-Ovq');
+if ($boot) {
+    $version .= " (bootldr $boot)";
+}
 $serial   = snmp_get($device, 'rlPhdUnitGenParamSerialNum.1', '-Ovq', 'CISCOSB-Physicaldescription-MIB');
 $features = snmp_get($device, 'rlPhdUnitGenParamServiceTag.1', '-Ovq', 'CISCOSB-Physicaldescription-MIB');
