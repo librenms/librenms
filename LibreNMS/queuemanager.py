@@ -55,16 +55,19 @@ class QueueManager:
     def _service_worker(self, work_func, queue_id):
         debug("Worker started {}".format(threading.current_thread().getName()))
         while not self._stop_event.is_set():
-            debug("Worker {} checking queue {} ({}) for work".format(threading.current_thread().getName(), queue_id, self.get_queue(queue_id).qsize()))
+            debug("Worker {} checking queue {} ({}) for work".format(threading.current_thread().getName(), queue_id,
+                                                                     self.get_queue(queue_id).qsize()))
             try:
                 # cannot break blocking request with redis-py, so timeout :(
                 device_id = self.get_queue(queue_id).get(True, 3)
 
                 if device_id is not None:  # None returned by redis after timeout when empty
-                    debug("Worker {} ({}) got work {} ".format(threading.current_thread().getName(), queue_id, device_id))
+                    debug(
+                        "Worker {} ({}) got work {} ".format(threading.current_thread().getName(), queue_id, device_id))
                     with LibreNMS.TimeitContext.start() as t:
                         debug("Queues: {}".format(self._queues))
-                        target_desc = "{} ({})".format(device_id if device_id else '', queue_id) if queue_id else device_id
+                        target_desc = "{} ({})".format(device_id if device_id else '',
+                                                       queue_id) if queue_id else device_id
                         if work_func:
                             work_func(device_id)
                         else:
@@ -273,19 +276,17 @@ class TimedQueueManager(QueueManager):
 
 
 class BillingQueueManager(TimedQueueManager):
-    def __init__(self, config, lock_manager, work_function, poll_dispatch_function, calculate_dispatch_function,
-                 auto_start=True):
+    def __init__(self, config, lock_manager, auto_start=True):
         """
         A TimedQueueManager with two timers dispatching poll billing and calculate billing to the same work queue
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
-        :param work_function: function that will be called to perform the task
-        :param poll_dispatch_function: function that will be called when the timer is up, should call post_work()
-        :param calculate_dispatch_function: function that will be called when the timer is up, should call post_work()
+        :param lock_manager: the single instance of lock manager
         :param auto_start: automatically start worker threads
         """
-        TimedQueueManager.__init__(self, config, lock_manager, 'billing', work_function, poll_dispatch_function, auto_start)
-        self.calculate_timer = LibreNMS.RecurringTimer(self.get_poller_config().calculate, calculate_dispatch_function, 'calculate_billing_timer')
+        TimedQueueManager.__init__(self, config, lock_manager, 'billing', None, None, auto_start)
+        self.calculate_timer = LibreNMS.RecurringTimer(self.get_poller_config().calculate,
+                                                       self.dispatch_calculate_billing, 'calculate_billing_timer')
 
     def start_dispatch(self):
         """
@@ -301,6 +302,20 @@ class BillingQueueManager(TimedQueueManager):
         self.calculate_timer.stop()
         TimedQueueManager.stop_dispatch(self)
 
+    def dispatch_calculate_billing(self):
+        self.post_work('calculate', 0)
+
+    def do_dispatch(self):
+        self.post_work('poll', 0)
+
+    def do_work(self, run_type, group):
+        if run_type == 'poll':
+            info("Polling billing")
+            self.call_script('poll-billing.php')
+        else:  # run_type == 'calculate'
+            info("Calculating billing")
+            self.call_script('billing-calculate.php')
+
 
 class PingQueueManager(TimedQueueManager):
     def __init__(self, config, lock_manager, auto_start=True):
@@ -308,14 +323,11 @@ class PingQueueManager(TimedQueueManager):
         A TimedQueueManager with two timers dispatching poll billing and calculate billing to the same work queue
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
-        :param work_function: function that will be called to perform the task
-        :param poll_dispatch_function: function that will be called when the timer is up, should call post_work()
-        :param calculate_dispatch_function: function that will be called when the timer is up, should call post_work()
+        :param lock_manager: the single instance of lock manager
         :param auto_start: automatically start worker threads
         """
         TimedQueueManager.__init__(self, config, lock_manager, 'ping', auto_start=auto_start)
         self._db = LibreNMS.DB(self.config)
-        self.start_dispatch()
 
     def do_dispatch(self):
         groups = self._db.query("SELECT DISTINCT (`poller_group`) FROM `devices`")
@@ -323,9 +335,41 @@ class PingQueueManager(TimedQueueManager):
             self.post_work(0, group[0])
 
     def do_work(self, context, group):
-        if self.lock(group, 'group'):
+        if self.lock(group, 'group', timeout=self.config.ping.frequency):
             try:
                 info("Running fast ping")
                 self.call_script('ping.php', ('-g', group))
             finally:
                 self.unlock(group, 'group')
+
+
+class ServicesQueueManager(TimedQueueManager):
+    def __init__(self, config, lock_manager, auto_start=True):
+        """
+        A TimedQueueManager with two timers dispatching poll billing and calculate billing to the same work queue
+
+        :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: the single instance of lock manager
+        :param auto_start: automatically start worker threads
+        """
+        TimedQueueManager.__init__(self, config, lock_manager, 'services', auto_start=auto_start)
+        self._db = LibreNMS.DB(self.config)
+
+    def do_dispatch(self):
+        devices = self._db.query("SELECT DISTINCT(`device_id`), `poller_group` FROM `services`"
+                                 " LEFT JOIN `devices` USING (`device_id`) WHERE `disabled`=0")
+        for device in devices:
+            self.post_work(device[0], device[1])
+
+    def do_work(self, device_id, group):
+        if self.lock(device_id, timeout=self.config.services.frequency):
+            try:
+                info("Checking services on device {}".format(device_id))
+                self.call_script('check-services.php', ('-h', device_id))
+            except subprocess.CalledProcessError as e:
+                if e.returncode == 5:
+                    info("Device {} is down, cannot poll service, waiting {}s for retry"
+                         .format(device_id, self.config.down_retry))
+                    self.lock(device_id, retry=True, timeout=self.config.down_retry)
+            finally:
+                self.unlock(device_id)

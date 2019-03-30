@@ -6,7 +6,7 @@ from math import ceil
 from time import time
 
 from .service import Service, ServiceConfig
-from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager, PingQueueManager
+from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager, PingQueueManager, ServicesQueueManager
 
 
 def normalize_wait(seconds):
