@@ -37,7 +37,7 @@
             if ($pre_cache['adva_fsp150'][$index][$sensor_name]) {
                 $oid          = $entry['sensor_oid'].".".$index;
                 $descr        = $pre_cache['adva_fsp150'][$index]['slotCardUnitName']." [#".$pre_cache['adva_fsp150'][$index]['slotIndex']."]";
-                $current      = $pre_cache['adva_fsp150'][$index][$entry]/$divisor;
+                $current      = $pre_cache['adva_fsp150'][$index][$entry['sensor_name']]/$divisor;
 
                 discover_sensor(
                     $valid['sensor'],

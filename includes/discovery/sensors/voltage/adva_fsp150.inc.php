@@ -24,6 +24,7 @@
     $sensors_adva = [
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.6', 'sensor_name' => 'psuOutputVoltage'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.7.1.5', 'sensor_name' => 'nemiVoltage'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.25.1.5', 'sensor_name' => 'ethernetNTEGE112CardVoltage'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.5', 'sensor_name' => 'ethernetNTEGE114CardVoltage'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.5', 'sensor_name' => 'ethernetNTEGE114SCardVoltage'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.5', 'sensor_name' => 'ethernetNTEXG210CardVoltage'],
@@ -41,7 +42,7 @@
                 $oid          = $entry['sensor_oid'].".".$index;
                 $rrd_filename = $pre_cache['adva_fsp150'][$index]['slotCardUnitName']."-".$pre_cache['adva_fsp150'][$index]['slotIndex'];
                 $descr        = $pre_cache['adva_fsp150'][$index]['slotCardUnitName']." [#".$pre_cache['adva_fsp150'][$index]['slotIndex']."]";
-                $current      = $pre_cache['adva_fsp150'][$index][$entry]/$divisor;
+                $current      = $pre_cache['adva_fsp150'][$index][$entry['sensor_name']]/$divisor;
 
                 discover_sensor(
                     $valid['sensor'],

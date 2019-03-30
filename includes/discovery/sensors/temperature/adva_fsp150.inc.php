@@ -21,6 +21,7 @@
 // *************************************************************
 
     $sensors_adva = [
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.25.1.6', 'sensor_name' => 'ethernetNTEGE112CardTemperature'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.6', 'sensor_name' => 'ethernetNTEGE114CardTemperature'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.6', 'sensor_name' => 'ethernetNTEGE114SCardTemperature'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.6', 'sensor_name' => 'ethernetNTEXG210CardTemperature'],
@@ -31,6 +32,16 @@
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.7', 'sensor_name' => 'psuTemperature'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.6.1.6', 'sensor_name' => 'scuTemperature'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.7.1.6', 'sensor_name' => 'nemiTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.9.1.6', 'sensor_name' => 'ethernetCPMRCardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.10.1.6', 'sensor_name' => 'ethernetNTEGE101CardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.11.1.6', 'sensor_name' => 'ethernetNTEGE206CardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.14.1.6', 'sensor_name' => 'ethernetNTECardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.15.1.6', 'sensor_name' => 'ethernetNTEGE201CardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.16.1.6', 'sensor_name' => 'ethernetNTEGE201SyncECardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.17.1.6', 'sensor_name' => 'ethernetNTEGE206FCardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.18.1.6', 'sensor_name' => 'ethernet1x10GCardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.19.1.6', 'sensor_name' => 'ethernet10x1GCardTemperature'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.21.1.6', 'sensor_name' => 'stuCardTemperature'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.22.1.5', 'sensor_name' => 'amiTemperature'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.41.1.6', 'sensor_name' => 'ethernetGE8SCCCardTemperature'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.47.1.5', 'sensor_name' => 'stuHighPerCardTemperature'],
@@ -47,8 +58,9 @@
             if ($pre_cache['adva_fsp150'][$index][$sensor_name]) {
                 $oid          = $entry['sensor_oid'].".".$index;
                 $descr        = $pre_cache['adva_fsp150'][$index]['slotCardUnitName']." [#".$pre_cache['adva_fsp150'][$index]['slotIndex']."]";
-                $current      = $pre_cache['adva_fsp150'][$index][$entry]/$divisor;
+                $current      = $pre_cache['adva_fsp150'][$index][$entry['sensor_name']]/$divisor;
 
+                d_echo($pre_cache['adva_fsp150']);
                 discover_sensor(
                     $valid['sensor'],
                     'temperature',
