@@ -1332,7 +1332,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "sensor_const": null,
                     "state_name": null
                 },
                 {
@@ -1357,7 +1356,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "sensor_const": null,
                     "state_name": null
                 }
             ],
