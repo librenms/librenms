@@ -3,7 +3,7 @@ import random
 import subprocess
 import threading
 import traceback
-from logging import debug, info, error, critical
+from logging import debug, info, error, critical, warning
 from multiprocessing import Queue
 from subprocess import CalledProcessError
 
@@ -320,7 +320,7 @@ class BillingQueueManager(TimedQueueManager):
 class PingQueueManager(TimedQueueManager):
     def __init__(self, config, lock_manager, auto_start=True):
         """
-        A TimedQueueManager with two timers dispatching poll billing and calculate billing to the same work queue
+        A TimedQueueManager to manage dispatch and workers for Ping
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
@@ -346,7 +346,7 @@ class PingQueueManager(TimedQueueManager):
 class ServicesQueueManager(TimedQueueManager):
     def __init__(self, config, lock_manager, auto_start=True):
         """
-        A TimedQueueManager with two timers dispatching poll billing and calculate billing to the same work queue
+        A TimedQueueManager to manage dispatch and workers for Services
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
@@ -373,3 +373,29 @@ class ServicesQueueManager(TimedQueueManager):
                     self.lock(device_id, retry=True, timeout=self.config.down_retry)
             finally:
                 self.unlock(device_id)
+
+
+class AlertQueueManager(TimedQueueManager):
+    def __init__(self, config, lock_manager, auto_start=True):
+        """
+        A TimedQueueManager to manage dispatch and workers for Alerts
+
+        :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: the single instance of lock manager
+        :param auto_start: automatically start worker threads
+        """
+        TimedQueueManager.__init__(self, config, lock_manager, 'alerting', auto_start=auto_start)
+        self._db = LibreNMS.DB(self.config)
+
+    def do_dispatch(self):
+        self.post_work('alerts', 0)
+
+    def do_work(self, device_id, group):
+        try:
+            info("Checking alerts")
+            self.call_script('alerts.php')
+        except subprocess.CalledProcessError as e:
+            if e.returncode == 1:
+                warning("There was an error issuing alerts: {}".format(e.output))
+            else:
+                raise

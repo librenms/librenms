@@ -212,18 +212,16 @@ class Service:
 
         # initialize and start the worker pools
         self.poller_manager = LibreNMS.QueueManager(self.config, self._lm, 'poller', self.poll_device, False)
-        self.alerting_manager = LibreNMS.TimedQueueManager(self.config, self._lm, 'alerting', self.poll_alerting,
-                                                           self.dispatch_alerting, False)
         self.discovery_manager = LibreNMS.TimedQueueManager(self.config, self._lm, 'discovery', self.discover_device,
                                                             self.dispatch_discovery, False)
         # self.ping_manager = LibreNMS.TimedQueueManager(self.config, 'ping')
         self.queue_managers['poller'] = self.poller_manager
-        self.queue_managers['alerting'] = self.alerting_manager
-        self.queue_managers['services'] = LibreNMS.ServicesQueueManager(self.config, self._lm)
+        self.queue_managers['alerting'] = LibreNMS.AlertQueueManager(self.config, self._lm)
+        # self.queue_managers['services'] = LibreNMS.ServicesQueueManager(self.config, self._lm)
         self.queue_managers['discovery'] = self.discovery_manager
-        self.queue_managers['billing'] = LibreNMS.BillingQueueManager(self.config, self._lm)
-        if self.config.ping.enabled:
-            self.queue_managers['ping'] = LibreNMS.PingQueueManager(self.config, self._lm)
+        # self.queue_managers['billing'] = LibreNMS.BillingQueueManager(self.config, self._lm)
+        # if self.config.ping.enabled:
+            # self.queue_managers['ping'] = LibreNMS.PingQueueManager(self.config, self._lm)
         self.daily_timer.start()
         self.stats_timer.start()
 
@@ -571,7 +569,7 @@ class Service:
                                'values(@parent_poller_id, "{0}", {1}, {2}, {3}, {4}, {5}) '
                                'ON DUPLICATE KEY UPDATE depth={1}, devices={2}, worker_seconds={3}, workers={4}, frequency={5}; '
                                .format(worker_type,
-                                       sum([getattr(self, ''.join([worker_type, '_manager'])).get_queue(group).qsize() for group in self.config.group]),
+                                       sum([manager.get_queue(group).qsize() for group in self.config.group]),
                                        devices,
                                        worker_seconds,
                                        getattr(self.config, worker_type).workers,
