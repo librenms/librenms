@@ -1,11 +1,12 @@
 import threading
+import timeit
 
 from logging import critical, info, debug, exception
 from math import ceil
 from time import time
 
 from .service import Service, ServiceConfig
-from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager
+from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager, PingQueueManager
 
 
 def normalize_wait(seconds):
@@ -220,7 +221,6 @@ class RedisLock(Lock):
             exception("Unable to obtain lock, local state: name: %s, owner: %s, expiration: %s, allow_owner_relock: %s",
                       name, owner, expiration, allow_owner_relock)
 
-
     def unlock(self, name, owner):
         """
         Release the named lock.
@@ -276,3 +276,80 @@ class RedisQueue(object):
 
     def get_nowait(self):
         return self.get(False)
+
+
+class PerformanceCounter(object):
+    """
+    This is a simple counter to record execution time and number of jobs. It's unique to each
+    poller instance, so does not need to be globally syncronised, just locally.
+    """
+
+    def __init__(self):
+        self._count = 0
+        self._jobs = 0
+        self._lock = threading.Lock()
+
+    def add(self, n):
+        """
+        Add n to the counter and increment the number of jobs by 1
+        :param n: Number to increment by
+        """
+        with self._lock:
+            self._count += n
+            self._jobs += 1
+
+    def split(self, precise=False):
+        """
+        Return the current counter value and keep going
+        :param precise: Whether floating point precision is desired
+        :return: ((INT or FLOAT), INT)
+        """
+        return (self._count if precise else int(self._count)), self._jobs
+
+    def reset(self, precise=False):
+        """
+        Return the current counter value and then zero it.
+        :param precise: Whether floating point precision is desired
+        :return: ((INT or FLOAT), INT)
+        """
+        with self._lock:
+            c = self._count
+            j = self._jobs
+            self._count = 0
+            self._jobs = 0
+
+            return (c if precise else int(c)), j
+
+
+class TimeitContext(object):
+    """
+    Wrapper around timeit to allow the timing of larger blocks of code by wrapping them in "with"
+    """
+
+    def __init__(self):
+        self._t = timeit.default_timer()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        del self._t
+
+    def delta(self):
+        """
+        Calculate the elapsed time since the context was initialised
+        :return: FLOAT
+        """
+        if not self._t:
+            raise ArithmeticError("Timer has not been started, cannot return delta")
+
+        return timeit.default_timer() - self._t
+
+    @classmethod
+    def start(cls):
+        """
+        Factory method for TimeitContext
+        :param cls:
+        :return: TimeitContext
+        """
+        return cls()

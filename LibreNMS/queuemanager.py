@@ -1,4 +1,6 @@
+import os
 import random
+import subprocess
 import threading
 import traceback
 from logging import debug, info, error, critical
@@ -16,7 +18,7 @@ else:
 
 
 class QueueManager:
-    def __init__(self, config, type_desc, work_function, auto_start=True):
+    def __init__(self, config, lock_manager, type_desc, work_function, auto_start=True):
         """
         This class manages a queue of jobs and can be used to submit jobs to the queue with post_work()
         and process jobs in that queue in worker threads using the work_function
@@ -26,16 +28,19 @@ class QueueManager:
         You can start or stop the worker threads with start(), stop(), and stop_and_wait()
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: A LibreNMS.Lock instance to help with locks
         :param type_desc: description for this queue manager type
         :param work_function: function that will be called to perform the task
         :param auto_start: automatically start worker threads
         """
         self.type = type_desc
         self.config = config
+        self.performance = LibreNMS.PerformanceCounter()
 
         self._threads = []
         self._queues = {}
         self._queue_create_lock = threading.Lock()
+        self._lm = lock_manager
 
         self._work_function = work_function
         self._stop_event = threading.Event()
@@ -48,14 +53,26 @@ class QueueManager:
             self.start()
 
     def _service_worker(self, work_func, queue_id):
+        debug("Worker started {}".format(threading.current_thread().getName()))
         while not self._stop_event.is_set():
+            debug("Worker {} checking queue {} ({}) for work".format(threading.current_thread().getName(), queue_id, self.get_queue(queue_id).qsize()))
             try:
                 # cannot break blocking request with redis-py, so timeout :(
                 device_id = self.get_queue(queue_id).get(True, 3)
 
-                if device_id:  # None returned by redis after timeout when empty
-                    debug("Queues: {}".format(self._queues))
-                    work_func(device_id)
+                if device_id is not None:  # None returned by redis after timeout when empty
+                    debug("Worker {} ({}) got work {} ".format(threading.current_thread().getName(), queue_id, device_id))
+                    with LibreNMS.TimeitContext.start() as t:
+                        debug("Queues: {}".format(self._queues))
+                        target_desc = "{} ({})".format(device_id if device_id else '', queue_id) if queue_id else device_id
+                        if work_func:
+                            work_func(device_id)
+                        else:
+                            self.do_work(device_id, queue_id)
+
+                        runtime = t.delta()
+                        info("Completed {} run for {} in {:.2f}s".format(self.type, target_desc, runtime))
+                        self.performance.add(runtime)
             except Empty:
                 pass  # ignore empty queue exception from subprocess.Queue
             except CalledProcessError as e:
@@ -91,6 +108,9 @@ class QueueManager:
                 debug("Started {} {} threads for group {}".format(group_workers, self.type, group))
         else:
             self.spawn_worker(self.type.title(), 0)
+
+    def do_work(self, device_id, group):
+        pass
 
     def spawn_worker(self, thread_name, group):
         pt = threading.Thread(target=self._service_worker, name=thread_name,
@@ -175,9 +195,47 @@ class QueueManager:
         else:
             raise ValueError("Refusing to create improperly scoped queue - parameters were invalid or not set")
 
+    def record_runtime(self, duration):
+        self.performance.add(duration)
+
+    def call_script(self, script, args=()):
+        """
+        Run a LibreNMS script.  Captures all output and throws an exception if a non-zero
+        status is returned.  Blocks parent signals (like SIGINT and SIGTERM).
+        :param script: the name of the executable relative to the base directory
+        :param args: a tuple of arguments to send to the command
+        :returns the output of the command
+        """
+        if script.endswith('.php'):
+            # save calling the sh process
+            base = ('/usr/bin/env', 'php')
+        else:
+            base = ()
+
+        cmd = base + ("{}/{}".format(self.config.BASE_DIR, script),) + tuple(map(str, args))
+        debug("Running {}".format(cmd))
+        # preexec_fn=os.setsid here keeps process signals from propagating
+        return subprocess.check_output(cmd, stderr=subprocess.STDOUT, preexec_fn=os.setsid, close_fds=True).decode()
+
+    # ------ Locking Helpers ------
+    def lock(self, context, context_name='device', retry=False, timeout=0):
+        return self._lm.lock(self._gen_lock_name(context, context_name), self._gen_lock_owner(), timeout, retry)
+
+    def unlock(self, context, context_name='device'):
+        return self._lm.unlock(self._gen_lock_name(context, context_name), self._gen_lock_owner())
+
+    def is_locked(self, context, context_name='device'):
+        return self._lm.check_lock(self._gen_lock_name(context, context_name))
+
+    def _gen_lock_name(self, context, context_name):
+        return '{}.{}.{}'.format(self.type, context_name, context)
+
+    def _gen_lock_owner(self):
+        return "{}-{}".format(self.config.unique_name, threading.current_thread().name)
+
 
 class TimedQueueManager(QueueManager):
-    def __init__(self, config, type_desc, work_function, dispatch_function, auto_start=True):
+    def __init__(self, config, lock_manager, type_desc, work_function=None, dispatch_function=None, auto_start=True):
         """
         A queue manager that periodically dispatches work to the queue
         The times are normalized like they started at 0:00
@@ -187,7 +245,8 @@ class TimedQueueManager(QueueManager):
         :param dispatch_function: function that will be called when the timer is up, should call post_work()
         :param auto_start: automatically start worker threads
         """
-        QueueManager.__init__(self, config, type_desc, work_function, auto_start)
+        dispatch_function = dispatch_function if dispatch_function else self.do_dispatch
+        QueueManager.__init__(self, config, lock_manager, type_desc, work_function, auto_start)
         self.timer = LibreNMS.RecurringTimer(self.get_poller_config().frequency, dispatch_function)
 
     def start_dispatch(self):
@@ -209,9 +268,12 @@ class TimedQueueManager(QueueManager):
         self.stop_dispatch()
         QueueManager.stop(self)
 
+    def do_dispatch(self):
+        pass
+
 
 class BillingQueueManager(TimedQueueManager):
-    def __init__(self, config, work_function, poll_dispatch_function, calculate_dispatch_function,
+    def __init__(self, config, lock_manager, work_function, poll_dispatch_function, calculate_dispatch_function,
                  auto_start=True):
         """
         A TimedQueueManager with two timers dispatching poll billing and calculate billing to the same work queue
@@ -222,7 +284,7 @@ class BillingQueueManager(TimedQueueManager):
         :param calculate_dispatch_function: function that will be called when the timer is up, should call post_work()
         :param auto_start: automatically start worker threads
         """
-        TimedQueueManager.__init__(self, config, 'billing', work_function, poll_dispatch_function, auto_start)
+        TimedQueueManager.__init__(self, config, lock_manager, 'billing', work_function, poll_dispatch_function, auto_start)
         self.calculate_timer = LibreNMS.RecurringTimer(self.get_poller_config().calculate, calculate_dispatch_function, 'calculate_billing_timer')
 
     def start_dispatch(self):
@@ -238,3 +300,32 @@ class BillingQueueManager(TimedQueueManager):
         """
         self.calculate_timer.stop()
         TimedQueueManager.stop_dispatch(self)
+
+
+class PingQueueManager(TimedQueueManager):
+    def __init__(self, config, lock_manager, auto_start=True):
+        """
+        A TimedQueueManager with two timers dispatching poll billing and calculate billing to the same work queue
+
+        :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param work_function: function that will be called to perform the task
+        :param poll_dispatch_function: function that will be called when the timer is up, should call post_work()
+        :param calculate_dispatch_function: function that will be called when the timer is up, should call post_work()
+        :param auto_start: automatically start worker threads
+        """
+        TimedQueueManager.__init__(self, config, lock_manager, 'ping', auto_start=auto_start)
+        self._db = LibreNMS.DB(self.config)
+        self.start_dispatch()
+
+    def do_dispatch(self):
+        groups = self._db.query("SELECT DISTINCT (`poller_group`) FROM `devices`")
+        for group in groups:
+            self.post_work(0, group[0])
+
+    def do_work(self, context, group):
+        if self.lock(group, 'group'):
+            try:
+                info("Running fast ping")
+                self.call_script('ping.php', ('-g', group))
+            finally:
+                self.unlock(group, 'group')
