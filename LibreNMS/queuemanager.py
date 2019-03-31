@@ -449,7 +449,6 @@ class DiscoveryQueueManager(TimedQueueManager):
             try:
                 info("Discovering device {}".format(device_id))
                 self.call_script('discovery.php', ('-h', device_id))
-                info('Discovery complete {}'.format(device_id))
             except subprocess.CalledProcessError as e:
                 if e.returncode == 5:
                     info("Device {} is down, cannot discover, waiting {}s for retry"
