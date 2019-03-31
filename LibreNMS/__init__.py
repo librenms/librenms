@@ -270,42 +270,6 @@ class RedisLock(Lock):
             print("{} locked by {}, expires in {} seconds".format(key, self._redis.get(key), self._redis.ttl(key)))
 
 
-class RedisQueue(object):
-    def __init__(self, name, namespace='queue', **redis_kwargs):
-        import redis
-        redis_kwargs['decode_responses'] = True
-        self._redis = redis.Redis(**redis_kwargs)
-        self._redis.ping()
-        self.key = "{}:{}".format(namespace, name)
-
-    def qsize(self):
-        return self._redis.llen(self.key)
-
-    def empty(self):
-        return self.qsize() == 0
-
-    def put(self, item):
-        # commented code allows unique entries, but shuffles the queue
-        # p = self._redis.pipeline()
-        # p.lrem(self.key, 1, item)
-        # p.lpush(self.key, item)
-        # p.execute()
-        self._redis.rpush(self.key, item)
-
-    def get(self, block=True, timeout=None):
-        if block:
-            item = self._redis.blpop(self.key, timeout=timeout)
-        else:
-            item = self._redis.lpop(self.key)
-
-        if item:
-            item = item[1]
-        return item
-
-    def get_nowait(self):
-        return self.get(False)
-
-
 class RedisUniqueQueue(object):
     def __init__(self, name, namespace='queue', **redis_kwargs):
         import redis
@@ -324,10 +288,8 @@ class RedisUniqueQueue(object):
     def empty(self):
         return self.qsize() == 0
 
-    def put(self, item, score=None):
-        if score is None:
-            score = time()
-            self._redis.zadd(self.key, {item: score})
+    def put(self, item):
+        self._redis.zadd(self.key, {item: time()}, nx=True)
 
     def get(self, block=True, timeout=None):
         if block:
