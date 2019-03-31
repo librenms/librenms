@@ -10,7 +10,8 @@ from time import time
 from redis import ResponseError
 
 from .service import Service, ServiceConfig
-from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager, PingQueueManager, ServicesQueueManager, AlertQueueManager, PollerQueueManager
+from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager, PingQueueManager, ServicesQueueManager, \
+    AlertQueueManager, PollerQueueManager, DiscoveryQueueManager
 
 
 def normalize_wait(seconds):
@@ -190,7 +191,7 @@ class ThreadingLock(Lock):
         return Lock.check_lock(self, name)
 
     def print_locks(self):
-            Lock.print_locks(self)
+        Lock.print_locks(self)
 
 
 class RedisLock(Lock):

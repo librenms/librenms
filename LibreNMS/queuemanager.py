@@ -52,7 +52,7 @@ class QueueManager:
                                                                      self.get_queue(queue_id).qsize()))
             try:
                 # cannot break blocking request with redis-py, so timeout :(
-                device_id = self.get_queue(queue_id).get(True, 3)
+                device_id = self.get_queue(queue_id).get(True, 10)
 
                 if device_id is not None:  # None returned by redis after timeout when empty
                     debug(
@@ -425,3 +425,37 @@ class PollerQueueManager(QueueManager):
                 self.unlock(device_id)
         else:
             debug('Tried to poll {}, but it is locked'.format(device_id))
+
+
+class DiscoveryQueueManager(TimedQueueManager):
+    def __init__(self, config, lock_manager, auto_start=True):
+        """
+        A TimedQueueManager to manage dispatch and workers for Alerts
+
+        :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: the single instance of lock manager
+        :param auto_start: automatically start worker threads
+        """
+        QueueManager.__init__(self, config, lock_manager, 'discovery', None, auto_start=auto_start)
+        self._db = LibreNMS.DB(self.config)
+
+    def do_dispatch(self):
+        devices = self._db.query("SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0")
+        for device in devices:
+            self.post_work(device[0], device[1])
+
+    def do_work(self, device_id, group):
+        if self.lock(device_id, timeout=LibreNMS.normalize_wait(self.config.discovery.frequency)):
+            try:
+                info("Discovering device {}".format(device_id))
+                self.call_script('discovery.php', ('-h', device_id))
+                info('Discovery complete {}'.format(device_id))
+            except subprocess.CalledProcessError as e:
+                if e.returncode == 5:
+                    info("Device {} is down, cannot discover, waiting {}s for retry"
+                         .format(device_id, self.config.down_retry))
+                    self.lock(device_id, allow_relock=True, timeout=self.config.down_retry)
+                else:
+                    self.unlock(device_id)
+            else:
+                self.unlock(device_id)

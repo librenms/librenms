@@ -172,7 +172,6 @@ class Service:
     _fp = False
     _started = False
     queue_managers = {}
-    alerting_manager = None
     poller_manager = None
     discovery_manager = None
     last_poll = {}
@@ -184,10 +183,7 @@ class Service:
 
         self.attach_signals()
 
-        # init database connections different ones for different threads
-        self._db = LibreNMS.DB(self.config)  # main
-        self._services_db = LibreNMS.DB(self.config)  # services dispatch
-        self._discovery_db = LibreNMS.DB(self.config)  # discovery dispatch
+        self._db = LibreNMS.DB(self.config)
 
         self._lm = self.create_lock_manager()
         self.daily_timer = LibreNMS.RecurringTimer(self.config.update_frequency, self.run_maintenance, 'maintenance')
@@ -211,17 +207,15 @@ class Service:
         debug("Starting up queue managers...")
 
         # initialize and start the worker pools
-        # self.poller_manager = LibreNMS.PollerQueueManager(self.config, self._lm)
-        self.discovery_manager = LibreNMS.TimedQueueManager(self.config, self._lm, 'discovery', self.discover_device,
-                                                            self.dispatch_discovery, False)
-        # self.ping_manager = LibreNMS.TimedQueueManager(self.config, 'ping')
-        # self.queue_managers['poller'] = self.poller_manager
-        # self.queue_managers['alerting'] = LibreNMS.AlertQueueManager(self.config, self._lm)
-        # self.queue_managers['services'] = LibreNMS.ServicesQueueManager(self.config, self._lm)
+        self.poller_manager = LibreNMS.PollerQueueManager(self.config, self._lm)
+        self.queue_managers['poller'] = self.poller_manager
+        self.discovery_manager = LibreNMS.DiscoveryQueueManager(self.config, self._lm)
         self.queue_managers['discovery'] = self.discovery_manager
-        # self.queue_managers['billing'] = LibreNMS.BillingQueueManager(self.config, self._lm)
-        # if self.config.ping.enabled:
-            # self.queue_managers['ping'] = LibreNMS.PingQueueManager(self.config, self._lm)
+        self.queue_managers['alerting'] = LibreNMS.AlertQueueManager(self.config, self._lm)
+        self.queue_managers['services'] = LibreNMS.ServicesQueueManager(self.config, self._lm)
+        self.queue_managers['billing'] = LibreNMS.BillingQueueManager(self.config, self._lm)
+        if self.config.ping.enabled:
+            self.queue_managers['ping'] = LibreNMS.PingQueueManager(self.config, self._lm)
         self.daily_timer.start()
         self.stats_timer.start()
 
@@ -265,29 +259,8 @@ class Service:
 
     # ------------ Discovery ------------
     def dispatch_immediate_discovery(self, device_id, group):
-        if self.discovery_manager.get_queue(group).empty() and not self.discovery_is_locked(device_id):
+        if not self.discovery_manager.is_locked(device_id):
             self.discovery_manager.post_work(device_id, group)
-
-    def dispatch_discovery(self):
-        devices = self.fetch_device_list()
-        for device in devices:
-            self.discovery_manager.post_work(device[0], device[1])
-
-    def discover_device(self, device_id):
-        if self.lock_discovery(device_id):
-            try:
-                info("Discovering device {}".format(device_id))
-                self.call_script('discovery.php', ('-h', device_id))
-                info('Discovery complete {}'.format(device_id))
-            except subprocess.CalledProcessError as e:
-                if e.returncode == 5:
-                    info("Device {} is down, cannot discover, waiting {}s for retry"
-                         .format(device_id, self.config.down_retry))
-                    self.lock_discovery(device_id, True)
-                else:
-                    self.unlock_discovery(device_id)
-            else:
-                self.unlock_discovery(device_id)
 
     # ------------ Polling ------------
     def dispatch_immediate_polling(self, device_id, group):
@@ -302,9 +275,6 @@ class Service:
                 if elapsed > (self.config.poller.frequency - self.config.master_resolution):
                     debug("Dispatching polling for device {}, time since last poll {:.2f}s"
                           .format(device_id, elapsed))
-
-    def fetch_device_list(self):
-        return self._discovery_db.query("SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0")
 
     def fetch_immediate_device_list(self):
         poller_find_time = self.config.poller.frequency - 1
@@ -345,27 +315,6 @@ class Service:
         info("Maintenance tasks complete\n{}".format(output))
 
         self.restart()
-
-    # Lock Helpers #
-    def lock_discovery(self, device_id, retry=False):
-        timeout = self.config.down_retry if retry else LibreNMS.normalize_wait(self.config.discovery.frequency)
-        return self._lm.lock(self.gen_lock_name('discovery', device_id), self.gen_lock_owner(), timeout, retry)
-
-    def unlock_discovery(self, device_id):
-        return self._lm.unlock(self.gen_lock_name('discovery', device_id), self.gen_lock_owner())
-
-    def discovery_is_locked(self, device_id):
-        return self._lm.check_lock(self.gen_lock_name('discovery', device_id))
-
-    def lock_polling(self, device_id, retry=False):
-        timeout = self.config.down_retry if retry else self.config.poller.frequency
-        return self._lm.lock(self.gen_lock_name('polling', device_id), self.gen_lock_owner(), timeout, retry)
-
-    def unlock_polling(self, device_id):
-        return self._lm.unlock(self.gen_lock_name('polling', device_id), self.gen_lock_owner())
-
-    def polling_is_locked(self, device_id):
-        return self._lm.check_lock(self.gen_lock_name('polling', device_id))
 
     @staticmethod
     def gen_lock_name(lock_class, device_id):
