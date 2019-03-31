@@ -9,8 +9,6 @@ from math import ceil
 from queue import Queue
 from time import time
 
-from redis import ResponseError
-
 from .service import Service, ServiceConfig
 from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager, PingQueueManager, ServicesQueueManager, \
     AlertQueueManager, PollerQueueManager, DiscoveryQueueManager

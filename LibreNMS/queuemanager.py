@@ -1,9 +1,7 @@
-import os
 import subprocess
 import threading
 import traceback
 from logging import debug, info, error, critical, warning
-from multiprocessing import Queue
 from queue import Empty
 from subprocess import CalledProcessError
 
