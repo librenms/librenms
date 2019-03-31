@@ -211,12 +211,12 @@ class Service:
         debug("Starting up queue managers...")
 
         # initialize and start the worker pools
-        self.poller_manager = LibreNMS.QueueManager(self.config, self._lm, 'poller', self.poll_device, False)
+        # self.poller_manager = LibreNMS.PollerQueueManager(self.config, self._lm)
         self.discovery_manager = LibreNMS.TimedQueueManager(self.config, self._lm, 'discovery', self.discover_device,
                                                             self.dispatch_discovery, False)
         # self.ping_manager = LibreNMS.TimedQueueManager(self.config, 'ping')
-        self.queue_managers['poller'] = self.poller_manager
-        self.queue_managers['alerting'] = LibreNMS.AlertQueueManager(self.config, self._lm)
+        # self.queue_managers['poller'] = self.poller_manager
+        # self.queue_managers['alerting'] = LibreNMS.AlertQueueManager(self.config, self._lm)
         # self.queue_managers['services'] = LibreNMS.ServicesQueueManager(self.config, self._lm)
         self.queue_managers['discovery'] = self.discovery_manager
         # self.queue_managers['billing'] = LibreNMS.BillingQueueManager(self.config, self._lm)
@@ -289,23 +289,9 @@ class Service:
             else:
                 self.unlock_discovery(device_id)
 
-    # ------------ Alerting ------------
-    def dispatch_alerting(self):
-        self.alerting_manager.post_work('alerts', 0)
-
-    def poll_alerting(self, _=None):
-        try:
-            info("Checking alerts")
-            self.call_script('alerts.php')
-        except subprocess.CalledProcessError as e:
-            if e.returncode == 1:
-                warning("There was an error issuing alerts: {}".format(e.output))
-            else:
-                raise
-
     # ------------ Polling ------------
     def dispatch_immediate_polling(self, device_id, group):
-        if self.poller_manager.get_queue(group).empty() and not self.polling_is_locked(device_id):
+        if not self.poller_manager.is_locked(device_id):
             self.poller_manager.post_work(device_id, group)
 
             if self.config.debug:
@@ -316,26 +302,6 @@ class Service:
                 if elapsed > (self.config.poller.frequency - self.config.master_resolution):
                     debug("Dispatching polling for device {}, time since last poll {:.2f}s"
                           .format(device_id, elapsed))
-
-    def poll_device(self, device_id):
-        if self.lock_polling(device_id):
-            info('Polling device {}'.format(device_id))
-
-            try:
-                self.call_script('poller.php', ('-h', device_id))
-            except subprocess.CalledProcessError as e:
-                if e.returncode == 6:
-                    warning('Polling device {} unreachable, waiting {}s for retry'.format(device_id, self.config.down_retry))
-                    # re-lock to set retry timer
-                    self.lock_polling(device_id, True)
-                else:
-                    error('Polling device {} failed! {}'.format(device_id, e))
-                    self.unlock_polling(device_id)
-            else:
-                info('Polling complete {}'.format(device_id))
-                # self.polling_unlock(device_id)
-        else:
-            debug('Tried to poll {}, but it is locked'.format(device_id))
 
     def fetch_device_list(self):
         return self._discovery_db.query("SELECT `device_id`, `poller_group` FROM `devices` WHERE `disabled`=0")

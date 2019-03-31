@@ -1,12 +1,16 @@
 import threading
 import timeit
+from collections import deque
 
 from logging import critical, info, debug, exception
 from math import ceil
+from queue import Queue
 from time import time
 
+from redis import ResponseError
+
 from .service import Service, ServiceConfig
-from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager, PingQueueManager, ServicesQueueManager, AlertQueueManager
+from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager, PingQueueManager, ServicesQueueManager, AlertQueueManager, PollerQueueManager
 
 
 def normalize_wait(seconds):
@@ -276,6 +280,59 @@ class RedisQueue(object):
 
     def get_nowait(self):
         return self.get(False)
+
+
+class RedisUniqueQueue(object):
+    def __init__(self, name, namespace='queue', **redis_kwargs):
+        import redis
+        redis_kwargs['decode_responses'] = True
+        self._redis = redis.Redis(**redis_kwargs)
+        self._redis.ping()
+        self.key = "{}:{}".format(namespace, name)
+
+        # clean up from previous implementations
+        if self._redis.type(self.key) != 'zset':
+            self._redis.delete(self.key)
+
+    def qsize(self):
+        return self._redis.zcount(self.key, '-inf', '+inf')
+
+    def empty(self):
+        return self.qsize() == 0
+
+    def put(self, item, score=None):
+        if score is None:
+            score = time()
+            self._redis.zadd(self.key, {item: score})
+
+    def get(self, block=True, timeout=None):
+        if block:
+            item = self._redis.bzpopmin(self.key, timeout=timeout)
+        else:
+            item = self._redis.zpopmin(self.key)
+
+        if item:
+            item = item[1]
+        return item
+
+    def get_nowait(self):
+        return self.get(False)
+
+
+class UniqueQueue(Queue):
+    def _init(self, maxsize):
+        self.queue = deque()
+        self.setqueue = set()
+
+    def _put(self, item):
+        if item not in self.setqueue:
+            self.setqueue.add(item)
+            self.queue.append(item)
+
+    def _get(self):
+        item = self.queue.popleft()
+        self.setqueue.remove(item)
+        return item
 
 
 class PerformanceCounter(object):

@@ -1,20 +1,13 @@
 import os
-import random
 import subprocess
 import threading
 import traceback
 from logging import debug, info, error, critical, warning
 from multiprocessing import Queue
+from queue import Empty
 from subprocess import CalledProcessError
 
-import sys
-
 import LibreNMS
-
-if sys.version_info[0] < 3:
-    from Queue import Empty
-else:
-    from queue import Empty
 
 
 class QueueManager:
@@ -170,14 +163,14 @@ class QueueManager:
         """
         info("Creating queue {}".format(self.queue_name(queue_type, group)))
         try:
-            return LibreNMS.RedisQueue(self.queue_name(queue_type, group),
-                                       namespace='librenms.queue',
-                                       host=self.config.redis_host,
-                                       port=self.config.redis_port,
-                                       db=self.config.redis_db,
-                                       password=self.config.redis_pass,
-                                       unix_socket_path=self.config.redis_socket
-                                       )
+            return LibreNMS.RedisUniqueQueue(self.queue_name(queue_type, group),
+                                             namespace='librenms.queue',
+                                             host=self.config.redis_host,
+                                             port=self.config.redis_port,
+                                             db=self.config.redis_db,
+                                             password=self.config.redis_pass,
+                                             unix_socket_path=self.config.redis_socket
+                                             )
         except ImportError:
             if self.config.distributed:
                 critical("ERROR: Redis connection required for distributed polling")
@@ -189,7 +182,7 @@ class QueueManager:
                 critical("Could not connect to Redis. {}".format(e))
                 exit(2)
 
-        return Queue()
+        return LibreNMS.UniqueQueue()
 
     @staticmethod
     def queue_name(queue_type, group):
@@ -221,8 +214,8 @@ class QueueManager:
         return subprocess.check_output(cmd, stderr=subprocess.STDOUT, preexec_fn=os.setsid, close_fds=True).decode()
 
     # ------ Locking Helpers ------
-    def lock(self, context, context_name='device', retry=False, timeout=0):
-        return self._lm.lock(self._gen_lock_name(context, context_name), self._gen_lock_owner(), timeout, retry)
+    def lock(self, context, context_name='device', allow_relock=False, timeout=0):
+        return self._lm.lock(self._gen_lock_name(context, context_name), self._gen_lock_owner(), timeout, allow_relock)
 
     def unlock(self, context, context_name='device'):
         return self._lm.unlock(self._gen_lock_name(context, context_name), self._gen_lock_owner())
@@ -370,8 +363,8 @@ class ServicesQueueManager(TimedQueueManager):
                 if e.returncode == 5:
                     info("Device {} is down, cannot poll service, waiting {}s for retry"
                          .format(device_id, self.config.down_retry))
-                    self.lock(device_id, retry=True, timeout=self.config.down_retry)
-            finally:
+                    self.lock(device_id, allow_relock=True, timeout=self.config.down_retry)
+            else:
                 self.unlock(device_id)
 
 
@@ -399,3 +392,36 @@ class AlertQueueManager(TimedQueueManager):
                 warning("There was an error issuing alerts: {}".format(e.output))
             else:
                 raise
+
+
+class PollerQueueManager(QueueManager):
+    def __init__(self, config, lock_manager, auto_start=True):
+        """
+        A TimedQueueManager to manage dispatch and workers for Alerts
+
+        :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: the single instance of lock manager
+        :param auto_start: automatically start worker threads
+        """
+        QueueManager.__init__(self, config, lock_manager, 'poller', None, auto_start=auto_start)
+
+    def do_work(self, device_id, group):
+        if self.lock(device_id, timeout=self.config.poller.frequency):
+            info('Polling device {}'.format(device_id))
+
+            try:
+                self.call_script('poller.php', ('-h', device_id))
+            except subprocess.CalledProcessError as e:
+                if e.returncode == 6:
+                    warning('Polling device {} unreachable, waiting {}s for retry'.format(device_id,
+                                                                                          self.config.down_retry))
+                    # re-lock to set retry timer
+                    self.lock(device_id, allow_relock=True, timeout=self.config.down_retry)
+                else:
+                    error('Polling device {} failed! {}'.format(device_id, e))
+                    self.unlock(device_id)
+            else:
+                info('Polling complete {}'.format(device_id))
+                self.unlock(device_id)
+        else:
+            debug('Tried to poll {}, but it is locked'.format(device_id))
