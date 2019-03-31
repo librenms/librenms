@@ -1,3 +1,5 @@
+import os
+import subprocess
 import threading
 import timeit
 from collections import deque
@@ -16,6 +18,27 @@ from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager, 
 
 def normalize_wait(seconds):
     return ceil(seconds - (time() % seconds))
+
+
+def call_script(script, args=()):
+    """
+    Run a LibreNMS script.  Captures all output and throws an exception if a non-zero
+    status is returned.  Blocks parent signals (like SIGINT and SIGTERM).
+    :param script: the name of the executable relative to the base directory
+    :param args: a tuple of arguments to send to the command
+    :returns the output of the command
+    """
+    if script.endswith('.php'):
+        # save calling the sh process
+        base = ('/usr/bin/env', 'php')
+    else:
+        base = ()
+
+    base_dir = os.path.realpath(os.path.dirname(__file__) + "/..")
+    cmd = base + ("{}/{}".format(base_dir, script),) + tuple(map(str, args))
+    debug("Running {}".format(cmd))
+    # preexec_fn=os.setsid here keeps process signals from propagating
+    return subprocess.check_output(cmd, stderr=subprocess.STDOUT, preexec_fn=os.setsid, close_fds=True).decode()
 
 
 class DB:

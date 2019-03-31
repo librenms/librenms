@@ -194,25 +194,6 @@ class QueueManager:
     def record_runtime(self, duration):
         self.performance.add(duration)
 
-    def call_script(self, script, args=()):
-        """
-        Run a LibreNMS script.  Captures all output and throws an exception if a non-zero
-        status is returned.  Blocks parent signals (like SIGINT and SIGTERM).
-        :param script: the name of the executable relative to the base directory
-        :param args: a tuple of arguments to send to the command
-        :returns the output of the command
-        """
-        if script.endswith('.php'):
-            # save calling the sh process
-            base = ('/usr/bin/env', 'php')
-        else:
-            base = ()
-
-        cmd = base + ("{}/{}".format(self.config.BASE_DIR, script),) + tuple(map(str, args))
-        debug("Running {}".format(cmd))
-        # preexec_fn=os.setsid here keeps process signals from propagating
-        return subprocess.check_output(cmd, stderr=subprocess.STDOUT, preexec_fn=os.setsid, close_fds=True).decode()
-
     # ------ Locking Helpers ------
     def lock(self, context, context_name='device', allow_relock=False, timeout=0):
         return self._lm.lock(self._gen_lock_name(context, context_name), self._gen_lock_owner(), timeout, allow_relock)
@@ -304,10 +285,10 @@ class BillingQueueManager(TimedQueueManager):
     def do_work(self, run_type, group):
         if run_type == 'poll':
             info("Polling billing")
-            self.call_script('poll-billing.php')
+            LibreNMS.call_script('poll-billing.php')
         else:  # run_type == 'calculate'
             info("Calculating billing")
-            self.call_script('billing-calculate.php')
+            LibreNMS.call_script('billing-calculate.php')
 
 
 class PingQueueManager(TimedQueueManager):
@@ -331,7 +312,7 @@ class PingQueueManager(TimedQueueManager):
         if self.lock(group, 'group', timeout=self.config.ping.frequency):
             try:
                 info("Running fast ping")
-                self.call_script('ping.php', ('-g', group))
+                LibreNMS.call_script('ping.php', ('-g', group))
             finally:
                 self.unlock(group, 'group')
 
@@ -358,7 +339,7 @@ class ServicesQueueManager(TimedQueueManager):
         if self.lock(device_id, timeout=self.config.services.frequency):
             try:
                 info("Checking services on device {}".format(device_id))
-                self.call_script('check-services.php', ('-h', device_id))
+                LibreNMS.call_script('check-services.php', ('-h', device_id))
             except subprocess.CalledProcessError as e:
                 if e.returncode == 5:
                     info("Device {} is down, cannot poll service, waiting {}s for retry"
@@ -386,7 +367,7 @@ class AlertQueueManager(TimedQueueManager):
     def do_work(self, device_id, group):
         try:
             info("Checking alerts")
-            self.call_script('alerts.php')
+            LibreNMS.call_script('alerts.php')
         except subprocess.CalledProcessError as e:
             if e.returncode == 1:
                 warning("There was an error issuing alerts: {}".format(e.output))
@@ -410,7 +391,7 @@ class PollerQueueManager(QueueManager):
             info('Polling device {}'.format(device_id))
 
             try:
-                self.call_script('poller.php', ('-h', device_id))
+                LibreNMS.call_script('poller.php', ('-h', device_id))
             except subprocess.CalledProcessError as e:
                 if e.returncode == 6:
                     warning('Polling device {} unreachable, waiting {}s for retry'.format(device_id,
@@ -448,7 +429,7 @@ class DiscoveryQueueManager(TimedQueueManager):
         if self.lock(device_id, timeout=LibreNMS.normalize_wait(self.config.discovery.frequency)):
             try:
                 info("Discovering device {}".format(device_id))
-                self.call_script('discovery.php', ('-h', device_id))
+                LibreNMS.call_script('discovery.php', ('-h', device_id))
             except subprocess.CalledProcessError as e:
                 if e.returncode == 5:
                     info("Device {} is down, cannot discover, waiting {}s for retry"

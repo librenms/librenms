@@ -270,7 +270,7 @@ class Service:
             if self.config.debug:
                 cur_time = time.time()
                 elapsed = cur_time - self.last_poll.get(device_id, cur_time)
-                self.last_poll[device_id] = time.time()
+                self.last_poll[device_id] = cur_time
                 # arbitrary limit to reduce spam
                 if elapsed > (self.config.poller.frequency - self.config.master_resolution):
                     debug("Dispatching polling for device {}, time since last poll {:.2f}s"
@@ -311,35 +311,10 @@ class Service:
             sleep(wait)
 
         info("Running maintenance tasks")
-        output = self.call_script('daily.sh')
+        output = LibreNMS.call_script('daily.sh')
         info("Maintenance tasks complete\n{}".format(output))
 
         self.restart()
-
-    @staticmethod
-    def gen_lock_name(lock_class, device_id):
-        return '{}.device.{}'.format(lock_class, device_id)
-
-    def gen_lock_owner(self):
-        return "{}-{}".format(self.config.unique_name, threading.current_thread().name)
-
-    def call_script(self, script, args=()):
-        """
-        Run a LibreNMS script.  Captures all output and throws an exception if a non-zero
-        status is returned.  Blocks parent signals (like SIGINT and SIGTERM).
-        :param script: the name of the executable relative to the base directory
-        :param args: a tuple of arguments to send to the command
-        :returns the output of the command
-        """
-        if script.endswith('.php'):
-            # save calling the sh process
-            base = ('/usr/bin/env', 'php')
-        else:
-            base = ()
-
-        cmd = base + ("{}/{}".format(self.config.BASE_DIR, script),) + tuple(map(str, args))
-        # preexec_fn=os.setsid here keeps process signals from propagating
-        return subprocess.check_output(cmd, stderr=subprocess.STDOUT, preexec_fn=os.setsid, close_fds=True).decode()
 
     def create_lock_manager(self):
         """
