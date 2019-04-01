@@ -16,6 +16,7 @@
 */
 
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Util\StringHelpers;
 
 $graph_type = 'toner_usage';
 
@@ -25,7 +26,7 @@ if (!empty($searchPhrase)) {
     $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `toner_descr` LIKE '%$searchPhrase%')";
 }
 
-$count_sql = "SELECT COUNT(`toner_id`) FROM `toner`";
+$count_sql = "SELECT COUNT(*) FROM `toner`";
 $param[] = LegacyAuth::id();
 
 $count     = dbFetchCell($count_sql, $param);
@@ -54,6 +55,7 @@ if ($rowCount != -1) {
 foreach (dbFetchRows($sql, $param) as $toner) {
     if (device_permitted($toner['device_id'])) {
         $perc  = $toner['toner_current'];
+        $type = $toner['toner_type'];
 
         $graph_array['type']        = $graph_type;
         $graph_array['id']          = $toner['toner_id'];
@@ -74,6 +76,7 @@ foreach (dbFetchRows($sql, $param) as $toner) {
             'toner_descr' => $toner['toner_descr'],
             'graph' => $mini_graph,
             'toner_used' => $bar_link,
+            'toner_type' => StringHelpers::camelToTitle($type == 'opc' ? 'organicPhotoConductor' : $type),
             'toner_current' => $perc.'%',
         );
 

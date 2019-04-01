@@ -143,6 +143,8 @@ $config['os']['linux']['discovery_modules']['discovery-arp'] = true;
 
 `arp-table`: Detection of the ARP table for the device.
 
+`fdb-table`: Detection of the Forwarding DataBase table for the device, with history data.
+
 `discovery-arp`: Auto discovery via ARP.
 
 `junose-atm-vp`: Juniper ATM support.

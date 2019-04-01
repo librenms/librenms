@@ -304,8 +304,20 @@ if ($device['os'] == 'cmm') {
     require_once 'ports/cmm.inc.php';
 }
 
+if ($device['os'] == 'nokia-isam') {
+    require_once 'ports/nokia-isam.inc.php';
+}
+
 if ($device['os'] == 'timos') {
     require_once 'ports/timos.inc.php';
+}
+
+if ($device['os'] == 'infinera-groove') {
+    require_once 'ports/infinera-groove.inc.php';
+}
+
+if ($device['os'] == 'junos') {
+    require_once 'ports/junos-vcp.inc.php';
 }
 
 if ($config['enable_ports_adsl']) {

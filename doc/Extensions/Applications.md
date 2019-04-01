@@ -855,7 +855,7 @@ extend postgres /etc/snmp/postgres
 
 4: Restart snmpd on your host
 
-5: Install the Nagios check check_postgres.pl on your system.
+5: Install the Nagios check check_postgres.pl on your system: https://github.com/bucardo/check_postgres
 
 6: Verify the path to check_postgres.pl in /etc/snmp/postgres is correct.
 
@@ -1144,7 +1144,7 @@ The application should be auto-discovered as described at the top of the page. I
 A small shell script that exports apcacess ups status.
 
 ##### SNMP Extend
-1. Copy the [ups apcups](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-apcups to `/etc/snmp/` on your host.
+1. Copy the [ups apcups](https://github.com/librenms/librenms-agent/blob/master/snmp/ups-apcups) to `/etc/snmp/` on your host.
 
 2. Run `chmod +x /etc/snmp/ups-apcups`
 

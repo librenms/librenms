@@ -27,7 +27,7 @@ if (file_exists($config['install_dir'] . '/config.php')) {
     echo("This should only be called during install");
     exit;
 }
-$init_modules = ['laravel', 'nodb'];
+$init_modules = ['nodb'];
 require $config['install_dir'] . '/includes/init.php';
 
 header("Content-type: text/plain");
@@ -63,9 +63,15 @@ try {
 
     echo \Artisan::output();
 
-    echo $ret == 0 ? "\n\nSuccess!" : "\n\nError!";
+    if ($ret == 0 && \LibreNMS\DB\Schema::isCurrent()) {
+        echo "\n\nSuccess!";
+    } else {
+        echo "\n\nError!";
+        http_response_code(500);
+    }
 } catch (Exception $e) {
     echo $e->getMessage() . "\n\nError!";
+    http_response_code(500);
 }
 
 ob_end_flush();

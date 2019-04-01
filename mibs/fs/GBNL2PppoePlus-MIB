@@ -1,0 +1,51 @@
+    GBNL2PppoePlus-MIB  DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter32,
+        TimeTicks, IpAddress                    FROM SNMPv2-SMI
+        DisplayString, TruthValue,RowStatus     FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnL2                                   FROM ADMIN-MASTER-MIB;       
+           
+        
+    gbnL2PppoePlus MODULE-IDENTITY
+        LAST-UPDATED    "0711220000Z"  -- November 22,2007 
+        ORGANIZATION    "admin Systems, Inc."
+        CONTACT-INFO    "admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "ADMIN Enterprise MIB definition."
+
+        REVISION        "07110220000Z"  -- November 22,2007
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL2 6 }
+
+------------------------------------------------------------------------------
+-- Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+    pppoeplusOnOff OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "start/stop pppoe plus.Default is off。" 
+        --开启关闭 pppoe plus 功能。
+        ::= { gbnL2PppoePlus 1 }
+
+    pppoeplusType OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        standard(0),
+                        huawei(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "ppoeplus type."
+        --pppoeplus 类型，默认为standard.    
+        ::= { gbnL2PppoePlus 2 }  
+
+END

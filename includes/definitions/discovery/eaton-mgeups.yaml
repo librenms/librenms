@@ -8,7 +8,7 @@ modules:
                     value: mgoutputLoadPerPhase
                     num_oid: '.1.3.6.1.4.1.705.1.7.2.1.4.{{ $index }}'
                     multiplier: 1000
-                    descr: 'Output (VA) Phase {{ $index }}'
+                    descr: 'Output (VA) Phase {{ $subindex0 }}'
                     index: 'kva.mgoutputLoadPerPhase.{{ $index }}'
         current:
             data:
@@ -17,14 +17,14 @@ modules:
                     value: mginputCurrent
                     num_oid: '.1.3.6.1.4.1.705.1.6.2.1.6.{{ $index }}'
                     divisor: 10
-                    descr: 'Input Current Phase {{ $index }}'
+                    descr: 'Input Current Phase {{ $subindex0 }}'
                     index: 'mginputCurrent.{{ $index }}'
                 -
                     oid: upsmgOutputPhaseTable
                     value: mgoutputCurrent
                     num_oid: '.1.3.6.1.4.1.705.1.7.2.1.5.{{ $index }}'
                     divisor: 10
-                    descr: 'Output Current Phase {{ $index }}'
+                    descr: 'Output Current Phase {{ $subindex0 }}'
                     index: 'mgoutputCurrent.{{ $index }}'
                 -
                     oid: upsmgBattery
@@ -62,14 +62,14 @@ modules:
                     value: mginputFrequency
                     num_oid: '.1.3.6.1.4.1.705.1.6.2.1.3.{{ $index }}'
                     divisor: 10
-                    descr: 'Input Frequency Phase {{ $index }}'
+                    descr: 'Input Frequency Phase {{ $subindex0 }}'
                     index: 'mginputFrequency.{{ $index }}'
                 -
                     oid: upsmgOutputPhaseTable
                     value: mgoutputFrequency
                     num_oid: '.1.3.6.1.4.1.705.1.7.2.1.3.{{ $index }}'
                     divisor: 10
-                    descr: 'Output Frequency Phase {{ $index }}'
+                    descr: 'Output Frequency Phase {{ $subindex0 }}'
                     index: 'mgoutputFrequency.{{ $index }}'
         delay:
             data:
@@ -94,14 +94,14 @@ modules:
                     value: mginputVoltage
                     num_oid: '.1.3.6.1.4.1.705.1.6.2.1.2.{{ $index }}'
                     divisor: 10
-                    descr: 'Input Phase/Phase {{ $index }}'
+                    descr: 'Input Phase/Phase {{ $subindex0 }}'
                     index: 'mginputVoltage.{{ $index }}'
                 -
                     oid: upsmgOutputPhaseTable
                     value: mgoutputVoltage
                     num_oid: '.1.3.6.1.4.1.705.1.7.2.1.2.{{ $index }}'
                     divisor: 10
-                    descr: 'Output Phase/Phase {{ $index }}'
+                    descr: 'Output Phase/Phase {{ $subindex0 }}'
                     index: 'mgoutputVoltage.{{ $index }}'
                 -
                     oid: upsmgBattery

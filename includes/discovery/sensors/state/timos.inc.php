@@ -1,39 +1,37 @@
 <?php
-$oids = snmpwalk_cache_numerical_oid($device, 'tmnxChassisPowerSupplyTable', $power_supply_table = array(), 'TIMETRA-CHASSIS-MIB', null, '-OQUsne');
+$oids = snmpwalk_cache_numerical_oid($device, 'tmnxChassisPowerSupplyTable', $power_supply_table = [], 'TIMETRA-CHASSIS-MIB', null, '-OQUsne');
 
 if (!empty($oids)) {
     // Create State Index
     $dev_state_name = 'tmnxDeviceState';
-    $dev_states = array(
-        array('value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'),
-        array('value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'Not Equipped'),
-        array('value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'),
-        array('value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed'),
-        array('value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'Out of Service')
-    );
-
+    $dev_states = [
+        ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
+        ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'Not Equipped'],
+        ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
+        ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed'],
+        ['value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'Out of Service']
+    ];
     create_state_index($dev_state_name, $dev_states);
 
     $ps_state_name = 'tmnxChassisPowerSupplyAssignedTypes';
-    $ps_states = array(
-        array('value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'None'),
-        array('value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'DC'),
-        array('value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Single AC'),
-        array('value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'Multiple AC')
-    );
-
+    $ps_states = [
+        ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'None'],
+        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'DC'],
+        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Single AC'],
+        ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'Multiple AC']
+    ];
     create_state_index($ps_state_name, $ps_states);
     
-    $ps_table = array(
-        array('tbl_index' => 2, 'desc' => 'AC Status PS ', 'type' => $dev_state_name),
-        array('tbl_index' => 3, 'desc' => 'DC Status PS ', 'type' => $dev_state_name),
-        array('tbl_index' => 4, 'desc' => 'Temperature Status PS ', 'type' => $dev_state_name),
-        array('tbl_index' => 6, 'desc' => 'Power Supply 1 Status PS ', 'type' => $dev_state_name),
-        array('tbl_index' => 7, 'desc' => 'Power Supply 2 Status PS ', 'type' => $dev_state_name),
-        array('tbl_index' => 8, 'desc' => 'Assigned Type PS ', 'type' => $ps_state_name),
-        array('tbl_index' => 9, 'desc' => 'Input Status PS ', 'type' => $dev_state_name),
-        array('tbl_index' => 10, 'desc' => 'Output Status PS ', 'type' => $dev_state_name),
-    );
+    $ps_table = [
+        ['tbl_index' => 2, 'desc' => 'AC Status PS ', 'type' => $dev_state_name],
+        ['tbl_index' => 3, 'desc' => 'DC Status PS ', 'type' => $dev_state_name],
+        ['tbl_index' => 4, 'desc' => 'Temperature Status PS ', 'type' => $dev_state_name],
+        ['tbl_index' => 6, 'desc' => 'Power Supply 1 Status PS ', 'type' => $dev_state_name],
+        ['tbl_index' => 7, 'desc' => 'Power Supply 2 Status PS ', 'type' => $dev_state_name],
+        ['tbl_index' => 8, 'desc' => 'Assigned Type PS ', 'type' => $ps_state_name],
+        ['tbl_index' => 9, 'desc' => 'Input Status PS ', 'type' => $dev_state_name],
+        ['tbl_index' => 10, 'desc' => 'Output Status PS ', 'type' => $dev_state_name],
+    ];
 
     $base_oid = '.1.3.6.1.4.1.6527.3.1.2.2.1.5.1.';
     

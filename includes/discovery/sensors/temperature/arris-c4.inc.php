@@ -1,5 +1,5 @@
 <?php
-$oids = snmpwalk_cache_oid($device, 'cardTemperature', array(), 'CADANT-CMTS-EQUIPMENT-MIB');
+$oids = snmpwalk_cache_oid($device, 'cardTemperature', [], 'CADANT-CMTS-EQUIPMENT-MIB');
 $oids = snmpwalk_cache_oid($device, 'cardName', $oids, 'CADANT-CMTS-EQUIPMENT-MIB');
 $oids = snmpwalk_cache_oid($device, 'cardTemperatureHighWarn', $oids, 'CADANT-CMTS-EQUIPMENT-MIB');
 $oids = snmpwalk_cache_oid($device, 'cardTemperatureHighError', $oids, 'CADANT-CMTS-EQUIPMENT-MIB');

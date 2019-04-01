@@ -1,0 +1,1138 @@
+
+NSCRTV-EPON-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    DateAndTime, MacAddress, TimeStamp, RowStatus, TruthValue, DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    EponDeviceIndex, EponCardIndex, EponPortIndex, EponAlarmCode, EponAlarmInstance, EponSeverityType,
+    AutoNegotiationTechAbility, TAddress, EponStats15MinRecordType, EponStats24HourRecordType, EponStatsThresholdType
+		FROM NSCRTV-EPONEOC-EPON-MIB
+    systemObjects
+        FROM NSCRTV-EPONEOC-EPON-MIB;
+
+--------------------------------------------------------------------------------
+--  systemObjects [系统属性参数管理项](1.3.6.1.4.1.17409.2.3.1)
+--------------------------------------------------------------------------------       
+    systemGlobalObjects OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION 
+        "全局参数表"
+      ::= { systemObjects 1 }
+                            
+    systemTime OBJECT-TYPE
+      SYNTAX DateAndTime
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        节点系统时间        
+        建议采用8字节定义，不包括时区"
+      ::= { systemGlobalObjects 1 }
+    
+    inbandIpAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        带内管理接口IP地址"
+      ::= { systemGlobalObjects 2 }
+    
+    inbandIpSubnetMask OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        带内管理接口IP掩码"
+      ::= { systemGlobalObjects 3 }
+    
+    inbandIpGateway OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        带内管理接口网关IP地址"
+      ::= { systemGlobalObjects 4 }
+    
+    inbandVlanId OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        带内管理接口VLAN ID.
+        
+        带内管理VLAN的成员关系由VLAN表定义"
+      ::= { systemGlobalObjects 5 }
+    
+    inbandMacAddress OBJECT-TYPE
+      SYNTAX MacAddress
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        带内管理接口MAC地址."
+      ::= { systemGlobalObjects 6 }
+    
+    outbandIpAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        带外管理接口IP地址"
+      ::= { systemGlobalObjects 7 }
+    
+    outbandIpSubnetMask OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        带外管理接口IP掩码"
+      ::= { systemGlobalObjects 8 }
+    
+    outbandIpGateway OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        带外管理接口网关IP地址"
+      ::= { systemGlobalObjects 9 }
+    
+    outbandMacAddress OBJECT-TYPE
+      SYNTAX MacAddress
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        带外管理接口MAC地址"
+      ::= { systemGlobalObjects 10 }
+    
+    systemOUI OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (3))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        系统OUI"
+      ::= { systemGlobalObjects 11 }
+
+    vendorName OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        Vender name of the OLT equipment"
+      ::= { systemGlobalObjects 12 }   
+      
+    Save OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        save olt running-config"
+      ::= { systemGlobalObjects 13 } 
+      
+    Clear OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        clear olt running-config"
+      ::= { systemGlobalObjects 14 }
+    
+    oltObjects OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION 
+        "
+        OLT管理项节点"
+      ::= { systemObjects 2 }
+    
+    oltPropertyTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OltPropertyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        OLT属性表"
+      ::= { oltObjects 1 }
+    
+    oltPropertyEntry OBJECT-TYPE
+      SYNTAX OltPropertyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { oltDeviceIndex }
+      ::= { oltPropertyTable 1 }
+    
+    OltPropertyEntry ::=
+      SEQUENCE { 
+        oltDeviceIndex
+          INTEGER,
+        oltName
+          DisplayString,
+        oltType
+          DisplayString,
+        oltAdminStatus
+          INTEGER,
+        oltDeviceUpTime
+          TimeStamp,
+        oltDeviceNumOfTotalServiceSlot
+          INTEGER,
+        oltDeviceNumOfTotalPowerSlot
+          INTEGER,
+        oltDeviceNumOfTotalFanSlot
+          INTEGER,
+        oltDeviceStyle
+          INTEGER
+                    
+       }
+
+    oltDeviceIndex  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        OLT设备索引号。
+        
+        一个OLT节点可以由多台OLT设备组成。节点内的每台OLT设备由OLT设备索引号唯一标识"
+      ::= { oltPropertyEntry 1 }
+    
+    oltName OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        该OLT设备的名称"
+      ::= { oltPropertyEntry 2 }
+    
+    oltType OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        OLT设备类型"
+      ::= { oltPropertyEntry 3 }
+    
+    oltAdminStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        up(1),
+        down(2),
+        testing(3)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        OLT设备管理状态        
+        up(1)      - 设备允许提供业务
+        down(2)    - 设备禁止提供业务
+        testing(3) - 设备处于测试状态，该状态下可能无法正常提供业务"
+      ::= { oltPropertyEntry 4 }
+    
+    oltDeviceUpTime OBJECT-TYPE
+      SYNTAX TimeStamp
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        该OLT设备启动时长"
+      ::= { oltPropertyEntry 5 }
+
+    oltDeviceNumOfTotalServiceSlot OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        Total number of service slots in the OLT device, including
+        service card, switch card, control card, uplink card, etc. 
+        but except power, FAN, regardless whether the slot is installed
+        module"
+      ::= { oltPropertyEntry 6 }
+
+    oltDeviceNumOfTotalPowerSlot OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        Total number of power slots in the OLT device, regardless whether 
+        the slot is installed module"
+      ::= { oltPropertyEntry 7 }
+       
+    oltDeviceNumOfTotalFanSlot OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        Total number of FAN slots in the OLT device, regardless whether 
+        the slot is installed module"
+      ::= { oltPropertyEntry 8 }
+
+    oltDeviceStyle OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+          fixed(1),
+          chassisBased(2),
+          other(3)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        The device stype of either fixed or chassis based：        
+        fixed(1) - such as pizza box
+        chassisBased(2) - Have number of slots for installing service card, power card, etc.        
+        "
+      ::= { oltPropertyEntry 9 }
+    
+    boardObjects OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION 
+        "
+        板卡管理项"
+      ::= { systemObjects 3 }
+    
+    boardTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF BoardEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        This table shall include rows for all slots, including the slots has
+        a presence state of 'NotInstalled'.
+        "
+      ::= { boardObjects 1 }
+    
+    boardEntry OBJECT-TYPE
+      SYNTAX BoardEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { bDeviceIndex, bCardIndex}
+      ::= { boardTable 1 }
+    
+    BoardEntry ::=
+      SEQUENCE { 
+        bDeviceIndex
+          INTEGER,
+        bCardIndex
+          EponCardIndex,
+        bType
+          INTEGER,
+        bAttribute
+          INTEGER,
+        bOperationStatus
+          INTEGER,
+        bAdminStatus
+          INTEGER,
+        bHardwareVersion
+          DisplayString,
+        bFirmwareVersion
+          DisplayString,
+        bSoftwareVersion
+          DisplayString,
+        bUpTime
+          TimeStamp,
+        bAlarmStatus
+          BITS,
+        bSerialNumber
+          DisplayString,
+        bAction
+          INTEGER,
+        bName
+          OCTET STRING,
+        bPresenceStatus 
+          INTEGER
+       }
+
+    bDeviceIndex  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        ""
+      ::= { boardEntry 1 }
+
+    bCardIndex  OBJECT-TYPE
+      SYNTAX EponCardIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        板卡索引号"
+      ::= { boardEntry 2 }
+    
+    bType OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        controlBoard(1),
+        geponBoard(2),
+        uplinkBoard(3),
+        switchBoard(4),
+        other(5),
+        vacant(6),
+        controlUplinkBoard(7),
+        ponUplinkBoard(8)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        "
+      ::= { boardEntry 3 }
+    
+    bAttribute OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        active(1),
+        standby(2),
+        standalone(3),
+        notApplicable(4)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        ""
+      ::= { boardEntry 4 }
+    
+    bOperationStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        up(1),
+        down(2),
+        testing(3)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        板卡操作状态
+        
+        up(1)      - 该板卡可以提供业务
+        down(2)    - 该板卡无法提供业务
+        testing(3) - 该板卡处于测试状态，该状态下可能无法正常提供业务"
+      ::= { boardEntry 5 }
+    
+    bAdminStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        up(1),
+        down(2),
+        testing(3)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        板卡管理状态        
+        up(1)      - 该板卡允许提供业务
+        down(2)    - 该板卡禁止提供业务
+        testing(3) - 该板卡处于测试状态，该状态下可能无法正常提供业务"
+      ::= { boardEntry 6 }
+    
+    bHardwareVersion OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        板卡硬件版本"
+      ::= { boardEntry 7 }
+    
+    bFirmwareVersion OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        板卡固件版本"
+      ::= { boardEntry 8 }
+    
+    bSoftwareVersion OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        板卡软件版本"
+      ::= { boardEntry 9 }
+    
+    bUpTime OBJECT-TYPE
+      SYNTAX TimeStamp
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        板卡在线时间"
+      ::= { boardEntry 10 }
+    
+    bAlarmStatus OBJECT-TYPE
+      SYNTAX BITS
+        {
+        critical(0),
+        major(1),
+        minor(2),
+        warning(3)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        板卡告警状态"
+      ::= { boardEntry 11 }
+    
+    bSerialNumber OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        板卡SN"
+      ::= { boardEntry 12 }
+    
+    bAction OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        noAction(1),
+        switchover(2),
+        upgrade(3)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        对板卡施加的操作        
+        noAction(1)    - 表示没有任何操作，用于默认设置和其他操作完成后恢复值
+        switchover(2)  - 主备切换，只针对主控卡和交换卡
+        upgrade(3)     - 板卡软件升级"
+      ::= { boardEntry 13 }
+    bName OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..32))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        The board name defined by vendor individual"
+      ::= { boardEntry 14 }
+    
+    bPresenceStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        installed(1),
+        notInstalled(2),
+        others(3)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "The physical presence status of the slot"
+      ::= { boardEntry 15 }
+    
+    powerObjects OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION 
+        "
+        电源表模块列表"
+      ::= { systemObjects 4 }
+    
+    powerPropertyTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF PowerPropertyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        电源板属性表"
+      ::= { powerObjects 1 }
+    
+    powerPropertyEntry OBJECT-TYPE
+      SYNTAX PowerPropertyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { powerDeviceIndex, powerCardIndex}
+      ::= { powerPropertyTable 1 }
+    
+    PowerPropertyEntry ::=
+      SEQUENCE { 
+        powerDeviceIndex
+          INTEGER,
+        powerCardIndex
+          EponCardIndex,
+        powerCardOperationStatus
+          INTEGER,
+        powerCardAlarmStatus
+          BITS,
+        powerCardAction
+          INTEGER,
+        powerCardName
+          OCTET STRING,
+        powerCardPresenceStatus
+          INTEGER,
+        powerCardRedundancyStatus
+          INTEGER
+       }
+
+    powerDeviceIndex  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        OLT设备索引号。        
+        一个OLT节点可以由多台OLT设备组成。节点内的每台OLT设备由OLT设备索引号唯一标识"
+      ::= { powerPropertyEntry 1 }
+
+    powerCardIndex  OBJECT-TYPE
+      SYNTAX EponCardIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        板卡索引号"
+      ::= { powerPropertyEntry 2 }
+
+    powerCardOperationStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        up(1),
+        down(2),
+        testing(3)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        电源板操作状态        
+        up(1)      - 该板卡可以提供业务
+        down(2)    - 该板卡无法提供业务
+        testing(3) - 该板卡处于测试状态，该状态下可能无法正常提供业务"
+      ::= { powerPropertyEntry 3 }
+    
+    powerCardAlarmStatus OBJECT-TYPE
+      SYNTAX BITS
+        {
+        critical(0),
+        major(1),
+        minor(2),
+        warning(3)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        电源板告警状态"
+      ::= { powerPropertyEntry 4 }
+    
+    powerCardAction OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        noAction(1),
+        switchover(2)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        对电源板施加的操作        
+        noAction(1)    - 表示没有任何操作，用于默认设置和其他操作完成后恢复值
+        switchover(2)  - 主备切换，如果电源工作在主备模式
+        
+        Note:
+        
+        Switchover(2) shall be only set to the power board with powerCardRedundancyStatus
+        of active(1)"
+      ::= { powerPropertyEntry 5 }
+
+    powerCardName OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..32))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        The power card name defined by vendor individual"
+      ::= { powerPropertyEntry 6 }
+   
+    powerCardPresenceStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        installed(1),
+        notInstalled(2),
+        others(3)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "The physical presence status of the power slot"
+      ::= { powerPropertyEntry 7 }
+
+    powerCardRedundancyStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        active(1),
+        stanby(2),
+        standalone(3),
+        loadShareing(4)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "The redundancy status of the power card：        
+        active(1)   -   The power card is working on redundanct active/
+                    Standby mode and the current role is active.
+        stanby(2)   - The power card is working on redundanct active/
+                    Standby mode and the current role is standby.
+        standalone(3) -   The power card is not working on redundanct mode 
+                  and the current role is standalone.
+        loadShareing(4) -   The power card is working on redundanct loadsharing
+                  mode.
+        "
+      ::= { powerPropertyEntry 8 }
+    
+    fanObjects OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION 
+        "
+        风扇表"
+      ::= { systemObjects 5 }
+    
+    fanPropertyTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF FanPropertyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        风扇属性表"
+      ::= { fanObjects 1 }
+    
+    fanPropertyEntry OBJECT-TYPE
+      SYNTAX FanPropertyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { fanDeviceIndex, fanCardIndex}
+      ::= { fanPropertyTable 1 }
+    
+    FanPropertyEntry ::=
+      SEQUENCE { 
+        fanDeviceIndex
+          INTEGER,
+        fanCardIndex
+          EponCardIndex,
+        fanCardOperationStatus
+          INTEGER,
+        fanCardAlarmStatus
+          BITS,
+        fanCardName
+          OCTET STRING,
+        fanCardPresenceStatus
+          INTEGER
+       }
+
+    fanDeviceIndex  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        OLT设备索引号。        
+        一个OLT节点可以由多台OLT设备组成。节点内的每台OLT设备由OLT设备索引号唯一标识"
+      ::= { fanPropertyEntry 1 }
+
+    fanCardIndex  OBJECT-TYPE
+      SYNTAX EponCardIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        板卡索引号"
+      ::= { fanPropertyEntry 2 }
+
+    fanCardOperationStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        up(1),
+        down(2),
+        testing(3)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        风扇板操作状态        
+        up(1)      - 该板卡可以提供业务
+        down(2)    - 该板卡无法提供业务
+        testing(3) - 该板卡处于测试状态，该状态下可能无法正常提供业务"
+      ::= { fanPropertyEntry 3 }
+    
+    fanCardAlarmStatus OBJECT-TYPE
+      SYNTAX BITS
+        {
+        critical(0),
+        major(1),
+        minor(2),
+        warning(3)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        风扇板告警状态"
+      ::= { fanPropertyEntry 4 }
+
+    fanCardName OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (1..32))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        The FAN card name defined by vendor individual"
+      ::= { fanPropertyEntry 5 }
+    
+    fanCardPresenceStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        installed(1),
+        notInstalled(2),
+        others(3)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "The physical presence status of the FAN card slot"
+      ::= { fanPropertyEntry 6 }
+  
+    fileTransferManagement OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION 
+        "
+        文件传输节点"
+      ::= { systemObjects 6 }
+    
+    fileTransferTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF FileTransferEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        文件传输进程表"
+      ::= { fileTransferManagement 1 }
+    
+    fileTransferEntry OBJECT-TYPE
+      SYNTAX FileTransferEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { fileTransferIndex }
+      ::= { fileTransferTable 1 }
+    
+    FileTransferEntry ::=
+      SEQUENCE { 
+        fileTransferIndex
+          INTEGER,
+        fileTransferProtocolType
+          INTEGER,
+        serverIpAddress
+          IpAddress,
+        ftpUserName
+          DisplayString,
+        ftpUserPassword
+          DisplayString,
+        transferFileSrcNamePath
+          DisplayString,
+        transferFileDstNamePath
+          DisplayString,
+        transferAction
+          INTEGER,
+        transferStatus
+          INTEGER
+       }
+
+    fileTransferIndex OBJECT-TYPE
+      SYNTAX INTEGER (1..10)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        文件传送进程流水号"
+      ::= { fileTransferEntry 1 }
+    
+    fileTransferProtocolType OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        ftp(1),
+        tftp(2)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        该进程使用的文件传输协议类型"
+      ::= { fileTransferEntry 2 }
+    
+    serverIpAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        该进程使用的服务器IP地址"
+      ::= { fileTransferEntry 3 }
+    
+    ftpUserName OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        该进程使用的用户名，仅适用于FTP协议"
+      ::= { fileTransferEntry 4 }
+    
+    ftpUserPassword OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        该进程使用的密码，仅适用于FTP协议"
+      ::= { fileTransferEntry 5 }
+    
+    transferFileSrcNamePath OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        该进程对应的文件源名称路径，比如‘/tftproot/file/image.bin"
+      ::= { fileTransferEntry 6 }
+    
+    transferFileDstNamePath OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        该进程对应的文件目的名称路径，比如‘/tftproot/file/image.bin"
+      ::= { fileTransferEntry 7 }
+    
+    transferAction OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        noOperation(1),
+        put(2), 
+        get(3),
+        halt(4)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        该进程对应的文件传输动作        
+        noOperation(1) - 表示没有任何传输操作，用于默认设置和其他操作完成后恢复值
+        put(2)       - 上传文件
+        get(3)         - 下载文件
+        halt(4)        - 停止文件传送"
+      ::= { fileTransferEntry 8 }
+    
+    transferStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        idle(1),
+        inProgress(2),
+        success(3),
+        failure(4)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        该进程对应的文件传输状态        
+        idle(1)       - 空闲
+        inProgress(2) - 正在传送中
+        success(3)    - 传送成功
+        failure(4)    - 传送失败"
+      ::= { fileTransferEntry 9 }
+
+    
+    fileInfoManagementTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF FileInfoManagementEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        OLT文件信息管理表        
+        It is done by file list per directionary.        
+        Please walk filePath for the file lists in the specified
+        path. If leave it NULL or walk fileInfoManagementEntry,
+        the file list of the root directionary shall be returned        
+        "
+      ::= { fileTransferManagement 2 }
+    
+    fileInfoManagementEntry OBJECT-TYPE
+      SYNTAX FileInfoManagementEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { filePath, fileName }
+      ::= { fileInfoManagementTable 1 }
+    
+    FileInfoManagementEntry ::=
+      SEQUENCE { 
+        filePath
+          DisplayString,
+        fileName
+          DisplayString,
+        fileSize
+          Counter32,
+        fileModifyTime
+          DateAndTime,
+        fileManagementAction
+          INTEGER,
+        fileAttribute
+          INTEGER
+       }
+              
+    filePath OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        File path        
+        It shall be started with a length octet, followed with path string. The length octet
+        shall indicate the number of character octets, excluding length itself.        
+        For example, 0x05 41 42 43 44 45, respresents ABCDE        
+        It shall be ended with '/', which is used to distinguish the two DisplayString
+        indexes. For example, if the path is flash/root, filePath shall be set to flash/root/. 
+        "
+      ::= { fileInfoManagementEntry 1 }
+    fileName OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        File name. MUST not include '/' character and MUST not be NULL.        
+        It shall be started with a length octet, followed with name string. The length octet
+        shall indicate the number of character octets, excluding length itself.        
+        For example, 0x05 41 42 43 44 45, respresents ABCDE
+        "
+      ::= { fileInfoManagementEntry 2 }
+         
+    fileSize OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "bytes"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        文件大小，以字节为单位"
+      ::= { fileInfoManagementEntry 3 }
+    
+    fileModifyTime OBJECT-TYPE
+      SYNTAX DateAndTime
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        文件修改时间"
+      ::= { fileInfoManagementEntry 4 }
+    
+    fileManagementAction OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        noOperation(1),
+        erase(2)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        对文件施加的动作        
+        noOperation(1) - 表示没有任何传输操作，用于默认设置和其他操作完成后恢复值
+        erase(2)       - 文件删除"
+      ::= { fileInfoManagementEntry 5 }
+
+    fileAttribute OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        file(1),        -- It is a file
+        dir(2)          -- It is a directionary
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        The attribute of the file"
+      ::= { fileInfoManagementEntry 6 }    
+      
+    onuUpgradeManagement OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION 
+        ""
+      ::= { systemObjects 7 }     
+      
+    onuBatchUpgradeObjects OBJECT IDENTIFIER ::= { onuUpgradeManagement 1 }   
+    
+    onuBatchUpgradeOnuList  OBJECT-TYPE
+      SYNTAX    OCTET STRING (SIZE(0..1024))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "Onu列表，每4byte表示一个onu（参照EponDeviceIndex），长度为4 * （onu个数），最大长度是4*256"
+      ::= { onuBatchUpgradeObjects 1 }
+
+    onuBatchUpgradeAction  OBJECT-TYPE
+      SYNTAX   INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "写入任意值触发升级"
+      ::= { onuBatchUpgradeObjects 2 }   
+
+    onuBatchUpgradeStatus  OBJECT-TYPE
+      SYNTAX   OCTET STRING (SIZE(0..512))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "Onu列表，每2byte表示一个onu的升级状态，长度为2 * （onu个数），同当前升级任务的onulist一一对应
+		状态码说明：
+			1：Idle
+			2：Waiting
+			3：InProgress
+			4：Success
+			5：Failure（不确定原因的错误）
+			6：OnuTypeNotConsistent（Onu类型不一致）
+			7：FileDownloadFail（下载镜像失败，包括OLT内部板卡间传输失败或者文件前置校验失败）
+			8：OnuNotExist（Onu掉线或者别的导致Onuid失效的情况）
+			9：NotConsistent（Onu同升级文件不匹配）
+			10：OnuCommunicationFail（Onu通信失败）
+		"
+      ::= { onuBatchUpgradeObjects 3 } 
+          
+--
+-- END of NSCRTV-EPON-SYSTEM-MIB
+--
+
+END

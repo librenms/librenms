@@ -135,6 +135,7 @@ nav:
       - Support/Device-Sensors.md
   - 10. Contributing + Developing:
       - Contributing: Developing/index.md
+      - Developing/Getting-Started.md
       - Developing/Using-Git.md
       - Developing/Code-Guidelines.md
       - Developing/Style-Guidelines.md

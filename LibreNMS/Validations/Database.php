@@ -29,6 +29,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\DB\Schema;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 use Symfony\Component\Yaml\Yaml;
@@ -43,16 +44,23 @@ class Database extends BaseValidation
 
         $this->checkMode($validator);
         $this->checkTime($validator);
+        $this->checkMysqlEngine($validator);
 
         // check database schema version
         $current = get_db_schema();
         $latest = 1000;
 
         if ($current === 0 || $current === $latest) {
-            \Artisan::call('migrate', ['--pretend' => true, '--force' => true]);
-            if (\Artisan::output() !== "Nothing to migrate.\n") {
+            // Using Laravel migrations
+            if (!Schema::isCurrent()) {
                 $validator->fail("Your database is out of date!", './lnms migrate');
                 return;
+            }
+
+            $migrations = Schema::getUnexpectedMigrations();
+            if ($migrations->isNotEmpty()) {
+                $validator->warn("Your database schema has extra migrations (" . $migrations->implode(', ') .
+                "). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
             }
         } elseif ($current < $latest) {
             $validator->fail(
@@ -93,6 +101,19 @@ class Database extends BaseValidation
             $validator->fail(
                 'You have lower_case_table_names set to 1 or true in mysql config.',
                 'Set lower_case_table_names=0 in your mysql config file in the [mysqld] section.'
+            );
+        }
+    }
+
+    private function checkMysqlEngine(Validator $validator)
+    {
+        $db = Config::get('db_name', 'librenms');
+        $query = "SELECT `TABLE_NAME` FROM information_schema.tables WHERE `TABLE_SCHEMA` = '$db' && `ENGINE` != 'InnoDB'";
+        $tables = dbFetchRows($query);
+        if (!empty($tables)) {
+            $validator->result(
+                ValidationResult::warn("Some tables are not using the recommended InnoDB engine, this may cause you issues.")
+                    ->setList('Tables', $tables)
             );
         }
     }
@@ -163,6 +184,12 @@ class Database extends BaseValidation
 
                 foreach ($data['Columns'] as $index => $cdata) {
                     $column = $cdata['Field'];
+
+                    // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
+                    if ($cdata['Type'] == 'timestamp') {
+                         $current_columns[$column]['Extra'] = preg_replace("/DEFAULT_GENERATED[ ]*/", '', $current_columns[$column]['Extra']);
+                    }
+
                     if (empty($current_columns[$column])) {
                         $validator->fail("Database: missing column ($table/$column)");
                         $primary = false;

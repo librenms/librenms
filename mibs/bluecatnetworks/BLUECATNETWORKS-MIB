@@ -1,0 +1,40 @@
+-- Copyright 2017 BlueCat Networks. All rights reserved.
+-- *****************************************************************
+-- BLUECATNETWORKS-MIB.mib
+-- BlueCat Networks Enterprise Structure of Management Information
+--
+-- December 2010, Fabian Ischia
+--
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+BLUECATNETWORKS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	enterprises
+        	FROM SNMPv2-SMI;
+
+bluecatnetworksId MODULE-IDENTITY
+	LAST-UPDATED "201011300000Z"
+	ORGANIZATION "BlueCat Networks Inc."
+	CONTACT-INFO
+		"BlueCat Networks Inc.
+		 
+		 Tel: +1 866 491 2228 (toll free)
+		      +1 416 646 8400 (international) 
+		 Email: support@bluecatnetworks.com"
+    DESCRIPTION
+        "New oid assignments for Cisco REPEATER MIB and others."
+    REVISION        "201011300000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+	::= { bluecatnetworks 1 }
+
+bluecatnetworks OBJECT IDENTIFIER ::= { enterprises 13315 }
+
+
+appliances OBJECT IDENTIFIER ::= { bluecatnetworks 100 }
+
+END

@@ -28,10 +28,10 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
+use Log;
 
 class AuthenticationFailure implements SnmptrapHandler
 {
-
     /**
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
@@ -42,8 +42,6 @@ class AuthenticationFailure implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        //FIXME added device hostname format helper in some branch, use that when merged
-        $device_array = $device->toArray();
-        log_event('SNMP Trap: Authentication Failure: ' . format_hostname($device_array), $device_array, 'auth', 3, $device->hostname);
+        Log::event('SNMP Trap: Authentication Failure: ' . $device->displayName(), $device->device_id, 'auth', 3);
     }
 }

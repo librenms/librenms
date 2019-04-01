@@ -267,6 +267,7 @@ $config['graph_colours']['mixed']   = array(
     'D01F3C',
     '36393D',
     'FF0084',
+    '91B13C',
 );
 $config['graph_colours']['oranges'] = array(
     'E43C00',
@@ -584,6 +585,9 @@ $config['bad_if_regexp'][] = '/^sl[0-9]/';
 // Rewrite Interfaces
 $config['rewrite_if_regexp']['/^cpu interface/'] = 'Mgmt';
 
+// Storage default warning percentage
+$config['storage_perc_warn'] = 60;
+
 $config['ignore_mount_removable'] = 1;
 // Ignore removable disk storage
 $config['ignore_mount_network'] = 1;
@@ -839,6 +843,9 @@ $config['discovery_modules']['fdb-table']            = true;
 // Enable daily updates
 $config['update'] = 1;
 
+// Sets automatic sensor limits when no values are returned by the device.
+$config['sensors']['guess_limits']                   = true;
+
 // Purge syslog and eventlog
 $config['syslog_purge'] = 30;
 // Number in days of how long to keep syslog entries for.
@@ -852,6 +859,8 @@ $config['device_perf_purge'] = 7;
 // Number in days of how long to keep device performance data for.
 $config['alert_log_purge'] = 365;
 // Number in days of how long to keep alert log data for.
+$config['ports_fdb_purge'] = 10;
+// Number in days of how long to keep fdb table data for.
 
 // Date format for PHP date()s
 $config['dateformat']['long'] = 'r';
@@ -978,13 +987,6 @@ $config['xirrus_disable_stations']  = false;
 
 // Graphite default port
 $config['graphite']['port']         = 2003;
-
-// Whether to enable secure cookies. Setting this to true enable secure cookies
-// and only send them over HTTPS. Setting this to false will send cookies over
-// HTTP and HTTPS, but they will be insecure. Setting this to $_SERVER["HTTPS"]
-// will send secure cookies when the site is being accessed over HTTPS, and
-// send insecure cookies when the site is being accessed over HTTP.
-$config['secure_cookies'] = isset($_SERVER["HTTPS"]) ? $_SERVER["HTTPS"] : false;
 
 // API config
 $config['api']['cors']['enabled'] = false;

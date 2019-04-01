@@ -3,12 +3,12 @@
 if ($device['os_group'] == 'cisco') {
     echo ' CISCO-ENTITY-SENSOR: ';
 
-    $oids = array();
+    $oids = [];
     echo 'Caching OIDs:';
 
     if (empty($entity_array)) {
-        $tmp_oids = array('entPhysicalDescr', 'entPhysicalName', 'entPhysicalClass', 'entPhysicalContainedIn', 'entPhysicalParentRelPos');
-        $entity_array = array();
+        $tmp_oids = ['entPhysicalDescr', 'entPhysicalName', 'entPhysicalClass', 'entPhysicalContainedIn', 'entPhysicalParentRelPos'];
+        $entity_array = [];
         foreach ($tmp_oids as $tmp_oid) {
             echo " $tmp_oid";
             $entity_array = snmpwalk_cache_multi_oid($device, $tmp_oid, $entity_array, 'ENTITY-MIB:CISCO-ENTITY-SENSOR-MIB');
@@ -28,7 +28,7 @@ if ($device['os_group'] == 'cisco') {
     echo ' entSensorPrecision';
     $oids = snmpwalk_cache_multi_oid($device, 'entSensorPrecision', $oids, 'CISCO-ENTITY-SENSOR-MIB');
 
-    $t_oids = array();
+    $t_oids = [];
     echo ' entSensorThresholdSeverity';
     $t_oids = snmpwalk_cache_twopart_oid($device, 'entSensorThresholdSeverity', $t_oids, 'CISCO-ENTITY-SENSOR-MIB');
     echo ' entSensorThresholdRelation';

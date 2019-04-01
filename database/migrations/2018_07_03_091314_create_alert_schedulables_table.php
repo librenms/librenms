@@ -29,6 +29,6 @@ class CreateAlertSchedulablesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('alert_schedule_items');
+        Schema::drop('alert_schedulables');
     }
 }

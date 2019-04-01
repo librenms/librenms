@@ -6,70 +6,14 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Validation\Rule;
 use LibreNMS\Config;
-use LibreNMS\Exceptions\DatabaseConnectException;
+use LibreNMS\Permissions;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
-use Request;
 use Validator;
-
-include_once __DIR__ . '/../../includes/dbFacile.php';
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        // Install legacy dbFacile fetch mode listener
-        \LibreNMS\DB\Eloquent::initLegacyListeners();
-
-        // load config
-        Config::load();
-
-        // replace early boot logging redirect log to config location, unless APP_LOG is set
-        Log::getMonolog()->popHandler(); // remove existing errorlog logger
-        Log::useFiles(config('app.log') ?: Config::get('log_file', base_path('logs/librenms.log')), 'error');
-
-        // Blade directives (Yucky because of < L5.5)
-        Blade::directive('config', function ($key) {
-            return "<?php if (\LibreNMS\Config::get(($key))): ?>";
-        });
-        Blade::directive('notconfig', function ($key) {
-            return "<?php if (!\LibreNMS\Config::get(($key))): ?>";
-        });
-        Blade::directive('endconfig', function () {
-            return "<?php endif; ?>";
-        });
-        Blade::directive('admin', function () {
-            return "<?php if (auth()->check() && auth()->user()->isAdmin()): ?>";
-        });
-        Blade::directive('endadmin', function () {
-            return "<?php endif; ?>";
-        });
-
-        $this->bootCustomValidators();
-        $this->configureMorphAliases();
-
-        // Development service providers
-        if ($this->app->environment() !== 'production') {
-            if (class_exists(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class)) {
-                $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
-            }
-
-            if (config('app.debug') && class_exists(\Barryvdh\Debugbar\ServiceProvider::class)) {
-                // disable debugbar for api routes
-                if (!Request::is('api/*')) {
-                    $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
-                }
-            }
-        }
-    }
-
     /**
      * Register any application services.
      *
@@ -77,7 +21,40 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->registerFacades();
         $this->registerGeocoder();
+
+        $this->app->singleton('permissions', function ($app) {
+            return new Permissions();
+        });
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
+        $this->app->booted('\LibreNMS\Config::load');
+
+        $this->bootCustomBladeDirectives();
+        $this->bootCustomValidators();
+        $this->configureMorphAliases();
+    }
+
+    private function bootCustomBladeDirectives()
+    {
+        Blade::if('config', function ($key) {
+            return \LibreNMS\Config::get($key);
+        });
+        Blade::if('notconfig', function ($key) {
+            return !\LibreNMS\Config::get($key);
+        });
+        Blade::if('admin', function () {
+            return auth()->check() && auth()->user()->isAdmin();
+        });
     }
 
     private function configureMorphAliases()
@@ -88,6 +65,14 @@ class AppServiceProvider extends ServiceProvider
             'device' => \App\Models\Device::class,
             'device_group' => \App\Models\DeviceGroup::class,
         ]);
+    }
+
+    private function registerFacades()
+    {
+        // replace log manager so we can add the event function
+        $this->app->bind('log', function ($app) {
+            return new \App\Facades\LogManager($app);
+        });
     }
 
     private function registerGeocoder()

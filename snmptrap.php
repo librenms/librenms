@@ -13,7 +13,7 @@
  * Adapted from old snmptrap.php handler
  */
 
-$init_modules = ['laravel', 'alerts']; // so I don't have to rebase yet
+$init_modules = [];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('d::');

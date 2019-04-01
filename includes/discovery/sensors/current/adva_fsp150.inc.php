@@ -21,12 +21,12 @@
 // ******************************************
 
     // Define Sensors and Limits
-    $sensors_adva = array
-                (
-                array(
-                        'sensor_name'     => 'psuOutputCurrent',
-                        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.8')
-                );
+    $sensors_adva = [
+        [
+        'sensor_name'     => 'psuOutputCurrent',
+        'sensor_oid'      => '.1.3.6.1.4.1.2544.1.12.3.1.4.1.8'
+        ]
+    ];
 
     $multiplier = 1;
     $divisor    = 1000;

@@ -83,7 +83,7 @@ class Elasticsearch extends Transport
         }
 
         $data = array(
-            '@timestamp' => strftime("%Y-%m-%dT%T"),
+            '@timestamp' => date('c'),
             "host" => gethostname(),
             "location" => $obj['location'],
             "title" => $obj['name'],

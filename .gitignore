@@ -29,8 +29,11 @@ patches
 !/lib/yaml
 /vendor
 /node_modules
+npm-debug.log
+yarn-error.log
 composer.phar
 _ide_helper.php
+_ide_helper_models.php
 
 # Docs #
 ########

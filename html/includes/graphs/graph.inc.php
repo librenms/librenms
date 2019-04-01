@@ -119,7 +119,7 @@ if ($error_msg) {
         echo "<div class='infobox'>";
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
         echo "<pre class='rrd-pre'>";
-        echo "rrdtool graph $graphfile $rrd_options";
+        echo "rrdtool ".rrdtool_build_command("graph", $graphfile, $rrd_options);
         echo "</pre>";
         $return = rrdtool_graph($graphfile, $rrd_options);
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";

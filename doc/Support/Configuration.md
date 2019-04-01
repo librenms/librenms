@@ -580,8 +580,20 @@ $config['bad_entity_sensor_regex'][] = '/Physical id [0-9]+/';
 $config['os']['cisco']['bad_entity_sensor_regex'] = '/Physical id [0-9]+/';
 ```
 
+### Entity sensors limit values
+
+Vendors may give some limit values (or thresholds) for the discovered sensors. By default, when no such value is given,
+both high and low limit values are guessed, based on the value measured during the initial discovery.
+
+When it is preferred to have no high and/or low limit values at all if these are not provided by the vendor, the guess
+method can be disabled:
+```php
+$config['sensors']['guess_limits'] = false;
+```
+
 ### Storage configuration
 
+Mounted storage / mount points to ignore in discovery and polling.
 ```php
 $config['ignore_mount_removable']  = 1;
 $config['ignore_mount_network']    = 1;
@@ -609,7 +621,12 @@ $config['ignore_mount_regexp'][] = "/^\/dev\/md0/";
 $config['ignore_mount_regexp'][] = "/^\/var\/dhcpd\/dev,/";
 $config['ignore_mount_regexp'][] = "/UMA/";
 ```
-Mounted storage / mount points to ignore in discovery and polling.
+
+Custom storage warning percentage
+```php
+$config['storage_perc_warn'] = 60;
+$config['os']['linux']['storage_perc_warn'] = 60;
+```
 
 ### IRC Bot
 
@@ -629,9 +646,11 @@ $config['eventlog_purge']                                 = 30;
 $config['authlog_purge']                                  = 30;
 $config['perf_times_purge']                               = 30;
 $config['device_perf_purge']                              = 7;
+$config['alert_log_purge']                                = 365;
+$config['port_fdb_purge']                                 = 10;
 $config['rrd_purge']                                      = 90;// Not set by default
 ```
-These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually,
+These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually.
 values are in days.
 
 > NOTE: Please be aware that `$config['rrd_purge']` is _NOT_ set by default. This option will remove any old data within 

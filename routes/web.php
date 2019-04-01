@@ -25,9 +25,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::get('locations', 'LocationController@index');
 
     // old route redirects
-    Route::get('poll-log', function () {
-        return redirect('pollers/tab=log/');
-    });
+    Route::permanentRedirect('poll-log', 'pollers/tab=log/');
 
     // Two Factor Auth
     Route::get('2fa', 'TwoFactorController@showTwoFactorForm')->name('2fa.form');
@@ -105,29 +103,15 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         });
     });
 
-    // Debugbar routes need to be here because of catch-all
-    if (config('app.env') !== 'production' && config('app.debug') && config('debugbar.enabled') !== false) {
-        Route::get('/_debugbar/assets/stylesheets', [
-            'as' => 'debugbar-css',
-            'uses' => '\Barryvdh\Debugbar\Controllers\AssetController@css'
-        ]);
-
-        Route::get('/_debugbar/assets/javascript', [
-            'as' => 'debugbar-js',
-            'uses' => '\Barryvdh\Debugbar\Controllers\AssetController@js'
-        ]);
-
-        Route::get('/_debugbar/open', [
-            'as' => 'debugbar-open',
-            'uses' => '\Barryvdh\Debugbar\Controllers\OpenController@handler'
-        ]);
-    }
-
     // demo helper
-    Route::get('demo', function () {
-        return redirect('/');
+    Route::permanentRedirect('demo', '/');
+
+    // blank page, dummy page for external code using Laravel::bootWeb()
+    Route::any('/blank', function () {
+        return '';
     });
 
     // Legacy routes
-    Route::any('/{path?}', 'LegacyController@index')->where('path', '.*');
+    Route::any('/{path?}', 'LegacyController@index')
+        ->where('path', '^((?!_debugbar).)*');
 });

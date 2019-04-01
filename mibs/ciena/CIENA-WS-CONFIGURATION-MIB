@@ -1,0 +1,267 @@
+-- This file was automatically generated from ciena-ws-configuration.yang. Do not edit.
+
+CIENA-WS-CONFIGURATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    EnabledDisabledEnum, StringMaxl128, StringMaxl254
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+cienaWsConfigurationMIB MODULE-IDENTITY
+    LAST-UPDATED "201704050000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This module defines configuration data for the Waveserver."
+    REVISION "201704050000Z"
+    DESCRIPTION "Waveserver Release 1.5
+Added 'include-default-settings' option to 'ws-configuration-save' RPC.
+Added 'include-default-settings' option to 'ws-configuration-backup' RPC.
+Added Zero Touch Provisioning (ZTP) support."
+    REVISION "201703020000Z"
+    DESCRIPTION "Waveserver Release 1.4
+
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3"
+    REVISION "201606150000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.  
+Restructuring of the module."
+    REVISION "201509230000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 19 }
+
+ZtpError ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), none(1), bootFileDownloadFailed(2), bootFileParseError(3), ftpConfigError(4), ftpLicenseFileError(5), ftpSoftwareLoadFileError(6), sshKeyError(7), licenseIdError(8), licenseDownloadError(9), licenseInstallError(10), licenseHostIdMismatchError(11), licenseWarmRebootRequired(12), licenseUnsupportedFileType(13), expiredLicenseFile(14), systemTimeNotSet(15), loginBannerError(16), welcomeBannerError(17), configFileDownloadFailed(18), configFileApplyFailed(19), softwareUpgradeFailed(20), softwareServerSetFailed(21), softwareDownloadFailed(22), softwareRepositoryRemountFailed(23), softwareUnzipFailed(24), softwareAlreadyRunning(25), scriptFileDownloadFailed(26), scriptFileApplyFailed(27) }
+
+ZtpOperationalState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), idle(1), start(2), restarting(3), waitingForDhcpLease(4), downloadingBootFile(5), parsingBootFile(6), processingBootFile(7), processingFtpConfigFile(8), processingFtpLicenseFile(9), processingFtpSoftwareLoadFile(10), processingSshKeys(11), processingLicenseId(12), installingLicenses(13), downloadingLoginBanner(14), downloadingWelcomeBanner(15), downloadingConfigFile(16), applyingConfigFile(17), processingConfigFile(18), processingSoftwarePackage(19), requestingReboot(20), upgradingSoftware(21), booting(22), completed(23), failed(24), downloadingScriptFile(25), downloadingLicenses(26) }
+
+cwsConfigurationFileListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsConfigurationFileListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "The filename list for all the saved configuration files."
+    ::= { cienaWsConfigurationMIB 3 }
+
+cwsConfigurationFileListEntry OBJECT-TYPE
+    SYNTAX CwsConfigurationFileListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsConfigurationFileListTable."
+    INDEX { cwsConfigurationConfigurationFilesTableSnmpKey, cwsConfigurationFileListTableSnmpKey }
+    ::= { cwsConfigurationFileListTable 1 }
+
+CwsConfigurationFileListEntry ::= SEQUENCE { 
+    cwsConfigurationFileListTableSnmpKey Integer32,
+    cwsConfigurationFileList StringMaxl254 
+}
+
+cwsConfigurationFileListTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsConfigurationFileList"
+    ::= { cwsConfigurationFileListEntry 1 }
+
+cwsConfigurationFileList OBJECT-TYPE
+    SYNTAX StringMaxl254
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The filename list for all the saved configuration files."
+    ::= { cwsConfigurationFileListEntry 2 }
+
+cwsConfigurationConfigurationFilesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsConfigurationConfigurationFilesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "List of saved configuration files on the Waveserver."
+    ::= { cienaWsConfigurationMIB 4 }
+
+cwsConfigurationConfigurationFilesEntry OBJECT-TYPE
+    SYNTAX CwsConfigurationConfigurationFilesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsConfigurationConfigurationFilesTable."
+    INDEX { cwsConfigurationConfigurationFilesTableSnmpKey }
+    ::= { cwsConfigurationConfigurationFilesTable 1 }
+
+CwsConfigurationConfigurationFilesEntry ::= SEQUENCE { 
+    cwsConfigurationConfigurationFilesTableSnmpKey Integer32 
+}
+
+cwsConfigurationConfigurationFilesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Unique key for cwsConfigurationFileList"
+    ::= { cwsConfigurationConfigurationFilesEntry 1 }
+
+cwsConfigurationDefaultFilesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsConfigurationDefaultFilesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver Configuration: default configuration files."
+    ::= { cienaWsConfigurationMIB 5 }
+
+cwsConfigurationDefaultFilesEntry OBJECT-TYPE
+    SYNTAX CwsConfigurationDefaultFilesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsConfigurationDefaultFilesTable."
+    INDEX { cwsConfigurationDefaultFilesTableSnmpKey }
+    ::= { cwsConfigurationDefaultFilesTable 1 }
+
+CwsConfigurationDefaultFilesEntry ::= SEQUENCE { 
+    cwsConfigurationDefaultFilesTableSnmpKey Integer32,
+    cwsConfigurationDefaultFilesSaveFilename StringMaxl254,
+    cwsConfigurationDefaultFilesLoadFilename StringMaxl254,
+    cwsConfigurationDefaultFilesBackupLoadFilename StringMaxl254 
+}
+
+cwsConfigurationDefaultFilesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsConfigurationDefaultFiles"
+    ::= { cwsConfigurationDefaultFilesEntry 1 }
+
+cwsConfigurationDefaultFilesSaveFilename OBJECT-TYPE
+    SYNTAX StringMaxl254
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The filename for the default save configuration file."
+    ::= { cwsConfigurationDefaultFilesEntry 2 }
+
+cwsConfigurationDefaultFilesLoadFilename OBJECT-TYPE
+    SYNTAX StringMaxl254
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The filename for the default load configuration file."
+    ::= { cwsConfigurationDefaultFilesEntry 3 }
+
+cwsConfigurationDefaultFilesBackupLoadFilename OBJECT-TYPE
+    SYNTAX StringMaxl254
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The filename for the backup load configuration file."
+    ::= { cwsConfigurationDefaultFilesEntry 4 }
+
+cwsConfigurationZtpStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsConfigurationZtpStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsConfigurationMIB 7 }
+
+cwsConfigurationZtpStateEntry OBJECT-TYPE
+    SYNTAX CwsConfigurationZtpStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsConfigurationZtpStateTable."
+    INDEX { cwsConfigurationZtpStateTableSnmpKey }
+    ::= { cwsConfigurationZtpStateTable 1 }
+
+CwsConfigurationZtpStateEntry ::= SEQUENCE { 
+    cwsConfigurationZtpStateTableSnmpKey Integer32,
+    cwsConfigurationZtpStateAdminState EnabledDisabledEnum,
+    cwsConfigurationZtpStateOperationalState ZtpOperationalState,
+    cwsConfigurationZtpStateLastFailure ZtpError,
+    cwsConfigurationZtpStateLastCommandFile StringMaxl128,
+    cwsConfigurationZtpStateLastConfigFile StringMaxl128 
+}
+
+cwsConfigurationZtpStateTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsConfigurationZtpState"
+    ::= { cwsConfigurationZtpStateEntry 1 }
+
+cwsConfigurationZtpStateAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Whether the ZTP admin state is enabled or disabled. When ZTP is disabled, DHCP bootfile requests will be ignored."
+    ::= { cwsConfigurationZtpStateEntry 2 }
+
+cwsConfigurationZtpStateOperationalState OBJECT-TYPE
+    SYNTAX ZtpOperationalState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The current status or functional step being executed in the ZTP process. ZTP operational state will be 'idle' before ZTP is run, and 'completed' when the bootfile has been fully processed and applied."
+    ::= { cwsConfigurationZtpStateEntry 3 }
+
+cwsConfigurationZtpStateLastFailure OBJECT-TYPE
+    SYNTAX ZtpError
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The most recent failure encountered while running ZTP. This failure will be blank if no failure has occurred, or if the failure has been cleared due to successful completion of ZTP procedure."
+    ::= { cwsConfigurationZtpStateEntry 4 }
+
+cwsConfigurationZtpStateLastCommandFile OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The filename of the most recent command file (bootfile) processed by DHCP/ZTP."
+    ::= { cwsConfigurationZtpStateEntry 5 }
+
+cwsConfigurationZtpStateLastConfigFile OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The filename of the most recent config file processed by ZTP."
+    ::= { cwsConfigurationZtpStateEntry 6 }
+
+
+
+-- Conformance statements
+cienaWsConfigurationObjects OBJECT IDENTIFIER
+    ::= { cienaWsConfigurationMIB 1 }
+
+cienaWsConfigurationConformance OBJECT IDENTIFIER
+    ::= { cienaWsConfigurationMIB 2 }
+
+cienaWsConfigurationGroups OBJECT IDENTIFIER
+    ::= { cienaWsConfigurationConformance 1 }
+
+cienaWsConfigurationGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsConfigurationDefaultFilesSaveFilename,
+        cwsConfigurationDefaultFilesLoadFilename,
+        cwsConfigurationDefaultFilesBackupLoadFilename,
+        cwsConfigurationZtpStateAdminState,
+        cwsConfigurationZtpStateOperationalState,
+        cwsConfigurationZtpStateLastFailure,
+        cwsConfigurationZtpStateLastCommandFile,
+        cwsConfigurationZtpStateLastConfigFile
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsConfigurationGroups 1 }
+
+cienaWsConfigurationCompliances OBJECT IDENTIFIER
+    ::= { cienaWsConfigurationConformance 2 }
+
+cienaWsConfigurationCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsConfigurationGroup }
+    ::= { cienaWsConfigurationCompliances 1 }
+
+END -- End module

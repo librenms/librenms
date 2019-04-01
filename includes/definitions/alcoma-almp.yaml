@@ -1,7 +1,6 @@
 os: alcoma-almp
 text: Alcoma
 type: wireless
-icon: alcoma
 over:
     - { graph: device_wireless_rssi, text: 'Wireless rssi' }
     - { graph: device_wireless_snr, text: 'Wireles snr' }

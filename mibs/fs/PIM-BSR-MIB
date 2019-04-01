@@ -1,0 +1,715 @@
+   PIM-BSR-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE,
+       NOTIFICATION-TYPE,
+       mib-2, Unsigned32, TimeTicks     FROM SNMPv2-SMI
+       RowStatus, TruthValue,
+       StorageType                      FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP,
+       NOTIFICATION-GROUP               FROM SNMPv2-CONF 
+       gbnL3                            FROM ADMIN-MASTER-MIB;   
+
+   pimBsrMIB MODULE-IDENTITY
+       LAST-UPDATED "200702040000Z" -- 4 February 2007
+       ORGANIZATION
+               "IETF Protocol Independent Multicast (PIM) Working Group"
+       CONTACT-INFO
+               "Email: pim@ietf.org
+                WG charter:
+                http://www.ietf.org/html.charters/pim-charter.html"
+       DESCRIPTION
+               "The MIB module for management of the Bootstrap Router
+               (BSR) mechanism for PIM routers.
+
+               Copyright (C) The IETF Trust (2007).  This version
+               of this MIB module is part of RFC yyyy; see the RFC
+               itself for full legal notices."
+       REVISION     "200702040000Z" -- 4 February 2007
+       DESCRIPTION  "Initial version, published as RFC yyyy."
+       ::= { gbnL3 9 }
+
+   --
+   -- Top-level structure
+   --
+
+   pimBsrNotifications   OBJECT IDENTIFIER ::= { pimBsrMIB 0 }
+   pimBsrObjects         OBJECT IDENTIFIER ::= { pimBsrMIB 1 }
+
+   --
+   -- Conformance Information
+   --
+
+   pimBsrConformance OBJECT IDENTIFIER ::= { pimBsrMIB 2 }
+   pimBsrCompliances OBJECT IDENTIFIER ::= { pimBsrConformance 1 }
+   pimBsrGroups      OBJECT IDENTIFIER ::= { pimBsrConformance 2 }
+
+   --
+   -- The BSR Candidate-RP Table
+   --
+
+   pimBsrCandidateRPTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF PimBsrCandidateRPEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The (conceptual) table listing the IP multicast group
+               prefixes for which the local router is to advertise
+               itself as a Candidate-RP."
+       ::= { pimBsrObjects 1 }
+
+   pimBsrCandidateRPEntry OBJECT-TYPE
+       SYNTAX     PimBsrCandidateRPEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "An entry (conceptual row) in the
+                pimBsrCandidateRPTable."
+       INDEX      { pimBsrCandidateRPAddressType,
+                    pimBsrCandidateRPAddress,
+                    pimBsrCandidateRPGroupAddress,
+                    pimBsrCandidateRPGroupPrefixLength }
+       ::= { pimBsrCandidateRPTable 1 }
+
+   PimBsrCandidateRPEntry ::= SEQUENCE {
+       pimBsrCandidateRPAddressType       INTEGER,
+       pimBsrCandidateRPAddress           OCTET STRING,
+       pimBsrCandidateRPGroupAddress      OCTET STRING,
+       pimBsrCandidateRPGroupPrefixLength Unsigned32,
+       pimBsrCandidateRPBidir             TruthValue,
+       pimBsrCandidateRPAdvTimer          TimeTicks,
+       pimBsrCandidateRPPriority          Unsigned32,
+       pimBsrCandidateRPAdvInterval       Unsigned32,
+       pimBsrCandidateRPHoldtime          Unsigned32,
+       pimBsrCandidateRPStatus            RowStatus,
+       pimBsrCandidateRPStorageType       StorageType
+   }
+
+   pimBsrCandidateRPAddressType OBJECT-TYPE
+       SYNTAX     INTEGER
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The Inet address type of the Candidate-RP."
+               --C-RP的地址类型，IPv4或者IPv6
+       ::= { pimBsrCandidateRPEntry 1 }
+
+   pimBsrCandidateRPAddress OBJECT-TYPE
+       SYNTAX     OCTET STRING (SIZE (0..255)) --(SIZE (4|8|16|20))
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The (unicast) address that will be advertised as a
+               Candidate-RP.  The InetAddressType is given by the
+               pimBsrCandidateRPAddressType object."
+               --C-RP的地址，此地址为单播地址
+       ::= { pimBsrCandidateRPEntry 2 }
+
+   pimBsrCandidateRPGroupAddress OBJECT-TYPE
+       SYNTAX     OCTET STRING (SIZE (0..255)) --(SIZE (4|8|16|20))
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The IP multicast group address that, when combined with
+               the corresponding value of
+               pimBsrCandidateRPGroupPrefixLength, identifies a group
+               prefix for which the local router will advertise itself
+               as a Candidate-RP. The InetAddressType is given by the
+               pimBsrCandidateRPAddressType object."
+               --对应本条目的C-RP所管理的组地址
+       ::= { pimBsrCandidateRPEntry 3 }
+
+   pimBsrCandidateRPGroupPrefixLength OBJECT-TYPE
+       SYNTAX     Unsigned32 (4..128)
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The multicast group address mask that, when combined
+               with the corresponding value of
+               pimBsrCandidateRPGroupAddress, identifies a group prefix
+               for which the local router will advertise itself as a
+               Candidate-RP.  The InetAddressType is given by the
+               pimBsrCandidateRPAddressType object."
+               --多播组前缀长度
+       ::= { pimBsrCandidateRPEntry 4 }
+
+   pimBsrCandidateRPBidir OBJECT-TYPE
+       SYNTAX     TruthValue
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "If this object is set to TRUE, this group range is
+               advertised with this RP as a BIDIR-PIM group range. If
+               it is set to FALSE, it is advertised as a PIM-SM group
+               range."
+               --多播组和组前缀结合所代表的组范围是否Bidir
+       DEFVAL { false }
+       ::= { pimBsrCandidateRPEntry 5 }
+
+   pimBsrCandidateRPAdvTimer OBJECT-TYPE
+       SYNTAX     TimeTicks
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The time remaining before the local router next sends
+               a Candidate-RP-Advertisement to the elected BSR for
+               this zone."
+               --发送下一个C-RP-Adv报文的剩余时间
+       ::= { pimBsrCandidateRPEntry 6 }
+
+   pimBsrCandidateRPPriority OBJECT-TYPE
+       SYNTAX     Unsigned32 (0..255)
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "The priority for this Candidate RP advertised in
+                Candidate-RP-Advertisements."
+                --优先级，用于C-RP-Adv报文中的Priority
+       REFERENCE "I-D.ietf-pim-sm-bsr section 3.2"
+       DEFVAL { 192 }
+       ::= { pimBsrCandidateRPEntry 7 }
+
+   pimBsrCandidateRPAdvInterval OBJECT-TYPE
+       SYNTAX     Unsigned32 (0..26214)
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "A Candidate RP generates Candidate-RP-Advertisements
+               periodically. This object represents the time interval
+               in seconds between two consecutive advertisements."
+               --发送C-RP-Adv的周期
+               
+       REFERENCE "I-D.ietf-pim-sm-bsr section 3.2 and section 5"
+       DEFVAL { 60 }
+
+       ::= { pimBsrCandidateRPEntry 8 }
+
+   pimBsrCandidateRPHoldtime OBJECT-TYPE
+       SYNTAX     Unsigned32 (0..65535)
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "Holdtime for this Candidate RP. The amount of time (in
+               seconds) this Candidate-RP entry is valid."
+               --代表本条目作为有效信息需要保存的时间
+
+       REFERENCE "I-D.ietf-pim-sm-bsr section 4.2"
+       DEFVAL { 150 }
+
+       ::= { pimBsrCandidateRPEntry 9 }
+
+   pimBsrCandidateRPStatus OBJECT-TYPE
+       SYNTAX     RowStatus
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "The status of this row, by which new entries may be
+               created, or old entries deleted from this table."
+               --本条目状态
+
+       ::= { pimBsrCandidateRPEntry 10 }
+
+
+   pimBsrCandidateRPStorageType OBJECT-TYPE
+       SYNTAX     StorageType
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "The storage type for this row. Rows having the value
+               'permanent' need not allow write-access to any columnar
+               objects in the row."
+               --本条目存储类型
+         DEFVAL { nonVolatile }
+      ::= { pimBsrCandidateRPEntry 11 }
+
+   --
+   -- The BSR Elected BSR RP-Set Table
+   --
+
+   pimBsrElectedBSRRPSetTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF PimBsrElectedBSRRPSetEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The (conceptual) table listing BSR-specific information
+               about PIM group mappings learned via C-RP advertisements
+               or created locally using configurations. This table is
+               maintained only on the Elected BSR.
+
+               An Elected BSR uses this table to create Bootstrap
+               Messages after applying a local policy to include some
+               or all of the group mappings in this table."
+               --Elected BSR RP-Set表，只有当本地路由器当选为BSR时才维护该表，
+               --表中包含了所有通过处理受到的C-RP报文而整理出来的Group-to-RP映射信息。
+
+       ::= { pimBsrObjects 2 }       
+
+   pimBsrElectedBSRRPSetEntry OBJECT-TYPE
+       SYNTAX     PimBsrElectedBSRRPSetEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "An entry (conceptual row) in the
+                pimBsrElectedBSRRPSetTable."
+                --Elected BSR RP-Set表条目
+       INDEX      { pimBsrElectedBSRGrpMappingAddrType,
+                    pimBsrElectedBSRGrpMappingGrpAddr,
+                    pimBsrElectedBSRGrpMappingGrpPrefixLen,
+                    pimBsrElectedBSRGrpMappingRPAddr }
+       ::= { pimBsrElectedBSRRPSetTable 1 }
+
+   PimBsrElectedBSRRPSetEntry ::= SEQUENCE {
+       pimBsrElectedBSRGrpMappingAddrType      INTEGER,
+       pimBsrElectedBSRGrpMappingGrpAddr       OCTET STRING,
+       pimBsrElectedBSRGrpMappingGrpPrefixLen  Unsigned32,
+       pimBsrElectedBSRGrpMappingRPAddr        OCTET STRING,
+       pimBsrElectedBSRRPSetPriority           Unsigned32,
+       pimBsrElectedBSRRPSetHoldtime           Unsigned32,
+       pimBsrElectedBSRRPSetExpiryTime         TimeTicks,
+       pimBsrElectedBSRRPSetGrpBidir           TruthValue
+   }
+
+   pimBsrElectedBSRGrpMappingAddrType OBJECT-TYPE
+       SYNTAX     INTEGER
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The Inet address type of the IP multicast group
+               prefix."
+               --映射组播组的IP地址类型，IPv4或IPv6
+       ::= { pimBsrElectedBSRRPSetEntry 1 }
+
+   pimBsrElectedBSRGrpMappingGrpAddr OBJECT-TYPE
+       SYNTAX     OCTET STRING (SIZE (0..255)) --(SIZE (4|8|16|20))
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The IP multicast group address which, when combined
+               with pimBsrElectedBSRGrpMappingGrpPrefixLen, gives the
+               group prefix for this mapping.  The InetAddressType is
+               given by the pimBsrElectedBSRGrpMappingAddrType object.
+
+               This address object is only significant up to
+               pimBsrElectedBSRGrpMappingGrpPrefixLen bits. The
+               remainder of the address bits are zero.  This is
+               especially important for this field, which is part of
+               the index of this entry.  Any non-zero bits would
+               signify an entirely different entry."
+               --映射组播组的IP地址
+       ::= { pimBsrElectedBSRRPSetEntry 2 }
+
+   pimBsrElectedBSRGrpMappingGrpPrefixLen OBJECT-TYPE
+       SYNTAX     Unsigned32 (4..128)
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The multicast group prefix length that, when combined
+               with pimBsrElectedBSRGrpMappingGrpAddr, gives the group
+               prefix for this mapping.  The InetAddressType is given by
+               the pimBsrElectedBSRGrpMappingAddrType object.  If
+               pimBsrElectedBSRGrpMappingAddrType is 'ipv4' or 'ipv4z',
+               this object must be in the range 4..32.  If
+               pimBsrElectedBSRGrpMappingAddrType is 'ipv6' or 'ipv6z',
+               this object must be in the range 8..128."
+               --映射组播组的IP地址前缀长度，IPv4取值范围为4到32
+       ::= { pimBsrElectedBSRRPSetEntry 3 }
+
+   pimBsrElectedBSRGrpMappingRPAddr OBJECT-TYPE
+       SYNTAX     OCTET STRING (SIZE (0..255)) --(SIZE (4|8|16|20))
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The IP address of the RP to be used for groups within
+               this group prefix. The InetAddressType is given by the
+               pimBsrElectedBSRGrpMappingAddrType object."
+               --映射RP的IP地址
+       ::= { pimBsrElectedBSRRPSetEntry 4 }
+
+   pimBsrElectedBSRRPSetPriority OBJECT-TYPE
+       SYNTAX     Unsigned32 (0..255)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The priority for RP. Numerically higher values for
+               this object indicate lower priorities, with the value
+               zero denoting the highest priority."
+               --RP的优先级，取值范围为0到255，值越小优先级越高，0的优先级最高
+
+       REFERENCE "I-D.ietf-pim-sm-bsr section 4.1"
+       ::= { pimBsrElectedBSRRPSetEntry 5 }
+
+   pimBsrElectedBSRRPSetHoldtime OBJECT-TYPE
+       SYNTAX     Unsigned32 (0..65535)
+       UNITS      "seconds"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The holdtime for RP"
+       REFERENCE "I-D.ietf-pim-sm-bsr section 4.1"
+       ::= { pimBsrElectedBSRRPSetEntry 6 }
+       --本C-RP信息的维护时间，取值范围为0到65535，缺省值为150
+
+   pimBsrElectedBSRRPSetExpiryTime OBJECT-TYPE
+       SYNTAX     TimeTicks
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The minimum time remaining before this entry will be
+               aged out.  The value zero indicates that this entry will
+               never be aged out."
+       ::= { pimBsrElectedBSRRPSetEntry 7 }
+       --本C-RP信息的老化剩余时间，0表示永不老化
+
+   pimBsrElectedBSRRPSetGrpBidir OBJECT-TYPE
+       SYNTAX     TruthValue
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "If this object is TRUE, this group range with this
+               RP is a BIDIR-PIM group range. If it is set to FALSE,
+               it is a PIM-SM group range."
+               --是否为BIDIR-PIM的组范围
+       ::= { pimBsrElectedBSRRPSetEntry 8 }
+
+   --
+   -- The BSR Candidate-BSR Table
+   --
+
+   pimBsrCandidateBSRTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF PimBsrCandidateBSREntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The (conceptual) table containing Candidate-BSR
+               configuration for the local router.  The table contains
+               one row for each zone for which the local router is
+               to advertise itself as a Candidate-BSR."
+               --Candidate-BSR表，每个表项体现了本地路由器在不同的Admin-scoped中配置的C-BSR信息。
+               --由于我们不支持Admin-scoped的划分，因此该表中最多只有一个表项。
+       ::= { pimBsrObjects 3 }
+
+   pimBsrCandidateBSREntry OBJECT-TYPE
+       SYNTAX     PimBsrCandidateBSREntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "An entry (conceptual row) in the
+               pimBsrCandidateBSRTable."
+               --Candidate-BSR表条目
+       INDEX      { pimBsrCandidateBSRZoneIndex }
+       ::= { pimBsrCandidateBSRTable 1 }
+
+   PimBsrCandidateBSREntry ::= SEQUENCE {
+       pimBsrCandidateBSRZoneIndex        Unsigned32,
+       pimBsrCandidateBSRAddressType      INTEGER,
+       pimBsrCandidateBSRAddress          OCTET STRING,
+       pimBsrCandidateBSRPriority         Unsigned32,
+       pimBsrCandidateBSRHashMaskLength   Unsigned32,
+       pimBsrCandidateBSRElectedBSR       TruthValue,
+       pimBsrCandidateBSRBootstrapTimer   TimeTicks,
+       pimBsrCandidateBSRStatus           RowStatus,
+       pimBsrCandidateBSRStorageType      StorageType
+   }
+
+   pimBsrCandidateBSRZoneIndex OBJECT-TYPE
+       SYNTAX     Unsigned32
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The zone index uniquely identifies the zone on a
+               device to which this Candidate BSR is attached. There is
+               one entry for each zone in ipMcastZoneTable. Scope-level
+               information for this zone can be extracted from
+               ipMcastZoneTable in IP Multicast MIB.
+               [I-D.ietf-mboned-ip-mcast-mib]."
+               --域索引，对应ipMcastZoneTable中的域信息。
+               --由于不支持Administratively Scoped划分，因此该字段永远为缺省值0
+       ::= { pimBsrCandidateBSREntry 1 }
+
+   pimBsrCandidateBSRAddressType OBJECT-TYPE
+       SYNTAX     INTEGER
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "The address type of the Candidate-BSR."
+               --C-BSR的地址类型
+       ::= { pimBsrCandidateBSREntry 2 }
+
+   pimBsrCandidateBSRAddress OBJECT-TYPE
+       SYNTAX     OCTET STRING (SIZE (0..255))
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "The (unicast) address that the local router will
+               use to advertise itself as a Candidate-BSR.  The
+               InetAddressType is given by the
+               pimBsrCandidateBSRAddressType object."
+               --C-BSR的地址
+       ::= { pimBsrCandidateBSREntry 3 }
+
+   pimBsrCandidateBSRPriority OBJECT-TYPE
+       SYNTAX     Unsigned32 (0..255)
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "The priority value for the local router as a
+               Candidate-BSR for this zone. Numerically higher
+               values for this object indicate higher priorities."
+               --该C-BSR在pimBsrCandidateBSRZoneIndex对应的域中的优先级，取值范围0到255，值越大优先级越高，缺省为0
+       DEFVAL { 0 }
+       ::= { pimBsrCandidateBSREntry 4 }
+
+   pimBsrCandidateBSRHashMaskLength OBJECT-TYPE
+       SYNTAX     Unsigned32 (0..128)
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "The hash mask length (used in the RP hash function)
+               that the local router will advertise in its Bootstrap
+               messages for this zone.  This object defaults
+               to 30 if pimBsrCandidateBSRAddressType is 'ipv4' or
+               'ipv4z' , and defaults to 126 if
+               pimBsrCandidateBSRAddressType is 'ipv6' or 'ipv6z'."
+               --用于hash函数的掩码长度，取值范围0到128，IPv4缺省为32，IPv6缺省为126
+       ::= { pimBsrCandidateBSREntry 5 }
+
+   pimBsrCandidateBSRElectedBSR OBJECT-TYPE
+       SYNTAX     TruthValue
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "Whether the local router is the elected BSR for this
+               zone."
+               --是否为该域当选的BSR
+       ::= { pimBsrCandidateBSREntry 6 }
+
+   pimBsrCandidateBSRBootstrapTimer OBJECT-TYPE
+       SYNTAX     TimeTicks
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The time remaining before the local router next
+               originates a Bootstrap message for this zone.
+               Value of this object is zero if
+               pimBsrCandidateBSRElectedBSR is 'FALSE'."
+               --发送下一个bootstrap报文的剩余时间，当bElectedBSR为FALSE，该字段为0
+
+       ::= { pimBsrCandidateBSREntry 7 }
+
+   pimBsrCandidateBSRStatus OBJECT-TYPE
+       SYNTAX     RowStatus
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "The status of this row, by which new entries may
+               be created, or old entries deleted from this table."
+               --条目状态
+       ::= { pimBsrCandidateBSREntry 8 }
+
+   pimBsrCandidateBSRStorageType OBJECT-TYPE
+       SYNTAX     StorageType
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "The storage type for this row. Rows having the value
+               'permanent' need not allow write-access to any columnar
+               objects in the row."
+               --条目存储类型
+         DEFVAL { nonVolatile }
+      ::= { pimBsrCandidateBSREntry 9 }
+
+   --
+   -- The BSR Elected-BSR Table
+   --
+
+   pimBsrElectedBSRTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF PimBsrElectedBSREntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The (conceptual) table containing information about
+               elected BSRs.  The table contains one row for each
+               zone for which there is an elected BSR."
+               --Elected BSR表，每个表现说明了不同的Admin-scoped当选的BSR信息。
+               --由于我们不支持Admin-scoped的划分，因此该表中最多只有一个表项。
+       ::= { pimBsrObjects 4 }
+
+   pimBsrElectedBSREntry OBJECT-TYPE
+       SYNTAX     PimBsrElectedBSREntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "An entry (conceptual row) in the
+                pimBsrElectedBSRTable."
+                --Elected BSR表条目
+       INDEX      { pimBsrElectedBSRZoneIndex }
+       ::= { pimBsrElectedBSRTable 1 }
+
+   PimBsrElectedBSREntry ::= SEQUENCE {
+       pimBsrElectedBSRZoneIndex        Unsigned32,
+       pimBsrElectedBSRAddressType      INTEGER,
+       pimBsrElectedBSRAddress          OCTET STRING,
+       pimBsrElectedBSRPriority         Unsigned32,
+       pimBsrElectedBSRHashMaskLength   Unsigned32,
+       pimBsrElectedBSRExpiryTime       TimeTicks
+   }
+
+   pimBsrElectedBSRZoneIndex OBJECT-TYPE
+       SYNTAX     Unsigned32
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The zone index uniquely identifies the zone on a
+               device to which this Elected BSR is attached. There
+               is one entry for each zone in ipMcastZoneTable.
+               Scope-level information for this zone can be extracted
+               from ipMcastZoneTable in IP MCAST MIB."
+               --域索引，对应ipMcastZoneTable中的域信息。
+               --由于不支持Administratively Scoped划分，因此该字段永远为缺省值0
+       ::= { pimBsrElectedBSREntry 1 }
+
+   pimBsrElectedBSRAddressType OBJECT-TYPE
+       SYNTAX     INTEGER
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The address type of the elected BSR."
+               --当选的BSR的地址类型
+       ::= { pimBsrElectedBSREntry 2 }
+
+   pimBsrElectedBSRAddress OBJECT-TYPE
+       SYNTAX     OCTET STRING (SIZE (0..255)) --(SIZE (4|8|16|20))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The (unicast) address of the elected BSR.  The
+               InetAddressType is given by the
+               pimBsrElectedBSRAddressType object."
+               --当选的BSR的地址
+       ::= { pimBsrElectedBSREntry 3 }
+
+   pimBsrElectedBSRPriority OBJECT-TYPE
+       SYNTAX     Unsigned32 (0..255)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The priority value for the elected BSR for this address
+               type.  Numerically higher values for this object indicate
+               higher priorities."
+               --优先级，取值范围0到255，值越大优先级越高
+       ::= { pimBsrElectedBSREntry 4 }
+
+   pimBsrElectedBSRHashMaskLength OBJECT-TYPE
+       SYNTAX     Unsigned32 (0..128)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The hash mask length (used in the RP hash function)
+               advertised by the elected BSR for this zone."
+               --用于hash函数的掩码长度，取值范围0到128
+       ::= { pimBsrElectedBSREntry 5 }
+
+   pimBsrElectedBSRExpiryTime OBJECT-TYPE
+       SYNTAX     TimeTicks
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The minimum time remaining before the elected BSR for
+               this zone will be declared down."
+               --老化剩余时间
+       ::= { pimBsrElectedBSREntry 6 }
+       
+
+
+   --
+   -- PIM BSR Notifications
+   --
+
+   pimBsrElectedBSRLostElection   NOTIFICATION-TYPE
+       OBJECTS { pimBsrCandidateBSRElectedBSR }
+       STATUS     current
+       DESCRIPTION
+               "A pimBsrElectedBSRLostElection notification should be
+               generated when current E-BSR lost election to a new
+               Candidate BSR. Only an E-BSR should generate this
+               notification.
+
+               This notification is generated when
+               pimBsrCandidateBSRElectedBSR becomes FALSE."
+
+       REFERENCE "I-D.ietf-pim-sm-bsr section 3.1"
+       ::= { pimBsrNotifications 1 }
+
+   pimBsrCandidateBSRWinElection   NOTIFICATION-TYPE
+       OBJECTS { pimBsrCandidateBSRElectedBSR }
+       STATUS     current
+       DESCRIPTION
+               "A pimBsrCandidateBSRWinElection notification should be
+               generated when a C-BSR wins BSR Election. Only an
+               E-BSR should generate this notification.
+
+               This notification is generated when
+               pimBsrCandidateBSRElectedBSR becomes TRUE."
+
+       REFERENCE "I-D.ietf-pim-sm-bsr section 3.1"
+       ::= { pimBsrNotifications 2 }
+
+   --
+   -- Compliance Statements
+   --
+
+   pimBsrCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+               "The compliance statement for PIM routers that implement
+               the Bootstrap Router (BSR) mechanism."
+       MODULE  -- this module
+       MANDATORY-GROUPS { pimBsrObjectGroup }
+
+         GROUP   pimBsrDiagnosticsGroup
+         DESCRIPTION
+             "This group is optional."
+
+       ::= { pimBsrCompliances 1 }
+
+   --
+   -- Units of Conformance
+   --
+
+   pimBsrObjectGroup OBJECT-GROUP
+       OBJECTS { pimBsrCandidateRPBidir,
+                 pimBsrCandidateRPAdvTimer,
+                 pimBsrCandidateRPPriority,
+                 pimBsrCandidateRPAdvInterval,
+                 pimBsrCandidateRPHoldtime,
+                 pimBsrCandidateRPStatus,
+                 pimBsrElectedBSRRPSetPriority,
+                 pimBsrElectedBSRRPSetHoldtime,
+                 pimBsrElectedBSRRPSetExpiryTime,
+                 pimBsrElectedBSRRPSetGrpBidir,
+                 pimBsrCandidateBSRAddress,
+                 pimBsrCandidateBSRPriority,
+                 pimBsrCandidateBSRHashMaskLength,
+                 pimBsrCandidateBSRElectedBSR,
+                 pimBsrCandidateBSRBootstrapTimer,
+                 pimBsrCandidateBSRStatus,
+                 pimBsrElectedBSRAddress,
+                 pimBsrElectedBSRPriority,
+                 pimBsrElectedBSRHashMaskLength,
+                 pimBsrElectedBSRExpiryTime }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects for managing the Bootstrap
+               Router (BSR) mechanism for PIM routers."
+       ::= { pimBsrGroups 1 }
+
+   pimBsrDiagnosticsGroup NOTIFICATION-GROUP
+       NOTIFICATIONS  { pimBsrElectedBSRLostElection,
+                        pimBsrCandidateBSRWinElection }
+       STATUS  current
+       DESCRIPTION
+               "Objects providing additional diagnostics related to
+               the Bootstrap Router (BSR) mechanism for PIM routers."
+       ::= { pimBsrGroups 2 }
+
+   END

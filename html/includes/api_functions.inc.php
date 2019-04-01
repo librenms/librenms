@@ -18,8 +18,6 @@ use LibreNMS\Config;
 
 function authToken(\Slim\Route $route)
 {
-    global $permissions;
-
     if (Auth::check()) {
         $user = Auth::user();
 
@@ -29,7 +27,6 @@ function authToken(\Slim\Route $route)
             'user_id' => $user->user_id,
             'userlevel' => $user->level
         ];
-        $permissions = permissions_cache($user->user_id);
 
         return;
     }
@@ -2027,6 +2024,23 @@ function get_link()
 }
 
 
+function list_sensors()
+{
+    check_is_read();
+
+    $app        = \Slim\Slim::getInstance();
+    $router     = $app->router()->getCurrentRoute()->getParams();
+
+    $sensors = \App\Models\Sensor::hasAccess(Auth::user())->get();
+    $total_sensors = $sensors->count();
+    if ($total_sensors == 0) {
+        api_error(404, 'Sensors do not exist');
+    }
+
+    api_success($sensors, 'sensors');
+}
+
+
 function list_ip_addresses()
 {
     check_is_read();
@@ -2205,6 +2219,12 @@ function list_logs()
     $count = dbFetchCell($count_query, $param);
     $full_query = $full_query . $query . " ORDER BY $timestamp ASC LIMIT $start,$limit";
     $logs = dbFetchRows($full_query, $param);
+
+    if ($type === 'list_alertlog') {
+        foreach ($logs as $index => $log) {
+            $logs[$index]['details'] = json_decode(gzuncompress($log['details']), true);
+        }
+    }
 
     api_success($logs, 'logs', null, 200, null, array('total' => $count));
 }

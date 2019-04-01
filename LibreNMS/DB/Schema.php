@@ -26,7 +26,9 @@
 namespace LibreNMS\DB;
 
 use LibreNMS\Config;
+use LibreNMS\Util\Version;
 use Symfony\Component\Yaml\Yaml;
+use \Schema as LaravelSchema;
 
 class Schema
 {
@@ -38,6 +40,50 @@ class Schema
 
     private $relationships;
     private $schema;
+
+    /**
+     * Check the database to see if the migrations have all been run
+     *
+     * @return bool
+     */
+    public static function isCurrent()
+    {
+        if (LaravelSchema::hasTable('migrations')) {
+            return self::getMigrationFiles()->diff(self::getAppliedMigrations())->isEmpty();
+        }
+
+        return false;
+    }
+
+    /**
+     * Check for extra migrations and return them
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getUnexpectedMigrations()
+    {
+        return self::getAppliedMigrations()->diff(self::getMigrationFiles());
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    private static function getMigrationFiles()
+    {
+        $migrations = collect(glob(base_path('database/migrations/') . '*.php'))
+            ->map(function ($migration_file) {
+                return basename($migration_file, '.php');
+            });
+        return $migrations;
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    private static function getAppliedMigrations()
+    {
+        return Eloquent::DB()->table('migrations')->pluck('migration');
+    }
 
     /**
      * Get the primary key column(s) for a table
@@ -101,10 +147,11 @@ class Schema
     {
         $update_cache = true;
         $cache_file = Config::get('install_dir') . "/cache/{$base}_relationships.cache";
+        $db_version = Version::get()->database();
 
         if (is_file($cache_file)) {
             $cache = unserialize(file_get_contents($cache_file));
-            if ($cache['version'] == get_db_schema()) {
+            if ($cache['version'] == $db_version) {
                 $update_cache = false;  // cache is valid skip update
             }
         }
@@ -119,7 +166,7 @@ class Schema
             }
 
             $cache = [
-                'version' => get_db_schema(),
+                'version' => $db_version,
                 $base => $paths
             ];
 

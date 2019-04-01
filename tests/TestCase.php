@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Util\Snmpsim;
 
-abstract class TestCase extends \PHPUnit_Framework_TestCase
+abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
     use SnmpsimHelpers;
 
@@ -40,6 +40,12 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         // grab global $snmpsim from bootstrap and make it accessible
         global $snmpsim;
         $this->snmpsim = $snmpsim;
+    }
+
+    public function setUp()
+    {
+        parent::setUp();
+        set_debug(false); // prevent warnings from stopping execution for legacy code
     }
 
     public function dbSetUp()

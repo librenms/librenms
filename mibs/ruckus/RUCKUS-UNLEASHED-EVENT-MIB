@@ -1,0 +1,365 @@
+--
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-UNLEASHED-EVENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusEvents
+        FROM RUCKUS-ROOT-MIB
+    MacAddress,
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI;
+
+ruckusUnleashedEventMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless Inc.
+
+        Postal:
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "Ruckus Unleashed event objects, including trap OID and trap payload."
+    ::= { ruckusEvents 15 }
+
+
+-- Groups
+--
+
+ruckusUnleashedEventTraps OBJECT IDENTIFIER      ::= { ruckusUnleashedEventMIB 1 }
+
+ruckusUnleashedEventObjects OBJECT IDENTIFIER    ::= { ruckusUnleashedEventMIB 2 }
+
+ruckusUnleashedEventTrapSwitchCmd OBJECT IDENTIFIER      ::= { ruckusUnleashedEventMIB 3 }
+
+-- Ruckus Traps
+--
+
+ruckusUnleashedEventAPJoinTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusUnleashedEventSerial,
+                  ruckusUnleashedEventNEID,
+                  ruckusUnleashedEventSeverity,
+                  ruckusUnleashedEventType,
+                  ruckusUnleashedEventTime,
+                  ruckusUnleashedEventStatus,
+                  ruckusUnleashedEventTitle,
+                  ruckusUnleashedEventAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+        "Trigger when there is a AP join event. 
+         The AP's MAC address is enclosed."
+    ::= { ruckusUnleashedEventTraps 1 }
+
+
+ruckusUnleashedEventAPLostTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusUnleashedEventSerial,
+                  ruckusUnleashedEventNEID,
+                  ruckusUnleashedEventSeverity,
+                  ruckusUnleashedEventType,
+                  ruckusUnleashedEventTime,
+                  ruckusUnleashedEventStatus,
+                  ruckusUnleashedEventTitle,
+                  ruckusUnleashedEventAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when AP lost contact.
+         The AP's MAC address is enclosed."
+    ::= { ruckusUnleashedEventTraps 5 }
+
+ruckusUnleashedEventAPSystemColdStartTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusUnleashedEventSerial,
+                  ruckusUnleashedEventNEID,
+                  ruckusUnleashedEventSeverity,
+                  ruckusUnleashedEventType,
+                  ruckusUnleashedEventTime,
+                  ruckusUnleashedEventStatus,
+                  ruckusUnleashedEventTitle,
+                  ruckusUnleashedEventAPMacAddr,
+                  ruckusUnleashedEventOccurTime }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when an AP performs cold start."
+    ::= { ruckusUnleashedEventTraps 31 }
+
+ruckusUnleashedEventAPSystemWarmStartTrap NOTIFICATION-TYPE
+    OBJECTS     { ruckusUnleashedEventSerial,
+                  ruckusUnleashedEventNEID,
+                  ruckusUnleashedEventSeverity,
+                  ruckusUnleashedEventType,
+                  ruckusUnleashedEventTime,
+                  ruckusUnleashedEventStatus,
+                  ruckusUnleashedEventTitle,
+                  ruckusUnleashedEventAPMacAddr,
+                  ruckusUnleashedEventOccurTime }
+    STATUS      current
+    DESCRIPTION
+         "Trigger when an AP performs warm start."
+    ::= { ruckusUnleashedEventTraps 32 }
+
+    
+ruckusUnleashedEventAPRadioOn NOTIFICATION-TYPE
+    OBJECTS     { ruckusUnleashedEventSerial,
+                  ruckusUnleashedEventNEID,
+                  ruckusUnleashedEventSeverity,
+                  ruckusUnleashedEventType,
+                  ruckusUnleashedEventTime,
+                  ruckusUnleashedEventStatus,
+                  ruckusUnleashedEventTitle,
+                  ruckusUnleashedEventAPMacAddr,
+                  ruckusUnleashedEventAPRadioIndex,
+                  ruckusUnleashedEventOccurTime
+                   }
+    STATUS      current
+    DESCRIPTION
+         "AP Radio ON, the period is 60 seconds"
+    ::= { ruckusUnleashedEventTraps 130 }     
+
+ruckusUnleashedEventAPRadioOff NOTIFICATION-TYPE
+    OBJECTS     { ruckusUnleashedEventSerial,
+                  ruckusUnleashedEventNEID,
+                  ruckusUnleashedEventSeverity,
+                  ruckusUnleashedEventType,
+                  ruckusUnleashedEventTime,
+                  ruckusUnleashedEventStatus,
+                  ruckusUnleashedEventTitle,
+                  ruckusUnleashedEventAPMacAddr,
+                  ruckusUnleashedEventAPRadioIndex,
+                  ruckusUnleashedEventOccurTime
+                   }
+    STATUS      current
+    DESCRIPTION
+         "AP Radio OFF, the period is 60 seconds"
+    ::= { ruckusUnleashedEventTraps 131 } 
+
+ruckusUnleashedEventMasterAPSwitch NOTIFICATION-TYPE
+    OBJECTS     { ruckusUnleashedEventSerial,
+                  ruckusUnleashedEventNEID,
+                  ruckusUnleashedEventSeverity,
+                  ruckusUnleashedEventType,
+                  ruckusUnleashedEventTime,
+                  ruckusUnleashedEventStatus,
+                  ruckusUnleashedEventTitle,
+                  ruckusUnleashedEventContent}
+    STATUS      current
+    DESCRIPTION
+         "[master ap switch: Unleashed network change master role 
+                 from [172.18.151.1]/[e0:10:7f:28:2d:70] 
+                 into [172.18.151.9]/[6c:aa:b3:3d:66:30]"
+    ::= { ruckusUnleashedEventTraps 138 }    
+    
+--  Trap payload
+--
+
+ruckusUnleashedEventSerial OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Trap serial number."
+    ::= { ruckusUnleashedEventObjects 1 }
+
+ruckusUnleashedEventNEID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Network element ID."
+    ::= { ruckusUnleashedEventObjects 2 }
+
+ruckusUnleashedEventSeverity OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Severity level of the trap."
+    ::= { ruckusUnleashedEventObjects 3 }
+
+ruckusUnleashedEventType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Trap type."
+    ::= { ruckusUnleashedEventObjects 4 }
+
+ruckusUnleashedEventTime OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Time when trap reported."
+    ::= { ruckusUnleashedEventObjects 5 }
+    
+ruckusUnleashedEventStatus OBJECT-TYPE
+    SYNTAX      INTEGER { raise(1),
+                          clear(2) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Trap status."
+    ::= { ruckusUnleashedEventObjects 6 }    
+
+ruckusUnleashedEventTitle OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Trap title."
+    ::= { ruckusUnleashedEventObjects 7 }
+
+ruckusUnleashedEventContent OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Trap content."
+    ::= { ruckusUnleashedEventObjects 8 }    
+    
+ruckusUnleashedEventOccurTime OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Time when trap occur."
+    ::= { ruckusUnleashedEventObjects 10 }    
+    
+ruckusUnleashedEventAPRadioIndex OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "AP radio index, 0, 2.4G, 1, 5G; or 2.4G, 5G. "
+    ::= { ruckusUnleashedEventObjects 11 }        
+
+ruckusUnleashedEventClientMacAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The client's MAC address."
+    ::= { ruckusUnleashedEventObjects 15 }
+
+ruckusUnleashedEventAPMacAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The AP's MAC address. or the AP's name. "
+    ::= { ruckusUnleashedEventObjects 18 }
+    
+ruckusUnleashedEventSSID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "SSID."
+    ::= { ruckusUnleashedEventObjects 23 }    
+    
+ruckusUnleashedEventIpAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IpAddress (ipv4 and ipv6)."
+    ::= { ruckusUnleashedEventObjects 30 }       
+   
+    
+ruckusUnleashedEventAPJoinTrapSwitchCmd OBJECT-TYPE
+    SYNTAX  INTEGER{
+            enable(1),
+            disable(0)} 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "trap switch command."
+        DEFVAL {disable}
+    ::= { ruckusUnleashedEventTrapSwitchCmd 1 }
+    
+ruckusUnleashedEventAPLostTrapSwitchCmd OBJECT-TYPE
+    SYNTAX  INTEGER{
+            enable(1),
+            disable(0)} 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "trap switch command."
+        DEFVAL {disable}
+    ::= { ruckusUnleashedEventTrapSwitchCmd 5 }
+    
+ruckusUnleashedEventAPSystemColdStartTrapSwitchCmd OBJECT-TYPE
+    SYNTAX  INTEGER{
+            enable(1),
+            disable(0)} 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "trap switch command."
+        DEFVAL {disable}
+    ::= { ruckusUnleashedEventTrapSwitchCmd 31 }
+    
+ruckusUnleashedEventAPSystemWarmStartTrapSwitchCmd OBJECT-TYPE
+    SYNTAX  INTEGER{
+            enable(1),
+            disable(0)} 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "trap switch command."
+        DEFVAL {disable}
+    ::= { ruckusUnleashedEventTrapSwitchCmd 32 }   
+   
+ruckusUnleashedEventAPRadioOnTrapSwitchCmd OBJECT-TYPE
+    SYNTAX  INTEGER{
+            enable(1),
+            disable(0)} 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "trap switch command."
+        DEFVAL {disable}
+    ::= { ruckusUnleashedEventTrapSwitchCmd 130 }   
+    
+ruckusUnleashedEventAPRadioOffTrapSwitchCmd OBJECT-TYPE
+    SYNTAX  INTEGER{
+            enable(1),
+            disable(0)} 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "trap switch command."
+        DEFVAL {disable}
+    ::= { ruckusUnleashedEventTrapSwitchCmd 131 }
+
+ruckusUnleashedEventMasterAPSwitchTrapSwitchCmd OBJECT-TYPE
+    SYNTAX  INTEGER{
+            enable(1),
+            disable(0)} 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "trap switch command."
+        DEFVAL {disable}
+    ::= { ruckusUnleashedEventTrapSwitchCmd 138 }     
+    
+END
