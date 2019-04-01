@@ -30,10 +30,7 @@ $pagetitle[] = 'Oxidized';
                             <thead>
                             <tr>
                                 <th data-column-id="hostname" data-order="desc">Hostname</th>
-                                <?php
-                                if (!Config::get('force_ip_to_sysname')) {
-                                    echo '<th data-column-id="sysname">SysName</th>';
-                                }
+                                <?php echo '<th data-column-id="sysname" data-visible="' . (!Config::get('force_ip_to_sysname')  ? 'true' : 'false') . '">SysName</th>';
                                 ?>
                                 <th data-column-id="last_status">Last Status</th>
                                 <th data-column-id="last_update">Last Update</th>
