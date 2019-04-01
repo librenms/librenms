@@ -1349,15 +1349,9 @@ function get_oxidized_nodes_list()
         }
         echo "
         </td>
-        ";
-        if (!Config::get('force_ip_to_sysname')) {
-            echo "
-            <td>
-            " . $device['sysName'] . "
-            </td>
-            ";
-        }
-        echo "
+        <td>
+        " . $device['sysName'] . "
+        </td>
         <td>
         <i class='fa fa-square text-" . $fa_color . "'></i>
         </td>
