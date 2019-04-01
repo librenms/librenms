@@ -28,7 +28,7 @@ import argparse
 from argparse import RawTextHelpFormatter
 import json
 from collections import namedtuple
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 from os import path, chdir
 from socket import gethostbyname, gethostbyaddr, herror, gaierror
 from subprocess import check_output, CalledProcessError
@@ -57,7 +57,7 @@ class Outcome:
 
 
 VERBOSE_LEVEL = 0
-THREADS = 32
+THREADS = min(cpu_count(), 32)
 CONFIG = {}
 EXCLUDED_NETS = []
 start_time = time()
