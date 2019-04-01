@@ -79,6 +79,7 @@ The only sensor we have defined here is airflow. The available options are as fo
   - `num_oid` (required): This is the numerical OID that contains `value`. This should always include `{{ $index }}`.  snmptranslate -On can help figure out the number
   - `divisor` (optional): This is the divisor to use against the returned `value`.
   - `multiplier` (optional): This is the multiplier to use against the returned `value`.
+  - `const` (optional): This is a constant added to the return value AFTER both divisor and multiplier have been processed, if given.
   - `low_limit` (optional): This is the critical low threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
   - `low_warn_limit` (optional): This is the warning low threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
   - `warn_limit` (optional): This is the warning high threshold that `value` should be (used in alerting). If an OID is specified then divisor / multiplier are used.
@@ -97,6 +98,7 @@ For `options:` you have the following available:
 
   - `divisor`: This is the divisor to use against the returned `value`.
   - `multiplier`: This is the multiplier to use against the returned `value`.
+  - `const`: This is the constant to add to the returned `value` (after both multiplier and divisor have been processed).
   - `skip_values`: This is an array of values we should skip over (see note below).
   - `skip_value_lt`: If sensor value is less than this, skip the discovery.
   - `skip_value_gt`: If sensor value is greater than this, skip the discovery.
@@ -138,6 +140,7 @@ exception of state which requires additional code.
   - $descr = Required. This is a descriptive value for the sensor. Some devices will provide names to use.
   - $divisor = Defaults to 1. This is used to divided the returned value.
   - $multiplier = Defaults to 1. This is used to multiply the returned value.
+  - $const = Defaults to 0. This is added to the returned value after both $divisor and $multiplier have been processed.
   - $low_limit = Defaults to null. Sets the low threshold limit for the sensor, used in alerting to report out range sensors.
   - $low_warn_limit = Defaults to null. Sets the low warning limit for the sensor, used in alerting to report near out of range sensors.
   - $warn_limit = Defaults to null. Sets the high warning limit for the sensor, used in alerting to report near out of range sensors.
