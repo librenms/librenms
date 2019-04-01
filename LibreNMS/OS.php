@@ -141,7 +141,7 @@ class OS implements ProcessorDiscovery
             return null;
         }
 
-        if (!isset($this->cache[$oid])) {
+        if (!isset($this->cache['group'][$depth][$oid])) {
             $this->cache['group'][$depth][$oid] = snmpwalk_group($this->getDevice(), $oid, $mib, $depth);
         }
 
