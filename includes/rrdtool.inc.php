@@ -227,11 +227,12 @@ function rrdtool_build_command($command, $filename, $options)
  */
 function rrdtool_check_rrd_exists($filename)
 {
-    global $config;
-    if ($config['rrdcached'] && version_compare(Config::get('rrdtool_version', '1.4'), '1.5', '>=')) {
-        $chk = rrdtool('last', $filename, '');
-        $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
-        return !str_contains(implode($chk), "$filename': No such file or directory");
+    if (Config::get('rrdcached') && version_compare(Config::get('rrdtool_version', '1.4'), '1.5', '>=')) {
+        $chk = implode(rrdtool('last', $filename, ''));
+        return !(
+            str_contains($chk, "No such file or directory") &&
+            str_contains($chk, ltrim(str_replace(Config::get('rrd_dir'), '', $filename), '/'))
+        );
     } else {
         return is_file($filename);
     }
