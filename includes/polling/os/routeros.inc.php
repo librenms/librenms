@@ -26,3 +26,19 @@ if (is_numeric($leases)) {
 }
 
 unset($leases);
+
+$pppoe_sessions = snmp_get($device, '1.3.6.1.4.1.9.9.150.1.1.1.0', '-OQv', '', '');
+
+if (is_numeric($pppoe_sessions)) {
+    $rrd_def = RrdDefinition::make()->addDataset('pppoe_sessions', 'GAUGE', 0);
+
+    $fields = array(
+        'pppoe_sessions' => $pppoe_sessions,
+    );
+
+    $tags = compact('rrd_def');
+    data_update($device, 'routeros_pppoe_sessions', $tags, $fields);
+    $graphs['routeros_pppoe_sessions'] = true;
+}
+
+unset($pppoe_sessions);
