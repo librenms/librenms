@@ -79,7 +79,7 @@ if ($_REQUEST['action'] == 'read' && isset($_REQUEST['notification_id'])) {
             'message' => 'Removed Sticky',
         ]));
     }
-} elseif ($_REQUEST['action'] == 'create' && (isset($_REQUEST['title']) && isset($_REQUEST['body']))) {
+} elseif ($_REQUEST['action'] == 'create' && (!empty($_REQUEST['title']) && !empty($_REQUEST['body']))) {
     if (dbInsert(['title'=>$_REQUEST['title'],'body'=>$_REQUEST['body'],'checksum'=>hash('sha512', LegacyAuth::id().'.LOCAL.'.$_REQUEST['title']),'source'=>LegacyAuth::id()], 'notifications')) {
         die(json_encode([
             'status' => 'ok',
