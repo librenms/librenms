@@ -210,11 +210,9 @@ $(function() {
       dataType: "json",
       success: function (data) {
         if( data.status == "ok" ) {
-          $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
           window.location.href="notifications";
-        }
-        else {
-          $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+        } else {
+          toastr.error(data.message);
         }
       }
     });
