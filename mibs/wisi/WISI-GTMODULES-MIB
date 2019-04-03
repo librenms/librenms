@@ -1,0 +1,580 @@
+
+WISI-GTMODULES-MIB DEFINITIONS ::= BEGIN
+--============================================================================--
+
+IMPORTS
+	MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+		FROM SNMPv2-CONF
+
+	Counter32, Unsigned32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+		FROM SNMPv2-SMI
+
+	DisplayString
+		FROM SNMPv2-TC
+
+	gtUnit
+		FROM WISI-TANGRAM-MIB;
+
+--------------------------------------------------------------------------------
+
+gtModulesMIB MODULE-IDENTITY
+	LAST-UPDATED "201609080000Z"
+	ORGANIZATION "WISI Communications GmbH & Co. KG"
+	CONTACT-INFO
+		"https://wisiconnect.tv/"
+	DESCRIPTION
+		"This MIB module represents the modules within a system (rack
+		unit) of a WISI next-generation headend. It provides general
+		module information, such as the hardware or firmware ID as well
+		as an unique serial number."
+
+	REVISION "201609080000Z"
+	DESCRIPTION
+		"Added gtModuleReboot to gtModulesTable. Made module power
+		a writeable enumerated value. Updated contact information."
+	REVISION "201606080000Z"
+	DESCRIPTION
+		"Renamed scalar gtModuleSlot to avoid clash with gtModuleTable column."
+	REVISION "201506160000Z"
+	DESCRIPTION
+		"Changes: 	Added FWIDUploaded to gtModulesTable.."
+	REVISION "201307290000Z"
+	DESCRIPTION
+		"Changes: Added module status for N+1 redundancy to table gtModulesTable"
+	REVISION "201306260000Z"
+	DESCRIPTION
+		"Changes: Added notifications for N+1 redundancy and module status used in GT11."
+	REVISION "201210310000Z"
+	DESCRIPTION
+		"Changes: Added inputs and outputs list."
+	REVISION "201112130000Z"
+	DESCRIPTION
+		"Changes: Updated MIBs to revision 11 for AixSolve (GT22)."
+	REVISION "201109080000Z"
+	DESCRIPTION
+		"Updated representation of versions."
+	REVISION "201104010000Z"
+	DESCRIPTION
+		"Initial version."
+::= { gtUnit 2 }
+
+--------------------------------------------------------------------------------
+
+gtModulesNotifications OBJECT IDENTIFIER ::= { gtModulesMIB 0 }
+gtModulesObjects OBJECT IDENTIFIER ::= { gtModulesMIB 1 }
+gtModulesConformance OBJECT IDENTIFIER ::= { gtModulesMIB 2 }
+gtModulesCompliances OBJECT IDENTIFIER ::= { gtModulesConformance 1 }
+gtModulesGroups OBJECT IDENTIFIER ::= { gtModulesConformance 2 }
+
+--============================================================================--
+
+gtModulesNotifyPlugin NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtModulesNotifyPlugin notification indicates that
+	    a new SFM/MFM module has been plugged in the GT01/GN50 rack unit."
+::= { gtModulesNotifications 1 }
+
+gtModulesNotifyPlugout NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtModulesNotifyPlugout notification indicates that
+	    an SFM/MFM module has been plugged out of the GT01/GN50 rack unit."
+::= { gtModulesNotifications 2 }
+
+gtModulesNotifyFailure NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtModulesNotifyFailure notification indicates that
+	    GT11 has status failure detected on SFM/MFM module"
+::= { gtModulesNotifications 3 }
+
+gtModulesNotifyRedundancy NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtModulesNotifyRedundancy notification indicates that
+	    GT11 has replaced a faulty SFM/MFM module with reserved SFM/MFM module"
+::= { gtModulesNotifications 4 }
+
+gtModulesNotifyRedundancyClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtModulesNotifyRedundancyClear notification indicates that
+	    GT11 has replaces the SFM/MFM reserve module with a new SFM/MFM master module"
+::= { gtModulesNotifications 5 }
+
+gtModulesNotifyFailureClear NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+	    "The gtModulesNotifyFailureClear notification indicates that
+	    GT11 has status failure cleared detected on SFM/MFM module"
+::= { gtModulesNotifications 6 }
+
+--============================================================================--
+
+gtThisModuleSlot OBJECT-TYPE
+	SYNTAX Unsigned32 (1..15)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtThisModuleSlot entity represents the slot where the
+		agent module is plugged in."
+::= { gtModulesObjects 1 }
+
+--------------------------------------------------------------------------------
+
+gtNumModules OBJECT-TYPE
+	SYNTAX Unsigned32 (0..15)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtNumModules entity represents the number of
+		SFM/MFM modules within the GT01/GN50 rack unit.
+		The related entries are provided by gtModulesTable."
+::= { gtModulesObjects 2 }
+
+--------------------------------------------------------------------------------
+
+gtModulesTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtModulesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtModulesTable table contains a list of all
+		SFM/MFM modules within the GT01/GN50 rack unit.
+		The number of entries is provided by gtNumModules."
+::= { gtModulesObjects 3 }
+
+gtModulesEntry OBJECT-TYPE
+	SYNTAX GtModulesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtModulesEntry table entry represents a
+		SFM/MFM module within the GT01/GN50 rack unit.
+		The number of entries is provided by gtNumModules."
+	INDEX {
+		gtModule
+	}
+::= { gtModulesTable 1 }
+
+GtModulesEntry ::= SEQUENCE {
+	gtModule Unsigned32,
+	gtModuleName DisplayString,
+	gtModuleHWID DisplayString,
+	gtModuleFWID DisplayString,
+	gtModuleSerNo DisplayString,
+	gtModuleUptime Counter32,
+	gtModuleLifetime Counter32,
+	gtModulePower INTEGER,
+	gtModuleMode DisplayString,
+	gtModuleStatus DisplayString,
+	gtModuleSlot Unsigned32,
+	gtModuleFWIDUploaded DisplayString,
+	gtModuleReboot INTEGER
+}
+
+gtModule OBJECT-TYPE
+	SYNTAX Unsigned32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtModule entity represents the numeric index
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModulesEntry 1 }
+
+gtModuleName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtModule entity represents the symbolic index
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModulesEntry 2 }
+
+gtModuleHWID OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtModule entity represents the hardware revision
+		of a SFM/MFM module within the GT01/GN50 rack unit.
+		HWID := Major.PCB.BOM.Rework"
+::= { gtModulesEntry 3 }
+
+gtModuleFWID OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtModule entity represents the firmware revision
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModulesEntry 4 }
+
+gtModuleSerNo OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtModule entity represents the unique serial number
+		of a SFM/MFM module within the GT01/GN50 rack unit.
+		SerNo := DDDOPYYMMDDSSSSS, whereby DDD = Device ID,
+		O = OEM code, P = production place, YYMMDD = year-month-day,
+		SSSSS = serial number during a day."
+::= { gtModulesEntry 5 }
+
+gtModuleUptime OBJECT-TYPE
+	SYNTAX Counter32
+	UNITS "s"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtModule entity represents the current uptime
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModulesEntry 6 }
+
+gtModuleLifetime OBJECT-TYPE
+	SYNTAX Counter32
+	UNITS "s"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtModule entity represents the accumulated lifetime
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModulesEntry 7 }
+
+gtModulePower OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtModule entity represents the current power state
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModulesEntry 8 }
+
+gtModuleMode OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtModule entity represents the current N+1 redundancy mode
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModulesEntry 9 }
+
+gtModuleStatus OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtModule entity represents the current status
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModulesEntry 10 }
+
+gtModuleSlot OBJECT-TYPE
+	SYNTAX Unsigned32 (1..15)
+	MAX-ACCESS read-only
+	STATUS deprecated
+	DESCRIPTION
+		"The gtModule entity represents the slot id
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModulesEntry 11 }
+
+gtModuleFWIDUploaded OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtModule entity represents the uploaded firmware revision
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModulesEntry 12 }
+
+gtModuleReboot OBJECT-TYPE
+	SYNTAX INTEGER { running(0), reboot(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtModuleReboot entity can be used to reboot an SFM/MFM
+		module within the GT01/GN50 rack unit. During normal
+		operations, reading this object will return a value of
+		running(0) and writing a value of reboot(1) to it will cause
+		the module to reboot."
+::= { gtModulesEntry 13 }
+
+--------------------------------------------------------------------------------
+
+gtNumCapabilities OBJECT-TYPE
+	SYNTAX Unsigned32 (0..15)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtNumCapabilities entity represents the number of
+		streaming capabilites within the GT01/GN50 rack unit.
+		The related entries are provided by gtModulesTable."
+::= { gtModulesObjects 4 }
+
+--------------------------------------------------------------------------------
+
+gtCapabilitiesTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtCapabilitiesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtCapabilitiesTable table contains a list of all
+		streaming capabilites within the GT01/GN50 rack unit.
+		The number of entries is provided by gtNumCapabilities."
+::= { gtModulesObjects 5 }
+
+gtCapabilitiesEntry OBJECT-TYPE
+	SYNTAX GtCapabilitiesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtCapabilitiesEntry table entry represents a
+		streaming capability within the GT01/GN50 rack unit.
+		The number of entries is provided by gtNumCapabilities."
+	INDEX {
+		gtModule,
+		gtChannel,
+		gtCapability
+	}
+::= { gtCapabilitiesTable 1 }
+
+GtCapabilitiesEntry ::= SEQUENCE {
+	gtChannel Unsigned32,
+	gtCapability Unsigned32
+}
+
+gtChannel OBJECT-TYPE
+	SYNTAX Unsigned32 (1..4095)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtChannel entity represents the numeric index
+		of a streaming capability within the GT01/GN50 rack unit."
+::= { gtCapabilitiesEntry 1 }
+
+gtCapability OBJECT-TYPE
+	SYNTAX Unsigned32 (1..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtCapability entity represents the numeric index
+		of a streaming capability within the GT01/GN50 rack unit."
+::= { gtCapabilitiesEntry 2 }
+
+--------------------------------------------------------------------------------
+
+gtInputsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtInputsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtInputsTable table contains a list of all
+		inputs on a SFM/MFM module."
+::= { gtModulesObjects 7 }
+
+gtInputsEntry OBJECT-TYPE
+	SYNTAX GtInputsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtInputsEntry table entry represents an
+		input on a SFM/MFM module."
+	INDEX {
+		gtModule,
+                gtInputsTableIdx
+	}
+::= { gtInputsTable 1 }
+
+GtInputsEntry ::= SEQUENCE {
+	gtInputsTableIdx Unsigned32,
+	gtInputChannel OBJECT IDENTIFIER,
+	gtInputName DisplayString
+}
+
+gtInputsTableIdx OBJECT-TYPE
+	SYNTAX Unsigned32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtInputsTableIdx entity represents the numeric index
+		of an input on a SFM/MFM module."
+::= { gtInputsEntry 1 }
+
+gtInputChannel OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtInputChannel referer to the settings table specific
+                to the current type of input on a SFM/MFM module."
+::= { gtInputsEntry 2 }
+
+gtInputName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtInputName entity represents the descriptive name
+		of an input on a SFM/MFM module."
+::= { gtInputsEntry 3 }
+
+--------------------------------------------------------------------------------
+
+gtOutputsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtOutputsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtOutputsTable table contains a list of all
+		outputs on a SFM/MFM module."
+::= { gtModulesObjects 8 }
+
+gtOutputsEntry OBJECT-TYPE
+	SYNTAX GtOutputsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtOutputsEntry table entry represents an
+		output on a SFM/MFM module."
+	INDEX {
+		gtModule,
+                gtOutputsTableIdx
+	}
+::= { gtOutputsTable 1 }
+
+GtOutputsEntry ::= SEQUENCE {
+	gtOutputsTableIdx Unsigned32,
+        gtOutputChannel OBJECT IDENTIFIER,
+	gtOutputName DisplayString
+}
+
+gtOutputsTableIdx OBJECT-TYPE
+	SYNTAX Unsigned32 (1..256)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtOutputsTableIdx entity represents the numeric index
+		of an output on a SFM/MFM module."
+::= { gtOutputsEntry 1 }
+
+gtOutputChannel OBJECT-TYPE
+	SYNTAX OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtOutputChannel referer to the settings table specific
+                to the current type of output on a SFM/MFM module."
+::= { gtOutputsEntry 2 }
+
+gtOutputName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtOutputName entity represents the descriptive name
+		of an output on a SFM/MFM module."
+::= { gtOutputsEntry 3 }
+
+--============================================================================--
+
+gtModulesMIBCompliance MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION
+		"The compliance statement for GTMODULESv2 entities
+		which implement the GTMODULESv2 MIB."
+	MODULE
+	MANDATORY-GROUPS {
+		gtModulesV1Group,
+		gtModulesSystemGroup,
+		gtModulesStatsGroup,
+		gtModulesTrapGroup,
+		gtModulesSetGroup,
+		gtModulesBasicNotificationsGroup
+	}
+::= { gtModulesCompliances 1 }
+
+--------------------------------------------------------------------------------
+
+gtModulesV1Group OBJECT-GROUP
+	OBJECTS {
+		gtThisModuleSlot,
+		gtNumModules,
+		gtModuleName,
+		gtModuleHWID,
+		gtModuleFWID,
+		gtModuleSerNo
+	}
+	STATUS current
+	DESCRIPTION
+		"The gtModulesV1Group group is mandatory only for those
+		GTMODULESv2 entities which also implement GTMODULESv1."
+::= { gtModulesGroups 1 }
+
+--------------------------------------------------------------------------------
+
+gtModulesSystemGroup OBJECT-GROUP
+	OBJECTS {
+		gtThisModuleSlot,
+		gtNumModules,
+		gtModuleName,
+		gtModuleHWID,
+		gtModuleFWID,
+		gtModuleSerNo,
+		gtCapability
+	}
+	STATUS current
+	DESCRIPTION
+		"The gtModulesSystemGroup group defines GTMODULESv2 entities
+		which are mandatory."
+::= { gtModulesGroups 2 }
+
+--------------------------------------------------------------------------------
+
+gtModulesStatsGroup OBJECT-GROUP
+	OBJECTS {
+		gtNumModules,
+		gtModuleUptime,
+		gtModuleLifetime,
+		gtNumCapabilities
+	}
+	STATUS current
+	DESCRIPTION
+		"The gtModulesStatsGroup group defines GTMODULESv2 entities
+		which provide statistical information."
+::= { gtModulesGroups 3 }
+
+--------------------------------------------------------------------------------
+
+gtModulesTrapGroup OBJECT IDENTIFIER --OBJECT-GROUP
+--	STATUS current
+--	DESCRIPTION
+--		"The gtModulesTrapGroup group defines GTMODULESv2 trap objects
+--		which are mandatory."
+::= { gtModulesGroups 4 }
+
+--------------------------------------------------------------------------------
+
+gtModulesSetGroup OBJECT IDENTIFIER --OBJECT-GROUP
+--	STATUS current
+--	DESCRIPTION
+--		"The gtModulesSetGroup group defines GTMODULESv2 entities
+--		which can be set the manager."
+::= { gtModulesGroups 5 }
+
+--------------------------------------------------------------------------------
+
+gtModulesBasicNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		gtModulesNotifyPlugin,
+		gtModulesNotifyPlugout
+	}
+	STATUS current
+	DESCRIPTION
+		"The gtModulesBasicNotificationsGroup group defines
+		GTMODULESv2 notification objects which are mandatory."
+::= { gtModulesGroups 6 }
+
+--============================================================================--
+END
+
