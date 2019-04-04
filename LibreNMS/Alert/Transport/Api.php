@@ -41,6 +41,7 @@ class Api extends Transport
         list($host, $api) = explode("?", $api, 2);
         foreach ($obj as $k => $v) {
             $api = str_replace("%" . $k, $method == "get" ? urlencode($v) : $v, $api);
+            $api = str_replace("{{ $" . $k . " }}", $method == "get" ? urlencode($v) : $v, $api);
         }
         //  var_dump($api); //FIXME: propper debuging
         $curl = curl_init();
