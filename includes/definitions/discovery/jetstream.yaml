@@ -1,4 +1,4 @@
-mib: TPLINK-MIB:TPLINK-PRODUCTS-MIB:TPLINK-SYSMONITOR-MIB
+mib: TPLINK-SYSMONITOR-MIB
 modules:
     processors:
           data:
