@@ -61,10 +61,12 @@ __Note__: it is highly recommended to define your own [Templates](Templates.md) 
 
 **Example:**
 
+The exemple below will use the API named sms-api of my.example.com and send the title of the alert to the provided number using the provided service key. Refer to your service documentation to configure it properly.
+
 | Config | Example |
 | ------ | ------- |
 | API Method | get |
-| API URL    | http://my.example.com/api |
+| API URL    | http://my.example.com/sms-api?rcpt=0123456789&key=0987654321abcdef&msg=(LNMS) {{ $title }} |
 
 ## Boxcar
 Copy your access token from the Boxcar app or from the Boxcar.io website and setup the transport.

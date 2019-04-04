@@ -16,6 +16,7 @@
 /**
  * API Transport
  * @author f0o <f0o@devilcode.org>
+ * @author PipoCanaja (github.com/PipoCanaja)
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
  * @package LibreNMS
@@ -25,39 +26,64 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use App\Models\AlertTemplate;
 
 class Api extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
         $url = $this->config['api-url'];
+        $options = $this->config['api-options'];
         $method = $this->config['api-method'];
-        return $this->contactAPI($obj, $url, $method);
+        return $this->contactAPI($obj, $url, $options, $method);
     }
 
-    private function contactAPI($obj, $api, $method)
+    private function contactAPI($obj, $api, $options, $method)
     {
         $method = strtolower($method);
-        list($host, $api) = explode("?", $api, 2);
-        foreach ($obj as $k => $v) {
-            $api = str_replace("%" . $k, $method == "get" ? urlencode($v) : $v, $api);
-            $api = str_replace("{{ $" . $k . " }}", $method == "get" ? urlencode($v) : $v, $api);
+        $host = explode("?", $api, 2)[0]; //we don't use the parameter part, cause we build it out of options. 
+
+        //Split the line of options
+        $params_lines = preg_split("/\\r\\n|\\r|\\n/", $options);
+
+        //get the key-values
+        
+        foreach ($params_lines as $current_line) {
+            list($k, $v) = explode('=', $current_line, 2);
+            try {
+                // process the variables on the value
+                $value_processed = view(['template' => $v], $obj)->__toString();
+            } catch (\Exception $e) {
+                echo "Exception e";
+                var_dump($e);
+            }
+            //store the parameter in the array
+            $params[] = $k . '=' . rawurlencode($value_processed);
         }
-        //  var_dump($api); //FIXME: propper debuging
+
+        $params_string = '';
+        
+        if (isset($params)) {
+            //We have at least one param
+            $params_string = '?' . implode('&', $params);
+        }
+
         $curl = curl_init();
         set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_URL, ($method == "get" ? $host."?".$api : $host));
+        curl_setopt($curl, CURLOPT_URL, ($method == "get" ? $host.$params_string : $host));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, strtoupper($method));
         if (json_decode($api) !== null) {
             curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
         }
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $api);
+        if (isset($params)) {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, implode('&', $params));
+        }
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
             var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump("Params: ".$api); //FIXME: propper debuging
+            var_dump("Params: ".implode(PHP_EOL, $params); //FIXME: propper debuging
             var_dump("Return: ".$ret); //FIXME: propper debuging
             return 'HTTP Status code '.$code;
         }
@@ -84,11 +110,18 @@ class Api extends Transport
                     'name' => 'api-url',
                     'descr' => 'API URL',
                     'type' => 'text',
+                ],
+                [
+                    'title' => 'Options',
+                    'name' => 'api-options',
+                    'descr' => 'Enter the options (format: option=value separated by new lines)',
+                    'type' => 'textarea',
                 ]
             ],
             'validation' => [
                 'api-method' => 'in:GET,POST',
-                'api-url' => 'required|url'
+                'api-url' => 'required|url',
+                'api-options' => 'required|string'
             ]
         ];
     }
