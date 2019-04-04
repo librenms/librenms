@@ -58,7 +58,10 @@ if ($ports['total']) {
 
     $ifsep = '';
 
-    foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1' AND `disabled` = 0 ORDER BY ifName", array($device['device_id'])) as $data) {
+    $results = dbFetch("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1' AND `disabled` = 0", array($device['device_id']));
+    $results = collect($results)->sortBy('ifName', SORT_NATURAL);
+
+    foreach ($results as $data) {
         $data = cleanPort($data);
         $data = array_merge($data, $device);
         echo "$ifsep".generate_port_link($data, makeshortif(strtolower($data['label'])));

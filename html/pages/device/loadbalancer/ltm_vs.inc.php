@@ -16,6 +16,7 @@ $components = $component->getComponents($device['device_id'], array('filter' => 
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
+$components = collect($components)->sortBy('label', SORT_NATURAL);
 
 // We extracted all the components for this device, now lets only get the LTM ones.
 $keep = array();

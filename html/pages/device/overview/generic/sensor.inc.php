@@ -5,6 +5,8 @@ if ($sensor_class == 'state') {
     $sensors = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND device_id = ? ORDER BY `group`, `sensor_descr`, `sensor_oid`, `sensor_index`', array($sensor_class, $device['device_id']));
 }
 
+$sensors = collect($results)->sortBy('sensor_descr', SORT_NATURAL);
+
 if (count($sensors)) {
     $icons = \App\Models\Sensor::getIconMap();
     $sensor_fa_icon = 'fa-' . (isset($icons[$sensor_class]) ? $icons[$sensor_class] : 'delicious');
