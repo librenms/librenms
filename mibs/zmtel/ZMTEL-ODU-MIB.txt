@@ -1,0 +1,672 @@
+
+-- File Name  : ZMTEL-ODU-MIB.txt
+-- Description: LTE ODU project enterprise MIB tree
+-- Date       : 2015.08.03
+
+------------------------------------------------------------------------------
+
+
+ZMTEL-ODU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises, OBJECT-TYPE, Integer32, Unsigned32, Gauge32,
+    NOTIFICATION-TYPE, OBJECT-IDENTITY, TimeTicks, Counter64
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+ NetworkAddress,IpAddress
+   FROM RFC1155-SMI;
+
+ZMTEL MODULE-IDENTITY
+        LAST-UPDATED "1508030000Z"
+  ORGANIZATION "Zmtel Co. Ltd."
+  CONTACT-INFO "Zmtel Co. Ltd.
+                         E-mail: zmtel@zmtel.com"
+  DESCRIPTION  "Zmtel MIB OID defines and documentation."
+  REVISION  "1508030000Z"
+  DESCRIPTION  "Initial MIB creation."
+        ::= { enterprises 38595 }
+
+ODU OBJECT-IDENTITY
+    STATUS   current
+    DESCRIPTION  "Zmtel ODU MIB OID defines."
+    ::= { ZMTEL 10 }
+
+
+deviceInfo OBJECT IDENTIFIER ::= { ODU 1 }
+systemInfo OBJECT IDENTIFIER ::= { ODU 2 }
+lteInfo OBJECT IDENTIFIER ::= { ODU 3 }
+wanInfo OBJECT IDENTIFIER ::= { ODU 4 }
+lanInfo OBJECT IDENTIFIER ::= { ODU 5 }
+
+
+--&gt; 1.Device Information
+vendor OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..32))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates the device vendor."
+        ::= { deviceInfo 1 }
+
+--productName OBJECT-TYPE
+--  SYNTAX  OCTET STRING (SIZE (0..32))
+--  MAX-ACCESS read-only
+--  STATUS  current
+--  DESCRIPTION "Indicates the device product name."
+--        ::= { deviceInfo 2 }
+
+modelName OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..32))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates the device model name."
+        ::= { deviceInfo 3 }
+
+hardwareVersion OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..32))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates the device hardware version."
+        ::= { deviceInfo 4 }
+
+SN OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..32))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates the device serial number."
+        ::= { deviceInfo 5 }
+
+moduleSN OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..32))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates the module serial number."
+        ::= { deviceInfo 6 }
+
+softwareVersion OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..32))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates the software version."
+        ::= { deviceInfo 7 }
+
+firmwareVersion OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..32))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates the firmware version."
+        ::= { deviceInfo 8 }
+
+bootROM OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..32))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates the bootROM version."
+        ::= { deviceInfo 9 }
+
+IMEI OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..20))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates device IMEI."
+        ::= { deviceInfo 10 }
+
+IMSI OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..20))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates USIM card IMSI."
+        ::= { deviceInfo 11 }
+
+lteBand OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..32))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates support LTE bands."
+        ::= { deviceInfo 12 }
+
+reboot OBJECT-TYPE
+        SYNTAX  INTEGER{ true(1), false(0) }
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION "Reboot the device."
+        ::= { deviceInfo 13 }
+        
+reset OBJECT-TYPE
+        SYNTAX  INTEGER{ true(1), false(0) }
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION "Factory reset."
+        ::= { deviceInfo 14 }
+
+--&gt; 2.System Information
+deviceUpTime OBJECT-TYPE
+  SYNTAX  Unsigned32
+  UNITS  "Second"
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates the seconds when device is up."
+        ::= { systemInfo 1 }
+
+cpuUsageCurrent OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates current cpu usage, such as 30%."
+        ::= { systemInfo 2 }
+
+cpuUsageMax OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates max cpu usage, such as 60%."
+        ::= { systemInfo 3 }
+
+cpuUsageMin OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates min cpu usage, such as 10%."
+        ::= { systemInfo 4 }
+
+memTotal OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates system total memory size, such as 37904 KB."
+        ::= { systemInfo 5 }
+
+memUsageCurrent OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates current memory usage, such as 81%."
+        ::= { systemInfo 6 }
+
+memUsageMax OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates max memory usage, such as 81%."
+        ::= { systemInfo 7 }
+
+memUsageMin OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates min memory usage, such as 69%."
+        ::= { systemInfo 8 }
+
+firewall OBJECT-TYPE
+  SYNTAX  Integer32 { Disabled(0), Enabled(1) }
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates firewall status,disabled or enabled ."
+        ::= { systemInfo 9 }
+
+
+
+--&gt; 3.LTE Information
+lteConnectionTime OBJECT-TYPE
+  SYNTAX  Unsigned32  -- unit:second
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates the seconds when device is connected to the LTE mobile network."
+        ::= { lteInfo 1 }
+
+usimCardStatus OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the USIM Card status."
+        ::= { lteInfo 2 }
+
+lteNetworkStatus OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..32))
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the LTE mobile network connection status."
+        ::= { lteInfo 3 }
+
+lteDuplexMode OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the lte mobile network duplex mode,TDD or FDD."
+        ::= { lteInfo 4 }
+
+operator OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network operator."
+        ::= { lteInfo 5 }
+
+dlMCS OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network downlink MCS."
+        ::= { lteInfo 6 }
+
+ulMCS OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network uplink MCS."
+        ::= { lteInfo 7 }
+
+dlFrequency OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network downlink frequency(KHz)."
+        ::= { lteInfo 8 }
+
+ulFrequency OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network uplink frequency(KHz)."
+        ::= { lteInfo 9 }
+
+bandwidth OBJECT-TYPE
+  SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network bandwidth(KHz)."
+        ::= { lteInfo 10 }
+
+rsrp0 OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network RSRP0(dBm)."
+        ::= { lteInfo 11 }
+
+rsrp1 OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network RSRP1(dBm)."
+        ::= { lteInfo 12 }
+
+rsrq OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network RSRQ(dB)."
+        ::= { lteInfo 13 }
+
+rssi OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network RSSI(dBm)."
+        ::= { lteInfo 14 }
+
+sinr OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network SINR(dB)."
+        ::= { lteInfo 15 }
+
+cinr0 OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network CINR0(dB)."
+        ::= { lteInfo 16 }
+
+cinr1 OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network CINR1(dB)."
+        ::= { lteInfo 17 }
+
+txPower OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network TX Power(dBm)."
+        ::= { lteInfo 18 }
+
+pCID OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network physical cell id."
+        ::= { lteInfo 19 }
+
+eNBID OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network eNB id."
+        ::= { lteInfo 20 }
+
+cellID OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network physical cell id of the detected cell."
+        ::= { lteInfo 21 }
+
+MCC OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network MCC."
+        ::= { lteInfo 22 }
+
+MNC OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network MNC."
+        ::= { lteInfo 23 }
+
+dlDataRateCurrent OBJECT-TYPE
+        SYNTAX  Counter64  -- unit:Bytes/s
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network downlink current data rate(Bytes/s)."
+        ::= { lteInfo 24 }
+        
+dlDataRateMax OBJECT-TYPE
+        SYNTAX  Counter64  -- unit:Bytes/s
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network downlink maximum data rate(Bytes/s)."
+        ::= { lteInfo 25 }
+        
+dlDataRateMin OBJECT-TYPE
+        SYNTAX  Counter64  -- unit:Bytes/s
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network downlink minimum data rate(Bytes/s)."
+        ::= { lteInfo 26 }
+        
+ulDataRateCurrent OBJECT-TYPE
+        SYNTAX  Counter64  -- unit:Bytes/s
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network uplink current data rate(Bytes/s)."
+        ::= { lteInfo 27 }
+        
+ulDataRateMax OBJECT-TYPE
+        SYNTAX  Counter64  -- unit:Bytes/s
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network uplink maximum data rate(Bytes/s)."
+        ::= { lteInfo 28 }
+        
+ulDataRateMin OBJECT-TYPE
+        SYNTAX  Counter64  -- unit:Bytes/s
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the mobile network uplink minimum data rate(Bytes/s)."
+        ::= { lteInfo 29 }
+
+apnTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ApnEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Indicates all LTE APNs information."
+        ::= { lteInfo 30 }
+
+apnEntry OBJECT-TYPE
+        SYNTAX        ApnEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Entry contains information of APN."
+        INDEX         { apnEntryIndex }
+        ::= { apnTable 1 }
+
+ulEARFCN OBJECT-TYPE
+        SYNTAX  Counter64  
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the uplink EARFCN."
+        ::= { lteInfo 31 }
+
+dlEARFCN OBJECT-TYPE
+        SYNTAX  Counter64  
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates the downlink EARFCN."
+        ::= { lteInfo 32 }
+        
+ApnEntry ::= SEQUENCE {
+                apnEntryIndex   Unsigned32,
+                apnName     OCTET STRING,
+                
+                apnStatus    INTEGER,
+                apnIpAddress   IpAddress,
+                apnSubnetMask   IpAddress,
+                
+                apnRxTotalTraffic  Counter64,
+                apnRxPackets   Counter64,
+                apnRxErrorPackets  Counter64,
+                apnRxDroppedPackets  Counter64,
+                
+                apnTxTotalTraffic  Counter64,
+                apnTxPackets   Counter64,
+                apnTxErrorPackets  Counter64,
+                apnTxDroppedPackets  Counter64
+                }
+
+apnEntryIndex OBJECT-TYPE
+  SYNTAX  Unsigned32 (1..4)
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION "APN index."
+        ::= { apnEntry  1 }
+
+apnName OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..256))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "APN name."
+        ::= { apnEntry 2 }
+
+apnStatus OBJECT-TYPE
+  SYNTAX  INTEGER { Disabled(0), Enabled(1) }
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "Indicates an APN status,disabled or enabled."
+        ::= { apnEntry 3 }
+
+apnIpAddress OBJECT-TYPE
+  SYNTAX  IpAddress
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "APN ip address."
+        ::= { apnEntry 4 }
+
+apnSubnetMask OBJECT-TYPE
+  SYNTAX  IpAddress
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "APN subnet mask."
+        ::= { apnEntry 5 }
+
+apnRxTotalTraffic OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates an APN Rx total traffic(Bytes)."
+        ::= { apnEntry 6 }
+
+apnRxPackets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates an APN Rx(Receive) packets number."
+        ::= { apnEntry 7 }
+
+apnRxErrorPackets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates an APN Rx(Receive) error packets number."
+        ::= { apnEntry 8 }
+
+apnRxDroppedPackets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates an APN Rx(Receive) dropped packets number."
+        ::= { apnEntry 9 }
+
+apnTxTotalTraffic OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates an APN Tx(Send) total traffic."
+        ::= { apnEntry 10 }
+
+apnTxPackets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates an APN Tx(Send) packets number."
+        ::= { apnEntry 11 }
+
+apnTxErrorPackets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates an APN Tx(Send) error packets number."
+        ::= { apnEntry 12 }
+
+apnTxDroppedPackets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates an APN Tx(Send) dropped packets number."
+        ::= { apnEntry 13 }
+
+
+
+--&gt; 4.WAN Information
+wanMode OBJECT-TYPE
+        SYNTAX  Integer32 { NAT(0), Router(1), Bridge(2) }
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates WAN mode, NAT/Router/Bridge."
+        ::= { wanInfo 1 }
+
+wanType OBJECT-TYPE
+        SYNTAX  Integer32 { DHCP(0), Static(1) }
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates WAN type, DHCP/Static."
+        ::= { wanInfo 2 }
+
+wanDnsServer OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (0..128))
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates WAN dns server ip address,such as 213.172.33.34."
+        ::= { wanInfo 3 }
+
+wanTimeServer OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (0..128))
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates WAN time server ip address(NTP Server IP Address),such as 213.172.43.4."
+        ::= { wanInfo 4 }
+
+
+
+--&gt; 5.LAN Information
+lanType OBJECT-TYPE
+        SYNTAX  Integer32 { DHCP(0), Static(1) }
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates LAN type,DHCP/Static."
+        ::= { lanInfo 1 }
+
+lanMacAddress OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (0..20))
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates LAN mac address,such as '00:12:61:00:85:DB'."
+        ::= { lanInfo 2 }
+
+lanIpAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates LAN ip address,such as '192.168.1.1'."
+        ::= { lanInfo 3 }
+
+lanSubnetMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates LAN subnet mask,such as '255.255.255.0'."
+        ::= { lanInfo 4 }
+
+lanRxTotalTraffic OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates LAN Rx(Receive) total traffic(Bytes)."
+        ::= { lanInfo 5 }
+
+lanRxPackets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates LAN Rx(Receive) packets number."
+        ::= { lanInfo 6 }
+
+lanRxErrorPackets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates LAN Rx(Receive) error packets number."
+        ::= { lanInfo 7 }
+
+lanRxDroppedPackets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates LAN Rx(Receive) dropped packets number."
+        ::= { lanInfo 8 }
+
+lanTxTotalTraffic OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates LAN Tx(Send) total traffic."
+        ::= { lanInfo 9 }
+
+lanTxPackets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates LAN Tx(Send) packets number."
+        ::= { lanInfo 10 }
+
+lanTxErrorPackets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates LAN Tx(Send) error packets number."
+        ::= { lanInfo 11 }
+
+lanTxDroppedPackets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION "Indicates LAN Tx(Send) dropped packets number."
+        ::= { lanInfo 12 }
+
+
+
+END
