@@ -1,6 +1,56 @@
 mib: ZMTEL-ODU-MIB
 modules:
     sensors:
+        count:
+            data:
+                -
+                    oid: dlMCS
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.6.{{ $index }}'
+                    descr: Download
+                    index: 'dlMCS.{{ $index }}'
+                    group: Modulation
+                -
+                    oid: ulMCS
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.7.{{ $index }}'
+                    descr: Upload
+                    index: 'ulMCS.{{ $index }}'
+                    group: Modulation
+                -
+                    oid: sinr
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.15.{{ $index }}'
+                    descr: Signal to Interference
+                    index: 'sinr.{{ $index }}'
+                    group: Noise
+                -
+                    oid: cinr0
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.16.{{ $index }}'
+                    descr: Carrier to Interference 0
+                    index: 'cinr0.{{ $index }}'
+                    group: Noise
+                -
+                    oid: cinr1
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.17.{{ $index }}'
+                    descr: Carrier to Interference 1
+                    index: 'cinr1.{{ $index }}'
+                    group: Noise
+                -
+                    oid: pCID
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.19.{{ $index }}'
+                    descr: Physical
+                    index: 'pCID.{{ $index }}'
+                    group: Identification
+                -
+                    oid: eNBID
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.20.{{ $index }}'
+                    descr: eNodeB
+                    index: 'eNBID.{{ $index }}'
+                    group: Identification
+                -
+                    oid: cellID
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.21.{{ $index }}'
+                    descr: Physical Cell
+                    index: 'cellID.{{ $index }}'
+                    group: Identification
         frequency:
             data:
                 -
@@ -8,19 +58,16 @@ modules:
                     num_oid: '.1.3.6.1.4.1.38595.10.3.8.{{ $index }}'
                     descr: Download
                     index: 'dlFrequency.{{ $index }}'
-                    multiplier: 1000
                 -
                     oid: ulFrequency
                     num_oid: '.1.3.6.1.4.1.38595.10.3.9.{{ $index }}'
                     descr: Upload
                     index: 'ulFrequency.{{ $index }}'
-                    multiplier: 1000
                 -
                     oid: bandwidth
                     num_oid: '.1.3.6.1.4.1.38595.10.3.10.{{ $index }}'
                     descr: Bandwidth
                     index: 'bandwidth.{{ $index }}'
-                    multiplier: 1000
         dbm:
             data:
                 -
@@ -28,21 +75,28 @@ modules:
                     num_oid: '.1.3.6.1.4.1.38595.10.3.11.{{ $index }}'
                     descr: RSRP0
                     index: 'rsrp0.{{ $index }}'
+                    group: Reference Signal Received Power
                 -
                     oid: rsrp1
                     num_oid: '.1.3.6.1.4.1.38595.10.3.12.{{ $index }}'
                     descr: RSRP1
                     index: 'rsrp1.{{ $index }}'
+                    group: Reference Signal Received Power
+                -
+                    oid: rsrq
+                    num_oid: '.1.3.6.1.4.1.38595.10.3.13.{{ $index }}'
+                    descr: Reference Signal Received Quality
+                    index: 'rsrq.{{ $index }}'
                 -
                     oid: rssi
                     num_oid: '.1.3.6.1.4.1.38595.10.3.14.{{ $index }}'
-                    descr: RSSI
+                    descr: Received Signal Strength Indicator
                     index: 'rssi.{{ $index }}'
                 -
                     oid: txPower
                     num_oid: '.1.3.6.1.4.1.38595.10.3.18.{{ $index }}'
                     descr: Tx Power
-                    index: 'rssi.{{ $index }}'
+                    index: 'txPower.{{ $index }}'
         state:
             data:
                 -
