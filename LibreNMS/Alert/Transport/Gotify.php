@@ -64,7 +64,7 @@ class Gotify extends Transport
 
         $curl            = curl_init();
         set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_URL, $gotify_server . '/message?token=' . $gotify_token );
+        curl_setopt($curl, CURLOPT_URL, $gotify_server . '/message?token=' . $gotify_token);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
@@ -101,4 +101,3 @@ class Gotify extends Transport
         ];
     }
 }
-
