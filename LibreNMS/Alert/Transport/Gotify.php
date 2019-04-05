@@ -48,24 +48,15 @@ class Gotify extends Transport
     {
         switch ($obj['severity']) {
             case "critical":
-                $data['priority'] = 1;
-                if (!empty($api['options']['sound_critical'])) {
-                    $data['sound'] = $api['options']['sound_critical'];
-                }
+                $data['priority'] = 10;
                 break;
             case "warning":
-                $data['priority'] = 1;
-                if (!empty($api['options']['sound_warning'])) {
-                    $data['sound'] = $api['options']['sound_warning'];
-                }
+                $data['priority'] = 5;
                 break;
         }
         switch ($obj['state']) {
             case 0:
                 $data['priority'] = 0;
-                if (!empty($api['options']['sound_ok'])) {
-                    $data['sound'] = $api['options']['sound_ok'];
-                }
                 break;
         }
         $data['title']   = $obj['title'];
