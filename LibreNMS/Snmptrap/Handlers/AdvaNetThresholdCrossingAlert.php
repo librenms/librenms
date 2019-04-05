@@ -1,6 +1,6 @@
 <?php
 /**
- * AdvaThresholdCrossingAlert.php
+ * AdvaNetThresholdCrossingAlert.php
  *
  * -Description-
  *
@@ -43,12 +43,9 @@ class AdvaNetThresholdCrossingAlert implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $device_array = $device->toArray();
-        if ($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetNetPortThreshold")) {
-            $interval = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdInterval"));
-            $ifName = $trap->getOidData($trap->findOid("IF-MIB::ifName"));
-            $threshOid = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdVariable"));
-            log_event("$ifName threshold exceeded for $interval. Threshold OID is $threshOid.", $device_array, 'trap', 2);
-        }
+        $interval = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdInterval"));
+        $ifName = $trap->getOidData($trap->findOid("IF-MIB::ifName"));
+        $threshOid = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdVariable"));
+        Log::event("$ifName threshold exceeded for $interval. Threshold OID is $threshOid.", $device->device_id, 'trap', 2);
     }
 }

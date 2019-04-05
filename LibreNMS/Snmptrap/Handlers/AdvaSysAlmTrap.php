@@ -45,7 +45,6 @@ class AdvaSysAlmTrap implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $device_array = $device->toArray();
         $alSeverity = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmNotifCode'));
         switch ($alSeverity) {
             case "critical":
@@ -67,6 +66,6 @@ class AdvaSysAlmTrap implements SnmptrapHandler
 
         $sysAlmDescr = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmDescr'));
         $sysAlmState = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmNotifCode'));
-        log_event("System Alarm: $sysAlmDescr Status: $sysAlmState", $device_array, 'trap', $logSeverity);
+        Log::event("System Alarm: $sysAlmDescr Status: $sysAlmState", $device->device_id, 'trap', $logSeverity);
     }
 }

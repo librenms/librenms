@@ -31,6 +31,7 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
+use Log;
 
 class AdvaSnmpDyingGaspTrap implements SnmptrapHandler
 {
@@ -44,7 +45,7 @@ class AdvaSnmpDyingGaspTrap implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $device_array = $device->toArray();
-        log_event("Dying Gasp received", $device_array, 'trap', 5);
+        Log::event("Dying Gasp received", $device->device_id, 'trap', 5);
+
     }
 }

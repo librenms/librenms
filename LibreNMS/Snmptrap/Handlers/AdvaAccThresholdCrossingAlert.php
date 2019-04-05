@@ -1,6 +1,6 @@
 <?php
 /**
- * AdvaThresholdCrossingAlert.php
+ * AdvaAccThresholdCrossingAlert.php
  *
  * -Description-
  *
@@ -31,7 +31,7 @@ use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
-class AdvaThresholdCrossingAlert implements SnmptrapHandler
+class AdvaAccThresholdCrossingAlert implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
@@ -43,14 +43,11 @@ class AdvaThresholdCrossingAlert implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $device_array = $device->toArray();
         $raw = $trap->getRaw();
-        log_event($raw, $device_array, 'trap', 2);
-        if ($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThreshold")) {
-            $interval = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdInterval"));
-            $ifName = $trap->getOidData($trap->findOid("IF-MIB::ifName"));
-            $threshOid = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdVariable"));
-            log_event("$ifName threshold exceeded for $interval. Threshold OID is $threshOid.", $device_array, 'trap', 2);
-        }
+        Log::event($raw, $device->device_id, 'trap', 2);
+        $interval = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdInterval"));
+        $ifName = $trap->getOidData($trap->findOid("IF-MIB::ifName"));
+        $threshOid = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdVariable"));
+        Log::event("$ifName threshold exceeded for $interval. Threshold OID is $threshOid.", $device->device_id, 'trap', 2);
     }
 }

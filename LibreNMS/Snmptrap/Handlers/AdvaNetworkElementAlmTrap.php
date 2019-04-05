@@ -44,7 +44,6 @@ class AdvaNetworkElementAlmTrap implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $device_array = $device->toArray();
         $alSeverity = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmNotifCode'));
         switch ($alSeverity) {
             case "critical":
@@ -66,6 +65,6 @@ class AdvaNetworkElementAlmTrap implements SnmptrapHandler
 
         $almDescr = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmDescr'));
         $almObjName = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmNetworkElementAlmObjectName'));
-        log_event("$almObjName $almDescr state $alSeverity", $device_array, 'trap', $logSeverity);
+        Log::event("$almObjName $almDescr state $alSeverity", $device->device_id, 'trap', $logSeverity);
     }
 }

@@ -47,24 +47,22 @@ class AdvaStateChangeTrap implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-
-        $device_array = $device->toArray();
         if ($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortAdminState')) {
             $adminState = $trap->getOidData($trap_oid);
             $opState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetAccPortOperationalState'));
             $portName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
-            log_event("Port state change: $portName Admin State: $adminState Operational State: $opState", $device_array, 'trap', 2);
+            Log::event("Port state change: $portName Admin State: $adminState Operational State: $opState", $device->device_id, 'trap', 2);
         } elseif ($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmFlowAdminState')) {
             $adminState = $trap->getOidData($trap_oid);
             $opState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmFlowOperationalState'));
             $flowID = substr($trap->findOid('CM-FACILITY-MIB::cmFlowAdminState'), 34);
             $flowID = str_replace(".", "-", $flowID);
-            log_event("Flow state change: $flowID Admin State: $adminState Operational State: $opState", $device_array, 'trap', 2);
+            Log::event("Flow state change: $flowID Admin State: $adminState Operational State: $opState", $device->device_id, 'trap', 2);
         } elseif ($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortAdminState')) {
             $adminState = $trap->getOidData($trap_oid);
             $opState = $trap->getOidData($trap->findOid('CM-FACILITY-MIB::cmEthernetNetPortOperationalState'));
             $portName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
-            log_event("Port state change: $portName Admin State: $adminState Operational State: $opState", $device_array, 'trap', 2);
+            Log::event("Port state change: $portName Admin State: $adminState Operational State: $opState", $device->device_id, 'trap', 2);
         }
     }
 }
