@@ -14,13 +14,14 @@
 use App\Models\Location;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Time;
 
 $snmpdata = snmp_get_multi_oid($device, ['sysUpTime.0', 'sysLocation.0', 'sysContact.0', 'sysName.0', 'sysObjectID.0', 'sysDescr.0'], '-OQnUt', 'SNMPv2-MIB');
 
 $poll_device['sysUptime']   = $snmpdata['.1.3.6.1.2.1.1.3.0'];
-$poll_device['sysLocation'] = $snmpdata['.1.3.6.1.2.1.1.6.0'];
-$poll_device['sysContact']  = $snmpdata['.1.3.6.1.2.1.1.4.0'];
-$poll_device['sysName']     = strtolower($snmpdata['.1.3.6.1.2.1.1.5.0']);
+$poll_device['sysLocation'] = str_replace("\n", '', $snmpdata['.1.3.6.1.2.1.1.6.0']);
+$poll_device['sysContact']  = str_replace("\n", '', $snmpdata['.1.3.6.1.2.1.1.4.0']);
+$poll_device['sysName']     = str_replace("\n", '', strtolower($snmpdata['.1.3.6.1.2.1.1.5.0']));
 $poll_device['sysObjectID'] = $snmpdata['.1.3.6.1.2.1.1.2.0'];
 $poll_device['sysDescr']    = $snmpdata['.1.3.6.1.2.1.1.1.0'];
 
@@ -41,7 +42,7 @@ if (!empty($agent_data['uptime'])) {
 
 if ($uptime != 0 && $config['os'][$device['os']]['bad_uptime'] !== true) {
     if ($uptime < $device['uptime']) {
-        log_event('Device rebooted after ' . formatUptime($device['uptime']) . " -> {$uptime}s", $device, 'reboot', 4, $device['uptime']);
+        log_event('Device rebooted after ' . Time::formatInterval($device['uptime']) . " -> {$uptime}s", $device, 'reboot', 4, $device['uptime']);
     }
 
     $tags = array(
@@ -51,7 +52,7 @@ if ($uptime != 0 && $config['os'][$device['os']]['bad_uptime'] !== true) {
 
     $graphs['uptime'] = true;
 
-    echo 'Uptime: ' . formatUptime($uptime) . PHP_EOL;
+    echo 'Uptime: ' . Time::formatInterval($uptime) . PHP_EOL;
 
     $update_array['uptime'] = $uptime;
     $device['uptime']       = $uptime;

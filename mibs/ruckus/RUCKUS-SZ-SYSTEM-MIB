@@ -1,0 +1,157 @@
+--
+-- Copyright 2010-2014 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-SZ-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusSZSystemModule
+        FROM RUCKUS-ROOT-MIB
+    DisplayString,
+    MacAddress,
+    RowStatus,
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI;
+
+ruckusSZSystemMIB MODULE-IDENTITY
+    LAST-UPDATED "201405191100Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        T: +1 (650) 265-4200
+        F: +1 (408) 738-2065
+        EMail: info@ruckuswireless.com
+        Web: www.ruckuswireless.com"
+    DESCRIPTION
+        "Ruckus System mib"
+    ::= { ruckusSZSystemModule 1 }
+
+ruckusSZSystemObjects OBJECT IDENTIFIER     ::= { ruckusSZSystemMIB 1 }
+
+ruckusSZSystemInfo OBJECT IDENTIFIER    ::= { ruckusSZSystemObjects 1 }
+
+--
+-- Smart Zone System Statistics, Operation Status
+--
+ruckusSZSystemStats OBJECT IDENTIFIER    ::= { ruckusSZSystemObjects 15 }
+
+ruckusSZSystemStatsNumAP OBJECT-TYPE
+    SYNTAX Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of AP"
+    ::= { ruckusSZSystemStats 1 }
+
+ruckusSZSystemStatsNumSta OBJECT-TYPE
+    SYNTAX Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of authorized client devices"
+    ::= { ruckusSZSystemStats 2 }
+
+-- ruckusSZSystemStatsNumRogue OBJECT-TYPE
+--     SYNTAX Unsigned32 
+--     MAX-ACCESS read-only
+--     STATUS current
+--     DESCRIPTION
+--         "Number of rogue devices"
+--     ::= { ruckusSZSystemStats 3 }
+
+ruckusSZSystemStatsWLANTotalRxPkts OBJECT-TYPE
+    SYNTAX Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total received packets of wireless interfaces"
+    ::= { ruckusSZSystemStats 5 }
+
+ruckusSZSystemStatsWLANTotalRxBytes OBJECT-TYPE
+    SYNTAX Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total received bytes of wireless interfaces"
+    ::= { ruckusSZSystemStats 6 }
+
+ruckusSZSystemStatsWLANTotalRxMulticast OBJECT-TYPE
+    SYNTAX Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total received multicast packets of wireless interfaces"
+    ::= { ruckusSZSystemStats 7 }
+
+ruckusSZSystemStatsWLANTotalTxPkts OBJECT-TYPE
+    SYNTAX Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted packets of wireless interfaces"
+    ::= { ruckusSZSystemStats 8 }
+
+ruckusSZSystemStatsWLANTotalTxBytes OBJECT-TYPE
+    SYNTAX Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted bytes of wireless interfaces"
+    ::= { ruckusSZSystemStats 9 }
+
+ruckusSZSystemStatsWLANTotalTxMulticast OBJECT-TYPE
+    SYNTAX Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted multicast packets of wireless interfaces"
+    ::= { ruckusSZSystemStats 10 }
+
+ruckusSZSystemStatsWLANTotalTxFail OBJECT-TYPE
+    SYNTAX Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted fail packets of wireless interfaces"
+    ::= { ruckusSZSystemStats 11 }
+
+ruckusSZSystemStatsWLANTotalTxRetry OBJECT-TYPE
+    SYNTAX Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted retry packets of wireless interfaces"
+    ::= { ruckusSZSystemStats 12 }
+
+ruckusSZSystemStatsSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial Number"
+    ::= { ruckusSZSystemStats 13 }
+
+END

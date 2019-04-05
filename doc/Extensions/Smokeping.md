@@ -16,6 +16,7 @@ For new installations, we can use the included `scripts/gen_smokeping.php` scrip
 
 This guide assumes you have already [installed librenms](http://docs.librenms.org/Installation/Installing-LibreNMS/), and is working with either **Apache** or **nginx**.
 
+Note: You may need to install `fcgiwrap` as well (at least with `nginx`).
 
 ### Install Smokeping
 
@@ -41,7 +42,7 @@ cgiurl   = http://yourlibrenms/cgi-bin/smokeping.cgi
 Add the following line to `/etc/smokeping/config` config file:
 
 ```bash
-@include /opt/smokeping/etc/librenms.conf
+@include /etc/smokeping/config.d/librenms.conf
 ```
 
 We will generate the conf file in the next step. 
@@ -53,7 +54,7 @@ LibreNMS comes equipped with a script which exports our list of nodes from Libre
 To generate the config file once: 
 
 ```bash
-php /opt/librenms/scripts/gen_smokeping.php > /opt/smokeping/etc/librenms.conf
+(echo "+ LibreNMS"; php -f /opt/librenms/scripts/gen_smokeping.php) | sudo tee /etc/smokeping/config.d/librenms.conf
 ```
 
 **However**, it is more desirable to set up a cron job which regenerates our list of nodes and adds these into Smokeping. You can add the following to the end of your librenms cron job, e.g. `nano /etc/cron.d/librenms` 
@@ -79,7 +80,7 @@ menu = Top
 title = Network Latency Grapher
 ```
 
-Which can cause Smokeping to not start. `echo "+ LibreNMS"` appends this in our smokeping config file. We could remove the above from the gen_smokeping script, however this may cause issues with LibreNMS failing to update with `daily.sh` due config files being modified. 
+Which can cause Smokeping to not start. `echo "+ LibreNMS"` prepends this in our smokeping config file. We could remove the above from the gen_smokeping script, however this may cause issues with LibreNMS failing to update with `daily.sh` due config files being modified. 
 
 
 ## Configure LibreNMS
@@ -89,7 +90,7 @@ Edit `/opt/librenms/config.php` and add the following:
 **Note:** Make sure you point dir to the correct Smokeping data directory:
 
 ```php
-$config['smokeping']['dir'] = '/var/lib/smokeping'; // Ubuntu 16.04 Location
+$config['smokeping']['dir'] = '/var/lib/smokeping'; // Ubuntu 16.04 and newer Location
 #$config['smokeping']['dir'] = '/opt/smokeping/data';
 $config['smokeping']['pings'] = 20;		// should be equal to "pings" in your smokeping config
 $config['smokeping']['integration'] = true;
@@ -121,7 +122,7 @@ You should be able to load the Smokeping web interface at `http://yourhost/cgi-b
 
 ### Nginx Configuration 
 
-This section assumes you have configured LibreNMS with Nginx as specified in [Configure Nginx](https://docs.librenms.org/#Installation/Installation-Ubuntu-1604-Nginx/#web-server).
+This section assumes you have configured LibreNMS with Nginx as specified in [Configure Nginx](https://docs.librenms.org/Installation/Installation-Ubuntu-1804-Nginx/).
 
 Add the following configuration to your `/etc/nginx/conf.d/librenms` config file. 
 
@@ -174,7 +175,7 @@ Use the below commands to start and verify smokeping is running.
 
 Verify: `sudo service smokeping status`
 
-**Ubuntu 16.04:**  `sudo systemctl start smokeping`
+**Ubuntu 16.04 and newer:**  `sudo systemctl start smokeping`
 
 Verify: `sudo systemctl status smokeping`
 
@@ -196,7 +197,7 @@ In terms of configuration, simply add the location of where smokeping data such 
 
 
 ```php
-$config['smokeping']['dir'] = '/var/lib/smokeping'; // Ubuntu 16.04 Location
+$config['smokeping']['dir'] = '/var/lib/smokeping'; // Ubuntu 16.04 and newer Location
 #$config['smokeping']['dir'] = '/opt/smokeping/data';
 $config['smokeping']['pings'] = 20;		// should be equal to "pings" in your smokeping config
 $config['smokeping']['integration'] = true;
@@ -219,7 +220,7 @@ nano /etc/smokeping/config.d/pathnames
 
 ### Smokeping and RRDCached ###
 
-If you are using the standard smokeping data dir (/opt/smokeping/data) then you may need to alter the rrdcached config slightly.
+If you are using the standard smokeping data dir (`/etc/smokeping/data`) then you may need to alter the rrdcached config slightly.
 
 In the standard configuration the -B argument may have been used to restrict rrdcached to read only from a single base dir.
 

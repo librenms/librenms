@@ -132,48 +132,50 @@ if ($device['os_group'] == 'cisco') {
         }
 
         // Add each adjacency to the array.
-        foreach ((array)$tblAdjacentDevName as $key => $value) {
-            preg_match('/^1.3.6.1.4.1.9.9.810.1.3.1.1.4.(\d+).1.4.(\d+.\d+.\d+.\d+)$/', $key, $matches);
-            $result = array();
-            $result['index'] = $matches[1];
-            $result['endpoint'] = $matches[2];
-            $tblEndpoints[$value] = true;
-            $result['otvtype'] = 'adjacency';
-            $result['UID'] = $result['otvtype']."-".$result['index']."-".str_replace(' ', '', $tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.3.'.$result['index'].'.1.4.'.$result['endpoint']]);
-            $result['uptime'] = $tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.6.'.$result['index'].'.1.4.'.$result['endpoint']];
-            $message = false;
-            if ($tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.5.'.$result['index'].'.1.4.'.$result['endpoint']] != 1) {
-                $message .= "Adjacency is Down\n";
-            }
-
-            // If we have set a message, we have an error, activate alert.
-            if ($message !== false) {
-                $result['error'] = $message;
-                $result['status'] = 1;
-            } else {
-                $result['error'] = "";
-                $result['status'] = 0;
-            }
-
-            // Set a default name, if for some unknown reason we cant find the parent VPN.
-            $result['label'] = "Unknown (".$result['index'].") - ".$value;
-            // We need to search the existing array to build the name
-            foreach ($tblOTV as $item) {
-                if (($item['otvtype'] == 'overlay') && ($item['index'] == $result['index'])) {
-                    $result['label'] = $item['label']." - ".$value;
+        if ($tblAdjacentDevName) {
+            foreach ((array)$tblAdjacentDevName as $key => $value) {
+                preg_match('/^1.3.6.1.4.1.9.9.810.1.3.1.1.4.(\d+).1.4.(\d+.\d+.\d+.\d+)$/', $key, $matches);
+                $result = array();
+                $result['index'] = $matches[1];
+                $result['endpoint'] = $matches[2];
+                $tblEndpoints[$value] = true;
+                $result['otvtype'] = 'adjacency';
+                $result['UID'] = $result['otvtype']."-".$result['index']."-".str_replace(' ', '', $tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.3.'.$result['index'].'.1.4.'.$result['endpoint']]);
+                $result['uptime'] = $tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.6.'.$result['index'].'.1.4.'.$result['endpoint']];
+                $message = false;
+                if ($tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.5.'.$result['index'].'.1.4.'.$result['endpoint']] != 1) {
+                    $message .= "Adjacency is Down\n";
                 }
+
+                // If we have set a message, we have an error, activate alert.
+                if ($message !== false) {
+                    $result['error'] = $message;
+                    $result['status'] = 1;
+                } else {
+                    $result['error'] = "";
+                    $result['status'] = 0;
+                }
+
+                // Set a default name, if for some unknown reason we cant find the parent VPN.
+                $result['label'] = "Unknown (".$result['index'].") - ".$value;
+                // We need to search the existing array to build the name
+                foreach ($tblOTV as $item) {
+                    if (($item['otvtype'] == 'overlay') && ($item['index'] == $result['index'])) {
+                        $result['label'] = $item['label']." - ".$value;
+                    }
+                }
+
+                // Let's log some debugging
+                d_echo("\n\nAdjacency: ".$result['label']."\n");
+                d_echo("    Endpoint: ".$result['endpoint']."\n");
+                d_echo("    Index: ".$result['index']."\n");
+                d_echo("    UID: ".$result['UID']."\n");
+                d_echo("    Status: ".$result['status']."\n");
+                d_echo("    Message: ".$result['error']."\n");
+
+                // Add the result to the parent array.
+                $tblOTV[] = $result;
             }
-
-            // Let's log some debugging
-            d_echo("\n\nAdjacency: ".$result['label']."\n");
-            d_echo("    Endpoint: ".$result['endpoint']."\n");
-            d_echo("    Index: ".$result['index']."\n");
-            d_echo("    UID: ".$result['UID']."\n");
-            d_echo("    Status: ".$result['status']."\n");
-            d_echo("    Message: ".$result['error']."\n");
-
-            // Add the result to the parent array.
-            $tblOTV[] = $result;
         }
 
         // We retain a list of all endpoints to tie the RRD to.

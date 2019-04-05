@@ -20,11 +20,11 @@ class RadiusAuthorizer extends MysqlAuthorizer
         $this->radius = new Radius(Config::get('radius.hostname'), Config::get('radius.secret'), Config::get('radius.suffix'), Config::get('radius.timeout'), Config::get('radius.port'));
     }
 
-    public function authenticate($username, $password)
+    public function authenticate($credentials)
     {
         global $debug;
 
-        if (empty($username)) {
+        if (empty($credentials['username'])) {
             throw new AuthenticationException('Username is required');
         }
 
@@ -32,8 +32,9 @@ class RadiusAuthorizer extends MysqlAuthorizer
             $this->radius->setDebug(true);
         }
 
-        if ($this->radius->accessRequest($username, $password) === true) {
-            $this->addUser($username, $password, Config::get('radius.default_level', 1));
+        $password = $credentials['password'] ?? null;
+        if ($this->radius->accessRequest($credentials['username'], $password) === true) {
+            $this->addUser($credentials['username'], $password, Config::get('radius.default_level', 1));
             return true;
         }
 

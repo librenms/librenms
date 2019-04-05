@@ -83,6 +83,58 @@ Running in Proxmox.
 | Health sensors | 3223                |                     |
 | Load           | < 14.5              |                     |
 
+#### [CppMonkey(KodApa85)](https://github.com/cppmonkey)
+
+> Home
+|                | LibreNMS            | MySQL               |
+| -------------- | ------------------- | ------------------- |
+| Type           | i5-4690K            | Same Workstation    |
+| OS             | Ubuntu 18.04.2      |                     |
+| CPU            | 4 Cores             |                     |
+| Memory         | 16GB                |                     |
+| Disk Type      | Hybrid SATA         |                     |
+| Disk Space     | 2 TB                |                     |
+| Devices        | 14                  |                     |
+| Ports          | 0                   |                     |
+| Health sensors | 70                  |                     |
+| Load           | < 0.5               |                     |
+
+#### [CppMonkey(KodApa85)](https://github.com/cppmonkey)
+
+> Dev
+Running in Ganeti
+|                | LibreNMS            | MySQL               |
+| -------------- | ------------------- | ------------------- |
+| Type           | VM                  | Same VM             |
+| OS             | CentOS 7.5          |                     |
+| CPU            | 2 Cores             |                     |
+| Memory         | 4GB                 |                     |
+| Disk Type      | M.2                 |                     |
+| Disk Space     | 40 GB               |                     |
+| Devices        | 38                  |                     |
+| Ports          | 1583                |                     |
+| Health sensors | 884                 |                     |
+| Load           | < 1.0               |                     |
+
+#### [CppMonkey(KodApa85)](https://github.com/cppmonkey)
+
+> Work NOC
+Running in Ganeti Cluster
+Dell PER730xd - 64GB, Dual E5-2660 v3
+Dell PER730xd - 64GB, Dual E5-2640 v3
+|                | LibreNMS            | MySQL               |
+| -------------- | ------------------- | ------------------- |
+| Type           | VM                  | VM                  |
+| OS             | Debian Stretch      | Debian Stretch      |
+| CPU            | 4 Cores             | 2 Cores             |
+| Memory         | 8GB                 | 4GB                 |
+| Disk Type      | Raid 6, SAS Drives  |                     |
+| Disk Space     | 100 GB              | 40GB                |
+| Devices        | 179                 |                     |
+| Ports          | 14495               |                     |
+| Health sensors | 2329                |                     |
+| Load           | < 2.5               | < 1.5               |
+
 #### [LaZyDK](https://github.com/lazydk)
 
 > Home
@@ -99,3 +151,20 @@ Running in Proxmox.
 | Ports          | 228                 |                     |
 | Health sensors | 117                 |                     |
 | Load           | < 0.92              |                     |
+
+#### [SirMaple](https://github.com/sirmaple)
+
+> Home
+
+|                | LibreNMS            | MariaDB             |
+| -------------- | ------------------- | ------------------- |
+| Type           | VM                  | Same Server         |
+| OS             | Ubuntu 18.04 LTS    |                     |
+| CPU            | 2 vCore             |                     |
+| Memory         | 1GB                 |                     |
+| Disk Type      | Raid 1, SSD         |                     |
+| Disk Space     | 25 GB               |                     |
+| Devices        | 30                  |                     |
+| Ports          | 196                 |                     |
+| Health sensors | 207                 |                     |
+| Load           | < 3.65              |                     |

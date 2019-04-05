@@ -40,10 +40,9 @@
 namespace LibreNMS\Authentication;
 
 use App\Models\User;
-use Carbon\Carbon;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
-use Session;
+use LibreNMS\Exceptions\LdapMissingException;
 
 class LdapAuthorizationAuthorizer extends AuthorizerBase
 {
@@ -55,7 +54,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
     public function __construct()
     {
         if (!function_exists('ldap_connect')) {
-            throw new AuthenticationException("PHP does not support LDAP, please install or enable the PHP LDAP extension.");
+            throw new LdapMissingException();
         }
 
         /**
@@ -77,9 +76,9 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         }
     }
 
-    public function authenticate($username, $password)
+    public function authenticate($credentials)
     {
-        if ($this->userExists($username)) {
+        if (isset($credentials['username']) && $this->userExists($credentials['username'])) {
             return true;
         }
 

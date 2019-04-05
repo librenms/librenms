@@ -32,34 +32,23 @@ $serverscheck_oids = [
 ];
  
 foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
-    if ((str_contains($oid_name, 'name')) && (str_contains($oid_value, array('Flooding', 'Leckage')))) {
+    if ((str_contains($oid_name, 'name')) && (str_contains($oid_value, ['Flooding', 'Leckage']))) {
         preg_match("/(\d+)/", $oid_name, $temp_x);
         $tmp_oid = 'sensor' . $temp_x[0] . 'Value.0';
         $current = $pre_cache['serverscheck_control'][$tmp_oid];
-        $state = 'Serverscheck_FloodSensor';
+        $state_name = 'Serverscheck_FloodSensor';
         if ($current) {
             $index = str_replace('.0', '', $oid_name);
             $descr = $oid_value;
-            $state_index_id = create_state_index($state);
-            if ($state_index_id) {
-                $states = [
-                    [$state_index_id, '-', 1, 1, 1],
-                    [$state_index_id, 'DRY', 1, 2, 0],
-                    [$state_index_id, 'WET', 1, 4, 2],
-                ];
-                foreach ($states as $value) {
-                    $insert = [
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                    ];
-                    dbInsert($insert, 'state_translations');
-                }
-            }
-            discover_sensor($valid['sensor'], 'state', $device, $serverscheck_oids[$tmp_oid], $index, $state, $descr, 1, 1, null, null, null, null, 1);
-            create_sensor_to_state_index($device, $state, $index);
+            $states = [
+                ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => '-'],
+                ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'DRY'],
+                ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'WET'],
+            ];
+            create_state_index($state_name, $states);
+            
+            discover_sensor($valid['sensor'], 'state', $device, $serverscheck_oids[$tmp_oid], $index, $state_name, $descr, 1, 1, null, null, null, null, 1);
+            create_sensor_to_state_index($device, $state_name, $index);
         }
     }
 }

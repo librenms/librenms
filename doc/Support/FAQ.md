@@ -36,6 +36,7 @@ path: blob/master/doc/
  - [Where do I update my database credentials?](#faq-where-do-i-update-my-database-credentials)
  - [My reverse proxy is not working](#my-reverse-proxy-is-not-working)
  - [My alerts aren't being delivered on time](#my-alerts-aren't-being-delivered-on-time)
+ - [My alert templates stopped working](#my-alert-templates-stopped-working)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -86,7 +87,7 @@ LibreNMS does not parse MIBs to discover sensors for devices.  LibreNMS uses sta
 
 #### <a name="faq6"> Why do I get blank pages sometimes in the WebUI?</a>
 
-The first thing to do is to add /debug=yes/ to the end of the URI (I.e /devices/debug=yes/).
+You can enable debug information by setting `APP_DEBUG=true` in your .env. (Do not leave this enabled, it could leak private data)
 
 If the page you are trying to load has a substantial amount of data in it then it could be that the php memory limit needs to be increased in [config.php](Configuration.md#core).
 
@@ -101,9 +102,9 @@ the [included snmpd.conf](https://raw.githubusercontent.com/librenms/librenms/ma
 
 A debug system is in place which enables you to see the output from php errors, warnings and notices along with the MySQL queries that have been run for that page.
 
-To enable the debug option, add /debug=yes/ to the end of any URI (I.e /devices/debug=yes/) or ?debug=yes if you are debugging a graph directly.
-
-You will then have a two options in the footer of the website - Show SQL Debug and Show PHP Debug. These will both popup that pages debug window for you to view. If the page itself has generated a fatal error then this will be displayed directly on the page.
+You can enable debug information by setting `APP_DEBUG=true` in your .env. (Do not leave this enabled, it could leak private data)
+To see additional information, run `./scripts/composer_wrapper.php install`, to install additional debug tools.
+This will add a debug bar at the bottom of every page that will show you detailed debug information.
 
 #### <a name="faq11"> How do I debug the discovery process?</a>
 
@@ -231,13 +232,15 @@ If you are moving from one CPU architecture to another then you will need to dum
 this scenario then you can use [Dan Brown's migration scripts](https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/).    
     
 If you are just moving to another server with the same CPU architecture then the following steps should be all that's needed:   
-    
-    - Install LibreNMS as per our normal documentation, you don't need to run through the web installer or building the sql schema.   
-    - Stop cron by commenting out all lines in `/etc/cron.d/librenms`
-    - Dump the MySQL database `librenms` and import this into your new server.
-    - Copy the `rrd/` folder to the new server.
-    - Copy the `config.php` file to the new server.
-    - Renable cron by uncommenting all lines in `/etc/cron.d/librenms`
+  
+  * Install LibreNMS as per our normal documentation; you don't need to run through the web installer or building the sql schema.   
+  * Stop cron by commenting out all lines in `/etc/cron.d/librenms`
+  * Dump the MySQL database `librenms` from your old server (`mysqldump librenms -u root -p > librenms.sql`)...
+  * and import it into your new server (`mysql -u root -p < librenms.sql`).
+  * Copy the `rrd/` folder to the new server.
+  * Copy the `config.php` file to the new server.
+  * Ensure ownership of the copied files and folders (substitute your user if necessary) - `chown -R librenms:librenms rrd/; chown librenms:librenms config.php`
+  * Re-enable cron by uncommenting all lines in `/etc/cron.d/librenms`
 
 #### <a name="faq25"> Why is my EdgeRouter device not detected?</a>
 
@@ -398,3 +401,9 @@ you may need to set [APP_URL](../Support/Environment-Variables.md#base-url) and 
 
 ### <a name='my-alerts-aren't-being-delivered-on-time'>My alerts aren't being delivered on time</a>
 If you're running MySQL/MariaDB on a separate machine or container make sure the timezone is set properly on both the LibreNMS **and**  MySQL/MariaDB instance. Alerts will be delivered according to MySQL/MariaDB's time, so a mismatch between the two can cause alerts to be delivered late if LibreNMS is on a timezone later than MySQL/MariaDB.
+
+### <a name='my-alert-templates-stopped-working'>My alert templates stopped working</a>
+You should probably have a look in the documentation concerning the new template syntax: https://docs.librenms.org/Alerting/Templates/. 
+Since version 1.42, syntax changed, and you basically need to convert your templates to this new syntax (including the titles). 
+
+

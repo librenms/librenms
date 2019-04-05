@@ -21,6 +21,7 @@ use Illuminate\Database\QueryException;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Util\Laravel;
 
 function dbIsConnected()
 {
@@ -46,16 +47,31 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
         return Eloquent::DB();
     }
 
-    if (!function_exists('mysqli_connect')) {
-        throw new DatabaseConnectException("mysqli extension not loaded!");
+    if (!extension_loaded('pdo_mysql')) {
+        throw new DatabaseConnectException("PHP pdo_mysql extension not loaded!");
     }
 
     try {
-        if (is_null($db_host) && empty($db_name)) {
-            Eloquent::boot();
-        } else {
-            Eloquent::boot(get_defined_vars());
+        if (!is_null($db_host) || !empty($db_name)) {
+            // legacy connection override
+            \Config::set('database.connections.setup', [
+                "driver" => "mysql",
+                "host" => $db_host,
+                "port" => $db_port,
+                "database" => $db_name,
+                "username" => $db_user,
+                "password" => $db_pass,
+                "unix_socket" => $db_socket,
+                "charset" => "utf8",
+                "collation" => "utf8_unicode_ci",
+                "prefix" => "",
+                "strict" => true,
+                "engine" => null
+            ]);
+            \Config::set('database.default', 'setup');
         }
+
+        Eloquent::boot();
     } catch (PDOException $e) {
         throw new DatabaseConnectException($e->getMessage(), $e->getCode(), $e);
     }
@@ -463,11 +479,9 @@ function dbHandleException(QueryException $exception)
         }
     }
 
-    foreach ($exception->getTrace() as $trace) {
-        $message .= "\n  " . $trace['file'] . ':' . $trace['line'];
-    }
+    $message .= $exception->getTraceAsString();
 
-    if (class_exists('Log')) {
+    if (Laravel::isBooted()) {
         Log::error($message);
     } else {
         c_echo("%rSQL Error!%n ");

@@ -1,0 +1,182 @@
+CIENA-WS-ENCRYPTION-RPC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    TimeStamp, DisplayString
+        FROM SNMPv2-TC;
+
+cienaWsEncryptionRPCMIB MODULE-IDENTITY
+    LAST-UPDATED "201702130000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION 
+		"Datapath encryption clear-security-parameters RPC support."
+    REVISION "201702130000Z"
+    DESCRIPTION "Initial revision"
+    ::= { cienaWsConfig 24 }
+
+
+cwsEncryptionRPCClearCSPTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF CwsEncryptionRPCClearCSPEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Table for Clear CSP RPC attributes"
+	::= { cienaWsEncryptionRPCMIB 3 }
+
+cwsEncryptionRPCClearCSPEntry OBJECT-TYPE
+	SYNTAX CwsEncryptionRPCClearCSPEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Entry for Clear CSP RPC attributes"
+	INDEX { cwsEncryptionRPCClearCSPSnmpIndex }
+	::= { cwsEncryptionRPCClearCSPTable  1 }
+
+CwsEncryptionRPCClearCSPEntry ::= SEQUENCE {
+	cwsEncryptionRPCClearCSPSnmpIndex Integer32,
+	cwsEncryptionRPCClearCSPActivate INTEGER,
+	cwsEncryptionRPCClearCSPLastActivation TimeStamp,
+	cwsEncryptionRPCClearCSPLastReturnCode INTEGER,
+	cwsEncryptionRPCClearCSPLastFailureReason DisplayString
+}
+
+cwsEncryptionRPCClearCSPSnmpIndex OBJECT-TYPE
+	SYNTAX Integer32(0..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique key for the clear-critical-security-parameters RPC"
+	::= { cwsEncryptionRPCClearCSPEntry 1 }
+
+cwsEncryptionRPCClearCSPActivate OBJECT-TYPE
+	SYNTAX INTEGER { notActive(0), activate(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Node to activate the clear-critical-security-parameters RPC"
+	::= { cwsEncryptionRPCClearCSPEntry 2 }
+
+cwsEncryptionRPCClearCSPLastActivation OBJECT-TYPE
+	SYNTAX TimeStamp
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Elapsed time since the last ClearCSP activation"
+	::= { cwsEncryptionRPCClearCSPEntry 3 }
+
+cwsEncryptionRPCClearCSPLastReturnCode OBJECT-TYPE
+	SYNTAX INTEGER { fail(0), pass(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Return code of the last ClearCSP activation"
+	::= { cwsEncryptionRPCClearCSPEntry 4 }
+
+cwsEncryptionRPCClearCSPLastFailureReason OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Failure reason of the last ClearCSP activation failure. If the last 
+                 call to ClearCSP did not fail, this is an empty string."
+	::= { cwsEncryptionRPCClearCSPEntry 5 }
+
+cwsEncryptionRPCEnableEncryptionTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF CwsEncryptionRPCEnableEncryptionEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Table for Clear CSP RPC attributes"
+	::= { cienaWsEncryptionRPCMIB 4 }
+
+cwsEncryptionRPCEnableEncryptionEntry OBJECT-TYPE
+	SYNTAX CwsEncryptionRPCEnableEncryptionEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Entry for Clear CSP RPC attributes"
+	INDEX { cwsEncryptionRPCEnableEncryptionSnmpIndex }
+	::= { cwsEncryptionRPCEnableEncryptionTable  1 }
+
+CwsEncryptionRPCEnableEncryptionEntry ::= SEQUENCE {
+	cwsEncryptionRPCEnableEncryptionSnmpIndex Integer32,
+	cwsEncryptionRPCEnableEncryptionActivate INTEGER,
+	cwsEncryptionRPCEnableEncryptionLastActivation TimeStamp,
+	cwsEncryptionRPCEnableEncryptionLastReturnCode INTEGER,
+	cwsEncryptionRPCEnableEncryptionLastFailureReason DisplayString
+}
+
+cwsEncryptionRPCEnableEncryptionSnmpIndex OBJECT-TYPE
+	SYNTAX Integer32(0..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique key for the clear-critical-security-parameters RPC"
+	::= { cwsEncryptionRPCEnableEncryptionEntry 1 }
+
+cwsEncryptionRPCEnableEncryptionActivate OBJECT-TYPE
+	SYNTAX INTEGER { notActive(0), activate(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Node to activate the clear-critical-security-parameters RPC"
+	::= { cwsEncryptionRPCEnableEncryptionEntry 2 }
+
+cwsEncryptionRPCEnableEncryptionLastActivation OBJECT-TYPE
+	SYNTAX TimeStamp
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Elapsed time since the last EnableEncryption activation"
+	::= { cwsEncryptionRPCEnableEncryptionEntry 3 }
+
+cwsEncryptionRPCEnableEncryptionLastReturnCode OBJECT-TYPE
+	SYNTAX INTEGER { fail(0), pass(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Return code of the last EnableEncryption activation"
+	::= { cwsEncryptionRPCEnableEncryptionEntry 4 }
+
+cwsEncryptionRPCEnableEncryptionLastFailureReason OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Failure reason of the last EnableEncryption activation failure. If the last 
+                 call to EnableEncryption did not fail, this is an empty string."
+	::= { cwsEncryptionRPCEnableEncryptionEntry 5 }
+
+
+-- Conformance statements
+cienaWsEncryptionRPCObjects OBJECT IDENTIFIER
+    ::= { cienaWsEncryptionRPCMIB 1 }
+
+cienaWsEncryptionRPCConformance OBJECT IDENTIFIER
+    ::= { cienaWsEncryptionRPCMIB 2 }
+
+cienaWsEncryptionRPCGroups OBJECT IDENTIFIER
+    ::= { cienaWsEncryptionRPCConformance 1 }
+
+cienaWsEncryptionRPCGroup OBJECT-GROUP
+    OBJECTS { 
+		cwsEncryptionRPCClearCSPActivate,
+		cwsEncryptionRPCClearCSPLastActivation,
+		cwsEncryptionRPCClearCSPLastReturnCode,
+		cwsEncryptionRPCClearCSPLastFailureReason,
+		cwsEncryptionRPCEnableEncryptionActivate,
+		cwsEncryptionRPCEnableEncryptionLastActivation,
+		cwsEncryptionRPCEnableEncryptionLastReturnCode,
+		cwsEncryptionRPCEnableEncryptionLastFailureReason
+	}
+	STATUS current
+	DESCRIPTION "Clear Security Parameters RPC group"
+	::= { cienaWsEncryptionRPCGroups 1 }
+
+cienaWsEncryptionRPCCompliances OBJECT IDENTIFIER
+    ::= { cienaWsEncryptionRPCConformance 2 }
+
+cienaWsEncryptionRPCCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsEncryptionRPCGroup }
+    ::= { cienaWsEncryptionRPCCompliances 1 }
+
+END -- End module

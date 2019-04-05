@@ -1,0 +1,12 @@
+os: riello
+text: 'Riello UPS'
+type: power
+icon: riello
+rfc1628_compat: true
+over:
+    - { graph: device_current, text: Current }
+mib_dir:
+    - riello
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.5491.304

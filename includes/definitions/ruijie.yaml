@@ -1,0 +1,9 @@
+os: ruijie
+text: 'Ruijie Networks'
+type: network
+icon: ruijie
+mib_dir:
+    - ruijie
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.4881.1

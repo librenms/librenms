@@ -291,7 +291,7 @@ if ($format == "graph") {
                     <th data-column-id="metrics" data-width="<?php echo $detailed ? '100px' : '150px'; ?>" data-sortable="false" data-searchable="false" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Metrics</th>
                     <th data-column-id="hardware">Platform</th>
                     <th data-column-id="os">Operating System</th>
-                    <th data-column-id="uptime">Uptime</th>
+                    <th data-column-id="uptime" data-formatter="uptime">Up/Down Time</th>
                     <th data-column-id="location" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Location</th>
                     <th data-column-id="actions" data-width="<?php echo $detailed ? '90px' : '200px'; ?>" data-sortable="false" data-searchable="false" data-header-css-class="device-table-header-actions">Actions</th>
                 </tr>
@@ -313,6 +313,15 @@ if ($format == "graph") {
                 },
                 "device": function (column, row) {
                     return "<span>" + row.hostname + "</span>";
+                },
+                "uptime": function (column, row) {
+                    if (isNaN(row.uptime.charAt(0))) {
+                        return row.uptime;
+                    } else if (row.status == 'down') {
+                        return "<span class='alert-status-small label-danger'></span><span>" + row.uptime + "</span>";
+                    } else {
+                        return "<span class='alert-status-small label-success'></span><span>" + row.uptime + "</span>";
+                    }
                 },
             },
             templates: {

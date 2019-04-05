@@ -211,7 +211,7 @@ main () {
             status_run 'Updating to latest codebase' 'git pull --quiet' 'update'
             update_res=$?
             new_ver=$(git rev-parse --short HEAD)
-        elif [[ "$up" == "3" ]]; then
+        else
             # Update to last Tag
             old_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
             status_run 'Updating to latest release' 'git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))' 'update'
@@ -273,6 +273,7 @@ main () {
                                "bill_data"
                                "alert_log"
                                "rrd_purge"
+                               "ports_fdb"
                                "ports_purge");
                 call_daily_php "${options[@]}";
             ;;

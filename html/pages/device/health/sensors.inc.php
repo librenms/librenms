@@ -49,7 +49,7 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
         echo " <span class='label label-default'>high: $sensor_limit</span>";
     }
 
-    echo "</div></div>
+    echo "</div></h3>
         </div>";
     echo "<div class='panel-body'>";
 

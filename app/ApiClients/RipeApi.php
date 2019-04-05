@@ -81,7 +81,6 @@ class RipeApi extends BaseApi
             if (isset($response_data['status']) && $response_data['status'] == 'ok') {
                 return $response_data;
             } else {
-                dd($response->getBody());
                 throw new ApiException("RIPE API call failed", $response_data);
             }
         } catch (RequestException $e) {

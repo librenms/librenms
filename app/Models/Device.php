@@ -7,10 +7,13 @@ use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\Url;
+use LibreNMS\Util\Time;
 
 class Device extends BaseModel
 {
@@ -19,7 +22,10 @@ class Device extends BaseModel
     public $timestamps = false;
     protected $primaryKey = 'device_id';
     protected $fillable = ['hostname', 'ip', 'status', 'status_reason'];
-    protected $casts = ['status' => 'boolean'];
+    protected $casts = [
+        'last_polled' => 'datetime',
+        'status' => 'boolean',
+    ];
 
     /**
      * Initialize this class
@@ -251,34 +257,7 @@ class Device extends BaseModel
 
     public function formatUptime($short = false)
     {
-        $result = '';
-        $interval = $this->uptime;
-        $data = [
-            'years' => 31536000,
-            'days' => 86400,
-            'hours' => 3600,
-            'minutes' => 60,
-            'seconds' => 1,
-        ];
-
-        foreach ($data as $k => $v) {
-            if ($interval >= $v) {
-                $diff = floor($interval / $v);
-
-                $result .= " $diff";
-                if ($short) {
-                    $result .= substr($k, 0, 1);
-                } elseif ($diff > 1) {
-                    $result .= $k;
-                } else {
-                    $result .= substr($k, 0, -1);
-                }
-
-                $interval -= $v * $diff;
-            }
-        }
-
-        return $result;
+        return Time::formatInterval($this->uptime, $short);
     }
 
     /**
@@ -387,11 +366,10 @@ class Device extends BaseModel
 
     public function getIconAttribute($icon)
     {
-        if (isset($icon)) {
-            return "images/os/$icon";
-        }
-        return 'images/os/generic.svg';
+        $this->loadOs();
+        return Str::start(Url::findOsImage($this->os, $this->features, $icon), 'images/os/');
     }
+
     public function getIpAttribute($ip)
     {
         if (empty($ip)) {
@@ -593,7 +571,7 @@ class Device extends BaseModel
 
     public function syslogs()
     {
-        return $this->hasMany('App\Models\General\Syslog', 'device_id', 'device_id');
+        return $this->hasMany('App\Models\Syslog', 'device_id', 'device_id');
     }
 
     public function users()

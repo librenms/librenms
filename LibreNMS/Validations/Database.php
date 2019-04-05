@@ -44,6 +44,7 @@ class Database extends BaseValidation
 
         $this->checkMode($validator);
         $this->checkTime($validator);
+        $this->checkMysqlEngine($validator);
 
         // check database schema version
         $current = get_db_schema();
@@ -100,6 +101,19 @@ class Database extends BaseValidation
             $validator->fail(
                 'You have lower_case_table_names set to 1 or true in mysql config.',
                 'Set lower_case_table_names=0 in your mysql config file in the [mysqld] section.'
+            );
+        }
+    }
+
+    private function checkMysqlEngine(Validator $validator)
+    {
+        $db = Config::get('db_name', 'librenms');
+        $query = "SELECT `TABLE_NAME` FROM information_schema.tables WHERE `TABLE_SCHEMA` = '$db' && `ENGINE` != 'InnoDB'";
+        $tables = dbFetchRows($query);
+        if (!empty($tables)) {
+            $validator->result(
+                ValidationResult::warn("Some tables are not using the recommended InnoDB engine, this may cause you issues.")
+                    ->setList('Tables', $tables)
             );
         }
     }
@@ -170,6 +184,12 @@ class Database extends BaseValidation
 
                 foreach ($data['Columns'] as $index => $cdata) {
                     $column = $cdata['Field'];
+
+                    // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
+                    if ($cdata['Type'] == 'timestamp') {
+                         $current_columns[$column]['Extra'] = preg_replace("/DEFAULT_GENERATED[ ]*/", '', $current_columns[$column]['Extra']);
+                    }
+
                     if (empty($current_columns[$column])) {
                         $validator->fail("Database: missing column ($table/$column)");
                         $primary = false;

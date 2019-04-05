@@ -18,8 +18,6 @@ use LibreNMS\Config;
 
 function authToken(\Slim\Route $route)
 {
-    global $permissions;
-
     if (Auth::check()) {
         $user = Auth::user();
 
@@ -29,7 +27,6 @@ function authToken(\Slim\Route $route)
             'user_id' => $user->user_id,
             'userlevel' => $user->level
         ];
-        $permissions = permissions_cache($user->user_id);
 
         return;
     }
@@ -2024,6 +2021,23 @@ function get_link()
     }
 
     api_success($link, 'link');
+}
+
+
+function list_sensors()
+{
+    check_is_read();
+
+    $app        = \Slim\Slim::getInstance();
+    $router     = $app->router()->getCurrentRoute()->getParams();
+
+    $sensors = \App\Models\Sensor::hasAccess(Auth::user())->get();
+    $total_sensors = $sensors->count();
+    if ($total_sensors == 0) {
+        api_error(404, 'Sensors do not exist');
+    }
+
+    api_success($sensors, 'sensors');
 }
 
 

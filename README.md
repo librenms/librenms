@@ -34,8 +34,9 @@ You can participate in the project by:
 - Talking to us on [Discord](https://t.libren.ms/discord) or [Twitter][3].
 - Joining the [LibreNMS Community](https://community.librenms.org)
 - Improving the [documentation][5].
-- Cloning the [repo][2] and filing [bug reports][18] and [pull requests][19] on github.
-  See [CONTRIBUTING][15] for more details.
+- Cloning the [repo][2] and filing [pull requests][19] on github.
+- [Bug Reports](https://community.librenms.org) on our Community Fourms
+- See [CONTRIBUTING][15] for more details.
 
 
 VM image

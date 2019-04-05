@@ -28,6 +28,9 @@ use LibreNMS\Alert\AlertData;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Config;
+use PHPMailer\PHPMailer\PHPMailer;
+use LibreNMS\Util\Time;
 
 /**
  * @param $rule
@@ -253,13 +256,14 @@ function RunRules($device_id)
  */
 function GetContacts($results)
 {
-    global $config, $authorizer;
+    global $config;
 
-    if (sizeof($results) == 0) {
-        return array();
+    if (empty($results)) {
+        return [];
     }
-    if ($config['alert']['default_only'] === true || $config['alerts']['email']['default_only'] === true) {
-        return array(''.($config['alert']['default_mail'] ? $config['alert']['default_mail'] : $config['alerts']['email']['default']) => '');
+    if (Config::get('alert.default_only') === true || Config::get('alerts.email.default_only') === true) {
+        $email = Config::get('alert.default_mail', Config::get('alerts.email.default'));
+        return $email ? [$email => ''] : [];
     }
     $users = LegacyAuth::get()->getUserlist();
     $contacts = array();
@@ -386,20 +390,6 @@ function populate($txt, $wrap = true)
 }//end populate()
 
 /**
- * "Safely" run eval
- * @param string $code Code to run
- * @param array  $obj  Object with variables
- * @return string|mixed
- */
-function RunJail($code, $obj)
-{
-    $ret = '';
-    @eval($code);
-    return $ret;
-}//end RunJail()
-
-
-/**
  * Describe Alert
  * @param array $alert Alert-Result from DB
  * @return array|boolean
@@ -422,8 +412,8 @@ function DescribeAlert($alert)
     $obj['version']       = $device['version'];
     $obj['location']      = $device['location'];
     $obj['uptime']        = $device['uptime'];
-    $obj['uptime_short']  = formatUptime($device['uptime'], 'short');
-    $obj['uptime_long']   = formatUptime($device['uptime']);
+    $obj['uptime_short']  = Time::formatInterval($device['uptime'], 'short');
+    $obj['uptime_long']   = Time::formatInterval($device['uptime']);
     $obj['description']   = $device['purpose'];
     $obj['notes']         = $device['notes'];
     $obj['alert_notes']   = $alert['note'];
@@ -821,8 +811,6 @@ function RunAlerts()
  */
 function ExtTransports($obj)
 {
-    global $config;
-    $tmp = false;
     $type  = new Template;
 
     // If alert transport mapping exists, override the default transports
@@ -830,47 +818,28 @@ function ExtTransports($obj)
 
     if (!$transport_maps) {
         $transport_maps = AlertUtil::getDefaultAlertTransports();
-        $legacy_transports = array_unique(array_map(function ($transports) {
-            return $transports['transport_type'];
-        }, $transport_maps));
-        foreach ($config['alert']['transports'] as $transport => $opts) {
-            if (in_array($transport, $legacy_transports)) {
-                // If it is a default transport type, then the alert has already been sent out, so skip
-                continue;
-            }
-            if (is_array($opts)) {
-                $opts = array_filter($opts);
-            }
-            $class  = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport);
-            if (($opts === true || !empty($opts)) && $opts != false && class_exists($class)) {
-                $transport_maps[] = [
-                    'transport_id' => null,
-                    'transport_type' => $transport,
-                    'opts' => $opts,
-                    'legacy' => true,
-                ];
-            }
-        }
-        unset($legacy_transports);
+    }
+
+    // alerting for default contacts, etc
+    if (Config::get('alert.transports.mail') === true && !empty($obj['contacts'])) {
+        $transport_maps[] = [
+            'transport_id' => null,
+            'transport_type' => 'mail',
+            'opts' => $obj,
+        ];
     }
 
     foreach ($transport_maps as $item) {
         $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($item['transport_type']);
-        //FIXME remove Deprecated noteice
-        $dep_notice = 'DEPRECATION NOTICE: https://t.libren.ms/deprecation-alerting';
         if (class_exists($class)) {
             //FIXME remove Deprecated transport
-            $transport_title = ($item['legacy'] === true) ? "Transport {$item['transport_type']} (%YTransport $dep_notice%n)" : "Transport {$item['transport_type']}";
+            $transport_title = "Transport {$item['transport_type']}";
             $obj['transport'] = $item['transport_type'];
             $obj['transport_name'] = $item['transport_name'];
             $obj['alert']     = new AlertData($obj);
             $obj['title']     = $type->getTitle($obj);
             $obj['alert']['title'] = $obj['title'];
             $obj['msg']       = $type->getBody($obj);
-            //FIXME remove Deprecated template check
-            if (preg_match('/{\/if}/', $type->getTemplate()->template)) {
-                c_echo(" :: %YTemplate $dep_notice :: Please update your template " . $type->getTemplate()->name . "%n" . PHP_EOL);
-            }
             c_echo(" :: $transport_title => ");
             $instance = new $class($item['transport_id']);
             $tmp = $instance->deliverAlert($obj, $item['opts']);

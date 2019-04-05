@@ -8,13 +8,13 @@
                     "sysDescr": "Temperature & Sensor Gateway",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
                     "location": null,
                     "os": "serverscheck",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "serverscheck.svg"
                 }
             ]
         },
@@ -26,13 +26,13 @@
                     "sysDescr": "Temperature & Sensor Gateway",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
                     "location": "<private>",
                     "os": "serverscheck",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "serverscheck.svg"
                 }
             ]
         }

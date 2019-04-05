@@ -29,28 +29,25 @@ class Alertmanager extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        $alertmanager_opts = [];
+        $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options']);
         $alertmanager_opts['url'] = $this->config['alertmanager-url'];
-        foreach (explode(PHP_EOL, $this->config['alertmanager-options']) as $option) {
-            list($k,$v) = explode('=', $option);
-            $alertmanager_opts[$k] = $v;
-        }
+
         return $this->contactAlertmanager($obj, $alertmanager_opts);
     }
 
     public static function contactAlertmanager($obj, $api)
     {
         if ($obj['state'] == 0) {
-            $alertmanager_status = 'resolved';
+            $alertmanager_status = 'endsAt';
         } else {
-            $alertmanager_status = 'firing';
+            $alertmanager_status = 'startsAt';
         }
         $gen_url          = (Config::get('base_url') . 'device/device=' . $obj['device_id']);
-        $host             = ($api['url'] . '/api/v1/alerts');
+        $host             = ($api['url'] . '/api/v2/alerts');
         $curl             = curl_init();
         $alertmanager_msg = strip_tags($obj['msg']);
         $data             = [[
-            'status' => $alertmanager_status,
+            $alertmanager_status => date("c"),
             'generatorURL' => $gen_url,
             'annotations' => [
                 'summary' => $obj['name'],
@@ -61,9 +58,13 @@ class Alertmanager extends Transport
                     'alertname' => $obj['name'],
                     'severity' => $obj['severity'],
                     'instance' => $obj['hostname'],
-                    'source' => $api['source'],
                 ],
         ]];
+
+        unset($api['url']);
+        foreach ($api as $label => $value) {
+            $data[0]['labels'][$label] = $value;
+        };
 
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);

@@ -9,7 +9,7 @@ Templates can be assigned to a single or a group of rules and can contain any ki
 
 To attach a template to a rule just open the `Alert Templates` settings page, choose the template to assign and click the yellow button in the `Actions` column. In the appearing popupbox select the rule(s) you want the template to be assigned to and click the `Attach` button. You might hold down the CTRL key to select multiple rules at once.
 
-The templating engine in use is Laravel Blade. We will cover some of the basics here, however the official Laravel docs will have more information [here](https://laravel.com/docs/5.4/blade) 
+The templating engine in use is Laravel Blade. We will cover some of the basics here, however the official Laravel docs will have more information [here](https://laravel.com/docs/5.7/blade) 
 
 ## Syntax
 
@@ -98,7 +98,7 @@ You can use plain text or html as per Alert templates and this will form the bas
 In your alert template just use
 
 ```
-@extends('alerts.templates.default');
+@extends('alerts.templates.default')
 
 @section('content')
   {{ $alert->title }}
@@ -107,7 +107,7 @@ In your alert template just use
 @endsection
 ```
 
-More info: https://laravel.com/docs/5.4/blade#extending-a-layout
+More info: https://laravel.com/docs/5.7/blade#extending-a-layout
 
 ## Examples
 
@@ -304,12 +304,26 @@ Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif <br>
 {{ $key }}: {{ $value['string'] }}<br>
 @endforeach 
 @if ($alert->faults) <b>Faults:</b><br>
-@foreach ($alert->faults as $key => $value)<img src="https://server/graph.php?device={{ $value['device_id'] }}&type=device_processor&width=459&height=213&lazy_w=552&from=end-72h><br>
+@foreach ($alert->faults as $key => $value)<img src="https://server/graph.php?device={{ $value['device_id'] }}&type=device_processor&width=459&height=213&lazy_w=552&from=end-72h"><br>
 https://server/graphs/id={{ $value['device_id'] }}/type=device_processor/<br>
 @endforeach 
 Template: CPU alert <br>
 @endif
 @endif
+```
+
+#### MS Teams formatted default template:
+```
+<a href="https://your.librenms.url/device/device={{ $alert->device_id }}/">{{ $alert->title }}</a>
+<pre><strong>Device name:</strong> {{ $alert->sysName }}
+<strong>Severity:</strong> {{ $alert->severity }}
+@if ($alert->state == 0)<strong>Time elapsed:</strong>{{ $alert->elapsed }}
+@endif<strong>Timestamp:</strong> {{ $alert->timestamp }}
+<strong>Unique-ID:</strong> {{ $alert->uid }}
+<strong>Rule:</strong>@if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif</pre>
+<pre style="white-space:normal;">@if ($alert->faults) <strong>Faults:</strong>
+ @foreach ($alert->faults as $key => $value)  #{{ $key }}: {{ $value['string'] }}
+ @endforeach </pre>  @endif
 ```
 
 ## Included
