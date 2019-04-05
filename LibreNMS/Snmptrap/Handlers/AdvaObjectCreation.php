@@ -28,7 +28,7 @@
 
 namespace LibreNMS\Snmptrap\Handlers;
 
-use App\Models\Devic;
+use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;

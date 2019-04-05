@@ -65,7 +65,6 @@ class AdvaSysAlmTrap implements SnmptrapHandler
         }
 
         $sysAlmDescr = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmDescr'));
-        $sysAlmState = $trap->getOidData($trap->findOid('CM-ALARM-MIB::cmSysAlmNotifCode'));
-        Log::event("System Alarm: $sysAlmDescr Status: $sysAlmState", $device->device_id, 'trap', $logSeverity);
+        Log::event("System Alarm: $sysAlmDescr Status: $alSeverity", $device->device_id, 'trap', $logSeverity);
     }
 }
