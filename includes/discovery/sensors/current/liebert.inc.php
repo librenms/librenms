@@ -72,9 +72,8 @@ foreach (array_keys($psline_data) as $index) {
         $user_func,
         $group
     );
-    }
+}
 unset($psline_data);
-
 
 $ps_data = snmpwalk_cache_oid($device, 'lgpPduPsTable', [], 'LIEBERT-GP-PDU-MIB', 'liebert', '-OQUse');
 
@@ -116,7 +115,7 @@ foreach (array_keys($ps_data) as $index) {
         $user_func,
         $group
     );
-    }
+}
 unset($ps_data);
 
 $rb_data = snmpwalk_cache_oid($device, 'lgpPduRbTable', [], 'LIEBERT-GP-PDU-MIB', 'liebert', '-OQUse');
@@ -161,5 +160,5 @@ foreach (array_keys($rb_data) as $index) {
         $user_func,
         $group
     );
-    }
+}
 unset($rb_data);
