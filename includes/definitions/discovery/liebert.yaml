@@ -12,8 +12,8 @@ modules:
                     divisor: 10
                     low_limit: lgpPduAuxMeasTempThrshldUndrAlmDegC
                     low_warn_limit: lgpPduAuxMeasTempThrshldUndrWarnDegC
-                    high_limit: lgpPduAuxMeasTempThrshldOvrAlmDegC
                     warn_limit: lgpPduAuxMeasTempThrshldOvrWarnDegC
+                    high_limit: lgpPduAuxMeasTempThrshldOvrAlmDegC
         humidity:
             data:
                 -
@@ -23,10 +23,10 @@ modules:
                     descr: 'Humidity for {{ $lgpPduAuxMeasUsrLabel }}'
                     index: 'lgpPduAuxMeasHum.{{ $index }}'
                     divisor: 10
-                    low_limit: lgpPduAuxMeasHumThrshldUndrAlmDegC
-                    low_warn_limit: lgpPduAuxMeasHumThrshldUndrWarnDegC
-                    high_limit: lgpPduAuxMeasHumThrshldOvrAlmDegC
-                    warn_limit: lgpPduAuxMeasHumThrshldOvrWarnDegC
+                    low_limit: lgpPduAuxMeasHumThrshldUndrAlm
+                    low_warn_limit: lgpPduAuxMeasHumThrshldUndrWarn
+                    warn_limit: lgpPduAuxMeasHumThrshldOvrWarn
+                    high_limit: lgpPduAuxMeasHumThrshldOvrAlm
         voltage:
             data:
                 -
@@ -36,8 +36,6 @@ modules:
                     descr: 'AC RMS {{ $lgpPduPsLineEntryLine }}'
                     index: 'lgpPduPsLineEntryEpLNTenths.{{ $index }}'
                     divisor: 10
-                    low_limit: lgpPduPsLineEntryEcThrshldUndrAlarm
-                    high_limit: lgpPduPsLineEntryEcThrshldOvrAlarm
         power:
             data:
                 -
@@ -54,35 +52,6 @@ modules:
                     index: 'lgpPduPsEntryApTotal.{{ $index }}'
         current:
             data:
-                -
-                    oid: lgpPduPsTable
-                    value: lgpPduPsEntryEcNeutral
-                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.20.1.70.{{ $index }}'
-                    descr: 'Neutral Current {{ $lgpPduPsEntryId }}'
-                    index: 'lgpPduPsEntryEcNeutral.{{ $index }}'
-                    divisor: 10
-                    high_limit: lgpPduPsEntryEcNeutralThrshldOvrAlarm
-                    warn_limit: lgpPduPsEntryEcNeutralThrshldOvrWarn
-                -
-                    oid: lgpPduPsLineTable
-                    value: lgpPduPsLineEntryEcHundredths
-                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.40.1.22.{{ $index }}'
-                    descr: 'Total Input Line {{ $lgpPduPsLineEntryId }}'
-                    index: 'lgpPduPsLineEntryEcHundredths.{{ $index }}'
-                    divisor: 100
-                    low_limit: lgpPduPsLineEntryEcThrshldUndrAlarm 
-                    warn_limit: lgpPduPsLineEntryEcThrshldOvrWarn
-                -
-                    oid: lgpPduRbTable
-                    value: lgpPduRbEntryEcHundredths
-                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.40.20.1.130.{{ $index }}'
-                    descr: 'RMS {{ $lgpPduRbEntryUsrLabel }}'
-                    index: 'lgpPduRbEntryEcHundredths.{{ $index }}'
-                    divisor: 100
-                    low_limit: lgpPduRbEntryEcThrshldUndrAlm
-                    warn_limit: lgpPduRbEntryEcThrshldOvrWarn
-                    high_limit: lgpPduRbEntryEcThrshldOvrAlm
-                    group: Line to Neutral
                 -
                     oid: lgpPduRbTable
                     value: lgpPduRbEntryEcAvailBeforeAlarmHundredths
