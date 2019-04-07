@@ -2,7 +2,6 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-
 $rrd_name = getPortRrdName($port_id, 'poe');
 $rrd_def = RrdDefinition::make()
     ->addDataset('PortPwrAllocated', 'GAUGE', 0)
@@ -61,7 +60,9 @@ if (($device['os'] == 'vrp')) {
         echo 'PoE(IOS) ';
     }//end if
 } else {
-    //This is the legacy code, to be tested against devices
+    //This is the legacy code, to be tested against devices. This code looks terribly broken. There is 
+    //most probably no device that can show anything out of this ...
+
     if ($this_port['dot3StatsIndex'] && $port['ifType'] == 'ethernetCsmacd') {
         $upd = "$polled:".$port['cpeExtPsePortPwrAllocated'].':'.$port['cpeExtPsePortPwrAvailable'].':'.
             $port['cpeExtPsePortPwrConsumption'].':'.$port['cpeExtPsePortMaxPwrDrawn'];
