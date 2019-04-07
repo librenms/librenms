@@ -80,12 +80,12 @@ $config['rrd_rra'] .= ' RRA:LAST:0.5:1:1440 ';
 // $config['rrdcached']    = "unix:/var/run/rrdcached.sock";
 
 // Web Interface Settings
-if (isset($_SERVER['HOST_NAME']) && isset($_SERVER['SERVER_PORT'])) {
-    if (strpos($_SERVER['HOST_NAME'], ':')) {
+if (isset($_SERVER['HTTP_HOST']) && isset($_SERVER['SERVER_PORT'])) {
+    if (strpos($_SERVER['HTTP_HOST'], ':')) {
         // Literal IPv6
-        $config['base_url'] = 'http://['.$_SERVER['HOST_NAME'].']'.($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
+        $config['base_url'] = 'http://['.$_SERVER['HTTP_HOST'].']'.($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
     } else {
-        $config['base_url'] = 'http://'.$_SERVER['HOST_NAME'].($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
+        $config['base_url'] = 'http://'.$_SERVER['HTTP_HOST'].($_SERVER['SERVER_PORT'] != 80 ? ':'.$_SERVER['SERVER_PORT'] : '').'/';
     }
 }
 
