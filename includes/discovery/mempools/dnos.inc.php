@@ -1,6 +1,6 @@
 <?php
 /**
- * dell-net.inc.php
+ * dnos.inc.php
  *
  * LibreNMS memory discovery module for Dell-Networking
  *
