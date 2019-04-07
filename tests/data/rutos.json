@@ -13,7 +13,7 @@
                     "os": "rutos",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "teltonika.png",
                     "location": null
                 }
             ]
@@ -31,7 +31,7 @@
                     "os": "rutos",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "teltonika.png",
                     "location": "<private>"
                 }
             ]
