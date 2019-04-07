@@ -2,6 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
+
 $rrd_name = getPortRrdName($port_id, 'poe');
 $rrd_def = RrdDefinition::make()
     ->addDataset('PortPwrAllocated', 'GAUGE', 0)
@@ -24,6 +25,22 @@ if (($device['os'] == 'vrp')) {
         $tags = compact('ifName', 'rrd_name', 'rrd_def');
         data_update($device, 'poe', $tags, $fields);
         echo 'PoE(vrp) ';
+    }
+} elseif (($device['os'] == 'linksys-ss')) {
+    //Tested 318P
+    if (isset($this_port['pethPsePortAdminEnable'])) {
+        $upd = "$polled:".$this_port['rlPethPsePortPowerLimit'].':'.$this_port['rlPethPsePortOutputPower'];
+
+        $fields = array(
+                'PortPwrAllocated'   => $this_port['rlPethPsePortPowerLimit'],
+                'PortPwrAvailable'   => $this_port['rlPethPsePortPowerLimit'],
+                'PortConsumption'    => $this_port['rlPethPsePortOutputPower'],
+                'PortMaxPwrDrawn'    => $this_port['rlPethPsePortPowerLimit'],
+                   );
+
+        $tags = compact('ifName', 'rrd_name', 'rrd_def');
+        data_update($device, 'poe', $tags, $fields);
+        echo 'PoE(linksys) ';
     }
 } elseif (($device['os'] == 'ios') || ($device['os'] == 'iosxe')) {
     // Code for Cisco IOS and IOSXE, tested on 2960X
