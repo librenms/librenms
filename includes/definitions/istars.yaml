@@ -2,6 +2,7 @@ os: istars
 text: 'East'
 icon: istars
 type: power
+rfc1628_compat: true
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
