@@ -1,0 +1,91 @@
+TPLINK-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+		tplinkProducts
+				FROM TPLINK-MIB;
+
+-- the *manageswitch switch entries are not defined anywhere. le sigh (spencerbutler)
+	tplink-tlsl5428		    OBJECT IDENTIFIER ::= { tplinkProducts 1 }
+	tplink-tlsl3452		    OBJECT IDENTIFIER ::= { tplinkProducts 2 }
+	tplink-tlsg3424		    OBJECT IDENTIFIER ::= { tplinkProducts 3 }
+	tplink-tlsg3216		    OBJECT IDENTIFIER ::= { tplinkProducts 4 }
+	tplink-tlsg3210		    OBJECT IDENTIFIER ::= { tplinkProducts 5 }
+	tplink-tlsl3428		    OBJECT IDENTIFIER ::= { tplinkProducts 6 }
+	tplink-tlsg5428		    OBJECT IDENTIFIER ::= { tplinkProducts 7 }
+	tplink-tlsg3424p	    OBJECT IDENTIFIER ::= { tplinkProducts 8 }
+	tplink-tlsg5412f	    OBJECT IDENTIFIER ::= { tplinkProducts 9 }
+	tplink-t2700-28tct	  OBJECT IDENTIFIER ::= { tplinkProducts 10 }
+	tplink-tlsl2428		    OBJECT IDENTIFIER ::= { tplinkProducts 11 }
+	tplink-tlsg2216		    OBJECT IDENTIFIER ::= { tplinkProducts 12 }
+	tplink-tlsg2424		    OBJECT IDENTIFIER ::= { tplinkProducts 13 }
+	tplink-tlsg5428cn	    OBJECT IDENTIFIER ::= { tplinkProducts 14 }
+	tplink-tlsg2452	 	    OBJECT IDENTIFIER ::= { tplinkProducts 15 }
+	tplink-tlsl2218		    OBJECT IDENTIFIER ::= { tplinkProducts 16 }
+	tplink-tlsg2424p	    OBJECT IDENTIFIER ::= { tplinkProducts 17 }
+	tplink-tlsg2210		    OBJECT IDENTIFIER ::= { tplinkProducts 18 }
+	tplink-tlsl2210		    OBJECT IDENTIFIER ::= { tplinkProducts 19 }
+	tplink-t3700g-28tq	  OBJECT IDENTIFIER ::= { tplinkProducts 20 }
+	tplink-tlsl2226p	    OBJECT IDENTIFIER ::= { tplinkProducts 21 }
+	tplink-tlsl2452		    OBJECT IDENTIFIER ::= { tplinkProducts 22 }
+	tplink-tlsl2218p	    OBJECT IDENTIFIER ::= { tplinkProducts 23 }
+	tplink-tlsg3424-ipv6	OBJECT IDENTIFIER ::= { tplinkProducts 24 }
+	tplink-tlsg2008		    OBJECT IDENTIFIER ::= { tplinkProducts 25 }
+	tplink-tlsg2210p	    OBJECT IDENTIFIER ::= { tplinkProducts 26 }
+	tplink-t2700g-28tq	  OBJECT IDENTIFIER ::= { tplinkProducts 27 }
+	tplink-t1600g-28ts	  OBJECT IDENTIFIER ::= { tplinkProducts 28 }
+	tplink-t1600g-52ts	  OBJECT IDENTIFIER ::= { tplinkProducts 29 }
+	tplink-t3700g-54tq	  OBJECT IDENTIFIER ::= { tplinkProducts 30 }
+	tplink-t1700g-28tq	  OBJECT IDENTIFIER ::= { tplinkProducts 31 }
+	tplink-t1700g-52tq	  OBJECT IDENTIFIER ::= { tplinkProducts 32 }
+	tplink-t2600g-28ts	  OBJECT IDENTIFIER ::= { tplinkProducts 33 }
+	tplink-t2600g-52ts	  OBJECT IDENTIFIER ::= { tplinkProducts 34 }
+	tplink-t1600g-28ps	  OBJECT IDENTIFIER ::= { tplinkProducts 37 }
+	tplink-t1600g-52ps	  OBJECT IDENTIFIER ::= { tplinkProducts 38 }
+	tplink-tlsg2224p	    OBJECT IDENTIFIER ::= { tplinkProducts 39 }
+	tplink-tlsg3428 	    OBJECT IDENTIFIER ::= { tplinkProducts 40 }
+	tplink-t1700x-16ts	  OBJECT IDENTIFIER ::= { tplinkProducts 41 }
+	--tlsl3226p-combo_v1    OBJECT IDENTIFIER ::= { l2manageswitch 42 }
+	--tlsl3218pe-combo_v1   OBJECT IDENTIFIER ::= { l2manageswitch 43 }
+	tplink-t2500-28tc     OBJECT IDENTIFIER ::= { tplinkProducts 44 }
+	--tlsl3226pe-combo_v1   OBJECT IDENTIFIER ::= { l2manageswitch 45 }
+	--tlsl3452-combo_v1     OBJECT IDENTIFIER ::= { l2manageswitch 46 }
+	--tlsg3210_v3           OBJECT IDENTIFIER ::= { l2manageswitch 47 }
+	--tlsg3218_v1           OBJECT IDENTIFIER ::= { l2manageswitch 48 }
+	--tlsl3226-combo_v1     OBJECT IDENTIFIER ::= { l2manageswitch 49 }
+	--tlsl3226_v1           OBJECT IDENTIFIER ::= { l2manageswitch 50 }
+	--tlsg3452_v1           OBJECT IDENTIFIER ::= { l2manageswitch 51 }
+	--tlsg5428_v2           OBJECT IDENTIFIER ::= { l3manageswitch 52 }
+	--tlsl3428-combo_v1     OBJECT IDENTIFIER ::= { l2manageswitch 53 }
+	--tlsl3218_v1           OBJECT IDENTIFIER ::= { l2manageswitch 54 }
+	--tlsl3218-combo_v1     OBJECT IDENTIFIER ::= { l2manageswitch 55 }
+	--tlsg3226p_v1          OBJECT IDENTIFIER ::= { l2manageswitch 56 }
+	--tlsg3226pe_v1         OBJECT IDENTIFIER ::= { l2manageswitch 57 }
+	--tlsg3218pe_v1         OBJECT IDENTIFIER ::= { l2manageswitch 58 }
+	tplink-t2500g-10ts    OBJECT IDENTIFIER ::= { tplinkProducts 59 }
+	--tlsl3210_v2           OBJECT IDENTIFIER ::= { l2manageswitch 60 }
+	--tlsl3109_v1           OBJECT IDENTIFIER ::= { l2manageswitch 61 }
+	--tlsl3210pe_v1         OBJECT IDENTIFIER ::= { l2manageswitch 62 }
+	--tlsg3210pe_v1         OBJECT IDENTIFIER ::= { l2manageswitch 63 }
+	--tlsl5218-combo_v1     OBJECT IDENTIFIER ::= { l3manageswitch 64 }
+	--tlsl5210_v1	          OBJECT IDENTIFIER ::= { l3manageswitch 65 }
+	--tlsl5428-combo_v1	    OBJECT IDENTIFIER ::= { l3manageswitch 66 }
+	--tlsg5218_v1	          OBJECT IDENTIFIER ::= { l3manageswitch 67 }
+	--tlsg5210_v1	          OBJECT IDENTIFIER ::= { l3manageswitch 68 }
+	--tlsl5452-combo_v1	    OBJECT IDENTIFIER ::= { l3manageswitch 71 }
+	tplink-t2600g-18ts	  OBJECT IDENTIFIER ::= { tplinkProducts 72 }
+	--tlsg5452_v1	          OBJECT IDENTIFIER ::= { l3manageswitch 73 }
+	tplink-t2600g-28mps	  OBJECT IDENTIFIER ::= { tplinkProducts 74 }
+	--tlsg5820f_v1          OBJECT IDENTIFIER ::= { l3manageswitch 75 }
+	tplink-t1500g-8t	    OBJECT IDENTIFIER ::= { tplinkProducts 76 }
+	tplink-t1500g-10ps	  OBJECT IDENTIFIER ::= { tplinkProducts 78 }
+	tplink-t1500g-10mps	  OBJECT IDENTIFIER ::= { tplinkProducts 80 }
+	tplink-t1500-28tc	    OBJECT IDENTIFIER ::= { tplinkProducts 82 }
+	tplink-t1500-28pct	  OBJECT IDENTIFIER ::= { tplinkProducts 84 }
+	tplink-t1600g-18ts	  OBJECT IDENTIFIER ::= { tplinkProducts 86 }
+	tplink-t2500g-10mps	  OBJECT IDENTIFIER ::= { tplinkProducts 88 }
+	tplink-t2600g-28ps	  OBJECT IDENTIFIER ::= { tplinkProducts 90 }
+	tplink-t2600g-28sq	  OBJECT IDENTIFIER ::= { tplinkProducts 92 }
+		
+END
+
