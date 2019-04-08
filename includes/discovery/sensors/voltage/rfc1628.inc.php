@@ -37,7 +37,7 @@ foreach ($output_volts as $index => $data) {
 
     $upsOutputVoltage_value = $data['upsOutputVoltage'];
 
-    if (is_array($data['upsOutputVoltage'])) {
+    if (isset($data['upsOutputVoltage'][0])) {
         $upsOutputVoltage_value = $data['upsOutputVoltage'][0];
         $volt_oid .= ".0";
     }
@@ -71,7 +71,7 @@ foreach ($input_volts as $index => $data) {
     
     $upsInputVoltage_value = $data['upsInputVoltage'];
     
-    if (is_array($data['upsInputVoltage'])) {
+    if (isset($data['upsInputVoltage'][0])) {
         $upsInputVoltage_value = $data['upsInputVoltage'][0];
         $volt_oid .= ".0";
     }
@@ -102,7 +102,7 @@ foreach ($bypass_volts as $index => $data) {
     if (count($bypass_volts) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsBypassVoltage'])) {
+    if (isset($data['upsBypassVoltage'][0])) {
         $data['upsBypassVoltage'] = $data['upsBypassVoltage'][0];
     }
 

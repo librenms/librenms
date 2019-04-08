@@ -8,7 +8,7 @@ foreach ($output_power as $index => $data) {
     if (count($output_power) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsOutputPower'])) {
+    if (isset($data['upsOutputPower'][0])) {
         $data['upsOutputPower'] = $data['upsOutputPower'][0];
     }
 
@@ -37,7 +37,7 @@ foreach ($input_power as $index => $data) {
     if (count($input_power) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsInputTruePower'])) {
+    if (isset($data['upsInputTruePower'][0])) {
         $data['upsInputTruePower'] = $data['upsInputTruePower'][0];
     }
 
@@ -65,7 +65,7 @@ foreach ($bypass_power as $index => $data) {
     if (count($bypass_power) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsBypassPower'])) {
+    if (isset($data['upsBypassPower'][0])) {
         $data['upsBypassPower'] = $data['upsBypassPower'][0];
     }
 

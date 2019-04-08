@@ -10,7 +10,7 @@ foreach ($input_freq as $index => $data) {
     if (count($input_freq) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsInputFrequency'])) {
+    if (isset($data['upsInputFrequency'][0])) {
         $data['upsInputFrequency'] = $data['upsInputFrequency'][0];
     }
 
