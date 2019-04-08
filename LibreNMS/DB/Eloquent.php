@@ -25,42 +25,27 @@
 
 namespace LibreNMS\DB;
 
+use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Events\Dispatcher;
+use LibreNMS\Util\Laravel;
 
 class Eloquent
 {
     /** @var Capsule static reference to capsule */
     private static $capsule;
-    private static $legacy_listener_installed = false;
 
-    public static function boot($options = [])
+    public static function boot()
     {
         // boot Eloquent outside of Laravel
-        if (!defined('LARAVEL_START') && class_exists(Capsule::class) && is_null(self::$capsule)) {
+        if (!Laravel::isBooted() && is_null(self::$capsule)) {
             $install_dir = realpath(__DIR__ . '/../../');
+
+            (new Dotenv($install_dir))->load();
 
             $db_config = include($install_dir . '/config/database.php');
             $settings = $db_config['connections'][$db_config['default']];
-
-            // legacy connection override
-            if (!empty($options)) {
-                $fields = [
-                    'host' => 'db_host',
-                    'port' => 'db_port',
-                    'database' => 'db_name',
-                    'username' => 'db_user',
-                    'password' => 'db_pass',
-                    'unix_socket' => 'db_socket',
-                ];
-
-                foreach ($fields as $new => $old) {
-                    if (isset($options[$old])) {
-                        $settings[$new] = $options[$old];
-                    }
-                }
-            }
 
             self::$capsule = new Capsule;
             self::$capsule->addConnection($settings);
@@ -75,7 +60,7 @@ class Eloquent
 
     public static function initLegacyListeners()
     {
-        if (self::isConnected() && !self::$legacy_listener_installed) {
+        if (self::isConnected()) {
             // set FETCH_ASSOC for queries that required by setting the global variable $PDO_FETCH_ASSOC (for dbFacile)
             self::DB()->getEventDispatcher()->listen(StatementPrepared::class, function ($event) {
                 global $PDO_FETCH_ASSOC;
@@ -83,7 +68,6 @@ class Eloquent
                     $event->statement->setFetchMode(\PDO::FETCH_ASSOC);
                 }
             });
-            self::$legacy_listener_installed = true;
         }
     }
 
@@ -107,8 +91,7 @@ class Eloquent
         try {
             $conn = self::DB();
             if ($conn) {
-                $conn->getPdo();
-                return true;
+                return !is_null($conn->getPdo());
             }
         } catch (\PDOException $e) {
             return false;
@@ -125,7 +108,7 @@ class Eloquent
     public static function DB()
     {
         // check if Laravel is booted
-        if (defined('LARAVEL_START') && class_exists('DB')) {
+        if (Laravel::isBooted()) {
             return \DB::connection();
         }
 

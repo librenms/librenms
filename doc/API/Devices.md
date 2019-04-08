@@ -758,6 +758,58 @@ Output:
 }
 ```
 
+### `list_sensors`
+
+Get a list of all Sensors.
+
+Route: `/api/v0/resources/sensors`
+
+Input:
+
+  -
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/sensors
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "sensors": [
+        {
+            "sensor_id": 218810,
+            "sensor_deleted": 0,
+            "sensor_class": "dbm",
+            "device_id": 136,
+            "poller_type": "snmp",
+            "sensor_oid": ".1.3.6.1.4.1.2636.3.60.1.1.1.1.7.919",
+            "sensor_index": "tx-919",
+            "sensor_type": "junos",
+            "sensor_descr": "xe-2/1/4 Tx Power",
+            "group": null,
+            "sensor_divisor": 100,
+            "sensor_multiplier": 1,
+            "sensor_current": -1.81,
+            "sensor_limit": 2,
+            "sensor_limit_warn": 0.5,
+            "sensor_limit_low": -9.7,
+            "sensor_limit_low_warn": -8.21,
+            "sensor_alert": 1,
+            "sensor_custom": "No",
+            "entPhysicalIndex": "919",
+            "entPhysicalIndex_measured": "ports",
+            "lastupdate": "2019-02-18 02:47:09",
+            "sensor_prev": -1.77,
+            "user_func": null
+        },
+        ...
+    ],
+    "count": 100
+}
+```
+
 ### `list_devices`
 
 Return a list of devices.

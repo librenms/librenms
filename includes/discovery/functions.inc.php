@@ -218,6 +218,8 @@ function discover_device(&$device, $force_module = false)
 // Discover sensors
 function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null)
 {
+    $guess_limits   = Config::get('sensors.guess_limits', true);
+
     $low_limit      = set_null($low_limit);
     $low_warn_limit = set_null($low_warn_limit);
     $warn_limit     = set_null($warn_limit);
@@ -227,7 +229,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         $divisor  = 1;
     }
 
-    d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current\n");
+    d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current, (limits: LL: $low_limit, LW: $low_warn_limit, W: $warn_limit, H: $high_limit)\n");
 
     if (isset($warn_limit, $low_warn_limit) && $low_warn_limit > $warn_limit) {
         // Fix high/low thresholds (i.e. on negative numbers)
@@ -235,11 +237,11 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     }
 
     if (dbFetchCell('SELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ?', array($poller_type, $class, $device['device_id'], $type, (string)$index)) == '0') {
-        if (is_null($high_limit)) {
+        if ($guess_limits && is_null($high_limit)) {
             $high_limit = sensor_limit($class, $current);
         }
 
-        if (is_null($low_limit)) {
+        if ($guess_limits && is_null($low_limit)) {
             $low_limit = sensor_low_limit($class, $current);
         }
 
@@ -285,7 +287,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         $sensor_entry = dbFetchRow('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ?', array($class, $device['device_id'], $type, (string)$index));
 
         if (!isset($high_limit)) {
-            if (!$sensor_entry['sensor_limit']) {
+            if ($guess_limits && !$sensor_entry['sensor_limit']) {
                 // Calculate a reasonable limit
                 $high_limit = sensor_limit($class, $current);
             } else {
@@ -295,7 +297,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         }
 
         if (!isset($low_limit)) {
-            if (!$sensor_entry['sensor_limit_low']) {
+            if ($guess_limits && !$sensor_entry['sensor_limit_low']) {
                 // Calculate a reasonable limit
                 $low_limit = sensor_low_limit($class, $current);
             } else {
@@ -604,6 +606,12 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
     if ($descr && $size > '0') {
         $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', array($index, $device['device_id'], $mib));
         if ($storage === false || !count($storage)) {
+            if (Config::getOsSetting($device['os'], 'storage_perc_warn')) {
+                $perc_warn = Config::getOsSetting($device['os'], 'storage_perc_warn');
+            } else {
+                $perc_warn = Config::get('storage_perc_warn', 60);
+            }
+
             $insert = dbInsert(
                 array(
                     'device_id' => $device['device_id'],
@@ -614,6 +622,7 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
                     'storage_units' => $units,
                     'storage_size' => $size,
                     'storage_used' => $used,
+                    'storage_perc_warn' => $perc_warn,
                 ),
                 'storage'
             );

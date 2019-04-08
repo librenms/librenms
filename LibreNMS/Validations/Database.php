@@ -44,6 +44,7 @@ class Database extends BaseValidation
 
         $this->checkMode($validator);
         $this->checkTime($validator);
+        $this->checkMysqlEngine($validator);
 
         // check database schema version
         $current = get_db_schema();
@@ -71,7 +72,6 @@ class Database extends BaseValidation
             $validator->warn("Your database schema ($current) is newer than expected ($latest). If you just switched to the stable release from the daily release, your database is in between releases and this will be resolved with the next release.");
         }
 
-        $this->checkMysqlEngine($validator);
         $this->checkCollation($validator);
         $this->checkSchema($validator);
     }

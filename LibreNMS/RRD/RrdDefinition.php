@@ -49,7 +49,7 @@ class RrdDefinition
      * @param int $min Minimum allowed value.  null means undefined.
      * @param int $max Maximum allowed value.  null means undefined.
      * @param int $heartbeat Heartbeat for this dataset. Uses the global setting if null.
-     * @return $this
+     * @return RrdDefinition
      */
     public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
     {

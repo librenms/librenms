@@ -292,105 +292,48 @@ function print_graph_popup($graph_array)
     echo generate_graph_popup($graph_array);
 }//end print_graph_popup()
 
-
-function permissions_cache($user_id)
-{
-    $permissions = array();
-    foreach (dbFetchRows("SELECT * FROM devices_perms WHERE user_id = '" . $user_id . "'") as $device) {
-        $permissions['device'][$device['device_id']] = 1;
-    }
-
-    foreach (dbFetchRows("SELECT * FROM ports_perms WHERE user_id = '" . $user_id . "'") as $port) {
-        $permissions['port'][$port['port_id']] = 1;
-    }
-
-    foreach (dbFetchRows("SELECT * FROM bill_perms WHERE user_id = '" . $user_id . "'") as $bill) {
-        $permissions['bill'][$bill['bill_id']] = 1;
-    }
-
-    return $permissions;
-}//end permissions_cache()
-
-
 function bill_permitted($bill_id)
 {
-    global $permissions;
-
     if (LegacyAuth::user()->hasGlobalRead()) {
-        $allowed = true;
-    } elseif ($permissions['bill'][$bill_id]) {
-        $allowed = true;
-    } else {
-        $allowed = false;
+        return true;
     }
 
-    return $allowed;
-}//end bill_permitted()
-
+    return \Permissions::canAccessBill($bill_id, LegacyAuth::id());
+}
 
 function port_permitted($port_id, $device_id = null)
 {
-    global $permissions;
-
     if (!is_numeric($device_id)) {
         $device_id = get_device_id_by_port_id($port_id);
     }
 
-    if (LegacyAuth::user()->hasGlobalRead()) {
-        $allowed = true;
-    } elseif (device_permitted($device_id)) {
-        $allowed = true;
-    } elseif ($permissions['port'][$port_id]) {
-        $allowed = true;
-    } else {
-        $allowed = false;
+    if (device_permitted($device_id)) {
+        return true;
     }
 
-    return $allowed;
-}//end port_permitted()
-
+    return \Permissions::canAccessPort($port_id, LegacyAuth::id());
+}
 
 function application_permitted($app_id, $device_id = null)
 {
-    global $permissions;
-
-    if (is_numeric($app_id)) {
-        if (!$device_id) {
-            $device_id = get_device_id_by_app_id($app_id);
-        }
-
-        if (LegacyAuth::user()->hasGlobalRead()) {
-            $allowed = true;
-        } elseif (device_permitted($device_id)) {
-            $allowed = true;
-        } elseif ($permissions['application'][$app_id]) {
-            $allowed = true;
-        } else {
-            $allowed = false;
-        }
-    } else {
-        $allowed = false;
+    if (!is_numeric($app_id)) {
+        return false;
     }
 
-    return $allowed;
-}//end application_permitted()
+    if (!$device_id) {
+        $device_id = get_device_id_by_app_id($app_id);
+    }
 
+    return device_permitted($device_id);
+}
 
 function device_permitted($device_id)
 {
-    global $permissions;
-
     if (LegacyAuth::user()->hasGlobalRead()) {
-        $allowed = true;
-    } elseif ($permissions['device'][$device_id]) {
-        $allowed = true;
-    } else {
-        $allowed = false;
+        return true;
     }
-
-    return $allowed;
-}//end device_permitted()
-
+    return \Permissions::canAccessDevice($device_id, LegacyAuth::id());
+}
 
 function print_graph_tag($args)
 {
@@ -1407,6 +1350,9 @@ function get_oxidized_nodes_list()
         echo "
         </td>
         <td>
+        " . $device['sysName'] . "
+        </td>
+        <td>
         <i class='fa fa-square text-" . $fa_color . "'></i>
         </td>
         <td>
@@ -1636,7 +1582,6 @@ function get_device_name($device)
 /**
  * Returns state generic label from value with optional text
  */
-
 function get_state_label($state_value, $state_text_param = null)
 {
     switch ($state_value) {
@@ -1689,7 +1634,6 @@ function get_sensor_label_color($sensor)
 /**
  * Rounds down to the closest number divisible by 5.
  */
-
 function lowest_five($number)
 {
     return floor($number / 5) * 5;
@@ -1703,7 +1647,7 @@ function lowest_five_minutes($time)
     return $time - ($time % 300);
 }
 
-/*
+/**
  * @params int
  * @return string
  *
@@ -1752,7 +1696,7 @@ function time_to_nfsen_subpath($time)
     }
 }
 
-/*
+/**
  * @params string hostname
  * @return array
  *
@@ -1760,7 +1704,6 @@ function time_to_nfsen_subpath($time)
  * keys for the string are channel names and the values are is the
  * path to the RRD for the channel.
 */
-
 function nfsen_channel_rrds($hostname)
 {
     $channels=array();
@@ -1805,14 +1748,13 @@ function nfsen_channel_rrds($hostname)
     return $channels;
 }
 
-/*
+/**
  * @params string hostname
  * @return string
  *
  * Takes a hostname and transforms it to the name
  * used by nfsen.
 */
-
 function nfsen_hostname($hostname)
 {
     $nfsen_hostname=str_replace('.', Config::get('nfsen_split_char'), $hostname);
@@ -1823,14 +1765,13 @@ function nfsen_hostname($hostname)
     return $nfsen_hostname;
 }
 
-/*
+/**
  * @params string hostname
  * @return string
  *
  * Takes a hostname and returns the path to the nfsen
  * live dir.
 */
-
 function nfsen_live_dir($hostname)
 {
     $hostname=nfsen_hostname($hostname);
@@ -1840,4 +1781,45 @@ function nfsen_live_dir($hostname)
             return $base_dir.'/profiles-data/live/'.$hostname;
         }
     }
+}
+
+/**
+ * Get the unit for the sensor class given as parameter
+ * @param $class
+ * @return string The unit
+ */
+function get_unit_for_sensor_class($class)
+{
+    $units_by_classes = array(
+        'ber'                  => '',
+        'charge'               => '%',
+        'chromatic_dispersion' => 'ps/nm',
+        'cooling'              => 'W',
+        'count'                => '',
+        'current'              => 'A',
+        'dbm'                  => 'dBm',
+        'delay'                => 's',
+        'eer'                  => '',
+        'fanspeed'             => 'rpm',
+        'frequency'            => 'Hz',
+        'humidity'             => '%',
+        'load'                 => '%',
+        'power'                => 'W',
+        'power_consumed'       => 'kWh',
+        'power_factor'         => '',
+        'pressure'             => 'kPa',
+        'quality_factor'       => 'dB',
+        'signal'               => 'dBm',
+        'snr'                  => 'dB',
+        'state'                => '',
+        'temperature'          => '&deg;C',
+        'voltage'              => 'V',
+        'waterflow'            => 'l/m',
+    );
+
+    if (!array_key_exists($class, $units_by_classes)) {
+        return '';
+    }
+
+    return $units_by_classes[$class];
 }

@@ -130,8 +130,10 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
         'graph'            => overlib_link($link_graph, $sensor_minigraph, $overlib_content, null),
         'alert'            => $alert,
         'sensor_current'   => $sensor_current,
-        'sensor_limit_low' => is_null($sensor['sensor_limit_low']) ? '-' : round($sensor['sensor_limit_low'], 2).$unit,
-        'sensor_limit'     => is_null($sensor['sensor_limit']) ? '-' : round($sensor['sensor_limit'], 2).$unit,
+        'sensor_limit_low' => is_null($sensor['sensor_limit_low']) ? '-' :
+            '<span class=\'label label-default\'>' . trim(format_si($sensor['sensor_limit_low']) . $unit) . '</span>',
+        'sensor_limit'     => is_null($sensor['sensor_limit']) ? '-' :
+            '<span class=\'label label-default\'>' . trim(format_si($sensor['sensor_limit']) . $unit) . '</span>',
     );
 
     if ($vars['view'] == 'graphs') {

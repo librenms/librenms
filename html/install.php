@@ -27,7 +27,7 @@ $init_modules = array('web', 'nodb');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 // List of php modules we expect to see
-$modules = array('gd','mysqlnd');
+$modules = array('gd','mysqlnd', 'pdo_mysql');
 
 $dbhost = @$_POST['dbhost'] ?: 'localhost';
 $dbuser = @$_POST['dbuser'] ?: 'librenms';

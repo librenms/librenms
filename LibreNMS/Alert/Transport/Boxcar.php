@@ -48,11 +48,9 @@ class Boxcar extends Transport
         if (empty($this->config)) {
             return $this->deliverAlertOld($obj, $opts);
         }
+        $boxcar_opts = $this->parseUserOptions($this->config['options']);
         $boxcar_opts['access_token'] = $this->config['boxcar-token'];
-        foreach (explode(PHP_EOL, $this->config['options']) as $option) {
-            list($k,$v) = explode('=', $option);
-            $boxcar_opts[$k] = $v;
-        }
+
         return $this->contactBoxcar($obj, $boxcar_opts);
     }
 

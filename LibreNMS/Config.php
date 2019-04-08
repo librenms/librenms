@@ -442,10 +442,6 @@ class Config
             self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
         }
 
-        if (self::get('secure_cookies')) {
-            ini_set('session.cookie_secure', 1);
-        }
-
         // If we're on SSL, let's properly detect it
         if (isset($_SERVER['HTTPS'])) {
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
@@ -533,19 +529,14 @@ class Config
         }
 
         // Check for testing database
-        if (getenv('DBTEST')) {
-            if (isset($config['test_db_name'])) {
-                putenv('DB_DATABASE=' . $config['test_db_name']);
-                $config['db_name'] = $config['test_db_name'];
-            }
-            if (isset($config['test_db_user'])) {
-                putenv('DB_USERNAME=' . $config['test_db_user']);
-                $config['db_user'] = $config['test_db_user'];
-            }
-            if (isset($config['test_db_pass'])) {
-                putenv('DB_PASSWORD=' . $config['test_db_pass']);
-                $config['db_pass'] = $config['test_db_pass'];
-            }
+        if (isset($config['test_db_name'])) {
+            putenv('DB_TEST_DATABASE=' . $config['test_db_name']);
+        }
+        if (isset($config['test_db_user'])) {
+            putenv('DB_TEST_USERNAME=' . $config['test_db_user']);
+        }
+        if (isset($config['test_db_pass'])) {
+            putenv('DB_TEST_PASSWORD=' . $config['test_db_pass']);
         }
 
         return array_intersect_key($config, $keys); // return only the db settings

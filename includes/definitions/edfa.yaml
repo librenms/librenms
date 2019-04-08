@@ -1,0 +1,15 @@
+os: edfa
+text: 'EDFA'
+type: network
+icon: edfa
+group: edfa
+mib_dir:
+    - edfa
+over:
+    - { graph: device_dbm, text: 'dBm' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.17409.1
+        sysObjectID_except:
+            - .1.3.6.1.4.1.17409.1.11

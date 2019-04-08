@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
+use LibreNMS\Util\Time;
 
 class DeviceController extends TableController
 {
@@ -125,7 +126,7 @@ class DeviceController extends TableController
             'metrics' => $this->getMetrics($device),
             'hardware' => Rewrite::ciscoHardware($device),
             'os' => $this->getOsText($device),
-            'uptime' => $device->formatUptime(true),
+            'uptime' => (!$device->status && !$device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : $device->last_polled->diffInSeconds(), 'short'),
             'location' => $this->getLocation($device),
             'actions' => $this->getActions($device),
         ];
@@ -211,6 +212,8 @@ class DeviceController extends TableController
     /**
      * @param $device
      * @param $count
+     * @param $tab
+     * @param $icon
      * @return string
      */
     private function formatMetric($device, $count, $tab, $icon)

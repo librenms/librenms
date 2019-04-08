@@ -61,7 +61,7 @@ foreach ($menu_options as $option => $text) {
 }
 
 $displayLists .= '<div style="float: right;">';
-$displayLists .= '<a href="csv.php/report=' . generate_url($vars, array('format' => '')) . '" title="Export as CSV" target="_blank" rel="noopener">Export CSV</a> | <a href="' . generate_url($vars) . '" title="Update the browser URL to reflect the search criteria.">Update URL</a>';
+$displayLists .= '<a href="csv.php/report=' . generate_url($vars, array('format' => '')) . '" title="Export as CSV" target="_blank" rel="noopener">Export CSV</a> | <a href="' . generate_url($vars) . '" title="Update the browser URL to reflect the search criteria.">Update URL</a> | ';
 
 if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
     $displayLists .= '<a href="' . generate_url($vars, array('searchbar' => '')) . '">Search</a>';

@@ -26,7 +26,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 
 abstract class BaseModel extends Model
 {
@@ -69,8 +69,7 @@ abstract class BaseModel extends Model
             $table = $this->getTable();
         }
 
-        return $query->join('devices_perms', 'devices_perms.device_id', "$table.device_id")
-            ->where('devices_perms.user_id', $user->user_id);
+        return $query->whereIn("$table.device_id", \Permissions::devicesForUser($user));
     }
 
     /**
@@ -91,11 +90,9 @@ abstract class BaseModel extends Model
             $table = $this->getTable();
         }
 
-        return $query->join('ports_perms', 'ports_perms.port_id', "$table.port_id")
-            ->join('devices_perms', 'devices_perms.device_id', "$table.device_id")
-            ->where(function ($query) use ($user) {
-                $query->where('ports_perms.user_id', $user->user_id)
-                    ->orWhere('devices_perms.user_id', $user->user_id);
-            });
+        return $query->where(function ($query) use ($table, $user) {
+            return $query->whereIn("$table.port_id", \Permissions::portsForUser($user))
+                ->orWhereIn("$table.device_id", \Permissions::devicesForUser($user));
+        });
     }
 }

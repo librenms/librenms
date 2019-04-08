@@ -32,7 +32,7 @@ class Eventlog extends DeviceRelatedModel
     protected $table = 'eventlog';
     protected $primaryKey = 'event_id';
     public $timestamps = false;
-    protected $fillable = ['datetime', 'message', 'type', 'reference', 'username', 'severity'];
+    protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
 
     // ---- Helper Functions ----
 
