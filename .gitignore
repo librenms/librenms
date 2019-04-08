@@ -39,3 +39,6 @@ _ide_helper_models.php
 ########
 out
 librenms_theme
+librenms-docker/docker-compose.yml
+librenms-docker/librenms.env
+laradock-lnms/
