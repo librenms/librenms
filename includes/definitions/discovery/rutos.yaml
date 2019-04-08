@@ -1,0 +1,66 @@
+mib: TELTONIKA-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - Operator
+        temperature:
+            data:
+                -
+                    oid: Temperature
+                    value: Temperature
+                    num_oid: '.1.3.6.1.4.1.48690.2.9.{{ $index }}'
+                    descr: system
+                    index: 'Temperature.{{ $index }}'
+                    divisor: 10
+
+        state:
+            data:
+                -
+                    oid: PinState
+                    value: PinState
+                    num_oid: '.1.3.6.1.4.1.48690.2.2.{{ $index }}'
+                    descr: Pinstate
+                    index: 'PinState.{{ $index }}'
+                    state_name: Pinstate
+                    states:
+                        - { descr: READY , graph: 0, value: 0, generic: 0 }
+                        - { descr: not READY, graph: 0, value: 1, generic: 2 }
+
+                -
+                    oid: ConnectionState
+                    value: ConnectionState
+                    num_oid: '.1.3.6.1.4.1.48690.2.7.{{ $index }}'
+                    descr: "{{ $Operator }}"
+                    index: 'ConnectionState.{{ $index }}'
+                    state_name: ConnectionState
+                    states:
+                        - { descr: connected , graph: 0, value: 0, generic: 0 }
+                        - { descr: not connected, graph: 0, value: 1, generic: 2 }
+
+                -
+                    oid: ConnectionType
+                    value: ConnectionType
+                    num_oid: '.1.3.6.1.4.1.48690.2.8.{{ $index }}'
+                    descr: "{{ $Operator }}"
+                    index: 'ConnectionType.{{ $index }}'
+                    state_name: ConnectionType
+                    states:
+                        - { descr: LTE , graph: 0, value: 0, generic: 0 }
+                        - { descr: 3G, graph: 0, value: 1, generic: 2 }
+                        - { descr: 2G, graph: 0, value: 2, generic: 2 }
+
+
+        dbm:
+            data:
+                -
+                    oid: Signal
+                    value: Signal
+                    num_oid: '.1.3.6.1.4.1.48690.2.4.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'Signal'
+                    descr: 'signal'
+                    index: 'Signal.{{ $index }}'
+
+
