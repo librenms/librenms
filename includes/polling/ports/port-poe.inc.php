@@ -60,7 +60,7 @@ if (($device['os'] == 'vrp')) {
         echo 'PoE(IOS) ';
     }//end if
 } else {
-    //This is the legacy code, to be tested against devices. This code looks terribly broken. There is 
+    //This is the legacy code, to be tested against devices. This code looks terribly broken. There is
     //most probably no device that can show anything out of this ...
 
     if ($this_port['dot3StatsIndex'] && $port['ifType'] == 'ethernetCsmacd') {
