@@ -29,17 +29,9 @@ class Clickatell extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
         $clickatell_opts['token'] = $this->config['clickatell-token'];
         $clickatell_opts['to'] = preg_split('/([,\r\n]+)/', $this->config['clickatell-numbers']);
         return $this->contactClickatell($obj, $clickatell_opts);
-    }
-
-    public function deliverAlertOld($obj, $opts)
-    {
-        return $this->contactClickatell($obj, $opts);
     }
 
     public static function contactClickatell($obj, $opts)

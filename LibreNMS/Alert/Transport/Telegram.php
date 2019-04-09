@@ -30,21 +30,10 @@ class Telegram extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
         $telegram_opts['chat_id'] = $this->config['telegram-chat-id'];
         $telegram_opts['token'] = $this->config['telegram-token'];
         $telegram_opts['format'] = $this->config['telegram-format'];
         return $this->contactTelegram($obj, $telegram_opts);
-    }
-
-    public function deliverAlertOld($obj, $opts)
-    {
-        foreach ($opts as $chat_id => $data) {
-            $this->contactTelegram($obj, $data);
-        }
-        return true;
     }
 
     public static function contactTelegram($obj, $data)
