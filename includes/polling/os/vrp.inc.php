@@ -32,6 +32,8 @@ if (empty($hardware_tmp) && !empty($matches[1])) {
     $hardware = "Huawei " . trim($matches[1]);
 }
 
+// Polling the Wireless data
+
 global $config;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -44,11 +46,6 @@ if (!empty($apTable)) {
     $apTableOids = array(
             'hwWlanApSn',
             'hwWlanApTypeInfo',
-            //            'hwWlanApGroup',
-            //            'hwWlanApSoftwareVersion',
-            //            'hwWlanApHardwareVersion',
-            //            'hwWlanApDomain',
-            //            'hwWlanApTemperature',
             );
     foreach ($apTableOids as $apTableOid) {
         $apTable = snmpwalk_group($device, $apTableOid, 'HUAWEI-WLAN-AP-MIB', 2, $apTable);
@@ -58,9 +55,6 @@ if (!empty($apTable)) {
             'hwWlanRadioMac',
             'hwWlanRadioChUtilizationRate',
             'hwWlanRadioChInterferenceRate',
-            //            'hwWlanRadioSendBytes',
-            //            'hwWlanRadioRecvBytes',
-            //            'hwWlanRadioType',
             'hwWlanRadioActualEIRP',
             'hwWlanRadioFreqType',
             'hwWlanRadioWorkingChannel',
@@ -105,7 +99,7 @@ if (!empty($apTable)) {
             $channel       = $radio['hwWlanRadioWorkingChannel'];
             $mac           = $radio['hwWlanRadioMac'];
             $name          = $apTable[$ap_id]['hwWlanApName'] . " Radio " . $r_id;
-            $radionum      = $r_id ; //$radio['hwWlanRadioMac'].$radio['hwWlanRadioID'];
+            $radionum      = $r_id ;
             $txpow         = $radio['hwWlanRadioActualEIRP'];
             $interference  = $radio['hwWlanRadioChInterferenceRate'];
             $radioutil     = $radio['hwWlanRadioChUtilizationRate'];
