@@ -25,7 +25,7 @@
 
 $temp_data = snmp_getnext_multi($device, 'upsIdentManufacturer upsIdentModel upsIdentUPSSoftwareVersion upsIdentAgentSoftwareVersion upsIdentAttachedDevices', '-OQUs', 'UPS-MIB');
 
-    $hardware = $temp_data['upsIdentManufacturer'] . $temp_data['upsIdentModel'];
-    $version  = $temp_data['upsIdentAgentSoftwareVersion'] . $temp_data['upsIdentUPSSoftwareVersion'];
-    $features = $temp_data['upsIdentAttachedDevices'];
+$hardware = $temp_data['upsIdentManufacturer'] . $temp_data['upsIdentModel'];
+$version  = $temp_data['upsIdentAgentSoftwareVersion'] . $temp_data['upsIdentUPSSoftwareVersion'];
+$features = $temp_data['upsIdentAttachedDevices'];
 unset($temp_data);
