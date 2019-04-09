@@ -1,13 +1,12 @@
 <?php
-$name = 'nvidia';
-$app_id = $app['app_id'];
-$colours       = 'manycolours';
+$name          = 'nvidia';
+$app_id        = $app['app_id'];
+$colours       = 'greens';
 $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 15;
-$name = 'nvidia';
-$app_id = $app['app_id'];
+$app_id        = $app['app_id'];
 
 $int=0;
 $rrd_list=array();
