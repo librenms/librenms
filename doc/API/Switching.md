@@ -187,3 +187,41 @@ Output:
     "count": 1
 }
 ```
+
+### `list_fdb`
+
+Get a list of all ports FDB.
+
+Route: `/api/v0/resources/fdb/:mac`
+
+  - mac is the specific MAC address you would like to query
+
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/fdb
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/fdb/1aaa2bbb3ccc
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "ports_fdb": [
+        {
+            "ports_fdb_id": 10,
+            "port_id": 10000,
+            "mac_address": "1aaa2bbb3ccc",
+            "vlan_id": 20000,
+            "device_id": 1,
+            "created_at": "2019-01-1 01:01:01",
+            "updated_at": "2019-01-1 01:01:01"
+        },
+        ...
+    ],
+    "count": 100
+}
+```
