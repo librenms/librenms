@@ -25,6 +25,22 @@ if (($device['os'] == 'vrp')) {
         data_update($device, 'poe', $tags, $fields);
         echo 'PoE(vrp) ';
     }
+} elseif (($device['os'] == 'linksys-ss')) {
+    //Tested 318P
+    if (isset($this_port['pethPsePortAdminEnable'])) {
+        $upd = "$polled:".$this_port['rlPethPsePortPowerLimit'].':'.$this_port['rlPethPsePortOutputPower'];
+
+        $fields = array(
+                'PortPwrAllocated'   => $this_port['rlPethPsePortPowerLimit'],
+                'PortPwrAvailable'   => $this_port['rlPethPsePortPowerLimit'],
+                'PortConsumption'    => $this_port['rlPethPsePortOutputPower'],
+                'PortMaxPwrDrawn'    => $this_port['rlPethPsePortPowerLimit'],
+                   );
+
+        $tags = compact('ifName', 'rrd_name', 'rrd_def');
+        data_update($device, 'poe', $tags, $fields);
+        echo 'PoE(linksys) ';
+    }
 } elseif (($device['os'] == 'ios') || ($device['os'] == 'iosxe')) {
     // Code for Cisco IOS and IOSXE, tested on 2960X
     if (isset($this_port['cpeExtPsePortPwrAllocated'])) {
@@ -44,7 +60,9 @@ if (($device['os'] == 'vrp')) {
         echo 'PoE(IOS) ';
     }//end if
 } else {
-    //This is the legacy code, to be tested against devices
+    //This is the legacy code, to be tested against devices. This code looks terribly broken. There is
+    //most probably no device that can show anything out of this ...
+
     if ($this_port['dot3StatsIndex'] && $port['ifType'] == 'ethernetCsmacd') {
         $upd = "$polled:".$port['cpeExtPsePortPwrAllocated'].':'.$port['cpeExtPsePortPwrAvailable'].':'.
             $port['cpeExtPsePortPwrConsumption'].':'.$port['cpeExtPsePortMaxPwrDrawn'];
