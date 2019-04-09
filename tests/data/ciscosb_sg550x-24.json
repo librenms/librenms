@@ -18,6 +18,23 @@
                 }
             ]
         },
-        "poller": "matches discovery"
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.9.6.1.93.24.1",
+                    "sysDescr": "SG550X-24 24-Port Gigabit Stackable Managed Switch",
+                    "sysContact": null,
+                    "version": "Software ",
+                    "hardware": null,
+                    "features": null,
+                    "os": "ciscosb",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "cisco.svg",
+                    "location": null
+                }
+            ]
+        }
     }
 }
