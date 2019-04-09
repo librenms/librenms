@@ -1,9 +1,9 @@
 <?php
 // Linksys OS details
 
-$hardware = snmp_get($device, 'LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamModelName.1', '-OQv');
-$hardware .= " " . snmp_get($device, 'LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamHardwareVersion.1', '-OQv');
-$serial = snmp_get($device, 'LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamSerialNum.1', '-OQv');
+$data = snmp_get_multi($device, ['rlPhdUnitGenParamModelName.1', 'rlPhdUnitGenParamHardwareVersion.1', 'rlPhdUnitGenParamSerialNum.1', 'rlPhdUnitGenParamSoftwareVersion.1', 'rlPhdUnitGenParamFirmwareVersion.1'], '-OQUs', 'LINKSYS-Physicaldescription-MIB');
+$hardware = $data['1']['rlPhdUnitGenParamHardwareVersion'] . " " . $data['1']['rlPhdUnitGenParamSoftwareVersion'];
+$serial = $data['1']['rlPhdUnitGenParamSerialNum'];
+$version = "SW: " . $data['1']['rlPhdUnitGenParamSoftwareVersion'];
+$version .= ", FW: " . $data['1']['rlPhdUnitGenParamFirmwareVersion'];
 
-$version = "SW: " . snmp_get($device, 'LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion.1', '-OQv');
-$version .= ", FW: " . snmp_get($device, 'LINKSYS-Physicaldescription-MIB::rlPhdUnitGenParamFirmwareVersion.1', '-OQv');
