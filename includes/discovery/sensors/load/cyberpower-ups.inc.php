@@ -2,11 +2,9 @@
 
 echo 'CyberPower UPS ';
 
-// "The UPS output load expressed in percentage"
-
 $oid_array = [
     [
-        'oidname'      => 'upsAdvanceOutputLoad',
+        'oidname'     => 'upsAdvanceOutputLoad',
         'type'        => 'cyberpower-ups',
         'index'       => 0,
         'descr'       => 'Percent',
