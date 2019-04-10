@@ -224,8 +224,9 @@ $config['alerts']['port_util_perc'] = 85;
 $config['uptime_warning'] = '84600';
 // Time in seconds to display a "Device Rebooted" Alert. 0 to disable warnings.
 // Cosmetics
-$config['rrdgraph_def_text']  = '-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c FONT#000000 -c CANVAS#FFFFFF00 -c GRID#a5a5a5';
+$config['rrdgraph_def_text']  = '-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5';
 $config['rrdgraph_def_text'] .= ' -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal';
+$config['rrdgraph_def_text_color'] = '000000';
 $config['rrdgraph_real_percentile'] = false;
 $config['percentile_value'] = 95;
 // Set to TRUE if you want to display the 95% based on the highest value. (aka real 95%)
