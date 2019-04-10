@@ -64,7 +64,7 @@ foreach ($components as $peer) {
         $graph_array['width']  = '215';
         $graph_array['to']     = $config['time']['now'];
         $graph_array['type']   = 'device_ntp_stratum';
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
 
         ?>
     </div>
@@ -83,7 +83,7 @@ foreach ($components as $peer) {
         $graph_array['width']  = '215';
         $graph_array['to']     = $config['time']['now'];
         $graph_array['type']   = 'device_ntp_offset';
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
 
         ?>
     </div>
@@ -102,7 +102,7 @@ foreach ($components as $peer) {
         $graph_array['width']  = '215';
         $graph_array['to']     = $config['time']['now'];
         $graph_array['type']   = 'device_ntp_delay';
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
 
         ?>
     </div>
@@ -121,7 +121,7 @@ foreach ($components as $peer) {
         $graph_array['width']  = '215';
         $graph_array['to']     = $config['time']['now'];
         $graph_array['type']   = 'device_ntp_dispersion';
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
 
         ?>
     </div>

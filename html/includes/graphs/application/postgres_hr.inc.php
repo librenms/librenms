@@ -41,4 +41,4 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
 }
 
 
-require 'includes/graphs/generic_v3_multiline.inc.php';
+require 'includes/html/graphs/generic_v3_multiline.inc.php';

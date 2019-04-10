@@ -7,4 +7,4 @@ $class     = 'quality';
 $unit      = '%';
 $unit_long = '';
 
-require 'includes/graphs/device/wireless-sensor.inc.php';
+require 'includes/html/graphs/device/wireless-sensor.inc.php';

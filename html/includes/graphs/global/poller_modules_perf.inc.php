@@ -29,7 +29,7 @@ use LibreNMS\Config;
 $scale_min = '0';
 $colors = Config::get('graph_colours.manycolours');
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $hostnames = Device::pluck('hostname');
 $modules = array_keys(Config::get('poller_modules'));

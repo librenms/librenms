@@ -17,4 +17,4 @@ if (rrdtool_check_rrd_exists($ntpdserver_rrd)) {
     $rrd_filename = $ntpdserver_rrd;
 }
 
-require 'includes/graphs/generic_duplex.inc.php';
+require 'includes/html/graphs/generic_duplex.inc.php';

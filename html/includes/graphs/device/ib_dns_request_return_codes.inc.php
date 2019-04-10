@@ -1,5 +1,5 @@
 <?php
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = rrd_name($device['hostname'], 'ib_dns_request_return_codes');
 $rrd_options .= " --vertical-label='Requests per second'";

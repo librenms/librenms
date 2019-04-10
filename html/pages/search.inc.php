@@ -16,9 +16,7 @@ if (dbFetchCell('SELECT 1 from `packages` LIMIT 1')) {
     $sections['packages'] = 'Packages';
 }
 
-if (!isset($vars['search'])) {
-    $vars['search'] = 'ipv4';
-}
+$search_type = basename($vars['search'] ?? 'ipv4');
 
 print_optionbar_start('', '');
 
@@ -45,8 +43,8 @@ unset($sep);
 
 print_optionbar_end();
 
-if (file_exists('pages/search/'.$vars['search'].'.inc.php')) {
-    include 'pages/search/'.$vars['search'].'.inc.php';
+if (file_exists("includes/html/pages/search/$search_type.inc.php")) {
+    include "includes/html/pages/search/$search_type.inc.php";
 } else {
-    echo report_this('Unknown search type '.$vars['search']);
+    echo report_this("Unknown search type $search_type");
 }

@@ -30,7 +30,7 @@ $pagetitle[] = 'Eventlog';
     </div>
 
     <?php
-    require_once 'includes/common/eventlog.inc.php';
+    require_once 'includes/html/common/eventlog.inc.php';
     echo implode('', $common_output);
     ?>
 </div>

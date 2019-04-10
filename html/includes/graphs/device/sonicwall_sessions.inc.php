@@ -15,4 +15,4 @@ $nototal   = 1;
 $unit_text = 'Sessions';
 $scale_min = '0';
 
-require 'includes/graphs/generic_multi_line.inc.php';
+require 'includes/html/graphs/generic_multi_line.inc.php';

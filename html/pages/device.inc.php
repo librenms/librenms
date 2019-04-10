@@ -43,7 +43,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
 
     echo '<div class="panel panel-default">';
         echo '<div class="panel-body '.$alert_class.'">';
-        require 'includes/device-header.inc.php';
+        require 'includes/html/device-header.inc.php';
         echo '</div>';
     echo '</div>';
 
@@ -494,9 +494,9 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
 
     // include the tabcontent
     echo '<div class="tabcontent">';
-    require 'pages/device/'.filter_var(basename($tab), FILTER_SANITIZE_URL).'.inc.php';
+    require 'includes/html/pages/device/'.filter_var(basename($tab), FILTER_SANITIZE_URL).'.inc.php';
     echo '</div>';
 } else {
     // no device permissions
-    require 'includes/error-no-perm.inc.php';
+    require 'includes/html/error-no-perm.inc.php';
 }

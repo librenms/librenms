@@ -16,7 +16,7 @@ $scale_min = '0';
 $attribs = get_dev_attribs($device['device_id']);
 ksort($config['poller_modules']);
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $count = 0;
 foreach ($config['poller_modules'] as $module => $module_status) {
@@ -39,4 +39,4 @@ $simple_rrd = false;
 $nototal = false;
 $text_orig = true;
 $colours = 'manycolours';
-require "includes/graphs/generic_multi_simplex_seperated.inc.php";
+require "includes/html/graphs/generic_multi_simplex_seperated.inc.php";

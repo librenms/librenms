@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/graphs/device/auth.inc.php';
+require 'includes/html/graphs/device/auth.inc.php';
 
 if ($auth && is_numeric($_GET['mod']) && is_numeric($_GET['chan'])) {
     $entity = dbFetchRow('SELECT * FROM entPhysical WHERE device_id = ? AND entPhysicalIndex = ?', array($device['device_id'], $_GET['mod']));

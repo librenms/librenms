@@ -1,8 +1,9 @@
 <?php
 
 foreach ($datas as $type) {
+    $type = basename($type);
     if ($type != 'overview') {
-        if (is_file('pages/routing/overview/'.mres($type).'.inc.php')) {
+        if (is_file("includes/html/pages/routing/overview/$type.inc.php")) {
             $g_i++;
             if (!is_integer($g_i / 2)) {
                 $row_colour = $config['list_colour']['even'];
@@ -13,7 +14,7 @@ foreach ($datas as $type) {
             echo '<div style="background-color: '.$row_colour.';">';
             echo '<div style="padding:4px 0px 0px 8px;"><span class=graphhead>'.$type_text[$type].'</span>';
 
-            include 'pages/routing/overview/'.mres($type).'.inc.php';
+            include "includes/html/pages/routing/overview/$type.inc.php";
 
             echo '</div>';
             echo '</div>';
@@ -21,7 +22,7 @@ foreach ($datas as $type) {
             $graph_title = $type_text[$type];
             $graph_type  = 'device_'.$type;
 
-            include 'includes/print-device-graph.php';
+            include 'includes/html/print-device-graph.php';
         }
     }
 }

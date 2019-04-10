@@ -19,8 +19,8 @@
 $no_refresh   = true;
 $default_dash = get_user_pref('dashboard', 0);
 
-require_once 'includes/modal/alert_notes.inc.php';
-require_once 'includes/modal/alert_ack.inc.php';
+require_once 'includes/html/modal/alert_notes.inc.php';
+require_once 'includes/html/modal/alert_ack.inc.php';
 
 // get all dashboards this user can access and put them into two lists user_dashboards and shared_dashboards
 $dashboards = get_dashboards();

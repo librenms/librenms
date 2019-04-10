@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename    = rrd_name($device['hostname'], 'cipsec_flow');
 $ds              = 'Tunnels';
@@ -10,4 +10,4 @@ $colour_area_max = 'aaaaacc';
 $scale_min       = 0;
 $unit_text       = 'Active Tunnels';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

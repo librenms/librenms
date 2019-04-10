@@ -14,7 +14,7 @@
 
 $pagetitle[] = 'Poller Groups';
 
-require_once 'includes/modal/poller_groups.inc.php';
+require_once 'includes/html/modal/poller_groups.inc.php';
 
 ?>
 <br />

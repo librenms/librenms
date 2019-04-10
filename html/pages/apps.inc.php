@@ -301,12 +301,12 @@ foreach ($app_list as $app) {
 echo '</div>';
 echo '<div class="panel-body">';
 if ($vars['app']) {
-    if (is_file('pages/apps/'.mres($vars['app']).'.inc.php')) {
-        include 'pages/apps/'.mres($vars['app']).'.inc.php';
+    if (is_file('includes/html/pages/apps/'.mres($vars['app']).'.inc.php')) {
+        include 'includes/html/pages/apps/'.mres($vars['app']).'.inc.php';
     } else {
-        include 'pages/apps/default.inc.php';
+        include 'includes/html/pages/apps/default.inc.php';
     }
 } else {
-    include 'pages/apps/overview.inc.php';
+    include 'includes/html/pages/apps/overview.inc.php';
 }
 echo '</div>';

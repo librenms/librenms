@@ -6,6 +6,8 @@ foreach ($_GET as $name => $value) {
 }
 
 preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
+$type    = basename($graphtype['type']);
+$subtype = basename($graphtype['subtype']);
 
 if (is_numeric($vars['device'])) {
     $device = device_by_id_cache($vars['device']);
@@ -33,21 +35,14 @@ $prev_from = ($from - $period);
 
 $graphfile = $config['temp_dir'].'/'.strgen();
 
-$type    = $graphtype['type'];
-$subtype = $graphtype['subtype'];
-
-if ($auth !== true && $auth != 1) {
-    $auth = is_client_authorized($_SERVER['REMOTE_ADDR']);
-}
-
-require $config['install_dir']."/html/includes/graphs/$type/auth.inc.php";
+require $config['install_dir']."/includes/html/graphs/$type/auth.inc.php";
 
 if ($auth && is_custom_graph($type, $subtype, $device)) {
-    include($config['install_dir'] . "/html/includes/graphs/custom.inc.php");
+    include($config['install_dir'] . "/includes/html/graphs/custom.inc.php");
 } elseif ($auth && is_mib_graph($type, $subtype)) {
-    include $config['install_dir']."/html/includes/graphs/$type/mib.inc.php";
-} elseif ($auth && is_file($config['install_dir']."/html/includes/graphs/$type/$subtype.inc.php")) {
-    include $config['install_dir']."/html/includes/graphs/$type/$subtype.inc.php";
+    include $config['install_dir']."/includes/html/graphs/$type/mib.inc.php";
+} elseif ($auth && is_file($config['install_dir']."/includes/html/graphs/$type/$subtype.inc.php")) {
+    include $config['install_dir']."/includes/html/graphs/$type/$subtype.inc.php";
 } else {
     graph_error("$type*$subtype ");
     // Graph Template Missing");
@@ -59,7 +54,7 @@ function graph_error($string)
 
     $vars['bg'] = 'FFBBBB';
 
-    include 'includes/graphs/common.inc.php';
+    include 'includes/html/graphs/common.inc.php';
 
     $rrd_options .= ' HRULE:0#555555';
     $rrd_options .= " --title='".$string."'";

@@ -35,7 +35,7 @@ foreach (dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY stora
                 <h3 class='panel-title'>$storage_descr <div class='pull-right'>$used/$total - $perc% used</div></h3>
             </div>";
     echo "<div class='panel-body'>";
-    include 'includes/print-graphrow.inc.php';
+    include 'includes/html/print-graphrow.inc.php';
     echo "</div></div>";
 
     $row++;

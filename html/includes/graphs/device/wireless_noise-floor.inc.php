@@ -7,4 +7,4 @@ $class     = 'noise-floor';
 $unit      = '';
 $unit_long = 'dBm/Hz';
 
-require 'includes/graphs/device/wireless-sensor.inc.php';
+require 'includes/html/graphs/device/wireless-sensor.inc.php';

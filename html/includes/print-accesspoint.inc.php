@@ -49,42 +49,42 @@ if ($vars['tab'] == 'accesspoint') {
     $graph_type = 'accesspoints_numasoclients';
     echo "<tr style='background-color: $row_colour; padding: 0px;'><td colspan=7>";
     echo "<div class='graphhead'>Associated Clients</div>";
-    include 'includes/print-accesspoint-graphs.inc.php';
+    include 'includes/html/print-accesspoint-graphs.inc.php';
     echo '</td></tr>';
 
     $graph_type = 'accesspoints_interference';
     echo "<tr style='background-color: $row_colour; padding: 0px;'><td colspan=7>";
     echo "<div class='graphhead'>Interference</div>";
-    include 'includes/print-accesspoint-graphs.inc.php';
+    include 'includes/html/print-accesspoint-graphs.inc.php';
     echo '</td></tr>';
 
     $graph_type = 'accesspoints_channel';
     echo "<tr style='background-color: $row_colour; padding: 0px;'><td colspan=7>";
     echo "<div class='graphhead'>Channel</div>";
-    include 'includes/print-accesspoint-graphs.inc.php';
+    include 'includes/html/print-accesspoint-graphs.inc.php';
     echo '</td></tr>';
 
     $graph_type = 'accesspoints_txpow';
     echo "<tr style='background-color: $row_colour; padding: 0px;'><td colspan=7>";
     echo "<div class='graphhead'>Transmit Power</div>";
-    include 'includes/print-accesspoint-graphs.inc.php';
+    include 'includes/html/print-accesspoint-graphs.inc.php';
     echo '</td></tr>';
 
     $graph_type = 'accesspoints_radioutil';
     echo "<tr style='background-color: $row_colour; padding: 0px;'><td colspan=7>";
     echo "<div class='graphhead'>Radio Utilization</div>";
-    include 'includes/print-accesspoint-graphs.inc.php';
+    include 'includes/html/print-accesspoint-graphs.inc.php';
     echo '</td></tr>';
 
     $graph_type = 'accesspoints_nummonclients';
     echo "<tr style='background-color: $row_colour; padding: 0px;'><td colspan=7>";
     echo "<div class='graphhead'>Monitored Clients</div>";
-    include 'includes/print-accesspoint-graphs.inc.php';
+    include 'includes/html/print-accesspoint-graphs.inc.php';
     echo '</td></tr>';
 
     $graph_type = 'accesspoints_nummonbssid';
     echo "<tr style='background-color: $row_colour; padding: 0px;'><td colspan=7>";
     echo "<div class='graphhead'>Number of monitored BSSIDs</div>";
-    include 'includes/print-accesspoint-graphs.inc.php';
+    include 'includes/html/print-accesspoint-graphs.inc.php';
     echo '</td></tr>';
 }//end if

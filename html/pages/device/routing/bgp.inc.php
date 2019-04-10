@@ -286,7 +286,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         $graph_array['to']     = $config['time']['now'];
         echo '<tr bgcolor="'.$bg_colour.'"'.($bg_image ? ' background="'.$bg_image.'"' : '').'"><td colspan="7">';
 
-        include 'includes/print-graphrow.inc.php';
+        include 'includes/html/print-graphrow.inc.php';
 
         echo '</td></tr>';
     }

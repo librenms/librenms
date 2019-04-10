@@ -32,7 +32,7 @@ if (LegacyAuth::user()->hasGlobalRead()) {
 
     echo '<div class="col-sm-6">';
 
-    include_once 'includes/print-service-add.inc.php';
+    include_once 'includes/html/print-service-add.inc.php';
 } else {
-    include 'includes/error-no-perm.inc.php';
+    include 'includes/html/error-no-perm.inc.php';
 }

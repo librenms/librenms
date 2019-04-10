@@ -5,4 +5,4 @@ $sensor_class = 'cooling';
 $sensor_unit  = 'W';
 $sensor_type  = 'Cooling';
 
-require 'pages/device/overview/generic/sensor.inc.php';
+require 'includes/html/pages/device/overview/generic/sensor.inc.php';

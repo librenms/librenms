@@ -7,7 +7,7 @@ $i     = '0';
 $ports = dbFetchRows("select * from `ports` AS P, `ports_adsl` AS A WHERE P.device_id = ? AND A.port_id = P.port_id AND P.deleted = '0' ORDER BY `ifIndex` ASC", array($device['device_id']));
 
 foreach ($ports as $port) {
-    include 'includes/print-interface-adsl.inc.php';
+    include 'includes/html/print-interface-adsl.inc.php';
     $i++;
 }
 

@@ -26,11 +26,11 @@ $no_refresh = true;
 
 switch ($vars['section']) {
     case 'ix-list':
-        require_once 'pages/peering/ix-list.inc.php';
+        require_once 'includes/html/pages/peering/ix-list.inc.php';
         break;
     case 'ix-peers':
-        require_once 'pages/peering/ix-peers.inc.php';
+        require_once 'includes/html/pages/peering/ix-peers.inc.php';
         break;
     default:
-        require_once 'pages/peering/as-selection.inc.php';
+        require_once 'includes/html/pages/peering/as-selection.inc.php';
 }

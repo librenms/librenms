@@ -6,4 +6,4 @@ $class     = 'ap-count';
 $unit      = '';
 $unit_long = 'APs';
 
-require 'includes/graphs/device/wireless-sensor.inc.php';
+require 'includes/html/graphs/device/wireless-sensor.inc.php';

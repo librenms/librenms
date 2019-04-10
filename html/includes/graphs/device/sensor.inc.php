@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $col_w = 7 + strlen($unit);
 $rrd_options .= " COMMENT:'". str_pad($unit_long, 19) . str_pad("Cur", $col_w). str_pad("Min", $col_w) . "Max\\n'";

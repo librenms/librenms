@@ -13,7 +13,7 @@
  * @author     SvennD <svennd@svennd.be>
 */
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 $scale_min     = 0;
 $colours       = 'mixed';
 $unit_text     = 'Operations';
@@ -46,7 +46,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     echo "file missing: $rrd_filename";
 }
 
-require 'includes/graphs/generic_v3_multiline.inc.php';
+require 'includes/html/graphs/generic_v3_multiline.inc.php';
 
 
 /*
@@ -59,6 +59,6 @@ $rrd_filename  = rrd_name($device['hostname'], array('app', 'nfs-server-default'
 $ds_in  = 'io_read';
 $ds_out = 'io_write';
 
-require 'includes/graphs/generic_data.inc.php';
+require 'includes/html/graphs/generic_data.inc.php';
 
 */

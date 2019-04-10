@@ -27,4 +27,4 @@ while (rrdtool_check_rrd_exists($rrd_filename)) {
     $rrd_filename=rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id'], $int));
 }
 
-require 'includes/graphs/generic_multi_line_exact_numbers.inc.php';
+require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';

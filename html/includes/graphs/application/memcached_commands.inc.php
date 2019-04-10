@@ -1,7 +1,7 @@
 <?php
 
 require 'memcached.inc.php';
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $nototal = 1;
 
@@ -20,4 +20,4 @@ $colour_area_out     = 'bEbEFFAA';
 $colour_area_in_max  = 'CC88CC';
 $colour_area_out_max = 'FFEFAA';
 
-require 'includes/graphs/generic_duplex.inc.php';
+require 'includes/html/graphs/generic_duplex.inc.php';

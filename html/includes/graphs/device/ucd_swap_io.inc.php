@@ -7,4 +7,4 @@ $ds_out           = 'value';
 
 $multiplier = 512;
 
-require 'includes/graphs/generic_data.inc.php';
+require 'includes/html/graphs/generic_data.inc.php';

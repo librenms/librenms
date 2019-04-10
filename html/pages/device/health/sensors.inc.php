@@ -56,7 +56,7 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
     $graph_array['id']   = $sensor['sensor_id'];
     $graph_array['type'] = $graph_type;
 
-    include 'includes/print-graphrow.inc.php';
+    include 'includes/html/print-graphrow.inc.php';
 
     echo '</div></div>';
 

@@ -25,8 +25,9 @@ $sla = dbFetchRow('SELECT `sla_nr`,`rtt_type` FROM `slas` WHERE `sla_id` = ?', a
 include 'sla/rtt.inc.php';
 
 // Load the per-type SLA metrics
-if (file_exists('pages/device/sla/'.$sla['rtt_type'].'.inc.php')) {
-    include 'sla/'.$sla['rtt_type'].'.inc.php';
+$rtt_type = basename($sla['rtt_type']);
+if (file_exists("includes/html/pages/device/sla/$rtt_type.inc.php")) {
+    include "includes/html/pages/device/sla/$rtt_type.inc.php";
 }
 
 ?>

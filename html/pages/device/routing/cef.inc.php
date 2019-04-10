@@ -121,7 +121,7 @@ foreach (dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
 
         echo "<tr bgcolor='$bg_colour'><td colspan=6>";
 
-        include 'includes/print-graphrow.inc.php';
+        include 'includes/html/print-graphrow.inc.php';
 
         echo '</td></tr>';
     }

@@ -15,7 +15,7 @@ if (is_numeric($_GET['topn'])) {
     $topn = '10';
 }
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 if ($stat == 'pkts') {
     $units      = 'pps';

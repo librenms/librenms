@@ -1,6 +1,6 @@
 <?php
 
-require_once('includes/application/proxmox.inc.php');
+require_once('includes/html/application/proxmox.inc.php');
 $graphs['proxmox']    = array(
     'netif'
 );
@@ -44,7 +44,7 @@ if (!isset($vars['instance'])) {
 }
 
 if (isset($vars['vmid'])) {
-    include("pages/apps/proxmox/vm.inc.php");
+    include("includes/html/pages/apps/proxmox/vm.inc.php");
     $pagetitle[] = $vars['vmid'];
 } else {
     echo '

@@ -40,7 +40,7 @@ foreach (get_disks($device['device_id']) as $drive) {
                 <h3 class='panel-title'>$overlib_link - $graph_type_title</h3>
             </div>";
         echo "<div class='panel-body'>";
-            include 'includes/print-graphrow.inc.php';
+            include 'includes/html/print-graphrow.inc.php';
         echo '</div></div>';
     }
 

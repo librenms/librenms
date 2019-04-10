@@ -44,7 +44,7 @@ if ($vars['view'] == 'incoming') {
         echo '<tr><td>';
         echo '<h3>Average</h3>';
 
-        include 'includes/print-graphrow.inc.php';
+        include 'includes/html/print-graphrow.inc.php';
 
         echo '</td></tr>';
 
@@ -54,7 +54,7 @@ if ($vars['view'] == 'incoming') {
         echo '<tr><td>';
         echo '<h3>Aggregate</h3>';
 
-        include 'includes/print-graphrow.inc.php';
+        include 'includes/html/print-graphrow.inc.php';
 
         echo '</td></tr>';
 
@@ -76,7 +76,7 @@ if ($vars['view'] == 'incoming') {
                 $graph_array['device'] = $device['device_id'];
                 $graph_array['src']    = $host['device_id'];
 
-                include 'includes/print-graphrow.inc.php';
+                include 'includes/html/print-graphrow.inc.php';
 
                 echo '</td></tr>';
             }
@@ -89,7 +89,7 @@ if ($vars['view'] == 'incoming') {
         echo '<tr><td>';
         echo '<h3>Aggregate</h3>';
 
-        include 'includes/print-graphrow.inc.php';
+        include 'includes/html/print-graphrow.inc.php';
 
         echo '</td></tr>';
 
@@ -98,7 +98,7 @@ if ($vars['view'] == 'incoming') {
         echo '<tr><td>';
         echo '<h3>Aggregate</h3>';
 
-        include 'includes/print-graphrow.inc.php';
+        include 'includes/html/print-graphrow.inc.php';
 
         echo '</td></tr>';
 
@@ -116,7 +116,7 @@ if ($vars['view'] == 'incoming') {
                 $graph_array['device'] = $device['device_id'];
                 $graph_array['dest']   = $host['device_id'];
 
-                include 'includes/print-graphrow.inc.php';
+                include 'includes/html/print-graphrow.inc.php';
 
                 echo '</td></tr>';
             }

@@ -3,7 +3,7 @@
 // Don't refresh this page to stop adding multiple ports
 $no_refresh = true;
 
-  require 'includes/javascript-interfacepicker.inc.php';
+  require 'includes/html/javascript-interfacepicker.inc.php';
   
   // This needs more verification. Is it already added? Does it exist?
   // Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
@@ -76,7 +76,7 @@ if ($bill_data['bill_type'] == 'cdr') {
                     $('#quotaDiv').toggle();
                 }
               </script>
-                <?php   include 'pages/bill/addoreditbill.inc.php'; ?>
+                <?php   include 'includes/html/pages/bill/addoreditbill.inc.php'; ?>
                 <div class="form-group">
                   <div class="col-sm-offset-4 col-sm-4">
                     <button type="submit" class="btn btn-primary" name="Submit" value="Save" /><i class="fa fa-check"></i> Save Properties</button>

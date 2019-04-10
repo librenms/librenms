@@ -4,7 +4,7 @@ use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\InvalidIpException;
 
 if (!LegacyAuth::user()->hasGlobalRead()) {
-    include 'includes/error-no-perm.inc.php';
+    include 'includes/html/error-no-perm.inc.php';
 } else {
     $link_array = array(
         'page'     => 'routing',

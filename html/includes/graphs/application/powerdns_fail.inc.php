@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $scale_min    = 0;
 $colours      = 'red';
@@ -36,4 +36,4 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     echo "file missing: $file";
 }
 
-require 'includes/graphs/generic_multi_simplex_seperated.inc.php';
+require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

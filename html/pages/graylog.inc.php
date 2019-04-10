@@ -22,7 +22,7 @@ echo '<div class="panel panel-default panel-condensed">
         <strong>Graylog entries</strong>
     </div>';
 
-require_once 'includes/common/graylog.inc.php';
+require_once 'includes/html/common/graylog.inc.php';
 echo implode('', $common_output);
 
 echo '</div>';

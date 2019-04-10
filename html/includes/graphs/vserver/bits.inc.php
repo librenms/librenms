@@ -3,4 +3,4 @@
 $ds_in  = 'ByteCounts';
 $ds_out = 'ClientByteCounts';
 
-require 'includes/graphs/generic_data.inc.php';
+require 'includes/html/graphs/generic_data.inc.php';

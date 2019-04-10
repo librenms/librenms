@@ -38,9 +38,9 @@ if ($count > 1) {
     $divider = $count;
     $text_orig = 1;
     $colours = 'manycolours';
-    include "includes/graphs/generic_multi_simplex_seperated.inc.php";
+    include "includes/html/graphs/generic_multi_simplex_seperated.inc.php";
 } else {
     $colours = 'mixed';
     $nototal = 0;
-    include "includes/graphs/generic_multi_line.inc.php";
+    include "includes/html/graphs/generic_multi_line.inc.php";
 }

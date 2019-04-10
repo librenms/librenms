@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $ds              = 'frequency';
 $colour_area     = $config['graph_colours']['pinks'][0].'33';
@@ -14,4 +14,4 @@ if (rrdtool_check_rrd_exists($ntpclient_rrd)) {
     $rrd_filename = $ntpclient_rrd;
 }
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

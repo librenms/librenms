@@ -8,7 +8,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'canopy-generic-freq');
 if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Ghz           Now     \\n'";

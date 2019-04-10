@@ -2,7 +2,7 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 
-require_once 'includes/object-cache.inc.php';
+require_once 'includes/html/object-cache.inc.php';
 
 
 function generate_front_box($frontbox_class, $content)
@@ -152,11 +152,11 @@ echo '
 
 if ($config['vertical_summary']) {
     echo '   <div class="col-md-3">';
-    include_once 'includes/device-summary-vert.inc.php';
+    include_once 'includes/html/device-summary-vert.inc.php';
     echo implode('', $common_output);
 } else {
     echo '   <div class="col-md-4">';
-    include_once 'includes/common/device-summary-horiz.inc.php';
+    include_once 'includes/html/common/device-summary-horiz.inc.php';
     echo implode('', $common_output);
 }
 
@@ -188,7 +188,7 @@ if ($config['enable_syslog']) {
         $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
 
         unset($syslog_output);
-        include 'includes/print-syslog.inc.php';
+        include 'includes/html/print-syslog.inc.php';
         echo $syslog_output;
     }
 
@@ -221,7 +221,7 @@ if ($config['enable_syslog']) {
               <table class="table table-hover table-condensed table-striped">';
 
     foreach (dbFetchRows($alertquery) as $alert_entry) {
-        include 'includes/print-alerts.inc.php';
+        include 'includes/html/print-alerts.inc.php';
     }
 
     echo '</table>
@@ -235,7 +235,7 @@ if ($config['enable_syslog']) {
               <table class="table table-hover table-condensed table-striped">';
 
     foreach (dbFetchRows($query) as $entry) {
-        include 'includes/print-event.inc.php';
+        include 'includes/html/print-event.inc.php';
     }
 
     echo '</table>';

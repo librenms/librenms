@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-include 'pages/device/loadbalancer/gtm_pool_common.inc.php';
+include 'includes/html/pages/device/loadbalancer/gtm_pool_common.inc.php';
 
 if ($components[$vars['gtmpoolid']]['type'] == 'f5-gtm-pool') {
     ?>
@@ -34,7 +34,7 @@ if ($components[$vars['gtmpoolid']]['type'] == 'f5-gtm-pool') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_gtm_pool_requests';
                             $graph_array['id'] = $vars['gtmpoolid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>
@@ -52,7 +52,7 @@ if ($components[$vars['gtmpoolid']]['type'] == 'f5-gtm-pool') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_gtm_pool_dropped';
                             $graph_array['id'] = $vars['gtmpoolid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>

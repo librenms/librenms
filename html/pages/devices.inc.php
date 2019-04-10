@@ -112,7 +112,7 @@ if ($format == "graph") {
     echo '<div class="pull-left">' . $listoptions . '</div>';
     echo '<div class="pull-right">' . $headeroptions . '</div>';
     echo '<div class="col-md-12" style="padding: 10px 0px 0px 0px;">';
-    include_once 'includes/print-date-selector.inc.php';
+    include_once 'includes/html/print-date-selector.inc.php';
     echo '</div>';
     echo '</div>';
     echo '</div>';
@@ -179,7 +179,6 @@ if ($format == "graph") {
         $location_filter = $vars['location'];
     }
     if (!empty($vars['group'])) {
-        require_once('../includes/device-groups.inc.php');
         $where .= " AND ( ";
         foreach (GetDevicesFromGroup($vars['group']) as $dev) {
             $where .= "device_id = ? OR ";

@@ -4,5 +4,5 @@ if (rrdtool_check_rrd_exists(rrd_name($device['hostname'], 'netstats-icmp'))) {
     $graph_title = 'ICMP Statistics';
     $graph_type  = 'device_icmp';
 
-    include 'includes/print-device-graph.php';
+    include 'includes/html/print-device-graph.php';
 }

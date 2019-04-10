@@ -5,4 +5,4 @@ $sensor_class = "humidity";
 $sensor_unit = "%";
 $sensor_type = "Humidity";
 
-include('pages/device/overview/generic/sensor.inc.php');
+include('includes/html/pages/device/overview/generic/sensor.inc.php');

@@ -2,9 +2,7 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 
-if (!isset($vars['view'])) {
-    $vars['view'] = 'graphs';
-}
+$vars['view'] = basename($vars['view'] ?? 'graphs');
 
 $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($vars['port']));
 
@@ -44,7 +42,7 @@ $show_all = 1;
 
 echo "<div class=ifcell style='margin: 0px;'><table width=100% cellpadding=10 cellspacing=0>";
 
-require 'includes/print-interface.inc.php';
+require 'includes/html/print-interface.inc.php';
 
 echo '</table></div>';
 
@@ -253,6 +251,6 @@ print_optionbar_end();
 
 echo "<div style='margin: 5px;'>";
 
-require 'pages/device/port/'.mres($vars['view']).'.inc.php';
+require 'includes/html/pages/device/port/'.$vars['view'].'.inc.php';
 
 echo '</div>';

@@ -19,4 +19,4 @@ $graph_type = "sensor_charge";
 $unit = "%";
 $class = "charge";
 
-require 'pages/health/sensors.inc.php';
+require 'includes/html/pages/health/sensors.inc.php';

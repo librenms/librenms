@@ -13,8 +13,6 @@
  * @author     LibreNMS Contributors
 */
 
-require_once $config['install_dir'] . '/includes/device-groups.inc.php';
-
 /* FIXME: is there a central place we can put this? */
 
 $alert_states = array(

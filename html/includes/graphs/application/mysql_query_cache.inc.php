@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $mysql_rrd = rrd_name($device['hostname'], ['app', 'mysql', $app['app_id']]);
 
@@ -48,4 +48,4 @@ $colours   = 'mixed';
 $nototal   = 1;
 $unit_text = 'Commands';
 
-require 'includes/graphs/generic_multi_simplex_seperated.inc.php';
+require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

@@ -93,7 +93,7 @@ $sql = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['comp
 echo '<table cellspacing=0 cellpadding=2 width=100%>';
 foreach (dbFetchRows($sql) as $entry) {
     unset($syslog_output);
-    include 'includes/print-syslog.inc.php';
+    include 'includes/html/print-syslog.inc.php';
     echo $syslog_output;
 }
 

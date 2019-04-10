@@ -55,7 +55,7 @@ if ($vars['metric'] == 'overview') {
         $graph_title = generate_link($text, $wireless_link_array, array('metric' => $type));
         $graph_array['type'] = 'device_wireless_'.$type;
 
-        include $config['install_dir'] . '/html/includes/print-device-graph.php';
+        include $config['install_dir'] . '/includes/html/print-device-graph.php';
     }
 } elseif (isset($types[$vars['metric']])) {
     $unit = $types[$vars['metric']]['unit'];
@@ -101,7 +101,7 @@ if ($vars['metric'] == 'overview') {
         $graph_array['id']   = $sensor['sensor_id'];
         $graph_array['type'] = 'wireless_' . $vars['metric'];
 
-        include $config['install_dir'] . '/html/includes/print-graphrow.inc.php';
+        include $config['install_dir'] . '/includes/html/print-graphrow.inc.php';
 
         echo '</div></div>';
     }

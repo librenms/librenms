@@ -27,7 +27,7 @@ if (isset($components[$vars['id']])) {
 
     $rrd_filename = rrd_name($device['hostname'], array('f5-gtm-pool', $label, $hash));
     if (rrdtool_check_rrd_exists($rrd_filename)) {
-        require 'includes/graphs/common.inc.php';
+        require 'includes/html/graphs/common.inc.php';
         $ds = 'resolved';
 
         $colour_area = '9999cc';
@@ -40,6 +40,6 @@ if (isset($components[$vars['id']])) {
 
         $unit_text = 'Resolved Requests';
         $line_text = 'Resolved Requests';
-        require 'includes/graphs/generic_simplex.inc.php';
+        require 'includes/html/graphs/generic_simplex.inc.php';
     }
 }

@@ -80,8 +80,9 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
 
     print_optionbar_end();
 
-    if (is_file("pages/device/edit/".mres($vars['section']).".inc.php")) {
-        require "pages/device/edit/".mres($vars['section']).".inc.php";
+    $section = basename($vars['section']);
+    if (is_file("includes/html/pages/device/edit/$section.inc.php")) {
+        require "includes/html/pages/device/edit/$section.inc.php";
     }
 }
 

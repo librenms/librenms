@@ -37,4 +37,4 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     d_echo('RRD "'.$rrd_filename.'" not found');
 }
 
-require 'includes/graphs/generic_multi_line.inc.php';
+require 'includes/html/graphs/generic_multi_line.inc.php';

@@ -27,7 +27,6 @@ use LibreNMS\Config;
 
 $install_dir = Config::get('install_dir');
 require_once $install_dir . '/includes/alerts.inc.php';
-require_once $install_dir . '/includes/device-groups.inc.php';
 
 if (Config::get('map.engine', 'leaflet') == 'leaflet') {
     $temp_output = '

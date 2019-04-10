@@ -37,14 +37,11 @@ foreach ($config['nfsen_rrds'] as $nfsenDir) {
 
 print_optionbar_end();
 
-if (!$vars['nfsen']) {
-    $vars['nfsen'] = 'general';
-}
-
-if (is_file('pages/device/nfsen/'.mres($vars['nfsen']).'.inc.php')) {
-    include 'pages/device/nfsen/'.mres($vars['nfsen']).'.inc.php';
+$nfsen_type = basename($vars['nfsen'] ?? 'general');
+if (is_file("includes/html/pages/device/nfsen/$nfsen_type.inc.php")) {
+    include "includes/html/pages/device/nfsen/$nfsen_type.inc.php";
 } else {
-    include 'pages/device/nfsen/general.inc.php';
+    include 'includes/html/pages/device/nfsen/general.inc.php';
 }
 
 $pagetitle[] = 'Netflow';

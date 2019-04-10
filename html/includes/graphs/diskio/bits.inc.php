@@ -5,4 +5,4 @@ $ds_out = 'written';
 
 $format = 'bytes';
 
-require 'includes/graphs/generic_data.inc.php';
+require 'includes/html/graphs/generic_data.inc.php';

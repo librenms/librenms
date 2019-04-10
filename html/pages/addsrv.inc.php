@@ -5,7 +5,7 @@ use LibreNMS\Authentication\LegacyAuth;
 $no_refresh = true;
 
 if (!LegacyAuth::user()->hasGlobalAdmin()) {
-    include 'includes/error-no-perm.inc.php';
+    include 'includes/html/error-no-perm.inc.php';
 } else {
     if ($vars['addsrv']) {
         if (LegacyAuth::user()->hasGlobalAdmin()) {
@@ -35,7 +35,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
     echo "<div class='row'>
         <div class='col-sm-6'>";
 
-    include_once 'includes/print-service-add.inc.php';
+    include_once 'includes/html/print-service-add.inc.php';
 
     echo '</div>
         </div>';

@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-include 'pages/device/loadbalancer/gtm_wide_common.inc.php';
+include 'includes/html/pages/device/loadbalancer/gtm_wide_common.inc.php';
 
 if ($components[$vars['wideid']]['type'] == 'f5-gtm-wide') {
     ?>
@@ -34,7 +34,7 @@ if ($components[$vars['wideid']]['type'] == 'f5-gtm-wide') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_gtm_wide_requests';
                             $graph_array['id'] = $vars['wideid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>
@@ -53,7 +53,7 @@ if ($components[$vars['wideid']]['type'] == 'f5-gtm-wide') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_gtm_wide_resolved';
                             $graph_array['id'] = $vars['wideid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>
@@ -71,7 +71,7 @@ if ($components[$vars['wideid']]['type'] == 'f5-gtm-wide') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_gtm_wide_dropped';
                             $graph_array['id'] = $vars['wideid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>

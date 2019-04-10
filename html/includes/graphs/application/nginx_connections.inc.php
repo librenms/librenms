@@ -2,7 +2,7 @@
 
 $scale_min = 0;
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = rrd_name($device['hostname'], array('app', 'nginx', $app['app_id']));
 
@@ -42,4 +42,4 @@ $colours   = 'mixed';
 $nototal   = 1;
 $unit_text = 'Workers';
 
-require 'includes/graphs/generic_multi_simplex_seperated.inc.php';
+require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

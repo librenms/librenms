@@ -5,14 +5,14 @@ use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh = true;
 
-require 'includes/javascript-interfacepicker.inc.php';
+require 'includes/html/javascript-interfacepicker.inc.php';
 
 echo "<div style='margin: 10px;'>";
 
 $pagetitle[] = 'Edit user';
 
 if (! Auth::user()->hasGlobalAdmin()) {
-    include 'includes/error-no-perm.inc.php';
+    include 'includes/html/error-no-perm.inc.php';
 } else {
     if ($vars['user_id'] && !$vars['edit']) {
         /** @var User $user */

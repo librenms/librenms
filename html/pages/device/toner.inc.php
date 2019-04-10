@@ -3,6 +3,6 @@
 $graph_title = 'Toner';
 $graph_type  = 'device_toner';
 
-require 'includes/print-device-graph.php';
+require 'includes/html/print-device-graph.php';
 
 $pagetitle[] = 'Toner';

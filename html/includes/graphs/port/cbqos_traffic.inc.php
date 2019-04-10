@@ -30,7 +30,7 @@ if (!isset($vars['policy'])) {
     }
 }
 
-include "includes/graphs/common.inc.php";
+include "includes/html/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_options .= " COMMENT:'Class-Map              Now      Avg      Max\\n'";
 $rrd_additions = "";

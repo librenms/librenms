@@ -81,7 +81,7 @@ foreach (dbFetchRows($sql, $param) as $processor) {
         $graph_array['id']     = $processor['processor_id'];
         $graph_array['type']   = $graph_type;
         $return_data           = true;
-        include 'includes/print-graphrow.inc.php';
+        include 'includes/html/print-graphrow.inc.php';
         unset($return_data);
         $response[] = array(
             'hostname'        => $graph_data[0],

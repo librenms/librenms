@@ -12,4 +12,4 @@
  * the source code distribution for details.
  */
 
-require_once 'includes/print-alert-templates.php';
+require_once 'includes/html/print-alert-templates.php';

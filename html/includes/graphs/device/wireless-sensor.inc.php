@@ -23,7 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 // escape % characters
 $unit = preg_replace('/(?<!%)%(?!%)/', '%%', $unit);

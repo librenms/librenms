@@ -24,7 +24,7 @@
  */
 
 require 'rrdcached.inc.php';
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $ds  = 'queue_length';
 
@@ -34,4 +34,4 @@ $colour_area_max = 'F78800';
 
 $unit_text = 'Queue Length';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

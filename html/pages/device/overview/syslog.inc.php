@@ -12,7 +12,7 @@ if ($config['enable_syslog']) {
               <table class="table table-hover table-condensed table-striped">';
         foreach ($syslog as $entry) {
             unset($syslog_output);
-            include 'includes/print-syslog.inc.php';
+            include 'includes/html/print-syslog.inc.php';
             echo $syslog_output;
         }
 

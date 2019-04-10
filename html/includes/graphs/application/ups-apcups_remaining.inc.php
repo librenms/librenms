@@ -18,7 +18,7 @@
 * @copyright  2016 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 $scale_min = 0;
 $ds        = 'time_remaining';
 $colour_area     = 'FF000011';
@@ -30,4 +30,4 @@ $ups_apcups  = rrd_name($device['hostname'], array('app', 'ups-apcups', $app['ap
 if (rrdtool_check_rrd_exists($ups_apcups)) {
     $rrd_filename = $ups_apcups;
 }
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

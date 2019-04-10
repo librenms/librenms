@@ -17,8 +17,8 @@ use LibreNMS\Authentication\LegacyAuth;
 $pagetitle[] = 'Alert Schedule';
 $no_refresh  = true;
 if (LegacyAuth::user()->hasGlobalAdmin()) {
-    include_once 'includes/modal/alert_schedule.inc.php';
-    include_once 'includes/modal/remove_alert_schedule.inc.php';
+    include_once 'includes/html/modal/alert_schedule.inc.php';
+    include_once 'includes/html/modal/remove_alert_schedule.inc.php';
 
 ?>
 

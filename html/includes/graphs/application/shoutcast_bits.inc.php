@@ -21,4 +21,4 @@ $colour_area_out = 'C3D9FF';
 $hostname     = (isset($_GET['hostname']) ? $_GET['hostname'] : 'unknown');
 $rrd_filename = rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id'], $hostname));
 
-require 'includes/graphs/generic_data.inc.php';
+require 'includes/html/graphs/generic_data.inc.php';

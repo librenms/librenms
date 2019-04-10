@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $scale_min       = 0;
 $ds              = 'calls';
@@ -11,4 +11,4 @@ $graph_max       = 10000;
 $unit_text       = 'Calls';
 $rrd_filename = rrd_name($device['hostname'], array('app', 'asterisk', 'stats', $app['app_id']));
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

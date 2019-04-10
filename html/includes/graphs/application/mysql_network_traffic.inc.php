@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $mysql_rrd = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id']));
 
@@ -13,4 +13,4 @@ $multiplier = 8;
 $ds_in  = 'BRd';
 $ds_out = 'BSt';
 
-require 'includes/graphs/generic_data.inc.php';
+require 'includes/html/graphs/generic_data.inc.php';

@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 // $rrd_options .= " -l 0 -E ";
 $rrdfilename = rrd_name($device['hostname'], 'ubnt-airfiber-mib');

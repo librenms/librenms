@@ -217,15 +217,16 @@ foreach ($datas as $type) {
 
 print_optionbar_end();
 
-if (is_file('pages/device/health/'.mres($vars['metric']).'.inc.php')) {
-    include 'pages/device/health/'.mres($vars['metric']).'.inc.php';
+$metric = basename($vars['metric']);
+if (is_file("includes/html/pages/device/health/$metric.inc.php")) {
+    include "includes/html/pages/device/health/$metric.inc.php";
 } else {
     foreach ($datas as $type) {
         if ($type != 'overview') {
             $graph_title         = $type_text[$type];
             $graph_array['type'] = 'device_'.$type;
 
-            include 'includes/print-device-graph.php';
+            include 'includes/html/print-device-graph.php';
         }
     }
 }

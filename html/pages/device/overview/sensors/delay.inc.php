@@ -5,4 +5,4 @@ $sensor_class = 'delay';
 $sensor_unit  = 's';
 $sensor_type  = 'delay';
 
-require 'pages/device/overview/generic/sensor.inc.php';
+require 'includes/html/pages/device/overview/generic/sensor.inc.php';

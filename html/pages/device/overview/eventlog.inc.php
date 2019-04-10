@@ -11,7 +11,7 @@ echo '        </div>
 
 $eventlog = dbFetchRows("SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate FROM `eventlog` WHERE `device_id` = ? ORDER BY `datetime` DESC LIMIT 0,10", [$device['device_id']]);
 foreach ($eventlog as $entry) {
-    include 'includes/print-event-short.inc.php';
+    include 'includes/html/print-event-short.inc.php';
 }
 
 echo '</table>';

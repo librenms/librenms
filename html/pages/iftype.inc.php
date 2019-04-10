@@ -39,7 +39,7 @@ if ($if_list) {
     $graph_type      = 'multiport_bits_separate';
     $port['port_id'] = $if_list;
 
-    include 'includes/print-interface-graphs.inc.php';
+    include 'includes/html/print-interface-graphs.inc.php';
 
     echo '</td></tr>';
 
@@ -76,7 +76,7 @@ if ($if_list) {
         if (file_exists(get_port_rrdfile_path($port['hostname'], $port['port_id']))) {
             $graph_type = 'port_bits';
 
-            include 'includes/print-interface-graphs.inc.php';
+            include 'includes/html/print-interface-graphs.inc.php';
         }
 
         echo '</td></tr>';

@@ -4,4 +4,4 @@ $class     = 'fanspeed';
 $unit      = '';
 $unit_long = 'RPM';
 
-require 'includes/graphs/device/sensor.inc.php';
+require 'includes/html/graphs/device/sensor.inc.php';

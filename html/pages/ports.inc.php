@@ -412,7 +412,7 @@ if ($ignore_filter == 0 && $disabled_filter == 0) {
 $query = "SELECT * FROM `ports` AS I, `devices` AS D LEFT JOIN `locations` AS L ON D.location_id = L.id WHERE I.device_id = D.device_id" . $where . " " . $query_sort;
 $row = 1;
 
-list($format, $subformat) = explode("_", $vars['format']);
+list($format, $subformat) = explode('_', basename($vars['format']));
 
 // only grab list of ports for graph pages, table uses ajax
 $ports = $format == 'graph' ? dbFetchRows($query, $param) : [];
@@ -456,6 +456,6 @@ switch ($vars['sort']) {
         $ports = array_sort_by_column($ports, 'hostname', SORT_ASC);
 }
 
-if (file_exists('pages/ports/' . $format . '.inc.php')) {
-    require 'pages/ports/' . $format . '.inc.php';
+if (file_exists('includes/html/pages/ports/' . $format . '.inc.php')) {
+    require 'includes/html/pages/ports/' . $format . '.inc.php';
 }

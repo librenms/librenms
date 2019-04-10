@@ -18,7 +18,7 @@ $components = $component->getComponents($device['device_id'], $options);
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
-include "includes/graphs/common.inc.php";
+include "includes/html/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_options .= " COMMENT:'MAC Addresses       Now    Min     Max\\n'";
 $rrd_additions = "";

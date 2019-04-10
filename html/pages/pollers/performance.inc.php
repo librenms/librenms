@@ -16,7 +16,7 @@ $pagetitle[] = 'Poll Performance';
             'legend' => 'yes',
             'height' => 100,
         ];
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
 </div>
@@ -31,7 +31,7 @@ $pagetitle[] = 'Poll Performance';
             'legend' => 'yes',
             'height' => 100,
         ];
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
 </div>

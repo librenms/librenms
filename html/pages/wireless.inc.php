@@ -30,14 +30,8 @@ use LibreNMS\Device\WirelessSensor;
 $sensors = dbFetchColumn('SELECT `sensor_class` FROM `wireless_sensors` GROUP BY `sensor_class`');
 $valid_wireless_types = array_intersect_key(WirelessSensor::getTypes(), array_flip($sensors));
 
-$class = $vars['metric'];
-if (!$class) {
-    $class = key($valid_wireless_types);  // get current type in array (should be the first)
-}
-if (!$vars['view']) {
-    $vars['view'] = "nographs";
-}
-
+$class = basename($vars['metric'] ?? key($valid_wireless_types));
+$vars['view'] = basename($vars['view'] ?? 'nographs');
 
 $link_array = array('page' => 'wireless');
 
@@ -84,7 +78,7 @@ if (isset($valid_wireless_types[$class])) {
     $graph_type = 'wireless_' . $class;
     $unit = $valid_wireless_types[$class]['unit'];
     $pagetitle[] = "Wireless :: ".$class;
-    include $config['install_dir'] . '/html/pages/wireless/sensors.inc.php';
+    include $config['install_dir'] . '/includes/html/pages/wireless/sensors.inc.php';
 } else {
     echo("No sensors of type " . $class . " found.");
 }

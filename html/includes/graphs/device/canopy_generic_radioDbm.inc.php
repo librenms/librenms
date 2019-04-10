@@ -9,7 +9,7 @@
  * the source code distribution for details.
  */
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'canopy-generic-radioDbm');
 if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";

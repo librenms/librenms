@@ -1,5 +1,5 @@
 <?php
-require_once 'includes/object-cache.inc.php';
+require_once 'includes/html/object-cache.inc.php';
 
 $temp_output = '
 <div class="panel panel-default panel-condensed table-responsive">

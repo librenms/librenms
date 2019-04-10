@@ -36,11 +36,11 @@ unset($sep);
 print_optionbar_end();
 
 if ($vars['view'] == 'basic') {
-    include 'includes/print-stp.inc.php';
+    include 'includes/html/print-stp.inc.php';
 }
 
 if ($vars['view'] == 'ports') {
-    include 'includes/common/stp-ports.inc.php';
+    include 'includes/html/common/stp-ports.inc.php';
     echo implode('', $common_output);
 }
 

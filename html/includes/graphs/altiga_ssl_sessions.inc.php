@@ -2,7 +2,7 @@
 
 $scale_min = '0';
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $device = device_by_id_cache($id);
 

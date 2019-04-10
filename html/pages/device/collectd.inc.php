@@ -16,9 +16,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02150-1301, USA.
  */
 
-require 'includes/collectd/config.php';
-require 'includes/collectd/functions.php';
-require 'includes/collectd/definitions.php';
+require 'includes/html/collectd/config.php';
+require 'includes/html/collectd/functions.php';
+require 'includes/html/collectd/definitions.php';
 
 global $MetaGraphDefs;
 load_graph_definitions();
@@ -116,7 +116,7 @@ foreach ($pinsts as &$instance) {
             $graph_array['c_type']            = $type;
             $graph_array['c_type_instance']   = $tinst;
 
-            include 'includes/print-graphrow.inc.php';
+            include 'includes/html/print-graphrow.inc.php';
 
             echo '</div>';
         }

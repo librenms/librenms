@@ -77,7 +77,7 @@ foreach ($graphs[$vars['app_section']] as $key => $text) {
     </div>
     <div class="panel-body">
     <div class="row">';
-    include 'includes/print-graphrow.inc.php';
+    include 'includes/html/print-graphrow.inc.php';
     echo '</div>';
     echo '</div>';
     echo '</div>';

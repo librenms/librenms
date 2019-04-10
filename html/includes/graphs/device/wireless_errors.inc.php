@@ -6,4 +6,4 @@ $class     = 'errors';
 $unit      = 'bps';
 $unit_long = 'Errors';
 
-require 'includes/graphs/device/wireless-sensor.inc.php';
+require 'includes/html/graphs/device/wireless-sensor.inc.php';

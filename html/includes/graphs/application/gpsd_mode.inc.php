@@ -20,7 +20,7 @@
 *
 */
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $scale_min = 0;
 $ds = 'mode';
@@ -37,4 +37,4 @@ if (rrdtool_check_rrd_exists($gpsd)) {
     echo "file missing: $rrd_filename";
 }
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

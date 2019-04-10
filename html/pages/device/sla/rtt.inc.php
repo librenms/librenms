@@ -10,6 +10,6 @@
     $graph_array['to']      = $config['time']['now'];
     $graph_array['type']    = 'device_sla';
     $graph_array['id']      = $vars['id'];
-    require 'includes/print-graphrow.inc.php';
+    require 'includes/html/print-graphrow.inc.php';
 ?>
     </div>

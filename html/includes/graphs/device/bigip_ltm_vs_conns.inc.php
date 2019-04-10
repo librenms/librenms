@@ -26,7 +26,7 @@ if (isset($components[$vars['id']])) {
 
     $rrd_filename = rrd_name($device['hostname'], array('f5-ltm-vs', $label, $hash));
     if (rrdtool_check_rrd_exists($rrd_filename)) {
-        require 'includes/graphs/common.inc.php';
+        require 'includes/html/graphs/common.inc.php';
         $ds = 'totconns';
 
         $colour_area = '9999cc';
@@ -39,6 +39,6 @@ if (isset($components[$vars['id']])) {
 
         $unit_text = 'Total Connections';
         $line_text = 'Connections';
-        require 'includes/graphs/generic_simplex.inc.php';
+        require 'includes/html/graphs/generic_simplex.inc.php';
     }
 }

@@ -1,5 +1,5 @@
 <?php
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 $name = 'dhcp-stats';
 $app_id = $app['app_id'];
 $scale_min     = 0;
@@ -40,4 +40,4 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     echo "file missing: $rrd_filename";
 }
 
-require 'includes/graphs/generic_v3_multiline.inc.php';
+require 'includes/html/graphs/generic_v3_multiline.inc.php';

@@ -2,7 +2,7 @@
 
 $scale_min = 0;
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $drbd_rrd = rrd_name($device['hostname'], array('app', 'drbd', $app['app_instance']));
 
@@ -16,4 +16,4 @@ $ds_out = 'dw';
 $multiplier = '8';
 $format     = 'bytes';
 
-require 'includes/graphs/generic_data.inc.php';
+require 'includes/html/graphs/generic_data.inc.php';

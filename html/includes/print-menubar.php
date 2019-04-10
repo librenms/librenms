@@ -59,7 +59,6 @@ if ($config['title_image']) {
               <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg" aria-hidden="true"></i> Availability</a></li>
               <li><a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg" aria-hidden="true"></i> Network</a></li>
                 <?php
-                    require_once '../includes/device-groups.inc.php';
                     $devices_groups = GetDeviceGroups();
                 if (count($devices_groups) > 0) {
                     echo '<li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Device Groups Maps</a><ul class="dropdown-menu scrollable-menu">';
@@ -596,8 +595,8 @@ if ($alerts['active_count'] > 0) {
 
 <?php
 // Custom menubar entries.
-if (is_file("includes/print-menubar-custom.inc.php")) {
-    require 'includes/print-menubar-custom.inc.php';
+if (is_file("includes/html/print-menubar-custom.inc.php")) {
+    require 'includes/html/print-menubar-custom.inc.php';
 }
 
 ?>

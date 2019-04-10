@@ -19,7 +19,7 @@ $components = $component->getComponents($device['device_id'], $options);
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
-include "includes/graphs/common.inc.php";
+include "includes/html/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_options .= " COMMENT:'VS Total Connections       Now      Avg      Max\\n'";
 $colours = array_merge($config['graph_colours']['mixed'], $config['graph_colours']['manycolours']);

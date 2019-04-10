@@ -18,8 +18,6 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
-require_once '../includes/device-groups.inc.php';
-
 $pattern  = $_POST['patterns'];
 $group_id = $_POST['group_id'];
 $name     = mres($_POST['name']);

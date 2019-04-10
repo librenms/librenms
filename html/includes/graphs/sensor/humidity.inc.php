@@ -3,7 +3,7 @@
 $scale_min = '25';
 $scale_max = '40';
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $rrd_options .= " COMMENT:'                                 Last   Max\\n'";
 

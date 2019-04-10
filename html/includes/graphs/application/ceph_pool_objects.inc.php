@@ -2,7 +2,7 @@
 
 $scale_min = 0;
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $ceph_pool_rrd = ceph_rrd('df');
 
@@ -19,4 +19,4 @@ $colour_area_max = 'FFEE99';
 
 $unit_text = 'Objects';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

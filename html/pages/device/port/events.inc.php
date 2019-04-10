@@ -5,7 +5,7 @@ echo '<table class="table table-condensed">';
 echo '<th>Timestamp</th><th>Port</th><th>Event</th>';
 
 foreach ($entries as $entry) {
-    include 'includes/print-event.inc.php';
+    include 'includes/html/print-event.inc.php';
 }
 
 echo '</table>';

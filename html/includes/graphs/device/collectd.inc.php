@@ -17,9 +17,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-require 'includes/collectd/config.php';
-require 'includes/collectd/functions.php';
-require 'includes/collectd/definitions.php';
+require 'includes/html/collectd/config.php';
+require 'includes/html/collectd/functions.php';
+require 'includes/html/collectd/definitions.php';
 
 
 function makeTextBlock($text, $fontfile, $fontsize, $width)
@@ -229,13 +229,8 @@ if (isset($MetaGraphDefs[$type])) {
 }
 
 if (isset($rrd_cmd)) {
-    if ($_GET['from']) {
-        $from = mres($_GET['from']);
-    }
-
-    if ($_GET['to']) {
-        $to = mres($_GET['to']);
-    }
+    $from = (int)($_GET['from'] ?? time() - 86400);
+    $to = (int)($_GET['to'] ?? time());
 
     $rrd_cmd .= ' -s '.$from.' -e '.$to;
 }

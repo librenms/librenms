@@ -4,4 +4,4 @@ $graph_type = 'sensor_ber';
 $class      = 'ber';
 $unit       = '';
 
-require 'pages/health/sensors.inc.php';
+require 'includes/html/pages/health/sensors.inc.php';

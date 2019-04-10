@@ -2,7 +2,7 @@
 
 $rrd_filename = rrd_name($device['hostname'], 'fortios_lograte');
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $ds = 'lograte';
 
@@ -15,4 +15,4 @@ $graph_max = 1;
 
 $unit_text = 'Logs per second';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

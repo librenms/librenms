@@ -40,4 +40,4 @@ $scale_min = '0';
 $scale_max = '100';
 $nototal   = 1;
 
-require_once 'includes/graphs/generic_multi_line.inc.php';
+require_once 'includes/html/graphs/generic_multi_line.inc.php';

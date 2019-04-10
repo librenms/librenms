@@ -26,4 +26,4 @@ if ($request->has('oauthtransport')) {
 unset($request);
 
 // print alert transports
-require_once 'includes/print-alert-transports.php';
+require_once 'includes/html/print-alert-transports.php';

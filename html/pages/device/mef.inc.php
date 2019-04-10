@@ -4,7 +4,7 @@ echo '<table border="0" cellspacing="0" cellpadding="5" width="100%" class="tabl
 $i = '1';
 
 foreach (dbFetchRows('SELECT `mefIdent`,`mefType`,`mefMTU`,`mefAdmState`,`mefRowState` FROM `mefinfo` WHERE `device_id` = ? ORDER BY `mefID`', array($device['device_id'])) as $mef) {
-    include 'includes/print-mef.inc.php';
+    include 'includes/html/print-mef.inc.php';
     $i++;
 }
 

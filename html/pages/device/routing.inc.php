@@ -50,12 +50,13 @@ foreach ($routing_tabs as $type) {
 
 print_optionbar_end();
 
-if (is_file('pages/device/routing/'.mres($vars['proto']).'.inc.php')) {
-    include 'pages/device/routing/'.mres($vars['proto']).'.inc.php';
+$protocol = basename($vars['proto']);
+if (is_file("includes/html/pages/device/routing/$protocol.inc.php")) {
+    include "includes/html/pages/device/routing/$protocol.inc.php";
 } else {
     foreach ($routing_tabs as $type) {
         if ($type != 'overview') {
-            if (is_file('pages/device/routing/overview/'.mres($type).'.inc.php')) {
+            if (is_file("includes/html/pages/device/routing/overview/$type.inc.php")) {
                 $g_i++;
                 if (!is_integer($g_i / 2)) {
                     $row_colour = $config['list_colour']['even'];
@@ -66,7 +67,7 @@ if (is_file('pages/device/routing/'.mres($vars['proto']).'.inc.php')) {
                 echo '<div style="background-color: '.$row_colour.';">';
                 echo '<div style="padding:4px 0px 0px 8px;"><span class=graphhead>'.$type_text[$type].'</span>';
 
-                include 'pages/device/routing/overview/'.mres($type).'.inc.php';
+                include "includes/html/pages/device/routing/overview/$type.inc.php";
 
                 echo '</div>';
                 echo '</div>';
@@ -74,7 +75,7 @@ if (is_file('pages/device/routing/'.mres($vars['proto']).'.inc.php')) {
                 $graph_title = $type_text[$type];
                 $graph_type  = 'device_'.$type;
 
-                include 'includes/print-device-graph.php';
+                include 'includes/html/print-device-graph.php';
             }//end if
         }//end if
     }//end foreach

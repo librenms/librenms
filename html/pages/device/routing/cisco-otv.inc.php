@@ -65,7 +65,7 @@ $graph_array['height'] = '100';
 $graph_array['width']  = '215';
 $graph_array['to']     = $config['time']['now'];
 $graph_array['type']   = 'device_cisco-otv-vlan';
-require 'includes/print-graphrow.inc.php';
+require 'includes/html/print-graphrow.inc.php';
 
 ?>
     </div>
@@ -84,7 +84,7 @@ $graph_array['height'] = '100';
 $graph_array['width']  = '215';
 $graph_array['to']     = $config['time']['now'];
 $graph_array['type']   = 'device_cisco-otv-mac';
-require 'includes/print-graphrow.inc.php';
+require 'includes/html/print-graphrow.inc.php';
 
         ?>
     </div>

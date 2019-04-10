@@ -9,7 +9,7 @@
  * the source code distribution for details.
  */
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 $rrdfilename = rrd_name($device['hostname'], 'cisco-wwan-mnc');
 if (rrdtool_check_rrd_exists($rrdfilename)) {
     $rrd_options .= ' DEF:mnc='.$rrdfilename.':mnc:LAST ';

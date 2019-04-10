@@ -23,8 +23,8 @@ if (!is_numeric($vars['to'])) {
 
 preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
 
-$type = $graphtype['type'];
-$subtype = $graphtype['subtype'];
+$type = basename($graphtype['type']);
+$subtype = basename($graphtype['subtype']);
 $id = $vars['id'];
 
 if (is_numeric($vars['device'])) {
@@ -33,12 +33,12 @@ if (is_numeric($vars['device'])) {
     $device = device_by_name($vars['device']);
 }
 
-if (is_file("includes/graphs/".$type."/auth.inc.php")) {
-    require "includes/graphs/".$type."/auth.inc.php";
+if (is_file("includes/html/graphs/".$type."/auth.inc.php")) {
+    require "includes/html/graphs/".$type."/auth.inc.php";
 }
 
 if (!$auth) {
-    require 'includes/error-no-perm.inc.php';
+    require 'includes/html/error-no-perm.inc.php';
 } else {
     if (isset($config['graph_types'][$type][$subtype]['descr'])) {
         $title .= " :: " . $config['graph_types'][$type][$subtype]['descr'];
@@ -128,7 +128,7 @@ if (!$auth) {
 
     echo("<hr />");
 
-    include_once 'includes/print-date-selector.inc.php';
+    include_once 'includes/html/print-date-selector.inc.php';
 
     echo ('<div style="padding-top: 5px";></div>');
     echo('<center>');
@@ -183,6 +183,6 @@ if (!$auth) {
         $_GET = $graph_array;
         $command_only = 1;
 
-        require 'includes/graphs/graph.inc.php';
+        require 'includes/html/graphs/graph.inc.php';
     }
 }

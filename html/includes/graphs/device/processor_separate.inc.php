@@ -27,4 +27,4 @@ $scale_max = '100';
 
 $nototal = 1;
 
-require 'includes/graphs/generic_multi_line.inc.php';
+require 'includes/html/graphs/generic_multi_line.inc.php';

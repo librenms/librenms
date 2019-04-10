@@ -19,4 +19,4 @@ $graph_max = 1;
 
 $unit_text = 'Updates';
 
-require 'includes/graphs/generic_duplex.inc.php';
+require 'includes/html/graphs/generic_duplex.inc.php';

@@ -2,7 +2,7 @@
 
 $scale_min = 0;
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $ceph_pool_rrd = ceph_rrd('pool');
 
@@ -21,4 +21,4 @@ $graph_max         = 1;
 
 $unit_text = 'Operations';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

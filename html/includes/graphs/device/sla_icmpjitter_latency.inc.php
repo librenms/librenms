@@ -13,7 +13,7 @@
 
 $sla = dbFetchRow('SELECT `sla_nr` FROM `slas` WHERE `sla_id` = ?', array($vars['id']));
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 $rrd_options .= ' -l 0 -E ';
 $rrd_filename = rrd_name($device['hostname'], array('sla', $sla['sla_nr'], 'icmpjitter'));
 

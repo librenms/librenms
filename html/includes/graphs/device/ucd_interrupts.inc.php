@@ -14,4 +14,4 @@ $scale_min = 0;
 
 $unit_text = 'Interrupts/s';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

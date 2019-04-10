@@ -2,7 +2,7 @@
 
 $scale_min = 0;
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $agent_rrd = rrd_name($device['hostname'], 'agent');
 
@@ -23,4 +23,4 @@ $multiplier_action = '/';
 
 $unit_text = 'Seconds';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

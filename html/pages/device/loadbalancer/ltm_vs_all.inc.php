@@ -78,7 +78,7 @@
         $graph_array['legend'] = 'no';
         $graph_array['to']     = $config['time']['now'];
         $graph_array['type']   = 'device_bigip_ltm_allvs_conns';
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
 </div>
@@ -96,7 +96,7 @@
         $graph_array['legend'] = 'no';
         $graph_array['to']     = $config['time']['now'];
         $graph_array['type']   = 'device_bigip_ltm_allvs_bytesin';
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
 </div>
@@ -114,7 +114,7 @@
         $graph_array['legend'] = 'no';
         $graph_array['to']     = $config['time']['now'];
         $graph_array['type']   = 'device_bigip_ltm_allvs_bytesout';
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
 </div>
@@ -132,7 +132,7 @@
         $graph_array['legend'] = 'no';
         $graph_array['to']     = $config['time']['now'];
         $graph_array['type']   = 'device_bigip_ltm_allvs_pktsin';
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
 </div>
@@ -150,7 +150,7 @@
         $graph_array['legend'] = 'no';
         $graph_array['to']     = $config['time']['now'];
         $graph_array['type']   = 'device_bigip_ltm_allvs_pktsout';
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
 </div>

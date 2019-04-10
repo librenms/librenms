@@ -1,6 +1,6 @@
 <?php
 $scale_min = '0';
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 $rrd_options .= " COMMENT:'                                       Last     Max\\n'";
 $sensor['sensor_descr_fixed'] = rrdtool_escape($sensor['sensor_descr'], 32);
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";

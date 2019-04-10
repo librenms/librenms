@@ -42,7 +42,7 @@ if (LegacyAuth::user()->isDemoUser()) {
         }
     }
 
-    include 'includes/update-preferences-password.inc.php';
+    include 'includes/html/update-preferences-password.inc.php';
 
     if (LegacyAuth::get()->canUpdatePasswords(LegacyAuth::user()->username)) {
         echo '<h3>Change Password</h3>';

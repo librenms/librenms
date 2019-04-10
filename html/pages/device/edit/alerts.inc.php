@@ -29,7 +29,7 @@ if ($_POST['editing']) {
         $update_message = 'Device alert settings updated.';
         $updated        = 1;
     } else {
-        include 'includes/error-no-perm.inc.php';
+        include 'includes/html/error-no-perm.inc.php';
     }//end if
 }//end if
 
@@ -100,7 +100,7 @@ if ($disable_notify) {
 </form>
 
 <?php
-require_once 'includes/modal/new_alert_rule.inc.php';
+require_once 'includes/html/modal/new_alert_rule.inc.php';
 ?>
 <br>
 <div class="row">

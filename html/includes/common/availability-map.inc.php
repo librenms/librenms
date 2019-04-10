@@ -143,7 +143,7 @@ if (defined('SHOW_SETTINGS')) {
         </div>
     </form>';
 } else {
-    require_once 'includes/object-cache.inc.php';
+    require_once 'includes/html/object-cache.inc.php';
 
     $host_up_count = 0;
     $host_warn_count = 0;

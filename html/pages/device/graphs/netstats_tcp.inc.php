@@ -4,5 +4,5 @@ if (rrdtool_check_rrd_exists(rrd_name($device['hostname'], 'netstats-tcp'))) {
     $graph_title = 'TCP Statistics';
     $graph_type  = 'device_tcp';
 
-    include 'includes/print-device-graph.php';
+    include 'includes/html/print-device-graph.php';
 }

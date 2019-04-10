@@ -16,7 +16,7 @@ use LibreNMS\Config;
 
 $pagetitle[] = 'Pollers';
 
-require_once 'includes/modal/delete_poller.inc.php';
+require_once 'includes/html/modal/delete_poller.inc.php';
 
 ?>
     <br />

@@ -5,7 +5,7 @@
 is_numeric($sensor['sensor_limit_low']) ? $scale_min = $sensor['sensor_limit_low'] : $scale_min = '-1';
 is_numeric($sensor['sensor_limit']) ? $scale_max = $sensor['sensor_limit'] : $scale_max = '1';
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $rrd_options .= " COMMENT:'                                     Min     Max     Last\\n'";
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";

@@ -28,4 +28,4 @@ while (isset($disks[$int])) {
     $int++;
 }
 
-require 'includes/graphs/generic_multi_line_exact_numbers.inc.php';
+require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';

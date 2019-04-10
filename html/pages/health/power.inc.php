@@ -19,4 +19,4 @@ $graph_type = 'sensor_power';
 $unit       = 'W';
 $class      = 'power';
 
-require 'pages/health/sensors.inc.php';
+require 'includes/html/pages/health/sensors.inc.php';

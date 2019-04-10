@@ -19,7 +19,7 @@ $components = $component->getComponents($device['device_id'], $options);
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
-include "includes/graphs/common.inc.php";
+include "includes/html/graphs/common.inc.php";
 $rrd_options .= " -E ";
 $rrd_options .= " --vertical-label='Seconds'";
 $rrd_options .= " COMMENT:'Offset (s)             Now      Min      Max\\n'";

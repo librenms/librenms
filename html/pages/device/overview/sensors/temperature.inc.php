@@ -5,4 +5,4 @@ $sensor_class = 'temperature';
 $sensor_unit  = '&deg;C';
 $sensor_type  = 'Temperature';
 
-require 'pages/device/overview/generic/sensor.inc.php';
+require 'includes/html/pages/device/overview/generic/sensor.inc.php';

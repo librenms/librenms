@@ -69,7 +69,7 @@ print_optionbar_end();
 echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
 $i = '0';
 foreach (dbFetchRows('SELECT * FROM `vrfs` WHERE `device_id` = ? ORDER BY `vrf_name`', array($device['device_id'])) as $vrf) {
-    include 'includes/print-vrf.inc.php';
+    include 'includes/html/print-vrf.inc.php';
 
     $i++;
 }

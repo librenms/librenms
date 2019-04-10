@@ -2,7 +2,7 @@
 
 $scale_min = 0;
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $apache_rrd = rrd_name($device['hostname'], array('app', 'apache', $app['app_id']));
 
@@ -21,4 +21,4 @@ $graph_max = 1;
 
 $unit_text = '% Used';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

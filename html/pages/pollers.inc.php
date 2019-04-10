@@ -40,7 +40,7 @@ $poll_tabs[] = [
     'icon' => 'fa-file-text',
 ];
 
-$current_tab = isset($vars['tab']) ? str_replace('/', '', $vars['tab']) : 'pollers';
+$current_tab = basename($vars['tab'] ?? 'pollers');
 
 foreach ($poll_tabs as $tab) {
     $taburl = strtolower($tab['name']);
@@ -52,4 +52,4 @@ foreach ($poll_tabs as $tab) {
 
 echo '</ul>';
 
-include_once 'pages/pollers/'.$current_tab.'.inc.php';
+include_once "includes/html/pages/pollers/$current_tab.inc.php";

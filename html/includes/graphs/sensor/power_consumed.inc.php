@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $rrd_options .= " COMMENT:'                                               Min           Max\\n'";
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";

@@ -162,7 +162,7 @@ switch ($vars["sort"]) {
 }
 
 foreach ($ports as $port) {
-    include 'includes/print-interface.inc.php';
+    include 'includes/html/print-interface.inc.php';
     $i++;
 }
 

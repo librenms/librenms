@@ -337,7 +337,7 @@ if ($graph_type && is_file($graph_file)) {
 
     echo "<tr style='background-color: $row_colour; padding: 0px;'><td colspan=7>";
 
-    include 'includes/print-interface-graphs.inc.php';
+    include 'includes/html/print-interface-graphs.inc.php';
 
     echo '</td></tr>';
 }

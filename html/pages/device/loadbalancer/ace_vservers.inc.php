@@ -84,7 +84,7 @@ foreach (dbFetchRows('SELECT * FROM `loadbalancer_vservers` WHERE `device_id` = 
         $graph_array['id']     = $vserver['classmap_id'];
         $graph_array['type']   = $graph_type;
 
-        include 'includes/print-graphrow.inc.php';
+        include 'includes/html/print-graphrow.inc.php';
 
         echo '
             </td>

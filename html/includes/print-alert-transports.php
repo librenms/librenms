@@ -12,8 +12,8 @@ $no_refresh = true;
 </div>
 <?php
 
-require_once 'includes/modal/edit_alert_transport.inc.php';
-require_once 'includes/modal/edit_transport_group.inc.php';
+require_once 'includes/html/modal/edit_alert_transport.inc.php';
+require_once 'includes/html/modal/edit_transport_group.inc.php';
 
 ?>
 

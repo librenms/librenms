@@ -18,9 +18,9 @@ $no_refresh = true;
 
 $pagetitle[] = 'Device Dependencies';
 
-require_once 'includes/modal/delete_host_dependency.inc.php';
-require_once 'includes/modal/edit_host_dependency.inc.php';
-require_once 'includes/modal/manage_host_dependencies.inc.php';
+require_once 'includes/html/modal/delete_host_dependency.inc.php';
+require_once 'includes/html/modal/edit_host_dependency.inc.php';
+require_once 'includes/html/modal/manage_host_dependencies.inc.php';
 ?>
 <div class="row">
     <div class="col-sm-12">

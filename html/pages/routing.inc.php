@@ -54,7 +54,7 @@ switch ($vars['protocol']) {
     case 'cef':
     case 'ospf':
     case 'cisco-otv':
-        include 'pages/routing/'.$vars['protocol'].'.inc.php';
+        include 'includes/html/pages/routing/'.$vars['protocol'].'.inc.php';
         break;
 
     default:

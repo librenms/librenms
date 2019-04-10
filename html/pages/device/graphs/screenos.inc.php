@@ -4,5 +4,5 @@ if ($device['os'] == 'screenos' && rrdtool_check_rrd_exists(rrd_name($device['ho
     $graph_title = 'Firewall Sessions';
     $graph_type  = 'screenos_sessions';
 
-    include 'includes/print-device-graph.php';
+    include 'includes/html/print-device-graph.php';
 }

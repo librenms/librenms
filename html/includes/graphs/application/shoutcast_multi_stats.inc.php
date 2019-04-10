@@ -20,7 +20,7 @@ foreach ($rrd_filenames as $file) {
     );
 }
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 if ($width > '500') {
     $descr_len = 38;

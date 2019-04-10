@@ -2,7 +2,7 @@
 
 $rrd_filename = rrd_name($device['hostname'], 'routeros_pppoe_sessions');
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $ds = 'pppoe_sessions';
 
@@ -16,4 +16,4 @@ $graph_min = 0;
 
 $unit_text = 'PPPoE Sessions';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

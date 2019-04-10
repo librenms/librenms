@@ -12,8 +12,14 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Authentication\LegacyAuth;
+
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+if (!LegacyAuth::check()) {
+    die('Unauthorized');
+}
 
 set_debug(strpos($_SERVER['PATH_INFO'], 'debug'));
 
@@ -37,7 +43,7 @@ $pdf->setTextShadow(array('enabled' => false, 'depth_w' => 0.2, 'depth_h' => 0.2
 if (isset($_GET['report']) && !empty($_GET['report'])) {
     $report = mres($_GET['report']);
     $pdf->SetHeaderData('../../../../../html/'.$config['title_image'], 40, ucfirst($report), $config['project_name'], array(0, 0, 0), array(0, 64, 128));
-    include_once "includes/reports/$report.pdf.inc.php";
+    include_once "includes/html/reports/$report.pdf.inc.php";
 } else {
     $report = 'report';
 }

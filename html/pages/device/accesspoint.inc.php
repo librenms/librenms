@@ -8,6 +8,6 @@ $ap = dbFetchRow("SELECT * FROM `access_points` WHERE `device_id` = ? AND `acces
 
 echo "<div class=ifcell style='margin: 0px;'><table width=100% cellpadding=10 cellspacing=0>";
 
-require 'includes/print-accesspoint.inc.php';
+require 'includes/html/print-accesspoint.inc.php';
 
 echo '</table></div>';

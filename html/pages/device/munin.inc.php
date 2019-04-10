@@ -64,7 +64,7 @@ foreach ($graph_enable as $graph => $entry) {
             $graph_array['type'] = 'device_'.$graph;
         }
 
-        include 'includes/print-device-graph.php';
+        include 'includes/html/print-device-graph.php';
     }
 }
 

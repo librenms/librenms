@@ -12,7 +12,7 @@
  */
 
 // Get a list of all services for this device.
-require_once '../includes/services.inc.php';
+require_once 'includes/services.inc.php';
 $services = service_get($device['device_id']);
 
 // Determine which key is the service we want to show.
@@ -45,7 +45,7 @@ if (is_file($check_script)) {
     }
 }
 
-include "includes/graphs/common.inc.php";
+include "includes/html/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_options .= " COMMENT:'                      Now     Avg      Max\\n'";
 $rrd_additions = "";

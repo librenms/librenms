@@ -25,7 +25,7 @@
  * I have mostly axed a lot of stuff and added a tiny bit of CSS
  * To make use of this, your config.php needs to contain
  * something like this:
-$config['front_page'] = "pages/front/fullscreenmap.php";
+$config['front_page'] = "includes/html/pages/front/fullscreenmap.php";
 $config['map']['engine'] = 'leaflet';
 $config['leaflet']['default_zoom'] = 5;
 $config['leaflet']['default_lat'] = 65.3258792;
@@ -36,7 +36,7 @@ $config['leaflet']['default_lng'] = 14.1115485;
 $pagetitle[] = 'Geographical Map';
 
 if ($config['map']['engine'] == 'leaflet') {
-    require_once 'includes/common/worldmap.inc.php';
+    require_once 'includes/html/common/worldmap.inc.php';
     echo implode('', $common_output);
 }
 /* Yes, this code requires the leaflet map engine  */

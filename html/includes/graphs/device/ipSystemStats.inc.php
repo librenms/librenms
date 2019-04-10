@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename_4 = rrd_name($device['hostname'], 'ipSystemStats-ipv4');
 $rrd_filename_6 = rrd_name($device['hostname'], 'ipSystemStats-ipv6');

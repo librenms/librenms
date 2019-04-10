@@ -48,9 +48,9 @@ if (isset($_POST['create-default'])) {
     unset($qb);
 }
 
-require_once 'includes/modal/new_alert_rule.inc.php';
-require_once 'includes/modal/delete_alert_rule.inc.php';
-require_once 'includes/modal/alert_rule_collection.inc.php';
+require_once 'includes/html/modal/new_alert_rule.inc.php';
+require_once 'includes/html/modal/delete_alert_rule.inc.php';
+require_once 'includes/html/modal/alert_rule_collection.inc.php';
 ?>
 <form method="post" action="" id="result_form">
 <?php

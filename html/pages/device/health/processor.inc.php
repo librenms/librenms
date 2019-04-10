@@ -38,6 +38,6 @@ foreach ($processors as $proc) {
                 <h3 class='panel-title'>$text_descr <div class='pull-right'>$percent% used</div></h3>
             </div>";
     echo "<div class='panel-body'>";
-    include 'includes/print-graphrow.inc.php';
+    include 'includes/html/print-graphrow.inc.php';
     echo "</div></div>";
 }//end foreach

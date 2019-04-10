@@ -1,11 +1,11 @@
 <?php
 
 if ($config['old_graphs']) {
-    include 'includes/graphs/old_generic_simplex.inc.php';
+    include 'includes/html/graphs/old_generic_simplex.inc.php';
 } else {
     // Draw generic bits graph
     // args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, percentile
-    include 'includes/graphs/common.inc.php';
+    include 'includes/html/graphs/common.inc.php';
 
     $unit_text = str_pad(substr($unit_text, 0, 18), 18);
     $line_text = str_pad(substr($line_text, 0, 12), 12);

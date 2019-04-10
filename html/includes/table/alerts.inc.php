@@ -15,8 +15,6 @@
 
 use LibreNMS\Authentication\LegacyAuth;
 
-require_once $config['install_dir'] . '/includes/device-groups.inc.php';
-
 $where = ' `devices`.`disabled` = 0';
 
 $alert_states = array(

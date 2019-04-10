@@ -14,7 +14,7 @@
 use LibreNMS\Authentication\LegacyAuth;
 
 if (LegacyAuth::user()->hasGlobalAdmin()) {
-    require 'includes/javascript-interfacepicker.inc.php';
+    require 'includes/html/javascript-interfacepicker.inc.php';
 
     $port_device_id = -1;
     if (is_numeric($vars['port'])) {
@@ -76,7 +76,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
     $bill_data['bill_type'] = 'cdr';
     $quota = array('select_gb' => ' selected');
     $cdr = array('select_mbps' => ' selected');
-    include 'pages/bill/addoreditbill.inc.php';
+    include 'includes/html/pages/bill/addoreditbill.inc.php';
 ?>
                 <div class="form-group">
                   <div class="col-sm-offset-4 col-sm-4">

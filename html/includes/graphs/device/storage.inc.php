@@ -3,7 +3,7 @@
 $scale_min = '0';
 $scale_max = '100';
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $iter         = '1';
 $rrd_options .= " COMMENT:'                    Size      Used    %age\\l'";

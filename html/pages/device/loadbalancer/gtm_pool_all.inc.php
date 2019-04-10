@@ -61,7 +61,7 @@
         $graph_array['legend'] = 'no';
         $graph_array['to']     = $config['time']['now'];
         $graph_array['type']   = 'device_bigip_gtm_allpool_requests';
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
 </div>
@@ -79,7 +79,7 @@
         $graph_array['legend'] = 'no';
         $graph_array['to']     = $config['time']['now'];
         $graph_array['type']   = 'device_bigip_gtm_allpool_dropped';
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
         ?>
     </div>
 </div>

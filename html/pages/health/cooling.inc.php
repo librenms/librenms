@@ -19,4 +19,4 @@ $graph_type = 'sensor_cooling';
 $class      = 'cooling';
 $unit       = 'w';
 
-require 'pages/health/sensors.inc.php';
+require 'includes/html/pages/health/sensors.inc.php';

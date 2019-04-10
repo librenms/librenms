@@ -3,7 +3,7 @@
 $scale_min = '0';
 $scale_max = '1';
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $service_text = substr(str_pad($service['service_type'], 28), 0, 28);
 

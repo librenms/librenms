@@ -24,7 +24,7 @@ if (isset($total) && $total === true) {
         </div>
         <div class="panel-body">
         <div class="row">';
-        include 'includes/print-graphrow.inc.php';
+        include 'includes/html/print-graphrow.inc.php';
         echo '</div>';
         echo '</div>';
         echo '</div>';
@@ -52,7 +52,7 @@ foreach ($files as $file) {
         echo '<h3>'.$text.'</h3>';
         echo "<tr bgcolor='$row_colour'><td colspan=5>";
 
-        include 'includes/print-graphrow.inc.php';
+        include 'includes/html/print-graphrow.inc.php';
 
         echo '</td></tr>';
     }

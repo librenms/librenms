@@ -50,7 +50,7 @@ if (is_numeric($vars['vsvr'])) {
 
             echo '<h3>'.$graph_text.'</h3>';
 
-            include 'includes/print-graphrow.inc.php';
+            include 'includes/html/print-graphrow.inc.php';
 
             echo '
     </td>
@@ -142,7 +142,7 @@ if (is_numeric($vars['vsvr'])) {
             $graph_array['id']     = $vsvr['vsvr_id'];
             $graph_array['type']   = $graph_type;
 
-            include 'includes/print-graphrow.inc.php';
+            include 'includes/html/print-graphrow.inc.php';
 
             echo '
     </td>

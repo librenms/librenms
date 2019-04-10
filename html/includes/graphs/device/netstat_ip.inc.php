@@ -29,4 +29,4 @@ $scale_min  = '0';
 $nototal    = 1;
 $simple_rrd = true;
 
-require 'includes/graphs/generic_multi_line.inc.php';
+require 'includes/html/graphs/generic_multi_line.inc.php';

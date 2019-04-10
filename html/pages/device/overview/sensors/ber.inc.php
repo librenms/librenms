@@ -5,4 +5,4 @@ $sensor_class = 'ber';
 $sensor_unit  = '';
 $sensor_type  = 'ber';
 
-require 'pages/device/overview/generic/sensor.inc.php';
+require 'includes/html/pages/device/overview/generic/sensor.inc.php';

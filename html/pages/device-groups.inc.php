@@ -1,6 +1,6 @@
 <?php
-require_once 'includes/modal/new_device_group.inc.php';
-require_once 'includes/modal/delete_device_group.inc.php';
+require_once 'includes/html/modal/new_device_group.inc.php';
+require_once 'includes/html/modal/delete_device_group.inc.php';
 
 $no_refresh = true;
 $group_count_check = array_filter(GetDeviceGroups());

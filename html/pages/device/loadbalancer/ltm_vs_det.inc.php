@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-include 'pages/device/loadbalancer/ltm_vs_common.inc.php';
+include 'includes/html/pages/device/loadbalancer/ltm_vs_common.inc.php';
 
 if ($components[$vars['vsid']]['type'] == 'f5-ltm-vs') {
     ?>
@@ -33,7 +33,7 @@ if ($components[$vars['vsid']]['type'] == 'f5-ltm-vs') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_ltm_vs_conns';
                             $graph_array['id'] = $vars['vsid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>
@@ -52,7 +52,7 @@ if ($components[$vars['vsid']]['type'] == 'f5-ltm-vs') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_ltm_vs_bytes';
                             $graph_array['id'] = $vars['vsid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>
@@ -71,7 +71,7 @@ if ($components[$vars['vsid']]['type'] == 'f5-ltm-vs') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_ltm_vs_pkts';
                             $graph_array['id'] = $vars['vsid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>

@@ -15,4 +15,4 @@ $graph_min = 0;
 
 $unit_text = 'CM Registered';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

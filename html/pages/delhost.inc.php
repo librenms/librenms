@@ -3,7 +3,7 @@
 use LibreNMS\Authentication\LegacyAuth;
 
 if (!LegacyAuth::user()->hasGlobalAdmin()) {
-    require 'includes/error-no-perm.inc.php';
+    require 'includes/html/error-no-perm.inc.php';
     exit;
 }
 

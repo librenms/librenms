@@ -62,7 +62,7 @@ foreach ($mempools as $mempool) {
     }
     echo "            </div>";
     echo "<div class='panel-body'>";
-    include 'includes/print-graphrow.inc.php';
+    include 'includes/html/print-graphrow.inc.php';
     echo "</div></div>";
 
     $i++;

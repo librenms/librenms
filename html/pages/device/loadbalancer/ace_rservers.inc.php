@@ -86,9 +86,9 @@ foreach (dbFetchRows('SELECT * FROM `loadbalancer_rservers` WHERE `device_id` = 
         $graph_array['id']     = $rserver['rserver_id'];
         $graph_array['type']   = $graph_type;
 
-        require 'includes/print-graphrow.inc.php';
+        require 'includes/html/print-graphrow.inc.php';
 
-        // include("includes/print-interface-graphs.inc.php");
+        // include("includes/html/print-interface-graphs.inc.php");
         echo '
    </td>
    </tr>';

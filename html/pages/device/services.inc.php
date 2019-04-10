@@ -19,11 +19,11 @@ use LibreNMS\Authentication\LegacyAuth;
 
 $pagetitle[] = 'Services';
 
-require_once '../includes/services.inc.php';
+require_once 'includes/services.inc.php';
 $services = service_get($device['device_id']);
 
-require_once 'includes/modal/new_service.inc.php';
-require_once 'includes/modal/delete_service.inc.php';
+require_once 'includes/html/modal/new_service.inc.php';
+require_once 'includes/html/modal/delete_service.inc.php';
 
 if (!$vars['view']) {
     $vars['view'] = 'basic';
@@ -119,7 +119,7 @@ if (count($services) > '0') {
                 echo '<tr>';
                 echo '<td colspan="5"><div class="col-sm-12">';
 
-                include 'includes/print-graphrow.inc.php';
+                include 'includes/html/print-graphrow.inc.php';
 
                 echo '</div></td>';
                 echo '</tr>';

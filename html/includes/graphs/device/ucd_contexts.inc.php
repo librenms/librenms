@@ -13,4 +13,4 @@ $scale_min = 1;
 
 $unit_text = 'Switches/s';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

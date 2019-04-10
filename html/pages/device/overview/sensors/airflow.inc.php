@@ -28,4 +28,4 @@ $sensor_class = 'airflow';
 $sensor_unit  = 'cfm';
 $sensor_type  = 'Airflow';
 
-require 'pages/device/overview/generic/sensor.inc.php';
+require 'includes/html/pages/device/overview/generic/sensor.inc.php';

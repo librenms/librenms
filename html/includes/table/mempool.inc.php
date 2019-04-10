@@ -85,7 +85,7 @@ foreach (dbFetchRows($sql, $param) as $mempool) {
         $graph_array['id']     = $mempool['mempool_id'];
         $graph_array['type']   = $graph_type;
         $return_data           = true;
-        include 'includes/print-graphrow.inc.php';
+        include 'includes/html/print-graphrow.inc.php';
         unset($return_data);
         $response[] = array(
             'hostname'      => $graph_data[0],

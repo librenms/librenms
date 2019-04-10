@@ -25,4 +25,4 @@ $colours_out = 'blues';
 
 $nototal = 1;
 
-require 'includes/graphs/generic_multi_seperated.inc.php';
+require 'includes/html/graphs/generic_multi_seperated.inc.php';

@@ -23,4 +23,4 @@ $colours   = 'mixed';
 $nototal   = 1;
 $unit_text = 'Errors';
 
-require 'includes/graphs/generic_multi_simplex_seperated.inc.php';
+require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

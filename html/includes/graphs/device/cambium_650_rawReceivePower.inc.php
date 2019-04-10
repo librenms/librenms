@@ -9,7 +9,7 @@
  * the source code distribution for details.
  */
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $rrdfilename = rrd_name($device['hostname'], 'cambium-650-rawReceivePower');
 if (rrdtool_check_rrd_exists($rrdfilename)) {

@@ -123,7 +123,7 @@ foreach ($slas as $sla) {
     </div>
     <div class="panel-body">';
     echo "<div class='row'>";
-    include 'includes/print-graphrow.inc.php';
+    include 'includes/html/print-graphrow.inc.php';
     echo '</div>';
     echo '</div>';
     echo '</div>';

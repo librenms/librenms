@@ -4,10 +4,10 @@ if (rrdtool_check_rrd_exists(rrd_name($device['hostname'], 'netstats-ip'))) {
     $graph_title = 'IP Statistics';
     $graph_type  = 'device_ip';
 
-    include 'includes/print-device-graph.php';
+    include 'includes/html/print-device-graph.php';
 
     $graph_title = 'IP Fragmented Statistics';
     $graph_type  = 'device_ip_fragmented';
 
-    include 'includes/print-device-graph.php';
+    include 'includes/html/print-device-graph.php';
 }

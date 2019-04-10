@@ -5,4 +5,4 @@ $sensor_class = "current";
 $sensor_unit = "A";
 $sensor_type = "Current";
 
-include('pages/device/overview/generic/sensor.inc.php');
+include('includes/html/pages/device/overview/generic/sensor.inc.php');

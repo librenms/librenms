@@ -25,4 +25,4 @@ $unit_text  = 'W';
 $divider = 1000;
 $scale_min  = 0;
 
-require 'includes/graphs/generic_v3_multiline_float.inc.php';
+require 'includes/html/graphs/generic_v3_multiline_float.inc.php';

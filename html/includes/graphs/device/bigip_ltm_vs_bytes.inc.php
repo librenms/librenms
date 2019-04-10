@@ -24,7 +24,7 @@ if (isset($components[$vars['id']])) {
     $label = $components[$vars['id']]['label'];
     $hash = $components[$vars['id']]['hash'];
 
-    include "includes/graphs/common.inc.php";
+    include "includes/html/graphs/common.inc.php";
     $rrd_options .= " -l 0 -E ";
     $rrd_options .= " COMMENT:'Bits           Now      Ave      Max\\n'";
 

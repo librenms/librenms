@@ -46,7 +46,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
     echo '<ul class="nav nav-tabs">';
     $pages = dbFetchRows("SELECT DISTINCT `config_group` FROM `config` WHERE `config_group` IS NOT NULL AND `config_group` != ''");
     array_unshift($pages, array('config_group' => 'Global')); // Add Global tab
-    $curr_page = isset($vars['sub']) ? $vars['sub'] : 'Global';
+    $curr_page = basename($vars['sub'] ?? 'Global');
 
     foreach ($pages as $sub_page) {
         $sub_page = $sub_page['config_group'];
@@ -65,9 +65,9 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
 
     echo '</ul></div></div><br />';
 
-    if (isset($vars['sub']) && $vars['sub'] != 'Global') {
-        if (file_exists("pages/settings/" . mres($vars['sub']) . ".inc.php")) {
-            require_once "pages/settings/" . mres($vars['sub']) . ".inc.php";
+    if ($curr_page != 'Global') {
+        if (file_exists("includes/html/pages/settings/$curr_page.inc.php")) {
+            require_once "includes/html/pages/settings/$curr_page.inc.php";
         } else {
             print_error("This settings page doesn't exist, please go to the main settings page");
         }
@@ -112,7 +112,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
         }
     }
 } else {
-    include 'includes/error-no-perm.inc.php';
+    include 'includes/html/error-no-perm.inc.php';
 }
 ?>
 </div>

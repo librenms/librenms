@@ -5,4 +5,4 @@ $sensor_class = 'signal';
 $sensor_unit  = 'dBm';
 $sensor_type  = 'Wireless';
 
-require 'pages/device/overview/generic/sensor.inc.php';
+require 'includes/html/pages/device/overview/generic/sensor.inc.php';

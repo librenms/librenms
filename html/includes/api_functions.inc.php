@@ -161,7 +161,7 @@ function get_graph_by_port_hostname()
     check_port_permission($vars['id'], $device_id);
     $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
-    include 'includes/graphs/graph.inc.php';
+    include 'includes/html/graphs/graph.inc.php';
     rrdtool_close();
     if ($vars['output'] === 'base64') {
         api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
@@ -245,7 +245,7 @@ function get_graph_generic_by_hostname()
     $vars['device'] = dbFetchCell('SELECT `D`.`device_id` FROM `devices` AS `D` WHERE `D`.`hostname`=?', array($hostname));
     $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
-    include 'includes/graphs/graph.inc.php';
+    include 'includes/html/graphs/graph.inc.php';
     rrdtool_close();
 
     if ($vars['output'] === 'base64') {
@@ -670,7 +670,7 @@ function get_graph_by_portgroup()
     $vars['id']   = $if_list;
     $app->response->headers->set('Content-Type', get_image_type());
     rrdtool_initialize(false);
-    include 'includes/graphs/graph.inc.php';
+    include 'includes/html/graphs/graph.inc.php';
     rrdtool_close();
     if ($vars['output'] === 'base64') {
         api_success(['image' => $base64_output, 'content-type' => get_image_type()], 'image');
@@ -1440,7 +1440,7 @@ function get_bill_graph()
     $vars['height'] = $_GET['height'] ?: 300;
 
     $app->response->headers->set('Content-Type', 'image/png');
-    include 'includes/graphs/graph.inc.php';
+    include 'includes/html/graphs/graph.inc.php';
 }
 
 function get_bill_graphdata()
@@ -1532,7 +1532,7 @@ function get_bill_history_graph()
     $vars['height'] = $_GET['height'] ?: 300;
 
     $app->response->headers->set('Content-Type', 'image/png');
-    include 'includes/graphs/graph.inc.php';
+    include 'includes/html/graphs/graph.inc.php';
 }
 
 function get_bill_history_graphdata()

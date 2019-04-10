@@ -24,7 +24,7 @@ foreach ($graphs as $key => $text) {
                 $graph_array['pool']   = $pool;
 
                 echo "<tr bgcolor='$row_colour'><td colspan=5>";
-                include 'includes/print-graphrow.inc.php';
+                include 'includes/html/print-graphrow.inc.php';
                 echo '</td></tr>';
 
                 $graph_array['to']     = $config['time']['now'];
@@ -34,7 +34,7 @@ foreach ($graphs as $key => $text) {
                 $graph_array['pool']   = $pool;
 
                 echo "<tr bgcolor='$row_colour'><td colspan=5>";
-                include 'includes/print-graphrow.inc.php';
+                include 'includes/html/print-graphrow.inc.php';
                 echo '</td></tr>';
             }
         }
@@ -49,7 +49,7 @@ foreach ($graphs as $key => $text) {
                 $graph_array['osd']    = $osd;
 
                 echo "<tr bgcolor='$row_colour'><td colspan=5>";
-                include 'includes/print-graphrow.inc.php';
+                include 'includes/html/print-graphrow.inc.php';
                 echo '</td></tr>';
             }
         }
@@ -65,7 +65,7 @@ foreach ($graphs as $key => $text) {
                     $graph_array['pool']   = $pool;
 
                     echo "<tr bgcolor='$row_colour'><td colspan=5>";
-                    include 'includes/print-graphrow.inc.php';
+                    include 'includes/html/print-graphrow.inc.php';
                     echo '</td></tr>';
                 } else {
                     echo '<h3>'.$pool.' Usage</h3>';
@@ -75,7 +75,7 @@ foreach ($graphs as $key => $text) {
                     $graph_array['pool']   = $pool;
 
                     echo "<tr bgcolor='$row_colour'><td colspan=5>";
-                    include 'includes/print-graphrow.inc.php';
+                    include 'includes/html/print-graphrow.inc.php';
                     echo '</td></tr>';
 
                     echo '<h3>'.$pool.' Objects</h3>';
@@ -85,7 +85,7 @@ foreach ($graphs as $key => $text) {
                     $graph_array['pool']   = $pool;
 
                     echo "<tr bgcolor='$row_colour'><td colspan=5>";
-                    include 'includes/print-graphrow.inc.php';
+                    include 'includes/html/print-graphrow.inc.php';
                     echo '</td></tr>';
                 }
             }

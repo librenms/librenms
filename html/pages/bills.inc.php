@@ -6,7 +6,7 @@ $no_refresh = true;
 
 if ($_POST['addbill'] == 'yes') {
     if (!LegacyAuth::user()->hasGlobalAdmin()) {
-        include 'includes/error-no-perm.inc.php';
+        include 'includes/html/error-no-perm.inc.php';
         exit;
     }
 
@@ -89,7 +89,7 @@ $pagetitle[] = 'Billing';
 
 echo "<meta http-equiv='refresh' content='10000'>";
 
-include 'includes/modal/new_bill.inc.php';
+include 'includes/html/modal/new_bill.inc.php';
 ?>
 <div class="panel panel-default panel-condensed">
     <div class="table-responsive">

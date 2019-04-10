@@ -21,4 +21,4 @@ if (rrdtool_check_rrd_exists($mailscanner_rrd)) {
     $rrd_filename = $mailscanner_rrd;
 }
 
-require 'includes/graphs/generic_duplex.inc.php';
+require 'includes/html/graphs/generic_duplex.inc.php';

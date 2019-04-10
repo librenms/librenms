@@ -5,4 +5,4 @@ $sensor_class = 'voltage';
 $sensor_unit  = 'V';
 $sensor_type  = 'Voltage';
 
-require 'pages/device/overview/generic/sensor.inc.php';
+require 'includes/html/pages/device/overview/generic/sensor.inc.php';

@@ -32,8 +32,9 @@ unset($sep);
 
 print_optionbar_end();
 
-if (file_exists('pages/tools/'.$vars['tool'].'.inc.php')) {
-    include 'pages/tools/'.$vars['tool'].'.inc.php';
+$tools_type = basename($vars['tool']);
+if (file_exists("includes/html/pages/tools/$tools_type.inc.php")) {
+    include "includes/html/pages/tools/$tools_type.inc.php";
 } else {
-    echo report_this('Unknown tool type '.$vars['tool']);
+    echo report_this("Unknown tool type $tools_type");
 }

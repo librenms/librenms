@@ -16,7 +16,7 @@
  * See http://www.gnu.org/licenses/gpl.txt for the full license
  */
 
-include('includes/application/proxmox.inc.php');
+include('includes/html/application/proxmox.inc.php');
 
 if (!isset($config['enable_proxmox']) || !$config['enable_proxmox']) {
     print_error('Proxmox agent was discovered on this host. Please enable Proxmox in your config.');
@@ -47,7 +47,7 @@ if (!isset($config['enable_proxmox']) || !$config['enable_proxmox']) {
 
                 echo "<tr bgcolor='$row_colour'><td colspan=5>";
 
-                include 'includes/print-graphrow.inc.php';
+                include 'includes/html/print-graphrow.inc.php';
 
                 echo '</td></tr>';
             }

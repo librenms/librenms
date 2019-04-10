@@ -7,7 +7,7 @@ use LibreNMS\Util\IP;
 $no_refresh = true;
 
 if (!LegacyAuth::user()->hasGlobalAdmin()) {
-    include 'includes/error-no-perm.inc.php';
+    include 'includes/html/error-no-perm.inc.php';
 
     exit;
 }

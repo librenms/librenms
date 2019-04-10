@@ -19,8 +19,8 @@ use LibreNMS\Authentication\LegacyAuth;
 
 $pagetitle[] = 'Services';
 
-require_once 'includes/modal/new_service.inc.php';
-require_once 'includes/modal/delete_service.inc.php';
+require_once 'includes/html/modal/new_service.inc.php';
+require_once 'includes/html/modal/delete_service.inc.php';
 ?>
 <div class="container-fluid">
     <div class="row">

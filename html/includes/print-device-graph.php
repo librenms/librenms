@@ -18,7 +18,7 @@ echo '<div class="panel panel-default">
     <div class="panel-body">
 ';
 echo "<div class='row'>";
-require 'includes/print-graphrow.inc.php';
+require 'includes/html/print-graphrow.inc.php';
 echo '</div>';
 echo '</div>';
 echo '</div>';

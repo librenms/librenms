@@ -5,4 +5,4 @@ $scale_min = '0';
 $class     = 'rate';
 $unit      = 'bps';
 
-require 'includes/graphs/device/wireless-sensor.inc.php';
+require 'includes/html/graphs/device/wireless-sensor.inc.php';

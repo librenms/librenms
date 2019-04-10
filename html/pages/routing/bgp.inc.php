@@ -5,7 +5,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv6;
 
 if (!LegacyAuth::user()->hasGlobalRead()) {
-    include 'includes/error-no-perm.inc.php';
+    include 'includes/html/error-no-perm.inc.php';
 } else {
     $link_array = array(
         'page'     => 'routing',
@@ -358,7 +358,7 @@ if (!LegacyAuth::user()->hasGlobalRead()) {
             $graph_array['to']     = $config['time']['now'];
             echo '<tr></tr><tr class="bgp"'.($bg_image ? ' background="'.$bg_image.'"' : '').'"><td colspan="9">';
 
-            include 'includes/print-graphrow.inc.php';
+            include 'includes/html/print-graphrow.inc.php';
 
             echo '</td></tr>';
         }

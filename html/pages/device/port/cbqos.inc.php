@@ -111,7 +111,7 @@ foreach ($components as $id => $array) {
             $graph_array['class'] = $vars['class'];
         }
         $graph_type = 'port_cbqos_traffic';
-        include 'includes/print-interface-graphs.inc.php';
+        include 'includes/html/print-interface-graphs.inc.php';
 
         echo "<div class='graphhead'>QoS Drops by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
         $graph_array['policy'] = $vars['policy'];
@@ -119,7 +119,7 @@ foreach ($components as $id => $array) {
             $graph_array['class'] = $vars['class'];
         }
         $graph_type = 'port_cbqos_bufferdrops';
-        include 'includes/print-interface-graphs.inc.php';
+        include 'includes/html/print-interface-graphs.inc.php';
 
         echo "<div class='graphhead'>Buffer Drops by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
         $graph_array['policy'] = $vars['policy'];
@@ -127,7 +127,7 @@ foreach ($components as $id => $array) {
             $graph_array['class'] = $vars['class'];
         }
         $graph_type = 'port_cbqos_qosdrops';
-        include 'includes/print-interface-graphs.inc.php';
+        include 'includes/html/print-interface-graphs.inc.php';
         echo "</div>\n\n";
     }
 }

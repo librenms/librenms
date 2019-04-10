@@ -3,7 +3,7 @@
 $hostname     = (isset($_GET['hostname']) ? $_GET['hostname'] : 'unkown');
 $rrd_filename = rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id'], $hostname));
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $rrd_options .= ' DEF:cur='.$rrd_filename.':current:AVERAGE';
 $rrd_options .= ' DEF:max='.$rrd_filename.':max:MAX';

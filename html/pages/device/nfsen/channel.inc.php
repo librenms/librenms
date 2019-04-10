@@ -18,5 +18,5 @@ foreach ($datas as $name => $type) {
     $graph_type  = 'device_'.$type;
     $graph_array['channel']=$vars['channel'];
 
-    include 'includes/print-device-graph.php';
+    include 'includes/html/print-device-graph.php';
 }

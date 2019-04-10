@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = rrd_name($device['hostname'], 'vpdn-l2tp');
 
@@ -18,4 +18,4 @@ $colours = 'mixed';
 $nototal    = 1;
 $simple_rrd = 1;
 
-require 'includes/graphs/generic_multi_line.inc.php';
+require 'includes/html/graphs/generic_multi_line.inc.php';

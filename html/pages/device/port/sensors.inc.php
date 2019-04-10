@@ -53,7 +53,7 @@ foreach ($sensors as $sensor) {
     $graph_array['id']   = $sensor['sensor_id'];
     $graph_array['type'] = 'sensor_' . $sensor['sensor_class'];
 
-    include 'includes/print-graphrow.inc.php';
+    include 'includes/html/print-graphrow.inc.php';
 
     echo "    </div>\n" .
          "</div>\n";

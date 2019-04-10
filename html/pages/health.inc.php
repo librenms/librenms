@@ -130,9 +130,8 @@ $type_text['ber'] = 'Bit Error Rate';
 $type_text['eer'] = 'Energy Efficiency Ratio';
 $type_text['waterflow'] = 'Water Flow Rate';
 
-if (!$vars['metric']) {
-    $vars['metric'] = "processor";
-}
+$active_metric = basename($vars['metric'] ?? 'processor');
+
 if (!$vars['view']) {
     $vars['view'] = "detail";
 }
@@ -144,11 +143,11 @@ $sep = "";
 foreach ($datas as $texttype) {
     $metric = strtolower($texttype);
     $navbar .= $sep;
-    if ($vars['metric'] == $metric) {
+    if ($active_metric == $metric) {
         $navbar .= '<span class="pagemenu-selected">';
     }
     $navbar .= generate_link($type_text[$metric], $link_array, array('metric'=> $metric, 'view' => $vars['view']));
-    if ($vars['metric'] == $metric) {
+    if ($active_metric == $metric) {
         $navbar .= '</span>';
     }
     $sep = ' | ';
@@ -159,7 +158,7 @@ if ($vars['view'] == "graphs") {
     $displayoptions = '<span class="pagemenu-selected">';
 }
 
-$displayoptions .= generate_link("Graphs", $link_array, array('metric'=> $vars['metric'], 'view' => "graphs"));
+$displayoptions .= generate_link("Graphs", $link_array, ['metric'=> $active_metric, 'view' => "graphs"]);
 
 if ($vars['view'] == "graphs") {
     $displayoptions .= '</span>';
@@ -171,18 +170,21 @@ if ($vars['view'] != "graphs") {
     $displayoptions .= '<span class="pagemenu-selected">';
 }
 
-$displayoptions .= generate_link("No Graphs", $link_array, array('metric'=> $vars['metric'], 'view' => "detail"));
+$displayoptions .= generate_link("No Graphs", $link_array, ['metric'=> $active_metric, 'view' => "detail"]);
 
 if ($vars['view'] != "graphs") {
     $displayoptions .= '</span>';
 }
 
-if (in_array($vars['metric'], array_keys($used_sensors))
-    || $vars['metric'] == 'processor'
-    || $vars['metric'] == 'storage'
-    || $vars['metric'] == 'toner'
-    || $vars['metric'] == 'mempool') {
-    include('pages/health/'.$vars['metric'].'.inc.php');
+$valid_metrics = array_merge(array_keys($used_sensors), [
+    'processor',
+    'storage',
+    'toner',
+    'mempool',
+]);
+
+if (in_array($active_metric, $valid_metrics)) {
+    include("includes/html/pages/health/$active_metric.inc.php");
 } else {
-    echo("No sensors of type " . $vars['metric'] . " found.");
+    echo("No sensors of type $active_metric found.");
 }

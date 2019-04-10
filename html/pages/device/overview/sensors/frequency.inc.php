@@ -5,4 +5,4 @@ $sensor_class = 'frequency';
 $sensor_unit  = 'Hz';
 $sensor_type  = 'Frequency';
 
-require 'pages/device/overview/generic/sensor.inc.php';
+require 'includes/html/pages/device/overview/generic/sensor.inc.php';

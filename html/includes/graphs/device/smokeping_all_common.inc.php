@@ -5,7 +5,7 @@
 $scale_min   = 0;
 $scale_rigid = true;
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 require 'smokeping_common.inc.php';
 
 $i         = 0;

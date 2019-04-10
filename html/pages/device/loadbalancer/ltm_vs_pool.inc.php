@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-include 'pages/device/loadbalancer/ltm_vs_common.inc.php';
+include 'includes/html/pages/device/loadbalancer/ltm_vs_common.inc.php';
 
 if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
     $array = $components[$vars['poolid']];
@@ -121,7 +121,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_ltm_allpm_conns';
                             $graph_array['id'] = $vars['poolid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>
@@ -140,7 +140,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_ltm_allpm_bytesin';
                             $graph_array['id'] = $vars['poolid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>
@@ -159,7 +159,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_ltm_allpm_bytesout';
                             $graph_array['id'] = $vars['poolid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>
@@ -178,7 +178,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_ltm_allpm_pktsin';
                             $graph_array['id'] = $vars['poolid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>
@@ -197,7 +197,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
                             $graph_array['to'] = $config['time']['now'];
                             $graph_array['type'] = 'device_bigip_ltm_allpm_pktsout';
                             $graph_array['id'] = $vars['poolid'];
-                            require 'includes/print-graphrow.inc.php';
+                            require 'includes/html/print-graphrow.inc.php';
                             ?>
                         </div>
                     </div>

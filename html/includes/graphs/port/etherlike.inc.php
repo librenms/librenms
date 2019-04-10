@@ -36,4 +36,4 @@ $nototal    = 1;
 $unit_text  = 'Errors/sec';
 $simple_rrd = 1;
 
-require 'includes/graphs/generic_multi_simplex_seperated.inc.php';
+require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

@@ -25,7 +25,7 @@ foreach ($vm['ports'] as $port) {
 
         echo "<tr bgcolor='$row_colour'><td colspan=5>";
 
-        include 'includes/print-graphrow.inc.php';
+        include 'includes/html/print-graphrow.inc.php';
 
         echo '</td></tr>';
     }

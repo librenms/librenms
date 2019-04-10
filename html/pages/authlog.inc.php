@@ -33,7 +33,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
 
     echo '</tbody></table>';
 } else {
-    include 'includes/error-no-perm.inc.php';
+    include 'includes/html/error-no-perm.inc.php';
 }//end if
 ?>
 <script>

@@ -25,7 +25,7 @@
 use LibreNMS\Authentication\LegacyAuth;
 
 if ($config['map']['engine'] == 'leaflet') {
-    require_once 'includes/common/worldmap.inc.php';
+    require_once 'includes/html/common/worldmap.inc.php';
     echo implode('', $common_output);
 } else {
     if (isset($config['mapael']['default_map']) && is_file($config['html_dir'].'/js/'.$config['mapael']['default_map'])) {
@@ -132,23 +132,23 @@ $(function () {
 </div>
 <?php
 }
-include_once 'includes/object-cache.inc.php';
+include_once 'includes/html/object-cache.inc.php';
 echo '<div class="container-fluid">
 	<div class="row">
 		<div class="col-md-4">';
-            include_once 'includes/front/boxes.inc.php';
+            include_once 'includes/html/front/boxes.inc.php';
 echo '		</div>
                 <div class="col-md-2">
                 </div>
 		<div class="col-md-4">';
-            include_once 'includes/common/device-summary-vert.inc.php';
+            include_once 'includes/html/common/device-summary-vert.inc.php';
                         echo implode('', $common_output);
 echo '		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">';
             $device['device_id'] = '-1';
-            require_once 'includes/common/alerts.inc.php';
+            require_once 'includes/html/common/alerts.inc.php';
                         echo implode('', $common_output);
             unset($device['device_id']);
 echo '		</div>
@@ -177,7 +177,7 @@ if ($config['enable_syslog']) {
         $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
 
         unset($syslog_output);
-        include("includes/print-syslog.inc.php");
+        include("includes/html/print-syslog.inc.php");
         echo $syslog_output;
     }
     echo("</table>");
@@ -208,7 +208,7 @@ if ($config['enable_syslog']) {
               <table class="table table-hover table-condensed table-striped">');
 
     foreach (dbFetchRows($query) as $entry) {
-        include 'includes/print-event.inc.php';
+        include 'includes/html/print-event.inc.php';
     }
 
     echo("</table>");

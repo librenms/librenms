@@ -5,4 +5,4 @@ $sensor_class = 'quality_factor';
 $sensor_unit  = 'dB';
 $sensor_type  = 'quality_factor';
 
-require 'pages/device/overview/generic/sensor.inc.php';
+require 'includes/html/pages/device/overview/generic/sensor.inc.php';

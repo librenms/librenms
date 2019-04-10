@@ -11,7 +11,7 @@
    * the source code distribution for details.
    */
 
-include "includes/graphs/common.inc.php";
+include "includes/html/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_filename = rrd_name($device['hostname'], 'cisco-iosmtp');
 

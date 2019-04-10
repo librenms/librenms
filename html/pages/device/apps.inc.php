@@ -52,8 +52,8 @@ if ($vars['instance']) {
 
 $app = dbFetchRow('SELECT * FROM `applications` WHERE `device_id` = ? AND `app_type` = ?'.$where, $where_array);
 
-if (is_file('pages/device/apps/'.mres($vars['app']).'.inc.php')) {
-    include 'pages/device/apps/'.mres($vars['app']).'.inc.php';
+if (is_file('includes/html/pages/device/apps/'.mres($vars['app']).'.inc.php')) {
+    include 'includes/html/pages/device/apps/'.mres($vars['app']).'.inc.php';
 }
 
 $pagetitle[] = 'Apps';

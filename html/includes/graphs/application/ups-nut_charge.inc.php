@@ -19,7 +19,7 @@
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $scale_min = 0;
 $ds        = 'charge';
@@ -35,4 +35,4 @@ if (rrdtool_check_rrd_exists($ups_nut)) {
     echo "file missing: $rrd_filename";
 }
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

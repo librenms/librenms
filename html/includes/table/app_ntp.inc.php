@@ -80,7 +80,7 @@ foreach ($components as $devid => $comp) {
                 // Do we want a graphrow.
                 if (is_array($graph_array)) {
                     $return_data = true;
-                    require 'includes/print-graphrow.inc.php';
+                    require 'includes/html/print-graphrow.inc.php';
                     unset($return_data);
                     $response[] = array(
                         'device'    => $graph_data[0],

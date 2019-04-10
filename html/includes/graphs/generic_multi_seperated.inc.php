@@ -13,7 +13,7 @@
  * @author     LibreNMS Contributors
 */
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $rrddescr_len = 14; // length of the padded rrd_descr in legend
 

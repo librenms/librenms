@@ -21,5 +21,5 @@ if ($config['gui']['network-map']['style'] == 'old') {
 </center>
     ';
 } else {
-    require_once 'includes/print-map.inc.php';
+    require_once 'includes/html/print-map.inc.php';
 }

@@ -13,7 +13,7 @@
  * @author     LibreNMS Contributors
 */
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
 

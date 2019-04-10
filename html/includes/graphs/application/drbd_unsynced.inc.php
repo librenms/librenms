@@ -2,7 +2,7 @@
 
 $scale_min = 0;
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $drbd_rrd = rrd_name($device['hostname'], array('app', 'drbd', $app['app_instance']));
 
@@ -22,4 +22,4 @@ $multiplier = 8;
 
 $unit_text = 'Bytes';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

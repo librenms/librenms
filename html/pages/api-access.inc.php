@@ -244,5 +244,5 @@ foreach (ApiToken::all() as $api) {
 
 <?php
 } else {
-    include 'includes/error-no-perm.inc.php';
+    include 'includes/html/error-no-perm.inc.php';
 }//end if

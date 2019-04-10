@@ -16,25 +16,23 @@ $link_array = array(
 print_optionbar_start();
 echo "<span style='font-weight: bold;'>Neighbours</span> &#187; ";
 
-if (!$vars['selection']) {
-    $vars['selection'] = 'list';
-}
+$selection = basename($vars['selection'] ?? 'list');
 
 unset($sep);
 foreach ($datas as $type) {
     echo $sep;
     
-    if ($vars['selection'] == $type) {
+    if ($selection == $type) {
         echo '<span class="pagemenu-selected">';
     }
     echo generate_link($page_text[$type], $link_array, array(
         'selection' => $type
     ));
-    if ($vars['selection'] == $type) {
+    if ($selection == $type) {
         echo '</span>';
     }
     $sep = ' | ';
 }
 print_optionbar_end();
-include 'pages/device/neighbours/' . mres($vars['selection']) . '.inc.php';
+include "includes/html/pages/device/neighbours/$selection.inc.php";
 $pagetitle[] = 'Neighbours';

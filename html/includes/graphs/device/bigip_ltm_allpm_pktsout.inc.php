@@ -29,7 +29,7 @@ foreach ($components as $k => $v) {
 }
 $components = $keep;
 
-include "includes/graphs/common.inc.php";
+include "includes/html/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_options .= " COMMENT:'LTM Pool Members                               Now      Avg      Max\\n'";
 $colours = array_merge($config['graph_colours']['mixed'], $config['graph_colours']['manycolours'], $config['graph_colours']['manycolours']);

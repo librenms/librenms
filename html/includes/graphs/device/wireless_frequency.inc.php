@@ -6,4 +6,4 @@ $class     = 'frequency';
 $unit      = 'Hz';
 $unit_long = 'Hz';
 
-require 'includes/graphs/device/wireless-sensor.inc.php';
+require 'includes/html/graphs/device/wireless-sensor.inc.php';

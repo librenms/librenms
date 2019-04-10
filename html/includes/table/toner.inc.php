@@ -87,7 +87,7 @@ foreach (dbFetchRows($sql, $param) as $toner) {
             $graph_array['id']     = $toner['toner_id'];
             $graph_array['type']   = $graph_type;
             $return_data           = true;
-            include 'includes/print-graphrow.inc.php';
+            include 'includes/html/print-graphrow.inc.php';
             unset($return_data);
             $response[] = array(
                 'hostname'      => $graph_data[0],

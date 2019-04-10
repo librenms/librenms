@@ -40,4 +40,4 @@ $rrd_list = array(
     )
 );
 
-require 'includes/graphs/generic_multi.inc.php';
+require 'includes/html/graphs/generic_multi.inc.php';

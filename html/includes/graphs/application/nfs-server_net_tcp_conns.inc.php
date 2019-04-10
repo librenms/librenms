@@ -13,7 +13,7 @@
  * @author     SvennD <svennd@svennd.be>
 */
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $scale_min           = 0;
 $ds                  = 'net_tcpconn';
@@ -25,4 +25,4 @@ $unit_text           = 'net tcp connections';
 
 $rrd_filename  = rrd_name($device['hostname'], array('app', 'nfs-server-default', $app['app_id']));
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

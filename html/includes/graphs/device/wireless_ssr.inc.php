@@ -7,4 +7,4 @@ $class     = 'ssr';
 $unit = 'dB';
 $unit_long = 'SSR (dB)';
 
-require 'includes/graphs/device/wireless-sensor.inc.php';
+require 'includes/html/graphs/device/wireless-sensor.inc.php';

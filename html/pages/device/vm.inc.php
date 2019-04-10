@@ -3,7 +3,7 @@ echo '<table border="0" cellspacing="0" cellpadding="5" width="100%" class="tabl
 $i = '1';
 
 foreach (dbFetchRows('SELECT `vmwVmDisplayName`,`vmwVmState`,`vmwVmGuestOS`,`vmwVmMemSize`,`vmwVmCpus` FROM `vminfo` WHERE `device_id` = ? ORDER BY `vmwVmDisplayName`', array($device['device_id'])) as $vm) {
-    include 'includes/print-vm.inc.php';
+    include 'includes/html/print-vm.inc.php';
     $i++;
 }
 
