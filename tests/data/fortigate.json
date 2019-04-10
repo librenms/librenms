@@ -7468,7 +7468,7 @@
                     "sensor_index": "fgHwSensorEntIndex.1",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "+VCC3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7482,6 +7482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7492,7 +7493,7 @@
                     "sensor_index": "fgHwSensorEntIndex.10",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "NP6_P3V3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7506,6 +7507,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7516,7 +7518,7 @@
                     "sensor_index": "fgHwSensorEntIndex.11",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "P1V0_PCH",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7530,6 +7532,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7540,7 +7543,7 @@
                     "sensor_index": "fgHwSensorEntIndex.12",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "VTT_DDR",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7554,6 +7557,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7564,7 +7568,7 @@
                     "sensor_index": "fgHwSensorEntIndex.13",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "VCCSA",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7578,6 +7582,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7588,7 +7593,7 @@
                     "sensor_index": "fgHwSensorEntIndex.14",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "VCCIO",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7602,6 +7607,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7612,7 +7618,7 @@
                     "sensor_index": "fgHwSensorEntIndex.15",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "+VCORE",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7626,6 +7632,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7636,7 +7643,7 @@
                     "sensor_index": "fgHwSensorEntIndex.16",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "+VCC_DDR",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7650,6 +7657,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7660,7 +7668,7 @@
                     "sensor_index": "fgHwSensorEntIndex.17",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "VPP_DDR",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7674,6 +7682,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7684,7 +7693,7 @@
                     "sensor_index": "fgHwSensorEntIndex.18",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "VCCST",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7698,6 +7707,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7708,7 +7718,7 @@
                     "sensor_index": "fgHwSensorEntIndex.19",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "CPU DTS0",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7722,6 +7732,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7732,7 +7743,7 @@
                     "sensor_index": "fgHwSensorEntIndex.2",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "+VCC5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7746,6 +7757,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7756,7 +7768,7 @@
                     "sensor_index": "fgHwSensorEntIndex.20",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "TD1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7770,6 +7782,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7780,7 +7793,7 @@
                     "sensor_index": "fgHwSensorEntIndex.21",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "TD2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7794,6 +7807,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7804,7 +7818,7 @@
                     "sensor_index": "fgHwSensorEntIndex.22",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "TR3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7818,6 +7832,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7828,7 +7843,7 @@
                     "sensor_index": "fgHwSensorEntIndex.23",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "LM75 U75",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7842,6 +7857,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7852,7 +7868,7 @@
                     "sensor_index": "fgHwSensorEntIndex.24",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "LM75 U78",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7866,6 +7882,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7876,7 +7893,7 @@
                     "sensor_index": "fgHwSensorEntIndex.25",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "LM75 U79",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7890,6 +7907,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7900,7 +7918,7 @@
                     "sensor_index": "fgHwSensorEntIndex.26",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "LM75 U76",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7914,6 +7932,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7924,7 +7943,7 @@
                     "sensor_index": "fgHwSensorEntIndex.27",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "Fan 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7938,6 +7957,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7948,7 +7968,7 @@
                     "sensor_index": "fgHwSensorEntIndex.28",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "Fan 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7962,6 +7982,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7972,7 +7993,7 @@
                     "sensor_index": "fgHwSensorEntIndex.29",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "Fan 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -7986,6 +8007,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -7996,7 +8018,7 @@
                     "sensor_index": "fgHwSensorEntIndex.3",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "+VCC12",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8010,6 +8032,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8020,7 +8043,7 @@
                     "sensor_index": "fgHwSensorEntIndex.30",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "PS1 VIN",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8034,6 +8057,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8044,7 +8068,7 @@
                     "sensor_index": "fgHwSensorEntIndex.31",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "PS1 VOUT_12V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8058,6 +8082,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8068,7 +8093,7 @@
                     "sensor_index": "fgHwSensorEntIndex.32",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "PS1 Temp 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8082,6 +8107,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8092,7 +8118,7 @@
                     "sensor_index": "fgHwSensorEntIndex.33",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "PS1 Temp 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8106,6 +8132,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8116,7 +8143,7 @@
                     "sensor_index": "fgHwSensorEntIndex.34",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "PS1 Fan 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8130,6 +8157,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8140,7 +8168,7 @@
                     "sensor_index": "fgHwSensorEntIndex.35",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "PS1 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8154,6 +8182,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8164,7 +8193,7 @@
                     "sensor_index": "fgHwSensorEntIndex.36",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "PS2 VIN",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8178,6 +8207,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8188,7 +8218,7 @@
                     "sensor_index": "fgHwSensorEntIndex.37",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "PS2 VOUT_12V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8202,6 +8232,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8212,7 +8243,7 @@
                     "sensor_index": "fgHwSensorEntIndex.38",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "PS2 Temp 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8226,6 +8257,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8236,7 +8268,7 @@
                     "sensor_index": "fgHwSensorEntIndex.39",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "PS2 Temp 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8250,6 +8282,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8260,7 +8293,7 @@
                     "sensor_index": "fgHwSensorEntIndex.4",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "DVDD10",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8274,6 +8307,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8284,7 +8318,7 @@
                     "sensor_index": "fgHwSensorEntIndex.40",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "PS2 Fan 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8298,6 +8332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8308,7 +8343,7 @@
                     "sensor_index": "fgHwSensorEntIndex.41",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "PS2 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8322,6 +8357,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8332,7 +8368,7 @@
                     "sensor_index": "fgHwSensorEntIndex.5",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "NP6_1V15_1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8346,6 +8382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8356,7 +8393,7 @@
                     "sensor_index": "fgHwSensorEntIndex.6",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "DDR3_VCC1V5_1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8370,6 +8407,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8380,7 +8418,7 @@
                     "sensor_index": "fgHwSensorEntIndex.7",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "NP6_2V5_1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8394,6 +8432,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8404,7 +8443,7 @@
                     "sensor_index": "fgHwSensorEntIndex.8",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "VCC10_CP9",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8418,6 +8457,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -8428,7 +8468,7 @@
                     "sensor_index": "fgHwSensorEntIndex.9",
                     "sensor_type": "fgHwSensors",
                     "sensor_descr": "P3V3_I/O",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -8442,6 +8482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fgHwSensors"
                 }
             ],

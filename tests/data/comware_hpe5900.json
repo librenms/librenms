@@ -66,7 +66,7 @@
                     "sensor_index": "hh3cEntityExtCurrentPower.2",
                     "sensor_type": "comware",
                     "sensor_descr": "5900AF Power Usage",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 101,
@@ -80,6 +80,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -90,7 +91,7 @@
                     "sensor_index": "1",
                     "sensor_type": "hh3cdevMFanStatusTable",
                     "sensor_descr": "Fan 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -104,6 +105,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hh3cdevMFanStatusTable"
                 },
                 {
@@ -114,7 +116,7 @@
                     "sensor_index": "2",
                     "sensor_type": "hh3cdevMFanStatusTable",
                     "sensor_descr": "Fan 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -128,6 +130,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hh3cdevMFanStatusTable"
                 },
                 {
@@ -138,7 +141,7 @@
                     "sensor_index": "1",
                     "sensor_type": "hh3cdevMPowerStatusTable",
                     "sensor_descr": "Power Supply 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -152,6 +155,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -162,7 +166,7 @@
                     "sensor_index": "2",
                     "sensor_type": "hh3cdevMPowerStatusTable",
                     "sensor_descr": "Power Supply 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -176,6 +180,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hh3cdevMPowerStatusTable"
                 }
             ],

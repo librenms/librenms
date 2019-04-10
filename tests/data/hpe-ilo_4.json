@@ -4468,7 +4468,7 @@
                     "sensor_index": "cpqHeFltTolPowerSupplyBay.0.1",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "PowerSupply #1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 45,
@@ -4482,6 +4482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -4492,7 +4493,7 @@
                     "sensor_index": "cpqHeFltTolPowerSupplyBay.0.2",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "PowerSupply #2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 42,
@@ -4506,6 +4507,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -4516,7 +4518,7 @@
                     "sensor_index": "cpqDaCntlrCondition.0",
                     "sensor_type": "cpqDaCntlrCondition",
                     "sensor_descr": "Array Controller Slot#0",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4530,6 +4532,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqDaCntlrCondition"
                 },
                 {
@@ -4540,7 +4543,7 @@
                     "sensor_index": "cpqDaLogDrvCondition.0.1",
                     "sensor_type": "cpqDaLogDrvCondition",
                     "sensor_descr": "Logical Drive #1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4554,6 +4557,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqDaLogDrvCondition"
                 },
                 {
@@ -4564,7 +4568,7 @@
                     "sensor_index": "cpqDaPhyDrvCondition.0.0",
                     "sensor_type": "cpqDaPhyDrvCondition",
                     "sensor_descr": "Disk #Port 1I Box 6 Bay 4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4578,6 +4582,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqDaPhyDrvCondition"
                 },
                 {
@@ -4588,7 +4593,7 @@
                     "sensor_index": "cpqDaPhyDrvCondition.0.1",
                     "sensor_type": "cpqDaPhyDrvCondition",
                     "sensor_descr": "Disk #Port 1I Box 6 Bay 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4602,6 +4607,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqDaPhyDrvCondition"
                 },
                 {
@@ -4612,7 +4618,7 @@
                     "sensor_index": "cpqDaPhyDrvCondition.0.2",
                     "sensor_type": "cpqDaPhyDrvCondition",
                     "sensor_descr": "Disk #Port 1I Box 6 Bay 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4626,6 +4632,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqDaPhyDrvCondition"
                 },
                 {
@@ -4636,7 +4643,7 @@
                     "sensor_index": "cpqDaPhyDrvCondition.0.3",
                     "sensor_type": "cpqDaPhyDrvCondition",
                     "sensor_descr": "Disk #Port 1I Box 6 Bay 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4650,6 +4657,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqDaPhyDrvCondition"
                 },
                 {
@@ -4660,7 +4668,7 @@
                     "sensor_index": "cpqDaPhyDrvCondition.0.4",
                     "sensor_type": "cpqDaPhyDrvCondition",
                     "sensor_descr": "Disk #Port 2I Box 6 Bay 5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4674,6 +4682,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqDaPhyDrvCondition"
                 },
                 {
@@ -4684,7 +4693,7 @@
                     "sensor_index": "cpqHeFltTolFanCondition.0.1",
                     "sensor_type": "cpqHeFltTolFanCondition",
                     "sensor_descr": "Fan #1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4698,6 +4707,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeFltTolFanCondition"
                 },
                 {
@@ -4708,7 +4718,7 @@
                     "sensor_index": "cpqHeFltTolFanCondition.0.2",
                     "sensor_type": "cpqHeFltTolFanCondition",
                     "sensor_descr": "Fan #2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4722,6 +4732,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeFltTolFanCondition"
                 },
                 {
@@ -4732,7 +4743,7 @@
                     "sensor_index": "cpqHeFltTolFanCondition.0.3",
                     "sensor_type": "cpqHeFltTolFanCondition",
                     "sensor_descr": "Fan #3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4746,6 +4757,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeFltTolFanCondition"
                 },
                 {
@@ -4756,7 +4768,7 @@
                     "sensor_index": "cpqHeFltTolFanCondition.0.4",
                     "sensor_type": "cpqHeFltTolFanCondition",
                     "sensor_descr": "Fan #4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4770,6 +4782,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeFltTolFanCondition"
                 },
                 {
@@ -4780,7 +4793,7 @@
                     "sensor_index": "cpqHeFltTolFanCondition.0.5",
                     "sensor_type": "cpqHeFltTolFanCondition",
                     "sensor_descr": "Fan #5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4794,6 +4807,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeFltTolFanCondition"
                 },
                 {
@@ -4804,7 +4818,7 @@
                     "sensor_index": "cpqHeFltTolFanCondition.0.6",
                     "sensor_type": "cpqHeFltTolFanCondition",
                     "sensor_descr": "Fan #6",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4818,6 +4832,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeFltTolFanCondition"
                 },
                 {
@@ -4828,7 +4843,7 @@
                     "sensor_index": "cpqHeFltTolFanCondition.0.7",
                     "sensor_type": "cpqHeFltTolFanCondition",
                     "sensor_descr": "Fan #7",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4842,6 +4857,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeFltTolFanCondition"
                 },
                 {
@@ -4852,7 +4868,7 @@
                     "sensor_index": "cpqHeFltTolFanCondition.0.8",
                     "sensor_type": "cpqHeFltTolFanCondition",
                     "sensor_descr": "Fan #8",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4866,6 +4882,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeFltTolFanCondition"
                 },
                 {
@@ -4876,7 +4893,7 @@
                     "sensor_index": "cpqHeFltTolPowerSupplyCondition.0.1",
                     "sensor_type": "cpqHeFltTolPowerSupplyCondition",
                     "sensor_descr": "PowerSupply #1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4890,6 +4907,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeFltTolPowerSupplyCondition"
                 },
                 {
@@ -4900,7 +4918,7 @@
                     "sensor_index": "cpqHeFltTolPowerSupplyCondition.0.2",
                     "sensor_type": "cpqHeFltTolPowerSupplyCondition",
                     "sensor_descr": "PowerSupply #2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4914,6 +4932,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeFltTolPowerSupplyCondition"
                 },
                 {
@@ -4924,7 +4943,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.0",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 1 DIMM 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -4938,6 +4957,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -4948,7 +4968,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.1",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 1 DIMM 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4962,6 +4982,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -4972,7 +4993,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.10",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 1 DIMM 11",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4986,6 +5007,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -4996,7 +5018,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.11",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 1 DIMM 12",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -5010,6 +5032,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5020,7 +5043,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.12",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 2 DIMM 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5034,6 +5057,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5044,7 +5068,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.13",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 2 DIMM 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5058,6 +5082,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5068,7 +5093,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.14",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 2 DIMM 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5082,6 +5107,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5092,7 +5118,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.15",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 2 DIMM 4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5106,6 +5132,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5116,7 +5143,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.16",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 2 DIMM 5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5130,6 +5157,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5140,7 +5168,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.17",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 2 DIMM 6",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5154,6 +5182,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5164,7 +5193,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.18",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 2 DIMM 7",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5178,6 +5207,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5188,7 +5218,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.19",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 2 DIMM 8",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5202,6 +5232,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5212,7 +5243,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.2",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 1 DIMM 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5226,6 +5257,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5236,7 +5268,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.20",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 2 DIMM 9",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5250,6 +5282,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5260,7 +5293,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.21",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 2 DIMM 10",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5274,6 +5307,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5284,7 +5318,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.22",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 2 DIMM 11",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5298,6 +5332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5308,7 +5343,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.23",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 2 DIMM 12",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5322,6 +5357,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5332,7 +5368,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.3",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 1 DIMM 4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -5346,6 +5382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5356,7 +5393,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.4",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 1 DIMM 5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5370,6 +5407,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5380,7 +5418,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.5",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 1 DIMM 6",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5394,6 +5432,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5404,7 +5443,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.6",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 1 DIMM 7",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5418,6 +5457,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5428,7 +5468,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.7",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 1 DIMM 8",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5442,6 +5482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5452,7 +5493,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.8",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 1 DIMM 9",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5466,6 +5507,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5476,7 +5518,7 @@
                     "sensor_index": "cpqHeResMem2ModuleCondition.9",
                     "sensor_type": "cpqHeResMem2ModuleCondition",
                     "sensor_descr": "PROC 1 DIMM 10",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5490,6 +5532,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqHeResMem2ModuleCondition"
                 },
                 {
@@ -5500,7 +5543,7 @@
                     "sensor_index": "cpqSeCpuStatus.0",
                     "sensor_type": "cpqSeCpuStatus",
                     "sensor_descr": "Processor #0",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -5514,6 +5557,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "cpqSeCpuStatus"
                 },
                 {
@@ -5524,7 +5568,7 @@
                     "sensor_index": "cpqDaPhyDrvCurrentTemperature.0.0",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "Port 1I Box 6 Bay 4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 54,
@@ -5538,6 +5582,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5548,7 +5593,7 @@
                     "sensor_index": "cpqDaPhyDrvCurrentTemperature.0.1",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "Port 1I Box 6 Bay 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 56,
@@ -5562,6 +5607,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5572,7 +5618,7 @@
                     "sensor_index": "cpqDaPhyDrvCurrentTemperature.0.2",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "Port 1I Box 6 Bay 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 56,
@@ -5586,6 +5632,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5596,7 +5643,7 @@
                     "sensor_index": "cpqDaPhyDrvCurrentTemperature.0.3",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "Port 1I Box 6 Bay 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 51,
@@ -5610,6 +5657,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5620,7 +5668,7 @@
                     "sensor_index": "cpqDaPhyDrvCurrentTemperature.0.4",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "Port 2I Box 6 Bay 5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 46,
@@ -5634,6 +5682,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5644,7 +5693,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.1",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "ambient",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 21,
@@ -5658,6 +5707,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5668,7 +5718,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.10",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "powerSupply",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 40,
@@ -5682,6 +5732,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5692,7 +5743,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.11",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "powerSupply",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 40,
@@ -5706,6 +5757,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5716,7 +5768,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.14",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "system",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 30,
@@ -5730,6 +5782,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5740,7 +5793,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.16",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "system",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
@@ -5754,6 +5807,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5764,7 +5818,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.17",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "system",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
@@ -5778,6 +5832,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5788,7 +5843,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.2",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "cpu",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 40,
@@ -5802,6 +5857,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5812,7 +5868,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.21",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "system",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 31,
@@ -5826,6 +5882,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5836,7 +5893,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.22",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "system",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 23,
@@ -5850,6 +5907,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5860,7 +5918,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.23",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "system",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 33,
@@ -5874,6 +5932,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5884,7 +5943,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.24",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "ioBoard",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 47,
@@ -5898,6 +5957,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5908,7 +5968,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.34",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "system",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 25,
@@ -5922,6 +5982,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5932,7 +5993,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.35",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "system",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -5946,6 +6007,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5956,7 +6018,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.36",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "chassis",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
@@ -5970,6 +6032,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5980,7 +6043,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.37",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "system",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 22,
@@ -5994,6 +6057,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6004,7 +6068,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.38",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "ioBoard",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 26,
@@ -6018,6 +6082,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6028,7 +6093,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.39",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "ioBoard",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 26,
@@ -6042,6 +6107,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6052,7 +6118,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.4",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "memory",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
@@ -6066,6 +6132,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6076,7 +6143,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.40",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "ioBoard",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 28,
@@ -6090,6 +6157,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6100,7 +6168,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.41",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "ioBoard",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -6114,6 +6182,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6124,7 +6193,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.42",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "ioBoard",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
@@ -6138,6 +6207,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6148,7 +6218,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.43",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "ioBoard",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
@@ -6162,6 +6232,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6172,7 +6243,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.44",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "ioBoard",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
@@ -6186,6 +6257,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6196,7 +6268,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.45",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "ioBoard",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
@@ -6210,6 +6282,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6220,7 +6293,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.46",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "ioBoard",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 23,
@@ -6234,6 +6307,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6244,7 +6318,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.5",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "memory",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
@@ -6258,6 +6332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6268,7 +6343,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.8",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "system",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 46,
@@ -6282,6 +6357,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -6292,7 +6368,7 @@
                     "sensor_index": "cpqHeTemperatureCelsius.0.9",
                     "sensor_type": "hpe-ilo",
                     "sensor_descr": "system",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 26,
@@ -6306,6 +6382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

@@ -50,7 +50,7 @@ class Sensor implements DiscoveryModule, PollerModule
     private $current;
     private $multiplier;
     private $divisor;
-    private $const;
+    private $offset;
     private $aggregator;
     private $high_limit;
     private $low_limit;
@@ -71,7 +71,7 @@ class Sensor implements DiscoveryModule, PollerModule
      * @param int|float $current The current value of this sensor, will seed the db and may be used to guess limits
      * @param int $multiplier a number to multiply the value(s) by
      * @param int $divisor a number to divide the value(s) by
-     * @param int|float $const a constant to add to the value (signed)
+     * @param int|float $offset a constant to add to the value (signed)
      * @param string $aggregator an operation to combine multiple numbers. Supported: sum, avg
      * @param int|float $high_limit Alerting: Maximum value
      * @param int|float $low_limit Alerting: Minimum value
@@ -90,7 +90,7 @@ class Sensor implements DiscoveryModule, PollerModule
         $current = null,
         $multiplier = 1,
         $divisor = 1,
-        $const = 0,
+        $offset = 0,
         $aggregator = 'sum',
         $high_limit = null,
         $low_limit = null,
@@ -108,7 +108,7 @@ class Sensor implements DiscoveryModule, PollerModule
         $this->current = $current;
         $this->multiplier = $multiplier;
         $this->divisor = $divisor;
-        $this->const = $const;
+        $this->offset = $offset;
         $this->aggregator = $aggregator;
         $this->entPhysicalIndex = $entPhysicalIndex;
         $this->entPhysicalMeasured = $entPhysicalMeasured;
@@ -228,7 +228,7 @@ class Sensor implements DiscoveryModule, PollerModule
             'sensor_type' => $this->subtype,
             'sensor_descr' => $this->description,
             'sensor_divisor' => $this->divisor,
-            'sensor_const' => $this->const,
+            'sensor_offset' => $this->offset,
             'sensor_multiplier' => $this->multiplier,
             'sensor_aggregator' => $this->aggregator,
             'sensor_limit' => $this->high_limit,
@@ -420,8 +420,8 @@ class Sensor implements DiscoveryModule, PollerModule
                 $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
             }
 
-            if ($sensor['sensor_const']) {
-                $sensor_value = ($sensor_value + $sensor['sensor_const']);
+            if ($sensor['sensor_offset']) {
+                $sensor_value = ($sensor_value + $sensor['sensor_offset']);
             }
 
             $sensor_data[$sensor['sensor_id']] = $sensor_value;

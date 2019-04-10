@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "eltek-webpower",
                     "type": "power",
                     "serial": null,
-                    "icon": "eltek.png"
+                    "icon": "eltek.png",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "4.11",
                     "hardware": "smartpack",
                     "features": "Rectifier type: FLATPACK2 48/2000 HE, Battery name: PowerSafe 12V170FS",
-                    "location": "sysLocation",
                     "os": "eltek-webpower",
                     "type": "power",
                     "serial": "142308329523",
-                    "icon": "eltek.png"
+                    "icon": "eltek.png",
+                    "location": "sysLocation"
                 }
             ]
         }
@@ -268,7 +268,7 @@
                     "sensor_index": "batteryCapacityLeft.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Battery remaining capacity (Ah)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1360,
@@ -282,6 +282,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -292,7 +293,7 @@
                     "sensor_index": "batteryCapacityUsed.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Battery capacity used (Ah)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -306,6 +307,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -316,7 +318,7 @@
                     "sensor_index": "batteryCurrent.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Battery (charge/drain)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -330,6 +332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -340,7 +343,7 @@
                     "sensor_index": "loadDistributionCurrent.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Distribution total out",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 58,
@@ -354,6 +357,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -364,11 +368,11 @@
                     "sensor_index": "rectifierStatusOutputCurrent.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Rectifier 0 out",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 19.4,
-                    "sensor_limit": 29.1,
+                    "sensor_current": 19.399999999999999,
+                    "sensor_limit": 29.100000000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -378,6 +382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -388,11 +393,11 @@
                     "sensor_index": "rectifierStatusOutputCurrent.1",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Rectifier 1 out",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 19.4,
-                    "sensor_limit": 29.1,
+                    "sensor_current": 19.399999999999999,
+                    "sensor_limit": 29.100000000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -402,6 +407,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -412,11 +418,11 @@
                     "sensor_index": "rectifierStatusOutputCurrent.2",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Rectifier 2 out",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 19.8,
-                    "sensor_limit": 29.7,
+                    "sensor_current": 19.800000000000001,
+                    "sensor_limit": 29.699999999999999,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -426,6 +432,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -436,7 +443,7 @@
                     "sensor_index": "rectifierUtilization.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Rectifier current utilization",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 46,
@@ -450,6 +457,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -460,7 +468,7 @@
                     "sensor_index": "batteryTimeToDisconnect.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Battery time to disconnect",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1406,
@@ -474,6 +482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -484,7 +493,7 @@
                     "sensor_index": "0",
                     "sensor_type": "batteryBreakerStatus.{{ $index }}",
                     "sensor_descr": "Battery breaker status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -498,6 +507,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "batteryBreakerStatus.{{ $index }}"
                 },
                 {
@@ -508,7 +518,7 @@
                     "sensor_index": "0",
                     "sensor_type": "rectifierInstalledRectifiers",
                     "sensor_descr": "Rectifiers installed",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -522,6 +532,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rectifierInstalledRectifiers"
                 },
                 {
@@ -532,7 +543,7 @@
                     "sensor_index": "0",
                     "sensor_type": "rectifierRectifiersActive",
                     "sensor_descr": "Rectifiers active",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -546,6 +557,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rectifierRectifiersActive"
                 },
                 {
@@ -556,7 +568,7 @@
                     "sensor_index": "0",
                     "sensor_type": "rectifierStatusStatus.{{ $index }}",
                     "sensor_descr": "Rectifier 0 status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -570,6 +582,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rectifierStatusStatus.{{ $index }}"
                 },
                 {
@@ -580,7 +593,7 @@
                     "sensor_index": "1",
                     "sensor_type": "rectifierStatusStatus.{{ $index }}",
                     "sensor_descr": "Rectifier 1 status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -594,6 +607,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rectifierStatusStatus.{{ $index }}"
                 },
                 {
@@ -604,7 +618,7 @@
                     "sensor_index": "2",
                     "sensor_type": "rectifierStatusStatus.{{ $index }}",
                     "sensor_descr": "Rectifier 2 status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -618,6 +632,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rectifierStatusStatus.{{ $index }}"
                 },
                 {
@@ -628,7 +643,7 @@
                     "sensor_index": "0",
                     "sensor_type": "systemNominalVoltage.{{ $index }}",
                     "sensor_descr": "The nominal voltage rating",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -642,6 +657,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "systemNominalVoltage.{{ $index }}"
                 },
                 {
@@ -652,7 +668,7 @@
                     "sensor_index": "0",
                     "sensor_type": "systemOperationalStatus.{{ $index }}",
                     "sensor_descr": "System operational status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -666,6 +682,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "systemOperationalStatus.{{ $index }}"
                 },
                 {
@@ -676,7 +693,7 @@
                     "sensor_index": "rectifierStatusTemp.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Rectifier 0",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 30,
@@ -690,6 +707,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -700,7 +718,7 @@
                     "sensor_index": "rectifierStatusTemp.1",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Rectifier 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 31,
@@ -714,6 +732,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -724,7 +743,7 @@
                     "sensor_index": "rectifierStatusTemp.2",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Rectifier 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 31,
@@ -738,6 +757,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -748,13 +768,13 @@
                     "sensor_index": "acVoltage1.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "AC L1 input",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 233,
-                    "sensor_limit": 267.95,
+                    "sensor_limit": 267.94999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 198.05,
+                    "sensor_limit_low": 198.05000000000001,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -762,6 +782,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -772,7 +793,7 @@
                     "sensor_index": "acVoltage2.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "AC L2 input",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 235,
@@ -786,6 +807,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -796,13 +818,13 @@
                     "sensor_index": "acVoltage3.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "AC L3 input",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 236,
-                    "sensor_limit": 271.4,
+                    "sensor_limit": 271.39999999999998,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 200.6,
+                    "sensor_limit_low": 200.59999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -810,6 +832,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -820,11 +843,11 @@
                     "sensor_index": "batteryVoltage.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Battery bank",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 53.23,
-                    "sensor_limit": 61.2145,
+                    "sensor_current": 53.229999999999997,
+                    "sensor_limit": 61.214500000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 45.2455,
                     "sensor_limit_low_warn": null,
@@ -834,6 +857,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -844,13 +868,13 @@
                     "sensor_index": "rectifierStatusOutputVoltage.0",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Rectifier0 out",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 53.1,
-                    "sensor_limit": 61.065,
+                    "sensor_current": 53.100000000000001,
+                    "sensor_limit": 61.064999999999998,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 45.135,
+                    "sensor_limit_low": 45.134999999999998,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -858,6 +882,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -868,13 +893,13 @@
                     "sensor_index": "rectifierStatusOutputVoltage.1",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Rectifier1 out",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
                     "sensor_current": 53,
-                    "sensor_limit": 60.95,
+                    "sensor_limit": 60.950000000000003,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 45.05,
+                    "sensor_limit_low": 45.049999999999997,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -882,6 +907,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -892,11 +918,11 @@
                     "sensor_index": "rectifierStatusOutputVoltage.2",
                     "sensor_type": "eltek-webpower",
                     "sensor_descr": "Rectifier2 out",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 52.95,
-                    "sensor_limit": 60.8925,
+                    "sensor_current": 52.950000000000003,
+                    "sensor_limit": 60.892499999999998,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 45.0075,
                     "sensor_limit_low_warn": null,
@@ -906,6 +932,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

@@ -9643,11 +9643,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.10.1",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray B 1 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 4069,
-                    "sensor_limit": 7324.2,
+                    "sensor_limit": 7324.1999999999998,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -9657,6 +9657,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9667,11 +9668,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.10.2",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray B 1 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3643,
-                    "sensor_limit": 6557.4,
+                    "sensor_limit": 6557.3999999999996,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -9681,6 +9682,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9691,11 +9693,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.10.3",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray B 2 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3973,
-                    "sensor_limit": 7151.4,
+                    "sensor_limit": 7151.3999999999996,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -9705,6 +9707,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9715,11 +9718,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.10.4",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray B 2 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3633,
-                    "sensor_limit": 6539.4,
+                    "sensor_limit": 6539.3999999999996,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -9729,6 +9732,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9739,11 +9743,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.9.1",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray A 1 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 4051,
-                    "sensor_limit": 7291.8,
+                    "sensor_limit": 7291.8000000000002,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -9753,6 +9757,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9763,11 +9768,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.9.2",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray A 1 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3592,
-                    "sensor_limit": 6465.6,
+                    "sensor_limit": 6465.6000000000004,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -9777,6 +9782,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9787,11 +9793,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.9.3",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray A 2 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3932,
-                    "sensor_limit": 7077.6,
+                    "sensor_limit": 7077.6000000000004,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -9801,6 +9807,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9811,7 +9818,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.9.4",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray A 2 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3550,
@@ -9825,6 +9832,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9835,7 +9843,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.10.1",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray B 1 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 4020,
@@ -9849,6 +9857,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9859,11 +9868,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.10.2",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray B 1 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3683,
-                    "sensor_limit": 6629.4,
+                    "sensor_limit": 6629.3999999999996,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -9873,6 +9882,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9883,11 +9893,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.10.3",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray B 2 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3973,
-                    "sensor_limit": 7151.4,
+                    "sensor_limit": 7151.3999999999996,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -9897,6 +9907,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9907,11 +9918,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.10.4",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray B 2 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3534,
-                    "sensor_limit": 6361.2,
+                    "sensor_limit": 6361.1999999999998,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -9921,6 +9932,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9931,7 +9943,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.9.1",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray A 1 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3930,
@@ -9945,6 +9957,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9955,11 +9968,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.9.2",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray A 1 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3486,
-                    "sensor_limit": 6274.8,
+                    "sensor_limit": 6274.8000000000002,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -9969,6 +9982,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -9979,11 +9993,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.9.3",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray A 2 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 4137,
-                    "sensor_limit": 7446.6,
+                    "sensor_limit": 7446.6000000000004,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -9993,6 +10007,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -10003,11 +10018,11 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.9.4",
                     "sensor_type": "awplus",
                     "sensor_descr": "Fan:  Fan Tray A 2 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3612,
-                    "sensor_limit": 6501.6,
+                    "sensor_limit": 6501.6000000000004,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 3000,
                     "sensor_limit_low_warn": null,
@@ -10017,6 +10032,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -10027,7 +10043,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.10.1",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 1 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10041,6 +10057,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10051,7 +10068,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.10.2",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 1 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10065,6 +10082,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10075,7 +10093,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.10.3",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 2 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10089,6 +10107,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10099,7 +10118,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.10.4",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 2 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10113,6 +10132,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10123,7 +10143,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.9.1",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 1 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10137,6 +10157,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10147,7 +10168,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.9.2",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 1 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10161,6 +10182,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10171,7 +10193,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.9.3",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 2 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10185,6 +10207,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10195,7 +10218,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.1.9.4",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 2 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10209,6 +10232,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10219,7 +10243,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.10.1",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 1 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10233,6 +10257,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10243,7 +10268,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.10.2",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 1 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10257,6 +10282,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10267,7 +10293,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.10.3",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 2 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10281,6 +10307,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10291,7 +10318,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.10.4",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray B 2 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10305,6 +10332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10315,7 +10343,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.9.1",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 1 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10329,6 +10357,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10339,7 +10368,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.9.2",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 1 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10353,6 +10382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10363,7 +10393,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.9.3",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 2 Int",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10377,6 +10407,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10387,7 +10418,7 @@
                     "sensor_index": "atEnvMonv2FanIndex.2.9.4",
                     "sensor_type": "AtFanState",
                     "sensor_descr": "Fan:  Fan Tray A 2 Ext",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10401,6 +10432,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtFanState"
                 },
                 {
@@ -10411,7 +10443,7 @@
                     "sensor_index": "atEnvMonv2PsbSensorIndex.1.1.2",
                     "sensor_type": "AtPowerSupplyState",
                     "sensor_descr": "Fan/Temperature Fault",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10425,6 +10457,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtPowerSupplyState"
                 },
                 {
@@ -10435,7 +10468,7 @@
                     "sensor_index": "atEnvMonv2PsbSensorIndex.1.1.3",
                     "sensor_type": "AtPowerSupplyState",
                     "sensor_descr": "PSU Power Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10449,6 +10482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtPowerSupplyState"
                 },
                 {
@@ -10459,7 +10493,7 @@
                     "sensor_index": "atEnvMonv2PsbSensorIndex.1.1.4",
                     "sensor_type": "AtPowerSupplyState",
                     "sensor_descr": "PSU Power Input",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10473,6 +10507,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtPowerSupplyState"
                 },
                 {
@@ -10483,7 +10518,7 @@
                     "sensor_index": "atEnvMonv2PsbSensorIndex.2.1.2",
                     "sensor_type": "AtPowerSupplyState",
                     "sensor_descr": "Fan/Temperature Fault",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10497,6 +10532,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtPowerSupplyState"
                 },
                 {
@@ -10507,7 +10543,7 @@
                     "sensor_index": "atEnvMonv2PsbSensorIndex.2.1.3",
                     "sensor_type": "AtPowerSupplyState",
                     "sensor_descr": "PSU Power Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10521,6 +10557,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtPowerSupplyState"
                 },
                 {
@@ -10531,7 +10568,7 @@
                     "sensor_index": "atEnvMonv2PsbSensorIndex.2.1.4",
                     "sensor_type": "AtPowerSupplyState",
                     "sensor_descr": "PSU Power Input",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10545,6 +10582,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtPowerSupplyState"
                 },
                 {
@@ -10555,7 +10593,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.10",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray B 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10569,6 +10607,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10579,7 +10618,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.11",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Near Switch",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10593,6 +10632,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10603,7 +10643,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.12",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Front Left",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10617,6 +10657,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10627,7 +10668,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.13",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Front Mid",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10641,6 +10682,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10651,7 +10693,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.14",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Front Right",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10665,6 +10707,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10675,7 +10718,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.15",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Console",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10689,6 +10732,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10699,7 +10743,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.6",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Internal",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10713,6 +10757,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10723,7 +10768,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.7",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray A 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10737,6 +10782,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10747,7 +10793,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.8",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray A 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10761,6 +10807,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10771,7 +10818,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.9",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray B 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10785,6 +10832,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10795,7 +10843,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.6.1",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Front",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10809,6 +10857,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10819,7 +10868,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.6.2",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Rear",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10833,6 +10882,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10843,7 +10893,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.7.1",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Front",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10857,6 +10907,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10867,7 +10918,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.7.2",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Rear",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10881,6 +10932,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10891,7 +10943,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.10",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray B 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10905,6 +10957,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10915,7 +10968,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.11",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Near Switch",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10929,6 +10982,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10939,7 +10993,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.12",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Front Left",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10953,6 +11007,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10963,7 +11018,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.13",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Front Mid",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -10977,6 +11032,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -10987,7 +11043,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.14",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Front Right",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11001,6 +11057,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -11011,7 +11068,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.15",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Console",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11025,6 +11082,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -11035,7 +11093,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.6",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Internal",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11049,6 +11107,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -11059,7 +11118,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.7",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray A 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11073,6 +11132,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -11083,7 +11143,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.8",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray A 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11097,6 +11157,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -11107,7 +11168,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.9",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: Fan Tray B 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11121,6 +11182,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -11131,7 +11193,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.6.1",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Front",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11145,6 +11207,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -11155,7 +11218,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.6.2",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Rear",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11169,6 +11232,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -11179,7 +11243,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.7.1",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Front",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11193,6 +11257,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -11203,7 +11268,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.7.2",
                     "sensor_type": "AtTemperatureState",
                     "sensor_descr": "Temp: XEM Rear",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11217,6 +11282,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtTemperatureState"
                 },
                 {
@@ -11227,7 +11293,7 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.1",
                     "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 2.5V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11241,6 +11307,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtVoltageState"
                 },
                 {
@@ -11251,7 +11318,7 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.2",
                     "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: Battery",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11265,6 +11332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtVoltageState"
                 },
                 {
@@ -11275,7 +11343,7 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.3",
                     "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 3.3V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11289,6 +11357,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtVoltageState"
                 },
                 {
@@ -11299,7 +11368,7 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.4",
                     "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 12V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11313,6 +11382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtVoltageState"
                 },
                 {
@@ -11323,7 +11393,7 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.5",
                     "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 1V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11337,6 +11407,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtVoltageState"
                 },
                 {
@@ -11347,7 +11418,7 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.1",
                     "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 2.5V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11361,6 +11432,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtVoltageState"
                 },
                 {
@@ -11371,7 +11443,7 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.2",
                     "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: Battery",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11385,6 +11457,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtVoltageState"
                 },
                 {
@@ -11395,7 +11468,7 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.3",
                     "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 3.3V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11409,6 +11482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtVoltageState"
                 },
                 {
@@ -11419,7 +11493,7 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.4",
                     "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 12V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11433,6 +11507,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtVoltageState"
                 },
                 {
@@ -11443,7 +11518,7 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.5",
                     "sensor_type": "AtVoltageState",
                     "sensor_descr": "Voltage: 1V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -11457,6 +11532,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "AtVoltageState"
                 },
                 {
@@ -11467,7 +11543,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.10",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Fan Tray B 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 29,
@@ -11481,6 +11557,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11491,7 +11568,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.11",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Near Switch",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 30,
@@ -11505,6 +11582,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11515,7 +11593,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.12",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Front Left",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 28,
@@ -11529,6 +11607,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11539,7 +11618,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.13",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Front Mid",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 26,
@@ -11553,6 +11632,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11563,7 +11643,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.14",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Front Right",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -11577,6 +11657,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11587,7 +11668,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.15",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Console",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -11601,6 +11682,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11611,7 +11693,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.6",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Internal",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 30,
@@ -11625,6 +11707,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11635,7 +11718,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.7",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Fan Tray A 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -11649,6 +11732,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11659,7 +11743,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.8",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Fan Tray A 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 26,
@@ -11673,6 +11757,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11683,7 +11768,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.5.9",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Fan Tray B 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -11697,6 +11782,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11707,7 +11793,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.6.1",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: XEM Front",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 28,
@@ -11721,6 +11807,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11731,7 +11818,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.6.2",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: XEM Rear",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 34,
@@ -11745,6 +11832,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11755,7 +11843,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.7.1",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: XEM Front",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
@@ -11769,6 +11857,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11779,7 +11868,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.1.7.2",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: XEM Rear",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -11793,6 +11882,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11803,7 +11893,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.10",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Fan Tray B 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 28,
@@ -11817,6 +11907,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11827,7 +11918,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.11",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Near Switch",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 29,
@@ -11841,6 +11932,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11851,7 +11943,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.12",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Front Left",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 28,
@@ -11865,6 +11957,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11875,7 +11968,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.13",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Front Mid",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 25,
@@ -11889,6 +11982,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11899,7 +11993,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.14",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Front Right",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -11913,6 +12007,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11923,7 +12018,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.15",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Console",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 26,
@@ -11937,6 +12032,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11947,7 +12043,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.6",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Internal",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 29,
@@ -11961,6 +12057,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11971,7 +12068,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.7",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Fan Tray A 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -11985,6 +12082,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -11995,7 +12093,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.8",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Fan Tray A 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 26,
@@ -12009,6 +12107,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12019,7 +12118,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.5.9",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: Fan Tray B 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -12033,6 +12132,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12043,7 +12143,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.6.1",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: XEM Front",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -12057,6 +12157,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12067,7 +12168,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.6.2",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: XEM Rear",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 33,
@@ -12081,6 +12182,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12091,7 +12193,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.7.1",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: XEM Front",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 23,
@@ -12105,6 +12207,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12115,7 +12218,7 @@
                     "sensor_index": "atEnvMonv2TemperatureIndex.2.7.2",
                     "sensor_type": "awplus",
                     "sensor_descr": "Temp: XEM Rear",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -12129,6 +12232,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12139,13 +12243,13 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.1",
                     "sensor_type": "awplus",
                     "sensor_descr": "Voltage: 2.5V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 2.487,
-                    "sensor_limit": 2.865,
+                    "sensor_current": 2.4870000000000001,
+                    "sensor_limit": 2.8650000000000002,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.344,
+                    "sensor_limit_low": 2.3439999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -12153,6 +12257,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12163,13 +12268,13 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.2",
                     "sensor_type": "awplus",
                     "sensor_descr": "Voltage: Battery",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.164,
-                    "sensor_limit": 3.586,
+                    "sensor_current": 3.1640000000000001,
+                    "sensor_limit": 3.5859999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.7,
+                    "sensor_limit_low": 2.7000000000000002,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -12177,6 +12282,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12187,13 +12293,13 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.3",
                     "sensor_type": "awplus",
                     "sensor_descr": "Voltage: 3.3V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.317,
-                    "sensor_limit": 3.627,
+                    "sensor_current": 3.3170000000000002,
+                    "sensor_limit": 3.6269999999999998,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.973,
+                    "sensor_limit_low": 2.9729999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -12201,6 +12307,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12211,13 +12318,13 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.4",
                     "sensor_type": "awplus",
                     "sensor_descr": "Voltage: 12V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 12.125,
-                    "sensor_limit": 13.188,
+                    "sensor_limit": 13.188000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 10.813,
+                    "sensor_limit_low": 10.813000000000001,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -12225,6 +12332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12235,13 +12343,13 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.1.5.5",
                     "sensor_type": "awplus",
                     "sensor_descr": "Voltage: 1V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.998,
                     "sensor_limit": 1.097,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 0.9,
+                    "sensor_limit_low": 0.90000000000000002,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -12249,6 +12357,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12259,13 +12368,13 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.1",
                     "sensor_type": "awplus",
                     "sensor_descr": "Voltage: 2.5V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 2.5,
-                    "sensor_limit": 2.865,
+                    "sensor_limit": 2.8650000000000002,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.344,
+                    "sensor_limit_low": 2.3439999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -12273,6 +12382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12283,13 +12393,13 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.2",
                     "sensor_type": "awplus",
                     "sensor_descr": "Voltage: Battery",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.136,
-                    "sensor_limit": 3.586,
+                    "sensor_current": 3.1360000000000001,
+                    "sensor_limit": 3.5859999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.7,
+                    "sensor_limit_low": 2.7000000000000002,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -12297,6 +12407,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12307,13 +12418,13 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.3",
                     "sensor_type": "awplus",
                     "sensor_descr": "Voltage: 3.3V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.317,
-                    "sensor_limit": 3.627,
+                    "sensor_current": 3.3170000000000002,
+                    "sensor_limit": 3.6269999999999998,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.973,
+                    "sensor_limit_low": 2.9729999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -12321,6 +12432,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12331,13 +12443,13 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.4",
                     "sensor_type": "awplus",
                     "sensor_descr": "Voltage: 12V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 12.125,
-                    "sensor_limit": 13.188,
+                    "sensor_limit": 13.188000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 10.813,
+                    "sensor_limit_low": 10.813000000000001,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -12345,6 +12457,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12355,13 +12468,13 @@
                     "sensor_index": "atEnvMonv2VoltageIndex.2.5.5",
                     "sensor_type": "awplus",
                     "sensor_descr": "Voltage: 1V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.998,
                     "sensor_limit": 1.097,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 0.9,
+                    "sensor_limit_low": 0.90000000000000002,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -12369,6 +12482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

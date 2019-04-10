@@ -282,6 +282,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -306,6 +307,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -319,7 +321,7 @@
                     "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 86.9,
+                    "sensor_current": 86.900000000000006,
                     "sensor_limit": 8,
                     "sensor_limit_warn": 6,
                     "sensor_limit_low": 1,
@@ -330,6 +332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -343,7 +346,7 @@
                     "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 85.7,
+                    "sensor_current": 85.700000000000003,
                     "sensor_limit": 8,
                     "sensor_limit_warn": 6,
                     "sensor_limit_low": 1,
@@ -354,6 +357,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -367,7 +371,7 @@
                     "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 78.6,
+                    "sensor_current": 78.599999999999994,
                     "sensor_limit": 8,
                     "sensor_limit_warn": 6,
                     "sensor_limit_low": 1,
@@ -378,6 +382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -402,6 +407,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -426,6 +432,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -450,6 +457,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -474,6 +482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -498,6 +507,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -522,6 +532,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -546,6 +557,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -570,6 +582,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -594,6 +607,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -618,6 +632,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -642,6 +657,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -666,6 +682,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -690,6 +707,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -714,6 +732,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -738,6 +757,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -762,6 +782,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -786,6 +807,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -810,6 +832,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -834,6 +857,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -858,6 +882,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -882,6 +907,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -906,6 +932,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -930,6 +957,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -954,6 +982,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -978,6 +1007,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1002,6 +1032,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1026,6 +1057,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1050,6 +1082,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1074,6 +1107,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1098,6 +1132,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1122,6 +1157,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1146,6 +1182,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1170,6 +1207,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1194,6 +1232,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1218,6 +1257,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1242,6 +1282,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1266,6 +1307,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1290,6 +1332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1314,6 +1357,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1338,6 +1382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1362,6 +1407,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1386,6 +1432,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1410,6 +1457,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1434,6 +1482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1458,6 +1507,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1482,6 +1532,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1506,6 +1557,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1530,6 +1582,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1554,6 +1607,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1578,6 +1632,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1602,6 +1657,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1626,6 +1682,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1650,6 +1707,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1674,6 +1732,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1698,6 +1757,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1722,6 +1782,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1746,6 +1807,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1770,6 +1832,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1794,6 +1857,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1818,6 +1882,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1842,6 +1907,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1866,6 +1932,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1890,6 +1957,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensorProbeSwitchTable"
                 },
                 {
@@ -1914,6 +1982,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "spStatus"
                 },
                 {
@@ -1927,7 +1996,7 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 19.9,
+                    "sensor_current": 19.899999999999999,
                     "sensor_limit": 32,
                     "sensor_limit_warn": 28,
                     "sensor_limit_low": 5,
@@ -1938,6 +2007,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1962,6 +2032,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1975,7 +2046,7 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 22.1,
+                    "sensor_current": 22.100000000000001,
                     "sensor_limit": 32,
                     "sensor_limit_warn": 27,
                     "sensor_limit_low": 5,
@@ -1986,6 +2057,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

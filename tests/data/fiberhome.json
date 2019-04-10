@@ -151,7 +151,7 @@
                     "sensor_index": "21",
                     "sensor_type": "fanState",
                     "sensor_descr": "Fan slot 21 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -165,6 +165,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fanState"
                 },
                 {
@@ -175,7 +176,7 @@
                     "sensor_index": "22",
                     "sensor_type": "fanState",
                     "sensor_descr": "Fan slot 22 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -189,6 +190,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fanState"
                 },
                 {
@@ -199,7 +201,7 @@
                     "sensor_index": "23",
                     "sensor_type": "fanState",
                     "sensor_descr": "Fan slot 23 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -213,6 +215,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fanState"
                 },
                 {
@@ -223,7 +226,7 @@
                     "sensor_index": "1",
                     "sensor_type": "powerState",
                     "sensor_descr": "Power slot 1 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -237,6 +240,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "powerState"
                 },
                 {
@@ -247,7 +251,7 @@
                     "sensor_index": "2",
                     "sensor_type": "powerState",
                     "sensor_descr": "Power slot 2 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -261,6 +265,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "powerState"
                 },
                 {
@@ -271,7 +276,7 @@
                     "sensor_index": "0",
                     "sensor_type": "fiberhome",
                     "sensor_descr": "Internal Temperature 0",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 45,
@@ -285,6 +290,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

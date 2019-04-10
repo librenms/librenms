@@ -11188,7 +11188,7 @@
                     "sensor_index": "1",
                     "sensor_type": "dataCardCommState",
                     "sensor_descr": "Data 1 Mgmt Comm State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 14,
@@ -11202,6 +11202,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dataCardCommState"
                 },
                 {
@@ -11212,7 +11213,7 @@
                     "sensor_index": "1",
                     "sensor_type": "dataCardOperState",
                     "sensor_descr": "Data 1 Operational State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -11226,6 +11227,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dataCardOperState"
                 },
                 {
@@ -11236,7 +11238,7 @@
                     "sensor_index": "10",
                     "sensor_type": "dslCardCommState",
                     "sensor_descr": "LTU 10 Mgmt Comm State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 14,
@@ -11250,6 +11252,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dslCardCommState"
                 },
                 {
@@ -11260,7 +11263,7 @@
                     "sensor_index": "5",
                     "sensor_type": "dslCardCommState",
                     "sensor_descr": "LTU 5 Mgmt Comm State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 14,
@@ -11274,6 +11277,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dslCardCommState"
                 },
                 {
@@ -11284,7 +11288,7 @@
                     "sensor_index": "6",
                     "sensor_type": "dslCardCommState",
                     "sensor_descr": "LTU 6 Mgmt Comm State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 14,
@@ -11298,6 +11302,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dslCardCommState"
                 },
                 {
@@ -11308,7 +11313,7 @@
                     "sensor_index": "7",
                     "sensor_type": "dslCardCommState",
                     "sensor_descr": "LTU 7 Mgmt Comm State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 14,
@@ -11322,6 +11327,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dslCardCommState"
                 },
                 {
@@ -11332,7 +11338,7 @@
                     "sensor_index": "8",
                     "sensor_type": "dslCardCommState",
                     "sensor_descr": "LTU 8 Mgmt Comm State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 14,
@@ -11346,6 +11352,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dslCardCommState"
                 },
                 {
@@ -11356,7 +11363,7 @@
                     "sensor_index": "9",
                     "sensor_type": "dslCardCommState",
                     "sensor_descr": "LTU 9 Mgmt Comm State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 14,
@@ -11370,6 +11377,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dslCardCommState"
                 },
                 {
@@ -11380,7 +11388,7 @@
                     "sensor_index": "10",
                     "sensor_type": "dslCardOperState",
                     "sensor_descr": "LTU 10 Operational State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -11394,6 +11402,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dslCardOperState"
                 },
                 {
@@ -11404,7 +11413,7 @@
                     "sensor_index": "5",
                     "sensor_type": "dslCardOperState",
                     "sensor_descr": "LTU 5 Operational State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -11418,6 +11427,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dslCardOperState"
                 },
                 {
@@ -11428,7 +11438,7 @@
                     "sensor_index": "6",
                     "sensor_type": "dslCardOperState",
                     "sensor_descr": "LTU 6 Operational State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -11442,6 +11452,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dslCardOperState"
                 },
                 {
@@ -11452,7 +11463,7 @@
                     "sensor_index": "7",
                     "sensor_type": "dslCardOperState",
                     "sensor_descr": "LTU 7 Operational State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -11466,6 +11477,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dslCardOperState"
                 },
                 {
@@ -11476,7 +11488,7 @@
                     "sensor_index": "8",
                     "sensor_type": "dslCardOperState",
                     "sensor_descr": "LTU 8 Operational State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -11490,6 +11502,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dslCardOperState"
                 },
                 {
@@ -11500,7 +11513,7 @@
                     "sensor_index": "9",
                     "sensor_type": "dslCardOperState",
                     "sensor_descr": "LTU 9 Operational State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -11514,6 +11527,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dslCardOperState"
                 },
                 {
@@ -11524,7 +11538,7 @@
                     "sensor_index": "3",
                     "sensor_type": "v5CardCommState",
                     "sensor_descr": "V5 3 Mgmt Comm State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 14,
@@ -11538,6 +11552,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "v5CardCommState"
                 },
                 {
@@ -11548,7 +11563,7 @@
                     "sensor_index": "3",
                     "sensor_type": "v5CardOperState",
                     "sensor_descr": "V5 3 Operational State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -11562,6 +11577,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "v5CardOperState"
                 }
             ],

@@ -478,7 +478,7 @@
                     "sensor_index": "matInvOutputCurrent.1",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 1 Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -492,6 +492,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -502,7 +503,7 @@
                     "sensor_index": "matInvOutputCurrent.2",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 2 Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -516,6 +517,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -526,7 +528,7 @@
                     "sensor_index": "matInvOutputCurrent.3",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 3 Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -540,6 +542,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -550,7 +553,7 @@
                     "sensor_index": "matInvOutputCurrent.4",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 4 Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -564,6 +567,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -574,7 +578,7 @@
                     "sensor_index": "matInvOutputCurrent.5",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 5 Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -588,6 +592,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -598,7 +603,7 @@
                     "sensor_index": "matInvOutputCurrent.6",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 6 Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -612,6 +617,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -622,7 +628,7 @@
                     "sensor_index": "matStsOutputCurrent.1",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "STS Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -636,6 +642,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -646,7 +653,7 @@
                     "sensor_index": "matInvOutputPower.1",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 1 Output Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 10,
@@ -660,6 +667,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -670,7 +678,7 @@
                     "sensor_index": "matInvOutputPower.2",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 2 Output Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 16,
@@ -684,6 +692,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -694,7 +703,7 @@
                     "sensor_index": "matInvOutputPower.3",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 3 Output Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 17,
@@ -708,6 +717,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -718,7 +728,7 @@
                     "sensor_index": "matInvOutputPower.4",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 4 Output Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 16,
@@ -732,6 +742,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -742,7 +753,7 @@
                     "sensor_index": "matInvOutputPower.5",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 5 Output Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 17,
@@ -756,6 +767,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -766,7 +778,7 @@
                     "sensor_index": "matInvOutputPower.6",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 6 Output Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 17,
@@ -780,6 +792,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -790,7 +803,7 @@
                     "sensor_index": "matStsOutputPower.1",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "STS Output Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 29,
@@ -804,6 +817,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -814,7 +828,7 @@
                     "sensor_index": "0",
                     "sensor_type": "matConfStsPriority",
                     "sensor_descr": "STS Priority",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -828,6 +842,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "matConfStsPriority"
                 },
                 {
@@ -838,7 +853,7 @@
                     "sensor_index": "1",
                     "sensor_type": "matInvOnOff",
                     "sensor_descr": "Inverter 1 Status (180500000)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -852,6 +867,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "matInvOnOff"
                 },
                 {
@@ -862,7 +878,7 @@
                     "sensor_index": "2",
                     "sensor_type": "matInvOnOff",
                     "sensor_descr": "Inverter 2 Status (180500000)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -876,6 +892,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "matInvOnOff"
                 },
                 {
@@ -886,7 +903,7 @@
                     "sensor_index": "3",
                     "sensor_type": "matInvOnOff",
                     "sensor_descr": "Inverter 3 Status (180500000)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -900,6 +917,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "matInvOnOff"
                 },
                 {
@@ -910,7 +928,7 @@
                     "sensor_index": "4",
                     "sensor_type": "matInvOnOff",
                     "sensor_descr": "Inverter 4 Status (180500000)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -924,6 +942,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "matInvOnOff"
                 },
                 {
@@ -934,7 +953,7 @@
                     "sensor_index": "5",
                     "sensor_type": "matInvOnOff",
                     "sensor_descr": "Inverter 5 Status (180500000)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -948,6 +967,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "matInvOnOff"
                 },
                 {
@@ -958,7 +978,7 @@
                     "sensor_index": "6",
                     "sensor_type": "matInvOnOff",
                     "sensor_descr": "Inverter 6 Status (180500000)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -972,6 +992,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "matInvOnOff"
                 },
                 {
@@ -982,7 +1003,7 @@
                     "sensor_index": "1",
                     "sensor_type": "matStsMbsStatus",
                     "sensor_descr": "MBS Switch",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -996,6 +1017,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "matStsMbsStatus"
                 },
                 {
@@ -1006,7 +1028,7 @@
                     "sensor_index": "1",
                     "sensor_type": "matStsRunningMode",
                     "sensor_descr": "STS Running Mode",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1020,6 +1042,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "matStsRunningMode"
                 },
                 {
@@ -1030,7 +1053,7 @@
                     "sensor_index": "1",
                     "sensor_type": "matStsStatus",
                     "sensor_descr": "STS Status (999900000)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1044,6 +1067,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "matStsStatus"
                 },
                 {
@@ -1054,7 +1078,7 @@
                     "sensor_index": "matConTemperature.0",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Controller Temperature",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 34,
@@ -1068,6 +1092,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1078,7 +1103,7 @@
                     "sensor_index": "matInvTemperature.1",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 1 Temperature",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -1092,6 +1117,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1102,7 +1128,7 @@
                     "sensor_index": "matInvTemperature.2",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 2 Temperature",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
@@ -1116,6 +1142,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1126,7 +1153,7 @@
                     "sensor_index": "matInvTemperature.3",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 3 Temperature",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 25,
@@ -1140,6 +1167,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1150,7 +1178,7 @@
                     "sensor_index": "matInvTemperature.4",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 4 Temperature",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 26,
@@ -1164,6 +1192,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1174,7 +1203,7 @@
                     "sensor_index": "matInvTemperature.5",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 5 Temperature",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -1188,6 +1217,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1198,7 +1228,7 @@
                     "sensor_index": "matInvTemperature.6",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 6 Temperature",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 26,
@@ -1212,6 +1242,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1222,7 +1253,7 @@
                     "sensor_index": "matStsTemperature.1",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "STS Temperature",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 22,
@@ -1236,6 +1267,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1246,13 +1278,13 @@
                     "sensor_index": "matInvBatteryVoltage.1",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 1 Input",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 54.1,
-                    "sensor_limit": 62.215,
+                    "sensor_current": 54.100000000000001,
+                    "sensor_limit": 62.215000000000003,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 45.985,
+                    "sensor_limit_low": 45.984999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1260,6 +1292,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1270,13 +1303,13 @@
                     "sensor_index": "matInvBatteryVoltage.2",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 2 Input",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 54.1,
-                    "sensor_limit": 62.215,
+                    "sensor_current": 54.100000000000001,
+                    "sensor_limit": 62.215000000000003,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 45.985,
+                    "sensor_limit_low": 45.984999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1284,6 +1317,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1294,13 +1328,13 @@
                     "sensor_index": "matInvBatteryVoltage.3",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 3 Input",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 54,
-                    "sensor_limit": 62.1,
+                    "sensor_limit": 62.100000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 45.9,
+                    "sensor_limit_low": 45.899999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1308,6 +1342,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1318,13 +1353,13 @@
                     "sensor_index": "matInvBatteryVoltage.4",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 4 Input",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 54.1,
-                    "sensor_limit": 62.215,
+                    "sensor_current": 54.100000000000001,
+                    "sensor_limit": 62.215000000000003,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 45.985,
+                    "sensor_limit_low": 45.984999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1332,6 +1367,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1342,13 +1378,13 @@
                     "sensor_index": "matInvBatteryVoltage.5",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 5 Input",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 54,
-                    "sensor_limit": 62.1,
+                    "sensor_limit": 62.100000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 45.9,
+                    "sensor_limit_low": 45.899999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1356,6 +1392,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1366,13 +1403,13 @@
                     "sensor_index": "matInvBatteryVoltage.6",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 6 Input",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 54.1,
-                    "sensor_limit": 62.215,
+                    "sensor_current": 54.100000000000001,
+                    "sensor_limit": 62.215000000000003,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 45.985,
+                    "sensor_limit_low": 45.984999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1380,6 +1417,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1390,10 +1428,10 @@
                     "sensor_index": "matInvOutputVoltage.1",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 1 Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 122.4,
+                    "sensor_current": 122.40000000000001,
                     "sensor_limit": 138,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 100,
@@ -1404,6 +1442,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1414,7 +1453,7 @@
                     "sensor_index": "matInvOutputVoltage.2",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 2 Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 122.2,
@@ -1428,6 +1467,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1438,7 +1478,7 @@
                     "sensor_index": "matInvOutputVoltage.3",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 3 Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 122.2,
@@ -1452,6 +1492,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1462,7 +1503,7 @@
                     "sensor_index": "matInvOutputVoltage.4",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 4 Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 122.5,
@@ -1476,6 +1517,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1486,7 +1528,7 @@
                     "sensor_index": "matInvOutputVoltage.5",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 5 Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 122.3,
@@ -1500,6 +1542,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1510,10 +1553,10 @@
                     "sensor_index": "matInvOutputVoltage.6",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "Inverter 6 Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 122.4,
+                    "sensor_current": 122.40000000000001,
                     "sensor_limit": 138,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 100,
@@ -1524,6 +1567,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1534,10 +1578,10 @@
                     "sensor_index": "matStsInvInputVoltage.1",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "STS Input - Inverter",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 121.6,
+                    "sensor_current": 121.59999999999999,
                     "sensor_limit": 138,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 100,
@@ -1548,6 +1592,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1558,7 +1603,7 @@
                     "sensor_index": "matStsMainInputVoltage.1",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "STS Input - Mains",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 120.5,
@@ -1572,6 +1617,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1582,7 +1628,7 @@
                     "sensor_index": "matStsOutputVoltage.1",
                     "sensor_type": "eaton-matrix",
                     "sensor_descr": "STS Output",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 122.2,
@@ -1596,6 +1642,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

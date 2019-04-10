@@ -66,7 +66,7 @@
                     "sensor_index": "boxServicesTempUnitState.1",
                     "sensor_type": "boxServicesTempUnitEntry",
                     "sensor_descr": "Chassis state",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -80,6 +80,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "boxServicesTempUnitEntry"
                 },
                 {
@@ -90,7 +91,7 @@
                     "sensor_index": "boxServicesTempSensorTemperature.1.0",
                     "sensor_type": "edgeswitch",
                     "sensor_descr": "Temperature 1.0",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 70,
@@ -104,6 +105,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -114,7 +116,7 @@
                     "sensor_index": "boxServicesTempSensorTemperature.1.1",
                     "sensor_type": "edgeswitch",
                     "sensor_descr": "Temperature 1.1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 59,
@@ -128,6 +130,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -138,7 +141,7 @@
                     "sensor_index": "boxServicesTempSensorTemperature.1.2",
                     "sensor_type": "edgeswitch",
                     "sensor_descr": "Temperature 1.2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 66,
@@ -152,6 +155,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -162,7 +166,7 @@
                     "sensor_index": "boxServicesTempSensorTemperature.1.3",
                     "sensor_type": "edgeswitch",
                     "sensor_descr": "Temperature 1.3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 66,
@@ -176,6 +180,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

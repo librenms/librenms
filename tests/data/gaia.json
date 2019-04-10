@@ -48,11 +48,11 @@
                     "sensor_index": "fanSpeedSensorValue.1.0",
                     "sensor_type": "gaia",
                     "sensor_descr": "CPU Fan",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2109,
-                    "sensor_limit": 3796.2,
+                    "sensor_limit": 3796.1999999999998,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 1687.2,
                     "sensor_limit_low_warn": null,
@@ -62,6 +62,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -72,7 +73,7 @@
                     "sensor_index": "fanSpeedSensorStatus.1.0",
                     "sensor_type": "fanSpeedSensorStatus",
                     "sensor_descr": "CPU Fan, Fanspeed Out Of Range",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -86,6 +87,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "fanSpeedSensorStatus"
                 },
                 {
@@ -96,7 +98,7 @@
                     "sensor_index": "tempertureSensorStatus.1.0",
                     "sensor_type": "tempertureSensorStatus",
                     "sensor_descr": "CPU Temp, Temperature Out Of Range",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -110,6 +112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "tempertureSensorStatus"
                 },
                 {
@@ -120,7 +123,7 @@
                     "sensor_index": "tempertureSensorStatus.2.0",
                     "sensor_type": "tempertureSensorStatus",
                     "sensor_descr": "Outlet Temp, Temperature Out Of Range",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -134,6 +137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "tempertureSensorStatus"
                 },
                 {
@@ -144,7 +148,7 @@
                     "sensor_index": "tempertureSensorStatus.3.0",
                     "sensor_type": "tempertureSensorStatus",
                     "sensor_descr": "Intake Temp, Temperature Out Of Range",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -158,6 +162,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "tempertureSensorStatus"
                 },
                 {
@@ -168,7 +173,7 @@
                     "sensor_index": "voltageSensorStatus.1.0",
                     "sensor_type": "voltageSensorStatus",
                     "sensor_descr": "VBAT3, Voltage Out Of Range",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -182,6 +187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "voltageSensorStatus"
                 },
                 {
@@ -192,7 +198,7 @@
                     "sensor_index": "voltageSensorStatus.2.0",
                     "sensor_type": "voltageSensorStatus",
                     "sensor_descr": "VDIMM, Voltage Out Of Range",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -206,6 +212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "voltageSensorStatus"
                 },
                 {
@@ -216,7 +223,7 @@
                     "sensor_index": "voltageSensorStatus.3.0",
                     "sensor_type": "voltageSensorStatus",
                     "sensor_descr": "+5V, Voltage Out Of Range",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -230,6 +237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "voltageSensorStatus"
                 },
                 {
@@ -240,7 +248,7 @@
                     "sensor_index": "voltageSensorStatus.4.0",
                     "sensor_type": "voltageSensorStatus",
                     "sensor_descr": "3.3V, Voltage Out Of Range",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -254,6 +262,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "voltageSensorStatus"
                 },
                 {
@@ -264,7 +273,7 @@
                     "sensor_index": "voltageSensorStatus.5.0",
                     "sensor_type": "voltageSensorStatus",
                     "sensor_descr": "+12V, Voltage Out Of Range",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -278,6 +287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "voltageSensorStatus"
                 },
                 {
@@ -288,7 +298,7 @@
                     "sensor_index": "voltageSensorStatus.6.0",
                     "sensor_type": "voltageSensorStatus",
                     "sensor_descr": "VCore, Voltage Out Of Range",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -302,6 +312,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "voltageSensorStatus"
                 },
                 {
@@ -312,7 +323,7 @@
                     "sensor_index": "tempertureSensorValue.1.0",
                     "sensor_type": "gaia",
                     "sensor_descr": "CPU Temp",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 54.5,
@@ -326,6 +337,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -336,7 +348,7 @@
                     "sensor_index": "tempertureSensorValue.2.0",
                     "sensor_type": "gaia",
                     "sensor_descr": "Outlet Temp",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 46.5,
@@ -350,6 +362,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -360,7 +373,7 @@
                     "sensor_index": "tempertureSensorValue.3.0",
                     "sensor_type": "gaia",
                     "sensor_descr": "Intake Temp",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 43,
@@ -374,6 +387,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -384,11 +398,11 @@
                     "sensor_index": "voltageSensorValue.1.0",
                     "sensor_type": "gaia",
                     "sensor_descr": "VBAT3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.06,
-                    "sensor_limit": 3.519,
+                    "sensor_current": 3.0600000000000001,
+                    "sensor_limit": 3.5190000000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 2.601,
                     "sensor_limit_low_warn": null,
@@ -398,6 +412,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -408,13 +423,13 @@
                     "sensor_index": "voltageSensorValue.2.0",
                     "sensor_type": "gaia",
                     "sensor_descr": "VDIMM",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1.51,
-                    "sensor_limit": 1.7365,
+                    "sensor_limit": 1.7364999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 1.2835,
+                    "sensor_limit_low": 1.2835000000000001,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -422,6 +437,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -432,13 +448,13 @@
                     "sensor_index": "voltageSensorValue.3.0",
                     "sensor_type": "gaia",
                     "sensor_descr": "+5V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 4.99,
-                    "sensor_limit": 5.7385,
+                    "sensor_current": 4.9900000000000002,
+                    "sensor_limit": 5.7385000000000002,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 4.2415,
+                    "sensor_limit_low": 4.2415000000000003,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -446,6 +462,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -456,13 +473,13 @@
                     "sensor_index": "voltageSensorValue.4.0",
                     "sensor_type": "gaia",
                     "sensor_descr": "3.3V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.3,
-                    "sensor_limit": 3.795,
+                    "sensor_current": 3.2999999999999998,
+                    "sensor_limit": 3.7949999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.805,
+                    "sensor_limit_low": 2.8050000000000002,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -470,6 +487,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -480,11 +498,11 @@
                     "sensor_index": "voltageSensorValue.5.0",
                     "sensor_type": "gaia",
                     "sensor_descr": "+12V",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 11.98,
-                    "sensor_limit": 13.777,
+                    "sensor_limit": 13.776999999999999,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 10.183,
                     "sensor_limit_low_warn": null,
@@ -494,6 +512,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -504,13 +523,13 @@
                     "sensor_index": "voltageSensorValue.6.0",
                     "sensor_type": "gaia",
                     "sensor_descr": "VCore",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.97,
-                    "sensor_limit": 1.1155,
+                    "sensor_current": 0.96999999999999997,
+                    "sensor_limit": 1.1154999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 0.8245,
+                    "sensor_limit_low": 0.82450000000000001,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -518,6 +537,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

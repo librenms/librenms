@@ -934,7 +934,7 @@
                     "sensor_index": "0",
                     "sensor_type": "statusGeneral",
                     "sensor_descr": "General Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -948,6 +948,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "statusGeneral"
                 },
                 {
@@ -958,7 +959,7 @@
                     "sensor_index": "0",
                     "sensor_type": "statusHardware",
                     "sensor_descr": "Hardware Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -972,6 +973,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "statusHardware"
                 },
                 {
@@ -982,7 +984,7 @@
                     "sensor_index": "0",
                     "sensor_type": "statusSoftware",
                     "sensor_descr": "Software Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -996,6 +998,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "statusSoftware"
                 },
                 {
@@ -1006,7 +1009,7 @@
                     "sensor_index": "0",
                     "sensor_type": "statusTemperature",
                     "sensor_descr": "Temperature Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1020,6 +1023,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "statusTemperature"
                 },
                 {
@@ -1030,7 +1034,7 @@
                     "sensor_index": "1",
                     "sensor_type": "luminato",
                     "sensor_descr": "Slot 1 (LQM-C) ",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 40,
@@ -1044,6 +1048,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1054,7 +1059,7 @@
                     "sensor_index": "10",
                     "sensor_type": "luminato",
                     "sensor_descr": "Slot 0 (LCH-D) ",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 32,
@@ -1068,6 +1073,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1078,7 +1084,7 @@
                     "sensor_index": "2",
                     "sensor_type": "luminato",
                     "sensor_descr": "Slot 2 (LQM-C) ",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 40,
@@ -1092,6 +1098,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1102,7 +1109,7 @@
                     "sensor_index": "3",
                     "sensor_type": "luminato",
                     "sensor_descr": "Slot 3 (LQM-C) ",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 39,
@@ -1116,6 +1123,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

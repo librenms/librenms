@@ -793,7 +793,7 @@
                     "sensor_index": "0",
                     "sensor_type": "ftpdService",
                     "sensor_descr": "FTP Service",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -807,6 +807,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "ftpdService"
                 },
                 {
@@ -817,7 +818,7 @@
                     "sensor_index": "0",
                     "sensor_type": "httpdService",
                     "sensor_descr": "HTTP Service",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -831,6 +832,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "httpdService"
                 },
                 {
@@ -841,7 +843,7 @@
                     "sensor_index": "0",
                     "sensor_type": "telnetdService",
                     "sensor_descr": "Telnet Service",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -855,6 +857,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "telnetdService"
                 }
             ],

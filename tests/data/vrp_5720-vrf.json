@@ -34397,6 +34397,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34421,6 +34422,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34445,6 +34447,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34469,6 +34472,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34493,6 +34497,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34517,6 +34522,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34541,6 +34547,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34565,6 +34572,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34589,6 +34597,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34613,6 +34622,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hwMemberStackRole"
                 },
                 {
@@ -34637,6 +34647,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hwMemberStackRole"
                 },
                 {
@@ -34661,6 +34672,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hwStackPortStatus"
                 },
                 {
@@ -34685,6 +34697,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hwStackPortStatus"
                 },
                 {
@@ -34709,6 +34722,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hwStackPortStatus"
                 },
                 {
@@ -34733,6 +34747,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hwStackPortStatus"
                 },
                 {
@@ -34757,6 +34772,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34781,6 +34797,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34805,6 +34822,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34829,6 +34847,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34853,6 +34872,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34877,6 +34897,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34901,6 +34922,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34925,6 +34947,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -34949,6 +34972,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

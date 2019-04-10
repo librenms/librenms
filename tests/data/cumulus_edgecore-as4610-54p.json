@@ -12169,7 +12169,7 @@
                     "sensor_current": 5912,
                     "sensor_limit": 10641.6,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 4729.6,
+                    "sensor_limit_low": 4729.6000000000004,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -12177,6 +12177,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12191,9 +12192,9 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 6026,
-                    "sensor_limit": 10846.8,
+                    "sensor_limit": 10846.800000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 4820.8,
+                    "sensor_limit_low": 4820.8000000000002,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -12201,6 +12202,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12225,6 +12227,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12249,6 +12252,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12273,6 +12277,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -12297,6 +12302,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

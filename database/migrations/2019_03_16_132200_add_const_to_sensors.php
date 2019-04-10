@@ -14,7 +14,10 @@ class AddConstToSensors extends Migration
     public function up()
     {
         Schema::table('sensors', function (Blueprint $table) {
-            $table->integer('sensor_const')->nullable();
+            $table->integer('sensor_offset')->nullable();
+        });
+        Schema::table('wireless_sensors', function (Blueprint $table) {
+            $table->integer('sensor_offset')->nullable();
         });
     }
 
@@ -26,7 +29,10 @@ class AddConstToSensors extends Migration
     public function down()
     {
         Schema::table('sensors', function (Blueprint $table) {
-            $table->dropColumn('sensor_const');
+            $table->dropColumn('sensor_offset');
+        });
+        Schema::table('wireless_sensors', function (Blueprint $table) {
+            $table->dropColumn('sensor_offset');
         });
     }
 }

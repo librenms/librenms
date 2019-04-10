@@ -10709,6 +10709,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rcChasPowerSupplyOperStatus"
                 },
                 {
@@ -10733,6 +10734,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rcChasPowerSupplyOperStatus"
                 },
                 {
@@ -10757,6 +10759,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rcChasPowerSupplyOperStatus"
                 },
                 {
@@ -10781,6 +10784,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rcChasPowerSupplyOperStatus"
                 },
                 {
@@ -10805,6 +10809,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rcChasPowerSupplyOperStatus"
                 },
                 {
@@ -10829,6 +10834,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rcChasPowerSupplyOperStatus"
                 }
             ],
@@ -10887,6 +10893,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rcChasPowerSupplyOperStatus"
                 },
                 {
@@ -10911,6 +10918,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rcChasPowerSupplyOperStatus"
                 },
                 {
@@ -10935,6 +10943,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rcChasPowerSupplyOperStatus"
                 },
                 {
@@ -10959,6 +10968,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rcChasPowerSupplyOperStatus"
                 },
                 {
@@ -10983,6 +10993,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rcChasPowerSupplyOperStatus"
                 },
                 {
@@ -11007,6 +11018,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "rcChasPowerSupplyOperStatus"
                 }
             ],

@@ -48,10 +48,10 @@
                     "sensor_index": "sensTable.1",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "H.Servidores",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 30.3,
+                    "sensor_current": 30.300000000000001,
                     "sensor_limit": 70,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 30,
@@ -62,6 +62,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -72,10 +73,10 @@
                     "sensor_index": "sensTable.2",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "H.Network",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 29.6,
+                    "sensor_current": 29.600000000000001,
                     "sensor_limit": 70,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 30,
@@ -86,6 +87,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -96,10 +98,10 @@
                     "sensor_index": "sensTable.3",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "H.Ambiente",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 28.7,
+                    "sensor_current": 28.699999999999999,
                     "sensor_limit": 70,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 30,
@@ -110,6 +112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -120,10 +123,10 @@
                     "sensor_index": "sensTable.4",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "H.C4c",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 20.6,
+                    "sensor_current": 20.600000000000001,
                     "sensor_limit": 70,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 30,
@@ -134,6 +137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -144,7 +148,7 @@
                     "sensor_index": "inpAlarmState.1",
                     "sensor_type": "inpAlarmState",
                     "sensor_descr": "alarm : Binary 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -158,6 +162,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpAlarmState"
                 },
                 {
@@ -168,7 +173,7 @@
                     "sensor_index": "inpAlarmState.2",
                     "sensor_type": "inpAlarmState",
                     "sensor_descr": "alarm : Binary 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -182,6 +187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpAlarmState"
                 },
                 {
@@ -192,7 +198,7 @@
                     "sensor_index": "inpAlarmState.3",
                     "sensor_type": "inpAlarmState",
                     "sensor_descr": "alarm : Binary 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -206,6 +212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpAlarmState"
                 },
                 {
@@ -216,7 +223,7 @@
                     "sensor_index": "inpAlarmState.4",
                     "sensor_type": "inpAlarmState",
                     "sensor_descr": "alarm : Binary 4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -230,6 +237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpAlarmState"
                 },
                 {
@@ -240,7 +248,7 @@
                     "sensor_index": "inpAlarmState.5",
                     "sensor_type": "inpAlarmState",
                     "sensor_descr": "alarm : Binary 5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -254,6 +262,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpAlarmState"
                 },
                 {
@@ -264,7 +273,7 @@
                     "sensor_index": "inpAlarmState.6",
                     "sensor_type": "inpAlarmState",
                     "sensor_descr": "alarm : Binary 6",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -278,6 +287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpAlarmState"
                 },
                 {
@@ -288,7 +298,7 @@
                     "sensor_index": "inpValue.1",
                     "sensor_type": "inpValue",
                     "sensor_descr": "Binary 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -302,6 +312,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpValue"
                 },
                 {
@@ -312,7 +323,7 @@
                     "sensor_index": "inpValue.2",
                     "sensor_type": "inpValue",
                     "sensor_descr": "Binary 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -326,6 +337,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpValue"
                 },
                 {
@@ -336,7 +348,7 @@
                     "sensor_index": "inpValue.3",
                     "sensor_type": "inpValue",
                     "sensor_descr": "Binary 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -350,6 +362,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpValue"
                 },
                 {
@@ -360,7 +373,7 @@
                     "sensor_index": "inpValue.4",
                     "sensor_type": "inpValue",
                     "sensor_descr": "Binary 4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -374,6 +387,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpValue"
                 },
                 {
@@ -384,7 +398,7 @@
                     "sensor_index": "inpValue.5",
                     "sensor_type": "inpValue",
                     "sensor_descr": "Binary 5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -398,6 +412,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpValue"
                 },
                 {
@@ -408,7 +423,7 @@
                     "sensor_index": "inpValue.6",
                     "sensor_type": "inpValue",
                     "sensor_descr": "Binary 6",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -422,6 +437,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpValue"
                 },
                 {
@@ -432,7 +448,7 @@
                     "sensor_index": "sensState.1",
                     "sensor_type": "sensName",
                     "sensor_descr": "H.Servidores",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -446,6 +462,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -456,7 +473,7 @@
                     "sensor_index": "sensState.2",
                     "sensor_type": "sensName",
                     "sensor_descr": "H.Network",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -470,6 +487,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -480,7 +498,7 @@
                     "sensor_index": "sensState.3",
                     "sensor_type": "sensName",
                     "sensor_descr": "H.Ambiente",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -494,6 +512,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -504,7 +523,7 @@
                     "sensor_index": "sensState.4",
                     "sensor_type": "sensName",
                     "sensor_descr": "H.C4c",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -518,6 +537,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -528,7 +548,7 @@
                     "sensor_index": "sensState.5",
                     "sensor_type": "sensName",
                     "sensor_descr": "T.Network",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -542,6 +562,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -552,7 +573,7 @@
                     "sensor_index": "sensState.6",
                     "sensor_type": "sensName",
                     "sensor_descr": "T.C4c",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -566,6 +587,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -576,7 +598,7 @@
                     "sensor_index": "sensState.7",
                     "sensor_type": "sensName",
                     "sensor_descr": "T.Ambiente",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -590,6 +612,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -600,7 +623,7 @@
                     "sensor_index": "sensState.8",
                     "sensor_type": "sensName",
                     "sensor_descr": "T.Servidores",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -614,6 +637,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -624,11 +648,11 @@
                     "sensor_index": "sensTable.5",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "T.Network",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 24.9,
-                    "sensor_limit": 44.9,
+                    "sensor_current": 24.899999999999999,
+                    "sensor_limit": 44.899999999999999,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 14.9,
                     "sensor_limit_low_warn": null,
@@ -638,6 +662,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -648,13 +673,13 @@
                     "sensor_index": "sensTable.6",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "T.C4c",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 31.1,
-                    "sensor_limit": 51.1,
+                    "sensor_current": 31.100000000000001,
+                    "sensor_limit": 51.100000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 21.1,
+                    "sensor_limit_low": 21.100000000000001,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -662,6 +687,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -672,13 +698,13 @@
                     "sensor_index": "sensTable.7",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "T.Ambiente",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 25.7,
-                    "sensor_limit": 45.7,
+                    "sensor_current": 25.699999999999999,
+                    "sensor_limit": 45.700000000000003,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 15.7,
+                    "sensor_limit_low": 15.699999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -686,6 +712,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -696,11 +723,11 @@
                     "sensor_index": "sensTable.8",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "T.Servidores",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 23.6,
-                    "sensor_limit": 43.6,
+                    "sensor_current": 23.600000000000001,
+                    "sensor_limit": 43.600000000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 13.6,
                     "sensor_limit_low_warn": null,
@@ -710,6 +737,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],
@@ -782,10 +810,10 @@
                     "sensor_index": "sensTable.1",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "H.Servidores",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 30.3,
+                    "sensor_current": 30.300000000000001,
                     "sensor_limit": 70,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 30,
@@ -796,6 +824,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -806,10 +835,10 @@
                     "sensor_index": "sensTable.2",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "H.Network",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 29.6,
+                    "sensor_current": 29.600000000000001,
                     "sensor_limit": 70,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 30,
@@ -820,6 +849,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -830,10 +860,10 @@
                     "sensor_index": "sensTable.3",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "H.Ambiente",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 28.7,
+                    "sensor_current": 28.699999999999999,
                     "sensor_limit": 70,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 30,
@@ -844,6 +874,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -854,10 +885,10 @@
                     "sensor_index": "sensTable.4",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "H.C4c",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 20.6,
+                    "sensor_current": 20.600000000000001,
                     "sensor_limit": 70,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 30,
@@ -868,6 +899,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -878,7 +910,7 @@
                     "sensor_index": "inpAlarmState.1",
                     "sensor_type": "inpAlarmState",
                     "sensor_descr": "alarm : Binary 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -892,6 +924,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpAlarmState"
                 },
                 {
@@ -902,7 +935,7 @@
                     "sensor_index": "inpAlarmState.2",
                     "sensor_type": "inpAlarmState",
                     "sensor_descr": "alarm : Binary 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -916,6 +949,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpAlarmState"
                 },
                 {
@@ -926,7 +960,7 @@
                     "sensor_index": "inpAlarmState.3",
                     "sensor_type": "inpAlarmState",
                     "sensor_descr": "alarm : Binary 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -940,6 +974,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpAlarmState"
                 },
                 {
@@ -950,7 +985,7 @@
                     "sensor_index": "inpAlarmState.4",
                     "sensor_type": "inpAlarmState",
                     "sensor_descr": "alarm : Binary 4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -964,6 +999,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpAlarmState"
                 },
                 {
@@ -974,7 +1010,7 @@
                     "sensor_index": "inpAlarmState.5",
                     "sensor_type": "inpAlarmState",
                     "sensor_descr": "alarm : Binary 5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -988,6 +1024,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpAlarmState"
                 },
                 {
@@ -998,7 +1035,7 @@
                     "sensor_index": "inpAlarmState.6",
                     "sensor_type": "inpAlarmState",
                     "sensor_descr": "alarm : Binary 6",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1012,6 +1049,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpAlarmState"
                 },
                 {
@@ -1022,7 +1060,7 @@
                     "sensor_index": "inpValue.1",
                     "sensor_type": "inpValue",
                     "sensor_descr": "Binary 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1036,6 +1074,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpValue"
                 },
                 {
@@ -1046,7 +1085,7 @@
                     "sensor_index": "inpValue.2",
                     "sensor_type": "inpValue",
                     "sensor_descr": "Binary 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1060,6 +1099,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpValue"
                 },
                 {
@@ -1070,7 +1110,7 @@
                     "sensor_index": "inpValue.3",
                     "sensor_type": "inpValue",
                     "sensor_descr": "Binary 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1084,6 +1124,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpValue"
                 },
                 {
@@ -1094,7 +1135,7 @@
                     "sensor_index": "inpValue.4",
                     "sensor_type": "inpValue",
                     "sensor_descr": "Binary 4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1108,6 +1149,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpValue"
                 },
                 {
@@ -1118,7 +1160,7 @@
                     "sensor_index": "inpValue.5",
                     "sensor_type": "inpValue",
                     "sensor_descr": "Binary 5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1132,6 +1174,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpValue"
                 },
                 {
@@ -1142,7 +1185,7 @@
                     "sensor_index": "inpValue.6",
                     "sensor_type": "inpValue",
                     "sensor_descr": "Binary 6",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1156,6 +1199,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inpValue"
                 },
                 {
@@ -1166,7 +1210,7 @@
                     "sensor_index": "sensState.1",
                     "sensor_type": "sensName",
                     "sensor_descr": "H.Servidores",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1180,6 +1224,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 1,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -1190,7 +1235,7 @@
                     "sensor_index": "sensState.2",
                     "sensor_type": "sensName",
                     "sensor_descr": "H.Network",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1204,6 +1249,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 1,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -1214,7 +1260,7 @@
                     "sensor_index": "sensState.3",
                     "sensor_type": "sensName",
                     "sensor_descr": "H.Ambiente",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1228,6 +1274,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 1,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -1238,7 +1285,7 @@
                     "sensor_index": "sensState.4",
                     "sensor_type": "sensName",
                     "sensor_descr": "H.C4c",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1252,6 +1299,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 1,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -1262,7 +1310,7 @@
                     "sensor_index": "sensState.5",
                     "sensor_type": "sensName",
                     "sensor_descr": "T.Network",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1276,6 +1324,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 1,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -1286,7 +1335,7 @@
                     "sensor_index": "sensState.6",
                     "sensor_type": "sensName",
                     "sensor_descr": "T.C4c",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1300,6 +1349,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 1,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -1310,7 +1360,7 @@
                     "sensor_index": "sensState.7",
                     "sensor_type": "sensName",
                     "sensor_descr": "T.Ambiente",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1324,6 +1374,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 1,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -1334,7 +1385,7 @@
                     "sensor_index": "sensState.8",
                     "sensor_type": "sensName",
                     "sensor_descr": "T.Servidores",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1348,6 +1399,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 1,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sensName"
                 },
                 {
@@ -1358,11 +1410,11 @@
                     "sensor_index": "sensTable.5",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "T.Network",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 24.9,
-                    "sensor_limit": 44.9,
+                    "sensor_current": 24.899999999999999,
+                    "sensor_limit": 44.899999999999999,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 14.9,
                     "sensor_limit_low_warn": null,
@@ -1372,6 +1424,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1382,13 +1435,13 @@
                     "sensor_index": "sensTable.6",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "T.C4c",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 31.1,
-                    "sensor_limit": 51.1,
+                    "sensor_current": 31.100000000000001,
+                    "sensor_limit": 51.100000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 21.1,
+                    "sensor_limit_low": 21.100000000000001,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1396,6 +1449,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1406,13 +1460,13 @@
                     "sensor_index": "sensTable.7",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "T.Ambiente",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 25.7,
-                    "sensor_limit": 45.7,
+                    "sensor_current": 25.699999999999999,
+                    "sensor_limit": 45.700000000000003,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 15.7,
+                    "sensor_limit_low": 15.699999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1420,6 +1474,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1430,11 +1485,11 @@
                     "sensor_index": "sensTable.8",
                     "sensor_type": "hwg-poseidon",
                     "sensor_descr": "T.Servidores",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 23.6,
-                    "sensor_limit": 43.6,
+                    "sensor_current": 23.600000000000001,
+                    "sensor_limit": 43.600000000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 13.6,
                     "sensor_limit_low_warn": null,
@@ -1444,6 +1499,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

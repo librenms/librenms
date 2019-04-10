@@ -3898,7 +3898,7 @@
                     "sensor_index": "hillstonePowerIndex.1",
                     "sensor_type": "hillstonePowerState",
                     "sensor_descr": "PS0",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -3912,6 +3912,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hillstonePowerState"
                 },
                 {
@@ -3922,7 +3923,7 @@
                     "sensor_index": "hillstonePowerIndex.2",
                     "sensor_type": "hillstonePowerState",
                     "sensor_descr": "PS1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -3936,6 +3937,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hillstonePowerState"
                 },
                 {
@@ -3946,7 +3948,7 @@
                     "sensor_index": "1",
                     "sensor_type": "stoneos",
                     "sensor_descr": "CPU",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 36,
@@ -3960,6 +3962,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3970,7 +3973,7 @@
                     "sensor_index": "2",
                     "sensor_type": "stoneos",
                     "sensor_descr": "Chassis_Outlet",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 35,
@@ -3984,6 +3987,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3994,7 +3998,7 @@
                     "sensor_index": "3",
                     "sensor_type": "stoneos",
                     "sensor_descr": "Chassis_Inlet",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
@@ -4008,6 +4012,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -4018,7 +4023,7 @@
                     "sensor_index": "4",
                     "sensor_type": "stoneos",
                     "sensor_descr": "Switch",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 68,
@@ -4032,6 +4037,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -4042,7 +4048,7 @@
                     "sensor_index": "5",
                     "sensor_type": "stoneos",
                     "sensor_descr": "Slot_Inlet",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 28,
@@ -4056,6 +4062,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

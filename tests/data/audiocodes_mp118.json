@@ -328,7 +328,7 @@
                     "sensor_index": "hookStatus0",
                     "sensor_type": "acAnalogFxsFxoHookState",
                     "sensor_descr": "FXS 0 (Fax, 9647)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -342,6 +342,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -352,7 +353,7 @@
                     "sensor_index": "hookStatus1",
                     "sensor_type": "acAnalogFxsFxoHookState",
                     "sensor_descr": "FXS 1 (Fax, 9702)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -366,6 +367,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -376,7 +378,7 @@
                     "sensor_index": "hookStatus2",
                     "sensor_type": "acAnalogFxsFxoHookState",
                     "sensor_descr": "FXS 2 (Fax, 9782)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -390,6 +392,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -400,7 +403,7 @@
                     "sensor_index": "hookStatus3",
                     "sensor_type": "acAnalogFxsFxoHookState",
                     "sensor_descr": "FXS 3 (Fax, 9785)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -414,6 +417,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -424,7 +428,7 @@
                     "sensor_index": "hookStatus4",
                     "sensor_type": "acAnalogFxsFxoHookState",
                     "sensor_descr": "FXS 4 (Fax, 9788)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -438,6 +442,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -448,7 +453,7 @@
                     "sensor_index": "hookStatus5",
                     "sensor_type": "acAnalogFxsFxoHookState",
                     "sensor_descr": "FXS 5 (Fax, 9798)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -462,6 +467,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -472,7 +478,7 @@
                     "sensor_index": "hookStatus6",
                     "sensor_type": "acAnalogFxsFxoHookState",
                     "sensor_descr": "FXS 6 (Fax, 9801)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -486,6 +492,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "acAnalogFxsFxoHookState"
                 },
                 {
@@ -496,7 +503,7 @@
                     "sensor_index": "hookStatus7",
                     "sensor_type": "acAnalogFxsFxoHookState",
                     "sensor_descr": "FXS 7 (Fax, 9806)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -510,6 +517,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "acAnalogFxsFxoHookState"
                 }
             ],

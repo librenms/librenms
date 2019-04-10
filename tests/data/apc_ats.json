@@ -478,7 +478,7 @@
                     "sensor_index": "atsStatusPhaseSyncStatus.0",
                     "sensor_type": "atsStatusPhaseSyncStatus",
                     "sensor_descr": "Phase Sync Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -492,6 +492,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "atsStatusPhaseSyncStatus"
                 },
                 {
@@ -502,7 +503,7 @@
                     "sensor_index": "atsStatusRedundancyState.0",
                     "sensor_type": "atsStatusRedundancyState",
                     "sensor_descr": "Redundancy State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -516,6 +517,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "atsStatusRedundancyState"
                 },
                 {
@@ -526,7 +528,7 @@
                     "sensor_index": "atsStatusSelectedSource.0",
                     "sensor_type": "atsStatusSelectedSource",
                     "sensor_descr": "Selected Source",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -540,6 +542,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "atsStatusSelectedSource"
                 },
                 {
@@ -550,7 +553,7 @@
                     "sensor_index": "atsStatusSourceAStatus.0",
                     "sensor_type": "atsStatusSourceAStatus",
                     "sensor_descr": "Source A Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -564,6 +567,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "atsStatusSourceAStatus"
                 },
                 {
@@ -574,7 +578,7 @@
                     "sensor_index": "atsStatusSourceBStatus.0",
                     "sensor_type": "atsStatusSourceBStatus",
                     "sensor_descr": "Source B Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -588,6 +592,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "atsStatusSourceBStatus"
                 },
                 {
@@ -598,7 +603,7 @@
                     "sensor_index": "atsStatusSwitchStatus.0",
                     "sensor_type": "atsStatusSwitchStatus",
                     "sensor_descr": "Global Switch Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -612,6 +617,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "atsStatusSwitchStatus"
                 }
             ],

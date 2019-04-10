@@ -48,7 +48,7 @@
                     "sensor_index": "cooling-capacity.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Free Cooling Capacity",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 100,
                     "sensor_current": 33900,
@@ -62,6 +62,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -72,7 +73,7 @@
                     "sensor_index": "freecooling-capacity.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Compressor Cooling Capacity",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 100,
                     "sensor_current": 0,
@@ -86,6 +87,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -96,7 +98,7 @@
                     "sensor_index": "total-capacity.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Total cooling Capacity",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 100,
                     "sensor_current": 33900,
@@ -110,6 +112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -120,7 +123,7 @@
                     "sensor_index": "amp-value.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Current Consumption",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -134,6 +137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -144,7 +148,7 @@
                     "sensor_index": "analogObjects.120.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Energy Efficiency Ratio",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -158,6 +162,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -168,7 +173,7 @@
                     "sensor_index": "pp1.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Hydraulic Pump 1 Speed",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 100,
@@ -182,6 +187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -192,7 +198,7 @@
                     "sensor_index": "pp2.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Hydraulic Pump 2 Speed",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -206,6 +212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -216,7 +223,7 @@
                     "sensor_index": "analogObjects.103.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Power Consumption",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 100,
                     "sensor_current": 700,
@@ -230,6 +237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -240,7 +248,7 @@
                     "sensor_index": "analogObjects.133.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Hydraulic Pressure (Discharge)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 10,
                     "sensor_current": 370,
@@ -254,6 +262,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -264,7 +273,7 @@
                     "sensor_index": "analogObjects.138.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Hydraulic Pressure (Suction)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 10,
                     "sensor_current": 160,
@@ -278,6 +287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -288,7 +298,7 @@
                     "sensor_index": "pressione1.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Condensation Pressure 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 10,
                     "sensor_current": 700,
@@ -302,6 +312,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -312,7 +323,7 @@
                     "sensor_index": "pressione2.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Condensation Pressure 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 10,
                     "sensor_current": 0,
@@ -326,6 +337,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -336,7 +348,7 @@
                     "sensor_index": "analogObjects.136.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Temperature In",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 18,
@@ -350,6 +362,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -360,13 +373,13 @@
                     "sensor_index": "analogObjects.137.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Temperature Out",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 17.9,
-                    "sensor_limit": 37.9,
+                    "sensor_current": 17.899999999999999,
+                    "sensor_limit": 37.899999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 7.9,
+                    "sensor_limit_low": 7.9000000000000004,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -374,6 +387,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -384,13 +398,13 @@
                     "sensor_index": "analogObjects.140.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Temperature Ambient",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.6,
-                    "sensor_limit": 23.6,
+                    "sensor_current": 3.6000000000000001,
+                    "sensor_limit": 23.600000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": -6.4,
+                    "sensor_limit_low": -6.4000000000000004,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -398,6 +412,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -408,10 +423,10 @@
                     "sensor_index": "flow-value.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Water Flow Rate",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 141.3,
+                    "sensor_current": 141.30000000000001,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -422,6 +437,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],
@@ -437,7 +453,7 @@
                     "sensor_index": "cooling-capacity.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Free Cooling Capacity",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 100,
                     "sensor_current": 33900,
@@ -451,6 +467,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -461,7 +478,7 @@
                     "sensor_index": "freecooling-capacity.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Compressor Cooling Capacity",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 100,
                     "sensor_current": 0,
@@ -475,6 +492,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -485,7 +503,7 @@
                     "sensor_index": "total-capacity.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Total cooling Capacity",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 100,
                     "sensor_current": 33900,
@@ -499,6 +517,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -509,7 +528,7 @@
                     "sensor_index": "amp-value.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Current Consumption",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -523,6 +542,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -533,7 +553,7 @@
                     "sensor_index": "analogObjects.120.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Energy Efficiency Ratio",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 48,
@@ -547,6 +567,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -557,7 +578,7 @@
                     "sensor_index": "pp1.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Hydraulic Pump 1 Speed",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 100,
@@ -571,6 +592,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -581,7 +603,7 @@
                     "sensor_index": "pp2.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Hydraulic Pump 2 Speed",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -595,6 +617,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -605,7 +628,7 @@
                     "sensor_index": "analogObjects.103.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Power Consumption",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 100,
                     "sensor_current": 700,
@@ -619,6 +642,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -629,7 +653,7 @@
                     "sensor_index": "analogObjects.133.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Hydraulic Pressure (Discharge)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 10,
                     "sensor_current": 370,
@@ -643,6 +667,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -653,7 +678,7 @@
                     "sensor_index": "analogObjects.138.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Hydraulic Pressure (Suction)",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 10,
                     "sensor_current": 160,
@@ -667,6 +692,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -677,7 +703,7 @@
                     "sensor_index": "pressione1.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Condensation Pressure 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 10,
                     "sensor_current": 700,
@@ -691,6 +717,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -701,7 +728,7 @@
                     "sensor_index": "pressione2.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Condensation Pressure 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 10,
                     "sensor_current": 0,
@@ -715,6 +742,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -725,7 +753,7 @@
                     "sensor_index": "analogObjects.136.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Temperature In",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 18,
@@ -739,6 +767,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -749,13 +778,13 @@
                     "sensor_index": "analogObjects.137.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Temperature Out",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 17.9,
-                    "sensor_limit": 37.9,
+                    "sensor_current": 17.899999999999999,
+                    "sensor_limit": 37.899999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 7.9,
+                    "sensor_limit_low": 7.9000000000000004,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -763,6 +792,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -773,13 +803,13 @@
                     "sensor_index": "analogObjects.140.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Temperature Ambient",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.6,
-                    "sensor_limit": 23.6,
+                    "sensor_current": 3.6000000000000001,
+                    "sensor_limit": 23.600000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": -6.4,
+                    "sensor_limit_low": -6.4000000000000004,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -787,6 +817,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -797,10 +828,10 @@
                     "sensor_index": "flow-value.0",
                     "sensor_type": "pcoweb-rittalchiller",
                     "sensor_descr": "Water Flow Rate",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 141.3,
+                    "sensor_current": 141.30000000000001,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -811,6 +842,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

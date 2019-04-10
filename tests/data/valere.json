@@ -282,6 +282,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -295,7 +296,7 @@
                     "group": "Shelf 1",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 9.11,
+                    "sensor_current": 9.1099999999999994,
                     "sensor_limit": 52.5,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -306,6 +307,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -319,7 +321,7 @@
                     "group": "Shelf 1",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 9.07,
+                    "sensor_current": 9.0700000000000003,
                     "sensor_limit": 52.5,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -330,6 +332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -354,6 +357,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "vpwrModuleOperStatus"
                 },
                 {
@@ -378,6 +382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "vpwrModuleOperStatus"
                 },
                 {
@@ -402,6 +407,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "vpwrSystemControllerState"
                 },
                 {
@@ -426,6 +432,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "vpwrSystemTempCompensationState"
                 },
                 {
@@ -450,6 +457,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -474,6 +482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -488,9 +497,9 @@
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
                     "sensor_current": 54,
-                    "sensor_limit": 62.1,
+                    "sensor_limit": 62.100000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 45.9,
+                    "sensor_limit_low": 45.899999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -498,6 +507,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

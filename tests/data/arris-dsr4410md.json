@@ -62,6 +62,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "acquisitionState"
                 }
             ],
@@ -113,7 +114,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1166.1.621.11.8.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1166.1.621.11.8.0\"]",
+                    "sensor_offset": 0
                 },
                 {
                     "sensor_deleted": 0,
@@ -124,7 +126,7 @@
                     "sensor_divisor": 10,
                     "sensor_multiplier": 0,
                     "sensor_aggregator": "sum",
-                    "sensor_current": 18.2,
+                    "sensor_current": 18.199999999999999,
                     "sensor_prev": null,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
@@ -134,7 +136,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1166.1.621.16.6.8.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1166.1.621.16.6.8.0\"]",
+                    "sensor_offset": 0
                 },
                 {
                     "sensor_deleted": 0,
@@ -155,7 +158,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1166.1.621.11.9.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1166.1.621.11.9.0\"]",
+                    "sensor_offset": 0
                 }
             ]
         },
@@ -180,7 +184,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1166.1.621.11.8.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1166.1.621.11.8.0\"]",
+                    "sensor_offset": 0
                 },
                 {
                     "sensor_deleted": 0,
@@ -191,8 +196,8 @@
                     "sensor_divisor": 10,
                     "sensor_multiplier": 0,
                     "sensor_aggregator": "sum",
-                    "sensor_current": 18.2,
-                    "sensor_prev": 18.2,
+                    "sensor_current": 18.199999999999999,
+                    "sensor_prev": 18.199999999999999,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -201,7 +206,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1166.1.621.16.6.8.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1166.1.621.16.6.8.0\"]",
+                    "sensor_offset": 0
                 },
                 {
                     "sensor_deleted": 0,
@@ -222,7 +228,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1166.1.621.11.9.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1166.1.621.11.9.0\"]",
+                    "sensor_offset": 0
                 }
             ]
         }

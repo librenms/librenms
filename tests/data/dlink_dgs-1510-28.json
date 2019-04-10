@@ -8168,7 +8168,7 @@
                     "sensor_index": "dEntityExtEnvFanStatus.1.7",
                     "sensor_type": "dEntityExtEnvFanTable",
                     "sensor_descr": "Right Fan",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -8182,6 +8182,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dEntityExtEnvFanTable"
                 },
                 {
@@ -8192,7 +8193,7 @@
                     "sensor_index": "dEntityExtEnvPowerStatus.1.1",
                     "sensor_type": "dEntityExtEnvPowerTable",
                     "sensor_descr": "Power 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -8206,6 +8207,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dEntityExtEnvPowerTable"
                 },
                 {
@@ -8216,7 +8218,7 @@
                     "sensor_index": "dEntityExtEnvPowerStatus.1.2",
                     "sensor_type": "dEntityExtEnvPowerTable",
                     "sensor_descr": "Power 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -8230,6 +8232,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dEntityExtEnvPowerTable"
                 },
                 {
@@ -8240,7 +8243,7 @@
                     "sensor_index": "dEntityExtEnvTempStatus.1.1",
                     "sensor_type": "dEntityExtEnvTempTable",
                     "sensor_descr": "Center",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -8254,6 +8257,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dEntityExtEnvTempTable"
                 },
                 {
@@ -8264,7 +8268,7 @@
                     "sensor_index": "dEntityExtEnvTempCurrent.1.1",
                     "sensor_type": "dlink",
                     "sensor_descr": "$dEntityExtEnvTempDescr",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 30,
@@ -8278,6 +8282,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

@@ -3838,7 +3838,7 @@
                     "sensor_index": "oKstatus.0",
                     "sensor_type": "oKstatus",
                     "sensor_descr": "Ok Relay",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -3852,6 +3852,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "oKstatus"
                 },
                 {
@@ -3862,7 +3863,7 @@
                     "sensor_index": "p1status.0",
                     "sensor_type": "p1status",
                     "sensor_descr": "Power Supply #1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -3876,6 +3877,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "p1status"
                 },
                 {
@@ -3886,7 +3888,7 @@
                     "sensor_index": "p2status.0",
                     "sensor_type": "p2status",
                     "sensor_descr": "Power Supply #2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -3900,6 +3902,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "p2status"
                 }
             ],

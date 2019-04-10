@@ -1036,6 +1036,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "bcnDhcpv4SerOperState"
                 },
                 {
@@ -1060,6 +1061,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "bcnDnsSerOperState"
                 },
                 {
@@ -1084,6 +1086,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "bcnHaSerOperState"
                 },
                 {
@@ -1108,6 +1111,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "bcnNtpSerOperState"
                 }
             ],
@@ -1306,6 +1310,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "bcnDhcpv4SerOperState"
                 },
                 {
@@ -1330,6 +1335,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "bcnDnsSerOperState"
                 },
                 {
@@ -1354,6 +1360,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "bcnHaSerOperState"
                 },
                 {
@@ -1378,6 +1385,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 1,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "bcnNtpSerOperState"
                 }
             ],

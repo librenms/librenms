@@ -28,7 +28,7 @@
                     "sensor_index": "hpicfPsWattageCur.1",
                     "sensor_type": "procurve",
                     "sensor_descr": "Power Supply #1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 48,
@@ -42,6 +42,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -52,7 +53,7 @@
                     "sensor_index": "hpicfPsWattageCur.2",
                     "sensor_type": "procurve",
                     "sensor_descr": "Power Supply #2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 45,
@@ -66,6 +67,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -76,7 +78,7 @@
                     "sensor_index": "hpicfFanState.1",
                     "sensor_type": "hpicfFanState",
                     "sensor_descr": "Fan #1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 5,
@@ -90,6 +92,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hpicfFanState"
                 },
                 {
@@ -100,7 +103,7 @@
                     "sensor_index": "hpicfFanState.2",
                     "sensor_type": "hpicfFanState",
                     "sensor_descr": "Fan #2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 5,
@@ -114,6 +117,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hpicfFanState"
                 },
                 {
@@ -124,7 +128,7 @@
                     "sensor_index": "hpicfFanState.3",
                     "sensor_type": "hpicfFanState",
                     "sensor_descr": "Fan #3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 5,
@@ -138,6 +142,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hpicfFanState"
                 },
                 {
@@ -148,7 +153,7 @@
                     "sensor_index": "hpicfFanState.4",
                     "sensor_type": "hpicfFanState",
                     "sensor_descr": "Fan #4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 5,
@@ -162,6 +167,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hpicfFanState"
                 },
                 {
@@ -172,7 +178,7 @@
                     "sensor_index": "hpicfFanState.5",
                     "sensor_type": "hpicfFanState",
                     "sensor_descr": "Fan #5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 5,
@@ -186,6 +192,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hpicfFanState"
                 },
                 {
@@ -196,7 +203,7 @@
                     "sensor_index": "hpicfFanState.6",
                     "sensor_type": "hpicfFanState",
                     "sensor_descr": "Fan #6",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 5,
@@ -210,6 +217,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hpicfFanState"
                 },
                 {
@@ -220,7 +228,7 @@
                     "sensor_index": "hpicfPsState.1",
                     "sensor_type": "hpicfPsState",
                     "sensor_descr": "Power Supply #1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -234,6 +242,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hpicfPsState"
                 },
                 {
@@ -244,7 +253,7 @@
                     "sensor_index": "hpicfPsState.2",
                     "sensor_type": "hpicfPsState",
                     "sensor_descr": "Power Supply #2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -258,6 +267,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "hpicfPsState"
                 },
                 {
@@ -282,6 +292,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "icfFanSensor"
                 },
                 {
@@ -306,6 +317,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "icfTemperatureSensor"
                 },
                 {
@@ -330,6 +342,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -340,7 +353,7 @@
                     "sensor_index": "hpicfPsTemp.1",
                     "sensor_type": "procurve",
                     "sensor_descr": "Power Supply #1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
@@ -354,6 +367,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -364,7 +378,7 @@
                     "sensor_index": "hpicfPsTemp.2",
                     "sensor_type": "procurve",
                     "sensor_descr": "Power Supply #2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 29,
@@ -378,6 +392,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

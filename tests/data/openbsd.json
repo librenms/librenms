@@ -48,7 +48,7 @@
                     "sensor_index": "16",
                     "sensor_type": "carpIfTable",
                     "sensor_descr": "CARP - vlan12",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -62,6 +62,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "carpIfTable"
                 },
                 {
@@ -72,7 +73,7 @@
                     "sensor_index": "17",
                     "sensor_type": "carpIfTable",
                     "sensor_descr": "CARP - vlan34",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -86,6 +87,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "carpIfTable"
                 },
                 {
@@ -110,6 +112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -123,8 +126,8 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 8.3,
-                    "sensor_limit": 28.3,
+                    "sensor_current": 8.3000000000000007,
+                    "sensor_limit": 28.300000000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -1.7,
                     "sensor_limit_low_warn": null,
@@ -134,6 +137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

@@ -2287,6 +2287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2311,6 +2312,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2335,6 +2337,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2359,6 +2362,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2383,6 +2387,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2407,6 +2412,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2431,6 +2437,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2455,6 +2462,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2479,6 +2487,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2503,6 +2512,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2527,6 +2537,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2537,7 +2548,7 @@
                     "sensor_index": "haCurState.0",
                     "sensor_type": "haCurState",
                     "sensor_descr": "Current HA state",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -2551,6 +2562,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "haCurState"
                 },
                 {
@@ -2561,7 +2573,7 @@
                     "sensor_index": "haCurStatus.0",
                     "sensor_type": "haCurStatus",
                     "sensor_descr": "Configured for HA",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -2575,6 +2587,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "haCurStatus"
                 },
                 {
@@ -2585,7 +2598,7 @@
                     "sensor_index": "haPeerState.0",
                     "sensor_type": "haPeerState",
                     "sensor_descr": "Peer HA mode",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -2599,6 +2612,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "haPeerState"
                 },
                 {
@@ -2609,7 +2623,7 @@
                     "sensor_index": "sysHighAvailabilityMode.0",
                     "sensor_type": "sysHighAvailabilityMode",
                     "sensor_descr": "Current HA mode",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -2623,6 +2637,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "sysHighAvailabilityMode"
                 },
                 {
@@ -2647,6 +2662,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2671,6 +2687,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2695,6 +2712,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2719,6 +2737,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2743,6 +2762,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2767,6 +2787,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2791,6 +2812,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2815,6 +2837,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2839,6 +2862,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2853,7 +2877,7 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 0,
                     "sensor_current": 12.084,
-                    "sensor_limit": 13.8966,
+                    "sensor_limit": 13.896599999999999,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 10.2714,
                     "sensor_limit_low_warn": null,
@@ -2863,6 +2887,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2876,10 +2901,10 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 0,
-                    "sensor_current": 5.216,
-                    "sensor_limit": 5.9984,
+                    "sensor_current": 5.2160000000000002,
+                    "sensor_limit": 5.9984000000000002,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 4.4336,
+                    "sensor_limit_low": 4.4336000000000002,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -2887,6 +2912,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2911,6 +2937,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2935,6 +2962,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2959,6 +2987,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -2983,6 +3012,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3007,6 +3037,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3031,6 +3062,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3055,6 +3087,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3079,6 +3112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3092,8 +3126,8 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 0,
-                    "sensor_current": 3.088,
-                    "sensor_limit": 3.5512,
+                    "sensor_current": 3.0880000000000001,
+                    "sensor_limit": 3.5512000000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 2.6248,
                     "sensor_limit_low_warn": null,
@@ -3103,6 +3137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3116,8 +3151,8 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 0,
-                    "sensor_current": 1.184,
-                    "sensor_limit": 1.3616,
+                    "sensor_current": 1.1839999999999999,
+                    "sensor_limit": 1.3615999999999999,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 1.0064,
                     "sensor_limit_low_warn": null,
@@ -3127,6 +3162,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3151,6 +3187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3175,6 +3212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3188,10 +3226,10 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 0,
-                    "sensor_current": 3.376,
-                    "sensor_limit": 3.8824,
+                    "sensor_current": 3.3759999999999999,
+                    "sensor_limit": 3.8824000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.8696,
+                    "sensor_limit_low": 2.8696000000000002,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -3199,6 +3237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3212,10 +3251,10 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 0,
-                    "sensor_current": 0.003,
-                    "sensor_limit": 0.00345,
+                    "sensor_current": 0.0030000000000000001,
+                    "sensor_limit": 0.0034499999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 0.00255,
+                    "sensor_limit_low": 0.0025500000000000002,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -3223,6 +3262,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3236,10 +3276,10 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 0,
-                    "sensor_current": 0.003,
-                    "sensor_limit": 0.00345,
+                    "sensor_current": 0.0030000000000000001,
+                    "sensor_limit": 0.0034499999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 0.00255,
+                    "sensor_limit_low": 0.0025500000000000002,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -3247,6 +3287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3271,6 +3312,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3295,6 +3337,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3319,6 +3362,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3332,10 +3376,10 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 0,
-                    "sensor_current": 3.376,
-                    "sensor_limit": 3.8824,
+                    "sensor_current": 3.3759999999999999,
+                    "sensor_limit": 3.8824000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 2.8696,
+                    "sensor_limit_low": 2.8696000000000002,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -3343,6 +3387,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -3356,8 +3401,8 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 0,
-                    "sensor_current": 3.392,
-                    "sensor_limit": 3.9008,
+                    "sensor_current": 3.3919999999999999,
+                    "sensor_limit": 3.9007999999999998,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 2.8832,
                     "sensor_limit_low_warn": null,
@@ -3367,6 +3412,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

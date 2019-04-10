@@ -48,11 +48,11 @@
                     "sensor_index": "st4LineCurrent.1.1.1",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Line, AA:L1, Current",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 5.6,
-                    "sensor_limit": 8.4,
+                    "sensor_current": 5.5999999999999996,
+                    "sensor_limit": 8.4000000000000004,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -62,6 +62,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -72,11 +73,11 @@
                     "sensor_index": "st4LineCurrent.1.1.2",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Line, AA:L2, Current",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.69,
-                    "sensor_limit": 5.535,
+                    "sensor_current": 3.6899999999999999,
+                    "sensor_limit": 5.5350000000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -86,6 +87,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -96,11 +98,11 @@
                     "sensor_index": "st4LineCurrent.1.1.3",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Line, AA:L3, Current",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 5.6,
-                    "sensor_limit": 8.4,
+                    "sensor_current": 5.5999999999999996,
+                    "sensor_limit": 8.4000000000000004,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -110,6 +112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -120,11 +123,11 @@
                     "sensor_index": "st4PhaseCurrent.1.1.1",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Phase, AA:L1-L2, Current",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 2.09,
-                    "sensor_limit": 3.135,
+                    "sensor_current": 2.0899999999999999,
+                    "sensor_limit": 3.1349999999999998,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -134,6 +137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -144,11 +148,11 @@
                     "sensor_index": "st4PhaseCurrent.1.1.2",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Phase, AA:L2-L3, Current",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
-                    "sensor_current": 2.22,
-                    "sensor_limit": 3.33,
+                    "sensor_current": 2.2200000000000002,
+                    "sensor_limit": 3.3300000000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -158,6 +162,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -168,11 +173,11 @@
                     "sensor_index": "st4PhaseCurrent.1.1.3",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Phase, AA:L3-L1, Current",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
                     "sensor_current": 4.29,
-                    "sensor_limit": 6.435,
+                    "sensor_limit": 6.4349999999999996,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -182,6 +187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -192,7 +198,7 @@
                     "sensor_index": "st4InputCord.1.1",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Line, Master_Cord_A, Frequency",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 60,
@@ -206,6 +212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -216,7 +223,7 @@
                     "sensor_index": "st4InputCord.1.1",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Cord, Master_Cord_A, Active Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1701,
@@ -230,6 +237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -240,7 +248,7 @@
                     "sensor_index": "st4PhaseActivePower.1.1.1",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Phase, AA:L1-L2, Active Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 415,
@@ -254,6 +262,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -264,7 +273,7 @@
                     "sensor_index": "st4PhaseActivePower.1.1.2",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Phase, AA:L2-L3, Active Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 444,
@@ -278,6 +287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -288,7 +298,7 @@
                     "sensor_index": "st4PhaseActivePower.1.1.3",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Phase, AA:L3-L1, Active Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 848,
@@ -302,6 +312,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -312,7 +323,7 @@
                     "sensor_index": "st4BranchCurrentStatus.1.1.1",
                     "sensor_type": "st4BranchCurrentStatus",
                     "sensor_descr": "Branch Current AA:L1-L2-BR1 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -326,6 +337,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4BranchCurrentStatus"
                 },
                 {
@@ -336,7 +348,7 @@
                     "sensor_index": "st4BranchCurrentStatus.1.1.2",
                     "sensor_type": "st4BranchCurrentStatus",
                     "sensor_descr": "Branch Current AA:L2-L3-BR2 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -350,6 +362,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4BranchCurrentStatus"
                 },
                 {
@@ -360,7 +373,7 @@
                     "sensor_index": "st4BranchCurrentStatus.1.1.3",
                     "sensor_type": "st4BranchCurrentStatus",
                     "sensor_descr": "Branch Current AA:L3-L1-BR3 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -374,6 +387,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4BranchCurrentStatus"
                 },
                 {
@@ -384,7 +398,7 @@
                     "sensor_index": "st4BranchState.1.1.1",
                     "sensor_type": "st4BranchState",
                     "sensor_descr": "Branch AA:L1-L2-BR1 State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -398,6 +412,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4BranchState"
                 },
                 {
@@ -408,7 +423,7 @@
                     "sensor_index": "st4BranchState.1.1.2",
                     "sensor_type": "st4BranchState",
                     "sensor_descr": "Branch AA:L2-L3-BR2 State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -422,6 +437,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4BranchState"
                 },
                 {
@@ -432,7 +448,7 @@
                     "sensor_index": "st4BranchState.1.1.3",
                     "sensor_type": "st4BranchState",
                     "sensor_descr": "Branch AA:L3-L1-BR3 State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -446,6 +462,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4BranchState"
                 },
                 {
@@ -456,7 +473,7 @@
                     "sensor_index": "st4BranchStatus.1.1.1",
                     "sensor_type": "st4BranchStatus",
                     "sensor_descr": "Branch AA:L1-L2-BR1 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -470,6 +487,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4BranchStatus"
                 },
                 {
@@ -480,7 +498,7 @@
                     "sensor_index": "st4BranchStatus.1.1.2",
                     "sensor_type": "st4BranchStatus",
                     "sensor_descr": "Branch AA:L2-L3-BR2 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -494,6 +512,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4BranchStatus"
                 },
                 {
@@ -504,7 +523,7 @@
                     "sensor_index": "st4BranchStatus.1.1.3",
                     "sensor_type": "st4BranchStatus",
                     "sensor_descr": "Branch AA:L3-L1-BR3 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -518,6 +537,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4BranchStatus"
                 },
                 {
@@ -528,7 +548,7 @@
                     "sensor_index": "st4InputCordActivePowerStatus.1.1",
                     "sensor_type": "st4InputCordActivePowerStatus",
                     "sensor_descr": "Input Cord Active Power Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -542,6 +562,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4InputCordActivePowerStatus"
                 },
                 {
@@ -552,7 +573,7 @@
                     "sensor_index": "st4InputCordApparentPowerStatus.1.1",
                     "sensor_type": "st4InputCordApparentPowerStatus",
                     "sensor_descr": "Input Cord Apparent Power Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -566,6 +587,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4InputCordApparentPowerStatus"
                 },
                 {
@@ -576,7 +598,7 @@
                     "sensor_index": "st4InputCordOutOfBalanceStatus.1.1",
                     "sensor_type": "st4InputCordOutOfBalanceStatus",
                     "sensor_descr": "Input Out Of Balance Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -590,6 +612,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4InputCordOutOfBalanceStatus"
                 },
                 {
@@ -600,7 +623,7 @@
                     "sensor_index": "st4InputCordPowerFactorStatus.1.1",
                     "sensor_type": "st4InputCordPowerFactorStatus",
                     "sensor_descr": "Input Cord Power Factor Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -614,6 +637,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4InputCordPowerFactorStatus"
                 },
                 {
@@ -624,7 +648,7 @@
                     "sensor_index": "st4InputCordState.1.1",
                     "sensor_type": "st4InputCordState",
                     "sensor_descr": "Input Cord State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -638,6 +662,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4InputCordState"
                 },
                 {
@@ -648,7 +673,7 @@
                     "sensor_index": "st4InputCordStatus.1.1",
                     "sensor_type": "st4InputCordStatus",
                     "sensor_descr": "Input Cord Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -662,6 +687,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4InputCordStatus"
                 },
                 {
@@ -672,7 +698,7 @@
                     "sensor_index": "st4LineState.1.1.1",
                     "sensor_type": "st4LineState",
                     "sensor_descr": "Line AA:L1 State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -686,6 +712,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4LineState"
                 },
                 {
@@ -696,7 +723,7 @@
                     "sensor_index": "st4LineState.1.1.2",
                     "sensor_type": "st4LineState",
                     "sensor_descr": "Line AA:L2 State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -710,6 +737,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4LineState"
                 },
                 {
@@ -720,7 +748,7 @@
                     "sensor_index": "st4LineState.1.1.3",
                     "sensor_type": "st4LineState",
                     "sensor_descr": "Line AA:L3 State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -734,6 +762,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4LineState"
                 },
                 {
@@ -744,7 +773,7 @@
                     "sensor_index": "st4LineStatus.1.1.1",
                     "sensor_type": "st4LineStatus",
                     "sensor_descr": "Line AA:L1 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -758,6 +787,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4LineStatus"
                 },
                 {
@@ -768,7 +798,7 @@
                     "sensor_index": "st4LineStatus.1.1.2",
                     "sensor_type": "st4LineStatus",
                     "sensor_descr": "Line AA:L2 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -782,6 +812,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4LineStatus"
                 },
                 {
@@ -792,7 +823,7 @@
                     "sensor_index": "st4LineStatus.1.1.3",
                     "sensor_type": "st4LineStatus",
                     "sensor_descr": "Line AA:L3 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -806,6 +837,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4LineStatus"
                 },
                 {
@@ -816,7 +848,7 @@
                     "sensor_index": "st4OcpStatus.1.1.1",
                     "sensor_type": "st4OcpStatus",
                     "sensor_descr": "Over-current Protector AA:L1-L2-BR1 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -830,6 +862,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4OcpStatus"
                 },
                 {
@@ -840,7 +873,7 @@
                     "sensor_index": "st4OcpStatus.1.1.2",
                     "sensor_type": "st4OcpStatus",
                     "sensor_descr": "Over-current Protector AA:L2-L3-BR2 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -854,6 +887,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4OcpStatus"
                 },
                 {
@@ -864,7 +898,7 @@
                     "sensor_index": "st4OcpStatus.1.1.3",
                     "sensor_type": "st4OcpStatus",
                     "sensor_descr": "Over-current Protector AA:L3-L1-BR3 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -878,6 +912,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4OcpStatus"
                 },
                 {
@@ -888,7 +923,7 @@
                     "sensor_index": "st4PhasePowerFactorStatus.1.1.1",
                     "sensor_type": "st4PhasePowerFactorStatus",
                     "sensor_descr": "Phase AA:L1-L2 Power Factor Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -902,6 +937,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4PhasePowerFactorStatus"
                 },
                 {
@@ -912,7 +948,7 @@
                     "sensor_index": "st4PhasePowerFactorStatus.1.1.2",
                     "sensor_type": "st4PhasePowerFactorStatus",
                     "sensor_descr": "Phase AA:L2-L3 Power Factor Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -926,6 +962,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4PhasePowerFactorStatus"
                 },
                 {
@@ -936,7 +973,7 @@
                     "sensor_index": "st4PhasePowerFactorStatus.1.1.3",
                     "sensor_type": "st4PhasePowerFactorStatus",
                     "sensor_descr": "Phase AA:L3-L1 Power Factor Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -950,6 +987,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4PhasePowerFactorStatus"
                 },
                 {
@@ -960,7 +998,7 @@
                     "sensor_index": "st4PhaseState.1.1.1",
                     "sensor_type": "st4PhaseState",
                     "sensor_descr": "Phase AA:L1-L2 State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -974,6 +1012,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4PhaseState"
                 },
                 {
@@ -984,7 +1023,7 @@
                     "sensor_index": "st4PhaseState.1.1.2",
                     "sensor_type": "st4PhaseState",
                     "sensor_descr": "Phase AA:L2-L3 State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -998,6 +1037,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4PhaseState"
                 },
                 {
@@ -1008,7 +1048,7 @@
                     "sensor_index": "st4PhaseState.1.1.3",
                     "sensor_type": "st4PhaseState",
                     "sensor_descr": "Phase AA:L3-L1 State",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1022,6 +1062,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4PhaseState"
                 },
                 {
@@ -1032,7 +1073,7 @@
                     "sensor_index": "st4PhaseStatus.1.1.1",
                     "sensor_type": "st4PhaseStatus",
                     "sensor_descr": "Phase AA:L1-L2 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1046,6 +1087,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4PhaseStatus"
                 },
                 {
@@ -1056,7 +1098,7 @@
                     "sensor_index": "st4PhaseStatus.1.1.2",
                     "sensor_type": "st4PhaseStatus",
                     "sensor_descr": "Phase AA:L2-L3 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1070,6 +1112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4PhaseStatus"
                 },
                 {
@@ -1080,7 +1123,7 @@
                     "sensor_index": "st4PhaseStatus.1.1.3",
                     "sensor_type": "st4PhaseStatus",
                     "sensor_descr": "Phase AA:L3-L1 Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1094,6 +1137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4PhaseStatus"
                 },
                 {
@@ -1104,7 +1148,7 @@
                     "sensor_index": "st4PhaseVoltageStatus.1.1.1",
                     "sensor_type": "st4PhaseVoltageStatus",
                     "sensor_descr": "Phase AA:L1-L2 Voltage Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1118,6 +1162,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4PhaseVoltageStatus"
                 },
                 {
@@ -1128,7 +1173,7 @@
                     "sensor_index": "st4PhaseVoltageStatus.1.1.2",
                     "sensor_type": "st4PhaseVoltageStatus",
                     "sensor_descr": "Phase AA:L2-L3 Voltage Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1142,6 +1187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4PhaseVoltageStatus"
                 },
                 {
@@ -1152,7 +1198,7 @@
                     "sensor_index": "st4PhaseVoltageStatus.1.1.3",
                     "sensor_type": "st4PhaseVoltageStatus",
                     "sensor_descr": "Phase AA:L3-L1 Voltage Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1166,6 +1212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4PhaseVoltageStatus"
                 },
                 {
@@ -1176,7 +1223,7 @@
                     "sensor_index": "st4UnitStatus.1",
                     "sensor_type": "st4UnitStatus",
                     "sensor_descr": "Unit Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1190,6 +1237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "st4UnitStatus"
                 },
                 {
@@ -1200,11 +1248,11 @@
                     "sensor_index": "st4PhaseVoltage.1.1.1",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Phase, AA:L1-L2, Voltage",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 207.9,
-                    "sensor_limit": 239.085,
+                    "sensor_current": 207.90000000000001,
+                    "sensor_limit": 239.08500000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 176.715,
                     "sensor_limit_low_warn": null,
@@ -1214,6 +1262,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1224,11 +1273,11 @@
                     "sensor_index": "st4PhaseVoltage.1.1.2",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Phase, AA:L2-L3, Voltage",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 208.9,
-                    "sensor_limit": 240.235,
+                    "sensor_current": 208.90000000000001,
+                    "sensor_limit": 240.23500000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 177.565,
                     "sensor_limit_low_warn": null,
@@ -1238,6 +1287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1248,13 +1298,13 @@
                     "sensor_index": "st4PhaseVoltage.1.1.3",
                     "sensor_type": "sentry4",
                     "sensor_descr": "Phase, AA:L3-L1, Voltage",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 209.4,
+                    "sensor_current": 209.40000000000001,
                     "sensor_limit": 240.81,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 177.99,
+                    "sensor_limit_low": 177.99000000000001,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1262,6 +1312,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

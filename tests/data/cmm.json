@@ -1213,7 +1213,7 @@
                     "sensor_index": "powerStatus.1",
                     "sensor_type": "CMM3-MIB::powerStatus",
                     "sensor_descr": "Power Status 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1227,6 +1227,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1237,7 +1238,7 @@
                     "sensor_index": "powerStatus.2",
                     "sensor_type": "CMM3-MIB::powerStatus",
                     "sensor_descr": "Power Status 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1251,6 +1252,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1261,7 +1263,7 @@
                     "sensor_index": "powerStatus.3",
                     "sensor_type": "CMM3-MIB::powerStatus",
                     "sensor_descr": "Power Status 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1275,6 +1277,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1285,7 +1288,7 @@
                     "sensor_index": "powerStatus.4",
                     "sensor_type": "CMM3-MIB::powerStatus",
                     "sensor_descr": "Power Status 4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1299,6 +1302,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1309,7 +1313,7 @@
                     "sensor_index": "powerStatus.5",
                     "sensor_type": "CMM3-MIB::powerStatus",
                     "sensor_descr": "Power Status 5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1323,6 +1327,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1333,7 +1338,7 @@
                     "sensor_index": "powerStatus.6",
                     "sensor_type": "CMM3-MIB::powerStatus",
                     "sensor_descr": "Power Status 6",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1347,6 +1352,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1357,7 +1363,7 @@
                     "sensor_index": "powerStatus.7",
                     "sensor_type": "CMM3-MIB::powerStatus",
                     "sensor_descr": "Power Status 7",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1371,6 +1377,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1381,7 +1388,7 @@
                     "sensor_index": "powerStatus.8",
                     "sensor_type": "CMM3-MIB::powerStatus",
                     "sensor_descr": "Power Status 8",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -1395,6 +1402,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "CMM3-MIB::powerStatus"
                 }
             ],

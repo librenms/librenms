@@ -1459,6 +1459,7 @@ sensors:
     - { Field: lastupdate, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
     - { Field: sensor_prev, Type: double, 'Null': true, Extra: '' }
     - { Field: user_func, Type: varchar(100), 'Null': true, Extra: '' }
+    - { Field: sensor_offset, Type: int(11), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sensor_id], Unique: true, Type: BTREE }
     sensor_host: { Name: sensor_host, Columns: [device_id], Unique: false, Type: BTREE }
@@ -1769,6 +1770,7 @@ wireless_sensors:
     - { Field: lastupdate, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
     - { Field: sensor_oids, Type: text, 'Null': false, Extra: '' }
     - { Field: access_point_id, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: sensor_offset, Type: int(11), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sensor_id], Unique: true, Type: BTREE }
     sensor_class: { Name: sensor_class, Columns: [sensor_class], Unique: false, Type: BTREE }

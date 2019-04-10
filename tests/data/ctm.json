@@ -48,7 +48,7 @@
                     "sensor_index": "portPwrM1.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Master 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 6.5,
@@ -62,6 +62,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -72,11 +73,11 @@
                     "sensor_index": "portPwrM2.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Master 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 5.8,
-                    "sensor_limit": 8.7,
+                    "sensor_current": 5.7999999999999998,
+                    "sensor_limit": 8.6999999999999993,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -86,6 +87,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -96,7 +98,7 @@
                     "sensor_index": "portPwrM3.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Master 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 11.5,
@@ -110,6 +112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -120,7 +123,7 @@
                     "sensor_index": "portPwrM4.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Master 4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -134,6 +137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -144,11 +148,11 @@
                     "sensor_index": "portPwrM5.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Master 5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 10.8,
-                    "sensor_limit": 16.2,
+                    "sensor_current": 10.800000000000001,
+                    "sensor_limit": 16.199999999999999,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -158,6 +162,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -168,7 +173,7 @@
                     "sensor_index": "portPwrM6.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Master 6",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -182,6 +187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -192,11 +198,11 @@
                     "sensor_index": "portPwrM7.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Master 7",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 12.6,
-                    "sensor_limit": 18.9,
+                    "sensor_limit": 18.899999999999999,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -206,6 +212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -216,7 +223,7 @@
                     "sensor_index": "portPwrM8.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Master 8",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -230,6 +237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -240,7 +248,7 @@
                     "sensor_index": "portPwrS1.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Slave 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 13,
@@ -254,6 +262,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -264,11 +273,11 @@
                     "sensor_index": "portPwrS2.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Slave 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 11.2,
-                    "sensor_limit": 16.8,
+                    "sensor_current": 11.199999999999999,
+                    "sensor_limit": 16.800000000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -278,6 +287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -288,7 +298,7 @@
                     "sensor_index": "portPwrS3.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Slave 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 12,
@@ -302,6 +312,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -312,7 +323,7 @@
                     "sensor_index": "portPwrS4.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Slave 4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 12.5,
@@ -326,6 +337,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -336,11 +348,11 @@
                     "sensor_index": "portPwrS5.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Slave 5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 11.3,
-                    "sensor_limit": 16.95,
+                    "sensor_current": 11.300000000000001,
+                    "sensor_limit": 16.949999999999999,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -350,6 +362,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -360,11 +373,11 @@
                     "sensor_index": "portPwrS6.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Slave 6",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 5.1,
-                    "sensor_limit": 7.65,
+                    "sensor_current": 5.0999999999999996,
+                    "sensor_limit": 7.6500000000000004,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -374,6 +387,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -384,11 +398,11 @@
                     "sensor_index": "portPwrS7.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Slave 7",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 5.9,
-                    "sensor_limit": 8.85,
+                    "sensor_current": 5.9000000000000004,
+                    "sensor_limit": 8.8499999999999996,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -398,6 +412,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -408,7 +423,7 @@
                     "sensor_index": "portPwrS8.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Port Power Slave 8",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 5.5,
@@ -422,6 +437,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -446,6 +462,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnM"
                 },
                 {
@@ -470,6 +487,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnM"
                 },
                 {
@@ -494,6 +512,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnM"
                 },
                 {
@@ -518,6 +537,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnM"
                 },
                 {
@@ -542,6 +562,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnM"
                 },
                 {
@@ -566,6 +587,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnM"
                 },
                 {
@@ -590,6 +612,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnM"
                 },
                 {
@@ -614,6 +637,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnM"
                 },
                 {
@@ -638,6 +662,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnS"
                 },
                 {
@@ -662,6 +687,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnS"
                 },
                 {
@@ -686,6 +712,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnS"
                 },
                 {
@@ -710,6 +737,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnS"
                 },
                 {
@@ -734,6 +762,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnS"
                 },
                 {
@@ -758,6 +787,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnS"
                 },
                 {
@@ -782,6 +812,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnS"
                 },
                 {
@@ -806,6 +837,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portOnS"
                 },
                 {
@@ -830,6 +862,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncM"
                 },
                 {
@@ -854,6 +887,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncM"
                 },
                 {
@@ -878,6 +912,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncM"
                 },
                 {
@@ -902,6 +937,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncM"
                 },
                 {
@@ -926,6 +962,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncM"
                 },
                 {
@@ -950,6 +987,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncM"
                 },
                 {
@@ -974,6 +1012,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncM"
                 },
                 {
@@ -998,6 +1037,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncM"
                 },
                 {
@@ -1022,6 +1062,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncS"
                 },
                 {
@@ -1046,6 +1087,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncS"
                 },
                 {
@@ -1070,6 +1112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncS"
                 },
                 {
@@ -1094,6 +1137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncS"
                 },
                 {
@@ -1118,6 +1162,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncS"
                 },
                 {
@@ -1142,6 +1187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncS"
                 },
                 {
@@ -1166,6 +1212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncS"
                 },
                 {
@@ -1190,6 +1237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "portSyncS"
                 },
                 {
@@ -1200,7 +1248,7 @@
                     "sensor_index": "0",
                     "sensor_type": "pwrP",
                     "sensor_descr": "Master Primary Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1214,6 +1262,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "pwrP"
                 },
                 {
@@ -1224,7 +1273,7 @@
                     "sensor_index": "0",
                     "sensor_type": "pwrS",
                     "sensor_descr": "Master Secondary Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1238,6 +1287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "pwrS"
                 },
                 {
@@ -1248,7 +1298,7 @@
                     "sensor_index": "0",
                     "sensor_type": "pwrSP",
                     "sensor_descr": "Slave Primary Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1262,6 +1312,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "pwrSP"
                 },
                 {
@@ -1272,7 +1323,7 @@
                     "sensor_index": "0",
                     "sensor_type": "pwrSS",
                     "sensor_descr": "Slave Secondary Power",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -1286,6 +1337,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "pwrSS"
                 },
                 {
@@ -1296,7 +1348,7 @@
                     "sensor_index": "tempC.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Temperature",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 41,
@@ -1310,6 +1362,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1320,13 +1373,13 @@
                     "sensor_index": "portPwrM1.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Master Primary Voltage",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
-                    "sensor_limit": 27.6,
+                    "sensor_limit": 27.600000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 20.4,
+                    "sensor_limit_low": 20.399999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1334,6 +1387,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1344,13 +1398,13 @@
                     "sensor_index": "portPwrM2.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Master Secondary Voltage",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 23.9,
-                    "sensor_limit": 27.485,
+                    "sensor_current": 23.899999999999999,
+                    "sensor_limit": 27.484999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 20.315,
+                    "sensor_limit_low": 20.315000000000001,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1358,6 +1412,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1368,13 +1423,13 @@
                     "sensor_index": "portPwrS1.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Slave Primary Voltage",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 23.9,
-                    "sensor_limit": 27.485,
+                    "sensor_current": 23.899999999999999,
+                    "sensor_limit": 27.484999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 20.315,
+                    "sensor_limit_low": 20.315000000000001,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1382,6 +1437,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -1392,13 +1448,13 @@
                     "sensor_index": "portPwrS2.0",
                     "sensor_type": "ctm",
                     "sensor_descr": "Slave Secondary Voltage",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 24,
-                    "sensor_limit": 27.6,
+                    "sensor_limit": 27.600000000000001,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 20.4,
+                    "sensor_limit_low": 20.399999999999999,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -1406,6 +1462,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

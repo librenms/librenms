@@ -496,7 +496,7 @@
                     "sensor_index": "deviceStatus.0",
                     "sensor_type": "deviceStatus",
                     "sensor_descr": "Device Status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -510,6 +510,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "deviceStatus"
                 }
             ],

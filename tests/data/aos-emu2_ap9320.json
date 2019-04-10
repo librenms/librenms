@@ -62,6 +62,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -86,6 +87,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "emsInputContactNormalState_NC"
                 },
                 {
@@ -110,6 +112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "emsInputContactNormalState_NO"
                 },
                 {
@@ -134,6 +137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "emsInputContactNormalState_NO"
                 },
                 {
@@ -158,6 +162,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "emsInputContactNormalState_NO"
                 },
                 {
@@ -182,6 +187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "emsInputContactNormalState_NO"
                 },
                 {
@@ -206,6 +212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "emsInputContactNormalState_NO"
                 },
                 {
@@ -230,6 +237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "emsInputContactNormalState_NO"
                 },
                 {
@@ -254,6 +262,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "emsInputContactNormalState_NO"
                 },
                 {
@@ -278,6 +287,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "emsOutletNormalState_OFF"
                 },
                 {
@@ -302,6 +312,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "emsOutletNormalState_OFF"
                 },
                 {
@@ -326,6 +337,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "emsOutputRelayNormalState_NO"
                 },
                 {
@@ -350,6 +362,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "emsOutputRelayNormalState_NO"
                 },
                 {
@@ -363,17 +376,18 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 27.22,
+                    "sensor_current": 27.219999999999999,
                     "sensor_limit": 60,
-                    "sensor_limit_warn": 29.44,
+                    "sensor_limit_warn": 29.440000000000001,
                     "sensor_limit_low": 0,
-                    "sensor_limit_low_warn": 0.56,
+                    "sensor_limit_low_warn": 0.56000000000000005,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -387,17 +401,18 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 23.89,
+                    "sensor_current": 23.890000000000001,
                     "sensor_limit": 60,
-                    "sensor_limit_warn": 26.67,
+                    "sensor_limit_warn": 26.670000000000002,
                     "sensor_limit_low": 0,
-                    "sensor_limit_low_warn": 0.56,
+                    "sensor_limit_low_warn": 0.56000000000000005,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

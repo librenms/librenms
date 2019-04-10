@@ -4681,8 +4681,8 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 26.9,
-                    "sensor_limit": 28.245,
+                    "sensor_current": 26.899999999999999,
+                    "sensor_limit": 28.245000000000001,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 25.555,
                     "sensor_limit_low_warn": null,
@@ -4692,6 +4692,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -4716,6 +4717,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -4729,8 +4731,8 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 28.1,
-                    "sensor_limit": 29.505,
+                    "sensor_current": 28.100000000000001,
+                    "sensor_limit": 29.504999999999999,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 26.695,
                     "sensor_limit_low_warn": null,
@@ -4740,6 +4742,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -4764,6 +4767,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -4788,6 +4792,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -4812,6 +4817,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -4822,7 +4828,7 @@
                     "sensor_index": "dcxFPDAttachedStatus.0",
                     "sensor_type": "dcxFPDAttachedStatus",
                     "sensor_descr": "Front panel",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4836,6 +4842,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dcxFPDAttachedStatus"
                 },
                 {
@@ -4846,7 +4853,7 @@
                     "sensor_index": "dcxFPDFan1Status.0",
                     "sensor_type": "dcxFPDFan1Status",
                     "sensor_descr": "Fan 1",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4860,6 +4867,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dcxFPDFan1Status"
                 },
                 {
@@ -4870,7 +4878,7 @@
                     "sensor_index": "dcxFPDFan2Status.0",
                     "sensor_type": "dcxFPDFan2Status",
                     "sensor_descr": "Fan 2",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4884,6 +4892,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dcxFPDFan2Status"
                 },
                 {
@@ -4894,7 +4903,7 @@
                     "sensor_index": "dcxFPDFan3Status.0",
                     "sensor_type": "dcxFPDFan3Status",
                     "sensor_descr": "Fan 3",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4908,6 +4917,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dcxFPDFan3Status"
                 },
                 {
@@ -4918,7 +4928,7 @@
                     "sensor_index": "dcxFPDFan4Status.0",
                     "sensor_type": "dcxFPDFan4Status",
                     "sensor_descr": "Fan 4",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4932,6 +4942,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dcxFPDFan4Status"
                 },
                 {
@@ -4942,7 +4953,7 @@
                     "sensor_index": "dcxFPDFan5Status.0",
                     "sensor_type": "dcxFPDFan5Status",
                     "sensor_descr": "Fan 5",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4956,6 +4967,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dcxFPDFan5Status"
                 },
                 {
@@ -4966,7 +4978,7 @@
                     "sensor_index": "dcxFPDFan6Status.0",
                     "sensor_type": "dcxFPDFan6Status",
                     "sensor_descr": "Fan 6",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -4980,6 +4992,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dcxFPDFan6Status"
                 },
                 {
@@ -4990,7 +5003,7 @@
                     "sensor_index": "dcxFPDPowerStatus2.0",
                     "sensor_type": "dcxFPDPowerStatus2",
                     "sensor_descr": "Power status",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -5004,6 +5017,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "dcxFPDPowerStatus2"
                 },
                 {
@@ -5014,7 +5028,7 @@
                     "sensor_index": "dcxFPDTemp1Status.0",
                     "sensor_type": "arris-c3",
                     "sensor_descr": "CPU card closest to the CPU",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
                     "sensor_current": 38,
@@ -5028,6 +5042,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5038,7 +5053,7 @@
                     "sensor_index": "dcxFPDTemp2Status.0",
                     "sensor_type": "arris-c3",
                     "sensor_descr": "CPU card, on the right hand side.",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
                     "sensor_current": 34,
@@ -5052,6 +5067,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5062,7 +5078,7 @@
                     "sensor_index": "dcxFPDTemp3Status.0",
                     "sensor_type": "arris-c3",
                     "sensor_descr": "Kanga, under Roo cards between RX4 and RX5.",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
                     "sensor_current": 38,
@@ -5076,6 +5092,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -5086,7 +5103,7 @@
                     "sensor_index": "dcxFPDTemp4Status.0",
                     "sensor_type": "arris-c3",
                     "sensor_descr": "Kanga, under Roo cards between RX2 and RX3.",
-                    "group": null,
+                    "group": "",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
                     "sensor_current": 40,
@@ -5100,6 +5117,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 }
             ],

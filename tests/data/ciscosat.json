@@ -62,6 +62,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -86,6 +87,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -110,6 +112,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -134,6 +137,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -158,6 +162,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -182,6 +187,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -206,6 +212,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": null
                 },
                 {
@@ -230,6 +237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "sensor_offset": 0,
                     "state_name": "inputStatusSatLock"
                 }
             ],
@@ -278,7 +286,7 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
-                    "sensor_current": 1.6,
+                    "sensor_current": 1.6000000000000001,
                     "sensor_prev": null,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
@@ -288,7 +296,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.6.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.6.1\"]",
+                    "sensor_offset": 0
                 },
                 {
                     "sensor_deleted": 0,
@@ -309,7 +318,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.5.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.5.1\"]",
+                    "sensor_offset": 0
                 },
                 {
                     "sensor_deleted": 0,
@@ -330,7 +340,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.7.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.7.1\"]",
+                    "sensor_offset": 0
                 },
                 {
                     "sensor_deleted": 0,
@@ -351,7 +362,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.12.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.12.1\"]",
+                    "sensor_offset": 0
                 }
             ]
         },
@@ -366,8 +378,8 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
-                    "sensor_current": 1.6,
-                    "sensor_prev": 1.6,
+                    "sensor_current": 1.6000000000000001,
+                    "sensor_prev": 1.6000000000000001,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -376,7 +388,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.6.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.6.1\"]",
+                    "sensor_offset": 0
                 },
                 {
                     "sensor_deleted": 0,
@@ -397,7 +410,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.5.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.5.1\"]",
+                    "sensor_offset": 0
                 },
                 {
                     "sensor_deleted": 0,
@@ -418,7 +432,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.7.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.7.1\"]",
+                    "sensor_offset": 0
                 },
                 {
                     "sensor_deleted": 0,
@@ -439,7 +454,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.12.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.12.1\"]",
+                    "sensor_offset": 0
                 }
             ]
         }
