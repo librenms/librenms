@@ -15,6 +15,8 @@
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IPv4;
 
 function authToken(\Slim\Route $route)
 {
@@ -2137,7 +2139,7 @@ function list_arp()
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $ip       = $router['ip'];
-    $hostname = mres($_GET['device']);
+    $hostname = $_GET['device'];
     $total    = 0;
     if (empty($ip)) {
         api_error(400, "No valid IP provided");
@@ -2147,15 +2149,19 @@ function list_arp()
 
     if ($ip === "all") {
         $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-        $arp = dbFetchRows("SELECT `ipv4_mac`.* FROM `ipv4_mac` LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` WHERE `ports`.`device_id` = ?", array($device_id));
+        $arp = dbFetchRows("SELECT `ipv4_mac`.* FROM `ipv4_mac` LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` WHERE `ports`.`device_id` = ?", [$device_id]);
     } elseif (str_contains($ip, '/')) {
-        list($net, $cidr) = explode('/', $ip, 2);
-        $arp = dbFetchRows(
-            'SELECT * FROM `ipv4_mac` WHERE (inet_aton(`ipv4_address`) & ?) = ?',
-            array(cidr2long($cidr), ip2long($net))
-        );
+        try {
+            $ip = new IPv4($ip);
+            $arp = dbFetchRows(
+                'SELECT * FROM `ipv4_mac` WHERE (inet_aton(`ipv4_address`) & ?) = ?',
+                [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())]
+            );
+        } catch (InvalidIpException $e) {
+            api_error(400, "Invalid Network Address");
+        }
     } else {
-        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", array($ip));
+        $arp = dbFetchRows("SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?", [$ip]);
     }
     api_success($arp, 'arp');
 }
