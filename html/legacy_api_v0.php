@@ -188,7 +188,7 @@ $app->group(
                     '/resources',
                     function () use ($app) {
                         $app->get('/fdb/', 'authToken', 'list_fdb')->name('list_fdb');
-                        $app->get('/fdb/:mac', 'authToken', 'list_fdb')->name('list_fdb');
+                        $app->get('/fdb/:mac', 'authToken', 'list_fdb')->name('list_fdb_mac');
                         $app->get('/links', 'authToken', 'list_links')->name('list_links');
                         $app->get('/links/:id', 'authToken', 'get_link')->name('get_link');
                         $app->get('/locations', 'authToken', 'list_locations')->name('list_locations');
