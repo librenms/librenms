@@ -445,6 +445,37 @@ Output:
     ]
 }
 ```
+
+### `get_device_fdb`
+
+Get a list of FDB entries associated with a device.
+
+Route: `/api/v0/devices/:hostname/fdb`
+
+  - hostname can be either the device hostname or id
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/fdb
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ports_fdb": {
+        "ports_fdb_id": 10,
+        "port_id": 10000,
+        "mac_address": "1aaa2bbb3ccc",
+        "vlan_id": 20000,
+        "device_id": 1,
+        "created_at": "2019-01-1 01:01:01",
+        "updated_at": "2019-01-1 01:01:01"
+    }
+}
+```
+
 ### `get_device_ip_addresses`
 
 Get a list of IP addresses (v4 and v6) associated with a device.

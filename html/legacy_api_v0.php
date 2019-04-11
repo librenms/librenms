@@ -64,6 +64,8 @@ $app->group(
                         // api/v0/devices/$hostname/links
                         $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');
                         // api/v0/devices/$hostname/graphs
+                        $app->get('/:hostname/fdb', 'authToken', 'get_fdb')->name('get_fdb');
+                        // api/v0/devices/$hostname/fdb
                         $app->get('/:hostname/health(/:type)(/:sensor_id)', 'authToken', 'list_available_health_graphs')->name('list_available_health_graphs');
                         $app->get('/:hostname/wireless(/:type)(/:sensor_id)', 'authToken', 'list_available_wireless_graphs')->name('list_available_wireless_graphs');
                         $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');
@@ -185,6 +187,8 @@ $app->group(
                 $app->group(
                     '/resources',
                     function () use ($app) {
+                        $app->get('/fdb/', 'authToken', 'list_fdb')->name('list_fdb');
+                        $app->get('/fdb/:mac', 'authToken', 'list_fdb')->name('list_fdb_mac');
                         $app->get('/links', 'authToken', 'list_links')->name('list_links');
                         $app->get('/links/:id', 'authToken', 'get_link')->name('get_link');
                         $app->get('/locations', 'authToken', 'list_locations')->name('list_locations');

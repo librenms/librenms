@@ -15,7 +15,7 @@ IMPORTS
 -- =============================================================================
 
 liebertGlobalProductsFlexibleConditionsModule MODULE-IDENTITY
-  LAST-UPDATED "201606080000Z"
+  LAST-UPDATED "201810020000Z"
   ORGANIZATION "Liebert Corporation"
   CONTACT-INFO
       "Contact:   Technical Support
@@ -29,13 +29,13 @@ liebertGlobalProductsFlexibleConditionsModule MODULE-IDENTITY
 
       Tel: +1 (800) 222-5877
 
-      E-mail: liebert.monitoring@emerson.com
-      Web:    www.liebert.com"
+      E-mail: liebert.monitoring@vertivco.com
+      Web:    www.vertivco.com"
 
    DESCRIPTION
       "The MIB module used to register Liebert SNMP OIDs.
 
-      Copyright 2000-2016 Liebert Corporation. All rights reserved.
+      Copyright 2000-2018 Liebert Corporation. All rights reserved.
       Reproduction of this document is authorized on the condition
       that the forgoing copyright notice is included.
 
@@ -43,9 +43,9 @@ liebertGlobalProductsFlexibleConditionsModule MODULE-IDENTITY
       makes no warranty, either express or implied, as to the use,
       operation, condition, or performance of the Specification."
 
-   REVISION "201606080000Z"
+   REVISION "201810020000Z"
    DESCRIPTION
-    "Compiled From GDD Version: 6520.1"
+    "Compiled From GDD Version: 6825.1"
 
 
    ::= { liebertFlexibleConditionsModuleReg 1 }
@@ -4723,5 +4723,812 @@ lgpCondId6518StandbyUnitActivatedDuetoChillerFailure  OBJECT-IDENTITY
         "External chiller unit has failed for this unit, so the standby
         cooling unit has been activated."
     ::= { lgpFlexConditionsWellKnown 6518 }
+
+lgpCondId6522PDUResidualOverCurrent  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a PDU residual over current condition."
+    ::= { lgpFlexConditionsWellKnown 6522 }
+
+lgpCondId6527PDUOverCurrentProtection  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The PDU over current protection is triggered."
+    ::= { lgpFlexConditionsWellKnown 6527 }
+
+lgpCondId6528PowerModuleLeverUnlocked  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The power module is inactive because the lever is in the unlocked
+        position."
+    ::= { lgpFlexConditionsWellKnown 6528 }
+
+lgpCondId6529HardwareMismatch  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The assigned system model settings do not match the actual
+        installed hardware. The module count is wrong, or a module of the
+        wrong type is installed."
+    ::= { lgpFlexConditionsWellKnown 6529 }
+
+lgpCondId6530SupplyNTCAirSensorIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The supply NTC air sensor is disconnected or the signal is out of
+        range."
+    ::= { lgpFlexConditionsWellKnown 6530 }
+
+lgpCondId6531ExternalAirSensorCIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The external air sensor C is disconnected or the signal is out of
+        range."
+    ::= { lgpFlexConditionsWellKnown 6531 }
+
+lgpCondId6532ExternalAirSensorDIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The external air sensor D is disconnected or the signal is out of
+        range."
+    ::= { lgpFlexConditionsWellKnown 6532 }
+
+lgpCondId6533ExternalAirSensorEIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The external air sensor E is disconnected or the signal is out of
+        range."
+    ::= { lgpFlexConditionsWellKnown 6533 }
+
+lgpCondId6534PumpThermalOverload  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump is shut down due to thermal overload."
+    ::= { lgpFlexConditionsWellKnown 6534 }
+
+lgpCondId6535XDModuleCommunicationLost  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Communication with XD Module has been lost."
+    ::= { lgpFlexConditionsWellKnown 6535 }
+
+lgpCondId6536MMSCapacityExceeded  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The critical load is larger than the redundant rating of a 1+N
+        redundant multi-module system."
+    ::= { lgpFlexConditionsWellKnown 6536 }
+
+lgpCondId6538TSAControlInputIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The analog input used to set the air temperature set point for
+        cooling control is disconnected or the signal is out of range."
+    ::= { lgpFlexConditionsWellKnown 6538 }
+
+lgpCondId6539ChilledWaterValveHoursExceeded  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "[Chilled Water Valve Hours] has exceeded [Chilled Water Valve
+        Operating Hours Threshold]."
+    ::= { lgpFlexConditionsWellKnown 6539 }
+
+lgpCondId6540FSAControlInputIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The analog input used to set the air temperature set point for fan
+        speed control is disconnected or the signal is out of range."
+    ::= { lgpFlexConditionsWellKnown 6540 }
+
+lgpCondId6541AutoTuneLicenseExpiring  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "License for the AutoTune feature has not been refreshed in 30 days
+        and will be expiring soon."
+    ::= { lgpFlexConditionsWellKnown 6541 }
+
+lgpCondId6542AutoTuneLicenseExpired  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "License for the AutoTune feature has expired."
+    ::= { lgpFlexConditionsWellKnown 6542 }
+
+lgpCondId6543UnitInStandbyDueToCoolingLoss  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Unit forced into standby because it is unable to provide any
+        cooling."
+    ::= { lgpFlexConditionsWellKnown 6543 }
+
+lgpCondId6544ControlUnitsRemoteShutdownMismatch  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The remote shutdown status of the primary control unit does not
+        match the remote shutdown status of the secondary control unit."
+    ::= { lgpFlexConditionsWellKnown 6544 }
+
+lgpCondId6545SecondaryControlUnitCommunicationLost  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The primary control unit has lost Ethernet communications with the
+        secondary control unit."
+    ::= { lgpFlexConditionsWellKnown 6545 }
+
+lgpCondId6546ControlUnitsUnitCodeMismatch  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Unit codes for the primary and secondary control units do not
+        match."
+    ::= { lgpFlexConditionsWellKnown 6546 }
+
+lgpCondId6547SSAControlInputIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The analog input used to set the static pressure set point for fan
+        speed control is disconnected or the signal is out of range."
+    ::= { lgpFlexConditionsWellKnown 6547 }
+
+lgpCondId6574SubfeedPhaseUndercurrent  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Subfeed breaker phase current has dropped below the threshold."
+    ::= { lgpFlexConditionsWellKnown 6574 }
+
+lgpCondId6587TransferCountCleared  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A system event indicating the transfer count has been cleared."
+    ::= { lgpFlexConditionsWellKnown 6587 }
+
+lgpCondId6588EnergyCounterCleared  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A system event indicating the energy counter (e.g. KWH) has been
+        cleared."
+    ::= { lgpFlexConditionsWellKnown 6588 }
+
+lgpCondId6589HistoryLogsFull  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The history logs are full."
+    ::= { lgpFlexConditionsWellKnown 6589 }
+
+lgpCondId6590HistoryLogsCleared  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "History logs have been cleared."
+    ::= { lgpFlexConditionsWellKnown 6590 }
+
+lgpCondId6591EventLogCleared  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "All past alarms and faults have been cleared."
+    ::= { lgpFlexConditionsWellKnown 6591 }
+
+lgpCondId6592SystemDateChanged  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system date has been updated."
+    ::= { lgpFlexConditionsWellKnown 6592 }
+
+lgpCondId6593SystemTimeChanged  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system time has been updated."
+    ::= { lgpFlexConditionsWellKnown 6593 }
+
+lgpCondId6594AccessPasswordChanged  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The access password has been changed."
+    ::= { lgpFlexConditionsWellKnown 6594 }
+
+lgpCondId6595ConfigModified  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A setpoint has been updated."
+    ::= { lgpFlexConditionsWellKnown 6595 }
+
+lgpCondId6612SCRShort  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The SCR is in a short condition."
+    ::= { lgpFlexConditionsWellKnown 6612 }
+
+lgpCondId6613SCROpen  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The SCR is in an open condition."
+    ::= { lgpFlexConditionsWellKnown 6613 }
+
+lgpCondId6614ACPowerSupplyFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A failure of the AC Power Supply has been detected."
+    ::= { lgpFlexConditionsWellKnown 6614 }
+
+lgpCondId6615DCPowerSupplyFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A failure of the DC Power Supply has been detected."
+    ::= { lgpFlexConditionsWellKnown 6615 }
+
+lgpCondId6616VoltageSensorFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A voltage sensor failure has been detected."
+    ::= { lgpFlexConditionsWellKnown 6616 }
+
+lgpCondId6617SCRSensorFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The SCR sensor module failed."
+    ::= { lgpFlexConditionsWellKnown 6617 }
+
+lgpCondId6618CurrentSensorFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The current sensor module failed."
+    ::= { lgpFlexConditionsWellKnown 6618 }
+
+lgpCondId6619GateDriveFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The Gate Drive module failed."
+    ::= { lgpFlexConditionsWellKnown 6619 }
+
+lgpCondId6620SurgeFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The surge module failed for the input source."
+    ::= { lgpFlexConditionsWellKnown 6620 }
+
+lgpCondId6621FastUnderVoltage  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Fast under voltage detected."
+    ::= { lgpFlexConditionsWellKnown 6621 }
+
+lgpCondId6622SlowUnderVoltage  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Slow under voltage detected."
+    ::= { lgpFlexConditionsWellKnown 6622 }
+
+lgpCondId6623OverVoltage  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Over voltage detected."
+    ::= { lgpFlexConditionsWellKnown 6623 }
+
+lgpCondId6624OverUnderFrequencyFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "An over or under frequency condition has been detected."
+    ::= { lgpFlexConditionsWellKnown 6624 }
+
+lgpCondId6625GeneralSourceFailure  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A non-specific failure has been detected in the source."
+    ::= { lgpFlexConditionsWellKnown 6625 }
+
+lgpCondId6626OverCurrent  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "An over current has been detected."
+    ::= { lgpFlexConditionsWellKnown 6626 }
+
+lgpCondId6627PeakCurrentOffLimit  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The peak current has exceeded the setpoint defined by I-PK Xfer
+        Lockout."
+    ::= { lgpFlexConditionsWellKnown 6627 }
+
+lgpCondId6628SyncFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A phase rotation/out of synchronization failure has been detected."
+    ::= { lgpFlexConditionsWellKnown 6628 }
+
+lgpCondId6629InputOverVoltage  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Input over voltage."
+    ::= { lgpFlexConditionsWellKnown 6629 }
+
+lgpCondId6630InputUnderVoltage  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Input under voltage."
+    ::= { lgpFlexConditionsWellKnown 6630 }
+
+lgpCondId6631InputOverUnderFrequency  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Input over/under frequency."
+    ::= { lgpFlexConditionsWellKnown 6631 }
+
+lgpCondId6635VoltageSenseFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Output voltage sense failure."
+    ::= { lgpFlexConditionsWellKnown 6635 }
+
+lgpCondId6636LoadonAlternateSource  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The load is on the alternate source."
+    ::= { lgpFlexConditionsWellKnown 6636 }
+
+lgpCondId6637UnderVoltageFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Output under voltage failure."
+    ::= { lgpFlexConditionsWellKnown 6637 }
+
+lgpCondId6638OutputOverCurrent  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Output is over current."
+    ::= { lgpFlexConditionsWellKnown 6638 }
+
+lgpCondId6639GroundOverCurrent  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Ground is over current."
+    ::= { lgpFlexConditionsWellKnown 6639 }
+
+lgpCondId6640NeutralOverCurrent  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Neutral is over current."
+    ::= { lgpFlexConditionsWellKnown 6640 }
+
+lgpCondId6641LoadVoltageTHD  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Load voltage THD has exceeded the set limit."
+    ::= { lgpFlexConditionsWellKnown 6641 }
+
+lgpCondId6662ControlLogicFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A control logic module has failed."
+    ::= { lgpFlexConditionsWellKnown 6662 }
+
+lgpCondId6663PowerSupplyLogicFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A power supply module has failed."
+    ::= { lgpFlexConditionsWellKnown 6663 }
+
+lgpCondId6664ExternalCommsFailure  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "External communications failure."
+    ::= { lgpFlexConditionsWellKnown 6664 }
+
+lgpCondId6665HeatSinkOverTemp  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system heat sink temperature has exceeded design limits."
+    ::= { lgpFlexConditionsWellKnown 6665 }
+
+lgpCondId6666AutomaticTransferInhibited  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Automatic transfer is inhibited."
+    ::= { lgpFlexConditionsWellKnown 6666 }
+
+lgpCondId6667InputSourceTransferInhibited  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Input source transfer is inhibited."
+    ::= { lgpFlexConditionsWellKnown 6667 }
+
+lgpCondId6676CB1ShuntTrip  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "CB1 Shunt Trip event."
+    ::= { lgpFlexConditionsWellKnown 6676 }
+
+lgpCondId6677CB2ShuntTrip  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "CB2 Shunt Trip event."
+    ::= { lgpFlexConditionsWellKnown 6677 }
+
+lgpCondId6678CB6NeutralOpen  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "CB6 neutral open event."
+    ::= { lgpFlexConditionsWellKnown 6678 }
+
+lgpCondId6679ContactorNeutralFail  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Contactor Neutral Fail event."
+    ::= { lgpFlexConditionsWellKnown 6679 }
+
+lgpCondId6680CB1BreakerOpen  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "CB1 Breaker open event. Normal state is breaker closed. Latched
+        state is breaker open."
+    ::= { lgpFlexConditionsWellKnown 6680 }
+
+lgpCondId6681CB2BreakerOpen  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "CB2 Breaker open event. Normal state is breaker closed. Latched
+        state is breaker open."
+    ::= { lgpFlexConditionsWellKnown 6681 }
+
+lgpCondId6682CB4BreakerClosed  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "CB4 breaker closed event. Normal state is breaker open. Latched
+        state is breaker closed."
+    ::= { lgpFlexConditionsWellKnown 6682 }
+
+lgpCondId6683CB5BreakerClosed  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "CB5 breaker closed event. Normal state is breaker open. Latched
+        state is breaker closed."
+    ::= { lgpFlexConditionsWellKnown 6683 }
+
+lgpCondId6684CB3BreakerOpen  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "CB3 breaker open event. Normal state is breaker closed. Latched
+        state is breaker open."
+    ::= { lgpFlexConditionsWellKnown 6684 }
+
+lgpCondId6685CB3ABreakerOpen  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "CB3A breaker open event. Normal state is breaker closed. Latched
+        state is breaker open."
+    ::= { lgpFlexConditionsWellKnown 6685 }
+
+lgpCondId6686CB6BreakerOpen  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "CB6 breaker open event. Normal state is breaker closed. Latched
+        state is breaker open."
+    ::= { lgpFlexConditionsWellKnown 6686 }
+
+lgpCondId6687CB7BreakerOpen  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "CB7 breaker open event. Normal state is breaker closed. Latched
+        state is breaker open."
+    ::= { lgpFlexConditionsWellKnown 6687 }
+
+lgpCondId6691GroupIndependentOn  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The group standby/cascade state for this unit has been overridden.
+        The unit has been forced on."
+    ::= { lgpFlexConditionsWellKnown 6691 }
+
+lgpCondId6692GroupIndependentOff  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The group standby/cascade state for this unit has been overridden.
+        The unit has been forced off."
+    ::= { lgpFlexConditionsWellKnown 6692 }
+
+lgpCondId6693BranchResidualOverCurrent  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a branch residual over current condition."
+    ::= { lgpFlexConditionsWellKnown 6693 }
+
+lgpCondId6694ReceptacleResidualOverCurrent  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a receptacle residual over current
+        condition."
+    ::= { lgpFlexConditionsWellKnown 6694 }
+
+lgpCondId6728BuckOn  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The input voltage is currently being bucked (lowered) by the
+        inverter."
+    ::= { lgpFlexConditionsWellKnown 6728 }
+
+lgpCondId6729BoostOn  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The input voltage is currently being boosted (raised) by the
+        inverter."
+    ::= { lgpFlexConditionsWellKnown 6729 }
+
+lgpCondId6739Compressor1HighPressure  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Compressor 1 High Pressure."
+    ::= { lgpFlexConditionsWellKnown 6739 }
+
+lgpCondId6740Compressor2HighPressure  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Compressor 2 High Pressure."
+    ::= { lgpFlexConditionsWellKnown 6740 }
+
+lgpCondId6741Compressor1ThermalOverload  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Compressor 1 Thermal Overload."
+    ::= { lgpFlexConditionsWellKnown 6741 }
+
+lgpCondId6742Compressor2ThermalOverload  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Compressor 2 Thermal Overload."
+    ::= { lgpFlexConditionsWellKnown 6742 }
+
+lgpCondId6758CompressorFreezeProtection  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Compressor has entered the freeze protection phase."
+    ::= { lgpFlexConditionsWellKnown 6758 }
+
+lgpCondId6773FanTemperatureCompensationLimitReached  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Unit is configured for fan temperature compensation, and the fan
+        control set point cannot be reduced any further due to high
+        remote air temperature sensor readings."
+    ::= { lgpFlexConditionsWellKnown 6773 }
+
+lgpCondId6774ModbusECFanCommunicationLost  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Communication with Modbus EC fan has been lost."
+    ::= { lgpFlexConditionsWellKnown 6774 }
+
+lgpCondId6785AnalogTemperatureControlIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Analog input used for creating the control temperature (instead of
+        reading a sensor)  is disconnected or the signal is out of range."
+    ::= { lgpFlexConditionsWellKnown 6785 }
+
+lgpCondId6786SubgroupFirmwareUpdateRequired  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Mismatch of subgroup firmware.  Both the primary and secondary
+        control boards must be running the same firmware version."
+    ::= { lgpFlexConditionsWellKnown 6786 }
+
+lgpCondId6787SubgroupSecondaryControlUnitIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Subgroup secondary control unit is reporting an unspecified issue."
+    ::= { lgpFlexConditionsWellKnown 6787 }
+
+lgpCondId6788EEVCommunicationLost  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Communication with Electronic Expansion Valve unit has been lost."
+    ::= { lgpFlexConditionsWellKnown 6788 }
+
+lgpCondId6789EEVMotorIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Electronic Expansion Valve stepper motor issue."
+    ::= { lgpFlexConditionsWellKnown 6789 }
+
+lgpCondId6790EEVFeedbackIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Electronic Expansion Valve feedback error."
+    ::= { lgpFlexConditionsWellKnown 6790 }
+
+lgpCondId6791EEVPressureSensorIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Electronic Expansion Valve refrigerant pressure sensor is
+        disconnected or the signal is out of range."
+    ::= { lgpFlexConditionsWellKnown 6791 }
+
+lgpCondId6792EEVCoilTemperatureSensorIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Electronic Expansion Valve coil temperature sensor is disconnected
+        or the signal is out of range."
+    ::= { lgpFlexConditionsWellKnown 6792 }
+
+lgpCondId6793EEVDischargeTemperatureSensorIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Electronic Expansion Valve discharge temperature sensor is
+        disconnected or the signal is out of range."
+    ::= { lgpFlexConditionsWellKnown 6793 }
+
+lgpCondId6794EEVSumpTemperatureSensorIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Electronic Expansion Valve sump temperature sensor is disconnected
+        or the signal is out of range."
+    ::= { lgpFlexConditionsWellKnown 6794 }
+
+lgpCondId6795EEVBatteryTestIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Electronic Expansion Valve battery state cannot be determined."
+    ::= { lgpFlexConditionsWellKnown 6795 }
+
+lgpCondId6796EEVBatteryPersistentIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Electronic Expansion Valve has continuously detected a 'bad'
+        battery condition for an extended period of time."
+    ::= { lgpFlexConditionsWellKnown 6796 }
+
+lgpCondId6798PumpCycleLockOut  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump is locked out due to multiple pump-to-compressor transitions
+        at cold ambient air temperature."
+    ::= { lgpFlexConditionsWellKnown 6798 }
+
+lgpCondId6799PumpBoardFirmwareUpdateRequired  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Mismatch of pump board firmware.  All pump boards must be running
+        the same firmware version."
+    ::= { lgpFlexConditionsWellKnown 6799 }
+
+lgpCondId6800PumpControlBoardIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump is shut down due to a pump control board issue.  Control
+        board must be rebooted."
+    ::= { lgpFlexConditionsWellKnown 6800 }
+
+lgpCondId6801PumpInvalidDataShutdown  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump is shut down due to invalid data."
+    ::= { lgpFlexConditionsWellKnown 6801 }
+
+lgpCondId6802PumpInputPressureSensorIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump input refrigerant pressure sensor is disconnected or the
+        signal is out of range."
+    ::= { lgpFlexConditionsWellKnown 6802 }
+
+lgpCondId6803PumpInputTemperatureSensorIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump input refrigerant temperature sensor is disconnected or the
+        signal is out of range."
+    ::= { lgpFlexConditionsWellKnown 6803 }
+
+lgpCondId6804PumpOutputPressureSensorIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump output refrigerant pressure sensor is disconnected or the
+        signal is out of range."
+    ::= { lgpFlexConditionsWellKnown 6804 }
+
+lgpCondId6805PumpOutputTemperatureSensorIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump output refrigerant temperature sensor is disconnected or the
+        signal is out of range."
+    ::= { lgpFlexConditionsWellKnown 6805 }
+
+lgpCondId6806PumpCommunicationLost  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Communication with pump unit has been lost."
+    ::= { lgpFlexConditionsWellKnown 6806 }
+
+lgpCondId6807PumpRemoteShutdown  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump is shut down by a remote signal."
+    ::= { lgpFlexConditionsWellKnown 6807 }
+
+lgpCondId6808PumpUSBEthernetPortIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump control board USB or Ethernet interface has failed."
+    ::= { lgpFlexConditionsWellKnown 6808 }
+
+lgpCondId6809PumpStartupFailure  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Multiple attempts to start the pump have failed."
+    ::= { lgpFlexConditionsWellKnown 6809 }
+
+lgpCondId6810PumpInverterFailure  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump inverter is reporting a failure."
+    ::= { lgpFlexConditionsWellKnown 6810 }
+
+lgpCondId6811PumpTVSSIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump Transient Voltage Surge Suppressor or Surge Protection Device
+        has failed."
+    ::= { lgpFlexConditionsWellKnown 6811 }
+
+lgpCondId6812PumpHighSuperheat  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Pump inlet refrigerant superheat temperature is too high, or the
+        pump has been running too long with the condenser fan off."
+    ::= { lgpFlexConditionsWellKnown 6812 }
+
+lgpCondId6813CondenserHighAmbientAirTempDelta  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The difference between condenser measured ambient air temperatures
+        has been  too large for an extended period of time."
+    ::= { lgpFlexConditionsWellKnown 6813 }
+
+lgpCondId6814CondenserLeeTempOptionMismatch  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Lee-Temp option configured at a condenser unit does not match Lee
+        -Temp option configured at the control unit."
+    ::= { lgpFlexConditionsWellKnown 6814 }
+
+lgpCondId6815CondenserBoardFirmwareUpdateRequired  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Mismatch of condenser board firmware.  All condenser boards must
+        be running the same firmware version."
+    ::= { lgpFlexConditionsWellKnown 6815 }
+
+lgpCondId6816CondenserToPumpHighRefrigerantTempDelta  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Temperature delta between the condenser output refrigerant and
+        pump inlet refrigerant is too large."
+    ::= { lgpFlexConditionsWellKnown 6816 }
+
+lgpCondId6817CondenserRefrigerantTypeMismatch  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Refrigerant type configured at condenser unit does not match
+        refrigerant type configured at the control unit."
+    ::= { lgpFlexConditionsWellKnown 6817 }
+
+lgpCondId6818ExternalSupplyFluidHighTemperature  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Supply fluid temperature has exceeded a threshold, as indicated by
+        an external input signal."
+    ::= { lgpFlexConditionsWellKnown 6818 }
+
+lgpCondId6819ExternalSupplyFluidTempSensorIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Supply fluid temperature sensor is disconnected or the signal is
+        out of range, as indicated by an external input signal."
+    ::= { lgpFlexConditionsWellKnown 6819 }
+
+lgpCondId6822AuditLogUpdate  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Audit log has been updated."
+    ::= { lgpFlexConditionsWellKnown 6822 }
+
+lgpCondId6824ExternalSupplyFluidFlowIssue  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Supply fluid flow issue, as indicated by an external input signal."
+    ::= { lgpFlexConditionsWellKnown 6824 }
 
 END

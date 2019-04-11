@@ -53,12 +53,12 @@ if ($vars['view'] == 'prefixes_ipv4unicast') {
 
 echo ' | ';
 
-if ($vars['view'] == 'prefixes_vpnv4unicast') {
+if ($vars['view'] == 'prefixes_ipv4vpn') {
     echo "<span class='pagemenu-selected'>";
 }
 
-echo generate_link('VPNv4', $link_array, array('view' => 'prefixes_vpnv4unicast'));
-if ($vars['view'] == 'prefixes_vpnv4unicast') {
+echo generate_link('VPNv4 Ucast', $link_array, array('view' => 'prefixes_ipv4vpn'));
+if ($vars['view'] == 'prefixes_ipv4vpn') {
     echo '</span>';
 }
 
@@ -71,6 +71,18 @@ if ($vars['view'] == 'prefixes_ipv6unicast') {
 
 echo generate_link('IPv6', $link_array, array('view' => 'prefixes_ipv6unicast'));
 if ($vars['view'] == 'prefixes_ipv6unicast') {
+    echo '</span>';
+}
+
+echo ' | ';
+
+if ($vars['view'] == 'prefixes_ipv6vpn') {
+    echo "<span class='pagemenu-selected'>";
+    $extra_sql = " AND `bgpPeerIdentifier` LIKE '%:%'";
+}
+
+echo generate_link('VPNv6 Ucast', $link_array, array('view' => 'prefixes_ipv6vpn'));
+if ($vars['view'] == 'prefixes_ipv6vpn') {
     echo '</span>';
 }
 
