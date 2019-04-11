@@ -47,17 +47,17 @@ class AdvaObjectDeletion implements SnmptrapHandler
     {
         if ($trap_oid = $trap->findOid('CM-SECURITY-MIB::cmSecurityUserName')) {
             $UserName = $trap->getOidData($trap_oid);
-            Log::event("User object $UserName deleted.", $device->device_id, 'trap', 2);
+            Log::event("User object $UserName deleted", $device->device_id, 'trap', 2);
         } elseif ($trap_oid = $trap->findOid('CM-FACILITY-MIB::cmFlowIndex')) {
             $flowID = str_replace(".", "-", substr($trap_oid, 29));
-            Log::event("Flow $flowID deleted.", $device->device_id, 'trap', 2);
+            Log::event("Flow $flowID deleted", $device->device_id, 'trap', 2);
         } elseif ($trap_oid = $trap->findOid('F3-LAG-MIB::f3LagPortIndex')) {
             $lagPortID = $trap->getOidData($trap_oid);
             $lagID = str_replace(".", "-", substr($trap_oid, -5, 3));
-            Log::event("LAG member port $lagPortID removed from LAG $lagID.", $device->device_id, 'trap', 2);
+            Log::event("LAG member port $lagPortID removed from LAG $lagID", $device->device_id, 'trap', 2);
         } elseif ($trap_oid = $trap->findOid('F3-LAG-MIB::f3LagIndex')) {
             $lagID = $trap->getOidData($trap_oid);
-            Log::event("LAG $lagID deleted.", $device->device_id, 'trap', 2);
+            Log::event("LAG $lagID deleted", $device->device_id, 'trap', 2);
         }
     }
 }

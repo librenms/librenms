@@ -35,9 +35,6 @@ class AdvaObjectDeletionTest extends LaravelTestCase
 {
     use DatabaseTransactions;
 
-    /*
-     *  User object deleted
-     */
     public function testUserDeletion()
     {
         $device = factory(Device::class)->create();
@@ -53,40 +50,33 @@ ADVA-MIB::neEventLogTimeStamp.92 2018-12-10,8:56:27.5,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "User object testuser deleted.";
+        $message = "User object testuser deleted";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmObjectDeletionTrap user deletion');
     }
 
-    /*
-     * Flow deleted (trap is wrong, need to recapture.)
-     *
     public function testFLowDeletion()
     {
-    $device = factory(Device::class)->create();
+        $device = factory(Device::class)->create();
 
-    $trapText = "$device->hostname
-    UDP: [$device->ip]:57602->[192.168.5.5]:162
-    DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
-    SNMPv2-MIB::snmpTrapOID.0 CM-SYSTEM-MIB::cmObjectDeletionTrap
-    CM-FACILITY-MIB::cmQosShaperIndex.1.1.1.4.1.1.1 1
-    RMON2-MIB::probeDateTime.0 \"07 E2 0C 0A 09 07 1C 00 2D 06 00 \"
-    ADVA-MIB::neEventLogIndex.148 148
-    ADVA-MIB::neEventLogTimeStamp.148 2018-12-10,9:7:28.1,-6:0";
+        $trapText = "$device->hostname
+UDP: [$device->ip]:57602->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
+SNMPv2-MIB::snmpTrapOID.0 CM-SYSTEM-MIB::cmObjectDeletionTrap
+CM-FACILITY-MIB::cmFlowIndex.1.1.1.4.1 1
+RMON2-MIB::probeDateTime.0 \"07 E2 0C 0A 09 07 1C 00 2D 06 00 \"
+ADVA-MIB::neEventLogIndex.148 148
+ADVA-MIB::neEventLogTimeStamp.148 2018-12-10,9:7:28.1,-6:0";
 
-    $trap = new Trap($trapText);
+        $trap = new Trap($trapText);
 
-    $message = "Flow 1-1-1-4-1 deleted.";
-    \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
+        $message = "Flow 1-1-1-4-1 deleted";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
-    $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmObjectDeletionTrap flow deletion');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmObjectDeletionTrap flow deletion');
     }
-     */
 
-    /*
-     * LAG port deleted from LAG
-     */
     public function testLagPortDeletion()
     {
         $device = factory(Device::class)->create();
@@ -102,15 +92,12 @@ ADVA-MIB::neEventLogTimeStamp.136 2018-12-10,9:3:51.3,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "LAG member port 1 removed from LAG 1-1.";
+        $message = "LAG member port 1 removed from LAG 1-1";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmObjectDeletionTrap LAG port deletion');
     }
 
-    /*
-     *  LAG deleted
-     */
     public function testLagDeletion()
     {
         $device = factory(Device::class)->create();
@@ -126,7 +113,7 @@ ADVA-MIB::neEventLogTimeStamp.139 2018-12-10,9:3:51.4,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "LAG 1 deleted.";
+        $message = "LAG 1 deleted";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmObjectDeletionTrap LAG deletion');

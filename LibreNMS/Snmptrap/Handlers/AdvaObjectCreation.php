@@ -48,13 +48,10 @@ class AdvaObjectCreation implements SnmptrapHandler
 
         if ($trap_oid = $trap->findOid('CM-SECURITY-MIB::cmSecurityUserName')) {
             $UserName = $trap->getOidData($trap_oid);
-            Log::event("User object $UserName created.", $device->device_id, 'trap', 2);
-        } elseif ($trap->findOid('CM-FACILITY-MIB::cmFlow')) {
-            $flowID = str_replace(".", "-", substr($trap->findOid('CM-FACILITY-MIB::cmFlowAdminState'), 34));
-            Log::event("Flow $flowID created.", $device->device_id, 'trap', 2);
+            Log::event("User object $UserName created", $device->device_id, 'trap', 2);
         } elseif ($trap_oid = $trap->findOid('F3-LAG-MIB::f3LagName')) {
             $lagID = substr($trap_oid, -1);
-            Log::event("LAG $lagID created.", $device->device_id, 'trap', 2);
+            Log::event("LAG $lagID created", $device->device_id, 'trap', 2);
         }
     }
 }

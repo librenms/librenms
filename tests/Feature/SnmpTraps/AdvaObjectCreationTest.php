@@ -35,9 +35,6 @@ class AdvaObjectCreationTest extends LaravelTestCase
 {
     use DatabaseTransactions;
 
-    /*
-     *  User object deleted
-     */
     public function testUserCreation()
     {
         $device = factory(Device::class)->create();
@@ -56,40 +53,12 @@ ADVA-MIB::neEventLogTimeStamp.91 2018-12-10,8:55:41.1,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "User object testuser created.";
+        $message = "User object testuser created";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmObjectCreationTrap user created');
     }
 
-    /*
-     * Flow created (trap is wrong, need to recapture.)
-     *
-    public function testFLowDeletion()
-    {
-    $device = factory(Device::class)->create();
-
-    $trapText = "$device->hostname
-    UDP: [$device->ip]:57602->[192.168.5.5]:162
-    DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
-    SNMPv2-MIB::snmpTrapOID.0 CM-SYSTEM-MIB::cmObjectDeletionTrap
-    CM-FACILITY-MIB::cmQosShaperIndex.1.1.1.4.1.1.1 1
-    RMON2-MIB::probeDateTime.0 \"07 E2 0C 0A 09 07 1C 00 2D 06 00 \"
-    ADVA-MIB::neEventLogIndex.148 148
-    ADVA-MIB::neEventLogTimeStamp.148 2018-12-10,9:7:28.1,-6:0";
-
-    $trap = new Trap($trapText);
-
-    $message = "Flow 1-1-1-4-1 deleted.";
-    \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-
-    $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmObjectDeletionTrap flow deletion');
-    }
-     */
-
-    /*
-     *  LAG created
-     */
     public function testLagCreation()
     {
         $device = factory(Device::class)->create();
@@ -115,7 +84,7 @@ ADVA-MIB::neEventLogTimeStamp.110 2018-12-10,8:58:43.7,-6:0";
 
         $trap = new Trap($trapText);
 
-        $message = "LAG 1 created.";
+        $message = "LAG 1 created";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmObjectCreationTrap LAG created');

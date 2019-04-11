@@ -35,10 +35,6 @@ class AdvaStateChangeTrapTest extends LaravelTestCase
 {
     use DatabaseTransactions;
 
-    /* Tests access port state change to
-     * admin state maintenance and operational
-     * state normal
-     */
     public function testAccessPortChg()
     {
         $device = factory(Device::class)->create();
@@ -63,11 +59,6 @@ ADVA-MIB::neEventLogTimeStamp.48 2018-12-10,11:20:40.7,-6:0";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmStateChangeTrap access port amdmin state maintenance and op state normal');
     }
 
-    /*
-     *  Network port state change
-     *  to admin state maintenance
-     *  operational state outage
-     */
     public function testNetworkPortChg()
     {
         $device = factory(Device::class)->create();
@@ -92,11 +83,6 @@ ADVA-MIB::neEventLogTimeStamp.19 2018-12-10,11:17:7.9,-6:0";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmStateChangeTrap access port amdmin state maintenance and op state normal');
     }
 
-    /*
-     *  Flow 1-1-1-3-1 changed state to
-     *  admin state management and 
-     *  operational state normal
-     */
     public function testFlowStateChg()
     {
         $device = factory(Device::class)->create();
