@@ -1,0 +1,899 @@
+-- ****************************************************************************
+--
+--  This module provides authoritative definitions for Dell Networking OS
+--  Virtual Link Trunk Mib.
+--
+-- ****************************************************************************
+--
+
+DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       MODULE-IDENTITY, 
+       OBJECT-TYPE,
+       NOTIFICATION-TYPE,
+       Counter32,
+       Unsigned32       
+              FROM SNMPv2-SMI
+       MODULE-COMPLIANCE, 
+       OBJECT-GROUP, 
+       NOTIFICATION-GROUP
+              FROM SNMPv2-CONF
+       TEXTUAL-CONVENTION,
+       MacAddress, 
+       TimeInterval
+              FROM SNMPv2-TC
+       InterfaceIndex
+              FROM IF-MIB
+       InetAddressType, 
+       InetAddress
+              FROM INET-ADDRESS-MIB       
+       dellNetMgmt
+              FROM DELL-NETWORKING-SMI;
+
+-- ****************************************************************************
+-- *   MODULE IDENTITY
+-- ****************************************************************************
+
+dellNetVirtualLinkTrunkMib MODULE-IDENTITY
+
+       LAST-UPDATED         "201211280000Z" 
+       ORGANIZATION         "Dell Inc"
+       CONTACT-INFO
+                            "http://www.dell.com/support"
+       DESCRIPTION
+
+              "This MIB module provides information on Dual Brain Virtual Link
+              Trunk(VLT) feature which is a control plane mechanism to provide
+              Layer2 multipathing between access network devices (switches or 
+              servers) and the core network.
+       
+              VLT represents a single logical layer 2 domain from the view of 
+              downstream devices that have LAG bundles terminating on separate
+              chassis in the virtual link trunk domain.
+
+              However, the two VLT chassis are independent L2/L3 switches for 
+              devices in the upstream network.
+
+              A sample of VLT scenario:
+
+              ---------------------------------------------------------------
+              |                       _______________                       |
+              |                      |  Edge router  |                      |
+              |                      |_______________|                      |
+              |                     /                 \                     |
+              |                    /                   \                    |
+              | VLT               /                     \                   |
+              |      ____________/_______________________\____________    . |
+              |     |    _______/      Back Up Link       \_______    |  /|\|
+              |     |   |       |-------------------------|       |   |   | |
+              |     |   |       |         -------         |       |   | L3| |
+              |     |   | S4810 |________| Inter |________| S4810 |   |_____|
+              |     |   |       |________|Chassis|________|       |   | L2| |
+              |     |   |       |        | Link  |        |       |   |   | |
+              | VLT port \_____\          -------          /____/VLT port\|/|  
+              |     |_____\_____\_________________________/____/_____|    . | 
+              |            \     \      -----------------/    /             |
+              |             \     \----/------------         /              |
+              |              \        /             \       /               |
+              |               \      /               \     /                |
+              |Lag(active)<--- \    /                 \   /--->Lag(active)  |
+              |              ___\__/___________________\_/______            |
+              |             |  _______     Stacking   ______    |           |
+              |             | |  S60  |--------------|  S60 |   |           |
+              |             | |__\____|              |____/_|   |           |
+              |             |_____\______________________/______|           |
+              |                    \                    /-->Nic teaming     |
+              |                     \__________________/                    |
+              |                    | Nic1          Nic2 |                   |
+              |                    |       Server       |                   |
+              |                    |____________________|                   |
+              ---------------------------------------------------------------
+              
+              Benefits of VLT are as follows: 
+               > Allows a single device to use LAG across two upstream devices
+               > Eliminates Spanning Tree Protocol (STP) blocked ports
+               > Provides a loop-free topology
+               > Uses all available uplink bandwidth
+               > Provides fast convergence if either the link or a device fails
+               > Provides link-level resiliency
+               > Assures high availability
+              
+                            GLOSSARY AND ABBREVIATIONS
+              
+              VLT - Virtual Link Trunk 
+                     The combined port channel between the VLT peer devices and
+                     the downstream device.
+       
+              VLT Peer device 
+                     One of a pair of devices that are connected with the 
+                     special port channel known as the chassis interconnect 
+                     trunk.
+              
+              VLT Chassis Interconnect Trunk
+                     The link used to synchronize states between the VLT peer 
+                     devices. 
+              
+              VLT domain 
+                     This domain includes both VLT peer devices, the VLT chassis
+                     interconnect trunk, and all of the port channels in the VLT
+                     connected to the downstream devices. 
+       
+              VLT Backup link 
+                     The backup link monitors the vitality of a VLT peer device.
+                     The backup trunk sends configurable, periodic heart beat 
+                     messages between VLT peer devices.
+
+              ICL 
+                     Abbreviation for Chassis InterConnect Link."
+
+       REVISION      "201211280000Z" -- Nov 29, 2012
+       DESCRIPTION
+                     " - Added new objects dellNetVLTPeerRouting,
+                         dellNetVLTPeerRoutingTimeout,dellNetVLTRemotePeerRouting
+                         in dellNetVirtualLinkTrunkTable
+                       - Added additional error reason peerRoutMismatch
+                         in dellNetVltErrorReason object"
+
+       REVISION      "201205210000Z" -- May 21, 2012
+       DESCRIPTION
+                     "Added new object dellNetVLTCfgSysMacAddr in 
+                     dellNetVirtualLinkTrunkTable"
+                     
+       REVISION      "201205140000Z" -- May 14, 2012
+       DESCRIPTION
+                     "Re arranged MIB objects in the dellNetVirtualLinkTrunkTable
+                      to make it compatible with older version. Moved the newly
+                      added objects at the bottom"
+
+      
+       REVISION      "201204020000Z" -- April 2, 2012
+       DESCRIPTION 
+                     "Re arrenged the dellNetVirtualLinkTrunkTable, additional 
+                      objects are added.
+                      - dellNetVirtualLinkTrunkNotifications added to make 
+                        notifications separate subtree from dellNetVirtualLinkTrunkMib.
+                      - dellNetVirtualLinkDetailsTable is added for VLT details.
+                      - dellNetVLTIclBwUsageExceed, dellNetVLTDomainConfigError new 
+                        notifications are added.
+                      - Updated the corresponding conformance groups
+                      - Some indentation change"
+
+       REVISION      "201105060000Z" -- May 6, 2011
+       DESCRIPTION 
+                     "Modified MIB OID from 13 to 16."
+
+       REVISION      "201103140000Z" -- March 14, 2011
+       DESCRIPTION   "Initial draft of VLT MIB."
+
+       ::= { dellNetMgmt 17 }
+
+dellNetVirtualLinkTrunkObjects OBJECT IDENTIFIER 
+       ::={ dellNetVirtualLinkTrunkMib 1 }
+
+dellNetVirtualLinkTrunkNotifObjects OBJECT IDENTIFIER 
+       ::={ dellNetVirtualLinkTrunkMib 2 } -- For Notifications
+
+-- Textual Conventions
+
+DellNetVLTMemberLinkStatus      ::= TEXTUAL-CONVENTION
+       STATUS        current
+       DESCRIPTION
+              "This defines the status of the link.
+              The states are:
+              linkNotEstablished   - Initial State.
+              linkUp               - Link is established and the VLT operations 
+                                     specific to this link are up.
+              linkDown             - Communication with Peer is lost.
+              linkError            - Configuration incompatible."
+       SYNTAX        INTEGER {
+                        linkNotEstablished(0),
+                        linkUp(1),
+                        linkDown(2),
+                        linkError(3)
+                     }
+
+-- ****************************************************************************
+-- Virtual Link Trunk Table
+-- ****************************************************************************
+
+dellNetVirtualLinkTrunkTable    OBJECT-TYPE
+       SYNTAX               SEQUENCE OF DellNetVirtualLinkTrunkTableEntry
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION 
+              "This table provides the information about Virtual Link Trunks.
+               A row is added to the table when a VLT domain is configured in
+               the device. A row is deleted from the table when the configured
+               VLT domain is removed."
+
+       ::= {dellNetVirtualLinkTrunkObjects 1 }
+
+dellNetVirtualLinkTrunkTableEntry      OBJECT-TYPE
+       SYNTAX                      DellNetVirtualLinkTrunkTableEntry
+       MAX-ACCESS                  not-accessible
+       STATUS                      current
+       DESCRIPTION
+              "Each entry represents information about the specific VLT domain."
+       INDEX           { dellNetVLTDomainId }
+
+       ::= { dellNetVirtualLinkTrunkTable 1 }
+
+DellNetVirtualLinkTrunkTableEntry   ::= 
+       SEQUENCE {
+           dellNetVLTDomainId               Unsigned32,
+           dellNetVLTMacAddr                MacAddress,
+           dellNetVLTPriority               Unsigned32,
+           dellNetVLTIclIfIndex             InterfaceIndex,
+           dellNetVLTRole                   INTEGER,
+           dellNetVLTPeerStatus             INTEGER,
+           dellNetVLTIclStatus              DellNetVLTMemberLinkStatus,
+           dellNetVLTHBeatStatus            DellNetVLTMemberLinkStatus,
+           dellNetVLTBkUpIpAddrType         InetAddressType,
+           dellNetVLTBkUpIpAddr             InetAddress,
+           dellNetVLTBkUpInterval           TimeInterval,
+           dellNetVLTRemoteMacAddr          MacAddress,
+           dellNetVLTRemoteRolePriority     Unsigned32,
+           dellNetVLTUnitId                 Unsigned32,
+           dellNetVLTVersionMajor           Unsigned32,
+           dellNetVLTVersionMinor           Unsigned32,
+           dellNetVLTRemoteUnitId           Unsigned32,
+           dellNetVLTRemoteVersionMajor     Unsigned32,
+           dellNetVLTRemoteVersionMinor     Unsigned32,
+           dellNetVLTIclBwStatus            INTEGER,
+           dellNetVLTCfgSysMacAddr          MacAddress,
+           dellNetVLTPeerRouting            INTEGER,
+           dellNetVLTPeerRoutingTimeout     TimeInterval,
+           dellNetVLTRemotePeerRouting      INTEGER
+           }
+
+dellNetVLTDomainId              OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION   
+              "This oject represents the Virtual Link Trunk Domain's id."
+       ::= { dellNetVirtualLinkTrunkTableEntry 1 }
+
+dellNetVLTMacAddr               OBJECT-TYPE
+       SYNTAX               MacAddress
+       MAX-ACCESS           read-only 
+       STATUS               current
+       DESCRIPTION
+              " This object represents the MAC Address value assigned to this 
+              Virtual Link Trunk domain."
+       ::= { dellNetVirtualLinkTrunkTableEntry 2 }
+
+dellNetVLTPriority              OBJECT-TYPE
+       SYNTAX               Unsigned32(1..65535)
+       MAX-ACCESS           read-only
+       STATUS               current 
+       DESCRIPTION
+              "This object represents the Virtual Link Trunk domain's System
+              Priority value."
+       DEFVAL               { 32768 }
+       ::= { dellNetVirtualLinkTrunkTableEntry 3 }
+
+dellNetVLTIclIfIndex            OBJECT-TYPE
+       SYNTAX               InterfaceIndex
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the interface index of the link configured
+              as the Inter Chassis Link for the Virtual Link Trunk domain."
+       ::= { dellNetVirtualLinkTrunkTableEntry 4 }
+
+             
+dellNetVLTRole                  OBJECT-TYPE
+       SYNTAX               INTEGER {
+                                standAlone(0),
+                                primary(1),
+                                secondary(2)
+                            }
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the role of the device in the Virtual 
+              Link Trunk domain configured."
+       ::= { dellNetVirtualLinkTrunkTableEntry 5 }
+
+dellNetVLTPeerStatus            OBJECT-TYPE
+       SYNTAX               INTEGER {
+                                notEstablished(0),
+                                peerUp(1),
+                                peerDown(2),
+                                linkDown(3)
+                            }
+       MAX-ACCESS           read-only 
+       STATUS               current
+       DESCRIPTION
+              "This object represents the status of the VLT Peer i.e whether
+              it is active, or in disabled/errored state.
+              notEstablished     - set if ICL Link is either in notEstablished 
+                                   status or error status.
+              peerUp             - set if ICL Link is up.
+              peerDown           - set if both ICL link and Backup link are down
+              linkDown           - set if ICL link down and Backup link is up. "
+       ::= { dellNetVirtualLinkTrunkTableEntry 6 }
+
+dellNetVLTIclStatus             OBJECT-TYPE
+       SYNTAX               DellNetVLTMemberLinkStatus
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the state of the IC link aggregation.
+               linkNotEstablished - ICL Hello has not yet started.Initial State.
+               linkUp             - Hello protocol is established and the VLT
+                                    operations are up.
+               linkDown           - Communication with Peer is lost.
+               linkError          - Communication with Peer is established but 
+                                    configuration incompatible."
+       ::= { dellNetVirtualLinkTrunkTableEntry 7 }
+
+dellNetVLTHBeatStatus           OBJECT-TYPE
+       SYNTAX               DellNetVLTMemberLinkStatus
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the status of the heart beat link/backup
+              link.
+              linkNotEstablished - Heartbeat has not yet started. Initial stage.
+              linkUp             - Heartbeat started and Remote is Up. 
+              linkDown           - Heartbeat lost.
+              linkError          - This indicates a configuration error."
+       ::= { dellNetVirtualLinkTrunkTableEntry 8 }
+
+dellNetVLTBkUpIpAddrType        OBJECT-TYPE
+       SYNTAX               InetAddressType
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the address family of the Backup link 
+              designated for the Virtual Link Trunk Domain."
+       ::= { dellNetVirtualLinkTrunkTableEntry 9 }
+
+dellNetVLTBkUpIpAddr            OBJECT-TYPE
+       SYNTAX               InetAddress
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the Ip address of the backup link."
+       ::= { dellNetVirtualLinkTrunkTableEntry 10 }
+
+dellNetVLTBkUpInterval          OBJECT-TYPE
+       SYNTAX               TimeInterval(100..500)
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION   
+              "This object represents the time interval for the VLT heart-beat
+              timer. "      
+       DEFVAL               { 100 }
+       ::= { dellNetVirtualLinkTrunkTableEntry 11 }
+
+dellNetVLTRemoteMacAddr         OBJECT-TYPE
+       SYNTAX               MacAddress
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the MAC Address of the Remote system that
+              is part of the VLT Domain."
+       ::= { dellNetVirtualLinkTrunkTableEntry 12 }
+
+dellNetVLTRemoteRolePriority    OBJECT-TYPE
+       SYNTAX               Unsigned32(1..65535)
+       MAX-ACCESS           read-only
+       STATUS               current       
+       DESCRIPTION
+              "This object represents the role priority of the Remote System 
+              that is part of the Virtual Link Trunk Domain."
+       DEFVAL               { 32768 }
+       ::= { dellNetVirtualLinkTrunkTableEntry 13 }
+
+dellNetVLTUnitId                OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the configured unit ID for the Virtual 
+               Link Trunk domain."
+       ::= { dellNetVirtualLinkTrunkTableEntry 14 }
+             
+dellNetVLTVersionMajor          OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the major version of for the Virtual 
+               Link Trunk domain protocol running."
+       ::= { dellNetVirtualLinkTrunkTableEntry 15 }
+
+dellNetVLTVersionMinor          OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the minor version of for the Virtual 
+               Link Trunk domain protocol running."
+       ::= { dellNetVirtualLinkTrunkTableEntry 16 }
+
+dellNetVLTRemoteUnitId          OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the configured unit ID for the Virtual 
+               Link Trunk domain on the remote node."
+       ::= { dellNetVirtualLinkTrunkTableEntry 17 }
+             
+dellNetVLTRemoteVersionMajor    OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the major version of for the Virtual 
+               Link Trunk domain protocol running on the remote node."
+       ::= { dellNetVirtualLinkTrunkTableEntry 18 }
+
+dellNetVLTRemoteVersionMinor    OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the minor version of for the Virtual 
+               Link Trunk domain protocol running on the remote node."
+       ::= { dellNetVirtualLinkTrunkTableEntry 19 }
+
+dellNetVLTIclBwStatus           OBJECT-TYPE
+       SYNTAX               INTEGER {
+                                belowthreshold(0),
+                                abovethreshold(1)
+                            }
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "This object represents the status of the VLT ICL Bandwidth usage
+              i.e whether it crosses threshold, or below threshold state.
+              below-threshold    - set if ICL Link BW usage is below 80%
+              above-threshold    - set if ICL link BW usage is above 80%. "
+       ::= { dellNetVirtualLinkTrunkTableEntry 20 }
+
+dellNetVLTCfgSysMacAddr         OBJECT-TYPE
+       SYNTAX               MacAddress
+       MAX-ACCESS           read-only 
+       STATUS               current
+       DESCRIPTION
+              " This object represents the System MAC Address value configured  
+              the Virtual Link Trunk domain."
+       ::= { dellNetVirtualLinkTrunkTableEntry 21 }
+
+dellNetVLTPeerRouting           OBJECT-TYPE
+       SYNTAX               INTEGER {
+                                disabled(0),
+                                enabled(1)
+                            }
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+            "This object represents the state of the VLT Peer routing i.e
+             whether it is enabled or disabled."
+       ::= { dellNetVirtualLinkTrunkTableEntry 22 }
+
+dellNetVLTPeerRoutingTimeout    OBJECT-TYPE
+       SYNTAX               TimeInterval(0..65535)
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION   
+              "This object represents the time interval for VLT peer-routing
+              timer, which is configured for removing the local-da of the other
+              peer in case of peer failure."      
+       ::= { dellNetVirtualLinkTrunkTableEntry 23 }
+
+dellNetVLTRemotePeerRouting     OBJECT-TYPE
+       SYNTAX               INTEGER {
+                                disabled(0),
+                                enabled(1)
+                            }
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+            "This object represents the state of the VLT Peer routing 
+            configured on the remote peer node i.e whether it is enabled or 
+            disabled."
+       ::= { dellNetVirtualLinkTrunkTableEntry 24 }
+
+-- ****************************************************************************
+-- Virtual Link Statistics Table 
+-- ****************************************************************************
+
+dellNetVirtualLinkStatsTable   OBJECT-TYPE
+       SYNTAX              SEQUENCE OF DellNetVirtualLinkStatsTableEntry
+       MAX-ACCESS          not-accessible
+       STATUS              current
+       DESCRIPTION
+              "This table provides the details of the statistical information on
+              traffic traversing port channels to attached devices, Interchassis
+              link, and backup link."
+       ::= { dellNetVirtualLinkTrunkObjects 2 }
+
+dellNetVirtualLinkStatsTableEntry      OBJECT-TYPE
+       SYNTAX                      DellNetVirtualLinkStatsTableEntry
+       MAX-ACCESS                  not-accessible
+       STATUS                      current
+       DESCRIPTION
+              "Each entry is the device specific statistical information on 
+              traffic in the links in VLT domain."
+       AUGMENTS           { dellNetVirtualLinkTrunkTableEntry }
+       ::= { dellNetVirtualLinkStatsTable 1 }
+
+DellNetVirtualLinkStatsTableEntry       ::=
+       SEQUENCE{
+           dellNetVLTStatNumHelloSent         Counter32,
+           dellNetVLTStatNumHelloRcvd         Counter32,
+           dellNetVLTStatNumHbeatSent         Counter32,
+           dellNetVLTStatNumHbeatRcvd         Counter32,
+           dellNetVLTStatNumDomainErrors      Counter32,
+           dellNetVLTStatNumVersionErrors     Counter32
+           }
+
+dellNetVLTStatNumHelloSent      OBJECT-TYPE
+       SYNTAX               Counter32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "The count of Hello Packets sent across the ICL for 
+              synchronization."
+       ::= { dellNetVirtualLinkStatsTableEntry 1 }
+
+dellNetVLTStatNumHelloRcvd      OBJECT-TYPE
+       SYNTAX               Counter32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION 
+              "The count of Hello Packets received from the remote VLT through 
+              the ICL."
+       ::= { dellNetVirtualLinkStatsTableEntry 2 }
+
+dellNetVLTStatNumHbeatSent      OBJECT-TYPE
+       SYNTAX               Counter32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "The count of periodic Keepalive messages sent by the VLT device
+              to the peer."
+       ::= { dellNetVirtualLinkStatsTableEntry 3 }
+
+dellNetVLTStatNumHbeatRcvd      OBJECT-TYPE
+       SYNTAX               Counter32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "The count of periodic Keepalive messages received by the VLT 
+              device from the peer."
+       ::= { dellNetVirtualLinkStatsTableEntry 4 }
+
+dellNetVLTStatNumDomainErrors   OBJECT-TYPE
+       SYNTAX               Counter32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+             "The count of hello/heartbeat packets dropped by the VLT device 
+             which failed to match the device's VLT domain Id."
+       ::= { dellNetVirtualLinkStatsTableEntry 5 }
+
+dellNetVLTStatNumVersionErrors  OBJECT-TYPE
+       SYNTAX               Counter32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+             "The count of hello/heartbeat packets dropped by the VLT device
+             which failed to match the device's VLT message's version."
+       ::= { dellNetVirtualLinkStatsTableEntry 6 }
+
+-- ****************************************************************************
+-- Virtual Link Trunk Details Table
+-- ****************************************************************************
+
+dellNetVirtualLinkDetailsTable         OBJECT-TYPE
+       SYNTAX                      SEQUENCE OF DellNetVirtualLinkDetailsTableEntry
+       MAX-ACCESS                  not-accessible
+       STATUS                      current
+       DESCRIPTION
+              "This table provides the details of port channel information by
+              traversing port channels to attached devices, peer port-channel 
+              ID, status and Active Vlans"
+       ::= { dellNetVirtualLinkTrunkObjects 3 }
+
+dellNetVirtualLinkDetailsTableEntry    OBJECT-TYPE
+       SYNTAX                      DellNetVirtualLinkDetailsTableEntry
+       MAX-ACCESS                  not-accessible
+       STATUS                      current
+       DESCRIPTION
+              "Each entry is the port channel specific information on links
+              between TOR and VLT domain."
+       INDEX           { dellNetVLTDetailLocalLagID }
+       ::= { dellNetVirtualLinkDetailsTable 1 }
+
+DellNetVirtualLinkDetailsTableEntry       ::=
+       SEQUENCE{
+           dellNetVLTDetailLocalLagID      Unsigned32,
+           dellNetVLTDetailPeerLagID       Unsigned32,
+           dellNetVLTDetailLocalStatus     INTEGER,
+           dellNetVLTDetailPeerStatus      INTEGER
+       }
+
+dellNetVLTDetailLocalLagID      OBJECT-TYPE
+       SYNTAX               Unsigned32(1..65535)
+       MAX-ACCESS           read-only 
+       STATUS               current
+       DESCRIPTION
+              "The Detail of the vlt local lag ID."
+       ::= { dellNetVirtualLinkDetailsTableEntry 1 }
+
+dellNetVLTDetailPeerLagID       OBJECT-TYPE
+       SYNTAX               Unsigned32(1..65535)
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "The Detail of the vlt peer lag ID"
+       ::= { dellNetVirtualLinkDetailsTableEntry 2 }
+
+dellNetVLTDetailLocalStatus     OBJECT-TYPE
+       SYNTAX               INTEGER {
+                                down(0),
+                                up(1)
+                            }
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "The interface operational status of the vlt local LAG ID"
+       ::= { dellNetVirtualLinkDetailsTableEntry 3 }
+
+dellNetVLTDetailPeerStatus      OBJECT-TYPE
+       SYNTAX               INTEGER {
+                                down(0),
+                                up(1)
+                            }
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+              "The interface operational status of the vlt peer LAG ID."
+       ::= { dellNetVirtualLinkDetailsTableEntry 4 }
+
+-- This object is for dellNetVLTDomainConfigError Trap/Notification
+
+dellNetVLTErrorReason          OBJECT-TYPE 
+       SYNTAX              INTEGER {
+                               noError(1),
+                               domainIdMismatch(2),
+                               unitIdMismatch(3),
+                               versionMismatch(4),
+                               sysMacMismatch(5),
+                               peerRoutingMismatch(6)
+                           }
+       MAX-ACCESS          accessible-for-notify
+       STATUS              current
+       DESCRIPTION
+              "This object represents the VLT domain config error,the possible
+               errors are:
+              noError             - No Error.
+              domainIdMismatch    - local and remote vlt domain Id mismatch.
+              unitIdMismatch      - local or remote vlt Unit Id is Identical or 
+                                    not configured.
+              versionMismatch     - local and remote vlt version does not meet
+                                    criteria for peer UP.
+              sysMacMismatch      - local and remote vlt system MAC mismatch.
+              peerRoutingMismatch - local and remote vlt peer-routing config
+                                    mismatch"
+       ::= { dellNetVirtualLinkTrunkObjects 4}
+
+-- ****************************************************************************
+-- * Virtual link Trunk Alarms and Notifications
+-- ****************************************************************************
+
+dellNetVirtualLinkTrunkNotifications OBJECT IDENTIFIER 
+       ::={ dellNetVirtualLinkTrunkNotifObjects 0 } -- For Notifications
+
+dellNetVLTRoleChange            NOTIFICATION-TYPE
+       OBJECTS              { 
+                                dellNetVLTRole 
+                            }
+       STATUS               current
+       DESCRIPTION 
+              "The agent generates this norification to denote the change in 
+              role of the VLT device in the VLT domain. This notification 
+              carries the information about the new role.
+              The possible roles are as follows:
+              1. StandAlone
+              2. Primary
+              3. Secondary"
+       ::= { dellNetVirtualLinkTrunkNotifications 1 }
+
+dellNetVLTIclStatusChange       NOTIFICATION-TYPE
+       OBJECTS              { 
+                                dellNetVLTIclStatus 
+                            }
+       STATUS               current
+       DESCRIPTION
+              "The agent generates this notification to denote the change in 
+              InterConnect Link Status.The notification contains information on
+              the new ICL status. The possible states are as follows:
+              1. NotEstabished
+              2. LinkUp
+              3. LinkDown
+              4. LinkError"
+       ::= { dellNetVirtualLinkTrunkNotifications 2 }
+
+dellNetVLTPeerStatusChange      NOTIFICATION-TYPE
+       OBJECTS              {
+                                dellNetVLTPeerStatus
+                            }
+       STATUS               current
+       DESCRIPTION
+              "The agent generates this notification to denote the change in
+              Status of the Peer in the VLT domain. This notification contains 
+              information on the new status of the peer device. The possible 
+              states are as follows: 
+              1. NotEstablished
+              2. PeerUp
+              3. PeerDown
+              4. LinkDown"
+       ::= { dellNetVirtualLinkTrunkNotifications 3 }
+
+dellNetVLTHBeatStatusChange     NOTIFICATION-TYPE
+       OBJECTS              {
+                                dellNetVLTHBeatStatus
+                            }
+       STATUS               current
+       DESCRIPTION
+              "The agent generates this notification to denote the change in
+              Backup Link Status. The notification contains information on
+              the new BackupLink Status. The possible states are as follows:
+              1. NotEstabished
+              2. LinkUp
+              3. LinkDown
+              4. LinkError"
+       ::= { dellNetVirtualLinkTrunkNotifications 4 }
+
+dellNetVLTIclBwUsageExceed      NOTIFICATION-TYPE
+        OBJECTS             {
+                                dellNetVLTIclIfIndex,
+                                dellNetVLTIclBwStatus
+                            }
+        STATUS              current
+        DESCRIPTION
+               "The IFM agent generates this notification to denote the change
+               in Bandwidth usage of ICL Link, when it crosses the threshold
+               above 80 %. The possible states are as follows:
+               0. Below threshold
+               1. Above threshold"
+        ::= { dellNetVirtualLinkTrunkNotifications 5 }
+
+dellNetVLTDomainConfigError     NOTIFICATION-TYPE
+       OBJECTS              {
+                                dellNetVLTErrorReason
+                            }
+       STATUS               current
+       DESCRIPTION
+              "The agent generates this notification to denote there is a 
+               error/conflict in the VLT domain config parameters (either 
+               locally or in remote node which prevent the peer up. The mismatch
+               can be domain Id, unitId,version or system MAC. The notification 
+               contains information on the error/mismatch type."
+       ::= { dellNetVirtualLinkTrunkNotifications 6 }
+
+-- ****************************************************************************
+-- Conformance Information
+-- ****************************************************************************
+
+dellNetVirtualLinkTrunkConformance     OBJECT IDENTIFIER 
+       ::= { dellNetVirtualLinkTrunkMib 3 }
+       
+dellNetVirtualLinkTrunkCompliances     OBJECT IDENTIFIER
+       ::= { dellNetVirtualLinkTrunkConformance 1 }
+       
+dellNetVirtualLinkTrunkGroups          OBJECT IDENTIFIER
+       ::= { dellNetVirtualLinkTrunkConformance 2 }
+
+-- ****************************************************************************
+-- * Compliance Statements
+-- ****************************************************************************
+
+dellNetVirtualLinkTrunkCompliance   MODULE-COMPLIANCE
+       STATUS                   current
+       DESCRIPTION
+              "The compliance statement for the Dell Networking OS Virtual Link Trunk MIB."
+       MODULE  
+       MANDATORY-GROUPS { 
+                     dellNetVirtualLinkTrunkGroup,
+                     dellNetVirtualLinkStatisticsGroup,
+                     dellNetVirtualLinkNotificationGroup,
+                     dellNetVirtualLinkDetailsTableGroup
+              }
+       ::= { dellNetVirtualLinkTrunkCompliances 1}
+       
+-- ****************************************************************************
+-- Units of Conformance
+-- ****************************************************************************
+
+dellNetVirtualLinkTrunkGroup OBJECT-GROUP
+       OBJECTS {
+           dellNetVLTDomainId,
+           dellNetVLTMacAddr,
+           dellNetVLTPriority,
+           dellNetVLTIclIfIndex,
+           dellNetVLTRole,
+           dellNetVLTPeerStatus,
+           dellNetVLTIclStatus,
+           dellNetVLTHBeatStatus,
+           dellNetVLTBkUpIpAddrType,
+           dellNetVLTBkUpIpAddr,
+           dellNetVLTBkUpInterval,
+           dellNetVLTRemoteMacAddr,
+           dellNetVLTRemoteRolePriority,
+           dellNetVLTUnitId,
+           dellNetVLTVersionMajor,
+           dellNetVLTVersionMinor,
+           dellNetVLTRemoteUnitId,
+           dellNetVLTRemoteVersionMajor,
+           dellNetVLTRemoteVersionMinor,
+           dellNetVLTIclBwStatus,
+           dellNetVLTCfgSysMacAddr,
+           dellNetVLTPeerRouting,
+           dellNetVLTPeerRoutingTimeout,
+           dellNetVLTRemotePeerRouting,
+           dellNetVLTErrorReason --No Separate group added for this object.
+       }
+       STATUS               current
+       DESCRIPTION
+              "This group represents a collection of objects providing the 
+              overall VLT information."
+       ::= { dellNetVirtualLinkTrunkGroups 1 }
+
+dellNetVirtualLinkStatisticsGroup   OBJECT-GROUP
+      OBJECTS {
+          dellNetVLTStatNumHelloSent,
+          dellNetVLTStatNumHelloRcvd,
+          dellNetVLTStatNumHbeatSent,
+          dellNetVLTStatNumHbeatRcvd,
+          dellNetVLTStatNumDomainErrors,
+          dellNetVLTStatNumVersionErrors
+      }
+      STATUS                    current
+      DESCRIPTION 
+             "This group represents a collection of objects providing the 
+             overall statistical information on the VLT."
+      ::= { dellNetVirtualLinkTrunkGroups 2 }
+
+dellNetVirtualLinkNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+           dellNetVLTRoleChange,
+           dellNetVLTIclStatusChange,
+           dellNetVLTPeerStatusChange,
+           dellNetVLTHBeatStatusChange,
+           dellNetVLTIclBwUsageExceed,
+           dellNetVLTDomainConfigError
+       }
+       STATUS               current
+       DESCRIPTION
+              "A collection of notification objects for the Dell Networking OS VLT mib"
+       ::= { dellNetVirtualLinkTrunkGroups 3 }
+
+dellNetVirtualLinkDetailsTableGroup    OBJECT-GROUP
+      OBJECTS {
+          dellNetVLTDetailLocalLagID,
+          dellNetVLTDetailPeerLagID,
+          dellNetVLTDetailLocalStatus,
+          dellNetVLTDetailPeerStatus
+      }
+      STATUS                    current
+      DESCRIPTION
+             "This group represents a collection of objects providing the
+             LAG details on the VLT."
+      ::= { dellNetVirtualLinkTrunkGroups 4 }
+
+-- ****************************************************************************
+-- End of Units of conformance
+-- ****************************************************************************
+
+END
+
