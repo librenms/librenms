@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use Adldap\Laravel\Commands\Import;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use LibreNMS\Authentication\AdldapUserFindScope;
 use LibreNMS\Config;
 use LibreNMS\Permissions;
 use LibreNMS\Util\IP;
@@ -39,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
         $this->app->booted('\LibreNMS\Config::load');
 
+        $this->bootAdldap();
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();
@@ -105,5 +108,12 @@ class AppServiceProvider extends ServiceProvider
             $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too
             return IP::isValid($ip) || Validate::hostname($value);
         }, __('The :attribute must a valid IP address/network or hostname.'));
+    }
+
+    private function bootAdldap()
+    {
+        if (config('auth.guards.web.provider') == 'adldap2') {
+            Import::useScope(AdldapUserFindScope::class);
+        }
     }
 }

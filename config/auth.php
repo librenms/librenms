@@ -46,7 +46,7 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'legacy',
+            'provider' => env('AUTH_PROVIDER', 'legacy'),
         ],
 
         'token' => [
@@ -82,6 +82,11 @@ return [
              'driver' => 'legacy',
              'model' => App\Models\User::class,
          ],
+
+        'adldap2' => [
+            'driver' => 'ldap',
+            'model'  => App\Models\User::class,
+        ],
     ],
 
     /*

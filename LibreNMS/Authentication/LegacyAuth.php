@@ -18,6 +18,7 @@ class LegacyAuth
         'ad-authorization' => 'LibreNMS\Authentication\ADAuthorizationAuthorizer',
         'ldap-authorization' => 'LibreNMS\Authentication\LdapAuthorizationAuthorizer',
         'sso' => 'LibreNMS\Authentication\SSOAuthorizer',
+        'adldap2' => 'LibreNMS\Authentication\AdldapAuthorizer',
     );
 
     /**
@@ -41,7 +42,7 @@ class LegacyAuth
      */
     public static function getType()
     {
-        return Config::get('auth_mechanism');
+        return config('auth.guards.web.provider',  Config::get('auth_mechanism'));
     }
 
     /**
