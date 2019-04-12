@@ -17,15 +17,17 @@ The LibreNMS service won't work under Python 2.7+; some features require behavio
 #### Python modules
  - PyMySQL is recommended as it requires no C compiler to install. MySQLclient can also be used, but does require compilation.
  - python-dotenv .env loader
- - redis-py (if using distributed polling)
+ - redis-py 3.0+ and redis 5.0+ (if using distributed polling)
 
 These can be obtained from your OS package manager, or from PyPI with the below commands. (You ma)
 ```bash
 pip3 install -r requirements.txt
 ```
 
-#### Redis (distributed polling only)
-If you want to use distributed polling, you'll need a redis instance to coordinate the nodes. It's recommeded that you do not share the redis database with any other system - by default, redis supports up to 16 databases (numbered 0-15).
+#### Redis (distributed polling)
+If you want to use distributed polling, you'll need a redis instance to coordinate the nodes. 
+It's recommended that you do not share the redis database with any other system - by default, redis supports up to 16 databases (numbered 0-15).
+You can also use redis on a single host if you want
 
 It's strongly recommended that you deploy a resilient cluster of redis systems, and use redis-sentinel.
 
@@ -46,7 +48,7 @@ DB_USERNAME=librenms
 DB_PASSWORD=
 ```
 
-### Distributed Polling Configuration
+### Distributed Polling Cononlyfiguration
 
 Once you have your redis database set up, configure it in the .env file on each node.
 
@@ -92,6 +94,12 @@ You should not rely on the password for the security of your system. See https:/
 distributed_poller                             = true;  # Set to true to enable distributed polling
 distributed_poller_name                        = null;  # Uniquely identifies the poller instance
 distributed_poller_group                       = 0;     # Which group to poll
+```
+
+## Fast Ping
+The [fast ping](Fast-Ping-Check.md) scheduler is disabled by default.  You can enable it by setting the following:
+```php
+$config['service_ping_enabled'] = true;
 ```
 
 ## Cron Scripts

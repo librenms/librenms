@@ -58,6 +58,7 @@ class ServiceConfig:
     billing = PollerConfig(2, 300, 60)
     ping = PollerConfig(1, 120)
     down_retry = 60
+    update_enabled = True
     update_frequency = 86400
 
     master_resolution = 1
@@ -93,18 +94,25 @@ class ServiceConfig:
         self.log_level = config.get('poller_service_loglevel', ServiceConfig.log_level)
 
         # new options
+        self.poller.enabled = config.get('service_poller_enabled', True)  # unused
         self.poller.workers = config.get('service_poller_workers', ServiceConfig.poller.workers)
         self.poller.frequency = config.get('service_poller_frequency', ServiceConfig.poller.frequency)
-        self.services.workers = config.get('service_services_workers', ServiceConfig.services.workers)
-        self.services.frequency = config.get('service_services_frequency', ServiceConfig.services.frequency)
+        self.discovery.enabled = config.get('service_discovery_enabled', True)   # unused
         self.discovery.workers = config.get('service_discovery_workers', ServiceConfig.discovery.workers)
         self.discovery.frequency = config.get('service_discovery_frequency', ServiceConfig.discovery.frequency)
+        self.services.enabled = config.get('service_services_enabled', True)
+        self.services.workers = config.get('service_services_workers', ServiceConfig.services.workers)
+        self.services.frequency = config.get('service_services_frequency', ServiceConfig.services.frequency)
+        self.billing.enabled = config.get('service_billing_enabled', True)
         self.billing.frequency = config.get('service_billing_frequency', ServiceConfig.billing.frequency)
         self.billing.calculate = config.get('service_billing_calculate_frequency', ServiceConfig.billing.calculate)
+        self.alerting.enabled = config.get('service_ping_enabled', True)
+        self.alerting.frequency = config.get('service_billing_frequency', ServiceConfig.alerting.frequency)
         self.ping.enabled = config.get('service_ping_enabled', False)
         self.ping.frequency = config.get('ping_rrd_step', ServiceConfig.billing.calculate)
         self.down_retry = config.get('service_poller_down_retry', ServiceConfig.down_retry)
         self.log_level = config.get('service_loglevel', ServiceConfig.log_level)
+        self.update_enabled = config.get('service_update_enabled', ServiceConfig.update_enabled)
         self.update_frequency = config.get('service_update_frequency', ServiceConfig.update_frequency)
 
         self.redis_host = os.getenv('REDIS_HOST', config.get('redis_host', ServiceConfig.redis_host))
@@ -211,12 +219,16 @@ class Service:
         self.queue_managers['poller'] = self.poller_manager
         self.discovery_manager = LibreNMS.DiscoveryQueueManager(self.config, self._lm)
         self.queue_managers['discovery'] = self.discovery_manager
-        self.queue_managers['alerting'] = LibreNMS.AlertQueueManager(self.config, self._lm)
-        self.queue_managers['services'] = LibreNMS.ServicesQueueManager(self.config, self._lm)
-        self.queue_managers['billing'] = LibreNMS.BillingQueueManager(self.config, self._lm)
+        if self.config.alerting.enabled:
+            self.queue_managers['alerting'] = LibreNMS.AlertQueueManager(self.config, self._lm)
+        if self.config.services.enabled:
+            self.queue_managers['services'] = LibreNMS.ServicesQueueManager(self.config, self._lm)
+        if self.config.billing.enabled:
+            self.queue_managers['billing'] = LibreNMS.BillingQueueManager(self.config, self._lm)
         if self.config.ping.enabled:
             self.queue_managers['ping'] = LibreNMS.PingQueueManager(self.config, self._lm)
-        self.daily_timer.start()
+        if self.config.update_enabled:
+            self.daily_timer.start()
         self.stats_timer.start()
 
         info("LibreNMS Service: {} started!".format(self.config.unique_name))
