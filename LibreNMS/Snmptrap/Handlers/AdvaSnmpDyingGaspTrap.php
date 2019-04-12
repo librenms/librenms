@@ -46,6 +46,5 @@ class AdvaSnmpDyingGaspTrap implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         Log::event("Dying Gasp received", $device->device_id, 'trap', 5);
-
     }
 }
