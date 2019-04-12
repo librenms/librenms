@@ -42,7 +42,8 @@ class LegacyAuth
      */
     public static function getType()
     {
-        return config('auth.guards.web.provider',  Config::get('auth_mechanism'));
+        $provider = config('auth.guards.web.provider');
+        return $provider == 'legacy' ? Config::get('auth_mechanism') : $provider;
     }
 
     /**

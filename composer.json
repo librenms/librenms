@@ -29,7 +29,6 @@
         "ext-pdo": "*",
         "ext-session": "*",
         "ext-xml": "*",
-        "adldap2/adldap2-laravel": "^6.0",
         "amenadiel/jpgraph": "^3.6",
         "dapphp/radius": "^2.0",
         "doctrine/dbal": "^2.9",
@@ -71,7 +70,8 @@
         "ext-memcached": "Required if you utilize distributed polling",
         "ext-posix": "Allows for additional validation tests",
         "ext-mysqlnd": "*",
-        "ext-ldap": "*"
+        "ext-ldap": "*",
+        "adldap2/adldap2-laravel": "^6.0"
     },
     "autoload": {
         "exclude-from-classmap": [
