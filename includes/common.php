@@ -760,10 +760,11 @@ function get_graph_subtypes($type, $device = null)
 {
     global $config;
 
+    $type = basename($type);
     $types = array();
 
     // find the subtypes defined in files
-    if ($handle = opendir($config['install_dir'] . "/html/includes/graphs/$type/")) {
+    if ($handle = opendir($config['install_dir'] . "/includes/html/graphs/$type/")) {
         while (false !== ($file = readdir($handle))) {
             if ($file != "." && $file != ".." && $file != "auth.inc.php" && strstr($file, ".inc.php")) {
                 $types[] = str_replace(".inc.php", "", $file);
