@@ -27,5 +27,7 @@ namespace LibreNMS\Authentication;
 
 class AdldapAuthorizer extends MysqlAuthorizer
 {
-
+    protected static $HAS_AUTH_USERMANAGEMENT = 0;
+    protected static $CAN_UPDATE_USER = 0;
+    protected static $CAN_UPDATE_PASSWORDS = 0;
 }
