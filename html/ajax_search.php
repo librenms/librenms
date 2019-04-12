@@ -5,12 +5,11 @@ use LibreNMS\Authentication\LegacyAuth;
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-set_debug($_REQUEST['debug']);
-
 if (!LegacyAuth::check()) {
-    echo "Unauthenticated\n";
-    exit;
+    die('Unauthorized');
 }
+
+set_debug($_REQUEST['debug']);
 
 $device = array();
 $ports  = array();
@@ -24,7 +23,6 @@ if (isset($_REQUEST['search'])) {
         $found = 0;
 
         if ($_REQUEST['type'] == 'group') {
-            include_once '../includes/device-groups.inc.php';
             foreach (dbFetchRows("SELECT id,name FROM device_groups WHERE name LIKE ?", ["%$search%"]) as $group) {
                 if ($_REQUEST['map']) {
                     $results[] = array(

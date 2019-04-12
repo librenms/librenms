@@ -29,14 +29,14 @@ $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (!LegacyAuth::check()) {
-    die('Unauthorized.');
+    die('Unauthorized');
 }
 
 set_debug($_REQUEST['debug']);
 
 /**
  * Levenshtein Sort
- * @param string $base Comparisson basis
+ * @param string $base Comparison basis
  * @param array  $obj  Object to sort
  * @return array
  */
