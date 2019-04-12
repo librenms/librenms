@@ -415,7 +415,7 @@ class DiscoveryQueueManager(TimedQueueManager):
         :param lock_manager: the single instance of lock manager
         :param auto_start: automatically start worker threads
         """
-        QueueManager.__init__(self, config, lock_manager, 'discovery', None, auto_start=auto_start)
+        TimedQueueManager.__init__(self, config, lock_manager, 'discovery', None, auto_start=auto_start)
         self._db = LibreNMS.DB(self.config)
 
     def do_dispatch(self):
