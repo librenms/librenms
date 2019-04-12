@@ -84,14 +84,6 @@ $config['graph_types']['device']['barracuda_firewall_sessions']['section'] = 'fi
 $config['graph_types']['device']['barracuda_firewall_sessions']['order'] = 0;
 $config['graph_types']['device']['barracuda_firewall_sessions']['descr'] = 'Active Sessions';
 
-$config['graph_types']['device']['barracuda_packet_throughput']['section'] = 'firewall';
-$config['graph_types']['device']['barracuda_packet_throughput']['order'] = 1;
-$config['graph_types']['device']['barracuda_packet_throughput']['descr'] = 'Packet throughput';
-
-$config['graph_types']['device']['barracuda_data_throughput']['section'] = 'firewall';
-$config['graph_types']['device']['barracuda_data_throughput']['order'] = 2;
-$config['graph_types']['device']['barracuda_data_throughput']['descr'] = 'Data throughput';
-
 
 // Ceragon Ceraos support
 $config['graph_types']['device']['ceraos_RxLevel']['section'] = 'wireless';

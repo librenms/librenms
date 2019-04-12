@@ -29,33 +29,3 @@ if (is_numeric($sessions)) {
     data_update($device, 'barracuda_firewall_sessions', $tags, $fields);
     $graphs['barracuda_firewall_sessions'] = true;
 }
-
-
-$packet_throughput = snmp_get($device, 'packetThroughput64.8.102.119.83.116.97.116.115.0', '-OQv', 'PHION-MIB');
-
-if (is_numeric($packet_throughput)) {
-    $rrd_def = RrdDefinition::make()->addDataset('packet_throughput', 'DERIVE', 0, 12500000000);
-
-    $fields = array(
-        'packet_throughput' => $packet_throughput
-    );
-
-    $tags = compact('rrd_def');
-    data_update($device, 'barracuda_packet_throughput', $tags, $fields);
-    $graphs['barracuda_packet_throughput'] = true;
-}
-
-
-$data_throughput = snmp_get($device, 'dataThroughput64.8.102.119.83.116.97.116.115.0', '-OQv', 'PHION-MIB');
-
-if (is_numeric($data_throughput)) {
-    $rrd_def = RrdDefinition::make()->addDataset('data_throughput', 'DERIVE', 0, 12500000000);
-
-    $fields = array(
-        'data_throughput' => $data_throughput
-    );
-
-    $tags = compact('rrd_def');
-    data_update($device, 'barracuda_data_throughput', $tags, $fields);
-    $graphs['barracuda_data_throughput'] = true;
-}
