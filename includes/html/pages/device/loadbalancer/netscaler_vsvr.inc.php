@@ -20,7 +20,9 @@ if (is_numeric($vars['vsvr'])) {
     echo "<tr><th width=320>VServer</th><th width=320>VIP and port</th><th width=100>State</th>";
     echo "<th width=320>Type</th><th width=320>Inbound traffic</th><th width=320>Outbound traffic</th></tr>";
     // Vserver graphs
-    foreach (dbFetchRows('SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? AND `vsvr_id` = ? ORDER BY `vsvr_name`', array($device['device_id'], $vars['vsvr'])) as $vsvr) {
+    // Can this really return more than one row?
+    $vservers = dbFetchRows('SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? AND `vsvr_id` = ? ORDER BY `vsvr_name`', array($device['device_id'], $vars['vsvr']));
+    foreach ($vservers as $vsvr) {
         if (is_integer($i / 2)) {
             $bg_colour = $config['list_colour']['even'];
         } else {
@@ -29,7 +31,7 @@ if (is_numeric($vars['vsvr'])) {
 
         if ($vsvr['vsvr_state'] == 'up') {
             $vsvr_label = 'success';
-        } else if ($vsvr['vsvr_state'] == 'down') {
+        } elseif ($vsvr['vsvr_state'] == 'down') {
             $vsvr_label = 'danger';
         } else {
             $vsvr_label = 'default';
@@ -119,11 +121,32 @@ if (is_numeric($vars['vsvr'])) {
 
     echo "<div style='margin: 0px;'><table class='table'>";
     // Table header
-    echo "<tr><th width=320>VServer</th><th width=320>VIP and port</th><th width=100>State</th>";
-    echo "<th width=320>Type</th><th width=320>Inbound traffic</th><th width=320>Outbound traffic</th></tr>";
+    echo "<tr><th width=320><a href=" . generate_url($vars, array('sort' => "vsvr_name")) . ">VServer</a></th>";
+    echo "<th width=320>VIP and port</th><th width=100>State</th><th width=320>Type</th>";
+    echo "<th width=320><a href=" . generate_url($vars, array('sort' => "vsvr_bps_in")) . ">Inbound traffic</a></th>";
+    echo "<th width=320><a href=" . generate_url($vars, array('sort' => "vsvr_bps_out")). ">Outbound traffic</a></th></tr>";
     // Vserver list
+    $vservers = dbFetchRows('SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? ORDER BY `vsvr_name`', array($device['device_id']));
+
+    // Vserver sorting
+    $valid_sort_keys = array('vsvr_bps_in', 'vsvr_bps_out', 'vsrv_name');
+    if (isset($vars['sort']) && in_array($vars['sort'], $valid_sort_keys)) {
+        $sort_key = $vars['sort'];
+    } else {
+        $sort_key = 'vsvr_name';
+    }
+    switch ($sort_key) {
+        case 'vsvr_bps_in':
+        case 'vsvr_bps_out':
+            $sort_direction = SORT_DESC;
+            break;
+        default:
+            $sort_direction = SORT_ASC;
+    }
+    $vservers = array_sort_by_column($vservers, $sort_key, $sort_direction);
+
     $i = '0';
-    foreach (dbFetchRows('SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? ORDER BY `vsvr_name`', array($device['device_id'])) as $vsvr) {
+    foreach ($vservers as $vsvr) {
         if (is_integer($i / 2)) {
             $bg_colour = $config['list_colour']['even'];
         } else {
@@ -132,7 +155,7 @@ if (is_numeric($vars['vsvr'])) {
 
         if ($vsvr['vsvr_state'] == 'up') {
             $vsvr_label = 'success';
-        } else if ($vsvr['vsvr_state'] == 'down') {
+        } elseif ($vsvr['vsvr_state'] == 'down') {
             $vsvr_label = 'danger';
         } else {
             $vsvr_label = 'default';
