@@ -304,7 +304,7 @@ class PingQueueManager(TimedQueueManager):
     def do_dispatch(self):
         groups = self._db.query("SELECT DISTINCT (`poller_group`) FROM `devices`")
         for group in groups:
-            self.post_work(0, group[0])
+            self.post_work('', group[0])
 
     def do_work(self, context, group):
         if self.lock(group, 'group', timeout=self.config.ping.frequency):
