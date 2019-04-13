@@ -15,7 +15,11 @@ if (is_numeric($vars['vsvr'])) {
 
     $i = 0;
 
-    echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
+    echo "<div style='margin: 0px;'><table class='table'>";
+    // Table header
+    echo "<tr><th width=320>VServer</th><th width=320>VIP and port</th><th width=100>State</th>";
+    echo "<th width=320>Type</th><th width=320>Inbound traffic</th><th width=320>Outbound traffic</th></tr>";
+    // Vserver graphs
     foreach (dbFetchRows('SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? AND `vsvr_id` = ? ORDER BY `vsvr_name`', array($device['device_id'], $vars['vsvr'])) as $vsvr) {
         if (is_integer($i / 2)) {
             $bg_colour = $config['list_colour']['even'];
@@ -24,17 +28,20 @@ if (is_numeric($vars['vsvr'])) {
         }
 
         if ($vsvr['vsvr_state'] == 'up') {
-            $vsvr_class = 'green';
+            $vsvr_label = 'success';
+        } else if ($vsvr['vsvr_state'] == 'down') {
+            $vsvr_label = 'danger';
         } else {
-            $vsvr_class = 'red';
+            $vsvr_label = 'default';
         }
 
         echo "<tr bgcolor='$bg_colour'>";
-        echo '<td width=320 class=list-large><a href="'.generate_url($vars, array('vsvr' => $vsvr['vsvr_id'], 'view' => null, 'graph' => null)).'">'.$vsvr['vsvr_name'].'</a></td>';
-        echo '<td width=320 class=list-small>'.$vsvr['vsvr_ip'].':'.$vsvr['vsvr_port'].'</a></td>';
-        echo "<td width=100 class=list-small><span class='".$vsvr_class."'>".$vsvr['vsvr_state'].'</span></td>';
-        echo ('<td width=320 class=list-small>'.format_si(($vsvr['vsvr_bps_in'] * 8)).'bps</a></td>');
-        echo ('<td width=320 class=list-small>'.format_si(($vsvr['vsvr_bps_out'] * 8)).'bps</a></td>');
+        echo '<td><a href="'.generate_url($vars, array('vsvr' => $vsvr['vsvr_id'], 'view' => null, 'graph' => null)).'">'.$vsvr['vsvr_name'].'</a></td>';
+        echo '<td>' . $vsvr['vsvr_ip'] . ':' . $vsvr['vsvr_port'] . '</td>';
+        echo "<td><span class='label label-" . $vsvr_label . "'>" . $vsvr['vsvr_state'] . '</span></td>';
+        echo '<td><span class="label label-default">' . $vsvr['vsvr_type'] . '</span></td>';
+        echo ('<td>'.format_si(($vsvr['vsvr_bps_in'] * 8)).'bps</a></td>');
+        echo ('<td>'.format_si(($vsvr['vsvr_bps_out'] * 8)).'bps</a></td>');
         echo '</tr>';
 
         foreach ($graph_types as $graph_type => $graph_text) {
@@ -110,7 +117,11 @@ if (is_numeric($vars['vsvr'])) {
 
     print_optionbar_end();
 
-    echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
+    echo "<div style='margin: 0px;'><table class='table'>";
+    // Table header
+    echo "<tr><th width=320>VServer</th><th width=320>VIP and port</th><th width=100>State</th>";
+    echo "<th width=320>Type</th><th width=320>Inbound traffic</th><th width=320>Outbound traffic</th></tr>";
+    // Vserver list
     $i = '0';
     foreach (dbFetchRows('SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? ORDER BY `vsvr_name`', array($device['device_id'])) as $vsvr) {
         if (is_integer($i / 2)) {
@@ -120,17 +131,20 @@ if (is_numeric($vars['vsvr'])) {
         }
 
         if ($vsvr['vsvr_state'] == 'up') {
-            $vsvr_class = 'green';
+            $vsvr_label = 'success';
+        } else if ($vsvr['vsvr_state'] == 'down') {
+            $vsvr_label = 'danger';
         } else {
-            $vsvr_class = 'red';
+            $vsvr_label = 'default';
         }
 
         echo "<tr bgcolor='$bg_colour'>";
-        echo '<td width=320 class=list-large><a href="'.generate_url($vars, array('vsvr' => $vsvr['vsvr_id'], 'view' => null, 'graph' => null)).'">'.$vsvr['vsvr_name'].'</a></td>';
-        echo '<td width=320 class=list-small>'.$vsvr['vsvr_ip'].':'.$vsvr['vsvr_port'].'</a></td>';
-        echo "<td width=100 class=list-small><span class='".$vsvr_class."'>".$vsvr['vsvr_state'].'</span></td>';
-        echo ('<td width=320 class=list-small>'.format_si(($vsvr['vsvr_bps_in'] * 8)).'bps</a></td>');
-        echo ('<td width=320 class=list-small>'.format_si(($vsvr['vsvr_bps_out'] * 8)).'bps</a></td>');
+        echo '<td><a href="'.generate_url($vars, array('vsvr' => $vsvr['vsvr_id'], 'view' => null, 'graph' => null)).'">'.$vsvr['vsvr_name'].'</a></td>';
+        echo '<td>' . $vsvr['vsvr_ip'] . ':' . $vsvr['vsvr_port'] . '</td>';
+        echo "<td><span class='label label-" . $vsvr_label . "'>" . $vsvr['vsvr_state'] . '</span></td>';
+        echo '<td><span class="label label-default">' . $vsvr['vsvr_type'] . '</span></td>';
+        echo ('<td>'.format_si(($vsvr['vsvr_bps_in'] * 8)).'bps</a></td>');
+        echo ('<td>'.format_si(($vsvr['vsvr_bps_out'] * 8)).'bps</a></td>');
         echo '</tr>';
         if ($vars['view'] == 'graphs') {
             echo '<tr class="list-bold" bgcolor="'.$bg_colour.'">';
