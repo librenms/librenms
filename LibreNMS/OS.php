@@ -134,7 +134,7 @@ class OS implements ProcessorDiscovery
      * @param string $depth depth for snmpwalk_group (optional)
      * @return array array indexed by the snmp index with the value as the data returned by snmp
      */
-    public function getCacheTable($oid, $mib = null, $depth = null)
+    public function getCacheTable($oid, $mib = null, $depth = 1)
     {
         if (str_contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
