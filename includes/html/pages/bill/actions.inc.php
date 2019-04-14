@@ -9,7 +9,7 @@ if ($_POST['action'] == 'delete_bill' && $_POST['confirm'] == 'confirm') {
 
     echo '<div class=infobox>Bill Deleted. Redirecting to Bills list.</div>';
 
-    echo "<meta http-equiv='Refresh' content=\"2; url='bills/'\">";
+    echo "<meta http-equiv='Refresh' content=\"2; url='../../../bills/'\">";
 }
 
 if ($_POST['action'] == 'reset_bill' && ($_POST['confirm'] == 'rrd' || $_POST['confirm'] == 'mysql')) {
