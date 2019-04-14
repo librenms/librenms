@@ -246,7 +246,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
           <button type='submit' class='btn btn-default' name='Submit' value='Add'>Add</button>
         </form>
         </div>";
-    }  else {
+    } else {
         echo '<script>window.location.replace("' . url('users') . '");</script>';
     }//end if
 }//end if
