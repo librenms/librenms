@@ -111,7 +111,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
 SNMPv2-MIB::snmpTrapOID.0 CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdCrossingAlert
 CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdIndex.1.1.1.3.1.37 37
 CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdInterval.1.1.1.3.1.37 interval-1day
-CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdVariable.1.1.1.3.1.37 CM-PERFORMANCE-MIB::defaultThresholdTest.1.1.1.2.1
+CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdVariable.1.1.1.3.1.37 CM-PERFORMANCE-MIB::defaultThresholdTest.1.1.1.3.1
 IF-MIB::ifName.2 Access PORT-1-1-1-3
 RMON2-MIB::probeDateTime.0 \"07 E2 0C 0A 0B 2D 0A 00 2D 06 00 \"
 ADVA-MIB::neEventLogIndex.79 79

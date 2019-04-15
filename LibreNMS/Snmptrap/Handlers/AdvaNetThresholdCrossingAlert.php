@@ -46,95 +46,80 @@ class AdvaNetThresholdCrossingAlert implements SnmptrapHandler
     {
         $interval = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdInterval"));
         $ifName = $trap->getOidData($trap->findOid("IF-MIB::ifName"));
-        $threshMessage = $this->handleThreshold($trap);
+        $thresholds = $this->getThresholds();
+        $threshMessage = $this->handleThreshold($trap, $thresholds);
         Log::event("$ifName $threshMessage threshold exceeded for $interval", $device->device_id, 'trap', 2);
     }
-    public static function handleThreshold($trap)
+    public static function handleThreshold($trap, $thresholds)
     {
-        $threshOid = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdVariable"));
-        switch (true) {
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsUAS') === 0:
-                return 'unavailable seconds';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESBF') === 0:
-                return 'broadcast frames sent';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESBP') === 0:
-                return 'broadcast frames received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESBS') === 0:
-                return 'bytes sent';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESCAE') === 0:
-                return 'crc align errors';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESC') === 0:
-                return 'collisions';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESDE') === 0:
-                return 'drop events';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESFS') === 0:
-                return 'frames sent';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESF ') === 0:
-                return 'fragments';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESJ') === 0:
-                return 'jabbers';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESMF') === 0:
-                return 'multicast frames sent';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESMP') === 0:
-                return 'multicast pakcets received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESOF') === 0:
-                return 'oversize frames discarded';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESOP') === 0:
-                return 'oversize packets received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESO') === 0:
-                return 'octets received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP64') === 0:
-                return '64 byte octets received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP65') === 0:
-                return '65 to 127 byte octets received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP128') === 0:
-                return '128 to 255 byte octets received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP256') === 0:
-                return '256 to 511 byte octets received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP512') === 0:
-                return '512 to 1023 byte octets received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP1024') === 0:
-                return '1024 to 1518 byte octets received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP1519') === 0:
-                return '1519 to MTU byte octets received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP') === 0:
-                return 'packets received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESUF') === 0:
-                return 'unicast frames sent';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESUP') === 0:
-                return 'unicast frames received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsL2CPFD') === 0:
-                return 'layer 2 control protocol frames discarded';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsL2CPFP') === 0:
-                return 'layer 2 control protocol frames processed';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsABRRx') === 0:
-                return 'average bit rate received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsABRTx') === 0:
-                return 'average bit rate transmitted';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsL2PTRxFramesEncap') === 0:
-                return 'layer 2 control protocol frames encapsulated';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsL2PTTxFramesDecap') === 0:
-                return 'layer 2 control protocol frames decapsulated';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsIBRMaxRx') === 0:
-                return 'instantaneous bit rate received max';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsIBRMaxTx') === 0:
-                return 'instantaneous bit rate transmitted max';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsIBRMinRx') === 0:
-                return 'instantaneous bit rate received min';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsIBRMinTx') === 0:
-                return 'instantaneous bit rate transmitted min';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsIBRRx') === 0:
-                return 'instantaneous bit rate received';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsIBRTx') === 0:
-                return 'instantaneous bit rate transmitted';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsAclDropNoMatch') === 0:
-                return 'acl drop no match';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsAclFwd2Cpu') === 0:
-                return 'acl forwarded to cpu';
-            case strpos($threshOid, 'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsDhcpDropNoAssocIf') === 0:
-                return 'dhcp dropped due to no associated interface';
-            default:
-                return 'unknown';
+        $thresholdOid = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdVariable"));
+        foreach ($thresholds as $oid => $descr) {
+            if (str_contains($thresholdOid, $oid)) {
+                return $descr;
+            }
         }
+        return 'unknown';
+    }
+    public static function getThresholds()
+    {
+        $thresholdArray = [
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsUAS' => 'unavailable seconds',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESBF' => 'broadcast frames sent',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESBP' => 'broadcast frames received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESBS' => 'bytes sent',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESCAE' => 'crc align errors',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESC' => 'collisions',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESDE' => 'drop events',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESFS' => 'frames sent',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESF' => 'fragments',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESJ' => 'jabbers',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESMF' => 'multicast frames sent',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESMP' => 'multicast pakcets received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESOF' => 'oversize frames discarded',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESOP' => 'oversize packets received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESO' => 'octets received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP64' => '64 byte octets received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP65' => '65 to 127 byte octets received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP128' => '128 to 255 byte octets received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP256' => '256 to 511 byte octets received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP512' => '512 to 1023 byte octets received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP1024' => '1024 to 1518 byte octets received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP1519' => '1519 to MTU byte octets received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESP' => 'packets received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESUF' => 'unicast frames sent',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsESUP' => 'unicast frames received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsL2CPFD' => 'layer 2 control protocol frames discarded',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsL2CPFP' => 'layer 2 control protocol frames discarded',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsABRRx' => 'average bit rate received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsABRTx' => 'average bit rate transmitted',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsL2PTRxFramesEncap' => 'layer 2 control protocol frames encapsulated',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsL2PTTxFramesDecap' => 'layer 2 control protocol frames decapsulated',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsIBRMaxRx' => 'instantaneous bit rate received max',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsIBRMaxTx' => 'instantaneous bit rate transmitted max',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsIBRMinRx' => 'instantaneous bit rate received min',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsIBRMinTx' => 'instantaneous bit rate transmitted min',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsIBRRx' => 'instantaneous bit rate received',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsIBRTx' => 'instantaneous bit rate transmitted',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsAclDropNoMatch' => 'acl drop no match',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsAclFwd2Cpu' => 'acl forwarded to cpu',
+            'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsDhcpDropNoAssocIf' => 'dhcp dropped due to no associated interface',
+            'cmQosFlowPolicerStatsFMG' => 'frames marked green and passed',
+            'cmQosFlowPolicerStatsFMY' => 'frames marked yellow and passed',
+            'cmQosFlowPolicerStatsFMYD' => 'frames marked yellow and discarded',
+            'cmQosFlowPolicerStatsFMRD' => 'frames marked red and discarded',
+            'cmQosFlowPolicerStatsBytesIn' => 'total bytes in',
+            'cmQosFlowPolicerStatsBytesOut' => 'total bytes out',
+            'cmQosFlowPolicerStatsABR' => 'average bit rate',
+            'cmAccPortQosShaperStatsBT' => 'bytes dequeued',
+            'cmAccPortQosShaperStatsBTD' => 'bytes tail dropped',
+            'cmAccPortQosShaperStatsFD' => 'frames dequeued',
+            'cmAccPortQosShaperStatsFTD' => 'frames tail dropped',
+            'cmAccPortQosShaperStatsBR' => 'bytes replicated',
+            'cmAccPortQosShaperStatsFR' => 'frames replicated',
+            'cmAccPortQosShaperStatsABRRL' => 'average bit rate - rate limited',
+            'cmAccPortQosShaperStatsBREDD' => 'bytes random early discard, dropped',
+            'cmAccPortQosShaperStatsFREDD' => 'frames random early discard, dropped',
+        ];
+        return $thresholdArray;
     }
 }
