@@ -153,7 +153,7 @@ var SVGDoc = null;
 var last_ifin = 0;
 var last_ifout = 0;
 var last_ugmt = 0;
-var real_interval = '?';
+var real_interval = 0;
 var max = 0;
 var plot_in = [];
 var plot_out = [];
@@ -217,7 +217,6 @@ function plot_data(obj) {
   if (diff_ugmt == 0)
     diff_ugmt = 1;  /* avoid division by zero */
 
-  real_interval = diff_ugmt;
   last_ugmt = ugmt;
   last_ifin = ifin;
   last_ifout = ifout;
@@ -234,15 +233,11 @@ function plot_data(obj) {
         break;
     case max_num_points:
         // shift plot to left if the maximum number of plot points has been reached
-        var i = 0;
-        while (i < max_num_points) {
-          plot_in[i] = plot_in[i+1];
-          plot_out[i] = plot_out[++i];
-        }
-        plot_in.length--;
-        plot_out.length--;
+        plot_in.shift();
+        plot_out.shift();
   }
 
+  real_interval = (real_interval === 0 ? diff_ugmt : ((diff_ugmt + real_interval) / 2));
   plot_in[plot_in.length] = diff_ifin / diff_ugmt;
   plot_out[plot_out.length]= diff_ifout / diff_ugmt;
   var index_plot = plot_in.length - 1;
@@ -328,7 +323,7 @@ function plot_data(obj) {
 function handle_error(type) {
   if (type === 'cachewarning') {
     SVGDoc.getElementById("cachewarning").setAttributeNS(null, 'visibility', 'visible');
-    if (real_interval < 30000) {
+    if (real_interval !== 0) {
         SVGDoc.getElementById('cacheinterval').firstChild.data = Math.round(real_interval);
     }
   } else {
