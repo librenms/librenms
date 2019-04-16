@@ -46,23 +46,27 @@ class AdvaAccThresholdCrossingAlert implements SnmptrapHandler
     {
         $interval = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdInterval"));
         $ifName = $trap->getOidData($trap->findOid("IF-MIB::ifName"));
-        $thresholds = $this->getThresholds();
-        $thresholdMessage = $this->handleThreshold($trap, $thresholds);
+
+        $thresholdMessage = $this->getThresholdMessage(
+            $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdVariable"))
+        );
+
         Log::event("$ifName $thresholdMessage threshold exceeded for $interval", $device->device_id, 'trap', 2);
     }
-    public static function handleThreshold($trap, $thresholds)
+
+    public function getThresholdMessage($thresholdOid)
     {
-        $thresholdOid = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdVariable"));
-        foreach ($thresholds as $oid => $descr) {
+        foreach ($this->getThresholds() as $oid => $descr) {
             if (str_contains($thresholdOid, $oid)) {
                 return $descr;
             }
         }
         return 'unknown';
     }
-    public static function getThresholds()
+
+    public function getThresholds()
     {
-        $thresholdArray = [
+        return [
             'CM-PERFORMANCE-MIB::cmEthernetAccPortStatsUAS' => 'unavailable seconds',
             'CM-PERFORMANCE-MIB::cmEthernetAccPortStatsESBF' => 'broadcast frames sent',
             'CM-PERFORMANCE-MIB::cmEthernetAccPortStatsESBP' => 'broadcast frames received',
@@ -120,6 +124,5 @@ class AdvaAccThresholdCrossingAlert implements SnmptrapHandler
             'cmAccPortQosShaperStatsBREDD' => 'bytes random early discard, dropped',
             'cmAccPortQosShaperStatsFREDD' => 'frames random early discard, dropped',
         ];
-        return $thresholdArray;
     }
 }
