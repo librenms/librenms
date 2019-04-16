@@ -106,7 +106,7 @@ Running in Proxmox.
 
 Running in Ganeti
 
-|                | LibreNMS            | MySQL               |
+|                | LibreNMS            | MySql               |
 | -------------- | ------------------- | ------------------- |
 | Type           | VM                  | Same VM             |
 | OS             | CentOS 7.5          |                     |
