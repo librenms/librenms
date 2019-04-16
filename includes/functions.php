@@ -1424,6 +1424,7 @@ function device_has_ip($ip)
  * @param int $count (min 1)
  * @param int $interval (min 20)
  * @param int $timeout (not more than $interval)
+ * @param int $retries (default 3)
  * @param string $address_family ipv4 or ipv6
  * @return array
  */
