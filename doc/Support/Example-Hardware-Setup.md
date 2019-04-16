@@ -86,6 +86,7 @@ Running in Proxmox.
 #### [CppMonkey(KodApa85)](https://github.com/cppmonkey)
 
 > Home
+
 |                | LibreNMS            | MySQL               |
 | -------------- | ------------------- | ------------------- |
 | Type           | i5-4690K            | Same Workstation    |
@@ -102,7 +103,9 @@ Running in Proxmox.
 #### [CppMonkey(KodApa85)](https://github.com/cppmonkey)
 
 > Dev
+
 Running in Ganeti
+
 |                | LibreNMS            | MySQL               |
 | -------------- | ------------------- | ------------------- |
 | Type           | VM                  | Same VM             |
@@ -119,9 +122,9 @@ Running in Ganeti
 #### [CppMonkey(KodApa85)](https://github.com/cppmonkey)
 
 > Work NOC
-Running in Ganeti Cluster
-Dell PER730xd - 64GB, Dual E5-2660 v3
-Dell PER730xd - 64GB, Dual E5-2640 v3
+
+Running in Ganeti Cluster with 2x Dell PER730xd - 64GB, Dual E5-2660 v3
+
 |                | LibreNMS            | MySQL               |
 | -------------- | ------------------- | ------------------- |
 | Type           | VM                  | VM                  |
