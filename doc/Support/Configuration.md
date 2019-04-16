@@ -72,12 +72,14 @@ $config['fping6']           = "fping6";
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count'] = 3;
 $config['fping_options']['interval'] = 500;
+$config['fping_options']['retries'] = 3;
 ```
 `fping` configuration options:
 
 * `timeout` (`fping` parameter `-t`): Amount of time that fping waits for a response to its first request (in milliseconds). **See note below**
 * `count` (`fping` parameter `-c`): Number of request packets to send to each target.
 * `interval` (`fping` parameter `-p`): Time in milliseconds that fping waits between successive packets to an individual target.
+* `retries` (`fping` parameter `-r`): Number of times to retry if the host does not respond.
 
 > NOTE: Setting a higher timeout value than the interval value can lead to slowing down poller. Example:
 >

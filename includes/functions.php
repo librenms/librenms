@@ -665,6 +665,7 @@ function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
         Config::get('fping_options.count', 3),
         Config::get('fping_options.interval', 500),
         Config::get('fping_options.timeout', 500),
+        Config::get('fping_options.retries', 3),
         $address_family
     );
 
@@ -1426,7 +1427,7 @@ function device_has_ip($ip)
  * @param string $address_family ipv4 or ipv6
  * @return array
  */
-function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_family = 'ipv4')
+function fping($host, $count = 3, $interval = 1000, $timeout = 500, $retries = 3, $address_family = 'ipv4')
 {
     // Default to ipv4
     $fping_name = $address_family == 'ipv6' ? 'fping6' : 'fping';
@@ -1437,6 +1438,8 @@ function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_fam
 
     $interval = max($interval, 20);
     $params .= ' -p ' . $interval;
+
+    $params .= ' -r ' . $retries;
 
     $params .= ' -t ' . max($timeout, $interval);
 

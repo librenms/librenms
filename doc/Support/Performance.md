@@ -72,6 +72,7 @@ You can change some of the default fping options used globally or per device. Th
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count']   = 3;
 $config['fping_options']['interval'] = 500;
+$config['fping_options']['retries'] = 3;
 ```
 
 If your devices are slow to respond then you will need to increase the timeout value and potentially the interval value.
@@ -81,6 +82,7 @@ However if your network is stable, you can increase poller performance by droppi
 $config['fping_options']['timeout'] = 300;
 $config['fping_options']['count']   = 1;
 $config['fping_options']['interval'] = 300;
+$config['fping_options']['retries'] = 1;
 ```
 
 This will mean that we no longer delay each icmp packet sent (we send 3 in total by default) by 0.5 seconds. With only 1 icmp packet
