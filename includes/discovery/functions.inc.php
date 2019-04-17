@@ -216,7 +216,7 @@ function discover_device(&$device, $force_module = false)
 //end discover_device()
 
 // Discover sensors
-function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $const = 0)
+function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null)
 {
     $guess_limits   = Config::get('sensors.guess_limits', true);
 
@@ -227,9 +227,6 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     if (!is_numeric($divisor)) {
         $divisor  = 1;
-    }
-    if (!is_numeric($const)) {
-        $const  = 1;
     }
 
     d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current, (limits: LL: $low_limit, LW: $low_warn_limit, W: $warn_limit, H: $high_limit)\n");
@@ -272,7 +269,6 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
             'user_func' => $user_func,
             'group' => $group,
-            'sensor_const' => $const,
         );
 
         foreach ($insert as $key => $val_check) {
@@ -355,7 +351,6 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             $descr == $sensor_entry['sensor_descr'] &&
             $multiplier == $sensor_entry['sensor_multiplier'] &&
             $divisor == $sensor_entry['sensor_divisor'] &&
-            $const == $sensor_entry['sensor_const'] &&
             $entPhysicalIndex_measured == $sensor_entry['entPhysicalIndex_measured'] &&
             $entPhysicalIndex == $sensor_entry['entPhysicalIndex'] &&
             $user_func == $sensor_entry['user_func'] &&
@@ -373,7 +368,6 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
                 'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
                 'user_func' => $user_func,
                 'group' => $group,
-                'sensor_const' => $const,
             );
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
             echo 'U';
@@ -1085,7 +1079,6 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                     $divisor = $data['divisor'] ?: ($sensor_options['divisor'] ?: 1);
                     $multiplier = $data['multiplier'] ?: ($sensor_options['multiplier'] ?: 1);
-                    $const = $data['const'] ?: ($sensor_options['const'] ?: 0);
 
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
@@ -1094,7 +1087,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         } else {
                             $$limit = dynamic_discovery_get_value($limit, $index, $data, $pre_cache, 'null');
                             if (is_numeric($$limit)) {
-                                $$limit = ($$limit / $divisor) * $multiplier + $const;
+                                $$limit = ($$limit / $divisor) * $multiplier;
                             }
                         }
                     }
@@ -1109,17 +1102,28 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $sensor_name = $data['state_name'] ?: $data['oid'];
                         create_state_index($sensor_name, $data['states']);
                     } else {
-                        // We default to 1 for both divisors / multipliers so it should be safe to do the calculation using both.
-                        $value = ($value / $divisor) * $multiplier + $const;
+                        // We default to 1 for both divisors / multipliers so it
+                        // should be safe to do the calculation using both.
+                        $value = ($value / $divisor) * $multiplier;
                     }
 
-                    //user_func must be applied after divisor/multiplier
                     if (isset($user_function) && function_exists($user_function)) {
                         $value = $user_function($value);
                     }
+                    if (isset($user_function) && !function_exists($user_function)) {
+                        //We try to eval() it. This is not user entered value.
+                        try {
+                            $func = eval($user_function);
+                        } catch (ParseError $e) {
+                            $user_function = '';
+                        }
+                        if (is_callable($func)) {
+                            $value = $func($value);
+                        }
+                    }
 
                     $uindex = str_replace('{{ $index }}', $index, isset($data['index']) ? $data['index'] : $index);
-                    discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $const);
+                    discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group);
 
                     if ($sensor_type === 'state') {
                         create_sensor_to_state_index($device, $sensor_name, $uindex);

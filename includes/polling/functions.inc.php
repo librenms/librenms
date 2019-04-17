@@ -171,12 +171,20 @@ function record_sensor_data($device, $all_sensors)
             $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
         }
 
-        if ($sensor['sensor_const']) {
-            $sensor_value = ($sensor_value + $sensor['sensor_const']);
-        }
-
         if (isset($sensor['user_func']) && function_exists($sensor['user_func'])) {
             $sensor_value = $sensor['user_func']($sensor_value);
+        }
+
+        if (isset($sensor['user_func']) && !function_exists($sensor['user_func'])) {
+            //We try to eval() it. This is not user entered value.
+            try {
+                $func = eval($sensor['user_func']);
+            } catch (ParseError $e) {
+                d_echo('Invalid function user_func');
+            }
+            if (is_callable($func)) {
+                $sensor_value = $func($sensor_value);
+            }
         }
 
         $rrd_name = get_sensor_rrd_name($device, $sensor);

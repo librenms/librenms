@@ -35,10 +35,9 @@ modules:
                     descr: '{{ $ifDescr }} {{ $ifAlias }}' 
                     index: 'opt-temp-{{ $index }}'
                     group: 'Optics'
-                    divisor: 256
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    const: -128
+                    user_func: 'return function($v){return ($v/256)-128;};'
                     skip_values:
                         -
                             oid: sfpDiagModuleTemperature
@@ -63,8 +62,7 @@ modules:
                     descr: '{{ $ifDescr }} Rx Power'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    const: -30
-                    divisor: 10
+                    user_func: 'return function($v){return ($v/10)-30;};'
                     group: '{{ $edfaFreeDescription }}'
                 -
                     oid: edfaConfigTable
@@ -74,8 +72,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'edfaAdminOutputPower-{{ $index }}'
-                    const: -30
-                    divisor: 10
+                    user_func: 'return function($v){return ($v/10)-30;};'
                     group: '{{ $edfaFreeDescription }}'
                 -
                     oid: edfaConfigTable
