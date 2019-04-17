@@ -30,22 +30,9 @@ class Api extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
         $url = $this->config['api-url'];
         $method = $this->config['api-method'];
         return $this->contactAPI($obj, $url, $method);
-    }
-
-    private function deliverAlertOld($obj, $opts)
-    {
-        foreach ($opts as $method => $apis) {
-            foreach ($apis as $api) {
-                $this->contactAPI($obj, $api, $method);
-            }
-        }
-        return true;
     }
 
     private function contactAPI($obj, $api, $method)

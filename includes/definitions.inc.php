@@ -503,6 +503,10 @@ $config['graph_types']['device']['routeros_leases']['section'] = 'network';
 $config['graph_types']['device']['routeros_leases']['order'] = 0;
 $config['graph_types']['device']['routeros_leases']['descr'] = 'DHCP Lease Count';
 
+$config['graph_types']['device']['routeros_pppoe_sessions']['section'] = 'network';
+$config['graph_types']['device']['routeros_pppoe_sessions']['order'] = 0;
+$config['graph_types']['device']['routeros_pppoe_sessions']['descr'] = 'PPPoE Session Count';
+
 
 //CheckPoint SPLAT specific graphs
 $config['graph_types']['device']['secureplatform_sessions']['section'] = 'firewall';

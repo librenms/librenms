@@ -1,0 +1,55 @@
+mib: WISI-GTSENSORS-MIB
+modules:
+    sensors:
+        fanspeed:
+            data:
+                -
+                    oid: gtFansTable
+                    value: gtFanSpeed
+                    num_oid: '.1.3.6.1.4.1.7465.20.2.9.1.3.1.4.1.4.{{ $index }}'
+                    descr: '{{ $gtFanName }}'
+                    index: 'gtFanSpeed.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: gtTempsTable
+                    value: gtTempValue
+                    num_oid: '.1.3.6.1.4.1.7465.20.2.9.1.3.1.2.1.3.{{ $index }}'
+                    descr: '{{ $gtTempName }}'
+                    index: 'gtTempValue.{{ $index }}'
+                    group: 'Chassis'
+                -
+                    oid: gtPSUsTable
+                    value: gtPSUTemperature
+                    num_oid: '.1.3.6.1.4.1.7465.20.2.9.1.3.1.6.1.8.{{ $index }}'
+                    descr: 'Power Supply ({{ $gtPSUName }})'
+                    index: 'gtPSUTemperature.{{ $index }}'
+                    group: 'Power Supply'
+        voltage:
+            data:
+                -
+                    oid: gtPSUsTable
+                    value: gtPSUVoltageExt
+                    num_oid: '.1.3.6.1.4.1.7465.20.2.9.1.3.1.6.1.7.{{ $index }}'
+                    descr: 'Power Supply ({{ $gtPSUName }})'
+                    index: 'gtPSUVoltageExt.{{ $index }}'
+                    divisor: 100
+                    group: 'External Voltage'
+                -
+                    oid: gtPSUsTable
+                    value: gtPSUVoltageInt
+                    num_oid: '.1.3.6.1.4.1.7465.20.2.9.1.3.1.6.1.5.{{ $index }}'
+                    descr: 'Power Supply ({{ $gtPSUName }})'
+                    index: 'gtPSUVoltageInt.{{ $index }}'
+                    divisor: 100
+                    group: 'Internal Voltage'
+        current:
+            data:
+                -
+                    oid: gtPSUsTable
+                    value: gtPSUCurrent
+                    num_oid: '.1.3.6.1.4.1.7465.20.2.9.1.3.1.6.1.4.{{ $index }}'
+                    descr: 'Power Supply ({{ $gtPSUName }})'
+                    index: 'gtTempValue.{{ $index }}'
+                    divisor: 1000
+                    group: 'Internal Current'
