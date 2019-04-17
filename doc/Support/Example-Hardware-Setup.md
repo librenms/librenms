@@ -87,7 +87,7 @@ Running in Proxmox.
 
 > Home
 
-|                | LibreNMS            | MySQL               |
+|                | LibreNMS            | MariaDB             |
 | -------------- | ------------------- | ------------------- |
 | Type           | i5-4690K            | Same Workstation    |
 | OS             | Ubuntu 18.04.2      |                     |
@@ -106,7 +106,7 @@ Running in Proxmox.
 
 Running in Ganeti
 
-|                | LibreNMS            | MySql               |
+|                | LibreNMS            | MariaDB             |
 | -------------- | ------------------- | ------------------- |
 | Type           | VM                  | Same VM             |
 | OS             | CentOS 7.5          |                     |
@@ -125,7 +125,7 @@ Running in Ganeti
 
 Running in Ganeti Cluster with 2x Dell PER730xd - 64GB, Dual E5-2660 v3
 
-|                | LibreNMS            | MySQL               |
+|                | LibreNMS            | MariaDB             |
 | -------------- | ------------------- | ------------------- |
 | Type           | VM                  | VM                  |
 | OS             | Debian Stretch      | Debian Stretch      |
