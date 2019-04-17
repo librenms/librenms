@@ -270,7 +270,7 @@ $config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
 $config['allow_unauth_graphs'] = true;
 ```
 
-Service Alert:
+#### Service Alert:
 ```
 <div style="font-family:Helvetica;">
 <h2>@if ($alert->state == 1) <span style="color:red;">{{ $alert->severity }} @endif
