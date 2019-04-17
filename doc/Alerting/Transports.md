@@ -45,17 +45,12 @@ It is possible to configure as much label values as required in Alertmanager Opt
 | Config | Example |
 | ------ | ------- |
 | Alertmanager URL      | http://alertmanager.example.com |
-| Alertmanager Options: | source=librenms |
-| | customlabel=value |
+| Alertmanager Options: | source=librenms <br/> customlabel=value |
 
 ## API
 API transports definitions are a bit more complex than the E-Mail configuration.
 
-The URL can have the same placeholders as defined in the [Template-Syntax](Templates.md#syntax).
-
-If the `Api Method` is `get`, all placeholders will be URL-Encoded.
-
-The API transport uses cURL to call the APIs, therefore you might need to install `php curl` to make it work.
+The API-Option field can have the same placeholders as defined in the [Template-Syntax](Templates#syntax).
 
 __Note__: it is highly recommended to define your own [Templates](Templates.md) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.
 
@@ -65,8 +60,9 @@ The exemple below will use the API named sms-api of my.example.com and send the 
 
 | Config | Example |
 | ------ | ------- |
-| API Method | get |
-| API URL    | http://my.example.com/sms-api?rcpt=0123456789&key=0987654321abcdef&msg=(LNMS) {{ $title }} |
+| API Method  | get |
+| API URL     | http://my.example.com/sms-api
+| API Options | rcpt=0123456789 <br/> key=0987654321abcdef <br/> msg=(LNMS) {{ $title }} |
 
 ## Boxcar
 Copy your access token from the Boxcar app or from the Boxcar.io website and setup the transport.
@@ -178,9 +174,7 @@ for details on acceptable values.
 | API URL | https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj |
 | Room ID | 7654321 |
 | From Name | LibreNMS |
-| Options | color = red |
-|  | notify = 1 |
-|  | message_format = text |
+| Options | color = red <br/> notify = 1 <br/> message_format = text |
 
 At present the following options are supported: `color`, `notify` and `message_format`. 
 
@@ -366,9 +360,7 @@ Now copy your API Key and obtain your User Key from the newly created Applicatio
 | ------ | ------- |
 | Api Key | APPLICATIONAPIKEYGOESHERE |
 | User Key | USERKEYGOESHERE |
-| Pushover Options | sound_critical=falling |
-|  | sound_warning=siren |
-|  | sound_ok=magic |
+| Pushover Options | sound_critical=falling <br/> sound_warning=siren <br/> sound_ok=magic |
 
 ## Rocket.chat
 The Rocket.chat transport will POST the alert message to your Rocket.chat Incoming WebHook using the
@@ -382,10 +374,7 @@ required value is for url, without this then no call to Rocket.chat will be made
 | Config | Example |
 | ------ | ------- |
 | Webhook URL | https://rocket.url/api/v1/chat.postMessage |
-| Rocket.chat Options | channel=#Alerting |
-|  | username=myname |
-|  | icon_url=http://someurl/image.gif |
-|  | icon_emoji=:smirk: |
+| Rocket.chat Options | channel=#Alerting <br/> username=myname <br/> icon_url=http://someurl/image.gif <br/> icon_emoji=:smirk: |
 
 ## Slack
 The Slack transport will POST the alert message to your Slack Incoming WebHook using the attachments option,
@@ -420,8 +409,7 @@ Destination numbers are one per line, with no spaces. They can be in either loca
 | SMSEagle Host | ip.add.re.ss |
 | User | smseagle_user |
 | Password | smseagle_user_password |
-| Mobiles | +3534567890 |
-|  | 0834567891 |
+| Mobiles | +3534567890 <br/> 0834567891 |
 
 ## Syslog
 You can have LibreNMS emit alerts as syslogs complying with RFC 3164.

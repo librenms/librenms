@@ -41,7 +41,7 @@ class Api extends Transport
     private function contactAPI($obj, $api, $options, $method)
     {
         $method = strtolower($method);
-        $host = explode("?", $api, 2)[0]; //we don't use the parameter part, cause we build it out of options. 
+        $host = explode("?", $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
         //Split the line of options
         $params_lines = preg_split("/\\r\\n|\\r|\\n/", $options);
@@ -83,7 +83,7 @@ class Api extends Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
             var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump("Params: ".implode(PHP_EOL, $params); //FIXME: propper debuging
+            var_dump("Params: ".implode(PHP_EOL, $params)); //FIXME: propper debuging
             var_dump("Return: ".$ret); //FIXME: propper debuging
             return 'HTTP Status code '.$code;
         }
