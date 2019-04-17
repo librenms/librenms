@@ -1,37 +1,55 @@
 <?php
+/**
+ * AlertRules.php
+ *
+ * Extending the built in logging to add an event logger function
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Original Code:
+ * @author Daniel Preussker <f0o@devilcode.org>
+ * @copyright 2014 f0o, LibreNMS
+ * @license GPL
+ * @package LibreNMS
+ * @subpackage Alerts
+ *
+ * Modeified by:
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2019 KanREN, Inc.
+ * @author     Heath Barnhart <hbarnhart@kanren.net>
+ */
 
 namespace LibreNMS\Alert;
 
 use App\Models\Device;
+use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Alert\AlertDB;
 
 class AlertRules
 {
-    /**
-     * Check if device is under maintenance
-     * @param int $device_id Device-ID
-     * @return bool
-     */
-    public function IsMaintenance($device_id)
-    {
-        return \App\Models\Device::find($device_id)->isUnderMaintenance();
-    }
-
-    /**
-     * Run all rules for a device
-     * @param int $device_id Device-ID
-     * @return void
-     */
-    public static function CheckRules($device_id)
+    public function runRules($device_id)
     {
 
         //Check to see if under maintenance
-        if (IsMaintenance($device_id) > 0) {
+        if (AlertUtil::isMaintenance($device_id) > 0) {
             echo "Under Maintenance, Skipping alerts.\r\n";
             return false;
         }
         //Checks each rule.
-        foreach (GetRules($device_id) as $rule) {
-            c_echo('Rule %p#' . $rule['id'] . ' (' . $rule['name'] . '):%n ');
+        foreach (AlertUtil::getRules($device_id) as $rule) {
+            c_echo('Rule %p#'.$rule['id'].' (' . $rule['name'] . '):%n ');
             $extra = json_decode($rule['extra'], true);
             if (isset($extra['invert'])) {
                 $inv = (bool) $extra['invert'];
@@ -40,7 +58,7 @@ class AlertRules
             }
             d_echo(PHP_EOL);
             if (empty($rule['query'])) {
-                $rule['query'] = GenSQL($rule['rule'], $rule['builder']);
+                $rule['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
             }
             $sql = $rule['query'];
             $qry = dbFetchRows($sql, array($device_id));
@@ -73,17 +91,17 @@ class AlertRules
      ORDER BY alert_log.id DESC LIMIT 1', array($device_id, $rule['id']));
                     $details = [];
                     if (!empty($alert_log['details'])) {
-                        $details = json_decode(gzuncompress($alert_log['details']), true);
+                         $details = json_decode(gzuncompress($alert_log['details']), true);
                     }
-                    $details['contacts'] = GetContacts($qry);
-                    $details['rule'] = $qry;
-                    $details = gzcompress(json_encode($details), 9);
+                    $details['contacts'] = AlertUtil::getContacts($qry);
+                    $details['rule']     = $qry;
+                    $details             = gzcompress(json_encode($details), 9);
                     dbUpdate(array('details' => $details), 'alert_log', 'id = ?', array($alert_log['id']));
                 } else {
-                    $extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule' => $qry)), 9);
+                    $extra = gzcompress(json_encode(array('contacts' => AlertUtil::getContacts($qry), 'rule'=>$qry)), 9);
                     if (dbInsert(['state' => 1, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'details' => $extra], 'alert_log')) {
                         if (is_null($current_state)) {
-                            dbInsert(array('state' => 1, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0), 'alerts');
+                            dbInsert(array('state' => 1, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');
                         } else {
                             dbUpdate(['state' => 1, 'open' => 1], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                         }

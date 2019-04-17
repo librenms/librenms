@@ -37,6 +37,7 @@ use Illuminate\Support\Collection;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 use Symfony\Component\Process\Process;
+use LibreNMS\Alert\AlertRules;
 
 class PingCheck implements ShouldQueue
 {
@@ -256,7 +257,8 @@ class PingCheck implements ShouldQueue
             $device->save();
 
             if ($changed) {
-                RunRules($device->device_id);
+                $rules = new AlertRules;
+                $rules->runRules($device->device_id);
             }
 
             // add data to rrd
