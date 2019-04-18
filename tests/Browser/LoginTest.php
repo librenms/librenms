@@ -6,9 +6,8 @@ use App\Models\User;
 use App\Models\UserPref;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
-use LibreNMS\Authentication\TwoFactor;
+use LibreNMS\Config;
 use LibreNMS\Tests\Browser\Pages\LoginPage;
-use LibreNMS\Tests\Browser\Pages\PreferencesPage;
 use LibreNMS\Tests\Browser\Pages\TwoFactorPage;
 use LibreNMS\Tests\DuskTestCase;
 
@@ -47,7 +46,6 @@ class LoginTest extends DuskTestCase
         });
     }
 
-
     /**
      * @throws \Throwable
      */
@@ -58,6 +56,7 @@ class LoginTest extends DuskTestCase
             $user = factory(User::class)->create([
                 'password' => password_hash($password, PASSWORD_DEFAULT)
             ]);
+            Config::set('twofactor', true, true); // set to db
             UserPref::setPref($user, 'twofactor', [
                 'key' => '5P3FLXBX7NU3ZBFOTWZL2GL5MKFEWBOA', // known key: 634456, 613687, 064292
                 'fails' => 0,
