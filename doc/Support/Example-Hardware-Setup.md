@@ -123,10 +123,7 @@ Running in Ganeti
 
 > Work NOC
 
-Running in Ganeti Cluster
-
-* Dell PER730xd - 64GB, Dual E5-2660 v3
-* Dell PER730xd - 64GB, Dual E5-2640 v3
+Running in Ganeti Cluster with 2x Dell PER730xd - 64GB, Dual E5-2660 v3
 
 |                | LibreNMS            | MariaDB             |
 | -------------- | ------------------- | ------------------- |
