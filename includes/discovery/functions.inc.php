@@ -1098,16 +1098,17 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                     $sensor_name = $device['os'];
 
-                    if (isset($user_function) && function_exists($user_function)) {
-                        $value = $user_function($value);
-                    }
-
                     if ($sensor_type === 'state') {
                         $sensor_name = $data['state_name'] ?: $data['oid'];
                         create_state_index($sensor_name, $data['states']);
                     } else {
                         // We default to 1 for both divisors / multipliers so it should be safe to do the calculation using both.
                         $value = ($value / $divisor) * $multiplier;
+                    }
+
+                    //user_func must be applied after divisor/multiplier
+                    if (isset($user_function) && function_exists($user_function)) {
+                        $value = $user_function($value);
                     }
 
                     $uindex = str_replace('{{ $index }}', $index, isset($data['index']) ? $data['index'] : $index);
