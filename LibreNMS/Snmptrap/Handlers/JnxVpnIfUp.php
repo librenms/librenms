@@ -46,7 +46,7 @@ class JnxVpnIfUp implements SnmptrapHandler
         $vpnName = $trap->getOidData($trap->findOid('JUNIPER-VPN-MIB::jnxVpnIfVpnName'));
 
         if (substr($vpnName, 0, 6) === "vt/lsi") {
-	    $vpnDevice = substr($vpnName, 7, 15);
+            $vpnDevice = substr($vpnName, 7, 15);
             Log::event("$vpnType to device $vpnDevice is now connected.", $device->device_id, 'trap', 2);
         } else {
             Log::event("$vpnType on interface $vpnName is now connected.", $device->device_id, 'trap', 2);

@@ -45,13 +45,8 @@ class JnxLdpLspDown implements SnmptrapHandler
         $lspForward = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpLspFec'));
         $routerID = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpRtrid'));
         $reason = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpLspDownReason'));
-        #$lspLength = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpLspFecLen'));
-        $instanceName = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpInstanceName')); 
+        $instanceName = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpInstanceName'));
         
-        Log::event("LDP session $instanceName from $routerID to $lspForward has gone down due to $reason.", $device->device_id , 'trap', 4);
-
-        #Show raw snmp trap information. Useful for debuging.
-        $raw = $trap->getRaw();
-        Log::event("$raw", $device->device_id , 'trap', 2);
+        Log::event("LDP session $instanceName from $routerID to $lspForward has gone down due to $reason.", $device->device_id, 'trap', 4);
     }
 }

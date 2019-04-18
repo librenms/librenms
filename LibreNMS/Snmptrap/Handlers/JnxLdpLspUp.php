@@ -47,10 +47,6 @@ class JnxLdpLspUp implements SnmptrapHandler
         #$lspLength = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpLspFecLen'));
         $instanceName = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpInstanceName'));
        
-        Log::event("LDP session $instanceName from $routerID to $lspForward is now up.", $device->device_id , 'trap', 1);
-
-        #Show raw snmp trap information. Useful for debuging.
-        $raw = $trap->getRaw();
-        Log::event("$raw", $device->device_id , 'trap', 2);
+        Log::event("LDP session $instanceName from $routerID to $lspForward is now up.", $device->device_id, 'trap', 1);
     }
 }

@@ -46,6 +46,6 @@ class JnxDomAlarmCleared implements SnmptrapHandler
         $currentAlarm = $trap->getOidData($trap->findOid('JUNIPER-DOM-MIB::jnxDomCurrentAlarms'));
         $ifDescr = $trap->getOidData($trap->findOid('IF-MIB::ifDescr'));
         $alarmList = JnxDomAlarmId::getAlarms($currentAlarm);
-        Log::event("DOM alarm cleared for interface $ifDescr. Cleared alarm(s): $alarmList", $device->device_id , 'trap', 1);
+        Log::event("DOM alarm cleared for interface $ifDescr. Cleared alarm(s): $alarmList", $device->device_id, 'trap', 1);
     }
 }

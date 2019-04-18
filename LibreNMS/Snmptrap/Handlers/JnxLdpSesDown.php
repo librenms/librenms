@@ -54,10 +54,6 @@ class JnxLdpSesDown implements SnmptrapHandler
 #            return;
 #        }
 
-        Log::event("LDP session on interface $ifIndex is $state due to $reason.", $device->device_id , 'trap', 2);
-
-        #Show raw snmp trap information. Useful for debuging.
-        $raw = $trap->getRaw();
-        Log::event("$raw", $device->device_id , 'trap', 2);
+        Log::event("LDP session on interface $ifIndex is $state due to $reason.", $device->device_id, 'trap', 2);
     }
 }

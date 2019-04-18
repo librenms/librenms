@@ -46,6 +46,6 @@ class JnxDomAlarmSet implements SnmptrapHandler
         $currentAlarm = $trap->getOidData($trap->findOid('JUNIPER-DOM-MIB::jnxDomCurrentAlarms'));
         $ifDescr = $trap->getOidData($trap->findOid('IF-MIB::ifDescr'));
         $alarmList = JnxDomAlarmId::getAlarms($currentAlarm);
-        Log::event("DOM alarm set for interface $ifDescr. Current alarm(s): $alarmList", $device->device_id , 'trap', 5);
+        Log::event("DOM alarm set for interface $ifDescr. Current alarm(s): $alarmList", $device->device_id, 'trap', 5);
     }
 }
