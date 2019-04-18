@@ -28,6 +28,7 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Snmptrap\Handlers\JnxDomAlarmId;
 use Log;
 
 class JnxDomAlarmCleared implements SnmptrapHandler
@@ -42,11 +43,9 @@ class JnxDomAlarmCleared implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        
-        #Log::event("<TEXT>", $device->device_id , 'trap', <servicelevel>);
-
-        #Show raw snmp trap information. Useful for debuging.
-        $raw = $trap->getRaw();
-        Log::event("$raw", $device->device_id , 'trap', 2);
+        $currentAlarm = $trap->getOidData($trap->findOid('JUNIPER-DOM-MIB::jnxDomCurrentAlarms'));
+        $ifDescr = $trap->getOidData($trap->findOid('IF-MIB::ifDescr'));
+        $alarmList = JnxDomAlarmId::getAlarms($currentAlarm);
+        Log::event("DOM alarm cleared for interface $ifDescr. Cleared alarm(s): $alarmList", $device->device_id , 'trap', 1);
     }
 }
