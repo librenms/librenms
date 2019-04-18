@@ -153,6 +153,7 @@ var SVGDoc = null;
 var last_ifin = 0;
 var last_ifout = 0;
 var last_ugmt = 0;
+var last_real = 0;
 var real_interval = 0;
 var max = 0;
 var plot_in = [];
@@ -211,7 +212,18 @@ function plot_data(obj) {
   var diff_ifout = ifout - last_ifout;
 
   if (diff_ifin === 0 && diff_ifout === 0) {
-      return handle_error('cachewarning');
+      handle_error('cachewarning');
+  } else {
+      var diff_real = ugmt - last_real;
+      last_real = ugmt;
+      if (real_interval === 0) {
+          if (diff_real < 10000) {
+              real_interval = diff_real;
+          }
+      } else {
+          // running average to smooth out the numbers a bit
+          real_interval = (diff_real + real_interval) / 2;
+      }
   }
 
   if (diff_ugmt == 0)
@@ -237,20 +249,22 @@ function plot_data(obj) {
         plot_out.shift();
   }
 
-  real_interval = (real_interval === 0 ? diff_ugmt : ((diff_ugmt + real_interval) / 2));
-  plot_in[plot_in.length] = diff_ifin / diff_ugmt;
-  plot_out[plot_out.length]= diff_ifout / diff_ugmt;
-  var index_plot = plot_in.length - 1;
+  var current_in = diff_ifin / diff_ugmt;
+  var current_out = diff_ifout / diff_ugmt;
+  plot_in.push(current_in);
+  plot_out.push(current_out);
 
-  SVGDoc.getElementById('graph_in_txt').firstChild.data = formatSpeed(plot_in[index_plot], unit);
-  SVGDoc.getElementById('graph_out_txt').firstChild.data = formatSpeed(plot_out[index_plot], unit);
+  if (current_in !== 0 && current_out !== 0) {
+      SVGDoc.getElementById('graph_in_txt').firstChild.data = formatSpeed(current_in, unit);
+      SVGDoc.getElementById('graph_out_txt').firstChild.data = formatSpeed(current_out, unit);
+  }
 
   /* determine peak for sensible scaling */
   if (scale_type == 'up') {
-    if (plot_in[index_plot] > max)
-      max = plot_in[index_plot];
-    if (plot_out[index_plot] > max)
-      max = plot_out[index_plot];
+    if (current_in > max)
+      max = current_in;
+    if (current_out > max)
+      max = current_out;
   }
   else if (scale_type == 'follow') {
     i = 0;
@@ -307,10 +321,12 @@ function plot_data(obj) {
   for (i = 1; i < plot_in.length; i++)
   {
     var x = step * i;
-    var y_in = <?php echo($height) ?> - (plot_in[i] * scale);
-    var y_out = <?php echo($height) ?> - (plot_out[i] * scale);
-    path_in += " L" + x + " " + y_in;
-    path_out += " L" + x + " " + y_out;
+    if (plot_in[i] !== 0 && plot_out[i] !== 0) {
+        var y_in = <?php echo($height) ?> - (plot_in[i] * scale);
+        var y_out = <?php echo($height) ?> - (plot_out[i] * scale);
+        path_in += " L" + x + " " + y_in;
+        path_out += " L" + x + " " + y_out;
+    }
   }
 
   SVGDoc.getElementById('error').setAttributeNS(null, 'visibility', 'hidden');
