@@ -178,7 +178,7 @@ function record_sensor_data($device, $all_sensors)
         if (isset($sensor['user_func']) && !function_exists($sensor['user_func'])) {
             //We try to eval() it. This is not user entered value.
             try {
-                $func = eval($sensor['user_func']);
+                $func = eval('return function($value){return (' . $sensor['user_func'] . ');};');
             } catch (ParseError $e) {
                 d_echo('Invalid function user_func');
             }

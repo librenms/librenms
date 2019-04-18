@@ -1113,9 +1113,10 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     if (isset($user_function) && !function_exists($user_function)) {
                         //We try to eval() it. This is not user entered value.
                         try {
-                            $func = eval($user_function);
+                            $func = eval('return function($value){return (' . $user_function . ');};');
                         } catch (ParseError $e) {
-                            $user_function = '';
+                            $user_function = null;
+                            d_echo('Error: Invalid user_func.');
                         }
                         if (is_callable($func)) {
                             $value = $func($value);
