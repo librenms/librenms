@@ -28,7 +28,7 @@
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg" aria-hidden="true"></i> Availability</a></li>
                                 <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg" aria-hidden="true"></i> Network</a></li>
-                                @if($device_groups)
+                                @if($device_groups->isNotEmpty())
                                     <li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Device Groups Maps</a><ul class="dropdown-menu scrollable-menu">
                                         @foreach($device_groups as $group)
                                             <li><a href="{{ url('map', [$group->id]) }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
@@ -105,7 +105,7 @@
                         <li class="dropdown-submenu"><a href="#">No devices</a></li>
                     @endif
 
-                    @if($device_groups)
+                    @if($device_groups->isNotEmpty())
                         <li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Device Groups</a>
                             <ul class="dropdown-menu scrollable-menu">
                             @foreach($device_groups as $group)
@@ -382,6 +382,15 @@
                         </li>
                         <li role="presentation" class="divider"></li>
                         @endadmin
+                        @if (isset($refresh))
+                        <li class="dropdown-submenu">
+                            <a href="#"><span class="countdown_timer" id="countdown_timer"></span></a>
+                            <ul class="dropdown-menu scrollable-menu">
+                                <li><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a></li>
+                            </ul>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        @endif
                         <li><a href="{{ url('about') }}"><i class="fa fa-info-circle fa-fw fa-lg" aria-hidden="true"></i> About&nbsp;{{ \LibreNMS\Config::get('project_name') }}</a></li>
                     </ul>
                 </li>

@@ -146,12 +146,4 @@ if (module_selected('discovery', $init_modules) && !update_os_cache()) {
     load_all_os(!module_selected('nodb', $init_modules));
 }
 
-if (module_selected('web', $init_modules)) {
-    umask(0002);
-    if (!isset($config['title_image'])) {
-        $config['title_image'] = 'images/librenms_logo_'.$config['site_style'].'.svg';
-    }
-    require $install_dir . '/includes/html/vars.inc.php';
-}
-
 $console_color = new Console_Color2();

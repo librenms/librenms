@@ -884,8 +884,8 @@ $config['allow_duplicate_sysName'] = false;// Set to true if you want to allow d
 
 $config['enable_port_relationship'] = true;
 // Set this to false to not display neighbour relationships for ports
-$config['enable_footer'] = 1;
-// Set this to 0 if you want to disable the footer copyright in the web interface
+$config['enable_footer'] = false;
+// Set this to true if you want to enable the footer in the web interface
 $config['api_demo'] = 0;
 // Set this to 1 if you want to disable some untrusting features for the API
 // Distributed Poller-Settings
