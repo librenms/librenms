@@ -189,8 +189,21 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
     echo PHP_EOL;
 } elseif (Config::get('autodiscovery.xdp') === true) {
     echo ' LLDP-MIB: ';
-    $lldp_array  = snmpwalk_group($device, 'lldpRemTable', 'LLDP-MIB', 3);
+    $lldp_array = snmpwalk_group($device, 'lldpRemTable', 'LLDP-MIB', 3);
     if (!empty($lldp_array)) {
+        $lldp_remAddr_num = snmpwalk_cache_multi_oid($device, '.1.0.8802.1.1.2.1.4.2.1.3', [], 'LLDP-MIB', null, '-OQun');
+        foreach ($lldp_remAddr_num as $key => $value) {
+            $res = preg_match("/1\.0\.8802\.1\.1\.2\.1\.4\.2\.1\.3\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*).(([^\.]*)(\.([^\.]*))+)/", $key, $matches);
+            if ($res) {
+                //collect the Management IP address
+                if ($matches[5] == 4) {
+                    $lldp_array[$matches[1]][$matches[2]][$matches[3]]['lldpRemManAddr'] = $matches[6];
+                } else {
+                    $lldp_array[$matches[1]][$matches[2]][$matches[3]]['lldpRemManAddr_v6'] = $matches[6];
+                }
+            }
+        }
+
         $dot1d_array = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
         $lldp_ports = snmpwalk_group($device, 'lldpLocPortId', 'LLDP-MIB');
     }
@@ -230,6 +243,9 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
                                 $remote_device_id = discover_new_device($ip, $device, 'LLDP', $interface);
                                 break;
                             }
+                        }
+                        if (!$remote_device_id && isset($lldp['lldpRemManAddr'])) {
+                            $remote_device_id = discover_new_device($lldp['lldpRemManAddr'], $device, 'LLDP', $interface);
                         }
                         unset($ptopo_array);
                     }
