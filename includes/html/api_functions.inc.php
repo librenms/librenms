@@ -2067,8 +2067,7 @@ function list_fdb()
     } else {
             $fdb = \App\Models\PortsFdb::find($mac);
     }
-    $total_fdb = $fdb->count();
-    if ($total_fdb == 0) {
+    if (!$fdb || $fdb->count() == 0) {
         api_error(404, 'Fdb do not exist');
     }
 
