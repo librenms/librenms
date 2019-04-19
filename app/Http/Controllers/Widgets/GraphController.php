@@ -160,15 +160,16 @@ class GraphController extends WidgetController
         }
 
         $type = $this->getGraphType();
-        $param = '';
+        $params = [];
 
         if ($type == 'device') {
-            $param = 'device='.$settings['graph_device'];
+            $params[] = 'device='.$settings['graph_device'];
         } elseif ($type == 'application') {
-            $param = 'id='.$settings['graph_application'];
+            $params[] = 'id='.$settings['graph_application'];
         } elseif ($type == 'munin') {
             if ($mplug = MuninPlugin::find($settings['graph_munin'])) {
-                $param = 'device='.$mplug->device_id.'&plugin='.$mplug->mplug_type;
+                $params[] = 'device='.$mplug->device_id;
+                $params[] = 'plugin='.$mplug->mplug_type;
             }
         } elseif ($type == 'aggregate') {
             $aggregate_type = $this->getGraphType(false);
@@ -196,14 +197,14 @@ class GraphController extends WidgetController
                 })->pluck('port_id')->all();
             }
 
-            $param = 'id=' . implode(',', $port_ids);
+            $params[] = 'id=' . implode(',', $port_ids);
             $settings['graph_type'] = 'multiport_bits_separate';
         } else {
-            $param = 'id='.$settings['graph_'.$type];
+            $params[] = 'id='.$settings['graph_'.$type];
         }
 
         $data = $settings;
-        $data['param'] = $param;
+        $data['params'] = $params;
         $data['dimensions'] = $request->get('dimensions');
         $data['from'] = Carbon::now()->subSeconds(Time::legacyTimeSpecToSecs($settings['graph_range']))->timestamp;
         $data['to'] = Carbon::now()->timestamp;
