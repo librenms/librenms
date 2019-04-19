@@ -42,7 +42,7 @@ class MuninPluginController extends SelectController
             ->with(['device' => function ($query) {
                 $query->select('device_id', 'hostname', 'sysName');
             }])
-            ->select('mplug_id', 'mplug_type');
+            ->select('mplug_id', 'mplug_type', 'device_id');
     }
 
     public function formatItem($munin_plugin)
