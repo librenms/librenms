@@ -1,6 +1,6 @@
 <?php
 /**
- * JnxDomAlarmTest.php
+ * JnxDomLaneAlarmTest.php
  * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,50 +35,57 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
+use Mockery\Mock;
 
-class JnxDomAlarmTest extends LaravelTestCase
+class JnxDomLaneAlarmTest extends LaravelTestCase
 {
     use DatabaseTransactions;
 
-    public function testJnxDomAlarmSetTrap()
+    public function testJnxDomLaneAlarmSetTrap()
     {
         $device = factory(Device::class)->create();
+        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device->ports()->save($port);
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
-SNMPv2-MIB::snmpTrapOID.0 JUNIPER-DOM-MIB::jnxDomAlarmSet
-IF-MIB::ifDescr.663 et-5/2/0
-JUNIPER-DOM-MIB::jnxDomLastAlarms.663 \"00 00 00 \"
-JUNIPER-DOM-MIB::jnxDomCurrentAlarms.663 \"80 00 00 \"
-JUNIPER-DOM-MIB::jnxDomCurrentAlarmDate.663 2019-4-17,0:4:51.0,-5:0
-SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX480";
+SNMPv2-MIB::snmpTrapOID.0 JUNIPER-DOM-MIB::jnxDomLaneAlarmSet
+IF-MIB::ifDescr.$port->ifIndex 
+JUNIPER-DOM-MIB::jnxDomLaneIndex.$port->ifIndex 0
+JUNIPER-DOM-MIB::jnxDomLaneLastAlarms.$port->ifIndex \"00 00 00 \"
+JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarms.$port->ifIndex \"40 00 00 \"
+JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarmDate.$port->ifIndex 2019-4-10,0:9:35.0,-5:0
+SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960";
 
         $trap = new Trap($trapText);
-        $message = "DOM alarm set for interface et-5/2/0. Current alarm(s): input loss of signal";
+        $message = "DOM lane alarm on interface $port->ifDescr lane 0. Current alarm(s): input signal low";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
 
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxDomAlarmSet');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxDomLaneAlarmSet');
     }
 
-    public function testJnxDomAlarmClearTrap()
+    public function testJnxDomLaneAlarmClearedTrap()
     {
         $device = factory(Device::class)->create();
+        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device->ports()->save($port);
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
-SNMPv2-MIB::snmpTrapOID.0 JUNIPER-DOM-MIB::jnxDomAlarmCleared
-IF-MIB::ifDescr.222 xe-0/0/2
-JUNIPER-DOM-MIB::jnxDomLastAlarms.222 \"00 00 00 \"
-JUNIPER-DOM-MIB::jnxDomCurrentAlarms.222 \"E8 01 00 \"
-JUNIPER-DOM-MIB::jnxDomCurrentAlarmDate.222 2019-4-17,0:4:51.0,-5:0
-SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX480";
+SNMPv2-MIB::snmpTrapOID.0 JUNIPER-DOM-MIB::jnxDomLaneAlarmCleared
+IF-MIB::ifDescr.$port->ifIndex 
+JUNIPER-DOM-MIB::jnxDomLaneIndex.$port->ifIndex 0
+JUNIPER-DOM-MIB::jnxDomLaneLastAlarms.$port->ifIndex \"00 00 00 \"
+JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarms.$port->ifIndex \"08 00 00 \"
+JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarmDate.$port->ifIndex 2019-4-10,0:9:35.0,-5:0
+SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960";
 
         $trap = new Trap($trapText);
-        $message = "DOM alarm cleared for interface xe-0/0/2. Cleared alarm(s): input loss of signal, input loss of lock, input rx path not ready, input laser power low, module not ready";
+        $message = "DOM lane alarm cleared on interface $port->ifDescr lane 0. Current alarm(s): output signal high";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
 
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxDomAlarmCleared');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxDomLaneAlarmCleared');
     }
 }

@@ -53,7 +53,7 @@ class JnxCmCfgChange implements SnmptrapHandler
         if ($source=='other' && $user=='root') {
             Log::event("Config rolled back at $changeTime", $device->device_id, 'trap', 2);
         } else {
-            Log::event("Config modified by $user from $source at $changeTime.", $device->device_id, 'trap', 2);
+            Log::event("Config modified by $user from $source at $changeTime", $device->device_id, 'trap', 2);
         }
     }
 }

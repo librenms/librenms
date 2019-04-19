@@ -1,6 +1,6 @@
 <?php
 /**
- * JnxDomAlarmId.php
+ * JnxLaneDomAlarmId.php
  *
  * -Description-
  *
@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * Used covert alarm ID in the JnxDomAlarm traps from Hex to a
+ * Used covert alarm ID in the JnxDomLaneAlarm traps from Hex to a
  * descriptive string.
 
  * @package    LibreNMS
@@ -29,9 +29,9 @@
 
 namespace LibreNMS\Snmptrap\Handlers;
 
-class JnxDomAlarmId
+class JnxDomLaneAlarmId
 {
-    public static function getAlarms($currentAlarm)
+    public static function getLaneAlarms($currentAlarm)
     {
         $alarmBin = preg_split(
             "//",
@@ -41,31 +41,18 @@ class JnxDomAlarmId
         );
 
         $alarmDescr = [
-        'input loss of signal',
-        'input loss of lock',
-        'input rx path not ready',
-        'input laser power high',
-        'input laser power low',
-        'output laser bias current high',
-        'output laser bias current low',
-        'output laser power high',
-        'output laser power low',
-        'output data not ready',
-        'output tx path not ready',
-        'output laser fault',
-        'output loss of lock',
-        'module temperature high',
-        'module temperature low',
-        'module not ready',
-        'module power down',
-        'wire unplugged or down',
-        'module unplugged or down',
-        'module voltage high',
-        'module voltage low',
+            'input signal high',
+            'input signal low',
+            'output bias high',
+            'output bias low',
+            'output signal high',
+            'output signal low',
+            'lane laser temp high',
+            'lane laster temp low',
         ];
 
-        $x = 0;
         $descr = [];
+        $x = 0;
         foreach ($alarmBin as $syntax) {
             if ($syntax == "1") {
                 $descr[$x] = $alarmDescr[$x];

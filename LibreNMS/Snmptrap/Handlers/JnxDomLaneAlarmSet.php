@@ -20,7 +20,7 @@
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
- * @author     Neil Kahle <nkahle@kanren.net>
+ * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
 namespace LibreNMS\Snmptrap\Handlers;
@@ -28,6 +28,7 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Snmptrap\Handlers\JnxDomLaneAlarmId;
 use Log;
 
 class JnxDomLaneAlarmSet implements SnmptrapHandler
@@ -42,11 +43,11 @@ class JnxDomLaneAlarmSet implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        
-        #Log::event("<TEXT>", $device->device_id , 'trap', <servicelevel>);
-
-        #Show raw snmp trap information. Useful for debuging.
-        $raw = $trap->getRaw();
-        Log::event("$raw", $device->device_id , 'trap', 2);
+        $currentAlarm = $trap->getOidData($trap->findOid('JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarms'));
+        $ifIndex = substr(strrchr($trap->findOid('IF-MIB::ifDescr'), '.'), 1);
+        $port = $device->ports()->where('ifIndex', $ifIndex)->first();
+        $lane = $trap->getOidData($trap->findOid('JUNIPER-DOM-MIB::jnxDomLaneIndex'));
+        $alarmList = JnxDomLaneAlarmId::getLaneAlarms($currentAlarm);
+        Log::event("DOM lane alarm on interface $port->ifDescr lane $lane. Current alarm(s): $alarmList", $device->device_id, 'trap', 5);
     }
 }
