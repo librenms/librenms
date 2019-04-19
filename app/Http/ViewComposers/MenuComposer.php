@@ -152,7 +152,18 @@ class MenuComposer
         // FIXME queries use relationships to user
         $routing_menu = [];
         if ($user->hasGlobalRead()) {
-            if (Vrf::hasAccess($user)->count()) {
+            $routing_count = \View::shared('routing_count', function () {}); // shared from routing page
+            if (!$routing_count) {
+                $routing_count = [
+                    'vrf' => Vrf::hasAccess($user)->count(),
+                    'ospf' => OspfInstance::hasAccess($user)->count(),
+                    'cisco-otv' => Component::hasAccess($user)->where('type', 'Cisco-OTV')->count(),
+                    'bgp' => BgpPeer::hasAccess($user)->count(),
+                    'cef' => CefSwitching::hasAccess($user)->count(),
+                ];
+            }
+
+            if ($routing_count['vrf']) {
                 $routing_menu[] = [
                     [
                         'url' => 'vrf',
@@ -162,7 +173,7 @@ class MenuComposer
                 ];
             }
 
-            if (OspfInstance::hasAccess($user)->count()) {
+            if ($routing_count['ospf']) {
                 $routing_menu[] = [
                     [
                         'url' => 'ospf',
@@ -172,7 +183,7 @@ class MenuComposer
                 ];
             }
 
-            if (Component::hasAccess($user)->where('type', 'Cisco-OTV')->count()) {
+            if ($routing_count['cisco-otv']) {
                 $routing_menu[] = [
                     [
                         'url' => 'cisco-otv',
@@ -182,7 +193,7 @@ class MenuComposer
                 ];
             }
 
-            if (BgpPeer::hasAccess($user)->count()) {
+            if ($routing_count['bgp']) {
                 $vars['show_peeringdb'] = Config::get('peeringdb.enabled', false);
                 $vars['bgp_alerts'] = BgpPeer::hasAccess($user)->inAlarm()->count();
                 $routing_menu[] = [
@@ -207,7 +218,7 @@ class MenuComposer
                 $vars['bgp_alerts'] = [];
             }
 
-            if (CefSwitching::hasAccess($user)->count()) {
+            if ($routing_count['cef']) {
                 $routing_menu[] = [
                     [
                         'url' => 'cef',
