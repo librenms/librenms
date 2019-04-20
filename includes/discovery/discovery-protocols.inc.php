@@ -195,11 +195,13 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
         foreach ($lldp_remAddr_num as $key => $value) {
             $res = preg_match("/1\.0\.8802\.1\.1\.2\.1\.4\.2\.1\.3\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*).(([^\.]*)(\.([^\.]*))+)/", $key, $matches);
             if ($res) {
-                //collect the Management IP address
+                //collect the Management IP address from the OID
                 if ($matches[5] == 4) {
                     $lldp_array[$matches[1]][$matches[2]][$matches[3]]['lldpRemManAddr'] = $matches[6];
                 } else {
-                    $lldp_array[$matches[1]][$matches[2]][$matches[3]]['lldpRemManAddr_v6'] = $matches[6];
+                    $ipv6 = implode(':', array_map(function ($v) {return sprintf('%02x',$v);}, explode('.', $matches[6])));
+                    $ipv6 = preg_replace('/([^:]{2}):([^:]{2})/i', '$1$2', $ipv6);
+                    $lldp_array[$matches[1]][$matches[2]][$matches[3]]['lldpRemManAddr'] = $ipv6;
                 }
             }
         }
