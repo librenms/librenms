@@ -199,7 +199,15 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
                 if ($matches[5] == 4) {
                     $lldp_array[$matches[1]][$matches[2]][$matches[3]]['lldpRemManAddr'] = $matches[6];
                 } else {
-                    $ipv6 = implode(':', array_map(function ($v) {return sprintf('%02x',$v);}, explode('.', $matches[6])));
+                    $ipv6 = implode(
+                        ':', 
+                        array_map(
+                            function ($v) {
+                                return sprintf('%02x', $v);
+                            },
+                            explode('.', $matches[6])
+                            )
+                        );
                     $ipv6 = preg_replace('/([^:]{2}):([^:]{2})/i', '$1$2', $ipv6);
                     $lldp_array[$matches[1]][$matches[2]][$matches[3]]['lldpRemManAddr'] = $ipv6;
                 }
