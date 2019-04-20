@@ -10217,7 +10217,7 @@
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 1 CWDM 1550",
                     "group": "Optics",
-                    "sensor_divisor": 1,
+                    "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 42.44140625,
                     "sensor_limit": 62.44140625,
@@ -10229,7 +10229,7 @@
                     "entPhysicalIndex": "115712",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "($value/256)-128",
+                    "user_func": "substract_128",
                     "state_name": null
                 },
                 {
@@ -10241,7 +10241,7 @@
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 5 to btcc",
                     "group": "Optics",
-                    "sensor_divisor": 1,
+                    "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 32.1328125,
                     "sensor_limit": 52.1328125,
@@ -10253,7 +10253,7 @@
                     "entPhysicalIndex": "377856",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "($value/256)-128",
+                    "user_func": "substract_128",
                     "state_name": null
                 },
                 {
@@ -10265,7 +10265,7 @@
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 9 CWDM 1470",
                     "group": "Optics",
-                    "sensor_divisor": 1,
+                    "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 36.55859375,
                     "sensor_limit": 56.55859375,
@@ -10277,7 +10277,7 @@
                     "entPhysicalIndex": "640000",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "($value/256)-128",
+                    "user_func": "substract_128",
                     "state_name": null
                 },
                 {
@@ -10289,7 +10289,7 @@
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 10 ",
                     "group": "Optics",
-                    "sensor_divisor": 1,
+                    "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 27.3359375,
                     "sensor_limit": 47.3359375,
@@ -10301,7 +10301,7 @@
                     "entPhysicalIndex": "705536",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "($value/256)-128",
+                    "user_func": "substract_128",
                     "state_name": null
                 },
                 {
@@ -10313,7 +10313,7 @@
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 11 CWDM 1530",
                     "group": "Optics",
-                    "sensor_divisor": 1,
+                    "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 36.25,
                     "sensor_limit": 56.25,
@@ -10325,7 +10325,7 @@
                     "entPhysicalIndex": "771072",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "($value/256)-128",
+                    "user_func": "substract_128",
                     "state_name": null
                 },
                 {
@@ -10337,7 +10337,7 @@
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 12 ",
                     "group": "Optics",
-                    "sensor_divisor": 1,
+                    "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 31.3359375,
                     "sensor_limit": 51.3359375,
@@ -10349,7 +10349,7 @@
                     "entPhysicalIndex": "836608",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "($value/256)-128",
+                    "user_func": "substract_128",
                     "state_name": null
                 },
                 {
