@@ -36,10 +36,11 @@ class Api extends Transport
         $url = $this->config['api-url'];
         $options = $this->config['api-options'];
         $method = $this->config['api-method'];
-        return $this->contactAPI($obj, $url, $options, $method);
+        $auth = [$this->config['api-auth-username'], $this->config['api-auth-password']];
+        return $this->contactAPI($obj, $url, $options, $method, $auth);
     }
 
-    private function contactAPI($obj, $api, $options, $method)
+    private function contactAPI($obj, $api, $options, $method, $auth)
     {
         $method = strtolower($method);
         $host = explode("?", $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
@@ -62,11 +63,16 @@ class Api extends Transport
         }
 
         $client = new \GuzzleHttp\Client();
-
+        
+        if (isset($auth) && !empty($auth[0])) {
+            $request_opts['auth'] = $auth;
+        }
         if ($method == "get") {
-            $res = $client->request('GET', $host, ['query' => $query]);
+            $request_opts['query'] = $query;
+            $res = $client->request('GET', $host, $request_opts);
         } else {
-            $res = $client->request('POST', $host, ['form_params' => $query]);
+            $request_opts['form_params'] = $query;
+            $res = $client->request('POST', $host, $request_opts);
         }
 
         $code = $res->getStatusCode();
@@ -109,6 +115,18 @@ class Api extends Transport
                     'name' => 'api-options',
                     'descr' => 'Enter the options (format: option=value separated by new lines)',
                     'type' => 'textarea',
+                ],
+                [
+                    'title' => 'Auth Username',
+                    'name' => 'api-auth-username',
+                    'descr' => 'Auth Username',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Auth Password',
+                    'name' => 'api-auth-password',
+                    'descr' => 'Auth Password',
+                    'type' => 'password',
                 ]
             ],
             'validation' => [
