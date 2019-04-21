@@ -27,6 +27,7 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use App\Models\AlertTemplate;
+use GuzzleHttp\Client;
 
 class Api extends Transport
 {
@@ -46,8 +47,7 @@ class Api extends Transport
         //Split the line of options
         $params_lines = preg_split("/\\r\\n|\\r|\\n/", $options);
 
-        //get the key-values
-        
+        //get the key-values and process blades
         foreach ($params_lines as $current_line) {
             list($k, $v) = explode('=', $current_line, 2);
             try {
@@ -57,34 +57,27 @@ class Api extends Transport
                 echo "Exception e";
                 var_dump($e);
             }
-            //store the parameter in the array
-            $params[] = $k . '=' . rawurlencode($value_processed);
+            //store the parameter in the array for HTTP query
+            $query[$k] = $value_processed;
         }
 
-        $params_string = '';
-        
-        if (isset($params)) {
-            //We have at least one param
-            $params_string = '?' . implode('&', $params);
+        $client = new \GuzzleHttp\Client();
+
+        if ($method == "get") {
+            $res = $client->request('GET', $host, ['query' => $query]);
+        } else {
+            $res = $client->request('POST', $host, ['form_params' => $query]);
         }
 
-        $curl = curl_init();
-        set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_URL, ($method == "get" ? $host.$params_string : $host));
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, strtoupper($method));
-        if (json_decode($api) !== null) {
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
-        }
-        if (isset($params)) {
-            curl_setopt($curl, CURLOPT_POSTFIELDS, implode('&', $params));
-        }
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $code = $res->getStatusCode();
+
         if ($code != 200) {
-            var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump("Params: ".implode(PHP_EOL, $params)); //FIXME: propper debuging
-            var_dump("Return: ".$ret); //FIXME: propper debuging
+            var_dump("API '$host' returned Error");
+            var_dump("Params:");
+            var_dump($query);
+            var_dump("Response headers:");
+            var_dump($res->getHeaders());
+            var_dump("Return: ".$res->getReasonPhrase());
             return 'HTTP Status code '.$code;
         }
 
