@@ -48,11 +48,11 @@ It is possible to configure as much label values as required in Alertmanager Opt
 | Alertmanager Options: | source=librenms <br/> customlabel=value |
 
 ## API
-API transports definitions are a bit more complex than the E-Mail configuration.
+The API Transport allows to reach any service provider using POST or GET URLs (Like SMS provider, etc).
+The API-Option field can have the same placeholders as defined in the [Template-Syntax](Templates.md#syntax).
 
-The API-Option field can have the same placeholders as defined in the [Template-Syntax](Templates#syntax).
-
-__Note__: it is highly recommended to define your own [Templates](Templates.md) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.
+__Note__: it is highly recommended to define your own [Templates](Templates.md) when you want to use the API transport.
+You have to be carefull with length (for HTTP GET requests) and should adapt to the Service Provider limits.
 
 **Example:**
 
@@ -60,9 +60,11 @@ The exemple below will use the API named sms-api of my.example.com and send the 
 
 | Config | Example |
 | ------ | ------- |
-| API Method  | get |
-| API URL     | http://my.example.com/sms-api
-| API Options | rcpt=0123456789 <br/> key=0987654321abcdef <br/> msg=(LNMS) {{ $title }} |
+| API Method    | get |
+| API URL       | http://my.example.com/sms-api
+| API Options   | rcpt=0123456789 <br/> key=0987654321abcdef <br/> msg=(LNMS) {{ $title }} |
+| API Username  | myUsername |
+| API Password  | myPassword |
 
 ## Boxcar
 Copy your access token from the Boxcar app or from the Boxcar.io website and setup the transport.
