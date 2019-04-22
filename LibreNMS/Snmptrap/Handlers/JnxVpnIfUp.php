@@ -47,9 +47,9 @@ class JnxVpnIfUp implements SnmptrapHandler
 
         if (substr($vpnName, 0, 6) === "vt/lsi") {
             $vpnDevice = substr($vpnName, 7, 15);
-            Log::event("$vpnType to device $vpnDevice is now connected.", $device->device_id, 'trap', 2);
+            Log::event("$vpnType to device $vpnDevice is now connected", $device->device_id, 'trap', 1);
         } else {
-            Log::event("$vpnType on interface $vpnName is now connected.", $device->device_id, 'trap', 2);
+            Log::event("$vpnType on interface $vpnName is now connected", $device->device_id, 'trap', 1);
         }
     }
 }

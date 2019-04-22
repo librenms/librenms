@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * Tests JnxDomAlertSet and JnxDomAlertCleared traps from Juniper devices.
+ * Tests JnxLdpLspDown and JnxLdpLspUp traps from Juniper devices.
  *
  * @package    LibreNMS
  * @link       http://librenms.org
@@ -39,7 +39,6 @@ use Log;
 class JnxLdpLspTest extends LaravelTestCase
 {
     use DatabaseTransactions;
-
     public function testLdpLspDownTrap()
     {
         $device = factory(Device::class)->create();

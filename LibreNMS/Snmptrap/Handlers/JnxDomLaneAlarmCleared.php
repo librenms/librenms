@@ -46,10 +46,16 @@ class JnxDomLaneAlarmCleared implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $currentAlarm = $trap->getOidData($trap->findOid('JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarms'));
-        $ifIndex = substr(strrchr($trap->findOid('IF-MIB::ifDescr'), '.'), 1);
-        $port = $device->ports()->where('ifIndex', $ifIndex)->first();
         $lane = $trap->getOidData($trap->findOid('JUNIPER-DOM-MIB::jnxDomLaneIndex'));
         $alarmList = JnxDomLaneAlarmId::getLaneAlarms($currentAlarm);
+
+        $ifIndex = substr(strrchr($trap->findOid('IF-MIB::ifDescr'), '.'), 1);
+        $port = $device->ports()->where('ifIndex', $ifIndex)->first();
+        if (!$port) {
+            Log::warning("Snmptrap JnxDomLaneAlarmCleared: Could not find port at ifIndex $port->ifIndex for device: " . $device->hostname);
+            return;
+        }
+
         Log::event("DOM lane alarm cleared on interface $port->ifDescr lane $lane. Current alarm(s): $alarmList", $device->device_id, 'trap', 1);
     }
 }

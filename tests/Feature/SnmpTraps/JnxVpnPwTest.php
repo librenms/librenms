@@ -1,6 +1,7 @@
 <?php
 /**
- * JnxDomLaneAlarmTest.php
+ * JnxVpnPwTest.php
+ *
  * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * Tests JnxDomAlertSet and JnxDomAlertCleared traps from Juniper devices.
+ * Tests JnxVpnPwDown and JnxVpnPwUp traps from Juniper devices.
  *
  * @package    LibreNMS
  * @link       http://librenms.org
@@ -37,11 +38,11 @@ use LibreNMS\Snmptrap\Trap;
 use Log;
 use Mockery\Mock;
 
-class JnxDomLaneAlarmTest extends LaravelTestCase
+class JnxVpnPwTest extends LaravelTestCase
 {
     use DatabaseTransactions;
 
-    public function testJnxDomLaneAlarmSetTrap()
+    public function testVpnPwDown()
     {
         $device = factory(Device::class)->create();
         $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
@@ -50,24 +51,20 @@ class JnxDomLaneAlarmTest extends LaravelTestCase
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
-SNMPv2-MIB::snmpTrapOID.0 JUNIPER-DOM-MIB::jnxDomLaneAlarmSet
-IF-MIB::ifDescr.$port->ifIndex 
-JUNIPER-DOM-MIB::jnxDomLaneIndex.$port->ifIndex 0
-JUNIPER-DOM-MIB::jnxDomLaneLastAlarms.$port->ifIndex \"00 00 00 \"
-JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarms.$port->ifIndex \"40 00 00 \"
-JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarmDate.$port->ifIndex 2019-4-10,0:9:35.0,-5:0
-SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960";
-
-        \Log::shouldReceive('warning')->never()->with("Snmptrap JnxDomLaneAlarmSet: Could not find port at ifIndex $port->ifIndex for device: $device->hostname");
+SNMPv2-MIB::snmpTrapOID.0 JUNIPER-VPN-MIB::jnxVpnPwDown
+JUNIPER-VPN-MIB::jnxVpnPwVpnType.l2Circuit.\"ge-1/1/1.0\".$port->ifIndex l2Circuit
+JUNIPER-VPN-MIB::jnxVpnPwVpnName.l2Circuit.\"ge-1/1/1.0\".$port->ifIndex $port->ifDescr
+JUNIPER-VPN-MIB::jnxVpnPwIndex.l2Circuit.\"ge-1/1/1.0\".$port->ifIndex $port->ifIndex
+SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX480";
 
         $trap = new Trap($trapText);
-        $message = "DOM lane alarm on interface $port->ifDescr lane 0. Current alarm(s): input signal low";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
+        $message = "l2Circuit on a pseudowire belonging to $port->ifDescr has gone down";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
 
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxDomLaneAlarmSet');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxVpnPwDown trap');
     }
 
-    public function testJnxDomLaneAlarmClearedTrap()
+    public function testVpnPwUp()
     {
         $device = factory(Device::class)->create();
         $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
@@ -76,20 +73,16 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX96
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
-SNMPv2-MIB::snmpTrapOID.0 JUNIPER-DOM-MIB::jnxDomLaneAlarmCleared
-IF-MIB::ifDescr.$port->ifIndex 
-JUNIPER-DOM-MIB::jnxDomLaneIndex.$port->ifIndex 0
-JUNIPER-DOM-MIB::jnxDomLaneLastAlarms.$port->ifIndex \"00 00 00 \"
-JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarms.$port->ifIndex \"08 00 00 \"
-JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarmDate.$port->ifIndex 2019-4-10,0:9:35.0,-5:0
+SNMPv2-MIB::snmpTrapOID.0 JUNIPER-VPN-MIB::jnxVpnPwUp
+JUNIPER-VPN-MIB::jnxVpnPwVpnType.l2Circuit.\"ge-0/0/2.0\".$port->ifIndex l2Circuit
+JUNIPER-VPN-MIB::jnxVpnPwVpnName.l2Circuit.\"ge-0/0/2.0\".$port->ifIndex $port->ifDescr
+JUNIPER-VPN-MIB::jnxVpnPwIndex.l2Circuit.\"ge-0/0/2.0\".$port->ifIndex $port->ifIndex
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960";
 
-        \Log::shouldReceive('warning')->never()->with("Snmptrap JnxDomLaneAlarmCleared: Could not find port at ifIndex $port->ifIndex for device: $device->hostname");
-
         $trap = new Trap($trapText);
-        $message = "DOM lane alarm cleared on interface $port->ifDescr lane 0. Current alarm(s): output signal high";
+        $message = "l2Circuit on a pseudowire belonging to $port->ifDescr is now connected";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
 
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxDomLaneAlarmCleared');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxVpnPwUp trap');
     }
 }

@@ -44,16 +44,15 @@ class JnxLdpSesDown implements SnmptrapHandler
     {
         
         $state = $trap->getOidData($trap->findOid('JUNIPER-MPLS-LDP-MIB::jnxMplsLdpSesState'));
-        $reason = $trap->getOidData($trap->findOid('JUNIPER-MPLS-LDP-MIB::jnxLdpSesDownReason'));
-        $ifIndex = $trap->getOidData($trap->findOid('JUNIPER-MPLS-LDP-MIB::jnxLdpSesDownIf'));
+        $reason = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpSesDownReason'));
+        $ifIndex = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpSesDownIf'));
+        $port = $device->ports()->where('ifIndex', $ifIndex)->first();
 
-#        $port = $device->ports()->where('ifIndex', $ifIndex)->first();
+        if (!$port) {
+            Log::warning("Snmptrap LdpSesDown: Could not find port at ifIndex $port->ifIndex for device: " . $device->hostname);
+            return;
+        }
 
-#        if (!$port) {
-#            Log::warning("Snmptrap LdpSesDown: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
-#            return;
-#        }
-
-        Log::event("LDP session on interface $ifIndex is $state due to $reason.", $device->device_id, 'trap', 2);
+        Log::event("LDP session on interface $port->ifDescr is $state due to $reason", $device->device_id, 'trap', 4);
     }
 }
