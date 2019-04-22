@@ -102,6 +102,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('device', 'DeviceController');
             Route::post('eventlog', 'EventlogController');
             Route::post('fdb-tables', 'FdbTablesController');
+            Route::post('inetCidrRoute', 'RoutesTablesController');
             Route::post('graylog', 'GraylogController');
             Route::post('location', 'LocationController');
             Route::post('port-nac', 'PortNacController');

@@ -269,6 +269,11 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             $routing_tabs[] = 'cisco-otv';
         }
 
+        $device_routing_count['routes'] = @dbFetchCell('SELECT COUNT(*) FROM `inetCidrRoute` WHERE `device_id` = ?', array($device['device_id']));
+        if ($device_routing_count['routes']) {
+            $routing_tabs[] = 'routes';
+        }
+
         if (is_array($routing_tabs)) {
             echo '<li role="presentation" '.$select['routing'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'routing')).'">
