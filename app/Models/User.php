@@ -19,10 +19,16 @@ class User extends Authenticatable
         'descr' => '',
         'realname' => '',
         'email' => '',
-        'can_modify_passwd' => 0,
     ];
     protected $dispatchesEvents = [
         'created' => UserCreated::class,
+    ];
+
+    protected $casts = [
+        'realname' => 'string',
+        'descr' => 'string',
+        'email' => 'string',
+        'can_modify_passwd' => 'integer',
     ];
 
     // ---- Helper Functions ----
@@ -90,6 +96,25 @@ class User extends Authenticatable
         $this->attributes['password'] = $password ? password_hash($password, PASSWORD_DEFAULT) : null;
     }
 
+    /**
+     * Check if the given user can set the password for this user
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canSetPassword($user)
+    {
+        if ($user && LegacyAuth::get()->canUpdatePasswords()) {
+            if ($user->isAdmin()) {
+                return true;
+            }
+
+            return $user->is($this) && $this->can_modify_passwd;
+        }
+
+        return false;
+    }
+
     // ---- Query scopes ----
 
     /**
@@ -111,13 +136,33 @@ class User extends Authenticatable
         });
     }
 
+    // ---- Accessors/Mutators ----
+
+    public function setRealnameAttribute($realname)
+    {
+        $this->attributes['realname'] = (string)$realname;
+    }
+
+    public function setDescrAttribute($descr)
+    {
+        $this->attributes['descr'] = (string)$descr;
+    }
+
+    public function setEmailAttribute($email)
+    {
+        $this->attributes['email'] = (string)$email;
+    }
+
+    public function setCanModifyPasswdAttribute($modify)
+    {
+        $this->attributes['can_modify_passwd'] = $modify ? 1 : 0;
+    }
+
     // ---- Define Relationships ----
 
     public function devices()
     {
         if ($this->hasGlobalRead()) {
-//            $instance = $this->newRelatedInstance('App\Models\Device');
-//            return new HasAll($instance);
             return Device::query();
         } else {
             return $this->belongsToMany('App\Models\Device', 'devices_perms', 'user_id', 'device_id');

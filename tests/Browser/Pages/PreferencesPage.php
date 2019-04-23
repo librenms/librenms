@@ -1,6 +1,6 @@
 <?php
 /**
- * MuninPluginController.php
+ * PreferencesPage.php
  *
  * -Description-
  *
@@ -19,37 +19,47 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 Tony Murray
+ * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers\Select;
+namespace LibreNMS\Tests\Browser\Pages;
 
-use App\Models\MuninPlugin;
+use Laravel\Dusk\Browser;
 
-class MuninPluginController extends SelectController
+class PreferencesPage extends Page
 {
-
     /**
-     * Defines the base query for this resource
+     * Get the URL for the page.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+     * @return string
      */
-    protected function baseQuery($request)
+    public function url()
     {
-        return MuninPlugin::hasAccess($request->user())
-            ->with(['device' => function ($query) {
-                $query->select('device_id', 'hostname', 'sysName');
-            }])
-            ->select('mplug_id', 'mplug_type', 'device_id');
+        return '/preferences';
     }
 
-    public function formatItem($munin_plugin)
+    /**
+     * Assert that the browser is on the page.
+     *
+     * @param  Browser $browser
+     * @return void
+     */
+    public function assert(Browser $browser)
+    {
+        $browser->assertPathIs($this->url());
+    }
+
+    /**
+     * Get the element shortcuts for the page.
+     *
+     * @return array
+     */
+    public function elements()
     {
         return [
-            'id' => $munin_plugin->mplug_id,
-            'text' => $munin_plugin->device->shortDisplayName() . ' - ' . $munin_plugin->mplug_type
+            '@type' => 'select[name=twofactortype]',
+            '@generate' => '#twofactor-generate',
         ];
     }
 }
