@@ -124,15 +124,15 @@ if (LegacyAuth::user()->isDemoUser()) {
   <div class="form-group">
     <label for="twofactortype" class="col-sm-2 control-label">TwoFactor Type</label>
     <div class="col-sm-4">
-      <select name="twofactortype" class="select">
+      <select name="twofactortype" class="select form-control">
         <option value="time">Time Based (TOTP)</option>
         <option value="counter">Counter Based (HOTP)</option>
       </select>
     </div>
   </div>
   <div class="form-group">
-      <div class="col-sm-4 col-sm-offset-1">
-        <button class="btn btn-default" type="submit">Generate TwoFactor Secret Key</button>
+      <div class="col-sm-4 col-sm-offset-2">
+        <button class="btn btn-default" type="submit" id="twofactor-generate">Generate TwoFactor Secret Key</button>
       </div>
   </div>
 </form>';
@@ -159,16 +159,16 @@ foreach (get_dashboards() as $dash) {
     echo "
             <option value='".$dash['dashboard_id']."'".($dash['default'] ? ' selected' : '').">".display($dash['username']).':'.display($dash['dashboard_name'])."</option>";
 }
-echo "
+echo '
           </select>
-          <br>
-          <center><button type='submit' class='btn btn-default'>Update Dashboard</button></center>
         </div>
-        <div class='col-sm-6'></div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-2"><button type="submit" class="btn btn-default">Update Dashboard</button></div>
       </div>
     </div>
   </form>
-</div>";
+</div>';
 
 
 echo "<h3>Add schedule notes to devices notes</h3>
