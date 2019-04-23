@@ -1,8 +1,8 @@
 import threading
 
-from logging import critical, info, debug, exception
+from logging import critical, warning, info, debug, exception
 from math import ceil
-from time import time
+from time import time, sleep
 
 from .service import Service, ServiceConfig
 from .queuemanager import QueueManager, TimedQueueManager, BillingQueueManager
@@ -68,7 +68,14 @@ class DB:
         if threading.get_ident() not in self._db.keys():
             self.connect()
 
-        return self._db[threading.get_ident()]
+        conn = self._db[threading.get_ident()]
+        try:
+            conn.ping()
+        except:
+            warning("WARNING: Lost connection to MySQL server, retrying in 10 seconds")
+            sleep(10)
+            conn.ping()
+        return conn
 
     def query(self, query, args=None):
         """
