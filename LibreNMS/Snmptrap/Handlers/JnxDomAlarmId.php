@@ -64,13 +64,13 @@ class JnxDomAlarmId
         'module voltage low',
         ];
 
-        $x = 0;
+        $index = 0;
         $descr = [];
         foreach ($alarmBin as $syntax) {
             if ($syntax == "1") {
-                $descr[$x] = $alarmDescr[$x];
+                $descr[$index] = $alarmDescr[$index];
             }
-            $x++;
+            $index++;
         }
         $message = implode(', ', $descr);
         return $message;

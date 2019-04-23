@@ -52,12 +52,12 @@ class JnxDomLaneAlarmId
         ];
 
         $descr = [];
-        $x = 0;
+        $index = 0;
         foreach ($alarmBin as $syntax) {
             if ($syntax == "1") {
-                $descr[$x] = $alarmDescr[$x];
+                $descr[$index] = $alarmDescr[$index];
             }
-            $x++;
+            $index++;
         }
         $message = implode(', ', $descr);
         return $message;

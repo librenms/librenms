@@ -52,9 +52,9 @@ class JnxBgpM2Established implements SnmptrapHandler
     {
         $ipv6Array = explode(' ', $ipv6Raw);
         $quartets = [];
-        $x = 0;
+        $index = 0;
         for ($i = 0; $i <= 15; $i = $i + 2) {
-            $quartets[$x++] = $ipv6Array[$i] . $ipv6Array[$i+1];
+            $quartets[$index++] = $ipv6Array[$i] . $ipv6Array[$i+1];
         }
         return implode(':', $quartets);
     }
