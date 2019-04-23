@@ -45,21 +45,10 @@ class Boxcar extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
         $boxcar_opts = $this->parseUserOptions($this->config['options']);
         $boxcar_opts['access_token'] = $this->config['boxcar-token'];
 
         return $this->contactBoxcar($obj, $boxcar_opts);
-    }
-
-    public function deliverAlertOld($obj, $opts)
-    {
-        foreach ($opts as $api) {
-            $this->contactBoxcar($obj, $api);
-        }
-        return true;
     }
 
     public static function contactBoxcar($obj, $api)

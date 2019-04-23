@@ -18,6 +18,10 @@ $links = 1;
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
+if (!LegacyAuth::check()) {
+    die('Unauthorized');
+}
+
 $options = getopt('d::');
 
 if (set_debug(isset($options['d']))) {

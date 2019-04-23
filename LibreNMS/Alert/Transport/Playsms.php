@@ -29,20 +29,12 @@ class Playsms extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
         $playsms_opts['url']   = $this->config['playsms-url'];
         $playsms_opts['user']  = $this->config['playsms-user'];
         $playsms_opts['token'] = $this->config['playsms-token'];
         $playsms_opts['from']  = $this->config['playsms-from'];
         $playsms_opts['to']    = preg_split('/([,\r\n]+)/', $this->config['playsms-mobiles']);
         return $this->contactPlaysms($obj, $playsms_opts);
-    }
-
-    public function deliverAlertOld($obj, $opts)
-    {
-        return $this->contactPlaysms($obj, $opts);
     }
 
     public static function contactPlaysms($obj, $opts)
