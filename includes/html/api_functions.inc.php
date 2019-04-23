@@ -2246,8 +2246,8 @@ function list_logs()
 
     $start = (int)$_GET['start'] ?: 0;
     $limit = (int)$_GET['limit'] ?: 50;
-    $from = (int)$_GET['from'];
-    $to = (int)$_GET['to'];
+    $from = $_GET['from'];
+    $to = $_GET['to'];
 
     $count_query = 'SELECT COUNT(*)';
     $full_query = "SELECT `devices`.`hostname`, `devices`.`sysName`, ";
