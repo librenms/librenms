@@ -1,7 +1,31 @@
 <?php
+/**
+ * TwoFactorController.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2018 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserPref;
 use Illuminate\Http\Request;
@@ -72,6 +96,7 @@ class TwoFactorController extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request)
@@ -80,14 +105,14 @@ class TwoFactorController extends Controller
             'twofactor' => Rule::in('time', 'counter')
         ]);
 
-        $key = \LibreNMS\Authentication\TwoFactor::genKey();
+        $key = TwoFactor::genKey();
 
         // assume time based
         $settings = [
             'key' => $key,
             'fails' => 0,
             'last' => 0,
-            'counter' => $request->get('twofactor') == 'counter' ? 0 : false,
+            'counter' => $request->get('twofactortype') == 'counter' ? 0 : false,
         ];
 
         Session::put('twofactoradd', $settings);
@@ -95,11 +120,10 @@ class TwoFactorController extends Controller
         return redirect()->intended();
     }
 
-
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request)
@@ -113,7 +137,7 @@ class TwoFactorController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function cancelAdd(Request $request)
@@ -126,8 +150,8 @@ class TwoFactorController extends Controller
     /**
      * @param User $user
      * @param string $token
+     * @return true
      * @throws AuthenticationException
-     * return true
      */
     private function checkToken($user, $token)
     {
@@ -182,7 +206,7 @@ class TwoFactorController extends Controller
     private function loadSettings($user)
     {
         if (Session::has('twofactoradd')) {
-            return  Session::get('twofactoradd');
+            return Session::get('twofactoradd');
         }
 
         return UserPref::getPref($user, 'twofactor');
@@ -190,7 +214,7 @@ class TwoFactorController extends Controller
 
     private function genUri($user, $settings)
     {
-        $title = urlencode("Librenms:" . $user->username);
+        $title = "LibreNMS:" . urlencode($user->username);
         $key = $settings['key'];
 
         // time based

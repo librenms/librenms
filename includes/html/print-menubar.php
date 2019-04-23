@@ -656,14 +656,8 @@ if (Auth::user()->hasGlobalAdmin()) {
           <li role="presentation" class="divider"></li>
 
 <?php if (Auth::user()->hasGlobalAdmin()) {
-    if (LegacyAuth::get()->canManageUsers()) {
-        echo('
-           <li><a href="adduser/"><i class="fa fa-user-plus fa-fw fa-lg" aria-hidden="true"></i> Add User</a></li>
-           <li><a href="deluser/"><i class="fa fa-user-times fa-fw fa-lg" aria-hidden="true"></i> Remove User</a></li>
-           ');
-    }
     echo('
-           <li><a href="edituser/"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> Edit User</a></li>
+           <li><a href="' . route('users.index') . '"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> Manage Users</a></li>
            <li><a href="authlog/"><i class="fa fa-shield fa-fw fa-lg" aria-hidden="true"></i> Auth History</a></li>
            <li role="presentation" class="divider"></li> ');
     echo('
