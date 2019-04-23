@@ -43,10 +43,19 @@ class JnxBgpM2Established implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         
-        #Log::event("<TEXT>", $device->device_id , 'trap', <servicelevel>);
+        $peerState = $trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState'));
+        $peerAddr = $this->formatIpv6($trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddr.')));
+        Log::event("BGP Peer $peerAddr is now in the $peerState state", $device->device_id, 'trap', 1);
+    }
 
-        #Show raw snmp trap information. Useful for debuging.
-        $raw = $trap->getRaw();
-        Log::event("$raw", $device->device_id , 'trap', 2);
+    public function formatIpv6($ipv6Raw)
+    {
+        $ipv6Array = explode(' ', $ipv6Raw);
+        $quartets = [];
+        $x = 0;
+        for ($i = 0; $i <= 15; $i = $i + 2) {
+            $quartets[$x++] = $ipv6Array[$i] . $ipv6Array[$i+1];
+        }
+        return implode(':', $quartets);
     }
 }

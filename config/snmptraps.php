@@ -33,5 +33,6 @@ return [
         'JUNIPER-VPN-MIB::jnxVpnPwDown' => \LibreNMS\Snmptrap\Handlers\JnxVpnPwDown::class,
         'JUNIPER-CFGMGMT-MIB::jnxCmCfgChange' => \LibreNMS\Snmptrap\Handlers\JnxCmCfgChange::class,
         'BGP4-V2-MIB-JUNIPER::jnxBgpM2Established' => \LibreNMS\Snmptrap\Handlers\JnxBgpM2Established::class,
+        'BGP4-V2-MIB-JUNIPER::jnxBgpM2BackwardTransition' => \LibreNMS\Snmptrap\Handlers\JnxBgpM2BackwardTransition::class,
     ]
 ];

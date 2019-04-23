@@ -46,8 +46,19 @@ class JnxBgpM2BackwardTransition implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $addrType = str_replace("............ .I. ...........\"", "", $trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddrType')));
-        $peerState = str_replace("............ .I. ...........\"", "", $trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState')));
-        Log::event("BGP backwards transition to $peerState on $addrType.", $device->device_id, 'trap', 3);
+        $peerState = $trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState'));
+        $peerAddr = $this->formatIpv6($trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddr.')));
+        Log::event("BGP Peer $peerAddr is now in the $peerState state", $device->device_id, 'trap', 3);
+    }
+
+    public function formatIpv6($ipv6Raw)
+    {
+        $ipv6Array = explode(' ', $ipv6Raw);
+        $quartets = [];
+        $x = 0;
+        for ($i = 0; $i <= 15; $i = $i + 2) {
+            $quartets[$x++] = $ipv6Array[$i] . $ipv6Array[$i+1];
+        }
+        return implode(':', $quartets);
     }
 }
