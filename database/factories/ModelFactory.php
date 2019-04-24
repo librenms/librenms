@@ -20,6 +20,7 @@ $factory->define(App\Models\User::class, function (Faker\Generator $faker) {
     static $password;
 
     return [
+        'auth_type' => 'mysql',
         'username' => $faker->unique()->userName,
         'realname' => $faker->name,
         'email' => $faker->safeEmail,
