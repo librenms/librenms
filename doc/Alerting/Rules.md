@@ -42,13 +42,13 @@ __Conditions__ can be any of:
 - Less or Equal `<=`
 - Regex `REGEXP`
 
-__Values__ can be an entity or any data. If using macros as value you must include the macro name into backticks. i.e. \`macros.past_60m`
+__Values__ can be an entity or any data. If using macros as value you must include the macro name into backticks. i.e. \`macros.past_60m\`
 
 __Note__: Regex supports MySQL Regular expressions.
 
 Arithmetics are allowed as well.
 
-# Options
+## Options
 
 Here are some of the other options available when adding an alerting rule:
 
@@ -61,7 +61,7 @@ Here are some of the other options available when adding an alerting rule:
 - Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
 - Recovery alerts: This will disable the recovery notification from being sent if turned off.
 
-# Advanced
+## Advanced
 
 On the Advanced tab, you can specify some additional options for the alert rule:
 
@@ -98,7 +98,8 @@ Alert when:
 - High port usage, where description is not client & ifType is not softwareLoopback: `macros.port_usage_perc >= 80 AND port.port_descr_type != "client" AND ports.ifType != "softwareLoopback"`
 - Alert when mac address is located on your network `ipv4_mac.mac_address = "2c233a756912"`
 
-### Alert Rules Collection
+## Alert Rules Collection
 You can also select Alert Rule from the Alerts Collection. These Alert Rules are submitted by users in the community :)
 If would like to submit your alert rules to the collection, please submit them here [Alert Rules Collection](https://github.com/librenms/librenms/blob/master/misc/alert_rules.json)
+
 ![Alert Rules Collection](/img/alert-rules-collection.png)
