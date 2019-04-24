@@ -28,6 +28,7 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Util\IP;
 use Log;
 
 class JnxBgpM2Established implements SnmptrapHandler
@@ -44,18 +45,7 @@ class JnxBgpM2Established implements SnmptrapHandler
     {
         
         $peerState = $trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState'));
-        $peerAddr = $this->formatIpv6($trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddr.')));
+        $peerAddr = IP::fromHexString($trap->getOidData($trap->findOid('BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddr.')));
         Log::event("BGP Peer $peerAddr is now in the $peerState state", $device->device_id, 'trap', 1);
-    }
-
-    public function formatIpv6($ipv6Raw)
-    {
-        $ipv6Array = explode(' ', $ipv6Raw);
-        $quartets = [];
-        $index = 0;
-        for ($i = 0; $i <= 15; $i = $i + 2) {
-            $quartets[$index++] = $ipv6Array[$i] . $ipv6Array[$i+1];
-        }
-        return implode(':', $quartets);
     }
 }

@@ -59,7 +59,7 @@ BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240";
 
         $trap = new Trap($trapText);
-        $message = "BGP Peer 2001:0D88:0001:0000:0000:0000:0000:0002 is now in the idle state";
+        $message = "BGP Peer 2001:d88:1::2 is now in the idle state";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 3);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxBgpM2BackwardsTransition trap');
@@ -82,7 +82,7 @@ BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240";
 
         $trap = new Trap($trapText);
-        $message = "BGP Peer 2001:0D88:0001:0000:0000:0000:0000:0002 is now in the established state";
+        $message = "BGP Peer 2001:d88:1::2 is now in the established state";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxBgpM2Established trap');
