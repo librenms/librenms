@@ -37,7 +37,7 @@ modules:
                     group: 'Optics'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    user_func: '\LibreNMS\OS\Packetlight::substract_128'
+                    user_func: '\LibreNMS\OS\Packetlight::substract128'
                     divisor: 256
                     skip_values:
                         -
@@ -63,7 +63,7 @@ modules:
                     descr: '{{ $ifDescr }} Rx Power'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    user_func: '\LibreNMS\OS\Packetlight::substract_30'
+                    user_func: '\LibreNMS\OS\Packetlight::substract30'
                     divisor: 10
                     group: '{{ $edfaFreeDescription }}'
                 -
@@ -74,7 +74,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'edfaAdminOutputPower-{{ $index }}'
-                    user_func: '\LibreNMS\OS\Packetlight::substract_30'
+                    user_func: '\LibreNMS\OS\Packetlight::substract30'
                     divisor: 10
                     group: '{{ $edfaFreeDescription }}'
                 -

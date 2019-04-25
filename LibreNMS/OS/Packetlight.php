@@ -27,13 +27,13 @@ namespace LibreNMS\OS;
 
 use LibreNMS\OS;
 
-class Packetlight extends OS 
+class Packetlight extends OS
 {
     /**
      * Substract 30 (for yaml user_func)
      *
      */
-    public static function substract_30($value)
+    public static function substract30($value)
     {
         return ($value - 30);
     }
@@ -42,9 +42,8 @@ class Packetlight extends OS
      * Substract 128 (for yaml user_func)
      *
      */
-    public static function substract_128($value)
+    public static function substract128($value)
     {
         return ($value - 128);
     }
-
 }
