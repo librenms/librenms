@@ -43,7 +43,8 @@ class FgTrapAvOversize implements SnmptrapHandler
      * @param Trap $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap) {
-        Log::event("File size exceeds buffer, skipping AV scan.", $device->device_id, 'trap', 2);
+    public function handle(Device $device, Trap $trap)
+    {
+        Log::event("$device->hostname received a file that exceeds proxy buffer, skipping AV scan", $device->device_id, 'trap', 2);
     }
 }

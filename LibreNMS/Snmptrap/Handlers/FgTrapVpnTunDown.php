@@ -18,11 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Fortigate VPN IPSec Tunnel UP.
- * 
+ *
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
- * @author     <your name> <your email>
+ * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
 namespace LibreNMS\Snmptrap\Handlers;

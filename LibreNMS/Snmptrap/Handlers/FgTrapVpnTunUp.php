@@ -1,6 +1,6 @@
 <?php
 /**
- * FgTrapVpnTunUp.php
+ * FgTrapVpnTunDown.php
  *
  * -Description-
  *
@@ -17,12 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Fortigate IPSec tunnel up trap.
- * 
+ * Fortigate VPN IPSec Tunnel UP.
+ *
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
- * @author     <your name> <your email>
+ * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
 namespace LibreNMS\Snmptrap\Handlers;
