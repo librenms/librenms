@@ -5,9 +5,9 @@ use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\ObjectCache;
 
-$service_status   = get_service_status();
-$typeahead_limit  = $config['webui']['global_search_result_limit'];
-$if_alerts        = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
+//$service_status   = get_service_status();
+//$typeahead_limit  = $config['webui']['global_search_result_limit'];
+//$if_alerts        = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
 
 if (Auth::user()->hasGlobalRead()) {
     $links['count']        = dbFetchCell("SELECT COUNT(*) FROM `links`");
@@ -16,7 +16,7 @@ if (Auth::user()->hasGlobalRead()) {
 }
 
 if (isset($config['enable_bgp']) && $config['enable_bgp']) {
-    $bgp_alerts = dbFetchCell("SELECT COUNT(bgpPeer_id) FROM bgpPeers AS B where (bgpPeerAdminStatus = 'start' OR bgpPeerAdminStatus = 'running') AND bgpPeerState != 'established'");
+//    $bgp_alerts = dbFetchCell("SELECT COUNT(bgpPeer_id) FROM bgpPeers AS B where (bgpPeerAdminStatus = 'start' OR bgpPeerAdminStatus = 'running') AND bgpPeerState != 'established'");
 }
 
 if (isset($config['site_style']) && ($config['site_style'] == 'dark' || $config['site_style'] == 'mono')) {
@@ -59,7 +59,7 @@ if ($config['title_image']) {
               <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg" aria-hidden="true"></i> Availability</a></li>
               <li><a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg" aria-hidden="true"></i> Network</a></li>
                 <?php
-                    $devices_groups = GetDeviceGroups();
+//                    $devices_groups = GetDeviceGroups();
                 if (count($devices_groups) > 0) {
                     echo '<li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> Device Groups Maps</a><ul class="dropdown-menu scrollable-menu">';
                     foreach ($devices_groups as $group) {
@@ -151,7 +151,7 @@ if (Auth::user()->hasGlobalRead()) {
     $param[] = Auth::id();
 }
 
-$device_types = dbFetchRows($sql, $param);
+//$device_types = dbFetchRows($sql, $param);
 
 if (count($device_types) > 0) {
 ?>
@@ -180,7 +180,7 @@ if (count($devices_groups) > 0) {
 }
 if ($config['show_locations']) {
     if ($config['show_locations_dropdown']) {
-        $locations = getlocations();
+        $locations = getlocations(); //FIXME referenced elsewhere
         if (count($locations) > 0) {
             echo('
                     <li role="presentation" class="divider"></li>
@@ -216,7 +216,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
     echo '<li><a href="'.generate_url(array('page'=>'device-dependencies')).'"><i class="fa fa-group fa-fw fa-lg"></i> Device Dependencies</a></li>';
 
-    $vm_count = dbFetchCell('SELECT COUNT(id) from `vminfo`');
+//    $vm_count = dbFetchCell('SELECT COUNT(id) from `vminfo`');
     if ($vm_count > 0) {
         echo '<li><a href="'.generate_url(array('page'=>'vminfo')).'"><i class="fa fa-cog fa-fw fa-lg"></i> Virtual Machines</a></li>';
     }
