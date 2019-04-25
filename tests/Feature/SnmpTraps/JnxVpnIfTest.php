@@ -29,18 +29,13 @@
 namespace LibreNMS\Tests;
 
 use App\Models\Device;
-use App\Models\Eventlog;
-use App\Models\Ipv4Address;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
-use Mockery\Mock;
 
 class JnxVpnIfTest extends LaravelTestCase
 {
-    use DatabaseTransactions;
 
     public function testVpnIfDown()
     {

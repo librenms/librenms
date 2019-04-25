@@ -28,34 +28,31 @@
 namespace LibreNMS\Tests;
 
 use App\Models\Device;
-use App\Models\Eventlog;
-use App\Models\Ipv4Address;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
 class JnxDomAlarmTest extends LaravelTestCase
 {
-    use DatabaseTransactions;
 
     public function testJnxDomAlarmSetTrap()
     {
         $device = factory(Device::class)->create();
+        $port = factory(Port::class)->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 JUNIPER-DOM-MIB::jnxDomAlarmSet
-IF-MIB::ifDescr.663 et-5/2/0
-JUNIPER-DOM-MIB::jnxDomLastAlarms.663 \"00 00 00 \"
-JUNIPER-DOM-MIB::jnxDomCurrentAlarms.663 \"80 00 00 \"
-JUNIPER-DOM-MIB::jnxDomCurrentAlarmDate.663 2019-4-17,0:4:51.0,-5:0
+IF-MIB::ifDescr.$port->ifIndex $port->ifDescr
+JUNIPER-DOM-MIB::jnxDomLastAlarms.$port->ifIndex \"00 00 00 \"
+JUNIPER-DOM-MIB::jnxDomCurrentAlarms.$port->ifIndex \"80 00 00 \"
+JUNIPER-DOM-MIB::jnxDomCurrentAlarmDate.$port->ifIndex 2019-4-17,0:4:51.0,-5:0
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX480";
 
         $trap = new Trap($trapText);
-        $message = "DOM alarm set for interface et-5/2/0. Current alarm(s): input loss of signal";
+        $message = "DOM alarm set for interface $port->ifDescr. Current alarm(s): input loss of signal";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxDomAlarmSet');
@@ -64,19 +61,20 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
     public function testJnxDomAlarmClearTrap()
     {
         $device = factory(Device::class)->create();
+        $port = factory(Port::class)->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 JUNIPER-DOM-MIB::jnxDomAlarmCleared
-IF-MIB::ifDescr.222 xe-0/0/2
-JUNIPER-DOM-MIB::jnxDomLastAlarms.222 \"00 00 00 \"
-JUNIPER-DOM-MIB::jnxDomCurrentAlarms.222 \"E8 01 00 \"
-JUNIPER-DOM-MIB::jnxDomCurrentAlarmDate.222 2019-4-17,0:4:51.0,-5:0
+IF-MIB::ifDescr.$port->ifIndex $port->ifDescr
+JUNIPER-DOM-MIB::jnxDomLastAlarms.$port->ifIndex \"00 00 00 \"
+JUNIPER-DOM-MIB::jnxDomCurrentAlarms.$port->ifIndex \"E8 01 00 \"
+JUNIPER-DOM-MIB::jnxDomCurrentAlarmDate.$port->ifIndex 2019-4-17,0:4:51.0,-5:0
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX480";
 
         $trap = new Trap($trapText);
-        $message = "DOM alarm cleared for interface xe-0/0/2. Cleared alarm(s): input loss of signal, input loss of lock, input rx path not ready, input laser power low, module not ready";
+        $message = "DOM alarm cleared for interface $port->ifDescr. Cleared alarm(s): input loss of signal, input loss of lock, input rx path not ready, input laser power low, module not ready";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxDomAlarmCleared');

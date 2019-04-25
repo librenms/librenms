@@ -28,17 +28,12 @@
 namespace LibreNMS\Tests;
 
 use App\Models\Device;
-use App\Models\Eventlog;
-use App\Models\Ipv4Address;
-use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
 class JnxBgpM2Test extends LaravelTestCase
 {
-    use DatabaseTransactions;
 
     public function testBgpBackwardTrasition()
     {
@@ -54,7 +49,6 @@ BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0
 BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddrType.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 ipv6
 BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddr.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 \"20 01 0D 88 00 01 00 00 00 00 00 00 00 00 00 02 \"
 BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceived.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 \"00 00 \"
-BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceivedText.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 
 BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 idle
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240";
 

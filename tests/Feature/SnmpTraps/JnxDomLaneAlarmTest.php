@@ -28,18 +28,13 @@
 namespace LibreNMS\Tests;
 
 use App\Models\Device;
-use App\Models\Eventlog;
-use App\Models\Ipv4Address;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
-use Mockery\Mock;
 
 class JnxDomLaneAlarmTest extends LaravelTestCase
 {
-    use DatabaseTransactions;
 
     public function testJnxDomLaneAlarmSetTrap()
     {
@@ -51,7 +46,7 @@ class JnxDomLaneAlarmTest extends LaravelTestCase
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 JUNIPER-DOM-MIB::jnxDomLaneAlarmSet
-IF-MIB::ifDescr.$port->ifIndex 
+IF-MIB::ifDescr.$port->ifIndex $port->ifDescr
 JUNIPER-DOM-MIB::jnxDomLaneIndex.$port->ifIndex 0
 JUNIPER-DOM-MIB::jnxDomLaneLastAlarms.$port->ifIndex \"00 00 00 \"
 JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarms.$port->ifIndex \"40 00 00 \"
@@ -77,7 +72,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX96
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 JUNIPER-DOM-MIB::jnxDomLaneAlarmCleared
-IF-MIB::ifDescr.$port->ifIndex 
+IF-MIB::ifDescr.$port->ifIndex $port->ifDescr
 JUNIPER-DOM-MIB::jnxDomLaneIndex.$port->ifIndex 0
 JUNIPER-DOM-MIB::jnxDomLaneLastAlarms.$port->ifIndex \"00 00 00 \"
 JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarms.$port->ifIndex \"08 00 00 \"

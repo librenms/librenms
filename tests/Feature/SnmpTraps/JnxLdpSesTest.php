@@ -28,23 +28,19 @@
 namespace LibreNMS\Tests;
 
 use App\Models\Device;
-use App\Models\Eventlog;
-use App\Models\Ipv4Address;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
 class JnxLdpSesTest extends LaravelTestCase
 {
-    use DatabaseTransactions;
 
     public function testJnxLdpSesDownTrap()
     {
-            $device = factory(Device::class)->create();
-            $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
-            $device->ports()->save($port);
+        $device = factory(Device::class)->create();
+        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device->ports()->save($port);
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
@@ -66,9 +62,9 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
 
     public function testJnxLdpSesUpTrap()
     {
-            $device = factory(Device::class)->create();
-            $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
-            $device->ports()->save($port);
+        $device = factory(Device::class)->create();
+        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device->ports()->save($port);
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162

@@ -29,18 +29,13 @@
 namespace LibreNMS\Tests;
 
 use App\Models\Device;
-use App\Models\Eventlog;
-use App\Models\Ipv4Address;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
-use Mockery\Mock;
 
 class JnxVpnPwTest extends LaravelTestCase
 {
-    use DatabaseTransactions;
 
     public function testVpnPwDown()
     {
@@ -52,9 +47,9 @@ class JnxVpnPwTest extends LaravelTestCase
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 JUNIPER-VPN-MIB::jnxVpnPwDown
-JUNIPER-VPN-MIB::jnxVpnPwVpnType.l2Circuit.\"ge-1/1/1.0\".$port->ifIndex l2Circuit
-JUNIPER-VPN-MIB::jnxVpnPwVpnName.l2Circuit.\"ge-1/1/1.0\".$port->ifIndex $port->ifDescr
-JUNIPER-VPN-MIB::jnxVpnPwIndex.l2Circuit.\"ge-1/1/1.0\".$port->ifIndex $port->ifIndex
+JUNIPER-VPN-MIB::jnxVpnPwVpnType.l2Circuit.\"ge-0/0/2.0\".$port->ifIndex l2Circuit
+JUNIPER-VPN-MIB::jnxVpnPwVpnName.l2Circuit.\"ge-0/0/2.0\".$port->ifIndex $port->ifDescr
+JUNIPER-VPN-MIB::jnxVpnPwIndex.l2Circuit.\"ge-0/0/2.0\".$port->ifIndex $port->ifIndex
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX480";
 
         $trap = new Trap($trapText);
@@ -76,7 +71,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 JUNIPER-VPN-MIB::jnxVpnPwUp
 JUNIPER-VPN-MIB::jnxVpnPwVpnType.l2Circuit.\"ge-0/0/2.0\".$port->ifIndex l2Circuit
 JUNIPER-VPN-MIB::jnxVpnPwVpnName.l2Circuit.\"ge-0/0/2.0\".$port->ifIndex $port->ifDescr
-JUNIPER-VPN-MIB::jnxVpnPwIndex.l2Circuit.\"ge-0/0/2.0\".$port->ifIndex $port->ifIndex
+JUNIPER-VPN-MIB::jnxVpnPwIndex.l2Circuit.\"ge-0/02.0\".$port->ifIndex $port->ifIndex
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960";
 
         $trap = new Trap($trapText);

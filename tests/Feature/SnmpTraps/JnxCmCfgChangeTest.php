@@ -28,17 +28,12 @@
 namespace LibreNMS\Tests;
 
 use App\Models\Device;
-use App\Models\Eventlog;
-use App\Models\Ipv4Address;
-use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
 class JnxCmCfgChangeTest extends LaravelTestCase
 {
-    use DatabaseTransactions;
 
     public function testConfigChangeTrap()
     {
@@ -53,7 +48,6 @@ JUNIPER-CFGMGMT-MIB::jnxCmCfgChgEventTime.54 316:13:26:37.65
 JUNIPER-CFGMGMT-MIB::jnxCmCfgChgEventDate.54 2018-11-21,7:34:39.0,-6:0
 JUNIPER-CFGMGMT-MIB::jnxCmCfgChgEventSource.54 cli
 JUNIPER-CFGMGMT-MIB::jnxCmCfgChgEventUser.54 TestUser
-JUNIPER-CFGMGMT-MIB::jnxCmCfgChgEventLog.54 
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameEX2200";
 
         $trap = new Trap($trapText);
@@ -65,7 +59,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameEX22
 
     public function testConfigRollbackTrap()
     {
-                $device = factory(Device::class)->create();
+        $device = factory(Device::class)->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
@@ -75,7 +69,6 @@ JUNIPER-CFGMGMT-MIB::jnxCmCfgChgEventTime.54 316:13:26:37.65
 JUNIPER-CFGMGMT-MIB::jnxCmCfgChgEventDate.54 2017-12-21,7:34:39.0,-6:0
 JUNIPER-CFGMGMT-MIB::jnxCmCfgChgEventSource.54 other
 JUNIPER-CFGMGMT-MIB::jnxCmCfgChgEventUser.54 root
-JUNIPER-CFGMGMT-MIB::jnxCmCfgChgEventLog.54 
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameEX2200";
 
         $trap = new Trap($trapText);
