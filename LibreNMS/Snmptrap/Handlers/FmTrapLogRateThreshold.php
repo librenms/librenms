@@ -17,10 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * FortiAnalyzer will send this trap when the received log rate
+ * exceeds the suggested rate for the daily rate license.
+ *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 <your name>
- * @author     <your name> <your email>
+ * @copyright  2019 KanREN, Inc.
+ * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
 namespace LibreNMS\Snmptrap\Handlers;
@@ -40,15 +43,10 @@ class FmTrapLogRateThreshold implements SnmptrapHandler
      * @param Trap $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap) {
-        $device_array = $device->toArray();
+    public function handle(Device $device, Trap $trap)
+    {
         $logRate = $trap->getOidData($trap->findOid('FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmLogRate'));
         $logThresh = $trap->getOidData($trap->findOid('FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmLogRateThreshold'));
-        log_event("Recommended log rate exceeded. Current Rate: $logRate Recommended Rate: $logThresh", $device_array , 'trap', 3);
-
-    #Show raw snmp trap information. Useful for debuging.
-    #$raw = $trap->getRaw();
-    #log_event("$raw", $device_array , 'trap', 2);
-
+        Log::event("Recommended log rate exceeded. Current Rate: $logRate Recommended Rate: $logThresh", $device->device_id, 'trap', 3);
     }
 }

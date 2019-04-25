@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Trap sent when Fortigate IPS signature database was updated.
- *   
+ * 
  * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
@@ -42,7 +42,8 @@ class FgTrapIpsPkgUpdate implements SnmptrapHandler
      * @param Trap $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap) {
+    public function handle(Device $device, Trap $trap)
+    {
         Log::event("IPS package updated on $device->hostname", $device->device_id, 'trap', 2);
     }
 }

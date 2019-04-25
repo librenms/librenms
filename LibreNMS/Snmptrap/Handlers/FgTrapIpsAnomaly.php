@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Fortigate DDoS Policy tripped.  
+ * Fortigate DDoS Policy tripped.
  *
  * @package    LibreNMS
  * @link       http://librenms.org
@@ -42,9 +42,10 @@ class FgTrapIpsAnomaly implements SnmptrapHandler
      * @param Trap $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap) {
-        $srcIP = $trap->getOidData($trap->findOid('FORTINET-FORTIGATE-MIB::fgIpsTrapSrcIp'));
+    public function handle(Device $device, Trap $trap)
+    {
+        $srcIp = $trap->getOidData($trap->findOid('FORTINET-FORTIGATE-MIB::fgIpsTrapSrcIp'));
         $proto = $trap->getOidData($trap->findOid('FORTINET-FORTIGATE-MIB::fgIpsTrapSigMsg'));
-        Log::event("DDoS prevention triggered. Source: $srcIP Protocol: $proto", $device->device_id, 'trap', 4);
+        Log::event("DDoS prevention triggered. Source: $srcIp Protocol: $proto", $device->device_id, 'trap', 4);
     }
 }

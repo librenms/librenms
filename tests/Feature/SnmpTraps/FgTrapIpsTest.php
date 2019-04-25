@@ -25,17 +25,14 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\BgpPeer;
 use App\Models\Device;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Models\Ipv4Address;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\LaravelTestCase;
-use App\Models\Ipv4Address;
 
 class FgTrapIpsTest extends LaravelTestCase
 {
-
     public function testIpsAnomaly()
     {
         $device = factory(Device::class)->create();

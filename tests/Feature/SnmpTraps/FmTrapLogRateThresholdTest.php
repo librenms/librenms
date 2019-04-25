@@ -1,6 +1,6 @@
 <?php
 /*
- * FgTrapAvOversizeTest.php
+ * FmTrapLogRateThresholdTest.php
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Unit tests for Fortigate FgTrapAvOversized.php
+ * Unit tests for Fortigate FmTrapLogRateThreshold.php
  *
  * @package    LibreNMS
  * @link       http://librenms.org
@@ -30,8 +30,9 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\LaravelTestCase;
 
-class FgTrapAvOversizeTest extends LaravelTestCase
+class FgTrapLogRateThresholdTest extends LaravelTestCase
 {
+
     public function testAvOversize()
     {
         $device = factory(Device::class)->create();
@@ -39,14 +40,16 @@ class FgTrapAvOversizeTest extends LaravelTestCase
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81
-SNMPv2-MIB::snmpTrapOID.0 FORTINET-FORTIGATE-MIB::fgTrapAvOversize
+SNMPv2-MIB::snmpTrapOID.0 FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmTrapLogRateThreshold
 FORTINET-CORE-MIB::fnSysSerial.0 $device->serial
-SNMPv2-MIB::sysName.0 $device->hostname";
+SNMPv2-MIB::sysName.0 $device->hostname
+FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmLogRate.0 315
+FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmLogRateThreshold.0 260";
 
-        $message = "$device->hostname received a file that exceeds proxy buffer, skipping AV scan";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
+        $message = "Recommended log rate exceeded. Current Rate: 315 Recommended Rate: 260";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 3);
 
         $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle fgTrapIpsAvOversize');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle fmTrapLogRateThreshold trap');
     }
 }
