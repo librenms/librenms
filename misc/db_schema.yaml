@@ -659,6 +659,27 @@ hrDevice:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [hrDevice_id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+inetCidrRoute:
+  Columns:
+    - { Field: inetCidrRoute_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: context_name, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: inetCidrRouteIfIndex, Type: bigint(20), 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteType, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteProto, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteNextHopAS, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteMetric1, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteDestType, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteDest, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteNextHopType, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteNextHop, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteNextHop_device_id, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: inetCidrRoutePolicy, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: inetCidrRoutePfxLen, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [inetCidrRoute_id], Unique: true, Type: BTREE }
 ipsec_tunnels:
   Columns:
     - { Field: tunnel_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }

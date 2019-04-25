@@ -99,7 +99,7 @@ class RoutesTablesController extends TableController
             $query->join('ports', function ($join) {
                     $join->on('inetCidrRoute.inetCidrRouteIfIndex', 'ports.ifIndex')
                     ->on('inetCidrRoute.device_id', '=', 'ports.device_id');
-                    })
+            })
             ->orderBy('ports.ifDescr', $sort['inetCidrRouteIfIndex']);
         }
 
@@ -185,5 +185,4 @@ class RoutesTablesController extends TableController
         }
         return $item;
     }
-
 }
