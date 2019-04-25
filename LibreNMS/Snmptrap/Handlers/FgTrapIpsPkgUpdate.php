@@ -43,6 +43,6 @@ class FgTrapIpsPkgUpdate implements SnmptrapHandler
      * @return void
      */
     public function handle(Device $device, Trap $trap) {
-        Log::event("IPS package updated.", $device->device_id, 'trap', 2);
+        Log::event("IPS package updated on $device->hostname", $device->device_id, 'trap', 2);
     }
 }

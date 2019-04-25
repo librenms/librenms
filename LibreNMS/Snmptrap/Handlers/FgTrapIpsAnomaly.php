@@ -45,6 +45,6 @@ class FgTrapIpsAnomaly implements SnmptrapHandler
     public function handle(Device $device, Trap $trap) {
         $srcIP = $trap->getOidData($trap->findOid('FORTINET-FORTIGATE-MIB::fgIpsTrapSrcIp'));
         $proto = $trap->getOidData($trap->findOid('FORTINET-FORTIGATE-MIB::fgIpsTrapSigMsg'));
-        Log::event("DDoS prevention triggered. Source: $srcIP Protocol: $proto", $device->device_id, 'trap', 3);
+        Log::event("DDoS prevention triggered. Source: $srcIP Protocol: $proto", $device->device_id, 'trap', 4);
     }
 }

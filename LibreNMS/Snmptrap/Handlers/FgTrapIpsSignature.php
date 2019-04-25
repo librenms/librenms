@@ -46,6 +46,6 @@ class FgTrapIpsSignature implements SnmptrapHandler
         $srcIP = $trap->getOidData($trap->findOid('FORTINET-FORTIGATE-MIB::fgIpsTrapSrcIp'));
         $sigNum = $trap->getOidData($trap->findOid('FORTINET-FORTIGATE-MIB::fgIpsTrapSigId'));
         $sigName = $trap->getOidData($trap->findOid('FORTINET-FORTIGATE-MIB::fgIpsTrapSigMsg'));
-        Log::event("IPS detection. Source: $srcIP Signature ID: $sigNum Signature: $sigName", $device->device_id, 'trap', 3);
+        Log::event("IPS signature $sigName detected from $srcIP with Fortiguard ID $sigNum", $device->device_id, 'trap', 4);
     }
 }
