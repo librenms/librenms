@@ -118,6 +118,10 @@ class RoutesTablesController extends TableController
             $query->orderBy('created_at', $sort['created_at']);
         }
 
+        if (isset($sort['context_name'])) {
+            $query->orderBy('context_name', $sort['context_name']);
+        }
+
         return $query;
     }
 
@@ -165,7 +169,7 @@ class RoutesTablesController extends TableController
             if ($device->device_id == $route_entry->device_id) {
                 $item['inetCidrRouteNextHop'] = Url::deviceLink($device, "localhost");
             } else {
-                $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . " (" . Url::deviceLink($device) . ")";
+                $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . "<br>(" . Url::deviceLink($device) . ")";
             }
         }
         if ($route_entry->inetCidrRouteProto && $translateProto[$route_entry->inetCidrRouteProto]) {
@@ -173,6 +177,11 @@ class RoutesTablesController extends TableController
         }
         if ($route_entry->inetCidrRouteType && $translateType[$route_entry->inetCidrRouteType]) {
             $item['inetCidrRouteType'] = $translateType[$route_entry->inetCidrRouteType];
+        }
+        if ($route_entry->context_name == '') {
+            $item['context_name'] = '[global]';
+        } else {
+            $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $route_entry->context_name]) . '">' . $route_entry->context_name . '</a>' ;
         }
         return $item;
     }

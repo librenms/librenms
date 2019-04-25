@@ -5,6 +5,7 @@ $no_refresh = true;
 <table id="inetCidrRoute" class="table table-condensed table-hover table-striped">
     <thead>
         <tr>
+            <th data-column-id="context_name" data-width="125px">VRF</th>
             <th data-column-id="inetCidrRouteDestType" data-width="70px">Proto</th>
             <th data-column-id="inetCidrRouteDest">Destination</th>
             <th data-column-id="inetCidrRoutePfxLen" data-width="80px">Mask</th>
