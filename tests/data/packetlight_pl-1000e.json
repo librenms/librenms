@@ -10229,7 +10229,7 @@
                     "entPhysicalIndex": "115712",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "substract_128",
+                    "user_func": "\\LibreNMS\\OS\\Packetlight::substract_128",
                     "state_name": null
                 },
                 {
@@ -10253,7 +10253,7 @@
                     "entPhysicalIndex": "377856",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "substract_128",
+                    "user_func": "\\LibreNMS\\OS\\Packetlight::substract_128",
                     "state_name": null
                 },
                 {
@@ -10277,7 +10277,7 @@
                     "entPhysicalIndex": "640000",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "substract_128",
+                    "user_func": "\\LibreNMS\\OS\\Packetlight::substract_128",
                     "state_name": null
                 },
                 {
@@ -10301,7 +10301,7 @@
                     "entPhysicalIndex": "705536",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "substract_128",
+                    "user_func": "\\LibreNMS\\OS\\Packetlight::substract_128",
                     "state_name": null
                 },
                 {
@@ -10325,7 +10325,7 @@
                     "entPhysicalIndex": "771072",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "substract_128",
+                    "user_func": "\\LibreNMS\\OS\\Packetlight::substract_128",
                     "state_name": null
                 },
                 {
@@ -10349,7 +10349,7 @@
                     "entPhysicalIndex": "836608",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
-                    "user_func": "substract_128",
+                    "user_func": "\\LibreNMS\\OS\\Packetlight::substract_128",
                     "state_name": null
                 },
                 {
