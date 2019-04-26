@@ -64,9 +64,9 @@ class Smseagle extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'SMSEagle URL',
+                    'title' => 'SMSEagle Host',
                     'name' => 'smseagle-url',
-                    'descr' => 'SMSEagle URL',
+                    'descr' => 'SMSEagle Host',
                     'type' => 'text',
                 ],
                 [
