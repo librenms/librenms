@@ -803,7 +803,7 @@ function list_available_health_graphs()
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     check_device_permission($device_id);
     if (isset($router['type'])) {
-        list($dump, $type) = explode('_', $router['type']);
+        list($dump, $type) = explode('device_', $router['type']);
     }
     $sensor_id = $router['sensor_id'] ?: null;
     $graphs    = array();
