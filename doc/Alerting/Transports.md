@@ -415,7 +415,7 @@ Destination numbers are one per line, with no spaces. They can be in either loca
 
 | Config | Example |
 | ------ | ------- |
-| SMSEagle URL | ip.add.re.ss |
+| SMSEagle Host | ip.add.re.ss |
 | User | smseagle_user |
 | Password | smseagle_user_password |
 | Mobiles | +3534567890 |
