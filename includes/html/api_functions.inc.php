@@ -397,6 +397,7 @@ function add_device()
     $snmp_disable = ($data['snmp_disable']);
     if ($snmp_disable) {
         $additional = array(
+            'sysName'      => $data['sysName'] ? mres($data['sysName']) : '',
             'os'           => $data['os'] ? mres($data['os']) : 'ping',
             'hardware'     => $data['hardware'] ? mres($data['hardware']) : '',
             'snmp_disable' => 1,
