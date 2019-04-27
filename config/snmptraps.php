@@ -19,5 +19,14 @@ return [
         'MG-SNMP-UPS-MIB::upsmgUtilityRestored' => \LibreNMS\Snmptrap\Handlers\UpsmgUtilityRestored::class,
         'EQUIPMENT-MIB::equipStatusTrap' => \LibreNMS\Snmptrap\Handlers\EquipStatusTrap::class,
         'LOG-MIB::logTrap' => \LibreNMS\Snmptrap\Handlers\LogTrap::class,
+        'FORTINET-FORTIGATE-MIB::fgTrapVpnTunDown' => \LibreNMS\Snmptrap\Handlers\FgTrapVpnTunDown::class,
+        'FORTINET-FORTIGATE-MIB::fgTrapVpnTunUp' => \LibreNMS\Snmptrap\Handlers\FgTrapVpnTunUp::class,
+        'FORTINET-FORTIGATE-MIB::fgTrapIpsSignature' => \LibreNMS\Snmptrap\Handlers\FgTrapIpsSignature::class,
+        'FORTINET-FORTIGATE-MIB::fgTrapIpsAnomaly' => \LibreNMS\Snmptrap\Handlers\FgTrapIpsAnomaly::class,
+        'FORTINET-FORTIGATE-MIB::fgTrapAvOversize' => \LibreNMS\Snmptrap\Handlers\FgTrapAvOversize::class,
+        'FORTINET-FORTIGATE-MIB::fgTrapIpsPkgUpdate' => \LibreNMS\Snmptrap\Handlers\FgTrapIpsPkgUpdate::class,
+        'FORTINET-CORE-MIB::fnTrapMemThreshold' => \LibreNMS\Snmptrap\Handlers\FnTrapMemThreshold::class,
+        'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmTrapLogRateThreshold' => \LibreNMS\Snmptrap\Handlers\FmTrapLogRateThreshold::class,
+        'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmTrapLogAlert' => \LibreNMS\Snmptrap\Handlers\FmTrapLogAlert::class,
     ]
 ];
