@@ -79,6 +79,12 @@ $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['section'] = 'w
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['order'] = '6';
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['descr'] = 'Other Octets';
 
+// Barracuda Firewall support
+$config['graph_types']['device']['barracuda_firewall_sessions']['section'] = 'firewall';
+$config['graph_types']['device']['barracuda_firewall_sessions']['order'] = 0;
+$config['graph_types']['device']['barracuda_firewall_sessions']['descr'] = 'Active Sessions';
+
+
 // Ceragon Ceraos support
 $config['graph_types']['device']['ceraos_RxLevel']['section'] = 'wireless';
 $config['graph_types']['device']['ceraos_RxLevel']['order'] = '0';
