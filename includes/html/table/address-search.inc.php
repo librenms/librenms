@@ -42,12 +42,12 @@ if ($vars['search_type'] == 'ipv4') {
 }//end if
 if (is_numeric($vars['device_id'])) {
     $sql    .= ' AND I.device_id = ?';
-    $param[] = array($vars['device_id']);
+    $param[] = $vars['device_id'];
 }
 
 if ($vars['interface']) {
-    $sql    .= " AND I.ifDescr LIKE '?'";
-    $param[] = array($vars['interface']);
+    $sql    .= " AND I.ifDescr LIKE ?";
+    $param[] = $vars['interface'];
 }
 
 if ($vars['search_type'] == 'ipv4') {
