@@ -29,10 +29,6 @@ class Mattermost extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
-
         $mattermost_opts = [
             'url' => $this->config['mattermost-url'],
             'username' => $this->config['mattermost-username'],
@@ -42,14 +38,6 @@ class Mattermost extends Transport
         ];
 
         return $this->contactMattermost($obj, $mattermost_opts);
-    }
-
-    public function deliverAlertOld($obj, $opts)
-    {
-        foreach ($opts as $tmp_api) {
-            $this->contactMattermost($obj, $tmp_api);
-        }
-        return true;
     }
 
     public static function contactMattermost($obj, $api)
