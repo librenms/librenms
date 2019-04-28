@@ -8400,7 +8400,7 @@
                     "features": null,
                     "os": "timos",
                     "type": "network",
-                    "serial": "<private>",
+                    "serial": null,
                     "icon": "nokia.svg",
                     "location": null
                 }
