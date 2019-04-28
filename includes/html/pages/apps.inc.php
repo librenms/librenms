@@ -230,6 +230,15 @@ $graphs['smart'] = array(
     'id231',
     'id233',
 );
+$graphs['mdadm'] = array(
+    'level',
+    'size',
+    'disc_count',
+    'hotspare_count',
+    'degraded',
+    'sync_speed',
+    'sync_completed',
+);
 $graphs['sdfsinfo'] = array(
     'volume',
     'blocks',

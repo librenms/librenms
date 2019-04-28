@@ -1444,6 +1444,33 @@ function get_postgres_databases($device_id)
 }
 
 /**
+ * Get all mdadm arrays from the collected
+ * rrd files.
+ *
+ * @param array $device device for which we get the rrd's
+ * @param int   $app_id application id on the device
+ * @return array list of disks
+ */
+function get_arrays_with_mdadm($device, $app_id)
+{
+    $arrays = array();
+
+    $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', 'mdadm', $app_id);
+
+    foreach (glob($pattern) as $rrd) {
+        $filename = basename($rrd, '.rrd');
+
+        list(,,, $array_name) = explode("-", $filename, 4);
+
+        if ($array_name) {
+            array_push($arrays, $array_name);
+        }
+    }
+
+    return $arrays;
+}
+
+/**
  * Get all disks (disk serial numbers) from the collected
  * rrd files.
  *
