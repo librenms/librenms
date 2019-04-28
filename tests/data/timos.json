@@ -7549,7 +7549,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Cymru FullBogon Feed",
@@ -7568,7 +7568,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Cymru FullBogon Feed",
@@ -7587,7 +7587,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Cymru FullBogon Feed",
@@ -7606,7 +7606,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": []
@@ -7630,7 +7630,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Cymru FullBogon Feed",
@@ -7649,7 +7649,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Cymru FullBogon Feed",
@@ -7668,7 +7668,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Cymru FullBogon Feed",
@@ -7687,7 +7687,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": []
