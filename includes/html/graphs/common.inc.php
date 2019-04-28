@@ -80,7 +80,7 @@ if (isset($scale_rigid)) {
 }
 
 $rrd_options .= ' -E --start '.$from.' --end '.$to.' --width '.$width.' --height '.$height.' ';
-$rrd_options .= $config['rrdgraph_def_text'];
+$rrd_options .= $config['rrdgraph_def_text'].' -c FONT#'.$config['rrdgraph_def_text_color'];
 
 if ($_GET['bg']) {
     $rrd_options .= ' -c CANVAS#'.mres($_GET['bg']).' ';
