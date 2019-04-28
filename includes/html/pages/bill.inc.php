@@ -221,38 +221,38 @@ if ($vars['view'] == 'accurate') {
     $bi  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
     $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
     $bi .= '&amp;x=1190&amp;y=250';
-    $bi .= "$type'>";
+    $bi .= "$type' class='center-block'>";
 
     $li  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
     $li .= '&amp;from='.$unix_prev_from.'&amp;to='.$unix_prev_to;
     $li .= '&amp;x=1190&amp;y=250';
-    $li .= "$type'>";
+    $li .= "$type' class='center-block'>";
 
     $di  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
     $di .= '&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'];
     $di .= '&amp;x=1190&amp;y=250';
-    $di .= "$type'>";
+    $di .= "$type' class='center-block'>";
 
     $mi  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
     $mi .= '&amp;from='.$lastmonth.'&amp;to='.$rightnow;
     $mi .= '&amp;x=1190&amp;y=250';
-    $mi .= "$type'>";
+    $mi .= "$type' class='center-block'>";
 } else {
     $bi  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
     $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
-    $bi .= "&amp;width=1000&amp;height=200&amp;total=1'>";
+    $bi .= "&amp;width=1000&amp;height=200&amp;total=1' class='center-block'>";
 
     $li  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
     $li .= '&amp;from='.$unix_prev_from.'&amp;to='.$unix_prev_to;
-    $li .= "&amp;width=1000&amp;height=200&amp;total=1'>";
+    $li .= "&amp;width=1000&amp;height=200&amp;total=1' class='center-block'>";
 
     $di  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
     $di .= '&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'];
-    $di .= "&amp;width=1000&amp;height=200&amp;total=1'>";
+    $di .= "&amp;width=1000&amp;height=200&amp;total=1' class='center-block'>";
 
     $mi  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
     $mi .= '&amp;from='.$lastmonth.'&amp;to='.$rightnow;
-    $mi .= "&amp;width=1000&amp;height=200&amp;total=1'>";
+    $mi .= "&amp;width=1000&amp;height=200&amp;total=1' class='center-block'>";
 }//end if
 
 ?>

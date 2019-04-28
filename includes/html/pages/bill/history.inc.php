@@ -8,7 +8,7 @@ $i = 0;
 $img['his']  = '<img src="graph.php?id='.$bill_id;
 $img['his'] .= '&amp;type=bill_historicmonthly';
 $img['his'] .= '&amp;width=1190&amp;height=250';
-$img['his'] .= '" style="margin: 15px 5px 25px 5px;" />';
+$img['his'] .= '" style="margin: 15px auto 25px auto; display: block;" />';
 ?>
 
 <h3>Historical Usage</h3>
@@ -36,7 +36,7 @@ function showDetails($bill_id, $imgtype, $bill_hist_id)
     if (is_numeric($bill_hist_id)) {
         $res .= '&amp;bill_hist_id='.$bill_hist_id;
     }
-    $res .= '" style="margin: 15px 5px 25px 5px;" />';
+    $res .= '" style="margin: 15px auto 25px auto; display: block;" />';
     return $res;
 }//end showDetails()
 

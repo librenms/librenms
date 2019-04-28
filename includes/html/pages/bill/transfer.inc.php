@@ -156,19 +156,19 @@ $bi  = "<img src='graph.php?type=bill_historictransfer&id=".$bill_id;
 $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
 $bi .= '&amp;imgtype=day';
 $bi .= '&amp;width=1190&amp;height=250';
-$bi .= "'>";
+$bi .= "' class='center-block'>";
 
 $di  = "<img src='graph.php?type=bill_historictransfer&id=".$bill_id;
 $di .= '&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'];
 $di .= '&amp;imgtype=hour';
 $di .= '&amp;width=1190&amp;height=250';
-$di .= "'>";
+$di .= "' class='center-block'>";
 
 $mi  = "<img src='graph.php?type=bill_historictransfer&id=".$bill_id;
 $mi .= '&amp;from='.$lastmonth.'&amp;to='.$rightnow;
 $mi .= '&amp;&imgtype=day';
 $mi .= '&amp;width=1190&amp;height=250';
-$mi .= "'>";
+$mi .= "' class='center-block'>";
 ?>
 
 <div class="panel panel-default">
