@@ -53,5 +53,10 @@
     <description>As described previously, Legacy Alert Templates and Transports have been removed.  You can find more info here: https://community.librenms.org/t/deprecation-notice-alerting-legacy-transports-and-templates/5915</description>
     <pubDate>Fri, 15 Feb 2017 23:00:00 +0000</pubDate>
   </item>
+    <item>
+      <title>Cisco Temperature Sensor Threshold Values Stored as High Limits</title>
+      <description>During discovery, some temperature sensors discovered on Cisco devices had their highest temperature value stored as warning high limit. For new discovered devices, this value is now stored as high limit.</description>
+      <pubDate>Sun, 17 Mar 2019 21:00:00 +0100</pubDate>
+    </item>
 </channel>
 </rss>

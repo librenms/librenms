@@ -1,0 +1,104 @@
+mib: ATS-MIB
+modules:
+  sensors:
+    pre-cache:
+      data:
+      - oid:
+        - atsMiscellaneousGroupSystemMaxCurrent
+        - atsInputGroupSourceAvoltageUpperLimit
+        - atsInputGroupSourceAvoltageLowerLimit
+        - atsInputGroupSourceBvoltageUpperLimit
+        - atsInputGroupSourceBvoltageLowerLimit
+        - atsInputGroupSourceAfrequencyUpperLimit
+        - atsInputGroupSourceAfrequencyLowerLimit
+        - atsInputGroupSourceBfrequencyUpperLimit
+        - atsInputGroupSourceBfrequencyLowerLimit
+    current:
+      data:
+      -
+        oid: atsOutputGroupOutputCurrent
+        value: atsOutputGroupOutputCurrent
+        num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.3.4.{{ $index }}'
+        divisor: 10
+        descr: 'Output'
+        index: 'atsOutputGroupOutputCurrent.{{ $index }}'
+        high_limit: 'atsMiscellaneousGroupSystemMaxCurrent'
+    load:
+      data:
+      -
+        oid: atsOutputGroupLoad
+        value: atsOutputGroupLoad
+        num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.3.5.{{ $index }}'
+        descr: 'Output'
+        index: 'atsOutputGroupLoad.{{ $index }}'
+        high_limit: 100
+    voltage:
+      data:
+      -
+        oid: atsInputGroupSourceAinputVoltage
+        value: atsInputGroupSourceAinputVoltage
+        num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.2.3.{{ $index }}'
+        descr: 'Input A'
+        index: 'atsInputGroupSourceAinputVoltage.{{ $index }}'
+        high_limit: 'atsInputGroupSourceAvoltageUpperLimit'
+        low_limit: 'atsInputGroupSourceAvoltageLowerLimit'
+      -
+        oid: atsInputGroupSourceBinputVoltage
+        value: atsInputGroupSourceBinputVoltage
+        num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.2.6.{{ $index }}'
+        descr: 'Input B'
+        index: 'atsInputGroupSourceBinputVoltage.{{ $index }}'
+        high_limit: 'atsInputGroupSourceBvoltageUpperLimit'
+        low_limit: 'atsInputGroupSourceBvoltageLowerLimit'
+    frequency:
+      data:
+      -
+        oid: atsInputGroupSourceAinputFrequency
+        value: atsInputGroupSourceAinputFrequency
+        num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.2.4.{{ $index }}'
+        divisor: 10
+        descr: 'Input A'
+        index: 'atsInputGroupSourceAinputFrequency.{{ $index }}'
+        high_limit: 'atsInputGroupSourceAfrequencyUpperLimit'
+        low_limit: 'atsInputGroupSourceAfrequencyLowerLimit'
+      -
+        oid: atsInputGroupSourceBinputFrequency
+        value: atsInputGroupSourceBinputFrequency
+        num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.2.4.{{ $index }}'
+        divisor: 10
+        descr: 'Input B'
+        index: 'atsInputGroupSourceBinputFrequency.{{ $index }}'
+        high_limit: 'atsInputGroupSourceBfrequencyUpperLimit'
+        low_limit: 'atsInputGroupSourceBfrequencyLowerLimit'
+    state:
+      data:
+        -
+          oid: atsInputGroupSourceAstatus
+          value: atsInputGroupSourceAstatus
+          num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.2.2.{{ $index }}'
+          descr: 'Input A'
+          index: 'atsInputGroupSourceAstatus.{{ $index }}'
+          state_name: atsInputGroupSourceAstatus
+          states:
+            - { descr: Ok, graph: 0, value: 2, generic: 0 }
+            - { descr: Fail, graph: 0, value: 1, generic: 2 }
+        -
+          oid: atsInputGroupSourceBstatus
+          value: atsInputGroupSourceBstatus
+          num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.2.5.{{ $index }}'
+          descr: 'Input B'
+          index: 'atsInputGroupSourceBstatus.{{ $index }}'
+          state_name: atsInputGroupSourceBstatus
+          states:
+            - { descr: Ok, graph: 0, value: 2, generic: 0 }
+            - { descr: Fail, graph: 0, value: 1, generic: 2 }
+        -
+          oid: atsHmiSwitchGroupBuzzer
+          value: atsHmiSwitchGroupBuzzer
+          num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.4.1.{{ $index }}'
+          descr: 'Buzzer'
+          index: 'atsHmiSwitchGroupBuzzer.{{ $index }}'
+          state_name: atsHmiSwitchGroupBuzzer
+          states:
+            - { descr: Disabled, graph: 0, value: 1, generic: 0 }
+            - { descr: Enabled, graph: 0, value: 2, generic: 0 }

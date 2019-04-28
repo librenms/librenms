@@ -28,6 +28,10 @@ $msg_box = array();
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
+if (!Auth::check()) {
+    die('Unauthorized');
+}
+
 set_debug(str_contains($_SERVER['REQUEST_URI'], 'debug'));
 
 LibreNMS\Plugins::start();
@@ -169,7 +173,7 @@ if (empty($_SESSION['screen_width']) && empty($_SESSION['screen_height'])) {
 
 if ((isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
     if (Auth::check()) {
-        require 'includes/print-menubar.php';
+        require 'includes/html/print-menubar.php';
     }
 } else {
     echo "<style>body { padding-top: 0px !important;
@@ -191,15 +195,15 @@ if (isset($devel) || isset($vars['devel'])) {
     echo("</pre>");
 }
 
-if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php")) {
-    require "pages/" . $vars['page'] . ".inc.php";
+$vars['page'] = basename($vars['page'] ?? '');
+if ($vars['page'] && is_file("includes/html/pages/" . $vars['page'] . ".inc.php")) {
+    require "includes/html/pages/" . $vars['page'] . ".inc.php";
+} elseif (Config::has('front_page') && is_file('includes/html/' . Config::get('front_page'))) {
+    require 'includes/html/' . Config::get('front_page');
 } else {
-    if (isset($config['front_page']) && is_file($config['front_page'])) {
-        require $config['front_page'];
-    } else {
-        require 'pages/front/default.php';
-    }
+    require 'includes/html/pages/front/default.php';
 }
+
 ?>
     </div>
   </div>

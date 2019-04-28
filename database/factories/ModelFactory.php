@@ -20,6 +20,7 @@ $factory->define(App\Models\User::class, function (Faker\Generator $faker) {
     static $password;
 
     return [
+        'auth_type' => 'mysql',
         'username' => $faker->unique()->userName,
         'realname' => $faker->name,
         'email' => $faker->safeEmail,
@@ -40,6 +41,12 @@ $factory->state(App\Models\User::class, 'read', function ($faker) {
     ];
 });
 
+$factory->define(\App\Models\Bill::class, function (Faker\Generator $faker) {
+    return [
+        'bill_name' => $faker->text
+    ];
+});
+
 $factory->define(\App\Models\Device::class, function (Faker\Generator $faker) {
     return [
         'hostname'      => $faker->domainWord.'.'.$faker->domainName,
@@ -53,6 +60,7 @@ $factory->define(\App\Models\Port::class, function (Faker\Generator $faker) {
     return [
         'ifIndex'      => $faker->unique()->numberBetween(),
         'ifName'       => $faker->text(20),
+        'ifDescr'      => $faker->text(255),
         'ifLastChange' => $faker->unixTime(),
     ];
 });

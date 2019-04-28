@@ -1,0 +1,232 @@
+-- This file was automatically generated from ciena-ws-service-domain.yang. Do not edit.
+
+CIENA-WS-SERVICE-DOMAIN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    DescriptionString, NameString, PortId, ServiceDomainIdx, ServiceIdx
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI;
+
+cienaWsServiceDomainMIB MODULE-IDENTITY
+    LAST-UPDATED "201703020000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This module defines service-domain data for the Waveserver. A service domain is a logical grouping of line ports and services. It is automatically provisioned at system turn-up. By default, a service domain is mapped to a line port"
+    REVISION "201703020000Z"
+    DESCRIPTION "Waveserver Release 1.4
+
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revised.
+Added RPCs: ws-service-domain-attach-port, ws-service-domain-detach-port"
+    REVISION "201506170000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.  port-members and service-index leaf list are now part of linked-references sub-container.
+Restructuring of the module."
+    REVISION "201504150000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 11 }
+
+cwsServiceDomainServiceDomainsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsServiceDomainServiceDomainsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Configured service domain."
+    ::= { cienaWsServiceDomainMIB 3 }
+
+cwsServiceDomainServiceDomainsEntry OBJECT-TYPE
+    SYNTAX CwsServiceDomainServiceDomainsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsServiceDomainServiceDomainsTable."
+    INDEX { cwsServiceDomainServiceDomainsServiceDomainIndex }
+    ::= { cwsServiceDomainServiceDomainsTable 1 }
+
+CwsServiceDomainServiceDomainsEntry ::= SEQUENCE { 
+    cwsServiceDomainServiceDomainsServiceDomainIndex Integer32 
+}
+
+cwsServiceDomainServiceDomainsServiceDomainIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Index of the service domain."
+    ::= { cwsServiceDomainServiceDomainsEntry 1 }
+
+cwsServiceDomainServiceDomainIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsServiceDomainServiceDomainIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Service Domain identification."
+    ::= { cienaWsServiceDomainMIB 4 }
+
+cwsServiceDomainServiceDomainIdEntry OBJECT-TYPE
+    SYNTAX CwsServiceDomainServiceDomainIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsServiceDomainServiceDomainIdTable."
+    INDEX { cwsServiceDomainServiceDomainsServiceDomainIndex, cwsServiceDomainServiceDomainIdTableSnmpKey }
+    ::= { cwsServiceDomainServiceDomainIdTable 1 }
+
+CwsServiceDomainServiceDomainIdEntry ::= SEQUENCE { 
+    cwsServiceDomainServiceDomainIdTableSnmpKey Integer32,
+    cwsServiceDomainServiceDomainIdName NameString,
+    cwsServiceDomainServiceDomainIdDescription DescriptionString 
+}
+
+cwsServiceDomainServiceDomainIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsServiceDomainServiceDomainId"
+    ::= { cwsServiceDomainServiceDomainIdEntry 1 }
+
+cwsServiceDomainServiceDomainIdName OBJECT-TYPE
+    SYNTAX NameString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The name of the service domain."
+    ::= { cwsServiceDomainServiceDomainIdEntry 2 }
+
+cwsServiceDomainServiceDomainIdDescription OBJECT-TYPE
+    SYNTAX DescriptionString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Description of the service domain."
+    ::= { cwsServiceDomainServiceDomainIdEntry 3 }
+
+cwsServiceDomainPortMembersTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsServiceDomainPortMembersEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Each entry identifies the ID of the port associated with this service domain"
+    ::= { cienaWsServiceDomainMIB 5 }
+
+cwsServiceDomainPortMembersEntry OBJECT-TYPE
+    SYNTAX CwsServiceDomainPortMembersEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsServiceDomainPortMembersTable."
+    INDEX { cwsServiceDomainServiceDomainsServiceDomainIndex, cwsServiceDomainLinkedReferencesTableSnmpKey, cwsServiceDomainPortMembersTableSnmpKey }
+    ::= { cwsServiceDomainPortMembersTable 1 }
+
+CwsServiceDomainPortMembersEntry ::= SEQUENCE { 
+    cwsServiceDomainPortMembersTableSnmpKey Integer32,
+    cwsServiceDomainPortMembers PortId 
+}
+
+cwsServiceDomainPortMembersTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsServiceDomainPortMembers"
+    ::= { cwsServiceDomainPortMembersEntry 1 }
+
+cwsServiceDomainPortMembers OBJECT-TYPE
+    SYNTAX PortId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Each entry identifies the ID of the port associated with this service domain"
+    ::= { cwsServiceDomainPortMembersEntry 2 }
+
+cwsServiceDomainLinkedReferencesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsServiceDomainLinkedReferencesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsServiceDomainMIB 6 }
+
+cwsServiceDomainLinkedReferencesEntry OBJECT-TYPE
+    SYNTAX CwsServiceDomainLinkedReferencesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsServiceDomainLinkedReferencesTable."
+    INDEX { cwsServiceDomainLinkedReferencesTableSnmpKey }
+    ::= { cwsServiceDomainLinkedReferencesTable 1 }
+
+CwsServiceDomainLinkedReferencesEntry ::= SEQUENCE { 
+    cwsServiceDomainLinkedReferencesTableSnmpKey Integer32 
+}
+
+cwsServiceDomainLinkedReferencesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Unique key for cwsServiceDomainPortMembers"
+    ::= { cwsServiceDomainLinkedReferencesEntry 1 }
+
+cwsServiceDomainServiceMembersTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsServiceDomainServiceMembersEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Each entry identifies the index number of a service associated with the service domain."
+    ::= { cienaWsServiceDomainMIB 7 }
+
+cwsServiceDomainServiceMembersEntry OBJECT-TYPE
+    SYNTAX CwsServiceDomainServiceMembersEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsServiceDomainServiceMembersTable."
+    INDEX { cwsServiceDomainServiceDomainsServiceDomainIndex, cwsServiceDomainLinkedReferencesTableSnmpKey, cwsServiceDomainServiceMembersTableSnmpKey }
+    ::= { cwsServiceDomainServiceMembersTable 1 }
+
+CwsServiceDomainServiceMembersEntry ::= SEQUENCE { 
+    cwsServiceDomainServiceMembersTableSnmpKey Integer32,
+    cwsServiceDomainServiceMembers ServiceIdx 
+}
+
+cwsServiceDomainServiceMembersTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsServiceDomainServiceMembers"
+    ::= { cwsServiceDomainServiceMembersEntry 1 }
+
+cwsServiceDomainServiceMembers OBJECT-TYPE
+    SYNTAX ServiceIdx
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Each entry identifies the index number of a service associated with the service domain."
+    ::= { cwsServiceDomainServiceMembersEntry 2 }
+
+
+
+-- Conformance statements
+cienaWsServiceDomainObjects OBJECT IDENTIFIER
+    ::= { cienaWsServiceDomainMIB 1 }
+
+cienaWsServiceDomainConformance OBJECT IDENTIFIER
+    ::= { cienaWsServiceDomainMIB 2 }
+
+cienaWsServiceDomainGroups OBJECT IDENTIFIER
+    ::= { cienaWsServiceDomainConformance 1 }
+
+cienaWsServiceDomainGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsServiceDomainServiceDomainsServiceDomainIndex,
+        cwsServiceDomainServiceDomainIdName,
+        cwsServiceDomainServiceDomainIdDescription
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsServiceDomainGroups 1 }
+
+cienaWsServiceDomainCompliances OBJECT IDENTIFIER
+    ::= { cienaWsServiceDomainConformance 2 }
+
+cienaWsServiceDomainCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsServiceDomainGroup }
+    ::= { cienaWsServiceDomainCompliances 1 }
+
+END -- End module

@@ -28,7 +28,7 @@ namespace LibreNMS\Tests;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 
-class ConfigTest extends TestCase
+class ConfigTest extends LaravelTestCase
 {
     public function testGetBasic()
     {

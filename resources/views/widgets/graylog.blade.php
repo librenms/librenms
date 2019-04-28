@@ -19,11 +19,11 @@
         rowCount: ['{{ $limit }}', 25,50,100,250,-1],
         formatters: {
             "browserTime": function(column, row) {
-                @if(Config::get('graylog.timezone'))
+                @config('graylog.timezone')
                     return row.timestamp;
                 @else
                     return moment.parseZone(row.timestamp).local().format("YYYY-MM-DD HH:MM:SS");
-                @endif
+                @endconfig
             }
         },
         post: function ()

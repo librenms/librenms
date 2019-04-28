@@ -1,0 +1,72 @@
+
+CIENA-WS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS 
+	enterprises, MODULE-IDENTITY, OBJECT-IDENTITY			
+		FROM SNMPv2-SMI;
+
+ciena MODULE-IDENTITY
+	LAST-UPDATED "201612140000Z"
+	ORGANIZATION
+		"Ciena Corporation"
+	CONTACT-INFO
+      "Web: http://www.ciena.com
+      Postal:   7035 Ridge Road
+                Hanover, Maryland 21076
+                U.S.A
+      Phone:    +1 800-921-1144
+      Fax:      +1 410-694-5750"
+	DESCRIPTION
+		"Top-level MIB structure for Ciena's Waveserver."
+	REVISION "201612140000Z"
+	DESCRIPTION
+		"Release 1.3. fixed LAST-UPDATED and REVISION statement order."
+	REVISION "201607070000Z"
+	DESCRIPTION
+		"String clean-up and addition of version node for release 1.2."
+	REVISION "201009272317Z"
+	DESCRIPTION
+		"Initial creation of MIB file structure for Ciena."
+	::= { enterprises 1271 }
+	
+--
+-- Node definitions
+--
+	
+waveserver OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"Root identifier for Ciena's Waveserver product."
+	::= { ciena 3 }
+
+cienaWsStatistics	  OBJECT-IDENTITY
+	STATUS	obsolete
+	DESCRIPTION
+		"Statistics for Waveserver."
+	::= { waveserver 3 }			                    
+	                
+cienaWsNotifications OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Waveserver notifications."
+	::= { waveserver 2 }	
+	
+cienaWsNotificationsControlModule	OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Waveserver control module." 		                                    
+	::= { cienaWsNotifications 1 }
+
+cienaWsConfigV1 OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Configuration for the Waveserver 1.0 and 1.1 releases."
+	::= { waveserver 1 }			                                    
+
+cienaWsConfig OBJECT-IDENTITY
+   STATUS     current
+   DESCRIPTION
+      "Root object for the Waveserver API in 1.2 and beyond."
+::= { waveserver 4 }
+
+END

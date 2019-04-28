@@ -36,6 +36,7 @@ path: blob/master/doc/
  - [Where do I update my database credentials?](#faq-where-do-i-update-my-database-credentials)
  - [My reverse proxy is not working](#my-reverse-proxy-is-not-working)
  - [My alerts aren't being delivered on time](#my-alerts-aren't-being-delivered-on-time)
+ - [My alert templates stopped working](#my-alert-templates-stopped-working)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -400,3 +401,9 @@ you may need to set [APP_URL](../Support/Environment-Variables.md#base-url) and 
 
 ### <a name='my-alerts-aren't-being-delivered-on-time'>My alerts aren't being delivered on time</a>
 If you're running MySQL/MariaDB on a separate machine or container make sure the timezone is set properly on both the LibreNMS **and**  MySQL/MariaDB instance. Alerts will be delivered according to MySQL/MariaDB's time, so a mismatch between the two can cause alerts to be delivered late if LibreNMS is on a timezone later than MySQL/MariaDB.
+
+### <a name='my-alert-templates-stopped-working'>My alert templates stopped working</a>
+You should probably have a look in the documentation concerning the new template syntax: https://docs.librenms.org/Alerting/Templates/. 
+Since version 1.42, syntax changed, and you basically need to convert your templates to this new syntax (including the titles). 
+
+

@@ -62,7 +62,7 @@ $check_graph['mysqluptime'] .= " CDEF:cuptime=DS0,86400,/";
 $check_graph['mysqluptime'] .= " 'COMMENT:Days      Current  Minimum  Maximum  Average\\n'";
 $check_graph['mysqluptime'] .= " AREA:cuptime#EEEEEE:Uptime";
 $check_graph['mysqluptime'] .= " LINE1.25:cuptime#36393D:";
-$check_graph['mysqluptime'] .= " GPRINT:cuptime:LAST:%6.2lf  GPRINT:cuptime:AVERAGE:%6.2lf";
+$check_graph['mysqluptime'] .= " GPRINT:cuptime:LAST:%6.2lf  GPRINT:cuptime:MIN:%6.2lf";
 $check_graph['mysqluptime'] .= " GPRINT:cuptime:MAX:%6.2lf  GPRINT:cuptime:AVERAGE:%6.2lf\\l";
 
 $check_graph['mysqlQcache'] = " DEF:DS0=" . $rrd_filename . ":Qcache_free_memory:AVERAGE ";

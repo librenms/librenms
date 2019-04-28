@@ -21,7 +21,7 @@ $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (!LegacyAuth::check()) {
-    die('Unauthorized.');
+    die('Unauthorized');
 }
 
 set_debug($_REQUEST['debug']);

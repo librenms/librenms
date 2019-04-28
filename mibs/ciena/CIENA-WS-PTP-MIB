@@ -1,0 +1,1201 @@
+-- This file was automatically generated from ciena-ws-ptp.yang. Do not edit.
+
+CIENA-WS-PTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    ChannelsNumber, Decimal1Dig, Decimal2Dig, Decimal2DigSmall, EnabledDisabledEnum, EnabledDisabledNaEnum, NameString, PtpId, StringMaxl15, StringMaxl32, TraceMismatchFailMode, TraceMismatchMode, TraceTxOperMode, XcvrId, XcvrType
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+cienaWsPtpMIB MODULE-IDENTITY
+    LAST-UPDATED "201708070000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "Physical Termination Point. This module models the physical characteristics of the signal. This base module contains generic definitions for all PTPs. Specific characteristics of PTPs can augment this model to provide more detail. PTPs are automatically provisioned by the system."
+    REVISION "201708070000Z"
+    DESCRIPTION "Waveserver Release 1.5
+Added 'properties/trace' container.
+Added ncx:user-write to 'ptps'.
+Added leaf 'spli-management' to container 'ptps/state'."
+    REVISION "201703020000Z"
+    DESCRIPTION "Waveserver Release 1.4
+
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revised.
+New status leafs added to 'channel/tx/power' and 'channel/rx/power' containers.
+New leaf 'properties/wavelength/actual' added.
+Changed some types to decimal-2-dig-small."
+    REVISION "201606140000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.
+Major restructuring of this YANG module."
+    REVISION "201602010000Z"
+    DESCRIPTION "Waveserver Rel 1.1 revised.  
+New 'ptp-adv-channel-status' container under 'ptp-status'.
+Added new 'ws-ptp-clear-ptp-statistics' rpc call."
+    REVISION "201504290000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 8 }
+
+PtpOpEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { up(0), down(1), tuning(2), fault(3), unknown(4) }
+
+cwsPtpPtpsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpPtpsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 3 }
+
+cwsPtpPtpsEntry OBJECT-TYPE
+    SYNTAX CwsPtpPtpsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpPtpsTable."
+    INDEX { cwsPtpPtpsPtpIndex }
+    ::= { cwsPtpPtpsTable 1 }
+
+CwsPtpPtpsEntry ::= SEQUENCE { 
+    cwsPtpPtpsPtpIndex Integer32 
+}
+
+cwsPtpPtpsPtpIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Unique, index of the PTP. Key value for the PTP list. Read-only attribute."
+    ::= { cwsPtpPtpsEntry 1 }
+
+cwsPtpPtpIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpPtpIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Identification information of this PTP instance."
+    ::= { cienaWsPtpMIB 4 }
+
+cwsPtpPtpIdEntry OBJECT-TYPE
+    SYNTAX CwsPtpPtpIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpPtpIdTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpPtpIdTableSnmpKey }
+    ::= { cwsPtpPtpIdTable 1 }
+
+CwsPtpPtpIdEntry ::= SEQUENCE { 
+    cwsPtpPtpIdTableSnmpKey Integer32,
+    cwsPtpPtpIdName NameString 
+}
+
+cwsPtpPtpIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpPtpId"
+    ::= { cwsPtpPtpIdEntry 1 }
+
+cwsPtpPtpIdName OBJECT-TYPE
+    SYNTAX NameString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Name of the ptp instance. Read only attribute."
+    ::= { cwsPtpPtpIdEntry 2 }
+
+cwsPtpPtpStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpPtpStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "State information of this PTP instance."
+    ::= { cienaWsPtpMIB 5 }
+
+cwsPtpPtpStateEntry OBJECT-TYPE
+    SYNTAX CwsPtpPtpStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpPtpStateTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpPtpStateTableSnmpKey }
+    ::= { cwsPtpPtpStateTable 1 }
+
+CwsPtpPtpStateEntry ::= SEQUENCE { 
+    cwsPtpPtpStateTableSnmpKey Integer32,
+    cwsPtpPtpStateAdminState EnabledDisabledEnum,
+    cwsPtpPtpStateOperationalState PtpOpEnum,
+    cwsPtpPtpStateSpliManagement EnabledDisabledEnum 
+}
+
+cwsPtpPtpStateTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpPtpState"
+    ::= { cwsPtpPtpStateEntry 1 }
+
+cwsPtpPtpStateAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Administrative state (enabled or disabled) of the PTP. If Admin State is set to enabled, majority of the ptp fields will no longer be modifiable. When PTP Transmitter State is Disabled, PTP Admin State cannot be changed from Disabled to Enabled."
+    ::= { cwsPtpPtpStateEntry 2 }
+
+cwsPtpPtpStateOperationalState OBJECT-TYPE
+    SYNTAX PtpOpEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Operational state of the ptp. Read-only attribute."
+    ::= { cwsPtpPtpStateEntry 3 }
+
+cwsPtpPtpStateSpliManagement OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "SPLI enabled or disabled state on the PTP."
+    ::= { cwsPtpPtpStateEntry 4 }
+
+cwsPtpPtpPropertiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpPtpPropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "All the configurable and operational data of this PTP instance."
+    ::= { cienaWsPtpMIB 6 }
+
+cwsPtpPtpPropertiesEntry OBJECT-TYPE
+    SYNTAX CwsPtpPtpPropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpPtpPropertiesTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpPtpPropertiesTableSnmpKey }
+    ::= { cwsPtpPtpPropertiesTable 1 }
+
+CwsPtpPtpPropertiesEntry ::= SEQUENCE { 
+    cwsPtpPtpPropertiesTableSnmpKey Integer32,
+    cwsPtpPtpPropertiesXcvrType XcvrType,
+    cwsPtpPtpPropertiesParentIndex XcvrId,
+    cwsPtpPtpPropertiesRate INTEGER 
+}
+
+cwsPtpPtpPropertiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpPtpProperties"
+    ::= { cwsPtpPtpPropertiesEntry 1 }
+
+cwsPtpPtpPropertiesXcvrType OBJECT-TYPE
+    SYNTAX XcvrType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Transceiver type of the xcvr that's associated with this ptp. Type depends on what is physically plugged in. Read only attribute."
+    ::= { cwsPtpPtpPropertiesEntry 2 }
+
+cwsPtpPtpPropertiesParentIndex OBJECT-TYPE
+    SYNTAX XcvrId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Index of the transceiver (XCVR) associated with the PTP. Read-only attribute."
+    ::= { cwsPtpPtpPropertiesEntry 3 }
+
+cwsPtpPtpPropertiesRate OBJECT-TYPE
+    SYNTAX INTEGER { none(0), linerate10dot3125gbps(1), linerate41dot25gbps(2), linerate103dot125gpbs(3), linerate2xotu4(4), linerate1xotu4(5), linerate1dot5xotu4(6) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Line Rate value, based off the mode of the parent XCVR."
+    ::= { cwsPtpPtpPropertiesEntry 4 }
+
+cwsPtpTransmitterTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpTransmitterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "PTP transmitter related config and operational data fields."
+    ::= { cienaWsPtpMIB 7 }
+
+cwsPtpTransmitterEntry OBJECT-TYPE
+    SYNTAX CwsPtpTransmitterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpTransmitterTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpTransmitterTableSnmpKey }
+    ::= { cwsPtpTransmitterTable 1 }
+
+CwsPtpTransmitterEntry ::= SEQUENCE { 
+    cwsPtpTransmitterTableSnmpKey Integer32,
+    cwsPtpTransmitterState EnabledDisabledNaEnum 
+}
+
+cwsPtpTransmitterTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpTransmitter"
+    ::= { cwsPtpTransmitterEntry 1 }
+
+cwsPtpTransmitterState OBJECT-TYPE
+    SYNTAX EnabledDisabledNaEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Transmitter state (enabled or disabled) of the PTP. PTP Admin State cannot be changed to enabled unless transmitter-state is enabled."
+    ::= { cwsPtpTransmitterEntry 2 }
+
+cwsPtpWavelengthTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpWavelengthEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 8 }
+
+cwsPtpWavelengthEntry OBJECT-TYPE
+    SYNTAX CwsPtpWavelengthEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpWavelengthTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpWavelengthTableSnmpKey }
+    ::= { cwsPtpWavelengthTable 1 }
+
+CwsPtpWavelengthEntry ::= SEQUENCE { 
+    cwsPtpWavelengthTableSnmpKey Integer32,
+    cwsPtpWavelengthValue Decimal2Dig,
+    cwsPtpWavelengthMinValue Decimal2DigSmall,
+    cwsPtpWavelengthMaxValue Decimal2DigSmall,
+    cwsPtpWavelengthActual Decimal2Dig 
+}
+
+cwsPtpWavelengthTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpWavelength"
+    ::= { cwsPtpWavelengthEntry 1 }
+
+cwsPtpWavelengthValue OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Wavelength value setting of the ptp, in nm. This is the configured wavelength value. Wavelength value cannot be modified while Admin State is set to enabled, except when changing from zero value to another value. It also cannot be modified if the PTP XCVR type is not a modem. Wavelength cannot be modified in the same operation as Frequency, Channel, and Wavelength Spacing, only one of those fields may be modified in a single operation. If Wavelength is modified, Frequency and Channel will be automatically updated to valid values. Modification to this field will be validated against the Wavelength Spacing field. In the case of automatic wavelength assignment, if Member ID = n, Port 1 PTP Channel = (n * 2 - 1), P12 PTP Channel = (n * 2). If PTP Wavelength, Frequency, and Channel have non-zero values, automatic wavelength assignment shall be skipped. If user provisions a Member ID that exceeds the maximum wavelength allocation specified in selected Band Plan (e.g. setting Member ID to 45 with Fixed-88 plan), automatic wavelength assignment shall be skipped. "
+    ::= { cwsPtpWavelengthEntry 2 }
+
+cwsPtpWavelengthMinValue OBJECT-TYPE
+    SYNTAX Decimal2DigSmall
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Wavelength Min value."
+    ::= { cwsPtpWavelengthEntry 3 }
+
+cwsPtpWavelengthMaxValue OBJECT-TYPE
+    SYNTAX Decimal2DigSmall
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Wavelength Max Value."
+    ::= { cwsPtpWavelengthEntry 4 }
+
+cwsPtpWavelengthActual OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The actual wavelength value of the ptp. in nm. It may or may not be equal to the configurable 'wavelength/value'."
+    ::= { cwsPtpWavelengthEntry 5 }
+
+cwsPtpChannelsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpChannelsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "PTP channels related operational data fields."
+    ::= { cienaWsPtpMIB 9 }
+
+cwsPtpChannelsEntry OBJECT-TYPE
+    SYNTAX CwsPtpChannelsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpChannelsTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpChannelsTableSnmpKey }
+    ::= { cwsPtpChannelsTable 1 }
+
+CwsPtpChannelsEntry ::= SEQUENCE { 
+    cwsPtpChannelsTableSnmpKey Integer32,
+    cwsPtpChannelsNumberOfChannels ChannelsNumber 
+}
+
+cwsPtpChannelsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpChannels"
+    ::= { cwsPtpChannelsEntry 1 }
+
+cwsPtpChannelsNumberOfChannels OBJECT-TYPE
+    SYNTAX ChannelsNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of channels this PTP has."
+    ::= { cwsPtpChannelsEntry 2 }
+
+cwsPtpChannelTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Operational data of a specific PTP channel."
+    ::= { cienaWsPtpMIB 10 }
+
+cwsPtpChannelEntry OBJECT-TYPE
+    SYNTAX CwsPtpChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpChannelTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpChannelChannelNumber }
+    ::= { cwsPtpChannelTable 1 }
+
+CwsPtpChannelEntry ::= SEQUENCE { 
+    cwsPtpChannelChannelNumber Integer32 
+}
+
+cwsPtpChannelChannelNumber OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Channel number of the channel status."
+    ::= { cwsPtpChannelEntry 1 }
+
+cwsPtpRxPowerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpRxPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 11 }
+
+cwsPtpRxPowerEntry OBJECT-TYPE
+    SYNTAX CwsPtpRxPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpRxPowerTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpChannelChannelNumber, cwsPtpRxPowerTableSnmpKey }
+    ::= { cwsPtpRxPowerTable 1 }
+
+CwsPtpRxPowerEntry ::= SEQUENCE { 
+    cwsPtpRxPowerTableSnmpKey Integer32,
+    cwsXcvrRxPowerActual Decimal1Dig,
+    cwsXcvrRxPowerMaximum Decimal1Dig,
+    cwsXcvrRxPowerMinimum Decimal1Dig,
+    cwsXcvrRxPowerMaximumRecordedTime StringMaxl32,
+    cwsXcvrRxPowerMinimumRecordedTime StringMaxl32 
+}
+
+cwsPtpRxPowerTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpRxPower"
+    ::= { cwsPtpRxPowerEntry 1 }
+
+cwsXcvrRxPowerActual OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Actual Tx or Rx optical power in dBm."
+    ::= { cwsPtpRxPowerEntry 2 }
+
+cwsXcvrRxPowerMaximum OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Maximum Tx or Rx optical power in dBm."
+    ::= { cwsPtpRxPowerEntry 3 }
+
+cwsXcvrRxPowerMinimum OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Minimum Tx or Rx optical power in dBm."
+    ::= { cwsPtpRxPowerEntry 4 }
+
+cwsXcvrRxPowerMaximumRecordedTime OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The exact date and time when the maximum optical power (Tx or Rx) was recorded. In the format of a date time string."
+    ::= { cwsPtpRxPowerEntry 5 }
+
+cwsXcvrRxPowerMinimumRecordedTime OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The exact date and time when the minimum optical power (Tx or Rx) was recorded. In the format of a date time string."
+    ::= { cwsPtpRxPowerEntry 6 }
+
+cwsPtpRxStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpRxStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 12 }
+
+cwsPtpRxStatusEntry OBJECT-TYPE
+    SYNTAX CwsPtpRxStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpRxStatusTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpChannelChannelNumber, cwsPtpRxStatusTableSnmpKey }
+    ::= { cwsPtpRxStatusTable 1 }
+
+CwsPtpRxStatusEntry ::= SEQUENCE { 
+    cwsPtpRxStatusTableSnmpKey Integer32,
+    cwsXcvrRxStatusHighAlarmStatus TruthValue,
+    cwsXcvrRxStatusLowAlarmStatus TruthValue,
+    cwsXcvrRxStatusHighWarningStatus TruthValue,
+    cwsXcvrRxStatusLowWarningStatus TruthValue,
+    cwsPtpRxStatusLossOfSignal TruthValue,
+    cwsPtpRxStatusLossOfLock TruthValue 
+}
+
+cwsPtpRxStatusTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpRxStatus"
+    ::= { cwsPtpRxStatusEntry 1 }
+
+cwsXcvrRxStatusHighAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power high alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsPtpRxStatusEntry 2 }
+
+cwsXcvrRxStatusLowAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power low alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsPtpRxStatusEntry 3 }
+
+cwsXcvrRxStatusHighWarningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power high warning status, boolean, true if warning is raised, false if warning is not raised."
+    ::= { cwsPtpRxStatusEntry 4 }
+
+cwsXcvrRxStatusLowWarningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power low warning status, boolean, true if warning is raised, false if warning is not raised."
+    ::= { cwsPtpRxStatusEntry 5 }
+
+cwsPtpRxStatusLossOfSignal OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Rx Loss of Signal."
+    ::= { cwsPtpRxStatusEntry 6 }
+
+cwsPtpRxStatusLossOfLock OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Rx Loss of Lock."
+    ::= { cwsPtpRxStatusEntry 7 }
+
+cwsPtpTxPowerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpTxPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 13 }
+
+cwsPtpTxPowerEntry OBJECT-TYPE
+    SYNTAX CwsPtpTxPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpTxPowerTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpChannelChannelNumber, cwsPtpTxPowerTableSnmpKey }
+    ::= { cwsPtpTxPowerTable 1 }
+
+CwsPtpTxPowerEntry ::= SEQUENCE { 
+    cwsPtpTxPowerTableSnmpKey Integer32,
+    cwsXcvrTxPowerActual Decimal1Dig,
+    cwsXcvrTxPowerMaximum Decimal1Dig,
+    cwsXcvrTxPowerMinimum Decimal1Dig,
+    cwsXcvrTxPowerMaximumRecordedTime StringMaxl32,
+    cwsXcvrTxPowerMinimumRecordedTime StringMaxl32 
+}
+
+cwsPtpTxPowerTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpTxPower"
+    ::= { cwsPtpTxPowerEntry 1 }
+
+cwsXcvrTxPowerActual OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Actual Tx or Rx optical power in dBm."
+    ::= { cwsPtpTxPowerEntry 2 }
+
+cwsXcvrTxPowerMaximum OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Maximum Tx or Rx optical power in dBm."
+    ::= { cwsPtpTxPowerEntry 3 }
+
+cwsXcvrTxPowerMinimum OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Minimum Tx or Rx optical power in dBm."
+    ::= { cwsPtpTxPowerEntry 4 }
+
+cwsXcvrTxPowerMaximumRecordedTime OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The exact date and time when the maximum optical power (Tx or Rx) was recorded. In the format of a date time string."
+    ::= { cwsPtpTxPowerEntry 5 }
+
+cwsXcvrTxPowerMinimumRecordedTime OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The exact date and time when the minimum optical power (Tx or Rx) was recorded. In the format of a date time string."
+    ::= { cwsPtpTxPowerEntry 6 }
+
+cwsPtpTxStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpTxStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 14 }
+
+cwsPtpTxStatusEntry OBJECT-TYPE
+    SYNTAX CwsPtpTxStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpTxStatusTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpChannelChannelNumber, cwsPtpTxStatusTableSnmpKey }
+    ::= { cwsPtpTxStatusTable 1 }
+
+CwsPtpTxStatusEntry ::= SEQUENCE { 
+    cwsPtpTxStatusTableSnmpKey Integer32,
+    cwsXcvrTxStatusHighAlarmStatus TruthValue,
+    cwsXcvrTxStatusLowAlarmStatus TruthValue,
+    cwsXcvrTxStatusHighWarningStatus TruthValue,
+    cwsXcvrTxStatusLowWarningStatus TruthValue 
+}
+
+cwsPtpTxStatusTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpTxStatus"
+    ::= { cwsPtpTxStatusEntry 1 }
+
+cwsXcvrTxStatusHighAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power high alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsPtpTxStatusEntry 2 }
+
+cwsXcvrTxStatusLowAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power low alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsPtpTxStatusEntry 3 }
+
+cwsXcvrTxStatusHighWarningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power high warning status, boolean, true if warning is raised, false if warning is not raised."
+    ::= { cwsPtpTxStatusEntry 4 }
+
+cwsXcvrTxStatusLowWarningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power low warning status, boolean, true if warning is raised, false if warning is not raised."
+    ::= { cwsPtpTxStatusEntry 5 }
+
+cwsPtpDiagnosticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 15 }
+
+cwsPtpDiagnosticsEntry OBJECT-TYPE
+    SYNTAX CwsPtpDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpDiagnosticsTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpDiagnosticsTableSnmpKey }
+    ::= { cwsPtpDiagnosticsTable 1 }
+
+CwsPtpDiagnosticsEntry ::= SEQUENCE { 
+    cwsPtpDiagnosticsTableSnmpKey Integer32,
+    cwsPtpDiagnosticsNumberOfChannels ChannelsNumber,
+    cwsPtpDiagnosticsNumberOfEthernet Unsigned32 
+}
+
+cwsPtpDiagnosticsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpDiagnostics"
+    ::= { cwsPtpDiagnosticsEntry 1 }
+
+cwsPtpDiagnosticsNumberOfChannels OBJECT-TYPE
+    SYNTAX ChannelsNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of channels the PTP has."
+    ::= { cwsPtpDiagnosticsEntry 2 }
+
+cwsPtpDiagnosticsNumberOfEthernet OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Ethernet connections the PTP has."
+    ::= { cwsPtpDiagnosticsEntry 3 }
+
+cwsPtpPtpOpticalDiagnosticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpPtpOpticalDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 16 }
+
+cwsPtpPtpOpticalDiagnosticsEntry OBJECT-TYPE
+    SYNTAX CwsPtpPtpOpticalDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpPtpOpticalDiagnosticsTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpPtpOpticalDiagnosticsChannelNumber }
+    ::= { cwsPtpPtpOpticalDiagnosticsTable 1 }
+
+CwsPtpPtpOpticalDiagnosticsEntry ::= SEQUENCE { 
+    cwsPtpPtpOpticalDiagnosticsChannelNumber Integer32 
+}
+
+cwsPtpPtpOpticalDiagnosticsChannelNumber OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Channel number of the physical diagnostic status."
+    ::= { cwsPtpPtpOpticalDiagnosticsEntry 1 }
+
+cwsPtpPtpRxOpticalDiagnosticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpPtpRxOpticalDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 17 }
+
+cwsPtpPtpRxOpticalDiagnosticsEntry OBJECT-TYPE
+    SYNTAX CwsPtpPtpRxOpticalDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpPtpRxOpticalDiagnosticsTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpPtpOpticalDiagnosticsChannelNumber, cwsPtpPtpRxOpticalDiagnosticsTableSnmpKey }
+    ::= { cwsPtpPtpRxOpticalDiagnosticsTable 1 }
+
+CwsPtpPtpRxOpticalDiagnosticsEntry ::= SEQUENCE { 
+    cwsPtpPtpRxOpticalDiagnosticsTableSnmpKey Integer32,
+    cwsPtpPtpRxOpticalDiagnosticsLossOfSignal TruthValue,
+    cwsPtpPtpRxOpticalDiagnosticsLossOfLock TruthValue 
+}
+
+cwsPtpPtpRxOpticalDiagnosticsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpPtpRxOpticalDiagnostics"
+    ::= { cwsPtpPtpRxOpticalDiagnosticsEntry 1 }
+
+cwsPtpPtpRxOpticalDiagnosticsLossOfSignal OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Rx Loss of Signal."
+    ::= { cwsPtpPtpRxOpticalDiagnosticsEntry 2 }
+
+cwsPtpPtpRxOpticalDiagnosticsLossOfLock OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Rx CDR Loss of Lock."
+    ::= { cwsPtpPtpRxOpticalDiagnosticsEntry 3 }
+
+cwsPtpPtpTxOpticalDiagnosticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpPtpTxOpticalDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 18 }
+
+cwsPtpPtpTxOpticalDiagnosticsEntry OBJECT-TYPE
+    SYNTAX CwsPtpPtpTxOpticalDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpPtpTxOpticalDiagnosticsTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpPtpOpticalDiagnosticsChannelNumber, cwsPtpPtpTxOpticalDiagnosticsTableSnmpKey }
+    ::= { cwsPtpPtpTxOpticalDiagnosticsTable 1 }
+
+CwsPtpPtpTxOpticalDiagnosticsEntry ::= SEQUENCE { 
+    cwsPtpPtpTxOpticalDiagnosticsTableSnmpKey Integer32,
+    cwsPtpPtpTxOpticalDiagnosticsLossOfSignal TruthValue,
+    cwsPtpPtpTxOpticalDiagnosticsLossOfLock TruthValue 
+}
+
+cwsPtpPtpTxOpticalDiagnosticsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpPtpTxOpticalDiagnostics"
+    ::= { cwsPtpPtpTxOpticalDiagnosticsEntry 1 }
+
+cwsPtpPtpTxOpticalDiagnosticsLossOfSignal OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Tx Loss of Signal."
+    ::= { cwsPtpPtpTxOpticalDiagnosticsEntry 2 }
+
+cwsPtpPtpTxOpticalDiagnosticsLossOfLock OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Tx Loss of Lock."
+    ::= { cwsPtpPtpTxOpticalDiagnosticsEntry 3 }
+
+cwsPtpPtpEthernetDiagnosticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpPtpEthernetDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 19 }
+
+cwsPtpPtpEthernetDiagnosticsEntry OBJECT-TYPE
+    SYNTAX CwsPtpPtpEthernetDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpPtpEthernetDiagnosticsTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpPtpEthernetDiagnosticsEthernetId }
+    ::= { cwsPtpPtpEthernetDiagnosticsTable 1 }
+
+CwsPtpPtpEthernetDiagnosticsEntry ::= SEQUENCE { 
+    cwsPtpPtpEthernetDiagnosticsEthernetId Integer32 
+}
+
+cwsPtpPtpEthernetDiagnosticsEthernetId OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ethernet Connection Id."
+    ::= { cwsPtpPtpEthernetDiagnosticsEntry 1 }
+
+cwsPtpPmaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpPmaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 20 }
+
+cwsPtpPmaEntry OBJECT-TYPE
+    SYNTAX CwsPtpPmaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpPmaTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpPtpEthernetDiagnosticsEthernetId, cwsPtpPmaTableSnmpKey }
+    ::= { cwsPtpPmaTable 1 }
+
+CwsPtpPmaEntry ::= SEQUENCE { 
+    cwsPtpPmaTableSnmpKey Integer32,
+    cwsPtpPmaSerdesOutOfLock TruthValue 
+}
+
+cwsPtpPmaTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpPma"
+    ::= { cwsPtpPmaEntry 1 }
+
+cwsPtpPmaSerdesOutOfLock OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Display true if the serializer/deserializer, on a given lane (1 for 10GE, 4 for 40GE and 20 for 100GE), is unable to lock to the incoming signal. Display false otherwise."
+    ::= { cwsPtpPmaEntry 2 }
+
+cwsPtpFecTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpFecEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 21 }
+
+cwsPtpFecEntry OBJECT-TYPE
+    SYNTAX CwsPtpFecEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpFecTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpPtpEthernetDiagnosticsEthernetId, cwsPtpFecTableSnmpKey }
+    ::= { cwsPtpFecTable 1 }
+
+CwsPtpFecEntry ::= SEQUENCE { 
+    cwsPtpFecTableSnmpKey Integer32,
+    cwsPtpFecLossOfAlignmentMarkerLock TruthValue 
+}
+
+cwsPtpFecTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpFec"
+    ::= { cwsPtpFecEntry 1 }
+
+cwsPtpFecLossOfAlignmentMarkerLock OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Loss of Alignment Marker lock."
+    ::= { cwsPtpFecEntry 2 }
+
+cwsPtpPcsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpPcsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 22 }
+
+cwsPtpPcsEntry OBJECT-TYPE
+    SYNTAX CwsPtpPcsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpPcsTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpPtpEthernetDiagnosticsEthernetId, cwsPtpPcsTableSnmpKey }
+    ::= { cwsPtpPcsTable 1 }
+
+CwsPtpPcsEntry ::= SEQUENCE { 
+    cwsPtpPcsTableSnmpKey Integer32,
+    cwsPtpPcsLossOfAlignmentMarker TruthValue,
+    cwsPtpPcsLossOfBlockLock TruthValue,
+    cwsPtpPcsHighBitErrorRate TruthValue 
+}
+
+cwsPtpPcsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpPcs"
+    ::= { cwsPtpPcsEntry 1 }
+
+cwsPtpPcsLossOfAlignmentMarker OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Loss of Alignment Marker."
+    ::= { cwsPtpPcsEntry 2 }
+
+cwsPtpPcsLossOfBlockLock OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Loss of Block Lock."
+    ::= { cwsPtpPcsEntry 3 }
+
+cwsPtpPcsHighBitErrorRate OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "High bit error rate."
+    ::= { cwsPtpPcsEntry 4 }
+
+cwsPtpRsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpRsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 23 }
+
+cwsPtpRsEntry OBJECT-TYPE
+    SYNTAX CwsPtpRsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpRsTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpPtpEthernetDiagnosticsEthernetId, cwsPtpRsTableSnmpKey }
+    ::= { cwsPtpRsTable 1 }
+
+CwsPtpRsEntry ::= SEQUENCE { 
+    cwsPtpRsTableSnmpKey Integer32,
+    cwsPtpRsLinkDown TruthValue,
+    cwsPtpRsLocalFault TruthValue,
+    cwsPtpRsRemoteFault TruthValue 
+}
+
+cwsPtpRsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpRs"
+    ::= { cwsPtpRsEntry 1 }
+
+cwsPtpRsLinkDown OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Link Down."
+    ::= { cwsPtpRsEntry 2 }
+
+cwsPtpRsLocalFault OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Local Fault."
+    ::= { cwsPtpRsEntry 3 }
+
+cwsPtpRsRemoteFault OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Remote Fault."
+    ::= { cwsPtpRsEntry 4 }
+
+cwsPtpTraceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpTraceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpMIB 24 }
+
+cwsPtpTraceEntry OBJECT-TYPE
+    SYNTAX CwsPtpTraceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpTraceTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpTraceTableSnmpKey }
+    ::= { cwsPtpTraceTable 1 }
+
+CwsPtpTraceEntry ::= SEQUENCE { 
+    cwsPtpTraceTableSnmpKey Integer32,
+    cwsPtpTraceMismatchMode TraceMismatchMode,
+    cwsPtpTraceMismatchFailMode TraceMismatchFailMode,
+    cwsPtpTraceTxSapi StringMaxl15,
+    cwsPtpTraceTxDapi StringMaxl15,
+    cwsPtpTraceTxOper StringMaxl32,
+    cwsPtpTraceTxOperActual StringMaxl32,
+    cwsPtpTraceTxOperMode TraceTxOperMode,
+    cwsPtpTraceRxSapi StringMaxl15,
+    cwsPtpTraceRxDapi StringMaxl15,
+    cwsPtpTraceRxOper StringMaxl32,
+    cwsPtpTraceExpSapi StringMaxl15,
+    cwsPtpTraceExpDapi StringMaxl15,
+    cwsPtpTraceExpOper StringMaxl32 
+}
+
+cwsPtpTraceTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpTrace"
+    ::= { cwsPtpTraceEntry 1 }
+
+cwsPtpTraceMismatchMode OBJECT-TYPE
+    SYNTAX TraceMismatchMode
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Mismatch Mode"
+    ::= { cwsPtpTraceEntry 2 }
+
+cwsPtpTraceMismatchFailMode OBJECT-TYPE
+    SYNTAX TraceMismatchFailMode
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Mismatch Failure Mode"
+    ::= { cwsPtpTraceEntry 3 }
+
+cwsPtpTraceTxSapi OBJECT-TYPE
+    SYNTAX StringMaxl15
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "SAPI Tx String"
+    ::= { cwsPtpTraceEntry 4 }
+
+cwsPtpTraceTxDapi OBJECT-TYPE
+    SYNTAX StringMaxl15
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "DAPI Tx String"
+    ::= { cwsPtpTraceEntry 5 }
+
+cwsPtpTraceTxOper OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Operator Tx String"
+    ::= { cwsPtpTraceEntry 6 }
+
+cwsPtpTraceTxOperActual OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Operator Tx String Actual"
+    ::= { cwsPtpTraceEntry 7 }
+
+cwsPtpTraceTxOperMode OBJECT-TYPE
+    SYNTAX TraceTxOperMode
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Operator Tx Mode"
+    ::= { cwsPtpTraceEntry 8 }
+
+cwsPtpTraceRxSapi OBJECT-TYPE
+    SYNTAX StringMaxl15
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "SAPI Rx String"
+    ::= { cwsPtpTraceEntry 9 }
+
+cwsPtpTraceRxDapi OBJECT-TYPE
+    SYNTAX StringMaxl15
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "DAPI Rx String"
+    ::= { cwsPtpTraceEntry 10 }
+
+cwsPtpTraceRxOper OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Operator Rx String"
+    ::= { cwsPtpTraceEntry 11 }
+
+cwsPtpTraceExpSapi OBJECT-TYPE
+    SYNTAX StringMaxl15
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "SAPI Expected Rx String"
+    ::= { cwsPtpTraceEntry 12 }
+
+cwsPtpTraceExpDapi OBJECT-TYPE
+    SYNTAX StringMaxl15
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "DAPI Expected Rx String"
+    ::= { cwsPtpTraceEntry 13 }
+
+cwsPtpTraceExpOper OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Operator Expected Rx String"
+    ::= { cwsPtpTraceEntry 14 }
+
+
+
+-- Conformance statements
+cienaWsPtpObjects OBJECT IDENTIFIER
+    ::= { cienaWsPtpMIB 1 }
+
+cienaWsPtpConformance OBJECT IDENTIFIER
+    ::= { cienaWsPtpMIB 2 }
+
+cienaWsPtpGroups OBJECT IDENTIFIER
+    ::= { cienaWsPtpConformance 1 }
+
+cienaWsPtpGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsPtpPtpsPtpIndex,
+        cwsPtpPtpIdName,
+        cwsPtpPtpStateAdminState,
+        cwsPtpPtpStateOperationalState,
+        cwsPtpPtpStateSpliManagement,
+        cwsPtpPtpPropertiesXcvrType,
+        cwsPtpPtpPropertiesParentIndex,
+        cwsPtpPtpPropertiesRate,
+        cwsPtpTransmitterState,
+        cwsPtpWavelengthValue,
+        cwsPtpWavelengthMinValue,
+        cwsPtpWavelengthMaxValue,
+        cwsPtpWavelengthActual,
+        cwsPtpChannelsNumberOfChannels,
+        cwsPtpChannelChannelNumber,
+        cwsXcvrRxPowerActual,
+        cwsXcvrRxPowerMaximum,
+        cwsXcvrRxPowerMinimum,
+        cwsXcvrRxPowerMaximumRecordedTime,
+        cwsXcvrRxPowerMinimumRecordedTime,
+        cwsXcvrRxStatusHighAlarmStatus,
+        cwsXcvrRxStatusLowAlarmStatus,
+        cwsXcvrRxStatusHighWarningStatus,
+        cwsXcvrRxStatusLowWarningStatus,
+        cwsPtpRxStatusLossOfSignal,
+        cwsPtpRxStatusLossOfLock,
+        cwsXcvrTxPowerActual,
+        cwsXcvrTxPowerMaximum,
+        cwsXcvrTxPowerMinimum,
+        cwsXcvrTxPowerMaximumRecordedTime,
+        cwsXcvrTxPowerMinimumRecordedTime,
+        cwsXcvrTxStatusHighAlarmStatus,
+        cwsXcvrTxStatusLowAlarmStatus,
+        cwsXcvrTxStatusHighWarningStatus,
+        cwsXcvrTxStatusLowWarningStatus,
+        cwsPtpDiagnosticsNumberOfChannels,
+        cwsPtpDiagnosticsNumberOfEthernet,
+        cwsPtpPtpOpticalDiagnosticsChannelNumber,
+        cwsPtpPtpRxOpticalDiagnosticsLossOfSignal,
+        cwsPtpPtpRxOpticalDiagnosticsLossOfLock,
+        cwsPtpPtpTxOpticalDiagnosticsLossOfSignal,
+        cwsPtpPtpTxOpticalDiagnosticsLossOfLock,
+        cwsPtpPtpEthernetDiagnosticsEthernetId,
+        cwsPtpPmaSerdesOutOfLock,
+        cwsPtpFecLossOfAlignmentMarkerLock,
+        cwsPtpPcsLossOfAlignmentMarker,
+        cwsPtpPcsLossOfBlockLock,
+        cwsPtpPcsHighBitErrorRate,
+        cwsPtpRsLinkDown,
+        cwsPtpRsLocalFault,
+        cwsPtpRsRemoteFault,
+        cwsPtpTraceMismatchMode,
+        cwsPtpTraceMismatchFailMode,
+        cwsPtpTraceTxSapi,
+        cwsPtpTraceTxDapi,
+        cwsPtpTraceTxOper,
+        cwsPtpTraceTxOperActual,
+        cwsPtpTraceTxOperMode,
+        cwsPtpTraceRxSapi,
+        cwsPtpTraceRxDapi,
+        cwsPtpTraceRxOper,
+        cwsPtpTraceExpSapi,
+        cwsPtpTraceExpDapi,
+        cwsPtpTraceExpOper
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsPtpGroups 1 }
+
+cienaWsPtpCompliances OBJECT IDENTIFIER
+    ::= { cienaWsPtpConformance 2 }
+
+cienaWsPtpCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsPtpGroup }
+    ::= { cienaWsPtpCompliances 1 }
+
+END -- End module

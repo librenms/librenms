@@ -320,6 +320,7 @@
                         <li><a href="{{ url('alert-rules') }}"><i class="fa fa-list fa-fw fa-lg" aria-hidden="true"></i> Alert Rules</a></li>
                         <li><a href="{{ url('alert-schedule') }}"><i class="fa fa-calendar fa-fw fa-lg" aria-hidden="true"></i> Scheduled Maintenance</a></li>
                         <li><a href="{{ url('templates') }}"><i class="fa fa-file fa-fw fa-lg" aria-hidden="true"></i> Alert Templates</a></li>
+                        <li><a href="{{ url('alert-transports') }}"><i class="fa fa-bus fa-fw fa-lg" aria-hidden="true"></i> Alert Transports</a></li>
                         @endadmin
                     </ul>
                 </li>
@@ -357,11 +358,7 @@
                         <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> Global Settings</a></li>
                         <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg" aria-hidden="true"></i> Validate Config</a></li>
                         <li role="presentation" class="divider"></li>
-                        @if(\LibreNMS\Authentication\LegacyAuth::get()->canManageUsers())
-                            <li><a href="{{ url('adduser') }}"><i class="fa fa-user-plus fa-fw fa-lg" aria-hidden="true"></i> Add User</a></li>
-                            <li><a href="{{ url('deluser') }}"><i class="fa fa-user-times fa-fw fa-lg" aria-hidden="true"></i> Remove User</a></li>
-                        @endif
-                        <li><a href="{{ url('edituser') }}"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> Edit User</a></li>
+                        <li><a href="{{ route('users.index') }}"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> Manage Users</a></li>
                         <li><a href="{{ url('authlog') }}"><i class="fa fa-shield fa-fw fa-lg" aria-hidden="true"></i> Auth History</a></li>
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">

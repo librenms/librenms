@@ -35,7 +35,7 @@ class LoginPage extends Page
     public function elements()
     {
         return [
-            '@element' => '#selector',
+            '@login' => '#login',
         ];
     }
 }

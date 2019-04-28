@@ -14,7 +14,7 @@ modules:
                     oid: boxServicesTempSensorsTable
                     value: boxServicesTempSensorTemperature
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.8.1.5.{{ $index }}'
-                    descr: 'Switch {{ $index }} Temperature'
+                    descr: 'Switch {{ $subindex0 }} Sensor {{ $subindex1 }} Temperature'
                     index: 'boxServicesTempSensorTemperature.{{ $index }}'
                     low_limit: boxServicesNormalTempRangeMin
                     high_limit: boxServicesNormalTempRangeMax
@@ -24,7 +24,7 @@ modules:
                     oid: boxServicesFansTable
                     value: boxServicesFanItemState
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.6.1.3.{{ $index }}'
-                    descr: 'Switch {{ $index }} Fan State'
+                    descr: 'Switch {{ $subindex0 }} Fan {{ $subindex1 }} State'
                     index: 'boxServicesFanItemState.{{ $index }}'
                     state_name: boxServicesFanItemState
                     states:

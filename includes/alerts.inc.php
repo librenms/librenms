@@ -30,6 +30,7 @@ use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 use PHPMailer\PHPMailer\PHPMailer;
+use LibreNMS\Util\Time;
 
 /**
  * @param $rule
@@ -157,7 +158,8 @@ function GetRules($device_id)
  */
 function IsMaintenance($device_id)
 {
-    return \App\Models\Device::find($device_id)->isUnderMaintenance();
+    $device = \App\Models\Device::find($device_id);
+    return !is_null($device) && $device->isUnderMaintenance();
 }
 /**
  * Run all rules for a device
@@ -411,8 +413,8 @@ function DescribeAlert($alert)
     $obj['version']       = $device['version'];
     $obj['location']      = $device['location'];
     $obj['uptime']        = $device['uptime'];
-    $obj['uptime_short']  = formatUptime($device['uptime'], 'short');
-    $obj['uptime_long']   = formatUptime($device['uptime']);
+    $obj['uptime_short']  = Time::formatInterval($device['uptime'], 'short');
+    $obj['uptime_long']   = Time::formatInterval($device['uptime']);
     $obj['description']   = $device['purpose'];
     $obj['notes']         = $device['notes'];
     $obj['alert_notes']   = $alert['note'];

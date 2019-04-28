@@ -29,6 +29,14 @@ use \PHPUnit\Framework\ExpectationFailedException as PHPUnitException;
 
 class DBSetupTest extends DBTestCase
 {
+    protected $db_name;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->db_name = dbFetchCell('SELECT DATABASE()');
+    }
+
     public function testSetupDB()
     {
         global $schema;

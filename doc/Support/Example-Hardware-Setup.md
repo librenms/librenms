@@ -86,7 +86,8 @@ Running in Proxmox.
 #### [CppMonkey(KodApa85)](https://github.com/cppmonkey)
 
 > Home
-|                | LibreNMS            | MySQL               |
+
+|                | LibreNMS            | MariaDB             |
 | -------------- | ------------------- | ------------------- |
 | Type           | i5-4690K            | Same Workstation    |
 | OS             | Ubuntu 18.04.2      |                     |
@@ -102,8 +103,10 @@ Running in Proxmox.
 #### [CppMonkey(KodApa85)](https://github.com/cppmonkey)
 
 > Dev
+
 Running in Ganeti
-|                | LibreNMS            | MySQL               |
+
+|                | LibreNMS            | MariaDB             |
 | -------------- | ------------------- | ------------------- |
 | Type           | VM                  | Same VM             |
 | OS             | CentOS 7.5          |                     |
@@ -119,10 +122,10 @@ Running in Ganeti
 #### [CppMonkey(KodApa85)](https://github.com/cppmonkey)
 
 > Work NOC
-Running in Ganeti Cluster
-Dell PER730xd - 64GB, Dual E5-2660 v3
-Dell PER730xd - 64GB, Dual E5-2640 v3
-|                | LibreNMS            | MySQL               |
+
+Running in Ganeti Cluster with 2x Dell PER730xd - 64GB, Dual E5-2660 v3
+
+|                | LibreNMS            | MariaDB             |
 | -------------- | ------------------- | ------------------- |
 | Type           | VM                  | VM                  |
 | OS             | Debian Stretch      | Debian Stretch      |

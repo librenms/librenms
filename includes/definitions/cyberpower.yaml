@@ -12,3 +12,4 @@ poller_modules:
     ports: false
 discovery_modules:
     ports: false
+nobulk: true

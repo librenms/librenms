@@ -1,0 +1,40 @@
+LINKSYS-SCT-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      Linksys Switch Interfaces Private
+-- Version:    7.50
+-- Date:       16 Aug 2010
+
+IMPORTS
+    OBJECT-TYPE, Counter32                         FROM SNMPv2-SMI
+    TruthValue                                      FROM SNMPv2-TC
+    rnd                                             FROM LINKSYS-MIB;
+
+rlSctMib MODULE-IDENTITY
+        LAST-UPDATED "201008161234Z"
+        ORGANIZATION "Linksys LLC."
+        CONTACT-INFO
+              "www.linksys.com/business/support"
+        DESCRIPTION
+            "The private MIB module definition for SCT MIB."
+        ::= { rnd 203 }
+
+--rlSctCpuRateEnabled
+rlSctCpuRateEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indication whether the counter CPU rate is enabled"
+    ::= { rlSctMib 1 }
+
+--rlSctCpuRate
+rlSctCpuRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the amount of packets per second the CPU is handling."
+    ::= { rlSctMib 2 }
+
+END
+

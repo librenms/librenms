@@ -21,6 +21,7 @@ modules:
             data:
                 - oid:
                     - entPhysicalName
+                    - hwStackPortTable
         temperature:
             data:
                 -
@@ -156,14 +157,4 @@ modules:
                          - { descr: Master, graph: 1, value: 1, generic: 0 }
                          - { descr: Standby, graph: 1, value: 2, generic: 0 }
                          - { descr: Slave, graph: 1, value: 3, generic: 0 }
-                -
-                    oid: hwStackPortTable
-                    value: hwStackPortStatus
-                    num_oid: '.1.3.6.1.4.1.2011.5.25.183.1.21.1.5.{{ $index }}'
-                    descr: 'Stack Port {{ $index }} Status'
-                    group: Stack
-                    state_name: hwStackPortStatus
-                    states:
-                         - { descr: Up, graph: 1, value: 1, generic: 0 }
-                         - { descr: Down, graph: 1, value: 2, generic: 2 }
 

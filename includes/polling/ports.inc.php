@@ -316,6 +316,10 @@ if ($device['os'] == 'infinera-groove') {
     require_once 'ports/infinera-groove.inc.php';
 }
 
+if ($device['os'] == 'junos') {
+    require_once 'ports/junos-vcp.inc.php';
+}
+
 if ($config['enable_ports_adsl']) {
     $device['xdsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` in ('adsl','vdsl')", [$device['device_id']]);
 }
@@ -372,6 +376,23 @@ if ($config['enable_ports_poe']) {
 
         foreach ($vrp_poe_oids as $oid) {
             $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'HUAWEI-POE-MIB');
+        }
+    } elseif ($device['os'] == 'linksys-ss') {
+        echo 'rlPethPsePort' ;
+
+        $linksys_poe_oids = array(
+            'pethPsePortAdminEnable',
+            'rlPethPsePortPowerLimit',
+            'rlPethPsePortOutputPower',
+        );
+
+        foreach ($linksys_poe_oids as $oid) {
+            $port_stats_temp = snmpwalk_cache_oid($device, $oid, $port_stats_temp, 'LINKSYS-POE-MIB:POWER-ETHERNET-MIB');
+        }
+        foreach ($port_stats_temp as $key => $value) {
+            //remove the group index and only keep the ifIndex
+            [$group_id, $if_id] = explode(".", $key);
+            $port_stats[$if_id] = array_merge($port_stats[$if_id], $value);
         }
     } else {
         //Any other device, generic polling

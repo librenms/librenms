@@ -4,7 +4,7 @@ use LibreNMS\Authentication\LegacyAuth;
 session_start();
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
-} elseif (!file_exists("../config.php")) {
+} elseif (!file_exists("config.php")) {
     $allowed_vars = array('stage','build-ok','dbhost','dbuser','dbpass','dbname','dbport','dbsocket','add_user','add_pass','add_email');
     foreach ($allowed_vars as $allowed) {
         if (isset($_POST[$allowed])) {
@@ -16,7 +16,7 @@ if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
 $stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
 
 // Before we do anything, if we see config.php, redirect back to the homepage.
-if (file_exists('../config.php') && $stage != 6) {
+if (file_exists('config.php') && $stage != 6) {
     unset($_SESSION['stage']);
     header("Location: /");
     exit;
@@ -27,7 +27,7 @@ $init_modules = array('web', 'nodb');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 // List of php modules we expect to see
-$modules = array('gd','mysqlnd');
+$modules = array('gd','mysqlnd', 'pdo_mysql');
 
 $dbhost = @$_POST['dbhost'] ?: 'localhost';
 $dbuser = @$_POST['dbuser'] ?: 'librenms';
@@ -78,7 +78,7 @@ if ($stage == 4) {
     }
 } elseif ($stage == 6) {
     // If we get here then let's do some final checks.
-    if (!file_exists("../config.php")) {
+    if (!file_exists("config.php")) {
         // config.php file doesn't exist. go back to that stage
         $msg = "config.php still doesn't exist";
         $stage = 5;
@@ -392,8 +392,8 @@ $config_file = <<<"EOD"
 #\$config\['update'\] = 0;  # uncomment to completely disable updates
 EOD;
 
-if (!file_exists("../config.php")) {
-    $conf = fopen("../config.php", 'w');
+if (!file_exists("config.php")) {
+    $conf = fopen("config.php", 'w');
     if ($conf != false) {
         if (fwrite($conf, "<?php\n") === false) {
             echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");

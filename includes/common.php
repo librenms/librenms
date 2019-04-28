@@ -22,6 +22,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Laravel;
 
 function generate_priority_label($priority)
 {
@@ -663,7 +664,7 @@ if (!function_exists('d_echo')) {
     {
         global $debug;
 
-        if (class_exists('\Log')) {
+        if (Laravel::isBooted()) {
             \Log::debug(is_string($text) ? rtrim($text) : $text);
         } elseif ($debug) {
             print_r($text);
@@ -759,10 +760,11 @@ function get_graph_subtypes($type, $device = null)
 {
     global $config;
 
+    $type = basename($type);
     $types = array();
 
     // find the subtypes defined in files
-    if ($handle = opendir($config['install_dir'] . "/html/includes/graphs/$type/")) {
+    if ($handle = opendir($config['install_dir'] . "/includes/html/graphs/$type/")) {
         while (false !== ($file = readdir($handle))) {
             if ($file != "." && $file != ".." && $file != "auth.inc.php" && strstr($file, ".inc.php")) {
                 $types[] = str_replace(".inc.php", "", $file);

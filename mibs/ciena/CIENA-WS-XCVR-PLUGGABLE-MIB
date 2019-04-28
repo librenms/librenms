@@ -1,0 +1,750 @@
+-- This file was automatically generated from ciena-ws-xcvr-pluggable.yang. Do not edit.
+
+CIENA-WS-XCVR-PLUGGABLE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    ChannelsNumber, Decimal2Dig, StringMaxl16, StringMaxl32, XcvrId, XcvrSerdesRxAmplitude, XcvrSerdesRxEmphasis, XcvrSerdesTxEq
+        FROM CIENA-WS-TYPEDEFS-MIB
+    cwsXcvrChannelDiagnosticsEntry, cwsXcvrDeviceIdEntry, cwsXcvrVendorDiagnosticMonitoringEntry, cwsXcvrVendorIdEntry, cwsXcvrVendorTransmitterEntry
+        FROM CIENA-WS-XCVR-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC;
+
+cienaWsXcvrPluggableMIB MODULE-IDENTITY
+    LAST-UPDATED "201707240000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This YANG module defines Ciena's XCVR common pluggable specific data for the NETCONF protocol. It will augment the ciena-ws-xcvr module."
+    REVISION "201707240000Z"
+    DESCRIPTION "Waveserver Release 1.5
+Added 'serdes-config' container for QSFP28s."
+    REVISION "201703020000Z"
+    DESCRIPTION "Waveserver Release 1.4
+
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revised.
+Updated enum definition for leaf identifier to remove the parentheses in some enum names.
+Added a new entry to enum of 'revision-compliance' leaf."
+    REVISION "201606140000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.
+Major restructuring of this YANG module."
+    REVISION "201502250000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 17 }
+
+cwsXcvrAugXcvrPluggableVendorIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrAugXcvrPluggableVendorIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrPluggableMIB 3 }
+
+cwsXcvrAugXcvrPluggableVendorIdEntry OBJECT-TYPE
+    SYNTAX CwsXcvrAugXcvrPluggableVendorIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrAugXcvrPluggableVendorIdTable."
+    AUGMENTS { cwsXcvrVendorIdEntry }
+    ::= { cwsXcvrAugXcvrPluggableVendorIdTable 1 }
+
+CwsXcvrAugXcvrPluggableVendorIdEntry ::= SEQUENCE { 
+    cwsXcvrPluggableVendorIdRevisionCompliance INTEGER 
+}
+
+cwsXcvrPluggableVendorIdRevisionCompliance OBJECT-TYPE
+    SYNTAX INTEGER { notspecified(0), rv47(1), rv472h(2), rv13(3), rv14(4), rv15(5), rv20(6), rv20and26and27(7) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Revision Compliance flags, as defined in documentation for Common Management Interface, SFF-8636, table 6-3."
+    ::= { cwsXcvrAugXcvrPluggableVendorIdEntry 1 }
+
+cwsXcvrPluggableVendorOuiTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrPluggableVendorOuiEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Free side device vendor IEEE company ID. Defined in Common Management Interface, SFF-8636, table 6-15. 3 bytes of data."
+    ::= { cienaWsXcvrPluggableMIB 4 }
+
+cwsXcvrPluggableVendorOuiEntry OBJECT-TYPE
+    SYNTAX CwsXcvrPluggableVendorOuiEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrPluggableVendorOuiTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrVendorIdTableSnmpKey, cwsXcvrPluggableVendorOuiTableSnmpKey }
+    ::= { cwsXcvrPluggableVendorOuiTable 1 }
+
+CwsXcvrPluggableVendorOuiEntry ::= SEQUENCE { 
+    cwsXcvrPluggableVendorOuiTableSnmpKey Integer32,
+    cwsXcvrPluggableVendorOui Unsigned32 
+}
+
+cwsXcvrPluggableVendorOuiTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrPluggableVendorOui"
+    ::= { cwsXcvrPluggableVendorOuiEntry 1 }
+
+cwsXcvrPluggableVendorOui OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Free side device vendor IEEE company ID. Defined in Common Management Interface, SFF-8636, table 6-15. 3 bytes of data."
+    ::= { cwsXcvrPluggableVendorOuiEntry 2 }
+
+cwsXcvrAugXcvrPluggableDeviceIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrAugXcvrPluggableDeviceIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrPluggableMIB 5 }
+
+cwsXcvrAugXcvrPluggableDeviceIdEntry OBJECT-TYPE
+    SYNTAX CwsXcvrAugXcvrPluggableDeviceIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrAugXcvrPluggableDeviceIdTable."
+    AUGMENTS { cwsXcvrDeviceIdEntry }
+    ::= { cwsXcvrAugXcvrPluggableDeviceIdTable 1 }
+
+CwsXcvrAugXcvrPluggableDeviceIdEntry ::= SEQUENCE { 
+    cwsXcvrPluggableDeviceIdIdentifier INTEGER,
+    cwsXcvrPluggableDeviceIdIdentifierRaw StringMaxl32,
+    cwsXcvrPluggableDeviceIdExtendedIdentifierRaw StringMaxl32,
+    cwsXcvrPluggableDeviceIdPowerConsumption INTEGER,
+    cwsXcvrPluggableDeviceIdClei StringMaxl16,
+    cwsXcvrPluggableDeviceIdConnectorTypeRaw StringMaxl32 
+}
+
+cwsXcvrPluggableDeviceIdIdentifier OBJECT-TYPE
+    SYNTAX INTEGER { unknownorunspecified(0), gbic(1), moduleconnectorsolderedtomotherboard(2), fpsfpplussfp(3), xbi300pin(4), xenpak(5), xfp(6), xff(7), xfpe(8), xpak(9), x2(10), wdmsfporsf(11), qsfp(12), qsfpplus(13), cxp(14), shieldedminimultilanehd4x(15), qsfp28(17), cxp2(18), cdfpstyle1or2(19), shieldedminimultilanehd4xfanout(20), shieldedminimultilanehd8xfanout(21), cdfpstyle3(22), wavelogic3extreme(256) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Human readable description of Vendor's identifier byte value. Reference SFF-8024, table 4-1"
+    ::= { cwsXcvrAugXcvrPluggableDeviceIdEntry 1 }
+
+cwsXcvrPluggableDeviceIdIdentifierRaw OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Vendor's identifier raw byte value. In the format of a HEX string. Reference SFF-8024, table 4-1"
+    ::= { cwsXcvrAugXcvrPluggableDeviceIdEntry 2 }
+
+cwsXcvrPluggableDeviceIdExtendedIdentifierRaw OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Vendor's extended identifier raw byte value. In the format of a HEX string. Reference SFF-8436, table 4-1"
+    ::= { cwsXcvrAugXcvrPluggableDeviceIdEntry 3 }
+
+cwsXcvrPluggableDeviceIdPowerConsumption OBJECT-TYPE
+    SYNTAX INTEGER { class1module15wmax(0), class2module20wmax(1), class3module25wmax(2), class4module35wmax(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The class of Power Consumption portion of the extended identifier byte, bit 7 to 6. Reference SFF-8436, section 7.6.2.2"
+    ::= { cwsXcvrAugXcvrPluggableDeviceIdEntry 4 }
+
+cwsXcvrPluggableDeviceIdClei OBJECT-TYPE
+    SYNTAX StringMaxl16
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "CLEI code. If bit4 in extended identifier is set to 1, show the CLEI code. If bit4 in extended identifier is set to 0, 'No CLEI code' will be shown. Reference SFF-8436, section 7.6.2.2 and section 7.6.4"
+    ::= { cwsXcvrAugXcvrPluggableDeviceIdEntry 5 }
+
+cwsXcvrPluggableDeviceIdConnectorTypeRaw OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Vendor's connector type raw byte value. In the format of a HEX string. Reference SFF-8024, table 4-3"
+    ::= { cwsXcvrAugXcvrPluggableDeviceIdEntry 6 }
+
+cwsXcvrAugXcvrPluggableVendorTransmitterTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrAugXcvrPluggableVendorTransmitterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrPluggableMIB 6 }
+
+cwsXcvrAugXcvrPluggableVendorTransmitterEntry OBJECT-TYPE
+    SYNTAX CwsXcvrAugXcvrPluggableVendorTransmitterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrAugXcvrPluggableVendorTransmitterTable."
+    AUGMENTS { cwsXcvrVendorTransmitterEntry }
+    ::= { cwsXcvrAugXcvrPluggableVendorTransmitterTable 1 }
+
+CwsXcvrAugXcvrPluggableVendorTransmitterEntry ::= SEQUENCE { 
+    cwsXcvrPluggableVendorTransmitterWavelength Decimal2Dig,
+    cwsXcvrPluggableVendorTransmitterWavelengthRaw StringMaxl32,
+    cwsXcvrPluggableVendorTransmitterEncodingDescription INTEGER,
+    cwsXcvrPluggableVendorTransmitterEncodingRaw StringMaxl32 
+}
+
+cwsXcvrPluggableVendorTransmitterWavelength OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Wave length value, in nanometers."
+    ::= { cwsXcvrAugXcvrPluggableVendorTransmitterEntry 1 }
+
+cwsXcvrPluggableVendorTransmitterWavelengthRaw OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Raw byte value of Wavelength, before any multiplier operation is done. In the format of a HEX string."
+    ::= { cwsXcvrAugXcvrPluggableVendorTransmitterEntry 2 }
+
+cwsXcvrPluggableVendorTransmitterEncodingDescription OBJECT-TYPE
+    SYNTAX INTEGER { unspecified(0), encoding8b10b(1), encoding4b5b(2), nrz(3), sonetscrambled(4), encoding64b66b(5), manchester(6), encoding256b257b(7) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Human readable description of Device encoding mechanism. Some values may differ depending on if it is 8472 or 8x36. Reference SFF-8024, TABLE 4-2."
+    ::= { cwsXcvrAugXcvrPluggableVendorTransmitterEntry 3 }
+
+cwsXcvrPluggableVendorTransmitterEncodingRaw OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Raw byte value of Device encoding mechanism. Some values may differ depending on if it is 8472 or 8x36. In the format of a HEX string. Reference SFF-8024, TABLE 4-2."
+    ::= { cwsXcvrAugXcvrPluggableVendorTransmitterEntry 4 }
+
+cwsXcvrAugXcvrPluggableVendorDiagnosticMonitoringTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrAugXcvrPluggableVendorDiagnosticMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrPluggableMIB 7 }
+
+cwsXcvrAugXcvrPluggableVendorDiagnosticMonitoringEntry OBJECT-TYPE
+    SYNTAX CwsXcvrAugXcvrPluggableVendorDiagnosticMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrAugXcvrPluggableVendorDiagnosticMonitoringTable."
+    AUGMENTS { cwsXcvrVendorDiagnosticMonitoringEntry }
+    ::= { cwsXcvrAugXcvrPluggableVendorDiagnosticMonitoringTable 1 }
+
+CwsXcvrAugXcvrPluggableVendorDiagnosticMonitoringEntry ::= SEQUENCE { 
+    cwsXcvrPluggableVendorDiagnosticMonitoringDiagnosticMonitoringTypeRaw StringMaxl32,
+    cwsXcvrPluggableVendorDiagnosticMonitoringDiagnosticMonitoringImplemented TruthValue 
+}
+
+cwsXcvrPluggableVendorDiagnosticMonitoringDiagnosticMonitoringTypeRaw OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Display the raw byte value of Diagnostic Monitoring Type, in the format of a HEX string. Reference SFF 8472 section 8.8 and table 9.5 for detail."
+    ::= { cwsXcvrAugXcvrPluggableVendorDiagnosticMonitoringEntry 1 }
+
+cwsXcvrPluggableVendorDiagnosticMonitoringDiagnosticMonitoringImplemented OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "If Digital diagnostic monitoring is implemented, determined by bit 6 of diagnostic monitoring type. Reference SFF 8472 section 8.8 and table 9.5 for detail."
+    ::= { cwsXcvrAugXcvrPluggableVendorDiagnosticMonitoringEntry 2 }
+
+cwsXcvrPluggableTransceiverCodeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrPluggableTransceiverCodeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrPluggableMIB 8 }
+
+cwsXcvrPluggableTransceiverCodeEntry OBJECT-TYPE
+    SYNTAX CwsXcvrPluggableTransceiverCodeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrPluggableTransceiverCodeTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrPluggableTransceiverCodeTableSnmpKey }
+    ::= { cwsXcvrPluggableTransceiverCodeTable 1 }
+
+CwsXcvrPluggableTransceiverCodeEntry ::= SEQUENCE { 
+    cwsXcvrPluggableTransceiverCodeTableSnmpKey Integer32,
+    cwsXcvrPluggableTransceiverCodeSpecificationCompliance BITS,
+    cwsXcvrPluggableTransceiverCodeTransceiverCodeRaw StringMaxl32 
+}
+
+cwsXcvrPluggableTransceiverCodeTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrPluggableTransceiverCode"
+    ::= { cwsXcvrPluggableTransceiverCodeEntry 1 }
+
+cwsXcvrPluggableTransceiverCodeSpecificationCompliance OBJECT-TYPE
+    SYNTAX BITS { speccompliance40gactivecablexlppi(0), speccompliance40gbaselr4(1), speccompliance40gbasesr4(2), speccompliance40gbasecr4(3), speccompliance10gbasesr(4), speccompliance10gbaselr(5), speccompliance10gbaselrm(6), extendedspeccompliance100gactiveopticalcable(8), extendedspeccompliance100gbasesr4(9), extendedspeccompliance100gbaselr4(10), extendedspeccompliance100gbaseer4(11), extendedspeccompliance100gbasesr10(12), extendedspeccompliance100gcwdm4msawithfec(13), extendedspeccompliance100gpsm4parallelsmf(14), extendedspeccompliance100gactivecoppercable(15), extendedspeccompliance100gcwdmmsawithoutfec(16), extendedspeccompliance100gbasecr4(18), extendedspeccompliance40gbaseer4(23), extendedspeccompliance4x10gbasesr(24), extendedspeccompliance40gpsm4parallelsmf(25), extendedspeccomplianceg9591p1i12d1(26), extendedspeccomplianceg9591p1s12d2(27), extendedspeccomplianceg9591p1l12d2(28), extspeccode10gbasetwithsfi(29), unknown(30) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "10 GbE ethernet, 40 GbE ethernet, and 100 GbE extended specification compliance of the transceiver. In the form of a YANG bit field. Note, the bit field in this node is not mapped with the SFF tables. Reference SFF-8436 table 33 for specification compliance of 10 GbE and 40 GbE Ethernet. Reference SFF-8024, TABLE 4-4 for extended specification compliance of 100 GbE."
+    ::= { cwsXcvrPluggableTransceiverCodeEntry 2 }
+
+cwsXcvrPluggableTransceiverCodeTransceiverCodeRaw OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Specification Compliance/Transceiver Code raw byte value. In the format of a HEX string. Reference SFF-8436 table 33 for specification compliance"
+    ::= { cwsXcvrPluggableTransceiverCodeEntry 3 }
+
+cwsXcvrPluggableDeviceTechnologyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrPluggableDeviceTechnologyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrPluggableMIB 9 }
+
+cwsXcvrPluggableDeviceTechnologyEntry OBJECT-TYPE
+    SYNTAX CwsXcvrPluggableDeviceTechnologyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrPluggableDeviceTechnologyTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrPluggableDeviceTechnologyTableSnmpKey }
+    ::= { cwsXcvrPluggableDeviceTechnologyTable 1 }
+
+CwsXcvrPluggableDeviceTechnologyEntry ::= SEQUENCE { 
+    cwsXcvrPluggableDeviceTechnologyTableSnmpKey Integer32,
+    cwsXcvrPluggableDeviceTechnologyDeviceTechnologyRaw StringMaxl32,
+    cwsXcvrPluggableDeviceTechnologyTransmitterTunable TruthValue,
+    cwsXcvrPluggableDeviceTechnologyMaxCaseTemperature Unsigned32 
+}
+
+cwsXcvrPluggableDeviceTechnologyTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrPluggableDeviceTechnology"
+    ::= { cwsXcvrPluggableDeviceTechnologyEntry 1 }
+
+cwsXcvrPluggableDeviceTechnologyDeviceTechnologyRaw OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Display the raw byte value of Device Technology, in the format of a HEX string. Reference SFF 8636 table 6-19."
+    ::= { cwsXcvrPluggableDeviceTechnologyEntry 2 }
+
+cwsXcvrPluggableDeviceTechnologyTransmitterTunable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Device Technology Transmitter tuneable value. Reference SFF 8636 table 6-19, bit 0."
+    ::= { cwsXcvrPluggableDeviceTechnologyEntry 3 }
+
+cwsXcvrPluggableDeviceTechnologyMaxCaseTemperature OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Maximum Case Temperature. In degrees C."
+    ::= { cwsXcvrPluggableDeviceTechnologyEntry 4 }
+
+cwsXcvrPluggableOptionsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrPluggableOptionsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrPluggableMIB 10 }
+
+cwsXcvrPluggableOptionsEntry OBJECT-TYPE
+    SYNTAX CwsXcvrPluggableOptionsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrPluggableOptionsTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrPluggableOptionsTableSnmpKey }
+    ::= { cwsXcvrPluggableOptionsTable 1 }
+
+CwsXcvrPluggableOptionsEntry ::= SEQUENCE { 
+    cwsXcvrPluggableOptionsTableSnmpKey Integer32,
+    cwsXcvrPluggableOptionsOptionsRaw StringMaxl32,
+    cwsXcvrPluggableOptionsTxinpeqautoadaptcapable TruthValue,
+    cwsXcvrPluggableOptionsTxinpeqfixedprogramsetting TruthValue,
+    cwsXcvrPluggableOptionsRxoutemfixedprogramsetting TruthValue,
+    cwsXcvrPluggableOptionsRxoutamfixedprogramsetting TruthValue,
+    cwsXcvrPluggableOptionsTxCdrLossOfLockFlag TruthValue,
+    cwsXcvrPluggableOptionsRxCdrLossOfLockFlag TruthValue,
+    cwsXcvrPluggableOptionsUserEepromPage02hProvided TruthValue,
+    cwsXcvrPluggableOptionsAstPage01hProvided TruthValue 
+}
+
+cwsXcvrPluggableOptionsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrPluggableOptions"
+    ::= { cwsXcvrPluggableOptionsEntry 1 }
+
+cwsXcvrPluggableOptionsOptionsRaw OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Raw byte value of 'options' field. In the format of a HEX string. Reference SFF 8636 table 6-22."
+    ::= { cwsXcvrPluggableOptionsEntry 2 }
+
+cwsXcvrPluggableOptionsTxinpeqautoadaptcapable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "A bit flag in 'options', reference SFF 8636 table 6-22."
+    ::= { cwsXcvrPluggableOptionsEntry 3 }
+
+cwsXcvrPluggableOptionsTxinpeqfixedprogramsetting OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "A bit flag in 'options', reference SFF 8636 table 6-22."
+    ::= { cwsXcvrPluggableOptionsEntry 4 }
+
+cwsXcvrPluggableOptionsRxoutemfixedprogramsetting OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "A bit flag in 'options', reference SFF 8636 table 6-22."
+    ::= { cwsXcvrPluggableOptionsEntry 5 }
+
+cwsXcvrPluggableOptionsRxoutamfixedprogramsetting OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "A bit flag in 'options', reference SFF 8636 table 6-22."
+    ::= { cwsXcvrPluggableOptionsEntry 6 }
+
+cwsXcvrPluggableOptionsTxCdrLossOfLockFlag OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "A bit flag in 'options', reference SFF 8636 table 6-22."
+    ::= { cwsXcvrPluggableOptionsEntry 7 }
+
+cwsXcvrPluggableOptionsRxCdrLossOfLockFlag OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "A bit flag in 'options', reference SFF 8636 table 6-22."
+    ::= { cwsXcvrPluggableOptionsEntry 8 }
+
+cwsXcvrPluggableOptionsUserEepromPage02hProvided OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "A bit flag in 'options', reference SFF 8636 table 6-22."
+    ::= { cwsXcvrPluggableOptionsEntry 9 }
+
+cwsXcvrPluggableOptionsAstPage01hProvided OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "A bit flag in 'options', reference SFF 8636 table 6-22."
+    ::= { cwsXcvrPluggableOptionsEntry 10 }
+
+cwsXcvrPluggableSupplyVoltageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrPluggableSupplyVoltageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrPluggableMIB 11 }
+
+cwsXcvrPluggableSupplyVoltageEntry OBJECT-TYPE
+    SYNTAX CwsXcvrPluggableSupplyVoltageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrPluggableSupplyVoltageTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrPluggableSupplyVoltageTableSnmpKey }
+    ::= { cwsXcvrPluggableSupplyVoltageTable 1 }
+
+CwsXcvrPluggableSupplyVoltageEntry ::= SEQUENCE { 
+    cwsXcvrPluggableSupplyVoltageTableSnmpKey Integer32,
+    cwsXcvrPluggableSupplyVoltageActual Decimal2Dig 
+}
+
+cwsXcvrPluggableSupplyVoltageTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrPluggableSupplyVoltage"
+    ::= { cwsXcvrPluggableSupplyVoltageEntry 1 }
+
+cwsXcvrPluggableSupplyVoltageActual OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Supply voltage, actual supply voltage in volts (V). Range must be between 0 and 6.55V."
+    ::= { cwsXcvrPluggableSupplyVoltageEntry 2 }
+
+cwsXcvrPluggableStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrPluggableStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrPluggableMIB 12 }
+
+cwsXcvrPluggableStatusEntry OBJECT-TYPE
+    SYNTAX CwsXcvrPluggableStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrPluggableStatusTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrPluggableStatusTableSnmpKey }
+    ::= { cwsXcvrPluggableStatusTable 1 }
+
+CwsXcvrPluggableStatusEntry ::= SEQUENCE { 
+    cwsXcvrPluggableStatusTableSnmpKey Integer32,
+    cwsXcvrStatusHighAlarmStatus TruthValue,
+    cwsXcvrStatusLowAlarmStatus TruthValue,
+    cwsXcvrStatusHighWarningStatus TruthValue,
+    cwsXcvrStatusLowWarningStatus TruthValue 
+}
+
+cwsXcvrPluggableStatusTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrPluggableStatus"
+    ::= { cwsXcvrPluggableStatusEntry 1 }
+
+cwsXcvrStatusHighAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Supply voltage high alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsXcvrPluggableStatusEntry 2 }
+
+cwsXcvrStatusLowAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Supply voltage low alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsXcvrPluggableStatusEntry 3 }
+
+cwsXcvrStatusHighWarningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Supply voltage high warning status, boolean, true if warning is raised, false if warning is not raised."
+    ::= { cwsXcvrPluggableStatusEntry 4 }
+
+cwsXcvrStatusLowWarningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Supply voltage low warning status, boolean, true if warning is raised, false if warning is not raised."
+    ::= { cwsXcvrPluggableStatusEntry 5 }
+
+cwsXcvrPluggableThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrPluggableThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrPluggableMIB 13 }
+
+cwsXcvrPluggableThresholdEntry OBJECT-TYPE
+    SYNTAX CwsXcvrPluggableThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrPluggableThresholdTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrPluggableThresholdTableSnmpKey }
+    ::= { cwsXcvrPluggableThresholdTable 1 }
+
+CwsXcvrPluggableThresholdEntry ::= SEQUENCE { 
+    cwsXcvrPluggableThresholdTableSnmpKey Integer32,
+    cwsXcvrThresholdHighAlarmThreshold Decimal2Dig,
+    cwsXcvrThresholdLowAlarmThreshold Decimal2Dig,
+    cwsXcvrThresholdHighWarningThreshold Decimal2Dig,
+    cwsXcvrThresholdLowWarningThreshold Decimal2Dig 
+}
+
+cwsXcvrPluggableThresholdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrPluggableThreshold"
+    ::= { cwsXcvrPluggableThresholdEntry 1 }
+
+cwsXcvrThresholdHighAlarmThreshold OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Supply voltage high alarm threshold, in volts (V)."
+    ::= { cwsXcvrPluggableThresholdEntry 2 }
+
+cwsXcvrThresholdLowAlarmThreshold OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Supply oltage low alarm threshold, in volts (V)."
+    ::= { cwsXcvrPluggableThresholdEntry 3 }
+
+cwsXcvrThresholdHighWarningThreshold OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Supply voltage high warning threshold, in volts (V)."
+    ::= { cwsXcvrPluggableThresholdEntry 4 }
+
+cwsXcvrThresholdLowWarningThreshold OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Supply voltage low warning threshold, in volts (V)."
+    ::= { cwsXcvrPluggableThresholdEntry 5 }
+
+cwsXcvrAugXcvrPluggableChannelDiagnosticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrAugXcvrPluggableChannelDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrPluggableMIB 14 }
+
+cwsXcvrAugXcvrPluggableChannelDiagnosticsEntry OBJECT-TYPE
+    SYNTAX CwsXcvrAugXcvrPluggableChannelDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrAugXcvrPluggableChannelDiagnosticsTable."
+    AUGMENTS { cwsXcvrChannelDiagnosticsEntry }
+    ::= { cwsXcvrAugXcvrPluggableChannelDiagnosticsTable 1 }
+
+CwsXcvrAugXcvrPluggableChannelDiagnosticsEntry ::= SEQUENCE { 
+    cwsXcvrPluggableChannelDiagnosticsTransmitterFault TruthValue,
+    cwsXcvrPluggableChannelDiagnosticsTxAdaptiveEqFault TruthValue 
+}
+
+cwsXcvrPluggableChannelDiagnosticsTransmitterFault OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "If the xcvr channel transmitter has detected a fault."
+    ::= { cwsXcvrAugXcvrPluggableChannelDiagnosticsEntry 1 }
+
+cwsXcvrPluggableChannelDiagnosticsTxAdaptiveEqFault OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "If the xcvr channel Tx Adaptive EQ Fault has detected a fault. Only applicable for QSFP28. For QSFP+, default value of FALSE will be returned."
+    ::= { cwsXcvrAugXcvrPluggableChannelDiagnosticsEntry 2 }
+
+cwsXcvrPluggableSerdesConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrPluggableSerdesConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrPluggableMIB 15 }
+
+cwsXcvrPluggableSerdesConfigEntry OBJECT-TYPE
+    SYNTAX CwsXcvrPluggableSerdesConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrPluggableSerdesConfigTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrPluggableSerdesConfigTableSnmpKey }
+    ::= { cwsXcvrPluggableSerdesConfigTable 1 }
+
+CwsXcvrPluggableSerdesConfigEntry ::= SEQUENCE { 
+    cwsXcvrPluggableSerdesConfigTableSnmpKey Integer32,
+    cwsXcvrSerdesConfigSerdesTxEq XcvrSerdesTxEq,
+    cwsXcvrSerdesConfigSerdesRxAmplitude XcvrSerdesRxAmplitude,
+    cwsXcvrSerdesConfigSerdesRxEmphasis XcvrSerdesRxEmphasis 
+}
+
+cwsXcvrPluggableSerdesConfigTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrPluggableSerdesConfig"
+    ::= { cwsXcvrPluggableSerdesConfigEntry 1 }
+
+cwsXcvrSerdesConfigSerdesTxEq OBJECT-TYPE
+    SYNTAX XcvrSerdesTxEq
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cwsXcvrPluggableSerdesConfigEntry 2 }
+
+cwsXcvrSerdesConfigSerdesRxAmplitude OBJECT-TYPE
+    SYNTAX XcvrSerdesRxAmplitude
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cwsXcvrPluggableSerdesConfigEntry 3 }
+
+cwsXcvrSerdesConfigSerdesRxEmphasis OBJECT-TYPE
+    SYNTAX XcvrSerdesRxEmphasis
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cwsXcvrPluggableSerdesConfigEntry 4 }
+
+
+
+-- Conformance statements
+cienaWsXcvrPluggableObjects OBJECT IDENTIFIER
+    ::= { cienaWsXcvrPluggableMIB 1 }
+
+cienaWsXcvrPluggableConformance OBJECT IDENTIFIER
+    ::= { cienaWsXcvrPluggableMIB 2 }
+
+cienaWsXcvrPluggableGroups OBJECT IDENTIFIER
+    ::= { cienaWsXcvrPluggableConformance 1 }
+
+cienaWsXcvrPluggableGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsXcvrPluggableVendorIdRevisionCompliance,
+        cwsXcvrPluggableDeviceIdIdentifier,
+        cwsXcvrPluggableDeviceIdIdentifierRaw,
+        cwsXcvrPluggableDeviceIdExtendedIdentifierRaw,
+        cwsXcvrPluggableDeviceIdPowerConsumption,
+        cwsXcvrPluggableDeviceIdClei,
+        cwsXcvrPluggableDeviceIdConnectorTypeRaw,
+        cwsXcvrPluggableVendorTransmitterWavelength,
+        cwsXcvrPluggableVendorTransmitterWavelengthRaw,
+        cwsXcvrPluggableVendorTransmitterEncodingDescription,
+        cwsXcvrPluggableVendorTransmitterEncodingRaw,
+        cwsXcvrPluggableVendorDiagnosticMonitoringDiagnosticMonitoringTypeRaw,
+        cwsXcvrPluggableVendorDiagnosticMonitoringDiagnosticMonitoringImplemented,
+        cwsXcvrPluggableTransceiverCodeSpecificationCompliance,
+        cwsXcvrPluggableTransceiverCodeTransceiverCodeRaw,
+        cwsXcvrPluggableDeviceTechnologyDeviceTechnologyRaw,
+        cwsXcvrPluggableDeviceTechnologyTransmitterTunable,
+        cwsXcvrPluggableDeviceTechnologyMaxCaseTemperature,
+        cwsXcvrPluggableOptionsOptionsRaw,
+        cwsXcvrPluggableOptionsTxinpeqautoadaptcapable,
+        cwsXcvrPluggableOptionsTxinpeqfixedprogramsetting,
+        cwsXcvrPluggableOptionsRxoutemfixedprogramsetting,
+        cwsXcvrPluggableOptionsRxoutamfixedprogramsetting,
+        cwsXcvrPluggableOptionsTxCdrLossOfLockFlag,
+        cwsXcvrPluggableOptionsRxCdrLossOfLockFlag,
+        cwsXcvrPluggableOptionsUserEepromPage02hProvided,
+        cwsXcvrPluggableOptionsAstPage01hProvided,
+        cwsXcvrPluggableSupplyVoltageActual,
+        cwsXcvrStatusHighAlarmStatus,
+        cwsXcvrStatusLowAlarmStatus,
+        cwsXcvrStatusHighWarningStatus,
+        cwsXcvrStatusLowWarningStatus,
+        cwsXcvrThresholdHighAlarmThreshold,
+        cwsXcvrThresholdLowAlarmThreshold,
+        cwsXcvrThresholdHighWarningThreshold,
+        cwsXcvrThresholdLowWarningThreshold,
+        cwsXcvrPluggableChannelDiagnosticsTransmitterFault,
+        cwsXcvrPluggableChannelDiagnosticsTxAdaptiveEqFault,
+        cwsXcvrSerdesConfigSerdesTxEq,
+        cwsXcvrSerdesConfigSerdesRxAmplitude,
+        cwsXcvrSerdesConfigSerdesRxEmphasis
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsXcvrPluggableGroups 1 }
+
+cienaWsXcvrPluggableCompliances OBJECT IDENTIFIER
+    ::= { cienaWsXcvrPluggableConformance 2 }
+
+cienaWsXcvrPluggableCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsXcvrPluggableGroup }
+    ::= { cienaWsXcvrPluggableCompliances 1 }
+
+END -- End module

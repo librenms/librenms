@@ -131,6 +131,13 @@ $config['unflatten']        = "/usr/bin/unflatten";
 $config['neato']            = "/usr/bin/neato";
 $config['sfdp']             = "/usr/bin/sfdp";
 ```
+### Authentication
+
+Generic Authentication settings.
+
+```php
+$config['password']['min_length'] = 8;  // password minimum length for auth that allows user creation
+```
 
 ### Proxy support
 
@@ -580,8 +587,20 @@ $config['bad_entity_sensor_regex'][] = '/Physical id [0-9]+/';
 $config['os']['cisco']['bad_entity_sensor_regex'] = '/Physical id [0-9]+/';
 ```
 
+### Entity sensors limit values
+
+Vendors may give some limit values (or thresholds) for the discovered sensors. By default, when no such value is given,
+both high and low limit values are guessed, based on the value measured during the initial discovery.
+
+When it is preferred to have no high and/or low limit values at all if these are not provided by the vendor, the guess
+method can be disabled:
+```php
+$config['sensors']['guess_limits'] = false;
+```
+
 ### Storage configuration
 
+Mounted storage / mount points to ignore in discovery and polling.
 ```php
 $config['ignore_mount_removable']  = 1;
 $config['ignore_mount_network']    = 1;
@@ -609,7 +628,12 @@ $config['ignore_mount_regexp'][] = "/^\/dev\/md0/";
 $config['ignore_mount_regexp'][] = "/^\/var\/dhcpd\/dev,/";
 $config['ignore_mount_regexp'][] = "/UMA/";
 ```
-Mounted storage / mount points to ignore in discovery and polling.
+
+Custom storage warning percentage
+```php
+$config['storage_perc_warn'] = 60;
+$config['os']['linux']['storage_perc_warn'] = 60;
+```
 
 ### IRC Bot
 

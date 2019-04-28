@@ -240,6 +240,18 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
                     $lldp['lldpRemPortId'] = 'EthPort ' . $lldp['lldpRemPortId'];
                 }
 
+                if ($remote_device['os'] == 'xos') {
+                    $slot_port = explode(':', $lldp['lldpRemPortId']);
+                    if (sizeof($slot_port) == 2) {
+                        $n_slot = (int)$slot_port[0];
+                        $n_port = (int)$slot_port[1];
+                    } else {
+                        $n_slot = 1;
+                        $n_port = (int)$slot_port[0];
+                    }
+                    $lldp['lldpRemPortId'] = (string)($n_slot * 1000 + $n_port);
+                }
+
                 $remote_port_id = find_port_id(
                     $lldp['lldpRemPortDesc'],
                     $lldp['lldpRemPortId'],

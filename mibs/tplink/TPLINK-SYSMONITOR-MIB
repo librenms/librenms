@@ -28,7 +28,7 @@ TPLINK-SYSMONITOR-MIB DEFINITIONS ::= BEGIN
         ORGANIZATION
             "TPLINK"
         CONTACT-INFO
-            "www.tplink.com.cn"
+            "www.tplink.com"
         DESCRIPTION
             "Private MIB for System Monitor."
         ::= { tplinkMgmt 4 }
