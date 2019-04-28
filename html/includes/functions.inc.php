@@ -1636,7 +1636,6 @@ function get_device_name($device)
 /**
  * Returns state generic label from value with optional text
  */
-
 function get_state_label($state_value, $state_text_param = null)
 {
     switch ($state_value) {
@@ -1689,7 +1688,6 @@ function get_sensor_label_color($sensor)
 /**
  * Rounds down to the closest number divisible by 5.
  */
-
 function lowest_five($number)
 {
     return floor($number / 5) * 5;
@@ -1703,7 +1701,7 @@ function lowest_five_minutes($time)
     return $time - ($time % 300);
 }
 
-/*
+/**
  * @params int
  * @return string
  *
@@ -1752,7 +1750,7 @@ function time_to_nfsen_subpath($time)
     }
 }
 
-/*
+/**
  * @params string hostname
  * @return array
  *
@@ -1760,7 +1758,6 @@ function time_to_nfsen_subpath($time)
  * keys for the string are channel names and the values are is the
  * path to the RRD for the channel.
 */
-
 function nfsen_channel_rrds($hostname)
 {
     $channels=array();
@@ -1805,14 +1802,13 @@ function nfsen_channel_rrds($hostname)
     return $channels;
 }
 
-/*
+/**
  * @params string hostname
  * @return string
  *
  * Takes a hostname and transforms it to the name
  * used by nfsen.
 */
-
 function nfsen_hostname($hostname)
 {
     $nfsen_hostname=str_replace('.', Config::get('nfsen_split_char'), $hostname);
@@ -1823,14 +1819,13 @@ function nfsen_hostname($hostname)
     return $nfsen_hostname;
 }
 
-/*
+/**
  * @params string hostname
  * @return string
  *
  * Takes a hostname and returns the path to the nfsen
  * live dir.
 */
-
 function nfsen_live_dir($hostname)
 {
     $hostname=nfsen_hostname($hostname);
@@ -1840,4 +1835,45 @@ function nfsen_live_dir($hostname)
             return $base_dir.'/profiles-data/live/'.$hostname;
         }
     }
+}
+
+/**
+ * Get the unit for the sensor class given as parameter
+ * @param $class
+ * @return string The unit
+ */
+function get_unit_for_sensor_class($class)
+{
+    $units_by_classes = array(
+        'ber'                  => '',
+        'charge'               => '%',
+        'chromatic_dispersion' => 'ps/nm',
+        'cooling'              => 'W',
+        'count'                => '',
+        'current'              => 'A',
+        'dbm'                  => 'dBm',
+        'delay'                => 's',
+        'eer'                  => '',
+        'fanspeed'             => 'rpm',
+        'frequency'            => 'Hz',
+        'humidity'             => '%',
+        'load'                 => '%',
+        'power'                => 'W',
+        'power_consumed'       => 'kWh',
+        'power_factor'         => '',
+        'pressure'             => 'kPa',
+        'quality_factor'       => 'dB',
+        'signal'               => 'dBm',
+        'snr'                  => 'dB',
+        'state'                => '',
+        'temperature'          => '&deg;C',
+        'voltage'              => 'V',
+        'waterflow'            => 'l/m',
+    );
+
+    if (!array_key_exists($class, $units_by_classes)) {
+        return '';
+    }
+
+    return $units_by_classes[$class];
 }
