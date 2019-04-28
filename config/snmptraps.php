@@ -28,5 +28,6 @@ return [
         'FORTINET-CORE-MIB::fnTrapMemThreshold' => \LibreNMS\Snmptrap\Handlers\FnTrapMemThreshold::class,
         'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmTrapLogRateThreshold' => \LibreNMS\Snmptrap\Handlers\FmTrapLogRateThreshold::class,
         'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmTrapLogAlert' => \LibreNMS\Snmptrap\Handlers\FmTrapLogAlert::class,
+        'NETGEAR-SWITCHING-MIB::failedUserLoginTrap' => \LibreNMS\Snmptrap\Handlers\FailedUserLogin::class,
     ]
 ];
