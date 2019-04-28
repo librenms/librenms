@@ -28,5 +28,8 @@ return [
         'FORTINET-CORE-MIB::fnTrapMemThreshold' => \LibreNMS\Snmptrap\Handlers\FnTrapMemThreshold::class,
         'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmTrapLogRateThreshold' => \LibreNMS\Snmptrap\Handlers\FmTrapLogRateThreshold::class,
         'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmTrapLogAlert' => \LibreNMS\Snmptrap\Handlers\FmTrapLogAlert::class,
+        'PowerNet-MIB::outletOn' => \LibreNMS\Snmptrap\Handlers\ApcPduOutletOn::class,
+        'PowerNet-MIB::outletOff' => \LibreNMS\Snmptrap\Handlers\ApcPduOutletOff::class,
+        'PowerNet-MIB::outletReboot' => \LibreNMS\Snmptrap\Handlers\ApcPduOutletReboot::class,
     ]
 ];
