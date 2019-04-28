@@ -18,10 +18,9 @@ if ($device['os_group'] == 'cisco') {
         $ah_f      = zeropad(dechex($a_f));
         $mac       = "$ah_a:$ah_b:$ah_c:$ah_d:$ah_e:$ah_f";
         $mac_cisco = "$ah_a$ah_b.$ah_c$ah_d.$ah_e$ah_f";
-        $mac_cisco = $mac_table[$if][$mac]['ciscomac'];
-        $clean_mac = $mac_table[$if][$mac]['cleanmac'];
-        $ip        = $mac_table[$if][$mac]['ip'];
-        if ($ip && $interface) {
+        $clean_mac = "$ah_a$ah_b$ah_c$ah_d$ah_e$ah_f";
+        
+        if ($interface) {
             $new_mac = str_replace(':', '', $mac);
             // echo($interface['ifDescr'] . " ($if) -> $mac ($oid) -> $ip");
             if (dbFetchCell('SELECT COUNT(*) from mac_accounting WHERE port_id = ? AND mac = ?', array($interface['port_id'], $clean_mac))) {
