@@ -1,6 +1,8 @@
 os: apc
 text: 'APC Management Module'
 type: power
+bad_if:
+    - veya
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
