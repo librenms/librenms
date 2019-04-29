@@ -397,6 +397,7 @@ function add_device()
     $snmp_disable = ($data['snmp_disable']);
     if ($snmp_disable) {
         $additional = array(
+            'sysName'      => $data['sysName'] ? mres($data['sysName']) : '',
             'os'           => $data['os'] ? mres($data['os']) : 'ping',
             'hardware'     => $data['hardware'] ? mres($data['hardware']) : '',
             'snmp_disable' => 1,
@@ -802,7 +803,7 @@ function list_available_health_graphs()
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     check_device_permission($device_id);
     if (isset($router['type'])) {
-        list($dump, $type) = explode('_', $router['type']);
+        list($dump, $type) = explode('device_', $router['type']);
     }
     $sensor_id = $router['sensor_id'] ?: null;
     $graphs    = array();
