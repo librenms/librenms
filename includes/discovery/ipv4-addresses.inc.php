@@ -17,7 +17,8 @@ foreach ($vrfs_lite_cisco as $vrf) {
         list($oid,$ifIndex) = explode(' ', $data);
         $mask               = trim(snmp_get($device, "ipAdEntNetMask.$oid", '-Oqv', 'IP-MIB'));
         $cidr               = IPv4::netmask2cidr($mask);
-        $network            = "$oid/$cidr";
+        $ipv4               = new IPv4("$oid/$cidr");
+        $network            = $ipv4->getNetworkAddress() . '/' . $ipv4->cidr;
 
 
         if (dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifIndex` = ?', array($device['device_id'], $ifIndex)) != '0' && $oid != '0.0.0.0' && $oid != 'ipAdEntIfIndex') {
