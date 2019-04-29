@@ -58,5 +58,9 @@ return [
         'PowerNet-MIB::outletOn' => \LibreNMS\Snmptrap\Handlers\ApcPduOutletOn::class,
         'PowerNet-MIB::outletReboot' => \LibreNMS\Snmptrap\Handlers\ApcPduOutletReboot::class,
         'SNMPv2-MIB::authenticationFailure' => \LibreNMS\Snmptrap\Handlers\AuthenticationFailure::class,
+        'BRIDGE-MIB::newRoot' => \LibreNMS\Snmptrap\Handlers\BridgeNewRoot::class,
+        'BRIDGE-MIB::topologyChange' => \LibreNMS\Snmptrap\Handlers\BridgeTopologyChanged::class,
+        'SNMPv2-MIB::coldStart' => \LibreNMS\Snmptrap\Handlers\ColdBoot::class,
+        'ENTITY-MIB::entConfigChange' => \LibreNMS\Snmptrap\Handlers\EntityDatabaseConfigChanged::class,
     ]
 ];
