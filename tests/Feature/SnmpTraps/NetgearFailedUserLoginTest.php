@@ -34,7 +34,6 @@ class NetgearFailedUserLoginTest extends LaravelTestCase
     public function testManagedSeries()
     {
         $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:44298->[192.168.5.5]:162
@@ -51,7 +50,6 @@ SNMPv2-MIB::snmpTrapOID.0 NETGEAR-SWITCHING-MIB::failedUserLoginTrap";
     public function testSmartSeries()
     {
         $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:1026->[192.168.5.5]:162
