@@ -1,0 +1,198 @@
+-- *****************************************************************
+-- ALS MIB
+-- *****************************************************************
+
+SL-ALS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE, Counter64,
+	Gauge32 			     			FROM SNMPv2-SMI
+	DisplayString, TruthValue, RowStatus
+								  		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex, ifIndex            	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+	sitelight				      		FROM SL-NE-MIB;
+
+slAlsMib MODULE-IDENTITY
+	LAST-UPDATED "200008280000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the SiteLight ALS feature."
+	::= { sitelight 12 }
+        
+slAlsConfig       	OBJECT IDENTIFIER ::= { slAlsMib 1} 
+slAlsTraps			OBJECT IDENTIFIER ::= { slAlsMib 2}
+   
+
+-- ----------------------------------------------------------------
+--
+-- Automatic Laser Shutdown (ALS) Configuration Table
+--
+-- ----------------------------------------------------------------
+ 
+slAlsConfigTable OBJECT-TYPE
+     SYNTAX  SEQUENCE OF SlAlsConfigEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+       "The ALS configuration Table."
+     ::= { slAlsConfig 1 }
+     
+slAlsConfigEntry OBJECT-TYPE
+	SYNTAX  SlAlsConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"The entries exist for active optical inetfaces 
+		ifType = 196. The objects in this table are 
+		used to configure the ALS algorithm."
+	INDEX   { ifIndex }
+	::= { slAlsConfigTable 1 }
+
+SlAlsConfigEntry ::=
+	SEQUENCE {
+		slAlsMode					INTEGER,
+		slAlsLosDeclareTime			INTEGER,
+		slAlsTestPulseTime			INTEGER,
+		slAlsManualPulseTime		INTEGER,
+		slAlsAutomaticPulseTime		INTEGER,
+		slAlsAutomaticDelayTime		INTEGER,
+		slAlsLaserTestActivate		INTEGER,
+		slAlsLaserManualActivate	INTEGER,
+		slAlsOperStatus				INTEGER,
+		slAlsResetParams			INTEGER
+	}
+
+slAlsMode OBJECT-TYPE
+     SYNTAX      INTEGER { 
+     	enable(1), 
+     	disable(2) 
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Enable/Disable the ALS algorithm.
+        When the Laser Admin Status is 'down' the ALS not operational."
+     ::= { slAlsConfigEntry 1 }
+
+slAlsLosDeclareTime OBJECT-TYPE
+     SYNTAX      INTEGER { 
+     	ms500(1), -- 500 ms
+     	ms550(2), -- 550 ms
+     	ms600(3)  -- 600 ms
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Time to declare optical LOS present or clear: 550 +- 50 msec."
+     ::= { slAlsConfigEntry 2 }
+
+slAlsTestPulseTime OBJECT-TYPE
+     SYNTAX      INTEGER { 
+     	s80(1),   -- 80 sec
+     	s90(2),   -- 90 sec
+     	s100(3)   -- 100 sec
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Manual restart for test Pulse time (in manual restart) - 90+-10 sec."
+     ::= { slAlsConfigEntry 3 }
+
+slAlsManualPulseTime OBJECT-TYPE
+     SYNTAX      INTEGER { 
+     	ms1750(1),   -- 1.75 Sec
+     	ms2000(2),   -- 2.0  sec
+     	ms2250(3)    -- 2.25 sec
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Manual restart Pulse time (in manual mode) - 2+-0.25 sec."
+     ::= { slAlsConfigEntry 4 }
+
+slAlsAutomaticPulseTime OBJECT-TYPE
+     SYNTAX      INTEGER { 
+     	ms1750(1),   -- 1.75 Sec
+     	ms2000(2),   -- 2.0  sec
+     	ms2250(3)    -- 2.25 sec
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Automatic restart Pulse time (in automatic mode) - 2+-0.25 sec."
+     ::= { slAlsConfigEntry 5 }
+
+slAlsAutomaticDelayTime OBJECT-TYPE
+     SYNTAX      INTEGER (60..300)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "In Automatic mode. The delay between two laser re-activations."
+     ::= { slAlsConfigEntry 6 }
+
+slAlsLaserTestActivate OBJECT-TYPE
+     SYNTAX      INTEGER { activate(1) }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Activate the laser for test operation."
+     ::= { slAlsConfigEntry 7 }
+
+slAlsLaserManualActivate OBJECT-TYPE
+     SYNTAX      INTEGER { activate(1) }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Activate the laser manual operation."
+     ::= { slAlsConfigEntry 8 }
+
+slAlsOperStatus OBJECT-TYPE
+     SYNTAX      INTEGER { 
+     	active(1), 
+     	inactive(2) 
+     }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The operational status of the ALS algorithm.
+        When the Laser Admin Status is 'down' the ALS not operational."
+     ::= { slAlsConfigEntry 9 }
+
+slAlsResetParams OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    resetCounters(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this variable to 1 will reset the ALS 
+        parameters to the factory defaults."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.1."
+    ::= { slAlsConfigEntry 10 }
+
+
+-- ----------------------------------------------------------------
+--
+-- ALS Traps
+--
+-- ----------------------------------------------------------------
+
+slAlsStatusChangeTrap NOTIFICATION-TYPE
+    OBJECTS { ifIndex, slAlsOperStatus }
+	STATUS  current
+	DESCRIPTION
+		"A slAlsStatusChangeTrap is sent when the TX laser status is changed."
+	::= { slAlsTraps 1 }
+
+
+END
+
+
+
