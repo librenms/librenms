@@ -40,6 +40,6 @@ class FailedUserLogin implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        Log::event('SNMP Trap: Failed User Login: ' . $device->displayName(), $device->device_id, 'auth', 3);
+        Log::event('SNMP Trap: Failed User Login: ' . $device->displayName(), $device->device_id, 'auth', 4);
     }
 }
