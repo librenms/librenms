@@ -34,7 +34,6 @@ class ApcPduOutletTest extends LaravelTestCase
     public function testOutletOff()
     {
         $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -54,7 +53,6 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
     public function testOutletOn()
     {
         $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -74,7 +72,6 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
     public function testOutletReboot()
     {
         $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
